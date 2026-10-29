@@ -178,6 +178,6 @@
         "requirements": "RY",
         "faction": "valhavn",
         "source": "beans",
-        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet."
+        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet.\nSPACE CANNON 5, PLANETARY SHIELD"
     }
 ]

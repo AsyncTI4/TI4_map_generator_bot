@@ -144,8 +144,16 @@
         "id": "reave",
         "name": "Reave",
         "faction": "valhavn",
-        "window": "Once per turn, when you would gain control of a planet controlled by another player",
-        "windowEffect": "You may choose to not gain control instead. If you do, destroy all of your ground forces on that planet and gain trade goods equal to its resource value.",
+        "window": "Once per turn, when you would win a ground combat on a planet you do not control",
+        "windowEffect": "You may destroy each of your units on that planet to gain trade goods equal to that planet's resource value; that combat ends in a draw.",
+        "source": "beans"
+    },
+    {
+        "id": "bloodlust",
+        "name": "Bloodlust",
+        "faction": "valhavn",
+        "window": "After you commit ground forces to a planet during a tactical action",
+        "windowEffect": "If there are no units on that planet, resolve ground combat.",
         "source": "beans"
     }
 ]

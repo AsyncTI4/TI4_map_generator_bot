@@ -255,8 +255,8 @@
     "type": "commander",
     "name": "Styrmir Ragnarsson",
     "title": "Fylkir",
-    "abilityWindow": "After you take control of a planet that was controlled by another player:",
-    "abilityText": "Place 1 infantry from your reinforcements onto that planet.\n\nOther players cannot use their units SPACE CANNON ability against your infantry.",
+    "abilityWindow": "When you roll for your infantry’s text ability:",
+    "abilityText": "Add +X to the result of each die, where X is the number of PDS units you have on the game board.\n\nOther players cannot use their units SPACE CANNON ability against your infantry.",
     "unlockCondition": "Have 3 infantry on each of 3 planets that contain your PDS units.",
     "source": "beans",
     "flavorText": "Fylking stendur sem einn maður, og enginn fellur einn."

@@ -72,7 +72,7 @@
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "text": "When you commit 1 or more infantry during invasion on a planet you do not control\n\nPlace this card face-up in your play area. You may commit 2 infantry from your reinforcements onto that planet.\n\nAt the end of your turn, return this card to the Valhavn player.",
+        "text": "When you commit 1 or more infantry during invasion on a planet you do not control\n\nYou may commit 2 infantry from your reinforcements onto that planet.\n\nAt the end of your turn, return this card to the Valhavn player.",
         "source": "beans"
     }
 ]

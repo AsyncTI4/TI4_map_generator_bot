@@ -442,7 +442,7 @@
     "source": "beans",
     "faction": "valhavn",
     "spaceCannonHitsOn": 5,
-    "spaceCannonDieCount": 2,
+    "spaceCannonDieCount": 1,
     "deepSpaceCannon": true,
     "planetaryShield": true,
     "isStructure": true,

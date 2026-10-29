@@ -92,7 +92,7 @@
             "CYBERNETIC",
             "PROPULSION"
         ],
-        "text": "After 1 of your units produces at least 1 hit using their SPACE CANNON ability during movement in a system that contains your ships: You may cancel  1 of those hits to move 1 ship from that unit's system into the active system. ",
+        "text": "After 1 or more of your units produces a hit during SPACE CANNON OFFENSE in a system containing your ships: You may cancel 1 of those hits to move 1 ship from that unit's system into the active system.",
         "source": "beans"
     }
 ]
