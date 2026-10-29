@@ -3045,14 +3045,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void exhaustTech(String tech) {
-        if (getTechs().contains(tech) && !getExhaustedTechs().contains(tech)) {
-            getExhaustedTechs().add(tech);
+        if (!getTechs().contains(tech) || getExhaustedTechs().contains(tech)) return;
 
-            if (game != null) {
-                if (hasUnexhaustedLeader("revenantagent")) {
-                    RevenantAgent.offerAfterExhaustingTech(this, tech);
-                }
-            }
+        getExhaustedTechs().add(tech);
+
+        if (game != null && hasUnexhaustedLeader("revenantagent")) {
+            RevenantAgent.offerAfterExhaustingTech(this, tech);
         }
         if (hasUnlockedBreakthrough("kolumebt")) {
             gainCommodities(1);
