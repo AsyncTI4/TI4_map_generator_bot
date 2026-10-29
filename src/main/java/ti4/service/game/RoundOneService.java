@@ -98,7 +98,7 @@ public class RoundOneService {
             Collections.shuffle(factions);
             factions.remove("firmament");
             for (Player player : game.getRealPlayers()) {
-                if(player.getFaction().equalsIgnoreCase("firmament")){
+                if (player.getFaction().equalsIgnoreCase("firmament")) {
                     continue;
                 }
                 player.setLeaders(new ArrayList<>());
