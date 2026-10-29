@@ -1283,7 +1283,7 @@ public class StartCombatService {
                         buttons);
             }
             if (player == p2
-                    && player.hasUnlockedBreakthrough("dreambt")
+                    && player.hasReadyBreakthrough("dreambt")
                     && tile.getPosition().equals(game.getActiveSystem())
                     && CommandCounterHelper.hasCC(player, tile)
                     && DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
