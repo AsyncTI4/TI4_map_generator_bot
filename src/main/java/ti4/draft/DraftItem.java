@@ -224,6 +224,13 @@ public abstract class DraftItem {
     }
 
     @JsonIgnore
+    public List<TextDisplay> getPlainTextDisplays(Game game) {
+        String descr = getLongDescriptionImpl(game).trim().replace("\n> ", "\n").replace("\n", "\n> ");
+        String details = getTitle(game) + System.lineSeparator() + "> " + descr;
+        return List.of(TextDisplay.of(details));
+    }
+
+    @JsonIgnore
     public String getLongDescription() {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
         if (hasAdditionalComponents()) {

@@ -165,6 +165,10 @@ public class FrankenDraft extends BagDraft {
                     && model.getSource() == ComponentSource.theodisi) {
                 return false;
             }
+            if ((game == null || game.initializeFrankenSettings().isWftvEnabled())
+                    && model.getSource() == ComponentSource.wftv) {
+                return false;
+            }
             return !model.getSource().isPok();
         });
         return factionSet;

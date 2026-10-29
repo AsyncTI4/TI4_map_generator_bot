@@ -1,0 +1,120 @@
+[
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "primordial",
+        "optionalSwaps": ["PN:bapnkalo"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "bapnkalo",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "scattered_legions",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "vyserixhero",
+        "alternateText": "[Franken only] Attach this card to 1 non-home planet on the game board that does not have a technology specialty. This planet is treated as having all four technology specialties. If you control that planet, you may place 1 PDS on that planet.",
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "marked_prey",
+        "additionalComponents": ["ABILITY:confirmed_kill"],
+        "optionalSwaps": ["TECH:bazephy", "FLAGSHIP:zephyrion_flagship", "AGENT:zephyrionagent", "HERO:zephyrionhero"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "confirmed_kill",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "bazephy",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "zephyrion_flagship",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "zephyrionagent",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "zephyrionhero",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "phantom_energy",
+        "optionalSwaps": ["FLAGSHIP:tyris_flagship"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "tyris_flagship",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "expanding_minds",
+        "additionalComponents": [
+            "ABILITY:initiation",
+            "ABILITY:multitasking"
+        ],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "initiation",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "multitasking",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "patience",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "detachment",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "strategic_fluidity",
+        "additionalComponents": ["ABILITY:detachment"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "xan_flagship",
+        "undraftable": true,
+        "source": "wftv"
+    }
+]
