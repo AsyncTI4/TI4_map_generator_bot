@@ -433,6 +433,30 @@ public class MessageHelper {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    public static void sendEphemeralFileInResponseToButtonPressComplete(
+            FileUpload fileUpload, GenericInteractionCreateEvent event) {
+        if (fileUpload == null) {
+            BotLogger.error(new LogOrigin(event), "FileUpload null");
+            return;
+        }
+        if (event instanceof ButtonInteractionEvent button) {
+            String msg = "Here is your requested image";
+            if (button.getButton().getCustomId().contains("ringTile")) {
+                msg = "Here is a picture of the active system";
+            }
+            button.getHook()
+                    .sendMessage(msg)
+                    .addFiles(fileUpload)
+                    .setEphemeral(true)
+                    .complete();
+        } else if (event instanceof SlashCommandInteractionEvent slash)
+            slash.getHook()
+                    .sendMessage("Here is your requested image")
+                    .addFiles(fileUpload)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     public static void sendFileToChannelAndAddLinkToButtons(
             MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
         sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons, null);

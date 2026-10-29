@@ -1064,6 +1064,8 @@ public final class ButtonHelperTacticalAction {
         if (FOWPlusService.isVoid(game, pos)) {
             tile = FOWPlusService.voidTile(pos);
         }
+        FileUpload file = SystemContextImage.upload(game, event, 1, tile.getPosition(), player);
+
         StringBuilder message = new StringBuilder(player.getRepresentationNoPing() + " activated "
                 + tile.getRepresentationForButtons(game, player) + ".");
 
@@ -1371,10 +1373,9 @@ public final class ButtonHelperTacticalAction {
         // Send buttons to move
 
         // send ephemeral image
-        FileUpload file = SystemContextImage.upload(game, event, 1, tile.getPosition(), player);
-
-        MessageHelper.sendEphemeralFileInResponseToButtonPress(file, event);
-
+        if (!game.isFowMode()) {
+            MessageHelper.sendEphemeralFileInResponseToButtonPressComplete(file, event);
+        }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",

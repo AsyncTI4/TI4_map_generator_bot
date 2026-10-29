@@ -27,6 +27,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -978,6 +979,9 @@ public class ButtonHelperHeroes {
         String planet = buttonID.split("_")[1];
         Planet unitHolder = game.getPlanetsInfo().get(planet);
         unitHolder.addToken("token_dmz.png");
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            unitHolder.removeAllUnits(p2.getColor());
+        }
         unitHolder.removeAllUnits(player.getColor());
         if (player.getExhaustedPlanets().contains(planet)) {
             PlanetService.refreshPlanet(player, planet);
@@ -1297,6 +1301,7 @@ public class ButtonHelperHeroes {
                 + Mapper.getTech(techID).getName() + "_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
+        DSHelperBreakthroughs.doLanefirBtCheck(player.getGame(), player);
     }
 
     @ButtonHandler("dwsHeroPurge_")

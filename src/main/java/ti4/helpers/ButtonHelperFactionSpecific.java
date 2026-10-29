@@ -49,6 +49,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -388,6 +389,7 @@ public final class ButtonHelperFactionSpecific {
         }
         BlueReverieHelper.checkXinHarmony(game);
         ButtonHelper.deleteMessage(event);
+        DSHelperBreakthroughs.doLanefirBtCheck(player.getGame(), player);
     }
 
     @ButtonHandler("useNekroNullRef")

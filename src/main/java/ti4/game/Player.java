@@ -3053,7 +3053,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 }
             }
         }
-        if (hasReadyBreakthrough("kolumebt")) {
+        if (hasUnlockedBreakthrough("kolumebt")) {
             gainCommodities(1);
             MessageHelper.sendMessageToChannel(
                     getCorrectChannel(), getRepresentationNoPing() + " gained 1 commodity due to Kolume breakthrough.");
