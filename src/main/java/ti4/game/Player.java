@@ -3148,6 +3148,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void refreshPlanet(String planet) {
         if (getExhaustedPlanets().removeIf(planet::equals)) {
             IxthLegendaryButtonHandler.onPlanetReadied(game, this, planet);
+            if ("mobilemountain".equals(planet)) {
+                StonebornUnitHandler.repairMobileMountain(game, this);
+            }
         }
     }
 

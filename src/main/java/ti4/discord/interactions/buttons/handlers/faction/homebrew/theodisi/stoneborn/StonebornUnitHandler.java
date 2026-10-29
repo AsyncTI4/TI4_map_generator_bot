@@ -212,6 +212,40 @@ public class StonebornUnitHandler {
                 .ifPresent(tile -> tile.addUnitDamage(Constants.SPACE, mobileMountain, 1));
     }
 
+    public static void repairMobileMountain(Game game, Player player) {
+        if (game == null
+                || player == null
+                || !player.hasPlanet("mobilemountain")
+                || !player.hasUnit("stoneborn_flagship")) {
+            return;
+        }
+        UnitKey mobileMountain = Units.getUnitKey(UnitType.Flagship, player.getColorID());
+        game.getTileMap().values().stream()
+                .filter(tile -> tile.getSpaceUnitHolder().getDamagedUnitCount(mobileMountain) > 0)
+                .findFirst()
+                .ifPresent(tile -> tile.removeUnitDamage(Constants.SPACE, mobileMountain, 1));
+    }
+
+    public static void syncMobileMountainDamage(Game game, Player player, UnitKey unitKey) {
+        if (game == null
+                || player == null
+                || !player.hasPlanet("mobilemountain")
+                || !player.hasUnit("stoneborn_flagship")) {
+            return;
+        }
+        UnitKey mobileMountain = Units.getUnitKey(UnitType.Flagship, player.getColorID());
+        if (!mobileMountain.equals(unitKey)) {
+            return;
+        }
+        boolean damaged = game.getTileMap().values().stream()
+                .anyMatch(tile -> tile.getSpaceUnitHolder().getDamagedUnitCount(mobileMountain) > 0);
+        if (damaged) {
+            player.exhaustPlanet("mobilemountain");
+        } else {
+            player.refreshPlanet("mobilemountain");
+        }
+    }
+
     private static boolean isMobileMountainOnBoard(Game game, Player player) {
         UnitKey mm = Units.getUnitKey(UnitType.Flagship, player.getColorID());
         return game.getTileMap().values().stream()

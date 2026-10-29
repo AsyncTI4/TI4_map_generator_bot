@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -91,6 +92,7 @@ class MahactHeroButtonHandler {
             AddUnitService.addUnits(event, tile2, game, player.getColor(), totalUnits + " " + unitName);
             if (damagedUnits > 0) {
                 game.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
+                StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
             }
         }
         // this will catch all the capacity units left behind in the previous iteration
@@ -115,6 +117,7 @@ class MahactHeroButtonHandler {
             AddUnitService.addUnits(event, tile2, game, player.getColor(), totalUnits + " " + unitName);
             if (damagedUnits > 0) {
                 game.getTileByPosition(pos2).addUnitDamage(Constants.SPACE, unitKey, damagedUnits);
+                StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
             }
         }
 

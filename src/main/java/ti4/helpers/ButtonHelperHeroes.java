@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -1469,6 +1470,7 @@ public class ButtonHelperHeroes {
                                 && unitModel.getSustainDamage()
                                 && (player != nivyn || !"mech".equalsIgnoreCase(unitModel.getBaseType()))) {
                             tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
+                            StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                         }
                     }
                 }
@@ -1531,6 +1533,7 @@ public class ButtonHelperHeroes {
                 int totalUnits = unitEntry.getValue() - damagedUnits;
                 if (totalUnits > 0 && unitModel.getIsShip()) {
                     tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
+                    StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
                 }
             }
         }
