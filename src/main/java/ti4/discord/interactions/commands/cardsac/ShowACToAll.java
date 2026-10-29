@@ -10,6 +10,8 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 
 class ShowACToAll extends GameStateSubcommand {
 
@@ -44,6 +46,8 @@ class ShowACToAll extends GameStateSubcommand {
                 + player.getUserName() + "\n" + "Shown Action Card:"
                 + "\n" + Mapper.getActionCard(acID).getRepresentation(game)
                 + "\n";
+        KnownCardsService.recordCardShownToAll(
+                game, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         player.setActionCard(acID);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }

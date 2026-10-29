@@ -74,6 +74,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
@@ -2711,6 +2713,8 @@ public class ActionCardHelper {
 
         player.removeActionCard(handIndex);
         p2.setActionCard(acID);
+        KnownCardsService.recordCardPassed(
+                player, p2, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         ButtonHelper.checkACLimit(game, p2);
         sendActionCardInfo(game, player);
         sendActionCardInfo(game, p2);
@@ -2736,6 +2740,8 @@ public class ActionCardHelper {
         }
         player.removeActionCard(actionCardsMap.get(acID));
         player2.setActionCard(acID);
+        KnownCardsService.recordCardPassed(
+                player, player2, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         sendActionCardInfo(game, player2);
         ButtonHelper.checkACLimit(game, player2);
         sendActionCardInfo(game, player);
@@ -2758,6 +2764,7 @@ public class ActionCardHelper {
                             + " Action Cards because they have _Astromantic Cloak (Steel)!");
             return;
         }
+        KnownCardsService.recordHandShown(player2, player, KnownCardType.ACTION_CARD);
         StringBuilder sb = new StringBuilder();
         StringBuilder sa = new StringBuilder();
         sa.append("Your action cards were shown to: ")
