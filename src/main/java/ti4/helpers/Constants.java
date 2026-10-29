@@ -290,6 +290,7 @@ public final class Constants {
     public static final String SEARCH_EVENTS = "events";
     public static final String SEARCH_EXPLORES = "explores";
     public static final String SEARCH_FACTIONS = "factions";
+    public static final String SEARCH_FACTION_COMPONENTS = "faction_components";
     // no /search franken_errata yet
     // no /search generic_cards yet
     public static final String SEARCH_LEADERS = "leaders";
