@@ -447,5 +447,39 @@
     "planetaryShield": true,
     "isStructure": true,
     "ability": "During the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet."
+  },
+  {
+    "id": "migo_flagship",
+    "baseType": "flagship",
+    "asyncId": "fs",
+    "name": "The Whisper",
+    "source": "beans",
+    "faction": "migo",
+    "moveValue": 2,
+    "capacityValue": 3,
+    "capacityUsed": 1,
+    "cost": 8,
+    "combatHitsOn": 8,
+    "combatDieCount": 2,
+    "sustainDamage": true,
+    "canBeDirectHit": true,
+    "isShip": true,
+    "ability": "At the start of a combat in this unit’s system, choose 1 non-unit upgrade technology in your opponent’s play area. That technology is treated as blank during this combat.",
+    "notes": "Probably won't be automated, just declare what tech you want them to treat as blank."
+  },
+  {
+    "id": "migo_mech",
+    "baseType": "mech",
+    "asyncId": "mf",
+    "name": "Nevermen",
+    "source": "beans",
+    "faction": "migo",
+    "capacityUsed": 1,
+    "cost": 2,
+    "combatHitsOn": 6,
+    "combatDieCount": 1,
+    "sustainDamage": true,
+    "isGroundForce": true,
+    "ability": "If you have 2 or more of this unit on a planet, that planet is counted as having a technology specialty of any color."
   }
 ]

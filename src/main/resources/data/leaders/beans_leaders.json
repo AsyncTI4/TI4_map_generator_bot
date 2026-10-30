@@ -273,5 +273,42 @@
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Ég yrki ekki um sigra. Ég kalla þá fram."
+  },
+  {
+    "id": "migoagent",
+    "faction": "migo",
+    "type": "agent",
+    "name": "N'ghaath",
+    "title": "The Anatomist",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Exhaust this card and choose 1 other player. That player may exhaust a planet that has a technology specialty to research 1 technology of that color. If they do, gain 1 command token or 2 trade goods.",
+    "unlockCondition": "Always Unlocked",
+    "source": "beans",
+    "flavorText": "Khal na'th. Yth na'th"
+  },
+  {
+    "id": "migocommander",
+    "faction": "migo",
+    "type": "commander",
+    "name": "Khal'Yth",
+    "title": "The Preserver",
+    "abilityWindow": "Ongoing",
+    "abilityText": "Apply +1 to the resource and influence values of planets you control that have technology specialties.",
+    "unlockCondition": "Control 3 planets that have technology specialties.",
+    "source": "beans",
+    "flavorText": "Keth y’gol. Keth n’gha. Keth vorr."
+  },
+  {
+    "id": "migohero",
+    "faction": "migo",
+    "type": "hero",
+    "name": "Y'goloth",
+    "title": "The Ascendant Mind",
+    "abilityName": "Xenobiological Feedback - Perfect Loop",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Ready up to 4 technologies or planets that have a technology specialty.",
+    "unlockCondition": "Have 3 scored objectives.",
+    "source": "beans",
+    "flavorText": "Y’gol na khal. Y’gol na keth. Y’gol na thuun."
   }
 ]

@@ -378,5 +378,47 @@
         "complexity": "Medium",
         "preferredColours": ["gcr", "nvy", "gray", "blu"],
         "source": "beans"
+    },
+    {
+        "alias": "migo",
+        "factionName": "Mi-Go Yth",
+        "homeSystem": "be9",
+        "startingFleet": "2 cv, 1 dd, 2 ff, 4 inf m, 1 sd m",
+        "commodities": 3,
+        "factionTech": [
+            "bemigob",
+            "bemigog"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "yuggoth"
+        ],
+        "abilities": [
+            "harvest",
+            "pseudomorphism"
+        ],
+        "leaders": [
+            "migoagent",
+            "migocommander",
+            "migohero"
+        ],
+        "promissoryNotes": [
+            "bepnmigo"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "migo_flagship",
+            "infantry",
+            "migo_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["blk", "copper", "gold", "eme"],
+        "source": "beans"
     }
 ]

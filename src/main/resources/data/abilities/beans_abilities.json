@@ -145,7 +145,7 @@
         "name": "Reave",
         "faction": "valhavn",
         "window": "Once per turn, when you would win a ground combat on a planet you do not control",
-        "windowEffect": "You may destroy each of your units on that planet to gain trade goods equal to that planet's resource value; that combat ends in a draw and you do not gain control of that planet.",
+        "windowEffect": "You may destroy each of your units on that planet to gain trade goods equal to that planet's resource value; that combat ends in a draw.",
         "source": "beans"
     },
     {
@@ -154,6 +154,58 @@
         "faction": "valhavn",
         "window": "Once per action, after you commit ground forces to a planet during a tactical action",
         "windowEffect": "If there are no units on that planet, you may resolve ground combat.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest",
+        "name": "Harvest",
+        "faction": "migo",
+        "window": "After you gain control of a planet that has a technology specialty",
+        "windowEffect": "Gain the corresponding harvest card and place it in your play area. Any time you control no planets that have a technology specialty that matches a harvest card in your play area, return that harvest card to your reinforcements.",
+        "source": "beans"
+    },
+    {
+        "id": "pseudomorphism",
+        "name": "Pseudomorphism",
+        "faction": "migo",
+        "window": "When you spend resources to research a technology",
+        "windowEffect": "If you exhaust a planet to use its technology specialty to ignore any prerequisites, you may reduce the spent resources by that planet’s influence value.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_blue",
+        "name": "Harvest - Propulsion",
+        "shortName": "Harvest\nBlue",
+        "faction": "migo",
+        "window": "After you activate a system",
+        "windowEffect": "You may exhaust this card to apply +1 to the MOVE value of 1 of your ships during this tactical action.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_green",
+        "name": "Harvest - Biotic",
+        "shortName": "Harvest\nGreen",
+        "faction": "migo",
+        "window": "After you exhaust a planet that has a technology specialty",
+        "windowEffect": "You may exhaust this card to draw 1 action card.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_red",
+        "name": "Harvest - Warfare",
+        "shortName": "Harvest\nRed",
+        "faction": "migo",
+        "window": "After you roll 1 or more dice during combat",
+        "windowEffect": "You may exhaust this card to reroll up to 2 of those dice.",
+        "source": "beans"
+    },
+    {
+        "id": "harvest_yellow",
+        "name": "Harvest - Cybernetic",
+        "shortName": "Harvest\nYellow",
+        "faction": "migo",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "windowEffect": "You may exhaust this card to apply +1 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "source": "beans"
     }
 ]
