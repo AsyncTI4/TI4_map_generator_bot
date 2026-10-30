@@ -245,8 +245,7 @@ class DiplomacyUseTest extends BaseTi4Test {
     }
 
     // With 4 command tokens in reinforcements, its own Leadership primary gains 3 for free and leaves room to buy only
-    // 1 more; following someone else's Leadership could buy 2 with Rarron and Meer's 7 influence. The holder's free
-    // tokens are plenty, so the one it buys counts at half its 3 influence (rounded to 2).
+    // 1 more; following someone else's Leadership could buy 2 with Rarron and Meer's 7 influence.
     @Test
     void countsOnlyTheTokensItsOwnLeadershipLeavesRoomToBuy() {
         homeWithoutDock();
@@ -258,8 +257,7 @@ class DiplomacyUseTest extends BaseTi4Test {
         assertThat(StrategyCardRules.reinforcements(test.game, test.nekro)).isEqualTo(4);
 
         assertThat(best())
-                .hasValueSatisfying(choice -> assertThat(choice.use()).isEqualTo((int)
-                        Math.round(TokenPurchase.INFLUENCE_PER_TOKEN * TokenPurchase.PLENTIFUL_TOKEN_SHARE)));
+                .hasValueSatisfying(choice -> assertThat(choice.use()).isEqualTo(TokenPurchase.INFLUENCE_PER_TOKEN));
 
         test.nekro.removeSC(LEADERSHIP);
         test.sol.addSC(LEADERSHIP);

@@ -20,7 +20,6 @@ public class TokenPurchase {
     static final int INFLUENCE_PER_TOKEN = 3;
     static final int MAX_TOKENS = 3;
     static final int CUSTODIANS_COST = 6;
-    static final double PLENTIFUL_TOKEN_SHARE = 0.5;
 
     record Purchase(int tokens, Wallet.Payment payment) {}
 
@@ -60,16 +59,7 @@ public class TokenPurchase {
                 game, seat, reinforcements, wallet.without(expedition.get().payment()));
         int tokensGivenUp =
                 spendingAll.get().tokens() - keeping.map(Purchase::tokens).orElse(0);
-        return tokensGivenUp * tokenWorth(game, seat) < expedition.get().worth() ? keeping : spendingAll;
-    }
-
-    static double tokenWorth(Game game, Player seat) {
-        double worth = CardValueScale.HELD_TOKEN;
-        return holdsLeadership(game, seat) ? worth * PLENTIFUL_TOKEN_SHARE : worth;
-    }
-
-    static boolean holdsLeadership(Game game, Player seat) {
-        return seat.getSCs().stream().anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.LEADERSHIP);
+        return tokensGivenUp * CardValueScale.HELD_TOKEN < expedition.get().worth() ? keeping : spendingAll;
     }
 
     private static Optional<Purchase> purchase(Game game, Player seat, int reinforcements, Wallet wallet) {

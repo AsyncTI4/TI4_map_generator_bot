@@ -108,17 +108,6 @@ class TechSkipExpeditionOverTokensTest extends BaseTi4Test {
         assertThat(tokensBoughtWithThePrimary()).isEqualTo(2);
     }
 
-    // A seat that holds Leadership has plenty of tokens coming, so a bought token is worth half its price.
-    @Test
-    void tokensAreWorthLessToTheLeadershipHolder() {
-        assertThat(TokenPurchase.tokenWorth(test.game, sardakk))
-                .isEqualTo(CardValueScale.HELD_TOKEN * TokenPurchase.PLENTIFUL_TOKEN_SHARE);
-
-        sardakk.removeSC(LEADERSHIP);
-        test.sol.addSC(LEADERSHIP);
-        assertThat(TokenPurchase.tokenWorth(test.game, sardakk)).isEqualTo(CardValueScale.HELD_TOKEN);
-    }
-
     // With both planets spent, Diplomacy readies Meer for the slice, and Meer's influence is not counted as Leadership
     // tokens because the slice claims it.
     @Test
