@@ -39,6 +39,9 @@ public class HomeSystemDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
+        if (Mapper.getFaction(getItemId()) == null) {
+            return getItemId() + " HS";
+        }
         return Mapper.getFaction(getItemId()).getShortName() + " HS";
     }
 
