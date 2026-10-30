@@ -330,7 +330,7 @@ public class NekroLeaderRules {
         return units;
     }
 
-    private static boolean ownsReadyAgent(Player seat) {
+    public static boolean ownsReadyAgent(Player seat) {
         return seat.hasLeader(AGENT) && seat.hasUnexhaustedLeader(AGENT);
     }
 

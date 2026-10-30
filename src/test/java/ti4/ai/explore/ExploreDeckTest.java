@@ -109,6 +109,8 @@ class ExploreDeckTest extends BaseTi4Test {
     // Lost Crew draws two action cards, a Derelict Vessel a secret objective.
     @Test
     void drawsAreWorthTheirCards() {
+        // Nekro Malleon would lift a drawn action card to 2 trade goods; this case values the cards without it.
+        test.nekro.getLeader("nekroagent").orElseThrow().setExhausted(true);
         deck("lc1");
         assertThat(value("frontier")).isCloseTo(2.0, within(EXACT));
 

@@ -3,6 +3,7 @@ package ti4.ai.agenda;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardPrior;
+import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.strategy.CommandTokenValue;
@@ -37,7 +38,7 @@ public class RiderPayoff {
             case IMPERIAL -> ScoringStakes.scoreValue(game, player, POINT);
             case TRADE ->
                 TRADE_GOODS + ScoringStakes.scoreValue(game, player, SpendUnlock.pointDelta(game, player, TRADE_GOODS));
-            case POLITICS -> POLITICS_CARDS * ActionCardPrior.AVERAGE_CARD + SpeakerTokenValue.of(game, player);
+            case POLITICS -> DrawnCardValue.of(game, player, POLITICS_CARDS) + SpeakerTokenValue.of(game, player);
             case TECHNOLOGY ->
                 StrategyCardRules.cannotResearch(player)
                         ? CommandTokenValue.tactic(game, player, LEADERSHIP_TOKENS)

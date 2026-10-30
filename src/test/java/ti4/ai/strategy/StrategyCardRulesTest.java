@@ -1009,7 +1009,7 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 .hasValueSatisfying(id -> assertThat(id).startsWith("construction_"));
     }
 
-    // Without Form a Spy Network, Politics is worth a strategy token only as a spare: 3 tokens leave 2 after it.
+    // Without Form a Spy Network, Politics takes a strategy token no other card this round wants.
     @Test
     void followsPoliticsWithSpareTokensAndRoomForTwoCards() {
         politicsPlayed(3);
@@ -1018,16 +1018,22 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 .contains("sc_ac_draw");
     }
 
-    // One spare token is not enough for extra cards: alone, or as the second of two when the other is kept for
-    // Imperial still to come.
+    // Live game aiplay1: Nekro ended round 1 with an unused strategy token after skipping Politics. A token no other
+    // card
+    // this round wants goes on Politics, even the last one; a token another card still to come wants (Imperial here)
+    // is kept for it.
     @Test
-    void keepsItsOnlySpareTokenInsteadOfFollowingPolitics() {
+    void followsPoliticsWithATokenNoOtherCardWants() {
         politicsPlayed(1);
-        assertThat(StrategyCardRules.follow(test.context(politicsCard()))).isEmpty();
+        assertThat(StrategyCardRules.follow(test.context(politicsCard())).map(AiTestGame::pressedId))
+                .contains("sc_ac_draw");
 
         test.sol.addSC(IMPERIAL);
-        test.nekro.setStrategicCC(2);
         assertThat(StrategyCardRules.follow(test.context(politicsCard()))).isEmpty();
+
+        test.nekro.setStrategicCC(2);
+        assertThat(StrategyCardRules.follow(test.context(politicsCard())).map(AiTestGame::pressedId))
+                .contains("sc_ac_draw");
     }
 
     // The bot draws the cards even for a player with no strategy token left, so the seat must not press it.
@@ -1050,7 +1056,7 @@ class StrategyCardRulesTest extends BaseTi4Test {
     }
 
     // Holding Form a Spy Network with 1 card, a single spare token is worth drawing towards it. Under Sanctions the
-    // hand limit is 3, so the secret can never be completed and the usual 2-token rule applies.
+    // hand limit is 3, so the secret can never be completed and the token is kept for Imperial, still to come.
     @Test
     void ignoresFormASpyNetworkUnderSanctions() {
         test.nekro.setSecret("fsn");
@@ -1060,6 +1066,7 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 .contains("sc_ac_draw");
 
         test.game.addLaw("sanctions", null);
+        test.sol.addSC(IMPERIAL);
         assertThat(StrategyCardRules.follow(test.context(politicsCard()))).isEmpty();
     }
 

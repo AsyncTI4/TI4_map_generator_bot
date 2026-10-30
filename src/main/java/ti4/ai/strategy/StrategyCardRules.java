@@ -11,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
+import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -103,7 +104,6 @@ public class StrategyCardRules {
     private static final String STRATEGIZE_SECRET_BUTTON = "non_sc_draw_so";
     private static final String HOLD_NO_ACTION_CARDS = "dont_fsn";
     private static final int POLITICS_DRAW = 2;
-    private static final int EXTRA_TOKENS = 2;
     private static final int MIN_HAND_ROOM_EXTRA = 2;
     private static final List<StrategyCard> FOLLOW_PRIORITY = List.of(
             StrategyCard.IMPERIAL,
@@ -483,6 +483,21 @@ public class StrategyCardRules {
         return saved;
     }
 
+    private static int tokensWantedByOtherCards(AiTurnContext context, StrategyCard card) {
+        Game game = context.game();
+        int wanted = 0;
+        for (Player other : game.getRealPlayers()) {
+            if (other.getUserID().equals(context.seat().getUserID())) continue;
+            for (int initiative : other.getSCs()) {
+                StrategyCard otherCard = StrategyCard.of(game, initiative);
+                if (otherCard != card && stillToFollow(context, initiative) && wantsToFollow(context, otherCard)) {
+                    wanted++;
+                }
+            }
+        }
+        return wanted + ScarToken.kept(game, context.seat());
+    }
+
     private static boolean stillToFollow(AiTurnContext context, int initiative) {
         if (!context.game().getPlayedSCs().contains(initiative)) return true;
         return !context.seat().hasFollowedSC(initiative) && waitsToFollow(context, initiative);
@@ -542,7 +557,7 @@ public class StrategyCardRules {
         }
         return room >= MIN_HAND_ROOM_EXTRA
                 && hasSpareStrategyToken(context, StrategyCard.POLITICS)
-                && strategyTokens - tokensSavedForBetterCards(context, StrategyCard.POLITICS) >= EXTRA_TOKENS;
+                && strategyTokens - tokensWantedByOtherCards(context, StrategyCard.POLITICS) >= 1;
     }
 
     private static Optional<AiDecision> followWarfare(AiTurnContext context, AiPrompt card) {
@@ -1234,7 +1249,7 @@ public class StrategyCardRules {
     private static Optional<Double> politicsValue(Game game, Player seat) {
         int room = ButtonHelper.getACLimit(game, seat) - seat.getAcCount();
         if (holdsNoActionCards(seat) || room < 1) return Optional.empty();
-        return Optional.of(CardValueScale.ACTION_CARD * Math.min(POLITICS_DRAW, room));
+        return Optional.of(DrawnCardValue.of(game, seat, Math.min(POLITICS_DRAW, room)));
     }
 
     public static Optional<AiDecision> startSecondary(AiTurnContext context, AiPrompt prompt, StrategyCard card) {

@@ -2,6 +2,7 @@ package ti4.ai.explore;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.eval.BoardView;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.secrets.SecretDraws;
@@ -58,7 +59,7 @@ public class ExploreValues {
     public static double drawnActionCards(Game game, Player seat, int count) {
         int limit = ButtonHelper.getACLimit(game, seat);
         int room = Math.max(0, limit - seat.getAcCount());
-        return Math.min(count, room) * ACTION_CARD;
+        return DrawnCardValue.of(game, seat, Math.min(count, room), ACTION_CARD);
     }
 
     public static double actionCardsFromLostCrew(Game game, Player seat) {

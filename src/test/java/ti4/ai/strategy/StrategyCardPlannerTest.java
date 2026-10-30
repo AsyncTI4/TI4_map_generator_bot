@@ -141,6 +141,8 @@ class StrategyCardPlannerTest extends BaseTi4Test {
 
     @Test
     void cashesTheImperialPointForHoldingMecatolRex() {
+        // Nekro Malleon would lift a drawn action card to 2 trade goods; this case values the cards without it.
+        test.nekro.getLeader("nekroagent").orElseThrow().setExhausted(true);
         placeMecatol();
         test.nekro.addPlanet("mr");
         changed();

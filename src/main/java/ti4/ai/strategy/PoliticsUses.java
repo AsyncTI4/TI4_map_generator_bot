@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.List;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
+import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.eval.CustodiansRace.Snapshot;
 import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -100,7 +101,7 @@ class PoliticsUses {
         Player seat = in.seat();
         if (StrategyCardRules.holdsNoActionCards(seat)) return 0;
         int drawn = cardsDrawn(in);
-        double value = drawn * CardValueScale.ACTION_CARD;
+        double value = DrawnCardValue.of(game, seat, drawn);
         if (SpyNetwork.withinReach(game, seat, CARDS_DRAWN)) {
             value += CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT;
         }

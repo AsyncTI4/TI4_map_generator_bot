@@ -73,6 +73,8 @@ class StrategyCardRankingTest extends BaseTi4Test {
     // Holding Mecatol Rex makes Imperial a sure point even with nothing else to score.
     @Test
     void takesImperialWhileHoldingMecatolRex() {
+        // Nekro Malleon would lift a drawn action card to 2 trade goods; this case values the cards without it.
+        test.nekro.getLeader("nekroagent").orElseThrow().setExhausted(true);
         test.place("18", "000");
         test.nekro.addPlanet("mr");
 
