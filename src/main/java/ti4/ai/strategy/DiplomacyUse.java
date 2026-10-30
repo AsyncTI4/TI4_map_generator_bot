@@ -313,7 +313,10 @@ class DiplomacyUse {
             if (!leadership || forInfluence.isEmpty()) return 0;
             int tokens = purchasedTokens.computeIfAbsent(
                     forInfluence, planets -> tokensBought(wallet.withPlanets(game, planets)));
-            return TokenPurchase.INFLUENCE_PER_TOKEN * Math.max(0, tokens - tokensNow);
+            int influence = TokenPurchase.INFLUENCE_PER_TOKEN * Math.max(0, tokens - tokensNow);
+            return TokenPurchase.holdsLeadership(game, seat)
+                    ? (int) Math.round(influence * TokenPurchase.PLENTIFUL_TOKEN_SHARE)
+                    : influence;
         }
 
         private int custodiansUse(List<String> forInfluence) {

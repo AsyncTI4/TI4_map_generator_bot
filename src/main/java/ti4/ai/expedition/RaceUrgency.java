@@ -14,21 +14,21 @@ class RaceUrgency {
     static final double CAP = 1.0;
 
     static double of(Game game, Player seat, ExpeditionKind kind) {
-        long rivals = game.getRealPlayers().stream()
-                .filter(rival -> rival != seat)
-                .filter(BreakthroughValue::isLocked)
-                .filter(rival -> couldClaim(game, rival, kind))
-                .count();
-        return Math.min(CAP, PER_RIVAL * rivals);
+        return Math.min(CAP, PER_RIVAL * racingRivals(game, seat, kind));
     }
 
     static double stillOpen(Game game, Player seat, ExpeditionKind kind) {
-        long rivals = game.getRealPlayers().stream()
+        return Math.pow(1 - PER_RIVAL, racingRivals(game, seat, kind));
+    }
+
+    private static long racingRivals(Game game, Player seat, ExpeditionKind kind) {
+        boolean lastSlice = game.getExpeditions().getRemainingExpeditionCount() == 1;
+        return game.getRealPlayers().stream()
                 .filter(rival -> rival != seat)
-                .filter(BreakthroughValue::isLocked)
+                .filter(rival -> BreakthroughValue.isLocked(rival)
+                        || (lastSlice && ThundersEdgeRace.gainFromClaiming(game, rival) > 0))
                 .filter(rival -> couldClaim(game, rival, kind))
                 .count();
-        return Math.pow(1 - PER_RIVAL, rivals);
     }
 
     static boolean couldClaim(Game game, Player rival, ExpeditionKind kind) {

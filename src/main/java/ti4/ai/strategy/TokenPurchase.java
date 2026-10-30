@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
@@ -19,6 +20,7 @@ public class TokenPurchase {
     static final int INFLUENCE_PER_TOKEN = 3;
     static final int MAX_TOKENS = 3;
     static final int CUSTODIANS_COST = 6;
+    static final double PLENTIFUL_TOKEN_SHARE = 0.5;
 
     record Purchase(int tokens, Wallet.Payment payment) {}
 
@@ -50,6 +52,27 @@ public class TokenPurchase {
     }
 
     static Optional<Purchase> best(Game game, Player seat, int reinforcements, Wallet wallet) {
+        Optional<Purchase> spendingAll = purchase(game, seat, reinforcements, wallet);
+        if (spendingAll.isEmpty()) return spendingAll;
+        Optional<ExpeditionUnlock.Plan> expedition = ExpeditionUnlock.planWith(game, seat, wallet);
+        if (expedition.isEmpty()) return spendingAll;
+        Optional<Purchase> keeping = purchase(
+                game, seat, reinforcements, wallet.without(expedition.get().payment()));
+        int tokensGivenUp =
+                spendingAll.get().tokens() - keeping.map(Purchase::tokens).orElse(0);
+        return tokensGivenUp * tokenWorth(game, seat) < expedition.get().worth() ? keeping : spendingAll;
+    }
+
+    static double tokenWorth(Game game, Player seat) {
+        double worth = CardValueScale.HELD_TOKEN;
+        return holdsLeadership(game, seat) ? worth * PLENTIFUL_TOKEN_SHARE : worth;
+    }
+
+    static boolean holdsLeadership(Game game, Player seat) {
+        return seat.getSCs().stream().anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.LEADERSHIP);
+    }
+
+    private static Optional<Purchase> purchase(Game game, Player seat, int reinforcements, Wallet wallet) {
         Wallet influencePlanets = new Wallet(
                 influenceLeaning(wallet), wallet.tradeGoods(), 0, 0, wallet.tradeGoodValue(), wallet.pooling());
         SpendCost keep = ScoringReserve.of(game, seat).plus(custodiansReserve(game, seat));

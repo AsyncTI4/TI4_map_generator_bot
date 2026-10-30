@@ -21,6 +21,22 @@ public class ExpeditionUnlock {
 
     public record Readying(List<String> planets, double gain) {}
 
+    public record Plan(Wallet.Payment payment, double worth) {
+
+        public boolean spendsSomething() {
+            return payment.planetCount() > 0 || payment.tradeGoods() > 0;
+        }
+    }
+
+    public static Optional<Plan> planWith(Game game, Player seat, Wallet wallet) {
+        if (!ExpeditionOutlook.isOpen(game, seat)) return Optional.empty();
+        Holdings passing = new Holdings(wallet, seat.getAcCount(), true, false);
+        return ExpeditionOutlook.best(game, seat, passing)
+                .map(choice ->
+                        new Plan(choice.payment(), choice.net() * RaceUrgency.stillOpen(game, seat, choice.kind())))
+                .filter(Plan::spendsSomething);
+    }
+
     public static double worth(Game game, Player seat, Holdings holdings) {
         return ExpeditionOutlook.value(game, seat, holdings);
     }
