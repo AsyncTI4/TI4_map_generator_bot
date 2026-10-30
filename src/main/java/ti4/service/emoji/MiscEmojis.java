@@ -93,6 +93,7 @@ public enum MiscEmojis implements TI4Emoji {
     TaDont,
     Zobat,
     SharkLoan,
+    PPcoin,
     skull1,
     skull2,
     skull3,
