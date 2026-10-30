@@ -10,7 +10,10 @@ import ti4.helpers.Constants;
 class ChannelExportGroup extends SubcommandGroup {
 
     private static final Map<String, Subcommand> subcommands = Stream.of(
-                    new StartChannelExport(), new CancelChannelExport(), new ResumeChannelExport())
+                    new StartChannelExport(),
+                    new CancelChannelExport(),
+                    new ResumeChannelExport(),
+                    new LogChannelExport())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     ChannelExportGroup() {
