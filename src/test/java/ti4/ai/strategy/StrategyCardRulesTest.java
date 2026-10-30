@@ -741,6 +741,31 @@ class StrategyCardRulesTest extends BaseTi4Test {
         assertThat(test.memory.get("readyPlanets|" + round)).isEmpty();
     }
 
+    // Outside fog the bot posts the ready prompt in the public Diplomacy thread, with a Done button only the following
+    // player may press. Another player's Done button in the same thread is left alone.
+    @Test
+    void readiesFromThePublicDiplomacyThreadAndPressesItsOwnDone() {
+        exhaustedInfluencePlanets();
+        test.place("35", "203");
+        int round = test.game.getRound();
+        test.memory.put("readyPlanets|" + round, NOW + "|1");
+        test.memory.put("readyPlan|" + round, "rarron");
+        AiPrompt othersPrompt = prompt("ready-sol", PromptSource.PUBLIC, NOW, "FFCC_sol_deleteButtons_diplomacy");
+        AiPrompt ready = prompt(
+                "ready", PromptSource.PUBLIC, NOW, "FFCC_nekro_refresh_rarron", "FFCC_nekro_deleteButtons_diplomacy");
+
+        assertThat(StrategyCardRules.readyPlanets(test.context(othersPrompt, ready))
+                        .map(AiTestGame::pressedId))
+                .contains("FFCC_nekro_refresh_rarron");
+
+        test.nekro.refreshPlanet("rarron");
+        ready = prompt("ready", PromptSource.PUBLIC, NOW, "FFCC_nekro_deleteButtons_diplomacy");
+        assertThat(StrategyCardRules.readyPlanets(test.context(othersPrompt, ready))
+                        .map(AiTestGame::pressedId))
+                .contains("FFCC_nekro_deleteButtons_diplomacy");
+        assertThat(test.memory.get("readyPlanets|" + round)).isEmpty();
+    }
+
     // After a memory wipe the plan is gone; the seat chooses again from the planets the prompt offers, with the same
     // test as the follow: Leadership is still to come, so an influence planet goes first.
     @Test

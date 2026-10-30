@@ -760,8 +760,11 @@ public class StrategyCardRules {
     public static Optional<AiDecision> readyPlanets(AiTurnContext context) {
         Optional<long[]> request = request(context, READY_KEY);
         if (request.isEmpty()) return Optional.empty();
-        List<AiPrompt> prompts = CardMessages.hiddenSince(context, request.get()[0] - CLOCK_SKEW_MILLIS);
-        Optional<Match> done = Prompts.unowned(prompts, handlerId -> handlerId.startsWith(DIPLOMACY_DONE));
+        List<AiPrompt> prompts = CardMessages.hiddenOrPublicSince(context, request.get()[0] - CLOCK_SKEW_MILLIS);
+        Optional<Match> done = Prompts.first(
+                prompts,
+                button -> (button.isOwnedBy(context.faction()) || button.isUnowned())
+                        && button.handlerId().startsWith(DIPLOMACY_DONE));
         if (done.isEmpty()) return Optional.empty();
         int remaining = (int) request.get()[1];
         if (remaining > 0) {

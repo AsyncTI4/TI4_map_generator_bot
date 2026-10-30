@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -18,6 +19,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.utils.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSettings;
 import ti4.ai.perception.AiPrompt.PromptSource;
@@ -35,6 +37,7 @@ public class AiPerception {
 
     public static final String DELEGATION_PREFIX = "aiSeatPick_";
     private static final int COMBAT_THREADS_TO_READ = 2;
+    private static final long STRATEGY_THREAD_WINDOW_MILLIS = 15 * 60_000L;
     public static final String OFFER_REJECTED = "has been rejected";
     private static final Pattern SYSTEM_POSITION = Pattern.compile("-system-([^-]+)-turn-");
     private static final Pattern THREAD_PARTIES = Pattern.compile("-turn-\\d+-(.+?)-vs-(.+)$");
@@ -45,6 +48,7 @@ public class AiPerception {
         private final Game game;
         private final Map<String, List<AiPrompt>> privateThreads = new HashMap<>();
         private final List<AiPrompt> main = new ArrayList<>();
+        private final List<AiPrompt> strategyThreads = new ArrayList<>();
         private final List<CombatThread> combatThreads = new ArrayList<>();
 
         Snapshot(Game game) {
@@ -62,6 +66,11 @@ public class AiPerception {
             for (AiPrompt prompt : main) {
                 if (isRelevant(PromptSource.PUBLIC, prompt.buttons(), faction, publicWindowPrefixes)
                         || prompt.isTableTalk()) {
+                    prompts.add(prompt);
+                }
+            }
+            for (AiPrompt prompt : strategyThreads) {
+                if (isRelevant(PromptSource.PUBLIC, prompt.buttons(), faction, Set.of())) {
                     prompts.add(prompt);
                 }
             }
@@ -102,6 +111,9 @@ public class AiPerception {
         TextChannel main = game.getMainGameChannel();
         if (main == null) return snapshot;
         snapshot.main.addAll(read(main, botId, PromptSource.PUBLIC));
+        for (ThreadChannel strategyThread : recentStrategyThreads(game)) {
+            snapshot.strategyThreads.addAll(read(strategyThread, botId, PromptSource.PUBLIC));
+        }
         for (ThreadChannel combat : ongoingCombatThreads(game, main, seats)) {
             snapshot.combatThreads.add(new CombatThread(
                     combat.getName(),
@@ -109,6 +121,25 @@ public class AiPerception {
                     read(combat, botId, PromptSource.COMBAT_THREAD)));
         }
         return snapshot;
+    }
+
+    private static List<ThreadChannel> recentStrategyThreads(Game game) {
+        long cutoff = System.currentTimeMillis() - STRATEGY_THREAD_WINDOW_MILLIS;
+        try {
+            return game.getPlayedSCs().stream()
+                    .map(initiative -> ButtonHelper.getRightStratThread(game, ButtonHelper.getStratName(initiative)))
+                    .filter(Objects::nonNull)
+                    .filter(thread -> !thread.isArchived())
+                    .filter(thread -> TimeUtil.getTimeCreated(thread.getLatestMessageIdLong())
+                                    .toInstant()
+                                    .toEpochMilli()
+                            >= cutoff)
+                    .distinct()
+                    .toList();
+        } catch (RuntimeException e) {
+            BotLogger.warning("AI players could not find the strategy card threads: " + e.getMessage());
+            return List.of();
+        }
     }
 
     @Nullable

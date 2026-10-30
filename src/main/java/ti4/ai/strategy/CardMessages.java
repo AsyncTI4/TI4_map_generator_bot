@@ -66,6 +66,13 @@ class CardMessages {
                 .toList();
     }
 
+    static List<AiPrompt> hiddenOrPublicSince(AiTurnContext context, long since) {
+        return Prompts.newestFirst(context.prompts()).stream()
+                .filter(prompt -> prompt.isHidden() || prompt.source() == AiPrompt.PromptSource.PUBLIC)
+                .filter(prompt -> prompt.createdAtMillis() >= since)
+                .toList();
+    }
+
     static boolean done(AiTurnContext context, String step) {
         return context.memory().has(stepKey(context, step));
     }
