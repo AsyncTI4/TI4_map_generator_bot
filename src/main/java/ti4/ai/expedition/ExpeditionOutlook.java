@@ -53,9 +53,13 @@ public class ExpeditionOutlook {
 
     public static Optional<Choice> claimNow(Game game, Player seat) {
         Holdings holdings = Holdings.of(game, seat);
-        if (BreakthroughValue.isPriority(seat)) return best(game, seat, holdings);
+        if (BreakthroughValue.isPriority(seat) || isLastSlice(game)) return best(game, seat, holdings);
         double waiting = waitingValue(game, seat, holdings);
         return best(game, seat, holdings).filter(choice -> choice.net() - choice.urgency() >= waiting);
+    }
+
+    private static boolean isLastSlice(Game game) {
+        return game.getExpeditions().getRemainingExpeditionCount() == 1;
     }
 
     public static double value(Game game, Player seat, Holdings holdings) {

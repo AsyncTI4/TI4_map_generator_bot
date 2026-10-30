@@ -2,6 +2,7 @@ package ti4.ai.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.ai.AiTestGame.NOW;
+import static ti4.ai.AiTestGame.pressedId;
 import static ti4.ai.AiTestGame.prompt;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.expedition.ExpeditionKind;
 import ti4.ai.expedition.ExpeditionOutlook;
+import ti4.ai.expedition.ExpeditionRules;
 import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.expedition.Holdings;
 import ti4.ai.perception.AiPrompt;
@@ -120,5 +122,48 @@ class TechSkipExpeditionOverTokensTest extends BaseTi4Test {
         assertThat(DiplomacyUse.eachAlone(test.game, sardakk, List.of("meer")))
                 .singleElement()
                 .satisfies(choice -> assertThat(choice.use()).isZero());
+    }
+
+    // Live game aiplay1, the turn after Leadership: Meer was still ready, but the end-of-turn check judged the claim
+    // cheaper at the pass (Meer's influence spent at 0.1 instead of 2/3) and, with no rival holding a ready technology
+    // specialty planet, saw no risk in waiting. The seat ended its turn with the slice open. A rival only needs a
+    // readied or newly ready specialty planet to take the last slice, Thunder's Edge and the breakthrough with it,
+    // which is worth far more than the discount, so the last slice is claimed at the end of the turn.
+    @Test
+    void theLastSliceIsClaimedAtTheEndOfTheTurnInsteadOfWaitingToPass() {
+        assertThat(ExpeditionOutlook.claimNow(test.game, sardakk))
+                .hasValueSatisfying(choice -> assertThat(choice.kind()).isEqualTo(ExpeditionKind.TECH_SKIP));
+    }
+
+    @Test
+    void theEndOfTurnMenusLeadToTheExpeditionInsteadOfEndingTheTurn() {
+        AiPrompt end = prompt("end", PromptSource.PUBLIC, NOW, "FFCC_sardakk_endOfTurnAbilities");
+        assertThat(ExpeditionRules.endOfTurn(test.context(end), List.of(end)))
+                .hasValueSatisfying(
+                        decision -> assertThat(pressedId(decision)).isEqualTo("FFCC_sardakk_endOfTurnAbilities"));
+
+        AiPrompt menu = prompt(
+                "abilities",
+                PromptSource.PUBLIC,
+                NOW + 1,
+                "FFCC_sardakk_turnEnd",
+                "FFCC_sardakk_expeditionInfoAndButtons");
+        assertThat(ExpeditionRules.endOfTurn(test.context(menu), List.of(menu)))
+                .hasValueSatisfying(
+                        decision -> assertThat(pressedId(decision)).isEqualTo("FFCC_sardakk_expeditionInfoAndButtons"));
+
+        AiPrompt slices =
+                prompt("choices", PromptSource.PUBLIC, NOW + 2, "FFCC_sardakk_TEexpedition_techSkip", "deleteButtons");
+        assertThat(ExpeditionRules.next(test.context(slices)))
+                .hasValueSatisfying(
+                        decision -> assertThat(pressedId(decision)).isEqualTo("FFCC_sardakk_TEexpedition_techSkip"));
+    }
+
+    // Once a slice other than the last is open, the seat still waits for the cheap pass when no rival could take it.
+    @Test
+    void anEarlierSliceStillWaitsForTheCheapPass() {
+        test.game.getExpeditions().getExpeditionFactions().put(ExpeditionKind.ACTION_CARDS.id(), null);
+
+        assertThat(ExpeditionOutlook.claimNow(test.game, sardakk)).isEmpty();
     }
 }
