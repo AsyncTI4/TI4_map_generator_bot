@@ -215,6 +215,10 @@ public class CombatButtonHandler {
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
         String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if (h <= 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
@@ -245,6 +249,10 @@ public class CombatButtonHandler {
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
         String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if (h <= 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
@@ -260,6 +268,26 @@ public class CombatButtonHandler {
         String msg2 = player.getRepresentationNoPing() + ", you may automatically assign "
                 + (h == 1 ? "the hit" : "hits") + ". "
                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, h, event, true, true);
+        event.getMessage()
+                .editMessage(msg2)
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler(CancelSpaceCannonDefenceHitsButtonId.PREFIX)
+    public static void cancelSpaceCannonDefenceHits(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        CancelSpaceCannonDefenceHitsButtonId cancelId = CancelSpaceCannonDefenceHitsButtonId.parse(buttonID);
+        Tile tile = game.getTileByPosition(cancelId.tilePosition());
+        int h = cancelId.hits() - 1;
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), cancellationMessage(game, player));
+        if (h <= 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<Button> buttons = SpaceCannonDefenceHitButtons.afterACancel(player, tile, cancelId.planet(), h);
+        String msg2 = player.getRepresentationNoPing() + ", you may automatically assign "
+                + (h == 1 ? "the hit" : "hits") + ".";
         event.getMessage()
                 .editMessage(msg2)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
@@ -284,6 +312,10 @@ public class CombatButtonHandler {
 
         String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if (h <= 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
@@ -321,6 +353,10 @@ public class CombatButtonHandler {
         }
         String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if (h <= 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
         buttons.add(Buttons.green(
@@ -384,6 +420,10 @@ public class CombatButtonHandler {
     @ButtonHandler(AutoAssignGroundHitsButtonIds.PREFIX)
     public static void autoAssignGroundHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         AutoAssignGroundHitsButtonIds.Parsed hits = AutoAssignGroundHitsButtonIds.parse(buttonID);
+        if (hits.hits() <= 0) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         Tile tile = game.getTileFromPlanet(hits.planetName());
         if (PonthousAbilityHandler.requiresManualLastStandAssignment(
                 game, player, tile, tile == null ? null : tile.getUnitHolderFromPlanet(hits.planetName()), event)) {

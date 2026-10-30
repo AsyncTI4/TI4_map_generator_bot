@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -1753,7 +1752,7 @@ public class ButtonHelper {
         if (!game.isFowMode()
                 && activeSystem.isAsteroidField()
                 && !activeSystem.isZelianAsteroidField()
-                && ThreadLocalRandom.current().nextInt(1, 11) == 10) {
+                && RandomHelper.current().nextInt(1, 11) == 10) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "-# " + player.getRepresentationNoPing()
@@ -4389,6 +4388,17 @@ public class ButtonHelper {
         return assessFleetAndCapacity(player, game, tile, ignoreFighters).counts();
     }
 
+    public static FleetCheck fleetCheck(Player player, Game game, Tile tile) {
+        FleetAssessment assessment = assessFleetAndCapacity(player, game, tile, false);
+        return new FleetCheck(
+                assessment.counts(),
+                assessment.fleetSupplyViolated(),
+                assessment.capacityViolated(),
+                assessment.capacitySlack());
+    }
+
+    public record FleetCheck(int[] counts, boolean fleetSupplyViolated, boolean capacityViolated, int capacitySlack) {}
+
     private static void remindAboutFlotilla(Player player, Game game, Tile tile, FleetAssessment assessment) {
         if (!player.hasAbility("flotilla")) {
             return;
@@ -4430,16 +4440,32 @@ public class ButtonHelper {
             boolean wasAssessed,
             int capitalShips,
             boolean fleetSupplyViolated,
+            boolean capacityViolated,
+            int capacitySlack,
             boolean violated,
             String message) {
 
         static FleetAssessment unassessed(int[] counts) {
-            return new FleetAssessment(counts, false, 0, false, false, "");
+            return new FleetAssessment(counts, false, 0, false, false, Integer.MAX_VALUE, false, "");
         }
 
         static FleetAssessment assessed(
-                int[] counts, int capitalShips, boolean fleetSupplyViolated, boolean violated, String message) {
-            return new FleetAssessment(counts, true, capitalShips, fleetSupplyViolated, violated, message);
+                int[] counts,
+                int capitalShips,
+                boolean fleetSupplyViolated,
+                boolean capacityViolated,
+                int capacitySlack,
+                boolean violated,
+                String message) {
+            return new FleetAssessment(
+                    counts,
+                    true,
+                    capitalShips,
+                    fleetSupplyViolated,
+                    capacityViolated,
+                    capacitySlack,
+                    violated,
+                    message);
         }
 
         boolean unlocksLetnevCommander() {
@@ -4736,6 +4762,7 @@ public class ButtonHelper {
             capacity += ageOfFightersFleet;
         }
 
+        int capacitySlack = capacity - numInfNFightersNMechs;
         if (numInfNFightersNMechs > capacity) {
             int overflow = numInfNFightersNMechs - capacity;
             int fighter2Overflow = Math.min(overflow, numFighter2s);
@@ -4846,6 +4873,8 @@ public class ButtonHelper {
                     capNCap,
                     numOfCapitalShips,
                     fleetSupplyViolated,
+                    capacityViolated,
+                    capacitySlack,
                     capacityViolated
                             || fleetSupplyViolated
                             || structuresViolated
@@ -4864,6 +4893,8 @@ public class ButtonHelper {
                 capNCap2,
                 numOfCapitalShips,
                 fleetSupplyViolated,
+                capacityViolated,
+                capacitySlack,
                 capacityViolated
                         || fleetSupplyViolated
                         || structuresViolated
@@ -5440,7 +5471,7 @@ public class ButtonHelper {
                         .toList());
 
                 List<MiltyDraftTile> tileToPullFromUnshuffled = new ArrayList<>(unusedBlueTiles);
-                Collections.shuffle(unusedBlueTiles);
+                Collections.shuffle(unusedBlueTiles, RandomHelper.current());
 
                 if (unusedBlueTiles.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
@@ -5472,7 +5503,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
 
                 List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
-                Collections.shuffle(redTilesToPullFrom);
+                Collections.shuffle(redTilesToPullFrom, RandomHelper.current());
 
                 if (redTilesToPullFrom.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
@@ -6067,9 +6098,9 @@ public class ButtonHelper {
                             player.getRepresentationUnfogged()
                                     + ", due to your **Reclamation** ability, 1 PDS and 1 space dock have been added to Mecatol Rex. This is optional though.");
                     CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
-                    int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+                    int randomJokeChance = RandomHelper.current().nextInt(1, 6);
                     if (randomJokeChance == 5) {
-                        randomJokeChance = ThreadLocalRandom.current().nextInt(1, 3);
+                        randomJokeChance = RandomHelper.current().nextInt(1, 3);
                         File audioFile =
                                 ResourceHelper.getFile("voices/winnu/", "reclmation" + randomJokeChance + ".mp3");
                         if (audioFile.exists()) {
@@ -9702,7 +9733,7 @@ public class ButtonHelper {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         List<Player> players = new ArrayList<>(game.getRealPlayers());
         if (game.isFowMode()) {
-            Collections.shuffle(players);
+            Collections.shuffle(players, RandomHelper.current());
         }
         for (Player player : players) {
             if (game.isFowMode() || !player.getUserID().equals(game.getSpeakerUserID())) {

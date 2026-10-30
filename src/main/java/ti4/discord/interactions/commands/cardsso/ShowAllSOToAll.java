@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.service.info.KnownCardsService;
 import ti4.service.info.KnownCardsService.KnownCardType;
@@ -29,7 +30,7 @@ class ShowAllSOToAll extends GameStateSubcommand {
         sb.append("Player: ").append(player.getUserName()).append('\n');
 
         List<String> secretObjectives = new ArrayList<>(player.getSecrets().keySet());
-        Collections.shuffle(secretObjectives);
+        Collections.shuffle(secretObjectives, RandomHelper.current());
         Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : getGame().getSoToPoList()) {
             scoredSecretObjective.remove(id);

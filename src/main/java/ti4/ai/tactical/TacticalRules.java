@@ -1,0 +1,835 @@
+package ti4.ai.tactical;
+
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
+import ti4.ai.actioncards.ProductionCards;
+import ti4.ai.brain.AiDecision;
+import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.Prompts;
+import ti4.ai.brain.Prompts.Match;
+import ti4.ai.eval.BoardView;
+import ti4.ai.explore.ExplorationRules;
+import ti4.ai.legendary.TempestaRules;
+import ti4.ai.perception.AiPrompt;
+import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.perception.PromptButton;
+import ti4.ai.promissory.CeasefireRules;
+import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.PaymentRules;
+import ti4.ai.scoring.Pooling;
+import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.SpendCost;
+import ti4.ai.scoring.Wallet;
+import ti4.ai.tactical.ProductionPlanner.BuildOrder;
+import ti4.ai.tactical.ProductionPlanner.BuildPlan;
+import ti4.ai.tactical.TacticalPlan.Kind;
+import ti4.ai.tactical.TacticalPlan.UnitMove;
+import ti4.ai.tech.TechRules;
+import ti4.game.Game;
+import ti4.game.Planet;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.CheckDistanceHelper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
+
+@UtilityClass
+public class TacticalRules {
+
+    static final String PLAN_KEY = "tacticalPlan|";
+    static final String BUILD_KEY = "buildPlan|";
+    static final String WAR_MACHINE_KEY = "warMachineBase|";
+    static final String PICKER_PRESSES_KEY = "pickerPresses|";
+    static final String EXHAUSTED_ORIGIN_KEY = "exhaustedOrigin|";
+    static final String COMBAT_EXPECTED_KEY = "combatExpectedSince|";
+    static final String SECOND_ACTION_KEY = "secondAction|";
+    private static final String EXTRA_ACTION_KEY = "extraAction|";
+    private static final String ANOTHER_PRESSED_KEY = "anotherActionPressed|";
+    private static final String SECOND_ACTION_SUFFIX = "#2";
+    private static final String FLEET_LOGISTICS = "fl";
+    private static final double URGENT_SCORE = 0.75 * ObjectiveValue.VICTORY_POINT_VALUE;
+    private static final String HAZARDOUS = "hazardous";
+    private static final String MECHANIZE_THE_MILITARY = "mtm";
+    private static final String TACTICAL_ACTION = "tacticalAction";
+    private static final List<String> ANOTHER_ACTION_BUTTONS = List.of("doAnotherAction", "confirmSecondAction");
+    private static final String FIELD = "|";
+    private static final int MAX_PICKER_PRESSES = 4;
+    private static final String RING_TILE_PREFIX = "ringTile_";
+    private static final int LARGE_RING = 5;
+    private static final long COMBAT_WAIT_MILLIS = 60_000L;
+    private static final long COMBAT_THREAD_GRACE_MILLIS = 90_000L;
+    public static final String WARFARE_SOURCE = "warfare";
+    private static final String TACTICAL_SOURCE = "tacticalAction";
+    private static final String DONE_PREFIX = "deleteButtons_";
+    private static final String DONE_PRODUCING = "Done Producing Units";
+    private static final String DONE_EXHAUSTING = "Done Exhausting Planets";
+    private static final int IGNORED_FIGHTERS_INDEX = 3;
+    private static final String SARWEEN = "sarween";
+    private static final String WAR_MACHINE_SPENT = "warmachine";
+    private static final long WAR_MACHINE_WAIT_MILLIS = 10_000L;
+    private static final String AIDA_EXHAUST = "exhaustTech_aida";
+    private static final String AIDA_DISCOUNT = "aida_";
+    private static final int CUSTODIANS_COST = 6;
+    static final String FREE_BUILD_KEY = "hacanHeroBuild|";
+    private static final String FREE_BUILD_PLANNED = "planned";
+    private static final String FREE_BUILD_PURGED = "purged";
+    private static final String PURGE_HACAN_HERO = "purgeHacanHero";
+    private static final Set<String> STATE_SEGMENTS =
+            Set.of(UnitState.dmg.name(), UnitState.glv.name(), UnitState.dmg_glv.name());
+
+    public static boolean inProgress(Game game, Player seat) {
+        String summary = game.getStoredValue("currentActionSummary" + seat.getFaction());
+        return StringUtils.isNotBlank(game.getCurrentActiveSystem())
+                && summary.contains(" Activated ")
+                && !"yes".equals(game.getStoredValue("gameEventTacticalLogged"));
+    }
+
+    public static boolean inProgress(AiTurnContext context) {
+        return inProgress(context.game(), context.seat()) && !pickingSecondSystem(context);
+    }
+
+    public static String actionKey(AiTurnContext context) {
+        return secondActionStarted(context) ? context.turnKey() + SECOND_ACTION_SUFFIX : context.turnKey();
+    }
+
+    public static boolean secondActionStarted(AiTurnContext context) {
+        return context.memory().has(SECOND_ACTION_KEY + context.turnKey());
+    }
+
+    public static void markSecondAction(AiTurnContext context, boolean tactical) {
+        String firstTarget = tactical ? context.game().getCurrentActiveSystem() : "";
+        context.memory().put(SECOND_ACTION_KEY + context.turnKey(), firstTarget + FIELD + context.now());
+    }
+
+    public static Optional<Match> anotherActionButton(AiTurnContext context, List<AiPrompt> thisTurn) {
+        return Prompts.owned(thisTurn, context.faction(), ANOTHER_ACTION_BUTTONS::contains)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
+    }
+
+    public static boolean firstActionConcluded(AiTurnContext context, List<AiPrompt> thisTurn) {
+        return actionTaken(context)
+                || context.memory().has(ANOTHER_PRESSED_KEY + context.turnKey())
+                || anotherActionButton(context, thisTurn).isPresent();
+    }
+
+    public static void allowAnotherAction(AiTurnContext context) {
+        context.memory().put(EXTRA_ACTION_KEY + context.turnKey(), String.valueOf(context.now()));
+    }
+
+    public static boolean mayTakeAnotherAction(AiTurnContext context) {
+        return context.seat().hasTech(FLEET_LOGISTICS) || context.memory().has(EXTRA_ACTION_KEY + context.turnKey());
+    }
+
+    public static boolean secondTacticalActionIsWorthIt(AiTurnContext context) {
+        return TacticalPlanner.best(context.game(), context.seat())
+                .filter(TacticalRules::urgent)
+                .isPresent();
+    }
+
+    public static Optional<AiDecision> secondAction(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!mayTakeAnotherAction(context)) return Optional.empty();
+        if (secondActionStarted(context)) return pickingSecondSystem(context) ? start(context) : Optional.empty();
+        if (!firstActionConcluded(context, thisTurn) || inProgress(context.game(), context.seat())) {
+            return Optional.empty();
+        }
+        Optional<TacticalPlan> plan = TacticalPlanner.best(context.game(), context.seat());
+        if (plan.isEmpty() || !urgent(plan.get())) return Optional.empty();
+        Optional<Match> again = Prompts.owned(thisTurn, context.faction(), TACTICAL_ACTION::equals)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
+        if (again.isEmpty()) {
+            return anotherActionButton(context, thisTurn).map(match -> {
+                context.memory().put(ANOTHER_PRESSED_KEY + context.turnKey(), String.valueOf(context.now()));
+                return match.press("take another action");
+            });
+        }
+        markSecondAction(context, true);
+        context.memory().put(PLAN_KEY + actionKey(context), plan.get().encode());
+        return Optional.of(again.get().press("take a second tactical action: " + describe(plan.get())));
+    }
+
+    static boolean urgent(TacticalPlan plan) {
+        return plan.kind() == Kind.ATTACK || plan.score() >= URGENT_SCORE;
+    }
+
+    private static boolean pickingSecondSystem(AiTurnContext context) {
+        String firstTarget = StringUtils.substringBefore(
+                context.memory().get(SECOND_ACTION_KEY + context.turnKey()).orElse(""), FIELD);
+        return !firstTarget.isEmpty() && firstTarget.equals(context.game().getCurrentActiveSystem());
+    }
+
+    private static long secondActionSince(AiTurnContext context) {
+        String since = StringUtils.substringAfter(
+                context.memory().get(SECOND_ACTION_KEY + context.turnKey()).orElse(""), FIELD);
+        return StringUtils.isNumeric(since) ? Long.parseLong(since) : 0;
+    }
+
+    public static boolean actionTaken(AiTurnContext context) {
+        String faction = context.faction();
+        return Prompts.thisTurn(context).stream()
+                .anyMatch(prompt -> prompt.buttons().stream()
+                        .filter(button -> button.isOwnedBy(faction))
+                        .filter(button -> "tacticalAction".equals(button.handlerId())
+                                || button.handlerId().startsWith("strategicAction_"))
+                        .anyMatch(button -> context.alreadyPressed(prompt, button)));
+    }
+
+    public static boolean pickingSystem(AiTurnContext context) {
+        String summary = context.game().getStoredValue("currentActionSummary" + context.faction());
+        boolean picking = !summary.contains(" Activated ") || pickingSecondSystem(context);
+        return picking && !pickers(context, Prompts.thisTurn(context)).isEmpty();
+    }
+
+    private static List<AiPrompt> pickers(AiTurnContext context, List<AiPrompt> turn) {
+        long since = secondActionSince(context);
+        return turn.stream()
+                .filter(TacticalRules::isPicker)
+                .filter(prompt -> prompt.createdAtMillis() >= since)
+                .toList();
+    }
+
+    public static Optional<AiDecision> start(AiTurnContext context) {
+        return start(context, hints -> TacticalPlanner.best(context.game(), context.seat(), hints));
+    }
+
+    public static Optional<AiDecision> stall(AiTurnContext context) {
+        return start(context, hints -> StallPlans.enduranceStall(context.game(), context.seat()));
+    }
+
+    private static Optional<AiDecision> start(
+            AiTurnContext context, Function<List<SetupHint>, Optional<TacticalPlan>> planner) {
+        List<AiPrompt> turn = Prompts.thisTurn(context);
+        List<AiPrompt> pickers = pickers(context, turn);
+        Optional<AiPrompt> picker = pickers.stream().findFirst();
+        List<SetupHint> hints = setupHints(context);
+        Optional<TacticalPlan> plan = rememberedPlan(context).or(() -> {
+            Optional<TacticalPlan> computed = planner.apply(hints);
+            computed.ifPresent(found -> remember(context, found));
+            return computed;
+        });
+        if (plan.isEmpty()) {
+            return picker.map(found -> new AiDecision.Unsure(found, "it found no system worth activating"));
+        }
+        if (picker.isPresent()) return Optional.of(pickSystem(context, pickers, plan.get()));
+        return Prompts.owned(turn, context.faction(), TACTICAL_ACTION::equals)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()))
+                .map(match -> match.press("start a tactical action: " + describe(plan.get())
+                        + (SetupHint.bonusFor(hints, plan.get()) > 0 ? " (sets up a strategy card)" : "")));
+    }
+
+    private static List<SetupHint> setupHints(AiTurnContext context) {
+        return SetupHint.decodeAll(
+                context.memory().get(SetupHint.key(context.game())).orElse(""));
+    }
+
+    public static void remember(AiTurnContext context, TacticalPlan plan) {
+        context.memory().put(PLAN_KEY + actionKey(context), plan.encode());
+        FractureMarch.record(context.game(), context.seat(), plan);
+    }
+
+    public static boolean activatedThisTurn(AiTurnContext context) {
+        return context.game()
+                .getStoredValue("currentActionSummary" + context.faction())
+                .contains(" Activated ");
+    }
+
+    public static Optional<AiDecision> continueAction(AiTurnContext context) {
+        Game game = context.game();
+        String target = game.getCurrentActiveSystem();
+        Tile tile = StringUtils.isBlank(target) ? null : game.getTileByPosition(target);
+        if (tile == null) return Optional.empty();
+        Player seat = context.seat();
+        List<AiPrompt> turn = Prompts.thisTurn(context);
+        Optional<TacticalPlan> plan = plan(context, target);
+
+        Optional<AiDecision> movement = movement(context, turn, target, plan);
+        if (movement.isPresent()) return movement;
+        if (BoardView.hasOwnShips(seat, tile) && BoardView.hasEnemyShips(game, seat, tile)) {
+            return waitForCombat(context, turn);
+        }
+        Optional<AiDecision> landing = landing(context, turn, tile, plan);
+        if (landing.isPresent()) return landing;
+        if (groundCombatOngoing(game, seat, tile)) return waitForCombat(context, turn);
+        Optional<AiDecision> explore = ExplorationRules.explore(context, turn);
+        if (explore.isPresent()) return explore;
+        Optional<Match> relic = Prompts.owned(turn, context.faction(), "drawRelic"::equals);
+        if (relic.isPresent()) return Optional.of(relic.get().press("draw a relic"));
+        Optional<AiDecision> pay = payForUnits(context, turn, TACTICAL_SOURCE);
+        if (pay.isPresent()) return pay;
+        Optional<AiDecision> warMachine = warMachine(context, turn, target);
+        if (warMachine.isPresent()) return warMachine;
+        Optional<BuildPlan> buildPlan =
+                context.memory().get(BUILD_KEY + actionKey(context)).flatMap(BuildPlan::decode);
+        Optional<AiDecision> place = placeUnits(context, turn, TACTICAL_SOURCE, target, buildPlan);
+        if (place.isPresent()) return place;
+        return build(context, turn, tile);
+    }
+
+    public static Optional<TacticalPlan> rememberedPlan(AiTurnContext context) {
+        return context.memory().get(PLAN_KEY + actionKey(context)).flatMap(TacticalPlan::decode);
+    }
+
+    public static Optional<TacticalPlan> plan(AiTurnContext context, String target) {
+        return rememberedPlan(context)
+                .filter(plan -> plan.target().equals(target))
+                .or(() -> context.game().getTacticalActionDisplacement().isEmpty()
+                        ? TacticalPlanner.forTarget(context.game(), context.seat(), target)
+                        : Optional.empty());
+    }
+
+    private static AiDecision pickSystem(AiTurnContext context, List<AiPrompt> pickers, TacticalPlan plan) {
+        Optional<Match> target =
+                Prompts.first(pickers, button -> button.handlerId().equals(RING_TILE_PREFIX + plan.target()));
+        if (target.isPresent()) return target.get().press("activate " + plan.target());
+        AiPrompt picker = pickers.getFirst();
+        String pressesKey = PICKER_PRESSES_KEY + actionKey(context);
+        int presses = Integer.parseInt(context.memory().get(pressesKey).orElse("0"));
+        Optional<PromptButton> navigate =
+                presses >= MAX_PICKER_PRESSES ? Optional.empty() : navigationButton(context, picker, plan.target());
+        if (navigate.isEmpty()) {
+            return bestOffered(context, pickers)
+                    .orElseGet(() -> new AiDecision.Unsure(picker, "it could not find system " + plan.target()));
+        }
+        context.memory().put(pressesKey, String.valueOf(presses + 1));
+        return AiDecision.press(picker, navigate.get(), "look for system " + plan.target());
+    }
+
+    private static Optional<AiDecision> bestOffered(AiTurnContext context, List<AiPrompt> pickers) {
+        Map<String, Match> offered = new LinkedHashMap<>();
+        for (AiPrompt prompt : pickers) {
+            for (PromptButton button : prompt.enabledButtons()) {
+                if (button.handlerId().startsWith(RING_TILE_PREFIX)) {
+                    offered.putIfAbsent(
+                            StringUtils.removeStart(button.handlerId(), RING_TILE_PREFIX), new Match(prompt, button));
+                }
+            }
+        }
+        Optional<TacticalPlan> best = offered.keySet().stream()
+                .map(position -> TacticalPlanner.forTarget(context.game(), context.seat(), position))
+                .flatMap(Optional::stream)
+                .filter(plan -> plan.score() >= TacticalPlanner.MIN_SCORE)
+                .max(Comparator.comparingDouble(TacticalPlan::score));
+        if (best.isEmpty()) return Optional.empty();
+        remember(context, best.get());
+        return Optional.of(offered.get(best.get().target()).press("activate " + describe(best.get()) + " instead"));
+    }
+
+    private static boolean isPicker(AiPrompt prompt) {
+        return prompt.hasHandlerPrefix("ringTile_")
+                || prompt.hasHandlerPrefix("getTilesThisFarAway_")
+                || prompt.hasHandlerPrefix("ring_");
+    }
+
+    private static Optional<PromptButton> navigationButton(AiTurnContext context, AiPrompt picker, String target) {
+        Optional<PromptButton> ring = ringButtons(target).stream()
+                .map(picker::enabledHandler)
+                .flatMap(Optional::stream)
+                .findFirst();
+        if (ring.isPresent()) return ring;
+        Integer distance = CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(
+                        context.game(), context.seat())
+                .get(target);
+        if (distance == null) return Optional.empty();
+        return picker.enabledButtons().stream()
+                .filter(button -> button.handlerId().startsWith("getTilesThisFarAway_"))
+                .min(Comparator.comparingInt(button -> Math.abs(bandOf(button) - distance)));
+    }
+
+    static List<String> ringButtons(String position) {
+        if (position.length() != 3 || !StringUtils.isNumeric(position)) return List.of("ring_corners");
+        int ring = position.charAt(0) - '0';
+        if (ring < LARGE_RING) return List.of("ring_" + ring);
+        int index = Integer.parseInt(position.substring(1));
+        String half = index <= ring * 6 / 2 ? "_right" : "_left";
+        return List.of("ring_" + ring + half, "ring_" + ring);
+    }
+
+    private static int bandOf(PromptButton button) {
+        String band = StringUtils.substringAfterLast(button.handlerId(), "_");
+        return StringUtils.isNumeric(band) ? Integer.parseInt(band) : Integer.MAX_VALUE / 2;
+    }
+
+    private static Optional<AiDecision> movement(
+            AiTurnContext context, List<AiPrompt> turn, String target, Optional<TacticalPlan> plan) {
+        String faction = context.faction();
+        Optional<AiPrompt> prompt = Prompts.newestWith(
+                turn,
+                button -> button.isOwnedBy(faction)
+                        && (button.handlerId().startsWith("unitTacticalMove_")
+                                || button.handlerId().startsWith("tacticalMoveFrom_")
+                                || button.handlerId().startsWith("concludeMove_")));
+        if (prompt.isEmpty()) return Optional.empty();
+        AiPrompt movementPrompt = prompt.get();
+        if (CeasefireRules.blocksMovement(context)) return holdPosition(context, turn, movementPrompt, target);
+        Optional<AiDecision> boost = TempestaRules.boost(context, movementPrompt, plan);
+        if (boost.isPresent()) return boost;
+        if (movementPrompt.hasHandlerPrefix("unitTacticalMove_")) {
+            return unitView(context, movementPrompt, plan);
+        }
+        if (plan.isPresent()) {
+            for (UnitMove move : plan.get().moves()) {
+                if (remaining(context, move) <= 0 || originExhausted(context, move.origin())) continue;
+                Optional<Match> from = Prompts.owned(turn, faction, ("tacticalMoveFrom_" + move.origin())::equals);
+                if (from.isPresent()) return Optional.of(from.get().press("pick units in " + move.origin()));
+            }
+        }
+        return Prompts.owned(turn, faction, ("concludeMove_" + target)::equals)
+                .map(match -> match.press("finish moving"));
+    }
+
+    private static Optional<AiDecision> holdPosition(
+            AiTurnContext context, List<AiPrompt> turn, AiPrompt movementPrompt, String target) {
+        Optional<PromptButton> doneHere =
+                movementPrompt.firstEnabled(button -> button.handlerId().startsWith("doneWithOneSystem_"));
+        if (doneHere.isPresent()) {
+            return Optional.of(
+                    AiDecision.press(movementPrompt, doneHere.get(), "stop picking units under a Ceasefire"));
+        }
+        String faction = context.faction();
+        if (!context.game().getTacticalActionDisplacement().isEmpty()) {
+            Optional<Match> reset = Prompts.owned(turn, faction, "resetTacticalMovement"::equals);
+            if (reset.isPresent()) return Optional.of(reset.get().press("take back its moves under a Ceasefire"));
+        }
+        return Prompts.owned(turn, faction, ("concludeMove_" + target)::equals)
+                .map(match -> match.press("move nothing into " + target + " under a Ceasefire"));
+    }
+
+    private static Optional<AiDecision> unitView(AiTurnContext context, AiPrompt prompt, Optional<TacticalPlan> plan) {
+        Optional<String> origin = prompt.buttons().stream()
+                .map(PromptButton::handlerId)
+                .filter(id -> id.startsWith("doneWithOneSystem_"))
+                .map(id -> StringUtils.substringAfter(id, "doneWithOneSystem_"))
+                .findFirst();
+        if (origin.isEmpty()) return Optional.empty();
+        if (plan.isPresent()) {
+            for (UnitMove move : plan.get().moves()) {
+                if (!move.origin().equals(origin.get())) continue;
+                int remaining = remaining(context, move);
+                if (remaining <= 0) continue;
+                Optional<PromptButton> button = moveButton(context, prompt, move, Math.min(2, remaining))
+                        .or(() -> moveButton(context, prompt, move, 1));
+                if (button.isPresent()) {
+                    return Optional.of(AiDecision.press(prompt, button.get(), "move " + move.type()));
+                }
+            }
+        }
+        context.memory().put(EXHAUSTED_ORIGIN_KEY + actionKey(context) + "|" + origin.get(), "yes");
+        return prompt.enabledHandler("doneWithOneSystem_" + origin.get())
+                .map(button -> AiDecision.press(prompt, button, "done picking units in " + origin.get()));
+    }
+
+    private static boolean originExhausted(AiTurnContext context, String origin) {
+        return context.memory().has(EXHAUSTED_ORIGIN_KEY + actionKey(context) + "|" + origin);
+    }
+
+    private static Optional<PromptButton> moveButton(
+            AiTurnContext context, AiPrompt prompt, UnitMove move, int amount) {
+        String asyncId = BoardView.model(context.seat(), move.type())
+                .map(model -> model.getAsyncId())
+                .orElse(move.type().value);
+        String prefix = "unitTacticalMove_" + move.origin() + "_" + amount + "_" + asyncId + "_";
+        String expectedTail = BoardView.SPACE.equals(move.holder())
+                ? context.seat().getColor()
+                : move.holder() + "_" + context.seat().getColor();
+        return prompt.firstEnabled(button -> button.handlerId().startsWith(prefix)
+                && matchesTail(button.handlerId().substring(prefix.length()), expectedTail));
+    }
+
+    static boolean matchesTail(String tail, String expectedTail) {
+        if (tail.equals(expectedTail)) return true;
+        if (!tail.endsWith("_" + expectedTail)) return false;
+        return STATE_SEGMENTS.contains(tail.substring(0, tail.length() - expectedTail.length() - 1));
+    }
+
+    static int remaining(AiTurnContext context, UnitMove move) {
+        Map<UnitKey, List<Integer>> staged = context.game()
+                .getTacticalActionDisplacement()
+                .getOrDefault(move.origin() + "-" + move.holder(), Map.of());
+        int moved = staged.entrySet().stream()
+                .filter(entry -> entry.getKey().unitType() == move.type())
+                .filter(entry -> context.seat().getColor().equals(entry.getKey().getColor()))
+                .mapToInt(entry ->
+                        entry.getValue().stream().mapToInt(Integer::intValue).sum())
+                .sum();
+        return move.count() - moved;
+    }
+
+    private static Optional<AiDecision> landing(
+            AiTurnContext context, List<AiPrompt> turn, Tile tile, Optional<TacticalPlan> plan) {
+        String target = tile.getPosition();
+        Optional<Match> done = Prompts.owned(turn, context.faction(), ("doneLanding_" + target)::equals);
+        if (done.isEmpty()) return Optional.empty();
+        Optional<AiDecision> bombardment = BombardmentRules.beforeLanding(
+                context,
+                turn,
+                tile,
+                plan.map(found -> found.landings().keySet()).orElse(Set.of()));
+        if (bombardment.isPresent()) return bombardment;
+        Player seat = context.seat();
+        if (BoardView.groundForces(BoardView.space(tile), seat) > 0) {
+            Optional<Landing> landing = nextLanding(context, tile, plan)
+                    .filter(found -> !needsCustodiansPayment(tile, found.planet())
+                            || custodiansPayment(context).isPresent());
+            Optional<PromptButton> button = landing.flatMap(
+                    found -> landButton(context.game(), done.get().prompt(), tile, found, seat));
+            if (button.isPresent()) {
+                expectCustodiansPayment(context, tile, landing.get().planet());
+                return Optional.of(AiDecision.press(
+                        done.get().prompt(),
+                        button.get(),
+                        "land on " + landing.get().planet()));
+            }
+        }
+        return Optional.of(done.get().press("done landing"));
+    }
+
+    private static Optional<PromptButton> landButton(
+            Game game, AiPrompt prompt, Tile tile, Landing landing, Player seat) {
+        for (UnitType type : landingOrder(game, seat, tile, landing.planet())) {
+            int inSpace = BoardView.count(BoardView.space(tile), seat, type);
+            if (inSpace == 0) continue;
+            int amount = Math.min(2, Math.min(inSpace, landing.wanted()));
+            Optional<PromptButton> button = landButton(prompt, tile.getPosition(), landing.planet(), amount, type, seat)
+                    .or(() -> landButton(prompt, tile.getPosition(), landing.planet(), 1, type, seat));
+            if (button.isPresent()) return button;
+        }
+        return Optional.empty();
+    }
+
+    private static List<UnitType> landingOrder(Game game, Player seat, Tile tile, String planetName) {
+        Planet planet = tile.getUnitHolders().get(planetName) instanceof Planet found ? found : null;
+        boolean claimingHazardous = BoardView.controller(game, planetName) == null
+                && planet != null
+                && planet.getPlanetTypes().contains(HAZARDOUS);
+        boolean mechanizes = planet != null
+                && seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)
+                && BoardView.count(planet, seat, UnitType.Mech) == 0;
+        return claimingHazardous || mechanizes
+                ? List.of(UnitType.Mech, UnitType.Infantry)
+                : List.of(UnitType.Infantry, UnitType.Mech);
+    }
+
+    private record Landing(String planet, int wanted) {}
+
+    private static void expectCustodiansPayment(AiTurnContext context, Tile tile, String planetName) {
+        if (!needsCustodiansPayment(tile, planetName)) return;
+        custodiansPayment(context)
+                .ifPresent(payment ->
+                        PaymentRules.expect(context, "the custodians token", payment, PaymentRules.OBJECTIVE_DONE));
+    }
+
+    private static boolean needsCustodiansPayment(Tile tile, String planetName) {
+        return tile.getUnitHolders().get(planetName) instanceof Planet planet && BoardView.hasCustodians(planet);
+    }
+
+    private static Optional<Wallet.Payment> custodiansPayment(AiTurnContext context) {
+        SpendCost cost = SpendCost.influence(CUSTODIANS_COST);
+        return ScoringReserve.planForCustodians(context.game(), context.seat())
+                .or(() -> Wallet.of(context.game(), context.seat()).plan(cost));
+    }
+
+    private static Optional<Landing> nextLanding(AiTurnContext context, Tile tile, Optional<TacticalPlan> plan) {
+        Player seat = context.seat();
+        if (plan.isPresent()) {
+            for (Map.Entry<String, Integer> wanted : plan.get().landings().entrySet()) {
+                Planet planet = tile.getUnitHolders().get(wanted.getKey()) instanceof Planet p ? p : null;
+                if (planet == null) continue;
+                int missing = wanted.getValue() - BoardView.groundForces(planet, seat);
+                if (missing > 0) return Optional.of(new Landing(planet.getName(), missing));
+            }
+            return Optional.empty();
+        }
+        return tile.getPlanetUnitHolders().stream()
+                .filter(planet -> !seat.getPlanets().contains(planet.getName()))
+                .filter(planet -> BoardView.groundForces(planet, seat) == 0)
+                .filter(planet -> !BoardView.enemyStructuresOn(context.game(), seat, planet))
+                .max(Comparator.comparingDouble(BoardView::planetValue))
+                .map(planet -> new Landing(planet.getName(), 1));
+    }
+
+    private static Optional<PromptButton> landButton(
+            AiPrompt prompt, String target, String planet, int amount, UnitType type, Player seat) {
+        String id = "landUnits_" + target + "_" + amount + type.getValue() + "_" + planet + "_" + seat.getColor();
+        return prompt.enabledHandler(id);
+    }
+
+    private static boolean groundCombatOngoing(Game game, Player seat, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
+                .anyMatch(planet ->
+                        BoardView.groundForces(planet, seat) > 0 && BoardView.enemyGroundForcesOn(game, seat, planet));
+    }
+
+    private static Optional<AiDecision> waitForCombat(AiTurnContext context, List<AiPrompt> turn) {
+        boolean combatThread =
+                context.prompts().stream().anyMatch(prompt -> prompt.source() == PromptSource.COMBAT_THREAD);
+        if (combatThread) {
+            return Optional.of(new AiDecision.Wait(context.now() + COMBAT_WAIT_MILLIS, "combat in the active system"));
+        }
+        String key = COMBAT_EXPECTED_KEY + actionKey(context);
+        long since = context.memory().get(key).map(Long::parseLong).orElse(context.now());
+        if (!context.memory().has(key)) context.memory().put(key, String.valueOf(since));
+        if (context.now() - since < COMBAT_THREAD_GRACE_MILLIS) {
+            return Optional.of(new AiDecision.Wait(since + COMBAT_THREAD_GRACE_MILLIS, "a combat to start"));
+        }
+        return turn.stream()
+                .filter(prompt -> prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(context.faction())))
+                .findFirst()
+                .map(prompt -> new AiDecision.Unsure(prompt, "its units share a system with another player's units"));
+    }
+
+    private static Optional<AiDecision> build(AiTurnContext context, List<AiPrompt> turn, Tile tile) {
+        String faction = context.faction();
+        Optional<Match> build = Prompts.owned(turn, faction, ("tacticalActionBuild_" + tile.getPosition())::equals);
+        Optional<Match> conclude = Prompts.owned(turn, faction, "doneWithTacticalAction"::equals);
+        if (build.isPresent()) {
+            DefenseOutlook defense = new DefenseOutlook(context.game(), context.seat());
+            Optional<BuildPlan> free = ProductionPlanner.freeBuild(context.game(), context.seat(), tile, defense);
+            BuildPlan plan = free.orElseGet(() -> plannedBuild(context, tile, defense));
+            if (!plan.isEmpty()) {
+                context.memory().put(BUILD_KEY + actionKey(context), plan.encode());
+                if (free.isPresent()) {
+                    context.memory().put(FREE_BUILD_KEY + actionKey(context), FREE_BUILD_PLANNED);
+                    return Optional.of(build.get().press("build units for free with Harrugh Gefhara"));
+                }
+                return Optional.of(build.get().press("build units"));
+            }
+        }
+        return conclude.map(match -> match.press("conclude the tactical action"));
+    }
+
+    private static BuildPlan plannedBuild(AiTurnContext context, Tile tile, DefenseOutlook defense) {
+        Game game = context.game();
+        Player seat = context.seat();
+        BuildPlan base = ProductionPlanner.plan(game, seat, tile, 0, defense);
+        if (!ProductionCards.holdsWarMachine(game, seat)) return base;
+        Optional<BuildPlan> boosted = ProductionPlanner.warMachinePlan(game, seat, tile, base, defense);
+        boosted.ifPresent(found -> context.memory().put(WAR_MACHINE_KEY + actionKey(context), base.encode()));
+        return boosted.orElse(base);
+    }
+
+    private static Optional<AiDecision> warMachine(AiTurnContext context, List<AiPrompt> turn, String target) {
+        String scope = actionKey(context);
+        Optional<BuildPlan> base = context.memory().get(WAR_MACHINE_KEY + scope).flatMap(BuildPlan::decode);
+        if (base.isEmpty()
+                || doneProducing(context, turn, TACTICAL_SOURCE, target).isEmpty()) {
+            return Optional.empty();
+        }
+        return switch (ProductionCards.warMachine(context, scope)) {
+            case UNPLAYED -> ProductionCards.playWarMachine(context, scope).or(() -> buildWithout(context, base.get()));
+            case PENDING ->
+                Optional.of(
+                        new AiDecision.Wait(context.now() + WAR_MACHINE_WAIT_MILLIS, "its War Machine action card"));
+            case SETTLED -> settleWarMachine(context, base.get());
+        };
+    }
+
+    private static Optional<AiDecision> settleWarMachine(AiTurnContext context, BuildPlan base) {
+        if (!context.seat().getSpentThingsThisWindow().contains(WAR_MACHINE_SPENT)) return buildWithout(context, base);
+        context.memory().remove(WAR_MACHINE_KEY + actionKey(context));
+        return Optional.empty();
+    }
+
+    private static Optional<AiDecision> buildWithout(AiTurnContext context, BuildPlan base) {
+        context.memory().put(BUILD_KEY + actionKey(context), base.encode());
+        context.memory().remove(WAR_MACHINE_KEY + actionKey(context));
+        return Optional.empty();
+    }
+
+    private static Optional<Match> doneProducing(
+            AiTurnContext context, List<AiPrompt> prompts, String source, String target) {
+        return Prompts.first(
+                prompts,
+                button -> button.isOwnedBy(context.faction())
+                        && button.handlerId().equals(DONE_PREFIX + source + "_" + target)
+                        && DONE_PRODUCING.equals(button.label()));
+    }
+
+    public static Optional<AiDecision> placeUnits(
+            AiTurnContext context, List<AiPrompt> prompts, String source, String target, Optional<BuildPlan> plan) {
+        Optional<Match> done = doneProducing(context, prompts, source, target);
+        if (done.isEmpty()) return Optional.empty();
+        if (plan.isPresent()) {
+            BuildPlan placing = ProductionPlanner.BELLUM_SOURCE.equals(source)
+                    ? plan.get()
+                    : plan.get().withoutBonus();
+            Optional<AiDecision> next = nextPlacement(context, done.get().prompt(), placing);
+            if (next.isPresent()) return next;
+        }
+        Optional<AiDecision> spinner =
+                TechRules.startYinSpinner(context, done.get().prompt());
+        if (spinner.isPresent()) return spinner;
+        Optional<AiDecision> assembly =
+                TechRules.startSelfAssembly(context, done.get().prompt());
+        if (assembly.isPresent()) return assembly;
+        return Optional.of(done.get().press("done building"));
+    }
+
+    private static Optional<AiDecision> nextPlacement(AiTurnContext context, AiPrompt prompt, BuildPlan plan) {
+        Game game = context.game();
+        Player seat = context.seat();
+        for (BuildOrder order : fightersLast(plan.orders())) {
+            int units = Math.min(order.units(), plan.units(order.type()) - produced(seat, order.type()));
+            if (order.type() == UnitType.Fighter) units = Math.min(units, fighterRoom(game, seat, order.location()));
+            if (units <= 0) continue;
+            Optional<PromptButton> whole =
+                    units == order.units() ? prompt.enabledHandler(order.handlerId()) : Optional.empty();
+            Optional<PromptButton> button = whole.or(() -> prompt.enabledHandler(order.singleHandlerId()));
+            if (button.isEmpty()) continue;
+            double added = whole.isPresent() ? order.cost() : order.cost() / Math.max(1, order.units());
+            if (!freeBuild(context) && breaksReserve(game, seat, added)) continue;
+            return Optional.of(AiDecision.press(prompt, button.get(), "build " + order.unitId()));
+        }
+        return Optional.empty();
+    }
+
+    private static List<BuildOrder> fightersLast(List<BuildOrder> orders) {
+        return orders.stream()
+                .sorted(Comparator.comparingInt(order -> order.type() == UnitType.Fighter ? 1 : 0))
+                .toList();
+    }
+
+    private static int fighterRoom(Game game, Player seat, String position) {
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null) return 0;
+        ButtonHelper.FleetCheck check = ButtonHelper.fleetCheck(seat, game, tile);
+        if (check.capacitySlack() == Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        int fighters = BoardView.count(BoardView.space(tile), seat, UnitType.Fighter);
+        int unusedAllowance = Math.max(0, check.counts()[IGNORED_FIGHTERS_INDEX] - fighters);
+        return Math.max(0, check.capacitySlack() + unusedAllowance);
+    }
+
+    static boolean breaksReserve(Game game, Player seat, double addedCost) {
+        SpendCost reserve = ProductionPlanner.reserve(game, seat);
+        if (reserve.isNone()) return false;
+        int discounts = (seat.hasTech("st") ? 1 : 0)
+                + ProductionPlanner.aidaDiscount(seat)
+                + (seat.getSpentThingsThisWindow().contains(WAR_MACHINE_SPENT) ? 1 : 0);
+        int owed = (int) Math.ceil(producedCost(seat) + addedCost - discounts);
+        if (owed <= 0) return false;
+        return ScoringReserve.planAfterReserve(Wallet.of(game, seat), reserve, SpendCost.resources(owed))
+                .isEmpty();
+    }
+
+    private static double producedCost(Player seat) {
+        double cost = 0;
+        for (UnitType type : UnitType.values()) {
+            int count = produced(seat, type);
+            if (count == 0) continue;
+            cost += count
+                    * BoardView.model(seat, type).map(model -> model.getCost()).orElse(0f);
+        }
+        return cost;
+    }
+
+    private static int produced(Player seat, UnitType type) {
+        String asyncId =
+                BoardView.model(seat, type).map(model -> model.getAsyncId()).orElse(type.value);
+        return seat.getCurrentProducedUnits().entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(asyncId + "_"))
+                .mapToInt(Map.Entry::getValue)
+                .sum();
+    }
+
+    public static Optional<AiDecision> payForUnits(AiTurnContext context, List<AiPrompt> prompts, String source) {
+        Game game = context.game();
+        Player seat = context.seat();
+        String cost = game.getStoredValue("producedUnitCostFor" + context.faction());
+        if (StringUtils.isBlank(cost)) return Optional.empty();
+        Optional<Match> done = Prompts.first(
+                prompts,
+                button -> button.isUnowned()
+                        && (DONE_PREFIX + source).equals(button.handlerId())
+                        && DONE_EXHAUSTING.equals(button.label()));
+        if (done.isEmpty()) return Optional.empty();
+        AiPrompt payment = done.get().prompt();
+        if (TACTICAL_SOURCE.equals(source)) {
+            Optional<AiDecision> hero = payWithHero(context, payment, done.get());
+            if (hero.isPresent()) return hero;
+        }
+        double owed = parseDouble(cost) - spent(game, seat);
+        if (owed > 0 && !seat.getSpentThingsThisWindow().contains(SARWEEN)) {
+            Optional<PromptButton> sarween = payment.enabledHandler("useTech_st");
+            if (sarween.isPresent()) return Optional.of(AiDecision.press(payment, sarween.get(), "use Sarween Tools"));
+        }
+        if (owed > 0 && ProductionPlanner.aidaDiscount(seat) > 0) {
+            Optional<PromptButton> aida = payment.enabledHandler(AIDA_EXHAUST);
+            if (aida.isPresent()) {
+                return Optional.of(AiDecision.press(payment, aida.get(), "exhaust AI Development Algorithm"));
+            }
+        }
+        if (owed > 0) {
+            SpendCost reserve = ProductionPlanner.reserve(game, seat);
+            Optional<PromptButton> planet = PaymentPlanner.keepingReserve(game, seat, payment, owed, reserve)
+                    .or(() -> PaymentPlanner.choosePlanet(game, seat, payment, owed));
+            if (planet.isPresent()) {
+                return Optional.of(AiDecision.press(
+                        payment, planet.get(), "pay for units with " + PaymentPlanner.describe(planet.get())));
+            }
+            if (seat.getTg() > 0) {
+                Optional<PromptButton> tradeGood = payment.enabledHandler("reduceTG_1_res");
+                if (tradeGood.isPresent()) {
+                    return Optional.of(AiDecision.press(payment, tradeGood.get(), "pay with a trade good"));
+                }
+            }
+        }
+        return Optional.of(done.get().press("done paying"));
+    }
+
+    private static boolean freeBuild(AiTurnContext context) {
+        return context.memory().has(FREE_BUILD_KEY + actionKey(context));
+    }
+
+    private static Optional<AiDecision> payWithHero(AiTurnContext context, AiPrompt payment, Match done) {
+        String key = FREE_BUILD_KEY + actionKey(context);
+        String state = context.memory().get(key).orElse("");
+        if (FREE_BUILD_PURGED.equals(state))
+            return Optional.of(done.press("done paying: Harrugh Gefhara made the units free"));
+        if (!FREE_BUILD_PLANNED.equals(state)) return Optional.empty();
+        Optional<PromptButton> purge = payment.enabledHandler(PURGE_HACAN_HERO);
+        if (purge.isEmpty()) {
+            context.memory().remove(key);
+            return Optional.empty();
+        }
+        context.memory().put(key, FREE_BUILD_PURGED);
+        return Optional.of(
+                AiDecision.press(payment, purge.get(), "purge Harrugh Gefhara to reduce the cost of the units to 0"));
+    }
+
+    private static double spent(Game game, Player seat) {
+        Pooling pooling = Pooling.of(seat);
+        double spent = 0;
+        for (String thing : seat.getSpentThingsThisWindow()) {
+            if (SARWEEN.equals(thing) || WAR_MACHINE_SPENT.equals(thing)) {
+                spent += 1;
+            } else if (AIDA_DISCOUNT.equals(thing)) {
+                spent += ButtonHelper.getNumberOfUnitUpgrades(seat);
+            } else if (thing.startsWith("tg_")) {
+                spent += parseDouble(StringUtils.substringAfter(thing, "tg_")) * Wallet.tradeGoodValue(seat);
+            } else if (seat.getPlanets().contains(thing)
+                    && game.getPlanetsInfo().get(thing) != null) {
+                spent += pooling.resourcesOf(game.getPlanetsInfo().get(thing));
+            }
+        }
+        return spent;
+    }
+
+    private static double parseDouble(String value) {
+        try {
+            return Double.parseDouble(value.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public static String describe(TacticalPlan plan) {
+        return plan.kind().name().toLowerCase() + " " + plan.target();
+    }
+}

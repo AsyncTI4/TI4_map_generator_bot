@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FactionDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
@@ -62,8 +63,8 @@ public class FactionDraftable extends SinglePickDraftable {
                 .map(FactionModel::getAlias)
                 .toList());
         List<String> randomOrder = new ArrayList<>(presetFactions);
-        Collections.shuffle(randomOrder);
-        Collections.shuffle(availableFactions);
+        Collections.shuffle(randomOrder, RandomHelper.current());
+        Collections.shuffle(availableFactions, RandomHelper.current());
         randomOrder.addAll(availableFactions);
 
         int i = 0;

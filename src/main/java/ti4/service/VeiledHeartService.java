@@ -22,6 +22,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Units;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
@@ -232,7 +233,7 @@ public class VeiledHeartService {
             return buttons;
         }
 
-        Collections.shuffle(veiledCards);
+        Collections.shuffle(veiledCards, RandomHelper.current());
 
         StringBuilder msgForTarget = new StringBuilder(
                 "Buttons to choose one of your veiled cards were sent to " + activePlayer.getRepresentationNoPing()

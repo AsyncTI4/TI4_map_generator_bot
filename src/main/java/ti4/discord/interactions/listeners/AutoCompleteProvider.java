@@ -38,6 +38,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -759,7 +760,7 @@ class AutoCompleteProvider {
                         }
                     }
                 }
-                Collections.shuffle(tableRelics);
+                Collections.shuffle(tableRelics, RandomHelper.current());
 
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tableRelics, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
+import ti4.ai.discord.AiCommand;
 import ti4.discord.interactions.commands.admin.AdminCommand;
 import ti4.discord.interactions.commands.agenda.AgendaCommand;
 import ti4.discord.interactions.commands.async.AsyncCommand;
@@ -109,6 +110,7 @@ public class SlashCommandManager {
                     new AdminCommand(),
                     new DeveloperCommand(),
                     new TestBedCommand(),
+                    new AiCommand(),
                     new BothelperCommand(),
                     new BothelperCommand2(),
                     new PlayerCommand(),

@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.thirtyk.ThirtyKAcState;
 import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.helpers.thirtyk.ThirtyKDistance;
@@ -301,7 +302,7 @@ public class ThirtyKEconomyAcButtonHandler {
     private static String randomFragment(Player target) {
         List<String> fragments = target.getFragments();
         if (fragments.isEmpty()) return null;
-        return fragments.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(fragments.size()));
+        return fragments.get(RandomHelper.current().nextInt(fragments.size()));
     }
 
     public static List<Button> priceOfInformationButtons(Game game, Player player) {

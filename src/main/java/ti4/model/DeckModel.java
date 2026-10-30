@@ -10,6 +10,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
+import ti4.helpers.RandomHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -102,7 +103,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     public List<String> getNewShuffledDeck() {
         List<String> cardList = new ArrayList<>(cardIDs);
-        Collections.shuffle(cardList);
+        Collections.shuffle(cardList, RandomHelper.current());
         return cardList;
     }
 

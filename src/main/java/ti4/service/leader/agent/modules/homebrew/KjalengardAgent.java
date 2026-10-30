@@ -2,13 +2,13 @@ package ti4.service.leader.agent.modules.homebrew;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.RandomHelper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
@@ -68,7 +68,7 @@ public final class KjalengardAgent extends UntargetedAgent {
                     kjalengard.getFactionEmoji()
                             + " there were no **Glory** tokens on the game board to move. Go win some battles and earn"
                             + " some, or your ancestors will laugh at ya when "
-                            + (ThreadLocalRandom.current().nextInt(20) == 0 ? "(if) " : "") + "you reach Valhalla.");
+                            + (RandomHelper.current().nextInt(20) == 0 ? "(if) " : "") + "you reach Valhalla.");
         }
         return Message.addressedTo(
                 kjalengard, ", please choose the system to move a **Glory** token from.", gloryTiles);

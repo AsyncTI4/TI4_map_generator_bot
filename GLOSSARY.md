@@ -474,6 +474,10 @@ A Player's removal from the Game when they control no Planets, have no ground fo
 
 ### Table slang
 
+**Slay**:
+To attack a Player who will otherwise win before you get to score, typically by taking a planet in their home System so they cannot score public objectives. AI seats announce it as "We must slay X, Y, Z." and other AI seats read the declared targets.
+_Avoid_: Kingmaking, gank
+
 **Pop**:
 To play a Strategy card's primary ability, as in "popping Trade".
 _Avoid_: Cast, fire

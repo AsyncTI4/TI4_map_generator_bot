@@ -277,7 +277,7 @@ public class SecretObjectiveHelper {
         sb.append("Player: ").append(player.getUserName()).append('\n');
         sb.append("Showed Secret Objectives:").append('\n');
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
-        Collections.shuffle(secrets);
+        Collections.shuffle(secrets, RandomHelper.current());
         for (String id : secrets) {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id))
                     .append('\n');
@@ -461,7 +461,7 @@ public class SecretObjectiveHelper {
             return;
         }
 
-        Collections.shuffle(secrets);
+        Collections.shuffle(secrets, RandomHelper.current());
         String soID = secrets.getFirst();
 
         String sb = otherPlayer.getRepresentationUnfogged()

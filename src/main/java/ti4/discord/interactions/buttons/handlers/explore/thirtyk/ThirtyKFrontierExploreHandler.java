@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -25,6 +24,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -372,7 +372,7 @@ public class ThirtyKFrontierExploreHandler {
                 .map(Map.Entry::getKey)
                 .toList();
         if (lastPlace.isEmpty()) return Optional.empty();
-        return Optional.of(lastPlace.get(ThreadLocalRandom.current().nextInt(lastPlace.size())));
+        return Optional.of(lastPlace.get(RandomHelper.current().nextInt(lastPlace.size())));
     }
 
     private static void rewardSympathies(

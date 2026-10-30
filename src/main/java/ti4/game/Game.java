@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -76,6 +75,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
@@ -1608,18 +1608,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     private void setSentAgenda(String id) {
         Collection<Integer> values = sentAgendas.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         sentAgendas.put(id, identifier);
     }
 
     private int addDiscardAgenda(String id) {
         Collection<Integer> values = discardAgendas.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         discardAgendas.put(id, identifier);
         return identifier;
@@ -1627,9 +1627,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public int discardEvent(String eventID) {
         Collection<Integer> values = discardedEvents.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         discardedEvents.put(eventID, identifier);
         return identifier;
@@ -1697,12 +1697,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Map.Entry<String, Integer> revealStage2Random() {
-        Collections.shuffle(publicObjectives2);
+        Collections.shuffle(publicObjectives2, RandomHelper.current());
         return revealNextPublicObjective(publicObjectives2);
     }
 
     public Map.Entry<String, Integer> revealStage1Random() {
-        Collections.shuffle(publicObjectives1);
+        Collections.shuffle(publicObjectives1, RandomHelper.current());
         return revealNextPublicObjective(publicObjectives1);
     }
 
@@ -1723,7 +1723,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (sizeOfBottom < 1) {
             throw new IllegalArgumentException("Size of bottom must be greater than 0.");
         }
-        var insertPositionFromEnd = ThreadLocalRandom.current().nextInt(sizeOfBottom);
+        var insertPositionFromEnd = RandomHelper.current().nextInt(sizeOfBottom);
         var insertPosition = objectiveList.size() - insertPositionFromEnd;
         objectiveList.add(insertPosition, cardIdToShuffle);
     }
@@ -1741,9 +1741,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         while (peekable.size() != num) {
             if (peekable.size() > num) {
                 objectiveDeck.add(peekable.removeLast());
-                Collections.shuffle(objectiveDeck);
+                Collections.shuffle(objectiveDeck, RandomHelper.current());
             } else {
-                Collections.shuffle(objectiveDeck);
+                Collections.shuffle(objectiveDeck, RandomHelper.current());
                 peekable.add(objectiveDeck.removeFirst());
             }
         }
@@ -1840,10 +1840,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (Mapper.getPublicObjective(id) == null) return;
         if (isStage1PublicObjective(id)) {
             publicObjectives1.add(id);
-            Collections.shuffle(publicObjectives1);
+            Collections.shuffle(publicObjectives1, RandomHelper.current());
         } else {
             publicObjectives2.add(id);
-            Collections.shuffle(publicObjectives2);
+            Collections.shuffle(publicObjectives2, RandomHelper.current());
         }
     }
 
@@ -1867,7 +1867,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Entry<String, Integer> revealSecretObjective() {
-        Collections.shuffle(getSecretObjectives());
+        Collections.shuffle(getSecretObjectives(), RandomHelper.current());
         String id = getSecretObjectives().getFirst();
         removeSOFromGame(id);
         addToSoToPoList(id);
@@ -1894,11 +1894,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (isStage1PublicObjective(id)) {
             publicObjectives1Peeked.remove(id);
             publicObjectives1.add(id);
-            Collections.shuffle(publicObjectives1);
+            Collections.shuffle(publicObjectives1, RandomHelper.current());
         } else {
             publicObjectives2Peeked.remove(id);
             publicObjectives2.add(id);
-            Collections.shuffle(publicObjectives2);
+            Collections.shuffle(publicObjectives2, RandomHelper.current());
         }
         return true;
     }
@@ -1941,9 +1941,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void shuffleObjectiveDeck(int stage) {
         if (stage == 1) {
-            Collections.shuffle(publicObjectives1);
+            Collections.shuffle(publicObjectives1, RandomHelper.current());
         } else if (stage == 2) {
-            Collections.shuffle(publicObjectives2);
+            Collections.shuffle(publicObjectives2, RandomHelper.current());
         }
     }
 
@@ -2164,7 +2164,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void addRelicToGame(String id) {
         relics.add(id);
-        Collections.shuffle(relics);
+        Collections.shuffle(relics, RandomHelper.current());
     }
 
     public boolean removePOFromGame(String id) {
@@ -2263,11 +2263,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void shuffleAgendas() {
-        Collections.shuffle(getAgendas());
+        Collections.shuffle(getAgendas(), RandomHelper.current());
     }
 
     public void shuffleEvents() {
-        Collections.shuffle(getEvents());
+        Collections.shuffle(getEvents(), RandomHelper.current());
     }
 
     public void resetAgendas() {
@@ -2295,9 +2295,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!id.isEmpty()) {
             Collection<Integer> values = eventsInEffect.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
+            int identifier = RandomHelper.current().nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
+                identifier = RandomHelper.current().nextInt(1000);
             }
             discardedEvents.remove(id);
             eventsInEffect.put(id, identifier);
@@ -2320,9 +2320,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public boolean addLaw(String id, String optionalText) {
         if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
+            int identifier = RandomHelper.current().nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
+                identifier = RandomHelper.current().nextInt(1000);
             }
             discardAgendas.remove(id);
             laws.put(id, identifier);
@@ -2373,9 +2373,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
-            int identifier = ThreadLocalRandom.current().nextInt(1000);
+            int identifier = RandomHelper.current().nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = ThreadLocalRandom.current().nextInt(1000);
+                identifier = RandomHelper.current().nextInt(1000);
             }
             discardAgendas.remove(id);
             laws.put(id, identifier);
@@ -2814,7 +2814,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         .allMatch(player -> player.getHydromorphicCards().isEmpty());
         if (noHydromorphicCardsExist) {
             setHydromorphicCards(new ArrayList<>(Mapper.getHydromorphicCards().keySet()));
-            Collections.shuffle(getHydromorphicCards());
+            Collections.shuffle(getHydromorphicCards(), RandomHelper.current());
             setStoredValue("hydromorphicDeck", "initialized");
         }
         if (!"2".equals(getStoredValue("hydromorphicDeckVersion"))) {
@@ -2849,7 +2849,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             setHydromorphicCards(new ArrayList<>());
         }
         getHydromorphicCards().add(cardId);
-        Collections.shuffle(getHydromorphicCards());
+        Collections.shuffle(getHydromorphicCards(), RandomHelper.current());
     }
 
     public int getHydromorphicCardFullDeckSize() {
@@ -2872,7 +2872,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         String names = acsToShuffle.stream()
                 .map(ac -> Mapper.getActionCard(ac).getName())
                 .collect(Collectors.joining("\n"));
-        Collections.shuffle(getActionCards());
+        Collections.shuffle(getActionCards(), RandomHelper.current());
         acsToShuffle.forEach(this::removeFromDiscard); // clear out the shuffled back cards
         String msg = "# " + getPing()
                 + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
@@ -2948,7 +2948,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         getEvents().addAll(discardedEvents.keySet());
         discardedEvents.clear();
-        Collections.shuffle(getEvents());
+        Collections.shuffle(getEvents(), RandomHelper.current());
         return drawEvent(userID);
     }
 
@@ -3061,7 +3061,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void shuffleExplores() {
-        Collections.shuffle(explore);
+        Collections.shuffle(explore, RandomHelper.current());
     }
 
     public void discardExplore(String id) {
@@ -3075,7 +3075,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         List<String> deck = getExplores(reqType, explore);
         if (deck.size() < count) {
             List<String> discards = new ArrayList<>(getExplores(reqType, discardExplore));
-            Collections.shuffle(discards);
+            Collections.shuffle(discards, RandomHelper.current());
             discardExplore.removeAll(discards);
             explore.addAll(discards);
             deck = getExplores(reqType, explore);
@@ -3095,7 +3095,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public void addExplore(String id) {
         if (Mapper.getExplore(id) != null) {
-            int place = ThreadLocalRandom.current().nextInt(explore.size());
+            int place = RandomHelper.current().nextInt(explore.size());
             explore.add(place, id);
         }
         discardExplore.remove(id);
@@ -3141,7 +3141,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 }
             }
         }
-        Collections.shuffle(deck);
+        Collections.shuffle(deck, RandomHelper.current());
         explore.addAll(deck);
     }
 
@@ -3152,7 +3152,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             explore.add(card + "extra1");
             explore.add(card + "extra2");
         }
-        Collections.shuffle(explore);
+        Collections.shuffle(explore, RandomHelper.current());
     }
 
     public void pbd1000decks() {
@@ -3178,7 +3178,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 .toList();
         List<String> newDeck2 = new ArrayList<>(newDeck);
         for (String card : newDeck) for (int i = 1; i < totalCopies; i++) newDeck2.add(card + "extra" + i);
-        Collections.shuffle(newDeck2);
+        Collections.shuffle(newDeck2, RandomHelper.current());
         return newDeck2;
     }
 
@@ -3194,13 +3194,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void shuffleRelics() {
-        Collections.shuffle(relics);
+        Collections.shuffle(relics, RandomHelper.current());
     }
 
     public boolean shuffleRelicBack(String relicID) {
         if (!relics.contains(relicID)) {
             relics.add(relicID);
-            Collections.shuffle(relics);
+            Collections.shuffle(relics, RandomHelper.current());
             return true;
         }
         return false;
@@ -3257,7 +3257,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (isErwansGambitMode() && "mentak".equalsIgnoreCase(player.getFaction())) {
             List<SecretObjectiveModel> heistObbies =
                     new ArrayList<>(Mapper.getSecretObjectives().values());
-            Collections.shuffle(heistObbies);
+            Collections.shuffle(heistObbies, RandomHelper.current());
             for (SecretObjectiveModel so : heistObbies) {
                 if (player.getSecrets().containsKey(so.getAlias()) || soToPoList.contains(so.getAlias())) {
                     continue;
@@ -3341,9 +3341,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         getPlayers()
                 .values()
                 .forEach(player -> values.addAll(player.getActionCards().values()));
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         getDiscardActionCards().put(id, identifier);
         if (status != null) getDiscardACStatus().put(id, status);
@@ -3442,7 +3442,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void shuffleActionCards() {
-        Collections.shuffle(getActionCards());
+        Collections.shuffle(getActionCards(), RandomHelper.current());
     }
 
     public Map<String, Integer> getPurgedActionCards() {
@@ -3504,7 +3504,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!acID.isEmpty()) {
             removeFromDiscard(acID);
             getActionCards().add(acID);
-            Collections.shuffle(getActionCards());
+            Collections.shuffle(getActionCards(), RandomHelper.current());
             return true;
         }
         return false;
@@ -3526,7 +3526,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
         player.removeActionCard(acIdNumber);
         getActionCards().add(acId);
-        Collections.shuffle(getActionCards());
+        Collections.shuffle(getActionCards(), RandomHelper.current());
         return true;
     }
 
@@ -3592,7 +3592,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
             getSecretObjectives().add(soID);
-            Collections.shuffle(getSecretObjectives());
+            Collections.shuffle(getSecretObjectives(), RandomHelper.current());
             return true;
         }
         return false;
@@ -3617,7 +3617,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 return true;
             }
             getSecretObjectives().add(soID);
-            Collections.shuffle(getSecretObjectives());
+            Collections.shuffle(getSecretObjectives(), RandomHelper.current());
             return true;
         }
         return false;
@@ -3910,7 +3910,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             for (String acID : newDeck) {
                 getActionCards().add(acID);
             }
-            Collections.shuffle(getActionCards());
+            Collections.shuffle(getActionCards(), RandomHelper.current());
         }
         removeOverruleIfPurged();
         return true;
@@ -3936,7 +3936,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         for (String acID : newDeck) {
             getActionCards().add(acID);
         }
-        Collections.shuffle(getActionCards());
+        Collections.shuffle(getActionCards(), RandomHelper.current());
     }
 
     public boolean validateAndSetRelicDeck(DeckModel deck) {
@@ -3948,10 +3948,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void shuffleDecks() {
-        Collections.shuffle(relics);
-        Collections.shuffle(getActionCards());
-        Collections.shuffle(getSecretObjectives());
-        Collections.shuffle(explore);
+        Collections.shuffle(relics, RandomHelper.current());
+        Collections.shuffle(getActionCards(), RandomHelper.current());
+        Collections.shuffle(getSecretObjectives(), RandomHelper.current());
+        Collections.shuffle(explore, RandomHelper.current());
     }
 
     public boolean validateAndSetSecretObjectiveDeck(GenericInteractionCreateEvent event, DeckModel deck) {
@@ -4068,7 +4068,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                     "strategic_coordination",
                     "minister_of_justice",
                     "invalidated_patent"));
-            Collections.shuffle(list);
+            Collections.shuffle(list, RandomHelper.current());
             setMandates(list);
         }
     }

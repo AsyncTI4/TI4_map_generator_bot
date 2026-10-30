@@ -36,6 +36,7 @@ import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
@@ -451,7 +452,7 @@ public class FrankenDraftBagService {
         List<DraftBag> bags = draft.generateBags(game);
         if (bags == null) return;
 
-        Collections.shuffle(bags);
+        Collections.shuffle(bags, RandomHelper.current());
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
@@ -512,7 +513,7 @@ public class FrankenDraftBagService {
         StringBuilder sb = new StringBuilder("Automatically setting players up as Franken factions:");
         List<Integer> emojiNum = new ArrayList<>(
                 List.of(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26));
-        Collections.shuffle(emojiNum);
+        Collections.shuffle(emojiNum, RandomHelper.current());
         boolean skipped = false;
         for (Player player : players) {
             if (player.isRealPlayer() && !force) {

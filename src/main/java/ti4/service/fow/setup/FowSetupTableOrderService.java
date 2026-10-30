@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -19,6 +18,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
@@ -252,7 +252,7 @@ final class FowSetupTableOrderService {
 
         int total = 0;
         for (int i = 0; i < state.getDiceCount(); i++) {
-            total += ThreadLocalRandom.current().nextInt(state.getDiceSides()) + 1;
+            total += RandomHelper.current().nextInt(state.getDiceSides()) + 1;
         }
         state.getDiceRolls().put(player.getUserID(), total);
         FowSetupWizardService.saveState(game, state);

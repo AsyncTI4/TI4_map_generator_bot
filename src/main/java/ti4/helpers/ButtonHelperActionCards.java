@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -1665,7 +1664,7 @@ public final class ButtonHelperActionCards {
                     game,
                     player.getRepresentationUnfogged() + " has stolen " + comm + " commodit" + (comm == 1 ? "y" : "ies")
                             + " from " + p2.getRepresentationUnfogged() + " in " + game.getName() + " with _Salvage_. "
-                            + switch (ThreadLocalRandom.current().nextInt(0, 5)) {
+                            + switch (RandomHelper.current().nextInt(0, 5)) {
                                 case 0 -> "Amazing";
                                 case 1 -> "Incredible";
                                 case 2 -> "Unbelievable";
@@ -1875,7 +1874,7 @@ public final class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged()
-                        + assassinateMessages.get(ThreadLocalRandom.current().nextInt(0, assassinateMessages.size())));
+                        + assassinateMessages.get(RandomHelper.current().nextInt(0, assassinateMessages.size())));
         game.setStoredValue("AssassinatedReps", game.getStoredValue("AssassinatedReps") + p2.getFaction());
         game.setStoredValue("preVoting" + p2.getFaction(), "");
     }

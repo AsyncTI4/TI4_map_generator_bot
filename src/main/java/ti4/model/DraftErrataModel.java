@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
+import ti4.helpers.RandomHelper;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -84,6 +85,6 @@ public class DraftErrataModel implements ModelInterface {
         Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
         items.clear();
         items.addAll(itemsSet);
-        Collections.shuffle(items);
+        Collections.shuffle(items, RandomHelper.current());
     }
 }

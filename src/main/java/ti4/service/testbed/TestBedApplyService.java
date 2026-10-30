@@ -19,6 +19,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.model.BoardPosition;
 import ti4.model.FactionModel;
@@ -196,7 +197,7 @@ public class TestBedApplyService {
                 .map(FactionModel::getAlias)
                 .filter(alias -> !alias.contains("keleres") && !taken.contains(alias))
                 .toList());
-        Collections.shuffle(pool);
+        Collections.shuffle(pool, RandomHelper.current());
         return pool;
     }
 

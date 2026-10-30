@@ -721,10 +721,15 @@ public class Tile {
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(tileID);
+    }
+
     @JsonIgnore
     public boolean isMecatol(Game game) {
-        return game.getMecatolTile() != null
-                && game.getMecatolTile().getPosition().equals(getPosition());
+        Tile mecatol = game.getMecatolTile();
+        return mecatol != null && mecatol.getPosition().equals(getPosition());
     }
 
     @JsonIgnore

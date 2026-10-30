@@ -857,7 +857,7 @@ public class PromissoryNoteHelper {
         sb.append("Showed Promissory Notes:").append('\n');
         List<String> promissoryNotes =
                 new ArrayList<>(player.getPromissoryNotes().keySet());
-        Collections.shuffle(promissoryNotes);
+        Collections.shuffle(promissoryNotes, RandomHelper.current());
         int index = 1;
         for (String id : promissoryNotes) {
             sb.append(index)
@@ -883,7 +883,7 @@ public class PromissoryNoteHelper {
         for (String pn : sourcePlayer.getPromissoryNotesInPlayArea()) {
             promissoryNotes.remove(pn);
         }
-        Collections.shuffle(promissoryNotes);
+        Collections.shuffle(promissoryNotes, RandomHelper.current());
         String promissoryNoteId = promissoryNotes.getFirst();
 
         sourcePlayer.removePromissoryNote(promissoryNoteCounts.get(promissoryNoteId));

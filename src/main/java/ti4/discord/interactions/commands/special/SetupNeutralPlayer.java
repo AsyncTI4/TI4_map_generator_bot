@@ -12,6 +12,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.service.emoji.ColorEmojis;
@@ -56,7 +57,7 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
             return "gray";
         }
 
-        Collections.shuffle(unusedColors);
+        Collections.shuffle(unusedColors, RandomHelper.current());
 
         for (String color : unusedColors) {
             if (!color.contains("split")) {

@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1722,7 +1721,7 @@ public final class LoreService {
     private static int rollDice(int count, int sides) {
         int total = 0;
         for (int i = 0; i < count; i++) {
-            total += ThreadLocalRandom.current().nextInt(1, sides + 1);
+            total += RandomHelper.current().nextInt(1, sides + 1);
         }
         return total;
     }

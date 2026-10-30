@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -20,6 +19,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.logging.BotLogger;
@@ -58,7 +58,7 @@ class TechUseButtonHandler {
                 player.setSarweenCounter(player.getSarweenCounter() + 1);
                 String msg = player.getFactionEmoji() + " has used _Sarween Tools_ to save "
                         + StringHelper.pluralize(player.getSarweenCounter(), "resource") + " in this game so far. ";
-                int result = ThreadLocalRandom.current().nextInt(0, 5);
+                int result = RandomHelper.current().nextInt(0, 5);
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 boolean startsWithSarween = false;
                 FactionModel fmod = Mapper.getFaction(player.getFaction());

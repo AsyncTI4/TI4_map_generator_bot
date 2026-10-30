@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -1010,7 +1009,7 @@ public final class ButtonHelperAbilities {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pillagerMessage + "\n" + pillagedMessage);
             }
             if (RandomHelper.isOneInX(8)) {
-                int randomJoke = ThreadLocalRandom.current().nextInt(5) + 1;
+                int randomJoke = RandomHelper.current().nextInt(5) + 1;
                 File audioFile = ResourceHelper.getFile("voices/mentak/", "Pillage" + randomJoke + ".mp3");
                 if (audioFile.exists()) {
                     MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
@@ -2765,7 +2764,7 @@ public final class ButtonHelperAbilities {
                             + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
         } else if (RandomHelper.isOneInX(40) && !colour.isEmpty() && "infantry".equals(unit)) {
             String poem = "";
-            switch (ThreadLocalRandom.current().nextInt(20)) {
+            switch (RandomHelper.current().nextInt(20)) {
                 case 0:
                 case 1:
                 case 2:
