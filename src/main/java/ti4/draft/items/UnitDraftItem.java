@@ -47,7 +47,11 @@ public class UnitDraftItem extends DraftItem {
         if (unit.getCost() > 0) {
             sb.append("Cost: ");
             float cost = unit.getCost();
-            sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
+            if (cost == 0.5f) {
+                sb.append("1(x2)");
+            } else {
+                sb.append(cost == (int) cost ? "" + (int) cost : "" + cost);
+            }
         }
         if (unit.getCombatHitsOn() > 0) {
             sb.append(" Combat: ");

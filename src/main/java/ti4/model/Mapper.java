@@ -98,6 +98,7 @@ public class Mapper {
     private static volatile Map<String, List<Wormhole>> wormholesByImagePath = new HashMap<>();
     private static volatile Map<Wormhole, String> imagePathByWormhole = new HashMap<>();
     private static volatile Set<String> mergeableWormholeImagePaths = new HashSet<>();
+    private static volatile Map<String, String> tokenImagePathByAlias = new HashMap<>();
     private static volatile Map<String, GalacticEventModel> galacticevents = new HashMap<>();
 
     @Getter
@@ -154,7 +155,11 @@ public class Mapper {
         technologies = importJsonObjectsFromFolder("technologies", TechnologyModel.class);
         galacticevents = importJsonObjectsFromFolder("galactic_events", GalacticEventModel.class);
 
-        tokens = importJsonObjectsFromFolder("tokens", TokenModel.class);
+        Map<String, TokenModel> loadedTokens = importJsonObjectsFromFolder("tokens", TokenModel.class);
+        Properties loadedTokenProperties = readData("tokens.properties");
+        tokens = loadedTokens;
+        tokensFromProperties = loadedTokenProperties;
+        tokenImagePathByAlias = indexTokenAliases(loadedTokens);
         indexFowVisionTokens();
         indexTokenWormholes();
         spaceTokens = importJsonObjectsFromFolder("tokens", SpaceTokenModel.class);
@@ -164,7 +169,6 @@ public class Mapper {
         general = readData("general.properties");
         hyperlaneAdjacencies = readData("hyperlanes.properties");
         specialCase = readData("special_case.properties");
-        tokensFromProperties = readData("tokens.properties");
 
         colorsByAnyName = indexColorsByAnyName(colors);
         unitAsyncIds = Collections.unmodifiableSet(
@@ -1337,7 +1341,20 @@ public class Mapper {
     }
 
     public static boolean isValidToken(String id) {
-        return getTokensFromProperties().contains(id);
+        if (id == null) return false;
+        return getTokensFromProperties().contains(id) || tokenImagePathByAlias.containsKey(id.toLowerCase());
+    }
+
+    // TODO: identity wormhole tokens (creuss*, ionalpha/ionbeta, PoK gamma, vortex) keep their own ids;
+    // renaming them to the wh scheme also needs the code that names them by id updated.
+    private static Map<String, String> indexTokenAliases(Map<String, TokenModel> tokenModels) {
+        Map<String, String> byAlias = new HashMap<>();
+        for (TokenModel token : tokenModels.values()) {
+            for (String alias : Optional.ofNullable(token.getAliasList()).orElse(List.of())) {
+                byAlias.putIfAbsent(alias.toLowerCase(), token.getImagePath());
+            }
+        }
+        return byAlias;
     }
 
     public static List<String> getTokensSources(ComponentSource compSource) {
@@ -1368,7 +1385,8 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
-        return tokensFromProperties.getProperty(tokenID);
+        String imagePath = tokensFromProperties.getProperty(tokenID);
+        return imagePath != null ? imagePath : tokenImagePathByAlias.get(tokenID.toLowerCase());
     }
 
     public static String getTokenKey(String tokenID) {

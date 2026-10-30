@@ -427,9 +427,12 @@ public final class ButtonHelperTwilightsFall {
 
     @ButtonHandler("chooseHomeSystem_")
     public static void chooseHomeSystem(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+
         String oldFactionHS = FrankenHomeService.getPlayerHsFaction(player);
-        DraftItem oldFactionItem = new HomeSystemDraftItem(oldFactionHS);
-        FrankenButtonHandler.resolveFrankenItemRemove(event, player, oldFactionItem);
+        if (oldFactionHS != null && Mapper.getFaction(oldFactionHS) != null) {
+            DraftItem oldFactionItem = new HomeSystemDraftItem(oldFactionHS);
+            FrankenButtonHandler.resolveFrankenItemRemove(event, player, oldFactionItem);
+        }
 
         String newFactionHS = buttonID.split("_")[1];
         DraftItem newHomeItem = new HomeSystemDraftItem(newFactionHS);

@@ -49,7 +49,8 @@ public final class CompactOverviewGenerator {
     private static final String CORNERS_TITLE = "corners";
     private static final List<TileStep> GM_STEPS =
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
-    private static final List<TileStep> PLAYER_STEPS = List.of(TileStep.Tile, TileStep.Units, TileStep.TileNumber);
+    private static final List<TileStep> PLAYER_STEPS =
+            List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
 
     record Panel(String title, Map<String, Rectangle> hexes, int margin) {
 
@@ -125,7 +126,7 @@ public final class CompactOverviewGenerator {
                 gmPanels(game),
                 new HashMap<>(game.getTileMap()),
                 TileLayers.of(game, null, displayTypeFor(overlay)),
-                withOverlay(GM_STEPS, overlay),
+                withOverlay(withDistances(game, GM_STEPS), overlay),
                 MAX_SIZE,
                 header(game, "GM overview", overlay));
     }
@@ -143,13 +144,22 @@ public final class CompactOverviewGenerator {
                 playerPanels(game, player, tiles.keySet()),
                 tiles,
                 TileLayers.forPreparedViewer(game, viewer, displayTypeFor(overlay)),
-                withOverlay(PLAYER_STEPS, overlay),
+                withOverlay(withDistances(game, PLAYER_STEPS), overlay),
                 MAX_SIZE,
                 header(game, player.getFaction() + " overview", overlay));
     }
 
     private static DisplayType displayTypeFor(@Nullable DisplayType overlay) {
         return overlay == null ? DisplayType.map : overlay;
+    }
+
+    private static List<TileStep> withDistances(Game game, List<TileStep> steps) {
+        if (game.getTileDistances().isEmpty()) {
+            return steps;
+        }
+        List<TileStep> withDistances = new ArrayList<>(steps);
+        withDistances.add(withDistances.indexOf(TileStep.TileNumber), TileStep.Distance);
+        return withDistances;
     }
 
     private static List<TileStep> withOverlay(List<TileStep> steps, @Nullable DisplayType overlay) {

@@ -181,15 +181,19 @@ public class TacticalActionOutputService {
 
         String header = (condensed ? "-# From system " : "From system ");
         StringBuilder summary = new StringBuilder(header).append(tile.getRepresentationForButtons(game, player));
-        if (!condensed) {
-            summary.append(" (")
-                    .append(distance)
-                    .append(" tile")
-                    .append(distance == 1 ? "" : "s")
-                    .append(" away)")
-                    .append('\n');
+        if (distance < 95) {
+            if (!condensed) {
+                summary.append(" (")
+                        .append(distance)
+                        .append(" tile")
+                        .append(distance == 1 ? "" : "s")
+                        .append(" away)")
+                        .append('\n');
+            } else {
+                summary.append(" (").append(distance).append(" away)").append('\n');
+            }
         } else {
-            summary.append(" (").append(distance).append(" away)").append('\n');
+            summary.append("(NO LEGAL PATH FOUND)").append('\n');
         }
         if (movingUnitsFromTile.isEmpty()) {
             if (condensed) return null;

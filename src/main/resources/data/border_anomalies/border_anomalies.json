@@ -86,5 +86,15 @@
         "source": "pbd100",
         "automation": "NO_RULES",
         "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "ratnest",
+        "name": "Rat Nest",
+        "aliasList": ["rat nest"],
+        "imagePath": "ratnest_border.png",
+        "source": "other",
+        "wholeHex": true,
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on all six borders only. Players apply the border's effect themselves."
     }
 ]

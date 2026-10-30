@@ -155,6 +155,12 @@ A Sigma planet attachment that gives its System an alpha and a beta wormhole and
 **Lambda wormhole**:
 A Sigma wormhole carried by the three lambda wormhole tokens. Lambda wormholes only connect to each other.
 
+**Rat race wormhole**:
+A wormhole on a rat race token (`whratalpha` to `whratkappa`). It is its own type: an alpha rat wormhole only connects to alpha rat wormholes, never to a plain alpha. Laws and abilities that name alpha or beta do not affect it.
+
+**Rat nest**:
+The rat race border anomaly `ratnest`: one hex-sized frame that sits on all six borders of a System. Its effect is not automated; players apply it themselves.
+
 **Wormhole nexus**:
 The extra System where alpha, beta and gamma wormholes converge, which starts with only its gamma wormhole and becomes active when a unit enters it or Mallice is controlled.
 

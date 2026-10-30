@@ -182,6 +182,66 @@ public enum TileEmojis implements TI4Emoji {
     D35a_Asteroids,
     D35b_Supernova,
     D36_Asteroids,
+    BR6_Toldar,
+    be1_dreamhs,
+    be2_crystellumhs,
+    be3_ashenhs,
+    be4_ironhs,
+    be5_tahs,
+    be6_netrunnershs,
+    be7_natauhs,
+    be8_valhavnhs,
+    be9_migohs,
+    th1_ardentiahs,
+    th2_verydithhs,
+    th3_veylorhs,
+    th4_myrrhs,
+    th5_kairnhs,
+    th6_kryxoshs,
+    th7_arcanumhs,
+    th8_xytherishs,
+    th9_oblivionhs,
+    th10_revenanths,
+    th11_throneshs,
+    th12_aeternahs,
+    th13_ponthoushs,
+    th14_vanguardhs,
+    th15_scrapyardhs,
+    th16a_stonebornhs,
+    th16b_stonebornhs,
+    th17_morphahs,
+    th18_thurvialihs,
+    fracture8,
+    fracture9,
+    fracture10,
+    fracture11,
+    fracture12,
+    fracture13,
+    fracture14,
+    fracture15,
+    fracture16,
+    fracture17,
+    fracture18,
+    fracture19,
+    fracture20,
+    fracture21,
+    fracture22,
+    fracture23,
+    fracture24,
+    fracture25,
+    fracture26,
+    fracture27,
+    fracture28,
+    fracture29,
+    fracture30,
+    fracture31,
+    fracture32,
+    fracture33,
+    fracture34,
+    fracture35,
+    fracture36,
+    fracture37,
+    fracture38,
 
     // uncharted space
     d100,
@@ -386,6 +446,66 @@ public enum TileEmojis implements TI4Emoji {
             case "D35a" -> D35a_Asteroids;
             case "D35b" -> D35b_Supernova;
             case "D36" -> D36_Asteroids;
+            case "br6" -> BR6_Toldar;
+            case "be1" -> be1_dreamhs;
+            case "be2" -> be2_crystellumhs;
+            case "be3" -> be3_ashenhs;
+            case "be4" -> be4_ironhs;
+            case "be5" -> be5_tahs;
+            case "be6" -> be6_netrunnershs;
+            case "be7" -> be7_natauhs;
+            case "be8" -> be8_valhavnhs;
+            case "be9" -> be9_migohs;
+            case "th1" -> th1_ardentiahs;
+            case "th2" -> th2_verydithhs;
+            case "th3" -> th3_veylorhs;
+            case "th4" -> th4_myrrhs;
+            case "th5" -> th5_kairnhs;
+            case "th6" -> th6_kryxoshs;
+            case "th7" -> th7_arcanumhs;
+            case "th8" -> th8_xytherishs;
+            case "th9" -> th9_oblivionhs;
+            case "th10" -> th10_revenanths;
+            case "th11" -> th11_throneshs;
+            case "th12" -> th12_aeternahs;
+            case "th13" -> th13_ponthoushs;
+            case "th14" -> th14_vanguardhs;
+            case "th15" -> th15_scrapyardhs;
+            case "th16a" -> th16a_stonebornhs;
+            case "th16b" -> th16b_stonebornhs;
+            case "th17" -> th17_morphahs;
+            case "th18" -> th18_thurvialihs;
+            case "fracture8" -> fracture8;
+            case "fracture9" -> fracture9;
+            case "fracture10" -> fracture10;
+            case "fracture11" -> fracture11;
+            case "fracture12" -> fracture12;
+            case "fracture13" -> fracture13;
+            case "fracture14" -> fracture14;
+            case "fracture15" -> fracture15;
+            case "fracture16" -> fracture16;
+            case "fracture17" -> fracture17;
+            case "fracture18" -> fracture18;
+            case "fracture19" -> fracture19;
+            case "fracture20" -> fracture20;
+            case "fracture21" -> fracture21;
+            case "fracture22" -> fracture22;
+            case "fracture23" -> fracture23;
+            case "fracture24" -> fracture24;
+            case "fracture25" -> fracture25;
+            case "fracture26" -> fracture26;
+            case "fracture27" -> fracture27;
+            case "fracture28" -> fracture28;
+            case "fracture29" -> fracture29;
+            case "fracture30" -> fracture30;
+            case "fracture31" -> fracture31;
+            case "fracture32" -> fracture32;
+            case "fracture33" -> fracture33;
+            case "fracture34" -> fracture34;
+            case "fracture35" -> fracture35;
+            case "fracture36" -> fracture36;
+            case "fracture37" -> fracture37;
+            case "fracture38" -> fracture38;
 
             // Uncharted Space
             case "d100" -> d100;

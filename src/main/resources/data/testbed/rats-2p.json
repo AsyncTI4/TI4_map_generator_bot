@@ -1,0 +1,18 @@
+{
+  "name": "rats-2p",
+  "description": "Rat race: alpha rat wormholes on 205 and 211, a beta rat on 208, a rat nest on all six sides of 103, and plain plus rat alpha/beta tokens on 209 with wormhole merge from 2. Sol on 205, Hacan on 211. Normal or fog game.",
+  "you": { "faction": "sol", "home": "307", "units": { "205": "cv" } },
+  "seats": [ { "faction": "hacan", "home": "316", "units": { "211": "dd" } } ],
+  "defaults": { "tg": 2, "ccs": "3/3/2" },
+  "tokens": {
+    "205": ["whratalpha"],
+    "208": ["whratbeta"],
+    "211": ["whratalpha"],
+    "209": ["whalpha", "whbeta", "whratalpha", "whratbeta"]
+  },
+  "borderAnomalies": {
+    "103": ["n:ratnest", "ne:ratnest", "se:ratnest", "s:ratnest", "sw:ratnest", "nw:ratnest"]
+  },
+  "gameOptions": { "wormhole_token_merge": "2" },
+  "start": "action"
+}

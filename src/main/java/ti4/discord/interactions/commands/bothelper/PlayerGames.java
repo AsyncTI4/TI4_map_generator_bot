@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.SusSlashCommandService;
 import ti4.service.bothelper.PlayerGamesReportService;
 
 class PlayerGames extends Subcommand {
@@ -37,6 +36,5 @@ class PlayerGames extends Subcommand {
         boolean ignoreAborted = event.getOption(Constants.IGNORE_ABORTED, Boolean.TRUE, OptionMapping::getAsBoolean);
         boolean showGameModes = event.getOption(Constants.SHOW_GAME_MODES, Boolean.FALSE, OptionMapping::getAsBoolean);
         PlayerGamesReportService.sendReport(event, target, includeEndedGames, ignoreAborted, showGameModes);
-        SusSlashCommandService.reportModeratorCheck(event);
     }
 }
