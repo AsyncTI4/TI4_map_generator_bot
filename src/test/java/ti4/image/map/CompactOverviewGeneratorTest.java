@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -124,6 +126,24 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
 
         assertNotNull(CompactOverviewGenerator.gmImage(game, DisplayType.spacecannon));
         assertNotNull(CompactOverviewGenerator.playerImage(game, player, DisplayType.wormholes));
+    }
+
+    @Test
+    void aPlayerOverviewDrawsBordersOfSystemsTheySee() {
+        game.getTileByPosition("000")
+                .addUnit(
+                        "space",
+                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
+                        1);
+        BufferedImage withoutBorder = CompactOverviewGenerator.playerImage(game, player);
+        game.addBorderAnomaly("000", 0, "spatial_tear");
+
+        BufferedImage withBorder = CompactOverviewGenerator.playerImage(game, player);
+        assertFalse(Arrays.equals(pixels(withoutBorder), pixels(withBorder)), "the border is drawn");
+    }
+
+    private static int[] pixels(BufferedImage image) {
+        return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
     }
 
     private static Rectangle box(Placed placed) {

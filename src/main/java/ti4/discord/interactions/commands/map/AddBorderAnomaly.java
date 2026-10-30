@@ -16,16 +16,18 @@ import ti4.model.Mapper;
 
 public class AddBorderAnomaly extends GameStateSubcommand {
 
+    static final Set<Integer> ALL_SIDES = Set.of(0, 1, 2, 3, 4, 5);
+
     public AddBorderAnomaly() {
         super(Constants.ADD_BORDER_ANOMALY, "Add a border anomaly to a tile", true, false);
         addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to", true, true);
+        addOption(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly", true, true);
         addOption(
                 OptionType.STRING,
                 Constants.PRIMARY_TILE_DIRECTION,
-                "Side of the system the anomaly will be on",
-                true,
+                "Side of the system the anomaly will be on (not needed for whole-hex types)",
+                false,
                 true);
-        addOption(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly", true, true);
     }
 
     @Override
@@ -34,12 +36,19 @@ public class AddBorderAnomaly extends GameStateSubcommand {
 
         Set<String> tiles =
                 Helper.getSetFromCSV(event.getOption(Constants.PRIMARY_TILE).getAsString());
-        Set<Integer> directions = resolveDirections(event);
 
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE).getAsString();
         BorderAnomalyModel anomalyType = Mapper.resolveBorderAnomaly(anomalyTypeString);
         if (anomalyType == null) {
             sendUnknownTypeMessage(event, anomalyTypeString);
+            return;
+        }
+        Set<Integer> directions = anomalyType.isWholeHex() ? ALL_SIDES : resolveDirections(event);
+        if (directions.isEmpty()) {
+            if (event.getOption(Constants.PRIMARY_TILE_DIRECTION) == null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), anomalyType.getName() + " needs a side: n, ne, se, s, sw or nw.");
+            }
             return;
         }
 
@@ -60,6 +69,13 @@ public class AddBorderAnomaly extends GameStateSubcommand {
             }
         }
         sb.append(anomalyType.getName()).append(" anomalies added: ").append(amountAdded);
+        if (anomalyType.isWholeHex()) {
+            sb.append(" (placed on all six sides of each tile");
+            if (event.getOption(Constants.PRIMARY_TILE_DIRECTION) != null) {
+                sb.append("; the given direction was ignored");
+            }
+            sb.append(")");
+        }
         if (amountAdded > 0 && anomalyType.getAutomation().needsPlayerAttention()) {
             sb.append("\n-# ")
                     .append(anomalyType.getName())

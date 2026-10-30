@@ -68,6 +68,22 @@ class WormholeTokenMergeTest extends BaseTi4Test {
     }
 
     @Test
+    void ratRaceTokensMergeOnlyWithEachOther() {
+        String ratAlpha = "token_whratalpha.png";
+        String ratBeta = "token_whratbeta.png";
+        WormholeTokenMerge.DrawOrder order = WormholeTokenMerge.apply(List.of(ALPHA, ratAlpha, BETA, ratBeta), 2);
+
+        assertThat(order.tokens()).hasSize(2);
+        assertThat(order.tokens().stream().map(key -> order.merged().get(key).wormholes()))
+                .containsExactly(
+                        List.of(Wormhole.ALPHA, Wormhole.BETA), List.of(Wormhole.ALPHA_RAT, Wormhole.BETA_RAT));
+
+        // Each family needs the threshold on its own: one rat token stays a single token.
+        WormholeTokenMerge.DrawOrder oneRat = WormholeTokenMerge.apply(List.of(ALPHA, ratAlpha, BETA), 2);
+        assertThat(oneRat.tokens()).hasSize(2).contains(ratAlpha);
+    }
+
+    @Test
     void mapOptionSwitchesBetweenSingleAndMergedTokens() {
         Game game = new Game();
         game.newGameSetup();
