@@ -32,6 +32,7 @@ public class ExpeditionRules {
     private static final String INFO = "expeditionInfoAndButtons";
     private static final String END_OF_TURN = "endOfTurnAbilities";
     private static final String PASSING = "passingAbilities";
+    private static final String PASS = "passForRound";
     private static final String PAYMENT_DONE = "deleteButtons_spitItOut";
     private static final String DISCARD_SECRET = "discardSecret_";
     private static final String DISCARD_CARD = "ac_discard_from_hand_";
@@ -70,12 +71,20 @@ public class ExpeditionRules {
     }
 
     public static Optional<AiDecision> endOfTurn(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (inThePassingMenu(context, thisTurn)) return beforePassing(context, thisTurn);
         return open(
                 context,
                 thisTurn,
                 END_OF_TURN,
                 "open its end-of-turn abilities to do an expedition",
                 () -> ExpeditionOutlook.claimNow(context.game(), context.seat()));
+    }
+
+    private static boolean inThePassingMenu(AiTurnContext context, List<AiPrompt> thisTurn) {
+        return Prompts.owned(thisTurn, context.faction(), INFO::equals)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()))
+                .map(match -> match.prompt().enabledHandler(PASS).isPresent())
+                .orElse(false);
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {

@@ -124,7 +124,6 @@ public class NekroBrain implements FactionBrain {
             "nekroAgentRes_",
             XxchaAgentRules.USER_PREFIX,
             XxchaAgentRules.READY_PREFIX,
-            TroAgentRules.USE_PREFIX,
             PromissoryRules.GREYFIRE_TARGET,
             TIED_PLANETS,
             "sendTGTo_",

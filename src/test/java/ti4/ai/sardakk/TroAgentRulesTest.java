@@ -49,7 +49,7 @@ class TroAgentRulesTest extends BaseTi4Test {
 
     private AiPrompt offer(String... planets) {
         String[] ids = new String[planets.length + 1];
-        for (int i = 0; i < planets.length; i++) ids[i] = "exhaustAgent_sardakkagent_" + planets[i];
+        for (int i = 0; i < planets.length; i++) ids[i] = "FFCC_sardakk_exhaustAgent_sardakkagent_" + planets[i];
         ids[planets.length] = "deleteButtons";
         return prompt("troOffer", PromptSource.PUBLIC, NOW, ids);
     }
@@ -73,7 +73,7 @@ class TroAgentRulesTest extends BaseTi4Test {
         test.game.setStoredValue("planetsTakenThisRound", LODOR);
 
         assertThat(pressed(afterTacticalAction(offer(lodorOffer()))))
-                .isEqualTo("exhaustAgent_sardakkagent_" + lodorOffer());
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer());
     }
 
     @Test
@@ -86,7 +86,7 @@ class TroAgentRulesTest extends BaseTi4Test {
         test.units(sol, "space", test.sol, UnitType.Carrier, 2);
 
         assertThat(pressed(afterTacticalAction(offer(lodorOffer()))))
-                .isEqualTo("exhaustAgent_sardakkagent_" + lodorOffer());
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer());
     }
 
     // Nothing threatens the planet and tokens remain for later actions, so a better window may still come.
@@ -101,7 +101,7 @@ class TroAgentRulesTest extends BaseTi4Test {
         sardakk.setTacticalCC(1);
 
         assertThat(pressed(afterTacticalAction(offer(lodorOffer()))))
-                .isEqualTo("exhaustAgent_sardakkagent_" + lodorOffer());
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer());
     }
 
     @Test
@@ -110,7 +110,7 @@ class TroAgentRulesTest extends BaseTi4Test {
         test.nekro.setPassed(true);
 
         assertThat(pressed(afterTacticalAction(offer(lodorOffer()))))
-                .isEqualTo("exhaustAgent_sardakkagent_" + lodorOffer());
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer());
     }
 
     @Test
@@ -148,7 +148,7 @@ class TroAgentRulesTest extends BaseTi4Test {
         String lodorOffer = lodorOffer();
 
         assertThat(pressed(afterTacticalAction(offer(lodorOffer, "000_mr"))))
-                .isEqualTo("exhaustAgent_sardakkagent_000_mr");
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_000_mr");
     }
 
     // Expand Borders needs six planets outside the home system; with exactly six, each one is a point at stake.
@@ -170,7 +170,7 @@ class TroAgentRulesTest extends BaseTi4Test {
         test.game.getRevealedPublicObjectives().put("expand_borders", 1);
 
         assertThat(pressed(afterTacticalAction(offer(lodorOffer()))))
-                .isEqualTo("exhaustAgent_sardakkagent_" + lodorOffer());
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer());
     }
 
     // Another player's tactical action, or the agent's "someone else" menu in the cards info thread, is never used:
@@ -179,8 +179,8 @@ class TroAgentRulesTest extends BaseTi4Test {
     void neverUsesTheAgentOnSomeoneElse() {
         sardakk.setTacticalCC(0);
         AiPrompt menu = prompt("menu", PromptSource.AI_THREAD, NOW, "getAgentSelection_sardakkagent");
-        AiPrompt target =
-                prompt("target", PromptSource.PUBLIC, NOW, "exhaustAgent_sardakkagent_" + test.sol.getFaction());
+        AiPrompt target = prompt(
+                "target", PromptSource.PUBLIC, NOW, "FFCC_sardakk_exhaustAgent_sardakkagent_" + test.sol.getFaction());
 
         assertThat(afterTacticalAction(menu, target)).isEmpty();
     }
@@ -200,10 +200,11 @@ class TroAgentRulesTest extends BaseTi4Test {
                 "hiddenOffer",
                 PromptSource.AI_THREAD,
                 NOW,
-                "exhaustAgent_sardakkagent_" + lodorOffer(),
+                "FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer(),
                 "deleteButtons");
 
-        assertThat(pressed(afterTacticalAction(hidden))).isEqualTo("exhaustAgent_sardakkagent_" + lodorOffer());
+        assertThat(pressed(afterTacticalAction(hidden)))
+                .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer());
     }
 
     @Test

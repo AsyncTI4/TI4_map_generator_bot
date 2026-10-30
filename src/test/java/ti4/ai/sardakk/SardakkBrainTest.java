@@ -52,9 +52,10 @@ class SardakkBrainTest extends BaseTi4Test {
         return Optional.of(brain.decide(context));
     }
 
+    // The agent offer is owned by the seat since the agent-module migration, so it needs no public window.
     @Test
-    void theAgentOfferIsAPublicWindow() {
-        assertThat(brain.publicWindowHandlerPrefixes()).contains(TroAgentRules.USE_PREFIX);
+    void theAgentOfferIsNoLongerAPublicWindow() {
+        assertThat(brain.publicWindowHandlerPrefixes()).doesNotContain(TroAgentRules.USE_PREFIX);
     }
 
     @Test
@@ -62,12 +63,16 @@ class SardakkBrainTest extends BaseTi4Test {
         sardakk.addLeader("sardakkagent");
         test.game.setStoredValue("planetsTakenThisRound", "lodor");
         AiPrompt offer = prompt(
-                "agent", PromptSource.PUBLIC, NOW, "exhaustAgent_sardakkagent_" + position + "_lodor", "deleteButtons");
+                "agent",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_sardakk_exhaustAgent_sardakkagent_" + position + "_lodor",
+                "deleteButtons");
         AiPrompt turn =
                 prompt("turn", PromptSource.PUBLIC, NOW, "FFCC_sardakk_turnEnd", "FFCC_sardakk_doAnotherAction");
 
         assertThat(decide(turn, offer).map(AiTestGame::pressedId))
-                .hasValue("exhaustAgent_sardakkagent_" + position + "_lodor");
+                .hasValue("FFCC_sardakk_exhaustAgent_sardakkagent_" + position + "_lodor");
     }
 
     @Test
@@ -76,7 +81,8 @@ class SardakkBrainTest extends BaseTi4Test {
         sardakk.getLeader("sardakkagent").orElseThrow().setExhausted(true);
         AiPrompt turn =
                 prompt("turn", PromptSource.PUBLIC, NOW, "FFCC_sardakk_turnEnd", "FFCC_sardakk_doAnotherAction");
-        AiPrompt offer = prompt("agent", PromptSource.PUBLIC, NOW, "exhaustAgent_sardakkagent_" + position + "_lodor");
+        AiPrompt offer = prompt(
+                "agent", PromptSource.PUBLIC, NOW, "FFCC_sardakk_exhaustAgent_sardakkagent_" + position + "_lodor");
 
         assertThat(decide(turn, offer).map(AiTestGame::pressedId)).hasValue("FFCC_sardakk_turnEnd");
     }

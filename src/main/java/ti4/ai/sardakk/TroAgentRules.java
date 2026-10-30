@@ -69,8 +69,8 @@ public class TroAgentRules {
         Player seat = context.seat();
         return Prompts.thisTurn(context).stream()
                 .flatMap(prompt -> prompt.enabledButtons().stream()
-                        .filter(button ->
-                                button.isUnowned() && button.handlerId().startsWith(USE_PREFIX))
+                        .filter(button -> button.isOwnedBy(seat.getFaction())
+                                && button.handlerId().startsWith(USE_PREFIX))
                         .filter(button -> !context.alreadyPressed(prompt, button))
                         .map(button -> offer(game, seat, prompt, button.handlerId(), button)))
                 .flatMap(Optional::stream)

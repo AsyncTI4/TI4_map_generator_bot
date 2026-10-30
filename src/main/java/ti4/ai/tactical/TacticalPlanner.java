@@ -208,14 +208,16 @@ public class TacticalPlanner {
         return plans.stream().filter(plan -> plan.score() > worth).toList();
     }
 
-    private static List<TacticalPlan> withinTokenBudget(List<TacticalPlan> plans, int spareTokens) {
+    static List<TacticalPlan> withinTokenBudget(List<TacticalPlan> plans, int spareTokens) {
         long worthwhile = plans.stream()
                 .filter(plan -> plan.score() >= MIN_SCORE)
                 .map(TacticalPlan::target)
                 .distinct()
                 .count();
-        if (spareTokens > worthwhile) return plans;
-        return plans.stream().filter(plan -> plan.score() >= MIN_SCORE).toList();
+        boolean tokensToSpare = spareTokens > worthwhile;
+        return plans.stream()
+                .filter(plan -> plan.score() >= MIN_SCORE || (tokensToSpare && plan.kind() != Kind.PRODUCE))
+                .toList();
     }
 
     private static Optional<TacticalPlan> holdForWarfareBuild(Context context, List<TacticalPlan> plans) {

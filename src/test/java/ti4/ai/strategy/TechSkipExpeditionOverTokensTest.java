@@ -166,4 +166,22 @@ class TechSkipExpeditionOverTokensTest extends BaseTi4Test {
 
         assertThat(ExpeditionOutlook.claimNow(test.game, sardakk)).isEmpty();
     }
+
+    // Live game aiplay1: with no action worth a token left, the seat passes. The pass menu carries the expedition
+    // button, and on the passing turn the slice is priced at passing (its planets would go unused anyway), so even an
+    // earlier slice that waits at the end of an ordinary turn is claimed there.
+    @Test
+    void thePassMenuClaimsTheSliceAtThePassingPrice() {
+        test.game.getExpeditions().getExpeditionFactions().put(ExpeditionKind.ACTION_CARDS.id(), null);
+        AiPrompt passMenu = prompt(
+                "passing",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_sardakk_passForRound",
+                "FFCC_sardakk_expeditionInfoAndButtons");
+
+        assertThat(ExpeditionRules.endOfTurn(test.context(passMenu), List.of(passMenu)))
+                .hasValueSatisfying(
+                        decision -> assertThat(pressedId(decision)).isEqualTo("FFCC_sardakk_expeditionInfoAndButtons"));
+    }
 }
