@@ -304,9 +304,9 @@ class HacanTradeTest extends BaseTi4Test {
         assertThat(CarthDeals.bestTarget(hacanContext())).isEmpty();
     }
 
-    // Replenished to 4, Sol is offered: its 3 commodities for 1 of Hacan's, so Sol keeps 1 and gains 1 trade good.
+    // Replenished to 4, Sol is offered: all 4 of its commodities for 1 of Hacan's, so Sol gains 1 trade good.
     @Test
-    void carthOffersTheReplenishedTargetThreeForOne() {
+    void carthOffersTheReplenishedTargetAllItsCommoditiesForOne() {
         giveHacanTheAgent();
         hacan.getLeader("hacanagent").orElseThrow().setExhausted(true);
         CarthDeals.remember(hacanContext(), table.sol);
@@ -317,7 +317,7 @@ class HacanTradeTest extends BaseTi4Test {
 
         assertThat(draft().partner()).isEqualTo("sol");
         assertThat(draft().purpose()).isEqualTo(Purpose.AGENT_TRADE);
-        assertThat(draft().target().total("sol", ItemType.COMMODITIES)).isEqualTo(3);
+        assertThat(draft().target().total("sol", ItemType.COMMODITIES)).isEqualTo(4);
         assertThat(draft().target().total("hacan", ItemType.COMMODITIES)).isEqualTo(1);
     }
 
@@ -330,31 +330,30 @@ class HacanTradeTest extends BaseTi4Test {
         assertThat(CarthDeals.followUp(hacanContext())).isEmpty();
     }
 
-    // A replenished AI target takes exactly that shape from the exhausted agent's owner, and nothing richer for Hacan.
+    // A replenished AI target takes that shape from the exhausted agent's owner, and nothing richer for Hacan.
     @Test
     void anAiTargetAcceptsTheAgentDealOnly() {
         giveHacanTheAgent();
         hacan.getLeader("hacanagent").orElseThrow().setExhausted(true);
         table.stock(table.sol, 4, 0);
         AiTurnContext sol = table.test.contextFor(table.sol, Set.of(), NOW);
-        Deal threeForOne =
-                deal("sol", "hacan", "sendingsol_receivinghacan_Comms_3", "sendinghacan_receivingsol_Comms_1");
-        Deal threeForTwo =
-                deal("sol", "hacan", "sendingsol_receivinghacan_Comms_3", "sendinghacan_receivingsol_Comms_2");
+        Deal fourForOne =
+                deal("sol", "hacan", "sendingsol_receivinghacan_Comms_4", "sendinghacan_receivingsol_Comms_1");
+        Deal fourForNothing = deal("sol", "hacan", "sendingsol_receivinghacan_Comms_4");
 
-        assertThat(CarthDeals.accepts(sol, hacan, threeForOne)).isTrue();
-        assertThat(CarthDeals.accepts(sol, hacan, threeForTwo)).isFalse();
+        assertThat(CarthDeals.accepts(sol, hacan, fourForOne)).isTrue();
+        assertThat(CarthDeals.accepts(sol, hacan, fourForNothing)).isFalse();
 
         table.stock(table.sol, 2, 0);
-        assertThat(CarthDeals.accepts(sol, hacan, threeForOne)).isFalse();
+        assertThat(CarthDeals.accepts(sol, hacan, fourForOne)).isFalse();
 
         table.stock(table.sol, 4, 0);
         hacan.getLeader("hacanagent").orElseThrow().setExhausted(false);
-        assertThat(CarthDeals.accepts(sol, hacan, threeForOne)).isFalse();
+        assertThat(CarthDeals.accepts(sol, hacan, fourForOne)).isFalse();
 
         hacan.getLeader("hacanagent").orElseThrow().setExhausted(true);
         table.points(hacan, 8);
-        assertThat(CarthDeals.accepts(sol, hacan, threeForOne)).isFalse();
+        assertThat(CarthDeals.accepts(sol, hacan, fourForOne)).isFalse();
     }
 
     // Crossing 10 trade goods while Gila the Silvertongue is locked is worth exactly 2.0 more to Hacan than the same
@@ -373,8 +372,8 @@ class HacanTradeTest extends BaseTi4Test {
 
         assertThat(crossing - below).isCloseTo(2.0, within(EXACT));
     }
-    // Hacan's take is what the target sends: value 4 at 3/1 and value 5 at 3/2 give it the same 3, so the target that
-    // gains less (Sol, 1 trade good) wins.
+    // Hacan's take is what the target sends less what it pays back: value 4 at 4/1 and value 5 at 5/2 give it the same
+    // 3, so the target that gains less (Sol, 1 trade good) wins.
     @Test
     void carthBreaksATieByTheSmallerTargetGain() {
         giveHacanTheAgent();
@@ -385,10 +384,10 @@ class HacanTradeTest extends BaseTi4Test {
 
         assertThat(plan.target()).isSameAs(table.sol);
         assertThat(plan.gain()).isEqualTo(1);
-        assertThat(plan.received()).isEqualTo(3);
+        assertThat(plan.received()).isEqualTo(4);
     }
 
-    // Value 6 asks 2 and sends 4, which beats value 4 at 3/1.
+    // Value 6 asks 2 and sends 6, a take of 4, which beats value 4 at 4/1.
     @Test
     void carthPrefersTheBiggerTakeEvenAtTwoTradeGoods() {
         giveHacanTheAgent();
@@ -399,11 +398,11 @@ class HacanTradeTest extends BaseTi4Test {
 
         assertThat(plan.target()).isSameAs(table.nekro);
         assertThat(plan.gain()).isEqualTo(2);
-        assertThat(plan.received()).isEqualTo(4);
+        assertThat(plan.received()).isEqualTo(6);
     }
 
-    // Nekro (value 4) is stingy toward a Hacan on 7 points and counters 2/2, which gives Hacan 2; Sol (value 3, level
-    // with Hacan) takes 2/1, which gives Hacan the same 2 for less, so Sol is chosen.
+    // Nekro (value 4) is stingy toward a Hacan on 7 points and wants 2 for its 4, a take of 2; Sol (value 3, level with
+    // Hacan) takes 1 for its 3, the same take of 2 for less, so Sol is chosen.
     @Test
     void carthSkipsAStingyCounterWhenAnotherTargetGivesAsMuch() {
         giveHacanTheAgent();
@@ -419,7 +418,7 @@ class HacanTradeTest extends BaseTi4Test {
 
         assertThat(plan.target()).isSameAs(table.sol);
         assertThat(plan.gain()).isEqualTo(1);
-        assertThat(plan.received()).isEqualTo(2);
+        assertThat(plan.received()).isEqualTo(3);
     }
 
     // 1 trade good is enough up to value 4, 2 are needed from value 5.
@@ -467,8 +466,8 @@ class HacanTradeTest extends BaseTi4Test {
         assertThat(CarthDeals.bestTarget(hacanContext())).containsSame(table.sol);
     }
 
-    // A human target gets a deal with steps, not a table-talk ask: Carth replenishes them, they send 3 of their 4
-    // commodities and get 1 back. Carth is not spent until they accept.
+    // A human target gets a deal with steps, not a table-talk ask: Carth replenishes them, they send all 4 commodities
+    // and get 1 back. Carth is not spent until they accept.
     @Test
     void carthProposesADealToAHumanInsteadOfSpendingTheAgent() {
         giveHacanTheAgent();
@@ -485,8 +484,8 @@ class HacanTradeTest extends BaseTi4Test {
         assertThat(deal.steps())
                 .containsExactly(
                         HumanAiDeal.Step.exhaust(
-                                "hacanagent", "xxcha", 3, "uses Carth of Golden Sands to replenish your commodities"),
-                        HumanAiDeal.Step.transfer("xxcha", "hacan", HumanAiDeal.Item.COMMODITIES, 3),
+                                "hacanagent", "xxcha", 4, "uses Carth of Golden Sands to replenish your commodities"),
+                        HumanAiDeal.Step.transfer("xxcha", "hacan", HumanAiDeal.Item.COMMODITIES, 4),
                         HumanAiDeal.Step.transfer("hacan", "xxcha", HumanAiDeal.Item.COMMODITIES, 1));
         assertThat(hacan.hasUnexhaustedLeader("hacanagent")).isTrue();
     }

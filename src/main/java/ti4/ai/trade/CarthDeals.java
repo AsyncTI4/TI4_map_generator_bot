@@ -18,7 +18,12 @@ import ti4.game.Player;
 @UtilityClass
 class CarthDeals {
 
-    record Plan(Player target, int gain, int received) {}
+    record Plan(Player target, int gain, int received) {
+
+        int take() {
+            return received - gain;
+        }
+    }
 
     private static final String AGENT = "hacanagent";
     private static final String TARGET_KEY = "hacanAgentTarget|";
@@ -27,7 +32,7 @@ class CarthDeals {
     private static final String LEADER_NAME = "Carth of Golden Sands";
     private static final long HUMAN_REPLY_MILLIS = Duration.ofHours(12).toMillis();
     private static final int SMALL_VALUE = 4;
-    private static final int MIN_RECEIVED = 2;
+    private static final int MIN_TAKE = 2;
 
     static Optional<Plan> bestPlan(AiTurnContext context) {
         return plans(context)
@@ -177,7 +182,6 @@ class CarthDeals {
                 && onlyGoods
                 && sent >= 1
                 && sent <= commodities
-                && sent + back <= commoditiesTotal
                 && acceptable(game, seat, offerer, back);
     }
 
@@ -194,7 +198,7 @@ class CarthDeals {
                 .filter(other -> AiSeats.isAiSeat(other) || OwnTurnDeals.mayApproach(context, other))
                 .filter(other -> !context.memory().has(proposedKey(context, other)))
                 .map(other -> plan(game, seat, other))
-                .filter(plan -> plan.gain() <= give && plan.received() >= MIN_RECEIVED);
+                .filter(plan -> plan.gain() <= give && plan.take() >= MIN_TAKE);
     }
 
     private static String proposedKey(AiTurnContext context, Player target) {
@@ -203,11 +207,11 @@ class CarthDeals {
 
     private static Plan plan(Game game, Player seat, Player target) {
         int gain = requiredGain(game, target, seat);
-        return new Plan(target, gain, target.getCommoditiesTotal() - gain);
+        return new Plan(target, gain, target.getCommoditiesTotal());
     }
 
     private static Comparator<Plan> ranking() {
-        return Comparator.comparingInt(Plan::received)
+        return Comparator.comparingInt(Plan::take)
                 .thenComparing(Comparator.comparingInt(Plan::gain).reversed());
     }
 
@@ -221,7 +225,7 @@ class CarthDeals {
         String theirs = target.getFaction();
         String ours = seat.getFaction();
         return Optional.of(Deal.EMPTY
-                .adjust(theirs, ours, ItemType.COMMODITIES, target.getCommodities() - gain)
+                .adjust(theirs, ours, ItemType.COMMODITIES, target.getCommodities())
                 .adjust(ours, theirs, ItemType.COMMODITIES, commodities)
                 .adjust(ours, theirs, ItemType.TRADE_GOODS, tradeGoods));
     }
