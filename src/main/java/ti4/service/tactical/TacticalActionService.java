@@ -13,6 +13,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateH
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -275,6 +276,7 @@ public class TacticalActionService {
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0
+                || ValhavnUnitHandler.hasBilrostPds(player)
                 || (player.hasUnit("crimson_mech")
                         && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
 

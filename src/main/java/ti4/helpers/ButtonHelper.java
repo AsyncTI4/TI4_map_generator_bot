@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
@@ -384,9 +385,15 @@ public class ButtonHelper {
             return;
         }
 
+        int reviveTarget = (player.hasTech("so2") || player.hasTech("tf-specops")) ? 5 : 6;
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "valhavncommander")) {
+            reviveTarget -= getNumberOfUnitsOnTheBoard(player.getGame(), player, "pds", false);
+        }
+        reviveTarget = Math.max(1, reviveTarget);
+
         if (totalAmount == 1) {
             String message = UnitEmojis.infantry + " died. Rolling for resurrection. ";
-            Die dice = new Die((player.hasTech("so2") || player.hasTech("tf-specops")) ? 5 : 6);
+            Die dice = new Die(reviveTarget);
             message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
             if (dice.isSuccess()) {
                 message +=
@@ -417,7 +424,7 @@ public class ButtonHelper {
                             + " died. Rolling for resurrection.\n");
             int revive = 0;
             for (int x = 0; x < amount; x++) {
-                Die dice = new Die(player.hasTech("so2") ? 5 : 6);
+                Die dice = new Die(reviveTarget);
                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                 revive += dice.isSuccess() ? 1 : 0;
             }
@@ -6885,11 +6892,22 @@ public class ButtonHelper {
                         && tile.getUnitHolders().values().stream()
                                 .anyMatch(unitHolder ->
                                         unitHolder.getUnitCount(UnitType.Infantry, target.getColor()) > 0);
+                boolean hasValhavnCommander = target != player
+                        && game.playerHasLeaderUnlockedOrAlliance(target, "valhavncommander")
+                        && tile.getUnitHolders().values().stream()
+                                .anyMatch(unitHolder ->
+                                        unitHolder.getUnitCount(UnitType.Infantry, target.getColor()) > 0);
                 if (hasQhetInfantry) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "Reminder: SPACE CANNON cannot be used against " + target.getRepresentationNoPing()
                                     + "'s Commandos (Qhet Infantry).");
+                }
+                if (hasValhavnCommander) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Reminder: SPACE CANNON cannot be used against " + target.getRepresentationNoPing()
+                                    + "'s infantry due to Thorberg Skafhógg, the Valhavn commander.");
                 }
                 UnitHolder invadedPlanet = game.getUnitHolderFromPlanet(unitHolderName);
                 if (target != player
@@ -8450,8 +8468,10 @@ public class ButtonHelper {
 
     public static List<Player> getPlayersWithPds2Cover(Player targetPlayer, Game game, String tilePos) {
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, targetPlayer, false, true);
+        Tile targetTile = game.getTileByPosition(tilePos);
         for (Player p2 : game.getRealPlayers()) {
             adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
+            adjTiles.addAll(ValhavnUnitHandler.getSleipnirPdsCoverageSystems(game, p2, targetTile));
         }
         List<Player> playersWithPds2 = new ArrayList<>();
 
@@ -8533,10 +8553,14 @@ public class ButtonHelper {
                     UnitKey unitKey = unitEntry.getKey();
                     Player owningPlayer =
                             game.getPlayerByColorID(unitKey.colorID()).orElse(null);
+                    boolean sleipnirCoverage = owningPlayer != null
+                            && ValhavnUnitHandler.getSleipnirPdsCoverageSystems(game, owningPlayer, targetTile)
+                                    .contains(adjTilePos);
                     if (owningPlayer == null
                             || playersWithPds2.contains(owningPlayer)
-                            || !FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true)
-                                    .contains(adjTilePos)) {
+                            || (!FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true)
+                                            .contains(adjTilePos)
+                                    && !sleipnirCoverage)) {
                         continue;
                     }
                     if (adjTile.isScar(game) && !owningPlayer.hasTech("dsxinystar")) {
@@ -8563,7 +8587,8 @@ public class ButtonHelper {
                     if (model.getSpaceCannonDieCount(owningPlayer) > 0
                             && (model.getDeepSpaceCannon(owningPlayer)
                                     || tilePos.equalsIgnoreCase(adjTilePos)
-                                    || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander"))) {
+                                    || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander")
+                                    || sleipnirCoverage)) {
                         if (owningPlayer == targetPlayer
                                 || targetPlayer.getAllianceMembers().contains(owningPlayer.getFaction())) {
                             if (FoWHelper.otherPlayersHaveShipsInSystem(

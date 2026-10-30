@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
@@ -707,6 +708,7 @@ public final class ButtonHelperTacticalAction {
     }
 
     public static void resetStoredValuesForTacticalAction(Game game) {
+        ValhavnAbilityHandler.clearBloodlustActionUse(game);
         VanguardUnitHandler.clearBulwarkSustain(game);
         VanguardBreakthroughHandler.clearTrainingDummiesState(game);
         game.setNaaluAgent(false);
@@ -944,6 +946,30 @@ public final class ButtonHelperTacticalAction {
                             player.factionButtonChecker() + "planetAbilityExhaust_jotunheim",
                             "Use Hrungnir's Husk",
                             PlanetEmojis.getPlanetEmojiOrNull("jotunheim")));
+        }
+        for (Player valhavnPlayer : game.getRealPlayers()) {
+            if (player != valhavnPlayer
+                    && valhavnPlayer.hasUnit("valhavn_mech")
+                    && tile.getUnitHolders().values().stream()
+                            .anyMatch(holder -> holder.getUnitCount(UnitType.Pds, valhavnPlayer) > 0)) {
+                List<Button> buttons = new ArrayList<>();
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    if (planet.getUnitCount(UnitType.Pds, valhavnPlayer) > 0) {
+                        buttons.add(Buttons.green(
+                                valhavnPlayer.factionButtonChecker()
+                                        + "placeOneNDone_skipbuild_mech_"
+                                        + planet.getName(),
+                                "Place 1 Mech on " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                    }
+                }
+
+                MessageHelper.sendMessageToChannelWithButtons(
+                        valhavnPlayer.getCorrectChannel(),
+                        valhavnPlayer.getRepresentationNoPing() + ", "
+                                + (game.isFowMode() ? "another player" : player.getRepresentationNoPing())
+                                + " activated a system containing one of your PDS units. You may place 1 mech with one of those units.",
+                        buttons);
+            }
         }
         if (game.isMonumentsMode()) {
             for (Player monumentOwner : game.getRealPlayers()) {

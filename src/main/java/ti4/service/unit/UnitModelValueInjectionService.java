@@ -516,6 +516,12 @@ public class UnitModelValueInjectionService {
             integers.productionValue(1);
         }
 
+        if (player.ownsUnit("valhavn_flagship") && unit.getUnitType() == UnitType.Flagship) {
+            integers.spaceCannonDieCount(2);
+            integers.spaceCannonHitsOn(
+                    Math.max(1, 10 - ButtonHelper.getNumberOfUnitsOnTheBoard(player.getGame(), player, "pds", false)));
+        }
+
         return UnitValueInjection.of(integers, floats, booleans);
     }
 

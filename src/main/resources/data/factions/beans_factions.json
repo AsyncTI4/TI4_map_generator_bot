@@ -335,15 +335,17 @@
         "alias": "valhavn",
         "factionName": "The Valhavn Star-Reavers",
         "homeSystem": "be8",
-        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 2 inf valhavn, 2 inf vigrid, 1 sd valhavn, 1 pds vigrid",
+        "startingFleet": "1 cv, 1 dd, 3 ff, 1 inf valhavn, 2 inf vigrid, 1 sd valhavn, 1 pds vigrid",
         "commodities": 3,
         "factionTech": [
             "bevalhavng",
             "bevalhavnpd"
         ],
-        "startingTech": [
-            "md"
+        "startingTechOptions": [
+            "md",
+            "dxa"
         ],
+        "startingTechAmount": 1,
         "homePlanets": [
             "valhavn",
             "vigrid"

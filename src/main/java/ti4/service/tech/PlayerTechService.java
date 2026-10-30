@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
@@ -733,6 +734,26 @@ public class PlayerTechService {
             case "is_br" -> {
                 BlueReverieTechHelper.offerInheritanceSystemsBr(event, game, player);
                 deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "bevalhavng" -> {
+                List<Button> pdsPlanets = new ArrayList<>();
+                for (Tile tile : game.getTileMap().values()) {
+                    for (Planet planet : tile.getPlanetUnitHolders()) {
+                        if (planet.getUnitCount(UnitType.Pds, player) > 0) {
+                            pdsPlanets.add(Buttons.green(
+                                    player.factionButtonChecker() + "refresh_" + planet.getName(),
+                                    "Ready " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                        }
+                    }
+                }
+                pdsPlanets.add(Buttons.red("deleteButtons_spitItOut", "Done Readying"));
+
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", please select which planet containing your PDS that you would like to ready using _Völundr Protocol_.",
+                        pdsPlanets);
+                ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
             }
             default ->
                 MessageHelper.sendMessageToChannel(

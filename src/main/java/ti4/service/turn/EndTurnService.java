@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
@@ -52,6 +53,7 @@ import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.agent.modules.homebrew.EdynAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.ValhavnAgent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.planet.JotunheimLegendaryService;
@@ -90,6 +92,7 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        ValhavnAgent.offerAtEndOfTurn(game, player);
         WarGamesBrActionCardHandler.clear(game);
         DisableService.clear(game);
         KaltrimUnitHandler.clearShrineInfantryRemovalState(game);
@@ -124,6 +127,7 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
+        ValhavnPromissoryHandler.returnEinherjarAtEndOfTurn(event, game, player);
         IronSalvageRelicHandler.clearTacticalActionState(game, player);
         AtokeraHeroButton.returnCommittedShips(event, game, player);
         AeternaAbilityHandler.clearCycleOfReclamationActionCaptures(game);

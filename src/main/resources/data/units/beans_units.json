@@ -416,7 +416,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When a player activates a system that contains 1 or more of your PDS units, you may place 1 mech with that unit."
+    "ability": "DEPLOY: When another player activates a system that contains 1 or more of your PDS units, you may place 1 mech with 1 of those units."
   },
   {
     "id": "valhavn_pds",
@@ -441,11 +441,11 @@
     "name": "Bilröst II",
     "source": "beans",
     "faction": "valhavn",
-    "spaceCannonHitsOn": 5,
+    "spaceCannonHitsOn": 4,
     "spaceCannonDieCount": 1,
     "deepSpaceCannon": true,
     "planetaryShield": true,
     "isStructure": true,
-    "ability": "During the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet."
+    "ability": "During the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet."
   }
 ]
