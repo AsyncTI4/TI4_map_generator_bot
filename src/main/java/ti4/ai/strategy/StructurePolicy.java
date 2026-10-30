@@ -47,6 +47,7 @@ class StructurePolicy {
     private static final String SAAR_DOCK_II = "saar_spacedock2";
     private static final Set<String> SPREAD_OBJECTIVES = Set.of("infrastructure", "protect_border");
     private static final int STRUCTURES_SHORT = 2;
+    private static final int NEXT_ROUND_SHORT = 3;
     private static final String ESTABLISH_A_PERIMETER = "eap";
     private static final int PERIMETER_NEAR = 3;
     private static final int PRIMARY_STRUCTURES = 2;
@@ -62,7 +63,7 @@ class StructurePolicy {
     }
 
     static boolean nearsStructureObjective(Game game, Player seat) {
-        return structureShortfall(game, seat) <= STRUCTURES_SHORT || nearsPerimeter(game, seat);
+        return structureShortfall(game, seat) <= NEXT_ROUND_SHORT || nearsPerimeter(game, seat);
     }
 
     static boolean nearsPerimeter(Game game, Player seat) {
@@ -79,9 +80,8 @@ class StructurePolicy {
     }
 
     static double objectiveScale(Game game, Player seat) {
-        if (structureShortfall(game, seat) <= STRUCTURES_SHORT) return 1;
-        int perimeter = perimeterShortfall(game, seat);
-        return perimeter == NO_SHORTFALL ? 1 : Math.min(1, (double) STRUCTURES_SHORT / perimeter);
+        double scale = closeness(structureShortfall(game, seat));
+        return scale > 0 ? scale : 1;
     }
 
     static int structureShortfall(Game game, Player seat) {
@@ -402,7 +402,7 @@ class StructurePolicy {
         double closeness = 0;
         for (Map.Entry<String, Integer> shortfall : shortfalls(game, seat).entrySet()) {
             if (advances(game, seat, shortfall.getKey(), unit, planet)) {
-                closeness = Math.max(closeness, closeness(shortfall.getKey(), shortfall.getValue()));
+                closeness = Math.max(closeness, closeness(shortfall.getValue()));
             }
         }
         if (SPACE_DOCK.equals(unit) && MassProduction.oneDockFromScoring(game, seat)) closeness = 1;
@@ -418,10 +418,9 @@ class StructurePolicy {
         };
     }
 
-    private static double closeness(String objective, int missing) {
+    private static double closeness(int missing) {
         if (missing <= STRUCTURES_SHORT) return 1;
-        boolean perimeterNear = ESTABLISH_A_PERIMETER.equals(objective) && missing <= PERIMETER_NEAR;
-        return perimeterNear ? (double) STRUCTURES_SHORT / missing : 0;
+        return missing <= NEXT_ROUND_SHORT ? (double) STRUCTURES_SHORT / missing : 0;
     }
 
     private static Map<String, Integer> shortfalls(Game game, Player seat) {
@@ -441,6 +440,7 @@ class StructurePolicy {
         seat.getSecretsUnscored().keySet().stream()
                 .filter(STRUCTURE_OBJECTIVES::contains)
                 .forEach(objectives::add);
+        if (pds(game, seat).isEmpty()) objectives.remove(ESTABLISH_A_PERIMETER);
         return objectives;
     }
 

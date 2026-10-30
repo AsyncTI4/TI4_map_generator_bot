@@ -425,20 +425,19 @@ class StrategyCardRulesTest extends BaseTi4Test {
                 "construction_spacedock");
     }
 
-    // Build Defenses needs 4 structures. A follow places one, so it is only worth a strategy token once the seat is
-    // close enough for the objective to come within reach.
+    // Build Defenses needs 4 structures. A lone home PDS is not worth a strategy token, but with the objective in play
+    // and only the home dock built, the follow leaves it 2 short, within reach of one Construction next round.
     @Test
     void followsConstructionOnlyWhenAStructureObjectiveIsWithinReach() {
-        Tile home = test.nekroHome();
+        test.nekroHome();
         test.nekro.setStrategicCC(2);
         test.nekro.setTacticalCC(3);
         someoneElsePlayed(CONSTRUCTION);
+        assertThat(StrategyCardRules.follow(test.context(constructionCard()))).isEmpty();
+
         test.game
                 .getRevealedPublicObjectives()
                 .put("build_defenses", test.game.getRevealedPublicObjectives().size() + 1);
-        assertThat(StrategyCardRules.follow(test.context(constructionCard()))).isEmpty();
-
-        test.units(home, "mordaiii", test.nekro, UnitType.Pds, 1);
         assertThat(StrategyCardRules.follow(test.context(constructionCard()))).isPresent();
     }
 

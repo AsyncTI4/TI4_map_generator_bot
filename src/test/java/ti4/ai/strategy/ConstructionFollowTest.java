@@ -174,6 +174,43 @@ class ConstructionFollowTest extends BaseTi4Test {
                                 - 1e-9));
     }
 
+    // In aiplay1 a 4-structure public was in play and the seat held only its home dock. The public could not be scored
+    // that round, but a PDS from the follow leaves it 2 short, which one Construction closes next round. That progress
+    // is worth the token.
+    @Test
+    void followsWithAPdsForAPublicThreeStructuresShort() {
+        revealBuildDefenses();
+        assertThat(StructurePolicy.structureShortfall(test.game, test.nekro)).isEqualTo(3);
+
+        assertThat(StrategyCardRules.wantsToFollow(test.game, test.nekro, StrategyCard.CONSTRUCTION))
+                .isTrue();
+        assertThat(follow()).contains(PDS_BUTTON);
+    }
+
+    // With the last strategy token the follow is still worth it, as long as no better card is waiting for it.
+    @Test
+    void spendsTheLastStrategyTokenOnThatProgress() {
+        revealBuildDefenses();
+        test.nekro.setStrategicCC(1);
+
+        assertThat(follow()).contains(PDS_BUTTON);
+    }
+
+    // Four short is beyond what this follow and one Construction next round can close, so a lone home PDS still does
+    // not pay for the token.
+    @Test
+    void doesNotFollowForAPublicFourStructuresShort() {
+        test.game
+                .getRevealedPublicObjectives()
+                .put("massive_cities", test.game.getRevealedPublicObjectives().size() + 1);
+        test.units(test.game.getTileFromPlanet("mordaiii"), "mordaiii", test.nekro, UnitType.Pds, 2);
+        assertThat(StructurePolicy.structureShortfall(test.game, test.nekro)).isEqualTo(4);
+
+        assertThat(StrategyCardRules.wantsToFollow(test.game, test.nekro, StrategyCard.CONSTRUCTION))
+                .isFalse();
+        assertThat(follow()).isEmpty();
+    }
+
     // Saar's Floating Factory goes into the space area, so the planet-based follow never offers a dock for it.
     @Test
     void offersNoDockToTheSaar() {

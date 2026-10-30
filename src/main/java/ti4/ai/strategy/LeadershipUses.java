@@ -27,6 +27,13 @@ class LeadershipUses {
                                 in.seat(), Math.min(StrategyCardRules.LEADERSHIP_TOKENS, in.reinforcements()))));
     }
 
+    static boolean fundsWantedFollows(PlanInputs in) {
+        if (in.reinforcements() <= 0) return false;
+        Player seat = in.seat();
+        int spendable = seat.getStrategicCC() - ScarToken.kept(in.game(), seat);
+        return StrategyCardRules.strategyTokensWantedForFollows(in.game(), seat) > spendable;
+    }
+
     private static double firstInTheRace(PlanInputs in) {
         Player seat = in.seat();
         Snapshot race = in.race();

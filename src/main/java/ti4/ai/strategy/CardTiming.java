@@ -33,6 +33,7 @@ class CardTiming {
         if (movesOutBeforeConstruction(in, plan)) return Timing.FALLBACK;
         if (opensTheRound(in, plan)) return Timing.NOW;
         if (claimsWithPeaceAccords(in, plan)) return Timing.NOW;
+        if (plan.card() == StrategyCard.LEADERSHIP && LeadershipUses.fundsWantedFollows(in)) return Timing.NOW;
         if (plan.card() == StrategyCard.WARFARE) return warfare(in, plan);
         if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
         Optional<Benefit> main = plan.main();
