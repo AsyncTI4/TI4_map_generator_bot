@@ -118,11 +118,6 @@ public class ProductionPlanner {
             UnitType.Mech,
             UnitType.Cruiser,
             UnitType.Destroyer);
-    private static final String AUTO_FACTORIES = "hacanbt";
-    private static final int AUTO_FACTORIES_SHIPS = 3;
-    private static final double FLEET_TOKEN_VALUE = 1.0;
-    private static final String FLEET_REGULATIONS = "regulations";
-    private static final int REGULATED_FLEET = 4;
     private static final int WAR_MACHINE_PRODUCTION = 4;
     private static final int WAR_MACHINE_DISCOUNT = 1;
 
@@ -279,12 +274,37 @@ public class ProductionPlanner {
             int overSupplyCarriers,
             int extraProduction) {
         try (Thinking.Span ignored = Thinking.enter("production.plan")) {
-            BuildPlan base =
-                    buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction, 0);
-            if (!grantsFleetToken(game, seat)) return base;
-            BuildPlan fed =
-                    buildPlan(game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction, 1);
-            return fed.ships() >= AUTO_FACTORIES_SHIPS && fed.value() > base.value() ? fed : base;
+            List<ProductionTrigger> triggers = ProductionTrigger.held(game, seat);
+            Planning planning =
+                    new Planning(game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction);
+            BuildPlan best = ProductionTrigger.credited(planning.build(null, false), triggers);
+            for (ProductionTrigger trigger : triggers) {
+                Optional<BuildPlan> aimed = planning.aimedAt(trigger, triggers);
+                if (aimed.isPresent() && aimed.get().value() > best.value()) best = aimed.get();
+            }
+            return best;
+        }
+    }
+
+    private record Planning(
+            Game game,
+            Player seat,
+            Tile tile,
+            int extraResources,
+            DefenseOutlook defense,
+            int overSupplyCarriers,
+            int extraProduction) {
+
+        BuildPlan build(@Nullable ProductionTrigger trigger, boolean seedFirst) {
+            return buildPlan(
+                    game, seat, tile, extraResources, defense, overSupplyCarriers, extraProduction, trigger, seedFirst);
+        }
+
+        Optional<BuildPlan> aimedAt(ProductionTrigger trigger, List<ProductionTrigger> triggers) {
+            BuildPlan toppedUp = ProductionTrigger.credited(build(trigger, false), triggers);
+            if (trigger.met(toppedUp)) return Optional.of(toppedUp);
+            BuildPlan seeded = ProductionTrigger.credited(build(trigger, true), triggers);
+            return trigger.met(seeded) ? Optional.of(seeded) : Optional.empty();
         }
     }
 
@@ -305,8 +325,10 @@ public class ProductionPlanner {
             DefenseOutlook defense,
             int overSupplyCarriers,
             int extraProduction,
-            int fleetRoomBonus) {
+            @Nullable ProductionTrigger trigger,
+            boolean seedFirst) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
+        int fleetRoomBonus = trigger == null ? 0 : trigger.fleetRoomGained();
         Budget budget;
         try (Thinking.Span ignored = Thinking.enter("production.budget")) {
             budget = new Budget(
@@ -317,6 +339,7 @@ public class ProductionPlanner {
         }
         budget.overSupply = Math.max(0, overSupplyCarriers);
         Builder builder = new Builder(game, seat, tile, budget, defense);
+        if (seedFirst && trigger != null) phase("production.triggerSeed", () -> seedTrigger(builder, trigger));
         phase("production.scoringUnits", () -> planScoringUnits(builder));
         phase("production.defensiveUnits", () -> planDefensiveUnits(builder));
         phase("production.coreShips", () -> planCoreShips(builder));
@@ -325,7 +348,7 @@ public class ProductionPlanner {
         phase("production.surplusShips", () -> planSurplusShips(builder));
         phase("production.coreGround", () -> planCoreGround(builder));
         phase("production.fractureFighters", () -> planFractureFighters(builder));
-        phase("production.autoFactories", () -> planAutoFactories(builder));
+        if (trigger != null) phase("production.triggerTopUp", () -> topUpTrigger(builder, trigger));
         phase("production.fill", () -> fillProduction(builder));
         return new BuildPlan(builder.orders);
     }
@@ -360,11 +383,6 @@ public class ProductionPlanner {
         return CARRIER_VALUE + (sustains ? SUSTAINING_CARRIER_BONUS : 0);
     }
 
-    public static boolean grantsFleetToken(Game game, Player seat) {
-        if (!seat.hasUnlockedBreakthrough(AUTO_FACTORIES)) return false;
-        return !ButtonHelper.isLawInPlay(game, FLEET_REGULATIONS) || seat.getEffectiveFleetCC() < REGULATED_FLEET;
-    }
-
     public static boolean holdsHero(Player seat) {
         return seat.hasLeaderUnlocked(HACAN_HERO);
     }
@@ -396,7 +414,10 @@ public class ProductionPlanner {
         Tile home = seat.getHomeSystemTile();
         if (!holdsHero(seat) || home == null) return 0;
         int slots = Math.min(HERO_FLEET_MAX, Helper.getProductionValue(seat, game, home, false));
-        return Math.max(0, slots - (grantsFleetToken(game, seat) ? 1 : 0));
+        int gained = ProductionTrigger.held(game, seat).stream()
+                .mapToInt(ProductionTrigger::fleetRoomGained)
+                .sum();
+        return Math.max(0, slots - gained);
     }
 
     private static double heroMinSaving(Game game) {
@@ -405,9 +426,12 @@ public class ProductionPlanner {
 
     private static BuildPlan heroPlan(Game game, Player seat, Tile tile, DefenseOutlook defense, int shipsMovedOut) {
         BuildPlan plain = heroPlanWithRoom(game, seat, tile, defense, shipsMovedOut);
-        if (!grantsFleetToken(game, seat)) return plain;
-        BuildPlan fed = heroPlanWithRoom(game, seat, tile, defense, shipsMovedOut + 1);
-        return fed.ships() >= AUTO_FACTORIES_SHIPS && fed.totalCost() > plain.totalCost() ? fed : plain;
+        BuildPlan best = plain;
+        for (ProductionTrigger trigger : ProductionTrigger.held(game, seat)) {
+            BuildPlan fed = heroPlanWithRoom(game, seat, tile, defense, shipsMovedOut + trigger.fleetRoomGained());
+            if (trigger.met(fed) && fed.totalCost() > best.totalCost()) best = fed;
+        }
+        return best;
     }
 
     private static BuildPlan heroPlanWithRoom(
@@ -437,19 +461,24 @@ public class ProductionPlanner {
         }
     }
 
-    private static void planAutoFactories(Builder builder) {
-        Player seat = builder.seat;
-        if (!grantsFleetToken(builder.game, seat)) return;
-        int ships = builder.plannedNonFighterShips();
-        int missing = AUTO_FACTORIES_SHIPS - ships;
-        if (ships == 0 || missing <= 0) return;
-        double cost = builder.cost(UnitType.Destroyer);
-        if (seat.getUnitByType(UnitType.Destroyer) == null || !builder.budget.allowsShips(missing, cost * missing)) {
-            return;
-        }
-        double value = builder.fillerValue(UnitType.Destroyer) + FLEET_TOKEN_VALUE / missing;
-        for (int added = 0; added < missing; added++) {
-            if (!builder.ship(UnitType.Destroyer, value, false)) return;
+    private static void seedTrigger(Builder builder, ProductionTrigger trigger) {
+        addTriggerShips(builder, trigger, trigger.needed());
+    }
+
+    private static void topUpTrigger(Builder builder, ProductionTrigger trigger) {
+        addTriggerShips(builder, trigger, trigger.missing(new BuildPlan(builder.orders)));
+    }
+
+    private static void addTriggerShips(Builder builder, ProductionTrigger trigger, int count) {
+        if (count <= 0) return;
+        Optional<UnitType> cheapest = trigger.counted().stream()
+                .filter(type -> builder.seat.getUnitByType(type) != null)
+                .min(Comparator.comparingDouble(builder::cost));
+        if (cheapest.isEmpty()) return;
+        UnitType type = cheapest.get();
+        if (!builder.budget.allowsShips(count, builder.cost(type) * count)) return;
+        for (int added = 0; added < count; added++) {
+            if (!builder.ship(type, builder.fillerValue(type), false)) return;
         }
     }
 
@@ -1166,13 +1195,6 @@ public class ProductionPlanner {
             String asyncId =
                     BoardView.model(seat, type).map(UnitModel::getAsyncId).orElse(type.getValue());
             return ButtonHelper.getNumberOfUnitsOnTheBoard(game, seat, asyncId);
-        }
-
-        int plannedNonFighterShips() {
-            return orders.stream()
-                    .filter(order -> BoardView.MOVING_SHIPS.contains(order.type()))
-                    .mapToInt(BuildOrder::units)
-                    .sum();
         }
 
         int planned(UnitType type) {

@@ -1,6 +1,7 @@
 package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.pressedId;
 import static ti4.ai.AiTestGame.prompt;
@@ -11,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.strategy.CardValueScale;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
@@ -21,8 +24,11 @@ import ti4.testUtils.BaseTi4Test;
 // the home dock production 6.
 class HacanProductionTest extends BaseTi4Test {
 
+    private static final String HACAN_ID = "7100000555555555";
+
     private AiTestGame test;
     private Tile home;
+    private Tile hacanHome;
 
     @BeforeEach
     void setUp() {
@@ -125,6 +131,70 @@ class HacanProductionTest extends BaseTi4Test {
                         + with.units(UnitType.Dreadnought)
                         + with.units(UnitType.Carrier))
                 .isEqualTo(3);
+    }
+
+    // From the live game aiplay1, round 1: the Hacan seat has moved its whole starting fleet out of its home system,
+    // every planet is exhausted and it holds 2 trade goods and Sarween Tools, so 3 resources buy at most 4 units at
+    // the production 4 dock. It built 4 infantry for 2 (1 trade good after Sarween). Three destroyers for 3 (both
+    // trade goods after Sarween) trigger Auto-Factories, and the command token it gains is worth far more.
+    @Test
+    void buildsThreeDestroyersForTheAutoFactoriesTokenOverInfantry() {
+        Player hacan = emptyHacanHome();
+        hacan.addBreakthrough("hacanbt");
+        hacan.setBreakthroughUnlocked("hacanbt", true);
+
+        BuildPlan plan = ProductionPlanner.plan(test.game, hacan, hacanHome);
+
+        assertThat(plan.units(UnitType.Destroyer)).isEqualTo(3);
+        assertThat(plan.units(UnitType.Infantry)).isZero();
+        assertThat(plan.totalCost()).isEqualTo(3);
+    }
+
+    // The same seat without the breakthrough has no reason to buy ships nobody asked for: it fills with infantry.
+    @Test
+    void buildsInfantryAtTheEmptyHomeWithoutAutoFactories() {
+        Player hacan = emptyHacanHome();
+
+        BuildPlan plan = ProductionPlanner.plan(test.game, hacan, hacanHome);
+
+        assertThat(plan.units(UnitType.Destroyer)).isZero();
+        assertThat(plan.units(UnitType.Infantry)).isEqualTo(4);
+    }
+
+    // The token Auto-Factories brings is valued as a held command token, on top of what the ships are worth.
+    @Test
+    void creditsTheAutoFactoriesTokenAtAHeldCommandToken() {
+        Player hacan = emptyHacanHome();
+        BuildPlan without = ProductionPlanner.plan(test.game, hacan, hacanHome);
+        hacan.addBreakthrough("hacanbt");
+        hacan.setBreakthroughUnlocked("hacanbt", true);
+
+        BuildPlan with = ProductionPlanner.plan(test.game, hacan, hacanHome);
+
+        double ships = ProductionPlanner.fillerValuePerResource(test.game) * with.totalCost();
+        assertThat(with.value()).isCloseTo(ships + CardValueScale.HELD_TOKEN, within(1e-9));
+        assertThat(with.value()).isGreaterThan(without.value());
+    }
+
+    // A table of its own, so the Hacan home sits at the usual home position.
+    private Player emptyHacanHome() {
+        test = new AiTestGame();
+        test.game.setRound(1);
+        Player hacan = test.addSeat(HACAN_ID, "hacan", "orange");
+        hacanHome = test.place("16", AiTestGame.HOME);
+        for (String planet : List.of("arretze", "hercant", "kamdorn")) {
+            hacan.addPlanet(planet);
+            hacan.exhaustPlanet(planet);
+        }
+        test.units(hacanHome, "arretze", hacan, UnitType.Spacedock, 1);
+        Tile forward = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(forward, "space", hacan, UnitType.Carrier, 2);
+        test.units(forward, "space", hacan, UnitType.Cruiser, 1);
+        test.units(forward, "space", hacan, UnitType.Infantry, 4);
+        hacan.setFleetCC(3);
+        hacan.setTg(2);
+        hacan.addTech("st");
+        return hacan;
     }
 
     // The free build spends its slots on the most expensive units first: the flagship, then dreadnoughts, with no

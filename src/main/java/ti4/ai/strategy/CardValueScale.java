@@ -12,7 +12,7 @@ public class CardValueScale {
     public static final double TRADE_GOOD = ValueScale.TRADE_GOOD;
     static final double COMMODITY = ValueScale.COMMODITY;
     public static final double TOKEN_FLOOR = 1.5;
-    static final double HELD_TOKEN = TokenPurchase.INFLUENCE_PER_TOKEN * ValueScale.INFLUENCE;
+    public static final double HELD_TOKEN = TokenPurchase.INFLUENCE_PER_TOKEN * ValueScale.INFLUENCE;
     static final double TOKEN_ACTION_SHARE = 0.6;
     static final double STRATEGY_TOKEN = 1.0;
     static final double ACTION_CARD = ActionCardPrior.AVERAGE_CARD;
