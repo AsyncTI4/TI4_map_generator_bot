@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
@@ -125,6 +126,7 @@ public class StartTurnService {
         game.removeStoredValue("stonebornTempusUsedAction_" + player.getFaction());
         StonebornUnitHandler.resetStalactiumTurnUse(game, player);
         StonebornUnitHandler.resetGolemExplore(game, player);
+        ValhavnAbilityHandler.clearReaveTurnUse(game, player);
 
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getStoredValueMap());

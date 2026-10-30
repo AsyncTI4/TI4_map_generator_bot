@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
@@ -192,6 +193,7 @@ public class DestroyUnitService {
         }
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
+            ValhavnAbilityHandler.offerValhollsCall(event, game, units);
 
             for (Player player : game.getRealPlayers()) {
                 Tile tile = units.getFirst().tile();

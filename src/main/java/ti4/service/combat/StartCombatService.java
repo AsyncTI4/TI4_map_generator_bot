@@ -40,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
@@ -1539,6 +1540,18 @@ public class StartCombatService {
                                 + ", a reminder that you have _Daxcive Animators_ exhausted, and may ready it if you win this ground combat.",
                         buttons);
             }
+            if (!"space".equalsIgnoreCase(type) && player.hasTech("bevalhavng") && !player.hasTechReady("bevalhavng")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "biostimsReady_tech_bevalhavng",
+                        "Ready Völundr Protocol",
+                        TechEmojis.BioticTech));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", a reminder that you have _Völundr Protocol_ exhausted, and may ready it if you win this ground combat.",
+                        buttons);
+            }
         }
         if (mentakFound) {
             Button steal = Buttons.gray(
@@ -1813,6 +1826,11 @@ public class StartCombatService {
         RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player1, player2, tile, unitHolderName);
         RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player2, player1, tile, unitHolderName);
         if ("ground".equalsIgnoreCase(spaceOrGround)) {
+            UnitHolder combatHolder = tile.getUnitHolders().get(unitHolderName);
+            ValhavnLeadersHandler.addHearthCallButton(buttons, player1, tile, combatHolder);
+            if (!game.isFowMode() && player2 != player1) {
+                ValhavnLeadersHandler.addHearthCallButton(buttons, player2, tile, combatHolder);
+            }
             TwilightsFallMonumentsButtonHandler.addGreenTfMonumentButtons(buttons, game, tile, unitHolderName);
             TwilightsFallMonumentsButtonHandler.addRedTfMonumentButtons(buttons, game, tile, unitHolderName);
             MonumentsDSButtonHandler.addDawnstarHqGroundCombatButton(buttons, game, tile, unitHolderName);

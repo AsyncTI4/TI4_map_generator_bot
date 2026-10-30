@@ -9,6 +9,7 @@ import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.ValhavnAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
@@ -106,6 +107,7 @@ public final class HomebrewAgents implements AgentCatalog {
                             new HopeOfTheCosmosAgent(),
                             new AshenAgent(),
                             new NetrunnersAgent(),
+                            new ValhavnAgent(),
                             new EdynAgent(),
                             new LanefirAgent(),
                             new VerydithAgent(),

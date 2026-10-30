@@ -345,6 +345,13 @@ public class CommanderUnlockCheckService {
                         .map(game::getTileFromPlanet)
                         .filter(Objects::nonNull)
                         .anyMatch(Tile::isFracture);
+            case "valhavn" ->
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                                .filter(planet -> planet.getUnitCount(UnitType.Pds, player) > 0)
+                                .filter(planet -> planet.getUnitCount(UnitType.Infantry, player) >= 3)
+                                .count()
+                        >= 3;
 
             // theodisi
             case "ardentia",

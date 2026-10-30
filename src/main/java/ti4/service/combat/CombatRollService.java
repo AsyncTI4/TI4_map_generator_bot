@@ -42,6 +42,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
@@ -1235,8 +1237,9 @@ public class CombatRollService {
                 && (opponent != player || targetPlayer != null)) {
             MessageChannel channel =
                     isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
-            if (!BlueReverieTechHelper.offerGravitonLaserSystemAfterSpaceCannon(
-                    game, player, opponent, tile, h, event)) {
+            if (!ValhavnBreakthroughHandler.offerYggdrasilCannon(event, game, player, opponent, tile, h)
+                    && !BlueReverieTechHelper.offerGravitonLaserSystemAfterSpaceCannon(
+                            game, player, opponent, tile, h, event)) {
                 sendSpaceCannonOffenceHitAssignment(game, player, opponent, tile, h, channel, event);
             }
         }
@@ -3283,7 +3286,9 @@ public class CombatRollService {
 
         Map<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
         Map<Pair<UnitModel, UnitHolder>, Integer> unitsOnAdjacentTiles = new HashMap<>();
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false);
+        Set<String> sleipnirCoverage = ValhavnUnitHandler.getSleipnirPdsCoverageSystems(game, player, tile);
+        Set<String> adjTiles = new HashSet<>(FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false));
+        adjTiles.addAll(sleipnirCoverage);
         for (String adjacentTilePosition : adjTiles) {
             if (adjacentTilePosition.equals(tile.getPosition())) {
                 continue;
@@ -3294,6 +3299,8 @@ public class CombatRollService {
                     || ButtonHelper.isTileSmothered(game, adjTile, player)) {
                 continue;
             }
+            Map<Pair<UnitModel, UnitHolder>, Integer> unitsFromTile =
+                    sleipnirCoverage.contains(adjacentTilePosition) ? unitsOnTile : unitsOnAdjacentTiles;
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 Map<String, Integer> holderUnits = new HashMap<>();
                 getUnitsOnHolderByAsyncIdForSpaceCannon(colorID, holderUnits, unitHolder, player);
@@ -3301,8 +3308,7 @@ public class CombatRollService {
                 for (var entry : holderUnits.entrySet()) {
                     UnitModel model = player.getPriorityUnitByAsyncID(entry.getKey(), null);
                     if (model != null)
-                        unitsOnAdjacentTiles.merge(
-                                new ImmutablePair<>(model, unitHolder), entry.getValue(), Integer::sum);
+                        unitsFromTile.merge(new ImmutablePair<>(model, unitHolder), entry.getValue(), Integer::sum);
                 }
                 for (Map.Entry<UnitKey, Integer> unitEntry :
                         unitHolder.getUnits().entrySet()) {
@@ -3318,7 +3324,7 @@ public class CombatRollService {
                     if ((ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitEntry.getKey())
                                     || graveholdControlled)
                             && structure != null) {
-                        unitsOnAdjacentTiles.merge(
+                        unitsFromTile.merge(
                                 new ImmutablePair<>(structure, unitHolder), unitEntry.getValue(), Integer::sum);
                     }
                 }
@@ -3327,7 +3333,7 @@ public class CombatRollService {
                         UnitModel twilightCannon =
                                 AeternaBreakthroughHandler.getTwilightDefenseCannon(player, planet, true);
                         if (twilightCannon != null) {
-                            unitsOnAdjacentTiles.put(new ImmutablePair<>(twilightCannon, unitHolder), 1);
+                            unitsFromTile.put(new ImmutablePair<>(twilightCannon, unitHolder), 1);
                         }
                     }
                 }

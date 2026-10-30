@@ -163,7 +163,7 @@
         "types": [
             "BIOTIC"
         ],
-        "requirements": "GG",
+        "requirements": "GGG",
         "faction": "valhavn",
         "source": "beans",
         "text": "ACTION: Exhaust this card to ready a planet that contains one of your PDS units.\n\nAfter you win a ground combat, ready this card."
@@ -178,6 +178,6 @@
         "requirements": "RY",
         "faction": "valhavn",
         "source": "beans",
-        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet.\nSPACE CANNON 5, PLANETARY SHIELD"
+        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet.\nSPACE CANNON 4, PLANETARY SHIELD"
     }
 ]
