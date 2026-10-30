@@ -2,6 +2,7 @@ package ti4.ai.strategy;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.brain.StrategyCard;
@@ -11,8 +12,11 @@ import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.tactical.ProductionPlanner;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Units.UnitType;
 
 @UtilityClass
 public class TokenPurchase {
@@ -20,14 +24,18 @@ public class TokenPurchase {
     static final int INFLUENCE_PER_TOKEN = 3;
     static final int MAX_TOKENS = 3;
     static final int CUSTODIANS_COST = 6;
+    private static final ThreadLocal<Boolean> ESTIMATING_PLANS = ThreadLocal.withInitial(() -> false);
 
     record Purchase(int tokens, Wallet.Payment payment) {}
 
     public static SpendCost influenceToKeep(Game game, Player seat, SpendCost scoringReserve) {
-        Wallet wallet = Wallet.of(game, seat);
+        return custodiansToKeep(game, seat, scoringReserve)
+                .plus(pendingLeadershipPurchase(game, seat, Wallet.of(game, seat)));
+    }
+
+    public static SpendCost custodiansToKeep(Game game, Player seat, SpendCost scoringReserve) {
         SpendCost custodians = custodiansReserve(game, seat);
-        SpendCost kept = wallet.canPay(scoringReserve.plus(custodians)) ? custodians : SpendCost.NONE;
-        return kept.plus(pendingLeadershipPurchase(game, seat, wallet));
+        return Wallet.of(game, seat).canPay(scoringReserve.plus(custodians)) ? custodians : SpendCost.NONE;
     }
 
     private static SpendCost pendingLeadershipPurchase(Game game, Player seat, Wallet wallet) {
@@ -65,7 +73,7 @@ public class TokenPurchase {
     private static Optional<Purchase> purchase(Game game, Player seat, int reinforcements, Wallet wallet) {
         Wallet influencePlanets = new Wallet(
                 influenceLeaning(wallet), wallet.tradeGoods(), 0, 0, wallet.tradeGoodValue(), wallet.pooling());
-        SpendCost keep = ScoringReserve.of(game, seat).plus(custodiansReserve(game, seat));
+        SpendCost keep = kept(game, seat, wallet);
         for (int tokens = Math.min(maxTokens(game, seat), reinforcements); tokens > 0; tokens--) {
             Optional<Wallet.Payment> payment = influencePlanets
                     .plan(SpendCost.influence(INFLUENCE_PER_TOKEN * tokens))
@@ -73,6 +81,44 @@ public class TokenPurchase {
             if (payment.isPresent()) return Optional.of(new Purchase(tokens, payment.get()));
         }
         return Optional.empty();
+    }
+
+    private static SpendCost kept(Game game, Player seat, Wallet wallet) {
+        SpendCost scoring = ScoringReserve.of(game, seat).plus(custodiansReserve(game, seat));
+        if (ESTIMATING_PLANS.get()) return scoring;
+        ESTIMATING_PLANS.set(true);
+        try {
+            return withPlans(game, seat, wallet, scoring);
+        } finally {
+            ESTIMATING_PLANS.set(false);
+        }
+    }
+
+    private static SpendCost withPlans(Game game, Player seat, Wallet wallet, SpendCost scoring) {
+        SpendCost build = SpendCost.resources(homeBuildCost(game, seat));
+        SpendCost research =
+                SpendCost.resources(extraResearchCost(game, seat)).plus(TechnologyFollowReserve.of(game, seat));
+        return Stream.of(scoring.plus(build).plus(research), scoring.plus(build), scoring.plus(research))
+                .filter(wallet::canPay)
+                .findFirst()
+                .orElse(scoring);
+    }
+
+    private static int homeBuildCost(Game game, Player seat) {
+        return ButtonHelper.getTilesOfPlayersSpecificUnits(game, seat, UnitType.Spacedock).stream()
+                .filter(dock -> !dock.hasPlayerCC(seat))
+                .map(dock -> ProductionPlanner.plan(game, seat, dock))
+                .filter(plan -> !plan.isEmpty())
+                .mapToInt(plan -> (int) Math.ceil(plan.totalCost()))
+                .max()
+                .orElse(0);
+    }
+
+    private static int extraResearchCost(Game game, Player seat) {
+        boolean wanted = TechnologyTiming.holdsUnplayed(game, seat, StrategyCard.TECHNOLOGY)
+                && !StrategyCardRules.cannotResearch(seat)
+                && StrategyCardRules.worthResearching(game, seat, ResearchPolicy.WORTH_PAYING_FOR);
+        return wanted ? StrategyCardRules.SECOND_TECH_COST : 0;
     }
 
     private static int maxTokens(Game game, Player seat) {

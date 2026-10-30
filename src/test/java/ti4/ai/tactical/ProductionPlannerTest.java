@@ -235,19 +235,15 @@ class ProductionPlannerTest extends BaseTi4Test {
         assertThat(plan().units(UnitType.Destroyer)).isPositive();
     }
 
-    // While another player still holds Leadership, the influence its secondary would spend on command tokens is
-    // kept: Mehar Xull (1/3) buys a token, so production may only spend Mordai II's 4 resources.
+    // Producing runs on a fixed tempo and comes before command tokens: while another player still holds Leadership,
+    // production may still spend Mehar Xull (1/3) as well as Mordai II's 4 resources. The Leadership purchase keeps
+    // what the build needs instead (see TokensAfterBuildAndResearchTest).
     @Test
-    void keepsInfluenceForAPendingLeadershipPurchase() {
+    void doesNotHoldInfluenceBackForAPendingLeadershipPurchase() {
         test.game.setPhaseOfGame("action");
         test.place("24", AiTestGame.neighbourOf(AiTestGame.HOME));
         test.nekro.addPlanet("meharxull");
         test.sol.addSC(LEADERSHIP);
-
-        assertThat(ProductionPlanner.spendableResources(test.game, test.nekro)).isEqualTo(4);
-
-        test.game.setSCPlayed(LEADERSHIP, true);
-        test.nekro.addFollowedSC(LEADERSHIP);
 
         assertThat(ProductionPlanner.spendableResources(test.game, test.nekro)).isEqualTo(5);
     }

@@ -535,7 +535,7 @@ public class ProductionPlanner {
 
     public static SpendCost reserve(Game game, Player seat) {
         SpendCost scoring = ScoringReserve.of(game, seat);
-        SpendCost kept = scoring.plus(TokenPurchase.influenceToKeep(game, seat, scoring));
+        SpendCost kept = scoring.plus(TokenPurchase.custodiansToKeep(game, seat, scoring));
         SpendCost withDrive =
                 kept.plus(OpeningHold.gravityDriveReserve(game, seat)).plus(TechnologyFollowReserve.of(game, seat));
         return Wallet.of(game, seat).canPay(withDrive) ? withDrive : kept;
