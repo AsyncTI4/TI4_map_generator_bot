@@ -20,7 +20,7 @@ class AiCommandTest {
             AiCommand command = new AiCommand();
 
             assertThat(command.getSubcommands())
-                    .containsKeys("add", "status", "pause", "resume", "delegate", "remove", "watch");
+                    .containsKeys("add", "status", "pause", "resume", "delegate", "remove", "watch", "play");
         }
     }
 
@@ -47,6 +47,20 @@ class AiCommandTest {
                 .satisfies(option -> {
                     assertThat(option.getMinValue()).isEqualTo(3L);
                     assertThat(option.getMaxValue()).isEqualTo(6L);
+                });
+    }
+
+    // /ai play seats you plus 2 to 5 AIs, so the table stays within the 3 to 6 seats the standard map supports.
+    @Test
+    void playOffersTwoToFiveOpponents() {
+        AiPlay play = new AiPlay();
+
+        assertThat(play.getOptions())
+                .filteredOn(option -> "opponents".equals(option.getName()))
+                .singleElement()
+                .satisfies(option -> {
+                    assertThat(option.getMinValue()).isEqualTo(2L);
+                    assertThat(option.getMaxValue()).isEqualTo(5L);
                 });
     }
 }

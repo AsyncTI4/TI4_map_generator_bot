@@ -86,4 +86,39 @@ class SelfPlaySetupTest extends BaseTi4Test {
         assertThat(List.of("AiWatch", "ai-watch", "pbd123", "fow4", "ab", "a234567890123456789012"))
                 .allSatisfy(name -> assertThat(SelfPlaySetup.isValidName(name)).isFalse());
     }
+
+    // A human at the table takes one of the seats and the AIs fill the rest, every faction different.
+    @Test
+    void seatsTheHumanAmongTheAiFactions() {
+        List<String> opponents = SelfPlaySetup.pickOpponentFactions(5, "nekro", new Random(3));
+
+        SelfPlaySetup.Table table = SelfPlaySetup.Table.withHuman("nekro", "red", opponents, new Random(3));
+
+        assertThat(table.hasHuman()).isTrue();
+        assertThat(table.humanColor()).isEqualTo("red");
+        assertThat(table.factions()).hasSize(6).doesNotHaveDuplicates();
+        assertThat(table.factions().get(table.humanSeat())).isEqualTo("nekro");
+        assertThat(table.factions()).containsAll(opponents);
+        assertThat(table.speakerSeat()).isBetween(0, 5);
+    }
+
+    @Test
+    void neverGivesAnOpponentTheHumansFaction() {
+        for (String humanFaction : List.of("nekro", "yin", "l1z1x")) {
+            for (int seed = 0; seed < 20; seed++) {
+                List<String> opponents = SelfPlaySetup.pickOpponentFactions(5, humanFaction, new Random(seed));
+
+                assertThat(opponents).hasSize(5).doesNotHaveDuplicates().doesNotContain(humanFaction);
+                assertThat(AiSettings.DEFAULT_FACTIONS).containsAll(opponents);
+            }
+        }
+    }
+
+    @Test
+    void anAllAiTableHasNoHumanAndTheFirstSeatSpeaks() {
+        SelfPlaySetup.Table table = SelfPlaySetup.Table.allAi(List.of("nekro", "sol", "hacan"));
+
+        assertThat(table.hasHuman()).isFalse();
+        assertThat(table.speakerSeat()).isZero();
+    }
 }

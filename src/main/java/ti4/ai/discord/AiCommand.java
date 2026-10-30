@@ -16,6 +16,7 @@ public class AiCommand implements ParentCommand {
                     new AiDelegate(),
                     new AiRemove(),
                     new AiWatch(),
+                    new AiPlay(),
                     new AiFallbacks(),
                     new AiThinkingProfile())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
@@ -27,7 +28,7 @@ public class AiCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "AI players: add them to a game, manage them, or watch them play each other";
+        return "AI players: add them to a game, manage them, play against them or watch them play each other";
     }
 
     @Override

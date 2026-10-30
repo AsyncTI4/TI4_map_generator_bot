@@ -232,6 +232,10 @@ final class SelfPlayGame {
     }
 
     Game setUp(List<String> factions) throws Exception {
+        return setUp(SelfPlaySetup.Table.allAi(factions));
+    }
+
+    Game setUp(SelfPlaySetup.Table table) throws Exception {
         RandomHelper.seedThisThread(seed);
         env.seeded = true;
         actions = env.discord.createTextChannel(name + "-actions");
@@ -242,12 +246,7 @@ final class SelfPlayGame {
         // The same setup /ai watch uses, so a batch also exercises the production path; this harness drives its own
         // lane, so the runtime's registration is dropped again.
         Game game = SelfPlaySetup.setUp(
-                name,
-                owner(),
-                new SelfPlaySetup.Channels(actions, tableTalk, mapUpdates),
-                factions,
-                false,
-                setupEvent());
+                name, owner(), new SelfPlaySetup.Channels(actions, tableTalk, mapUpdates), table, false, setupEvent());
         AiRuntime.forget(name);
         env.trajectory = TrajectoryLog.openIfEnabled(name, () -> env.gameMessages.messages(name));
         env.game = () -> {
@@ -1135,6 +1134,10 @@ final class SelfPlayGame {
         for (int i = Math.max(0, lines.size() - count); i < lines.size(); i++) {
             report.append("  ").append(lines.get(i)).append('\n');
         }
+    }
+
+    static String ownerId() {
+        return OWNER_ID;
     }
 
     private Member owner() {

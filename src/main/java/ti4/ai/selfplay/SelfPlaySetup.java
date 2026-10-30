@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.random.RandomGenerator;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -16,7 +17,10 @@ import ti4.ai.AiSettings;
 import ti4.ai.runtime.AiRuntime;
 import ti4.ai.seat.AiSeatService;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.persistence.GameManager;
+import ti4.service.draft.PlayerSetupService;
+import ti4.service.draft.PlayerSetupState;
 import ti4.service.game.CreateGameService;
 import ti4.service.map.AddTileListService;
 import ti4.service.map.MapStringMapper;
@@ -37,6 +41,29 @@ public class SelfPlaySetup {
                     + " 0 42 100 0 40 105 0 39 111 0 114 99 0 29 115 0 26 107";
 
     public record Channels(TextChannel actions, TextChannel tableTalk, ThreadChannel mapUpdates) {}
+
+    public record Table(
+            List<String> factions, int humanSeat, @Nullable String humanColor, int speakerSeat) {
+
+        private static final int NO_HUMAN = -1;
+
+        public static Table allAi(List<String> factions) {
+            return new Table(factions, NO_HUMAN, null, 0);
+        }
+
+        public static Table withHuman(
+                String humanFaction, @Nullable String humanColor, List<String> aiFactions, RandomGenerator random) {
+            int seats = aiFactions.size() + 1;
+            int humanSeat = random.nextInt(seats);
+            List<String> factions = new ArrayList<>(aiFactions);
+            factions.add(humanSeat, humanFaction);
+            return new Table(List.copyOf(factions), humanSeat, humanColor, random.nextInt(seats));
+        }
+
+        public boolean hasHuman() {
+            return humanSeat != NO_HUMAN;
+        }
+    }
 
     public static final class SetupFailed extends RuntimeException {
         SetupFailed(String message, Throwable cause) {
@@ -75,6 +102,13 @@ public class SelfPlaySetup {
         return List.copyOf(factions.subList(0, seats));
     }
 
+    public static List<String> pickOpponentFactions(int opponents, String humanFaction, RandomGenerator random) {
+        List<String> factions = new ArrayList<>(AiSettings.DEFAULT_FACTIONS);
+        factions.remove(humanFaction);
+        Collections.shuffle(factions, random);
+        return List.copyOf(factions.subList(0, opponents));
+    }
+
     public static boolean isValidName(String name) {
         return name != null
                 && NAME.matcher(name).matches()
@@ -88,6 +122,17 @@ public class SelfPlaySetup {
             List<String> factions,
             boolean fast,
             GenericInteractionCreateEvent event) {
+        return setUp(name, owner, channels, Table.allAi(factions), fast, event);
+    }
+
+    public static Game setUp(
+            String name,
+            Member owner,
+            Channels channels,
+            Table table,
+            boolean fast,
+            GenericInteractionCreateEvent event) {
+        List<String> factions = table.factions();
         Game game = CreateGameService.createNewGame(name, owner);
         try {
             game.setMainChannelID(channels.actions().getId());
@@ -101,8 +146,13 @@ public class SelfPlaySetup {
             AddTileListService.addTileMapToGame(game, tiles(factions.size(), game));
             List<String> homes = homePositions(factions.size());
             for (int seat = 0; seat < factions.size(); seat++) {
+                boolean speaker = seat == table.speakerSeat();
+                if (seat == table.humanSeat()) {
+                    seatHuman(game, owner, factions.get(seat), table.humanColor(), homes.get(seat), speaker, event);
+                    continue;
+                }
                 AiSeatService.AddResult added =
-                        AiSeatService.addSeat(game, factions.get(seat), null, homes.get(seat), seat == 0, event);
+                        AiSeatService.addSeat(game, factions.get(seat), null, homes.get(seat), speaker, event);
                 if (added.seat() == null) throw new SetupFailed(added.message(), null);
             }
             AddTileListService.finishSetup(game, null);
@@ -116,6 +166,23 @@ public class SelfPlaySetup {
         } catch (Exception e) {
             discard(name);
             throw new SetupFailed("Setting up the game failed: " + e.getMessage(), e);
+        }
+    }
+
+    private static void seatHuman(
+            Game game,
+            Member owner,
+            String faction,
+            @Nullable String color,
+            String homePosition,
+            boolean speaker,
+            GenericInteractionCreateEvent event) {
+        Player human = game.getPlayer(owner.getId());
+        PlayerSetupService.setupPlayer(new PlayerSetupState(color, faction, homePosition, speaker), human, game, event);
+        if (!human.isRealPlayer()
+                || human.getHomeSystemTile() == null
+                || human.getPlanets().isEmpty()) {
+            throw new SetupFailed("Could not seat you as " + faction + " at " + homePosition + ".", null);
         }
     }
 
