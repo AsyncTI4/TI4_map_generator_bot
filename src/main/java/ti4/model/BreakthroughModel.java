@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -17,6 +19,10 @@ import ti4.service.emoji.TechEmojis;
 
 @Data
 public class BreakthroughModel implements ModelInterface, EmbeddableModel {
+    private static final Pattern LINKED_UNIT_UPGRADE_PATTERN = Pattern.compile(
+            "If you have the (?<name>.+?) (?:unit upgrade )?technology, flip this card and place it on top of \\k<name>\\.",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
     private String alias;
     private String name;
     private String shortName;
@@ -35,6 +41,24 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getFaction() {
         return Optional.ofNullable(faction);
+    }
+
+    @JsonIgnore
+    public Optional<UnitModel> getLinkedUnitUpgrade() {
+        if (text == null) return Optional.empty();
+        Matcher matcher = LINKED_UNIT_UPGRADE_PATTERN.matcher(text);
+        if (!matcher.find()) return Optional.empty();
+        String baseType = matcher.group("name").replaceFirst("(?i) II$", "").replaceAll("\\s", "");
+        List<UnitModel> matchingUpgrades = Mapper.getUnits().values().stream()
+                .filter(unit -> getFaction().equals(unit.getFaction()))
+                .filter(unit -> baseType.equalsIgnoreCase(unit.getBaseType()))
+                .toList();
+        return matchingUpgrades.stream()
+                .filter(unit -> unit.getId().endsWith("3"))
+                .findFirst()
+                .or(() -> matchingUpgrades.stream()
+                        .filter(UnitModel::getIsUpgrade)
+                        .findFirst());
     }
 
     public TI4Emoji getFactionEmoji() {

@@ -237,5 +237,11 @@
         "itemId": "natau_mech",
         "undraftable": true,
         "source": "beans"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "migo",
+        "undraftable": true,
+        "source": "beans"
     }
 ]
