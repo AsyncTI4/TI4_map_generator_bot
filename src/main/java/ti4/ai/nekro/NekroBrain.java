@@ -152,7 +152,6 @@ public class NekroBrain implements FactionBrain {
             "genericReact4",
             FleetSupplyRules.OPEN_PREFIX,
             TechRules.BIOMES_TARGET,
-            CarthAgentRules.TARGET_PREFIX,
             DatahubRules.START,
             DatahubRules.SELECT_PREFIX,
             DatahubRules.SWAP_PREFIX,

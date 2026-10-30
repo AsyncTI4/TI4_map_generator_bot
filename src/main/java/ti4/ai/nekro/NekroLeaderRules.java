@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.actioncards.ActionCardValue;
+import ti4.ai.brain.AgentPick;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -32,7 +33,6 @@ public class NekroLeaderRules {
     private static final String HERO = "nekrohero";
     private static final String AGENT_NAME = "Nekro Malleon";
     private static final String USE_AGENT = "exhaustAgent_nekroagent";
-    private static final String AGENT_TARGET_PREFIX = "nekroAgentRes_";
     private static final String AGENT_KEY = "nekroAgent|";
     private static final String AGENT_DONE = "done";
     private static final String COST_KEY = "nekroAgentCost|";
@@ -100,12 +100,11 @@ public class NekroLeaderRules {
         Optional<Long> since =
                 context.memory().get(key).filter(StringUtils::isNumeric).map(Long::parseLong);
         if (since.isEmpty()) return Optional.empty();
-        String self = AGENT_TARGET_PREFIX + context.faction();
+        List<String> self = List.of(context.faction(), context.seat().getColor());
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
-            if (prompt.isHidden() || prompt.createdAtMillis() < since.get() - CLOCK_SKEW_MILLIS) continue;
+            if (prompt.createdAtMillis() < since.get() - CLOCK_SKEW_MILLIS) continue;
             if (!prompt.content().contains(AGENT_NAME) || !NekroRules.mentions(prompt, context.seat())) continue;
-            Optional<PromptButton> target =
-                    prompt.firstEnabled(button -> button.isUnowned() && self.equals(button.handlerId()));
+            Optional<PromptButton> target = AgentPick.target(prompt, context.faction(), AGENT, self);
             if (target.isPresent() && !context.alreadyPressed(prompt, target.get())) {
                 context.memory().put(key, AGENT_DONE);
                 return Optional.of(AiDecision.press(prompt, target.get(), "take Nekro Malleon's 2 trade goods itself"));

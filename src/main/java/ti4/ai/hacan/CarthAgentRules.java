@@ -5,6 +5,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
+import ti4.ai.brain.AgentPick;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -21,7 +22,6 @@ import ti4.game.Player;
 @UtilityClass
 public class CarthAgentRules {
 
-    public static final String TARGET_PREFIX = "hacanAgentRefresh_";
     private static final String AGENT = "hacanagent";
     private static final String USE_AGENT = "exhaustAgent_hacanagent";
     private static final String AGENT_NAME = "Carth of Golden Sands";
@@ -61,12 +61,11 @@ public class CarthAgentRules {
         if (since.isEmpty()) return Optional.empty();
         Player seat = context.seat();
         Player chosen = TradeRules.rememberedCarthTarget(context).orElse(seat);
-        List<String> wanted = List.of(TARGET_PREFIX + chosen.getFaction(), TARGET_PREFIX + chosen.getColor());
+        List<String> wanted = List.of(chosen.getFaction(), chosen.getColor());
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
-            if (prompt.isHidden() || prompt.createdAtMillis() < since.get() - CLOCK_SKEW_MILLIS) continue;
+            if (prompt.createdAtMillis() < since.get() - CLOCK_SKEW_MILLIS) continue;
             if (!prompt.content().contains(AGENT_NAME)) continue;
-            Optional<PromptButton> target =
-                    prompt.firstEnabled(button -> button.isUnowned() && wanted.contains(button.handlerId()));
+            Optional<PromptButton> target = AgentPick.target(prompt, context.faction(), AGENT, wanted);
             if (target.isPresent() && !context.alreadyPressed(prompt, target.get())) {
                 context.memory().put(key, DONE);
                 return Optional.of(AiDecision.press(prompt, target.get(), reason(chosen, seat)));

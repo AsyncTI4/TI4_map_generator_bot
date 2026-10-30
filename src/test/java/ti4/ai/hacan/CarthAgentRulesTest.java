@@ -44,8 +44,12 @@ class CarthAgentRulesTest extends BaseTi4Test {
     }
 
     private AiPrompt picker() {
-        AiPrompt picker =
-                prompt("picker", PromptSource.PUBLIC, NOW, "hacanAgentRefresh_nekro", "hacanAgentRefresh_sol");
+        AiPrompt picker = prompt(
+                "picker",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_agentPick_hacanagent_nekro",
+                "FFCC_nekro_agentPick_hacanagent_sol");
         return AiTestGame.withContent(
                 picker,
                 test.nekro.getRepresentationUnfogged()
@@ -59,7 +63,7 @@ class CarthAgentRulesTest extends BaseTi4Test {
         assertThat(pressed(CarthAgentRules.start(test.context(turnPrompt()))))
                 .isEqualTo("FFCC_nekro_exhaustAgent_hacanagent");
         assertThat(pressed(CarthAgentRules.chooseTarget(test.context(picker()))))
-                .isEqualTo("hacanAgentRefresh_nekro");
+                .isEqualTo("FFCC_nekro_agentPick_hacanagent_nekro");
     }
 
     // When a partner was picked at the start of the turn, the agent goes on that partner instead of on the seat.
@@ -70,7 +74,20 @@ class CarthAgentRulesTest extends BaseTi4Test {
         test.memory.put("hacanAgent|" + test.context().turnKey(), String.valueOf(NOW));
 
         assertThat(pressed(CarthAgentRules.chooseTarget(test.context(picker()))))
-                .isEqualTo("hacanAgentRefresh_sol");
+                .isEqualTo("FFCC_nekro_agentPick_hacanagent_sol");
+    }
+
+    // When the agent is pressed from the cards-info thread the faction picker comes back there, and a Yssaril copy
+    // flags each target id; the seat still picks itself.
+    @Test
+    void picksTheTargetFromItsOwnThreadAndAYssarilCopy() {
+        test.memory.put("hacanAgent|" + test.context().turnKey(), String.valueOf(NOW));
+        AiPrompt hidden = AiTestGame.withContent(
+                prompt("picker", PromptSource.AI_THREAD, NOW, "FFCC_nekro_agentPick_hacanagent_nekro~cc"),
+                "Please choose the faction on which you wish to use Carth of Golden Sands, the Hacan agent.");
+
+        assertThat(pressed(CarthAgentRules.chooseTarget(test.context(hidden))))
+                .isEqualTo("FFCC_nekro_agentPick_hacanagent_nekro~cc");
     }
 
     // With its commodities already at their maximum the 2 commodities would be lost, so the agent stays ready.

@@ -52,7 +52,7 @@ class AiPerceptionTest extends BaseTi4Test {
                 .isTrue();
     }
 
-    // Production Biomes, Quantum Datahub Node, Carth of Golden Sands and Wrath of Kenara ask for their choices with
+    // Production Biomes, Quantum Datahub Node and Wrath of Kenara ask for their choices with
     // unowned buttons in the main channel.
     @Test
     void seesTheUnownedPromptsOfTheHacanComponents() {
@@ -63,7 +63,6 @@ class AiPerceptionTest extends BaseTi4Test {
                 "startQDN",
                 "selectBeforeSwapSCs_sol_qdn",
                 "swapSCs_sol_qdn_5_2",
-                "hacanAgentRefresh_nekro",
                 "hacanFlagshipFinish_301_2")) {
             assertThat(AiPerception.isRelevant(PromptSource.PUBLIC, buttons(handler), "nekro", windows))
                     .as(handler)

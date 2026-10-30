@@ -62,7 +62,12 @@ class NekroLeaderRulesTest extends BaseTi4Test {
 
     private AiPrompt picker(long created) {
         AiPrompt picker = prompt(
-                "picker", PromptSource.PUBLIC, created, "nekroAgentRes_nekro", "nekroAgentRes_sol", "ultimateUndo_1");
+                "picker",
+                PromptSource.PUBLIC,
+                created,
+                "FFCC_nekro_agentPick_nekroagent_nekro",
+                "FFCC_nekro_agentPick_nekroagent_sol",
+                "ultimateUndo_1");
         return AiTestGame.withContent(
                 picker,
                 test.nekro.getRepresentationUnfogged()
@@ -93,7 +98,7 @@ class NekroLeaderRulesTest extends BaseTi4Test {
         assertThat(pressed(NekroLeaderRules.startAgent(test.context(turnPrompt()))))
                 .isEqualTo("FFCC_nekro_exhaustAgent_nekroagent");
         assertThat(pressed(NekroLeaderRules.chooseAgentTarget(test.context(picker(NOW)))))
-                .isEqualTo("nekroAgentRes_nekro");
+                .isEqualTo("FFCC_nekro_agentPick_nekroagent_nekro");
     }
 
     // Form a Spy Network needs 5 action cards in hand, so the agent never eats into them.
