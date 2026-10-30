@@ -304,7 +304,7 @@ public class SearchGameHelper {
             int daysPlayed =
                     (int) Duration.ofMillis(endedDateTime - creationDateTime).toDays();
             String dayLabel = (daysPlayed == 1) ? "DAY" : "DAYS";
-            String endedStatus = game.hasWinner() ? "COMPLETED" : "ABORTED";
+            String endedStatus = game.hasWinner() ? "COMPLETED" : "ABANDONED";
             sb.append(" [")
                     .append(daysPlayed)
                     .append(' ')
