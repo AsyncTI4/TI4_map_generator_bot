@@ -1643,6 +1643,7 @@ public final class Constants {
     public static final String START_CHANNEL_EXPORT = "start";
     public static final String CANCEL_CHANNEL_EXPORT = "cancel";
     public static final String RESUME_CHANNEL_EXPORT = "resume";
+    public static final String LOG_CHANNEL_EXPORT = "log";
     public static final String EXPORT_ID = "export_id";
     public static final String EXPORT_MAX_SIZE_MB = "max_size_mb";
     public static final String CHANNEL = "channel";

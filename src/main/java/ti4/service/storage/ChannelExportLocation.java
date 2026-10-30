@@ -13,8 +13,10 @@ import java.util.stream.Stream;
 
 public record ChannelExportLocation(Path exportsRoot, String channelId, String exportId) {
 
-    private static final int MAX_LOG_TAIL_BYTES = 1200;
+    private static final int MAX_LOG_READ_BYTES = 20_000;
+    private static final int MAX_LOG_TAIL_CHARS = 1200;
     private static final Pattern ANSI_ESCAPE = Pattern.compile("\u001B\\[[;?0-9]*[A-Za-z]");
+    private static final Pattern STACK_FRAME = Pattern.compile("(?m)^[ \\t]+at .*(?:\\R|$)");
     private static final Pattern EXPORT_ID = Pattern.compile("[0-9A-Za-z_-]+");
 
     public static boolean isValidExportId(String exportId) {
@@ -144,15 +146,29 @@ public record ChannelExportLocation(Path exportsRoot, String channelId, String e
     }
 
     public String logTail() throws IOException {
+        String withoutStackFrames = STACK_FRAME
+                .matcher(readLogEnd(MAX_LOG_READ_BYTES))
+                .replaceAll("")
+                .trim();
+        int start = Math.max(0, withoutStackFrames.length() - MAX_LOG_TAIL_CHARS);
+        return withoutStackFrames.substring(start).trim();
+    }
+
+    public Optional<byte[]> logForUpload(long maxBytes) throws IOException {
+        if (!Files.exists(log())) return Optional.empty();
+        return Optional.of(readLogEnd(maxBytes).getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String readLogEnd(long maxBytes) throws IOException {
         if (!Files.exists(log())) return "";
         try (SeekableByteChannel channel = Files.newByteChannel(log())) {
             long size = channel.size();
-            int length = (int) Math.min(size, MAX_LOG_TAIL_BYTES);
+            int length = (int) Math.min(size, maxBytes);
             channel.position(size - length);
             ByteBuffer buffer = ByteBuffer.allocate(length);
             while (buffer.hasRemaining() && channel.read(buffer) > 0) {}
-            String tail = new String(buffer.array(), 0, buffer.position(), StandardCharsets.UTF_8);
-            return ANSI_ESCAPE.matcher(tail).replaceAll("").trim();
+            String end = new String(buffer.array(), 0, buffer.position(), StandardCharsets.UTF_8);
+            return ANSI_ESCAPE.matcher(end).replaceAll("");
         }
     }
 
