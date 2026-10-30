@@ -7,9 +7,6 @@ import ti4.draft.DraftItem;
 import ti4.game.Game;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
-import ti4.model.PlanetTypeModel;
-import ti4.model.PlanetTypeModel.PlanetType;
-import ti4.model.TechSpecialtyModel;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.draft.DraftTileManager;
@@ -63,31 +60,33 @@ public abstract class TileDraftItem extends DraftItem {
     }
 
     private void buildPlanetString(PlanetModel planet, StringBuilder sb) {
-        sb.append(planet.getName()).append(' ');
-        if (!planet.getPlanetTypes().isEmpty()) {
-            for (PlanetType type : planet.getPlanetTypes()) {
-                sb.append(planetTypeEmoji(type));
-            }
-        }
+        sb.append(planet.getName());
+        planet.getPlanetTypes().stream()
+                .filter(type -> switch (type) {
+                    case CULTURAL, HAZARDOUS, INDUSTRIAL -> true;
+                    default -> false;
+                })
+                .forEach(type -> sb.append(' ').append(type.getEmoji()));
         sb.append(" (");
         sb.append(planet.getResources()).append('/').append(planet.getInfluence());
         if (planet.isLegendary()) {
             sb.append('/').append(MiscEmojis.LegendaryPlanet);
         }
         if (planet.getTechSpecialties() != null) {
-            for (var spec : planet.getTechSpecialties()) {
-                sb.append('/').append(techSpecEmoji(spec));
-            }
+            planet.getTechSpecialties().forEach(specialty -> sb.append('/').append(specialty.getEmoji()));
         }
         sb.append(") ");
-    }
-
-    private static String planetTypeEmoji(PlanetTypeModel.PlanetType type) {
-        return type.getEmoji();
-    }
-
-    private static String techSpecEmoji(TechSpecialtyModel.TechSpecialty type) {
-        return type.getEmoji();
+        if (planet.getBasicAbilityText() != null) {
+            sb.append('\n').append("**").append(planet.getName()).append("**: ").append(planet.getBasicAbilityText());
+        }
+        if (planet.isLegendary()) {
+            sb.append('\n')
+                    .append(MiscEmojis.LegendaryPlanet)
+                    .append(" **")
+                    .append(planet.getLegendaryAbilityName())
+                    .append("**: ")
+                    .append(planet.getLegendaryAbilityText());
+        }
     }
 
     public MiltyDraftTile getMiltyTile() {

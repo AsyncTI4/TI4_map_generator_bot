@@ -15,6 +15,7 @@ import ti4.model.PlanetModel;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 public class HomeSystemDraftItem extends DraftItem {
@@ -58,6 +59,7 @@ public class HomeSystemDraftItem extends DraftItem {
         FactionModel faction = Mapper.getFaction(getItemId());
         TileModel tile = TileHelper.getTileById(faction.getHomeSystem());
         StringBuilder sb = new StringBuilder();
+        appendSystemTraits(tile, sb);
         List<String> planetIds = tile.getPlanets();
         for (int i = 0; i < planetIds.size() - 1; i++) {
             buildPlanetString(Mapper.getPlanet(planetIds.get(i)), sb);
@@ -71,9 +73,43 @@ public class HomeSystemDraftItem extends DraftItem {
 
     private static void buildPlanetString(PlanetModel planet, StringBuilder sb) {
         sb.append(planet.getName());
+        planet.getPlanetTypes().stream()
+                .filter(type -> switch (type) {
+                    case CULTURAL, HAZARDOUS, INDUSTRIAL -> true;
+                    default -> false;
+                })
+                .forEach(type -> sb.append(' ').append(type.getEmoji()));
         sb.append(" (");
         sb.append(planet.getResources()).append('/').append(planet.getInfluence());
+        if (planet.isLegendary()) {
+            sb.append('/').append(MiscEmojis.LegendaryPlanet);
+        }
+        if (planet.getTechSpecialties() != null) {
+            planet.getTechSpecialties().forEach(specialty -> sb.append('/').append(specialty.getEmoji()));
+        }
         sb.append(") ");
+        if (planet.isLegendary()) {
+            sb.append('\n')
+                    .append(MiscEmojis.LegendaryPlanet)
+                    .append(" **")
+                    .append(planet.getLegendaryAbilityName())
+                    .append("**: ")
+                    .append(planet.getLegendaryAbilityText());
+        }
+    }
+
+    private static void appendSystemTraits(TileModel tile, StringBuilder sb) {
+        List<String> traits = new ArrayList<>();
+        if (tile.isAsteroidField()) traits.add(MiscEmojis.Asteroids + " Asteroid Field");
+        if (tile.isGravityRift()) traits.add(MiscEmojis.GravityRift + " Gravity Rift");
+        if (tile.isNebula()) traits.add(MiscEmojis.Nebula + " Nebula");
+        if (tile.isSupernova()) traits.add(MiscEmojis.Supernova + " Supernova");
+        if (tile.getWormholes() != null) {
+            tile.getWormholes().forEach(wormhole -> traits.add(wormhole.symbol() + " Wormhole"));
+        }
+        if (!traits.isEmpty()) {
+            sb.append(String.join(", ", traits)).append('\n');
+        }
     }
 
     @JsonIgnore
