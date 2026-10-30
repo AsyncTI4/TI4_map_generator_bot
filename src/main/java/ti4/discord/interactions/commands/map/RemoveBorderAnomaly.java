@@ -58,7 +58,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
         }
 
         if (directions.isEmpty()) {
-            directions = Set.of(0, 1, 2, 3, 4, 5);
+            directions = AddBorderAnomaly.ALL_SIDES;
         }
 
         int amountRemoved = 0;

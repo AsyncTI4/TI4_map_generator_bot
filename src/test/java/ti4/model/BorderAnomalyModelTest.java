@@ -24,7 +24,8 @@ class BorderAnomalyModelTest extends BaseTi4Test {
             "core_border",
             "rim_border",
             "yellow",
-            "redorange");
+            "redorange",
+            "ratnest");
 
     // Every spelling the old BorderAnomalyType enum accepted (enum name, toSearchString, display name),
     // mapped to the id it must resolve to now. Saves and old map JSON exports still contain these.
@@ -84,6 +85,15 @@ class BorderAnomalyModelTest extends BaseTi4Test {
                         .isFalse();
             }
         }
+    }
+
+    @Test
+    void onlyTheRatNestCoversTheWholeHex() {
+        assertThat(Mapper.getBorderAnomalies().stream()
+                        .filter(BorderAnomalyModel::isWholeHex)
+                        .map(BorderAnomalyModel::getId))
+                .containsExactly("ratnest");
+        assertThat(Mapper.resolveBorderAnomaly("rat nest").getAutomation()).isEqualTo(AutomationStatus.MANUAL);
     }
 
     @Test
