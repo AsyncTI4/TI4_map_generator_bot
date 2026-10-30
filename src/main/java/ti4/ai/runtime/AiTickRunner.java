@@ -392,8 +392,12 @@ class AiTickRunner {
         }
     }
 
-    private static SeatResult handleIdle(SeatTick tick) {
+    static SeatResult handleIdle(SeatTick tick) {
         AiSeatState state = tick.state();
+        if (tick.profile().isPaused() && !state.hasDelegationRequest()) {
+            state.clearStall();
+            return SeatResult.wakeAt(0);
+        }
         List<WaitReason> reasons = AiStallDetector.waitReasons(tick.game(), tick.seat(), tick.prompts());
         String described = AiStallDetector.describe(reasons);
         long stallAge = state.stallAge(described, tick.now());

@@ -100,6 +100,7 @@ public class AiSeatService {
         AiProfile profile = AiProfile.of(seat);
         profile.withPause(paused ? AiProfile.PauseState.MANUAL : AiProfile.PauseState.RUNNING)
                 .writeTo(seat);
+        AiRuntime.clearStall(seat.getGame().getName(), seat.getUserID());
     }
 
     private static boolean occupiedHome(Game game, String position) {

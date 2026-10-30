@@ -170,6 +170,12 @@ final class AiSeatState {
         return now - stallSince;
     }
 
+    void clearStall() {
+        stallSince = 0;
+        stallReasons = "";
+        stuckAnnounced = false;
+    }
+
     void restartStall(long now) {
         if (stallSince != 0) stallSince = now;
     }

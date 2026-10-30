@@ -92,6 +92,11 @@ public class AiRuntime {
         lane.markDirty(System.currentTimeMillis());
     }
 
+    public static void clearStall(String gameName, String seatId) {
+        AiLane lane = LANES.get(gameName);
+        if (lane != null) lane.seat(seatId).clearStall();
+    }
+
     public static boolean isCoolingDown(String gameName) {
         AiLane lane = LANES.get(gameName);
         return lane != null && AiTickRunner.isCoolingDown(lane, System.currentTimeMillis());

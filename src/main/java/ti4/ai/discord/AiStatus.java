@@ -45,7 +45,7 @@ class AiStatus extends GameStateSubcommand {
     private static String state(Game game, Player seat) {
         if (!AiSettings.isEnabled()) return "disabled on this bot, so the table chooses for it";
         if (!AiSeats.isActiveAiSeat(seat)) return "not playing";
-        if (AiProfile.of(seat).isPaused()) return "paused, so the table chooses for it";
+        if (AiProfile.of(seat).isPaused()) return "paused, so it makes no choices";
         if (AiRuntime.isCoolingDown(game.getName())) {
             return "holding back for a few minutes after repeated button failures, so the table chooses for it";
         }

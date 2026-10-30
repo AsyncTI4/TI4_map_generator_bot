@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 class AiPause extends GameStateSubcommand {
 
     AiPause() {
-        super("pause", "Pause AI players; the table then makes their choices", true, false);
+        super("pause", "Pause AI players: they make no choices until resumed", true, false);
         addOptions(AiCommandSupport.seatOption("Only this AI seat (default: all of them)"));
     }
 
@@ -28,8 +28,8 @@ class AiPause extends GameStateSubcommand {
         seats.forEach(seat -> AiSeatService.setPaused(seat, true));
         MessageHelper.replyToMessage(
                 event,
-                names(seats) + " paused. When a paused AI holds up the game, any player will be asked to choose for"
-                        + " it. Use `/ai resume` to let it play again.");
+                names(seats) + " paused and will make no choices. Use `/ai delegate` to choose for one, or `/ai resume`"
+                        + " to let it play again.");
     }
 
     static String names(List<Player> seats) {
