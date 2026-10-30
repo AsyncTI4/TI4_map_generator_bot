@@ -94,5 +94,17 @@
         ],
         "text": "After 1 or more of your units produces a hit during SPACE CANNON OFFENSE in a system containing your ships: You may cancel 1 of those hits to remove 1 ship from that unit's system and place it into the active system.",
         "source": "beans"
+    },
+    {
+        "alias": "migobt",
+        "name": "Ythic Symbiosis",
+        "shortName": "Ythic\nSymbiosis",
+        "faction": "migo",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "Planets you control that have technology specialties cannot be exhausted by other players. When another player would gain control of one of those planets, you may exhaust 1 technology to force those units into coexistence instead.",
+        "source": "beans"
     }
 ]

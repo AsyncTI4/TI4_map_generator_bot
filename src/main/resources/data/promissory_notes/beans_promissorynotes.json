@@ -74,5 +74,14 @@
         "playImmediately": false,
         "text": "When you commit 1 or more infantry during invasion on a planet you do not control\n\nYou may commit 2 infantry from your reinforcements onto that planet.\n\nAt the end of your turn, return this card to the Valhavn player.",
         "source": "beans"
+    },
+    {
+        "alias": "bepnmigo",
+        "name": "Extraction Science",
+        "faction": "migo",
+        "color": "",
+        "playArea": false,
+        "text": "When you research a technology\n\nYou may return this card to the Mi-Go player to treat 1 of your technology specialties as any color.",
+        "source": "beans"
     }
 ]
