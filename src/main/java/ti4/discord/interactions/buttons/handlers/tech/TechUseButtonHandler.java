@@ -180,7 +180,7 @@ class TechUseButtonHandler {
                         + " used their industrial juggernaut ability to replace a spacedock in tile "
                         + tile.getRepresentationForButtons() + " with a warsun for the cost of 6r.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", use these buttons to pay the 6 resources.",

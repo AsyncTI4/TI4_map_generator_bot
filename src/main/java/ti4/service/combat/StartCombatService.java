@@ -36,7 +36,11 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
@@ -53,14 +57,12 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
@@ -100,7 +102,6 @@ import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.helpers.twilight_kart.TkHelperGenomes;
 import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -114,6 +115,16 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.ExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.YinAgent;
+import ti4.service.leader.agent.modules.homebrew.HomebrewExhaustOnlyAgents;
+import ti4.service.leader.agent.modules.homebrew.KjalengardAgent;
+import ti4.service.leader.agent.modules.homebrew.KortaliAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.PonthousAgent;
+import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
+import ti4.service.leader.genome.homebrew.tknova.AristocraticGenome;
+import ti4.service.leader.genome.homebrew.tknova.HumanGenome;
+import ti4.service.leader.genome.homebrew.tknova.SplittingGenome;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.turn.StartTurnService;
@@ -239,6 +250,8 @@ public class StartCombatService {
             WarGamesBrActionCardHandler.clear(game);
         }
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        IronSalvageRelicHandler.clearCombatState(game);
+        IronUnitHandler.clearDominionState(game);
         XinCommanderHandler.beginCombat(game, tile, Constants.SPACE);
         if (CombatContestSettings.isEnabledStatic()) {
             SpringContext.getBean(CombatReplayService.class).onSpaceCombatStarted(game, player, player2, tile);
@@ -292,6 +305,8 @@ public class StartCombatService {
         WarGamesBrActionCardHandler.clear(game);
         XinTechHandler.offerAstromanticCloakStarButtons(game, player, unitHolder, unitHolder.getName());
         ScrapyardLeaderHandler.clearCommanderModifiers(game);
+        IronSalvageRelicHandler.clearCombatState(game);
+        IronUnitHandler.clearDominionState(game);
         XinCommanderHandler.beginCombat(game, tile, unitHolder.getName());
         ThirtyKActionCardHooks.onGroundCombatStart(game, unitHolder);
         ThirtyKSecretHooks.onGroundCombatStart(game, unitHolder);
@@ -400,8 +415,11 @@ public class StartCombatService {
         PonthousTechHandler.clearThunderbirdProtocol(game);
         VanguardLeadersHandler.clearCommanderState(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
-
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
+        if ("space".equalsIgnoreCase(spaceOrGround)) {
+            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player1, tile);
+            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player2, tile);
+        }
         String combatName2 = COMBAT_ROUND_TRACKER + player1.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
         combatName2 = COMBAT_ROUND_TRACKER + player2.getFaction() + tile.getPosition() + unitHolderName;
@@ -561,6 +579,8 @@ public class StartCombatService {
         }
         game.setStoredValue("solagent", "");
         game.setStoredValue("letnevagent", "");
+        game.setStoredValue(HumanGenome.ID, "");
+        game.setStoredValue(AristocraticGenome.ID, "");
         game.setStoredValue("classifiedWeapons", "");
 
         // sigma homebrew
@@ -1093,9 +1113,14 @@ public class StartCombatService {
                 otherPlayer = p2;
             }
             String msg = player.getRepresentation();
+            IronPromissoryHandler.sendRetrofittingCombatButton(
+                    game, player, otherPlayer, tile, "space".equalsIgnoreCase(type));
+            if (game.isFowMode()) {
+                IronSalvageRelicHandler.offerFlagshipCombatButton(game, player, tile);
+            }
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
                 buttons.add(Buttons.green("resolveSpyStep1", "Resolve Cymiae Flagship"));
-                buttons.add(Buttons.red("deleteButtons", "Delete These"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg
@@ -1176,7 +1201,7 @@ public class StartCombatService {
                                         player.factionButtonChecker() + "useVanguardReinforce",
                                         "Use Reinforce (On Win)",
                                         FactionEmojis.vanguard),
-                                Buttons.red("deleteButtons", "Decline")));
+                                Buttons.DECLINE_DELETE_BUTTONS));
             }
             if (!"space".equalsIgnoreCase(type) && player.hasAbility("enhanced_fundamentals") && player.getTg() >= 2) {
                 VanguardAbilitiesHandler.sendFundamentalsButton(player);
@@ -1259,7 +1284,7 @@ public class StartCombatService {
                         buttons);
             }
             if (player == p2
-                    && player.hasUnlockedBreakthrough("dreambt")
+                    && player.hasReadyBreakthrough("dreambt")
                     && tile.getPosition().equals(game.getActiveSystem())
                     && CommandCounterHelper.hasCC(player, tile)
                     && DreamAbilitiesHandler.hasNexusTokenOrDreamFlagship(game, tile)) {
@@ -1515,6 +1540,18 @@ public class StartCombatService {
                                 + ", a reminder that you have _Daxcive Animators_ exhausted, and may ready it if you win this ground combat.",
                         buttons);
             }
+            if (!"space".equalsIgnoreCase(type) && player.hasTech("bevalhavng") && !player.hasTechReady("bevalhavng")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "biostimsReady_tech_bevalhavng",
+                        "Ready Völundr Protocol",
+                        TechEmojis.BioticTech));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", a reminder that you have _Völundr Protocol_ exhausted, and may ready it if you win this ground combat.",
+                        buttons);
+            }
         }
         if (mentakFound) {
             Button steal = Buttons.gray(
@@ -1748,6 +1785,11 @@ public class StartCombatService {
             CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p2, tile);
         }
 
+        if (!game.isFowMode()) {
+            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p1, tile);
+            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p2, tile);
+        }
+
         return buttons;
     }
 
@@ -1784,6 +1826,11 @@ public class StartCombatService {
         RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player1, player2, tile, unitHolderName);
         RevenantLeadersHandler.addRevThronesHeroButton(buttons, game, player2, player1, tile, unitHolderName);
         if ("ground".equalsIgnoreCase(spaceOrGround)) {
+            UnitHolder combatHolder = tile.getUnitHolders().get(unitHolderName);
+            ValhavnLeadersHandler.addHearthCallButton(buttons, player1, tile, combatHolder);
+            if (!game.isFowMode() && player2 != player1) {
+                ValhavnLeadersHandler.addHearthCallButton(buttons, player2, tile, combatHolder);
+            }
             TwilightsFallMonumentsButtonHandler.addGreenTfMonumentButtons(buttons, game, tile, unitHolderName);
             TwilightsFallMonumentsButtonHandler.addRedTfMonumentButtons(buttons, game, tile, unitHolderName);
             MonumentsDSButtonHandler.addDawnstarHqGroundCombatButton(buttons, game, tile, unitHolderName);
@@ -1851,6 +1898,12 @@ public class StartCombatService {
         if (!game.isFowMode() && p2 != p1) {
             NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p2);
         }
+        if (!game.isFowMode()) {
+            IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p1, tile);
+            if (p2 != p1) {
+                IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p2, tile);
+            }
+        }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(
                     "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
@@ -1917,14 +1970,10 @@ public class StartCombatService {
             String factionChecker = "FFCC_" + agentHolder.getFaction() + "_";
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("thronesagent")) {
-                buttons.add(ThronesLeadersHandler.getThronesAgentButton(agentHolder));
+                buttons.add(ThronesAgent.button(agentHolder));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("titansagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_titansagent",
-                        "Use Titans " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Agent",
-                        FactionEmojis.Titans));
+                buttons.add(ExhaustOnlyAgents.TITANS.button(agentHolder));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasRelicReady("heartofixth")) {
                 buttons.add(Buttons.blue(
@@ -1933,19 +1982,11 @@ public class StartCombatService {
                         agentHolder.getFactionEmoji()));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("gheminaagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_gheminaagent",
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Ghemina Agents",
-                        FactionEmojis.ghemina));
+                buttons.add(HomebrewExhaustOnlyAgents.GHEMINA.button(agentHolder));
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("kjalengardagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_kjalengardagent",
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Kjalengard Agent",
-                        FactionEmojis.kjalengard));
+                buttons.add(KjalengardAgent.button(agentHolder));
             }
 
             if ((!game.isFowMode() || agentHolder == p1)
@@ -1971,6 +2012,31 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Valiant Genome",
                         FactionEmojis.Bastion));
+            }
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("tknovavaliantagent")) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_tknovavaliantagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Valiant Genome",
+                        FactionEmojis.Bastion));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnexhaustedLeader(HumanGenome.ID)
+                    && isGroundCombat) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_" + HumanGenome.ID,
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Human Genome",
+                        FactionEmojis.Sol));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnexhaustedLeader(AristocraticGenome.ID)
+                    && "space".equalsIgnoreCase(groundOrSpace)) {
+                buttons.add(Buttons.gray(
+                        factionChecker + "getAgentSelection_" + AristocraticGenome.ID,
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Aristocratic Genome",
+                        FactionEmojis.Letnev));
             }
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("obsidianagent")) {
                 buttons.add(Buttons.gray(
@@ -2015,11 +2081,7 @@ public class StartCombatService {
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "exhaustAgent_nomadagentthundarian",
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "The Thundarian",
-                        FactionEmojis.Nomad));
+                buttons.add(ExhaustOnlyAgents.THUNDARIAN.button(agentHolder));
             }
             List<Tile> flagshipTile =
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
@@ -2036,19 +2098,15 @@ public class StartCombatService {
             if ((!game.isFowMode() || agentHolder == p1)
                     && (isSpaceCombat || !game.isTwilightsFallMode())
                     && agentHolder.hasUnexhaustedLeader("yinagent")) {
-                buttons.add(Buttons.gray(
-                        factionChecker + "yinagent_" + pos,
-                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Yin Agent",
-                        FactionEmojis.Yin));
+                buttons.add(YinAgent.offerButton(agentHolder, pos));
             }
 
-            buttons.addAll(TkHelperGenomes.getGeneralCombatButtons(game, pos, p1, p2, agentHolder, factionChecker));
+            SplittingGenome.combatOffer(game, agentHolder, p1, pos).ifPresent(buttons::add);
 
             if ((!game.isFowMode() || agentHolder == p1)
                     && (isSpaceCombat || !game.isTwilightsFallMode())
                     && agentHolder.hasUnexhaustedLeader("ponthousagent")) {
-                buttons.add(PonthousLeadersHandler.getPonthousAgentButton(agentHolder, tile));
+                buttons.add(PonthousAgent.button(agentHolder, tile));
             }
             if ((!game.isFowMode() || agentHolder == p1)
                     && ButtonHelper.doesPlayerHaveFSHere("mirveda_flagship", agentHolder, tile)
@@ -2173,20 +2231,12 @@ public class StartCombatService {
                 && !game.isFowMode()
                 && isGroundCombat
                 && !p1.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    factionChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
-                    "Use Kortali Agent",
-                    FactionEmojis.kortali));
+            buttons.add(KortaliAgent.button(p2, p1));
         }
         if (p1.hasUnexhaustedLeader("kortaliagent")
                 && isGroundCombat
                 && !p2.getFragments().isEmpty()) {
-            String factionChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    factionChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
-                    "Use Kortali Agent",
-                    FactionEmojis.kortali));
+            buttons.add(KortaliAgent.button(p1, p2));
         }
 
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {

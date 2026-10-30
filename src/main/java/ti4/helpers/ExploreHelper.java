@@ -12,17 +12,29 @@ import ti4.model.Mapper;
 public final class ExploreHelper {
 
     public static boolean checkForMech(String planetName, Game game, Player player) {
-        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        UnitHolder unitHolder = findUnitHolder(planetName, game);
+        if (unitHolder == null) {
+            return false;
+        }
         UnitKey mechKey = Units.getUnitKey(UnitType.Mech, player.getColorID());
         return unitHolder.getUnitCount(mechKey) > 0;
     }
 
     public static boolean checkForInf(String planetName, Game game, Player player) {
-        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        UnitHolder unitHolder = findUnitHolder(planetName, game);
+        if (unitHolder == null) {
+            return false;
+        }
         UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
         return unitHolder.getUnitCount(infKey) > 0;
+    }
+
+    private static UnitHolder findUnitHolder(String planetName, Game game) {
+        if (planetName == null) {
+            return null;
+        }
+        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
+        return tile == null ? null : tile.getUnitHolders().get(planetName);
     }
 
     public static String getUnitListEmojisOnPlanetForHazardousExplorePurposes(

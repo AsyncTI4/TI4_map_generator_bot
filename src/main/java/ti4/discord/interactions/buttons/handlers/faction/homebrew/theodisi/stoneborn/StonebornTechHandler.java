@@ -12,6 +12,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -25,11 +26,15 @@ public class StonebornTechHandler {
 
     public static void addDormantXenolithExploreButton(
             List<Button> buttons, Player player, String planet, String trait) {
+        addDormantXenolithExploreButton(buttons, player, planet, trait, "Explore With Xenolith");
+    }
+
+    public static void addDormantXenolithExploreButton(
+            List<Button> buttons, Player player, String planet, String trait, String label) {
         if (!player.hasTechReady("thstoneborng")) {
             return;
         }
-        buttons.add(Buttons.green(
-                player.factionButtonChecker() + DORMANT_XENOLITH + planet + "|" + trait, "Explore With Xenolith"));
+        buttons.add(Buttons.green(player.factionButtonChecker() + DORMANT_XENOLITH + planet + "|" + trait, label));
     }
 
     public static void offerUnleashedXenolithAfterExplore(
@@ -124,6 +129,15 @@ public class StonebornTechHandler {
                     getOutputChannel(game, player, event), "No relic fragment was found in that exploration deck.");
             return;
         }
+        if ("thstoneborngu".equals(tech)) {
+            player.addFragment(fragment);
+            game.purgeExplore(fragment);
+            MessageHelper.sendMessageToChannel(
+                    getOutputChannel(game, player, event),
+                    player.getRepresentationNoPing() + " gained _"
+                            + Mapper.getExplore(fragment).getName() + "_ with _Xenolith Unleashed_.");
+            return;
+        }
         ExploreService.resolveExplore(
                 event,
                 fragment,
@@ -132,6 +146,7 @@ public class StonebornTechHandler {
                 player.getRepresentationNoPing() + " resolved _Xenolith_ and found a relic fragment:",
                 player,
                 game);
+        ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragment);
     }
 
     private static void returnXenolithReveals(Game game, List<String> revealed) {

@@ -31,7 +31,7 @@ public class VerydithAbilitiesHandler {
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + USE_MANDATE, "Use Mandate of Presence", FactionEmojis.verydith),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()

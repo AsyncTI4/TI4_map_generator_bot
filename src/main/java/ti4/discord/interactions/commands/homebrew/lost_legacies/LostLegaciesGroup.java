@@ -12,10 +12,14 @@ public class LostLegaciesGroup extends SubcommandGroup {
                     new RevLeaderFix(),
                     new RelicTradingHub(),
                     new ViewStonebornFragments(),
+                    new ViewPurgedStonebornFragments(),
                     new HydromorphicDraw(),
                     new HydromorphicDiscard(),
                     new HydromorphicSend(),
-                    new HydromorphicDrawSpecific())
+                    new HydromorphicDrawSpecific(),
+                    new AddFragmentumToken(),
+                    new RemoveFragmentumToken(),
+                    new StonebornUnleash())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     public LostLegaciesGroup() {

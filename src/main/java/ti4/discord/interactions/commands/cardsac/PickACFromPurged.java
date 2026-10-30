@@ -18,6 +18,7 @@ class PickACFromPurged extends GameStateSubcommand {
         super(Constants.PICK_AC_FROM_PURGED, "Pick an Action Card from the purged pile into your hand", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

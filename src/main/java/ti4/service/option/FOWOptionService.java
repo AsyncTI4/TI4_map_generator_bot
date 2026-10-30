@@ -211,7 +211,7 @@ public class FOWOptionService {
                 categoryButtons.add(Buttons.blue("fowOptionCategory_" + category, category.getTitle() + " Options"));
             }
         }
-        categoryButtons.add(Buttons.gray("deleteButtons", "Done"));
+        categoryButtons.add(Buttons.DONE_DELETE_BUTTONS);
 
         List<Button> optionButtons = new ArrayList<>();
         for (FOWOption option : FOWOption.values()) {

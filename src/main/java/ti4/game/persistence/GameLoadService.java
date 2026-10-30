@@ -561,6 +561,7 @@ class GameLoadService {
                 // TODO: default false here vs true in GameProperties; a missing token reverts to legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
+                case Constants.WORMHOLE_TOKEN_MERGE -> game.setWormholeTokenMergeFrom(wormholeTokenMergeFrom(info));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> game.setHomebrew(parseBooleanOrDefault(info, false));
@@ -1168,6 +1169,7 @@ class GameLoadService {
                     player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BOT_PLAYER -> player.setBotPlayer(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.NPC -> player.setNpc(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG ->
                     player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));
@@ -1183,6 +1185,9 @@ class GameLoadService {
                     player.setGhostCommanderCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.MAGEN_INFANTRY_COUNT ->
                     player.setMagenInfantryCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DACXIVE_COUNT -> player.setDacxiveCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.YIN_SPINNER_COUNT ->
+                    player.setYinSpinnerCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
@@ -1241,7 +1246,7 @@ class GameLoadService {
                     "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, counts);
+        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, UnitHolder.capToHolderLimit(uk, counts));
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
@@ -1276,5 +1281,14 @@ class GameLoadService {
         }
 
         return peekedPublicObjectives;
+    }
+
+    private static int wormholeTokenMergeFrom(String info) {
+        if ("true".equalsIgnoreCase(info)) return 2;
+        try {
+            return Integer.parseInt(info.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

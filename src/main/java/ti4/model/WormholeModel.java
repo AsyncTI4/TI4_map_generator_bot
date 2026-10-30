@@ -1,63 +1,61 @@
 package ti4.model;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class WormholeModel {
     public enum Wormhole {
-        ALPHA,
-        BETA,
-        GAMMA,
-        DELTA, ///
-        EPSILON,
-        ZETA,
-        ETA,
-        THETA,
-        IOTA,
-        KAPPA,
-        LAMBDA,
-        MU,
-        NU,
-        XI,
-        OMICRON,
-        PI,
-        RHO,
-        SIGMA,
-        TAU,
-        UPSILON,
-        PHI,
-        CHI,
-        PSI,
-        OMEGA, ///
-        CUSTOM_ERONOUS_WHEPSILON,
-        CUSTOM_ERONOUS_WHETA,
-        CUSTOM_ERONOUS_WHIOTA,
-        CUSTOM_ERONOUS_WHTHETA,
-        CUSTOM_ERONOUS_WHZETA, ///
-        WHNARROWS,
-        WHPROBABILITY,
-        WHCHAMPION,
-        WHVOYAGE,
-        VORTEX;
+        ALPHA("α"),
+        BETA("β"),
+        GAMMA("γ"),
+        DELTA("δ"),
+        @JsonAlias("CUSTOM_ERONOUS_WHEPSILON")
+        EPSILON("ε"),
+        @JsonAlias("CUSTOM_ERONOUS_WHZETA")
+        ZETA("ζ"),
+        @JsonAlias("CUSTOM_ERONOUS_WHETA")
+        ETA("η"),
+        @JsonAlias("CUSTOM_ERONOUS_WHTHETA")
+        THETA("θ"),
+        @JsonAlias("CUSTOM_ERONOUS_WHIOTA")
+        IOTA("ι"),
+        KAPPA("κ"),
+        LAMBDA("λ"),
+        MU("μ"),
+        NU("ν"),
+        XI("ξ"),
+        OMICRON("ο"),
+        PI("π"),
+        RHO("ρ"),
+        SIGMA("σ"),
+        TAU("τ"),
+        UPSILON("υ"),
+        PHI("φ"),
+        CHI("χ"),
+        PSI("ψ"),
+        OMEGA("ω"),
+        @JsonAlias("WHNARROWS")
+        NARROWS("N"),
+        @JsonAlias("WHPROBABILITY")
+        PROBABILITY("P"),
+        @JsonAlias("WHCHAMPION")
+        CHAMPION("C"),
+        @JsonAlias("WHVOYAGE")
+        VOYAGE("V"),
+        VORTEX("Vx");
+
+        private final String symbol;
+
+        Wormhole(String symbol) {
+            this.symbol = symbol;
+        }
+
+        public String symbol() {
+            return symbol;
+        }
 
         @Override
         public String toString() {
             return super.toString().toLowerCase();
         }
-
-        public String getWhString() {
-            if (!super.toString().startsWith("wh") && !super.toString().startsWith("custom")) {
-                return "wh" + super.toString().toLowerCase();
-            }
-            return super.toString();
-        }
-    }
-
-    public static Wormhole getWormholeFromString(String wh) {
-        Map<String, Wormhole> allWormholes = Arrays.stream(Wormhole.values())
-                .collect(Collectors.toMap(Wormhole::toString, (wormholeModel -> wormholeModel)));
-        if (allWormholes.containsKey(wh.toLowerCase())) return allWormholes.get(wh.toLowerCase());
-        return null;
     }
 }

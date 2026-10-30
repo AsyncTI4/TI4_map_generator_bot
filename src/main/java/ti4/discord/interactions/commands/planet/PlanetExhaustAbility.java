@@ -9,6 +9,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.planet.AlfheimLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.VanaheimLegendaryButtonHandler;
 import ti4.game.Game;
@@ -93,7 +94,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "hopesend" -> {
                 output = "Use buttons to drop 1 mech on a planet or to draw 1 action card.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                buttons.add(Buttons.DRAW_1_ACTION_CARD_DELETE);
             }
             case "alfheim" -> {
                 channel = player.getCardsInfoThread();
@@ -256,7 +257,22 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Please choose the system that the ship you wish to move is in.";
                 buttons.addAll(ButtonHelper.getDomnaStepOneTiles(player, game));
             }
-            case "eko" -> output = "blank";
+            case "horace" -> {
+                IxthLegendaryButtonHandler.offerHoraceAnomalies(game, player);
+                output = "blank";
+            }
+            case "lapidus" -> {
+                IxthLegendaryButtonHandler.offerLapidusExplore(game, player);
+                output = "blank";
+            }
+            case "eko" -> {
+                IxthLegendaryButtonHandler.offerEkoSystems(game, player);
+                output = "blank";
+            }
+            case "lloyd" -> {
+                IxthLegendaryButtonHandler.offerLloydInitiatives(game, player);
+                output = "blank";
+            }
             case "avarin" -> {
                 TheodisiLegendaryButtonHandler.offerAvarinUnitUpgradeResearch(game, player);
                 output = "blank";
@@ -292,7 +308,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
         }
 
-        if (!buttons.isEmpty()) buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+        if (!buttons.isEmpty()) buttons.add(Buttons.DELETE_BUTTONS);
         if (!"blank".equalsIgnoreCase(output)) {
             MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
         }

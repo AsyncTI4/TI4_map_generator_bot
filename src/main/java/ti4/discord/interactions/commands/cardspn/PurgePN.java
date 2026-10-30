@@ -20,6 +20,7 @@ public class PurgePN extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory note ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));

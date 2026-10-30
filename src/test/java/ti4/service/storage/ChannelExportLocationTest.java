@@ -156,6 +156,43 @@ class ChannelExportLocationTest {
     }
 
     @Test
+    void logTailDropsStackFramesSoTheErrorMessageSurvives() throws IOException {
+        // The exporter prints the exception message first and dozens of "  at ..." frames after it.
+        String frames = "  at Spectre.Console.Progress.StartAsync[T](Func`2 action) in /_/Progress.cs:125\n".repeat(40);
+        Files.writeString(
+                location.log(),
+                "Exporting part channel:0\nFatal error: Request failed: 400 Bad Request\n" + frames
+                        + "Part channel:0 failed, see 123.log\n");
+
+        String tail = location.logTail();
+
+        assertThat(tail).contains("Fatal error: Request failed: 400 Bad Request");
+        assertThat(tail).endsWith("Part channel:0 failed, see 123.log");
+        assertThat(tail).doesNotContain("Spectre.Console");
+    }
+
+    @Test
+    void logForUploadKeepsStackFramesButStripsAnsiAndCapsToTheEnd() throws IOException {
+        Files.writeString(
+                location.log(), "\u001B[32mfirst\u001B[0m\n" + "x".repeat(100) + "\n  at Some.frame()\nlast line\n");
+
+        byte[] uploaded = location.logForUpload(30).orElseThrow();
+
+        String text = new String(uploaded, java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(uploaded.length).isLessThanOrEqualTo(30);
+        assertThat(text).endsWith("last line\n");
+        assertThat(text).doesNotContain("\u001B");
+
+        String all = new String(location.logForUpload(10_000).orElseThrow(), java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(all).startsWith("first\n").contains("  at Some.frame()");
+    }
+
+    @Test
+    void logForUploadIsEmptyWhenThereIsNoLog() throws IOException {
+        assertThat(location.logForUpload(1000)).isEmpty();
+    }
+
+    @Test
     void logTailIsEmptyWhenThereIsNoLog() throws IOException {
         assertThat(location.logTail()).isEmpty();
     }

@@ -711,8 +711,8 @@
     "type": "agent",
     "name": "Hazorus Dormant",
     "title": "Nature's Bounty",
-    "abilityWindow": "At the start of a player's turn:",
-    "abilityText": "You may exhaust this card to allow that player to purge 1 relic fragment to replenish their commodities.\n\n**UNLEASH**: Return 1 fragmentum token of any color.",
+    "abilityWindow": "ACTION:",
+    "abilityText": "**UNLEASH**: Return 2 red fragmentum tokens from your faction sheet.\n\nExhaust this card and choose 1 player. That player may purge 1 relic fragment from their play area to explore 1 planet they control that has a trait matching the purged fragment.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -722,8 +722,8 @@
     "type": "agent",
     "name": "Hazorus Unleashed",
     "title": "Nature's Wrath",
-    "abilityWindow": "At the start of a player's turn:",
-    "abilityText": "You may exhaust this card to allow that player to purge 1 relic fragment to replenish their commodities. Then, you gain half as many trade goods (rounded down).",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Exhaust this card and choose 1 player. That player may purge 1 relic fragment from their play area to explore 1 planet they control that has a trait matching the purged fragment twice.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -733,9 +733,9 @@
     "type": "commander",
     "name": "Tempus Dormant",
     "title": "Slumbering Storm",
-    "abilityWindow": "Once per action, when you purge a non-action card component:",
-    "abilityText": "Gain 1 commodity.\n\n**UNLEASH**: Return 2 fragmentum tokens of different colors from your player sheet.",
-    "unlockCondition": "Have a fragmentum token on your player sheet.",
+    "abilityWindow": "Once per action, when you purge a component other than an action card:",
+    "abilityText": "**UNLEASH**: Return 1 green and 1 blue fragmentum token from your faction sheet.\n\nGain 1 commodity.",
+    "unlockCondition": "Have 1 fragmentum token on your faction sheet.",
     "source": "theodisi"
   },
   {
@@ -744,7 +744,7 @@
     "type": "commander",
     "name": "Tempus Unleashed",
     "title": "Raging Tempest",
-    "abilityWindow": "Once per action, when you purge a non-action card component:",
+    "abilityWindow": "Once per action, when you purge a component other than an action card:",
     "abilityText": "Gain 1 trade good or explore 1 planet you control.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
@@ -757,7 +757,7 @@
     "title": "The First Stoneborn",
     "abilityName": "Destiny Denied - Limited Potential",
     "abilityWindow": "ACTION:",
-    "abilityText": "Draw 3 relics and choose 1 to gain. Shuffle the rest into the deck and purge this card.\n\n**UNLEASH**: Remove 3 fragmentum tokens of different colors from your player sheet.",
+    "abilityText": "**UNLEASH**: Remove fragmentum tokens of 4 different colors from your faction sheet.\n\nDraw 3 relics and choose 1 to gain. Shuffle the rest into the deck. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -769,7 +769,7 @@
     "title": "Empowered Stoneborn",
     "abilityName": "Destined Purpose - Limitless Potential",
     "abilityWindow": "ACTION:",
-    "abilityText": "Draw and gain 3 relics. Then, purge this card.",
+    "abilityText": "Gain 3 relics. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },

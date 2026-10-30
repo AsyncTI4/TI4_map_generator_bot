@@ -1,0 +1,10 @@
+{
+  "name": "ixth-legendary-fog-2p",
+  "description": "Fog version of ixth-legendary-2p: Ixth legendary planets on ring 2, Sol holds Eko and Ethan, Hacan has a destroyer in Ethan's system.",
+  "fog": true,
+  "you": { "faction": "sol", "home": "301", "sc": 1, "planets": ["eko", "ethan"], "units": { "203": "cv" } },
+  "seats": [ { "faction": "hacan", "home": "310", "sc": 5, "units": { "203": "dd" } } ],
+  "defaults": { "tg": 3, "ccs": "3/3/2", "acs": 0, "sos": 0 },
+  "tiles": { "203": "c11", "204": "c06" },
+  "start": "action"
+}

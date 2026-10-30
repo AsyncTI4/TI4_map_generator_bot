@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ston
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -35,6 +36,7 @@ public class StonebornAbilityHandler {
     private static final String USE_ADAPTIVE = "useAdaptive";
     private static final String ADAPTIVE_COMPONENT = "adaptiveComponent_";
     private static final String ADAPTIVE_COST = "adaptiveCost_";
+    private static final List<String> FRAGMENTUM_TRAITS = List.of("cultural", "hazardous", "industrial", "frontier");
     private static final List<String> FRAGMENTS = List.of(
             "stonebornculturalfragment",
             "stonebornculturalfragment2",
@@ -85,18 +87,6 @@ public class StonebornAbilityHandler {
                 .toList();
     }
 
-    public static boolean returnPurgedFragment(Game game, String fragment) {
-        if (!FRAGMENTS.contains(fragment)) {
-            return false;
-        }
-
-        List<String> drawnFragments =
-                new ArrayList<>(List.of(game.getStoredValue(DRAWN_FRAGMENTS).split(",")));
-        drawnFragments.removeIf(fragment::equals);
-        game.setStoredValue(DRAWN_FRAGMENTS, String.join(",", drawnFragments));
-        return true;
-    }
-
     public static void offerFragmentumTokenPlacement(
             Game game, Player player, GenericInteractionCreateEvent event, List<String> fragments) {
         if (!player.hasAbility(FRAGMENTUM_UNLEASHED) || fragments.isEmpty()) {
@@ -105,8 +95,8 @@ public class StonebornAbilityHandler {
 
         List<String> traits = fragments.stream()
                 .map(Mapper::getExplore)
-                .filter(fragment -> fragment != null)
-                .map(fragment -> fragment.getType().toLowerCase())
+                .filter(Objects::nonNull)
+                .flatMap(fragment -> getFragmentumTraits(fragment).stream())
                 .distinct()
                 .filter(trait -> getFragmentumTokenCount(game, player, trait) < 3)
                 .toList();
@@ -129,16 +119,10 @@ public class StonebornAbilityHandler {
     @ButtonHandler(PLACE_FRAGMENTUM)
     public static void placeFragmentumToken(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String trait = buttonID.substring(PLACE_FRAGMENTUM.length());
-        if (!player.hasAbility(FRAGMENTUM_UNLEASHED)
-                || !List.of("cultural", "hazardous", "industrial", "frontier").contains(trait)
-                || getFragmentumTokenCount(game, player, trait) >= 3) {
+        if (!player.hasAbility(FRAGMENTUM_UNLEASHED) || !addFragmentumToken(game, player, trait)) {
             return;
         }
 
-        List<String> tokens = getFragmentumTokens(game, player);
-        tokens.add(trait);
-        game.setStoredValue(getFragmentumTokensKey(player), String.join(",", tokens));
-        CommanderUnlockCheckService.checkPlayer(player, "stoneborn");
         MessageHelper.sendMessageToChannel(
                 getOutputChannel(game, player, event),
                 player.getRepresentationNoPing() + " placed 1 " + getFragmentumTokenColor(trait)
@@ -152,6 +136,29 @@ public class StonebornAbilityHandler {
                 getFragmentumTokens(game, player).stream()
                         .filter(trait::equalsIgnoreCase)
                         .count());
+    }
+
+    public static boolean addFragmentumToken(Game game, Player player, String trait) {
+        if (!FRAGMENTUM_TRAITS.contains(trait) || getFragmentumTokenCount(game, player, trait) >= 3) {
+            return false;
+        }
+        List<String> tokens = getFragmentumTokens(game, player);
+        tokens.add(trait);
+        game.setStoredValue(getFragmentumTokensKey(player), String.join(",", tokens));
+        CommanderUnlockCheckService.checkPlayer(player, "stoneborn");
+        return true;
+    }
+
+    public static boolean removeFragmentumToken(Game game, Player player, String trait) {
+        if (!FRAGMENTUM_TRAITS.contains(trait)) {
+            return false;
+        }
+        List<String> tokens = getFragmentumTokens(game, player);
+        if (!tokens.remove(trait)) {
+            return false;
+        }
+        game.setStoredValue(getFragmentumTokensKey(player), String.join(",", tokens));
+        return true;
     }
 
     public static Button getFragmentumTokensInfoButton(Player player) {
@@ -194,18 +201,26 @@ public class StonebornAbilityHandler {
 
     @ButtonHandler(USE_ADAPTIVE)
     public static void useAdaptive(Game game, Player player, ButtonInteractionEvent event) {
+        if (!offerAdaptiveComponentButtons(game, player, getOutputChannel(game, player, event))) {
+            return;
+        }
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static boolean offerAdaptiveComponentButtons(Game game, Player player, MessageChannel channel) {
+        if (!player.hasAbility(ADAPTIVE)) {
+            return false;
+        }
         List<Button> buttons = getAdaptiveComponents(game, player).stream()
                 .map(component -> Buttons.green(
                         player.factionButtonChecker() + ADAPTIVE_COMPONENT + component.id, "UNLEASH " + component.name))
                 .toList();
         if (buttons.isEmpty()) {
-            return;
+            return false;
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                getOutputChannel(game, player, event),
-                player.getRepresentation() + ", choose a Dormant component to UNLEASH.",
-                buttons);
-        ButtonHelper.deleteTheOneButton(event);
+                channel, player.getRepresentation() + ", choose a Dormant component to UNLEASH.", buttons);
+        return true;
     }
 
     @ButtonHandler(ADAPTIVE_COMPONENT)
@@ -286,6 +301,7 @@ public class StonebornAbilityHandler {
         List<List<String>> costs = new ArrayList<>();
         buildCosts(tokens, cost.count, cost.different, cost.same, new ArrayList<>(), costs);
         return costs.stream()
+                .filter(selection -> isValidCost(cost, selection))
                 .distinct()
                 .sorted(Comparator.comparing(StonebornAbilityHandler::formatCost))
                 .toList();
@@ -319,15 +335,22 @@ public class StonebornAbilityHandler {
     }
 
     private static boolean isValidCost(AdaptiveCost expected, List<String> cost) {
-        if (cost.size() != expected.count
-                || cost.stream()
-                        .anyMatch(trait -> !List.of("cultural", "hazardous", "industrial", "frontier")
-                                .contains(trait))) {
+        if (cost.size() != expected.count || cost.stream().anyMatch(trait -> !FRAGMENTUM_TRAITS.contains(trait))) {
             return false;
         }
         return (expected.requiredTrait == null || cost.stream().allMatch(expected.requiredTrait::equals))
                 && (!expected.different || cost.stream().distinct().count() == cost.size())
-                && (!expected.same || cost.stream().distinct().count() == 1);
+                && (!expected.same || cost.stream().distinct().count() == 1)
+                && matchesRequiredTraits(expected, cost);
+    }
+
+    private static boolean matchesRequiredTraits(AdaptiveCost expected, List<String> cost) {
+        return switch (expected) {
+            case RED_BLUE -> cost.contains("hazardous") && cost.contains("cultural");
+            case GREEN_BLUE -> cost.contains("industrial") && cost.contains("cultural");
+            case GREEN_RED -> cost.contains("industrial") && cost.contains("hazardous");
+            default -> true;
+        };
     }
 
     private static String formatCost(List<String> cost) {
@@ -340,11 +363,12 @@ public class StonebornAbilityHandler {
     }
 
     private static void unleash(Game game, Player player, AdaptiveComponent component) {
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         switch (component) {
             case AGENT, COMMANDER, HERO -> replaceLeader(player, component.dormant, component.unleashed);
             case XENOLITH, STALACTIUM -> replaceTech(player, component.dormant, component.unleashed);
             case GOLEM -> replaceUnit(player, component.dormant, component.unleashed);
-            case REFRAGMENT -> player.changeBreakthrough(component.dormant, component.unleashed);
+            case REFRAGMENT -> replaceBreakthrough(player, component.dormant, component.unleashed);
             case PETRA -> unleashPetra(game, player);
         }
     }
@@ -375,10 +399,21 @@ public class StonebornAbilityHandler {
     }
 
     private static void replaceTech(Player player, String dormant, String unleashed) {
+        boolean exhausted = player.getExhaustedTechs().contains(dormant);
         player.purgeTech(dormant);
         player.addTech(unleashed);
+        if (exhausted) {
+            player.exhaustTech(unleashed);
+        }
         if ("thstoneborndn".equals(dormant)) {
             replaceUnit(player, "stoneborn_dreadnought2dormant", "stoneborn_dreadnought2unleashed");
+        }
+    }
+
+    private static void replaceBreakthrough(Player player, String dormant, String unleashed) {
+        boolean exhausted = player.isBreakthroughExhausted(dormant);
+        if (player.changeBreakthrough(dormant, unleashed)) {
+            player.setBreakthroughExhausted(unleashed, exhausted);
         }
     }
 
@@ -412,19 +447,19 @@ public class StonebornAbilityHandler {
     }
 
     private enum AdaptiveComponent {
-        AGENT("agent", "Hazorus", "stonebornagentdormant", "stonebornagentunleashed", AdaptiveCost.ONE),
+        AGENT("agent", "Hazorus", "stonebornagentdormant", "stonebornagentunleashed", AdaptiveCost.TWO_RED),
         COMMANDER(
                 "commander",
                 "Tempus",
                 "stoneborncommanderdormant",
                 "stoneborncommanderunleashed",
-                AdaptiveCost.TWO_DIFFERENT),
-        HERO("hero", "Meteorime", "stonebornherodormant", "stonebornherounleashed", AdaptiveCost.THREE_DIFFERENT),
+                AdaptiveCost.GREEN_BLUE),
+        HERO("hero", "Meteorime", "stonebornherodormant", "stonebornherounleashed", AdaptiveCost.FOUR_DIFFERENT),
         XENOLITH("xenolith", "Xenolith", "thstoneborng", "thstoneborngu", AdaptiveCost.TWO_GREEN),
         STALACTIUM("stalactium", "Stalactium II", "thstoneborndn", "thstoneborndnu", AdaptiveCost.TWO_BLUE),
-        GOLEM("golem", "Golem", "stoneborn_mechdormant", "stoneborn_mechunleashed", AdaptiveCost.TWO_RED),
+        GOLEM("golem", "Golem", "stoneborn_mechdormant", "stoneborn_mechunleashed", AdaptiveCost.RED_BLUE),
         REFRAGMENT("refragment", "Refragment", "stonebornbt", "stonebornbtunleashed", AdaptiveCost.TWO_SAME),
-        PETRA("petra", "Petra", "petra", "petraunleashed", AdaptiveCost.TWO_DIFFERENT);
+        PETRA("petra", "Petra", "petra", "petraunleashed", AdaptiveCost.GREEN_RED);
 
         private final String id;
         private final String name;
@@ -455,10 +490,14 @@ public class StonebornAbilityHandler {
         TWO_GREEN(2, false, false, "industrial"),
         TWO_BLUE(2, false, false, "cultural"),
         TWO_RED(2, false, false, "hazardous"),
+        RED_BLUE(2, true, false, null),
+        GREEN_BLUE(2, true, false, null),
+        GREEN_RED(2, true, false, null),
         TWO_SAME(2, false, true, null),
         TWO_DIFFERENT(2, true, false, null),
         THREE(3, false, false, null),
-        THREE_DIFFERENT(3, true, false, null);
+        THREE_DIFFERENT(3, true, false, null),
+        FOUR_DIFFERENT(4, true, false, null);
 
         private final int count;
         private final boolean different;
@@ -478,6 +517,14 @@ public class StonebornAbilityHandler {
                 List.of(game.getStoredValue(getFragmentumTokensKey(player)).split(",")));
         tokens.removeIf(String::isEmpty);
         return tokens;
+    }
+
+    private static List<String> getFragmentumTraits(ExploreModel fragment) {
+        if (fragment.getAlias().contains("unknown")
+                || fragment.getName().toLowerCase().contains("unknown")) {
+            return FRAGMENTUM_TRAITS;
+        }
+        return List.of(fragment.getType().toLowerCase());
     }
 
     private static String getFragmentumTokensKey(Player player) {

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
@@ -34,6 +35,7 @@ class RelicPurge extends GameStateSubcommand {
                     event, "Invalid relic or player does not have specified relic: " + relicId);
             return;
         }
+        boolean discardedSalvage = IronSalvageRelicHandler.isSalvageRelic(relicId);
         boolean discardedArtifact = BlueReverieArtifactService.discardArtifact(getGame(), player, relicId);
         if (!discardedArtifact) {
             player.removeRelic(relicId);
@@ -44,14 +46,17 @@ class RelicPurge extends GameStateSubcommand {
         }
         RelicModel relicData = Mapper.getRelic(relicId);
         if (relicData != null) {
-            MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.getRepresentation() + (discardedArtifact ? " discarded _" : " purged the relic _")
+            MessageHelper.sendMessageToChannel(
+                    getGame().isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                    player.getRepresentation()
+                            + (discardedArtifact || discardedSalvage ? " discarded _" : " purged the relic _")
                             + relicData.getName() + "_.\n> "
                             + relicData.getText());
             RelicInfoService.sendRelicInfo(getGame(), player, event);
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "Good job, purged that bad relic.");
+            MessageHelper.sendMessageToChannel(
+                    getGame().isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                    "Good job, purged that bad relic.");
         }
     }
 }

@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.components.separator.Separator.Spacing;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -287,7 +288,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         }
     }
 
-    public static void sendFactionComponentCards(ButtonInteractionEvent event, Player player, String faction) {
+    public static void sendFactionComponentCards(GenericInteractionCreateEvent event, Player player, String faction) {
         FactionDraftItem item = new FactionDraftItem(faction);
         List<DraftItem> components = item.getComponents(player.getGame());
         if (components.isEmpty()) {
@@ -303,13 +304,33 @@ public class FrankenDrazDraft extends FrankenDraft {
         builder.append("## " + item.getTitle(player.getGame()) + " Components");
         for (DraftItem component : components) {
             List<ContainerChildComponent> cardComponents =
-                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true));
+                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true, true));
             builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
             Collections.rotate(accents, -1);
         }
         builder.send();
         MessageHelper.sendEphemeralMessageToEventChannel(
                 event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+    }
+
+    public static void sendFactionComponentCards(GenericInteractionCreateEvent event, String faction) {
+        FactionDraftItem item = new FactionDraftItem(faction);
+        List<DraftItem> components = item.getComponents(null);
+        if (components.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(event, "## " + item.getTitle(null) + " Components\nNone.");
+            return;
+        }
+
+        List<Color> accents = FrankenDraftBagService.getAccents();
+        MessageV2Builder builder = new MessageV2Builder(event.getMessageChannel());
+        builder.append("## " + item.getTitle(null) + " Components");
+        for (DraftItem component : components) {
+            List<ContainerChildComponent> cardComponents =
+                    new ArrayList<>(component.getTextDisplays(null, null, true, true));
+            builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
+            Collections.rotate(accents, -1);
+        }
+        builder.send();
     }
 
     @ButtonHandler(value = "frankenDrazCategory", save = false)

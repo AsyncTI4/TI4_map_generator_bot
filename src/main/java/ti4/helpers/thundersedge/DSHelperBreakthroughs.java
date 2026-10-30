@@ -252,7 +252,7 @@ public final class DSHelperBreakthroughs {
     public static void kolumeBTStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
-        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research A Technology"));
+        buttons.add(Buttons.RESEARCH_A_TECHNOLOGY);
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -269,7 +269,7 @@ public final class DSHelperBreakthroughs {
         for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("acceptBentorBT_" + p1.getFaction(), "Explore 1 Planet"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", " + p1.getFactionNameOrColor()
@@ -306,7 +306,7 @@ public final class DSHelperBreakthroughs {
                     }
                 }
             }
-            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
             String msg = p2.getRepresentation() + " you can use these buttons to coexist after the explore.";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
         }
@@ -479,7 +479,7 @@ public final class DSHelperBreakthroughs {
                     buttons.add(Buttons.green("readyLanefirBt", "Ready Erasure Corps"));
                 }
                 buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
                         "Another player has purged a component (that isn't an action card). As such, "
@@ -614,7 +614,7 @@ public final class DSHelperBreakthroughs {
                     }
                 }
             }
-            buttons.add(Buttons.red("deleteButtons", "Cancel"));
+            buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + ", please choose a planet to coexist on with "

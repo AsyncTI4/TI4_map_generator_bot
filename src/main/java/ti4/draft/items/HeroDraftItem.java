@@ -59,7 +59,7 @@ public class HeroDraftItem extends DraftItem {
     public String getLongDescriptionImpl(Game game) {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            if (game.isTwilightsFallMode()) {
+            if (game != null && game.isTwilightsFallMode()) {
                 return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
                         + leader.getTFAbilityWindowIfAble() + "* " + leader.getTFAbilityTextIfAble();
             } else {

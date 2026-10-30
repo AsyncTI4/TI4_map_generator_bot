@@ -19,10 +19,10 @@ final class AetherstreamStep implements TileStepPainter {
     public void paint(TileScene scene, TileLayer layer) {
         Game game = scene.game();
         Tile tile = layer.tile();
-        if (HighlightGuards.isFogOrHyperlane(game, tile) || HighlightGuards.isTileImageMissing(tile)) {
+        if (HighlightGuards.isHiddenOrHyperlane(scene, tile) || HighlightGuards.isTileImageMissing(tile)) {
             return;
         }
-        if (!FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), null)) {
+        if (!FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), null, scene::seesPosition)) {
             HighlightGuards.fogOut(layer);
             return;
         }

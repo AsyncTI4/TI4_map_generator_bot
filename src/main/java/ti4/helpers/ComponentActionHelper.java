@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -62,9 +63,9 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.relic.BookOfLatviniaService;
 import ti4.service.relic.MutagenService;
 import ti4.service.relic.QuantumEntanglerService;
@@ -216,6 +217,8 @@ public class ComponentActionHelper {
                         factionChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
             }
         }
+
+        compButtons.addAll(IxthLegendaryButtonHandler.getComponentActionButtons(game, p1));
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {
@@ -653,7 +656,7 @@ public class ComponentActionHelper {
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
-        compButtons.add(Buttons.red("deleteButtons", "Cancel"));
+        compButtons.add(Buttons.CANCEL_DELETE_BUTTONS);
 
         return compButtons;
     }
@@ -700,19 +703,16 @@ public class ComponentActionHelper {
                             "veyloragent",
                             "taagent",
                             "vanguardagent",
-                            "sarcosaagent");
+                            "sarcosaagent",
+                            "stonebornagentdormant",
+                            "stonebornagentunleashed",
+                            "ironagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ExhaustLeaderService.exhaustLeader(
-                                    game, p1, p1.getLeader(buttonID).orElse(null));
-                            ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
-                        } else {
-                            ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
-                        }
+                        AgentLifecycle.press(buttonID, event, game, p1);
                     }
                 } else if (buttonID.contains("hero")) {
                     PlayHeroService.playHero(
@@ -1363,7 +1363,7 @@ public class ComponentActionHelper {
                     buttons3.add(Buttons.green(
                             "exhaustTCS_" + relicID + "_" + player.getFaction(),
                             "Exhaust Temporal Command Suite to Ready " + relicID));
-                    buttons3.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons3.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String msg = p2.getRepresentationUnfogged()
                             + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + relicID
                             + " and potentially resolve a transaction.";
@@ -1390,7 +1390,7 @@ public class ComponentActionHelper {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -1454,7 +1454,7 @@ public class ComponentActionHelper {
             case "enigmaticdevice" -> {
                 if (game.isTwilightsFallMode()) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                    Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+                    Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Use this to spend 6 resources.", buttons);

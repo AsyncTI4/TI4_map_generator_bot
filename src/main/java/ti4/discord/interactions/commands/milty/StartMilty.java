@@ -22,7 +22,8 @@ class StartMilty extends GameStateSubcommand {
 
     StartMilty() {
         super(Constants.QUICKSTART, "Start Milty Draft with default settings", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)")
+                .setRequiredRange(1, 30));
         addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default = players + 1)")
                 .setRequiredRange(1, 25));
         addOptions(

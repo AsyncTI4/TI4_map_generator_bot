@@ -63,7 +63,7 @@ class StartChannelExport extends Subcommand {
                                 Constants.EXPORT_MAX_SIZE_MB,
                                 "Pause once the export passes this many MB; resume to go on (default no cap)")
                         .setRequired(false)
-                        .setMinValue(1));
+                        .setRequiredRange(1, 100_000));
     }
 
     @Override

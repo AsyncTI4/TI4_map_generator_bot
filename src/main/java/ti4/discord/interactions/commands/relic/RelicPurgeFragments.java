@@ -35,9 +35,10 @@ class RelicPurgeFragments extends GameStateSubcommand {
                         .setAutoComplete(true)
                         .setRequired(true),
                 new OptionData(
-                        OptionType.INTEGER,
-                        Constants.COUNT,
-                        "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."),
+                                OptionType.INTEGER,
+                                Constants.COUNT,
+                                "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery).")
+                        .setRequiredRange(1, 20),
                 new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"),
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
@@ -85,9 +86,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         if (fragmentsToPurge.size() == 1) {
             String fragid = fragmentsToPurge.getFirst();
             activePlayer.removeFragment(fragid);
-            if (!StonebornAbilityHandler.returnPurgedFragment(game, fragid)) {
-                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-            }
+            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragid) {
                 case "crf1",
                         "crf2",
@@ -147,9 +146,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         } else {
             for (String fragid : fragmentsToPurge) {
                 activePlayer.removeFragment(fragid);
-                if (!StonebornAbilityHandler.returnPurgedFragment(game, fragid)) {
-                    game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                }
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                 switch (fragid) {
                     case "crf1",
                             "crf2",

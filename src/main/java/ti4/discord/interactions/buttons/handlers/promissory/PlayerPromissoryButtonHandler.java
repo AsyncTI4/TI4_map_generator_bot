@@ -2,8 +2,8 @@ package ti4.discord.interactions.buttons.handlers.promissory;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -21,6 +21,7 @@ import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 
 @UtilityClass
 class PlayerPromissoryButtonHandler {
@@ -49,7 +50,7 @@ class PlayerPromissoryButtonHandler {
             player.addTech(tech);
             NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
             NetrunnersTechHandler.resolveDataMining(event, game, player, tech);
-            NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, tech);
+            NetrunnersAgent.offerAfterGainingTech(event, game, player, tech);
             NetrunnersUnitHandler.offerNimdaDeploy(game, player);
             TechSummariesMetadataManager.addTech(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
@@ -57,6 +58,9 @@ class PlayerPromissoryButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);
+        if ("bepniron".equals(pnID)) {
+            IronPromissoryHandler.resolveRetrofittingPlay(event, game, player);
+        }
         if ("thpnmorpha".equals(pnID)) {
             HydromorphicHelper.draw(game, player, 2);
         }

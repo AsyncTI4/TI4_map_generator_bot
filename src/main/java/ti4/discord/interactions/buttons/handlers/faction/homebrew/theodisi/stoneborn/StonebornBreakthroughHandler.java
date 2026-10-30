@@ -11,9 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.Constants;
@@ -22,15 +20,13 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.explore.ExploreService;
 
 @UtilityClass
 public class StonebornBreakthroughHandler {
     private static final String DORMANT = "stonebornbt";
     private static final String UNLEASHED = "stonebornbtunleashed";
     private static final String SELECT_FRAGMENT = "refragmentFragment_";
-    private static final String EXPLORE_PLANET = "refragmentExplore_";
-    private static final String SKIP_EXPLORE = "refragmentSkipExplore";
+    private static final String SELECT_TRAIT = "refragmentTrait_";
     private static final String GAIN_FRAGMENT = "refragmentGain_";
     private static final String DECLINE_GAIN = "refragmentDeclineGain";
     private static final String STATE = "refragmentState_";
@@ -63,7 +59,7 @@ public class StonebornBreakthroughHandler {
                 event,
                 getOutputChannel(game, player, event),
                 buttons,
-                List.of(Buttons.red("deleteButtons", "Decline")),
+                List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 message,
                 prefix,
                 buttonID)) {
@@ -74,62 +70,37 @@ public class StonebornBreakthroughHandler {
         ExploreModel model = Mapper.getExplore(fragment);
         if (!player.getFragments().contains(fragment)
                 || model == null
-                || !Constants.FRAGMENT.equalsIgnoreCase(model.getResolution())
-                || Constants.FRONTIER.equalsIgnoreCase(model.getType())) {
+                || !Constants.FRAGMENT.equalsIgnoreCase(model.getResolution())) {
             ButtonHelper.deleteMessage(event);
             return;
         }
 
         ButtonHelperExplore.resolvePurgedFragments(game, player, event, List.of(fragment));
+        if (isUnknownFragment(model)) {
+            game.setStoredValue(stateKey(player), state.breakthrough() + "||" + gainCount(state.breakthrough()));
+            offerTraitSelection(event, game, player);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         String trait = model.getType().toLowerCase();
         game.setStoredValue(
                 stateKey(player), state.breakthrough() + "|" + trait + "|" + gainCount(state.breakthrough()));
-        offerExploration(event, game, player, trait);
+        offerPurgedFragmentGain(event, game, player, getState(game, player));
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler(EXPLORE_PLANET)
-    public static void explorePlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    @ButtonHandler(SELECT_TRAIT)
+    public static void selectTrait(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         RefragmentState state = getState(game, player);
-        if (state == null) {
+        String trait = buttonID.substring(SELECT_TRAIT.length());
+        if (state == null
+                || !state.trait().isEmpty()
+                || !List.of("cultural", "hazardous", "industrial").contains(trait)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        List<Button> buttons = explorationButtons(game, player, state.trait());
-        String message = explorationPromptMessage(player, state.trait());
-        String prefix = player.factionButtonChecker() + EXPLORE_PLANET;
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event,
-                getOutputChannel(game, player, event),
-                buttons,
-                List.of(Buttons.red(player.factionButtonChecker() + SKIP_EXPLORE, "Skip Exploration")),
-                message,
-                prefix,
-                buttonID)) {
-            return;
-        }
-        String planetName = buttonID.substring(EXPLORE_PLANET.length());
-        Planet planet = game.getUnitHolderFromPlanet(planetName);
-        Tile tile = game.getTileFromPlanet(planetName);
-        if (planet == null
-                || tile == null
-                || !player.getPlanets().contains(planetName)
-                || !hasPlanetTrait(planet, state.trait())) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        ExploreService.explorePlanet(event, tile, planetName, state.trait(), player, false, game, 1, false);
-        offerPurgedFragmentGain(event, game, player, state);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(SKIP_EXPLORE)
-    public static void skipExplore(ButtonInteractionEvent event, Game game, Player player) {
-        RefragmentState state = getState(game, player);
-        if (state != null) {
-            offerPurgedFragmentGain(event, game, player, state);
-        }
+        game.setStoredValue(stateKey(player), state.breakthrough() + "|" + trait + "|" + state.remainingGains());
+        offerPurgedFragmentGain(event, game, player, getState(game, player));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -184,33 +155,17 @@ public class StonebornBreakthroughHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void offerExploration(GenericInteractionCreateEvent event, Game game, Player player, String trait) {
-        List<Button> buttons = explorationButtons(game, player, trait);
-        List<Button> pinned = List.of(Buttons.red(player.factionButtonChecker() + SKIP_EXPLORE, "Skip Exploration"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                getOutputChannel(game, player, event),
-                explorationPromptMessage(player, trait),
-                paginate(buttons, pinned, player.factionButtonChecker() + EXPLORE_PLANET));
-    }
-
-    private static List<Button> explorationButtons(Game game, Player player, String trait) {
-        return game.getTileMap().values().stream()
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
-                .filter(planet -> player.getPlanets().contains(planet.getName()))
-                .filter(planet -> hasPlanetTrait(planet, trait))
-                .map(planet -> Buttons.gray(
-                        player.factionButtonChecker() + EXPLORE_PLANET + planet.getName(),
-                        "Explore " + planet.getRepresentation(game),
+    private static void offerTraitSelection(GenericInteractionCreateEvent event, Game game, Player player) {
+        List<Button> buttons = List.of("cultural", "hazardous", "industrial").stream()
+                .map(trait -> Buttons.gray(
+                        player.factionButtonChecker() + SELECT_TRAIT + trait,
+                        "Choose " + trait.substring(0, 1).toUpperCase() + trait.substring(1) + " Planet",
                         ExploreEmojis.getTraitEmoji(trait)))
                 .toList();
-    }
-
-    private static boolean hasPlanetTrait(Planet planet, String trait) {
-        return planet.getPlanetTypes().stream().anyMatch(planetTrait -> planetTrait.equalsIgnoreCase(trait));
-    }
-
-    private static String explorationPromptMessage(Player player, String trait) {
-        return player.getRepresentation() + ", choose up to 1 " + trait + " planet to explore for _Refragment_.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                getOutputChannel(game, player, event),
+                player.getRepresentation() + ", choose the color of the purged relic fragment for _Refragment_.",
+                buttons);
     }
 
     private static void offerPurgedFragmentGain(
@@ -239,7 +194,10 @@ public class StonebornBreakthroughHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 getOutputChannel(game, player, event),
                 message,
-                paginate(buttons, List.of(Buttons.red("deleteButtons", "Decline")), prefix));
+                paginate(
+                        buttons,
+                        List.of(Buttons.red(player.factionButtonChecker() + DECLINE_GAIN, "Decline")),
+                        prefix));
     }
 
     private static List<Button> fragmentButtons(Player player) {
@@ -247,7 +205,6 @@ public class StonebornBreakthroughHandler {
                 .map(Mapper::getExplore)
                 .filter(Objects::nonNull)
                 .filter(model -> Constants.FRAGMENT.equalsIgnoreCase(model.getResolution()))
-                .filter(model -> !Constants.FRONTIER.equalsIgnoreCase(model.getType()))
                 .map(model -> Buttons.gray(
                         player.factionButtonChecker() + SELECT_FRAGMENT + model.getAlias(),
                         "Purge " + model.getName(),
@@ -269,9 +226,12 @@ public class StonebornBreakthroughHandler {
 
     private static boolean isOtherTrait(String fragment, String excludedTrait) {
         ExploreModel model = Mapper.getExplore(fragment);
-        return model != null
-                && !Constants.FRONTIER.equalsIgnoreCase(model.getType())
-                && !model.getType().equalsIgnoreCase(excludedTrait);
+        return model != null && !model.getType().equalsIgnoreCase(excludedTrait);
+    }
+
+    private static boolean isUnknownFragment(ExploreModel fragment) {
+        return fragment.getAlias().contains("unknown")
+                || fragment.getName().toLowerCase().contains("unknown");
     }
 
     private static String fragmentPromptMessage(Player player) {

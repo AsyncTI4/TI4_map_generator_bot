@@ -51,7 +51,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 Constants.NO_FRACTURE,
                 "True to stop The Fracture ever entering play in TE games."));
         addOptions(new OptionData(
-                OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
+                        OptionType.INTEGER,
+                        Constants.CC_LIMIT,
+                        "Command token limit each player should have, default 16.")
+                .setRequiredRange(0, 99));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(

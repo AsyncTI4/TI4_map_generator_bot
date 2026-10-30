@@ -143,7 +143,7 @@ class RetreatButtonHandler {
             List<Button> breakthroughButtons = new ArrayList<>();
             breakthroughButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "moveAvernus_" + pos2, "Retreat Avernus", FactionEmojis.Muaat));
-            breakthroughButtons.add(Buttons.red("deleteButtons", "Decline"));
+            breakthroughButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String breakthroughMessage = player.getRepresentationUnfogged() + ", you may move Avernus into "
                     + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannelWithButtons(
@@ -157,7 +157,7 @@ class RetreatButtonHandler {
             List<Button> flagButtons = new ArrayList<>();
             flagButtons.add(Buttons.blue(
                     player.factionButtonChecker() + "anarchy7Build_" + pos1, "Build in " + pos1, FactionEmojis.Muaat));
-            flagButtons.add(Buttons.red("deleteButtons", "Decline"));
+            flagButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String flagMessage = player.getRepresentationUnfogged()
                     + ", you may build in the system your flagship is retreating from.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), flagMessage, flagButtons);

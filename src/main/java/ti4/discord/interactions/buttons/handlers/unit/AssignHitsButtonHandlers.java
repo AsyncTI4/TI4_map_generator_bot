@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.*;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -176,7 +177,10 @@ class AssignHitsButtonHandlers {
                     UnitHolder holder =
                             planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
                     UnitKey key = Units.getUnitKey(type, player.getColorID());
-                    if (holder != null) holder.removeDamagedUnit(key, amt);
+                    if (holder != null) {
+                        holder.removeDamagedUnit(key, amt);
+                        StonebornUnitHandler.syncMobileMountainDamage(game, player, key);
+                    }
 
                     String msg = player.getRepresentationNoPing() + " repaired " + amt
                             + (prefersState ? " " + state.humanDescr() : "") + type.humanReadableName();

@@ -18,6 +18,7 @@ class SCUnpick extends GameStateSubcommand {
     public SCUnpick() {
         super(Constants.SC_UNPICK, "Unpick a Strategy Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
+                .setRequiredRange(0, 99)
                 .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color returning strategy card")

@@ -261,12 +261,12 @@ public class ThirtyKRelics {
 
     private static void send(ButtonInteractionEvent event, String message, List<Button> buttons) {
         List<Button> withCancel = new ArrayList<>(buttons);
-        withCancel.add(Buttons.red("deleteButtons", "Cancel"));
+        withCancel.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, withCancel);
     }
 
     public static List<Button> cancel() {
-        return List.of(Buttons.red("deleteButtons", "Cancel"));
+        return List.of(Buttons.CANCEL_DELETE_BUTTONS);
     }
 
     public static String rediscoveryMessage(Player player) {

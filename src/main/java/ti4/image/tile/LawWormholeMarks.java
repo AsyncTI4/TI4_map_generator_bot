@@ -1,6 +1,7 @@
 package ti4.image.tile;
 
 import java.awt.image.BufferedImage;
+import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
@@ -8,6 +9,7 @@ import ti4.helpers.Constants;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.Mapper;
+import ti4.model.WormholeModel.Wormhole;
 
 final class LawWormholeMarks {
 
@@ -31,25 +33,25 @@ final class LawWormholeMarks {
         return ImageHelper.read(ImageResources.token("agenda_wormhole_blocked" + (half ? "_half" : "") + ".png"));
     }
 
-    static BufferedImage reconstructionPartnerImage(String partnerWormhole) {
+    static BufferedImage reconstructionPartnerImage(Wormhole partnerWormhole) {
         return ImageHelper.readScaled(ImageResources.token("token_wh" + partnerWormhole + ".png"), 40.0f / 65);
     }
 
     static void draw(Game game, TileLayer layer) {
         Tile tile = layer.tile();
         boolean reconstruction = isReconstructionInPlay(game);
+        Set<Wormhole> tileWormholes = Mapper.getWormholes(tile.getTileID());
         if (isTravelBanInPlay(game)
-                && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA)
-                        || Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA))) {
+                && (tileWormholes.contains(Wormhole.ALPHA) || tileWormholes.contains(Wormhole.BETA))) {
             WormholeIconSpots.draw(tile, layer.g(), blockedWormholeImage(reconstruction), BLOCKED_OFFSET, "ab", false);
         } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
             WormholeIconSpots.draw(tile, layer.g(), blockedWormholeImage(reconstruction), BLOCKED_OFFSET, "", true);
         }
-        if (reconstruction && Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA)) {
-            WormholeIconSpots.draw(tile, layer.g(), reconstructionPartnerImage("beta"), 0, "a", false);
+        if (reconstruction && tileWormholes.contains(Wormhole.ALPHA)) {
+            WormholeIconSpots.draw(tile, layer.g(), reconstructionPartnerImage(Wormhole.BETA), 0, "a", false);
         }
-        if (reconstruction && Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA)) {
-            WormholeIconSpots.draw(tile, layer.g(), reconstructionPartnerImage("alpha"), 0, "b", false);
+        if (reconstruction && tileWormholes.contains(Wormhole.BETA)) {
+            WormholeIconSpots.draw(tile, layer.g(), reconstructionPartnerImage(Wormhole.ALPHA), 0, "b", false);
         }
         if (isNexusLawInPlay(game) && "82b".equals(tile.getTileID()) && !isTravelBanInPlay(game)) {
             WormholeIconSpots.draw(tile, layer.g(), blockedWormholeImage(reconstruction), BLOCKED_OFFSET, "ab", false);

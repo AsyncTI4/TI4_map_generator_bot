@@ -17,6 +17,7 @@ class ClearDebt extends GameStateSubcommand {
     ClearDebt() {
         super(Constants.CLEAR_DEBT, "Clear debt tokens (control token) for player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear")
+                .setRequiredRange(1, 99)
                 .setRequired(true));
         addOptions(new OptionData(
                         OptionType.STRING,

@@ -2,6 +2,7 @@ package ti4.image.map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Rectangle;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.DisplayType;
 import ti4.image.map.CompactOverviewGenerator.Layout;
 import ti4.image.map.CompactOverviewGenerator.Panel;
 import ti4.image.map.CompactOverviewGenerator.Placed;
@@ -90,7 +92,7 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
     @Test
     void packedPanelsNeverOverlapAndFitTheSizeCap() {
         Layout layout = CompactOverviewGenerator.layout(
-                CompactOverviewGenerator.gmPanels(game), CompactOverviewGenerator.PLAYER_MAX_SIZE);
+                CompactOverviewGenerator.gmPanels(game), CompactOverviewGenerator.MAX_SIZE);
 
         List<Placed> placed = layout.placed();
         for (int i = 0; i < placed.size(); i++) {
@@ -98,8 +100,30 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
                 assertFalse(box(placed.get(i)).intersects(box(placed.get(j))), "panels overlap");
             }
         }
-        assertTrue(layout.canvasWidth() <= CompactOverviewGenerator.PLAYER_MAX_SIZE);
-        assertTrue(layout.canvasHeight() <= CompactOverviewGenerator.PLAYER_MAX_SIZE);
+        assertTrue(layout.canvasWidth() <= CompactOverviewGenerator.MAX_SIZE);
+        assertTrue(layout.canvasHeight() <= CompactOverviewGenerator.MAX_SIZE);
+    }
+
+    @Test
+    void onlyFeatureOverlaysAreDrawnAsOverviews() {
+        assertTrue(CompactOverviewGenerator.drawsOverlay(DisplayType.wormholes));
+        assertTrue(CompactOverviewGenerator.drawsOverlay(DisplayType.spacecannon));
+        // Map variants keep the normal full-size map.
+        assertFalse(CompactOverviewGenerator.drawsOverlay(DisplayType.shipless));
+        assertFalse(CompactOverviewGenerator.drawsOverlay(DisplayType.unlocked));
+        assertFalse(CompactOverviewGenerator.drawsOverlay(DisplayType.map));
+    }
+
+    @Test
+    void overlayOverviewsRenderForTheGmAndAPlayer() {
+        game.getTileByPosition("000")
+                .addUnit(
+                        "space",
+                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
+                        1);
+
+        assertNotNull(CompactOverviewGenerator.gmImage(game, DisplayType.spacecannon));
+        assertNotNull(CompactOverviewGenerator.playerImage(game, player, DisplayType.wormholes));
     }
 
     private static Rectangle box(Placed placed) {

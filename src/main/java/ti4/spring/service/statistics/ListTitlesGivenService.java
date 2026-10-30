@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.SortHelper;
 import ti4.message.MessageHelper;
@@ -22,7 +21,6 @@ public class ListTitlesGivenService {
 
     private final TitleEntityRepository titleEntityRepository;
 
-    @Transactional(readOnly = true)
     public void listTitlesGiven(SlashCommandInteractionEvent event) {
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();

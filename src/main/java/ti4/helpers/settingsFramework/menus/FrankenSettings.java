@@ -83,7 +83,7 @@ public class FrankenSettings extends SettingsMenu {
                         "Banned Factions",
                         "Ban faction",
                         "Unban faction",
-                        legalFactionOptions(game.isThundersEdge(), false, false, false)
+                        legalFactionOptions(game.isThundersEdge(), false, false, false, false)
                                 .entrySet(),
                         empty,
                         empty) {
@@ -323,6 +323,10 @@ public class FrankenSettings extends SettingsMenu {
         return homebrewSettings.getLostLegacies().isVal();
     }
 
+    public boolean isWftvEnabled() {
+        return homebrewSettings.getWftv().isVal();
+    }
+
     boolean isMonumentsEnabled() {
         return homebrewSettings.getMonuments().isVal();
     }
@@ -460,9 +464,10 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     private static Map<String, FactionModel> legalFactionOptions(
-            boolean teEnabled, boolean dsEnabled, boolean brEnabled, boolean lostLegaciesEnabled) {
+            boolean teEnabled, boolean dsEnabled, boolean brEnabled, boolean lostLegaciesEnabled, boolean wftvEnabled) {
         return Mapper.getFactionsValues().stream()
-                .filter(faction -> isLegalFrankenFaction(faction, teEnabled, dsEnabled, brEnabled, lostLegaciesEnabled))
+                .filter(faction -> isLegalFrankenFaction(
+                        faction, teEnabled, dsEnabled, brEnabled, lostLegaciesEnabled, wftvEnabled))
                 .collect(Collectors.toMap(FactionModel::getAlias, faction -> faction));
     }
 
@@ -471,7 +476,8 @@ public class FrankenSettings extends SettingsMenu {
                 game.isThundersEdge(),
                 isEffectiveDiscordantStarsEnabled(),
                 isEffectiveBlueReverieEnabled(),
-                isLostLegaciesEnabled());
+                isLostLegaciesEnabled(),
+                isWftvEnabled());
     }
 
     private static boolean isLegalFrankenFaction(
@@ -479,7 +485,8 @@ public class FrankenSettings extends SettingsMenu {
             boolean teEnabled,
             boolean dsEnabled,
             boolean brEnabled,
-            boolean lostLegaciesEnabled) {
+            boolean lostLegaciesEnabled,
+            boolean wftvEnabled) {
         String alias = faction.getAlias();
         if (ALWAYS_DISABLED_FACTIONS.contains(alias)) {
             return false;
@@ -488,6 +495,7 @@ public class FrankenSettings extends SettingsMenu {
         if (dsEnabled && faction.getSource() == ComponentSource.ds) return true;
         if (brEnabled && faction.getSource() == ComponentSource.blue_reverie) return true;
         if (lostLegaciesEnabled && faction.getSource() == ComponentSource.theodisi) return true;
+        if (wftvEnabled && faction.getSource() == ComponentSource.wftv) return true;
         return faction.getSource().isPok();
     }
 

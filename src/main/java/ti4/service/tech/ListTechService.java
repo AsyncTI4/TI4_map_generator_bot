@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
@@ -35,6 +34,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
@@ -159,7 +159,7 @@ public class ListTechService {
                 player.addTech(tech);
                 NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
                 NetrunnersTechHandler.resolveDataMining(event, game, player, tech);
-                NetrunnersLeadersHandler.offerZorNoAhnForOwner(event, game, player, tech);
+                NetrunnersAgent.offerAfterGainingTech(event, game, player, tech);
                 NetrunnersUnitHandler.offerNimdaDeploy(game, player);
                 ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

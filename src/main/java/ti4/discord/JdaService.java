@@ -113,6 +113,7 @@ public class JdaService {
     //       should actually have admin rights
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
+    public static final Set<Role> tiglAdminRoles = new HashSet<>();
     public static final Set<Role> bothelperRoles = new HashSet<>();
     private static final Pattern NUMERIC_GUILD_ID_PATTERN = Pattern.compile("\\b[0-9]+\\b");
 
@@ -520,10 +521,17 @@ public class JdaService {
 
         developerRoles.removeIf(Objects::isNull);
 
+        // TIGL ADMIN ROLES
+
+        tiglAdminRoles.add(jda.getRoleById("1440088130261745845")); // TIGL Admin
+
+        tiglAdminRoles.removeIf(Objects::isNull);
+
         // BOTHELPER ROLES
 
         bothelperRoles.addAll(developerRoles); // developers may also execute bothelper commands
         bothelperRoles.addAll(adminRoles); // admins can also execute bothelper commands
+        bothelperRoles.addAll(tiglAdminRoles); // TIGL admins may also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)

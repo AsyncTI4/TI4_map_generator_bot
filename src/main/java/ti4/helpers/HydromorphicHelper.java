@@ -221,11 +221,7 @@ public class HydromorphicHelper {
         setPendingCard(game, player, new PendingCard(cardId, identifier, 0, List.of()));
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(),
-                (game.isFowMode() ? "" : game.getPing() + ", ")
-                        + player.getRepresentationNoPing()
-                        + " is resolving "
-                        + card.getNameRepresentation()
-                        + ".",
+                player.getRepresentationNoPing() + " is resolving " + card.getNameRepresentation() + ".",
                 card.getRepresentationEmbed());
         sendPendingDiscardPrompt(game, player);
         return true;

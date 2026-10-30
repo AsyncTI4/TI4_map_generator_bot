@@ -27,7 +27,7 @@ public class LunariumUnitHandler {
                     Helper.getPlanetRepresentation(planet, game)));
         }
         if (buttons.isEmpty()) return;
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         String msg = player.getRepresentation()
                 + ", you may place 1 mech on a planet you control using Lunar Mercenary's DEPLOY ability.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);

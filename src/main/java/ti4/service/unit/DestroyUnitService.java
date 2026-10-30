@@ -16,7 +16,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
@@ -171,6 +174,9 @@ public class DestroyUnitService {
 
     private static void handleDestroyedUnits(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
+        if (units.isEmpty()) {
+            return;
+        }
         // batch up infantry for INF2-ish effects
         for (Player player : game.getRealPlayersNNeutral()) {
             int numInfantry = 0;
@@ -187,8 +193,21 @@ public class DestroyUnitService {
         }
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
+            ValhavnAbilityHandler.offerValhollsCall(event, game, units);
+
+            for (Player player : game.getRealPlayers()) {
+                Tile tile = units.getFirst().tile();
+                if (IronUnitHandler.canOfferDominionRepair(game, player, tile, units)) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                            player.getRepresentation()
+                                    + ", you may repair a unit using the Iron Dominion. This may happen once per round.",
+                            IronUnitHandler.getDominionButton(player, tile));
+                }
+            }
         }
         ScrapyardAbilitiesHandler.offerRepurposedParts(event, game, units, combat);
+        IronSalvageRelicHandler.offerSalvageCollectors(event, game, units, combat);
         ScrapyardBreakthroughHandler.offerCompactorCapture(event, game, units);
         AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);

@@ -10,6 +10,8 @@ import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.SecretObjectiveInfoService;
 
 class SendSecretObjectiveCommand extends GameStateSubcommand {
@@ -23,6 +25,7 @@ class SendSecretObjectiveCommand extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.SECRET_OBJECTIVE_ID,
                         "Secret objective ID, which is found between ()")
+                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
@@ -50,6 +53,11 @@ class SendSecretObjectiveCommand extends GameStateSubcommand {
         SecretObjectiveModel secretObjective = player.getSecret(secretObjectiveId);
         player.removeSecret(secretObjectiveId);
         otherPlayer.setSecret(secretObjective.getID());
+        KnownCardsService.recordCardPassed(
+                player,
+                otherPlayer,
+                KnownCardType.SECRET_OBJECTIVE,
+                KnownCardsService.secretObjectiveName(secretObjective.getID()));
 
         SecretObjectiveInfoService.sendSecretObjectiveInfoWithHeaderText(
                 game, player, "You sent a secret objective to another player.", false, false);

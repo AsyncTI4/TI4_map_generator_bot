@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -60,6 +61,8 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
@@ -2347,6 +2350,9 @@ public class TransactionHelper {
                 }
                 p1.removeRelic(amountToTrans);
                 p2.addRelic(amountToTrans);
+                if (IronSalvageRelicHandler.isSalvageRelic(amountToTrans)) {
+                    IronSalvageRelicHandler.onSalvageGained(p2);
+                }
             }
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt token"
@@ -2390,6 +2396,8 @@ public class TransactionHelper {
                 } else {
                     p1.removeActionCard(acNum);
                     p2.setActionCard(acID);
+                    KnownCardsService.recordCardPassed(
+                            p1, p2, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
                 }
                 ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
@@ -2479,6 +2487,8 @@ public class TransactionHelper {
 
                 p1.removeSecret(soNum);
                 p2.setSecret(soID);
+                KnownCardsService.recordCardPassed(
+                        p1, p2, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
 
                 if (oldWay) {
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p1, event);

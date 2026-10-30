@@ -42,6 +42,7 @@
             "spacedock"
         ],
         "complexity": "Low",
+        "preferredColours": ["nm", "bld", "red", "splitred"],
         "source": "beans"
     },
     {
@@ -94,6 +95,7 @@
             "spacedock"
         ],
         "complexity": "Medium",
+        "preferredColours": ["eth", "gcr", "nvy", "blu"],
         "source": "beans"
     },
     {
@@ -137,13 +139,14 @@
             "spacedock"
         ],
         "complexity": "Medium",
+        "preferredColours": ["red", "org", "ylw", "mgm"],
         "source": "beans"
     },
     {
         "alias": "iron",
         "factionName": "The Iron Tide",
         "homeSystem": "be4",
-        "startingFleet": "1 cv, 1 dd, 1 dn, 2 ff, 2 inf k, 2 mf k, sd k",
+        "startingFleet": "1 cv, 1 dn, 2 ff, 1 inf k, 2 mf p, sd p",
         "commodities": 3,
         "factionTech": [
             "beironsd",
@@ -156,11 +159,13 @@
         ],
         "startingTechAmount": 1,
         "homePlanets": [
-            "kymore"
+            "kymore",
+            "polaris"
         ],
         "abilities": [
             "salvage_collectors",
-            "trade_secrets"
+            "trade_secrets",
+            "modifications"
         ],
         "leaders": [
             "ironagent",
@@ -183,6 +188,7 @@
             "iron_spacedock"
         ],
         "complexity": "Medium",
+        "preferredColours": ["frs", "nvy", "gold", "copper"],
         "source": "beans"
     },
     {
@@ -229,6 +235,7 @@
             "spacedock"
         ],
         "complexity": "High",
+        "preferredColours": ["blue", "ylw", "nvy", "eme"],
         "source": "beans"
     },
     {
@@ -270,6 +277,7 @@
             "spacedock"
         ],
         "complexity": "High",
+        "preferredColours": ["ppl", "blue", "nvy", "pnk"],
         "source": "beans"
     },
     {
@@ -320,6 +328,55 @@
             "spacedock"
         ],
         "complexity": "High",
+        "preferredColours": ["ppl", "nvy", "gold", "gray"],
+        "source": "beans"
+    },
+    {
+        "alias": "valhavn",
+        "factionName": "The Valhavn Star-Reavers",
+        "homeSystem": "be8",
+        "startingFleet": "1 cv, 1 dd, 3 ff, 1 inf valhavn, 2 inf vigrid, 1 sd valhavn, 1 pds vigrid",
+        "commodities": 3,
+        "factionTech": [
+            "bevalhavng",
+            "bevalhavnpd"
+        ],
+        "startingTechOptions": [
+            "md",
+            "dxa"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "valhavn",
+            "vigrid"
+        ],
+        "abilities": [
+            "valholls_call",
+            "reave",
+            "bloodlust"
+        ],
+        "leaders": [
+            "valhavnagent",
+            "valhavncommander",
+            "valhavnhero"
+        ],
+        "promissoryNotes": [
+            "bepnvalhavn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "valhavn_flagship",
+            "infantry",
+            "valhavn_mech",
+            "valhavn_pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["gcr", "nvy", "gray", "blu"],
         "source": "beans"
     }
 ]

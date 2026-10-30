@@ -335,7 +335,7 @@ class ThirtyKRelicButtonHandler {
 
     static List<Button> withCancel(List<Button> buttons) {
         List<Button> result = new ArrayList<>(buttons);
-        result.add(Buttons.red("deleteButtons", "Cancel"));
+        result.add(Buttons.CANCEL_DELETE_BUTTONS);
         return result;
     }
 }

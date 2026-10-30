@@ -9,8 +9,8 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.TransactionHelper;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class HumanAiDealRunner {
@@ -54,8 +54,7 @@ public class HumanAiDealRunner {
             }
             transferAll(event, game, ai, human, batch);
             HumanAiDeal.Step.ExhaustLeader exhaust = (HumanAiDeal.Step.ExhaustLeader) step;
-            ButtonHelperAgents.exhaustAgent(
-                    "exhaustAgent_" + exhaust.leaderId() + "_" + exhaust.targetFaction(), event, game, ai);
+            AgentLifecycle.press("exhaustAgent_" + exhaust.leaderId() + "_" + exhaust.targetFaction(), event, game, ai);
         }
         transferAll(event, game, ai, human, batch);
     }

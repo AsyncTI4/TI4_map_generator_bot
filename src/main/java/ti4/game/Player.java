@@ -55,10 +55,11 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.discord.utility.DiscordChannelUtility;
@@ -121,7 +122,10 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
 import ti4.service.franken.FrankenUnitService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
 import ti4.service.map.FractureService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
@@ -1377,7 +1381,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 break;
             }
         }
-        actionCards.remove(idToRemove);
+        if (actionCards.remove(idToRemove) != null) {
+            KnownCardsService.recordCardLeftHand(this, KnownCardType.ACTION_CARD);
+        }
     }
 
     public void removePromissoryNote(Integer identifier) {
@@ -1434,7 +1440,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 break;
             }
         }
-        secrets.remove(idToRemove);
+        if (secrets.remove(idToRemove) != null) {
+            KnownCardsService.recordCardLeftHand(this, KnownCardType.SECRET_OBJECTIVE);
+        }
     }
 
     public SecretObjectiveModel getSecret(Integer identifier) {
@@ -1645,6 +1653,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             bonus += 2;
         }
         for (String planet : getPlanets()) {
+            bonus += IxthLegendaryButtonHandler.getCommoditiesModifier(planet);
             if (Mapper.getPlanet(planet) != null
                     && (Mapper.getPlanet(planet).isSpaceStation()
                             || (game.getUnitHolderFromPlanet(planet) != null
@@ -1862,10 +1871,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (noFactionIcon) {
             sb = new StringBuilder();
         }
-        if (ping) {
-            sb.append(getPing());
+        if (isBotPlayer()) {
+            sb.append("Bot Player");
         } else {
-            sb.append(getUserName());
+            if (ping) {
+                sb.append(getPing());
+            } else {
+                sb.append(getUserName());
+            }
         }
         if (getColor() != null && !"null".equals(getColor()) && !noColor) {
             sb.append(' ').append(ColorEmojis.getColorEmojiWithName(getColor()));
@@ -2306,12 +2319,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public void setTacticalCC(int tacticalCC) {
-        if (tacticalCC >= 0) super.setTacticalCC(tacticalCC);
+        if (tacticalCC >= 0) super.setTacticalCC(Math.min(tacticalCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     @Override
     public void setFleetCC(int fleetCC) {
-        if (fleetCC >= 0) super.setFleetCC(fleetCC);
+        if (fleetCC >= 0) super.setFleetCC(Math.min(fleetCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
+    }
+
+    @Override
+    public void setStasisInfantry(int stasisInfantry) {
+        super.setStasisInfantry(Math.min(stasisInfantry, SanityLimits.STASIS_UNITS));
+    }
+
+    @Override
+    public void setStasisFighters(int stasisFighters) {
+        super.setStasisFighters(Math.min(stasisFighters, SanityLimits.STASIS_UNITS));
     }
 
     public String gainFleetCC(int amt) {
@@ -2330,7 +2353,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public void setStrategicCC(int strategicCC) {
-        if (strategicCC >= 0) super.setStrategicCC(strategicCC);
+        if (strategicCC >= 0) super.setStrategicCC(Math.min(strategicCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     public double getExpectedHits() {
@@ -2399,13 +2422,13 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public void setTg(int tg) {
-        super.setTg(Math.max(0, tg));
+        super.setTg(SanityLimits.cap(tg, SanityLimits.TRADE_GOODS));
     }
 
     public String gainTG(int count) {
-        String message = "(" + getTg() + " -> " + (getTg() + count) + ")";
-        setTg(getTg() + count);
-        return message;
+        int before = getTg();
+        setTg(SanityLimits.cappedSum(before, count, SanityLimits.TRADE_GOODS));
+        return "(" + before + " -> " + getTg() + ")";
     }
 
     public String gainTG(int count, boolean checkForPillage) {
@@ -2563,8 +2586,8 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (game.isAgeOfCommerceMode() && comms > 0) {
             num = comms;
         }
-        super.setCommodities(num);
-        if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
+        if (getCommoditiesBase() + getCommoditiesBonus() == 0) num = comms;
+        super.setCommodities(SanityLimits.cap(num, SanityLimits.COMMODITIES));
     }
 
     public void gainCommodities(int commodities) {
@@ -2781,6 +2804,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 "hazardousartifact",
                 "industrialartifact",
                 "unknownartifact",
+                "salvage_war_sun",
+                "salvage_flagship",
+                "salvage_dreadnought",
+                "salvage_carrier",
+                "salvage_cruiser",
+                "salvage_destroyer",
                 "ancientexcavators30k",
                 "dauntingweaponsschematics30k",
                 "enhancedmobilitycore30k");
@@ -2809,7 +2838,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void clearExhaustedPlanets(boolean cleanAbilities) {
+        List<String> readied = new ArrayList<>(getExhaustedPlanets());
         getExhaustedPlanets().clear();
+        readied.forEach(planet -> IxthLegendaryButtonHandler.onPlanetReadied(game, this, planet));
         if (cleanAbilities) {
             getExhaustedPlanetsAbilities().clear();
         }
@@ -3022,16 +3053,14 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void exhaustTech(String tech) {
-        if (getTechs().contains(tech) && !getExhaustedTechs().contains(tech)) {
-            getExhaustedTechs().add(tech);
+        if (!getTechs().contains(tech) || getExhaustedTechs().contains(tech)) return;
 
-            if (game != null) {
-                if (hasUnexhaustedLeader("revenantagent")) {
-                    RevenantLeadersHandler.offerRevenantAgentButtons(this, tech);
-                }
-            }
+        getExhaustedTechs().add(tech);
+
+        if (game != null && hasUnexhaustedLeader("revenantagent")) {
+            RevenantAgent.offerAfterExhaustingTech(this, tech);
         }
-        if (hasReadyBreakthrough("kolumebt")) {
+        if (hasUnlockedBreakthrough("kolumebt")) {
             gainCommodities(1);
             MessageHelper.sendMessageToChannel(
                     getCorrectChannel(), getRepresentationNoPing() + " gained 1 commodity due to Kolume breakthrough.");
@@ -3086,6 +3115,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             TheodisiOutpostActionCardHandler.offerOutpostEffects(game, this, planet);
             TaBreakthroughHandler.offerSafeHavensInfantry(game, this, planet);
             ThirtyKRelicHooks.onPlanetExhausted(game, this, planet);
+            if ("mobilemountain".equals(planet)) {
+                StonebornUnitHandler.damageMobileMountain(game, this);
+            }
+            IxthLegendaryButtonHandler.onPlanetExhausted(game, this, planet);
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
@@ -3096,7 +3129,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Nano-Forge Ability"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     getCorrectChannel(),
                     getRepresentation()
@@ -3119,8 +3152,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void refreshPlanet(String planet) {
-        boolean isRemoved = getExhaustedPlanets().remove(planet);
-        if (isRemoved) refreshPlanet(planet);
+        if (getExhaustedPlanets().removeIf(planet::equals)) {
+            IxthLegendaryButtonHandler.onPlanetReadied(game, this, planet);
+            if ("mobilemountain".equals(planet)) {
+                StonebornUnitHandler.repairMobileMountain(game, this);
+            }
+        }
     }
 
     public void refreshPlanetAbility(String planet) {
@@ -3260,7 +3297,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     }
 
     public void setDebtTokens(Map<String, Integer> debtTokens, String pool) {
-        this.debtTokens.put(pool.toLowerCase(), debtTokens);
+        Map<String, Integer> capped = new LinkedHashMap<>();
+        debtTokens.forEach((color, count) ->
+                capped.put(color, count == null ? null : Math.min(count, SanityLimits.DEBT_TOKENS_PER_COLOR)));
+        this.debtTokens.put(pool.toLowerCase(), capped);
     }
 
     public void addDebtTokens(String tokenColor, int count) {
@@ -3273,11 +3313,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             debtTokens.put(pool, new LinkedHashMap<>());
         }
 
-        if (debtTokens.get(pool).containsKey(tokenColor)) {
-            debtTokens.get(pool).put(tokenColor, debtTokens.get(pool).get(tokenColor) + count);
-        } else {
-            debtTokens.get(pool).put(tokenColor, count);
-        }
+        int current = debtTokens.get(pool).getOrDefault(tokenColor, 0);
+        debtTokens.get(pool).put(tokenColor, (int)
+                Math.min((long) current + count, SanityLimits.DEBT_TOKENS_PER_COLOR));
     }
 
     public void removeDebtTokens(String tokenColor, int count) {

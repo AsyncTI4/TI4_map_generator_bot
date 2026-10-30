@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecBut
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinHeroHandler;
@@ -76,7 +77,6 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
@@ -317,6 +317,7 @@ public class PlayHeroService {
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
             case "crystellumhero" -> CrystellumLeadersHandler.startCrystellumHero(event, game, player);
             case "dreamhero" -> DreamLeadersHandler.postDreamHeroButtons(game, player);
+            case "ironhero" -> IronLeadersHandler.startAdmiralThalenHero(game, player);
             case "netrunnershero" -> NetrunnersLeadersHandler.startNetrunnersHero(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "tyrishero" ->
@@ -629,7 +630,7 @@ public class PlayHeroService {
                             + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
                             + " If you do, you will also choose another player, who will gain 2 trade goods.";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+                    buttons2.add(Buttons.USE_PRODUCTION_BIOMES);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
                 }
             }
@@ -651,10 +652,10 @@ public class PlayHeroService {
             }
             case "brilliancehero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-                buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+                buttons.add(Buttons.DRAW_1_ABILITY);
+                buttons.add(Buttons.DRAW_1_UNIT_UPGRADE);
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-                buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
@@ -736,7 +737,7 @@ public class PlayHeroService {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
                         Buttons.blue(player.factionButtonChecker() + "yinHeroStart", "Invade A Planet With Yin Hero"));
-                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
@@ -747,7 +748,7 @@ public class PlayHeroService {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue(
                         player.factionButtonChecker() + "yinBrHeroStart", "Invade A Planet With Yin Hero"));
-                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)
@@ -794,7 +795,7 @@ public class PlayHeroService {
                         player.factionButtonChecker() + "augersHeroStart_" + 1, "Resolve Ilyxum Hero on Stage 1 Deck"));
                 buttons.add(Buttons.blue(
                         player.factionButtonChecker() + "augersHeroStart_" + 2, "Resolve Ilyxum Hero on Stage 2 Deck"));
-                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)

@@ -23,7 +23,7 @@ class KeleresButtonHandler {
                 player.getFactionEmojiOrColor()
                         + " is paying 1 trade good or 1 commodity to ignore laws for the turn.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(doneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), "Please spend 1 commodity or 1 trade good.", buttons);

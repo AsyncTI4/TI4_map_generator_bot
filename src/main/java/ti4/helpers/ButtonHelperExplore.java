@@ -272,14 +272,11 @@ public class ButtonHelperExplore {
     public static void resolvePurgedFragments(
             Game game, Player player, ButtonInteractionEvent event, List<String> fragmentsToPurge) {
         ThirtyKActionCardHooks.onFragmentsPurged(game, player, fragmentsToPurge);
-        StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, fragmentsToPurge);
         StringBuilder message = new StringBuilder(player.getRepresentation() + " purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragId = fragmentsToPurge.getFirst();
             player.removeFragment(fragId);
-            if (!StonebornAbilityHandler.returnPurgedFragment(game, fragId)) {
-                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-            }
+            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragId) {
                 case "crf1",
                         "crf2",
@@ -339,9 +336,7 @@ public class ButtonHelperExplore {
         } else {
             for (String fragId : fragmentsToPurge) {
                 player.removeFragment(fragId);
-                if (!StonebornAbilityHandler.returnPurgedFragment(game, fragId)) {
-                    game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                }
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                 switch (fragId) {
                     case "crf1",
                             "crf2",
@@ -387,6 +382,7 @@ public class ButtonHelperExplore {
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
         OblivionUnitHandler.doOblivionMechCheck(game, player);
         StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
+        StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, fragmentsToPurge);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
         ArcanumLeadersHandler.offerArcanumCommanderTechPurge(game, player, event, fragmentsToPurge.size());
         if (!game.isFowMode() && event.getMessageChannel() instanceof ThreadChannel) {

@@ -479,6 +479,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_GEARS + " " + game.isShowGears());
         writer.write(System.lineSeparator());
+        writer.write(Constants.WORMHOLE_TOKEN_MERGE + " " + game.getWormholeTokenMergeFrom());
+        writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_BANNERS + " " + game.isShowBanners());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_HEX_BORDERS + " " + game.getHexBorderStyle());
@@ -850,6 +852,9 @@ class GameSaveService {
             writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.BOT_PLAYER + " " + player.isBotPlayer());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.NPC + " " + player.isNpc());
             writer.write(System.lineSeparator());
 
@@ -883,6 +888,12 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.MAGEN_INFANTRY_COUNT + " " + player.getMagenInfantryCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.DACXIVE_COUNT + " " + player.getDacxiveCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.YIN_SPINNER_COUNT + " " + player.getYinSpinnerCounter());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());

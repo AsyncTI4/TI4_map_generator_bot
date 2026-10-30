@@ -15,6 +15,8 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
@@ -23,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
@@ -32,7 +35,6 @@ import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -50,6 +52,8 @@ import ti4.service.fow.GMService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.agent.modules.homebrew.EdynAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.ValhavnAgent;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.planet.JotunheimLegendaryService;
@@ -88,6 +92,7 @@ public class EndTurnService {
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        ValhavnAgent.offerAtEndOfTurn(game, player);
         WarGamesBrActionCardHandler.clear(game);
         DisableService.clear(game);
         KaltrimUnitHandler.clearShrineInfantryRemovalState(game);
@@ -99,6 +104,7 @@ public class EndTurnService {
         }
         game.removeStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED);
         LostLegciesExploreHandler.resolveBattleworldEndOfTurn(event, game, player);
+        IxthLegendaryButtonHandler.resolveEthanAtEndOfTurn(event, game, player);
         for (Tile tile : game.getTileMap().values()) {
             TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         }
@@ -121,6 +127,8 @@ public class EndTurnService {
     }
 
     private static void resetStoredValuesEndOfTurn(GenericInteractionCreateEvent event, Game game, Player player) {
+        ValhavnPromissoryHandler.returnEinherjarAtEndOfTurn(event, game, player);
+        IronSalvageRelicHandler.clearTacticalActionState(game, player);
         AtokeraHeroButton.returnCommittedShips(event, game, player);
         AeternaAbilityHandler.clearCycleOfReclamationActionCaptures(game);
         AeternaLeadersHandler.clearAeternaCommanderActionState(game);
@@ -279,10 +287,10 @@ public class EndTurnService {
                         "You were the last player to pass, and so you may score _Prove Endurance_.");
             }
             CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
-            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
+            if (!EdynAgent.triggerPresetOnPass(game, mainPlayer, mainPlayer, event)) {
                 EndPhaseService.EndActionPhase(event, game, gameChannel);
                 game.updateActivePlayer(null);
-                ButtonHelperAgents.checkForEdynAgentActive(game, event);
+                EdynAgent.endPresetAction(game, event);
             }
 
             return;
@@ -320,11 +328,11 @@ public class EndTurnService {
             sendFogTurnSummary(game, mainPlayer);
         }
         if (justPassed) {
-            if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
+            if (!EdynAgent.triggerPresetOnPass(game, mainPlayer, nextPlayer, event)) {
                 StartTurnService.turnStart(event, game, nextPlayer);
             }
         } else {
-            if (!ButtonHelperAgents.checkForEdynAgentActive(game, event)) {
+            if (!EdynAgent.endPresetAction(game, event)) {
                 StartTurnService.turnStart(event, game, nextPlayer);
             }
         }

@@ -44,7 +44,7 @@
             "WARFARE",
             "BIOTIC"
         ],
-        "text": "ACTION: Exhaust this card to choose a system that contains 1 or more of your command tokens and your units; resolve those units' PRODUCTION abilities in that system. You may reduce the combined cost of the produced units by the number of your units with PRODUCTION in that system.",
+        "text": "ACTION: Exhaust this card to choose a system that contains 1 or more of your command tokens and your units; resolve those units' PRODUCTION abilities in that system. You may reduce the combined cost of the produced units by the number of your units with PRODUCTION in that system, up to a maximum of 3.",
         "source": "beans"
     },
     {
@@ -81,6 +81,18 @@
             "BIOTIC"
         ],
         "text": "After another player activates an anomaly that contains your command token and 1 or more of your units, you may exhaust this card to remove your command token from that system. Then, you may remove 1 of your non-fighter ships from another system that contains an anomaly and place it in the active system.",
+        "source": "beans"
+    },
+    {
+        "alias": "valhavnbt",
+        "name": "Yggdrasil Cannon",
+        "shortName": "Yggdrasil\nCannon",
+        "faction": "valhavn",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "After 1 or more of your units produces a hit during SPACE CANNON OFFENSE in a system containing your ships: You may cancel 1 of those hits to remove 1 ship from that unit's system and place it into the active system.",
         "source": "beans"
     }
 ]

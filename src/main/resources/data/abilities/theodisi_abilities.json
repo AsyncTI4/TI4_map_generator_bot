@@ -320,8 +320,8 @@
         "id": "fragmentum_unleashed",
         "name": "Fragmentum Unleashed",
         "faction": "stoneborn",
-        "window": "When you would purge 1 or more relic fragments:",
-        "windowEffect": "You may place a corresponding Fragmentum Token on your faction sheet that matches 1 of those fragments.",
+        "window": "After you purge 1 or more relic fragments:",
+        "windowEffect": "You may place 1 fragmentum token on your faction sheet that matches the color of 1 of those fragments.",
         "source": "theodisi"
     },
     {
@@ -329,7 +329,7 @@
         "name": "Adaptive",
         "faction": "stoneborn",
         "window": "During setup:",
-        "windowEffect": "Gain each of your components' \"Dormant\" counterparts. Components with an UNLEASH effect gain the following:\nAt the start of your turn, you may pay the listed cost and purge this component to gain that component's corresponding \"Unleashed\" counterpart.",
+        "windowEffect": "Gain the dormant version of each of your faction components. Each of your components with an UNLEASH ability gains the following ability text:\nAt the start of your turn, you may pay this component's listed UNLEASH cost and purge it to gain its corresponding Unleashed counterpart. If the purged component was exhausted, gain its Unleashed counterpart exhausted.",
         "notes": "This does not mean you gain your starting techs. Just that you start the game with the \"Dormant\" versions of all your components.",
         "source": "theodisi"
     },

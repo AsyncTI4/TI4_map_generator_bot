@@ -147,7 +147,13 @@ _Avoid_: Unit tech
 The System a Faction starts in and defends.
 
 **Wormhole**:
-A System feature that links it to other Systems bearing the same wormhole type.
+A System feature that links it to other Systems bearing the same wormhole type. It comes from the System tile or from a wormhole token or attachment in the System. Several wormholes of the same type count separately (LRR 101, note II), e.g. for Particle Synthesis.
+
+**Weirdway**:
+A Sigma planet attachment that gives its System an alpha and a beta wormhole and -1 move to ships of players who don't control the planet.
+
+**Lambda wormhole**:
+A Sigma wormhole carried by the three lambda wormhole tokens. Lambda wormholes only connect to each other.
 
 **Wormhole nexus**:
 The extra System where alpha, beta and gamma wormholes converge, which starts with only its gamma wormhole and becomes active when a unit enters it or Mallice is controlled.
@@ -236,6 +242,13 @@ A Thunder's Edge Faction card that is unlocked and then used for a powerful effe
 **Expedition**:
 A Thunder's Edge shared objective that one Faction completes first for a reward.
 
+**Genome**:
+A Twilight's Fall splice card that plays like a Faction's agent under a new name; in the bot it is a separate module that leans on the matching agent module instead of being one.
+_Avoid_: Agent (when the game is Twilight's Fall)
+
+**TK Nova genome**:
+A homebrew genome from the TK Nova Cup that replaces an official agent with its own text and works in any game it is drafted into.
+
 **Splice**:
 A Twilight's Fall card (ability, genome, paradigm or unit) drawn and distributed to shape a Faction.
 
@@ -285,6 +298,15 @@ A homebrew content mode that substitutes revised cards, technologies and leaders
 
 **Discordant Stars**:
 A homebrew content mode that adds additional Factions and components.
+
+**Base**:
+The original Twilight Imperium 4th Edition game before any expansion; a Game in base game mode uses only base content, and statistics filters name it `base`.
+
+**PoK**:
+Prophecy of Kings, the first Twilight Imperium 4th Edition expansion, whose content Games use by default; statistics filters name it `pok`.
+
+**TE**:
+Thunder's Edge, the Twilight Imperium 4th Edition expansion that follows PoK and adds Breakthroughs, Expeditions and the Fracture; statistics filters name it `te`.
 
 **Alliance mode**:
 A team mode in which Players are paired and share some benefits.

@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -34,6 +33,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.leader.agent.modules.homebrew.theodisi.KairnAgent;
 import ti4.service.planet.PlanetService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
@@ -442,8 +442,7 @@ class ExploreButtonHandler {
             bID = bID.substring("skipKairnAgent_".length());
         }
         String[] info = bID.split("_");
-        if (!skipKairnAgentInterrupt
-                && KairnLeadershandler.offerKairnAgentExploreInterrupt(event, game, player, buttonID, info)) {
+        if (!skipKairnAgentInterrupt && KairnAgent.offerExploreInterrupt(event, game, player, buttonID, info)) {
             return;
         }
         boolean dsdihmy = bID.startsWith("dsdihmy_");

@@ -238,26 +238,19 @@ public class AeternaLeadersHandler {
     }
 
     // Agent
-    public static void startAeternaAgent(Game game, Player player) {
+    public static List<Button> agentShipButtons(Game game, Player player) {
         List<Button> buttons = getAeternaAgentShipButtons(game, player);
-        String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
-        String message = player.getRepresentationNoPing()
-                + ", please choose a non-fighter ship to destroy for Morwen Deyth, the Aeterna agent.";
-
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + " has no eligible non-fighter ships.");
-            return;
+            return buttons;
         }
-
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         List<Button> paginatedButtons = NewStuffHelper.buttonPagination(buttons, extraButtons, prefix, 25, 0, false);
         if (buttons.size() <= 24) {
             paginatedButtons = new ArrayList<>(buttons);
             paginatedButtons.addAll(extraButtons);
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, paginatedButtons);
+        return paginatedButtons;
     }
 
     @ButtonHandler(SELECT_AGENT_SHIP)
@@ -269,7 +262,7 @@ public class AeternaLeadersHandler {
         String message = player.getRepresentationNoPing()
                 + ", please choose a non-fighter ship to destroy for Morwen Deyth, the Aeterna agent.";
         String prefix = player.factionButtonChecker() + SELECT_AGENT_SHIP;
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), buttons, extraButtons, message, prefix, buttonID)) {
             return;
@@ -303,7 +296,7 @@ public class AeternaLeadersHandler {
         } else {
             String systemPrefix = player.factionButtonChecker() + SELECT_AGENT_SYSTEM + sourceTile.getPosition() + "|"
                     + unit.getBaseType() + "|";
-            List<Button> systemExtraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+            List<Button> systemExtraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
             List<Button> paginatedButtons =
                     NewStuffHelper.buttonPagination(systemButtons, systemExtraButtons, systemPrefix, 25, 0, false);
             if (systemButtons.size() <= 24) {
@@ -329,7 +322,7 @@ public class AeternaLeadersHandler {
         String systemMessage = player.getRepresentationNoPing() + ", please choose an eligible adjacent system in which"
                 + " to place 1 neutral " + payload[1] + ".";
         String systemPrefix = player.factionButtonChecker() + SELECT_AGENT_SYSTEM + payload[0] + "|" + payload[1] + "|";
-        List<Button> extraButtons = List.of(Buttons.red("deleteButtons", "Decline"));
+        List<Button> extraButtons = List.of(Buttons.DECLINE_DELETE_BUTTONS);
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 event, event.getMessageChannel(), systemButtons, extraButtons, systemMessage, systemPrefix, buttonID)) {
             return;

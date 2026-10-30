@@ -21,9 +21,9 @@ import ti4.ai.AiTestGame;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.TransactionHelper;
 import ti4.message.MessageHelper;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -41,7 +41,7 @@ class HumanAiDealTest extends BaseTi4Test {
     private final List<String> order = new ArrayList<>();
     private MockedStatic<MessageHelper> messages;
     private MockedStatic<ButtonHelper> buttons;
-    private MockedStatic<ButtonHelperAgents> agents;
+    private MockedStatic<AgentLifecycle> agents;
     private MockedStatic<TransactionHelper> transactions;
     private ButtonInteractionEvent event;
 
@@ -81,9 +81,9 @@ class HumanAiDealTest extends BaseTi4Test {
         event = mock(ButtonInteractionEvent.class);
         messages = mockStatic(MessageHelper.class);
         buttons = mockStatic(ButtonHelper.class);
-        agents = mockStatic(ButtonHelperAgents.class);
+        agents = mockStatic(AgentLifecycle.class);
         transactions = mockStatic(TransactionHelper.class);
-        agents.when(() -> ButtonHelperAgents.exhaustAgent(anyString(), any(), any(), any()))
+        agents.when(() -> AgentLifecycle.press(anyString(), any(), any(), any()))
                 .thenAnswer(invocation -> {
                     order.add("exhaust " + invocation.getArgument(0));
                     ai.getLeader("hacanagent").orElseThrow().setExhausted(true);
@@ -224,7 +224,7 @@ class HumanAiDealTest extends BaseTi4Test {
 
         assertThat(order).isEmpty();
         assertThat(stored().status()).isEqualTo(HumanAiDeal.Status.PENDING);
-        agents.verify(() -> ButtonHelperAgents.exhaustAgent(anyString(), any(), any(), any()), never());
+        agents.verify(() -> AgentLifecycle.press(anyString(), any(), any(), any()), never());
     }
 
     // A deal that was answered once cannot be run a second time.

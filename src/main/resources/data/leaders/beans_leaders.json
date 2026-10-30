@@ -108,7 +108,7 @@
     "name": "Shipwright Kastel",
     "title": "Master of Supply",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose a player and exhaust this card to allow that player to resolve PRODUCTION with 1 of their units in a system that contains one of their units with PRODUCTION. Reduce the combined cost of the produced units by 1.",
+    "abilityText": "Choose a player and exhaust this card. You may allow that player to produce 1 unit in a system that contains one of their units with PRODUCTION, reducing the cost of the produced unit by 1.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -120,7 +120,7 @@
     "title": "Master of Logistics",
     "abilityWindow": "Ongoing",
     "abilityText": "Your mechs do not count against capacity when being transported or when in a space area that contains 1 or more of your ships with capacity. While your mechs are in the space area of a system they have PRODUCTION 1.",
-    "unlockCondition": "Have all of your mechs on the game board.",
+    "unlockCondition": "Have a salvage card in your play area.",
     "source": "beans"
   },
   {
@@ -129,7 +129,7 @@
     "type": "hero",
     "name": "Admiral Thalen",
     "title": "Master of Iron",
-    "abilityName": "Apex Frame - Mecha Prime",
+    "abilityName": "Hyper Forge - Mecha Prime",
     "abilityWindow": "ACTION:",
     "abilityText": "Ready each planet that contains 1 of your units with PRODUCTION. Then, resolve PRODUCTION in one of those systems. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
@@ -220,8 +220,8 @@
     "type": "commander",
     "name": "Kaethos",
     "title": "The Unyielding",
-    "abilityWindow": "You may treat anomalies as if they contained an ingress token.",
-    "abilityText": "Ongoing",
+    "abilityWindow": "Ongoing",
+    "abilityText": "You may treat anomalies as if they contained an ingress token.",
     "unlockCondition": "Take control of a planet in The Fracture.",
     "source": "beans"
   },
@@ -236,5 +236,42 @@
     "abilityText": "Place this card near the game board. During this game round, your ships may move out of anomalies that contain your command tokens. At the end of this game round, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
+  },
+  {
+    "id": "valhavnagent",
+    "faction": "valhavn",
+    "type": "agent",
+    "name": "Thorberg Skafhógg",
+    "title": "Höfuthsmithur",
+    "abilityWindow": "At the end of a player's turn:",
+    "abilityText": "You may exhaust this card to allow that player to either place 1 PDS from their reinforcements onto a planet they control, or place 2 infantry from their reinforcements onto a planet that contains 1 or more of their PDS units. If that player was another player, gain 1 command token.",
+    "unlockCondition": "Always Unlocked",
+    "source": "beans",
+    "flavorText": "Hvert vígi hefst með einum steini, og hver steinn með einu hamarshöggi."
+  },
+  {
+    "id": "valhavncommander",
+    "faction": "valhavn",
+    "type": "commander",
+    "name": "Styrmir Ragnarsson",
+    "title": "Fylkir",
+    "abilityWindow": "When you roll for your infantry’s text ability:",
+    "abilityText": "Add +X to the result of each die, where X is the number of PDS units you have on the game board.\n\nOther players cannot use their units SPACE CANNON ability against your infantry.",
+    "unlockCondition": "Have 3 infantry on each of 3 planets that contain your PDS units.",
+    "source": "beans",
+    "flavorText": "Fylking stendur sem einn maður, og enginn fellur einn."
+  },
+  {
+    "id": "valhavnhero",
+    "faction": "valhavn",
+    "type": "hero",
+    "name": "Brünnhilde Buthladóttir",
+    "title": "Skaldmær",
+    "abilityName": "Gjallarhorn - Hearth-Call",
+    "abilityWindow": "At the start of a ground combat you are participating in:",
+    "abilityText": "You may purge this card to move up to 3 ground forces from each system that contains 1 or more of your PDS units.",
+    "unlockCondition": "Have 3 scored objectives.",
+    "source": "beans",
+    "flavorText": "Ég yrki ekki um sigra. Ég kalla þá fram."
   }
 ]

@@ -19,9 +19,9 @@ import ti4.ai.AiTestGame;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.TransactionHelper;
 import ti4.message.MessageHelper;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.testUtils.BaseTi4Test;
 
 // A buyer pressing Buy pays Letnev one trade good and the agent is exhausted on the buyer; the services that touch
@@ -37,7 +37,7 @@ class ViscountUnlennSaleButtonsTest extends BaseTi4Test {
     private final List<String> order = new ArrayList<>();
     private MockedStatic<MessageHelper> messages;
     private MockedStatic<ButtonHelper> buttons;
-    private MockedStatic<ButtonHelperAgents> agents;
+    private MockedStatic<AgentLifecycle> agents;
     private MockedStatic<TransactionHelper> transactions;
     private ButtonInteractionEvent event;
 
@@ -54,9 +54,9 @@ class ViscountUnlennSaleButtonsTest extends BaseTi4Test {
         event = mock(ButtonInteractionEvent.class);
         messages = mockStatic(MessageHelper.class);
         buttons = mockStatic(ButtonHelper.class);
-        agents = mockStatic(ButtonHelperAgents.class);
+        agents = mockStatic(AgentLifecycle.class);
         transactions = mockStatic(TransactionHelper.class);
-        agents.when(() -> ButtonHelperAgents.exhaustAgent(anyString(), any(), any(), any()))
+        agents.when(() -> AgentLifecycle.press(anyString(), any(), any(), any()))
                 .thenAnswer(invocation -> {
                     order.add("exhaust " + invocation.getArgument(0));
                     letnev.getLeader("letnevagent").orElseThrow().setExhausted(true);
@@ -141,7 +141,7 @@ class ViscountUnlennSaleButtonsTest extends BaseTi4Test {
         ViscountUnlennSaleButtons.decline(event, game, test.nekro, declineButton(buyer));
 
         assertThat(order).isEmpty();
-        agents.verify(() -> ButtonHelperAgents.exhaustAgent(anyString(), any(), any(), any()), never());
+        agents.verify(() -> AgentLifecycle.press(anyString(), any(), any(), any()), never());
     }
 
     @Test

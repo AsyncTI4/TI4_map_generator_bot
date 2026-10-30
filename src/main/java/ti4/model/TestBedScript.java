@@ -20,7 +20,9 @@ public class TestBedScript {
             "hand",
             "actAs",
             "sendAnonComms",
-            "stackExplore");
+            "stackExplore",
+            "removeToken",
+            "setGameOption");
 
     private String name;
     private String description;

@@ -20,6 +20,7 @@ public enum LeaderRemovalReason {
             case "titanshero", "kyrohero", "toldarhero", "freesystemshero", "vyserixhero" -> ATTACHED;
 
             case "letnevhero",
+                    "natauhero",
                     "nomadhero",
                     "zealotshero",
                     "nokarhero",

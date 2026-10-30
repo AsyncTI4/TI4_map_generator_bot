@@ -6,10 +6,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.ids.AgentStepIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -29,6 +32,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
@@ -39,27 +43,38 @@ class CabalButtonHandler {
     @ButtonHandler("cabalAgentCapture_")
     public static void resolveCabalAgentCapture(
             String buttonID, Player player, Game game, ButtonInteractionEvent event) {
-        String unit = buttonID.split("_")[1];
-        String faction = buttonID.split("_")[2];
-        Player p2 = game.getPlayerFromColorOrFaction(faction);
-        if (p2 == null) {
+        Optional<Capture> capture = parseCapture(game, buttonID);
+        if (capture.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Unable to resolve player, please resolve manually.");
             return;
         }
+        String unit = capture.get().unit();
+        Player p2 = capture.get().victim();
         int commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + " a " + unit
                         + " of yours has been captured by "
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "The Stillness of Stars, the Vuil'raith"
-                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent. "
+                        + AgentLifecycle.agentNameShownTo(
+                                game, p2, player, "cabalagent", capture.get().viaYssaril()) + ". "
                         + "Rejoice, for your " + commodities + " commodities been washed.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);
         ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, player, 1, unit, event, true);
         ButtonHelper.deleteMessage(event);
+    }
+
+    record Capture(String unit, Player victim, boolean viaYssaril) {}
+
+    static Optional<Capture> parseCapture(Game game, String buttonID) {
+        AgentStepIds.Parsed step = AgentStepIds.parse(buttonID);
+        String unitAndFaction = StringUtils.substringAfter(step.id(), "_");
+        Player victim = game.getPlayerFromColorOrFaction(StringUtils.substringAfter(unitAndFaction, "_"));
+        if (victim == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new Capture(StringUtils.substringBefore(unitAndFaction, "_"), victim, step.viaYssaril()));
     }
 
     @ButtonHandler("cabalHeroTile_")
@@ -523,7 +538,7 @@ class CabalButtonHandler {
                     }
                 }
             }
-            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentation() + ", you are exceeding your fleet pool "
@@ -577,7 +592,7 @@ class CabalButtonHandler {
                     }
                 }
             }
-            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentation() + ", you are exceeding your capacity limit in tile "

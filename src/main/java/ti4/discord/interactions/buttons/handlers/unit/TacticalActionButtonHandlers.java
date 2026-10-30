@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -301,15 +302,21 @@ class TacticalActionButtonHandlers {
                     String landingMsg = player.fogSafeEmoji() + " landed " + amount + colorMsg + " "
                             + type.humanReadableName() + " on " + planetName + ".";
                     if (!removed.isEmpty()) {
-                        // Announce the landing before adding the units: addUnits can trigger CONTROLLED
-                        // lore (e.g. a troop-removing effect) that posts its own follow-up messages, and
-                        // we want "landed X" to read before those, not after.
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
                         AddUnitService.addUnits(event, game, toAdd);
                         CombatEventRecorder.recordLanding(game, player, tile, planet, type, amount);
                         ThirtyKExploreHooks.afterLanding(game, owner, tile, planet, type, amount);
                         if (type == UnitType.Infantry) {
                             MonumentsService.recordNaaluMonumentInfantryCommit(game, owner, tile, planet);
+                            ValhavnPromissoryHandler.offerEinherjarCommit(
+                                    event,
+                                    game,
+                                    owner,
+                                    tile,
+                                    planet,
+                                    removed.stream()
+                                            .mapToInt(RemovedUnit::getTotalRemoved)
+                                            .sum());
                         }
                         if (ArcanumBreakthroughHandler.hasPowerWordWish(owner)) {
                             ArcanumBreakthroughHandler.movePowerWordWishUnitsWithinActiveSystem(

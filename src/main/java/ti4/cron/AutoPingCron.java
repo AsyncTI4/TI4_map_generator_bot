@@ -1,10 +1,10 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.*;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -99,13 +99,21 @@ public class AutoPingCron {
 
         removeEndedGamesFromAutoPingMetadata();
 
+        Set<String> gamesWithAutoPing = AutoPingMetadataManager.getGameNamesWithAutoPing();
         GameManager.getManagedGames().stream()
-                .filter(not(ManagedGame::isHasEnded))
+                .filter(managedGame -> isDueForAutoPingCheck(managedGame, gamesWithAutoPing))
                 .map(ManagedGame::getGame)
-                .filter(game -> game.getAutoPingStatus() && !game.isTemporaryPingDisable())
+                .filter(Objects::nonNull)
                 .forEach(AutoPingCron::autoPingGame);
 
         BotLogger.logCron("Finished AutoPingCron.");
+    }
+
+    static boolean isDueForAutoPingCheck(ManagedGame managedGame, Set<String> gamesWithAutoPing) {
+        return !managedGame.isHasEnded()
+                && managedGame.isAutoPingEnabled()
+                && !managedGame.isTemporaryPingDisable()
+                && gamesWithAutoPing.contains(managedGame.getName());
     }
 
     private static void removeEndedGamesFromAutoPingMetadata() {
@@ -372,7 +380,7 @@ public class AutoPingCron {
                 List<Button> buttons = new ArrayList<>();
 
                 buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
-                buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
+                buttons.add(Buttons.PASS_ON_WHENS);
                 MessageHelper.sendMessageToChannel(
                         p2.getCardsInfoThread(),
                         p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"when\"s.",
@@ -385,7 +393,7 @@ public class AutoPingCron {
                 List<Button> buttons = new ArrayList<>();
 
                 buttons.add(Buttons.gray("queueAnAfter", "Play An \"After\""));
-                buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
+                buttons.add(Buttons.PASS_ON_AFTERS);
                 MessageHelper.sendMessageToChannel(
                         p2.getCardsInfoThread(),
                         p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"after\"s.",
@@ -394,9 +402,9 @@ public class AutoPingCron {
             if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
                 if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).contains(p2)) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green("preVote", "Pre-Vote"));
-                    buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain"));
-                    buttons.add(Buttons.red("deleteButtons", "Don't Do Anything"));
+                    buttons.add(Buttons.PRE_VOTE);
+                    buttons.add(Buttons.PRE_ABSTAIN);
+                    buttons.add(Buttons.DONT_DO_ANYTHING);
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCardsInfoThread(),
                             p2.getRepresentation(true, true) + ", this is a reminder to decide on voting.",

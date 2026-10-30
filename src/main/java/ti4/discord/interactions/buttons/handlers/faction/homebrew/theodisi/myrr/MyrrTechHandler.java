@@ -44,7 +44,7 @@ public class MyrrTechHandler {
         }
         buttons.add(Buttons.blue(
                 player.factionButtonChecker() + SEGMENTED_USE + tile.getPosition(), "Use Segmented Structuring"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
     }
 
     public static void offerSegmentedStructuring(ButtonInteractionEvent event, Game game, Player player, Tile tile) {

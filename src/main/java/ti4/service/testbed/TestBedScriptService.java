@@ -294,11 +294,23 @@ public class TestBedScriptService {
                 }
             }
             case "removeStored" -> requireValue(step.getKey(), "key", label, errors);
+            case "setGameOption" -> {
+                requireValue(step.getKey(), "key", label, errors);
+                requireValue(step.getValue(), "value", label, errors);
+                if (step.getKey() != null && step.getValue() != null) {
+                    String problem = TestBedComponentService.gameOptionProblem(step.getKey(), step.getValue());
+                    if (problem != null) errors.add(label + ": " + problem);
+                }
+            }
             case "stackExplore" -> {
                 requireValue(step.getValue(), "value", label, errors);
                 if (step.getValue() != null && !Mapper.isValidExplore(step.getValue())) {
                     errors.add(label + ": unknown explore card `" + step.getValue() + "`.");
                 }
+            }
+            case "removeToken" -> {
+                requireValue(step.getKey(), "key", label, errors);
+                requireValue(step.getValue(), "value", label, errors);
             }
             case "setActivePlayer" -> requireSeat(step, label, errors);
             case "sendAnonComms" -> {

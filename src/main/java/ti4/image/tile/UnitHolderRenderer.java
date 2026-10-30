@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
@@ -146,6 +147,7 @@ final class UnitHolderRenderer {
             List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
             List<UnitState> states = UnitState.unitRenderOrder().stream()
                     .flatMap(st -> Collections.nCopies(unitStates.get(st.ordinal()), st).stream())
+                    .limit(SanityLimits.unitsInOneHolder(unitKey.unitType()))
                     .toList();
             int unitRenderCt = 0;
             UnitState prevState = null;
@@ -219,6 +221,10 @@ final class UnitHolderRenderer {
                 .map(cc -> cc.replace(".png", "").replace("command_", ""))
                 .toList();
         if (tileCCsColorIDs.contains(unitKey.colorID())) return true;
-        return player.isPassed() || player.isNeutral();
+        return (player.isPassed() && seesPassedState(player)) || player.isNeutral();
+    }
+
+    private boolean seesPassedState(Player player) {
+        return !fogViewer.privateView() || fogViewer.canSeeStats(player);
     }
 }

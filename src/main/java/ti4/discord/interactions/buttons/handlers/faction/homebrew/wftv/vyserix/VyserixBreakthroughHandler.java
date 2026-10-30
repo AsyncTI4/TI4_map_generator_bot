@@ -24,7 +24,7 @@ public class VyserixBreakthroughHandler {
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "vyserixMoraySystem_" + tile.getPosition(),
                 "Place 1 Fighter in " + tile.getRepresentationForButtons(game, player)));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         String msg = player.getRepresentation() + " you could potentially cancel "
                 + (hits == 1 ? "the ANTI-FIGHTER BARRAGE hit" : "some ANTI-FIGHTER BARRAGE hits")
                 + " to place fighters instead due to _M.O.R.A.Y. System_. Use these buttons to do so, and press done when done. The bot did not track how many hits you got.";

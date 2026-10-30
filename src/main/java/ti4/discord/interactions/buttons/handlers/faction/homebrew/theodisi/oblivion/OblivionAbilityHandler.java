@@ -42,7 +42,7 @@ public class OblivionAbilityHandler {
                         player.factionButtonChecker() + START_IGNO_DISCO,
                         "Use Ignorant Discoveries",
                         FactionEmojis.oblivion),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
 
         return buttons;
     }
