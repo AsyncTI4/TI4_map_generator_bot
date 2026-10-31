@@ -56,6 +56,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
@@ -852,6 +853,9 @@ public class ButtonHelper {
         if (player.hasAbility("diplomats")
                 && !ButtonHelperAbilities.getDiplomatButtons(game, player).isEmpty()) {
             buttons.add(Buttons.gray("getDiplomatsButtons", "Use Diplomats Ability", FactionEmojis.freesystems));
+        }
+        if (whatIsItFor.contains("tech") && MigoPromissoryHandler.hasExtractionScience(player, game)) {
+            buttons.add(MigoPromissoryHandler.getExtractionScienceSpendButton(player, whatIsItFor));
         }
         if ((whatIsItFor.contains("res") || whatIsItFor.contains("both"))
                 && player.hasUnlockedBreakthrough("tyrisbt")) {

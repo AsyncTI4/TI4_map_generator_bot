@@ -51,6 +51,8 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -3111,6 +3113,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 StonebornUnitHandler.damageMobileMountain(game, this);
             }
             IxthLegendaryButtonHandler.onPlanetExhausted(game, this, planet);
+            if (getPlanets().contains(planet) && hasTech("bemigog") && hasTechReady("bemigog")) {
+                MigoTechHandler.offerSynapticFeedbackLoop(this, game, planet);
+            }
+            Planet planetM = this.game.getPlanetsInfo().get(planet);
+            if (getPlanets().contains(planet)
+                    && hasAbility("harvest_green")
+                    && !getExhaustedAbilities().contains("harvest_green")
+                    && planetM != null
+                    && !planetM.getTechSpecialities().isEmpty()) {
+                MigoHarvestHandler.offerGreenHarvest(this);
+            }
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null

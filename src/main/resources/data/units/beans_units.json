@@ -480,6 +480,6 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "If you have 2 or more of this unit on a planet, that planet is counted as having a technology specialty of any color."
+    "ability": "If you have 2 or more of this unit on a planet, that planet is counted as having a technology specialty of any color. If that planet already has a technology specialty, it gains another."
   }
 ]

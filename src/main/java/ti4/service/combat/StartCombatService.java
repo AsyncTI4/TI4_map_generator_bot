@@ -736,6 +736,18 @@ public class StartCombatService {
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
                 }
+                if (ButtonHelper.doesPlayerHaveFSHere("migo_flagship", player2, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
+                }
+                if (ButtonHelper.doesPlayerHaveFSHere("migo_flagship", player1, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
+                }
             }
         }
 

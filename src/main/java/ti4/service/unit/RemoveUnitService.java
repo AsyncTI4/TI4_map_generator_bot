@@ -9,6 +9,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -229,6 +232,19 @@ public class RemoveUnitService {
             if (player.hasUnit("stoneborn_flagship")) {
                 StonebornUnitHandler.syncMobileMountain(game, player);
             }
+        }
+
+        List<Player> harvestPlayers = allUnitsRemoved.stream()
+                .filter(removedUnit -> removedUnit.unitKey().unitType() == UnitType.Mech)
+                .map(removedUnit -> removedUnit.getPlayer(game))
+                .filter(Objects::nonNull)
+                .filter(player -> player.hasAbility("harvest"))
+                .distinct()
+                .toList();
+        if (!harvestPlayers.isEmpty()) {
+            MigoUnitHandler.syncNevermen(game);
+            MigoLeadersHandler.syncMigoCommanderBonus(game);
+            harvestPlayers.forEach(player -> MigoAbilityHandler.reconcileHarvestCards(game, player));
         }
 
         allUnitsRemoved.stream()
