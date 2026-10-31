@@ -915,10 +915,20 @@ public final class DefenseOutlook {
     }
 
     private double computeGround(Tile tile, IncomingForce force, Planet planet, Defenders defenders) {
+        double[] cannonHits =
+                L4Disruptors.shieldsInvaders(force.enemy()) ? new double[] {1} : spaceCannonHitOdds(planet);
+        double chance = 0;
+        for (int hits = 0; hits < cannonHits.length; hits++) {
+            if (cannonHits[hits] > 0) chance += cannonHits[hits] * landedChance(tile, force, planet, defenders, hits);
+        }
+        return chance;
+    }
+
+    private double landedChance(Tile tile, IncomingForce force, Planet planet, Defenders defenders, int cannonHits) {
         Player enemy = force.enemy();
         Map<UnitType, Integer> landing = new EnumMap<>(UnitType.class);
         landing.putAll(force.ground());
-        removeLandingForces(landing, L4Disruptors.shieldsInvaders(enemy) ? 0 : expectedSpaceCannonHits(planet));
+        removeLandingForces(landing, cannonHits);
         if (landing.values().stream().mapToInt(Integer::intValue).sum() == 0) return 0;
         Defenders.Stack ours = defenders.on(planet.getName());
         if (ours.isEmpty()) return 1;
@@ -941,15 +951,25 @@ public final class DefenseOutlook {
         return BombardmentRules.expectedHits(enemy, force.ships());
     }
 
-    private int expectedSpaceCannonHits(Planet planet) {
-        double expected = 0;
+    private double[] spaceCannonHitOdds(Planet planet) {
+        double[] odds = {1};
         for (UnitKey key : planet.getUnitKeysForPlayer(seat)) {
             UnitModel model = seat.getUnitFromUnitKey(key);
             if (model == null) continue;
             int dice = model.getSpaceCannonDieCount(seat) * planet.getUnitCount(key);
-            expected += dice * BattleMath.hitChance(model.getSpaceCannonHitsOn(seat));
+            double hit = BattleMath.hitChance(model.getSpaceCannonHitsOn(seat));
+            for (int die = 0; die < dice; die++) odds = withOneMoreDie(odds, hit);
         }
-        return (int) Math.round(expected);
+        return odds;
+    }
+
+    private static double[] withOneMoreDie(double[] odds, double hit) {
+        double[] next = new double[odds.length + 1];
+        for (int hits = 0; hits < odds.length; hits++) {
+            next[hits] += odds[hits] * (1 - hit);
+            next[hits + 1] += odds[hits] * hit;
+        }
+        return next;
     }
 
     private static void removeLandingForces(Map<UnitType, Integer> landing, int hits) {

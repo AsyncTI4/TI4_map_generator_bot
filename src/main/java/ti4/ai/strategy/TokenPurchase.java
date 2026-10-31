@@ -1,5 +1,6 @@
 package ti4.ai.strategy;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -8,6 +9,7 @@ import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.expedition.ExpeditionUnlock;
+import ti4.ai.scoring.ExpectedReadying;
 import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
@@ -77,10 +79,32 @@ public class TokenPurchase {
         for (int tokens = Math.min(maxTokens(game, seat), reinforcements); tokens > 0; tokens--) {
             Optional<Wallet.Payment> payment = influencePlanets
                     .plan(SpendCost.influence(INFLUENCE_PER_TOKEN * tokens))
-                    .filter(plan -> wallet.without(plan).canPay(keep));
+                    .filter(plan -> afterPaying(game, seat, wallet, plan).canPay(keep));
             if (payment.isPresent()) return Optional.of(new Purchase(tokens, payment.get()));
         }
         return Optional.empty();
+    }
+
+    private static Wallet afterPaying(Game game, Player seat, Wallet wallet, Wallet.Payment payment) {
+        Wallet left = wallet.without(payment);
+        int readies =
+                ExpectedReadying.DIPLOMACY_READIES - seat.getExhaustedPlanets().size();
+        if (readies <= 0 || !holdsUnplayedDiplomacy(game, seat)) return left;
+        List<Wallet.PlanetValue> readied = wallet.planets().stream()
+                .filter(planet -> payment.forInfluence().contains(planet.name())
+                        || payment.forResources().contains(planet.name()))
+                .sorted(Comparator.comparingInt(
+                        (Wallet.PlanetValue planet) -> -(planet.resources() + planet.influence())))
+                .limit(readies)
+                .toList();
+        return left.withPlanetValues(
+                Stream.concat(left.planets().stream(), readied.stream()).toList());
+    }
+
+    private static boolean holdsUnplayedDiplomacy(Game game, Player seat) {
+        return seat.getSCs().stream()
+                .anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.DIPLOMACY
+                        && !game.getPlayedSCs().contains(card));
     }
 
     private static SpendCost kept(Game game, Player seat, Wallet wallet) {

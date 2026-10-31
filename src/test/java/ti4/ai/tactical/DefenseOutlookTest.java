@@ -94,6 +94,19 @@ class DefenseOutlookTest extends BaseTi4Test {
         assertThat(with).isLessThan(without);
     }
 
+    // Live game aiplay1: one PDS die (a coin flip) used to count as a sure kill of a lone landing infantry, so an
+    // undefended home planet with a PDS looked impossible to take. A miss lets the infantry walk in.
+    @Test
+    void aSinglePdsDieStopsALoneInfantryHalfTheTime() {
+        board.raidingFleet(1, 0, 1);
+        board.test.units(board.home, HOME_PLANET, board.test.nekro, UnitType.Pds, 1);
+
+        DefenseOutlook.Chances chances =
+                outlook().chances(board.sardakk, board.home, Horizon.IMMEDIATE, board.defenders());
+
+        assertThat(chances.groundMax()).isCloseTo(0.5, org.assertj.core.data.Offset.offset(TOLERANCE));
+    }
+
     // Test 2: in round 1 a passive neighbour with a lone carrier is no reason to hold anything back.
     @Test
     void anEarlyPassiveNeighbourIsNoThreat() {
