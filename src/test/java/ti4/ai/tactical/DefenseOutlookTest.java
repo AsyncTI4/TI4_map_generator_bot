@@ -94,6 +94,21 @@ class DefenseOutlookTest extends BaseTi4Test {
         assertThat(with).isLessThan(without);
     }
 
+    // Taking a home planet stops its owner scoring public objectives until it is retaken, so a public the seat is
+    // ready to score makes its home a better target.
+    @Test
+    void aPublicReadyToScoreMakesHomeABetterTarget() {
+        board.test.game.setRound(3);
+        board.raidingFleet(1, 2, 2);
+        garrison(1);
+        board.test.units(board.home, HOME_PLANET, board.test.nekro, UnitType.Pds, 3);
+        assertThat(outlook().blockedScoring()).isZero();
+
+        board.reveal("build_defenses");
+
+        assertThat(outlook().blockedScoring()).isPositive();
+    }
+
     // Live game aiplay1: one PDS die (a coin flip) used to count as a sure kill of a lone landing infantry, so an
     // undefended home planet with a PDS looked impossible to take. A miss lets the infantry walk in.
     @Test

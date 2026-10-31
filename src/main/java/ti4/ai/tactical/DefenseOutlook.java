@@ -58,6 +58,7 @@ public final class DefenseOutlook {
     private static final double CONTESTED_GAIN = 4.0;
     private static final double MIN_FEAR = 0.05;
     private static final double HOME_PRIZE = 3.0;
+    private static final double ONE_STEP_SHORT_BLOCK = 0.25;
     private static final double ACTION_COST = 2.0;
     private static final double THUNDERS_EDGE_ACTION_COST = 0.5;
     private static final double APPETITE_SCALE = 3.0;
@@ -737,7 +738,9 @@ public final class DefenseOutlook {
 
     private double appetite(Player enemy, Tile tile, IncomingForce force, Defenders defenders, Chances chances) {
         double denial = denial(tile);
-        double prize = planetPrize(tile) + publicGain(enemy, tile, force) + denial + (isHome(tile) ? HOME_PRIZE : 0);
+        double prize = planetPrize(tile)
+                + publicGain(enemy, tile, force)
+                + (isHome(tile) ? HOME_PRIZE + Math.max(denial, blockedScoring()) : denial);
         double spaceGain = Math.max(0, spaceGain(tile, force));
         if (isScoringCritical(tile) && !isHome(tile)) spaceGain += denial + SCORING_LOSS_SHARE * scoringLoss(tile);
         double space = chances.space();
@@ -745,6 +748,11 @@ public final class DefenseOutlook {
                 + space * (1 - space) * Math.min(force.fleetCost(), defenders.shipCost(seat))
                 + space * (1 - chances.groundMax()) * force.groundCost();
         return chances.take() * prize + space * spaceGain - attackerLoss - actionCost(enemy);
+    }
+
+    double blockedScoring() {
+        double blockedPoints = standings().publicPoints(seat) + (own().oneStepShort() ? ONE_STEP_SHORT_BLOCK : 0);
+        return standings().denialWeight(seat) * ObjectiveValue.VICTORY_POINT_VALUE * blockedPoints;
     }
 
     private double actionCost(Player enemy) {
