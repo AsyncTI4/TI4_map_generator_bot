@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
@@ -17,6 +18,13 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     @BeforeEach
     void setUp() {
         test = new AiTestGame();
+        rivalTactics(0);
+    }
+
+    private void rivalTactics(int tactics) {
+        for (Player other : test.game.getRealPlayers()) {
+            if (other != test.nekro) other.setTacticalCC(tactics);
+        }
     }
 
     @Test
@@ -45,17 +53,17 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         assertThat(CommandTokenPolicy.statusPhaseGain(test.sol)).isEqualTo(4);
     }
 
-    // With few tokens, tactics come first: two of them, then the starting fleet pool of three, then two strategy
-    // tokens for follows; past that, tactics again. A held Strategize puts one strategy token ahead of the second
-    // tactic token (see StrategizeTokensTest).
+    // With few tokens and no rival able to out-stall it, one tactic token comes first, then two strategy tokens to
+    // follow next round's Technology or Imperial, then a second tactic token. A held Strategize adds a third strategy
+    // token after that (see StrategizeTokensTest).
     @Test
-    void growsTwoTacticsThenTwoStrategyTokensThenTactics() {
+    void growsATacticThenTwoStrategyTokensThenTactics() {
         test.nekro.setTacticalCC(0);
         test.nekro.setFleetCC(3);
         test.nekro.setStrategicCC(0);
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
 
-        test.nekro.setTacticalCC(2);
+        test.nekro.setTacticalCC(1);
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_strategy_cc");
 
         test.nekro.setStrategicCC(1);
@@ -63,6 +71,65 @@ class CommandTokenPolicyTest extends BaseTi4Test {
 
         test.nekro.setStrategicCC(2);
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
+    }
+
+    // Players keep the fleet pool at their largest stack early on rather than at a standing three, and spend the rest
+    // on one tactic and two strategy tokens, the second tactic token coming after them: 1/2/2, 1/1/2 and 1/2/0.
+    @Test
+    void statusPhaseKeepsTheFleetAtTheLargestStackAndFollowsNextRound() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(1);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 2);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 5)).isEqualTo(split(1, 2, 2));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 3)).isEqualTo(split(1, 2, 0));
+    }
+
+    @Test
+    void statusPhaseWithASingleShipStackKeepsOneFleetToken() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(1);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 4)).isEqualTo(split(1, 1, 2));
+    }
+
+    // A rival holding more tactic tokens and other stalls than this seat could make it pass first, so tactic tokens
+    // to match them come before the strategy tokens: 2/1/0 against two of them, 3/1/1 against three.
+    @Test
+    void keepsTacticsToMatchARivalsStallsBeforeStrategyTokens() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(1);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+
+        rivalTactics(2);
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 3)).isEqualTo(split(2, 1, 0));
+
+        rivalTactics(3);
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 5)).isEqualTo(split(3, 1, 1));
+    }
+
+    // Round two rarely needs a stack bigger than three, so ships that could join a stack of three grow the fleet pool
+    // only from the round two status phase on.
+    @Test
+    void growsTheFleetPastThreeOnlyAfterRoundTwo() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 3);
+        Tile away = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(away, "space", test.nekro, UnitType.Destroyer, 1);
+
+        test.game.setRound(1);
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).containsEntry(CommandTokenPolicy.Pool.FLEET, 3);
+
+        test.game.setRound(2);
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).containsEntry(CommandTokenPolicy.Pool.FLEET, 4);
+    }
+
+    private static java.util.Map<CommandTokenPolicy.Pool, Integer> split(int tactic, int fleet, int strategy) {
+        return java.util.Map.of(
+                CommandTokenPolicy.Pool.TACTIC, tactic,
+                CommandTokenPolicy.Pool.FLEET, fleet,
+                CommandTokenPolicy.Pool.STRATEGY, strategy);
     }
 
     // Raise a Fleet needs five non-fighter ships in one system, which fleet supply only allows with five fleet tokens.
@@ -177,6 +244,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     // first. Here the fifth fleet token is no longer needed once Raise a Fleet is not on the table.
     @Test
     void redistributesSurplusTokensTowardTheIdealPools() {
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 3);
         test.nekro.setTacticalCC(1);
         test.nekro.setFleetCC(5);
         test.nekro.setStrategicCC(2);
@@ -230,6 +298,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     @Test
     void midRoundStrategyPoolMatchesTheSecondariesItMeansToFollow() {
         tokens(3, 3, 3);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 3);
         test.aiIsActive("action");
         test.sol.addSC(IMPERIAL);
 
@@ -244,6 +313,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     @Test
     void midRoundSurplusGoesToTactics() {
         tokens(3, 3, 3);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 3);
         test.aiIsActive("action");
 
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9))
@@ -259,7 +329,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         test.game.setPhaseOfGame("statusHomework");
         test.sol.addSC(IMPERIAL);
 
-        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9))
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 5))
                 .containsEntry(CommandTokenPolicy.Pool.STRATEGY, 2);
     }
 

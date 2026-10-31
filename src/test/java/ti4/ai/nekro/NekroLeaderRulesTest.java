@@ -149,6 +149,7 @@ class NekroLeaderRulesTest extends BaseTi4Test {
     // bot rewrites the token prompt after the first token, so the AI recognises the prompt by its message afterwards.
     @Test
     void paysForTheAgentWithATokenWhenItHasNoActionCards() {
+        test.units(test.nekroHome(), "space", test.nekro, ti4.helpers.Units.UnitType.Carrier, 3);
         test.nekro.setTacticalCC(4);
         test.game.setStoredValue("originalCCsFornekro", test.nekro.getCCRepresentation());
         AiPrompt tokens = loseTokens(test.nekro.getRepresentationUnfogged()
@@ -169,6 +170,12 @@ class NekroLeaderRulesTest extends BaseTi4Test {
     @Test
     void anyTargetedSeatPays() {
         AiTestGame solTable = AiTestGame.withSolAi();
+        solTable.units(
+                solTable.place("26", AiTestGame.neighbourOf(AiTestGame.HOME)),
+                "space",
+                solTable.sol,
+                ti4.helpers.Units.UnitType.Carrier,
+                3);
         solTable.sol.setTacticalCC(5);
         solTable.game.setStoredValue("originalCCsForsol", solTable.sol.getCCRepresentation());
         AiPrompt tokens = AiTestGame.withContent(

@@ -31,9 +31,12 @@ public class StallCount {
             Set.of("tf-fabrication", "tf-orbitaldrop", "tf-mantlecracking", "tf-stalltactics", "lgf", "vtx");
 
     public static double of(Game game, Player player, Player viewer) {
+        return tokens(game, player, player == viewer) + besidesTokens(game, player, viewer);
+    }
+
+    public static double besidesTokens(Game game, Player player, Player viewer) {
         boolean own = player == viewer;
-        return tokens(game, player, own)
-                + unplayedStrategyCards(game, player)
+        return unplayedStrategyCards(game, player)
                 + (own ? ownComponents(game, player) : publicComponents(player))
                 + (own ? ownHand(player) : hiddenHand(game, player));
     }
