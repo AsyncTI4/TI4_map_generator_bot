@@ -2,7 +2,7 @@ package ti4.game;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units;
@@ -79,7 +79,7 @@ class UnitHolderTest {
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
         unitHolder.addUnit(unitKey, 1000);
 
-        assertThat(unitHolder.getUnitCount(unitKey)).isEqualTo(SanityLimits.OTHER_UNITS_OF_A_KIND);
+        assertThat(unitHolder.getUnitCount(unitKey)).isEqualTo(SanityLimits.PLASTIC_UNITS);
     }
 
     @Test
@@ -89,15 +89,13 @@ class UnitHolderTest {
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
         unitHolder.addUnitsWithStates(unitKey, List.of(Integer.MAX_VALUE, 3, 0, 0));
 
-        assertThat(unitHolder.getUnitStates(unitKey).subList(0, 2))
-                .containsExactly(SanityLimits.OTHER_UNITS_OF_A_KIND, 0);
+        assertThat(unitHolder.getUnitStates(unitKey).subList(0, 2)).containsExactly(SanityLimits.PLASTIC_UNITS, 0);
     }
 
     @Test
-    void cappingLoadedStatesKeepsTheEarliestStates() {
-        Units.UnitKey unitKey = new Units.UnitKey(Units.UnitType.Fighter, "red");
-
-        List<Integer> capped = UnitHolder.capToHolderLimit(unitKey, List.of(990, 20, 5, 0));
+    void cappingStatesKeepsTheEarliestStates() {
+        List<Integer> capped =
+                UnitHolder.capStates(List.of(990, 20, 5, 0), SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE);
 
         assertThat(capped).containsExactly(990, 9, 0, 0);
     }

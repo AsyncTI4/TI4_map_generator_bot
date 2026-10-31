@@ -8,24 +8,23 @@ import ti4.helpers.Units.UnitType;
 public class SanityLimits {
 
     public static final int INFANTRY_AND_FIGHTERS_PER_TILE = 999;
-    public static final int OTHER_UNITS_OF_A_KIND = 99;
+    public static final int PLASTIC_UNITS = 99;
     public static final int COMMAND_TOKENS_PER_POOL = 99;
     public static final int TRADE_GOODS = 999;
     public static final int COMMODITIES = 999;
-    public static final int TRADE_GOODS_ON_CARD = 99;
-    public static final int DEBT_TOKENS_PER_COLOR = 99;
-    public static final int STASIS_UNITS = 99;
-    public static final int REPEATED_EMOJIS = 50;
+    public static final int TRADE_GOODS_ON_CARD = 999;
+    public static final int DEBT_TOKENS_PER_COLOR = 999;
+    public static final int STASIS_UNITS = 999;
 
     public static int unitsInOneHolder(UnitType unitType) {
-        return isTokenBacked(unitType) ? INFANTRY_AND_FIGHTERS_PER_TILE : OTHER_UNITS_OF_A_KIND;
+        return isTokenBacked(unitType) ? INFANTRY_AND_FIGHTERS_PER_TILE : PLASTIC_UNITS;
     }
 
     public static int reinforcementLimit(Game game, UnitKey unitKey) {
         Player owner = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
-        if (owner == null || owner.isNeutral()) return OTHER_UNITS_OF_A_KIND;
+        if (owner == null) return PLASTIC_UNITS;
         int reinforcements = owner.getUnitCap(unitKey.asyncID());
-        return reinforcements > 0 ? Math.min(reinforcements, OTHER_UNITS_OF_A_KIND) : OTHER_UNITS_OF_A_KIND;
+        return cap(reinforcements, PLASTIC_UNITS);
     }
 
     public static boolean isTokenBacked(UnitType unitType) {
@@ -37,6 +36,6 @@ public class SanityLimits {
     }
 
     public static int cappedSum(int current, int added, int max) {
-        return (int) Math.clamp((long) current + added, 0, max);
+        return Math.clamp((long) current + added, 0, max);
     }
 }

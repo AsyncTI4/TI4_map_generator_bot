@@ -74,7 +74,7 @@ class AddUnitSupplyLimitTest extends BaseTi4Test {
         AddUnitService.addUnits(null, tile, game, letnev.getColor(), "300 dreadnought");
 
         assertThat(ButtonHelper.getNumberOfUnitsOnTheBoard(game, key(UnitType.Dreadnought)))
-                .isEqualTo(SanityLimits.OTHER_UNITS_OF_A_KIND);
+                .isEqualTo(SanityLimits.PLASTIC_UNITS);
     }
 
     @Test

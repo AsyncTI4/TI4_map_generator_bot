@@ -20,7 +20,6 @@ class AddCustomPO extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.PO_NAME, "Public objective name").setRequired(true));
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.PO_VP_WORTH, "Victory points the public objective is worth")
-                .setRequiredRange(-99, 99)
                 .setRequired(true));
     }
 

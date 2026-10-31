@@ -13,15 +13,11 @@ class TwilightsFallSpliceWinRates extends Subcommand {
                 Constants.TWILIGHTS_FALL_SPLICE_WIN_RATES,
                 "Twilight's Fall splice ability, unit upgrade, and genome win rates");
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        GameStatisticsFilterer.PLAYER_COUNT_FILTER,
-                        "Filter by player count, e.g. 3-8")
-                .setRequiredRange(1, 30));
+                OptionType.INTEGER, GameStatisticsFilterer.PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        GameStatisticsFilterer.VICTORY_POINT_GOAL_FILTER,
-                        "Filter by victory point goal, e.g. 10-14")
-                .setRequiredRange(1, 99));
+                OptionType.INTEGER,
+                GameStatisticsFilterer.VICTORY_POINT_GOAL_FILTER,
+                "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, GameStatisticsFilterer.FOG_FILTER, "Filter by if the game is a fog game"));
         addOptions(new OptionData(

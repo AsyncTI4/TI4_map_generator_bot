@@ -20,7 +20,7 @@ class SetPlanetTradeGoods extends GameStateSubcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count")
-                .setRequiredRange(0, 99)
+                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

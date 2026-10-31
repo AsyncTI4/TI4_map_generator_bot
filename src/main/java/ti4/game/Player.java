@@ -2313,22 +2313,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public void setTacticalCC(int tacticalCC) {
-        if (tacticalCC >= 0) super.setTacticalCC(Math.min(tacticalCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
+        if (tacticalCC >= 0) super.setTacticalCC(SanityLimits.cap(tacticalCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     @Override
     public void setFleetCC(int fleetCC) {
-        if (fleetCC >= 0) super.setFleetCC(Math.min(fleetCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
+        if (fleetCC >= 0) super.setFleetCC(SanityLimits.cap(fleetCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     @Override
     public void setStasisInfantry(int stasisInfantry) {
-        super.setStasisInfantry(Math.min(stasisInfantry, SanityLimits.STASIS_UNITS));
+        super.setStasisInfantry(SanityLimits.cap(stasisInfantry, SanityLimits.STASIS_UNITS));
     }
 
     @Override
     public void setStasisFighters(int stasisFighters) {
-        super.setStasisFighters(Math.min(stasisFighters, SanityLimits.STASIS_UNITS));
+        super.setStasisFighters(SanityLimits.cap(stasisFighters, SanityLimits.STASIS_UNITS));
     }
 
     public String gainFleetCC(int amt) {
@@ -2347,7 +2347,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public void setStrategicCC(int strategicCC) {
-        if (strategicCC >= 0) super.setStrategicCC(Math.min(strategicCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
+        if (strategicCC >= 0) super.setStrategicCC(SanityLimits.cap(strategicCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     public double getExpectedHits() {
@@ -3304,7 +3304,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void setDebtTokens(Map<String, Integer> debtTokens, String pool) {
         Map<String, Integer> capped = new LinkedHashMap<>();
         debtTokens.forEach((color, count) ->
-                capped.put(color, count == null ? null : Math.min(count, SanityLimits.DEBT_TOKENS_PER_COLOR)));
+                capped.put(color, count == null ? null : SanityLimits.cap(count, SanityLimits.DEBT_TOKENS_PER_COLOR)));
         this.debtTokens.put(pool.toLowerCase(), capped);
     }
 
@@ -3319,8 +3319,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         int current = debtTokens.get(pool).getOrDefault(tokenColor, 0);
-        debtTokens.get(pool).put(tokenColor, (int)
-                Math.min((long) current + count, SanityLimits.DEBT_TOKENS_PER_COLOR));
+        debtTokens
+                .get(pool)
+                .put(tokenColor, SanityLimits.cappedSum(current, count, SanityLimits.DEBT_TOKENS_PER_COLOR));
     }
 
     public void removeDebtTokens(String tokenColor, int count) {

@@ -6,20 +6,23 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ti4.service.emoji.MiscEmojis;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // A mistyped count (e.g. 1314000146 infantry in pbd26171) once ran the render and button handlers out of memory.
 // These ceilings sit far above anything a real game reaches, so they only ever catch bad input.
 class SanityLimitsTest extends BaseTi4Test {
 
+    private Game game;
     private Player red;
 
     @BeforeEach
     void setUp() {
-        Game game = new Game();
+        game = new Game();
         game.setName("sanity-limits-test");
-        red = new Player("red-user", "Red", game);
+        red = game.addPlayer("red-user", "Red");
         red.setColor("red");
     }
 
@@ -80,9 +83,89 @@ class SanityLimitsTest extends BaseTi4Test {
     }
 
     @Test
-    void tradeGoodEmojisStopRepeating() {
-        String one = MiscEmojis.tg(1);
+    void capClampsToZeroAndMax() {
+        assertThat(SanityLimits.cap(5, 10)).isEqualTo(5);
+        assertThat(SanityLimits.cap(10, 10)).isEqualTo(10);
+        assertThat(SanityLimits.cap(11, 10)).isEqualTo(10);
+        assertThat(SanityLimits.cap(Integer.MAX_VALUE, 10)).isEqualTo(10);
+        assertThat(SanityLimits.cap(0, 10)).isZero();
+        assertThat(SanityLimits.cap(-3, 10)).isZero();
+        assertThat(SanityLimits.cap(Integer.MIN_VALUE, 10)).isZero();
+    }
 
-        assertThat(MiscEmojis.tg(1_000_000)).hasSize(one.length() * SanityLimits.REPEATED_EMOJIS);
+    @Test
+    void cappedSumClampsToZeroAndMax() {
+        assertThat(SanityLimits.cappedSum(4, 5, 10)).isEqualTo(9);
+        assertThat(SanityLimits.cappedSum(4, 6, 10)).isEqualTo(10);
+        assertThat(SanityLimits.cappedSum(4, 7, 10)).isEqualTo(10);
+        assertThat(SanityLimits.cappedSum(4, -3, 10)).isEqualTo(1);
+        assertThat(SanityLimits.cappedSum(4, -5, 10)).isZero();
+    }
+
+    @Test
+    void cappedSumDoesNotOverflow() {
+        assertThat(SanityLimits.cappedSum(Integer.MAX_VALUE, Integer.MAX_VALUE, 10))
+                .isEqualTo(10);
+        assertThat(SanityLimits.cappedSum(Integer.MIN_VALUE, Integer.MIN_VALUE, 10))
+                .isZero();
+    }
+
+    @Test
+    void onlyInfantryAndFightersAreTokenBacked() {
+        assertThat(SanityLimits.isTokenBacked(UnitType.Infantry)).isTrue();
+        assertThat(SanityLimits.isTokenBacked(UnitType.Fighter)).isTrue();
+        assertThat(SanityLimits.isTokenBacked(UnitType.Mech)).isFalse();
+        assertThat(SanityLimits.isTokenBacked(UnitType.Dreadnought)).isFalse();
+        assertThat(SanityLimits.isTokenBacked(UnitType.Spacedock)).isFalse();
+    }
+
+    @Test
+    void tokenBackedUnitsHaveTheHigherHolderLimit() {
+        assertThat(SanityLimits.unitsInOneHolder(UnitType.Infantry))
+                .isEqualTo(SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE);
+        assertThat(SanityLimits.unitsInOneHolder(UnitType.Fighter))
+                .isEqualTo(SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE);
+        assertThat(SanityLimits.unitsInOneHolder(UnitType.Dreadnought)).isEqualTo(SanityLimits.PLASTIC_UNITS);
+        assertThat(SanityLimits.unitsInOneHolder(UnitType.Mech)).isEqualTo(SanityLimits.PLASTIC_UNITS);
+    }
+
+    @Test
+    void reinforcementLimitFollowsTheOwnersUnitCapUpToThePlasticLimit() {
+        red.setFaction(game, "letnev");
+        UnitKey dreadnought = Units.getUnitKey(UnitType.Dreadnought, red.getColorID());
+
+        red.setUnitCap("dn", 5);
+        assertThat(SanityLimits.reinforcementLimit(game, dreadnought)).isEqualTo(5);
+
+        red.setUnitCap("dn", 500);
+        assertThat(SanityLimits.reinforcementLimit(game, dreadnought)).isEqualTo(SanityLimits.PLASTIC_UNITS);
+
+        red.setUnitCap("dn", 0);
+        assertThat(SanityLimits.reinforcementLimit(game, dreadnought)).isZero();
+    }
+
+    @Test
+    void reinforcementLimitWithoutAnOwnerIsThePlasticLimit() {
+        UnitKey unowned = Units.getUnitKey(UnitType.Dreadnought, "ylw");
+
+        assertThat(SanityLimits.reinforcementLimit(game, unowned)).isEqualTo(SanityLimits.PLASTIC_UNITS);
+    }
+
+    @Test
+    void negativeCommandTokenCountsAreIgnored() {
+        red.setTacticalCC(7);
+        red.setTacticalCC(-1);
+
+        assertThat(red.getTacticalCC()).isEqualTo(7);
+    }
+
+    @Test
+    void negativeStasisAndDebtCountsFloorAtZero() {
+        red.setStasisInfantry(-5);
+        assertThat(red.getStasisInfantry()).isZero();
+
+        red.addDebtTokens("blue", 3);
+        red.addDebtTokens("blue", -10);
+        assertThat(red.getDebtTokens()).containsEntry("blue", 0);
     }
 }

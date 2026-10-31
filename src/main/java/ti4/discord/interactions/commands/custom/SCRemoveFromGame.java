@@ -13,7 +13,6 @@ class SCRemoveFromGame extends GameStateSubcommand {
     public SCRemoveFromGame() {
         super(Constants.REMOVE_SC_FROM_GAME, "Remove a Strategy Card # from the game", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to remove")
-                .setRequiredRange(0, 99)
                 .setRequired(true));
     }
 

@@ -130,8 +130,9 @@ class RunAgainstSpecificGame extends Subcommand {
     }
 
     private static <K> boolean capValues(Map<K, Integer> counts, int max) {
-        boolean changed = counts.values().stream().anyMatch(count -> count != null && count > max);
-        counts.replaceAll((key, count) -> count == null ? null : Math.min(count, max));
+        boolean changed =
+                counts.values().stream().anyMatch(count -> count != null && count != SanityLimits.cap(count, max));
+        counts.replaceAll((key, count) -> count == null ? null : SanityLimits.cap(count, max));
         return changed;
     }
 }
