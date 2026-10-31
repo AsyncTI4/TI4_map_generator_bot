@@ -15,7 +15,6 @@ class MarkFollowed extends GameStateSubcommand {
         super(Constants.MARK_FOLLOWED, "Mark player as having followed a strategy card", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.SC, "Initiative number for the strategy card being followed")
-                .setRequiredRange(0, 99)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color following")
                 .setAutoComplete(true)

@@ -80,7 +80,6 @@ import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.game.SanityLimits;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.GameManager;
@@ -4200,7 +4199,7 @@ public final class Helper {
     private record UnitTypeAndCount(UnitType unitType, int count) {
         public String emojis() {
             String emoji = unitType().getUnitTypeEmoji().toString();
-            return StringUtils.repeat(emoji, Math.min(count, SanityLimits.unitsInOneHolder(unitType())));
+            return StringUtils.repeat(emoji, count);
         }
     }
 

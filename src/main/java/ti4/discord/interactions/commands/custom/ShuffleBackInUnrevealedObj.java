@@ -19,11 +19,8 @@ class ShuffleBackInUnrevealedObj extends GameStateSubcommand {
                 true,
                 true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location of the unrevealed objective")
-                .setRequiredRange(1, 30)
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STAGE_1_OR_2, "Stage 1 or 2")
-                .setRequiredRange(1, 2)
-                .setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STAGE_1_OR_2, "Stage 1 or 2").setRequired(true));
     }
 
     @Override

@@ -30,7 +30,7 @@ class ResumeChannelExport extends Subcommand {
                                 Constants.EXPORT_MAX_SIZE_MB,
                                 "New size cap in MB for the whole export; 0 removes it (default keeps the old cap)")
                         .setRequired(false)
-                        .setRequiredRange(0, 100_000));
+                        .setRequiredRange(0, 500));
     }
 
     @Override

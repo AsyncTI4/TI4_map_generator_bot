@@ -14,7 +14,6 @@ class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
     public PutDiscardBackIntoDeckEvents() {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put event back into deck from discard", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID, which is found between ()")
-                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,

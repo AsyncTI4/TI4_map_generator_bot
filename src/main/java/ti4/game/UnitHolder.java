@@ -118,10 +118,6 @@ public abstract class UnitHolder {
         return Math.max(0, SanityLimits.unitsInOneHolder(unit.unitType()) - getTotalUnitCount(states));
     }
 
-    public static List<Integer> capToHolderLimit(UnitKey unit, List<Integer> states) {
-        return capStates(states, SanityLimits.unitsInOneHolder(unit.unitType()));
-    }
-
     public static List<Integer> capStates(List<Integer> states, int max) {
         int room = max;
         List<Integer> capped = new ArrayList<>();

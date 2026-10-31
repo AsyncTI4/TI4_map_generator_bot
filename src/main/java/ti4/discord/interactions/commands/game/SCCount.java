@@ -29,10 +29,6 @@ class SCCount extends GameStateSubcommand {
         }
 
         int sc = scOption.getAsInt();
-        if (sc > 99) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card count can be at most 99.");
-            return;
-        }
         if (sc < 8) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),

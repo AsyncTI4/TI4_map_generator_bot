@@ -60,15 +60,13 @@ class Stats extends GameStateSubcommand {
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_BASE, "Base commodity value")
                         .setRequiredRange(0, 99))
                 .addOptions(
-                        new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
-                                .setRequiredRange(0, 99))
+                        new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "Number of turns this round")
                         .setRequiredRange(0, 99))
                 .addOptions(new OptionData(
-                                OptionType.INTEGER,
-                                Constants.SC_PLAYED,
-                                "Flip a strategy card's played status; enter the initiative number")
-                        .setRequiredRange(0, 99))
+                        OptionType.INTEGER,
+                        Constants.SC_PLAYED,
+                        "Flip a strategy card's played status; enter the initiative number"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.TYRANT, "Set whether player is tyrant y/n"))

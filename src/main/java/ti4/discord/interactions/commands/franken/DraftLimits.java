@@ -38,8 +38,7 @@ class DraftLimits extends GameStateSubcommand {
         super(Constants.DRAFT_LIMITS, "Set limits for franken draft", true, false);
         // Automatically add all options from the list
         for (LimitConfig limit : LIMITS) {
-            addOptions(
-                    new OptionData(OptionType.INTEGER, limit.constant(), limit.description()).setRequiredRange(0, 20));
+            addOptions(new OptionData(OptionType.INTEGER, limit.constant(), limit.description()));
         }
     }
 

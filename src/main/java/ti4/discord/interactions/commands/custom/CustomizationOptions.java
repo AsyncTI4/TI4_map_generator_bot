@@ -99,7 +99,7 @@ class CustomizationOptions extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.FAST_SC_FOLLOW,
                         "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off")
-                .setRequiredRange(0, 720));
+                .setRequiredRange(0, 240));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.UNIT_SOURCE,
