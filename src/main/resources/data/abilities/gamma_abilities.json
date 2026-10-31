@@ -1,7 +1,7 @@
 [
     {
         "id": "fruiting_bodies",
-        "name": "Fruiting Bodies",
+        "name": "Fruiting Bodies - legacy",
         "faction": "diaspora",
         "window": "After you or 1 of your neighbours uses the PRODUCTION ability of 1 or more of their units",
         "windowEffect": "capture 1 infantry from your reinforcements.",
@@ -9,7 +9,7 @@
     },
     {
         "id": "megaflora",
-        "name": "Megaflora",
+        "name": "Megaflora - legacy",
         "faction": "diaspora",
         "window": "When you capture infantry",
         "windowEffect": "place each captured infantry on the planet card of a planet you control.",
@@ -18,12 +18,29 @@
     },
     {
         "id": "dizurga_emissaries",
-        "name": "Dizurga Emissaries",
+        "name": "Emissaries",
         "faction": "diaspora",
-        "window": "When you exhaust a planet to cast votes",
-        "windowEffect": "you may return any number of captured infantry from its planet card to cast 1 additional vote for each infantry returned.",
+        "window": "When you cast votes",
+        "windowEffect": "you may remove any number of infantry from planets you control to cast 1 additional vote for every 2 infantry returned.",
         "source": "gamma"
     },
+    {
+        "id": "cortage",
+        "name": "Cortage",
+        "faction": "diaspora",
+        "window": "After a strategy card is exhausted",
+        "windowEffect": "place 2 infantry from your reinforcements onto a planet you control.",
+        "source": "gamma"
+    },
+    {
+        "id": "blighted",
+        "name": "Blighted",
+        "faction": "diaspora",
+        "window": "During tactical actions, when you would assign 1 or more hits to your ground forces",
+        "windowEffect": "assign twice as many.",
+        "source": "gamma"
+    },
+    
     {
         "id": "cranial_modules",
         "name": "Cranial Modules",
