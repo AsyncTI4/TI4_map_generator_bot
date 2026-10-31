@@ -1,8 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1920,7 +1918,7 @@ public class CombatRollService {
                     numOfUnit = ogNumOfUnit - 1;
                     numRolls -= numRollsPerUnit + Math.min(1, extraRollsForUnit);
                 }
-                if (numRolls == 0) {
+                if (numRolls < 1) {
                     continue;
                 }
                 RollSegmentType segmentType =
