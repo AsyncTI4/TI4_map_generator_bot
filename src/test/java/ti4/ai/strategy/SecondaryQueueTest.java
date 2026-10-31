@@ -96,6 +96,22 @@ class SecondaryQueueTest extends BaseTi4Test {
         assertThat(StrategyCardRules.awaitFollowTurn(nekroContext())).isEmpty();
     }
 
+    // Live game aiplay1: the AIs waited on a human's Diplomacy answer with no sign of it, so the game looked stuck. The
+    // first AI to wait on a human pings them once for that card, then waits quietly.
+    @Test
+    void pingsTheHumanItWaitsOnOncePerCard() {
+        SecondaryQueue.forget(test.game.getName());
+
+        assertThat(StrategyCardRules.awaitFollowTurn(nekroContext()))
+                .hasValueSatisfying(decision -> assertThat(decision)
+                        .isInstanceOfSatisfying(
+                                AiDecision.Announce.class,
+                                announce -> assertThat(announce.text())
+                                        .contains(human.getRepresentation())
+                                        .contains("Imperial")));
+        assertThat(StrategyCardRules.awaitFollowTurn(nekroContext())).containsInstanceOf(AiDecision.Wait.class);
+    }
+
     @Test
     void anAbandonedStepStopsBlockingAfterTenMinutes() {
         human.addFollowedSC(IMPERIAL);

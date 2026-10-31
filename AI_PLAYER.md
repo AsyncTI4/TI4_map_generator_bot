@@ -420,7 +420,7 @@ to build one by hand:
   its last step) is open or an earlier player has not answered yet, or an earlier AI seat is still choosing its
   technology, paying for it, placing its structure, readying planets or building. An AI holder does not end its turn,
   play a second card or act again until every other player has followed or declined and the AI followers have
-  finished their steps. It waits for a human as long as it takes; an open step of an AI seat is given up after 10
+  finished their steps. It waits for a human as long as it takes, and the first AI to wait on a human pings them once for that card; an open step of an AI seat is given up after 10
   minutes. A human holder's primary cannot be seen, so AI followers only wait for the players ahead of them.
 
   Follows that cost a strategy token are ranked Imperial, Technology, Diplomacy, Warfare, Construction, Politics,

@@ -3,8 +3,10 @@ package ti4.ai.strategy;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiSeats;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -15,6 +17,7 @@ public class SecondaryQueue {
     public static final long RECHECK_MILLIS = 10_000L;
     private static final long STALE_MILLIS = 10 * 60_000L;
     private static final Map<String, Map<String, Long>> OPEN = new ConcurrentHashMap<>();
+    private static final Map<String, Set<String>> PINGED = new ConcurrentHashMap<>();
 
     public static void primaryStarted(Game game, int initiative, long now) {
         open(game).put(primaryKey(game, initiative), now);
@@ -34,6 +37,23 @@ public class SecondaryQueue {
 
     public static void forget(String gameName) {
         OPEN.remove(gameName);
+        PINGED.remove(gameName);
+    }
+
+    public static Optional<Player> humanToPing(Game game, Player seat, int initiative, long now) {
+        Player holder = game.getPlayerFromSC(initiative);
+        if (holder == null) return Optional.empty();
+        if (isOpen(game, primaryKey(game, initiative), now)) return Optional.empty();
+        for (Player player : PlayStrategyCardService.getPlayersInFollowOrder(game, holder)) {
+            if (player == seat) return Optional.empty();
+            if (player == holder || player.hasFollowedSC(initiative)) continue;
+            if (AiSeats.isAiSeat(player)) return Optional.empty();
+            String key = game.getRound() + "|ping|" + initiative + "|" + player.getFaction();
+            boolean first = PINGED.computeIfAbsent(game.getName(), name -> ConcurrentHashMap.newKeySet())
+                    .add(key);
+            return first ? Optional.of(player) : Optional.empty();
+        }
+        return Optional.empty();
     }
 
     public static Map<String, Long> snapshot(String gameName) {

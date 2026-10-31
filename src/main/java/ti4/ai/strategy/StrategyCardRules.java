@@ -161,6 +161,10 @@ public class StrategyCardRules {
 
     public static Optional<AiDecision> awaitSecondaries(AiTurnContext context) {
         if (!context.isActivePlayer()) return Optional.empty();
+        Optional<AiDecision> ping = playedInitiative(context)
+                .filter(initiative -> !overruledThisTurn(context))
+                .flatMap(initiative -> pingWaitedOnHuman(context, initiative));
+        if (ping.isPresent()) return ping;
         return unfinishedSecondary(context)
                 .map(player -> new AiDecision.Wait(
                         context.now() + SecondaryQueue.RECHECK_MILLIS, "the secondary of its card from " + player));
@@ -173,12 +177,22 @@ public class StrategyCardRules {
             if (seat.getSCs().contains(initiative) || seat.hasFollowedSC(initiative)) continue;
             Optional<String> blocker = SecondaryQueue.blockerFor(game, seat, initiative, context.now());
             if (blocker.isPresent()) {
+                Optional<AiDecision> ping = pingWaitedOnHuman(context, initiative);
+                if (ping.isPresent()) return ping;
                 return Optional.of(new AiDecision.Wait(
                         context.now() + SecondaryQueue.RECHECK_MILLIS,
                         "its turn to follow strategy card " + initiative + " after " + blocker.get()));
             }
         }
         return Optional.empty();
+    }
+
+    private static Optional<AiDecision> pingWaitedOnHuman(AiTurnContext context, int initiative) {
+        Game game = context.game();
+        return SecondaryQueue.humanToPing(game, context.seat(), initiative, context.now())
+                .map(human -> new AiDecision.Announce(human.getRepresentation()
+                        + ", the AI players are waiting for you to follow or decline **"
+                        + Helper.getSCName(initiative, game) + "** before they go on."));
     }
 
     private static Optional<String> unfinishedSecondary(AiTurnContext context) {
