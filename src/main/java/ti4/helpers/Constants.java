@@ -1284,6 +1284,8 @@ public final class Constants {
     public static final String LATERPICK_LIMIT = "laterpick_limit";
 
     public static final String ABILITY = "ability";
+    public static final String ABILITY_EXHAUST = "exhaust_ability";
+    public static final String ABILITY_READY = "ready_ability";
     public static final String BAN = "ban";
     public static final String DRAFT_LIMITS = "draft_limits";
     public static final String BAN_ABILITY = "ban_ability";

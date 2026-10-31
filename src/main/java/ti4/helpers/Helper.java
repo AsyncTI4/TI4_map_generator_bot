@@ -48,6 +48,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePr
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
@@ -1409,6 +1410,10 @@ public final class Helper {
         for (String thing : spentThings) {
             boolean found = false;
             switch (thing) {
+                case "bepnmigo" -> {
+                    msg.append("> Used _Extraction Science_ as a technology specialty\n");
+                    found = true;
+                }
                 case "sarween" -> {
                     msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + "\n");
                     res += 1;
@@ -1456,6 +1461,19 @@ public final class Helper {
                     } else {
                         res += planet.getInfluence();
                     }
+                }
+                found = true;
+            }
+            if (thing.startsWith("pseudomorphism_")) {
+                String planetName = thing.substring("pseudomorphism_".length());
+                Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetName));
+                if (planet != null) {
+                    msg.append("> Used **Pseudomorphism** with ")
+                            .append(planetWithResourcesAndInfluence.apply(planetName))
+                            .append(" for a ")
+                            .append(planet.getInfluence())
+                            .append(" discount\n");
+                    res += planet.getInfluence();
                 }
                 found = true;
             }
@@ -2640,6 +2658,7 @@ public final class Helper {
                 && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
             productionValueTotal *= 2;
         }
+        productionValueTotal += MigoHarvestHandler.getYellowHarvestProductionBonus(game, player, tile);
         return productionValueTotal;
     }
 
@@ -2718,6 +2737,7 @@ public final class Helper {
             if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
                 cost = Math.max(0, cost - 1);
             }
+            cost = Math.max(0, cost - MigoHarvestHandler.getYellowHarvestProductionDiscount(game, player));
             cost = Math.max(0, cost - ThirtyKExploreHooks.productionDiscount(game, producedUnits));
             if (game.isMonumentsMode()) {
                 if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
@@ -2806,6 +2826,7 @@ public final class Helper {
         }
         List<Button> unitButtons = new ArrayList<>();
         player.resetProducedUnits();
+        MigoHarvestHandler.clearYellowHarvestProduction(game, player);
         boolean asn = warfareNOtherstuff.contains("asn");
         warfareNOtherstuff = warfareNOtherstuff.replace("asn", "");
         ArcanumBreakthroughHandler.setPowerWordWishProductionContext(game, player, warfareNOtherstuff);
@@ -3246,6 +3267,8 @@ public final class Helper {
                 unitButtons.add(Buttons.gray("startMoyinsChosen", "Use Moyin's Chosen", FactionEmojis.Yin));
             }
         }
+
+        MigoHarvestHandler.addYellowHarvestButton(unitButtons, game, player, tile);
 
         return unitButtons;
     }

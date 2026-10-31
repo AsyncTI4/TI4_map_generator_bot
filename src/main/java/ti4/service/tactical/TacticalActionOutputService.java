@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystell
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -403,6 +404,11 @@ public class TacticalActionOutputService {
         UnitModel unitModel = player.getUnitFromUnitKey(unit);
         if (unitModel != null
                 && unitModel.getIsShip()
+                && MigoTechHandler.hasLaghMetalAttractorsMovementBonus(game, player)) {
+            output.append(" (Applies +1 to their ships MOVE value due to _Lagh-Metal Attractors_)");
+        }
+        if (unitModel != null
+                && unitModel.getIsShip()
                 && player.hasAbility("sacred_passage")
                 && isSacredPassageOrigin(game, player, tile, allMovingUnits)) {
             output.append(
@@ -487,6 +493,9 @@ public class TacticalActionOutputService {
                     .max(Integer::compare)
                     .orElse(baseMoveValue);
             bonusMoveValue = maxBase - baseMoveValue;
+        }
+        if (model.getIsShip() && MigoTechHandler.hasLaghMetalAttractorsMovementBonus(game, player)) {
+            bonusMoveValue++;
         }
 
         boolean tileHasBreach = tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);

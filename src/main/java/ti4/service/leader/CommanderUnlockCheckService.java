@@ -3,6 +3,7 @@ package ti4.service.leader;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
@@ -352,6 +353,17 @@ public class CommanderUnlockCheckService {
                                 .filter(planet -> planet.getUnitCount(UnitType.Infantry, player) >= 3)
                                 .count()
                         >= 3;
+            case "migo" -> {
+                int techSpecialtyPlanets = player.getPlanets().stream()
+                        .map(game.getPlanetsInfo()::get)
+                        .filter(Objects::nonNull)
+                        .filter(planet -> !planet.getTechSpecialities().isEmpty())
+                        .map(Planet::getName)
+                        .collect(Collectors.toSet())
+                        .size();
+
+                shouldBeUnlocked = techSpecialtyPlanets >= 3;
+            }
 
             // theodisi
             case "ardentia",

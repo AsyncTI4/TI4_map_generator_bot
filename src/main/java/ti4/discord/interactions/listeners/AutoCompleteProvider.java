@@ -1006,7 +1006,10 @@ class AutoCompleteProvider {
                 try {
                     Player player = CommandHelper.getPlayerFromGame(
                             game, event.getMember(), event.getUser().getId());
-                    if (player != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
+                    if (player != null
+                            && (Constants.ABILITY_REMOVE.equals(subcommandName)
+                                    || Constants.ABILITY_READY.equals(subcommandName)
+                                    || Constants.ABILITY_EXHAUST.equals(subcommandName))) {
                         for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
                         }

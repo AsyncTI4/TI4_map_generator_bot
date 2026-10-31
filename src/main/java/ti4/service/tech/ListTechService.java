@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
@@ -45,6 +46,8 @@ public class ListTechService {
     private static final Pattern G = Pattern.compile("G");
     private static final Pattern X = Pattern.compile("X");
     private static final String PROPAGATION_CHOICE = "propagationChoice_";
+
+    private record SpecialtyConversion(String planet, String specialty) {}
 
     @ButtonHandler("acquireATechWithSC")
     public void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -288,6 +291,15 @@ public class ListTechService {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
         String message = player.getRepresentation() + ", please choose which technology you wish to get.";
+        if (MigoPromissoryHandler.hasExtractionScience(player, game)) {
+            String reminder =
+                    "You have _Extraction Science_; while researching, you may treat 1 of your technology specialties as any color.";
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), reminder);
+            } else {
+                message += "\n-# " + reminder;
+            }
+        }
 
         if (!techType.contains("allTechResearchable")) {
             ButtonHelper.deleteMessage(event);
@@ -304,6 +316,34 @@ public class ListTechService {
     }
 
     public static boolean isTechResearchable(TechnologyModel tech, Player player) {
+        if (isTechResearchable(tech, player, null)) {
+            return true;
+        }
+        if (!MigoPromissoryHandler.hasExtractionScience(player, player.getGame())) {
+            return false;
+        }
+
+        Game game = player.getGame();
+        for (String planetId : player.getPlanets()) {
+            if (player.getExhaustedPlanets().contains(planetId)
+                    && !(player.hasTech("pa") || player.hasTech("absol_pa"))) {
+                continue;
+            }
+            Planet planet = game.getPlanetsInfo().get(planetId);
+            if (planet == null || !ButtonHelper.checkForTechSkips(game, planetId)) {
+                continue;
+            }
+            for (String specialty : planet.getTechSpecialities()) {
+                if (isTechResearchable(tech, player, new SpecialtyConversion(planetId, specialty))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isTechResearchable(
+            TechnologyModel tech, Player player, SpecialtyConversion specialtyConversion) {
         Game game = player.getGame();
         String requirements = tech.getRequirements().orElse("");
         int wilds = 0;
@@ -347,6 +387,15 @@ public class ListTechService {
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 List<String> techTypes = unitHolder.getTechSpecialities();
                 for (String type : techTypes) {
+                    if (specialtyConversion != null
+                            && specialtyConversion.planet().equals(planet)
+                            && specialtyConversion.specialty().equalsIgnoreCase(type)) {
+                        wilds++;
+                        if (player.hasAbility("ancient_knowledge")) {
+                            wilds++;
+                        }
+                        continue;
+                    }
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
                     } else {

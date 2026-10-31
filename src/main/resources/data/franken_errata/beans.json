@@ -243,5 +243,13 @@
         "itemId": "migo",
         "undraftable": true,
         "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "pseudomorphism",
+        "optionalSwaps": [
+            "HOMESYSTEM:migo"
+        ],
+        "source": "beans"
     }
 ]

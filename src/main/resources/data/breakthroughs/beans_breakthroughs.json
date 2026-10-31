@@ -104,7 +104,7 @@
             "BIOTIC",
             "WARFARE"
         ],
-        "text": "Planets you control that have technology specialties cannot be exhausted by other players. When another player would gain control of one of those planets, you may exhaust 1 technology to force those units into coexistence instead.",
+        "text": "Planets you control that have technology specialties cannot be exhausted by other players. When another player commits units onto one of those planets, you may exhaust 1 technology to force those units into coexistence instead.",
         "source": "beans"
     }
 ]

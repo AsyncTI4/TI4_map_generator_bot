@@ -52,5 +52,26 @@
         "imagePath": "attachment_ase.png",
         "isFakeAttachment": true,
         "source": "beans"
+    },
+    {
+        "id": "mcp",
+        "name": "Migo Commander Positive",
+        "imagePath": "attachment_mcp.png",
+        "isFakeAttachment": true,
+        "resourcesModifier": 1,
+        "influenceModifier": 1,
+        "source": "beans"
+    },
+    {
+        "id": "migomechspec",
+        "name": "Nevermen Mech Spec",
+        "imagePath": "attachment_migomechspec.png",
+        "techSpeciality": [
+            "biotic",
+            "cybernetic",
+            "propulsion",
+            "warfare"
+        ],
+        "source": "beans"
     }
 ]

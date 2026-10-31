@@ -383,7 +383,7 @@
         "alias": "migo",
         "factionName": "Mi-Go Yth",
         "homeSystem": "be9",
-        "startingFleet": "2 cv, 1 dd, 2 ff, 4 inf m, 1 sd m",
+        "startingFleet": "2 cv, 1 dd, 2 ff, 4 inf yuggoth, 1 sd yuggoth",
         "commodities": 3,
         "factionTech": [
             "bemigob",

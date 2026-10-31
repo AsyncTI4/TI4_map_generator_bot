@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -100,6 +101,7 @@ class SpendingButtonHandler {
         }
         PlanetExhaust.doAction(player, planetName, game);
         player.addSpentThing(planetName);
+        MigoAbilityHandler.offerPseudomorphism(event, game, player, planetName, whatIsItFor);
         ThirtyKExploreHooks.onPlanetExhausted(event, game, player, planetName);
         IxthLegendaryButtonHandler.onPlanetSpent(game, player, planetName, whatIsItFor);
 
