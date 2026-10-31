@@ -188,7 +188,6 @@ public class CheckDistanceHelper {
                 }
 
                 addAdjacentPositionsIfNotThereYet(game, existingPosition, distances, player, distance + num);
-                addNebulaAdjacenciesIfNotThereYet(game, existingPosition, distances, player, distance + num);
             }
         }
 
@@ -202,17 +201,6 @@ public class CheckDistanceHelper {
     private static void addAdjacentPositionsIfNotThereYet(
             Game game, String position, Map<String, Integer> distances, Player player, int distance) {
         for (String tilePosition : adjacentPositions(game, position, player)) {
-            if (distances.get(tilePosition) != null && distances.get(tilePosition) > distance) {
-                distances.remove(tilePosition);
-            }
-            distances.putIfAbsent(tilePosition, distance);
-        }
-    }
-
-    private static void addNebulaAdjacenciesIfNotThereYet(
-            Game game, String position, Map<String, Integer> distances, Player player, int distance) {
-        Tile tile = game.getTileByPosition(position);
-        for (String tilePosition : DreamFactionTechHandler.getNebulaAdjacencies(game, player, tile)) {
             if (distances.get(tilePosition) != null && distances.get(tilePosition) > distance) {
                 distances.remove(tilePosition);
             }

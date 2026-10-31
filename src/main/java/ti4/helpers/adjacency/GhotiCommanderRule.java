@@ -7,26 +7,14 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
 
-final class GhotiCommanderRule implements AdjacencyRule {
+final class GhotiCommanderRule implements SymmetricAdjacencyRule {
 
     @Override
     public void from(AdjacencyContext context, String position, Set<String> adjacent) {
         Set<Tile> emptyTiles = linkedEmptyTiles(context);
         Tile tile = context.getGame().getTileByPosition(position);
-        if (emptyTiles.isEmpty() || tile == null || !tile.getPlanetUnitHolders().isEmpty()) return;
+        if (tile == null || !emptyTiles.contains(tile)) return;
         emptyTiles.forEach(emptyTile -> adjacent.add(emptyTile.getPosition()));
-    }
-
-    @Override
-    public void into(AdjacencyContext context, String position, Set<String> sources) {
-        Set<Tile> emptyTiles = linkedEmptyTiles(context);
-        Tile target = context.getGame().getTileByPosition(position);
-        if (target == null || !emptyTiles.contains(target)) return;
-        for (Tile tile : context.getGame().getTileMap().values()) {
-            if (tile.getPlanetUnitHolders().isEmpty()) {
-                sources.add(tile.getPosition());
-            }
-        }
     }
 
     private static Set<Tile> linkedEmptyTiles(AdjacencyContext context) {

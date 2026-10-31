@@ -33,7 +33,8 @@ public final class AdjacencyContext {
     }
 
     public boolean hasActivatedSystem() {
-        return !game.getCurrentActiveSystem().isEmpty();
+        String activeSystem = game.getCurrentActiveSystem();
+        return activeSystem != null && !activeSystem.isEmpty();
     }
 
     @SuppressWarnings("unchecked")

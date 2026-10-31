@@ -65,7 +65,6 @@ final class IngressEgressRule implements AdjacencyRule {
         private final Player player;
         private final boolean scarAsIngress;
         private final boolean wormholeAsIngress;
-        private final boolean frameShift;
         private final boolean anomalyAsIngress;
         private final Map<String, Set<Feature>> links = new HashMap<>();
         private final Map<String, Set<Feature>> accepts = new HashMap<>();
@@ -73,12 +72,10 @@ final class IngressEgressRule implements AdjacencyRule {
         private State(AdjacencyContext context) {
             game = context.getGame();
             player = context.getPlayer();
-            Player activePlayer = game.getActivePlayer();
-            scarAsIngress = activePlayer != null && activePlayer.hasUnlockedBreakthrough("nivynbt");
-            frameShift = activePlayer != null && FrameShiftBrActionCardHandler.isActive(game, activePlayer);
-            wormholeAsIngress = activePlayer != null
-                            && (activePlayer.hasTech("tf-fraactalspikedrives") || activePlayer.hasTech("fsd"))
-                    || frameShift;
+            scarAsIngress = player != null && player.hasUnlockedBreakthrough("nivynbt");
+            boolean frameShift = FrameShiftBrActionCardHandler.isActive(game, player);
+            wormholeAsIngress =
+                    player != null && (player.hasTech("tf-fraactalspikedrives") || player.hasTech("fsd")) || frameShift;
             anomalyAsIngress = player != null && game.playerHasLeaderUnlockedOrAlliance(player, "nataucommander");
         }
 
@@ -92,29 +89,32 @@ final class IngressEgressRule implements AdjacencyRule {
 
         private Set<Feature> computeLinks(Tile tile) {
             Set<Feature> features = EnumSet.noneOf(Feature.class);
-            if (tile.hasEgress()) features.add(Feature.INGRESS);
-            if (tile.hasIngress()) features.add(Feature.EGRESS);
+            if (actsAsEgress(tile)) features.add(Feature.INGRESS);
+            if (actsAsIngress(tile)) features.add(Feature.EGRESS);
             if (game.isCosmicPhenomenaeMode() && tile.isScar(game)) features.add(Feature.SCAR);
-            if (scarAsIngress && tile.isScar(game)) features.add(Feature.EGRESS);
-            if (wormholeAsIngress && !tile.getWormholes(game).isEmpty()) features.add(Feature.EGRESS);
             if (hasToken(tile, Constants.TOKEN_BREACH_ACTIVE)) features.add(Feature.BREACH);
-            if (hasToken(tile, Constants.TOKEN_INGRESS)) features.add(Feature.EGRESS);
-            if (hasToken(tile, Constants.TOKEN_EGRESS)) features.add(Feature.INGRESS);
-            if (anomalyAsIngress && tile.isAnomaly(game, player)) features.add(Feature.EGRESS);
             return features;
         }
 
         private Set<Feature> computeAccepts(Tile tile) {
             Set<Feature> features = EnumSet.noneOf(Feature.class);
-            if (tile.hasEgress() || hasToken(tile, Constants.TOKEN_EGRESS)) features.add(Feature.EGRESS);
-            if (tile.hasIngress()
-                    || hasToken(tile, Constants.TOKEN_INGRESS)
-                    || frameShift && !tile.getWormholes(game).isEmpty()) {
-                features.add(Feature.INGRESS);
-            }
+            if (actsAsEgress(tile)) features.add(Feature.EGRESS);
+            if (actsAsIngress(tile)) features.add(Feature.INGRESS);
             if (game.isCosmicPhenomenaeMode() && tile.isScar(game)) features.add(Feature.SCAR);
             if (hasToken(tile, Constants.TOKEN_BREACH_ACTIVE)) features.add(Feature.BREACH);
             return features;
+        }
+
+        private boolean actsAsEgress(Tile tile) {
+            return tile.hasEgress() || hasToken(tile, Constants.TOKEN_EGRESS);
+        }
+
+        private boolean actsAsIngress(Tile tile) {
+            return tile.hasIngress()
+                    || hasToken(tile, Constants.TOKEN_INGRESS)
+                    || scarAsIngress && tile.isScar(game)
+                    || wormholeAsIngress && !tile.getWormholes(game).isEmpty()
+                    || anomalyAsIngress && tile.isAnomaly(game, player);
         }
     }
 }

@@ -8,10 +8,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -34,6 +34,9 @@ import ti4.service.planet.AsgardLegendaryService;
  * AdjacencyParityTest compares the new API against it. Do not "fix" anything here: it is the baseline.
  * Intended rule changes since then, each marked "Changed in" below:
  * - PR-M: custom links read primary -> listed for every purpose (vision already did).
+ * - PR-R: things treated as ingress work both ways and belong to the queried player; Sever is movement-only at
+ *   both ends; gate folding works at both ends for everyone during the folder's tactical action; the Ghost agent
+ *   links only the activated system; Ghoti uses the same empty systems on both ends; Dream nebulae are movement.
  */
 final class LegacyAdjacency {
 
@@ -57,6 +60,9 @@ final class LegacyAdjacency {
 
         if (forDistance) {
             NatauAbilityHandler.addChaosTurbineAdjacencies(game, player, position, adjacentPositions);
+            // Changed in PR-R: Dream nebula links moved here from CheckDistanceHelper.
+            adjacentPositions.addAll(
+                    DreamFactionTechHandler.getNebulaAdjacencies(game, player, game.getTileByPosition(position)));
         }
 
         if (player != null
@@ -152,8 +158,8 @@ final class LegacyAdjacency {
             Set<Tile> emptyTiles = FoWHelper.getEmptyTiles(game);
             boolean containsUnits =
                     emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(tile::containsPlayersUnits));
-            if (containsUnits
-                    && game.getTileByPosition(position).getPlanetUnitHolders().isEmpty()) {
+            // Changed in PR-R: the queried system must be one of the same empty systems.
+            if (containsUnits && emptyTiles.contains(game.getTileByPosition(position))) {
                 adjacentPositions.addAll(
                         emptyTiles.stream().map(Tile::getPosition).collect(Collectors.toSet()));
             }
@@ -202,22 +208,8 @@ final class LegacyAdjacency {
             }
         }
 
-        if (game.getActivePlayer() != null
-                && game.getActivePlayer().hasUnlockedBreakthrough("nivynbt")
-                && tile.isScar(game)) {
-            adjToFeatures.add(Feature.egress);
-        }
-
-        if (game.getActivePlayer() != null
-                && (game.getActivePlayer().hasTech("tf-fraactalspikedrives")
-                        || game.getActivePlayer().hasTech("fsd"))
-                && !tile.getWormholes(game).isEmpty()) {
-            adjToFeatures.add(Feature.egress);
-        }
-
-        if (game.getActivePlayer() != null
-                && FrameShiftBrActionCardHandler.isActive(game, game.getActivePlayer())
-                && !tile.getWormholes(game).isEmpty()) {
+        // Changed in PR-R: these follow the queried player, not the active player.
+        if (treatedAsIngress(game, player, tile)) {
             adjToFeatures.add(Feature.egress);
         }
 
@@ -231,12 +223,6 @@ final class LegacyAdjacency {
             }
         }
 
-        if (player != null
-                && game.playerHasLeaderUnlockedOrAlliance(player, "nataucommander")
-                && tile.isAnomaly(game, player)) {
-            adjToFeatures.add(Feature.egress);
-        }
-
         for (Tile t : allTiles) {
             if (adjToFeatures.contains(Feature.egress) && t.hasEgress()) {
                 adjacentPositions.add(t.getPosition());
@@ -246,10 +232,8 @@ final class LegacyAdjacency {
                 adjacentPositions.add(t.getPosition());
                 continue;
             }
-            if (game.getActivePlayer() != null
-                    && FrameShiftBrActionCardHandler.isActive(game, game.getActivePlayer())
-                    && adjToFeatures.contains(Feature.ingress)
-                    && !t.getWormholes(game).isEmpty()) {
+            // Changed in PR-R: whatever is treated as an ingress is also reached from an egress.
+            if (adjToFeatures.contains(Feature.ingress) && treatedAsIngress(game, player, t)) {
                 adjacentPositions.add(t.getPosition());
                 continue;
             }
@@ -277,6 +261,16 @@ final class LegacyAdjacency {
             }
         }
         return adjacentPositions;
+    }
+
+    private static boolean treatedAsIngress(Game game, Player player, Tile tile) {
+        if (player == null) return false;
+        boolean wormholesAsIngress = player.hasTech("tf-fraactalspikedrives")
+                || player.hasTech("fsd")
+                || FrameShiftBrActionCardHandler.isActive(game, player);
+        return player.hasUnlockedBreakthrough("nivynbt") && tile.isScar(game)
+                || wormholesAsIngress && !tile.getWormholes(game).isEmpty()
+                || game.playerHasLeaderUnlockedOrAlliance(player, "nataucommander") && tile.isAnomaly(game, player);
     }
 
     public static Set<String> traverseAdjacencies(Game game, boolean naturalMapOnly, String position) {
@@ -362,6 +356,7 @@ final class LegacyAdjacency {
         return tiles;
     }
 
+    // Changed in PR-R: rewritten around effective wormholes per system, see the class comment.
     private static Set<String> getWormholeAdjacencies(
             Game game, String position, Player player, boolean neighbors, boolean forDistance) {
         Set<String> adjacentPositions = new HashSet<>();
@@ -370,14 +365,11 @@ final class LegacyAdjacency {
             return adjacentPositions;
         }
 
-        boolean wh_recon = ButtonHelper.isLawInPlay(game, "wormhole_recon");
-        boolean absol_recon = ButtonHelper.isLawInPlay(game, "absol_recon");
-        List<String> creussFlagshipColors = Tile.creussFlagshipColors(game);
-        Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
-        wormholes.addAll(tile.getWormholes(creussFlagshipColors));
-
-        boolean hasQuantumEntanglement = player != null && player.hasAbility("quantum_entanglement");
-        boolean alphaBetaLinked = hasQuantumEntanglement || wh_recon || absol_recon;
+        boolean alphaBetaLinked = player != null && player.hasAbility("quantum_entanglement")
+                || ButtonHelper.isLawInPlay(game, "wormhole_recon")
+                || ButtonHelper.isLawInPlay(game, "absol_recon");
+        Player folder = StringUtils.isEmpty(game.getCurrentActiveSystem()) ? null : game.getActivePlayer();
+        Set<Wormhole> wormholes = effectiveWormholes(game, folder, tile);
 
         if (player != null
                 && player.hasAbility("sundered")
@@ -391,12 +383,8 @@ final class LegacyAdjacency {
             wormholes.retainAll(keepers);
         }
 
-        if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
-            Set<Wormhole> keepers = EnumSet.noneOf(Wormhole.class);
-            if (alphaBetaLinked) {
-                keepers.addAll(Set.of(Wormhole.ALPHA, Wormhole.BETA));
-            }
-            wormholes.retainAll(keepers);
+        if (forDistance && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+            wormholes.retainAll(alphaBetaLinked ? Set.of(Wormhole.ALPHA, Wormhole.BETA) : Set.of());
         }
 
         if (player != null
@@ -412,66 +400,59 @@ final class LegacyAdjacency {
                 wormholes.add(Wormhole.ALPHA);
             }
         }
-
-        if (player != null
-                && player == game.getActivePlayer()
-                && !game.getCurrentActiveSystem().isEmpty()
-                && player.hasTech("lgf")
-                && !player.getPlanets().contains("mrte")
-                && !player.getPlanets().contains("mr")
-                && (tile.getUnitHolders().containsKey("mrte")
-                        || tile.getUnitHolders().containsKey("mr"))) {
-            wormholes.add(Wormhole.BETA);
-            wormholes.add(Wormhole.ALPHA);
-        }
-
-        boolean hasLazaxGateFoldingBr = player != null
-                && player == game.getActivePlayer()
-                && !game.getCurrentActiveSystem().isEmpty()
-                && player.hasTech("lgf_br");
-        if (hasLazaxGateFoldingBr && hasUncontrolledLegendaryPlanet(player, tile)) {
-            wormholes.add(Wormhole.BETA);
-            wormholes.add(Wormhole.ALPHA);
-        }
-
-        if (player != null
-                && player == game.getActivePlayer()
-                && !game.getCurrentActiveSystem().isEmpty()
-                && player.hasTech("tf-lazaxgatefolding")) {
-            boolean hasUncontrolledLeg = false;
-            for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (planet.isLegendary() && !player.getPlanets().contains(planet.getName())) {
-                    hasUncontrolledLeg = true;
-                }
-            }
-            if (hasUncontrolledLeg) {
-                wormholes.add(Wormhole.BETA);
-                wormholes.add(Wormhole.ALPHA);
-            }
-        }
         if (!alphaBetaLinked && forDistance && ButtonHelper.isLawInPlay(game, "travel_ban") && !neighbors) {
             wormholes.remove(Wormhole.ALPHA);
             wormholes.remove(Wormhole.BETA);
         }
 
+        String ghostAgentSystem = game.getStoredValue("ghostagent_active");
+        boolean ghostAgent =
+                !StringUtils.isEmpty(ghostAgentSystem) && game.getActiveSystem().equals(ghostAgentSystem);
+        if (ghostAgent) {
+            if (position.equals(ghostAgentSystem)) {
+                for (Tile other : game.getTileMap().values()) {
+                    if (other.getTileID() != null
+                            && !effectiveWormholes(game, folder, other).isEmpty()) {
+                        adjacentPositions.add(other.getPosition());
+                    }
+                }
+            } else if (!effectiveWormholes(game, folder, tile).isEmpty()) {
+                adjacentPositions.add(ghostAgentSystem);
+            }
+        }
+
         if (wormholes.isEmpty()) {
             return adjacentPositions;
         }
-
-        boolean ghostAgent = player != null
-                && player.isActivePlayer()
-                && !StringUtils.isEmpty(game.getStoredValue("ghostagent_active"))
-                && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
-        boolean alphaOrBeta = wormholes.contains(Wormhole.ALPHA) || wormholes.contains(Wormhole.BETA);
         for (Tile target : game.getTileMap().values()) {
-            List<Wormhole> targetWormholes = target.getWormholes(creussFlagshipColors);
-            if (!Collections.disjoint(wormholes, targetWormholes)
-                    || ghostAgent && !targetWormholes.isEmpty()
-                    || hasLazaxGateFoldingBr && alphaOrBeta && hasUncontrolledLegendaryPlanet(player, target)) {
+            Set<Wormhole> targetWormholes = effectiveWormholes(game, folder, target);
+            if (forDistance && target.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+                targetWormholes.retainAll(alphaBetaLinked ? Set.of(Wormhole.ALPHA, Wormhole.BETA) : Set.of());
+            }
+            if (!Collections.disjoint(wormholes, targetWormholes)) {
                 adjacentPositions.add(target.getPosition());
             }
         }
         return adjacentPositions;
+    }
+
+    private static Set<Wormhole> effectiveWormholes(Game game, Player folder, Tile tile) {
+        Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
+        wormholes.addAll(tile.getWormholes(Tile.creussFlagshipColors(game)));
+        if (folder == null) return wormholes;
+        boolean mecatol = tile.getUnitHolders().containsKey("mrte")
+                || tile.getUnitHolders().containsKey("mr");
+        boolean folded = folder.hasTech("lgf")
+                        && mecatol
+                        && !folder.getPlanets().contains("mrte")
+                        && !folder.getPlanets().contains("mr")
+                || (folder.hasTech("lgf_br") || folder.hasTech("tf-lazaxgatefolding"))
+                        && hasUncontrolledLegendaryPlanet(folder, tile);
+        if (folded) {
+            wormholes.add(Wormhole.ALPHA);
+            wormholes.add(Wormhole.BETA);
+        }
+        return wormholes;
     }
 
     private static boolean hasUncontrolledLegendaryPlanet(Player player, Tile tile) {

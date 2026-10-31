@@ -28,6 +28,7 @@ public final class WormholeRule implements AdjacencyRule {
         Tile tile = context.getGame().getTileByPosition(position);
         if (tile == null || tile.getTileID() == null) return;
         State state = state(context);
+        state.addGhostAgentLinks(tile, adjacent);
         Set<Wormhole> departures = state.departures(tile);
         if (departures.isEmpty()) return;
         for (Tile target : context.getGame().getTileMap().values()) {
@@ -42,6 +43,7 @@ public final class WormholeRule implements AdjacencyRule {
         Tile target = context.getGame().getTileByPosition(position);
         if (target == null) return;
         State state = state(context);
+        if (target.getTileID() != null) state.addGhostAgentLinks(target, sources);
         for (Tile source : context.getGame().getTileMap().values()) {
             if (source.getTileID() == null) continue;
             Set<Wormhole> departures = state.departures(source);
@@ -60,99 +62,128 @@ public final class WormholeRule implements AdjacencyRule {
                 .anyMatch(planet -> planet.isLegendary() && !player.getPlanets().contains(planet.getName()));
     }
 
+    private static boolean isSevered(Tile tile) {
+        return tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED);
+    }
+
     private static final class State {
         private final Game game;
-        private final Player player;
+        private final boolean movement;
         private final List<String> creussFlagshipColors;
         private final boolean alphaBetaLinked;
         private final boolean sundered;
         private final boolean ghostWithoutEpsilon;
-        private final boolean lazaxGateFolding;
-        private final boolean lazaxGateFoldingBreakthrough;
-        private final boolean twilightsFallGateFolding;
+        private final Player gateFolder;
         private final boolean travelBanBlocksAlphaBeta;
-        private final boolean ghostAgent;
+        private final String ghostAgentSystem;
+        private final Map<String, EnumSet<Wormhole>> wormholes = new HashMap<>();
         private final Map<String, Set<Wormhole>> departures = new HashMap<>();
-        private final Map<String, List<Wormhole>> printed = new HashMap<>();
+        private final Map<String, Set<Wormhole>> arrivals = new HashMap<>();
 
         private State(AdjacencyContext context) {
             game = context.getGame();
-            player = context.getPlayer();
+            Player player = context.getPlayer();
+            movement = context.isMovement();
             creussFlagshipColors = Tile.creussFlagshipColors(game);
             alphaBetaLinked = player != null && player.hasAbility("quantum_entanglement")
                     || ButtonHelper.isLawInPlay(game, "wormhole_recon")
                     || ButtonHelper.isLawInPlay(game, "absol_recon");
-            boolean activeWithSystem = context.isActivePlayer() && context.hasActivatedSystem();
-            sundered = activeWithSystem && context.isMovement() && player.hasAbility("sundered");
+            sundered = context.isActivePlayer()
+                    && context.hasActivatedSystem()
+                    && movement
+                    && player.hasAbility("sundered");
             ghostWithoutEpsilon = player != null
                     && "ghost".equals(player.getFaction())
                     && game.getPlayerFromColorOrFaction("crimson") != null;
-            lazaxGateFolding = activeWithSystem
-                    && player.hasTech("lgf")
-                    && !player.getPlanets().contains("mrte")
-                    && !player.getPlanets().contains("mr");
-            lazaxGateFoldingBreakthrough = activeWithSystem && player.hasTech("lgf_br");
-            twilightsFallGateFolding = activeWithSystem && player.hasTech("tf-lazaxgatefolding");
-            travelBanBlocksAlphaBeta =
-                    !alphaBetaLinked && context.isMovement() && ButtonHelper.isLawInPlay(game, "travel_ban");
-            ghostAgent = player != null
-                    && player.isActivePlayer()
-                    && !StringUtils.isEmpty(game.getStoredValue("ghostagent_active"))
-                    && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
+            gateFolder = context.hasActivatedSystem() ? game.getActivePlayer() : null;
+            travelBanBlocksAlphaBeta = !alphaBetaLinked && movement && ButtonHelper.isLawInPlay(game, "travel_ban");
+            String ghostAgentActive = game.getStoredValue("ghostagent_active");
+            ghostAgentSystem = !StringUtils.isEmpty(ghostAgentActive) && ghostAgentActive.equals(game.getActiveSystem())
+                    ? ghostAgentActive
+                    : null;
         }
 
         private Set<Wormhole> departures(Tile tile) {
             return departures.computeIfAbsent(tile.getPosition(), position -> computeDepartures(tile));
         }
 
-        private List<Wormhole> printed(Tile tile) {
-            return printed.computeIfAbsent(tile.getPosition(), position -> tile.getWormholes(creussFlagshipColors));
+        private Set<Wormhole> arrivals(Tile tile) {
+            return arrivals.computeIfAbsent(tile.getPosition(), position -> computeArrivals(tile));
+        }
+
+        private EnumSet<Wormhole> wormholes(Tile tile) {
+            return wormholes.computeIfAbsent(tile.getPosition(), position -> computeWormholes(tile));
         }
 
         private boolean connects(Set<Wormhole> departures, Tile target) {
-            List<Wormhole> targetWormholes = printed(target);
-            boolean alphaOrBeta = departures.contains(Wormhole.ALPHA) || departures.contains(Wormhole.BETA);
-            return !Collections.disjoint(departures, targetWormholes)
-                    || ghostAgent && !targetWormholes.isEmpty()
-                    || lazaxGateFoldingBreakthrough && alphaOrBeta && hasUncontrolledLegendaryPlanet(player, target);
+            return !Collections.disjoint(departures, arrivals(target));
+        }
+
+        private void addGhostAgentLinks(Tile tile, Set<String> linked) {
+            if (ghostAgentSystem == null) return;
+            if (tile.getPosition().equals(ghostAgentSystem)) {
+                for (Tile other : game.getTileMap().values()) {
+                    if (other.getTileID() != null && !wormholes(other).isEmpty()) {
+                        linked.add(other.getPosition());
+                    }
+                }
+            } else if (!wormholes(tile).isEmpty()) {
+                linked.add(ghostAgentSystem);
+            }
+        }
+
+        private EnumSet<Wormhole> computeWormholes(Tile tile) {
+            EnumSet<Wormhole> printed = EnumSet.noneOf(Wormhole.class);
+            printed.addAll(tile.getWormholes(creussFlagshipColors));
+            if (isGateFolded(tile)) {
+                printed.add(Wormhole.ALPHA);
+                printed.add(Wormhole.BETA);
+            }
+            return printed;
+        }
+
+        private boolean isGateFolded(Tile tile) {
+            if (gateFolder == null) return false;
+            boolean mecatol = tile.getUnitHolders().containsKey("mrte")
+                    || tile.getUnitHolders().containsKey("mr");
+            boolean controlsMecatol = gateFolder.getPlanets().contains("mrte")
+                    || gateFolder.getPlanets().contains("mr");
+            return gateFolder.hasTech("lgf") && mecatol && !controlsMecatol
+                    || (gateFolder.hasTech("lgf_br") || gateFolder.hasTech("tf-lazaxgatefolding"))
+                            && hasUncontrolledLegendaryPlanet(gateFolder, tile);
+        }
+
+        private Set<Wormhole> computeArrivals(Tile tile) {
+            Set<Wormhole> arriving = EnumSet.copyOf(wormholes(tile));
+            if (movement && isSevered(tile)) {
+                arriving.retainAll(linkedOr(EnumSet.noneOf(Wormhole.class)));
+            }
+            return arriving;
         }
 
         private Set<Wormhole> computeDepartures(Tile tile) {
-            Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
-            wormholes.addAll(printed(tile));
-
+            Set<Wormhole> departing = EnumSet.copyOf(wormholes(tile));
             if (sundered) {
-                wormholes.retainAll(linkedOr(EnumSet.of(Wormhole.EPSILON)));
+                departing.retainAll(linkedOr(EnumSet.of(Wormhole.EPSILON)));
             }
-            if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
-                wormholes.retainAll(linkedOr(EnumSet.noneOf(Wormhole.class)));
+            if (movement && isSevered(tile)) {
+                departing.retainAll(linkedOr(EnumSet.noneOf(Wormhole.class)));
             }
             if (ghostWithoutEpsilon) {
-                wormholes.remove(Wormhole.EPSILON);
+                departing.remove(Wormhole.EPSILON);
             }
             if (alphaBetaLinked) {
-                if (wormholes.contains(Wormhole.ALPHA)) {
-                    wormholes.add(Wormhole.BETA);
-                } else if (wormholes.contains(Wormhole.BETA)) {
-                    wormholes.add(Wormhole.ALPHA);
+                if (departing.contains(Wormhole.ALPHA)) {
+                    departing.add(Wormhole.BETA);
+                } else if (departing.contains(Wormhole.BETA)) {
+                    departing.add(Wormhole.ALPHA);
                 }
             }
-            if (lazaxGateFolding
-                    && (tile.getUnitHolders().containsKey("mrte")
-                            || tile.getUnitHolders().containsKey("mr"))) {
-                addAlphaAndBeta(wormholes);
-            }
-            if (lazaxGateFoldingBreakthrough && hasUncontrolledLegendaryPlanet(player, tile)) {
-                addAlphaAndBeta(wormholes);
-            }
-            if (twilightsFallGateFolding && hasUncontrolledLegendaryPlanet(player, tile)) {
-                addAlphaAndBeta(wormholes);
-            }
             if (travelBanBlocksAlphaBeta) {
-                wormholes.remove(Wormhole.ALPHA);
-                wormholes.remove(Wormhole.BETA);
+                departing.remove(Wormhole.ALPHA);
+                departing.remove(Wormhole.BETA);
             }
-            return wormholes;
+            return departing;
         }
 
         private Set<Wormhole> linkedOr(Set<Wormhole> keepers) {
@@ -161,11 +192,6 @@ public final class WormholeRule implements AdjacencyRule {
                 keepers.add(Wormhole.BETA);
             }
             return keepers;
-        }
-
-        private static void addAlphaAndBeta(Set<Wormhole> wormholes) {
-            wormholes.add(Wormhole.BETA);
-            wormholes.add(Wormhole.ALPHA);
         }
     }
 }

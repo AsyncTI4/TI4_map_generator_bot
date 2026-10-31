@@ -18,6 +18,7 @@ public final class Adjacency {
             new IngressEgressRule(),
             new BifrostBridgeRule(),
             new ChaosTurbineRule(),
+            new DreamNebulaRule(),
             new SpaceDockWebwayRule(),
             new SaarMonumentRule(),
             new GheminaMonumentRule(),
