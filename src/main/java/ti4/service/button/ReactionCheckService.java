@@ -22,6 +22,7 @@ import ti4.logging.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.StatusCleanupService;
+import ti4.service.actioncard.ActionCardWindowHoldService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
@@ -230,6 +231,9 @@ public class ReactionCheckService {
             case "no_sabotage" ->
                 ReactionService.handleAllPlayersReactingNoSabotage(
                         event.getInteraction().getMessage(), game);
+            case ActionCardWindowHoldService.PASS_BUTTON_ID ->
+                GameMessageManager.getOne(game.getName(), event.getMessageId())
+                        .ifPresent(hold -> ActionCardWindowHoldService.close(game, hold, event));
             case Constants.PO_SCORING -> respondAllHaveScored(game);
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {

@@ -21,6 +21,7 @@ import ti4.helpers.StatusHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.StatusCleanupService;
+import ti4.service.actioncard.ActionCardWindowHoldService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FowScoringStatusService;
@@ -65,6 +66,8 @@ class StatusPhaseButtonHandler {
             game.setStoredValue("revealedPOInRound" + game.getRound(), "Yes");
         }
         String revealedObjective = null;
+        boolean objectiveRevealed =
+                !game.isRedTapeMode() && !game.isCivilizedSocietyMode() && !"none".equalsIgnoreCase(stage);
         if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event);
@@ -102,7 +105,9 @@ class StatusPhaseButtonHandler {
         }
 
         if (!game.isOmegaPhaseMode()) {
-            StartPhaseService.startStatusHomework(event, game);
+            if (!objectiveRevealed || !ActionCardWindowHoldService.openCorruptionHold(game)) {
+                StartPhaseService.startStatusHomework(event, game);
+            }
         } else {
             StatusHelper.commitStatusScoringEvent(game);
             if (Constants.IMPERIUM_REX_ID.equalsIgnoreCase(revealedObjective)) {
