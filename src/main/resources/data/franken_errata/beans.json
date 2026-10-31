@@ -245,6 +245,11 @@
         "source": "beans"
     },
     {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "migo",
+        "source": "beans"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "pseudomorphism",
         "optionalSwaps": [
