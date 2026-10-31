@@ -94,19 +94,30 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 4)).isEqualTo(split(1, 1, 2));
     }
 
-    // A rival holding more tactic tokens and other stalls than this seat could make it pass first, so tactic tokens
-    // to match them come before the strategy tokens: 2/1/0 against two of them, 3/1/1 against three.
+    // A rival holding more tactic tokens and other stalls than this seat could make it pass first, so it keeps two
+    // tactic tokens for every strategy token: 2/1/0, 3/1/1, then 4/1/1 and 4/1/2.
     @Test
-    void keepsTacticsToMatchARivalsStallsBeforeStrategyTokens() {
+    void keepsTwoTacticsPerStrategyTokenWhenARivalCouldOutStallIt() {
         test.game.setPhaseOfGame("statusHomework");
         test.game.setRound(1);
         test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
-
         rivalTactics(2);
-        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 3)).isEqualTo(split(2, 1, 0));
 
-        rivalTactics(3);
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 3)).isEqualTo(split(2, 1, 0));
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 5)).isEqualTo(split(3, 1, 1));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 6)).isEqualTo(split(4, 1, 1));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 7)).isEqualTo(split(4, 1, 2));
+    }
+
+    // One rival tactic token is no threat: a seat keeping one of its own can match it.
+    @Test
+    void aSingleRivalTacticTokenIsNoStallThreat() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(1);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+        rivalTactics(1);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 4)).isEqualTo(split(1, 1, 2));
     }
 
     // Round two rarely needs a stack bigger than three, so ships that could join a stack of three grow the fleet pool

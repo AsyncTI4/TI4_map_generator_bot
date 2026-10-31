@@ -30,7 +30,6 @@ public class CommandTokenPolicy {
     private static final int BASE_FLEET = 3;
     private static final int EARLY_ROUNDS = 2;
     private static final int EARLY_FLEET = 3;
-    private static final int STALL_TACTICS_MAX = 3;
     private static final int TACTIC_FIRST = 2;
     private static final int STRATEGY_TARGET = 2;
     private static final int TACTIC_PLENTY = 5;
@@ -76,6 +75,16 @@ public class CommandTokenPolicy {
     }
 
     private record Level(Pool pool, int count) {}
+
+    private static final List<Level> FOLLOWS_FIRST = List.of(
+            new Level(Pool.STRATEGY, 1),
+            new Level(Pool.STRATEGY, STRATEGY_TARGET),
+            new Level(Pool.TACTIC, TACTIC_FIRST));
+    private static final List<Level> TWO_TACTICS_PER_STRATEGY = List.of(
+            new Level(Pool.TACTIC, 2),
+            new Level(Pool.STRATEGY, 1),
+            new Level(Pool.TACTIC, 4),
+            new Level(Pool.STRATEGY, STRATEGY_TARGET));
 
     public static int statusPhaseGain(Player seat) {
         int gain = STATUS_PHASE_GAIN;
@@ -196,36 +205,34 @@ public class CommandTokenPolicy {
                     new Level(Pool.FLEET, Math.min(growth, stackingFleet(game, seat, largest)) - bonus));
         }
         int growth = Math.min(cap, plannedFleetCap(game.getRound() + 1));
-        return List.of(
+        List<Level> levels = new ArrayList<>(List.of(
                 new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                 new Level(Pool.TACTIC, 1),
                 new Level(Pool.FLEET, Math.min(cap, heroFleet) - bonus),
-                new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
-                new Level(Pool.TACTIC, tacticsAgainstAStall(game, seat)),
-                new Level(Pool.STRATEGY, 1),
-                new Level(Pool.STRATEGY, STRATEGY_TARGET),
-                new Level(Pool.TACTIC, TACTIC_FIRST),
+                new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus)));
+        levels.addAll(fearsAStall(game, seat) ? TWO_TACTICS_PER_STRATEGY : FOLLOWS_FIRST);
+        levels.addAll(List.of(
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.STRATEGY, strategyTarget(game, seat)),
                 new Level(Pool.FLEET, Math.min(growth, buildFleet(game, seat, largest)) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
                 new Level(Pool.FLEET, Math.min(growth, stackingFleet(game, seat, largest)) - bonus),
                 new Level(Pool.TACTIC, TACTIC_PLENTY),
-                new Level(Pool.STRATEGY, STRATEGY_MAX));
+                new Level(Pool.STRATEGY, STRATEGY_MAX)));
+        return levels;
     }
 
     private static int plannedFleetCap(int round) {
         return round <= EARLY_ROUNDS ? EARLY_FLEET : STACKING_FLEET_CAP;
     }
 
-    private static int tacticsAgainstAStall(Game game, Player seat) {
+    private static boolean fearsAStall(Game game, Player seat) {
         double rivalStalls = game.getRealPlayers().stream()
                 .filter(other -> other != seat)
                 .mapToDouble(other -> StallCount.of(game, other, seat))
                 .max()
                 .orElse(0);
-        long needed = Math.round(rivalStalls - StallCount.besidesTokens(game, seat, seat));
-        return Math.clamp(needed, 1, STALL_TACTICS_MAX);
+        return Math.round(rivalStalls - StallCount.besidesTokens(game, seat, seat)) > 1;
     }
 
     private static boolean strategizeHeld(Game game, Player seat) {

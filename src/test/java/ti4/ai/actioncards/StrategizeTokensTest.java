@@ -27,6 +27,9 @@ class StrategizeTokensTest extends BaseTi4Test {
         table.nekro.setTacticalCC(2);
         table.nekro.setFleetCC(3);
         table.nekro.setStrategicCC(2);
+        for (ti4.game.Player other : table.game.getRealPlayers()) {
+            if (other != table.nekro) other.setTacticalCC(0);
+        }
     }
 
     private void holdStrategize() {
@@ -92,12 +95,12 @@ class StrategizeTokensTest extends BaseTi4Test {
     }
 
     @Test
-    void withoutStrategizeTheSecondTacticTokenStillComesFirst() {
+    void withoutStrategizeAStrategyTokenForFollowsStillComesBeforeTheSecondTactic() {
         table.game.setPhaseOfGame("status");
         table.nekro.setTacticalCC(1);
         table.nekro.setStrategicCC(0);
 
-        assertThat(nextToken()).isEqualTo(GROW_TACTIC);
+        assertThat(nextToken()).isEqualTo(GROW_STRATEGY);
     }
 
     @Test

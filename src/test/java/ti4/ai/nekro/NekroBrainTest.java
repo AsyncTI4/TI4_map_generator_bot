@@ -442,6 +442,7 @@ class NekroBrainTest extends BaseTi4Test {
         game.setPhaseOfGame("statusHomework");
         AiPrompt homework = publicPrompt("homework", NOW, "redistributeCCButtons", "pass_on_abilities");
         game.setStoredValue("statusHomeworkReactionFornekroRound1", "added");
+        game.getPlayer("200000000000000001").setTacticalCC(0);
         nekro.setTacticalCC(0);
         nekro.setFleetCC(0);
         nekro.setStrategicCC(3);
