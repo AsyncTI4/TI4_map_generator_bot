@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -10,6 +11,9 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.BorderAnomalyModel;
+import ti4.model.MapPositionMapper;
 import ti4.service.fow.FOWPlusService;
 
 public final class PlayerNeighbourGraph {
@@ -23,6 +27,7 @@ public final class PlayerNeighbourGraph {
     private final Map<Player, Map<Tile, Boolean>> presence = new IdentityHashMap<>();
     private final Map<String, Set<Player>> playersAdjacentToPosition = new HashMap<>();
     private final Map<Player, Set<Player>> directNeighbours = new IdentityHashMap<>();
+    private List<ExemptEdge> exemptEdges;
 
     public PlayerNeighbourGraph(Game game) {
         this.game = game;
@@ -50,6 +55,7 @@ public final class PlayerNeighbourGraph {
         for (Tile tile : occupiedTilesOf(player)) {
             if (neighbours.size() == realPlayers.size()) break;
             neighbours.addAll(playersAdjacentTo(tile.getPosition()));
+            neighbours.addAll(playersAcrossExemptBorders(player, tile.getPosition()));
         }
         neighbours.remove(player);
         Set<Player> ordered = inRealPlayerOrder(neighbours);
@@ -81,6 +87,44 @@ public final class PlayerNeighbourGraph {
         }
         playersAdjacentToPosition.put(position, players);
         return players;
+    }
+
+    private Set<Player> playersAcrossExemptBorders(Player player, String position) {
+        Set<Player> players = new HashSet<>();
+        for (ExemptEdge edge : exemptEdges()) {
+            String otherSide = edge.otherSide(position);
+            Tile otherTile = otherSide == null ? null : game.getTileByPosition(otherSide);
+            if (otherTile == null) continue;
+            for (Player other : realPlayers) {
+                if ((edge.border().exempts(player) || edge.border().exempts(other)) && isInSystem(other, otherTile)) {
+                    players.add(other);
+                }
+            }
+        }
+        return players;
+    }
+
+    private List<ExemptEdge> exemptEdges() {
+        if (exemptEdges != null) return exemptEdges;
+        exemptEdges = new ArrayList<>();
+        for (BorderAnomalyHolder border : game.getBorderAnomalies()) {
+            BorderAnomalyModel model = border == null ? null : border.getModel();
+            if (model == null || model.getExemptHolderOf() == null || border.getTile() == null) continue;
+            List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(border.getTile());
+            if (neighbours == null || neighbours.size() != 6) continue;
+            String override = game.getAdjacentTileOverride(border.getTile(), border.getDirection());
+            String acrossFromHolder = override != null ? override : neighbours.get(border.getDirection());
+            exemptEdges.add(new ExemptEdge(border, border.getTile(), acrossFromHolder));
+        }
+        return exemptEdges;
+    }
+
+    private record ExemptEdge(BorderAnomalyHolder border, String holder, String acrossFromHolder) {
+        String otherSide(String position) {
+            if (holder.equals(position)) return acrossFromHolder;
+            if (acrossFromHolder.equals(position)) return holder;
+            return null;
+        }
     }
 
     private Set<String> extraWormholeAdjacencies(String position, Player player) {

@@ -28,6 +28,7 @@ public class BorderAnomalyModel implements ModelInterface {
     public static class Adjacency {
         private boolean blocksIn;
         private boolean blocksOut;
+        private String exemptHolderOf;
     }
 
     @Override
@@ -52,6 +53,13 @@ public class BorderAnomalyModel implements ModelInterface {
         return rules != null
                 && rules.getAdjacency() != null
                 && rules.getAdjacency().isBlocksOut();
+    }
+
+    @JsonIgnore
+    public String getExemptHolderOf() {
+        return rules == null || rules.getAdjacency() == null
+                ? null
+                : rules.getAdjacency().getExemptHolderOf();
     }
 
     @JsonIgnore

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
@@ -16,26 +17,32 @@ public final class GridRule implements AdjacencyRule {
 
     @Override
     public void from(AdjacencyContext context, String position, Set<String> adjacent) {
-        adjacent.addAll(traverse(context.getGame(), false, position));
+        adjacent.addAll(traverse(context.getGame(), context.getPlayer(), false, position, START, new HashSet<>()));
     }
 
     @Override
     public void into(AdjacencyContext context, String position, Set<String> sources) {
         Game game = context.getGame();
+        Player player = context.getPlayer();
         Set<String> explored = new HashSet<>();
         for (int side = 0; side < 6; side++) {
             if (canBeEnteredFrom(game, position, side)) {
-                collectSources(game, position, side, explored, sources);
+                collectSources(game, player, position, side, explored, sources);
             }
         }
     }
 
     public static Set<String> traverse(Game game, boolean naturalMapOnly, String position) {
-        return traverse(game, naturalMapOnly, position, START, new HashSet<>());
+        return traverse(game, null, naturalMapOnly, position, START, new HashSet<>());
     }
 
     private static Set<String> traverse(
-            Game game, boolean naturalMapOnly, String position, int sourceDirection, Set<String> explored) {
+            Game game,
+            Player player,
+            boolean naturalMapOnly,
+            String position,
+            int sourceDirection,
+            Set<String> explored) {
         Set<String> tiles = new HashSet<>();
         if (!explored.add(position + sourceDirection)) {
             return tiles;
@@ -63,16 +70,17 @@ public final class GridRule implements AdjacencyRule {
         }
 
         for (int direction = 0; direction < 6; direction++) {
-            String next = step(game, naturalMapOnly, position, direction, hyperlaneData, directlyAdjacentTiles);
+            String next = step(game, player, naturalMapOnly, position, direction, hyperlaneData, directlyAdjacentTiles);
             if (next == null) continue;
             int enteredFrom = naturalMapOnly ? NATURAL_MAP_ONLY : (direction + 3) % 6;
-            tiles.addAll(traverse(game, naturalMapOnly, next, enteredFrom, explored));
+            tiles.addAll(traverse(game, player, naturalMapOnly, next, enteredFrom, explored));
         }
         return tiles;
     }
 
     private static String step(
             Game game,
+            Player player,
             boolean naturalMapOnly,
             String position,
             int direction,
@@ -80,7 +88,7 @@ public final class GridRule implements AdjacencyRule {
             List<String> directlyAdjacentTiles) {
         int dirFrom = (direction + 3) % 6;
         String next = directlyAdjacentTiles.get(direction);
-        if (isBorderBlocked(game, position, direction, next, dirFrom) && !naturalMapOnly) {
+        if (!naturalMapOnly && isBorderBlocked(game, player, position, direction, next, dirFrom)) {
             return null;
         }
 
@@ -100,13 +108,15 @@ public final class GridRule implements AdjacencyRule {
         return next;
     }
 
-    private static boolean isBorderBlocked(Game game, String position, int direction, String next, int dirFrom) {
+    private static boolean isBorderBlocked(
+            Game game, Player player, String position, int direction, String next, int dirFrom) {
         for (BorderAnomalyHolder border : game.getBorderAnomalies()) {
             if (border == null || border.getTile() == null) continue;
-            if (border.getTile().equals(position) && border.getDirection() == direction && border.blocksAdjacencyOut()
-                    || border.getTile().equals(next)
-                            && border.getDirection() == dirFrom
-                            && border.blocksAdjacencyIn()) {
+            if ((border.getTile().equals(position) && border.getDirection() == direction && border.blocksAdjacencyOut()
+                            || border.getTile().equals(next)
+                                    && border.getDirection() == dirFrom
+                                    && border.blocksAdjacencyIn())
+                    && !border.exempts(player)) {
                 return true;
             }
         }
@@ -121,7 +131,7 @@ public final class GridRule implements AdjacencyRule {
     }
 
     private static void collectSources(
-            Game game, String position, int enteredFrom, Set<String> explored, Set<String> sources) {
+            Game game, Player player, String position, int enteredFrom, Set<String> explored, Set<String> sources) {
         if (!explored.add(position + enteredFrom)) {
             return;
         }
@@ -133,15 +143,16 @@ public final class GridRule implements AdjacencyRule {
 
             List<Boolean> startData = previousTile.getHyperlaneData(START, game);
             if (startData == null
-                    && position.equals(step(game, false, previous, direction, null, previousNeighbours))) {
+                    && position.equals(step(game, player, false, previous, direction, null, previousNeighbours))) {
                 sources.add(previous);
             }
 
             for (int side = 0; side < 6; side++) {
                 List<Boolean> hyperlaneData = previousTile.getHyperlaneData(side, game);
                 if (hyperlaneData == null || hyperlaneData.isEmpty()) continue;
-                if (position.equals(step(game, false, previous, direction, hyperlaneData, previousNeighbours))) {
-                    collectSources(game, previous, side, explored, sources);
+                if (position.equals(
+                        step(game, player, false, previous, direction, hyperlaneData, previousNeighbours))) {
+                    collectSources(game, player, previous, side, explored, sources);
                 }
             }
         }

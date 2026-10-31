@@ -60,11 +60,16 @@ class BorderAnomalyModelTest extends BaseTi4Test {
     }
 
     @Test
-    void adjacencyRulesMatchTheFormerHardcodedBehaviour() {
+    void adjacencyRulesAreTheExpectedOnes() {
         // Jackson ignores misspelt keys, so a typo in rules.adjacency would silently drop a rule.
         for (BorderAnomalyModel model : Mapper.getBorderAnomalies()) {
-            boolean expectedIn = Set.of("spatial_tear", "gravity_wave").contains(model.getId());
-            boolean expectedOut = "spatial_tear".equals(model.getId());
+            boolean expectedIn =
+                    Set.of("spatial_tear", "gravity_wave", "void_tether").contains(model.getId());
+            boolean expectedOut = Set.of("spatial_tear", "void_tether").contains(model.getId());
+            String expectedExemptHolderOf = "void_tether".equals(model.getId()) ? "empyreanbt" : null;
+            assertThat(model.getExemptHolderOf())
+                    .as(model.getId() + " exemptHolderOf")
+                    .isEqualTo(expectedExemptHolderOf);
             assertThat(model.blocksAdjacencyIn())
                     .as(model.getId() + " blocksIn")
                     .isEqualTo(expectedIn);

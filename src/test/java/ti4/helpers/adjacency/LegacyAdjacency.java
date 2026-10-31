@@ -46,7 +46,8 @@ final class LegacyAdjacency {
             Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
         if (FOWPlusService.isVoid(game, position)) return new HashSet<>();
 
-        Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
+        // Changed in PR-VT: the grid walk takes the queried player, so a Void Tether exempts its breakthrough holder.
+        Set<String> adjacentPositions = traverseAdjacencies(game, player, false, position, -1, new HashSet<>());
 
         // Changed in PR-M: was listed -> primary for movement and effects, primary -> listed for vision only.
         adjacentPositions.addAll(game.getCustomAdjacentTiles().getOrDefault(position, List.of()));
@@ -274,7 +275,7 @@ final class LegacyAdjacency {
     }
 
     public static Set<String> traverseAdjacencies(Game game, boolean naturalMapOnly, String position) {
-        return traverseAdjacencies(game, naturalMapOnly, position, -1, new HashSet<>());
+        return traverseAdjacencies(game, null, naturalMapOnly, position, -1, new HashSet<>());
     }
 
     /**
@@ -284,7 +285,12 @@ final class LegacyAdjacency {
      * Does not traverse wormholes
      */
     static Set<String> traverseAdjacencies(
-            Game game, boolean naturalMapOnly, String position, Integer sourceDirection, Set<String> exploredSet) {
+            Game game,
+            Player player,
+            boolean naturalMapOnly,
+            String position,
+            Integer sourceDirection,
+            Set<String> exploredSet) {
         Set<String> tiles = new HashSet<>();
         if (exploredSet.contains(position + sourceDirection)) {
             // We already explored this tile from this direction!
@@ -328,7 +334,7 @@ final class LegacyAdjacency {
                 if (b == null || b.getTile() == null) continue;
                 if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacencyOut()
                         || b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacencyIn()) {
-                    borderBlocked = true;
+                    borderBlocked |= !b.exempts(player);
                 }
             }
             if (borderBlocked && !naturalMapOnly) continue;
@@ -350,7 +356,8 @@ final class LegacyAdjacency {
 
             // explore that tile now!
             int direcetionFrom = naturalMapOnly ? -2 : dirFrom;
-            Set<String> newTiles = traverseAdjacencies(game, naturalMapOnly, position_, direcetionFrom, exploredSet);
+            Set<String> newTiles =
+                    traverseAdjacencies(game, player, naturalMapOnly, position_, direcetionFrom, exploredSet);
             tiles.addAll(newTiles);
         }
         return tiles;
