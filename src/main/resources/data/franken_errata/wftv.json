@@ -131,6 +131,12 @@
         "source": "wftv"
     },
     {
+        "itemCategory": "TECH",
+        "itemId": "baxanws",
+        "optionalSwaps": ["FLAGSHIP:xan_flagship"],
+        "source": "wftv"
+    },
+    {
         "itemCategory": "FLAGSHIP",
         "itemId": "xan_flagship",
         "undraftable": true,
