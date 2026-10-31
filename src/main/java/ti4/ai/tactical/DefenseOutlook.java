@@ -60,6 +60,7 @@ public final class DefenseOutlook {
     private static final double HOME_PRIZE = 3.0;
     private static final double ONE_STEP_SHORT_BLOCK = 0.25;
     private static final double ACTION_COST = 2.0;
+    private static final double WARINESS = 1.0;
     private static final double THUNDERS_EDGE_ACTION_COST = 0.5;
     private static final double APPETITE_SCALE = 3.0;
     private static final double APPETITE_MARGIN = 0.5;
@@ -112,6 +113,7 @@ public final class DefenseOutlook {
     private final Map<String, Double> publicGains;
     private final Map<String, Double> spaceGains;
     private final Map<String, Map<String, Double>> alternatives;
+    private final Map<String, Optional<List<TacticalPlan>>> intents;
     private final Map<String, Double> spaceChances;
     private Double homeDefenseLevel;
     private Planet anchor;
@@ -147,6 +149,7 @@ public final class DefenseOutlook {
         this.publicGains = root == null ? new HashMap<>() : root.publicGains;
         this.spaceGains = root == null ? new HashMap<>() : root.spaceGains;
         this.alternatives = root == null ? new HashMap<>() : root.alternatives;
+        this.intents = root == null ? new HashMap<>() : root.intents;
         this.spaceChances = root == null ? new HashMap<>() : root.spaceChances;
         this.groundChances = root == null ? new HashMap<>() : root.groundChances;
     }
@@ -295,7 +298,7 @@ public final class DefenseOutlook {
     private double motive(Player enemy, Tile tile, IncomingForce force) {
         Defenders current = defendersAt(tile);
         Defenders emptied = new Defenders(Defenders.Stack.EMPTY, current.groundInSpace(), current.planets());
-        double gain = appetite(enemy, tile, force, emptied, chances(tile, force, emptied)) + actionCost(enemy);
+        double gain = attackValue(enemy, tile, force, emptied, chances(tile, force, emptied)) + actionCost(enemy);
         return Math.max(MOTIVE_FLOOR, attackLikelihood(enemy, tile, Horizon.NEXT_ROUND, gain));
     }
 
@@ -729,11 +732,31 @@ public final class DefenseOutlook {
 
     private double appetiteShare(
             Player enemy, Tile tile, Horizon horizon, IncomingForce force, Defenders defenders, Chances chances) {
-        double appetite = appetite(enemy, tile, force, defenders, chances);
-        double alternative = alternative(enemy, tile) - ACTION_COST;
+        double appetite = attackValue(enemy, tile, force, defenders, chances);
+        double alternative = alternative(enemy, tile);
         double share =
                 appetite <= 0 ? 0 : clamp(appetite / Math.max(Math.max(appetite, alternative), APPETITE_SCALE), 0, 1);
         return horizon == Horizon.IMMEDIATE ? share : Math.max(share, NEXT_ROUND_APPETITE_FLOOR);
+    }
+
+    private double attackValue(Player enemy, Tile tile, IncomingForce force, Defenders defenders, Chances chances) {
+        double appetite = appetite(enemy, tile, force, defenders, chances);
+        Optional<List<TacticalPlan>> intent = intent(enemy);
+        IncomingForce now = incoming.of(enemy, tile, Horizon.IMMEDIATE);
+        if (intent.isEmpty() || now.isEmpty()) return appetite;
+        Defenders standing = defendersAt(tile);
+        double standingAppetite = appetite(enemy, tile, now, standing, chances(tile, now, standing));
+        double rated = intent.get().stream()
+                .filter(plan -> plan.target().equals(tile.getPosition()))
+                .mapToDouble(TacticalPlan::score)
+                .max()
+                .orElseGet(() -> EnemyIntent.attackWorth(game, enemy, tile, seat)
+                        .orElse(Math.min(standingAppetite, TacticalPlanner.MIN_SCORE)));
+        return rated + appetite - standingAppetite + WARINESS;
+    }
+
+    private Optional<List<TacticalPlan>> intent(Player enemy) {
+        return intents.computeIfAbsent(enemy.getFaction(), ignored -> EnemyIntent.ranked(game, enemy));
     }
 
     private double appetite(Player enemy, Tile tile, IncomingForce force, Defenders defenders, Chances chances) {
@@ -760,7 +783,7 @@ public final class DefenseOutlook {
     }
 
     double attackLikelihood(Player enemy, Tile tile, Horizon horizon, double netGain) {
-        double alternative = Math.max(alternative(enemy, tile) - ACTION_COST, APPETITE_SCALE);
+        double alternative = Math.max(alternative(enemy, tile), APPETITE_SCALE);
         double share = attackShare(netGain - actionCost(enemy), alternative);
         return clamp(
                 roundFactor(horizon) * aggression(enemy) * share * ceasefire(enemy) * boughtOff(enemy, tile, horizon),
@@ -787,6 +810,16 @@ public final class DefenseOutlook {
     }
 
     private double alternative(Player enemy, Tile excluded) {
+        Optional<List<TacticalPlan>> intent = intent(enemy);
+        if (intent.isEmpty()) return reachablePlanets(enemy, excluded) - ACTION_COST;
+        return intent.get().stream()
+                .filter(plan -> !plan.target().equals(excluded.getPosition()))
+                .mapToDouble(TacticalPlan::score)
+                .max()
+                .orElse(0);
+    }
+
+    private double reachablePlanets(Player enemy, Tile excluded) {
         Map<String, Double> byTile = alternatives.get(enemy.getFaction());
         if (byTile == null) {
             byTile = alternativesFor(enemy);

@@ -8,6 +8,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -31,7 +32,7 @@ public class SeatStrike {
     }
 
     static boolean holds(Player seat) {
-        return seat.getSecretsUnscored().containsKey(OCCUPY_THE_SEAT);
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(OCCUPY_THE_SEAT);
     }
 
     static boolean isSeat(Game game, Player seat, Tile tile) {

@@ -125,8 +125,10 @@ class DiplomacyLockCredibilityTest extends BaseTi4Test {
         assertThat(diplomacyDueNow()).isFalse();
     }
 
+    // Six ships in one system need six fleet tokens.
     @Test
     void locksHomeAgainstALargeFleetWithGroundForcesAtTheDoor() {
+        naalu.setFleetCC(6);
         Tile beside = enemyAt("27", BESIDE_HOME);
         test.units(beside, "space", naalu, UnitType.Carrier, 2);
         test.units(beside, "space", naalu, UnitType.Cruiser, 2);
@@ -140,10 +142,14 @@ class DiplomacyLockCredibilityTest extends BaseTi4Test {
         assertThat(diplomacyDueNow()).isTrue();
     }
 
-    // A landing party much smaller than the big fleet still matters when taking home would end the game.
+    // A landing party much smaller than the big fleet still matters when taking home would stop the seat scoring the
+    // public that would bring it within a point of winning.
     @Test
     void locksHomeAgainstALandingPartyAtTheDoorOfASeatNearWinning() {
         test.points(letnev, 8);
+        test.place("26", "319");
+        letnev.addPlanet("lodor");
+        test.game.getRevealedPublicObjectives().put("monument", 1);
         Tile beside = enemyAt("27", BESIDE_HOME);
         test.units(beside, "space", naalu, UnitType.Carrier, 1);
         test.units(beside, "space", naalu, UnitType.Cruiser, 1);

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -45,7 +46,7 @@ public class NeutralSetups {
     private static final StrikeRules RULES = new StrikeRules(false, 0.5, true, true);
 
     public static double value(Game game, Player seat, Tile tile, Pirates pirates) {
-        List<String> secrets = seat.getSecretsUnscored().keySet().stream()
+        List<String> secrets = ImaginedTurn.unscoredSecrets(seat).keySet().stream()
                 .filter(pirates.secrets::contains)
                 .toList();
         if (secrets.isEmpty() || !TacticalPlanner.hasTokensForAnAction(game, seat) || !attackable(game, seat, tile)) {

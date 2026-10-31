@@ -70,18 +70,21 @@ class ProductionDefenseTest extends BaseTi4Test {
     }
 
     // Test 3b: with nothing to score for, a Sardakk landing is less likely, so it is enough to hold it to a long shot.
+    // On this bare board the landing is still Sardakk's best move, so the dock fills up with infantry either way.
     @Test
-    void buildsLessWhenTheNeighbourHasNoReasonToScore() {
+    void fearsALandingLessWhenTheNeighbourHasNoReasonToScore() {
         roundFourThreat(true);
-        int withReason = defensiveGroundUnits(plan());
+        double withReason = new DefenseOutlook(board.test.game, board.test.nekro)
+                .fear(board.sardakk, board.home, Horizon.IMMEDIATE, board.defenders());
         DefenseScenario calm = new DefenseScenario();
         calm.test.nekro.setTg(6);
         calm.raidingFleet(1, 2, 4);
         calm.test.units(calm.home, HOME_PLANET, calm.test.nekro, UnitType.Infantry, 1);
         BuildPlan calmPlan = ProductionPlanner.plan(calm.test.game, calm.test.nekro, calm.home);
-
-        assertThat(defensiveGroundUnits(calmPlan)).isLessThan(withReason);
         DefenseOutlook outlook = new DefenseOutlook(calm.test.game, calm.test.nekro);
+
+        assertThat(outlook.fear(calm.sardakk, calm.home, Horizon.IMMEDIATE, calm.defenders()))
+                .isLessThan(withReason);
         assertThat(outlook.chances(calm.sardakk, calm.home, Horizon.IMMEDIATE, calm.afterBuilding(calmPlan))
                         .take())
                 .isLessThanOrEqualTo(LONG_SHOT);

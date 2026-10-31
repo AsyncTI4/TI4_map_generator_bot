@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -25,7 +26,7 @@ public class CannonWipeRules {
     public static final boolean NEUTRAL_SHIPS_COUNT = true;
 
     public static boolean held(Player seat) {
-        return seat.getSecretsUnscored().containsKey(TURN_THEIR_FLEETS_TO_DUST);
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(TURN_THEIR_FLEETS_TO_DUST);
     }
 
     public static boolean mayBeTarget(Player player) {

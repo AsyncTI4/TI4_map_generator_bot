@@ -2,6 +2,7 @@ package ti4.ai.tactical;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -42,7 +43,8 @@ class SeatCover {
     }
 
     private static boolean isSeat(Game game, Player seat, Tile tile) {
-        return tile == game.getMecatolTile() && seat.getSecretsUnscored().containsKey(OCCUPY_THE_SEAT);
+        return tile == game.getMecatolTile()
+                && ImaginedTurn.unscoredSecrets(seat).containsKey(OCCUPY_THE_SEAT);
     }
 
     private static boolean chasesSeat(Game game, Player seat, Tile tile, ObjectiveValue objectives) {

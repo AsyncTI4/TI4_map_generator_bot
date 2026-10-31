@@ -20,7 +20,7 @@ public class MoveBoost {
     }
 
     public static Optional<String> flankSpeedCard(Player seat) {
-        return seat.getActionCards().keySet().stream()
+        return ImaginedTurn.actionCards(seat).keySet().stream()
                 .filter(MoveBoost::isFlankSpeed)
                 .sorted()
                 .findFirst();

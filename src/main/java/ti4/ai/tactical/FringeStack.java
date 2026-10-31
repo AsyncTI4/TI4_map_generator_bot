@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -26,7 +27,7 @@ public class FringeStack {
     private static final int ELSEWHERE = 2;
 
     public static boolean held(Player seat) {
-        return seat.getSecretsUnscored().containsKey(OCCUPY_THE_FRINGE);
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(OCCUPY_THE_FRINGE);
     }
 
     public static Optional<Planet> best(Game game, Player seat) {

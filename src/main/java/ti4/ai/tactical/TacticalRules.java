@@ -15,6 +15,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.explore.ExplorationRules;
 import ti4.ai.legendary.TempestaRules;
 import ti4.ai.perception.AiPrompt;
@@ -510,7 +511,7 @@ public class TacticalRules {
                 && planet != null
                 && planet.getPlanetTypes().contains(HAZARDOUS);
         boolean mechanizes = planet != null
-                && seat.getSecretsUnscored().containsKey(MECHANIZE_THE_MILITARY)
+                && ImaginedTurn.unscoredSecrets(seat).containsKey(MECHANIZE_THE_MILITARY)
                 && BoardView.count(planet, seat, UnitType.Mech) == 0;
         return claimingHazardous || mechanizes
                 ? List.of(UnitType.Mech, UnitType.Infantry)

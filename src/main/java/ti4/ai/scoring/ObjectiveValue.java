@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -59,7 +60,7 @@ public final class ObjectiveValue {
             }
         }
         if (includeSecrets) {
-            for (String id : seat.getSecretsUnscored().keySet()) addTarget(id, 1);
+            for (String id : ImaginedTurn.unscoredSecrets(seat).keySet()) addTarget(id, 1);
         }
     }
 

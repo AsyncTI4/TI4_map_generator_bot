@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -23,7 +24,7 @@ public class SupplyLines {
     private static final double OWNER_CAN_RETURN_HOLD = 0.5;
 
     static boolean chases(Game game, Player seat, Tile tile, ObjectiveValue objectives) {
-        return seat.getSecretsUnscored().containsKey(CUT_SUPPLY_LINES)
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(CUT_SUPPLY_LINES)
                 && objectives.progress(CUT_SUPPLY_LINES, objectives.before())
                         < ListPlayerInfoService.getObjectiveThreshold(CUT_SUPPLY_LINES, game)
                 && !dockOwners(game, seat, tile).isEmpty();

@@ -2,8 +2,10 @@ package ti4.ai.actioncards;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
@@ -11,6 +13,7 @@ import ti4.ai.AiSettings;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.scoring.ScoringStakes;
@@ -28,6 +31,8 @@ import ti4.helpers.Constants;
 
 @UtilityClass
 public class ActionCardValue {
+
+    private static final ThreadLocal<Set<String>> RANKING_THE_HAND = ThreadLocal.withInitial(HashSet::new);
 
     static final String MINING = "mining_initiative";
     static final String INDUSTRIAL = "industrial_initiative";
@@ -207,18 +212,22 @@ public class ActionCardValue {
     }
 
     private static List<DiscardKey> discardKeys(Game game, Player seat) {
+        Set<String> ranking = RANKING_THE_HAND.get();
+        boolean reentered = !ranking.add(seat.getFaction());
         try (Thinking.Span ignored = Thinking.enter("cards.discardOrder")) {
-            return seat.getActionCards().keySet().stream()
+            return ImaginedTurn.actionCards(seat).keySet().stream()
                     .map(alias -> new DiscardKey(
                             alias,
-                            timedKeep(game, seat, alias),
+                            reentered ? ActionCardPrior.keepPrior(alias) : timedKeep(game, seat, alias),
                             ActionCardPrior.keepPrior(alias),
-                            () -> timedPlay(game, seat, alias)))
+                            reentered ? () -> 0 : () -> timedPlay(game, seat, alias)))
                     .sorted(Comparator.comparingDouble(DiscardKey::keep)
                             .thenComparingDouble(DiscardKey::prior)
                             .thenComparingDouble(DiscardKey::play)
                             .thenComparing(DiscardKey::alias))
                     .toList();
+        } finally {
+            if (!reentered) ranking.remove(seat.getFaction());
         }
     }
 

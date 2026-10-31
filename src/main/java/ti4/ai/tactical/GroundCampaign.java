@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.game.Game;
@@ -87,7 +88,7 @@ public final class GroundCampaign {
     private GroundCampaign(Game game, Player seat) {
         this.game = game;
         this.seat = seat;
-        var unscored = seat.getSecretsUnscored();
+        var unscored = ImaginedTurn.unscoredSecrets(seat);
         this.fringe = unscored.containsKey(OCCUPY_THE_FRINGE);
         this.mechanize = unscored.containsKey(MECHANIZE_THE_MILITARY);
     }

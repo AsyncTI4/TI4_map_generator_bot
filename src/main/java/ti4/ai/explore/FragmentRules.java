@@ -9,6 +9,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.RelicValue;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.Stall;
@@ -110,7 +111,7 @@ class FragmentRules {
     static boolean canMakeRelic(Player seat) {
         if (kindToPurge(seat).isEmpty()) return false;
         int total = fragmentCount(seat);
-        boolean keepsTwo = seat.getSecretsUnscored().containsKey(HERETICAL_WORKS);
+        boolean keepsTwo = ImaginedTurn.unscoredSecrets(seat).containsKey(HERETICAL_WORKS);
         return total - FRAGMENTS_PER_RELIC >= (keepsTwo ? HERETICAL_WORKS_FRAGMENTS : 0);
     }
 

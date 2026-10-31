@@ -24,7 +24,7 @@ public class TraitNeeds {
 
     public static List<Need> of(Game game, Player seat) {
         List<Need> needs = new ArrayList<>();
-        for (String secret : seat.getSecretsUnscored().keySet()) {
+        for (String secret : ImaginedTurn.unscoredSecrets(seat).keySet()) {
             String trait = ObjectiveValue.TRAIT_SECRETS.get(secret);
             if (trait == null) continue;
             int required = ListPlayerInfoService.getObjectiveThreshold(secret, game);

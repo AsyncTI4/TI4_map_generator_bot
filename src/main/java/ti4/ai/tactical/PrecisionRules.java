@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MovementGraph;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -21,7 +22,7 @@ public class PrecisionRules {
     static final int FORWARD_SHIPS = 3;
 
     public static boolean held(Player seat) {
-        return seat.getSecretsUnscored().containsKey(FIGHT_WITH_PRECISION);
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(FIGHT_WITH_PRECISION);
     }
 
     public static double chanceToClear(Player seat, Map<UnitType, Integer> ships, int fighters) {

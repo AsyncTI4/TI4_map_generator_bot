@@ -1115,9 +1115,14 @@ to build one by hand:
     in round 1, 0.6 in round 2, full from round 3) times the faction's temperament (`FactionAggression`, plus 0.03 per
     military technology up to 6 and up to 0.2 for a bigger navy) times the share of its fleet the attack leaves spare
     times whether it has a reason to score (a revealed public objective the attack completes, and denying the leader or
-    a player near winning; without one fear halves) times how the attack compares with its other options (the planets
-    it would take against the ships it would lose and the cost of the action, set against the best free planets it
-    could reach instead), and a Ceasefire the seat holds cuts it to 30%. The seat asks for no better than even odds,
+    a player near winning; without one fear halves) times how the attack compares with its other options, and a Ceasefire the seat holds cuts it to 30%. The options
+    come from imagining the enemy's turn (`EnemyIntent`): the tactical planner ranks the enemy's moves as it would on
+    its own turn, but from the table's view (`ImaginedTurn` hides that seat's unscored secrets and action cards) and
+    without the AI's own reluctance to land on another player's home. The attack is worth the enemy's own score for its
+    move against the system (an attack too weak for its list is scored the same way, without the bar for listing it or
+    the charge for sending carriers alone), moved by how much the seat's defenders change the prize, the ships it would
+    lose and the cost of the action, plus 1 for wariness; its best move elsewhere is the option it gives up. Inside an imagined turn the enemy's own defense does not imagine further turns: it sets
+    the attack against the best free planets the enemy's carriers could reach instead. The seat asks for no better than even odds,
     relaxing as fear falls (`target = 0.5 + 0.5 (1 - fear)^2`); the _defense cost_ is the value it expects to lose above
     that target, over both windows. Only the seat's own cards are read; a neighbour contributes its public board,
     objectives and technologies. The cost then drives the plans: ships, ground forces and fighters leave a guarded

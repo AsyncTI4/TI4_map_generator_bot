@@ -16,6 +16,7 @@ import ti4.ai.eval.FlagshipRating;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Threats;
 import ti4.ai.letnev.GravleashPlan;
@@ -568,11 +569,11 @@ public class ProductionPlanner {
                 builder.count(UnitType.Destroyer) + fleetShips,
                 builder.scoringValue(UnitType.Destroyer),
                 true);
-        if (seat.getSecretsUnscored().containsKey(MIGHTY_FLEET)) {
+        if (ImaginedTurn.unscoredSecrets(seat).containsKey(MIGHTY_FLEET)) {
             builder.shipsUpTo(
                     UnitType.Dreadnought, MIGHTY_FLEET_DREADNOUGHTS, builder.scoringValue(UnitType.Dreadnought), true);
         }
-        if (seat.getSecretsUnscored().containsKey(MAKE_AN_EXAMPLE)) {
+        if (ImaginedTurn.unscoredSecrets(seat).containsKey(MAKE_AN_EXAMPLE)) {
             builder.enablingShips(model -> model.getBombardDieCount(seat) > 0);
         }
         if (PrecisionRules.held(seat)) builder.barrageShips();
@@ -788,7 +789,7 @@ public class ProductionPlanner {
     }
 
     private static boolean wantsFlagshipForSecret(Builder builder) {
-        return builder.seat.getSecretsUnscored().containsKey(UNVEIL_FLAGSHIP)
+        return ImaginedTurn.unscoredSecrets(builder.seat).containsKey(UNVEIL_FLAGSHIP)
                 && builder.onBoard(UnitType.Flagship) == 0;
     }
 

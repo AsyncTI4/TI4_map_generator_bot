@@ -192,6 +192,8 @@ class DefenseOutlookTest extends BaseTi4Test {
         double before = fear();
 
         board.test.place("35", board.beyondStaging());
+        // A new board state, so the imagined Sardakk turn is weighed again.
+        board.test.game.setLastModifiedDate(board.test.game.getLastModifiedDate() + 1);
 
         assertThat(fear()).isLessThan(before);
     }

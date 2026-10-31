@@ -29,6 +29,7 @@ import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.IconStake;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.MoveBoost;
 import ti4.ai.eval.MovementGraph;
@@ -1568,7 +1569,11 @@ public class TacticalPlanner {
         if (first.isEmpty()) return first;
         boolean raidsAHome = isAnotherPlayersHome(context.game, context.seat, tile)
                 && !first.get().estimate().landings().isEmpty();
-        if (!raidsAHome || homeLandingJustified(context, opponent, first.get())) return first;
+        if (!raidsAHome
+                || ImaginedTurn.imagines(context.seat)
+                || homeLandingJustified(context, opponent, first.get())) {
+            return first;
+        }
         return evaluated(context, tile, opponent, parts, heldBack, blend, false);
     }
 
@@ -1578,7 +1583,7 @@ public class TacticalPlanner {
     }
 
     private static boolean raidsForHeldSecret(Player seat, StrikeEstimate estimate) {
-        Set<String> held = seat.getSecretsUnscored().keySet();
+        Set<String> held = ImaginedTurn.unscoredSecrets(seat).keySet();
         return estimate.groundCombat() && (held.contains(DARKEN_THE_SKIES) || held.contains(BECOME_A_MARTYR));
     }
 
@@ -2448,7 +2453,7 @@ public class TacticalPlanner {
             Tile tile,
             Map<UnitType, Integer> bombarding,
             Optional<BombardmentRules.Target> bombardment) {
-        if (!seat.getSecretsUnscored().containsKey(MAKE_AN_EXAMPLE) || bombardment.isEmpty()) return 0;
+        if (!ImaginedTurn.unscoredSecrets(seat).containsKey(MAKE_AN_EXAMPLE) || bombardment.isEmpty()) return 0;
         if (!(tile.getUnitHolders().get(bombardment.get().planet()) instanceof Planet planet)) return 0;
         return ObjectiveValue.VICTORY_POINT_VALUE
                 * BombardmentRules.chanceToDestroyAll(
@@ -2509,7 +2514,7 @@ public class TacticalPlanner {
             boolean ground,
             boolean withDarkenTheSkies,
             double cannonWipe) {
-        Set<String> held = seat.getSecretsUnscored().keySet();
+        Set<String> held = ImaginedTurn.unscoredSecrets(seat).keySet();
         List<String> generic = new ArrayList<>();
         if (held.contains("sar")
                 && !opponent.isNeutral()
@@ -3061,7 +3066,7 @@ public class TacticalPlanner {
     private static double scarGain(Context context, Tile tile) {
         Game game = context.game;
         Player seat = context.seat;
-        if (!tile.isScar(game) || !seat.getSecretsUnscored().containsKey(ADAPT_NEW_STRATEGIES)) return 0;
+        if (!tile.isScar(game) || !ImaginedTurn.unscoredSecrets(seat).containsKey(ADAPT_NEW_STRATEGIES)) return 0;
         boolean alreadyInAScar = game.getTileMap().values().stream()
                 .anyMatch(other -> other.isScar(game) && BoardView.hasOwnShips(seat, other));
         if (alreadyInAScar) return 0;
@@ -3520,7 +3525,7 @@ public class TacticalPlanner {
     }
 
     private static boolean mechanizes(Player seat) {
-        return seat.getSecretsUnscored().containsKey(GroundCampaign.MECHANIZE_THE_MILITARY);
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(GroundCampaign.MECHANIZE_THE_MILITARY);
     }
 
     private static void addMove(List<UnitMove> moves, String origin, String holder, UnitType type, int count) {

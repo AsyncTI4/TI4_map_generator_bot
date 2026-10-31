@@ -25,7 +25,7 @@ public class IconStake {
     private static final List<String> TRAITS = List.of("cultural", "hazardous", "industrial");
 
     public static boolean seeks(Game game, Player seat) {
-        return seat.getSecretsUnscored().containsKey(SEIZE_AN_ICON)
+        return ImaginedTurn.unscoredSecrets(seat).containsKey(SEIZE_AN_ICON)
                 && ListPlayerInfoService.getPlayerProgressOnObjective(SEIZE_AN_ICON, game, seat) == 0;
     }
 
