@@ -435,6 +435,37 @@ class NekroBrainTest extends BaseTi4Test {
         assertThat(((AiDecision.Press) done).button().label()).startsWith("Done");
     }
 
+    // Live game aiplay1: Leadership's card message carries an unowned Redistribute button too. Pressing that one marks
+    // the homework done without reacting to the homework message, so the round waited on the seat forever. The seat
+    // now only redistributes from the homework message, the one that also has the "Ready For" button.
+    @Test
+    void redistributesOnlyFromTheHomeworkMessage() {
+        game.setPhaseOfGame("statusHomework");
+        AiPrompt leadership = publicPrompt("leadership", NOW + 1000, "redistributeCCButtons", "sc_no_follow_1");
+        AiPrompt homework = publicPrompt("homework", NOW, "redistributeCCButtons", "pass_on_abilities");
+
+        AiDecision decision = decide(leadership, homework);
+
+        assertPressed(decision, "redistributeCCButtons");
+        assertThat(((AiDecision.Press) decision).prompt()).isEqualTo(homework);
+    }
+
+    // A seat whose homework counts as done but that never pressed anything on the homework message has no reaction
+    // there, so it marks itself ready on that message once its tokens are gained.
+    @Test
+    void marksItselfReadyWhenItNeverReactedToTheHomeworkMessage() {
+        game.setPhaseOfGame("statusHomework");
+        game.setStoredValue("statusHomeworkReactionFornekroRound1", "added");
+        game.setStoredValue("originalCCsFornekro", "1/3/1");
+        nekro.setTacticalCC(2);
+        nekro.setFleetCC(3);
+        nekro.setStrategicCC(2);
+        AiPrompt homework = publicPrompt("homework", NOW, "redistributeCCButtons", "pass_on_abilities");
+
+        assertPressed(decide(homework), "pass_on_abilities");
+        assertThat(decide(Set.of("homework|redistributeCCButtons"), homework)).isInstanceOf(AiDecision.Idle.class);
+    }
+
     // A third strategy token is surplus while tactics are short, so it is moved back during redistribution and the
     // freed token is gained again as a tactic token: the seat starts the round able to act.
     @Test

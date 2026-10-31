@@ -92,6 +92,8 @@ import ti4.helpers.Constants;
 public class NekroBrain implements FactionBrain {
 
     private static final String OPEN_SECRET_DISCARDS = "get_so_discard_buttons";
+    private static final String REDISTRIBUTE = "redistributeCCButtons";
+    private static final String READY_FOR_NEXT_PHASE = "pass_on_abilities";
     private static final String TIED_PLANETS = "tiedPlanets_";
     private static final String FLEET_LOGISTICS = "fl";
     private static final String CHECKS_AND_BALANCES = ChecksAndBalances.GIVE_PREFIX;
@@ -750,15 +752,38 @@ public class NekroBrain implements FactionBrain {
         Game game = context.game();
         if (!"statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) return Optional.empty();
         String key = "statusHomeworkReactionFor" + context.faction() + "Round" + game.getRound();
-        if (!game.getStoredValue(key).isEmpty()) return Optional.empty();
-        for (AiPrompt prompt : newestFirst(context.prompts())) {
-            if (prompt.isHidden()) continue;
-            Optional<PromptButton> redistribute = prompt.enabledHandler("redistributeCCButtons");
+        if (!game.getStoredValue(key).isEmpty()) return readyOnTheHomeworkMessage(context);
+        for (AiPrompt prompt : homeworkMessages(context)) {
+            Optional<PromptButton> redistribute = prompt.enabledHandler(REDISTRIBUTE);
             if (redistribute.isPresent()) {
                 return Optional.of(AiDecision.press(prompt, redistribute.get(), "gain status phase command tokens"));
             }
         }
         return Optional.empty();
+    }
+
+    private Optional<AiDecision> readyOnTheHomeworkMessage(AiTurnContext context) {
+        if (CommandTokenPolicy.netGainSoFar(context.game(), context.seat())
+                < gainTarget(context.game(), context.seat())) {
+            return Optional.empty();
+        }
+        for (AiPrompt prompt : homeworkMessages(context)) {
+            Optional<PromptButton> redistribute = prompt.enabledHandler(REDISTRIBUTE);
+            Optional<PromptButton> ready = prompt.enabledHandler(READY_FOR_NEXT_PHASE);
+            if (redistribute.isEmpty() || ready.isEmpty()) continue;
+            if (context.alreadyPressed(prompt, redistribute.get()) || context.alreadyPressed(prompt, ready.get())) {
+                return Optional.empty();
+            }
+            return Optional.of(AiDecision.press(prompt, ready.get(), "mark the status phase homework done"));
+        }
+        return Optional.empty();
+    }
+
+    private static List<AiPrompt> homeworkMessages(AiTurnContext context) {
+        return newestFirst(context.prompts()).stream()
+                .filter(prompt -> !prompt.isHidden())
+                .filter(prompt -> prompt.enabledHandler(READY_FOR_NEXT_PHASE).isPresent())
+                .toList();
     }
 
     private Optional<AiDecision> firstHandler(AiTurnContext context, String handler, String reason) {
