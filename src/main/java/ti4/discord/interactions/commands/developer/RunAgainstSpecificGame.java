@@ -1,6 +1,5 @@
 package ti4.discord.interactions.commands.developer;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntConsumer;
@@ -62,10 +61,10 @@ class RunAgainstSpecificGame extends Subcommand {
     private static boolean makeChanges(Game game) {
         boolean changed = false;
         for (Tile tile : game.getTileMap().values()) {
-            changed |= capUnitsInTile(game, tile);
+            changed |= capUnitsInTile(tile);
         }
         for (Player player : game.getPlayers().values()) {
-            changed |= capUnitsInTile(game, player.getNomboxTile());
+            changed |= capUnitsInTile(player.getNomboxTile());
             changed |= capPlayerCounts(player);
             changed |= capDebtTokens(player);
             for (Leader leader : player.getLeaders()) {
@@ -79,21 +78,14 @@ class RunAgainstSpecificGame extends Subcommand {
         return changed;
     }
 
-    private static boolean capUnitsInTile(Game game, Tile tile) {
+    private static boolean capUnitsInTile(Tile tile) {
         if (tile == null) return false;
         boolean changed = false;
-        Map<UnitKey, Integer> roomInTile = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             for (Map.Entry<UnitKey, List<Integer>> entry :
                     unitHolder.getUnitsByState().entrySet()) {
-                UnitKey unitKey = entry.getKey();
-                int room = SanityLimits.isTokenBacked(unitKey.unitType())
-                        ? roomInTile.getOrDefault(unitKey, SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE)
-                        : SanityLimits.reinforcementLimit(game, unitKey);
-                List<Integer> capped = UnitHolder.capStates(entry.getValue(), room);
-                roomInTile.put(
-                        unitKey,
-                        room - capped.stream().mapToInt(Integer::intValue).sum());
+                int max = SanityLimits.unitsInOneHolder(entry.getKey().unitType());
+                List<Integer> capped = UnitHolder.capStates(entry.getValue(), max);
                 if (!capped.equals(entry.getValue())) {
                     entry.setValue(capped);
                     changed = true;

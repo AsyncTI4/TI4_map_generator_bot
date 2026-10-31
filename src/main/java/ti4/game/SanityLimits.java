@@ -1,7 +1,6 @@
 package ti4.game;
 
 import lombok.experimental.UtilityClass;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 
 @UtilityClass
@@ -18,13 +17,6 @@ public class SanityLimits {
 
     public static int unitsInOneHolder(UnitType unitType) {
         return isTokenBacked(unitType) ? INFANTRY_AND_FIGHTERS_PER_TILE : PLASTIC_UNITS;
-    }
-
-    public static int reinforcementLimit(Game game, UnitKey unitKey) {
-        Player owner = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
-        if (owner == null) return PLASTIC_UNITS;
-        int reinforcements = owner.getUnitCap(unitKey.asyncID());
-        return cap(reinforcements, PLASTIC_UNITS);
     }
 
     public static boolean isTokenBacked(UnitType unitType) {

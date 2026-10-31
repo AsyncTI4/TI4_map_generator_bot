@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ti4.helpers.Units;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
@@ -15,12 +13,11 @@ import ti4.testUtils.BaseTi4Test;
 // These ceilings sit far above anything a real game reaches, so they only ever catch bad input.
 class SanityLimitsTest extends BaseTi4Test {
 
-    private Game game;
     private Player red;
 
     @BeforeEach
     void setUp() {
-        game = new Game();
+        Game game = new Game();
         game.setName("sanity-limits-test");
         red = game.addPlayer("red-user", "Red");
         red.setColor("red");
@@ -127,28 +124,6 @@ class SanityLimitsTest extends BaseTi4Test {
                 .isEqualTo(SanityLimits.INFANTRY_AND_FIGHTERS_PER_TILE);
         assertThat(SanityLimits.unitsInOneHolder(UnitType.Dreadnought)).isEqualTo(SanityLimits.PLASTIC_UNITS);
         assertThat(SanityLimits.unitsInOneHolder(UnitType.Mech)).isEqualTo(SanityLimits.PLASTIC_UNITS);
-    }
-
-    @Test
-    void reinforcementLimitFollowsTheOwnersUnitCapUpToThePlasticLimit() {
-        red.setFaction(game, "letnev");
-        UnitKey dreadnought = Units.getUnitKey(UnitType.Dreadnought, red.getColorID());
-
-        red.setUnitCap("dn", 5);
-        assertThat(SanityLimits.reinforcementLimit(game, dreadnought)).isEqualTo(5);
-
-        red.setUnitCap("dn", 500);
-        assertThat(SanityLimits.reinforcementLimit(game, dreadnought)).isEqualTo(SanityLimits.PLASTIC_UNITS);
-
-        red.setUnitCap("dn", 0);
-        assertThat(SanityLimits.reinforcementLimit(game, dreadnought)).isZero();
-    }
-
-    @Test
-    void reinforcementLimitWithoutAnOwnerIsThePlasticLimit() {
-        UnitKey unowned = Units.getUnitKey(UnitType.Dreadnought, "ylw");
-
-        assertThat(SanityLimits.reinforcementLimit(game, unowned)).isEqualTo(SanityLimits.PLASTIC_UNITS);
     }
 
     @Test

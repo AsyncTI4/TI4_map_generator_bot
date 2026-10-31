@@ -19,7 +19,7 @@ class SCTradeGoods extends GameStateSubcommand {
         super(Constants.SC_TRADE_GOODS, "Add trade goods to strategy cards", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"));
         addOptions(
-                new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card").setRequiredRange(0, 99));
+                new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card").setRequiredRange(0, 999));
     }
 
     @Override
