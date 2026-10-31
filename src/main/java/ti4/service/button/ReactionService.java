@@ -22,6 +22,7 @@ import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.ActionCardWindowHoldService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -203,6 +204,8 @@ public class ReactionService {
             handleAllPlayersReactingNoWhens(message, game);
         } else if (gameMessage.type() == GameMessageType.STRATEGY_CARD) {
             handleAllPlayersReactingToStrategyCard(message, game);
+        } else if (gameMessage.type() == GameMessageType.ACTION_CARD_WINDOW) {
+            ActionCardWindowHoldService.close(game, gameMessage, null);
         } else {
             handleAllPlayersReactingNoSabotage(message, game, gameMessage);
         }

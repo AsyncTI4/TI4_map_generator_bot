@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.ActionCardWindowHoldService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -33,6 +34,17 @@ class ActionCardButtonHandler {
     public static void noSabotage(ButtonInteractionEvent event, Game game, Player player) {
         String message = game.isFowMode() ? "No Sabotage" : null;
         ReactionService.addReaction(event, game, player, message);
+    }
+
+    @ButtonHandler(ActionCardWindowHoldService.PASS_BUTTON_ID)
+    public static void passOnHeldWindow(ButtonInteractionEvent event, Game game, Player player) {
+        String message = game.isFowMode() ? "Passed on the action card window." : null;
+        ReactionService.addReaction(event, game, player, message);
+    }
+
+    @ButtonHandler(ActionCardWindowHoldService.BYPASS_BUTTON_ID)
+    public static void bypassHeldWindow(ButtonInteractionEvent event, Game game, Player player) {
+        ActionCardWindowHoldService.bypass(game, player, event);
     }
 
     @ButtonHandler("increaseTGonSC_")

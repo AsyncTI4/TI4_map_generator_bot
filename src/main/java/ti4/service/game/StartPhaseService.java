@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -71,6 +70,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.VeiledHeartService;
+import ti4.service.actioncard.ActionCardWindowHoldService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.CardEmojis;
@@ -631,7 +631,6 @@ public class StartPhaseService {
             }
             firstSCPicker = firstInPriorityOrder.get();
         }
-        String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
         if (game.getRound() == 1) {
@@ -643,10 +642,7 @@ public class StartPhaseService {
         LoreService.showPhaseStartLore(game, "strategy");
         FowCommunicationThreadService.checkAllCommThreads(game);
         SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STRATEGY);
-        String pickSCMsg = " Please use the buttons to pick a strategy card.";
-        if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
-            pickSCMsg = " Please use the buttons to pick the strategy card you wish to give to someone else.";
-        } else {
+        if (!isChecksAndBalancesInPlay(game)) {
             if (game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()) {
                 for (Player player2 : game.getRealPlayers()) {
                     int number = PickStrategyCardService.getSCPickOrderNumber(game, player2);
@@ -672,13 +668,8 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        if (firstSCPicker.isNpc()) {
-            PickStrategyCardService.checkForQueuedSCPick(null, firstSCPicker, game, "");
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    firstSCPicker.getCorrectChannel(),
-                    message + pickSCMsg,
-                    Helper.getRemainingSCButtons(game, firstSCPicker));
+        if (!ActionCardWindowHoldService.openStrategyPhaseHold(game)) {
+            promptFirstStrategyCardPick(game, firstSCPicker);
         }
 
         for (Player player2 : game.getRealPlayers()) {
@@ -735,43 +726,27 @@ public class StartPhaseService {
                             }
                         }));
 
-        if (game.isAcd2() && game.getRound() > 1) {
-            handleStartOfStrategyForAcd2(game);
-        }
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of the Strategy Phase for round #" + game.getRound() + ".");
         }
     }
 
-    private static void handleStartOfStrategyForAcd2(Game game) {
-        boolean deflectionDiscarded = game.isACInDiscard("Deflection");
-        boolean revolutionDiscarded = game.isACInDiscard("Revolution");
-        StringJoiner stringJoiner = new StringJoiner(" and ");
-        if (!deflectionDiscarded) stringJoiner.add("_Deflection_");
-        if (!revolutionDiscarded) stringJoiner.add("_Revolution_");
-        String acd2Shenanigans;
-        if (stringJoiner.length() > 0) {
-            acd2Shenanigans = "This is the window for " + stringJoiner + "! " + game.getPing();
-            handleStartOfStrategyForAcd2Player(game);
-        } else {
-            acd2Shenanigans = "_Deflection_ and _Revolution_ are in the discard pile. Feel free to move forward.";
+    public static void promptFirstStrategyCardPick(Game game, Player firstSCPicker) {
+        if (firstSCPicker.isNpc()) {
+            PickStrategyCardService.checkForQueuedSCPick(null, firstSCPicker, game, "");
+            return;
         }
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), acd2Shenanigans);
+        String instruction = isChecksAndBalancesInPlay(game)
+                ? " Please use the buttons to pick the strategy card you wish to give to someone else."
+                : " Please use the buttons to pick a strategy card.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                firstSCPicker.getCorrectChannel(),
+                firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card." + instruction,
+                Helper.getRemainingSCButtons(game, firstSCPicker));
     }
 
-    private static void handleStartOfStrategyForAcd2Player(Game game) {
-        for (Player player : game.getRealPlayers()) {
-            if (player.getPlayableActionCards().contains("deflection")) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + ", a reminder this is the window to play _Deflection_.");
-            }
-            if (player.getPlayableActionCards().contains("revolution")) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + ", a reminder this is the window to play _Revolution_.");
-            }
-        }
+    private static boolean isChecksAndBalancesInPlay(Game game) {
+        return game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks");
     }
 
     public static void sendStatusReminders(Game game, Player player) {
