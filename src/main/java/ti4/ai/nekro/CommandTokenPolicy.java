@@ -30,6 +30,7 @@ public class CommandTokenPolicy {
     private static final int BASE_FLEET = 3;
     private static final int EARLY_ROUNDS = 2;
     private static final int EARLY_FLEET = 3;
+    private static final int SPARE_FLEET = 2;
     private static final int TACTIC_FIRST = 2;
     private static final int STRATEGY_TARGET = 2;
     private static final int TACTIC_PLENTY = 5;
@@ -212,6 +213,7 @@ public class CommandTokenPolicy {
                 new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus)));
         levels.addAll(fearsAStall(game, seat) ? TWO_TACTICS_PER_STRATEGY : FOLLOWS_FIRST);
         levels.addAll(List.of(
+                new Level(Pool.FLEET, Math.min(cap, SPARE_FLEET)),
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.STRATEGY, strategyTarget(game, seat)),
                 new Level(Pool.FLEET, Math.min(growth, buildFleet(game, seat, largest)) - bonus),

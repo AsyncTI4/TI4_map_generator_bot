@@ -54,9 +54,9 @@ class ScarTokenTest extends BaseTi4Test {
     void takesAThirdStrategyTokenWhileTheRouteNeedsResearch() {
         test.game.setPhaseOfGame("status");
         test.nekro.setTacticalCC(0);
-        Map<CommandTokenPolicy.Pool, Integer> held = CommandTokenPolicy.ideal(test.game, test.sol, 6);
+        Map<CommandTokenPolicy.Pool, Integer> held = CommandTokenPolicy.ideal(test.game, test.sol, 7);
         test.sol.removeSecret(test.sol.getSecretsUnscored().get("ans"));
-        Map<CommandTokenPolicy.Pool, Integer> without = CommandTokenPolicy.ideal(test.game, test.sol, 6);
+        Map<CommandTokenPolicy.Pool, Integer> without = CommandTokenPolicy.ideal(test.game, test.sol, 7);
 
         assertThat(held.get(CommandTokenPolicy.Pool.STRATEGY))
                 .isGreaterThan(without.get(CommandTokenPolicy.Pool.STRATEGY));

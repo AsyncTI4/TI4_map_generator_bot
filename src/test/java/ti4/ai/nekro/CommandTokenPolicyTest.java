@@ -92,6 +92,18 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
 
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 4)).isEqualTo(split(1, 1, 2));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 5)).isEqualTo(split(2, 1, 2));
+    }
+
+    // Past two tactic and two strategy tokens, a second fleet token comes before more tactics, leaving room to build or
+    // gather a second ship.
+    @Test
+    void growsTheFleetToTwoOnceTwoTacticAndTwoStrategyTokensAreKept() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(1);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 6)).isEqualTo(split(2, 2, 2));
     }
 
     // A rival holding more tactic tokens and other stalls than this seat could make it pass first, so it keeps two
@@ -107,6 +119,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 5)).isEqualTo(split(3, 1, 1));
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 6)).isEqualTo(split(4, 1, 1));
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 7)).isEqualTo(split(4, 1, 2));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 8)).isEqualTo(split(4, 2, 2));
     }
 
     // One rival tactic token is no threat: a seat keeping one of its own can match it.
