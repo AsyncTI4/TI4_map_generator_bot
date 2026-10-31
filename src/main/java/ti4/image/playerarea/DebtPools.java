@@ -140,9 +140,8 @@ final class DebtPools {
             if (bankImage != null) {
                 return bankImage;
             }
-            Emoji replacement =
-                    TI4Emoji.findEmojiFromJustName(customEmoji.getName()).asEmoji();
-            if (replacement instanceof CustomEmoji replacementCustom) {
+            TI4Emoji replacement = TI4Emoji.findEmojiFromJustName(customEmoji.getName());
+            if (replacement != null && replacement.asEmoji() instanceof CustomEmoji replacementCustom) {
                 return RemoteImages.readScaled(replacementCustom.getImageUrl(), 120, 120);
             }
             return null;
