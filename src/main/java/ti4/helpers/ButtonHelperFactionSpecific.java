@@ -554,7 +554,7 @@ public final class ButtonHelperFactionSpecific {
                 + ", please choose which neighbor who you wish to steal a random action card from."
                 + " Please ensure that everyone's action card counts are accurate before resolving this (async often floats action card draws).";
         List<Button> buttons = new ArrayList<>();
-        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+        for (Player neighbor : player.getAbilityNeighbours()) {
             String rep = neighbor.getFaction();
             if (game.isFowMode()) {
                 rep = neighbor.getColor();
@@ -576,7 +576,7 @@ public final class ButtonHelperFactionSpecific {
         if (!player.hasAbility("deceive")
                 || game.getStoredValue(DECEIVE_PENDING + player.getFaction()).isBlank()
                 || neighbor == null
-                || !player.getNeighbouringPlayers(true).contains(neighbor)) {
+                || !player.getAbilityNeighbours().contains(neighbor)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -596,7 +596,7 @@ public final class ButtonHelperFactionSpecific {
                 || !game.getStoredValue(REFLECT_DRAWING + player.getFaction()).isBlank()) {
             return;
         }
-        Set<Player> neighbors = player.getNeighbouringPlayers(true);
+        Set<Player> neighbors = player.getAbilityNeighbours();
         if (neighbors.isEmpty()) {
             return;
         }
@@ -623,7 +623,7 @@ public final class ButtonHelperFactionSpecific {
         if (!player.hasAbility("reflect")
                 || game.getStoredValue(REFLECT_PENDING + player.getFaction()).isBlank()
                 || neighbor == null
-                || !player.getNeighbouringPlayers(true).contains(neighbor)) {
+                || !player.getAbilityNeighbours().contains(neighbor)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -676,7 +676,7 @@ public final class ButtonHelperFactionSpecific {
                 .orElse(null);
         if (!player.hasAbility("reflect")
                 || neighbor == null
-                || !player.getNeighbouringPlayers(true).contains(neighbor)
+                || !player.getAbilityNeighbours().contains(neighbor)
                 || actionCard == null) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -1068,7 +1068,7 @@ public final class ButtonHelperFactionSpecific {
         int remaining = Integer.parseInt(game.getStoredValue(THWART_REMAINING + player.getFaction()));
         Set<String> targetedFactions = getThwartTargets(game, player);
         List<Button> buttons = new ArrayList<>();
-        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+        for (Player neighbor : player.getAbilityNeighbours()) {
             if (!targetedFactions.contains(neighbor.getFaction())
                     && (neighbor.getCommodities() > 0 || neighbor.getTg() > 0)) {
                 buttons.add(Buttons.red(
@@ -1094,7 +1094,7 @@ public final class ButtonHelperFactionSpecific {
                 || !session.equals(game.getStoredValue(THWART_SESSION + player.getFaction()))
                 || neighbor == null
                 || getThwartTargets(game, player).contains(neighbor.getFaction())
-                || !player.getNeighbouringPlayers(true).contains(neighbor)) {
+                || !player.getAbilityNeighbours().contains(neighbor)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -5109,8 +5109,9 @@ public final class ButtonHelperFactionSpecific {
             return false;
         }
         List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, empyPlayer, UnitType.Mech);
+        Adjacency adjacency = Adjacency.of(game, empyPlayer).forEffects().withSelf();
         for (Tile tile : tiles) {
-            Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), empyPlayer, true);
+            Set<String> adjTiles = adjacency.from(tile.getPosition());
             for (String adjTile : adjTiles) {
                 Tile adjT = game.getTileMap().get(adjTile);
                 if (FoWHelper.playerHasUnitsInSystem(acPlayer, adjT)) {
@@ -5131,9 +5132,10 @@ public final class ButtonHelperFactionSpecific {
         List<Tile> tiles =
                 CheckUnitContainmentService.getTilesContainingPlayersUnits(game, empyPlayer, UnitType.Fighter);
         int count = 0;
+        Adjacency adjacency = Adjacency.of(game, empyPlayer).forEffects().withSelf();
         for (Tile tile : tiles) {
             int systemFF = tile.getSpaceUnitHolder().getUnitCount(UnitType.Fighter, empyPlayer.getColor());
-            Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), empyPlayer, true);
+            Set<String> adjTiles = adjacency.from(tile.getPosition());
             for (String adjTile : adjTiles) {
                 Tile adjT = game.getTileMap().get(adjTile);
                 if (FoWHelper.playerHasUnitsInSystem(acPlayer, adjT)) {

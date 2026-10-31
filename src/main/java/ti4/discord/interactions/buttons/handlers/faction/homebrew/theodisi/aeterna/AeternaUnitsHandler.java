@@ -19,6 +19,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
@@ -521,7 +522,7 @@ public class AeternaUnitsHandler {
         if (ButtonHelper.doesPlayerHaveFSHere("aeterna_flagship", player, tile)) {
             return true;
         }
-        return FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false).stream()
+        return Adjacency.of(game, player).forEffects().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(adjacentTile -> ButtonHelper.doesPlayerHaveFSHere("aeterna_flagship", player, adjacentTile));
     }

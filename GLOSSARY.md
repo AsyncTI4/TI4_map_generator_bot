@@ -467,6 +467,18 @@ _Avoid_: Seating order
 The relationship between Systems that touch, share a wormhole type or are joined by hyperlane lines, governing movement.
 _Avoid_: Neighbors (that names Players with pieces in or next to each other's Systems)
 
+**Outbound / inbound adjacency**:
+The two directions of a one-way link: the Systems a System reaches (outbound, `Adjacency.from`) and the Systems that reach it (inbound, `Adjacency.into`). On two-way maps they are the same. The side that acts needs outbound access: a PDS covers a System its own System reaches, and ships score "adjacent to X" when their System reaches X.
+_Avoid_: Forward/backward adjacency
+
+**Either-way adjacency**:
+Outbound and inbound together (`Adjacency.either`), used only for communication such as Transactions and fog whispers.
+_Avoid_: Mutual adjacency (that would need both directions)
+
+**Ability neighbors**:
+The Neighbors an ability, card or objective that says "neighbor" counts for the Player who uses it (`Player.getAbilityNeighbours`): with One-way adjacency on, the Players their Systems reach; otherwise the same as Neighbors.
+_Avoid_: Direct neighbors
+
 **Elimination**:
 A Player's removal from the Game when they control no Planets, have no ground forces on the Map and own no unit with Production.
 

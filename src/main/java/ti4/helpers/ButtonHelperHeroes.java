@@ -713,7 +713,7 @@ public class ButtonHelperHeroes {
 
     public static boolean isNextToPlanetControlledBy(Game game, Player player, Tile tile) {
         if (tile == null) return false;
-        for (String position : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String position : Adjacency.of(game, player).forEffects().into(tile.getPosition())) {
             Tile adjacent = game.getTileByPosition(position);
             if (adjacent == null) continue;
             for (UnitHolder holder : adjacent.getPlanetUnitHolders()) {

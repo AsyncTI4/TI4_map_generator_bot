@@ -75,13 +75,13 @@ public class XytherisAbilityHandler {
 
     private static Set<String> systemsUpToTwoAway(Game game, Player player, String position) {
         Adjacency adjacency = Adjacency.of(game, player);
-        Set<String> nearby = adjacency.from(position);
+        Set<String> nearby = adjacency.into(position);
         for (String adjacent : Set.copyOf(nearby)) {
             Tile adjacentTile = game.getTileByPosition(adjacent);
             if (adjacentTile != null
                     && (adjacentTile.getTileModel() == null
                             || !adjacentTile.getTileModel().isHyperlane())) {
-                nearby.addAll(adjacency.from(adjacent));
+                nearby.addAll(adjacency.into(adjacent));
             }
         }
         nearby.remove(position);

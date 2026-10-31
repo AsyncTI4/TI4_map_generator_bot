@@ -28,6 +28,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.json.JsonMapperManager;
 import ti4.model.AbilityModel;
 import ti4.model.AgendaModel;
@@ -717,8 +718,7 @@ public class CombatModHelper {
                     List<Tile> tilesToCheck = new ArrayList<>();
                     tilesToCheck.add(tile);
                     if (unitsByQuantity.keySet().stream().anyMatch(UnitModel::getDeepSpaceCannon)) {
-                        for (String adjPos :
-                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                        for (String adjPos : Adjacency.of(game, player).into(tile.getPosition())) {
                             Tile adjTile = game.getTileByPosition(adjPos);
                             if (adjTile != null) {
                                 tilesToCheck.add(adjTile);
@@ -777,8 +777,7 @@ public class CombatModHelper {
                         "sigma_argent_flagship_1", player, game.getTileByPosition(game.getActiveSystem()));
             case "sigma_argent_flagship_2" -> {
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, tile);
-                for (String adjPos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                for (String adjPos : Adjacency.of(game, player).into(tile.getPosition())) {
                     meetsCondition |= ButtonHelper.doesPlayerHaveFSHere(
                             "sigma_argent_flagship_2", player, game.getTileByPosition(adjPos));
                 }
@@ -924,8 +923,7 @@ public class CombatModHelper {
                     }
                 }
                 case "adjacent_anomaly" -> {
-                    for (String pos :
-                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true, true)) {
+                    for (String pos : Adjacency.of(game, player).withSelf().from(activeSystem.getPosition())) {
                         Tile tile = game.getTileByPosition(pos);
                         if (tile.isAnomaly(game, player)) {
                             scalingCount += 1;
@@ -1106,8 +1104,7 @@ public class CombatModHelper {
         }
         Set<UnitHolder> holders = Collections.newSetFromMap(new IdentityHashMap<>());
         holders.add(unitHolder);
-        for (String adjacentPosition :
-                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+        for (String adjacentPosition : Adjacency.of(game, player).withSelf().into(activeSystem.getPosition())) {
             holders.addAll(
                     game.getTileByPosition(adjacentPosition).getUnitHolders().values());
         }

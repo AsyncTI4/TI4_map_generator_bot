@@ -545,15 +545,18 @@ public final class FoWHelper {
      * Includes custom adjacent tiles defined on the map level, hyperlanes, and
      * wormholes
      */
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow) {
         return getAdjacentTiles(game, position, player, toShow, true);
     }
 
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile) {
         return getAdjacentTiles(game, position, player, toShow, includeTile, false);
     }
 
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
         Adjacency adjacency =
@@ -574,6 +577,7 @@ public final class FoWHelper {
         return emptyTiles;
     }
 
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTilesAndNotThisTile(
             Game game, String position, Player player, boolean toShow) {
         return getAdjacentTiles(game, position, player, toShow, false);
@@ -596,7 +600,8 @@ public final class FoWHelper {
     public static boolean isTileInExileRange(Game game, Tile tile, Player player, Predicate<String> seen) {
         if (player.hasUnit("crimson_destroyer")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
-            Set<String> adjacent = seenAdjacentTiles(game, tile.getPosition(), player, seen);
+            Adjacency adjacency = Adjacency.of(game, player).withSelf();
+            Set<String> adjacent = seenTilesReaching(adjacency, tile.getPosition(), seen);
             for (Tile tile2 : destroyers) {
                 if (adjacent.contains(tile2.getPosition())) {
                     return true;
@@ -613,8 +618,9 @@ public final class FoWHelper {
     public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player, Predicate<String> seen) {
         if (player.hasUnit("crimson_destroyer2")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
-            for (String adjPos : seenAdjacentTiles(game, tile.getPosition(), player, seen)) {
-                Set<String> secondRing = seenAdjacentTiles(game, adjPos, player, seen);
+            Adjacency adjacency = Adjacency.of(game, player).withSelf();
+            for (String adjPos : seenTilesReaching(adjacency, tile.getPosition(), seen)) {
+                Set<String> secondRing = seenTilesReaching(adjacency, adjPos, seen);
                 for (Tile tile2 : destroyers) {
                     if (secondRing.contains(tile2.getPosition())) {
                         return true;
@@ -626,10 +632,10 @@ public final class FoWHelper {
     }
 
     // TODO: seen-filtering still links two seen tiles through an unseen hyperlane (FoW+ / HIDE_MAP already block it)
-    private static Set<String> seenAdjacentTiles(Game game, String position, Player player, Predicate<String> seen) {
-        Set<String> adjacent = new HashSet<>(getAdjacentTiles(game, position, player, false, true));
-        adjacent.removeIf(seen.negate());
-        return adjacent;
+    private static Set<String> seenTilesReaching(Adjacency adjacency, String position, Predicate<String> seen) {
+        Set<String> sources = adjacency.into(position);
+        sources.removeIf(seen.negate());
+        return sources;
     }
 
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
@@ -685,10 +691,16 @@ public final class FoWHelper {
      * privy to
      */
     public static List<Player> getAdjacentPlayers(Game game, String position, boolean includeSweep) {
+        return getAdjacentPlayers(game, position, includeSweep, AdjacencyPurpose.EFFECTS);
+    }
+
+    public static List<Player> getAdjacentPlayers(
+            Game game, String position, boolean includeSweep, AdjacencyPurpose purpose) {
         List<Player> players = new ArrayList<>();
         if (FOWPlusService.isVoid(game, position)) return players;
 
-        Set<String> tilesToCheck = getAdjacentTiles(game, position, null, false);
+        Set<String> tilesToCheck =
+                Adjacency.of(game).forPurpose(purpose).withSelf().into(position);
         Tile startingTile = game.getTileByPosition(position);
 
         for (Player player_ : game.getRealPlayers()) {
@@ -865,7 +877,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        for (String pos : getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String pos : Adjacency.of(game, player).into(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);
             UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {

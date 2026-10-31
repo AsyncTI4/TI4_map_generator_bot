@@ -20,7 +20,7 @@ class AbductionAcd2ButtonHandler {
     @ButtonHandler("resolveAbduction")
     public static void resolveAbduction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             if (p2 == player) continue;
             for (Leader leader : p2.getLeaders()) {
                 boolean isAgent = Constants.AGENT.equals(leader.getType());

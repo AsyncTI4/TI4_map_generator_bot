@@ -19,6 +19,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.tactical.movement.BelkoseaAgentService;
@@ -29,7 +30,23 @@ public class CheckDistanceHelper {
 
     public static int getDistanceBetweenTwoTiles(
             Game game, Player player, String tilePosition1, String tilePosition2, boolean countsRiftsAsNormal) {
-        Map<String, Integer> distances = getTileDistances(game, player, tilePosition1, 8, countsRiftsAsNormal);
+        return distanceBetweenTwoTiles(game, player, tilePosition1, tilePosition2, countsRiftsAsNormal, false);
+    }
+
+    public static int getDistanceIgnoringOtherShips(
+            Game game, Player player, String tilePosition1, String tilePosition2, boolean countsRiftsAsNormal) {
+        return distanceBetweenTwoTiles(game, player, tilePosition1, tilePosition2, countsRiftsAsNormal, true);
+    }
+
+    private static int distanceBetweenTwoTiles(
+            Game game,
+            Player player,
+            String tilePosition1,
+            String tilePosition2,
+            boolean countsRiftsAsNormal,
+            boolean ignoreOtherShips) {
+        Map<String, Integer> distances =
+                tileDistances(game, player, tilePosition1, 8, countsRiftsAsNormal, ignoreOtherShips);
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
         }
@@ -95,6 +112,11 @@ public class CheckDistanceHelper {
 
     public static Map<String, Integer> getTileDistances(
             Game game, Player player, String tilePosition, int maxDistance, boolean forMap) {
+        return tileDistances(game, player, tilePosition, maxDistance, forMap, false);
+    }
+
+    private static Map<String, Integer> tileDistances(
+            Game game, Player player, String tilePosition, int maxDistance, boolean forMap, boolean ignoreOtherShips) {
         Map<String, Integer> distances = new HashMap<>();
         distances.put(tilePosition, 0);
         Tile tile2 = game.getTileByPosition(tilePosition);
@@ -136,6 +158,7 @@ public class CheckDistanceHelper {
                                     && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)
                                     && !IxthLegendaryButtonHandler.ignoresHoraceAnomaly(game, player, tile))
                             || (player != null
+                                    && !ignoreOtherShips
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
                                     && !BelkoseaAgentService.ignoresOtherShips(game, player, tile)
                                     && !player.hasTech("lwd")
@@ -195,6 +218,25 @@ public class CheckDistanceHelper {
             distances.putIfAbsent(otherTilePosition, null);
         }
 
+        return distances;
+    }
+
+    public static Map<String, Integer> getBoardDistances(Game game, String tilePosition, int maxDistance) {
+        Adjacency adjacency = Adjacency.of(game).forEffects();
+        Map<String, Integer> distances = new HashMap<>();
+        distances.put(tilePosition, 0);
+        List<String> frontier = List.of(tilePosition);
+        for (int distance = 1; distance <= maxDistance && !frontier.isEmpty(); distance++) {
+            List<String> nextFrontier = new ArrayList<>();
+            for (String position : frontier) {
+                for (String adjacent : adjacency.from(position)) {
+                    if (distances.putIfAbsent(adjacent, distance) == null && game.getTileByPosition(adjacent) != null) {
+                        nextFrontier.add(adjacent);
+                    }
+                }
+            }
+            frontier = nextFrontier;
+        }
         return distances;
     }
 

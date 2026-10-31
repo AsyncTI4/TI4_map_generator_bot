@@ -256,7 +256,7 @@ public class IronSalvageRelicHandler {
 
     private static boolean hasDestroyerAfb(Game game, Player player, Tile combatTile) {
         return combatTile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, player) > 0
-                || FoWHelper.getAdjacentTiles(game, combatTile.getPosition(), player, false, false).stream()
+                || Adjacency.of(game, player).forEffects().into(combatTile.getPosition()).stream()
                         .map(game::getTileByPosition)
                         .filter(java.util.Objects::nonNull)
                         .anyMatch(tile -> tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, player) > 0);

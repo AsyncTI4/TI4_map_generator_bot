@@ -36,6 +36,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.logging.BotLogger;
@@ -1419,7 +1420,7 @@ public final class ButtonHelperSCs {
 
     public static int getNearbyEmbassyCount(Game game, Tile tile, Player player) {
         int embassy = 0;
-        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+        for (String pos : Adjacency.of(game).forEffects().withSelf().from(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);
             for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
                 for (String token : uH.getTokenList()) {
@@ -1434,7 +1435,7 @@ public final class ButtonHelperSCs {
 
     public static void updateEmbassies(Game game, Player player, Tile tile) {
         int count = getNearbyEmbassyCount(game, tile, player);
-        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+        for (String pos : Adjacency.of(game).forEffects().withSelf().from(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);
             for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
                 Set<String> tokens = new HashSet<>(uH.getTokenList());

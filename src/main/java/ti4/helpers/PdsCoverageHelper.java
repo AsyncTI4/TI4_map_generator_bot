@@ -14,6 +14,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.model.UnitModel;
 
@@ -53,7 +54,7 @@ public final class PdsCoverageHelper {
             }
 
             // Check adjacent tiles for PDS coverage
-            for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {
+            for (String adjTilePos : Adjacency.of(game, player).withSelf().into(tilePos)) {
                 Tile adjTile = game.getTileByPosition(adjTilePos);
                 if (adjTile == null) {
                     continue;

@@ -26,6 +26,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.UnusedCommanderHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
@@ -714,7 +715,7 @@ public class BlueReverieRelicHandler {
 
     private static boolean canPlaceEntropicScar(Game game, Player player, Tile tile) {
         if (tile.containsPlayersUnits(player)) return true;
-        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false).stream()
+        return Adjacency.of(game, player).forEffects().withSelf().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(adjacent -> adjacent != null && adjacent.containsPlayersUnits(player));
     }

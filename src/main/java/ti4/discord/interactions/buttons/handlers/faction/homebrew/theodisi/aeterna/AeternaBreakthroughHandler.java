@@ -1,6 +1,5 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna;
 
-import java.util.HashSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -8,10 +7,10 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.model.UnitModel;
 
 @UtilityClass
@@ -32,7 +31,8 @@ public class AeternaBreakthroughHandler {
             return false;
         }
 
-        Set<String> coveredTiles = new HashSet<>(FoWHelper.getAdjacentTiles(game, tilePosition, player, false, true));
+        Set<String> coveredTiles =
+                Adjacency.of(game, player).forEffects().withSelf().into(tilePosition);
         coveredTiles.add(tilePosition);
 
         for (String position : coveredTiles) {

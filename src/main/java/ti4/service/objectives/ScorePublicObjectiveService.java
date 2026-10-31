@@ -81,8 +81,9 @@ public class ScorePublicObjectiveService {
             if (player.getPromissoryNotesInPlayArea().contains("bapnkalo")) {
                 KaloraAbilityHandler.sharedTreasure(player, game);
             }
-            for (Player p2 : player.getNeighbouringPlayers(true)) {
-                if (p2.hasLeaderUnlocked("syndicatecommander")) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.hasLeaderUnlocked("syndicatecommander")
+                        && p2.getAbilityNeighbours().contains(player)) {
                     p2.setTg(p2.getTg() + 1);
                     String msg = p2.getRepresentationUnfogged() + ", you gained 1 trade good"
                             + " due to your neighbor scoring a public objective while you have Fillipo Rois, the Tnelis commander."

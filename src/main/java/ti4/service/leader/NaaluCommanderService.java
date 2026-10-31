@@ -73,7 +73,7 @@ public class NaaluCommanderService {
 
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (Player player_ : player.getNeighbouringPlayers(true)) {
+        for (Player player_ : player.getAbilityNeighbours()) {
             if (!first) sb.append("\n\n");
             first = false;
             sb.append("## ").append(player_.getRepresentation(false, false)).append("'s ");

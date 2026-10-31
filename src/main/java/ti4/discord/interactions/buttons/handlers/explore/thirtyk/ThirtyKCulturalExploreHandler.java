@@ -41,7 +41,7 @@ public class ThirtyKCulturalExploreHandler {
     private static final String FAUX_GIVE = "thirtyKFauxGive_";
 
     public static void resolveSharedWealth(GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
-        List<Player> eligible = playersWithUnitsInOrAdjacent(game, player, tile);
+        List<Player> eligible = playersWithUnitsInOrAdjacent(game, tile);
         if (eligible.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
                     event, "The colony opens its stores, but no player has units adjacent to this planet.");
@@ -262,7 +262,7 @@ public class ThirtyKCulturalExploreHandler {
     }
 
     public static void resolveFauxAltruisticFestivals(GenericInteractionCreateEvent event, Game game, Player player) {
-        for (Player neighbor : player.getNeighbouringPlayers(false)) {
+        for (Player neighbor : player.getAbilityNeighbours()) {
             List<Button> buttons = new ArrayList<>();
             for (Map.Entry<String, Integer> note : neighbor.getPromissoryNotes().entrySet()) {
                 if (neighbor.getPromissoryNotesInPlayArea().contains(note.getKey())) continue;
@@ -314,10 +314,10 @@ public class ThirtyKCulturalExploreHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static List<Player> playersWithUnitsInOrAdjacent(Game game, Player player, Tile tile) {
-        List<Tile> tiles = ThirtyKExploreSupport.tilesInOrAdjacent(game, player, tile);
+    private static List<Player> playersWithUnitsInOrAdjacent(Game game, Tile tile) {
         List<Player> players = new ArrayList<>();
         for (Player other : game.getRealPlayers()) {
+            List<Tile> tiles = ThirtyKExploreSupport.tilesInOrReaching(game, other, tile);
             if (tiles.stream().anyMatch(nearby -> FoWHelper.playerHasUnitsInSystem(other, nearby))) {
                 players.add(other);
             }

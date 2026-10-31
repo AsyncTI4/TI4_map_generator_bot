@@ -86,6 +86,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
@@ -2458,7 +2459,7 @@ public final class Helper {
         if (game.isTwilightsFallMode() && !XinTechHandler.hasVeiledNetworkingStar(player)) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
+                    for (String tilePos : Adjacency.of(game, p2).withSelf().into(tile.getPosition())) {
                         Tile t2 = game.getTileByPosition(tilePos);
                         for (UnitHolder uH : t2.getUnitHolders().values()) {
                             if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0

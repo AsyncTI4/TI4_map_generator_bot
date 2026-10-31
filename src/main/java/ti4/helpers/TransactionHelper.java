@@ -1963,8 +1963,10 @@ public class TransactionHelper {
             return;
         }
         String playerRepresentation = player.getRepresentation(false, false, true);
-        for (Player neighbor : player.getNeighbouringPlayers(true)) {
-            if (!neighbor.hasAbility("pillage")) {
+        for (Player neighbor : game.getRealPlayers()) {
+            if (neighbor == player
+                    || !neighbor.hasAbility("pillage")
+                    || !neighbor.getAbilityNeighbours().contains(player)) {
                 continue;
             }
             String neighborRepresentation = neighbor.getRepresentation(false, false, true);

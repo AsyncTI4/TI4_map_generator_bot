@@ -16,6 +16,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyIds;
@@ -46,7 +47,7 @@ public class VoidTetherService {
     public boolean meetsCriteria(Game game, Player player, Tile activeSystem) {
         if (!player.hasUnlockedBreakthrough("empyreanbt")) return false;
 
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true);
+        Set<String> adjTiles = Adjacency.of(game, player).withSelf().into(activeSystem.getPosition());
         for (String pos : adjTiles) {
             Tile t = game.getTileByPosition(pos);
             if (FoWHelper.playerHasUnitsInSystem(player, t)) {

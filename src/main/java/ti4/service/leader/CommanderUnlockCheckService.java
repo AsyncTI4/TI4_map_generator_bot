@@ -20,6 +20,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -89,7 +90,7 @@ public class CommanderUnlockCheckService {
             case "naalu" -> {
                 Tile rex = game.getMecatolTile();
                 if (rex != null) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, rex.getPosition(), player, false)) {
+                    for (String tilePos : Adjacency.of(game, player).withSelf().into(rex.getPosition())) {
                         Tile tile = game.getTileByPosition(tilePos);
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                             if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
@@ -156,8 +157,8 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = (num >= 6);
             }
             case "empyrean" ->
-                shouldBeUnlocked =
-                        (player.getNeighbourCount() >= (game.getRealPlayers().size() - 1));
+                shouldBeUnlocked = (player.getAbilityNeighbours().size()
+                        >= (game.getRealPlayers().size() - 1));
             case "mahact" -> shouldBeUnlocked = (player.getMahactCC().size() >= 2);
             case "mahact_y" -> shouldBeUnlocked = (player.getMahactCC().size() >= 3);
             case "naaz" ->

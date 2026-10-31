@@ -98,6 +98,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
@@ -2087,8 +2088,8 @@ public class StartCombatService {
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
             if (agentHolder.hasUnit("empyrean_flagship")
                     && !flagshipTile.isEmpty()
-                    && FoWHelper.getAdjacentTiles(game, pos, agentHolder, false, true)
-                            .contains(flagshipTile.getFirst().getPosition())) {
+                    && Adjacency.of(game, agentHolder)
+                            .isAdjacent(flagshipTile.getFirst().getPosition(), pos)) {
                 buttons.add(Buttons.gray(
                         factionChecker + "empyreanFlagshipAbilityStep1_" + pos,
                         "Use Empyrean Flagship Ability",

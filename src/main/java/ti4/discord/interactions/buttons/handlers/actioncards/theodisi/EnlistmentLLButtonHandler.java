@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 
@@ -87,7 +88,7 @@ public class EnlistmentLLButtonHandler {
     }
 
     private static boolean isAdjacentToPlayersUnits(Game game, Player player, Tile tile) {
-        return FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false).stream()
+        return Adjacency.of(game, player).forEffects().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(adjacent -> FoWHelper.playerHasUnitsInSystem(player, adjacent));
     }

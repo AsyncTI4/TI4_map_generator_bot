@@ -13,12 +13,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ti4.game.persistence.TestGameHarness;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
+import ti4.helpers.adjacency.WormholeRule;
 import ti4.model.ColorModel;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
+import ti4.service.fow.FOWPlusService;
 import ti4.testUtils.BaseTi4Test;
 
 class PlayerNeighbouringPlayersTest extends BaseTi4Test {
@@ -113,7 +117,7 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
         }
 
         for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(game, tile.getPosition(), false));
+            adjacentPlayers.addAll(legacyAdjacentPlayers(game, tile.getPosition()));
             if (realPlayers.size() == adjacentPlayers.size()) break;
         }
         adjacentPlayers.remove(self);
@@ -126,6 +130,27 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
             }
         }
         return adjacentPlayers;
+    }
+
+    // FoWHelper.getAdjacentPlayers as it was before PR-D turned it to the systems that reach the position.
+    private static List<Player> legacyAdjacentPlayers(Game game, String position) {
+        List<Player> players = new ArrayList<>();
+        if (FOWPlusService.isVoid(game, position)) return players;
+        Set<String> tilesToCheck = Adjacency.of(game).withSelf().from(position);
+        for (Player player : game.getRealPlayers()) {
+            Set<String> tiles = new HashSet<>(tilesToCheck);
+            if (player.hasAbility("quantum_entanglement") || ButtonHelper.isLawInPlay(game, "travel_ban")) {
+                tiles.addAll(WormholeRule.connectionsFrom(game, player, position));
+            }
+            for (String other : tiles) {
+                Tile tile = game.getTileByPosition(other);
+                if (tile != null && FoWHelper.playerIsInSystem(game, tile, player, true)) {
+                    players.add(player);
+                    break;
+                }
+            }
+        }
+        return players;
     }
 
     static Game syntheticGame(int playerCount, int rings, long seed, boolean quantumEntanglement, boolean travelBan) {
