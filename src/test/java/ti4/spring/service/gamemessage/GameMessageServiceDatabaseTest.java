@@ -31,9 +31,10 @@ import org.springframework.test.context.DynamicPropertySource;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageType;
 
-// Runs against a real Postgres, e.g. a throwaway database in a local container:
+// Runs against a real Postgres. CI provides one (the postgres service in .github/workflows/run-tests.yml).
+// Locally, set the variable to a throwaway database, never the dev "tibot" one, since create-drop drops its tables:
 //   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test
-// Skipped when the variable is unset (CI has no database).
+// Skipped when the variable is unset.
 @EnabledIfEnvironmentVariable(named = "TI4_TEST_POSTGRES_URL", matches = ".+")
 @SpringBootTest(
         classes = GameMessageServiceDatabaseTest.TestConfig.class,
