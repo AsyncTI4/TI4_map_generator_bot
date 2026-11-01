@@ -1676,7 +1676,7 @@ public final class ButtonHelperModifyUnits {
                     && !player.getPlanets().contains(unitHolder.getName())) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("takeMonument_" + unitHolder.getName(), "Take Control Of Monument"));
-                b2s.add(Buttons.blue("destroyMonument_" + tile.getPosition(), "Destroy Monument"));
+                b2s.add(Buttons.blue("destroyMonument_" + unitHolder.getName(), "Destroy Monument"));
                 b2s.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
