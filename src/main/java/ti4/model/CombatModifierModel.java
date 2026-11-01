@@ -63,7 +63,7 @@ public class CombatModifierModel implements ModelInterface {
                 isInScope = true;
             }
             if ("_best_".equals(scope)) {
-                List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
+                List<UnitModel> sortedAllUnits = unitsThatRoll(allUnits, rollType, player);
                 sortedAllUnits.sort(Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player)));
                 UnitModel best = sortedAllUnits.getFirst();
                 if (sortedAllUnits.size() > 1) {
@@ -135,5 +135,12 @@ public class CombatModifierModel implements ModelInterface {
             }
         }
         return isInScope;
+    }
+
+    private static List<UnitModel> unitsThatRoll(List<UnitModel> units, CombatRollType rollType, Player player) {
+        List<UnitModel> rolling = new ArrayList<>(units.stream()
+                .filter(unit -> unit.getCombatDieCountForAbility(rollType, player) > 0)
+                .toList());
+        return rolling.isEmpty() ? new ArrayList<>(units) : rolling;
     }
 }
