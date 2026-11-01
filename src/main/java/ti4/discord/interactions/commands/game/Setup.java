@@ -16,28 +16,21 @@ class Setup extends GameStateSubcommand {
     Setup() {
         super(Constants.SETUP, "Game Setup", true, false);
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.PLAYER_COUNT_FOR_MAP,
-                        "Number of players between 1 or 30. Default 6")
-                .setRequiredRange(1, 30));
+                OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game victory point count. Default is 10")
                 .setRequiredRange(1, 99));
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.SC_COUNT_FOR_MAP,
-                        "Number of strategy cards each player gets. Default 1")
-                .setRequiredRange(1, 10));
+                OptionType.INTEGER,
+                Constants.SC_COUNT_FOR_MAP,
+                "Number of strategy cards each player gets. Default 1"));
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.MAX_SO_COUNT,
-                        "Max Number of secret objectives per player. Default 3")
-                .setRequiredRange(0, 99));
+                OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of secret objectives per player. Default 3"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.AUTO_PING,
                         "Hours between auto pings. Min 1. Enter 0 to turn off.")
-                .setRequiredRange(0, 720));
+                .setRequiredRange(0, 240));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.WHISPERS_ENABLED, "True to allow whispers in this game."));
     }

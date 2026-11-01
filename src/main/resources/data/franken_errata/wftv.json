@@ -61,6 +61,18 @@
         "source": "wftv"
     },
     {
+        "itemCategory": "TECH",
+        "itemId": "bazephcr",
+        "optionalSwaps": ["COMMANDER:zephyrioncommander"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "zephyrioncommander",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "phantom_energy",
         "optionalSwaps": ["FLAGSHIP:tyris_flagship"],
@@ -109,6 +121,13 @@
         "itemCategory": "ABILITY",
         "itemId": "strategic_fluidity",
         "additionalComponents": ["ABILITY:detachment"],
+        "optionalSwaps": ["COMMANDER:onyxxacommander"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "onyxxacommander",
+        "undraftable": true,
         "source": "wftv"
     },
     {

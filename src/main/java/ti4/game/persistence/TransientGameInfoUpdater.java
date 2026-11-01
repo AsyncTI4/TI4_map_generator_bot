@@ -3,6 +3,9 @@ package ti4.game.persistence;
 import java.util.ArrayList;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -36,6 +39,14 @@ class TransientGameInfoUpdater {
             BlueReverieTechHelper.syncEcologicalEngineeringAttachments(game);
             for (Player player : game.getRealPlayers()) {
                 CommanderUnlockCheckService.checkPlayer(player, "ta");
+            }
+            MigoUnitHandler.syncNevermen(game);
+            for (Player player : game.getRealPlayers()) {
+                CommanderUnlockCheckService.checkPlayer(player, "migo");
+            }
+            MigoLeadersHandler.syncMigoCommanderBonus(game);
+            for (Player player : game.getRealPlayers()) {
+                MigoAbilityHandler.syncHarvestCards(game, player);
                 MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);
                 MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
             }

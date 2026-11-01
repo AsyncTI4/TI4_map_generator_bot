@@ -30,11 +30,9 @@ class GameWinsWithOtherFactions extends Subcommand {
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION6, "Faction That You Want In The Games")
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8")
-                .setRequiredRange(1, 30));
+        addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(
-                        OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14")
-                .setRequiredRange(1, 99));
+                OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(
                 OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2"));
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));

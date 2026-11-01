@@ -267,6 +267,9 @@ public enum LeaderEmojis implements TI4Emoji {
     ValhavnAgent,
     ValhavnCommander,
     ValhavnHero,
+    MigoAgent,
+    MigoCommander,
+    MigoHero,
 
     // Lost Legacies (Theodisi)
     ArdentiaAgent,

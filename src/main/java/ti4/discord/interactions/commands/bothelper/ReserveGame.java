@@ -23,8 +23,7 @@ public class ReserveGame extends Subcommand {
     ReserveGame() {
         super("reserve_game", "Adds or removes a game number from the list of reserved game numbers.");
         addOptions(new OptionData(OptionType.STRING, CATEGORY, "'pbd' or 'fow'", true).addChoices(categories));
-        addOptions(new OptionData(OptionType.INTEGER, NUMBER, "Game number to reserve", true)
-                .setRequiredRange(1, 999_999));
+        addOptions(new OptionData(OptionType.INTEGER, NUMBER, "Game number to reserve", true).setMinValue(1));
         addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove from the list instead", false)
                 .addChoices(removeOpts));
     }

@@ -16,7 +16,7 @@ class DiscardACRandom extends GameStateSubcommand {
     public DiscardACRandom() {
         super(Constants.DISCARD_AC_RANDOM, "Discard a random Action Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to discard, default 1")
-                .setRequiredRange(1, 50));
+                .setRequiredRange(1, 10));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }

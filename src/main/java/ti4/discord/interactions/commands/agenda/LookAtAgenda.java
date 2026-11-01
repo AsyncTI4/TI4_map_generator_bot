@@ -3,7 +3,6 @@ package ti4.discord.interactions.commands.agenda;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -14,8 +13,7 @@ class LookAtAgenda extends GameStateSubcommand {
 
     public LookAtAgenda() {
         super(Constants.LOOK, "Look at the agenda deck", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at")
-                .setRequiredRange(1, 60));
+        addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");
         addOption(OptionType.BOOLEAN, Constants.LOOK_AT_BOTTOM, "To look at top or bottom");
     }
 

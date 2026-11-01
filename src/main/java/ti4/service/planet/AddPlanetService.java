@@ -12,6 +12,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
@@ -244,6 +247,7 @@ public class AddPlanetService {
                         ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
+                    MigoAbilityHandler.reconcileHarvestCards(game, player_);
                     ThirtyKSecretHooks.onPlanetLost(game, player_, unitHolder);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());
@@ -353,6 +357,12 @@ public class AddPlanetService {
             }
         }
         ThirtyKActionCardHooks.onPlanetControlChanged(game, player, previousOwner, planet);
+        if (!doubleCheck && !setup) {
+            MigoAbilityHandler.onPlanetGained(player, planet);
+            MigoUnitHandler.syncNevermen(game);
+            MigoAbilityHandler.reconcileHarvestCards(game, player);
+            MigoAbilityHandler.offerMechHarvestChoices(game, player);
+        }
         if ((!alreadyOwned && player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
                 && !doubleCheck
@@ -744,7 +754,8 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "sol", "vaylerian", "olradin", "xxcha", "sardakk", "revenantoblivion", "kairn");
+                player, "sol", "vaylerian", "olradin", "xxcha", "sardakk", "revenantoblivion", "kairn", "migo");
+        MigoLeadersHandler.syncMigoCommanderBonus(game);
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");

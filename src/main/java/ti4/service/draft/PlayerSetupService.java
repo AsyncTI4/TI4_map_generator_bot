@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DeepReachesStartingTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
@@ -26,6 +27,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
@@ -584,6 +586,15 @@ public class PlayerSetupService {
                     player.getRepresentation()
                             + ", please choose which side you want your starting balance token to be on.",
                     ButtonHelper.getBalanceButtons(player));
+        }
+        if (player.hasAbility("harvest")) {
+            Tile tileHs = player.getHomeSystemTile();
+            for (Planet planet : tileHs.getPlanetUnitHolders()) {
+                if (planet.getTechSpecialities().isEmpty()) {
+                    continue;
+                }
+                MigoAbilityHandler.onPlanetGained(player, planet.getName());
+            }
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 

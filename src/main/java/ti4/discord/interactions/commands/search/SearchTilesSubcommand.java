@@ -37,10 +37,8 @@ class SearchTilesSubcommand extends SearchComponentModelSubcommand {
                         OptionType.BOOLEAN,
                         Constants.INCLUDE_ALIASES,
                         "True to also show the available aliases you can use"),
-                new OptionData(OptionType.INTEGER, MIN_NUM_PLANET, "Minimum number of planets on tiles")
-                        .setRequiredRange(0, 10),
-                new OptionData(OptionType.INTEGER, MAX_NUM_PLANET, "Maximum number of planets on tiles")
-                        .setRequiredRange(0, 10),
+                new OptionData(OptionType.INTEGER, MIN_NUM_PLANET, "Minimum number of planets on tiles"),
+                new OptionData(OptionType.INTEGER, MAX_NUM_PLANET, "Maximum number of planets on tiles"),
                 new OptionData(OptionType.BOOLEAN, INCLUDE_DRAFT_TILES, "Include tiles used for drafting"),
                 new OptionData(OptionType.BOOLEAN, INCLUDE_HYPERLANES, "Include Hyperlane tiles"),
                 new OptionData(

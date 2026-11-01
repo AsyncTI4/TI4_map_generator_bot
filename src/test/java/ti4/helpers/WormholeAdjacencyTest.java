@@ -27,6 +27,11 @@ class WormholeAdjacencyTest extends BaseTi4Test {
         "token_sigma_lambda.png, token_sigma_palace_emperors.png, space, false",
         "token_wheta.png, token_custom_eronous_wheta.png, space, true",
         "token_whalpha.png, attachment_sigma_weirdway.png, planet, true",
+        // Rat race wormholes only link to the same rat race wormhole.
+        "token_whratalpha.png, token_whratalpha.png, space, true",
+        "token_whratalpha.png, token_whalpha.png, space, false",
+        "token_whalpha.png, token_whratalpha.png, space, false",
+        "token_whratalpha.png, token_whratbeta.png, space, false",
     })
     void tokensConnectOnlyThroughDeclaredWormholes(String onA, String onB, String holderB, boolean adjacent) {
         try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {

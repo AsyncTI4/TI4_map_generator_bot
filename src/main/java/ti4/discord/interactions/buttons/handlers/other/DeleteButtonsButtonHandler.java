@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedReso
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
@@ -271,6 +272,7 @@ class DeleteButtonsButtonHandler {
                 cost = ThurvialiLeadersHandler.applyThurvialiHeroProductionDiscount(game, player, cost);
                 cost = IronLeadersHandler.applyShipwrightKastelProductionDiscount(game, player, cost);
                 cost = IronBreakthroughHandler.applyHyperstaticRelayProductionDiscount(game, player, cost);
+                cost = MigoHarvestHandler.applyYellowHarvestProductionDiscount(game, player, cost);
                 cost = ThirtyKRelicHooks.applyProductionDiscount(player, cost);
                 Map<String, Integer> unitsMap = new HashMap<>();
                 for (Map.Entry<String, Integer> entry :

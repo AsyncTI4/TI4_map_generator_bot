@@ -14,7 +14,6 @@ class RemoveCustomPO extends GameStateSubcommand {
     public RemoveCustomPO() {
         super(Constants.REMOVE_CUSTOM, "Remove custom Public Objective", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
-                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

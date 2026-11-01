@@ -41,16 +41,40 @@ public class WormholeModel {
         CHAMPION("C"),
         @JsonAlias("WHVOYAGE")
         VOYAGE("V"),
-        VORTEX("Vx");
+        VORTEX("Vx"),
+        ALPHA_RAT("α", true),
+        BETA_RAT("β", true),
+        GAMMA_RAT("γ", true),
+        DELTA_RAT("δ", true),
+        EPSILON_RAT("ε", true),
+        ZETA_RAT("ζ", true),
+        ETA_RAT("η", true),
+        THETA_RAT("θ", true),
+        IOTA_RAT("ι", true),
+        KAPPA_RAT("κ", true);
 
         private final String symbol;
+        private final boolean ratRace;
 
         Wormhole(String symbol) {
+            this(symbol, false);
+        }
+
+        Wormhole(String symbol, boolean ratRace) {
             this.symbol = symbol;
+            this.ratRace = ratRace;
         }
 
         public String symbol() {
             return symbol;
+        }
+
+        public boolean isRatRace() {
+            return ratRace;
+        }
+
+        public String tokenId() {
+            return ratRace ? "whrat" + toString().replace("_rat", "") : "wh" + this;
         }
 
         @Override

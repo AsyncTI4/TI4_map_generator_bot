@@ -12,8 +12,7 @@ class DealSOToAll extends GameStateSubcommand {
 
     public DealSOToAll() {
         super(Constants.DEAL_TO_ALL, "Deal Secret Objective (count) to all game players", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1")
-                .setRequiredRange(1, 10));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }
 
     @Override

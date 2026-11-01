@@ -16,6 +16,7 @@ public class BorderAnomalyModel implements ModelInterface {
     private String imagePath;
     private ComponentSource source;
     private Rules rules = new Rules();
+    private boolean wholeHex;
     private AutomationStatus automation;
     private String automationNotes;
 

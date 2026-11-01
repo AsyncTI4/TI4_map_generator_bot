@@ -1,8 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
@@ -397,6 +396,29 @@ public class CombatRollService {
         return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, automated, null, null);
     }
 
+    public static int resolveRedHarvestRoll(
+            Player player,
+            Game game,
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            String unitHolderName,
+            Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits) {
+        if (!player.hasAbility("harvest_red")) {
+            return 0;
+        }
+        return secondHalfOfCombatRoll(
+                player,
+                game,
+                event,
+                tile,
+                unitHolderName,
+                CombatRollType.combatround,
+                false,
+                selectedUnits,
+                null,
+                true);
+    }
+
     private static int secondHalfOfCombatRoll(
             Player player,
             Game game,
@@ -407,6 +429,21 @@ public class CombatRollService {
             boolean automated,
             Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits,
             Player targetPlayer) {
+        return secondHalfOfCombatRoll(
+                player, game, event, tile, unitHolderName, rollType, automated, selectedUnits, targetPlayer, false);
+    }
+
+    private static int secondHalfOfCombatRoll(
+            Player player,
+            Game game,
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            String unitHolderName,
+            CombatRollType rollType,
+            boolean automated,
+            Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits,
+            Player targetPlayer,
+            boolean supplementalCombatRoll) {
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {
@@ -858,7 +895,7 @@ public class CombatRollService {
             round2 = Integer.parseInt(game.getStoredValue(combatName2));
         }
 
-        if (round2 > round && rollType == CombatRollType.combatround) {
+        if (round2 > round && rollType == CombatRollType.combatround && !supplementalCombatRoll) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "## __Start of Combat Round #" + round2 + "__");
         }
@@ -884,6 +921,9 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (rollType == CombatRollType.combatround && !supplementalCombatRoll) {
+            MigoHarvestHandler.offerRedHarvest(game, player, payload, event.getMessageChannel());
+        }
         XytherisPromissoryHandler.resolveSwarmSpawnAfterRoll(event, game, player, rollType);
         int colossusHits = rollType == CombatRollType.combatround
                         && combatOnHolder instanceof Planet
@@ -900,7 +940,7 @@ public class CombatRollService {
                         event, game, player, opponent, tile, celestialDragonHits)) {
             h -= celestialDragonHits;
         }
-        if (rollType == CombatRollType.combatround && opponent != player) {
+        if (rollType == CombatRollType.combatround && opponent != player && !supplementalCombatRoll) {
             ToldarTechHandler.recordCombatRoundHits(game, player, tile, combatOnHolder, round2, h);
         }
         if (rollType != CombatRollType.bombardment) {
@@ -915,7 +955,8 @@ public class CombatRollService {
         ThronesUnitHandler.offerGholaAfterRoll(event, game, player, opponent, tile, combatOnHolder, rollType, payload);
         if (rollType == CombatRollType.combatround
                 && Constants.SPACE.equalsIgnoreCase(unitHolderName)
-                && opponent != player) {
+                && opponent != player
+                && !supplementalCombatRoll) {
             ArdentiaUnitHandler.offerSovereignsGavelButton(event, game, player, opponent, tile);
         }
         CombatReplayService combatReplayService = SpringContext.getBean(CombatReplayService.class);
@@ -961,7 +1002,7 @@ public class CombatRollService {
                             String msg = opponent.getRepresentationUnfogged() + " you may autoassign "
                                     + StringHelper.pluralize(h, "hit") + ".";
                             if (opponent.isDummy() || opponent.isNpc()) {
-                                if (round2 > round) {
+                                if (round2 > round && !supplementalCombatRoll) {
                                     buttons.add(Buttons.blue(
                                             opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
                                                     + combatOnHolder.getName(),
@@ -972,7 +1013,7 @@ public class CombatRollService {
                                                 + AutoAssignGroundHitsButtonIds.format(combatOnHolder.getName(), h),
                                         "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
                             } else {
-                                if (round2 > round) {
+                                if (round2 > round && !supplementalCombatRoll) {
                                     buttons.add(Buttons.blue(
                                             "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
                                             "Roll Dice For Combat Round #" + (round + 1)));
@@ -996,7 +1037,7 @@ public class CombatRollService {
                                         buttons, game, opponent, tile, "ground", h);
                                 AshenPromissoryHandler.addFromTheAshesButton(
                                         buttons, game, opponent, player, tile, combatOnHolder, h);
-                                if (round2 == 1 && opponent.hasTech("threvenantr")) {
+                                if (!supplementalCombatRoll && round2 == 1 && opponent.hasTech("threvenantr")) {
                                     RevenantTechHandler.addEternalAegisButton(
                                             buttons, game, opponent, player, tile, combatOnHolder, h);
                                 }
@@ -1045,7 +1086,7 @@ public class CombatRollService {
                             String msg = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
                                     + (round + 1) + ".";
                             if (opponent.isDummy() || opponent.isNpc()) {
-                                if (round2 > round) {
+                                if (round2 > round && !supplementalCombatRoll) {
                                     buttons.add(Buttons.blue(
                                             opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
                                                     + combatOnHolder.getName(),
@@ -1055,7 +1096,7 @@ public class CombatRollService {
                                 }
 
                             } else {
-                                if (round2 > round) {
+                                if (round2 > round && !supplementalCombatRoll) {
                                     buttons.add(Buttons.blue(
                                             "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(),
                                             "Roll Dice For Combat Round #" + (round + 1)));
@@ -1071,7 +1112,7 @@ public class CombatRollService {
                                 player.getRepresentation() + " suffered 1 hit due to _Valkyrie Particle Weave_.");
                     }
                 } else {
-                    if (round2 > round) {
+                    if (round2 > round && !supplementalCombatRoll) {
                         if (opponent.isDummy() || opponent.isNpc()) {
                             buttons.add(Buttons.blue(
                                     opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
@@ -1084,7 +1125,8 @@ public class CombatRollService {
                         }
                     }
                     String msg = "\n" + opponent.getRepresentation(true, true, true, true) + ", you suffered "
-                            + StringHelper.pluralize(h, "hit") + " in round #" + round2 + ".";
+                            + StringHelper.pluralize(h, "hit")
+                            + (supplementalCombatRoll ? "." : " in round #" + round2 + ".");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                     if (h > 0) {
                         String factionChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -1108,7 +1150,7 @@ public class CombatRollService {
                             VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, opponent, tile, h);
                         }
 
-                        if (round2 == 1 && opponent.hasTech("threvenantr")) {
+                        if (!supplementalCombatRoll && round2 == 1 && opponent.hasTech("threvenantr")) {
                             RevenantTechHandler.addEternalAegisButton(
                                     buttons, game, opponent, player, tile, combatOnHolder, h);
                         }
@@ -1414,6 +1456,20 @@ public class CombatRollService {
             if (player.hasTech("x89c4")) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2.hasPlanetReady(bombardPlanet)) {
+                        Planet planet = game.getPlanetsInfo().get(bombardPlanet);
+                        if (p2.hasUnlockedBreakthrough("migobt")
+                                && planet != null
+                                && !planet.getTechSpecialities().isEmpty()) {
+                            MessageHelper.sendMessageToChannel(
+                                    p2.getCorrectChannel(),
+                                    p2.getRepresentation() + ", your planet "
+                                            + Helper.getPlanetRepresentation(bombardPlanet, game)
+                                            + " would have been exhausted when "
+                                            + (game.isFowMode() ? "another player" : player.getRepresentationNoPing())
+                                            + " bombarded it with _X-89 Bacterial Weapon ΩΩ_, but you have _Ythic Symbiosis_ "
+                                            + "and as such, other players cannot exhaust your planets that have technology specialties!");
+                            continue;
+                        }
                         PlanetExhaust.doAction(p2, bombardPlanet, game);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCorrectChannel(),
@@ -1863,7 +1919,7 @@ public class CombatRollService {
                     numOfUnit = ogNumOfUnit - 1;
                     numRolls -= numRollsPerUnit + Math.min(1, extraRollsForUnit);
                 }
-                if (numRolls == 0) {
+                if (numRolls < 1) {
                     continue;
                 }
                 RollSegmentType segmentType =

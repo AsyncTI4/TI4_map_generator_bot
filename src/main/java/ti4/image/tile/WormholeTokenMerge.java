@@ -16,11 +16,15 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import ti4.image.io.ImageHelper;
@@ -45,24 +49,39 @@ final class WormholeTokenMerge {
     private WormholeTokenMerge() {}
 
     static DrawOrder apply(List<String> tokens, int minTokens) {
-        List<String> mergeable =
-                tokens.stream().filter(WormholeTokenMerge::isMergeable).toList();
-        if (mergeable.size() < Math.max(2, minTokens)) return new DrawOrder(tokens, Map.of());
-
         Map<String, Merged> merged = new LinkedHashMap<>();
-        for (List<Part> group : group(mergeable)) {
-            String key = cacheKey(group);
-            merged.put(key, new Merged(group.stream().map(Part::wormhole).toList(), image(key, group)));
+        Map<String, List<String>> keysByFirstToken = new HashMap<>();
+        Set<String> replaced = new HashSet<>();
+        for (List<String> family : mergeableFamilies(tokens)) {
+            if (family.size() < Math.max(2, minTokens)) continue;
+            List<String> keys = new ArrayList<>();
+            for (List<Part> group : group(family)) {
+                String key = cacheKey(group);
+                merged.put(key, new Merged(group.stream().map(Part::wormhole).toList(), image(key, group)));
+                keys.add(key);
+            }
+            keysByFirstToken.put(family.getFirst(), keys);
+            replaced.addAll(family);
         }
+        if (merged.isEmpty()) return new DrawOrder(tokens, Map.of());
+
         List<String> order = new ArrayList<>();
         for (String token : tokens) {
-            if (!mergeable.contains(token)) {
+            if (!replaced.contains(token)) {
                 order.add(token);
-            } else if (token.equals(mergeable.getFirst())) {
-                order.addAll(merged.keySet());
+            } else if (keysByFirstToken.containsKey(token)) {
+                order.addAll(keysByFirstToken.remove(token));
             }
         }
         return new DrawOrder(order, merged);
+    }
+
+    private static Collection<List<String>> mergeableFamilies(List<String> tokens) {
+        return tokens.stream()
+                .filter(WormholeTokenMerge::isMergeable)
+                .collect(Collectors.partitioningBy(
+                        token -> Mapper.getTokenWormholes(token).getFirst().isRatRace()))
+                .values();
     }
 
     private static boolean isMergeable(String token) {

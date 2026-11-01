@@ -22,6 +22,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
@@ -1557,6 +1558,7 @@ public final class ButtonHelperModifyUnits {
                                 || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
                                 || XinUnitHandler.canUseStarSentinelCoexistence(player, unitHolder)
                                 || XinUnitHandler.canUseStarSentinelCoexistence(player2, unitHolder)
+                                || MigoBreakthroughHandler.canUseYthicSymbiosis(game, player2, unitHolder.getName())
                                 || player2.hasAbility("researchteam"))) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
@@ -1595,11 +1597,16 @@ public final class ButtonHelperModifyUnits {
                                             && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
                                     || XinUnitHandler.canUseStarSentinelCoexistence(player2, unitHolder)
                                     || TaBreakthroughHandler.canUseSafeHavensCoexistence(
+                                            game, player2, unitHolder.getName())
+                                    || MigoBreakthroughHandler.canUseYthicSymbiosis(
                                             game, player2, unitHolder.getName()))) {
                         buttons = new ArrayList<>();
                         if (TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player2, unitHolder.getName())) {
                             buttons.add(TaBreakthroughHandler.getSafeHavensCoexistenceButton(
                                     player2, unitHolder.getName()));
+                        }
+                        if (MigoBreakthroughHandler.canUseYthicSymbiosis(game, player2, unitHolder.getName())) {
+                            buttons.add(MigoBreakthroughHandler.getYthicSymbiosisButton(player2, unitHolder.getName()));
                         }
                         buttons.add(Buttons.green(
                                 player2.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
@@ -1670,7 +1677,7 @@ public final class ButtonHelperModifyUnits {
                     && !player.getPlanets().contains(unitHolder.getName())) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("takeMonument_" + unitHolder.getName(), "Take Control Of Monument"));
-                b2s.add(Buttons.blue("destroyMonument_" + tile.getPosition(), "Destroy Monument"));
+                b2s.add(Buttons.blue("destroyMonument_" + unitHolder.getName(), "Destroy Monument"));
                 b2s.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),

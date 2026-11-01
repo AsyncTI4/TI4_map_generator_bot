@@ -24,6 +24,11 @@ into `BorderAnomalyModel` by `Mapper`.
   never `==`.
 - **Ids are lower case.** Legacy spellings resolve through `Mapper.resolveBorderAnomaly` at the
   boundaries (commands, game load, map import). Hot paths use `Mapper.getBorderAnomaly`.
+- **Whole-hex types (`"wholeHex": true`, e.g. `ratnest`) are still stored per edge.**
+  `/map add_border_anomaly` places them on all six sides and needs no direction;
+  `BorderDecorationsStep` draws their hex-sized image once, centered and unrotated, clipped to the
+  edges that hold it and are visible (fog), so a partial one only shows its own edges. Rules added
+  later apply per edge like any other border.
 - **Adding or changing a type means updating `BorderAnomalyModelTest`.** `Mapper` only logs JSON
   import errors, and Jackson ignores misspelt keys, so the test asserts the exact ids and rule values.
 
@@ -74,3 +79,11 @@ to its wormholes.
   at most 3 per icon, split evenly, far-apart colours dealt into the same icon). Game state
   keeps the single tokens. A token with its own identity (Creuss, Ion Storm, Vortex) sets
   `"wormholeIconMerge": false` and stays a separate icon.
+- **Plain wormhole token ids are `wh` + family + type** (`Wormhole.tokenId()`): `whalpha`,
+  `whlambda`. A renamed id stays usable as an `aliasList` entry in the token JSON
+  (`Mapper.getTokenID` and `isValidToken` resolve aliases), e.g. `sigma_lamdba_wormhole`,
+  `custom_eronous_whiota`. Identity tokens (Creuss, Ion Storm, PoK `gamma`, `vortex`) keep their ids
+  for now. Image file names never change; saves store them.
+- **Rat race wormholes are separate types** (`ALPHA_RAT` … `KAPPA_RAT`, `Wormhole.isRatRace()`). They
+  share the Greek symbol but never match the plain type, and they merge only with each other, with the
+  threshold counted per family. Their token ids are `whrat` + type (`whratalpha`).

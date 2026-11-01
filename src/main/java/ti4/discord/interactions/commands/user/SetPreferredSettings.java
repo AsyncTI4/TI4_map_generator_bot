@@ -39,7 +39,7 @@ class SetPreferredSettings extends Subcommand {
                         OptionType.INTEGER,
                         "sabo_decline_median",
                         "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off.")
-                .setRequiredRange(0, 720));
+                .setRequiredRange(0, 240));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "auto_respond_no_secrets",

@@ -1285,6 +1285,8 @@ public final class Constants {
     public static final String LATERPICK_LIMIT = "laterpick_limit";
 
     public static final String ABILITY = "ability";
+    public static final String ABILITY_EXHAUST = "exhaust_ability";
+    public static final String ABILITY_READY = "ready_ability";
     public static final String BAN = "ban";
     public static final String DRAFT_LIMITS = "draft_limits";
     public static final String BAN_ABILITY = "ban_ability";
@@ -1507,7 +1509,7 @@ public final class Constants {
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";
     public static final String PLAYER_GAMES = "player_games";
-    public static final String IGNORE_ABORTED = "ignore_aborted";
+    public static final String IGNORE_ABORTED = "ignore_abandoned";
     public static final String EPHEMERAL = "ephemeral";
     public static final String SET_GAME_LIMIT = "set_game_limit";
     public static final String SET_STATS_TRACKED_USER = "set_stats_tracked_user";

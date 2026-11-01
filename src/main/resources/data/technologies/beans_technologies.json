@@ -179,5 +179,27 @@
         "faction": "valhavn",
         "source": "beans",
         "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet.\nSPACE CANNON 4, PLANETARY SHIELD"
+    },
+    {
+        "alias": "bemigob",
+        "name": "Lagh-Metal Attractors",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "migo",
+        "source": "beans",
+        "text": "After you activate a system that contains a planet that has a technology specialty, you may exhaust this card to apply +1 to the move value of each of your ships during this tactical action."
+    },
+    {
+        "alias": "bemigog",
+        "name": "Synaptic Feedback Loop",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "migo",
+        "source": "beans",
+        "text": "After you exhaust a planet that has a technology specialty, you may exhaust this card to ready that planet."
     }
 ]
