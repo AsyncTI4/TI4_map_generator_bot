@@ -35,7 +35,8 @@ import ti4.service.planet.AsgardLegendaryService;
  * Intended rule changes since then, each marked "Changed in" below:
  * - PR-M: custom links read primary -> listed for every purpose (vision already did).
  * - PR-R: things treated as ingress work both ways and belong to the queried player; Sever is movement-only at
- *   both ends; gate folding works at both ends for everyone during the folder's tactical action; the Ghost agent
+ *   both ends; gate folding works at both ends, only for the folder, during their tactical action (designer
+ *   ruling: it counts only for the owner of the tech, not tirules2's "for all players"); the Ghost agent
  *   links only the activated system; Ghoti uses the same empty systems on both ends; Dream nebulae are movement.
  */
 final class LegacyAdjacency {
@@ -46,7 +47,8 @@ final class LegacyAdjacency {
             Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
         if (FOWPlusService.isVoid(game, position)) return new HashSet<>();
 
-        // Changed in PR-VT: the grid walk takes the queried player, so a Void Tether exempts its breakthrough holder.
+        // Changed in PR-VT: the grid walk takes the queried player, so a Void Tether exempts its breakthrough holder;
+        // the tether only blocks with one-way adjacency on (always in fog).
         Set<String> adjacentPositions = traverseAdjacencies(game, player, false, position, -1, new HashSet<>());
 
         // Changed in PR-M: was listed -> primary for movement and effects, primary -> listed for vision only.
@@ -331,7 +333,7 @@ final class LegacyAdjacency {
             String position_ = directlyAdjacentTiles.get(i);
             boolean borderBlocked = false;
             for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
-                if (b == null || b.getTile() == null) continue;
+                if (b == null || b.getTile() == null || !b.isEnforced(game)) continue;
                 if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacencyOut()
                         || b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacencyIn()) {
                     borderBlocked |= !b.exempts(player);
@@ -375,7 +377,8 @@ final class LegacyAdjacency {
         boolean alphaBetaLinked = player != null && player.hasAbility("quantum_entanglement")
                 || ButtonHelper.isLawInPlay(game, "wormhole_recon")
                 || ButtonHelper.isLawInPlay(game, "absol_recon");
-        Player folder = StringUtils.isEmpty(game.getCurrentActiveSystem()) ? null : game.getActivePlayer();
+        Player folder =
+                StringUtils.isEmpty(game.getCurrentActiveSystem()) || player != game.getActivePlayer() ? null : player;
         Set<Wormhole> wormholes = effectiveWormholes(game, folder, tile);
 
         if (player != null

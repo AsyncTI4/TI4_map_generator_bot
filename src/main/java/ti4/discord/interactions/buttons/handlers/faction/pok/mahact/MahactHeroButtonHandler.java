@@ -161,7 +161,8 @@ class MahactHeroButtonHandler {
         if (!players2.isEmpty()) {
             player = players2.getFirst();
         }
-        for (String pos2 : Adjacency.of(game, player).forMovement().from(pos1)) {
+        // TODO: Benediction moves ships; should it obey Travel Ban (mahact.md VIII) via forMovement()?
+        for (String pos2 : Adjacency.of(game, player).forEffects().from(pos1)) {
             if (pos1.equalsIgnoreCase(pos2)) {
                 continue;
             }

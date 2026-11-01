@@ -44,11 +44,10 @@ class BorderAnomalyAdjacencyTest extends BaseTi4Test {
         assertAdjacency("nebula", true, true);
     }
 
-    // Without a player nobody is exempt, so a tether blocks like a spatial tear (VoidTetherAdjacencyTest covers the
-    // holder).
+    // The tether only blocks with one-way adjacency on or in fog; VoidTetherAdjacencyTest covers those modes.
     @Test
-    void voidTetherBlocksBothDirectionsWithoutAPlayer() {
-        assertAdjacency("void_tether", false, false);
+    void voidTetherBlocksNothingInNormalGames() {
+        assertAdjacency("void_tether", true, true);
     }
 
     @Test

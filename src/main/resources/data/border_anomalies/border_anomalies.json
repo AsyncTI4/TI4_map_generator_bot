@@ -50,9 +50,9 @@
         "aliasList": ["voidtether"],
         "imagePath": "void_tether.png",
         "source": "thunders_edge",
-        "rules": { "adjacency": { "blocksIn": true, "blocksOut": true, "exemptHolderOf": "empyreanbt" } },
+        "rules": { "adjacency": { "blocksIn": true, "blocksOut": true, "exemptHolderOf": "empyreanbt", "oneWayAdjacencyOnly": true } },
         "automation": "FULL",
-        "automationNotes": "The two systems sharing this edge are not adjacent for anyone except the player with the Void Tether breakthrough, in either direction and for every effect."
+        "automationNotes": "Enforced only with one-way adjacency on (always in fog); in other games the token is drawn but blocks nothing. When enforced, the two systems sharing this edge are not adjacent for anyone except the player with the Void Tether breakthrough and the colours they allow through this token, in either direction and for every effect. Allowances end when the token is moved or removed."
     },
     {
         "id": "core_border",

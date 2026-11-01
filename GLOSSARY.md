@@ -186,7 +186,7 @@ An Anomaly that adds +1 to the move of ships leaving or passing through it, each
 An anomaly attached to a System's edge rather than its interior.
 
 **Void Tether**:
-The Empyrean breakthrough's Border anomaly token. The two Systems sharing that edge are not adjacent for anyone except the Player holding the breakthrough (`exemptHolderOf` in `border_anomalies.json`), in either direction and for every purpose; Neighbors across it only when that Player is one of the two.
+The Empyrean breakthrough's Border anomaly token. Enforced only with One-way adjacency on (always in fog); otherwise it is drawn but blocks nothing. When enforced, the two Systems sharing that edge are not adjacent for anyone except the Player holding the breakthrough (`exemptHolderOf` in `border_anomalies.json`) and the colours that Player allows through that token ("unless you allow it", stored on the token, cleared when it is moved or removed), in either direction and for every purpose; Neighbors across it only when one of the two is exempt.
 
 **Hyperlane**:
 A Tile that is not a System, whose drawn lanes make the Systems at their ends adjacent.

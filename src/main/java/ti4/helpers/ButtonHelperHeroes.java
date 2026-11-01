@@ -1743,7 +1743,8 @@ public class ButtonHelperHeroes {
             for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (FoWHelper.playerHasShipsInSystem(p2, tile1)) {
                     boolean adjacentPeeps = false;
-                    for (String pos2 : Adjacency.of(game, p2).forMovement().from(pos1)) {
+                    // TODO: Benediction moves ships; should it obey Travel Ban (mahact.md VIII) via forMovement()?
+                    for (String pos2 : Adjacency.of(game, p2).forEffects().from(pos1)) {
                         if (pos1.equalsIgnoreCase(pos2)) {
                             continue;
                         }

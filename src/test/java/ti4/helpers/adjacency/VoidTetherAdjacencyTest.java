@@ -9,11 +9,15 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
+import ti4.model.BorderAnomalyHolder;
 import ti4.testUtils.BaseTi4Test;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Void Tether ruling (docs/rules/factions/empyrean.md, Void Tether I): other players treat the two systems as not
- * adjacent for all game effects, the Empyrean still does. Board: Mecatol plus ring 1, tether between 000 and 101.
+ * adjacent for all game effects, the Empyrean still does. Enforced with one-way adjacency on (and in fog) only.
+ * Board: Mecatol plus ring 1, tether between 000 and 101.
  */
 class VoidTetherAdjacencyTest extends BaseTi4Test {
 
@@ -34,6 +38,7 @@ class VoidTetherAdjacencyTest extends BaseTi4Test {
             game.setTile(new Tile(PLAIN_SYSTEM, "10" + index));
         }
         game.addBorderAnomaly("000", 0, "void_tether");
+        game.setOneWayAdjacency(true);
         empyrean = addPlayer("empyrean", "purple");
         hacan = addPlayer("hacan", "yellow");
         letnev = addPlayer("letnev", "red");
@@ -51,6 +56,15 @@ class VoidTetherAdjacencyTest extends BaseTi4Test {
             assertThat(adjacency.from("101")).doesNotContain("000");
             assertThat(adjacency.into("101")).doesNotContain("000");
         }
+    }
+
+    // Normal games (one-way adjacency off, no fog) draw the tether but do not enforce it.
+    @Test
+    void normalGamesDoNotEnforceTheTether() {
+        game.setOneWayAdjacency(false);
+
+        assertThat(Adjacency.of(game, hacan).forMovement().from("000")).contains("101");
+        assertThat(Adjacency.of(game).from("101")).contains("000");
     }
 
     @Test
@@ -74,6 +88,30 @@ class VoidTetherAdjacencyTest extends BaseTi4Test {
         assertThat(letnev.getNeighbouringPlayers(false)).contains(empyrean).doesNotContain(hacan);
         assertThat(empyrean.getNeighbouringPlayers(false)).contains(letnev);
         assertThat(hacan.getNeighbouringPlayers(true)).doesNotContain(letnev);
+    }
+
+    // "unless you allow it": the holder opens one token for chosen colours; moving or removing the token resets it.
+    @Test
+    void allowedColourIsExemptUntilTheTokenIsReplaced() {
+        game.getBorderAnomalies().getFirst().allow(hacan.getColor());
+
+        assertThat(Adjacency.of(game, hacan).forMovement().from("000")).contains("101");
+        assertThat(Adjacency.of(game, letnev).forMovement().from("000")).doesNotContain("101");
+
+        game.removeBorderAnomaly("000", 0);
+        game.addBorderAnomaly("000", 0, "void_tether");
+        assertThat(Adjacency.of(game, hacan).forMovement().from("000")).doesNotContain("101");
+    }
+
+    @Test
+    void allowedColoursSurviveTheSaveFormat() throws Exception {
+        BorderAnomalyHolder tether = game.getBorderAnomalies().getFirst();
+        JsonMapper mapper = JsonMapperManager.basic();
+        assertThat(mapper.writeValueAsString(tether)).doesNotContain("allowedColors");
+
+        tether.allow(hacan.getColor());
+        BorderAnomalyHolder loaded = mapper.readValue(mapper.writeValueAsString(tether), BorderAnomalyHolder.class);
+        assertThat(loaded.isAllowed(hacan.getColor())).isTrue();
     }
 
     private void placeCruiser(Player player, String position) {

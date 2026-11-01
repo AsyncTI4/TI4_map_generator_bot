@@ -30,6 +30,7 @@ public class BorderAnomalyModel implements ModelInterface {
         private boolean blocksIn;
         private boolean blocksOut;
         private String exemptHolderOf;
+        private boolean oneWayAdjacencyOnly;
     }
 
     @Override
@@ -61,6 +62,13 @@ public class BorderAnomalyModel implements ModelInterface {
         return rules == null || rules.getAdjacency() == null
                 ? null
                 : rules.getAdjacency().getExemptHolderOf();
+    }
+
+    @JsonIgnore
+    public boolean isOneWayAdjacencyOnly() {
+        return rules != null
+                && rules.getAdjacency() != null
+                && rules.getAdjacency().isOneWayAdjacencyOnly();
     }
 
     @JsonIgnore

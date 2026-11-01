@@ -80,9 +80,10 @@ class AdjacencyRulingsTest extends BaseTi4Test {
     }
 
     // Lazax Gate Folding: "During your tactical actions, if you do not control Mecatol Rex, treat its system as if
-    // it contains both an alpha and beta wormhole." The system has them, so every player sees both ends.
+    // it contains both an alpha and beta wormhole." Designer ruling: it counts only for the owner of the tech, so
+    // the folder gets both ends and other players get neither (tirules2's "for all players" is overruled).
     @Test
-    void gateFoldingLinksMecatolBothWaysForEveryPlayerDuringTheTacticalAction() {
+    void gateFoldingLinksMecatolBothWaysOnlyForTheFolder() {
         Tile mecatol = game.getTileMap().values().stream()
                 .filter(tile -> tile.getUnitHolders().containsKey("mr")
                         || tile.getUnitHolders().containsKey("mrte"))
@@ -100,9 +101,11 @@ class AdjacencyRulingsTest extends BaseTi4Test {
         game.setActivePlayerID(winnu.getUserID());
         game.setActiveSystem(alpha.getPosition());
 
-        Adjacency adjacency = Adjacency.of(game, bystander).forMovement();
-        assertThat(adjacency.from(alpha.getPosition())).contains(mecatol.getPosition());
-        assertThat(adjacency.from(mecatol.getPosition())).contains(alpha.getPosition());
+        Adjacency folder = Adjacency.of(game, winnu).forMovement();
+        assertThat(folder.from(alpha.getPosition())).contains(mecatol.getPosition());
+        assertThat(folder.from(mecatol.getPosition())).contains(alpha.getPosition());
+        Adjacency other = Adjacency.of(game, bystander).forEffects();
+        assertThat(other.either(alpha.getPosition())).doesNotContain(mecatol.getPosition());
     }
 
     // Ghost agent: "that system is adjacent to all other systems that contain a wormhole during this tactical

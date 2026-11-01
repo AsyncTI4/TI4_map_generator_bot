@@ -96,7 +96,7 @@ public final class WormholeRule implements AdjacencyRule {
             ghostWithoutEpsilon = player != null
                     && "ghost".equals(player.getFaction())
                     && game.getPlayerFromColorOrFaction("crimson") != null;
-            gateFolder = context.hasActivatedSystem() ? game.getActivePlayer() : null;
+            gateFolder = context.hasActivatedSystem() && context.isActivePlayer() ? player : null;
             travelBanBlocksAlphaBeta = !alphaBetaLinked && movement && ButtonHelper.isLawInPlay(game, "travel_ban");
             String ghostAgentActive = game.getStoredValue("ghostagent_active");
             ghostAgentSystem = !StringUtils.isEmpty(ghostAgentActive) && ghostAgentActive.equals(game.getActiveSystem())

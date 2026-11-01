@@ -111,7 +111,7 @@ public final class GridRule implements AdjacencyRule {
     private static boolean isBorderBlocked(
             Game game, Player player, String position, int direction, String next, int dirFrom) {
         for (BorderAnomalyHolder border : game.getBorderAnomalies()) {
-            if (border == null || border.getTile() == null) continue;
+            if (border == null || border.getTile() == null || !border.isEnforced(game)) continue;
             if ((border.getTile().equals(position) && border.getDirection() == direction && border.blocksAdjacencyOut()
                             || border.getTile().equals(next)
                                     && border.getDirection() == dirFrom
