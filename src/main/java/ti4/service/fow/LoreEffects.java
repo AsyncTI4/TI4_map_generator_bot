@@ -710,11 +710,12 @@ final class LoreEffects {
     private static EffectDescription effectToken(EffectContext ctx) {
         if (ctx.tile == null || ctx.args.length == 0) return null;
         String tokenId = resolveTokenOrAttachment(ctx.arg(0));
-        ctx.tile.addToken(tokenId, ctx.holder);
+        String holder = Mapper.getOneWayWormholeToken(tokenId) != null ? Constants.SPACE : ctx.holder;
+        ctx.tile.addToken(tokenId, holder);
         String readableName = PNG_FILE_SUFFIX_PATTERN
                 .matcher(tokenId.replaceFirst("^token_", ""))
                 .replaceFirst("");
-        String location = ctx.tile.getPosition() + (Constants.SPACE.equals(ctx.holder) ? "" : " (" + ctx.holder + ")");
+        String location = ctx.tile.getPosition() + (Constants.SPACE.equals(holder) ? "" : " (" + holder + ")");
         return new EffectDescription(
                 "Placed " + readableName + " token in " + location + ".", true, ctx.tile.getPosition());
     }
@@ -724,7 +725,7 @@ final class LoreEffects {
         if (ctx.tile == null || ctx.args.length == 0) return null;
         String tokenId = resolveTokenOrAttachment(ctx.arg(0));
 
-        String holder = ctx.holder;
+        String holder = Mapper.getOneWayWormholeToken(tokenId) != null ? Constants.SPACE : ctx.holder;
         if (ctx.args.length >= 2) {
             String planetArg = AliasHandler.resolvePlanet(ctx.arg(1));
             if (ctx.tile.getUnitHolders().containsKey(planetArg)) {

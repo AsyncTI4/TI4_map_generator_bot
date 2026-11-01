@@ -2,7 +2,9 @@ package ti4.helpers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -12,6 +14,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.TestGameHarness;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.model.Mapper;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.testUtils.BaseTi4Test;
@@ -50,6 +53,91 @@ class WormholeAdjacencyTest extends BaseTi4Test {
         }
     }
 
+    // Same type on both sides: a link needs a departure (plain or entry-only) on A and an arrival
+    // (plain or exit-only) on B.
+    @ParameterizedTest(name = "{0} -> {1} reachable={2}")
+    @CsvSource({
+        "whalpha, whalpha, true",
+        "whalpha, whalpha_in, false",
+        "whalpha, whalpha_out, true",
+        "whalpha_in, whalpha, true",
+        "whalpha_in, whalpha_in, false",
+        "whalpha_in, whalpha_out, true",
+        "whalpha_out, whalpha, false",
+        "whalpha_out, whalpha_in, false",
+        "whalpha_out, whalpha_out, false",
+        "whbeta_in, whalpha, false",
+        "whdelta_in, whdelta_out, true",
+    })
+    void oneWayWormholesLinkOnlyFromDepartureToArrival(String onA, String onB, boolean reachable) {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
+            Game game = harness.load();
+            List<Tile> tiles = farApartTiles(game, 2);
+            String a = tiles.get(0).getPosition();
+            String b = tiles.get(1).getPosition();
+            tiles.get(0).getSpaceUnitHolder().addToken(Mapper.getTokenID(onA));
+            tiles.get(1).getSpaceUnitHolder().addToken(Mapper.getTokenID(onB));
+
+            assertThat(FoWHelper.getWormholeAdjacencies(game, a, null).contains(b))
+                    .isEqualTo(reachable);
+        }
+    }
+
+    @Test
+    void oneWayWormholesDirectMovementAndVision() {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
+            Game game = harness.load();
+            Player player = game.getRealPlayers().getFirst();
+            List<Tile> tiles = farApartTiles(game, 3);
+            String entry = tiles.get(0).getPosition();
+            String exit = tiles.get(1).getPosition();
+            String otherEntry = tiles.get(2).getPosition();
+            tiles.get(0).getSpaceUnitHolder().addToken(Mapper.getTokenID("whalpha_in"));
+            tiles.get(1).getSpaceUnitHolder().addToken(Mapper.getTokenID("whalpha_out"));
+            tiles.get(2).getSpaceUnitHolder().addToken(Mapper.getTokenID("whalpha_in"));
+
+            assertThat(CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, entry, exit, true))
+                    .isEqualTo(1);
+            assertThat(CheckDistanceHelper.getDistanceBetweenTwoTiles(game, player, exit, entry, true))
+                    .isGreaterThan(1);
+            // One-way adjacency off: only movement follows the direction, vision counts the link both ways.
+            assertThat(Adjacency.of(game, player).forVision().from(exit)).contains(entry);
+            // On: vision follows movement, an entry-only system sees the exit, never another entry.
+            game.setOneWayAdjacency(true);
+            assertThat(Adjacency.of(game, player).forVision().from(entry))
+                    .contains(exit)
+                    .doesNotContain(otherEntry);
+            assertThat(Adjacency.of(game, player).forVision().from(exit)).doesNotContain(entry, otherEntry);
+        }
+    }
+
+    @Test
+    void oneWayTokensAreNeverATypesDisplayImage() {
+        // Lambda has no token_whlambda.png, so the wormhole view relies on this lookup for its icon.
+        assertThat(Mapper.getWormholeTokenImagePath(Wormhole.LAMBDA)).isEqualTo("token_sigma_lambda.png");
+        for (Wormhole wormhole : Wormhole.values()) {
+            assertThat(Mapper.getOneWayWormholeToken(Mapper.getWormholeTokenImagePath(wormhole)))
+                    .as(wormhole.name())
+                    .isNull();
+        }
+    }
+
+    @Test
+    void reconstructionKeepsTheDirectionOfAOneWayAlpha() {
+        try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
+            Game game = harness.load();
+            game.addLaw("wormhole_recon", null);
+            List<Tile> tiles = farApartTiles(game, 2);
+            String entry = tiles.get(0).getPosition();
+            String beta = tiles.get(1).getPosition();
+            tiles.get(0).getSpaceUnitHolder().addToken(Mapper.getTokenID("whalpha_in"));
+            tiles.get(1).getSpaceUnitHolder().addToken("token_whbeta.png");
+
+            assertThat(FoWHelper.getWormholeAdjacencies(game, entry, null)).contains(beta);
+            assertThat(FoWHelper.getWormholeAdjacencies(game, beta, null)).doesNotContain(entry);
+        }
+    }
+
     @Test
     void tileCountsEveryDeclaredWormholeOnAnyHolder() {
         try (var harness = TestGameHarness.fromSourceGame("game-with-border-anomalies")) {
@@ -72,6 +160,18 @@ class WormholeAdjacencyTest extends BaseTi4Test {
                     .containsExactlyInAnyOrder(
                             Wormhole.DELTA, Wormhole.EPSILON, Wormhole.ALPHA, Wormhole.BETA, Wormhole.DELTA);
         }
+    }
+
+    private static List<Tile> farApartTiles(Game game, int count) {
+        List<Tile> picked = new ArrayList<>();
+        for (Tile candidate : wormholeFreeTilesWithPlanets(game)) {
+            Set<String> near = FoWHelper.getAdjacentTiles(game, candidate.getPosition(), null, false);
+            if (picked.stream().noneMatch(tile -> near.contains(tile.getPosition()))) {
+                picked.add(candidate);
+            }
+            if (picked.size() == count) return picked;
+        }
+        throw new IllegalStateException("map has fewer than " + count + " separated tiles");
     }
 
     private static List<Tile> wormholeFreeTilesWithPlanets(Game game) {

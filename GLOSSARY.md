@@ -161,6 +161,9 @@ A wormhole on a rat race token (`whratalpha` to `whratkappa`). It is its own typ
 **Rat nest**:
 The rat race border anomaly `ratnest`: one hex-sized frame that sits on all six borders of a System. Its effect is not automated; players apply it themselves.
 
+**Entry-only / exit-only wormhole**:
+A one-way wormhole token (`whalpha_in`, `whalpha_out`, …), drawn with a green (IN) or red (OUT) arrow ring. Units can leave a system through an entry-only wormhole and arrive through an exit-only one, never the other way; two entry-only (or two exit-only) wormholes never connect. Movement always follows the direction; everything else only with One-way adjacency on.
+
 **Wormhole nexus**:
 The extra System where alpha, beta and gamma wormholes converge, which starts with only its gamma wormhole and becomes active when a unit enters it or Mallice is controlled.
 
