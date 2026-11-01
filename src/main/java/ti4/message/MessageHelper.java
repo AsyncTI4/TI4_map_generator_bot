@@ -444,11 +444,15 @@ public class MessageHelper {
             if (button.getButton().getCustomId().contains("ringTile")) {
                 msg = "Here is a picture of the active system";
             }
-            button.getHook()
-                    .sendMessage(msg)
-                    .addFiles(fileUpload)
-                    .setEphemeral(true)
-                    .complete();
+            try {
+                button.getHook()
+                        .sendMessage(msg)
+                        .addFiles(fileUpload)
+                        .setEphemeral(true)
+                        .complete();
+            } catch (RuntimeException e) {
+                BotLogger.catchRestError(e);
+            }
         } else if (event instanceof SlashCommandInteractionEvent slash)
             slash.getHook()
                     .sendMessage("Here is your requested image")
