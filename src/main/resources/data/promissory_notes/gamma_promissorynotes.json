@@ -1,13 +1,13 @@
 [
     {
         "alias": "ggpndia",
-        "name": "Dirzuga Reinforcements",
+        "name": "Dirzuga Reserves",
         "faction": "diaspora",
         "color": "",
         "playArea": true,
-        "playImmediately": false,
+        "playImmediately": true,
         "source": "gamma",
-        "text": "When you produce units:Place this card face up in your play area and place a Dirzuga token on a non-home planet other than Mecatol Rex that has a unit you control with PRODUCTION, or at least 3 infantry you control. Planets that contain Dirzuga tokens have their planet's resources value increased by 2 and their influence value increased by 1. Ditzuga tokens cannot be removed from the planets that contain them \nAt the start of the status phase, return this card to the Arborec Diaspora player."
+        "text": "When you receive this card, if you are not the Diaspora player, you must place it face up in your play area. While this card is in your play area, after you perform a Strategic Action, you may place a number of infantry from your reinforcements equal to half your initiative value rounded up onto a planet you control. If you activate a system that contains 1 or more of the Diaspora player's units, return this card to the Diaspora player."
     },
     {
         "alias": "ggpnhlr",
