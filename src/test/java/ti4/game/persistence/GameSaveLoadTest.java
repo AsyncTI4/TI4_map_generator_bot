@@ -23,8 +23,8 @@ class GameSaveLoadTest extends BaseTi4Test {
                     .ignoringFields(
                             "latestCommand",
                             "draftManager.game.latestCommand",
-                            "persistenceRevision",
-                            "draftManager.game.persistenceRevision",
+                            "revisionKey",
+                            "draftManager.game.revisionKey",
                             "lastModifiedDate",
                             "draftManager.game.lastModifiedDate")
                     .isEqualTo(game);
@@ -48,8 +48,8 @@ class GameSaveLoadTest extends BaseTi4Test {
                     .ignoringFields(
                             "latestCommand",
                             "draftManager.game.latestCommand",
-                            "persistenceRevision",
-                            "draftManager.game.persistenceRevision",
+                            "revisionKey",
+                            "draftManager.game.revisionKey",
                             "lastModifiedDate",
                             "draftManager.game.lastModifiedDate")
                     .isEqualTo(game);

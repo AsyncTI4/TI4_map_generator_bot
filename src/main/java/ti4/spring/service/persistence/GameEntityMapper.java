@@ -40,7 +40,7 @@ public class GameEntityMapper {
     private static GameEntity toGameEntity(Game game, Map<String, UserEntity> users) {
         var gameEntity = new GameEntity();
         gameEntity.setGameName(game.getName());
-        gameEntity.setSourceRevision(game.getPersistenceRevision());
+        gameEntity.setSourceRevision(game.getRevisionKey());
         gameEntity.setMappingVersion(MAPPING_VERSION);
         gameEntity.setRound(game.getRound());
         gameEntity.setVictoryPointGoal(game.getVp());

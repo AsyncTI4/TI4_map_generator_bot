@@ -13,10 +13,10 @@ class GameEntityMapperTest extends BaseTi4Test {
     void snapshotCapturesSourceRevisionAndMappingVersion() {
         Game game = new Game();
         game.setName("mapper-revision");
-        game.setPersistenceRevision("saved-revision");
+        game.setRevisionKey("saved-revision");
 
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
-        game.setPersistenceRevision("later-revision");
+        game.setRevisionKey("later-revision");
 
         assertThat(snapshot.game().getSourceRevision()).isEqualTo("saved-revision");
         assertThat(snapshot.game().getMappingVersion()).isEqualTo(GameEntityMapper.MAPPING_VERSION);

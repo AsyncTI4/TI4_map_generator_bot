@@ -11,27 +11,27 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.testUtils.BaseTi4Test;
 
-class GamePersistenceRevisionTest extends BaseTi4Test {
+class GameRevisionKeyTest extends BaseTi4Test {
     @Test
     void successfulSavesHaveDistinctRevisionsThatSurviveReloadAndUndo() {
         try (var harness = TestGameHarness.forDefaultMap()) {
             var game = harness.load();
-            assertThat(game.getPersistenceRevision()).isNull();
+            assertThat(game.getRevisionKey()).isNull();
             assertThat(GameLoadService.loadRevision(game.getName())).isNull();
             assertThat(GameSaveService.save(game, "first")).isTrue();
-            String first = game.getPersistenceRevision();
+            String first = game.getRevisionKey();
             assertThat(first).isNotBlank();
-            assertThat(harness.load().getPersistenceRevision()).isEqualTo(first);
+            assertThat(harness.load().getRevisionKey()).isEqualTo(first);
             assertThat(GameLoadService.loadRevision(game.getName())).isEqualTo(first);
             assertThat(GameSaveService.save(game, "second")).isTrue();
-            assertThat(game.getPersistenceRevision()).isNotEqualTo(first);
+            assertThat(game.getRevisionKey()).isNotEqualTo(first);
             game.setFowMode(true);
             var restored = GameUndoService.undo(game, 1);
             assertThat(restored).isNotNull();
-            assertThat(restored.getPersistenceRevision()).isEqualTo(first);
+            assertThat(restored.getRevisionKey()).isEqualTo(first);
             assertThat(GameLoadService.loadRevision(game.getName())).isEqualTo(first);
             assertThat(GameSaveService.save(restored, "after undo")).isTrue();
-            assertThat(restored.getPersistenceRevision()).isNotEqualTo(first);
+            assertThat(restored.getRevisionKey()).isNotEqualTo(first);
         }
     }
 
@@ -40,7 +40,7 @@ class GamePersistenceRevisionTest extends BaseTi4Test {
         try (var harness = TestGameHarness.forDefaultMap()) {
             var game = harness.load();
             assertThat(GameSaveService.save(game, "first")).isTrue();
-            String first = game.getPersistenceRevision();
+            String first = game.getRevisionKey();
             var path = Storage.getGamePath(game.getName() + Constants.TXT);
             byte[] original = Files.readAllBytes(path);
             try (MockedStatic<PosixFileSystemUtility> permissions = mockStatic(PosixFileSystemUtility.class)) {
@@ -49,7 +49,7 @@ class GamePersistenceRevisionTest extends BaseTi4Test {
                         .thenThrow(new IllegalStateException("simulated save failure"));
                 assertThat(GameSaveService.save(game, "failed")).isFalse();
             }
-            assertThat(game.getPersistenceRevision()).isEqualTo(first);
+            assertThat(game.getRevisionKey()).isEqualTo(first);
             assertThat(Files.readAllBytes(path)).isEqualTo(original);
         }
     }
