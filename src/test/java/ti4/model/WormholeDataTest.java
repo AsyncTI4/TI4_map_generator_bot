@@ -103,32 +103,15 @@ class WormholeDataTest extends BaseTi4Test {
     }
 
     @Test
-    void everyPlainWormholeTypeHasEntryAndExitOnlyTokens() {
+    void everyPlainWormholeTypeHasAWhToken() {
         Set<Wormhole> plainTypes = EnumSet.noneOf(Wormhole.class);
         Mapper.getTokensValues().stream()
                 .filter(token -> Mapper.isMergeableWormholeToken(token.getImagePath()))
                 .forEach(token -> plainTypes.addAll(Mapper.getTokenWormholes(token.getImagePath())));
         assertThat(plainTypes).contains(Wormhole.ALPHA, Wormhole.OMEGA, Wormhole.LAMBDA, Wormhole.KAPPA_RAT);
-
-        for (Wormhole wormhole : plainTypes) {
-            assertThat(Mapper.getToken(wormhole.tokenId()))
-                    .as(wormhole.tokenId())
-                    .isNotNull();
-            for (WormholeModel.OneWay oneWay : WormholeModel.OneWay.values()) {
-                String id = wormhole.tokenId() + "_" + oneWay.suffix();
-                assertThat(Mapper.isValidToken(id)).as(id).isTrue();
-                TokenModel token = Mapper.getOneWayWormholeToken(Mapper.getTokenID(id));
-                assertThat(token).as(id).isNotNull();
-                assertThat(token.getOneWay()).isEqualTo(oneWay);
-                assertThat(Mapper.getTokenWormholes(token.getImagePath())).containsExactly(wormhole);
-                assertThat(Mapper.isMergeableWormholeToken(token.getImagePath()))
-                        .isFalse();
-                assertThat(Mapper.getTokenWormholes(token.getBaseImagePath())).containsExactly(wormhole);
-                // No file exists for the generated image, so /search shows the base token instead.
-                assertThat(token.getRepresentationEmbed().getThumbnail().getUrl())
-                        .contains(token.getBaseImagePath());
-            }
-        }
+        plainTypes.forEach(wormhole -> assertThat(Mapper.getToken(wormhole.tokenId()))
+                .as(wormhole.tokenId())
+                .isNotNull());
     }
 
     @Test
@@ -169,8 +152,6 @@ class WormholeDataTest extends BaseTi4Test {
         files.addAll(wormholeLookingImages("token_(wh|custom_eronous_wh).*\\.png"));
         // Rat race tokens came after the old parser and are checked on their own.
         files.removeIf(file -> Mapper.getTokenWormholes(file).stream().anyMatch(Wormhole::isRatRace));
-        // Generated one-way tokens came after the old parser and are checked on their own.
-        files.removeIf(file -> Mapper.getOneWayWormholeToken(file) != null);
         return files;
     }
 

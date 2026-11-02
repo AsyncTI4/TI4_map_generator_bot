@@ -1,6 +1,5 @@
 package ti4.helpers.adjacency;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -134,17 +133,13 @@ public final class WormholeRule implements AdjacencyRule {
         }
 
         private EnumSet<Wormhole> computeWormholes(Tile tile) {
-            return withGateFolding(tile, tile.getWormholes(creussFlagshipColors));
-        }
-
-        private EnumSet<Wormhole> withGateFolding(Tile tile, Collection<Wormhole> printed) {
-            EnumSet<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
-            wormholes.addAll(printed);
+            EnumSet<Wormhole> printed = EnumSet.noneOf(Wormhole.class);
+            printed.addAll(tile.getWormholes(creussFlagshipColors));
             if (isGateFolded(tile)) {
-                wormholes.add(Wormhole.ALPHA);
-                wormholes.add(Wormhole.BETA);
+                printed.add(Wormhole.ALPHA);
+                printed.add(Wormhole.BETA);
             }
-            return wormholes;
+            return printed;
         }
 
         private boolean isGateFolded(Tile tile) {
@@ -159,7 +154,7 @@ public final class WormholeRule implements AdjacencyRule {
         }
 
         private Set<Wormhole> computeArrivals(Tile tile) {
-            Set<Wormhole> arriving = withGateFolding(tile, tile.getArrivalWormholes(creussFlagshipColors));
+            Set<Wormhole> arriving = EnumSet.copyOf(wormholes(tile));
             if (movement && isSevered(tile)) {
                 arriving.retainAll(linkedOr(EnumSet.noneOf(Wormhole.class)));
             }
@@ -167,7 +162,7 @@ public final class WormholeRule implements AdjacencyRule {
         }
 
         private Set<Wormhole> computeDepartures(Tile tile) {
-            Set<Wormhole> departing = withGateFolding(tile, tile.getDepartureWormholes(creussFlagshipColors));
+            Set<Wormhole> departing = EnumSet.copyOf(wormholes(tile));
             if (sundered) {
                 departing.retainAll(linkedOr(EnumSet.of(Wormhole.EPSILON)));
             }

@@ -28,7 +28,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
-import ti4.service.map.OneWayAdjacencyHintService;
 import ti4.service.planet.PlanetService;
 
 public class AddTokenCommand extends AddRemoveTokenCommand {
@@ -60,7 +59,9 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
         } else {
             tokenName = AliasHandler.resolveToken(tokenName);
             tokenFileName = Mapper.getTokenID(tokenName);
-            if (!ImageResources.hasTokenImage(tokenFileName)) {
+            tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
+
+            if (tokenPath == null) {
                 MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");
                 return;
             }
@@ -75,9 +76,6 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                     MessageHelper.sendMessageToChannel(channel, "No reflection tokens remain.");
                 }
                 return;
-            }
-            if (Mapper.getOneWayWormholeToken(tokenFileName) != null) {
-                OneWayAdjacencyHintService.hintOnce(game, channel);
             }
             addToken(
                     event,

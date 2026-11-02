@@ -30,7 +30,6 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
-import ti4.model.TokenModel;
 import ti4.model.WormholeModel.Wormhole;
 
 final class SpaceTokens {
@@ -70,9 +69,7 @@ final class SpaceTokens {
         int index = 0;
         for (String tokenID : drawOrder.tokens()) {
             WormholeTokenMerge.Merged merged = drawOrder.merged().get(tokenID);
-            TokenModel oneWayToken = Mapper.getOneWayWormholeToken(tokenID);
-            String tokenPath =
-                    merged != null || oneWayToken != null ? tokenID : ImageResources.tokenOrAttachment(tokenID);
+            String tokenPath = merged != null ? tokenID : ImageResources.tokenOrAttachment(tokenID);
             if (tokenPath == null) {
                 BotLogger.warning(new LogOrigin(game), "Could not parse token file for: " + tokenID);
                 continue;
@@ -86,9 +83,7 @@ final class SpaceTokens {
                 tokenPath = tokenPath.replace("token_frontier", "token_frontier_cpti");
             }
 
-            BufferedImage tokenImage = merged != null
-                    ? merged.image()
-                    : oneWayToken != null ? OneWayWormholeIcon.image(oneWayToken) : ImageHelper.read(tokenPath);
+            BufferedImage tokenImage = merged != null ? merged.image() : ImageHelper.read(tokenPath);
             if (tokenImage == null) continue;
 
             if (Constants.TOKEN_PLANETS.contains(tokenName)) {

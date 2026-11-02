@@ -290,9 +290,11 @@ public class MapJsonIOService {
         for (String token : tileIO.getTokens()) {
             Tile tile = game.getTileByPosition(tileIO.getPosition());
             String tokenFileName = token;
-            if (!ImageResources.hasTokenImage(tokenFileName)) {
+            String tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
+            if (tokenPath == null) {
                 tokenFileName = Mapper.getTokenID(token);
-                if (!ImageResources.hasTokenImage(tokenFileName)) {
+                tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
+                if (tokenPath == null) {
                     appendError(sb, tileIO, "Token not found: " + token);
                     continue;
                 }
