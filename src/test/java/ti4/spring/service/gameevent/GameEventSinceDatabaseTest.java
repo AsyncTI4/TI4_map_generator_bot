@@ -17,32 +17,24 @@ import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfigu
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import ti4.game.Game;
+import ti4.test.PostgresDatabaseTest;
 
 // Runs against a real Postgres, e.g. a throwaway database in a local container:
-//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test
-// Skipped when the variable is unset (CI has no database).
+//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:55432/tibot_ci_test
+// Skipped when the variable is unset. CI provides a dedicated test database.
 @EnabledIfEnvironmentVariable(named = "TI4_TEST_POSTGRES_URL", matches = ".+")
 @SpringBootTest(
         classes = GameEventSinceDatabaseTest.TestConfig.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = "spring.jpa.hibernate.ddl-auto=create-drop")
-class GameEventSinceDatabaseTest {
+class GameEventSinceDatabaseTest extends PostgresDatabaseTest {
 
     @Autowired
     private GameEventService service;
 
     @Autowired
     private GameEventRepository repository;
-
-    @DynamicPropertySource
-    static void datasource(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> System.getenv("TI4_TEST_POSTGRES_URL"));
-        registry.add("spring.datasource.username", () -> envOrDefault("TI4_TEST_POSTGRES_USER", "tibot"));
-        registry.add("spring.datasource.password", () -> envOrDefault("TI4_TEST_POSTGRES_PASSWORD", ""));
-    }
 
     @BeforeEach
     void clearTable() {
@@ -92,11 +84,6 @@ class GameEventSinceDatabaseTest {
         when(game.getName()).thenReturn(name);
         when(game.getEventSequenceCounter()).thenReturn(eventSequenceCounter);
         return game;
-    }
-
-    private static String envOrDefault(String name, String fallback) {
-        String value = System.getenv(name);
-        return value == null ? fallback : value;
     }
 
     @Configuration
