@@ -30,6 +30,7 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
@@ -377,7 +378,7 @@ public final class TeHelperAbilities {
         // Get the tiles that are valid sources for Survival Instinct
         if (survivalMap == null) survivalMap = new HashMap<>();
         List<Button> buttons = new ArrayList<>();
-        for (String adj : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String adj : Adjacency.of(game, player).forMovement().into(tile.getPosition())) {
             Tile t = game.getTileByPosition(adj);
             if (t != null && !t.hasPlayerCC(player)) {
                 if (FoWHelper.playerHasShipsInSystem(player, t) || survivalMap.containsKey(adj)) {

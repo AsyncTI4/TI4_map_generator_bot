@@ -511,7 +511,7 @@ public class PromissoryNoteHelper {
                     player.getCorrectChannel(), "Please spend 1 influence.", buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             buttons = new ArrayList<>();
-            for (Player p2 : player.getNeighbouringPlayers(true)) {
+            for (Player p2 : player.getAbilityNeighbours()) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "passMalevolencyTo_" + p2.getFaction(),
                         p2.getFactionNameOrColor()));

@@ -69,8 +69,9 @@ public class DeepTechHandler {
     }
 
     public static void offerItLooksBack(Game game, Player producer, String productionMessageJumpUrl) {
-        for (Player player : producer.getNeighbouringPlayers(true)) {
-            if (!player.hasTechReady(IT_LOOKS_BACK)) {
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasTechReady(IT_LOOKS_BACK)
+                    || !player.getAbilityNeighbours().contains(producer)) {
                 continue;
             }
             List<Button> buttons = List.of(

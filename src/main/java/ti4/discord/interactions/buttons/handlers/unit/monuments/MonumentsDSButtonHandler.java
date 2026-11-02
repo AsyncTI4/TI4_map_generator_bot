@@ -1204,6 +1204,7 @@ public class MonumentsDSButtonHandler {
 
     // Tucc Academy
     public static boolean isPlanetNotAdjacentToHomeSystem(Game game, Planet planet, Player player) {
+        // TODO: the text says "a home system"; should other players' home systems count too?
         Tile homeSystem = player.getHomeSystemTile();
         Tile planetTile = game.getTileFromPlanet(planet.getName());
         if (homeSystem == null || planetTile == null) {

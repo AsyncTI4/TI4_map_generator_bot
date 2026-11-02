@@ -479,6 +479,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_GEARS + " " + game.isShowGears());
         writer.write(System.lineSeparator());
+        writer.write(Constants.ONE_WAY_ADJACENCY + " " + game.isOneWayAdjacency());
+        writer.write(System.lineSeparator());
         writer.write(Constants.WORMHOLE_TOKEN_MERGE + " " + game.getWormholeTokenMergeFrom());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_BANNERS + " " + game.isShowBanners());

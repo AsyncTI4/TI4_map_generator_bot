@@ -132,6 +132,11 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `Player.fogSafeEmoji()` / `getFactionEmojiOrColor()`. If none of them fits, suggest a cheap best-effort
   fix (e.g. `game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel()`). If even that
   isn't feasible, leave a compact TODO in the method saying what leaks, so it can be made fog safe later.
+- **Ask adjacency through `ti4.helpers.adjacency.Adjacency`, in the direction of whoever acts.**
+  `Adjacency.of(game, player).forMovement() / forVision() / forEffects()`, then `from(pos)` (what pos reaches),
+  `into(pos)` (what reaches pos) or `either(pos)` (communication only). Links can be one-way, so the acting side
+  needs access: a PDS covers T when `into(T)` holds its system, ships move along `from(origin)`. Abilities that say
+  "neighbor" use `Player.getAbilityNeighbours()`. The `FoWHelper.getAdjacentTiles*` overloads are deprecated.
 - **Never ping other players into a private cards-info thread.** A player's `#cards-info` thread
   (`getCardsInfoThread()`) is private: it shows their hand and secrets, and pinging someone in it adds them
   to the thread. Buttons pressed there reply there by default, so when a message is for another player
@@ -151,8 +156,8 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   - Border anomalies: any file or class named `BorderAnomaly*` or `border_anomal*`.
   - 30k Content Lab cards: source `thirtyk`, files or classes named `thirtyk` / `ThirtyK*`, card ids
     ending in `30k` or `jmsc`.
-  - Wormholes: `WormholeModel`, wormhole tokens or attachments, `Tile.getWormholes`, the wormhole
-    methods in `FoWHelper`.
+  - Wormholes: `WormholeModel`, wormhole tokens or attachments, `Tile.getWormholes`, `WormholeRule`
+    in `ti4.helpers.adjacency`.
 
 ### Testing of new functionality and/or bug fixes
 The repo includes a testbed: a developer-only feature for testing on a live Discord dev bot

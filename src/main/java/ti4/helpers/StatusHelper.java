@@ -499,7 +499,7 @@ public final class StatusHelper {
     public static void handleStatusPhaseMiddle(Game game) {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
-            for (Player p2 : vaden.getNeighbouringPlayers(true)) {
+            for (Player p2 : vaden.getAbilityNeighbours()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."

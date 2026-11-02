@@ -28,6 +28,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -122,6 +123,7 @@ public class ButtonHelperHeroes {
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "argentHeroStep2_" + activeSystem.getPosition(),
                 activeSystem.getRepresentationForButtons(game, player)));
+        // TODO: Wing Transfer moves ships; should it use forMovement() so Sever and gravity-wave direction apply?
         for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, activeSystem.getPosition(), player, false)) {
             Tile tile = game.getTileByPosition(pos);
             if (CommandCounterHelper.hasCC(player, tile)
@@ -712,7 +714,7 @@ public class ButtonHelperHeroes {
 
     public static boolean isNextToPlanetControlledBy(Game game, Player player, Tile tile) {
         if (tile == null) return false;
-        for (String position : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String position : Adjacency.of(game, player).forEffects().into(tile.getPosition())) {
             Tile adjacent = game.getTileByPosition(position);
             if (adjacent == null) continue;
             for (UnitHolder holder : adjacent.getPlanetUnitHolders()) {
@@ -1742,7 +1744,8 @@ public class ButtonHelperHeroes {
             for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (FoWHelper.playerHasShipsInSystem(p2, tile1)) {
                     boolean adjacentPeeps = false;
-                    for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, p2, false)) {
+                    // TODO: Benediction moves ships; should it obey Travel Ban (mahact.md VIII) via forMovement()?
+                    for (String pos2 : Adjacency.of(game, p2).forEffects().from(pos1)) {
                         if (pos1.equalsIgnoreCase(pos2)) {
                             continue;
                         }

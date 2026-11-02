@@ -107,6 +107,7 @@ public class GameProperties {
     private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
+    private boolean oneWayAdjacency;
     private boolean queueSO = true;
     private boolean showBanners = true;
     private boolean showBubbles = true;

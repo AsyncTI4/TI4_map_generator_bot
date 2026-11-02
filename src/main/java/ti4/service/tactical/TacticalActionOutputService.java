@@ -415,8 +415,8 @@ public class TacticalActionOutputService {
                     " (Receives +1 from _Sacred Passage_ due to starting its movement in The Fracture or an anomaly.)");
         }
         if (unitModel != null && "qhet_cruiser2".equals(unitModel.getId())) {
-            int battlecruiserDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
-                    game, null, tile.getPosition(), game.getActiveSystem(), true);
+            int battlecruiserDistance = CheckDistanceHelper.getDistanceIgnoringOtherShips(
+                    game, player, tile.getPosition(), game.getActiveSystem(), true);
             output.append(" (May move through systems that contain different other players' ships, distance is ")
                     .append(battlecruiserDistance)
                     .append(")");

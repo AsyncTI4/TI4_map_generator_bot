@@ -1558,6 +1558,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !"twilights_fall_sc".equals(getScSetID());
     }
 
+    public boolean usesOneWayAdjacency() {
+        return isFowMode() || isOneWayAdjacency();
+    }
+
     public void resetThalnosUnits() {
         thalnosUnits = new HashMap<>();
     }

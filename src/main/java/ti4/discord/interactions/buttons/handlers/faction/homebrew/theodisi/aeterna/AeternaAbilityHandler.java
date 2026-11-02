@@ -16,11 +16,11 @@ import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.unit.AddUnitService;
@@ -445,7 +445,7 @@ public class AeternaAbilityHandler {
                         && destroyedUnitModel.getIsShip())) {
             return true;
         }
-        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true).stream()
+        return Adjacency.of(game, player).forEffects().withSelf().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(adjacent -> adjacent != null
                         && adjacent.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip));

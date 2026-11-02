@@ -51,15 +51,9 @@ public class OblivionUnitHandler {
                 buttons);
     }
 
-    public static void addObsidianMirrorAdjacencies(
-            Game game, Player player, String position, Set<String> adjacentPositions) {
-        if (game == null || player == null || position == null || !player.hasUnit("oblivion_flagship")) {
-            return;
-        }
-
-        Tile queriedTile = game.getTileByPosition(position);
-        if (queriedTile == null || !queriedTile.getPlanetUnitHolders().isEmpty()) {
-            return;
+    public static Set<String> obsidianMirrorFlagshipPositions(Game game, Player player) {
+        if (game == null || player == null || !player.hasUnit("oblivion_flagship")) {
+            return Set.of();
         }
 
         Set<String> flagshipPositions = game.getTileMap().values().stream()
@@ -94,22 +88,6 @@ public class OblivionUnitHandler {
                 flagshipPositions.add(activeTile.getPosition());
             }
         }
-        if (flagshipPositions.isEmpty()) {
-            return;
-        }
-
-        if (flagshipPositions.contains(position)) {
-            game.getTileMap().values().stream()
-                    .filter(tile -> !tile.isFracture())
-                    .filter(tile -> tile.getPlanetUnitHolders().isEmpty())
-                    .map(Tile::getPosition)
-                    .forEach(adjacentPositions::add);
-        } else {
-            Tile currentTile = game.getTileByPosition(position);
-            boolean inFracture = currentTile != null ? currentTile.isFracture() : position.startsWith("frac");
-            if (!inFracture) {
-                adjacentPositions.addAll(flagshipPositions);
-            }
-        }
+        return flagshipPositions;
     }
 }
