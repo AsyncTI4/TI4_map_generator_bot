@@ -92,7 +92,9 @@ public final class PlayerNeighbourGraph {
         Set<String> reached = ownRules.from(position);
         Set<Player> players = new HashSet<>();
         for (Player candidate : realPlayers) {
-            if (isInAnyOf(candidate, reached) || isInAnyOf(candidate, extraWormholeAdjacencies(position, candidate))) {
+            if (isInAnyOf(candidate, reached)
+                    || candidate.hasAbility("quantum_entanglement")
+                            && isInAnyOf(candidate, extraWormholeAdjacencies(position, candidate))) {
                 players.add(candidate);
             }
         }

@@ -92,24 +92,49 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
     // (Quann, beta) through Quantum Entanglement; ghost.md QE II makes them neighbours from Hacan's side too.
     @Test
     void quantumEntanglementNeighboursBothWaysWithOneWayAdjacency() {
-        Game game = new Game();
-        game.newGameSetup();
-        game.setName("qe-neighbours");
-        game.setTile(new Tile("18", "000"));
-        game.setTile(new Tile("26", "101"));
-        game.setTile(new Tile("25", "104"));
-        game.setOneWayAdjacency(true);
-        Player creuss = game.addPlayer("creuss-user", "Creuss");
-        creuss.setFaction(game, "ghost");
-        creuss.setColor("blue");
-        Player hacan = game.addPlayer("hacan-user", "Hacan");
-        hacan.setFaction(game, "hacan");
-        hacan.setColor("yellow");
-        game.getTileByPosition("101").addUnit("space", Units.getUnitKey(UnitType.Cruiser, creuss.getColorID()), 1);
-        game.getTileByPosition("104").addUnit("space", Units.getUnitKey(UnitType.Cruiser, hacan.getColorID()), 1);
+        Game game = directedGame("26", "101", "25", "104");
+        Player creuss = seat(game, "ghost", "blue", "101");
+        Player hacan = seat(game, "hacan", "yellow", "104");
 
         assertThat(creuss.getAbilityNeighbours()).containsExactly(hacan);
         assertThat(hacan.getAbilityNeighbours()).containsExactly(creuss);
+    }
+
+    // Travel Ban must not let another player's holder-only links count: Lazax Gate Folding links Mecatol to Hacan's
+    // alpha system (Lodor, 201) only for the folding Winnu player.
+    @Test
+    void travelBanDoesNotLendAnotherPlayersGateFolding() {
+        Game game = directedGame("26", "201");
+        game.addLaw("travel_ban", null);
+        Player winnu = seat(game, "winnu", "green", "000");
+        Player hacan = seat(game, "hacan", "yellow", "201");
+        winnu.addTech("lgf");
+        game.setActivePlayerID(winnu.getUserID());
+        game.setActiveSystem("000");
+
+        assertThat(winnu.getAbilityNeighbours()).containsExactly(hacan);
+        assertThat(hacan.getAbilityNeighbours()).isEmpty();
+    }
+
+    // Mecatol plus the given tile id/position pairs, one-way adjacency on.
+    private static Game directedGame(String... tilesAndPositions) {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("directed-neighbours");
+        game.setTile(new Tile("18", "000"));
+        for (int i = 0; i < tilesAndPositions.length; i += 2) {
+            game.setTile(new Tile(tilesAndPositions[i], tilesAndPositions[i + 1]));
+        }
+        game.setOneWayAdjacency(true);
+        return game;
+    }
+
+    private static Player seat(Game game, String faction, String color, String cruiserAt) {
+        Player player = game.addPlayer(faction + "-user", faction);
+        player.setFaction(game, faction);
+        player.setColor(color);
+        game.getTileByPosition(cruiserAt).addUnit("space", Units.getUnitKey(UnitType.Cruiser, player.getColorID()), 1);
+        return player;
     }
 
     private static void assertMatchesLegacy(Game game) {
