@@ -448,7 +448,7 @@ public class MessageHelper {
                     .sendMessage(msg)
                     .addFiles(fileUpload)
                     .setEphemeral(true)
-                    .complete();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else if (event instanceof SlashCommandInteractionEvent slash)
             slash.getHook()
                     .sendMessage("Here is your requested image")
