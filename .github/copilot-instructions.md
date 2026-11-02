@@ -206,4 +206,4 @@ Scheduled tasks live in `ti4.cron.*`. They are started by `JdaService` after bot
 - Spring Boot serves on port 8081 (internal metrics/API).
 - Images and data are uploaded to S3 via Python scripts in `scripts/`.
 
-- Bump GameEntityMapper.MAPPING_VERSION when changing the database snapshot mapping so reconciliation refreshes rows even when their saved source revision matches. Legacy files without a revision are fully reconciled until their next save.
+- Bump GameEntityMapper.MAPPING_VERSION when changing the database snapshot mapping so reconciliation refreshes rows even when their saved revision key matches. Legacy files without a revision are fully reconciled until their next save.
