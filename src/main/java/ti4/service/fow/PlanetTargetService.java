@@ -341,12 +341,11 @@ public class PlanetTargetService {
         for (Player candidate : game.getRealPlayers()) {
             if (candidate.getColor() == null) continue;
             boolean self = candidate == actor;
-            boolean permitted =
-                    switch (spec.ownership()) {
-                        case ANY -> true;
-                        case EXCLUDE_SELF -> !self;
-                        case SELF_ONLY -> self;
-                    };
+            boolean permitted = switch (spec.ownership()) {
+                case ANY -> true;
+                case EXCLUDE_SELF -> !self;
+                case SELF_ONLY -> self;
+            };
             if (!permitted) continue;
             if (holder.getUnitCount(spec.unit(), candidate.getColor()) > 0) return candidate;
         }

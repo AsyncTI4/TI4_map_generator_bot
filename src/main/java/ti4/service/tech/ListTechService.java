@@ -533,15 +533,14 @@ public class ListTechService {
                     case "normal", "res", "nekro", "nopay", "free", "inf", "shareknowledge", "dwsbt" -> "getTech_";
                     default -> "swapTechs__" + buttonPrefixType + "__";
                 };
-        String idSuffix =
-                switch (buttonPrefixType.toLowerCase()) {
-                    case "nekro", "nopay" -> "__noPay";
-                    case "free" -> "__noPay__comp";
-                    case "inf" -> "__inf";
-                    case "dwsbt" -> "__dwsbt";
-                    case "shareknowledge" -> "__shareKnowledge";
-                    default -> "";
-                };
+        String idSuffix = switch (buttonPrefixType.toLowerCase()) {
+            case "nekro", "nopay" -> "__noPay";
+            case "free" -> "__noPay__comp";
+            case "inf" -> "__inf";
+            case "dwsbt" -> "__dwsbt";
+            case "shareknowledge" -> "__shareKnowledge";
+            default -> "";
+        };
 
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();

@@ -92,13 +92,12 @@ public class AeternaUnitsHandler {
 
             for (UnitState state : holder.getNonZeroUnitStates(unitKey)) {
                 int count = holder.getUnitCountForState(unitKey, state);
-                String stateText =
-                        switch (state) {
-                            case dmg -> "damaged ";
-                            case glv -> "galvanized ";
-                            case dmg_glv -> "damaged galvanized ";
-                            default -> "";
-                        };
+                String stateText = switch (state) {
+                    case dmg -> "damaged ";
+                    case glv -> "galvanized ";
+                    case dmg_glv -> "damaged galvanized ";
+                    default -> "";
+                };
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + CHOOSE_MECH + tile.getPosition() + "|" + holder.getName() + "|"
                                 + opponent.getFaction() + "|" + unitKey.asyncID() + "|" + state,
@@ -217,13 +216,12 @@ public class AeternaUnitsHandler {
                 if (count < 1) {
                     continue;
                 }
-                String stateText =
-                        switch (state) {
-                            case dmg -> "damaged ";
-                            case glv -> "galvanized ";
-                            case dmg_glv -> "damaged galvanized ";
-                            default -> "";
-                        };
+                String stateText = switch (state) {
+                    case dmg -> "damaged ";
+                    case glv -> "galvanized ";
+                    case dmg_glv -> "damaged galvanized ";
+                    default -> "";
+                };
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + DESTROY_GROUND_FORCE + tile.getPosition() + "|"
                                 + holder.getName() + "|" + opponent.getFaction() + "|" + unitKey.asyncID() + "|" + state

@@ -4161,16 +4161,15 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static boolean vortexButtonAvailable(Game game, UnitKey unitKey) {
-        int baseUnitCap =
-                switch (unitKey.unitType()) {
-                    case Infantry, Fighter -> 10_000;
-                    case Destroyer, Cruiser -> 8;
-                    case Dreadnought -> 5;
-                    case Mech, Carrier -> 4;
-                    case Warsun -> 2;
-                    case Flagship, Deep -> 1;
-                    default -> 0; // everything else that can't be captured
-                };
+        int baseUnitCap = switch (unitKey.unitType()) {
+            case Infantry, Fighter -> 10_000;
+            case Destroyer, Cruiser -> 8;
+            case Dreadnought -> 5;
+            case Mech, Carrier -> 4;
+            case Warsun -> 2;
+            case Flagship, Deep -> 1;
+            default -> 0; // everything else that can't be captured
+        };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
                 .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
@@ -4181,16 +4180,15 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static int remainingUnitsOfType(Game game, UnitKey unitKey) {
-        int baseUnitCap =
-                switch (unitKey.unitType()) {
-                    case Infantry, Fighter -> 10_000;
-                    case Destroyer, Cruiser -> 8;
-                    case Dreadnought -> 5;
-                    case Mech, Carrier -> 4;
-                    case Warsun -> 2;
-                    case Flagship, Deep -> 1;
-                    default -> 0; // everything else that can't be captured
-                };
+        int baseUnitCap = switch (unitKey.unitType()) {
+            case Infantry, Fighter -> 10_000;
+            case Destroyer, Cruiser -> 8;
+            case Dreadnought -> 5;
+            case Mech, Carrier -> 4;
+            case Warsun -> 2;
+            case Flagship, Deep -> 1;
+            default -> 0; // everything else that can't be captured
+        };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
                 .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))

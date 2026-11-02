@@ -1921,18 +1921,17 @@ public class CombatRollService {
                 if (numRolls < 1) {
                     continue;
                 }
-                RollSegmentType segmentType =
-                        switch (singleUnit) {
-                            case "singleUnit" ->
-                                player.hasTech("tf-supercharge")
-                                        ? RollSegmentType.SUPERCHARGE_SELECTED_UNIT
-                                        : RollSegmentType.GRAVLEASH_SELECTED_UNIT;
-                            case "RestOfUnits" ->
-                                player.hasTech("tf-supercharge")
-                                        ? RollSegmentType.SUPERCHARGE_REST
-                                        : RollSegmentType.GRAVLEASH_REST;
-                            default -> RollSegmentType.PRIMARY;
-                        };
+                RollSegmentType segmentType = switch (singleUnit) {
+                    case "singleUnit" ->
+                        player.hasTech("tf-supercharge")
+                                ? RollSegmentType.SUPERCHARGE_SELECTED_UNIT
+                                : RollSegmentType.GRAVLEASH_SELECTED_UNIT;
+                    case "RestOfUnits" ->
+                        player.hasTech("tf-supercharge")
+                                ? RollSegmentType.SUPERCHARGE_REST
+                                : RollSegmentType.GRAVLEASH_REST;
+                    default -> RollSegmentType.PRIMARY;
+                };
                 List<Die> resultRolls;
                 int[] cappedModifiersByDie = new int[numRolls];
                 if (cappedDiceModifiers.isEmpty()) {

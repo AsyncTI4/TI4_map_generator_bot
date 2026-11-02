@@ -138,14 +138,13 @@ final class LeaderCards {
     }
 
     private static void drawPips(Graphics2D g2, Leader leader, boolean isExhaustedLocked, int x, int y) {
-        String pipID =
-                switch (leader.getType()) {
-                    case Constants.AGENT -> "i";
-                    case Constants.COMMANDER -> "ii";
-                    case Constants.HERO -> "iii";
-                    case Constants.ENVOY -> "agenda";
-                    default -> "";
-                };
+        String pipID = switch (leader.getType()) {
+            case Constants.AGENT -> "i";
+            case Constants.COMMANDER -> "ii";
+            case Constants.HERO -> "iii";
+            case Constants.ENVOY -> "agenda";
+            default -> "";
+        };
         if (pipID.isEmpty()) {
             return;
         }

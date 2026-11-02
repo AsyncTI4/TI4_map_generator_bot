@@ -96,13 +96,12 @@ public class MiltyDraftDisplayService {
             case "order" -> POSITION.equals(txt);
             default -> false;
         };
-        List<Button> categoryButtons =
-                switch (category) {
-                    case "slice" -> manager.getSliceButtons();
-                    case "faction" -> manager.getFactionButtons();
-                    case "order" -> manager.getPositionButtons();
-                    default -> Collections.emptyList();
-                };
+        List<Button> categoryButtons = switch (category) {
+            case "slice" -> manager.getSliceButtons();
+            case "faction" -> manager.getFactionButtons();
+            case "order" -> manager.getPositionButtons();
+            default -> Collections.emptyList();
+        };
         String newSummary = manager.getOverallSummaryString(game);
         return hist -> {
             boolean summaryDone = false, categoryDone = false, sliceImgDone = false;

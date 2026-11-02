@@ -14,13 +14,12 @@ import ti4.logging.BotLogger;
 public class ImageUploads {
 
     public static FileUpload createFileUpload(BufferedImage bufferedImage, String filenamePrefix, String fileFormat) {
-        byte[] imageBytes =
-                switch (fileFormat) {
-                    case "png" -> ImageEncoder.png(bufferedImage);
-                    case "jpg" -> ImageEncoder.jpg(bufferedImage);
-                    case "webp" -> ImageEncoder.webp(bufferedImage);
-                    default -> throw new IllegalArgumentException("Unsupported file format: " + fileFormat);
-                };
+        byte[] imageBytes = switch (fileFormat) {
+            case "png" -> ImageEncoder.png(bufferedImage);
+            case "jpg" -> ImageEncoder.jpg(bufferedImage);
+            case "webp" -> ImageEncoder.webp(bufferedImage);
+            default -> throw new IllegalArgumentException("Unsupported file format: " + fileFormat);
+        };
         return createFileUpload(imageBytes, filenamePrefix, fileFormat);
     }
 

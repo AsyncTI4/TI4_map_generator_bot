@@ -826,14 +826,13 @@ class GameLoadService {
         while (actionCardToken.hasMoreTokens()) {
             StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
             String id = cardInfo.nextToken();
-            ACStatus status =
-                    switch (cardInfo.nextToken()) {
-                        case "garbozia" -> ACStatus.garbozia;
-                        case "ralnelbt" -> ACStatus.ralnelbt;
-                        case "morphabt" -> ACStatus.morphabt;
-                        case "purged" -> ACStatus.purged;
-                        default -> null;
-                    };
+            ACStatus status = switch (cardInfo.nextToken()) {
+                case "garbozia" -> ACStatus.garbozia;
+                case "ralnelbt" -> ACStatus.ralnelbt;
+                case "morphabt" -> ACStatus.morphabt;
+                case "purged" -> ACStatus.purged;
+                default -> null;
+            };
             cards.put(id, status);
         }
         return cards;

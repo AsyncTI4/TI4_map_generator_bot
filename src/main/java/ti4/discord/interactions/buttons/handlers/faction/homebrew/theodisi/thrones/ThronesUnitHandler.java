@@ -268,13 +268,12 @@ public class ThronesUnitHandler {
                         int holderIndex =
                                 new ArrayList<>(mechTile.getUnitHolders().values()).indexOf(mechHolder);
                         int count = mechHolder.getUnitCountForState(unitKey, state);
-                        String stateText =
-                                switch (state) {
-                                    case dmg -> "Damaged ";
-                                    case glv -> "Galvanized ";
-                                    case dmg_glv -> "Damaged Galvanized ";
-                                    default -> "";
-                                };
+                        String stateText = switch (state) {
+                            case dmg -> "Damaged ";
+                            case glv -> "Galvanized ";
+                            case dmg_glv -> "Damaged Galvanized ";
+                            default -> "";
+                        };
                         buttons.add(Buttons.red(
                                 player.factionButtonChecker() + DESTROY_GHOLA + pendingId + "|"
                                         + mechTile.getPosition() + "|"
