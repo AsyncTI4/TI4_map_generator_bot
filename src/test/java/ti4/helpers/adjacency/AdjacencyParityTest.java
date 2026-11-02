@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import ti4.game.Game;
@@ -13,6 +14,7 @@ import ti4.game.persistence.TestGameHarness;
 import ti4.helpers.FoWHelper;
 import ti4.testUtils.BaseTi4Test;
 
+// TODO: remove after 2026-12-31 together with LegacyAdjacency; it only guards the move to the Adjacency API.
 // The Adjacency API must answer exactly what FoWHelper.getAdjacentTiles answered before it (frozen in
 // LegacyAdjacency), for every flag combination callers use, every player and every tile.
 class AdjacencyParityTest extends BaseTi4Test {
@@ -36,7 +38,15 @@ class AdjacencyParityTest extends BaseTi4Test {
                             Set<String> current =
                                     FoWHelper.getAdjacentTiles(game, position, player, flags[0], includeTile, flags[1]);
                             if (!legacy.equals(current)) {
-                                mismatches.add(describe(player, flags, includeTile, position, legacy, current));
+                                mismatches.add("%s toShow=%s forDistance=%s includeTile=%s %s legacy=%s current=%s"
+                                        .formatted(
+                                                player == null ? "null" : player.getFaction(),
+                                                flags[0],
+                                                flags[1],
+                                                includeTile,
+                                                position,
+                                                new TreeSet<>(legacy),
+                                                new TreeSet<>(current)));
                             }
                         }
                     }
@@ -61,27 +71,5 @@ class AdjacencyParityTest extends BaseTi4Test {
                 }
             }
         }
-    }
-
-    private static String describe(
-            Player player,
-            boolean[] flags,
-            boolean includeTile,
-            String position,
-            Set<String> legacy,
-            Set<String> current) {
-        Set<String> missing = new java.util.TreeSet<>(legacy);
-        missing.removeAll(current);
-        Set<String> extra = new java.util.TreeSet<>(current);
-        extra.removeAll(legacy);
-        return "%s toShow=%s forDistance=%s includeTile=%s %s missing=%s extra=%s"
-                .formatted(
-                        player == null ? "null" : player.getFaction(),
-                        flags[0],
-                        flags[1],
-                        includeTile,
-                        position,
-                        missing,
-                        extra);
     }
 }

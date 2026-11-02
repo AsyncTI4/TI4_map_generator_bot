@@ -84,11 +84,7 @@ class AdjacencyRulingsTest extends BaseTi4Test {
     // the folder gets both ends and other players get neither (tirules2's "for all players" is overruled).
     @Test
     void gateFoldingLinksMecatolBothWaysOnlyForTheFolder() {
-        Tile mecatol = game.getTileMap().values().stream()
-                .filter(tile -> tile.getUnitHolders().containsKey("mr")
-                        || tile.getUnitHolders().containsKey("mrte"))
-                .findFirst()
-                .orElseThrow();
+        Tile mecatol = game.getMecatolTile();
         Tile alpha = apartFrom(mecatol);
         alpha.getSpaceUnitHolder().addToken(ALPHA);
         Player winnu = game.getRealPlayers().stream()

@@ -30,6 +30,8 @@ import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.planet.AsgardLegendaryService;
 
 /**
+ * TODO: remove after 2026-12-31 together with AdjacencyParityTest. It only guards the move to the Adjacency API;
+ * AdjacencyScenarios stays (AdjacencyTest and AdjacencyTransposeTest use it).
  * Frozen copy of FoWHelper.getAdjacentTiles and its helpers as they were before the Adjacency API (2026-10-30).
  * AdjacencyParityTest compares the new API against it. Do not "fix" anything here: it is the baseline.
  * Intended rule changes since then, each marked "Changed in" below:

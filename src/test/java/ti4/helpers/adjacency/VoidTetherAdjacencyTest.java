@@ -80,30 +80,28 @@ class VoidTetherAdjacencyTest extends BaseTi4Test {
         }
     }
 
+    // Void Tether I.γ: abilities use the acting player's own rules, so only the exempt side has the other as a
+    // neighbour; the two-way set (transactions, whispers) still pairs them. Hacan (infantry in 000) and Letnev (101),
+    // neither exempt, are not neighbours until Letnev is allowed through.
     @Test
-    void neighboursAcrossTheTetherOnlyWhenTheHolderIsOneOfThem() {
-        // Void Tether I.γ: Hacan (000) and Letnev (101) are not neighbours; the Empyrean (000) is, both ways.
-        placeCruiser(hacan, "000");
+    void neighboursAcrossTheTetherOnlyFromTheExemptSide() {
+        game.getTileByPosition("000")
+                .addUnit(
+                        game.getTileByPosition("000")
+                                .getPlanetUnitHolders()
+                                .getFirst()
+                                .getName(),
+                        Units.getUnitKey(UnitType.Infantry, hacan.getColorID()),
+                        1);
         placeCruiser(empyrean, "000");
         placeCruiser(letnev, "101");
 
-        assertThat(letnev.getNeighbouringPlayers(true)).contains(empyrean).doesNotContain(hacan);
-        assertThat(empyrean.getNeighbouringPlayers(false)).contains(letnev);
-        assertThat(hacan.getNeighbouringPlayers(true)).doesNotContain(letnev);
-    }
-
-    // Abilities use the acting player's one-way set: Letnev cannot reach across, so in fog it must not learn the
-    // Empyrean sits behind the tether (Naalu commander, Reflect, neighbour counts).
-    @Test
-    void onlyTheExemptSideGetsTheOneWayNeighbour() {
-        placeCruiser(empyrean, "000");
-        placeCruiser(letnev, "101");
-
-        assertThat(letnev.getAbilityNeighbours()).doesNotContain(empyrean);
         assertThat(empyrean.getAbilityNeighbours()).contains(letnev);
+        assertThat(letnev.getAbilityNeighbours()).isEmpty();
+        assertThat(letnev.getNeighbouringPlayers(true)).containsExactly(empyrean);
 
         game.getBorderAnomalies().getFirst().allow(letnev.getColor());
-        assertThat(letnev.getAbilityNeighbours()).contains(empyrean);
+        assertThat(letnev.getAbilityNeighbours()).contains(empyrean, hacan);
     }
 
     // GM "who can see" asks each player's own rules, so the holder still shows up across its tether.
