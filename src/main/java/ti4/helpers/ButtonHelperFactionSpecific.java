@@ -4168,7 +4168,7 @@ public final class ButtonHelperFactionSpecific {
                     case Dreadnought -> 5;
                     case Mech, Carrier -> 4;
                     case Warsun -> 2;
-                    case Flagship -> 1;
+                    case Flagship, Deep -> 1;
                     default -> 0; // everything else that can't be captured
                 };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
@@ -4188,7 +4188,7 @@ public final class ButtonHelperFactionSpecific {
                     case Dreadnought -> 5;
                     case Mech, Carrier -> 4;
                     case Warsun -> 2;
-                    case Flagship -> 1;
+                    case Flagship, Deep -> 1;
                     default -> 0; // everything else that can't be captured
                 };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())

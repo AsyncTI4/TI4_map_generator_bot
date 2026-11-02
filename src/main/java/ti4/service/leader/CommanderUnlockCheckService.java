@@ -364,6 +364,12 @@ public class CommanderUnlockCheckService {
 
                 shouldBeUnlocked = techSpecialtyPlanets >= 3;
             }
+            case "deep" ->
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                                .filter(tile -> tile.getPlanetUnitHolders().isEmpty())
+                                .filter(tile -> ButtonHelper.checkNumberNonFighterShips(player, tile, false) > 0)
+                                .count()
+                        >= 3;
 
             // theodisi
             case "ardentia",

@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
@@ -319,6 +320,7 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "bedeepg" -> DeepTechHandler.resolveItLooksBack(event, game, player);
             case "ththurvialig" -> {
                 ThurvialiTechHandler.resolveRestructuring(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -755,6 +757,9 @@ public class PlayerTechService {
                                 + ", please select which planet containing your PDS that you would like to ready using _Völundr Protocol_.",
                         pdsPlanets);
                 ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+            }
+            case "bedeepy" -> {
+                DeepTechHandler.startAbyssalGenesis(event, game, player);
             }
             default ->
                 MessageHelper.sendMessageToChannel(

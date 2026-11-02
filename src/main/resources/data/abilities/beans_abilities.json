@@ -207,5 +207,29 @@
         "window": "When 1 or more of your units use PRODUCTION",
         "windowEffect": "You may exhaust this card to apply +1 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "source": "beans"
+    },
+    {
+        "id": "origin_unknown",
+        "name": "Origin Unknown",
+        "faction": "deep",
+        "window": "When you create the game board",
+        "windowEffect": "Place the Deep Space tile where your home system would normally be placed; it is not a home system. During setup, gain and ready The Deep planet card; you cannot lose it.",
+        "source": "beans"
+    },
+    {
+        "id": "dark_matter_link",
+        "name": "Dark Matter Link",
+        "faction": "deep",
+        "window": "After you explore a frontier token",
+        "windowEffect": "You may place a frontier token in a different system that contains no planets, if able.",
+        "source": "beans"
+    },
+    {
+        "id": "energy_siphon",
+        "name": "Energy Siphon",
+        "faction": "deep",
+        "window": "When you purge an exploration card for its effect",
+        "windowEffect": "Gain 1 command token.",
+        "source": "beans"
     }
 ]

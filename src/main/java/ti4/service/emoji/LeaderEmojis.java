@@ -270,6 +270,9 @@ public enum LeaderEmojis implements TI4Emoji {
     MigoAgent,
     MigoCommander,
     MigoHero,
+    DeepAgent,
+    DeepCommander,
+    DeepHero,
 
     // Lost Legacies (Theodisi)
     ArdentiaAgent,
