@@ -84,11 +84,6 @@ public class GameManager {
         return game;
     }
 
-    @Nullable
-    public static Game loadForDatabaseReconciliation(String gameName) {
-        return GameLoadService.load(gameName);
-    }
-
     private static void handleManagedGameRemoval(String gameName) {
         gameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);

@@ -1,4 +1,4 @@
-package ti4.service.persistence;
+package ti4.game.persistence;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,11 +10,12 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
-import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
+import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.service.persistence.GameEntityMapper;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
 import ti4.spring.service.persistence.GameEntitySnapshot;
@@ -63,6 +64,12 @@ public class GameDatabaseReconciler {
         @Override
         public void reconcile(String gameName) {
             if (wasChangedAfter(gameName, startedAt)) {
+                existingGameNames.add(gameName);
+                return;
+            }
+            PersistedGameState persistedState = persistedStates.get(gameName);
+            String revision = GameLoadService.loadRevision(gameName);
+            if (persistedState != null && persistedState.matchesRevision(revision)) {
                 existingGameNames.add(gameName);
                 return;
             }
@@ -149,7 +156,7 @@ public class GameDatabaseReconciler {
 
     private static Game loadGame(String gameName) {
         try {
-            return GameManager.loadForDatabaseReconciliation(gameName);
+            return GameLoadService.load(gameName);
         } catch (Exception e) {
             BotLogger.error(TASK_NAME + " could not load game " + gameName + ".", e);
             return null;

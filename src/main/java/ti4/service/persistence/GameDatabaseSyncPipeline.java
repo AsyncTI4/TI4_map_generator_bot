@@ -13,7 +13,6 @@ import ti4.executors.ShutdownResult;
 import ti4.game.Game;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
-import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntityMapper;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
 import ti4.spring.service.persistence.GameEntitySnapshot;
@@ -50,7 +49,7 @@ public class GameDatabaseSyncPipeline {
                 EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    static boolean queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+    public static boolean queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
         var timedRunnable = new TimedRunnable(taskName, executionTimeWarningThresholdSeconds, runnable);
         try {
             ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
@@ -65,7 +64,7 @@ public class GameDatabaseSyncPipeline {
         Runnable runnable = () -> {
             if (DatabasePersistenceGate.isDisabled()) return;
             try {
-                databaseWrite.accept(SpringContext.getBean(GameEntityPersistenceService.class));
+                databaseWrite.accept(GameEntityPersistenceService.getBean());
             } catch (Exception e) {
                 BotLogger.error("Failed to sync game " + gameName + " to the database.", e);
             }

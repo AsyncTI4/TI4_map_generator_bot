@@ -25,6 +25,12 @@ public class GameEntity {
     @Column(name = "game_name", nullable = false)
     private String gameName;
 
+    @Column(name = "source_revision")
+    private String sourceRevision;
+
+    @Column(name = "mapping_version")
+    private Integer mappingVersion;
+
     @Column(name = "creation_epoch_milliseconds")
     private long creationEpochMilliseconds;
 

@@ -10,6 +10,19 @@ import ti4.testUtils.BaseTi4Test;
 class GameEntityMapperTest extends BaseTi4Test {
 
     @Test
+    void snapshotCapturesSourceRevisionAndMappingVersion() {
+        Game game = new Game();
+        game.setName("mapper-revision");
+        game.setPersistenceRevision("saved-revision");
+
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+        game.setPersistenceRevision("later-revision");
+
+        assertThat(snapshot.game().getSourceRevision()).isEqualTo("saved-revision");
+        assertThat(snapshot.game().getMappingVersion()).isEqualTo(GameEntityMapper.MAPPING_VERSION);
+    }
+
+    @Test
     void replacedPlayerUsesStatsTrackedUserNameFromTheGameFile() {
         Game game = new Game();
         game.setName("mapper-replaced-player");

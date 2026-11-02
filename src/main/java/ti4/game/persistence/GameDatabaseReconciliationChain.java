@@ -1,4 +1,4 @@
-package ti4.service.persistence;
+package ti4.game.persistence;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;

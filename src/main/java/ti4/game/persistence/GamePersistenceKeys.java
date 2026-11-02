@@ -5,6 +5,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class GamePersistenceKeys {
 
+    static final String PERSISTENCE_REVISION = "persistence_revision";
+
     static final String TILE = "-tile-";
     static final String UNITS = "-units-";
     static final String UNITHOLDER = "-unitholder-";

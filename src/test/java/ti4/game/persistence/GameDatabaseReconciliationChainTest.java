@@ -1,4 +1,4 @@
-package ti4.service.persistence;
+package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

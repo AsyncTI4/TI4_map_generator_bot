@@ -101,6 +101,24 @@ class GameLoadService {
         });
     }
 
+    @Nullable
+    static String loadRevision(String gameName) {
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            try (var reader = Files.newBufferedReader(Storage.getGamePath(gameName + GAME_FILE_EXTENSION))) {
+                for (int i = 0; i < 5; i++) {
+                    if (reader.readLine() == null) return null;
+                }
+                String line = reader.readLine();
+                String prefix = PERSISTENCE_REVISION + " ";
+                return line != null && line.startsWith(prefix)
+                        ? line.substring(prefix.length()).strip()
+                        : null;
+            } catch (Exception e) {
+                return null;
+            }
+        });
+    }
+
     private static String stripGameFileExtension(String fileName) {
         return fileName.substring(0, fileName.length() - GAME_FILE_EXTENSION.length());
     }
@@ -700,6 +718,7 @@ class GameLoadService {
                         game.setStartedDate(Long.parseLong(info));
                     }
                 }
+                case PERSISTENCE_REVISION -> game.setPersistenceRevision(info);
                 case Constants.LAST_MODIFIED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setLastModifiedDate(Long.parseLong(info));
@@ -826,14 +845,13 @@ class GameLoadService {
         while (actionCardToken.hasMoreTokens()) {
             StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
             String id = cardInfo.nextToken();
-            ACStatus status =
-                    switch (cardInfo.nextToken()) {
-                        case "garbozia" -> ACStatus.garbozia;
-                        case "ralnelbt" -> ACStatus.ralnelbt;
-                        case "morphabt" -> ACStatus.morphabt;
-                        case "purged" -> ACStatus.purged;
-                        default -> null;
-                    };
+            ACStatus status = switch (cardInfo.nextToken()) {
+                case "garbozia" -> ACStatus.garbozia;
+                case "ralnelbt" -> ACStatus.ralnelbt;
+                case "morphabt" -> ACStatus.morphabt;
+                case "purged" -> ACStatus.purged;
+                default -> null;
+            };
             cards.put(id, status);
         }
         return cards;

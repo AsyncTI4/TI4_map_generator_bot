@@ -45,6 +45,24 @@ class PersistedGameStateTest {
                         "title rows (1 missing, 0 unexpected)");
     }
 
+    @Test
+    void revisionMatchRequiresBothSourceAndMappingVersions() {
+        GameEntity entity = game(1);
+        entity.setSourceRevision("revision-a");
+        entity.setMappingVersion(GameEntityMapper.MAPPING_VERSION);
+        PersistedGameState state = PersistedGameState.of(entity, List.of(), List.of());
+        assertThat(state.matchesRevision("revision-a")).isTrue();
+        assertThat(state.matchesRevision("revision-b")).isFalse();
+        assertThat(state.matchesRevision(null)).isFalse();
+        assertThat(state.matchesRevision("")).isFalse();
+        entity.setMappingVersion(null);
+        assertThat(PersistedGameState.of(entity, List.of(), List.of()).matchesRevision("revision-a"))
+                .isFalse();
+        entity.setMappingVersion(GameEntityMapper.MAPPING_VERSION - 1);
+        assertThat(PersistedGameState.of(entity, List.of(), List.of()).matchesRevision("revision-a"))
+                .isFalse();
+    }
+
     private static GameEntity game(int round) {
         GameEntity game = new GameEntity();
         game.setGameName("pbd1");

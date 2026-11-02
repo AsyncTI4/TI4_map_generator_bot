@@ -43,6 +43,8 @@ public class GameProperties {
     @Deprecated // can be removed?
     private @ExportableField long startedDate;
 
+    private String persistenceRevision;
+
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;

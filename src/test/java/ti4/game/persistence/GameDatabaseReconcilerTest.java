@@ -1,4 +1,4 @@
-package ti4.service.persistence;
+package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import ti4.game.persistence.GameManager;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
+import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
 import ti4.spring.service.persistence.PersistedGameState;
@@ -57,7 +57,7 @@ class GameDatabaseReconcilerTest {
             fixture.run();
 
             verifyNoInteractions(fixture.persistence);
-            fixture.manager.verify(() -> GameManager.loadForDatabaseReconciliation("changed"), never());
+            fixture.loader.verify(() -> GameLoadService.load("changed"), never());
         }
     }
 
@@ -93,9 +93,36 @@ class GameDatabaseReconcilerTest {
         }
     }
 
+    @Test
+    void matchingRevisionSkipsParsingAndDatabaseWrites() {
+        try (Fixture fixture = new Fixture()) {
+            PersistedGameState state = mock(PersistedGameState.class);
+            fixture.persisted.put("unchanged", state);
+            fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
+            fixture.loader.when(() -> GameLoadService.loadRevision("unchanged")).thenReturn("revision");
+            when(state.matchesRevision("revision")).thenReturn(true);
+            fixture.run();
+            fixture.loader.verify(() -> GameLoadService.load("unchanged"), never());
+            verifyNoInteractions(fixture.persistence);
+        }
+    }
+
+    @Test
+    void differingRevisionLoadsTheGame() {
+        try (Fixture fixture = new Fixture()) {
+            fixture.persisted.put("changed", mock(PersistedGameState.class));
+            fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
+            fixture.loader.when(() -> GameLoadService.loadRevision("changed")).thenReturn("new-revision");
+            when(fixture.file.exists()).thenReturn(true);
+            fixture.run();
+            fixture.loader.verify(() -> GameLoadService.load("changed"));
+        }
+    }
+
     private static final class Fixture implements AutoCloseable {
         private final MockedStatic<SpringContext> context = mockStatic(SpringContext.class);
         private final MockedStatic<GameManager> manager = mockStatic(GameManager.class);
+        private final MockedStatic<GameLoadService> loader = mockStatic(GameLoadService.class);
         private final MockedStatic<Storage> storage = mockStatic(Storage.class);
         private final MockedStatic<DatabasePersistenceGate> gate = mockStatic(DatabasePersistenceGate.class);
         private final MockedStatic<BotLogger> logs = mockStatic(BotLogger.class);
@@ -127,6 +154,7 @@ class GameDatabaseReconcilerTest {
             logs.close();
             gate.close();
             storage.close();
+            loader.close();
             manager.close();
             context.close();
         }
