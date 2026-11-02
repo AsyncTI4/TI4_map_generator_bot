@@ -16,8 +16,9 @@ import ti4.testUtils.BaseTi4Test;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Void Tether ruling (docs/rules/factions/empyrean.md, Void Tether I): other players treat the two systems as not
- * adjacent for all game effects, the Empyrean still does. Enforced with one-way adjacency on (and in fog) only.
+ * Void Tether ruling (docs/rules/factions/empyrean.md, Void Tether I): the shared edge is blocked for other players
+ * for all game effects, the Empyrean still crosses it. Only the edge: wormholes or custom links between the same two
+ * systems still connect them. Enforced with one-way adjacency on (and in fog) only.
  * Board: Mecatol plus ring 1, tether between 000 and 101.
  */
 class VoidTetherAdjacencyTest extends BaseTi4Test {

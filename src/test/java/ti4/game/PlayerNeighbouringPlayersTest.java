@@ -88,6 +88,30 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
         }
     }
 
+    // One-way adjacency on (and fog): abilities use the acting player's own rules. Creuss (Lodor, alpha) reaches Hacan
+    // (Quann, beta) through Quantum Entanglement; ghost.md QE II makes them neighbours from Hacan's side too.
+    @Test
+    void quantumEntanglementNeighboursBothWaysWithOneWayAdjacency() {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("qe-neighbours");
+        game.setTile(new Tile("18", "000"));
+        game.setTile(new Tile("26", "101"));
+        game.setTile(new Tile("25", "104"));
+        game.setOneWayAdjacency(true);
+        Player creuss = game.addPlayer("creuss-user", "Creuss");
+        creuss.setFaction(game, "ghost");
+        creuss.setColor("blue");
+        Player hacan = game.addPlayer("hacan-user", "Hacan");
+        hacan.setFaction(game, "hacan");
+        hacan.setColor("yellow");
+        game.getTileByPosition("101").addUnit("space", Units.getUnitKey(UnitType.Cruiser, creuss.getColorID()), 1);
+        game.getTileByPosition("104").addUnit("space", Units.getUnitKey(UnitType.Cruiser, hacan.getColorID()), 1);
+
+        assertThat(creuss.getAbilityNeighbours()).containsExactly(hacan);
+        assertThat(hacan.getAbilityNeighbours()).containsExactly(creuss);
+    }
+
     private static void assertMatchesLegacy(Game game) {
         List<Player> everyone = new ArrayList<>(game.getPlayers().values());
         assertThat(everyone).isNotEmpty();
