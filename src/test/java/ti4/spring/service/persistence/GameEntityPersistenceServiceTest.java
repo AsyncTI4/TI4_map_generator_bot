@@ -15,6 +15,7 @@ class GameEntityPersistenceServiceTest {
 
     private GameEntityRepository gameEntityRepository;
     private PlayerEntityRepository playerEntityRepository;
+    private GameParticipantEntityRepository gameParticipantEntityRepository;
     private TitleEntityRepository titleEntityRepository;
     private UserEntityRepository userEntityRepository;
     private GameEntityPersistenceService service;
@@ -23,19 +24,26 @@ class GameEntityPersistenceServiceTest {
     void setUp() {
         gameEntityRepository = mock(GameEntityRepository.class);
         playerEntityRepository = mock(PlayerEntityRepository.class);
+        gameParticipantEntityRepository = mock(GameParticipantEntityRepository.class);
         titleEntityRepository = mock(TitleEntityRepository.class);
         userEntityRepository = mock(UserEntityRepository.class);
         service = new GameEntityPersistenceService(
-                gameEntityRepository, playerEntityRepository, titleEntityRepository, userEntityRepository);
+                gameEntityRepository,
+                playerEntityRepository,
+                gameParticipantEntityRepository,
+                titleEntityRepository,
+                userEntityRepository);
     }
 
     @Test
     void deleteRemovesRowsInForeignKeyOrder() {
         service.delete("pbd1");
 
-        InOrder deletionOrder = inOrder(titleEntityRepository, playerEntityRepository, gameEntityRepository);
+        InOrder deletionOrder = inOrder(
+                titleEntityRepository, playerEntityRepository, gameParticipantEntityRepository, gameEntityRepository);
         deletionOrder.verify(titleEntityRepository).deleteByGameName("pbd1");
         deletionOrder.verify(playerEntityRepository).deleteByGameName("pbd1");
+        deletionOrder.verify(gameParticipantEntityRepository).deleteByGameName("pbd1");
         deletionOrder.verify(gameEntityRepository).deleteByGameName("pbd1");
     }
 
@@ -48,11 +56,16 @@ class GameEntityPersistenceServiceTest {
 
         service.replace(new GameEntitySnapshot(game, users, titles));
 
-        InOrder order =
-                inOrder(userEntityRepository, titleEntityRepository, playerEntityRepository, gameEntityRepository);
+        InOrder order = inOrder(
+                userEntityRepository,
+                titleEntityRepository,
+                playerEntityRepository,
+                gameParticipantEntityRepository,
+                gameEntityRepository);
         order.verify(userEntityRepository).saveAll(users);
         order.verify(titleEntityRepository).deleteByGameName("pbd1");
         order.verify(playerEntityRepository).deleteByGameName("pbd1");
+        order.verify(gameParticipantEntityRepository).deleteByGameName("pbd1");
         order.verify(gameEntityRepository).deleteByGameName("pbd1");
         order.verify(gameEntityRepository).save(game);
         order.verify(titleEntityRepository).saveAll(titles);

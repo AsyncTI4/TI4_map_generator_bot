@@ -2,11 +2,11 @@ package ti4.game.persistence;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
@@ -15,10 +15,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
-import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.discord.JdaService;
 import ti4.game.Game;
-import ti4.game.Player;
-import ti4.helpers.FoWHelper;
 
 @Getter
 public class ManagedGame {
@@ -60,55 +58,62 @@ public class ManagedGame {
     private final Map<String, String> teamMateToPrimaryId;
 
     public ManagedGame(Game game) {
-        name = game.getName();
-        revisionKey = game.getRevisionKey();
-        hasEnded = game.isHasEnded();
-        competitiveExportEligible = hasEnded
-                && GameStatisticsFilterer.getCompetitiveExportGamesFilter().test(game);
-        hasWinner = game.hasWinner();
-        vpGoalReached =
-                game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
-        fowMode = game.isFowMode();
-        factionReactMode = game.isBotFactionReacts();
-        twilightsFallMode = game.isTwilightsFallMode();
-        colorReactMode = game.isBotColorReacts();
-        stratReactMode = game.isBotStratReacts();
-        fastScFollowMode = game.isFastSCFollowMode();
-        fogQol01 = FoWHelper.isFogQol01(game);
-        injectRules = game.isInjectRulesLinks();
-        autoPingEnabled = game.getAutoPingStatus();
-        temporaryPingDisable = game.isTemporaryPingDisable();
-        creationDateTime = game.getCreationDateTime();
-        lastModifiedDate = game.getLastModifiedDate();
-        activePlayerId = sanitizeToNull(game.getActivePlayerID());
-        lastActivePlayerChange = game.getLastActivePlayerChange() == null
-                ? 0
-                : game.getLastActivePlayerChange().getTime();
-        endedDate = game.getEndedDate();
-        round = game.getRound();
-        guild = game.getGuild();
-        mainGameChannel = game.getMainGameChannel();
-        tableTalkChannel = game.getTableTalkChannel();
-        launchPostThread = game.getLaunchPostThread();
-
-        players = game.getPlayers().values().stream()
-                .map(p -> GameManager.addOrMergePlayer(this, p))
-                .collect(toUnmodifiableSet());
-        playerToStatus = game.getPlayers().values().stream()
-                .collect(Collectors.toUnmodifiableMap(
-                        p -> getPlayer(p.getUserID()), p -> Status.of(p, game.isHasEnded())));
-        teamMateToPrimaryId = collectTeamMates(game);
+        this(ManagedGameState.of(game));
     }
 
-    private static Map<String, String> collectTeamMates(Game game) {
-        if (!game.isCommunityMode()) {
-            return Collections.emptyMap();
+    public ManagedGame(ManagedGameState state) {
+        name = state.name();
+        revisionKey = state.revisionKey();
+        hasEnded = state.hasEnded();
+        competitiveExportEligible = state.competitiveExportEligible();
+        hasWinner = state.hasWinner();
+        vpGoalReached = state.vpGoalReached();
+        fowMode = state.fowMode();
+        factionReactMode = state.factionReactMode();
+        twilightsFallMode = state.twilightsFallMode();
+        colorReactMode = state.colorReactMode();
+        stratReactMode = state.stratReactMode();
+        fastScFollowMode = state.fastScFollowMode();
+        fogQol01 = state.fogQol01();
+        injectRules = state.injectRules();
+        autoPingEnabled = state.autoPingEnabled();
+        temporaryPingDisable = state.temporaryPingDisable();
+        creationDateTime = state.creationDateTime();
+        lastModifiedDate = state.lastModifiedDate();
+        activePlayerId = state.activePlayerId();
+        lastActivePlayerChange = state.lastActivePlayerChange();
+        endedDate = state.endedDate();
+        round = state.round();
+        mainGameChannel = findById(state.mainGameChannelId(), id -> JdaService.jda.getTextChannelById(id));
+        tableTalkChannel = findById(state.tableTalkChannelId(), id -> JdaService.jda.getTextChannelById(id));
+        guild = findGuild(state.guildId(), mainGameChannel, tableTalkChannel);
+        launchPostThread = findById(state.launchPostThreadId(), ManagedGame::findPrimaryGuildThread);
+
+        players = state.participants().stream()
+                .map(participant -> GameManager.addOrMergePlayer(this, participant))
+                .collect(toUnmodifiableSet());
+        playerToStatus = state.participants().stream()
+                .collect(Collectors.toUnmodifiableMap(participant -> getPlayer(participant.userId()), Status::of));
+        teamMateToPrimaryId = state.teamMateToPrimaryId();
+    }
+
+    private static <T> T findById(String id, Function<String, T> lookup) {
+        if (JdaService.jda == null || !StringUtils.isNumeric(id)) return null;
+        return lookup.apply(id);
+    }
+
+    private static Guild findGuild(String guildId, TextChannel mainGameChannel, TextChannel tableTalkChannel) {
+        if (JdaService.jda != null && StringUtils.isNumeric(guildId)) {
+            return JdaService.jda.getGuildById(guildId);
         }
-        return game.getPlayers().values().stream()
-                .flatMap(player -> player.getTeamMateIDs().stream()
-                        .filter(id -> !id.equals(player.getUserID()))
-                        .map(id -> Map.entry(id, player.getUserID())))
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (first, _) -> first));
+        if (mainGameChannel != null) return mainGameChannel.getGuild();
+        if (tableTalkChannel != null) return tableTalkChannel.getGuild();
+        return null;
+    }
+
+    private static ThreadChannel findPrimaryGuildThread(String id) {
+        if (JdaService.guildPrimary == null) return null;
+        return JdaService.guildPrimary.getThreadChannelById(id);
     }
 
     public String getSeatUserId(String id) {
@@ -118,13 +123,6 @@ public class ManagedGame {
 
     public boolean hasPlayerOrTeamMate(String id) {
         return hasPlayer(id) || teamMateToPrimaryId.containsKey(id);
-    }
-
-    private static String sanitizeToNull(String str) {
-        if (StringUtils.isBlank(str) || "null".equalsIgnoreCase(str)) {
-            return null;
-        }
-        return str;
     }
 
     @Nullable
@@ -192,11 +190,11 @@ public class ManagedGame {
         REAL_OR_ELIMINATED,
         OTHER;
 
-        static Status of(Player player, boolean gameHasEnded) {
-            if ((player.isRealPlayer() && !player.isNpc()) || (player.isEliminated() && gameHasEnded)) {
+        static Status of(ManagedGameState.Participant participant) {
+            if (participant.realPlayer()) {
                 return REAL;
             }
-            if (player.isRealPlayer() || player.isEliminated()) {
+            if (participant.realOrEliminated()) {
                 return REAL_OR_ELIMINATED;
             }
             return OTHER;

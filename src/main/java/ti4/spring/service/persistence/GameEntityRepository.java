@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface GameEntityRepository extends JpaRepository<GameEntity, String> {
-    List<GameEntity> findByTwilightImperiumGlobalLeagueTrueAndEndedEpochMillisecondsIsNull();
+    List<GameEntity> findByTwilightImperiumGlobalLeagueTrueAndStatisticsIgnoredFalseAndEndedEpochMillisecondsIsNull();
 
     @Modifying
     @Query("DELETE FROM GameEntity g WHERE g.gameName = :gameName")

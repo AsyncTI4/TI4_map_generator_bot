@@ -1,6 +1,7 @@
 package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -57,7 +58,7 @@ class GameDatabaseReconcilerTest {
             fixture.run();
 
             verifyNoInteractions(fixture.persistence);
-            fixture.loader.verify(() -> GameLoadService.load("changed"), never());
+            fixture.manager.verify(() -> GameManager.loadGameFile("changed"), never());
         }
     }
 
@@ -103,9 +104,11 @@ class GameDatabaseReconcilerTest {
             when(managedGame.getRevisionKey()).thenReturn("revision");
             fixture.manager.when(() -> GameManager.getManagedGame("unchanged")).thenReturn(managedGame);
             when(state.matchesRevision("revision")).thenReturn(true);
+            // The game file is unchanged since the row was written, so only its stamp is read.
+            when(state.matchesGameFile(any())).thenReturn(true);
             fixture.run();
             fixture.loader.verifyNoInteractions();
-            fixture.storage.verifyNoInteractions();
+            fixture.manager.verify(() -> GameManager.loadGameFile("unchanged"), never());
             verifyNoInteractions(fixture.persistence);
         }
     }
@@ -120,7 +123,7 @@ class GameDatabaseReconcilerTest {
             fixture.manager.when(() -> GameManager.getManagedGame("changed")).thenReturn(managedGame);
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
-            fixture.loader.verify(() -> GameLoadService.load("changed"));
+            fixture.manager.verify(() -> GameManager.loadGameFile("changed"));
         }
     }
 
@@ -137,13 +140,14 @@ class GameDatabaseReconcilerTest {
             ManagedGame managedGame = mock(ManagedGame.class);
             when(managedGame.getRevisionKey()).thenReturn("revision");
             when(healthy.matchesRevision("revision")).thenReturn(true);
+            when(healthy.matchesGameFile(any())).thenReturn(true);
             fixture.manager.when(() -> GameManager.getManagedGame("healthy")).thenReturn(managedGame);
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
 
-            fixture.loader.verify(() -> GameLoadService.load("broken"));
-            fixture.loader.verify(() -> GameLoadService.load("healthy"), never());
+            fixture.manager.verify(() -> GameManager.loadGameFile("broken"));
+            fixture.manager.verify(() -> GameManager.loadGameFile("healthy"), never());
             verifyNoInteractions(fixture.persistence);
         }
     }

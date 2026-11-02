@@ -14,6 +14,10 @@ final class GameFileLockManager {
         return locks.computeIfAbsent(gameName, _ -> new ReentrantReadWriteLock());
     }
 
+    static boolean isWriteLockedByCurrentThread(String gameName) {
+        return getLock(gameName).isWriteLockedByCurrentThread();
+    }
+
     public static void wrapWithWriteLock(String gameName, Runnable runnable) {
         ReentrantReadWriteLock lock = getLock(gameName);
         lock.writeLock().lock();

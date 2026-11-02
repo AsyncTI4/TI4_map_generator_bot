@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.game.persistence.ManagedGameState;
 import ti4.spring.context.SpringContext;
 
 @Service
@@ -15,12 +16,18 @@ public class PersistedGameStateService {
 
     private final GameEntityRepository gameEntityRepository;
     private final PlayerEntityRepository playerEntityRepository;
+    private final GameParticipantEntityRepository gameParticipantEntityRepository;
     private final TitleEntityRepository titleEntityRepository;
 
     @Transactional(readOnly = true)
     public Map<String, PersistedGameState> loadAll() {
         Map<String, List<PlayerEntity>> playersByGame = playerEntityRepository.findAllWithUsersAndGames().stream()
                 .collect(Collectors.groupingBy(player -> player.getGame().getGameName()));
+        Map<String, List<ManagedGameState.Participant>> participantsByGame =
+                gameParticipantEntityRepository.findAllRows().stream()
+                        .collect(Collectors.groupingBy(
+                                GameParticipantRow::gameName,
+                                Collectors.mapping(GameParticipantRow::toParticipant, Collectors.toList())));
         Map<String, List<TitleEntity>> titlesByGame = titleEntityRepository.findAllWithUsersAndGames().stream()
                 .collect(Collectors.groupingBy(title -> title.getGame().getGameName()));
 
@@ -32,6 +39,7 @@ public class PersistedGameStateService {
                     PersistedGameState.of(
                             game,
                             playersByGame.getOrDefault(gameName, List.of()),
+                            participantsByGame.getOrDefault(gameName, List.of()),
                             titlesByGame.getOrDefault(gameName, List.of())));
         }
         return states;

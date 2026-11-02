@@ -21,11 +21,13 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
+import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.service.persistence.GameDatabaseSyncPipeline;
+import ti4.spring.service.persistence.PersistedManagedGame;
+import ti4.spring.service.persistence.PersistedManagedGameService;
 import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
@@ -63,14 +65,22 @@ public class GameManager {
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
+                Map<String, PersistedManagedGame> persistedGames = loadPersistedManagedGames();
                 Map<String, GameLoadResult.Corrupt> corruptGames = new ConcurrentHashMap<>();
+                AtomicInteger builtFromDatabase = new AtomicInteger();
+                AtomicInteger builtFromGameFiles = new AtomicInteger();
                 try (ExecutorService executorService =
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
-                    gameNames.forEach(name -> executorService.submit(() -> buildManagedGame(name, corruptGames)));
+                    gameNames.forEach(name -> executorService.submit(() -> {
+                        boolean fromDatabase = warmupManagedGame(name, persistedGames, corruptGames);
+                        (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
+                    }));
                 }
                 reportCorruptGamesFoundAtWarmup(corruptGames);
                 warmupFinishedLatch.countDown();
-                BotLogger.info("FINISHED BUILDING MANAGED GAMES");
+                BotLogger.info(String.format(
+                        "FINISHED BUILDING MANAGED GAMES: %,d FROM THE DATABASE, %,d FROM GAME FILES",
+                        builtFromDatabase.get(), builtFromGameFiles.get()));
                 if (JdaService.jda != null) {
                     JdaService.updatePresence();
                 }
@@ -81,13 +91,51 @@ public class GameManager {
         });
     }
 
-    private static void buildManagedGame(String gameName, Map<String, GameLoadResult.Corrupt> corruptGames) {
-        switch (GameLoadService.tryLoad(gameName)) {
-            case GameLoadResult.Loaded(Game game) ->
-                gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
+    @Nullable
+    private static Map<String, PersistedManagedGame> loadPersistedManagedGames() {
+        if (DatabasePersistenceGate.isDisabled()) {
+            BotLogger.info("Database maintenance mode is on, so every managed game will be built from its game file.");
+            return null;
+        }
+        try {
+            return PersistedManagedGameService.getBean().loadAll();
+        } catch (Exception e) {
+            BotLogger.error(
+                    "Failed to load managed games from the database, so they will be built from game files.", e);
+            return null;
+        }
+    }
+
+    static boolean warmupManagedGame(
+            String gameName,
+            @Nullable Map<String, PersistedManagedGame> persistedGames,
+            Map<String, GameLoadResult.Corrupt> corruptGames) {
+        PersistedManagedGame persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
+        if (persistedGame != null
+                && persistedGame.gameFileStamp().matches(GameLoadService.getGameFileStamp(gameName))) {
+            gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame.state()));
+            return true;
+        }
+        switch (buildManagedGameFromGameFile(gameName)) {
+            case GameLoadResult.Loaded _ -> {
+                if (persistedGames != null) {
+                    GameDatabaseSyncPipeline.queueSyncFromGameFile(gameName);
+                }
+            }
             case GameLoadResult.Corrupt corrupt -> corruptGames.put(gameName, corrupt);
             case GameLoadResult.Missing() -> {}
         }
+        return false;
+    }
+
+    private static GameLoadResult buildManagedGameFromGameFile(String gameName) {
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            GameLoadResult loadResult = GameLoadService.tryLoad(gameName);
+            if (loadResult instanceof GameLoadResult.Loaded(Game game)) {
+                gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
+            }
+            return loadResult;
+        });
     }
 
     private static void reportCorruptGamesFoundAtWarmup(Map<String, GameLoadResult.Corrupt> corruptGames) {
@@ -101,6 +149,23 @@ public class GameManager {
                         + ". A bothelper can run `/bothelper reload_game` on each to restore it from its latest undo."
                         + " The stack trace is from " + firstCorruptGameName + ".",
                 corruptGames.get(firstCorruptGameName).cause());
+    }
+
+    public static GameFileStamp getGameFileStamp(String gameName) {
+        return GameLoadService.getGameFileStamp(gameName);
+    }
+
+    @Nullable
+    public static LoadedGameFile loadGameFile(String gameName) {
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> switch (GameLoadService.tryLoad(gameName)) {
+            case GameLoadResult.Loaded(Game game) ->
+                new LoadedGameFile(game, GameLoadService.getGameFileStamp(gameName));
+            case GameLoadResult.Corrupt corrupt -> {
+                reportCorruptGame(gameName, corrupt);
+                yield null;
+            }
+            case GameLoadResult.Missing() -> null;
+        });
     }
 
     @Nullable
@@ -154,16 +219,14 @@ public class GameManager {
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
-        if (!GameSaveService.save(game, reason)) {
+        ManagedGameState managedGameState = saveAndQueueDatabaseSync(game, reason);
+        if (managedGameState == null) {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
-        // TODO: Queued after the file write lock is released, so two concurrent saves of one game can reach the
-        // database out of order and leave the older state until the next save or the nightly reconciliation.
-        GameDatabaseSyncPipeline.queueSync(game);
 
         gameNames.add(game.getName());
-        replaceManagedGame(game);
+        replaceManagedGame(managedGameState);
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
@@ -173,40 +236,54 @@ public class GameManager {
         }
     }
 
+    @Nullable
+    private static ManagedGameState saveAndQueueDatabaseSync(Game game, String reason) {
+        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
+            if (!GameSaveService.save(game, reason)) {
+                return null;
+            }
+            ManagedGameState managedGameState = ManagedGameState.of(game);
+            GameDatabaseSyncPipeline.queueSync(game, managedGameState);
+            return managedGameState;
+        });
+    }
+
     public static boolean delete(String gameName) {
         waitFor(warmupFinishedLatch);
-        if (!GameSaveService.delete(gameName)) {
-            return false;
-        }
-        handleManagedGameRemoval(gameName);
-        return true;
+        return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
+            if (!GameSaveService.delete(gameName)) {
+                return false;
+            }
+            handleManagedGameRemoval(gameName);
+            return true;
+        });
     }
 
     @Nullable
     public static Game undo(Game game) {
         waitFor(gameNamesLoadedLatch);
-        Game undo = GameUndoService.undo(game);
-        return handleUndo(undo);
+        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> handleUndo(GameUndoService.undo(game)));
     }
 
     private static Game handleUndo(Game undo) {
-        handleMissingMatchingManagedGame(undo);
-        GameDatabaseSyncPipeline.queueSync(undo);
+        if (undo == null) return null;
+        ManagedGameState managedGameState = ManagedGameState.of(undo);
+        handleMissingMatchingManagedGame(undo, managedGameState);
+        GameDatabaseSyncPipeline.queueSync(undo, managedGameState);
         return undo;
     }
 
-    private static void handleMissingMatchingManagedGame(Game game) {
-        if (game == null) return;
+    private static void handleMissingMatchingManagedGame(Game game, ManagedGameState managedGameState) {
         var managedGame = gameNameToManagedGame.get(game.getName());
         if (managedGame == null || !managedGame.matches(game)) {
             gameNames.add(game.getName());
-            replaceManagedGame(game);
+            replaceManagedGame(managedGameState);
         }
     }
 
-    private static void replaceManagedGame(Game game) {
-        gameNameToManagedGame.compute(game.getName(), (_, previousManagedGame) -> {
-            ManagedGame managedGame = new ManagedGame(game);
+    private static void replaceManagedGame(ManagedGameState managedGameState) {
+        gameNameToManagedGame.compute(managedGameState.name(), (_, previousManagedGame) -> {
+            ManagedGame managedGame = new ManagedGame(managedGameState);
             if (previousManagedGame != null) {
                 removeGameFromDepartedPlayers(previousManagedGame, managedGame);
             }
@@ -223,13 +300,18 @@ public class GameManager {
     @Nullable
     public static Game undo(Game game, int undoIndex) {
         waitFor(gameNamesLoadedLatch);
-        Game undo = GameUndoService.undo(game, undoIndex);
-        return handleUndo(undo);
+        return GameFileLockManager.wrapWithWriteLock(
+                game.getName(), () -> handleUndo(GameUndoService.undo(game, undoIndex)));
     }
 
     @Nullable
     public static Game reload(String gameName) {
         waitFor(gameNamesLoadedLatch);
+        return GameFileLockManager.wrapWithWriteLock(gameName, () -> reloadGameFile(gameName));
+    }
+
+    @Nullable
+    private static Game reloadGameFile(String gameName) {
         GameLoadResult loadResult = GameLoadService.tryLoad(gameName);
         Game game = loadResult instanceof GameLoadResult.Loaded(Game loadedGame)
                 ? loadedGame
@@ -240,8 +322,9 @@ public class GameManager {
             }
             return null;
         }
-        handleMissingMatchingManagedGame(game);
-        GameDatabaseSyncPipeline.queueSync(game);
+        ManagedGameState managedGameState = ManagedGameState.of(game);
+        handleMissingMatchingManagedGame(game, managedGameState);
+        GameDatabaseSyncPipeline.queueSync(game, managedGameState);
         return game;
     }
 
@@ -265,8 +348,12 @@ public class GameManager {
     @Nullable
     public static ManagedGame getManagedGame(String gameName) {
         if (!isValid(gameName)) return null;
-        waitFor(gameNamesLoadedLatch);
-        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(loadForManagedGame(gameName)));
+        ManagedGame managedGame = gameNameToManagedGame.get(gameName);
+        if (managedGame != null) return managedGame;
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            Game game = loadForManagedGame(gameName);
+            return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
+        });
     }
 
     private static Game loadForManagedGame(String gameName) {
@@ -306,12 +393,12 @@ public class GameManager {
         return Set.copyOf(userIdToManagedPlayer.values());
     }
 
-    static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
-        return userIdToManagedPlayer.compute(player.getUserID(), (_, existing) -> {
+    static ManagedPlayer addOrMergePlayer(ManagedGame game, ManagedGameState.Participant participant) {
+        return userIdToManagedPlayer.compute(participant.userId(), (_, existing) -> {
             if (existing == null) {
-                return new ManagedPlayer(game, player);
+                return new ManagedPlayer(game, participant.userId(), participant.userName());
             }
-            existing.addOrReplaceGame(game, player);
+            existing.addOrReplaceGame(game, participant.userId());
             return existing;
         });
     }

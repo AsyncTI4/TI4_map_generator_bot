@@ -5,12 +5,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
 import ti4.game.Game;
+import ti4.game.persistence.GameManager;
+import ti4.game.persistence.LoadedGameFile;
+import ti4.game.persistence.ManagedGameState;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
 import ti4.spring.service.persistence.GameEntityMapper;
@@ -25,18 +27,24 @@ public class GameDatabaseSyncPipeline {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(
             Thread.ofPlatform().name("ti4-game-database-sync-", 0).factory());
 
-    public static void queueSync(@Nullable Game game) {
-        if (game == null || DatabasePersistenceGate.isDisabled()) return;
+    public static void queueSync(Game game, ManagedGameState managedGameState) {
+        if (DatabasePersistenceGate.isDisabled()) return;
         try {
-            if (!GameEntityMapper.shouldPersist(game)) {
-                queueDelete(game.getName());
-                return;
-            }
-            GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+            GameEntitySnapshot snapshot =
+                    GameEntityMapper.toSnapshot(game, managedGameState, GameManager.getGameFileStamp(game.getName()));
             queue(game.getName(), service -> service.replace(snapshot));
         } catch (Exception e) {
             BotLogger.error("Failed to prepare database sync for game " + game.getName() + ".", e);
         }
+    }
+
+    public static void queueSyncFromGameFile(String gameName) {
+        if (DatabasePersistenceGate.isDisabled()) return;
+        queue(gameName, service -> {
+            LoadedGameFile gameFile = GameManager.loadGameFile(gameName);
+            if (gameFile == null) return;
+            service.replace(GameEntityMapper.toSnapshot(gameFile.game(), gameFile.stamp()));
+        });
     }
 
     public static void queueDelete(String gameName) {

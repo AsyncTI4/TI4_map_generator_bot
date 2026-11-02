@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
-import ti4.game.Player;
 
 public class ManagedPlayer {
 
@@ -18,9 +17,9 @@ public class ManagedPlayer {
     // We have to use a map for the "replace" logic to work, a set won't provide an atomic replace
     private final Map<String, ManagedGame> games;
 
-    public ManagedPlayer(ManagedGame game, Player player) {
-        id = player.getUserID();
-        name = player.getUserName();
+    public ManagedPlayer(ManagedGame game, String id, String name) {
+        this.id = id;
+        this.name = name;
         games = new ConcurrentHashMap<>();
         games.put(game.getName(), game);
     }
@@ -29,9 +28,9 @@ public class ManagedPlayer {
         games.remove(gameName);
     }
 
-    void addOrReplaceGame(ManagedGame game, Player player) {
-        if (!player.getUserID().equals(id)) {
-            throw new IllegalArgumentException("Player " + player.getUserID() + " attempted merge with " + id);
+    void addOrReplaceGame(ManagedGame game, String userId) {
+        if (!userId.equals(id)) {
+            throw new IllegalArgumentException("Player " + userId + " attempted merge with " + id);
         }
         games.put(game.getName(), game);
     }

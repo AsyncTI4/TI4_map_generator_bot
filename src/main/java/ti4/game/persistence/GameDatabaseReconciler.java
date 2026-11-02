@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
@@ -64,7 +63,7 @@ public class GameDatabaseReconciler {
         @Override
         public void reconcile(String gameName) {
             PersistedGameState persistedState = persistedStates.get(gameName);
-            if (matchesManagedRevision(gameName, persistedState)) {
+            if (isUnchangedSinceLastSync(gameName, persistedState)) {
                 existingGameNames.add(gameName);
                 return;
             }
@@ -72,11 +71,11 @@ public class GameDatabaseReconciler {
                 existingGameNames.add(gameName);
                 return;
             }
-            Game game = loadGame(gameName);
-            if (game == null) return;
+            LoadedGameFile gameFile = loadGameFile(gameName);
+            if (gameFile == null) return;
             existingGameNames.add(gameName);
-            reconcileGame(game, persistedStates.get(gameName), persistenceService)
-                    .ifPresent(discrepancies::add);
+            if (gameFile.stamp().lastModifiedEpochMilliseconds() > startedAt) return;
+            reconcileGame(gameFile, persistedState, persistenceService).ifPresent(discrepancies::add);
         }
 
         @Override
@@ -102,6 +101,11 @@ public class GameDatabaseReconciler {
         }
     }
 
+    private static boolean isUnchangedSinceLastSync(String gameName, PersistedGameState persistedState) {
+        return matchesManagedRevision(gameName, persistedState)
+                && persistedState.matchesGameFile(gameFileStamp(gameName));
+    }
+
     private static boolean matchesManagedRevision(String gameName, PersistedGameState persistedState) {
         if (persistedState == null) return false;
         try {
@@ -114,17 +118,11 @@ public class GameDatabaseReconciler {
     }
 
     private static Optional<String> reconcileGame(
-            Game game, PersistedGameState persistedState, GameEntityPersistenceService persistenceService) {
-        String gameName = game.getName();
-        if (!GameEntityMapper.shouldPersist(game)) {
-            if (persistedState == null) return Optional.empty();
-            return Optional.of(repair(
-                    gameName,
-                    "in the database but has fewer than 3 players",
-                    () -> persistenceService.delete(gameName)));
-        }
-
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+            LoadedGameFile gameFile,
+            PersistedGameState persistedState,
+            GameEntityPersistenceService persistenceService) {
+        String gameName = gameFile.game().getName();
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(gameFile.game(), gameFile.stamp());
         if (persistedState == null) {
             return Optional.of(
                     repair(gameName, "missing from the database", () -> persistenceService.replace(snapshot)));
@@ -157,16 +155,20 @@ public class GameDatabaseReconciler {
     }
 
     private static boolean wasChangedAfter(String gameName, long timestamp) {
-        return Storage.getGameFile(gameName + Constants.TXT).lastModified() > timestamp;
+        return gameFileStamp(gameName).lastModifiedEpochMilliseconds() > timestamp;
+    }
+
+    private static GameFileStamp gameFileStamp(String gameName) {
+        return GameFileStamp.of(Storage.getGameFile(gameName + Constants.TXT));
     }
 
     private static boolean gameFileExists(String gameName) {
         return Storage.getGameFile(gameName + Constants.TXT).exists();
     }
 
-    private static Game loadGame(String gameName) {
+    private static LoadedGameFile loadGameFile(String gameName) {
         try {
-            return GameLoadService.load(gameName);
+            return GameManager.loadGameFile(gameName);
         } catch (Exception e) {
             BotLogger.error(TASK_NAME + " could not load game " + gameName + ".", e);
             return null;
