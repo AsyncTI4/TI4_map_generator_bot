@@ -105,15 +105,14 @@ public class TestBedComponentService {
         preset.getDecks().forEach((slot, deckId) -> {
             DeckModel deck = Mapper.getDeck(deckId);
             if (deckProblem(slot, deckId) != null) return;
-            boolean applied =
-                    switch (DECK_SLOTS.get(slot)) {
-                        case ACTION_CARD -> game.validateAndSetActionCardDeck(event, deck);
-                        case SECRET_OBJECTIVE -> game.validateAndSetSecretObjectiveDeck(event, deck);
-                        case RELIC -> game.validateAndSetRelicDeck(deck);
-                        case EXPLORE -> game.validateAndSetExploreDeck(event, deck);
-                        case AGENDA -> game.validateAndSetAgendaDeck(event, deck);
-                        default -> false;
-                    };
+            boolean applied = switch (DECK_SLOTS.get(slot)) {
+                case ACTION_CARD -> game.validateAndSetActionCardDeck(event, deck);
+                case SECRET_OBJECTIVE -> game.validateAndSetSecretObjectiveDeck(event, deck);
+                case RELIC -> game.validateAndSetRelicDeck(deck);
+                case EXPLORE -> game.validateAndSetExploreDeck(event, deck);
+                case AGENDA -> game.validateAndSetAgendaDeck(event, deck);
+                default -> false;
+            };
             if (!applied) warnings.add("Could not switch the `" + slot + "` deck to `" + deckId + "`.");
         });
     }

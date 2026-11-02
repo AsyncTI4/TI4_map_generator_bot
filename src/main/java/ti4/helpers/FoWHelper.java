@@ -603,6 +603,24 @@ public final class FoWHelper {
             NatauAbilityHandler.addChaosTurbineAdjacencies(game, player, position, adjacentPositions);
         }
 
+        if (forDistance && player != null) {
+            Tile homeSystem = player.getHomeSystemTile();
+            Tile currentTile = game.getTileByPosition(position);
+
+            if (homeSystem != null && currentTile != null) {
+                if (ButtonHelper.doesPlayerHaveFSHere("deep_flagship", player, currentTile)) {
+                    adjacentPositions.add(homeSystem.getPosition());
+                }
+
+                if (position.equals(homeSystem.getPosition())) {
+                    game.getTileMap().values().stream()
+                            .filter(tile -> ButtonHelper.doesPlayerHaveFSHere("deep_flagship", player, tile))
+                            .map(Tile::getPosition)
+                            .forEach(adjacentPositions::add);
+                }
+            }
+        }
+
         if (player != null
                 && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
                         || player.hasTech("tf-starbasewebway"))

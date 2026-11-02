@@ -729,30 +729,28 @@ public class LostLegaciesRelicHandler {
                 .findFirst()
                 .orElse(null);
         var adjacentPositions = FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false);
-        int tokens =
-                switch (boon) {
-                    case "economicboon" ->
-                        (int) game.getTileMap().values().stream()
+        int tokens = switch (boon) {
+            case "economicboon" ->
+                (int) game.getTileMap().values().stream()
+                        .filter(adjacent -> !adjacent.getTileModel().isHyperlane())
+                        .filter(adjacent -> !adjacent.getPosition().equals(tile.getPosition()))
+                        .filter(adjacent -> adjacentPositions.contains(adjacent.getPosition()))
+                        .mapToLong(adjacent -> adjacent.getPlanetUnitHolders().stream()
+                                .filter(candidate -> !candidate.isSpaceStation())
+                                .count())
+                        .sum();
+            case "naturesboon" -> planet == null ? 0 : planet.getResources() + 1;
+            case "diplomaticboon" -> planet == null ? 0 : planet.getInfluence() + 1;
+            case "cosmicboon" ->
+                (int) game.getTileMap().values().stream()
                                 .filter(adjacent -> !adjacent.getTileModel().isHyperlane())
-                                .filter(adjacent -> !adjacent.getPosition().equals(tile.getPosition()))
                                 .filter(adjacent -> adjacentPositions.contains(adjacent.getPosition()))
-                                .mapToLong(adjacent -> adjacent.getPlanetUnitHolders().stream()
-                                        .filter(candidate -> !candidate.isSpaceStation())
-                                        .count())
-                                .sum();
-                    case "naturesboon" -> planet == null ? 0 : planet.getResources() + 1;
-                    case "diplomaticboon" -> planet == null ? 0 : planet.getInfluence() + 1;
-                    case "cosmicboon" ->
-                        (int) game.getTileMap().values().stream()
-                                        .filter(adjacent ->
-                                                !adjacent.getTileModel().isHyperlane())
-                                        .filter(adjacent -> adjacentPositions.contains(adjacent.getPosition()))
-                                        .filter(adjacent ->
-                                                adjacent.getPlanetUnitHolders().isEmpty())
-                                        .count()
-                                + 1;
-                    default -> 0;
-                };
+                                .filter(adjacent ->
+                                        adjacent.getPlanetUnitHolders().isEmpty())
+                                .count()
+                        + 1;
+            default -> 0;
+        };
         if (tokens == 0) {
             player.removeRelic(boon);
             player.removeExhaustedRelic(boon);

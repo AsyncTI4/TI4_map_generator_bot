@@ -952,16 +952,15 @@ public class Mapper {
         } else if (templates.size() == 1) {
             mapTemplate = templates.getFirst();
         } else {
-            String defaultMapTemplate =
-                    switch (players) {
-                        case 3 -> "3pHyperlanes";
-                        case 4 -> "4pHyperlanes";
-                        case 5 -> "5pHyperlanes";
-                        case 6 -> "6pStandard";
-                        case 7 -> "7pHyperlanes";
-                        case 8 -> "8pHyperlanes";
-                        default -> null;
-                    };
+            String defaultMapTemplate = switch (players) {
+                case 3 -> "3pHyperlanes";
+                case 4 -> "4pHyperlanes";
+                case 5 -> "5pHyperlanes";
+                case 6 -> "6pStandard";
+                case 7 -> "7pHyperlanes";
+                case 8 -> "8pHyperlanes";
+                default -> null;
+            };
             if (defaultMapTemplate == null) {
                 mapTemplate = templates.getFirst(); // just get whatever template lol
             } else {

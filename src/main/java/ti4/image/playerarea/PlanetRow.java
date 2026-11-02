@@ -95,12 +95,11 @@ final class PlanetRow {
         if (tile == null) {
             return null;
         }
-        String gateTileID =
-                switch (tile.getTileID()) {
-                    case "51" -> "17";
-                    case "118" -> "94";
-                    default -> null;
-                };
+        String gateTileID = switch (tile.getTileID()) {
+            case "51" -> "17";
+            case "118" -> "94";
+            default -> null;
+        };
         if (gateTileID == null) {
             return tile;
         }

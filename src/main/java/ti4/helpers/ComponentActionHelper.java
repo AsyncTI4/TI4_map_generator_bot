@@ -15,6 +15,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
@@ -173,28 +174,27 @@ public class ComponentActionHelper {
         for (BreakthroughModel bt : p1.getBreakthroughModels()) {
             if (bt != null && bt.getText().contains("ACTION:")) {
                 if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                    boolean validAction =
-                            switch (bt.getAlias()) {
-                                case "arborecbt" ->
-                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                                case "crimsonbt" -> true;
-                                case "mahactbt" -> !p1.getTechs().isEmpty();
-                                case "ardentiabt" ->
-                                    game.getRealPlayers().stream()
-                                            .anyMatch(otherPlayer -> otherPlayer != p1
-                                                    && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
-                                                            .isEmpty());
-                                case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
-                                case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
-                                case "stonebornbt", "stonebornbtunleashed" ->
-                                    !p1.getFragments().isEmpty();
-                                case "saarbt" ->
-                                    game.getTileMap().values().stream()
-                                            .filter(Tile::isAsteroidField)
-                                            .anyMatch(Tile.tileHasPlayerShips(p1));
-                                case "deepwroughtbt" -> true;
-                                default -> true;
-                            };
+                    boolean validAction = switch (bt.getAlias()) {
+                        case "arborecbt" ->
+                            game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                        case "crimsonbt" -> true;
+                        case "mahactbt" -> !p1.getTechs().isEmpty();
+                        case "ardentiabt" ->
+                            game.getRealPlayers().stream()
+                                    .anyMatch(otherPlayer -> otherPlayer != p1
+                                            && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
+                                                    .isEmpty());
+                        case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
+                        case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
+                        case "stonebornbt", "stonebornbtunleashed" ->
+                            !p1.getFragments().isEmpty();
+                        case "saarbt" ->
+                            game.getTileMap().values().stream()
+                                    .filter(Tile::isAsteroidField)
+                                    .anyMatch(Tile.tileHasPlayerShips(p1));
+                        case "deepwroughtbt" -> true;
+                        default -> true;
+                    };
 
                     if (validAction) {
                         TI4Emoji btEmoji = bt.getFactionEmoji();
@@ -707,7 +707,8 @@ public class ComponentActionHelper {
                             "stonebornagentdormant",
                             "stonebornagentunleashed",
                             "ironagent",
-                            "migoagent");
+                            "migoagent",
+                            "deepagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
@@ -1487,6 +1488,7 @@ public class ComponentActionHelper {
                     }
                 } else {
                     ButtonHelperActionCards.resolveResearch(game, player, event);
+                    DeepAbilityHandler.offerEnergySiphon(player);
                 }
             }
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);

@@ -314,64 +314,61 @@ public class MessageHelper {
     public static void sendMessageToChannelWithPersistentReacts(
             MessageChannel channel, String messageText, Game game, List<Button> buttons, GameMessageType messageType) {
         Consumer<Message> addFactionReact = (message) -> {
-            StringTokenizer players =
-                    switch (messageType) {
-                        case STATUS_SCORING -> {
-                            StringBuilder scored = new StringBuilder();
-                            for (Player player : game.getRealPlayers()) {
-                                String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
-                                String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+            StringTokenizer players = switch (messageType) {
+                case STATUS_SCORING -> {
+                    StringBuilder scored = new StringBuilder();
+                    for (Player player : game.getRealPlayers()) {
+                        String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+                        String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
 
-                                if (!po.isEmpty() && !so.isEmpty()) {
-                                    if (scored.isEmpty()) {
-                                        scored = new StringBuilder(player.getFaction());
-                                    } else {
-                                        scored.append("_").append(player.getFaction());
-                                    }
-                                }
+                        if (!po.isEmpty() && !so.isEmpty()) {
+                            if (scored.isEmpty()) {
+                                scored = new StringBuilder(player.getFaction());
+                            } else {
+                                scored.append("_").append(player.getFaction());
                             }
-                            yield new StringTokenizer(scored.toString(), "_");
                         }
-                        case AGENDA_WHEN -> {
-                            String oldMessageId = GameMessageManager.replace(
-                                    game.getName(),
-                                    new GameMessage(
-                                            message.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate()));
-                            if (oldMessageId != null) {
-                                game.getMainGameChannel()
-                                        .deleteMessageById(oldMessageId)
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                            }
-                            yield new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
+                    }
+                    yield new StringTokenizer(scored.toString(), "_");
+                }
+                case AGENDA_WHEN -> {
+                    String oldMessageId = GameMessageManager.replace(
+                            game.getName(),
+                            new GameMessage(message.getId(), GameMessageType.AGENDA_WHEN, game.getLastModifiedDate()));
+                    if (oldMessageId != null) {
+                        game.getMainGameChannel()
+                                .deleteMessageById(oldMessageId)
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                    yield new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
+                }
+                case AGENDA_AFTER -> {
+                    String oldMessageId = GameMessageManager.replace(
+                            game.getName(),
+                            new GameMessage(message.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate()));
+                    if (oldMessageId != null) {
+                        game.getMainGameChannel()
+                                .deleteMessageById(oldMessageId)
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                    yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
+                }
+                case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT, AGENDA_DEADLY_PLOT -> {
+                    StringBuilder noShenanigans = new StringBuilder(game.getStoredValue("Pass On Shenanigans"));
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.getAcCount() == 0
+                                || IsPlayerElectedService.isPlayerElected(game, p2, "censure")
+                                || IsPlayerElectedService.isPlayerElected(game, p2, "absol_censure")) {
+                            noShenanigans.append("_").append(p2.getFaction());
                         }
-                        case AGENDA_AFTER -> {
-                            String oldMessageId = GameMessageManager.replace(
-                                    game.getName(),
-                                    new GameMessage(
-                                            message.getId(), GameMessageType.AGENDA_AFTER, game.getLastModifiedDate()));
-                            if (oldMessageId != null) {
-                                game.getMainGameChannel()
-                                        .deleteMessageById(oldMessageId)
-                                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                            }
-                            yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
-                        }
-                        case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT, AGENDA_DEADLY_PLOT -> {
-                            StringBuilder noShenanigans = new StringBuilder(game.getStoredValue("Pass On Shenanigans"));
-                            for (Player p2 : game.getRealPlayers()) {
-                                if (p2.getAcCount() == 0
-                                        || IsPlayerElectedService.isPlayerElected(game, p2, "censure")
-                                        || IsPlayerElectedService.isPlayerElected(game, p2, "absol_censure")) {
-                                    noShenanigans.append("_").append(p2.getFaction());
-                                }
-                            }
-                            yield new StringTokenizer(noShenanigans.toString(), "_");
-                        }
-                        default -> {
-                            BotLogger.warning(new LogOrigin(game), "Unable to handle message type: " + messageType);
-                            yield null;
-                        }
-                    };
+                    }
+                    yield new StringTokenizer(noShenanigans.toString(), "_");
+                }
+                default -> {
+                    BotLogger.warning(new LogOrigin(game), "Unable to handle message type: " + messageType);
+                    yield null;
+                }
+            };
 
             while (players != null && players.hasMoreTokens()) {
                 String playerString = players.nextToken();

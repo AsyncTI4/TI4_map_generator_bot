@@ -104,13 +104,12 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        ComponentSource source =
-                switch (action) {
-                    case "prioritizeAllDS" -> ComponentSource.ds;
-                    case "prioritizeAllBR" -> ComponentSource.blue_reverie;
-                    case "prioritizeAllLL" -> ComponentSource.theodisi;
-                    default -> null;
-                };
+        ComponentSource source = switch (action) {
+            case "prioritizeAllDS" -> ComponentSource.ds;
+            case "prioritizeAllBR" -> ComponentSource.blue_reverie;
+            case "prioritizeAllLL" -> ComponentSource.theodisi;
+            default -> null;
+        };
         if (source == null) return null;
         List<String> priorities = new ArrayList<>(prioritizedFactions.getKeys());
         prioritizedFactions.getAllValues().values().stream()

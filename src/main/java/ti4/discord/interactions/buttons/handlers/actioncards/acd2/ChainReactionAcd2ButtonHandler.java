@@ -94,21 +94,19 @@ class ChainReactionAcd2ButtonHandler {
     }
 
     private static String getChainReactionLoreQuip(int hits) {
-        List<String> quips =
-                switch (hits) {
-                    case 0 ->
-                        List.of(
-                                "\"Where's the kaboom? There was supposed to be an earth-shattering kaboom!\" — Marvin the Martian, _Looney Tunes_");
-                    case 1 ->
-                        List.of(
-                                "\"Pow! Right in the kisser!\" — Ralph Kramden, _The Honeymooners_",
-                                "\"Bang! Zoom! Straight to the moon!\" — Ralph Kramden, _The Honeymooners_");
-                    case 2 ->
-                        List.of(
-                                "\"Now witness the firepower of this fully armed and operational battle station!\" — Emperor Palpatine, _Star Wars: Return of the Jedi_");
-                    default ->
-                        List.of("\"Great shot, kid! That was one in a million!\" — Han Solo, _Star Wars: A New Hope_");
-                };
+        List<String> quips = switch (hits) {
+            case 0 ->
+                List.of(
+                        "\"Where's the kaboom? There was supposed to be an earth-shattering kaboom!\" — Marvin the Martian, _Looney Tunes_");
+            case 1 ->
+                List.of(
+                        "\"Pow! Right in the kisser!\" — Ralph Kramden, _The Honeymooners_",
+                        "\"Bang! Zoom! Straight to the moon!\" — Ralph Kramden, _The Honeymooners_");
+            case 2 ->
+                List.of(
+                        "\"Now witness the firepower of this fully armed and operational battle station!\" — Emperor Palpatine, _Star Wars: Return of the Jedi_");
+            default -> List.of("\"Great shot, kid! That was one in a million!\" — Han Solo, _Star Wars: A New Hope_");
+        };
         return quips.get(ThreadLocalRandom.current().nextInt(quips.size()));
     }
 }

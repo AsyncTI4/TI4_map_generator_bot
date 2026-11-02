@@ -871,6 +871,7 @@ public final class ButtonHelperModifyUnits {
                 "carrier",
                 "dreadnought",
                 "flagship",
+                "thedeep",
                 "celagrom",
                 "aurelion",
                 "lady",
@@ -884,6 +885,7 @@ public final class ButtonHelperModifyUnits {
                     "carrier",
                     "dreadnought",
                     "flagship",
+                    "thedeep",
                     "celagrom",
                     "aurelion",
                     "lady",
@@ -900,6 +902,7 @@ public final class ButtonHelperModifyUnits {
                             "dreadnought",
                             "carrier",
                             "flagship",
+                            "thedeep",
                             "celagrom",
                             "aurelion",
                             "lady",
@@ -1389,7 +1392,7 @@ public final class ButtonHelperModifyUnits {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander") && player.getHomeSystemTile() != null) {
             positions.addAll(FoWHelper.getAdjacentTiles(game, player.getHomeSystemPosition(), player, false));
         }
-        if (player.hasUnlockedBreakthrough("ghotibt")) {
+        if (player.hasUnlockedBreakthrough("ghotibt") || player.hasUnlockedBreakthrough("deepbt")) {
             positions.addAll(FoWHelper.getEmptyTiles(game).stream()
                     .map(Tile::getPosition)
                     .collect(Collectors.toSet()));

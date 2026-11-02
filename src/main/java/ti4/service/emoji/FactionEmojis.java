@@ -136,6 +136,7 @@ public enum FactionEmojis implements TI4Emoji {
     natau,
     valhavn,
     migo,
+    deep,
 
     // luminous
     arachnera,
@@ -468,6 +469,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "natau" -> natau;
             case "valhavn" -> valhavn;
             case "migo" -> migo;
+            case "deep" -> deep;
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;

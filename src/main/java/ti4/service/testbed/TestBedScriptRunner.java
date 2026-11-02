@@ -561,12 +561,11 @@ public final class TestBedScriptRunner {
     private Status expect(int index, Step step) {
         Expect expect = step.getExpect();
         WaitMode mode = waitMode(expect);
-        Check check =
-                switch (mode) {
-                    case ONCE -> evaluate(expect);
-                    case UNTIL_PASS -> waitFor(() -> evaluate(expect), step);
-                    case UNTIL_QUIET -> waitForQuiet(() -> evaluate(expect), step);
-                };
+        Check check = switch (mode) {
+            case ONCE -> evaluate(expect);
+            case UNTIL_PASS -> waitFor(() -> evaluate(expect), step);
+            case UNTIL_QUIET -> waitForQuiet(() -> evaluate(expect), step);
+        };
         String actual = check.actual();
         if (!check.ok() && !check.hit() && mode != WaitMode.ONCE) {
             actual += "; game: " + TestBedWaitReasons.describe(current());
