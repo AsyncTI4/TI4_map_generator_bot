@@ -63,13 +63,15 @@ public class GameDatabaseReconciler {
 
         @Override
         public void reconcile(String gameName) {
-            if (wasChangedAfter(gameName, startedAt)) {
+            PersistedGameState persistedState = persistedStates.get(gameName);
+            ManagedGame managedGame = GameManager.getCachedManagedGame(gameName);
+            if (persistedState != null
+                    && managedGame != null
+                    && persistedState.matchesRevision(managedGame.getRevisionKey())) {
                 existingGameNames.add(gameName);
                 return;
             }
-            PersistedGameState persistedState = persistedStates.get(gameName);
-            String revision = GameLoadService.loadRevision(gameName);
-            if (persistedState != null && persistedState.matchesRevision(revision)) {
+            if (wasChangedAfter(gameName, startedAt)) {
                 existingGameNames.add(gameName);
                 return;
             }

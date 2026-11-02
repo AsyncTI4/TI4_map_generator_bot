@@ -17,19 +17,16 @@ class GameRevisionKeyTest extends BaseTi4Test {
         try (var harness = TestGameHarness.forDefaultMap()) {
             var game = harness.load();
             assertThat(game.getRevisionKey()).isNull();
-            assertThat(GameLoadService.loadRevision(game.getName())).isNull();
             assertThat(GameSaveService.save(game, "first")).isTrue();
             String first = game.getRevisionKey();
             assertThat(first).isNotBlank();
             assertThat(harness.load().getRevisionKey()).isEqualTo(first);
-            assertThat(GameLoadService.loadRevision(game.getName())).isEqualTo(first);
             assertThat(GameSaveService.save(game, "second")).isTrue();
             assertThat(game.getRevisionKey()).isNotEqualTo(first);
             game.setFowMode(true);
             var restored = GameUndoService.undo(game, 1);
             assertThat(restored).isNotNull();
             assertThat(restored.getRevisionKey()).isEqualTo(first);
-            assertThat(GameLoadService.loadRevision(game.getName())).isEqualTo(first);
             assertThat(GameSaveService.save(restored, "after undo")).isTrue();
             assertThat(restored.getRevisionKey()).isNotEqualTo(first);
         }

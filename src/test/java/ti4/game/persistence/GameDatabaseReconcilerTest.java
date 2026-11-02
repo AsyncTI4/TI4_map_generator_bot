@@ -99,10 +99,15 @@ class GameDatabaseReconcilerTest {
             PersistedGameState state = mock(PersistedGameState.class);
             fixture.persisted.put("unchanged", state);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
-            fixture.loader.when(() -> GameLoadService.loadRevision("unchanged")).thenReturn("revision");
+            ManagedGame managedGame = mock(ManagedGame.class);
+            when(managedGame.getRevisionKey()).thenReturn("revision");
+            fixture.manager
+                    .when(() -> GameManager.getCachedManagedGame("unchanged"))
+                    .thenReturn(managedGame);
             when(state.matchesRevision("revision")).thenReturn(true);
             fixture.run();
-            fixture.loader.verify(() -> GameLoadService.load("unchanged"), never());
+            fixture.loader.verifyNoInteractions();
+            fixture.storage.verifyNoInteractions();
             verifyNoInteractions(fixture.persistence);
         }
     }
@@ -112,7 +117,11 @@ class GameDatabaseReconcilerTest {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("changed", mock(PersistedGameState.class));
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
-            fixture.loader.when(() -> GameLoadService.loadRevision("changed")).thenReturn("new-revision");
+            ManagedGame managedGame = mock(ManagedGame.class);
+            when(managedGame.getRevisionKey()).thenReturn("new-revision");
+            fixture.manager
+                    .when(() -> GameManager.getCachedManagedGame("changed"))
+                    .thenReturn(managedGame);
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
             fixture.loader.verify(() -> GameLoadService.load("changed"));

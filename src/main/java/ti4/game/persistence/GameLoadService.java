@@ -101,24 +101,6 @@ class GameLoadService {
         });
     }
 
-    @Nullable
-    static String loadRevision(String gameName) {
-        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
-            try (var reader = Files.newBufferedReader(Storage.getGamePath(gameName + GAME_FILE_EXTENSION))) {
-                for (int i = 0; i < 5; i++) {
-                    if (reader.readLine() == null) return null;
-                }
-                String line = reader.readLine();
-                String prefix = PERSISTENCE_REVISION + " ";
-                return line != null && line.startsWith(prefix)
-                        ? line.substring(prefix.length()).strip()
-                        : null;
-            } catch (Exception e) {
-                return null;
-            }
-        });
-    }
-
     private static String stripGameFileExtension(String fileName) {
         return fileName.substring(0, fileName.length() - GAME_FILE_EXTENSION.length());
     }

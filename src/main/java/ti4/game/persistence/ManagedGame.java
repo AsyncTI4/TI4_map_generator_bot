@@ -26,6 +26,7 @@ public class ManagedGame {
 
     // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY MEGABYTES PER FIELD
     private final String name;
+    private final String revisionKey;
     private final boolean hasEnded;
     private final boolean hasWinner;
     private final boolean vpGoalReached;
@@ -58,6 +59,7 @@ public class ManagedGame {
 
     public ManagedGame(Game game) {
         name = game.getName();
+        revisionKey = game.getRevisionKey();
         hasEnded = game.isHasEnded();
         hasWinner = game.hasWinner();
         vpGoalReached =
@@ -160,7 +162,9 @@ public class ManagedGame {
     }
 
     public boolean matches(Game game) {
-        return name.equals(game.getName()) && lastModifiedDate == game.getLastModifiedDate();
+        return name.equals(game.getName())
+                && lastModifiedDate == game.getLastModifiedDate()
+                && Objects.equals(revisionKey, game.getRevisionKey());
     }
 
     public Game getGame() {
