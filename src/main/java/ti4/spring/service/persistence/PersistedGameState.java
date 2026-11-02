@@ -11,6 +11,8 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
 
     public record GameColumns(
             String gameName,
+            String revisionKey,
+            Integer mappingVersion,
             long creationEpochMilliseconds,
             Long endedEpochMilliseconds,
             int round,
@@ -43,6 +45,13 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
             boolean replaced) {}
 
     public record TitleRow(String userId, String title) {}
+
+    public boolean matchesRevision(String revision) {
+        return revision != null
+                && !revision.isBlank()
+                && revision.equals(game.revisionKey())
+                && Objects.equals(game.mappingVersion(), GameEntityMapper.MAPPING_VERSION);
+    }
 
     public static PersistedGameState of(GameEntitySnapshot snapshot) {
         return of(snapshot.game(), snapshot.game().getPlayers(), snapshot.titles());
@@ -104,6 +113,8 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     private static GameColumns toGameColumns(GameEntity game) {
         return new GameColumns(
                 game.getGameName(),
+                game.getRevisionKey(),
+                game.getMappingVersion(),
                 game.getCreationEpochMilliseconds(),
                 game.getEndedEpochMilliseconds(),
                 game.getRound(),

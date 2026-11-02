@@ -1,6 +1,7 @@
-package ti4.service.persistence;
+package ti4.game.persistence;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,13 +10,12 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
-import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
-import ti4.spring.context.SpringContext;
+import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.service.persistence.GameEntityMapper;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
 import ti4.spring.service.persistence.GameEntitySnapshot;
@@ -27,51 +27,67 @@ import ti4.spring.service.persistence.UnreferencedUserService;
 public class GameDatabaseReconciler {
 
     private static final String TASK_NAME = "GameDatabaseReconciler";
-    private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 600;
     private static final int MAX_REPORT_LENGTH = 1800;
     private static final int MAX_DISCREPANCY_LENGTH = 300;
+    private static final GameDatabaseReconciliationChain CHAIN = new GameDatabaseReconciliationChain(
+            TASK_NAME, GameDatabaseSyncPipeline::queueTask, DatabasePersistenceGate::isDisabled);
 
-    public static void queueReconciliation() {
-        GameDatabaseSyncPipeline.queueTask(
-                TASK_NAME, EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, GameDatabaseReconciler::reconcile);
+    public static boolean queueReconciliation() {
+        return CHAIN.start(Reconciliation::new);
     }
 
-    private static void reconcile() {
-        if (DatabasePersistenceGate.isDisabled()) return;
-        try {
-            long startedAt = System.currentTimeMillis();
-            Map<String, PersistedGameState> persistedStates =
-                    SpringContext.getBean(PersistedGameStateService.class).loadAll();
-            GameEntityPersistenceService persistenceService = SpringContext.getBean(GameEntityPersistenceService.class);
+    public static boolean queueCatchUpReconciliation() {
+        return CHAIN.startAfterCurrentRun(Reconciliation::new);
+    }
 
-            List<String> discrepancies = new ArrayList<>();
-            Set<String> existingGameNames = new HashSet<>();
-            List<ManagedGame> managedGames = GameManager.getManagedGames();
-            for (ManagedGame managedGame : managedGames) {
-                if (Thread.currentThread().isInterrupted()) {
-                    BotLogger.warning(TASK_NAME + " was interrupted before it finished.");
-                    return;
-                }
-                if (DatabasePersistenceGate.isDisabled()) {
-                    BotLogger.warning(TASK_NAME + " stopped because database maintenance mode was turned on.");
-                    return;
-                }
-                String gameName = managedGame.getName();
-                if (wasChangedAfter(gameName, startedAt)) {
-                    existingGameNames.add(gameName);
-                    continue;
-                }
-                Game game = loadGame(managedGame);
-                if (game == null) continue;
+    static final class Reconciliation implements GameDatabaseReconciliationChain.Run {
+
+        private final List<String> discrepancies = new ArrayList<>();
+        private final Set<String> existingGameNames = new HashSet<>();
+        private long startedAt;
+        private Map<String, PersistedGameState> persistedStates;
+        private GameEntityPersistenceService persistenceService;
+        private int gameCount;
+
+        @Override
+        public List<String> start() {
+            startedAt = System.currentTimeMillis();
+            persistedStates = PersistedGameStateService.getBean().loadAll();
+            persistenceService = GameEntityPersistenceService.getBean();
+            List<String> gameNames = GameManager.getGameNames().stream()
+                    .sorted(Comparator.reverseOrder())
+                    .toList();
+            gameCount = gameNames.size();
+            return gameNames;
+        }
+
+        @Override
+        public void reconcile(String gameName) {
+            PersistedGameState persistedState = persistedStates.get(gameName);
+            if (matchesManagedRevision(gameName, persistedState)) {
                 existingGameNames.add(gameName);
-                reconcileGame(game, persistedStates.get(gameName), persistenceService)
-                        .ifPresent(discrepancies::add);
+                return;
             }
+            if (wasChangedAfter(gameName, startedAt)) {
+                existingGameNames.add(gameName);
+                return;
+            }
+            Game game = loadGame(gameName);
+            if (game == null) return;
+            existingGameNames.add(gameName);
+            reconcileGame(game, persistedStates.get(gameName), persistenceService)
+                    .ifPresent(discrepancies::add);
+        }
+
+        @Override
+        public void finish() {
             for (String persistedGameName : persistedStates.keySet()) {
                 if (existingGameNames.contains(persistedGameName)) continue;
                 if (gameFileExists(persistedGameName)) {
-                    discrepancies.add(
-                            persistedGameName + ": game file is unloadable or corrupt, so its rows were kept");
+                    discrepancies.add(describe(
+                            persistedGameName,
+                            "in the database but its game file could not be loaded"
+                                    + " (not repaired: the game file may be corrupt)"));
                     continue;
                 }
                 discrepancies.add(repair(
@@ -82,9 +98,18 @@ public class GameDatabaseReconciler {
 
             Optional<String> userCleanup = reconcileUnreferencedUsers();
 
-            report(discrepancies, userCleanup, managedGames.size());
+            report(discrepancies, userCleanup, gameCount);
+        }
+    }
+
+    private static boolean matchesManagedRevision(String gameName, PersistedGameState persistedState) {
+        if (persistedState == null) return false;
+        try {
+            ManagedGame managedGame = GameManager.getManagedGame(gameName);
+            return managedGame != null && persistedState.matchesRevision(managedGame.getRevisionKey());
         } catch (Exception e) {
-            BotLogger.error("**" + TASK_NAME + " failed.**", e);
+            BotLogger.error(TASK_NAME + " could not look up managed game " + gameName + ".", e);
+            return false;
         }
     }
 
@@ -113,7 +138,7 @@ public class GameDatabaseReconciler {
 
     private static Optional<String> reconcileUnreferencedUsers() {
         if (DatabasePersistenceGate.isDisabled()) return Optional.empty();
-        UnreferencedUserService unreferencedUserService = SpringContext.getBean(UnreferencedUserService.class);
+        UnreferencedUserService unreferencedUserService = UnreferencedUserService.getBean();
         List<String> unreferencedUserIds = unreferencedUserService.findUnreferencedUserIds();
         if (unreferencedUserIds.isEmpty()) return Optional.empty();
 
@@ -139,17 +164,21 @@ public class GameDatabaseReconciler {
         return Storage.getGameFile(gameName + Constants.TXT).exists();
     }
 
-    private static Game loadGame(ManagedGame managedGame) {
+    private static Game loadGame(String gameName) {
         try {
-            return managedGame.getGame();
+            return GameLoadService.load(gameName);
         } catch (Exception e) {
-            BotLogger.error(TASK_NAME + " could not load game " + managedGame.getName() + ".", e);
+            BotLogger.error(TASK_NAME + " could not load game " + gameName + ".", e);
             return null;
         }
     }
 
+    private static String describe(String gameName, String discrepancy) {
+        return StringUtils.abbreviate(gameName + ": " + discrepancy, MAX_DISCREPANCY_LENGTH);
+    }
+
     private static String repair(String gameName, String discrepancy, Runnable databaseWrite) {
-        String description = StringUtils.abbreviate(gameName + ": " + discrepancy, MAX_DISCREPANCY_LENGTH);
+        String description = describe(gameName, discrepancy);
         if (DatabasePersistenceGate.isDisabled()) return description + " (not repaired: database maintenance mode)";
         try {
             databaseWrite.run();
@@ -160,10 +189,9 @@ public class GameDatabaseReconciler {
         }
     }
 
-    private static void report(List<String> discrepancies, Optional<String> userCleanup, int managedGameCount) {
+    private static void report(List<String> discrepancies, Optional<String> userCleanup, int gameCount) {
         if (discrepancies.isEmpty()) {
-            String inSync = String.format(
-                    "%s found the database in sync with all %,d managed games.", TASK_NAME, managedGameCount);
+            String inSync = String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount);
             BotLogger.logCron(
                     userCleanup.map(cleanup -> inSync + "\n- " + cleanup).orElse(inSync));
             return;
@@ -172,9 +200,11 @@ public class GameDatabaseReconciler {
         StringBuilder report = new StringBuilder(String.format(
                 "**%s found %s out of sync with their game files and updated the database:**",
                 TASK_NAME, StringHelper.pluralize(discrepancies.size(), "game")));
+        int cleanupLength = userCleanup.map(cleanup -> cleanup.length() + 3).orElse(0);
+        int reportLimit = MAX_REPORT_LENGTH - cleanupLength - 40;
         int reported = 0;
         for (String discrepancy : discrepancies) {
-            if (report.length() + discrepancy.length() + 3 > MAX_REPORT_LENGTH) break;
+            if (report.length() + discrepancy.length() + 3 > reportLimit) break;
             report.append("\n- ").append(discrepancy);
             reported++;
         }

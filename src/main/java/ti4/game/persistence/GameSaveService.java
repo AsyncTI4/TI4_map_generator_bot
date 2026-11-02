@@ -77,6 +77,8 @@ class GameSaveService {
         Path gameSavePath = Storage.getGamePath(game.getName() + Constants.TXT);
         Path gameSaveDirectory = gameSavePath.getParent();
         Path temporarySavePath = null;
+        String previousRevision = game.getRevisionKey();
+        game.setRevisionKey(java.util.UUID.randomUUID().toString());
         try {
             temporarySavePath = Files.createTempFile(gameSaveDirectory, game.getName(), ".tmp");
 
@@ -86,6 +88,7 @@ class GameSaveService {
 
             Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
+            game.setRevisionKey(previousRevision);
             BotLogger.critical(new LogOrigin(game), "Could not save map: " + game.getName(), e);
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(), "Failed to save the game during the last command.");
@@ -145,6 +148,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(GAMEINFO);
+        writer.write(System.lineSeparator());
+        writer.write(REVISION_KEY + " " + Objects.requireNonNullElse(game.getRevisionKey(), ""));
         writer.write(System.lineSeparator());
         // game information
         writer.write(Constants.LATEST_COMMAND + " " + game.getLatestCommand());
