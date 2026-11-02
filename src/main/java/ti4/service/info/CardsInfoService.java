@@ -40,6 +40,7 @@ import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -353,6 +354,9 @@ public class CardsInfoService {
         }
         if (player.hasUnlockedBreakthrough("yssarilbt")) {
             buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
+        }
+        if (player.hasUnlockedBreakthrough("empyreanbt") && VoidTetherService.hasEnforcedTether(game)) {
+            buttons.add(Buttons.gray("voidTetherAccessMenu", "Void Tether Access", FactionEmojis.Empyrean));
         }
         if (player.hasAbility("pillage") && !game.isTwilightsFallMode()) {
             if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())

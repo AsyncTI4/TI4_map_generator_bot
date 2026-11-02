@@ -109,7 +109,6 @@ public class VoidTetherService {
         String factionChecker = empyrean.factionButtonChecker();
 
         List<Button> buttons = new ArrayList<>(getRemoveVoidTetherButtons(game, empyrean, null));
-        buttons.addAll(getAccessButtons(game, empyrean));
         buttons.add(Buttons.blue(factionChecker + "addVoidTetherStep1", "Add Void Tether", FactionEmojis.Empyrean));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
@@ -234,6 +233,23 @@ public class VoidTetherService {
                     Buttons.gray(id, "Access " + border.getTile() + " (" + directionStr(border.getDirection()) + ")"));
         }
         return buttons;
+    }
+
+    public boolean hasEnforcedTether(Game game) {
+        return getTethersOnMap(game).stream().anyMatch(border -> border.isEnforced(game));
+    }
+
+    @ButtonHandler("voidTetherAccessMenu")
+    private void voidTetherAccessMenu(ButtonInteractionEvent event, Game game, Player player) {
+        List<Button> buttons = getAccessButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "You have no enforced Void Tether tokens on the map.");
+            return;
+        }
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Choose a " + tetherRep() + " token to open or close.", buttons);
     }
 
     private BorderAnomalyHolder findTether(Game game, String position, int direction) {
