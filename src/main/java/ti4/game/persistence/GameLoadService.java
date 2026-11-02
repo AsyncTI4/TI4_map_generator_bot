@@ -95,6 +95,20 @@ class GameLoadService {
 
     @Nullable
     public static Game load(String gameName) {
+        return switch (tryLoad(gameName)) {
+            case GameLoadResult.Loaded(Game game) -> game;
+            case GameLoadResult.Corrupt corrupt -> {
+                BotLogger.critical(
+                        "Encountered fatal error loading game file: " + gameName + GAME_FILE_EXTENSION
+                                + ". Load aborted.",
+                        corrupt.cause());
+                yield null;
+            }
+            case GameLoadResult.Missing() -> null;
+        };
+    }
+
+    static GameLoadResult tryLoad(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);
@@ -105,18 +119,15 @@ class GameLoadService {
         return fileName.substring(0, fileName.length() - GAME_FILE_EXTENSION.length());
     }
 
-    @Nullable
-    private static Game readGame(@NotNull File gameFile) {
+    private static GameLoadResult readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
             BotLogger.critical("Could not load map, file does not exist: " + gameFile.getAbsolutePath());
-            return null;
+            return new GameLoadResult.Missing();
         }
         try {
-            return readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            return new GameLoadResult.Loaded(readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset())));
         } catch (Exception e) {
-            BotLogger.critical(
-                    "Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.", e);
-            return null;
+            return new GameLoadResult.Corrupt(gameFile.lastModified(), e);
         }
     }
 

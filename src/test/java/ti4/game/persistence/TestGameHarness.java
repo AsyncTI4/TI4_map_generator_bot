@@ -51,6 +51,19 @@ public final class TestGameHarness implements AutoCloseable {
         return GameLoadService.load(gameName);
     }
 
+    public Path getGameFilePath() {
+        return Storage.getGamePath(gameName + Constants.TXT);
+    }
+
+    /** Overwrites the game file with a truncated save that the loader cannot parse. */
+    public void corruptGameFile() {
+        try {
+            Files.writeString(getGameFilePath(), "truncated-owner-id\n");
+        } catch (IOException e) {
+            throw new UncheckedIOException("Unable to corrupt test game file for: " + gameName, e);
+        }
+    }
+
     public Path buildUndoPath(int undoIndex) {
         return Storage.getGameUndo(gameName, gameName + "_" + undoIndex + Constants.TXT);
     }
