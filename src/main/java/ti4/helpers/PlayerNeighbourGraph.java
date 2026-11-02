@@ -11,6 +11,7 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.MapPositionMapper;
@@ -94,9 +95,9 @@ public final class PlayerNeighbourGraph {
         for (ExemptEdge edge : exemptEdges()) {
             String otherSide = edge.otherSide(position);
             Tile otherTile = otherSide == null ? null : game.getTileByPosition(otherSide);
-            if (otherTile == null) continue;
+            if (otherTile == null || !edge.border().exempts(player) || !reaches(player, position, otherSide)) continue;
             for (Player other : realPlayers) {
-                if ((edge.border().exempts(player) || edge.border().exempts(other)) && isInSystem(other, otherTile)) {
+                if (isInSystem(other, otherTile)) {
                     players.add(other);
                 }
             }
@@ -104,12 +105,19 @@ public final class PlayerNeighbourGraph {
         return players;
     }
 
+    private boolean reaches(Player player, String position, String target) {
+        return Adjacency.of(game, player).forEffects().from(position).contains(target);
+    }
+
     private List<ExemptEdge> exemptEdges() {
         if (exemptEdges != null) return exemptEdges;
         exemptEdges = new ArrayList<>();
         for (BorderAnomalyHolder border : game.getBorderAnomalies()) {
             BorderAnomalyModel model = border == null ? null : border.getModel();
-            if (model == null || model.getExemptHolderOf() == null || border.getTile() == null) continue;
+            if (model == null
+                    || model.getExemptHolderOf() == null
+                    || border.getTile() == null
+                    || !border.isEnforced(game)) continue;
             List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(border.getTile());
             if (neighbours == null || neighbours.size() != 6) continue;
             String override = game.getAdjacentTileOverride(border.getTile(), border.getDirection());

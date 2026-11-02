@@ -2099,7 +2099,8 @@ public class StartCombatService {
             // TODO: Franken: with two flagships, should every flagship tile count here, not only getFirst()?
             List<Tile> flagshipTile =
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
-            if (agentHolder.hasUnit("empyrean_flagship")
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnit("empyrean_flagship")
                     && !flagshipTile.isEmpty()
                     && Adjacency.of(game, agentHolder)
                             .isAdjacent(flagshipTile.getFirst().getPosition(), pos)) {

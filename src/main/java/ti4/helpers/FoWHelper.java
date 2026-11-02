@@ -699,15 +699,11 @@ public final class FoWHelper {
         List<Player> players = new ArrayList<>();
         if (FOWPlusService.isVoid(game, position)) return players;
 
-        Set<String> tilesToCheck =
-                Adjacency.of(game).forPurpose(purpose).withSelf().into(position);
         Tile startingTile = game.getTileByPosition(position);
 
         for (Player player_ : game.getRealPlayers()) {
-            Set<String> tiles = new HashSet<>(tilesToCheck);
-            if (player_.hasAbility("quantum_entanglement") || ButtonHelper.isLawInPlay(game, "travel_ban")) {
-                tiles.addAll(getWormholeAdjacencies(game, position, player_));
-            }
+            Set<String> tiles =
+                    Adjacency.of(game, player_).forPurpose(purpose).withSelf().into(position);
 
             if (includeSweep && startingTile.hasCC(Mapper.getSweepID(player_.getColor()))) {
                 players.add(player_);

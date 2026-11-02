@@ -158,6 +158,9 @@ public final class GridRule implements AdjacencyRule {
         }
     }
 
+    // TODO: an override (incl. secondary x) leaves the natural neighbour's own edge pointing here, so it still links
+    // one
+    // way; Off mode's union then joins it both ways (e.g. Space Cannon across a cut edge). Treat it as cut both ways?
     private static Set<String> previousPositions(Game game, String position, int enteredFrom, int direction) {
         Set<String> previous = new HashSet<>();
         List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(position);

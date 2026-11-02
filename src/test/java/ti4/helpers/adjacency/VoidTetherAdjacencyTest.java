@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.json.JsonMapperManager;
@@ -85,9 +86,45 @@ class VoidTetherAdjacencyTest extends BaseTi4Test {
         placeCruiser(empyrean, "000");
         placeCruiser(letnev, "101");
 
-        assertThat(letnev.getNeighbouringPlayers(false)).contains(empyrean).doesNotContain(hacan);
+        assertThat(letnev.getNeighbouringPlayers(true)).contains(empyrean).doesNotContain(hacan);
         assertThat(empyrean.getNeighbouringPlayers(false)).contains(letnev);
         assertThat(hacan.getNeighbouringPlayers(true)).doesNotContain(letnev);
+    }
+
+    // Abilities use the acting player's one-way set: Letnev cannot reach across, so in fog it must not learn the
+    // Empyrean sits behind the tether (Naalu commander, Reflect, neighbour counts).
+    @Test
+    void onlyTheExemptSideGetsTheOneWayNeighbour() {
+        placeCruiser(empyrean, "000");
+        placeCruiser(letnev, "101");
+
+        assertThat(letnev.getAbilityNeighbours()).doesNotContain(empyrean);
+        assertThat(empyrean.getAbilityNeighbours()).contains(letnev);
+
+        game.getBorderAnomalies().getFirst().allow(letnev.getColor());
+        assertThat(letnev.getAbilityNeighbours()).contains(empyrean);
+    }
+
+    // GM "who can see" asks each player's own rules, so the holder still shows up across its tether.
+    @Test
+    void gmViewCountsTheHolderAcrossItsTether() {
+        placeCruiser(empyrean, "101");
+
+        assertThat(FoWHelper.getAdjacentPlayers(game, "000", false, AdjacencyPurpose.VISION))
+                .contains(empyrean);
+
+        empyrean.removeBreakthrough("empyreanbt");
+        assertThat(FoWHelper.getAdjacentPlayers(game, "000", false, AdjacencyPurpose.VISION))
+                .doesNotContain(empyrean);
+    }
+
+    @Test
+    void anotherBorderOnTheSameEdgeStillSeparatesThem() {
+        placeCruiser(empyrean, "000");
+        placeCruiser(letnev, "101");
+        game.addBorderAnomaly("101", 3, "spatial_tear");
+
+        assertThat(empyrean.getNeighbouringPlayers(true)).doesNotContain(letnev);
     }
 
     // "unless you allow it": the holder opens one token for chosen colours; moving or removing the token resets it.

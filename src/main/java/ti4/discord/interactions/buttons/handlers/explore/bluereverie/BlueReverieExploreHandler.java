@@ -494,13 +494,12 @@ public class BlueReverieExploreHandler {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
-        boolean spent =
-                switch (pool) {
-                    case "tactical" -> spendTacticalToken(player);
-                    case "fleet" -> spendFleetToken(player);
-                    case "strategy" -> spendStrategyToken(player);
-                    default -> false;
-                };
+        boolean spent = switch (pool) {
+            case "tactical" -> spendTacticalToken(player);
+            case "fleet" -> spendFleetToken(player);
+            case "strategy" -> spendStrategyToken(player);
+            default -> false;
+        };
         if (!spent) {
             ButtonHelper.deleteTheOneButton(event);
             return;

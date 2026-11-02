@@ -605,7 +605,7 @@ public final class ButtonHelperFactionSpecific {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + REFLECT_TARGET + neighbor.getFaction(),
                     "Choose " + neighbor.getColor(),
-                    neighbor.getFactionEmoji()));
+                    neighbor.fogSafeEmoji()));
         }
         game.setStoredValue(REFLECT_PENDING + player.getFaction(), "true");
         buttons.add(Buttons.red(player.factionButtonChecker() + REFLECT_DECLINE, "Decline"));
@@ -1073,7 +1073,7 @@ public final class ButtonHelperFactionSpecific {
                     && (neighbor.getCommodities() > 0 || neighbor.getTg() > 0)) {
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + "thwartTake_" + session + "_" + neighbor.getFaction(),
-                        "Take 1 Commodity From " + neighbor.getFactionModel().getFactionName(),
+                        "Take 1 Commodity From " + neighbor.getFactionNameOrColor(),
                         neighbor.getFactionEmojiOrColor()));
             }
         }
@@ -4162,16 +4162,15 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static boolean vortexButtonAvailable(Game game, UnitKey unitKey) {
-        int baseUnitCap =
-                switch (unitKey.unitType()) {
-                    case Infantry, Fighter -> 10_000;
-                    case Destroyer, Cruiser -> 8;
-                    case Dreadnought -> 5;
-                    case Mech, Carrier -> 4;
-                    case Warsun -> 2;
-                    case Flagship -> 1;
-                    default -> 0; // everything else that can't be captured
-                };
+        int baseUnitCap = switch (unitKey.unitType()) {
+            case Infantry, Fighter -> 10_000;
+            case Destroyer, Cruiser -> 8;
+            case Dreadnought -> 5;
+            case Mech, Carrier -> 4;
+            case Warsun -> 2;
+            case Flagship -> 1;
+            default -> 0; // everything else that can't be captured
+        };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
                 .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
@@ -4182,16 +4181,15 @@ public final class ButtonHelperFactionSpecific {
     }
 
     public static int remainingUnitsOfType(Game game, UnitKey unitKey) {
-        int baseUnitCap =
-                switch (unitKey.unitType()) {
-                    case Infantry, Fighter -> 10_000;
-                    case Destroyer, Cruiser -> 8;
-                    case Dreadnought -> 5;
-                    case Mech, Carrier -> 4;
-                    case Warsun -> 2;
-                    case Flagship -> 1;
-                    default -> 0; // everything else that can't be captured
-                };
+        int baseUnitCap = switch (unitKey.unitType()) {
+            case Infantry, Fighter -> 10_000;
+            case Destroyer, Cruiser -> 8;
+            case Dreadnought -> 5;
+            case Mech, Carrier -> 4;
+            case Warsun -> 2;
+            case Flagship -> 1;
+            default -> 0; // everything else that can't be captured
+        };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
                 .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))

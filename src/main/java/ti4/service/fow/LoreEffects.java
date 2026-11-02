@@ -303,12 +303,11 @@ final class LoreEffects {
             if (p == null) continue;
             String where = " (in `!" + line + "`)";
             List<String> a = p.args();
-            boolean colorImplicit =
-                    switch (p.verb()) {
-                        case "unit", "plastic", "removeunit" -> !a.isEmpty() && isSignedInt(a, 0);
-                        case "cc", "removecc" -> a.isEmpty();
-                        default -> false;
-                    };
+            boolean colorImplicit = switch (p.verb()) {
+                case "unit", "plastic", "removeunit" -> !a.isEmpty() && isSignedInt(a, 0);
+                case "cc", "removecc" -> a.isEmpty();
+                default -> false;
+            };
             if (colorImplicit) {
                 problems.add("`" + p.verb() + "` needs an explicit color in phase lore — there is no triggering player"
                         + where);

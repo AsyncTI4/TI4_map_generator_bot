@@ -123,6 +123,7 @@ public class ButtonHelperHeroes {
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "argentHeroStep2_" + activeSystem.getPosition(),
                 activeSystem.getRepresentationForButtons(game, player)));
+        // TODO: Wing Transfer moves ships; should it use forMovement() so Sever and gravity-wave direction apply?
         for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, activeSystem.getPosition(), player, false)) {
             Tile tile = game.getTileByPosition(pos);
             if (CommandCounterHelper.hasCC(player, tile)

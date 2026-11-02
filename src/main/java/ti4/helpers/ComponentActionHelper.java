@@ -173,28 +173,27 @@ public class ComponentActionHelper {
         for (BreakthroughModel bt : p1.getBreakthroughModels()) {
             if (bt != null && bt.getText().contains("ACTION:")) {
                 if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                    boolean validAction =
-                            switch (bt.getAlias()) {
-                                case "arborecbt" ->
-                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                                case "crimsonbt" -> true;
-                                case "mahactbt" -> !p1.getTechs().isEmpty();
-                                case "ardentiabt" ->
-                                    game.getRealPlayers().stream()
-                                            .anyMatch(otherPlayer -> otherPlayer != p1
-                                                    && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
-                                                            .isEmpty());
-                                case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
-                                case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
-                                case "stonebornbt", "stonebornbtunleashed" ->
-                                    !p1.getFragments().isEmpty();
-                                case "saarbt" ->
-                                    game.getTileMap().values().stream()
-                                            .filter(Tile::isAsteroidField)
-                                            .anyMatch(Tile.tileHasPlayerShips(p1));
-                                case "deepwroughtbt" -> true;
-                                default -> true;
-                            };
+                    boolean validAction = switch (bt.getAlias()) {
+                        case "arborecbt" ->
+                            game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                        case "crimsonbt" -> true;
+                        case "mahactbt" -> !p1.getTechs().isEmpty();
+                        case "ardentiabt" ->
+                            game.getRealPlayers().stream()
+                                    .anyMatch(otherPlayer -> otherPlayer != p1
+                                            && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
+                                                    .isEmpty());
+                        case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
+                        case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
+                        case "stonebornbt", "stonebornbtunleashed" ->
+                            !p1.getFragments().isEmpty();
+                        case "saarbt" ->
+                            game.getTileMap().values().stream()
+                                    .filter(Tile::isAsteroidField)
+                                    .anyMatch(Tile.tileHasPlayerShips(p1));
+                        case "deepwroughtbt" -> true;
+                        default -> true;
+                    };
 
                     if (validAction) {
                         TI4Emoji btEmoji = bt.getFactionEmoji();

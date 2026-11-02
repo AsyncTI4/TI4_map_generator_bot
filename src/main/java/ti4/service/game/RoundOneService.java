@@ -149,6 +149,7 @@ public class RoundOneService {
                 for (int i = 0; i < others.size(); i++) {
                     Player target = others.get(i);
                     String shrine = (i == 0 ? "special" : "normal");
+                    // TODO: fog: planet names still show for tiles the target has not seen.
                     Adjacency adjacency = Adjacency.of(game, target).forEffects();
                     buttons = new ArrayList<>();
                     if (rex != null) {
@@ -159,7 +160,7 @@ public class RoundOneService {
                                     buttons.add(Buttons.green(
                                             "addShrine_" + planet.getName() + "_" + shrine,
                                             Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
-                                                    + tile.getRepresentationForButtons()));
+                                                    + tile.getRepresentationForButtons(game, target)));
                                 }
                             }
                         }
@@ -173,7 +174,7 @@ public class RoundOneService {
                                     buttons.add(Buttons.green(
                                             "addShrine_" + planet.getName() + "_" + shrine,
                                             Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
-                                                    + tile.getRepresentationForButtons()));
+                                                    + tile.getRepresentationForButtons(game, target)));
                                 }
                             }
                         }
