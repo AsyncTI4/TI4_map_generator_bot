@@ -30,8 +30,6 @@ import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfigu
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.spring.service.persistence.GameEntity;
@@ -44,6 +42,7 @@ import ti4.spring.service.persistence.UserEntity;
 import ti4.spring.service.persistence.UserEntityRepository;
 import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 import ti4.spring.service.tigl.TiglGamesInfoService;
+import ti4.test.PostgresDatabaseTest;
 
 // The statistics services run their repository queries without a surrounding transaction, so every
 // entity they read is detached. Touching an association the query did not JOIN FETCH throws
@@ -51,14 +50,14 @@ import ti4.spring.service.tigl.TiglGamesInfoService;
 // query/usage mismatch fails here rather than in production.
 //
 // Runs against a throwaway database, e.g. in a local container:
-//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test
-// Skipped when the variable is unset (CI has no database).
+//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:55432/tibot_ci_test
+// Skipped when the variable is unset. CI provides a dedicated test database.
 @EnabledIfEnvironmentVariable(named = "TI4_TEST_POSTGRES_URL", matches = ".+")
 @SpringBootTest(
         classes = StatisticsReportsDatabaseTest.TestConfig.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = "spring.jpa.hibernate.ddl-auto=create-drop")
-class StatisticsReportsDatabaseTest {
+class StatisticsReportsDatabaseTest extends PostgresDatabaseTest {
 
     private static final int PLAYERS_PER_GAME = 6;
     private static final int TURNS_PER_PLAYER = 120;
@@ -102,13 +101,6 @@ class StatisticsReportsDatabaseTest {
     private final List<String> sentMessages = new ArrayList<>();
     private MockedStatic<MessageHelper> messageHelper;
     private List<UserEntity> users;
-
-    @DynamicPropertySource
-    static void datasource(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> System.getenv("TI4_TEST_POSTGRES_URL"));
-        registry.add("spring.datasource.username", () -> envOrDefault("TI4_TEST_POSTGRES_USER", "tibot"));
-        registry.add("spring.datasource.password", () -> envOrDefault("TI4_TEST_POSTGRES_PASSWORD", ""));
-    }
 
     @BeforeEach
     void seedGames() {
@@ -254,11 +246,6 @@ class StatisticsReportsDatabaseTest {
         entity.setUser(user);
         entity.setTitle(title);
         return entity;
-    }
-
-    private static String envOrDefault(String name, String fallback) {
-        String value = System.getenv(name);
-        return value == null ? fallback : value;
     }
 
     @Configuration

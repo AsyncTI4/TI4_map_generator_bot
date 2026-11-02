@@ -272,15 +272,17 @@ To run Java tests in VSCode - make sure you add a test configuration your .vscod
 
 ## Database Tests
 
-Tests named `*DatabaseTest` run against a real PostgreSQL and are skipped unless `TI4_TEST_POSTGRES_URL` is set. CI provides a database, so they run in the pull request checks. To run them locally, start the local database and create a separate test database. The tests drop and recreate their tables, so never point them at `tibot`.
+Tests named `*DatabaseTest` run against a real PostgreSQL and are skipped unless `TI4_TEST_POSTGRES_URL` is set. CI provides an isolated database with throwaway credentials. Locally, start the dedicated test container, separate from the development database:
 
 ```bash
-docker compose -f docker-compose.local.yml up -d
-docker exec tibot-postgres createdb -U tibot tibot_test
-TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test mvn test -Dtest='*DatabaseTest'
+docker compose -f docker-compose.test.yml up -d --wait
+TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:55432/tibot_ci_test mvn test -Dtest='*DatabaseTest'
+docker compose -f docker-compose.test.yml down
 ```
 
-`TI4_TEST_POSTGRES_USER` (default `tibot`) and `TI4_TEST_POSTGRES_PASSWORD` (default empty) are also read.
+The container stores its data in memory; stopping it discards the test data. Database tests must extend `ti4.test.PostgresDatabaseTest`. Before Spring initializes Hibernate, this shared setup requires the exact database and user `tibot_ci_test`, rejects URL parameters and embedded credentials, and verifies the connected database and that the role has no administrative privileges. Other database names, including `tibot`, fail before any connection is opened. Reserve `tibot_ci_test` exclusively for tests; never create it in production.
+
+`TI4_TEST_POSTGRES_USER` and `TI4_TEST_POSTGRES_PASSWORD` both default to the throwaway value `tibot_ci_test`. Never supply production credentials. The dedicated container creates an unprivileged role that owns only the test database, and removes public access to its maintenance databases. Production credentials and production database access must never be added to the PR workflow.
 
 # Helpful Tips for Debugging
 

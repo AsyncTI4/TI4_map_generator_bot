@@ -14,13 +14,13 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: tibot_test
-          POSTGRES_USER: tibot
-          POSTGRES_PASSWORD: tibot
+          POSTGRES_DB: tibot_ci_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci_bootstrap_only
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U tibot -d tibot_test"
+          --health-cmd "pg_isready -U postgres -d tibot_ci_test"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
@@ -98,14 +98,17 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+      - name: Create unprivileged database test role
+        if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
+        run: docker exec -i ${{ job.services.postgres.id }} psql -v ON_ERROR_STOP=1 -U postgres -d tibot_ci_test < src/test/resources/postgres/init.sql
       - name: Run the Maven verify phase
         if: steps.diff.outputs.has_java == 'true' && (steps.validate-json.outcome == 'success' || steps.validate-json.outcome == 'skipped')
         id: maven
         shell: bash
         env:
-          TI4_TEST_POSTGRES_URL: jdbc:postgresql://localhost:5432/tibot_test
-          TI4_TEST_POSTGRES_USER: tibot
-          TI4_TEST_POSTGRES_PASSWORD: tibot
+          TI4_TEST_POSTGRES_URL: jdbc:postgresql://localhost:5432/tibot_ci_test
+          TI4_TEST_POSTGRES_USER: tibot_ci_test
+          TI4_TEST_POSTGRES_PASSWORD: tibot_ci_test
         run: |
           set -o pipefail
           mvn --batch-mode \

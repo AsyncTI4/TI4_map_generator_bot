@@ -15,8 +15,6 @@ import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfigu
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import ti4.spring.service.persistence.EarnedTitle;
 import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.GameEntityRepository;
@@ -26,17 +24,18 @@ import ti4.spring.service.persistence.TitleEntity;
 import ti4.spring.service.persistence.TitleEntityRepository;
 import ti4.spring.service.persistence.UserEntity;
 import ti4.spring.service.persistence.UserEntityRepository;
+import ti4.test.PostgresDatabaseTest;
 
 // Runs against a real Postgres. CI provides one (the postgres service in .github/workflows/run-tests.yml).
-// Locally, set the variable to a throwaway database, never the dev "tibot" one, since create-drop drops its tables:
-//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test
+// Locally, use docker-compose.test.yml; the shared setup rejects unsafe database names and roles:
+//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:55432/tibot_ci_test
 // Skipped when the variable is unset.
 @EnabledIfEnvironmentVariable(named = "TI4_TEST_POSTGRES_URL", matches = ".+")
 @SpringBootTest(
         classes = PlayerTitleServiceDatabaseTest.TestConfig.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = "spring.jpa.hibernate.ddl-auto=create-drop")
-class PlayerTitleServiceDatabaseTest {
+class PlayerTitleServiceDatabaseTest extends PostgresDatabaseTest {
 
     @Autowired
     private PlayerTitleService service;
@@ -52,13 +51,6 @@ class PlayerTitleServiceDatabaseTest {
 
     @Autowired
     private UserEntityRepository userRepository;
-
-    @DynamicPropertySource
-    static void datasource(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> System.getenv("TI4_TEST_POSTGRES_URL"));
-        registry.add("spring.datasource.username", () -> envOrDefault("TI4_TEST_POSTGRES_USER", "tibot"));
-        registry.add("spring.datasource.password", () -> envOrDefault("TI4_TEST_POSTGRES_PASSWORD", ""));
-    }
 
     @BeforeEach
     void clearTables() {
@@ -112,11 +104,6 @@ class PlayerTitleServiceDatabaseTest {
         entity.setUser(user);
         entity.setTitle(title);
         return entity;
-    }
-
-    private static String envOrDefault(String name, String fallback) {
-        String value = System.getenv(name);
-        return value == null ? fallback : value;
     }
 
     @Configuration
