@@ -1543,6 +1543,7 @@ public class ExploreService {
                                         adjacentTile.getPlanetUnitHolders().size())
                                 .sum();
 
+                // TODO: the card says "in, or adjacent to"; should this be the sum rather than the max?
                 int highestPlanetCount = Math.max(planetsInSystem, planetsInAdjacentSystems);
 
                 player.gainCommodities(highestPlanetCount);

@@ -2096,6 +2096,7 @@ public class StartCombatService {
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
                 buttons.add(ExhaustOnlyAgents.THUNDARIAN.button(agentHolder));
             }
+            // TODO: Franken: with two flagships, should every flagship tile count here, not only getFirst()?
             List<Tile> flagshipTile =
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
             if (agentHolder.hasUnit("empyrean_flagship")

@@ -71,6 +71,7 @@ public class EnlistmentLLButtonHandler {
 
     private static List<Button> getEligiblePlanetButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
+        // TODO: the card allows any non-home planet; should other players' and uncontrolled planets be offered?
         for (String planetName : player.getPlanets()) {
             Planet planet = game.getPlanetsInfo().get(planetName);
             Tile tile = game.getTileFromPlanet(planetName);

@@ -279,6 +279,7 @@ public final class ButtonHelperAbilities {
                 getTilesToRallyTheHorde(game, player));
     }
 
+    // TODO: nothing emits startBestow anymore (Bestow uses gain_2_comms); remove it and bestowPart2?
     @ButtonHandler("startBestow")
     public static void startBestow(Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

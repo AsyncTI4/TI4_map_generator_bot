@@ -4874,6 +4874,7 @@ public class ButtonHelper {
                 message);
     }
 
+    // TODO: customRexLegendary and this helper have no callers; remove them?
     private static List<String> getAllPlanetsAdjacentToTileNotOwnedByPlayer(Tile tile, Game game, Player player) {
         List<String> planets = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
@@ -8360,6 +8361,7 @@ public class ButtonHelper {
         if (tilesWithBombard.isEmpty()) {
             return buttons;
         }
+        // TODO: should a smothered first bombard tile be skipped here too, like in the loop below?
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {

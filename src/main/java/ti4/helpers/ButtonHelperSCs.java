@@ -1435,6 +1435,7 @@ public final class ButtonHelperSCs {
     }
 
     public static void updateEmbassies(Game game, Player player, Tile tile) {
+        // TODO: every nearby embassy gets this tile's count; should each count around its own tile?
         int count = getNearbyEmbassyCount(game, tile, player);
         for (String pos : Adjacency.of(game, player).forVision().withSelf().from(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);

@@ -476,6 +476,7 @@ public class BlueReverieRelicHandler {
             return;
         }
         Tile tile = game.getTileByPosition(payload);
+        // TODO: can getTileModel() be null here (custom or removed tile id)? Also in the Entropic Scar button filter.
         if (tile == null || tile.getTileModel().isHyperlane() || !canPlaceEntropicScar(game, player, tile)) {
             ButtonHelper.deleteMessage(event);
             return;

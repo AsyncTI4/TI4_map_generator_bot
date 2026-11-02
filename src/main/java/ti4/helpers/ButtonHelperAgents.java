@@ -517,6 +517,7 @@ public final class ButtonHelperAgents {
             Tile tile = game.getTileByPosition(pos);
             if (tile.getTileModel() != null && tile.getTileModel().isHyperlane()) continue;
 
+            // TODO: Smuggler Routes ignores anomalies and forbids any other units; should it skip these checks?
             if ((tile.isAsteroidField()
                             && !tile.isZelianAsteroidField()
                             && !player.getTechs().contains("amd")
