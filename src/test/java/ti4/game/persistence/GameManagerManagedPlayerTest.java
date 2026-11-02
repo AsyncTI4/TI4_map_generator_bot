@@ -98,13 +98,13 @@ class GameManagerManagedPlayerTest extends BaseTi4Test {
             loads.when(() -> GameLoadService.load(saved.getName())).thenReturn(restored);
             undos.when(() -> GameUndoService.undo(saved)).thenReturn(restored);
             GameManager.save(saved, "initial");
-            ManagedGame cached = GameManager.getCachedManagedGame(saved.getName());
+            ManagedGame cached = GameManager.getManagedGame(saved.getName());
             assertThat(cached.getRevisionKey()).isEqualTo("saved");
             assertThat(cached.matches(saved)).isTrue();
             assertThat(cached.matches(restored)).isFalse();
             if (reload) GameManager.reload(saved.getName());
             else GameManager.undo(saved);
-            assertThat(GameManager.getCachedManagedGame(saved.getName()).getRevisionKey())
+            assertThat(GameManager.getManagedGame(saved.getName()).getRevisionKey())
                     .isEqualTo("restored");
         }
     }

@@ -101,9 +101,7 @@ class GameDatabaseReconcilerTest {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
             ManagedGame managedGame = mock(ManagedGame.class);
             when(managedGame.getRevisionKey()).thenReturn("revision");
-            fixture.manager
-                    .when(() -> GameManager.getCachedManagedGame("unchanged"))
-                    .thenReturn(managedGame);
+            fixture.manager.when(() -> GameManager.getManagedGame("unchanged")).thenReturn(managedGame);
             when(state.matchesRevision("revision")).thenReturn(true);
             fixture.run();
             fixture.loader.verifyNoInteractions();
@@ -119,12 +117,34 @@ class GameDatabaseReconcilerTest {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
             ManagedGame managedGame = mock(ManagedGame.class);
             when(managedGame.getRevisionKey()).thenReturn("new-revision");
-            fixture.manager
-                    .when(() -> GameManager.getCachedManagedGame("changed"))
-                    .thenReturn(managedGame);
+            fixture.manager.when(() -> GameManager.getManagedGame("changed")).thenReturn(managedGame);
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
             fixture.loader.verify(() -> GameLoadService.load("changed"));
+        }
+    }
+
+    @Test
+    void failedManagedLookupFallsBackToReadOnlyLoadingAndContinues() {
+        try (Fixture fixture = new Fixture()) {
+            fixture.persisted.put("broken", mock(PersistedGameState.class));
+            PersistedGameState healthy = mock(PersistedGameState.class);
+            fixture.persisted.put("healthy", healthy);
+            fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("broken", "healthy"));
+            fixture.manager
+                    .when(() -> GameManager.getManagedGame("broken"))
+                    .thenThrow(new IllegalStateException("unreadable game"));
+            ManagedGame managedGame = mock(ManagedGame.class);
+            when(managedGame.getRevisionKey()).thenReturn("revision");
+            when(healthy.matchesRevision("revision")).thenReturn(true);
+            fixture.manager.when(() -> GameManager.getManagedGame("healthy")).thenReturn(managedGame);
+            when(fixture.file.exists()).thenReturn(true);
+
+            fixture.run();
+
+            fixture.loader.verify(() -> GameLoadService.load("broken"));
+            fixture.loader.verify(() -> GameLoadService.load("healthy"), never());
+            verifyNoInteractions(fixture.persistence);
         }
     }
 

@@ -64,10 +64,7 @@ public class GameDatabaseReconciler {
         @Override
         public void reconcile(String gameName) {
             PersistedGameState persistedState = persistedStates.get(gameName);
-            ManagedGame managedGame = GameManager.getCachedManagedGame(gameName);
-            if (persistedState != null
-                    && managedGame != null
-                    && persistedState.matchesRevision(managedGame.getRevisionKey())) {
+            if (matchesManagedRevision(gameName, persistedState)) {
                 existingGameNames.add(gameName);
                 return;
             }
@@ -102,6 +99,17 @@ public class GameDatabaseReconciler {
             Optional<String> userCleanup = reconcileUnreferencedUsers();
 
             report(discrepancies, userCleanup, gameCount);
+        }
+    }
+
+    private static boolean matchesManagedRevision(String gameName, PersistedGameState persistedState) {
+        if (persistedState == null) return false;
+        try {
+            ManagedGame managedGame = GameManager.getManagedGame(gameName);
+            return managedGame != null && persistedState.matchesRevision(managedGame.getRevisionKey());
+        } catch (Exception e) {
+            BotLogger.error(TASK_NAME + " could not look up managed game " + gameName + ".", e);
+            return false;
         }
     }
 

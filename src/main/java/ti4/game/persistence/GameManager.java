@@ -224,11 +224,6 @@ public class GameManager {
         });
     }
 
-    @Nullable
-    static ManagedGame getCachedManagedGame(String gameName) {
-        return gameNameToManagedGame.get(gameName);
-    }
-
     public static boolean isWarmupFinished() {
         return warmupFinishedLatch.getCount() == 0;
     }
