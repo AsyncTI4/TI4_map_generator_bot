@@ -146,6 +146,13 @@ public final class ButtonHelperSCs {
         boolean singleDock = !model.usesAutomationForSCID("te6warfare");
 
         Tile tile = player.getHomeSystemTile();
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you have no home system to produce units in, so you cannot use the **Warfare** secondary.");
+            return;
+        }
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
         int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
 
