@@ -10,10 +10,13 @@ import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
+import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
+import ti4.service.actioncard.ActionCardWindowHoldService;
+import ti4.service.actioncard.ActionCardWindowHoldService.HeldWindow;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -44,7 +47,46 @@ public class SabotageAutoReactCron {
                 game -> automaticallyReactToSabotageWindows(game, acMessagesByGame.get(game.getName())),
                 ExecutionLockType.WRITE);
 
+        Map<String, List<GameMessage>> heldWindowsByGame =
+                GameMessageManager.getAllByGame(GameMessageType.ACTION_CARD_WINDOW);
+        ConsumeGameUtility.consumeGames(
+                heldWindowsByGame.keySet(),
+                game -> automaticallyPassHeldWindows(game, heldWindowsByGame.get(game.getName())),
+                ExecutionLockType.WRITE);
+
         BotLogger.logCron("Finished SabotageAutoReactCron.");
+    }
+
+    private static void automaticallyPassHeldWindows(Game game, List<GameMessage> holds) {
+        boolean closedAny = false;
+        for (GameMessage hold : holds) {
+            HeldWindow window = ActionCardWindowHoldService.windowOf(hold).orElse(null);
+            if (window == null) {
+                continue;
+            }
+            for (Player player : game.getRealPlayers()) {
+                if (hold.factionsThatReacted().contains(player.getFaction())
+                        || ActionCardWindowHoldService.couldPlay(player, window)
+                        || !rollsAutoPass(player)) {
+                    continue;
+                }
+                try {
+                    ReactionService.addReaction(player, false, null, null, hold.messageId(), game);
+                    hold.factionsThatReacted().add(player.getFaction());
+                } catch (Exception e) {
+                    if (DiscordErrorUtility.isUnknownMessageError(e)) {
+                        GameMessageManager.remove(game.getName(), hold.messageId());
+                        break;
+                    }
+                    throw e;
+                }
+            }
+            closedAny |=
+                    GameMessageManager.getOne(game.getName(), hold.messageId()).isEmpty();
+        }
+        if (closedAny) {
+            GameManager.save(game, "Auto-passed a held action card window.");
+        }
     }
 
     private static void automaticallyReactToSabotageWindows(Game game, List<GameMessage> acMessages) {
@@ -74,12 +116,11 @@ public class SabotageAutoReactCron {
     }
 
     private static boolean playerShouldRandomlyReact(Player player, Game game) {
-        if (player.isAFK() || player.getAutoSaboPassMedian() == 0) {
-            return false;
-        }
+        return !SabotageService.canSabotage(player, game) && rollsAutoPass(player);
+    }
 
-        boolean canSabotage = SabotageService.canSabotage(player, game);
-        if (canSabotage) {
+    private static boolean rollsAutoPass(Player player) {
+        if (player.isAFK() || player.getAutoSaboPassMedian() == 0) {
             return false;
         }
 

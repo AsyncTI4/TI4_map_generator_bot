@@ -63,6 +63,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.ActionCardWindowHoldService;
 import ti4.service.actioncard.OracleDrawService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -874,6 +875,7 @@ public class ActionCardHelper {
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
+        ActionCardWindowHoldService.onActionCardPlayed(game, player, acID);
         if (isPlayedAsComponentAction(game, player, actionCard)) {
             TurnActionLog.recordComponent(game, "actionCard");
         }
