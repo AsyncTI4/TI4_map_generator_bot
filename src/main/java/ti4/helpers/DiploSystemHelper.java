@@ -6,8 +6,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veryd
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 
 @UtilityClass
 public class DiploSystemHelper {

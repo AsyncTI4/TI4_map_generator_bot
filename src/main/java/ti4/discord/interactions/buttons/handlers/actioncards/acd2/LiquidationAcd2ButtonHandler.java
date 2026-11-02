@@ -22,7 +22,7 @@ class LiquidationAcd2ButtonHandler {
                     player.factionButtonChecker() + "liquidationReduce_" + reduce,
                     "Reduce PRODUCTION by " + reduce + " (cost -" + (reduce * 2) + ")"));
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

@@ -4,9 +4,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.draft.DraftCategory;
 import ti4.game.Player;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class FrankenBreakthroughService {

@@ -11,8 +11,6 @@ import ti4.discord.interactions.context.ContextCommand;
 import ti4.discord.interactions.context.ContextCommandManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
-import ti4.logging.RollbarManager;
-import ti4.service.game.GameNameService;
 
 class ContextInteractionListener extends ListenerAdapter implements CommandListener {
 
@@ -40,9 +38,6 @@ class ContextInteractionListener extends ListenerAdapter implements CommandListe
 
     private void process(GenericContextInteractionEvent<?> event) {
         long processStartTime = System.currentTimeMillis();
-        RollbarManager.putInteractionMetadata("context_menu", event);
-        RollbarManager.put("command_name", event.getCommandString());
-        RollbarManager.put("game_name", GameNameService.getGameName(event));
 
         ContextCommand command = ContextCommandManager.getCommand(event.getName());
         try {
@@ -53,8 +48,6 @@ class ContextInteractionListener extends ListenerAdapter implements CommandListe
             }
         } catch (Exception e) {
             command.onException(event, e);
-        } finally {
-            RollbarManager.clear();
         }
 
         warnForLongRunningCommands(event, processStartTime);

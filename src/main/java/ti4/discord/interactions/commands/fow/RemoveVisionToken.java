@@ -9,8 +9,8 @@ import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 
 class RemoveVisionToken extends GameStateSubcommand {
 
@@ -32,7 +32,7 @@ class RemoveVisionToken extends GameStateSubcommand {
 
         StringBuilder sb = new StringBuilder();
         for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position `" + position + "` is invalid.");
                 continue;
             }

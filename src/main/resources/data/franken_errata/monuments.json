@@ -3,7 +3,7 @@
         "itemCategory": "MONUMENT",
         "itemId": "mahact_monument",
         "undraftable": true,
-        "alternateText": "[Franken Only] At the start of the status phase, you may place 1 player's control token on your primacy ability that has a command token in this unit's system.",
+        "alternateText": "[Franken Only] At the start of the status phase, the Mahact player may place 1 player's control token whose command token is in this system on their Primacy ability if it does not already have 1 of that player's tokens.",
         "source": "monuments"
     },
     {

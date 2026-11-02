@@ -1,0 +1,15 @@
+{
+  "name": "jmsc-relic-spy-reports-fog",
+  "description": "Fog: Spy Reports on a distant seat shows the cards only to the holder and names no faction in main or to the target.",
+  "preset": "jmsc-fog-4p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "letnev", "hand": { "relics": ["spyreportsjmsc"] } },
+    { "do": "hand", "as": "hacan", "hand": { "acs": 3 } },
+    { "as": "letnev", "pressId": "FFCC_letnev_componentActionRes_relic_spyreportsjmsc" },
+    { "as": "letnev", "press": "thirtyKSpyTarget_hacan" },
+    { "expect": { "in": "letnev:cards-info", "contains": "shows you these action cards" } },
+    { "expect": { "in": "hacan:cards-info", "contains": "used _Spy Reports_", "notContains": "Letnev" } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }
+  ]
+}

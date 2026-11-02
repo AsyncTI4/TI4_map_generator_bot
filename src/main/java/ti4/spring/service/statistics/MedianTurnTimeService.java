@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
@@ -28,7 +27,6 @@ public class MedianTurnTimeService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
-    @Transactional(readOnly = true)
     public void getMedianTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames =
                 event.getOption(Constants.IGNORE_ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);

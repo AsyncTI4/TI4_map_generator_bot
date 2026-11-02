@@ -208,7 +208,6 @@
         "name": "Thwart (2 Dishonor)",
         "faction": "toldar",
         "permanentEffect": "After you replenish commodities, take up to 2 commodities from any combination of your neighbors.",
-        "notes": "Not automated, have your neighbors subtract with `/player stats`.",
         "source": "blue_reverie"
     },
     {
@@ -225,5 +224,40 @@
         "permanentEffect": "Purge your promissory notes; you cannot gain honor. You treat scored secret objectives as public objectives, instead of public objectives.",
         "notes": "This also purges promissory notes in other players' play areas and hands.",
         "source": "blue_reverie"
+    },
+    {
+        "id": "radiance_br",
+        "name": "Radiance",
+        "faction": "edyn",
+        "window": "After an agenda is revealed",
+        "windowEffect": "You may predict aloud the outcome of that agenda. If your prediction is correct, place 1 command token from another player's reinforcements in a Sigil, unless that player spends 2 influence.",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "radiance"
+    },
+    {
+        "id": "desperados_br",
+        "name": "Desperados",
+        "faction": "nokar",
+        "window": "After you produce 1 or more ships in a system",
+        "windowEffect": "Place up to 1 destroyer in that system. While you are not the active player, apply +1 to your destroyers’ move values; those ships ignore your command tokens.",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "desperados"
+    },
+    {
+        "id": "plausible_deniability_br",
+        "name": "Plausible Deniability",
+        "faction": "tnelis",
+        "window": "At any time",
+        "windowEffect": "If another player satisfies the requirements of one of your secret objectives, you may ignore its requirements; if you score that objective, draw 1 secret objective.",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "plausible_deniability"
+    },
+    {
+        "id": "stealth_insertion_br",
+        "name": "Stealth Corps",
+        "faction": "tnelis",
+        "permanentEffect": "After 1 or more of your units enter coexistence on a planet, destroy up to 1 ground force on that planet.",
+        "source": "blue_reverie",
+        "homebrewReplacesID": "stealth_insertion"
     }
 ]

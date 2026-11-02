@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShie
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
+import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -31,7 +32,7 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.spring.context.SpringContext;
 
 @UtilityClass
-class CombatButtonHandler {
+public class CombatButtonHandler {
 
     @ButtonHandler("automateGroundCombat_")
     public static void automateGroundCombat(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
@@ -163,12 +164,13 @@ class CombatButtonHandler {
             msg +=
                     "\n> Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
         }
-        String combatName =
-                "combatRoundTracker" + game.getActivePlayer().getFaction() + game.getActiveSystem() + "space";
-        if (game.getActivePlayer() != null
-                && game.getActivePlayer() != player
-                && game.getActivePlayer().hasAbility("cargo_raiders")
-                && game.getStoredValue(combatName).isEmpty()) {
+        Player activePlayer = game.getActivePlayer();
+        if (activePlayer != null
+                && activePlayer != player
+                && activePlayer.hasAbility("cargo_raiders")
+                && game.getStoredValue(
+                                "combatRoundTracker" + activePlayer.getFaction() + game.getActiveSystem() + "space")
+                        .isEmpty()) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("pay1tgToAnnounceARetreat", "Pay 1 Trade Good"));
             buttons.add(Buttons.red("deleteButtons", "I Don't Have to Pay"));
@@ -211,7 +213,7 @@ class CombatButtonHandler {
             return;
         }
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -221,6 +223,8 @@ class CombatButtonHandler {
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_afb", "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelAFBHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, "cancelAFBHits_" + tile.getPosition() + "_" + h);
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelAFBHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "afb", h);
         String msg2 = "You may automatically assign " + h + " ANTI-FIGHTER BARRAGE hit" + (h == 1 ? "" : "s") + ".";
@@ -239,7 +243,7 @@ class CombatButtonHandler {
             return;
         }
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -249,6 +253,8 @@ class CombatButtonHandler {
         buttons.add(Buttons.red(
                 "getDamageButtons_" + tile.getPosition() + "_pds", "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h);
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelPdsOffenseHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "pds", h);
         String msg2 = player.getRepresentationNoPing() + ", you may automatically assign "
@@ -276,7 +282,7 @@ class CombatButtonHandler {
             MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
         }
 
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -287,6 +293,8 @@ class CombatButtonHandler {
                 "getDamageButtons_" + tile.getPosition() + "_groundcombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray(CancelGroundHitsButtonId.of(tile.getPosition(), h, planet), "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, CancelGroundHitsButtonId.of(tile.getPosition(), h, planet));
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelGroundHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(
                 buttons, game, player, tile, "ground", h);
@@ -311,7 +319,7 @@ class CombatButtonHandler {
         if (originalHits > 0) {
             MirrorShieldingLLButtonHandler.recordCancelledHits(game, player, tile, 1);
         }
-        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
+        String msg = cancellationMessage(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String factionChecker = player.factionButtonChecker();
@@ -322,6 +330,8 @@ class CombatButtonHandler {
                 "getDamageButtons_" + tile.getPosition() + "_spacecombat",
                 "Manually Assign Hit" + (h == 1 ? "" : "s")));
         buttons.add(Buttons.gray("cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+        TheodisiLegendaryButtonHandler.addVoskaCancelButton(
+                buttons, game, player, "cancelSpaceHits_" + tile.getPosition() + "_" + h);
         VanguardAbilitiesHandler.addInterlockingShieldsButton(buttons, game, player, tile, "cancelSpaceHits", h);
         TwilightsFallMonumentsButtonHandler.addYellowTfMonumentCancelHitButton(buttons, game, player, tile, "space", h);
         VanguardUnitHandler.addSpaceCombatHitButtons(buttons, game, player, tile, h);
@@ -386,5 +396,9 @@ class CombatButtonHandler {
             return;
         }
         ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, game, hits.planetName(), hits.hits(), event);
+    }
+
+    private static String cancellationMessage(Game game, Player player) {
+        return "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
     }
 }

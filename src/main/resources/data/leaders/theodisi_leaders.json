@@ -678,7 +678,7 @@
     "name": "Rikka \"Razor Fang\" Corvin",
     "title": "Wasteland Scrapper",
     "abilityWindow": "When a player activates a system:",
-    "abilityText": "You may exhaust this card. That player may select 2 units on the game board; swap the movement and combat values of those units until the end of that tactical action.",
+    "abilityText": "You may exhaust this card. That player may select 2 units they control on the game board; swap the movement and combat values of those units until the end of that tactical action.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -712,7 +712,7 @@
     "name": "Hazorus Dormant",
     "title": "Nature's Bounty",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 player and exhaust this card; that player may purge 1 relic fragment to replenish their commodities.\nUNLEASH: Return 1 fragmentum token of any color.",
+    "abilityText": "**UNLEASH**: Return 2 red fragmentum tokens from your faction sheet.\n\nExhaust this card and choose 1 player. That player may purge 1 relic fragment from their play area to explore 1 planet they control that has a trait matching the purged fragment.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -723,7 +723,7 @@
     "name": "Hazorus Unleashed",
     "title": "Nature's Wrath",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose 1 player and exhaust this card; that player may purge 1 relic fragment to replenish their commodities. Then, you gain half as many (rounded down) trade goods.",
+    "abilityText": "Exhaust this card and choose 1 player. That player may purge 1 relic fragment from their play area to explore 1 planet they control that has a trait matching the purged fragment twice.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -733,9 +733,9 @@
     "type": "commander",
     "name": "Tempus Dormant",
     "title": "Slumbering Storm",
-    "abilityWindow": "Once per action, when you purge a non-action card component:",
-    "abilityText": "Gain 1 commodity.\nUNLEASH: Return 2 fragmentum tokens of different colors form your player sheet.",
-    "unlockCondition": "Have a fragmentum token on your player sheet.",
+    "abilityWindow": "Once per action, when you purge a component other than an action card:",
+    "abilityText": "**UNLEASH**: Return 1 green and 1 blue fragmentum token from your faction sheet.\n\nGain 1 commodity.",
+    "unlockCondition": "Have 1 fragmentum token on your faction sheet.",
     "source": "theodisi"
   },
   {
@@ -744,7 +744,7 @@
     "type": "commander",
     "name": "Tempus Unleashed",
     "title": "Raging Tempest",
-    "abilityWindow": "Once per action, when you purge a non-action card component:",
+    "abilityWindow": "Once per action, when you purge a component other than an action card:",
     "abilityText": "Gain 1 trade good or explore 1 planet you control.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
@@ -757,7 +757,7 @@
     "title": "The First Stoneborn",
     "abilityName": "Destiny Denied - Limited Potential",
     "abilityWindow": "ACTION:",
-    "abilityText": "Draw 3 relics and choose 1 to gain. Shuffle the rest into the deck and purge this card.\nUNLEASH: Remove 3 fragmentum tokens from your player sheet.",
+    "abilityText": "**UNLEASH**: Remove fragmentum tokens of 4 different colors from your faction sheet.\n\nDraw 3 relics and choose 1 to gain. Shuffle the rest into the deck. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -769,7 +769,7 @@
     "title": "Empowered Stoneborn",
     "abilityName": "Destined Purpose - Limitless Potential",
     "abilityWindow": "ACTION:",
-    "abilityText": "Draw and gain 3 relics. Then, purge this card.",
+    "abilityText": "Gain 3 relics. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },
@@ -779,8 +779,8 @@
     "type": "agent",
     "name": "Golgi",
     "title": "Morpha's Fist",
-    "abilityWindow": "When a player discards 1 or more action cards:",
-    "abilityText": "You may exhaust this card and select a player other than yourself. That player takes 1 of those discarded action cards and then gives you 1 action card from their hand.",
+    "abilityWindow": "When a player other than the Morpha player discards an action card:",
+    "abilityText": "You may exhaust this card and select 1 player other than yourself. That player takes that action card and gives you 1 action card from their hand.",
     "unlockCondition": "Always Unlocked",
     "source": "theodisi"
   },
@@ -803,7 +803,7 @@
     "title": "Formless Force",
     "abilityName": "Perfect Adaptation - Strategic Chances",
     "abilityWindow": "ACTION:",
-    "abilityText": "Discard any number of action cards to perform the primary ability of a readied strategy card with an initiative up to the number of cards you discarded. Then, other players may give you an action card to perform the secondary ability of that card without spending a command token. Then, purge this card.",
+    "abilityText": "Discard any number of action cards to perform the primary ability of a readied or unchosen strategy card with an initiative up to the number of cards you discarded. Then, other players may give you an action card to perform the secondary ability of that card without spending a command token. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "theodisi"
   },

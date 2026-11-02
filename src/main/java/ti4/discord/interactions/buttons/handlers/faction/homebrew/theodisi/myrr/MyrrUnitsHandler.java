@@ -87,7 +87,7 @@ public class MyrrUnitsHandler {
                     "Remove 2 Infantry",
                     FactionEmojis.myrr));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation()

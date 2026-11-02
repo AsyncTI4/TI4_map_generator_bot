@@ -1,0 +1,29 @@
+{
+    "id": "pelor",
+    "tileId": "th29",
+    "name": "Pelor",
+    "aliases": [
+        "pelor"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "legendaryAbilityName": "Sword of the Saint",
+    "legendaryAbilityText": "When you produce 1 or more hits, you may exhaust this card to produce an additional hit.",
+    "planetLayout": {
+        "unitHolderName": "pelor",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200,
+            "y": 209
+        },
+        "planetRadius": 70
+    },
+    "positionInTile": {
+        "x": 200,
+        "y": 209
+    },
+    "source": "theodisi"
+}

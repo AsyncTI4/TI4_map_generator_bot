@@ -1,19 +1,21 @@
 package ti4.discord.interactions.commands.search;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.model.BreakthroughModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 
 class SearchBreakthroughs extends SearchComponentModelSubcommand {
 
     SearchBreakthroughs() {
-        super(Constants.SEARCH_BREAKTHROUGHS, "List all breakthorughs the bot can use");
+        super(Constants.SEARCH_BREAKTHROUGHS, "List all breakthroughs the bot can use");
     }
 
     @Override
@@ -24,15 +26,21 @@ class SearchBreakthroughs extends SearchComponentModelSubcommand {
 
         if (Mapper.isValidBreakthrough(searchString)) {
             event.getChannel()
-                    .sendMessageEmbeds(Mapper.getBreakthrough(searchString).getRepresentationEmbed(true))
+                    .sendMessageEmbeds(getEmbeds(Mapper.getBreakthrough(searchString)))
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         List<MessageEmbed> messageEmbeds = Mapper.getBreakthroughs().values().stream()
                 .filter(model -> model.search(searchString, source))
-                .map(model -> model.getRepresentationEmbed(true))
+                .flatMap(model -> getEmbeds(model).stream())
                 .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
+    }
+
+    private static List<MessageEmbed> getEmbeds(BreakthroughModel breakthrough) {
+        List<MessageEmbed> embeds = new ArrayList<>(List.of(breakthrough.getRepresentationEmbed(true)));
+        breakthrough.getLinkedUnitUpgrade().ifPresent(upgrade -> embeds.add(upgrade.getRepresentationEmbed(true)));
+        return embeds;
     }
 }

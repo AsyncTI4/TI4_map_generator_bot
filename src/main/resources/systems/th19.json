@@ -1,0 +1,15 @@
+{
+    "id":  "th19",
+    "name":  "Illyra",
+    "aliases":  [
+        "th19",
+        "illyra"
+    ],
+    "imagePath":  "th19.png",
+    "planets":  [
+        "illyra"
+    ],
+    "shipPositionsType":  "TYPE04",
+    "tileBack":  "blue",
+    "source":  "theodisi"
+}

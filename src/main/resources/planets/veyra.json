@@ -1,0 +1,27 @@
+{
+    "id": "veyra",
+    "tileId": "th28",
+    "name": "Veyra",
+    "aliases": [
+        "veyra"
+    ],
+    "resources": 2,
+    "influence": 3,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "veyra",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 208
+        },
+        "planetRadius": 64
+    },
+    "positionInTile": {
+        "x": 202,
+        "y": 208
+    },
+    "source": "theodisi"
+}

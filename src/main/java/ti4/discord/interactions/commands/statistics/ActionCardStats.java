@@ -33,7 +33,7 @@ class ActionCardStats extends Subcommand {
                         name,
                         "Impact Score weight for " + figure + ", relative to the other two (default " + defaultWeight
                                 + ")")
-                .setMinValue(0);
+                .setRequiredRange(0, 100.0);
     }
 
     @Override

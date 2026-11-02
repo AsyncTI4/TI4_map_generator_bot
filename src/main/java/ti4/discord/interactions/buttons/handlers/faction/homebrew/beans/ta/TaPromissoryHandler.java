@@ -76,7 +76,7 @@ public class TaPromissoryHandler {
                     player.factionButtonChecker() + TA_PN_ATTACH + tilePos.getPosition() + "|" + planetName,
                     Helper.getPlanetRepresentation(planetName, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

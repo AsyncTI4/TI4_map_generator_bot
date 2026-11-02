@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalLong;
 import java.util.stream.Collectors;
-import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.persistence.ManagedGame;
 
 final class DashboardBadgeEngine {
 
@@ -40,10 +37,11 @@ final class DashboardBadgeEngine {
 
     static PlayerDashboardResponse.PlayerInsights analyze(
             String userId,
-            List<ManagedGame> managedGames,
+            int totalTurns,
+            long totalTurnTimeMs,
             List<PlayerDashboardResponse.DashboardGame> games,
             PlayerDashboardResponse.TitleSummary titleSummary) {
-        PlayerTurnAggregate turnAggregate = getTurnAggregate(userId, managedGames);
+        PlayerTurnAggregate turnAggregate = toTurnAggregate(totalTurns, totalTurnTimeMs);
         List<PlayerDashboardResponse.FavoredFaction> favoredFactions = getFavoredFactions(games);
 
         int closeWins = getCloseWins(userId, games);
@@ -67,23 +65,7 @@ final class DashboardBadgeEngine {
                 favoredFactions);
     }
 
-    private static PlayerTurnAggregate getTurnAggregate(String userId, List<ManagedGame> managedGames) {
-        int totalTurns = 0;
-        long totalTurnTimeMs = 0;
-        for (ManagedGame managedGame : managedGames) {
-            Game game = managedGame.getGame();
-            if (game == null) {
-                continue;
-            }
-            for (Player player : game.getRealPlayers()) {
-                if (!userId.equals(player.getStatsTrackedUserID())) {
-                    continue;
-                }
-                totalTurns += Math.max(player.getNumberOfTurns(), 0);
-                totalTurnTimeMs += Math.max(player.getTotalTurnTime(), 0);
-            }
-        }
-
+    private static PlayerTurnAggregate toTurnAggregate(int totalTurns, long totalTurnTimeMs) {
         OptionalLong averageTurnTimeSeconds = OptionalLong.empty();
         if (totalTurns > 0 && totalTurnTimeMs > 0) {
             averageTurnTimeSeconds = OptionalLong.of((totalTurnTimeMs / totalTurns) / 1000);

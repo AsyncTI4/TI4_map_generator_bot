@@ -9,8 +9,8 @@
         "x": 134.0,
         "y": 86.0
     },
-    "resources": 4,
-    "influence": 1,
+    "resources": 3,
+    "influence": 0,
     "factionHomeworld": "crystellum",
     "planetType": "FACTION",
     "cardImagePath": null,

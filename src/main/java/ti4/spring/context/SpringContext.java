@@ -20,6 +20,10 @@ public final class SpringContext implements ApplicationContextAware {
         SpringContext.applicationContext = applicationContext;
     }
 
+    public static boolean isInitialized() {
+        return applicationContext != null;
+    }
+
     public static <T> T getBean(Class<T> type) {
         ApplicationContext context = applicationContext;
         if (context == null) {

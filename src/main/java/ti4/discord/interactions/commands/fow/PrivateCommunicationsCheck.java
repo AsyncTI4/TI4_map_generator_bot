@@ -7,6 +7,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.testbed.TestBedService;
 
@@ -26,7 +27,7 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
         Player player = getPlayer();
         Game game = getGame();
 
-        if (!FowCommunicationThreadService.isActive(game)) {
+        if (!FowCommunicationThreadService.isActive(game) && !AnonymousCommsService.isActive(game)) {
             MessageHelper.replyToMessage(
                     event, "Bot managed comm threads are not enabled.\nEnable them with `/fow fow_options`");
             return;

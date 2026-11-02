@@ -7,8 +7,8 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.enums.AutomationStatus;
 import ti4.service.emoji.ExploreEmojis;
 
 @Data
@@ -19,6 +19,8 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private Boolean shrinkName;
     private String text;
     private String notes;
+    private AutomationStatus automation;
+    private String automationNotes;
     private String flavourText;
     private String flavourTextFormatted;
     private Boolean isFakeRelic;
@@ -96,6 +98,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         if (notes != null) {
             eb.setDescription(text + "\n-# [" + notes + "]");
         }
+        if (automation != null) eb.appendDescription("\n" + automation.cardLine(automationNotes));
         if (includeFlavourText && flavourText != null) eb.addField("", flavourText, false);
 
         // Colour

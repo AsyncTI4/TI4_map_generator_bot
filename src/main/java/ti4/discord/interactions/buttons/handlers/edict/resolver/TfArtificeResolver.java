@@ -14,8 +14,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.StringHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.service.VeiledHeartService;
 

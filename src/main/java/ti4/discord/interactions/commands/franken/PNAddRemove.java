@@ -12,7 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 abstract class PNAddRemove extends GameStateSubcommand {
 

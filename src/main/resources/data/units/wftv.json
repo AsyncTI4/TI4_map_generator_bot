@@ -119,7 +119,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a BOMBARDMENT roll against another player’s units, if it rolls at least 1 result of 9 or 10, you may gain 1 trade good."
+        "ability": "When this unit makes a BOMBARDMENT roll against another player’s ground forces, if it rolls at least 1 result of 9 or 10, you may gain 1 trade good."
     },
     {
         "id": "kalora_dreadnought2",
@@ -140,7 +140,7 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s units, if it produces 1 or more hits, you may gain 1 trade good."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s ground forces, if it produces 1 or more hits, you may gain 1 trade good."
     },
     {
         "id": "lunarium_flagship",

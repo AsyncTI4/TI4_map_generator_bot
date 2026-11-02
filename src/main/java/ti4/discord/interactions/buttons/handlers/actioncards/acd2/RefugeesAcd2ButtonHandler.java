@@ -40,7 +40,7 @@ class RefugeesAcd2ButtonHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -112,7 +112,7 @@ class RefugeesAcd2ButtonHandler {
                         "resolveRefugeesStep3_" + target.getFaction() + "_" + infantryRemaining + "_" + planet,
                         Helper.getPlanetRepresentation(planet, game)))
                 .toList());
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

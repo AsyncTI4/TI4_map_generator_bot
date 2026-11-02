@@ -3,6 +3,7 @@ package ti4.service.testbed;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,15 +12,17 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
+import ti4.model.BoardPosition;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
@@ -31,6 +34,7 @@ import ti4.service.game.StartPhaseService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.map.AddTileListService;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.service.map.MapStringMapper;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.unit.AddUnitService;
@@ -52,11 +56,16 @@ public class TestBedApplyService {
         TestBedService.markAsTestBed(game, true);
         TestBedShortcuts.store(game, preset.getShortcuts());
         recordAppliedPreset(game, preset);
+        TestBedComponentService.applyDecks(game, preset, event, warnings);
         placeMap(game, preset, warnings);
         List<SeatPlan> plans = planSeats(game, preset, event.getUser());
         if (game.isFowMode()) prepareFog(game, plans, event.getMember(), warnings);
         for (SeatPlan plan : plans) {
             setUpSeat(game, plan, event, warnings);
+            if (plan.seat().isTeamMateYou()) {
+                plan.player().addTeamMateID(event.getUser().getId());
+                game.setCommunityMode(true);
+            }
         }
         AddTileListService.finishSetup(game, event);
         Helper.setOrder(game);
@@ -119,10 +128,22 @@ public class TestBedApplyService {
         return game.getStoredValue(APPLIED_PRESET_KEY);
     }
 
+    private static final String CUSTOM_HYPERLANE_TILE = "hl";
+
     private static void placeMap(Game game, TestBedPreset preset, List<String> warnings) {
         String mapString =
                 preset.getMapString() == null ? TestBedPresetService.DEFAULT_MAP_STRING : preset.getMapString();
         Map<String, String> tilesByPosition = MapStringMapper.getMappedTilesToPosition(mapString, game);
+        Map<String, String> extraTiles = new LinkedHashMap<>(preset.getTiles());
+        preset.getCustomHyperlanes().keySet().forEach(position -> extraTiles.put(position, CUSTOM_HYPERLANE_TILE));
+        extraTiles.forEach((position, tileId) -> {
+            String lower = position.toLowerCase();
+            if (BoardPosition.isBoardPosition(lower) && !game.isFowMode()) {
+                warnings.add("Skipped `" + lower + "`: maps A-G are only available in fog games.");
+                return;
+            }
+            tilesByPosition.put(lower, tileId);
+        });
         if (tilesByPosition.isEmpty()) {
             warnings.add("Could not map the map string to positions; the map was left empty.");
             return;
@@ -133,6 +154,12 @@ public class TestBedApplyService {
         } catch (Exception e) {
             warnings.add("Could not place the map: " + e.getMessage());
         }
+        preset.getCustomHyperlanes().forEach((position, matrix) -> {
+            String lower = position.toLowerCase();
+            if (game.getTileByPosition(lower) != null) {
+                CustomHyperlaneService.insertData(game, lower, matrix);
+            }
+        });
     }
 
     private static List<SeatPlan> planSeats(Game game, TestBedPreset preset, User developer) {
@@ -147,7 +174,9 @@ public class TestBedApplyService {
         for (int i = 0; i < seats.size(); i++) {
             Seat seat = seats.get(i);
             boolean isDeveloperSeat = i == 0 && preset.getYou() != null;
-            Player player = isDeveloperSeat ? developerPlayer(game, developer) : addVirtualSeat(game);
+            Player player = isDeveloperSeat
+                    ? developerPlayer(game, developer)
+                    : seat.isBotAccount() ? botAccountPlayer(game) : addVirtualSeat(game);
             String faction = seat.hasRandomFaction() ? randomFactions.removeFirst() : seat.getFaction();
             String home = seat.getHome() != null ? seat.getHome() : freeHomes.removeFirst();
             boolean speaker = seat.isSpeaker() || (!anySpeaker && i == 0);
@@ -180,6 +209,13 @@ public class TestBedApplyService {
     private static Player developerPlayer(Game game, User developer) {
         Player existing = game.getPlayer(developer.getId());
         return existing != null ? existing : game.addPlayer(developer.getId(), developer.getName());
+    }
+
+    private static Player botAccountPlayer(Game game) {
+        if (JdaService.jda == null) return addVirtualSeat(game);
+        User bot = JdaService.jda.getSelfUser();
+        Player existing = game.getPlayer(bot.getId());
+        return existing != null ? existing : game.addPlayer(bot.getId(), bot.getName());
     }
 
     private static Player addVirtualSeat(Game game) {

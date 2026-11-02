@@ -26,9 +26,9 @@ import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyDraftHelper;
@@ -72,14 +72,10 @@ public class SliceDraftableSettings extends SettingsMenu {
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
         mapGenerationMode = new ChoiceSetting<>("MapGenMode", "Map Generation Mode", "Milty");
 
-        if (isNucleusMode()) {
-            MapTemplateModel defaultNucleus = Mapper.getDefaultNucleusTemplate(players);
-            mapTemplate.setDefaultKey(defaultNucleus.getAlias());
-            mapTemplate.setChosenKey(defaultNucleus.getAlias());
-        } else {
-            MapTemplateModel defaultStandard = Mapper.getDefaultMapTemplateForPlayerCount(players);
-            mapTemplate.setDefaultKey(defaultStandard.getAlias());
-            mapTemplate.setChosenKey(defaultStandard.getAlias());
+        MapTemplateModel initialDefault = getDefaultTemplateForMode(players);
+        if (initialDefault != null) {
+            mapTemplate.setDefaultKey(initialDefault.getAlias());
+            mapTemplate.setChosenKey(initialDefault.getAlias());
         }
         // For initialization, load all templates unfiltered. This helps the default/chosen key be found.
         // It will be filtered properly before offering choices in updateTransientSettings()
@@ -103,12 +99,9 @@ public class SliceDraftableSettings extends SettingsMenu {
             mapTemplate.initialize(json.get("mapTemplate"));
             mapGenerationMode.initialize(json.get("mapGenerationMode"));
 
-            if (isNucleusMode()) {
-                MapTemplateModel defaultNucleus = Mapper.getDefaultNucleusTemplate(players);
-                mapTemplate.setDefaultKey(defaultNucleus.getAlias());
-            } else {
-                MapTemplateModel defaultStandard = Mapper.getDefaultMapTemplateForPlayerCount(players);
-                mapTemplate.setDefaultKey(defaultStandard.getAlias());
+            MapTemplateModel loadedDefault = getDefaultTemplateForMode(players);
+            if (loadedDefault != null) {
+                mapTemplate.setDefaultKey(loadedDefault.getAlias());
             }
 
             if (json.has("presetSlices")) {
@@ -263,12 +256,7 @@ public class SliceDraftableSettings extends SettingsMenu {
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                     .filter(getNucleusTemplatePredicate())
                     .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            MapTemplateModel defaultTemplate;
-            if (isNucleusMode()) {
-                defaultTemplate = Mapper.getDefaultNucleusTemplate(players);
-            } else {
-                defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
-            }
+            MapTemplateModel defaultTemplate = getDefaultTemplateForMode(players);
             if (defaultTemplate != null) {
                 mapTemplate.setAllValues(allowed, defaultTemplate.getAlias());
             }
@@ -298,6 +286,13 @@ public class SliceDraftableSettings extends SettingsMenu {
                 bpp = mapTemplate.getValue().bluePerPlayer();
             }
         }
+    }
+
+    private MapTemplateModel getDefaultTemplateForMode(int players) {
+        if (isNucleusMode()) {
+            return Mapper.getDefaultNucleusTemplate(players);
+        }
+        return Mapper.getDefaultMapTemplateForPlayerCount(players);
     }
 
     private Predicate<MapTemplateModel> getNucleusTemplatePredicate() {
@@ -425,7 +420,7 @@ public class SliceDraftableSettings extends SettingsMenu {
         return "Unknown Event";
     }
 
-    private boolean isNucleusMode() {
+    public boolean isNucleusMode() {
         return mapGenerationMode.getValue() == MapGenerationMode.Nucleus;
     }
 }

@@ -15,8 +15,9 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.RefreshLeaderService;
@@ -24,7 +25,7 @@ import ti4.service.leader.RefreshLeaderService;
 class PersonalCleanup extends GameStateSubcommand {
 
     public PersonalCleanup() {
-        super(Constants.PERSONAL_CLEANUP, "Status Phase cleanup", true, true);
+        super(Constants.PERSONAL_CLEANUP, "Run Status Phase cleanup for only your faction", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -51,7 +52,7 @@ class PersonalCleanup extends GameStateSubcommand {
 
         for (Tile tile : tileMap.values()) {
             tile.removeCC(ccID);
-            String ccPath = Tile.getCCPath(ccID);
+            String ccPath = ImageResources.commandToken(ccID);
 
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {

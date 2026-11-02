@@ -14,7 +14,7 @@ import ti4.service.explore.ExploreService;
 class ExploreInfo extends GameStateSubcommand {
 
     ExploreInfo() {
-        super(Constants.INFO, "Display cards in exploration decks and discards.", false, true);
+        super(Constants.INFO, "Display cards in exploration decks and discards.", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE if override fog"));
@@ -39,6 +39,6 @@ class ExploreInfo extends GameStateSubcommand {
             types.add(Constants.FRONTIER);
         }
         Game game = getGame();
-        ExploreService.secondHalfOfExpInfo(types, event, getPlayer(), game, over);
+        ExploreService.secondHalfOfExpInfo(types, event, game, over);
     }
 }

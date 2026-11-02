@@ -24,8 +24,8 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.emoji.FactionEmojis;
@@ -205,7 +205,7 @@ public class MonumentsButtonHandler {
         List<Button> buttons = List.of(
                 Buttons.green(
                         player.factionButtonChecker() + USE_QANOJ, "Exhaust Qanoj Shield Array", FactionEmojis.Xxcha),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -410,7 +410,7 @@ public class MonumentsButtonHandler {
                     UnitEmojis.infantry));
         }
         if (buttons.isEmpty()) return;
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -862,7 +862,7 @@ public class MonumentsButtonHandler {
                         "Replace with " + unit.getName(),
                         unit.getUnitEmoji()));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
@@ -908,7 +908,7 @@ public class MonumentsButtonHandler {
                     player.factionButtonChecker() + "resolveMentakMonument_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
@@ -1080,7 +1080,7 @@ public class MonumentsButtonHandler {
                         player.factionButtonChecker() + PLACE_JOLNAR_MONUMENT_INFANTRY + "2|"
                                 + monumentPlanet.getName(),
                         "Place 2 Infantry"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", **Calm Seas Sanatorium** triggered. Place up to 2 infantry on "
@@ -1388,7 +1388,7 @@ public class MonumentsButtonHandler {
                     Buttons.green(
                             monumentOwner.factionButtonChecker() + "revenanceCircuitProduceHits_" + tile.getPosition(),
                             "Produce Hits"),
-                    Buttons.red("deleteButtons", "Decline"));
+                    Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannelWithButtons(
                     monumentOwner.getCorrectChannel(),

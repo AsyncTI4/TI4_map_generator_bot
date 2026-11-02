@@ -3,9 +3,9 @@ package ti4.discord.interactions.commands.draft.seat;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.service.draft.draftables.SeatDraftable;
 
 class SeatDraftableSetSeatsForMapTemplate extends GameStateSubcommand {

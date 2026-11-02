@@ -10,8 +10,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.tech.ListTechService;
@@ -36,7 +36,7 @@ class FieldTestAcd2ButtonHandler {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "fieldTestType_" + type.name(), type + " Technology"));
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

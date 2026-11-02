@@ -60,6 +60,24 @@
     "ability": "This system is a Nebula, Nebulae in or adjacent to this unit's system do not affect your ships' movement. Place a Nebula token beneath this unit as a reminder."
   },
   {
+    "id": "arachnera_cruiser3",
+    "baseType": "cruiser",
+    "asyncId": "ca",
+    "name": "Mimetidae",
+    "upgradesFromUnitId": "cruiser2",
+    "source": "luminous",
+    "faction": "arachnera",
+    "isUpgrade": true,
+    "moveValue": 3,
+    "capacityValue": 2,
+    "capacityUsed": 1,
+    "cost": 2,
+    "combatHitsOn": 6,
+    "combatDieCount": 1,
+    "isShip": true,
+    "ability": "When this ship is destroyed:\n Place up to 2 of your ground forces from the space area of the active system onto a planet in that system; if the planet contains other players' units, these units must participate in combat during Ground Combat steps."
+  },
+  {
     "id": "psm_flagship",
     "baseType": "flagship",
     "asyncId": "fs",

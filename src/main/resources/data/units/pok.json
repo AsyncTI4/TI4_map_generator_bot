@@ -446,6 +446,7 @@
         "bombardHitsOn": 5,
         "bombardDieCount": 3,
         "sustainDamage": true,
+        "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other player's units in this system lose PLANETARY SHIELD.\nAt the start of each space combat round, repair this ship.",

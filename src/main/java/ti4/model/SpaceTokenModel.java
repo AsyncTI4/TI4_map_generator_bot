@@ -8,7 +8,6 @@ import java.util.Set;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.ExploreEmojis;
@@ -61,11 +60,6 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getFileName() {
         return imagePath;
-    }
-
-    @JsonIgnore
-    public String getFilePath() {
-        return Mapper.getTokenPath(imagePath);
     }
 
     public List<Wormhole> getWormholes() {
@@ -126,8 +120,10 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
         eb.setDescription(sb.toString());
 
         // Image
-        eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
-                + imagePath + "?raw=true");
+        eb.setThumbnail(
+                "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/" + imagePath
+                        + "?raw=true",
+                id);
 
         if (includeAliases) eb.setFooter("Aliases: " + getAliasList());
         return eb.build();

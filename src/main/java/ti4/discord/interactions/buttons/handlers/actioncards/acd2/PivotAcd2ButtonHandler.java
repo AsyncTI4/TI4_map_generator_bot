@@ -13,8 +13,8 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.SecretObjectiveHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
@@ -84,7 +84,7 @@ class PivotAcd2ButtonHandler {
         }
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "pivotToSecret_" + discarded, "Continue to Secret Objective step"));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         String remainingText = remaining == 1 ? "1 discard remaining" : remaining + " discards remaining";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

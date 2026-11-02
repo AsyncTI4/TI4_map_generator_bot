@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -27,7 +27,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CommandCounterHelper;
@@ -40,8 +39,8 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.twilight_kart.TkHelperStarflare;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -49,6 +48,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.MercerAgent;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -247,14 +247,12 @@ public class TacticalActionService {
                 "tyris",
                 "lunarium",
                 "zephyrion",
-                "vyserix",
-                "natau");
+                "vyserix");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
-        NetrunnersUnitsHandler.offerTrojan(game, player, ctx.tile);
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
                     game, player, ctx.playersWithPds2, ctx.tile);
@@ -270,9 +268,6 @@ public class TacticalActionService {
             ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(player, game, tile.getPosition());
 
-        if (player.hasLeader("ironhero")) {
-            IronLeadersHandler.updateIronHeroEligibility(game, player, tile);
-        }
         ArcanumBreakthroughHandler.movePowerWordWishUnitsToActiveSystem(game, player, tile);
         XytherisLeadersHandler.moveMyrixAgentShipToActiveSystem(game, player, tile);
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, tile);
@@ -281,6 +276,7 @@ public class TacticalActionService {
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0
+                || ValhavnUnitHandler.hasBilrostPds(player)
                 || (player.hasUnit("crimson_mech")
                         && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
 
@@ -346,7 +342,7 @@ public class TacticalActionService {
             buttons.add(Buttons.red(
                     player.factionButtonChecker() + "doneLanding_" + tile.getPosition(), "Done Landing Troops"));
         } else {
-            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         }
         return buttons;
     }
@@ -373,11 +369,9 @@ public class TacticalActionService {
                     "Units Travelled Through Weird Wormhole",
                     MiscEmojis.WHalpha));
         }
-        if (player.hasUnexhaustedLeader("sardakkagent")) {
-            buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
-        }
+
         if (player.hasUnexhaustedLeader("nomadagentmercer")) {
-            buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
+            buttons.addAll(MercerAgent.buttons(game, player));
         }
         if (player.hasAbility("shroud_of_lith")
                 && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
@@ -431,9 +425,14 @@ public class TacticalActionService {
             Tile tile = tileEntry.getValue();
             boolean movedFrom = TacticalActionDisplacementService.hasDisplacementFromPosition(game, tile.getPosition());
             boolean hasUnits = hasUnitsOrAlliedUnitsWithoutCC(player, game, event, tile);
+            if (PirateHordeBrActionCardHandler.isActive(game, player)
+                    && !movedFrom
+                    && !PirateHordeBrActionCardHandler.hasNeutralShips(game, tile)) {
+                continue;
+            }
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.canMoveOutOfLockedSystems(player, game)
+                            || ButtonHelper.canMoveOutOfLockedSystems(player, game, tile)
                             || MonumentsDSButtonHandler.canMoveOutOfFreeholdSystem(game, player, tile)
                             || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {

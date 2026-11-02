@@ -1,0 +1,14 @@
+{
+  "name": "30k-so-status-prescore",
+  "description": "A status-phase 30k secret (Preparation for War: 8 tokens in the pools) is recognised by the bot: passing offers to queue it for scoring.",
+  "preset": "30k-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "sol", "hand": { "sos": ["preparationforwar30k"], "ccs": "3/3/2" } },
+    { "expect": { "state": "sol.soIds", "contains": "preparationforwar30k" } },
+    { "note": "Sol passes; the pass flow offers pre-scoring for every secret whose threshold is met" },
+    { "as": "sol", "pressId": "FFCC_sol_passForRound" },
+    { "expect": { "state": "sol.passed", "equals": "true" } },
+    { "expect": { "in": "sol:cards-info", "contains": "queue a secret objective" } }
+  ]
+}

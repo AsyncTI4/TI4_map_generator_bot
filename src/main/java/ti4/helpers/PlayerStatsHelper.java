@@ -8,24 +8,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.image.PositionMapper;
+import ti4.model.MapPositionMapper;
+import ti4.service.fow.FogViewer;
 
 public final class PlayerStatsHelper {
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
-    public static List<String> findThreeNearbyStatTiles(
-            Game game, Player player, Set<String> taken, boolean isFoWPrivate, Player fowPlayer) {
-        boolean fow = isFoWPrivate;
+    public static List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken, FogViewer viewer) {
         boolean randomizeLocation = false;
-        if (fow && player != fowPlayer) {
-            if (FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
-                if (!FoWHelper.hasHomeSystemInView(player, fowPlayer)) {
+        if (viewer.privateView() && player != viewer.player()) {
+            if (viewer.canSeeStats(player)) {
+                if (!viewer.seesHomeSystem(player)) {
                     // if we can see a players stats, but we cannot see their home system - move
                     // their stats somewhere random
                     randomizeLocation = true;
@@ -39,15 +37,15 @@ public final class PlayerStatsHelper {
         if (randomizeLocation) anchor = "000"; // just stick them on 000
 
         int maxStatTileRing = game.getRingCount() + 1;
-        Set<String> validPositions = PositionMapper.getTilePositions().stream()
+        Set<String> validPositions = MapPositionMapper.getTilePositions().stream()
                 .filter(pos -> tileRing(pos) <= maxStatTileRing)
                 .filter(pos -> game.getTileByPosition(pos) == null)
                 .filter(pos -> taken == null || !taken.contains(pos))
                 .collect(Collectors.toSet());
 
-        Point anchorRaw = PositionMapper.getTilePosition(anchor);
+        Point anchorRaw = MapPositionMapper.getTilePosition(anchor);
         if (anchorRaw == null) return null;
-        Point anchorPt = PositionMapper.getScaledTilePosition(game, anchor, anchorRaw.x, anchorRaw.y);
+        Point anchorPt = MapPositionMapper.getScaledTilePosition(game, anchor, anchorRaw.x, anchorRaw.y);
 
         // BEGIN ALGORITHM
         // 1. Make a Priority Queue sorting on distance
@@ -57,12 +55,12 @@ public final class PlayerStatsHelper {
         // 1.
         boolean rand = randomizeLocation;
         PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
-            Point positionPoint = PositionMapper.getTilePosition(pos);
+            Point positionPoint = MapPositionMapper.getTilePosition(pos);
             if (positionPoint == null) return 100_000_000.0f;
             int ring = tileRing(pos);
-            Point realPosition = PositionMapper.getScaledTilePosition(game, pos, positionPoint.x, positionPoint.y);
+            Point realPosition = MapPositionMapper.getScaledTilePosition(game, pos, positionPoint.x, positionPoint.y);
             double distance = realPosition.distance(anchorPt);
-            distance = rand ? ThreadLocalRandom.current().nextInt(0, 200) : distance + ring * 75;
+            distance = rand ? RenderRandom.nextInt("statTiles.randomDistance", 0, 200) : distance + ring * 75;
             return distance;
         }));
         pq.addAll(validPositions);
@@ -77,7 +75,7 @@ public final class PlayerStatsHelper {
             closestTiles.add(next);
             numAdj.put(next, 0);
 
-            for (String pos : PositionMapper.getAdjacentTilePositions(next)) {
+            for (String pos : MapPositionMapper.getAdjacentTilePositions(next)) {
                 if (numAdj.containsKey(pos)) {
                     numAdj.merge(pos, 1, Integer::sum);
                     numAdj.merge(next, 1, Integer::sum);
@@ -85,7 +83,7 @@ public final class PlayerStatsHelper {
             }
             for (String pos : closestTiles) {
                 if (numAdj.get(pos) == 2) {
-                    List<String> adjOut = PositionMapper.getAdjacentTilePositions(pos);
+                    List<String> adjOut = MapPositionMapper.getAdjacentTilePositions(pos);
                     List<String> output = new ArrayList<>();
                     output.add(pos);
                     output.addAll(CollectionUtils.intersection(adjOut, closestTiles));

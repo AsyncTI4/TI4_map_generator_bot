@@ -14,8 +14,8 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.button.ReactionService;
@@ -141,7 +141,7 @@ public class VisionariaSelectService {
         }
         if (firstTime) {
             respondToVisionaria(event, game, player);
-            String msg = player.getRepresentationNoPing() + " is using _Visionaria Select_.";
+            String msg = " is using _Visionaria Select_.";
             ReactionService.addReaction(event, player.getGame(), player, msg);
         }
     }

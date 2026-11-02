@@ -11,6 +11,10 @@
         "name": "Weirdway",
         "imagePath": "attachment_sigma_weirdway.png",
         "token": "sigma_weirdway",
+        "wormholes": [
+            "ALPHA",
+            "BETA"
+        ],
         "source": "promises_promises"
     },
     {

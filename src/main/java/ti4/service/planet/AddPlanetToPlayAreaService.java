@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -11,7 +12,7 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class AddPlanetToPlayAreaService {
@@ -43,11 +44,19 @@ public class AddPlanetToPlayAreaService {
                 String colorID = Mapper.getColorID(player.getColor());
                 if (unitColor.equals(colorID)) {
                     if (!player.getPlanetsAllianceMode().contains(planetName)) {
-                        AddPlanetService.addPlanet(player, planetName, game, event, false);
+                        if (!ValhavnAbilityHandler.offerBloodlust(event, game, player, tile, planet)
+                                && !ValhavnAbilityHandler.offerReave(event, game, player, tile, planet)) {
+                            gainControl(event, tile, planet, game, player);
+                        }
                     }
                     break;
                 }
             }
         }
+    }
+
+    public static void gainControl(
+            GenericInteractionCreateEvent event, Tile tile, Planet planet, Game game, Player player) {
+        AddPlanetService.addPlanet(player, planet.getName(), game, event, false);
     }
 }

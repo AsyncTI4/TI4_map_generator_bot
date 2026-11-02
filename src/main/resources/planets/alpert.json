@@ -24,8 +24,10 @@
     "planetType": "INDUSTRIAL",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "Zazu's Petition",
+    "legendaryAbilityName": "Imperial Shipyard",
     "legendaryAbilityText": "This planet has the PRODUCTION 2 ability as if it were a unit. When you produce ships in this planet's system, reduce their combined cost by 1.",
+    "legendaryAbilityFlavourText": "The finest vessels of the galaxy come from a legendary shipyard.",
+    "legendaryNotes": "PRODUCTION 2 is added to this system automatically. The -1 cost is a \"Use Imperial Shipyard\" button in the payment step when ships were produced here.",
     "unitPositions": {
         "unitHolderName": "alpert",
         "coordinateMap": {

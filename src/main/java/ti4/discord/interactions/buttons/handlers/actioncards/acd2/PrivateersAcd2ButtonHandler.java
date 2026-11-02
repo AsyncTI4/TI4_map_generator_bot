@@ -52,7 +52,7 @@ class PrivateersAcd2ButtonHandler {
                             + ", you have no systems containing your non-fighter ships for _Privateers_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

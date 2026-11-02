@@ -23,7 +23,6 @@
     <jskills.version>1.1</jskills.version>
     <webp-imageio.version>0.11.0</webp-imageio.version>
     <jemoji.version>2.0.0</jemoji.version>
-    <rollbar.version>2.3.1</rollbar.version>
     <spotless.version>3.10.3</spotless.version>
     <spotless.skip>false</spotless.skip>
     <spotbugs.version>4.10.4</spotbugs.version>
@@ -140,11 +139,6 @@
       <groupId>net.fellbaum</groupId>
       <artifactId>jemoji</artifactId>
       <version>${jemoji.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.rollbar</groupId>
-      <artifactId>rollbar-java</artifactId>
-      <version>${rollbar.version}</version>
     </dependency>
 
     <dependency>

@@ -13,6 +13,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntityMapper;
@@ -74,9 +75,9 @@ public class GameDatabaseReconciler {
                         () -> persistenceService.delete(persistedGameName)));
             }
 
-            reconcileUnreferencedUsers().ifPresent(discrepancies::add);
+            Optional<String> userCleanup = reconcileUnreferencedUsers();
 
-            report(discrepancies, managedGames.size());
+            report(discrepancies, userCleanup, managedGames.size());
         } catch (Exception e) {
             BotLogger.error("**" + TASK_NAME + " failed.**", e);
         }
@@ -150,16 +151,18 @@ public class GameDatabaseReconciler {
         }
     }
 
-    private static void report(List<String> discrepancies, int managedGameCount) {
+    private static void report(List<String> discrepancies, Optional<String> userCleanup, int managedGameCount) {
         if (discrepancies.isEmpty()) {
-            BotLogger.logCron(String.format(
-                    "%s found the database in sync with all %,d managed games.", TASK_NAME, managedGameCount));
+            String inSync = String.format(
+                    "%s found the database in sync with all %,d managed games.", TASK_NAME, managedGameCount);
+            BotLogger.logCron(
+                    userCleanup.map(cleanup -> inSync + "\n- " + cleanup).orElse(inSync));
             return;
         }
 
         StringBuilder report = new StringBuilder(String.format(
-                "**%s found %,d games out of sync with their game files and updated the database:**",
-                TASK_NAME, discrepancies.size()));
+                "**%s found %s out of sync with their game files and updated the database:**",
+                TASK_NAME, StringHelper.pluralize(discrepancies.size(), "game")));
         int reported = 0;
         for (String discrepancy : discrepancies) {
             if (report.length() + discrepancy.length() + 3 > MAX_REPORT_LENGTH) break;
@@ -169,6 +172,7 @@ public class GameDatabaseReconciler {
         if (reported < discrepancies.size()) {
             report.append(String.format("\n...and %,d more.", discrepancies.size() - reported));
         }
+        userCleanup.ifPresent(cleanup -> report.append("\n- ").append(cleanup));
         BotLogger.error(report.toString());
     }
 }

@@ -1,0 +1,18 @@
+{
+    "id": "fracture13",
+    "name": "Mater Calyxa",
+    "aliases": [
+        "fracture13",
+        "matercalyxa",
+        "frac13",
+        "mcx"
+    ],
+    "imagePath": "fracture13.png",
+    "planets": [
+        "matercalyxa"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

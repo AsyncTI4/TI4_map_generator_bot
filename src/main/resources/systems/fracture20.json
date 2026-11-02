@@ -1,0 +1,14 @@
+{
+    "id": "fracture20",
+    "name": "Fracture Set3 Midway",
+    "aliases": [
+        "fracture20",
+        "fracturemidway",
+        "frac20" 
+    ],
+    "imagePath": "fracture20.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

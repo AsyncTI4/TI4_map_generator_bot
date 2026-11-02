@@ -14,8 +14,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -112,7 +112,7 @@ public class ArborecButtonHandlers {
                 poses.add(tile.getPosition());
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return buttons;
     }
 

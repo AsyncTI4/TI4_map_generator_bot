@@ -45,6 +45,10 @@
             "pds",
             "bastion_spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/LastBastion_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/LastBastion_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions/LastBastion",
         "preferredColours": [
             "dw",
             "jpt",
@@ -97,6 +101,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheDeepwroughtScholarate_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheDeepwroughtScholarate_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions/TheDeepwroughtScholarate",
         "preferredColours": [
             "gcr",
             "ppl",
@@ -156,6 +164,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFirmament_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFirmament_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions/TheFirmamentTheObsidian",
         "preferredColours": [
             "ppl",
             "blu",
@@ -210,6 +222,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheObsidian_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheObsidian_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions/TheFirmamentTheObsidian",
         "source": "thunders_edge"
     },
     {
@@ -258,6 +274,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheCrimsonRebellion_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheCrimsonRebellion_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions/TheCrimsonRebellion",
         "preferredColours": [
             "red",
             "bld",
@@ -316,6 +336,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheRalNelConsortium_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheRalNelConsortium_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions/TheRalNelConsortium",
         "preferredColours": [
             "grn",
             "ylw",

@@ -14,8 +14,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
-import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
@@ -50,14 +48,6 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
-        // migrations.put(
-        //         "renameGarboziaToBozgarbia_201025_withEnded",
-        //         DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
-        // migrations.put("fixMisspelledAgendaIds_200226", DataMigrationManager::fixMisspelledAgendaIds_200226);
-        // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
-        // migrations.put(
-        //         "unlockLockedAgentsBySetupState_120526",
-        //         DataMigrationManager::unlockLockedAgentsBySetupState_120526);
     }
 
     public static void runMigrations() {
@@ -148,61 +138,12 @@ public class DataMigrationManager {
             var game = managedGame.getGame();
             if (game.hasRunMigration(migrationName)) continue;
 
-            var changesMade = migrationMethod.apply(game);
+            if (!migrationMethod.apply(game)) continue;
             game.addMigration(migrationName);
             // TODO: Confirm games aren't able to make changes during this
             GameManager.save(game, "Data Migration - " + migrationName);
-            if (changesMade) {
-                migrationsApplied.add(game.getName());
-            }
+            migrationsApplied.add(game.getName());
         }
         return migrationsApplied;
-    }
-
-    private static Boolean renameGarboziaToBozgarbia_201025_withEnded(Game game) {
-        Tile old = null;
-        for (Tile t : game.getTileMap().values()) {
-            if ("sig01".equals(t.getTileID())) {
-                old = t;
-                break;
-            }
-        }
-        if (old == null) return false;
-
-        Player p = game.getPlanetOwner("garbozia");
-        if (p == null) return false;
-
-        p.getPlanets().remove("garbozia");
-        p.getExhaustedPlanets().remove("garbozia");
-        p.getExhaustedPlanetsAbilities().remove("garbozia");
-
-        p.getPlanets().add("bozgarbia");
-        p.getExhaustedPlanets().add("bozgarbia");
-        p.getExhaustedPlanetsAbilities().add("bozgarbia");
-        return true;
-    }
-
-    private static Boolean fixMisspelledAgendaIds_200226(Game game) {
-        Map<String, String> replacements = Map.of(
-                "disarmamament", "disarmament",
-                "absol_disarmamament", "absol_disarmament",
-                "cryypter_disarmamament", "cryypter_disarmament",
-                "minister_commrece", "minister_commerce",
-                "senate_sancuary", "senate_sanctuary");
-
-        return MigrationHelper.replaceAgendaCards(game, List.of(game.getAgendaDeckID()), replacements);
-    }
-
-    public static Boolean unlockLockedAgentsBySetupState_120526(Game game) {
-        boolean changed = false;
-        for (Player player : game.getPlayers().values()) {
-            for (var leader : player.getLeaders()) {
-                if (leader.isLocked() && "agent".equals(leader.getType())) {
-                    leader.setLocked(false);
-                    changed = true;
-                }
-            }
-        }
-        return changed;
     }
 }

@@ -17,8 +17,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.AddUnitService;
@@ -64,7 +64,7 @@ public class TaUnitHandler {
                         player.factionButtonChecker() + DEPLOY_MECH_PREFIX + tile.getPosition() + "|" + planetName,
                         "Pay 1 Resource to Deploy Mech",
                         FactionEmojis.ta),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -105,7 +105,7 @@ public class TaUnitHandler {
                         + " using its DEPLOY ability.");
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

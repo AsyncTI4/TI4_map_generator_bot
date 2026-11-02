@@ -11,6 +11,7 @@
             "alpha_wormhole"
         ],
         "wormholes": ["ALPHA"],
+        "wormholeIconMerge": false,
         "source": "base"
     },
     {
@@ -19,6 +20,7 @@
         "spaceOrPlanet": "space",
         "aliasList": ["creussbeta", "token_creussbeta", "ghostbeta"],
         "wormholes": ["BETA"],
+        "wormholeIconMerge": false,
         "source": "base"
     },
     {

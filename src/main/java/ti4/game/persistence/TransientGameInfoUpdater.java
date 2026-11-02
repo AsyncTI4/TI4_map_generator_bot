@@ -1,6 +1,11 @@
 package ti4.game.persistence;
 
+import java.util.ArrayList;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -8,6 +13,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DiscordantStarsHelper;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -30,14 +36,38 @@ class TransientGameInfoUpdater {
             DiscordantStarsHelper.checkUltimateAuthority(game);
             MonumentsService.syncZelianAsteroidFieldToken(game);
             TeHelperGeneral.checkTransientInfo(game);
+            BlueReverieTechHelper.syncEcologicalEngineeringAttachments(game);
             for (Player player : game.getRealPlayers()) {
                 CommanderUnlockCheckService.checkPlayer(player, "ta");
+            }
+            MigoUnitHandler.syncNevermen(game);
+            for (Player player : game.getRealPlayers()) {
+                CommanderUnlockCheckService.checkPlayer(player, "migo");
+            }
+            MigoLeadersHandler.syncMigoCommanderBonus(game);
+            for (Player player : game.getRealPlayers()) {
+                MigoAbilityHandler.syncHarvestCards(game, player);
                 MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);
                 MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
             }
         } catch (Exception e) {
             BotLogger.error(
                     new LogOrigin(game), "Error adding transient attachment tokens for game " + game.getName(), e);
+        }
+    }
+
+    static void removePlanetsMissingFromTheGame(Game game) {
+        Set<String> knownPlanets = game.getPlanetsInfo().keySet();
+        for (Player player : game.getPlayers().values()) {
+            for (String planet : new ArrayList<>(player.getPlanets())) {
+                if (!knownPlanets.contains(planet)) {
+                    player.removePlanet(planet);
+                    BotLogger.warning(
+                            new LogOrigin(player),
+                            "Planet " + planet + " not found in game " + game.getName()
+                                    + ". Removed planet from player.");
+                }
+            }
         }
     }
 }

@@ -15,8 +15,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 
 @UtilityClass
@@ -50,7 +50,7 @@ public class MyrrPromissoryHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", please choose a planet to attach _" + pnModel.getName() + "_ to.",

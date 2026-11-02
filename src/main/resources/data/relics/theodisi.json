@@ -66,7 +66,7 @@
     {
         "alias": "ancient_radar",
         "name": "Ancient Radar",
-        "text": "ACTION: Exhaust this card to explore 1 non-home planet you control once as if it were each planet trait.",
+        "text": "ACTION: Exhaust this card to explore 1 non-home, non-legendary planet you control once as if it were each planet trait.",
         "flavorText": "*The Kairn didn't know exactly how the radar worked but what he did know is whenever it turned on it always led him to new treasures.*",
         "source": "theodisi"
     },

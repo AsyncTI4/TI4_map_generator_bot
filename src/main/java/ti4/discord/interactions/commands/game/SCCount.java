@@ -13,8 +13,9 @@ class SCCount extends GameStateSubcommand {
 
     public SCCount() {
         super(Constants.SC_COUNT, "Strategy cards count in game", false, false);
-        addOptions(
-                new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card count")
+                .setRequiredRange(1, 99)
+                .setRequired(true));
     }
 
     @Override

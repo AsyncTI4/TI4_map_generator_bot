@@ -9,9 +9,9 @@ import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.game.Game;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
 
@@ -41,7 +41,7 @@ public class StandardBagDraft extends BagDraft {
     }
 
     private static final String[] excludedFactions = {
-        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "kaltrim"
+        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral"
     };
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {

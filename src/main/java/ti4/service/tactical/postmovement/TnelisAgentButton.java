@@ -2,9 +2,8 @@ package ti4.service.tactical.postmovement;
 
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.FoWHelper;
-import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.modules.homebrew.TnelisAgent;
 import ti4.service.tactical.PostMovementAbilityButton;
 import ti4.service.tactical.PostMovementButtonContext;
 
@@ -16,7 +15,6 @@ public final class TnelisAgentButton implements PostMovementAbilityButton {
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {
-        return List.of(Buttons.gray(
-                "exhaustAgent_tnelisagent_" + ctx.player().getFaction(), "Use Tnelis Agent", FactionEmojis.tnelis));
+        return List.of(TnelisAgent.button(ctx.player()));
     }
 }

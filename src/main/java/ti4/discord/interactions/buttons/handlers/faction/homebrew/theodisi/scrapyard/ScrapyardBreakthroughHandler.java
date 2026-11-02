@@ -63,11 +63,12 @@ public class ScrapyardBreakthroughHandler {
     }
 
     public static void resolveCompactorAction(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (!hasCapturedUnits(player) || !player.hasUnlockedBreakthrough(SCRAPYARD_BT)) {
+        if (!hasCapturedUnits(player) || !player.hasReadyBreakthrough(SCRAPYARD_BT)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "There are no captured units to return with _Compactor_.");
             return;
         }
+        player.setBreakthroughExhausted(SCRAPYARD_BT, true);
         game.setStoredValue(returnedCostKey(player), "0");
         sendReturnButtons(event, game, player);
     }

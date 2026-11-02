@@ -1,0 +1,20 @@
+{
+  "name": "border-anomalies-2p",
+  "description": "Every border anomaly type on the map, Empyrean with Void Tether unlocked and a carrier on 101.",
+  "fog": false,
+  "you": {
+    "faction": "empyrean",
+    "sc": 1,
+    "breakthrough": "unlocked",
+    "units": { "101": "cv" }
+  },
+  "seats": [ { "faction": "sol", "sc": 5 } ],
+  "defaults": { "tg": 3, "ccs": "3/3/2" },
+  "borderAnomalies": {
+    "202": ["n:spatial_tear", "ne:gravity_wave", "se:nebula"],
+    "205": ["n:asteroid", "se:minefield"],
+    "208": ["n:core_border", "ne:rim_border"],
+    "211": ["n:yellow", "ne:redorange", "s:SPATIAL_TEAR"]
+  },
+  "start": "action"
+}

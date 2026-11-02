@@ -1,0 +1,92 @@
+[
+    {
+        "id": "whratalpha",
+        "imagePath": "token_whratalpha.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "ALPHA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whratbeta",
+        "imagePath": "token_whratbeta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "BETA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whratgamma",
+        "imagePath": "token_whratgamma.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "GAMMA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whratdelta",
+        "imagePath": "token_whratdelta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "DELTA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whratepsilon",
+        "imagePath": "token_whratepsilon.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "EPSILON_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whratzeta",
+        "imagePath": "token_whratzeta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "ZETA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whrateta",
+        "imagePath": "token_whrateta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "ETA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whrattheta",
+        "imagePath": "token_whrattheta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "THETA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whratiota",
+        "imagePath": "token_whratiota.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "IOTA_RAT"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "whratkappa",
+        "imagePath": "token_whratkappa.png",
+        "spaceOrPlanet": "space",
+        "wormholes": [
+            "KAPPA_RAT"
+        ],
+        "source": "other"
+    }
+]

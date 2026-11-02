@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DeepReachesStartingTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
@@ -22,8 +24,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
@@ -36,10 +40,10 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.Source;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -126,6 +130,10 @@ public class PlayerSetupService {
             return;
         }
 
+        if (player.hasAbility("cataclysm")) {
+            NatauAbilityHandler.beginCataclysm(event, player, game);
+        }
+
         String breakthrough = factionModel.getBreakthrough();
         // BREAKTHROUGH
         if (Mapper.getBreakthrough(breakthrough) != null) {
@@ -138,7 +146,7 @@ public class PlayerSetupService {
         }
 
         // HOME SYSTEM
-        if (!PositionMapper.isTilePositionValid(positionHS)) {
+        if (!MapPositionMapper.isTilePositionValid(game, positionHS)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
@@ -150,7 +158,7 @@ public class PlayerSetupService {
             game.setTile(tile);
         }
 
-        // String statsAnchor = PositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
+        // String statsAnchor = MapPositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
         player.setPlayerStatsAnchorPosition(positionHS);
 
         // GHOST AND CRIMSON EXTRA HS TILES
@@ -327,7 +335,9 @@ public class PlayerSetupService {
         UnitInfoService.sendUnitInfo(game, player, event, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false, event);
 
-        if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
+        if (!DeepReachesStartingTechHandler.offerStartingTechButtons(game, player)
+                && player.getTechs().isEmpty()
+                && !player.getFaction().contains("sardakk")) {
             if (LostLegaciesStartingTechsHandler.offerStartingTechButtons(game, player, null)) {
                 // Lost Legacies starting-tech restrictions are handled by their faction handler.
             } else if (player.getFaction().contains("keleres")) {
@@ -389,7 +399,7 @@ public class PlayerSetupService {
         }
         if (player.hasAbility("ancient_empire")) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));
+            buttons.add(Buttons.PLACE_A_TOMB_TOKEN);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
@@ -523,9 +533,6 @@ public class PlayerSetupService {
                     "Set mech unit maximum to 6 for " + player.getRepresentation()
                             + ", due to their **Mechanized Military** ability.");
         }
-        if (player.hasAbility("doctrine") && player.hasAbility("paradigm") && player.hasAbility("natau_decree")) {
-            NatauAbilityHandler.offerDoctrineSetupButtons(event, game, player);
-        }
         if (player.hasAbility("primordial_secrets")) {
             ArcanumAbilityHandler.offerPrimordialSecretsButtons(game, player);
         }
@@ -560,6 +567,13 @@ public class PlayerSetupService {
                     player.getCorrectChannel(),
                     player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");
         }
+        if (player.hasAbility("initiation")) {
+            LunariumAbilityHandler.setFactionSheetCCs(game, player, 1);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " placed 1 command token on their faction sheet due to **Initiation**.");
+        }
         if (player.hasAbility("thrones_of_ruin")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -572,6 +586,15 @@ public class PlayerSetupService {
                     player.getRepresentation()
                             + ", please choose which side you want your starting balance token to be on.",
                     ButtonHelper.getBalanceButtons(player));
+        }
+        if (player.hasAbility("harvest")) {
+            Tile tileHs = player.getHomeSystemTile();
+            for (Planet planet : tileHs.getPlanetUnitHolders()) {
+                if (planet.getTechSpecialities().isEmpty()) {
+                    continue;
+                }
+                MigoAbilityHandler.onPlanetGained(player, planet.getName());
+            }
         }
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 

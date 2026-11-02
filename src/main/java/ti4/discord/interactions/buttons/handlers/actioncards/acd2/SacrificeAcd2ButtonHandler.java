@@ -42,7 +42,7 @@ class SacrificeAcd2ButtonHandler {
                             + " for _Sacrifice_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the planet whose units you will sacrifice.",
@@ -159,7 +159,7 @@ class SacrificeAcd2ButtonHandler {
                             + " _Sacrifice_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which ingress token to move into the system.",

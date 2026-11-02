@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 
 class SearchTilesSubcommand extends SearchComponentModelSubcommand {

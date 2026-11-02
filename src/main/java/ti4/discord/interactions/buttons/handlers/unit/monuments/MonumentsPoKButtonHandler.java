@@ -25,8 +25,8 @@ import ti4.helpers.SleeperTokenHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.FactionEmojis;
@@ -142,7 +142,7 @@ public class MonumentsPoKButtonHandler {
                         hitButtons.add(sustain.withCustomId(sustain.getCustomId() + "deleteThisMessage"));
                     }
 
-                    hitButtons.add(Buttons.gray("deleteButtons", "Cancel the Hit"));
+                    hitButtons.add(Buttons.CANCEL_THE_HIT);
 
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getMessageChannel(),

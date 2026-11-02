@@ -145,6 +145,7 @@ public final class ButtonHelperStats {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         offerBountyBrokerageAfterReplenish(game, player);
+        ButtonHelperFactionSpecific.offerThwart(game, player);
     }
 
     public static void offerBountyBrokerageAfterReplenish(Game game, Player player) {

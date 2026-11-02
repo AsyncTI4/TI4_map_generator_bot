@@ -23,13 +23,13 @@ import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.service.fow.LoreService.RECEIVER;
@@ -1054,7 +1054,7 @@ final class LoreEffects {
     private static EffectDescription effectSetTile(EffectContext ctx) {
         if (ctx.args.length < 2) return null;
         String position = ctx.arg(0);
-        if (!PositionMapper.isTilePositionValid(position)) return null;
+        if (!MapPositionMapper.isTilePositionValid(position)) return null;
 
         String tileId;
         if ("random".equalsIgnoreCase(ctx.arg(1))) {
@@ -1254,7 +1254,7 @@ final class LoreEffects {
                             "`settile` needs `<position> <tileId|random> [filters]`, e.g. `!settile 305 41` or `!settile 305 random red wormhole`"
                                     + where);
                 } else {
-                    if (!PositionMapper.isTilePositionValid(a.get(0))) {
+                    if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
                         problems.add("invalid position `" + a.getFirst() + "`" + where);
                     }
                     if ("random".equalsIgnoreCase(a.get(1))) {
@@ -1274,7 +1274,7 @@ final class LoreEffects {
                 if (a.isEmpty()) {
                     problems.add("`rotatehyperlane` needs a position, e.g. `!rotatehyperlane 305 2`" + where);
                 } else {
-                    if (!PositionMapper.isTilePositionValid(a.get(0))) {
+                    if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
                         problems.add("invalid position `" + a.getFirst() + "`" + where);
                     }
                     if (a.size() > 1 && !isSignedInt(a, 1)) {
@@ -1288,7 +1288,7 @@ final class LoreEffects {
                             "`sethyperlane` needs `<position> <encodedMatrix>` — use the 9-hex-char form from the hyperlane manager's Export button"
                                     + where);
                 } else {
-                    if (!PositionMapper.isTilePositionValid(a.get(0))) {
+                    if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
                         problems.add("invalid position `" + a.getFirst() + "`" + where);
                     }
                     if (decodeHyperlaneMatrixArg(a.get(1)) == null) {

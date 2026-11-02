@@ -36,6 +36,18 @@ public class ReserveGameNumberService {
         return readReservedList().contains(gameNum);
     }
 
+    public static int firstUnreservedNumber(String prefix, int from) {
+        return firstUnreservedNumber(prefix, from, ReserveGameNumberService::isGameNumReserved);
+    }
+
+    static int firstUnreservedNumber(String prefix, int from, Predicate<String> isReserved) {
+        int number = from;
+        while (isReserved.test(prefix + number)) {
+            number++;
+        }
+        return number;
+    }
+
     public static String summarizeReservedGames() {
         StringBuilder sb = new StringBuilder("__**Currently Reserved Game Numbers:**__");
         reservedGameCache.stream().sorted().forEach(g -> sb.append("\n> ").append(g));

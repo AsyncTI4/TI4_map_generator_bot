@@ -1,0 +1,28 @@
+{
+    "id": "karst",
+    "tileId": "th22",
+    "name": "Karst",
+    "aliases": [
+        "karst"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL",
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "karst",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 129,
+            "y": 84
+        },
+        "planetRadius": 61
+    },
+    "positionInTile": {
+        "x": 129,
+        "y": 84
+    },
+    "source": "theodisi"
+}

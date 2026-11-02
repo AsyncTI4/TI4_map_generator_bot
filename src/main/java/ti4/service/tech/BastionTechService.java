@@ -25,8 +25,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
@@ -198,7 +198,7 @@ public class BastionTechService {
                 buttons.add(Buttons.green(
                         factionChecker + AutoAssignGroundHitsButtonIds.format(planetN, h),
                         "Auto-Assign Hit" + (h == 1 ? "" : "s")));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.bombardment);
@@ -231,7 +231,7 @@ public class BastionTechService {
                 buttons.add(Buttons.green(
                         factionChecker + AutoAssignGroundHitsButtonIds.format(planetN, h),
                         "Auto-Assign Hit" + (h == 1 ? "" : "s")));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
         });

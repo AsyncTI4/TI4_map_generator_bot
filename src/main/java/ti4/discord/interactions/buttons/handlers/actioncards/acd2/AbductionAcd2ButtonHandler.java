@@ -43,7 +43,7 @@ class AbductionAcd2ButtonHandler {
                             + ", none of your neighbors have an agent or unlocked commander to take for _Abduction_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

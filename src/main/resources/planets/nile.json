@@ -1,0 +1,26 @@
+{
+    "id": "nile",
+    "tileId": "fracture10",
+    "name": "Nile",
+    "aliases": [
+        "nile"
+      
+    ],
+    "resources": 3,
+    "influence": 1,
+    "planetType": "LIGHTNING",
+    "techSpecialties": [
+        "BIOTIC"
+    ],
+
+    "planetLayout": {
+        "unitHolderName": "nile",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 210.0,
+            "y": 81.0
+        }
+    },
+    "flavorText": "*You create the grain, you bring forth the barley, assuring perpetuity to the temples. If you cease your toil and your work, then all that exists is in anguish.*",
+    "source": "merford"
+}

@@ -1,0 +1,730 @@
+[
+    {
+        "alias": "activate_fleets",
+        "name": "Activate Fleets",
+        "phase": "Status",
+        "text": "Have a command token in each of 5 systems that contain your ships.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "advanced_technologies",
+        "name": "Advanced Technologies",
+        "phase": "Status",
+        "text": "Own or control any combination of 5 technologies or technology specialty planets, respectively.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "begin_the_arms_race",
+        "name": "Begin The Arms Race",
+        "phase": "Status",
+        "text": "Have 3 units with a cost of at least 2 in each of 2 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "centralize_research",
+        "name": "Centralize Research",
+        "phase": "Status",
+        "text": "Own 2 technologies of a color and have a structure on a technology specialty planet of that color that is not adjacent to your home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "command_many_fleets",
+        "name": "Command Many Fleets",
+        "phase": "Status",
+        "text": "Have 3 non-fighter ships in each of 3 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "control_the_culture",
+        "name": "Control the Culture",
+        "phase": "Status",
+        "text": "Control planets with more combined influence than each of 2 players that are your neighbors.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "coordinate_colonies",
+        "name": "Coordinate Colonies",
+        "phase": "Status",
+        "text": "Control 2 planets outside your home system that are not adjacent to each other.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "declare_festival",
+        "name": "Declare Festival",
+        "phase": "Status",
+        "text": "Exhaust 3 planets you control outside of your home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "defend_research_outposts",
+        "name": "Defend Research Outposts",
+        "phase": "Status",
+        "text": "Have a structure on each of 2 planets you control with different technology specialties.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "demonstrate_power",
+        "name": "Demonstrate Power",
+        "phase": "Status",
+        "text": "Have at least 1 ship with a cost of 3 or more in each of 4 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "oplusplus_develop_weaponry",
+        "name": "Develop Weaponry",
+        "phase": "Status",
+        "text": "Own 2 unit upgrade technologies and have at least 2 of each of those units on the game board.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "diversify_interests",
+        "name": "Diversify Interests",
+        "phase": "Status",
+        "text": "Have a structure on a planet of each of 3 different traits.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "divide_research_efforts",
+        "name": "Divide Research Efforts",
+        "phase": "Status",
+        "text": "Own 2 technologies in each of 2 colors and control at least 1 technology specialty of each of those colors.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "oplusplus_engineer_a_marvel",
+        "name": "Engineer a Marvel",
+        "phase": "Status",
+        "text": "Have your flagship or war sun in a system that is not in or adjacent to your home system, ignoring wormhole adjacency.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "expand_knowledge",
+        "name": "Expand Knowledge",
+        "phase": "Status",
+        "text": "Own technologies with a combined 5 prerequisites",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "hold_divergent_interests",
+        "name": "Hold Divergent Interests",
+        "phase": "Status",
+        "text": "Control a planet of each trait, a planet with an attachment, and 2 planets with different technology specialties.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "hold_key_planets",
+        "name": "Hold Key Planets",
+        "phase": "Status",
+        "text": "Control 3 planets with at least 4 combined influence and resources.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "influential_dominion",
+        "name": "Influential Dominion",
+        "phase": "Status",
+        "text": "Control 4 planets with at least 2 influence.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "infrastructure_expansion",
+        "name": "Infrastructure Expansion",
+        "phase": "Status",
+        "text": "Have 2 structures on the game board that are not in or adjacent to your home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "infrastructure_specialization",
+        "name": "Infrastructure Specialization",
+        "phase": "Status",
+        "text": "Have a structure on 2 different planets of the same trait.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "intimidate_distant_worlds",
+        "name": "Intimidate Distant Worlds",
+        "phase": "Status",
+        "text": "Have units in each of 3 systems that are not in or adjacent to your home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "intimidate_the_council",
+        "name": "Intimidate the Council",
+        "phase": "Status",
+        "text": "Have 1 or more ships in 2 systems that are adjacent to Mecatol Rex.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "intimidate_their_home",
+        "name": "Intimidate Their Home",
+        "phase": "Status",
+        "text": "Have at least 6 units in or adjacent to other players' home systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "intimidate_their_worlds",
+        "name": "Intimidate Their Worlds",
+        "phase": "Status",
+        "text": "Have ships in 2 systems that contain a planet controlled by another player.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "invest_in_the_future",
+        "name": "Invest in the Future",
+        "phase": "Status",
+        "text": "Exhaust 1 planet in each of 3 different systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "lead_on_two_fronts",
+        "name": "Lead on Two Fronts",
+        "phase": "Status",
+        "text": "Control 3 planets of a trait and 2 planets of another trait.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "mobilize_forces",
+        "name": "Mobilize Forces",
+        "phase": "Status",
+        "text": "Have more non-fighter, non-infantry units in or adjacent to the Mecatol Rex system than each of 2 of your neighbors.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "mobilize_strike_forces",
+        "name": "Mobilize Strike Forces",
+        "phase": "Status",
+        "text": "Have 3 non-fighter, non-infantry units of the same type in each of 4 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "patrol_disputed_territory",
+        "name": "Patrol Disputed Territory",
+        "phase": "Status",
+        "text": "Have ships in each of 5 systems that are in systems adjacent to other players' units or planets.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "power_cities",
+        "name": "Power Cities",
+        "phase": "Status",
+        "text": "Exhaust 3 planets that contain your structures.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "probe_the_fracture",
+        "name": "Probe The Fracture",
+        "phase": "Status",
+        "text": "*When you reveal this objective, put The Fracture in play.*\n\nHave a unit in each of 3 systems in The Fracture or with an ingress token.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "raise_an_army",
+        "name": "Raise an Army",
+        "phase": "Status",
+        "text": "Have 15 non-infantry, non-fighter units on the game board.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "resourceful_holdings",
+        "name": "Resourceful Holdings",
+        "phase": "Status",
+        "text": "Control 3 planets with at least 3 resources.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "seize_the_wealth",
+        "name": "Seize the Wealth",
+        "phase": "Status",
+        "text": "Control planets with more combined resources than each of 2 players that are your neighbors.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "specialize_armies",
+        "name": "Specialize Armies",
+        "phase": "Status",
+        "text": "Have none of a unit type in your reinforcements while owning that unit's upgrade technology.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "specialize_designs",
+        "name": "Specialize Designs",
+        "phase": "Status",
+        "text": "Control a technology specialty planet matching each prerequisite for a unit upgrade technology you own.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "spread_the_sphere",
+        "name": "Spread the Sphere",
+        "phase": "Status",
+        "text": "Control at least 1 planet in each of 4 non-home systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "spread_vessels_of_war",
+        "name": "Spread Vessels of War",
+        "phase": "Status",
+        "text": "Have a ship with a cost of at least 3 in each of 4 systems.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "steer_market_forces",
+        "name": "Steer Market Forces",
+        "phase": "Status",
+        "text": "Spend 10 influence, resources, or a mix thereof.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "strategic_exhaustion",
+        "name": "Strategic Exhaustion",
+        "phase": "Status",
+        "text": "Exhaust 2 planets outside your home system each with at least a combined 4 influence and resources.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "strategic_presence",
+        "name": "Strategic Presence",
+        "phase": "Status",
+        "text": "Have a ship in each of 4 systems that contain or are adjacent to another player's home system, Mecatol Rex, or a legendary planet.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "strengthen_claim",
+        "name": "Strengthen Claim",
+        "phase": "Status",
+        "text": "Control 4 planets that are legendary, Mecatol Rex, in other players home systems, or adjacent to any of the aforementioned planet types.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "study_beyond_spacetime",
+        "name": "Study Beyond Spacetime",
+        "phase": "Status",
+        "text": "Have a unit in each of 3 systems that contain or are adjacent to a wormhole, gravity rift, or entropic scar.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "technological_triumph",
+        "name": "Technological Triumph",
+        "phase": "Status",
+        "text": "Own 2 technologies of a color, a technology specialty planet of that color, and a unit upgrade with a prerequisite of that color.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "unify_distant_lands",
+        "name": "Unify Distant Lands",
+        "phase": "Status",
+        "text": "Control 2 planets with the same trait that are not in or adjacent to your home system.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "unit_specialization",
+        "name": "Unit Specialization",
+        "phase": "Status",
+        "text": "Have none of 3 different unit types in your reinforcements.",
+        "points": 1,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "activate_armada",
+        "name": "Activate Armada",
+        "phase": "Status",
+        "text": "Have a command token in each of 8 systems that contain your ships.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "advanced_infrastructure",
+        "name": "Advanced Infrastructure",
+        "phase": "Status",
+        "text": "Have a structure on 4 different planets of the same trait.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "annex_their_worlds",
+        "name": "Annex Their Worlds",
+        "phase": "Status",
+        "text": "Control 4 planets with the same trait that are not in or adjacent to your home system.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "assert_military_dominance",
+        "name": "Assert Military Dominance",
+        "phase": "Status",
+        "text": "Have 25 non-infantry, non-fighter units on the game board.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "become_a_master_of_ships",
+        "name": "Become a Master of Ships",
+        "phase": "Status",
+        "text": "Have 3 non-fighter ships in each of 5 systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "bend_their_will",
+        "name": "Bend Their Will",
+        "phase": "Status",
+        "text": "Control planets in or adjacent to other players' home systems with a combine influence value of at least 5.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "brave_two_frontiers",
+        "name": "Brave Two Frontiers",
+        "phase": "Status",
+        "text": "Control 4 planets of each of 2 different traits.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "claim_supremacy",
+        "name": "Claim Supremacy",
+        "phase": "Status",
+        "text": "Control 7 planets that are legendary, Mecatol Rex, in other players home systems, or adjacent to any of the aforementioned planet types.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "closely_monitor_rivals",
+        "name": "Closely Monitor Rivals",
+        "phase": "Status",
+        "text": "Have at least 8 units in or adjacent to each of 2 different other players' home systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "control_distant_outposts",
+        "name": "Control Distant Outposts",
+        "phase": "Status",
+        "text": "Have 3 structures on the game board that are not in or adjacent to your home system.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "coordinate_an_empire",
+        "name": "Coordinate an Empire",
+        "phase": "Status",
+        "text": "Control 4 planets outside your home system that are not adjacent to each other.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "defend_diverse_interests",
+        "name": "Defend Diverse Interests",
+        "phase": "Status",
+        "text": "Have 2 structures on planets of each of 3 different traits.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "defy_physical_limits",
+        "name": "Defy Physical Limits",
+        "phase": "Status",
+        "text": "Have a unit in each of 6 systems that contain or are adjacent to a wormhole, gravity rift, or entropic scar.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominant_fleet_presence",
+        "name": "Dominant Fleet Presence",
+        "phase": "Status",
+        "text": "Have a ship in each of 7 systems that contain or are adjacent to another player's home system, Mecatol Rex, or a legendary planet.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_divergent_worlds",
+        "name": "Dominate Divergent Worlds",
+        "phase": "Status",
+        "text": "Control 2 planets of each trait, 2 planets with an attachment, and 3 planets with different a technology specialties.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_foreign_space",
+        "name": "Dominate Foreign Space",
+        "phase": "Status",
+        "text": "Have units in each of 5 systems that are not in or adjacent your home system.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_great_worlds",
+        "name": "Dominate Great Worlds",
+        "phase": "Status",
+        "text": "Exhaust 3 planets outside your home system each with at least a combined 4 influence and resources.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_specializations",
+        "name": "Dominate Specializations",
+        "phase": "Status",
+        "text": "Own 4 technologies in each of 2 colors and control at least 1 technology specialty of each of those colors.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_the_seat_of_power",
+        "name": "Dominate the Seat of Power",
+        "phase": "Status",
+        "text": "Have 10 non-fighter, non-infantry units in or adjacent to the Mecatol Rex system.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "dominate_the_sphere",
+        "name": "Dominate the Sphere",
+        "phase": "Status",
+        "text": "Control at least 1 planet in each of 6 non-home systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "elegant_engineering",
+        "name": "Elegant Engineering",
+        "phase": "Status",
+        "text": "Have at least 1 shps with a cost of 3 or more in each of 6 systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "galactic_celebrations",
+        "name": "Galactic Celebrations",
+        "phase": "Status",
+        "text": "Exhaust 5 planets you control outside of your home system.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "influential_empire",
+        "name": "Influential Empire",
+        "phase": "Status",
+        "text": "Control 5 planets with at least 3 influence.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "invest_in_an_empire",
+        "name": "Invest in an Empire",
+        "phase": "Status",
+        "text": "Exhaust 1 planet in each of 5 different systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "lead_the_arms_race",
+        "name": "Lead The Arms Race",
+        "phase": "Status",
+        "text": "Have 3 units with a cost of at least 2 in each of 4 systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "mandate_imperial_research",
+        "name": "Mandate Imperial Research",
+        "phase": "Status",
+        "text": "Own 2 technologies of 2 colors and have a structure on technology specialty planets of those colors that is not adjacent to your home system.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_technologist",
+        "name": "Master Technologist",
+        "phase": "Status",
+        "text": "Own 4 technologies of a color, 2 technology specialty planets of that color, and a unit upgrade with a prerequisite of that color.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "master_the_design_space",
+        "name": "Master the Design Space",
+        "phase": "Status",
+        "text": "Control a technology specialty planet matching each prerequisite for 2 unit upgrade technologies you own.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "mobilize_assault_squads",
+        "name": "Mobilize Assault Squads",
+        "phase": "Status",
+        "text": "Have 3 non-fighter, non-infantry units of the same type in each of 6 systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "monopolize_research",
+        "name": "Monopolize Research",
+        "phase": "Status",
+        "text": "Have a structure on each of 3 planets you control with different technology specialties.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "power_an_empire",
+        "name": "Power an Empire",
+        "phase": "Status",
+        "text": "Exhaust 5 planets that contain your structures.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "proliferate_warships",
+        "name": "Proliferate Warships",
+        "phase": "Status",
+        "text": "Have a ship with a cost of at least 3 in each of 7 systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "push_design_boundaries",
+        "name": "Push Design Boundaries",
+        "phase": "Status",
+        "text": "Have none of each of 2 unit types in your reinforcements while owning those units' upgrade technologies.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "research_mastery",
+        "name": "Research Mastery",
+        "phase": "Status",
+        "text": "Own or control any combination of 10 technologies or technology specialty planets, respectively.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "resource_dominion",
+        "name": "Resource Dominion",
+        "phase": "Status",
+        "text": "Control 5 planets with at least 3 resources.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "oplusplus_revolutionize_warfare",
+        "name": "Revolutionize Warfare",
+        "phase": "Status",
+        "text": "Own 3 unit upgrade technologies and have at least 2 of each of those units on the game board.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "shatter_frontiers",
+        "name": "Shatter Frontiers",
+        "phase": "Status",
+        "text": "Own technologies with a combined 10 prerequisites.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "shatter_markets",
+        "name": "Shatter Markets",
+        "phase": "Status",
+        "text": "Spend 20 influence, resources, or a mix thereof.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "oplusplus_subdue_the_galaxy",
+        "name": "Subdue the Galaxy",
+        "phase": "Status",
+        "text": "Control 10 planets in non-home systems.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "subdue_the_fracture",
+        "name": "Subdue the Fracture",
+        "phase": "Status",
+        "text": "*When you reveal this objective, put The Fracture in play.*\n\nHave a unit in each of 5 systems in The Fracture or with an ingress token.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "subjugate_critical_planets",
+        "name": "Subjugate Critical Planets",
+        "phase": "Status",
+        "text": "Control 4 planets with at least 5 combined influence and resources.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "terrorize_the_skies",
+        "name": "Terrorize The Skies",
+        "phase": "Status",
+        "text": "Have ships in 4 systems that contain a planet controlled by another player.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "unit_mastery",
+        "name": "Unit Mastery",
+        "phase": "Status",
+        "text": "Have none of 5 different unit types in your reinforcements.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "usurp_disputed_space",
+        "name": "Usurp Disputed Space",
+        "phase": "Status",
+        "text": "Have ships in each of 9 systems that are in systems adjacent to other players' units or planets.",
+        "points": 2,
+        "source": "oplusplus"
+    },
+    {
+        "alias": "usurp_their_resources",
+        "name": "Usurp Their Resources",
+        "phase": "Status",
+        "text": "Control planets in or adjacent to other players home systems with a combine resource value of at least 5.",
+        "points": 2,
+        "source": "oplusplus"
+    }
+]

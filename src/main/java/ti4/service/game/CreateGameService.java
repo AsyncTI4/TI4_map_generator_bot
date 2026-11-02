@@ -47,12 +47,14 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
-import ti4.image.ImageHelper;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.service.async.ReserveGameNumberService;
-import ti4.service.image.FileUploadService;
+import ti4.service.tigl.TiglSetupService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
 
@@ -143,12 +145,15 @@ public class CreateGameService {
 
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
+        boolean isTiglGame = TiglSetupService.looksLikeTiglGame(gameFunName);
         if (event.getChannel() instanceof ThreadChannel thread) {
-            if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")
-                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
-                gameFunName = "TIGL " + gameFunName;
-            }
+            isTiglGame = isTiglGame
+                    || TiglSetupService.looksLikeTiglGame(thread.getName())
+                    || CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equals(
+                            thread.getParentChannel().getName());
+        }
+        if (isTiglGame && !StringUtils.startsWithIgnoreCase(gameFunName, "tigl")) {
+            gameFunName = "TIGL " + gameFunName;
         }
 
         // ADD PLAYERS
@@ -241,6 +246,11 @@ public class CreateGameService {
 
         presentSetupToPlayers(newGame);
 
+        if (isTiglGame) {
+            TIGLHelper.markAsTIGLGame(newGame, false);
+            TiglSetupService.postLadderPrompt(newGame, newGame.getTableTalkOrActionsChannel());
+        }
+
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
                 && ("making-new-games".equals(thread.getParentChannel().getName())
@@ -250,11 +260,6 @@ public class CreateGameService {
                         || "making-superfast-games"
                                 .equals(thread.getParentChannel().getName()))) {
             newGame.setLaunchPostThreadID(thread.getId());
-            if (thread.getName().toLowerCase().contains("tigl")
-                    || newGame.getCustomName().toLowerCase().contains("tigl")
-                    || "making-tigl-games".equals(thread.getParentChannel().getName())) {
-                TIGLHelper.initializeTIGLGame(newGame);
-            }
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
@@ -471,8 +476,8 @@ public class CreateGameService {
                                 }
                                 MessageHelper.sendMessageToChannel(introThread, message);
                                 BufferedImage colorsImage = ImageHelper.readScaled(
-                                        ResourceHelper.getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                                FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
+                                        ImageResources.extra("Compiled_Async_colors.png"), 731, 593);
+                                FileUpload fileUpload = ImageUploads.createFileUpload(colorsImage, "colors");
                                 MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                             } catch (Exception e) {
                                 BotLogger.error(new LogOrigin(game), "newPlayerIntro", e);

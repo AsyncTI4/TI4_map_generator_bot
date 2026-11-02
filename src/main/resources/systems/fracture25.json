@@ -1,0 +1,18 @@
+{
+    "id": "fracture25",
+    "name": "Lekythoi",
+    "aliases": [
+        "fracture25",
+        "lekythoi",
+        "lek",
+        "frac25"
+    ],
+    "imagePath": "fracture25.png",
+    "planets": [
+        "lekythoi"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

@@ -1,13 +1,17 @@
 package ti4.discord.interactions.buttons.handlers.actioncards;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaRiderHelper;
+import ti4.helpers.AgendaWhensAftersHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -15,7 +19,12 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Helper;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
 
 @UtilityClass
 class ActionCardButtonHandler {
@@ -38,6 +47,22 @@ class ActionCardButtonHandler {
                         + " now " + newTradeGoodCount + " trade good" + (useSingular ? "" : "s") + " on it.");
     }
 
+    private static void recordCanceled(Game game, Player canceler, Player target, String cardName, String method) {
+        String targetFaction = target == null ? null : target.getFaction();
+        GameSubEvent.CardCanceled canceled =
+                new GameSubEvent.CardCanceled(targetFaction, cardName, canceler.getFaction(), method);
+        if (GameEventDraft.stage(game, canceled)) {
+            return;
+        }
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("cardName", cardName);
+        payload.put("method", method);
+        if (targetFaction != null) {
+            payload.put("targetFaction", targetFaction);
+        }
+        GameEventService.commit(game, GameEventType.CARD_CANCELED, canceler, payload);
+    }
+
     @ButtonHandler("sabotage_")
     public static void sabotage(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String typeNNameNTarget = buttonID.replace("sabotage_", "");
@@ -58,6 +83,21 @@ class ActionCardButtonHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", you cannot cancel your own action card _" + acName + "_.");
+            return;
+        }
+        if (SabotageService.isShameixBaneCancellationBlocked(player, targetPlayer)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", you cannot cancel " + targetPlayer.getRepresentationNoPing()
+                            + "'s action card due to _Shameix's Bane_.");
+            return;
+        }
+
+        if ("ac".equalsIgnoreCase(type) && SabotageService.wasWindowCanceled(game, event.getMessageId())) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", _" + acName
+                            + "_ has already been canceled. Your _Sabotage_ was not played.");
             return;
         }
 
@@ -126,24 +166,32 @@ class ActionCardButtonHandler {
             }
             if (hasSabo) {
                 ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
+                SabotageService.rememberCanceledWindow(game, event.getMessageId());
             } else {
                 message = "Tried to play a _Sabotage_ but found none in hand.";
                 sendReact = false;
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
-                                + ", you clicked the _Sabotage_ action card button but did not have a _Sabotage_ in hand.");
+                                + ", you clicked the _Sabotage_ action card button but did not have one in hand.");
             }
         }
 
-        if (acName.contains("Rider") || acName.contains("Sanction")) {
-            AgendaRiderHelper.reverseRider("reverse_" + acName, game, player);
-        }
         if (sendReact) {
-            game.getGameStats().markLatestPlayCanceled(acName);
+            recordCanceled(game, player, targetPlayer, acName, type);
+            if (game.getGameStats().markLatestPlayCanceled(acName)) {
+                SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
+                if (acName.contains("Rider") || acName.contains("Sanction")) {
+                    AgendaRiderHelper.reverseRider("reverse_" + acName, game, player, targetPlayer);
+                }
+                if ("Veto".equals(acName) && targetPlayer != null) {
+                    AgendaWhensAftersHelper.resumeWhenQueueAfterCanceledVeto(event, game, targetPlayer);
+                }
+            }
             if ("Relitigate".equals(acName) && targetPlayer != null) {
                 RelitigateLLButtonHandler.onRelitigateSabotaged(game, targetPlayer);
             }
+            EscapeClauseActionCardHandler.resolveSabotagedEscapeClause(event, game, targetPlayer, acName);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),

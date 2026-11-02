@@ -1,0 +1,18 @@
+{
+    "id": "fracture26",
+    "name": "Ptoma Station",
+    "aliases": [
+        "fracture26",
+        "ptomastation",
+        "ptomastation",
+        "frac26"
+    ],
+    "imagePath": "fracture26.png",
+    "planets": [
+        "ptomastation"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

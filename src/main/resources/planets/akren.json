@@ -1,0 +1,27 @@
+{
+    "id": "akren",
+    "tileId": "th39",
+    "name": "Akren",
+    "aliases": [
+        "akren"
+    ],
+    "resources": 3,
+    "influence": 1,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "akren",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 128,
+            "y": 83
+        },
+        "planetRadius": 60
+    },
+    "positionInTile": {
+            "x": 128,
+            "y": 83
+    },
+    "source": "theodisi"
+}

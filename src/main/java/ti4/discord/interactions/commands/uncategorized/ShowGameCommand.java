@@ -9,7 +9,7 @@ import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.image.MapRenderPipeline;
+import ti4.image.map.MapRenderPipeline;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 
@@ -45,19 +45,16 @@ public class ShowGameCommand extends GameStateCommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        if (!ShowGameService.mayShowMap(game, event)) {
+            return;
+        }
         String segment = event.getOption(Constants.MAP_SEGMENT, null, OptionMapping::getAsString);
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
         if (statsOption != null) {
             String temp = statsOption.getAsString();
             if (temp.equals(DisplayType.split.getValue())) {
-                displayType = DisplayType.map;
-                MapRenderPipeline.queue(
-                        game,
-                        event,
-                        displayType,
-                        segment,
-                        fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+                showMapHalf(game, event, segment);
                 displayType = DisplayType.stats;
             } else {
                 for (DisplayType i : DisplayType.values()) {
@@ -72,5 +69,18 @@ public class ShowGameCommand extends GameStateCommand {
             displayType = DisplayType.all;
         }
         ShowGameService.simpleShowGame(game, event, displayType, segment);
+    }
+
+    private static void showMapHalf(Game game, SlashCommandInteractionEvent event, String segment) {
+        if (game.isFowMode()) {
+            ShowGameService.showMapWithoutButtons(game, event, segment);
+            return;
+        }
+        MapRenderPipeline.queue(
+                game,
+                event,
+                DisplayType.map,
+                segment,
+                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
     }
 }

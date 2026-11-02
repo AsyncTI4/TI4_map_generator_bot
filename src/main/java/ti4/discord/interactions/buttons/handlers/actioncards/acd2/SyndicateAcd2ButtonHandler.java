@@ -16,8 +16,10 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 
 @UtilityClass
 class SyndicateAcd2ButtonHandler {
@@ -151,6 +153,7 @@ class SyndicateAcd2ButtonHandler {
                 .orElse(null);
         if (drawn != null) {
             player.removeActionCard(after.get(drawn));
+            KnownCardsService.recordCardLeftHandPublicly(game, player, KnownCardType.ACTION_CARD, null);
         }
         return drawn;
     }

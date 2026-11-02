@@ -2,6 +2,7 @@ package ti4.discord.interactions.commands.map;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -11,19 +12,22 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.Mapper;
 
 public class AddBorderAnomaly extends GameStateSubcommand {
+
+    static final Set<Integer> ALL_SIDES = Set.of(0, 1, 2, 3, 4, 5);
 
     public AddBorderAnomaly() {
         super(Constants.ADD_BORDER_ANOMALY, "Add a border anomaly to a tile", true, false);
         addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to", true, true);
+        addOption(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly", true, true);
         addOption(
                 OptionType.STRING,
                 Constants.PRIMARY_TILE_DIRECTION,
-                "Side of the system the anomaly will be on",
-                true,
+                "Side of the system the anomaly will be on (not needed for whole-hex types)",
+                false,
                 true);
-        addOption(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly", true, true);
     }
 
     @Override
@@ -32,11 +36,21 @@ public class AddBorderAnomaly extends GameStateSubcommand {
 
         Set<String> tiles =
                 Helper.getSetFromCSV(event.getOption(Constants.PRIMARY_TILE).getAsString());
-        Set<Integer> directions = resolveDirections(event);
 
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE).getAsString();
-        BorderAnomalyModel.BorderAnomalyType anomalyType =
-                BorderAnomalyModel.getBorderAnomalyTypeFromString(anomalyTypeString);
+        BorderAnomalyModel anomalyType = Mapper.resolveBorderAnomaly(anomalyTypeString);
+        if (anomalyType == null) {
+            sendUnknownTypeMessage(event, anomalyTypeString);
+            return;
+        }
+        Set<Integer> directions = anomalyType.isWholeHex() ? ALL_SIDES : resolveDirections(event);
+        if (directions.isEmpty()) {
+            if (event.getOption(Constants.PRIMARY_TILE_DIRECTION) == null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(), anomalyType.getName() + " needs a side: n, ne, se, s, sw or nw.");
+            }
+            return;
+        }
 
         StringBuilder sb = new StringBuilder();
         int amountAdded = 0;
@@ -49,13 +63,37 @@ public class AddBorderAnomaly extends GameStateSubcommand {
                             .append(d)
                             .append(".\n");
                 } else {
-                    game.addBorderAnomaly(tile, d, anomalyType);
+                    game.addBorderAnomaly(tile, d, anomalyType.getId());
                     amountAdded++;
                 }
             }
         }
         sb.append(anomalyType.getName()).append(" anomalies added: ").append(amountAdded);
+        if (anomalyType.isWholeHex()) {
+            sb.append(" (placed on all six sides of each tile");
+            if (event.getOption(Constants.PRIMARY_TILE_DIRECTION) != null) {
+                sb.append("; the given direction was ignored");
+            }
+            sb.append(")");
+        }
+        if (amountAdded > 0 && anomalyType.getAutomation().needsPlayerAttention()) {
+            sb.append("\n-# ")
+                    .append(anomalyType.getName())
+                    .append(" borders are ")
+                    .append(anomalyType.getAutomation().getLabel())
+                    .append(": ")
+                    .append(anomalyType.getAutomationNotes());
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
+
+    static void sendUnknownTypeMessage(SlashCommandInteractionEvent event, String anomalyTypeString) {
+        String validTypes = Mapper.getBorderAnomalies().stream()
+                .map(BorderAnomalyModel::getName)
+                .collect(Collectors.joining(", "));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Unknown border anomaly type `" + anomalyTypeString + "`. Valid types: " + validTypes + ".");
     }
 
     public static Set<Integer> resolveDirections(SlashCommandInteractionEvent event) {
@@ -63,16 +101,25 @@ public class AddBorderAnomaly extends GameStateSubcommand {
                 Helper.getSetFromCSV(event.getOption(Constants.PRIMARY_TILE_DIRECTION, "", OptionMapping::getAsString));
         Set<Integer> directions = new HashSet<>();
         for (String dir : directionsString) {
-            switch (dir) {
-                case "north", "n" -> directions.add(0);
-                case "northeast", "ne" -> directions.add(1);
-                case "southeast", "se" -> directions.add(2);
-                case "south", "s" -> directions.add(3);
-                case "southwest", "sw" -> directions.add(4);
-                case "northwest", "nw" -> directions.add(5);
-                default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid direction " + dir);
+            Integer direction = parseDirection(dir);
+            if (direction == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid direction " + dir);
+            } else {
+                directions.add(direction);
             }
         }
         return directions;
+    }
+
+    public static Integer parseDirection(String dir) {
+        return switch (dir) {
+            case "north", "n" -> 0;
+            case "northeast", "ne" -> 1;
+            case "southeast", "se" -> 2;
+            case "south", "s" -> 3;
+            case "southwest", "sw" -> 4;
+            case "northwest", "nw" -> 5;
+            case null, default -> null;
+        };
     }
 }

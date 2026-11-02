@@ -23,8 +23,6 @@ dream_bt_move_nexus_ -> dream_bt_move_nexus_from_
 dream_hero_move_nexus_ -> dream_hero_move_nexus_from_
 dream_offer_move_nexus -> dream_offer_move_nexus_from_
 dream_recurring_mech_ -> dream_recurring_mech_paid_
-exhaustAgent_ -> exhaustAgent_kaloraagent
-exhaustAgent_ -> exhaustAgent_lunariumagent
 expeditionInfo -> expeditionInfoAndButtons
 finishComponentAction -> finishComponentAction_
 finishKairnHero -> finishKairnHeroPurgedExplores
@@ -91,6 +89,7 @@ sc_follow_ -> sc_follow_trade
 sc_refresh -> sc_refresh_and_wash
 setupBaseGameMode -> setupBaseGameMode_confirm
 showDeck_ -> showDeck_unplayedAC
+showDeck_ -> showDeck_hydromorphic
 showMap -> showMapSegment_
 tacticalAction -> tacticalActionBuild_
 transaction -> transaction_BMD

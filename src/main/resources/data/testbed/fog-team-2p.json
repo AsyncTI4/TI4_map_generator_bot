@@ -1,0 +1,7 @@
+{
+  "name": "fog-team-2p",
+  "description": "Fog game: you play only as a teammate on the first seat; the bot's own account holds the second seat as a real outsider. Stops at setup.",
+  "fog": true,
+  "seats": [{ "teamMateYou": true }, { "botAccount": true }],
+  "start": "setup"
+}

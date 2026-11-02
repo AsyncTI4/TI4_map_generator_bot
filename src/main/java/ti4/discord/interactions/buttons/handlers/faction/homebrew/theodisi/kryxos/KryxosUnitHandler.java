@@ -19,8 +19,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.unit.AddUnitService;
 
@@ -58,7 +58,7 @@ public class KryxosUnitHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -99,6 +99,7 @@ public class KryxosUnitHandler {
             if (hits <= 0 || buttons.size() >= undamagedMechs) {
                 continue;
             }
+            int infantry = hits * (player.hasTech("x89") ? 2 : 1);
             buttons.add(Buttons.red(
                     player.factionButtonChecker()
                             + DAMAGE_WARSPAWN_JUGGERNAUT
@@ -109,7 +110,7 @@ public class KryxosUnitHandler {
                             + hits
                             + "|"
                             + buttons.size(),
-                    "Damage Warspawn Juggernaut III: Place " + hits + " Infantry"));
+                    "Damage Warspawn Juggernaut III: Place " + infantry + " Infantry"));
         }
         if (buttons.isEmpty()) {
             return;
@@ -162,7 +163,8 @@ public class KryxosUnitHandler {
 
         unitHolder.addDamagedUnit(mechKey, 1);
         String location = unitHolder.getName();
-        String infantry = hits + " inf" + (Constants.SPACE.equals(location) ? "" : " " + location);
+        int infantryCount = hits * (player.hasTech("x89") ? 2 : 1);
+        String infantry = infantryCount + " inf" + (Constants.SPACE.equals(location) ? "" : " " + location);
         AddUnitService.addUnits(event, tile, game, player.getColor(), infantry);
         boolean hasAnotherWarspawnButton = event.getMessage().getComponentTree().findAll(Button.class).stream()
                 .anyMatch(button -> button.getCustomId() != null
@@ -177,7 +179,7 @@ public class KryxosUnitHandler {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + " damaged a Warspawn Juggernaut III (Kryxos mech) and placed "
-                        + hits
+                        + infantryCount
                         + " infantry with it on " + Helper.getUnitHolderRepresentation(tile, location, game, player)
                         + ".");
     }

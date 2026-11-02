@@ -1,0 +1,18 @@
+{
+  "name": "30k-explore-play-area",
+  "description": "Subjectivity Equasion found on a frontier token goes to Sol's play area as a fake relic; its Use button purges it for 3 trade goods.",
+  "preset": "30k-explore-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "sol.tg", "equals": "3" } },
+    { "do": "stackExplore", "value": "subjectivityequasion30k" },
+    { "as": "sol", "pressId": "FFCC_{sol.faction}_exploreFront_317" },
+    { "expect": { "state": "sol.relics", "contains": "subjectivityequasion30k" } },
+    { "expect": { "state": "game.exploreDiscard", "notContains": "subjectivityequasion30k" } },
+    { "note": "The start-of-turn button only appears at the next turn start, so press it by id." },
+    { "as": "sol", "pressId": "FFCC_{sol.faction}_thirtyKPlayAreaUse_subjectivityequasion30k" },
+    { "as": "sol", "press": "thirtyKPlayAreaPurge_subjectivityequasion30k" },
+    { "expect": { "state": "sol.relics", "notContains": "subjectivityequasion30k" } },
+    { "expect": { "state": "sol.tg", "equals": "6" } }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+    "id": "ulth",
+    "tileId": "th27",
+    "name": "Ulth",
+    "aliases": [
+        "ulth"
+    ],
+    "resources": 0,
+    "influence": 3,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "ulth",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 202,
+            "y": 208
+        },
+        "planetRadius": 64
+    },
+    "positionInTile": {
+        "x": 202,
+        "y": 208
+    },
+    "source": "theodisi"
+}

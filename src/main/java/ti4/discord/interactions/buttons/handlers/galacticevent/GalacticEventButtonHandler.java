@@ -12,9 +12,9 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.option.TEOptionService;
 

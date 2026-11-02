@@ -7,8 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 
 class SetStatsAnchor extends GameStateSubcommand {
 
@@ -28,7 +28,7 @@ class SetStatsAnchor extends GameStateSubcommand {
         String tileID = StringUtils.substringBefore(
                 event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
 
-        if (!PositionMapper.isTilePositionValid(tileID)) {
+        if (!MapPositionMapper.isTilePositionValid(getGame(), tileID)) {
             MessageHelper.sendMessageToEventChannel(event, "Tile ID `" + tileID + "` is not valid");
             return;
         }

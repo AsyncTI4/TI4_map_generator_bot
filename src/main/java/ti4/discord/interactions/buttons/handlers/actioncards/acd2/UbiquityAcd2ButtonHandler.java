@@ -40,7 +40,7 @@ class UbiquityAcd2ButtonHandler {
                 ListTechService.getTechButtons(techs, player, "free"));
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", use these buttons to pay the 3 resources for _Ubiquity_.",

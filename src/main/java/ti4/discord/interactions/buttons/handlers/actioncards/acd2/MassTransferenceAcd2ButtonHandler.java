@@ -62,7 +62,7 @@ class MassTransferenceAcd2ButtonHandler {
                     player.getRepresentationUnfogged() + ", you control no planets to place the unit on.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which planet you control to place the "
@@ -139,7 +139,7 @@ class MassTransferenceAcd2ButtonHandler {
                             + ", you have no units left on planets in the active system for _Mass Transference_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         String remainingText = remaining == 1 ? "1 unit remaining" : remaining + " units remaining";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

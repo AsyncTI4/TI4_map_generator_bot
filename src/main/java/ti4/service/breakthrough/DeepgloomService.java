@@ -9,9 +9,9 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 
@@ -164,7 +164,7 @@ public final class DeepgloomService {
                 buttons.add(Buttons.green(id, "Allow " + model.getName() + " For " + name, p2.fogSafeEmoji()));
             }
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

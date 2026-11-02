@@ -292,21 +292,11 @@ public abstract class SettingsMenu {
         String settingTouched = null;
 
         // Check the settings buttons
-        for (SettingInterface setting : enabledSettings()) {
-            if (action.endsWith(setting.getId())) {
-                err = setting.modify(event, action);
-                settingTouched = setting.getId();
-                found = true;
-                break;
-            } else if (action.contains("_")) {
-                String actionID = action.split("_")[0];
-                if (!actionID.isEmpty() && actionID.endsWith(setting.getId())) {
-                    err = setting.modify(event, action);
-                    settingTouched = setting.getId();
-                    found = true;
-                    break;
-                }
-            }
+        SettingInterface setting = settingForAction(action);
+        if (setting != null) {
+            err = setting.modify(event, action);
+            settingTouched = setting.getId();
+            found = true;
         }
 
         if ("reset".equals(action)) {
@@ -316,12 +306,12 @@ public abstract class SettingsMenu {
 
         // Check the special buttons
         String special = handleSpecialButtonAction(event, action);
+        if (special != null && !"success".equals(special)) {
+            buttonFailed(event, special, false);
+            return;
+        }
         if (special != null) {
-            if ("success".equals(special)) {
-                found = true;
-            } else {
-                err = special;
-            }
+            found = true;
         }
 
         if (!found) {
@@ -333,8 +323,17 @@ public abstract class SettingsMenu {
         }
     }
 
+    SettingInterface settingForAction(String action) {
+        String actionId = action.contains("_") ? action.split("_")[0] : null;
+        for (SettingInterface setting : enabledSettings()) {
+            if (action.endsWith(setting.getId())) return setting;
+            if (actionId != null && !actionId.isEmpty() && actionId.endsWith(setting.getId())) return setting;
+        }
+        return null;
+    }
+
     private void refreshMessageAndButtons(GenericInteractionCreateEvent event, String settingTouched, int page) {
-        String newSummary = menuSummaryString(settingTouched);
+        String newSummary = fitToMessageLimit(menuSummaryString(settingTouched));
         List<MessageTopLevelComponent> actionRows = new ArrayList<>();
         for (List<Button> row : ListUtils.partition(getPaginatedButtons(page), 5)) {
             actionRows.add(ActionRow.of(row));
@@ -378,6 +377,12 @@ public abstract class SettingsMenu {
                     .setComponents(actionRows)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    static String fitToMessageLimit(String content) {
+        if (content.length() <= Message.MAX_CONTENT_LENGTH) return content;
+        String ellipsis = "...";
+        return content.substring(0, Message.MAX_CONTENT_LENGTH - ellipsis.length()) + ellipsis;
     }
 
     @JsonIgnore

@@ -13,9 +13,9 @@ import org.apache.commons.collections4.ListUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @UtilityClass

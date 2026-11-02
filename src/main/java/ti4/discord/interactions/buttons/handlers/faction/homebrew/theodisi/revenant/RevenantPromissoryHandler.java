@@ -6,9 +6,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RandomHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class RevenantPromissoryHandler {

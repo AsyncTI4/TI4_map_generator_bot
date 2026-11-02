@@ -15,9 +15,9 @@ import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
@@ -209,7 +209,7 @@ class CombatStatsServiceTest extends BaseTi4Test {
     }
 
     private static String getNextPosition() {
-        for (String pos : PositionMapper.getTilePositions()) {
+        for (String pos : MapPositionMapper.getTilePositions()) {
             if (testGame.getTileByPosition(pos) == null) return pos;
         }
         return null;

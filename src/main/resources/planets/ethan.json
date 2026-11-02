@@ -25,8 +25,10 @@
     "planetType": "HAZARDOUS",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "placeholder",
-    "legendaryAbilityText": "foo bar",
+    "legendaryAbilityName": "Metastability Event",
+    "legendaryAbilityText": "This card enters play with this side faceup. This planet is treated as having any 1 technology specialty at a time. After you exhaust this planet for resources during a player's turn, flip this card.\n\nBACK: At the end of this turn perform the secondary ability of any strategy card. Then, destroy all units in this system, purge its tile and each card related to it.",
+    "legendaryAbilityFlavourText": "The event changed the laws of physics, collapsing spacetime.",
+    "legendaryNotes": "Choose the specialty with the buttons sent when you gain Ethan. The card flips automatically when Ethan is spent for resources, and the system collapses automatically when that turn ends, so resolve the strategy card secondary first.",
     "unitPositions": {
         "unitHolderName": "ethan",
         "coordinateMap": {

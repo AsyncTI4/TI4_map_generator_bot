@@ -1,0 +1,27 @@
+{
+    "id": "neryth",
+    "tileId": "th23",
+    "name": "Neryth",
+    "aliases": [
+        "neryth"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "neryth",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 127,
+            "y": 89
+        },
+        "planetRadius": 72
+    },
+    "positionInTile": {
+        "x": 127,
+        "y": 89
+    },
+    "source": "theodisi"
+}

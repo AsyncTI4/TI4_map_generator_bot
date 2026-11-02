@@ -1,7 +1,5 @@
 package ti4.spring.resilience;
 
-import static com.rollbar.api.payload.data.Level.ERROR;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import ti4.logging.BotLogger;
-import ti4.logging.RollbarManager;
 import ti4.service.statistics.SREStats;
 import ti4.spring.security.UserNotInGameForbiddenException;
 
@@ -39,48 +36,36 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
             @NotNull FilterChain filterChain)
             throws ServletException, IOException {
         var cachingResponse = new ContentCachingResponseWrapper(response);
-        RollbarManager.clear();
-        RollbarManager.put("interaction_type", "http_request");
-        RollbarManager.put("http_method", request.getMethod());
-        RollbarManager.put("request_uri", request.getRequestURI());
         SREStats.incrementWebserverRequestCount();
         SREStats.incrementRequestCount();
 
         try {
-            try {
-                filterChain.doFilter(request, cachingResponse);
-            } catch (Exception e) {
-                if (!isAuthenticationNoise(e)) {
-                    String exceptionMessage = e.getMessage() != null ? e.getMessage() : "(no message)";
-                    String exceptionSummary = e.getClass().getName() + ": " + exceptionMessage;
-                    BotLogger.errorToThread(
-                            "Exception during request to " + request.getRequestURI() + ": " + exceptionSummary,
-                            HTTP_ERROR_THREAD_NAME);
-                    SREStats.incrementWebserverRequestErrorCount();
-                }
-                throw e;
+            filterChain.doFilter(request, cachingResponse);
+        } catch (Exception e) {
+            if (!isAuthenticationNoise(e)) {
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : "(no message)";
+                String exceptionSummary = e.getClass().getName() + ": " + exceptionMessage;
+                BotLogger.errorToThread(
+                        "Exception during request to " + request.getRequestURI() + ": " + exceptionSummary,
+                        HTTP_ERROR_THREAD_NAME);
+                SREStats.incrementWebserverRequestErrorCount();
             }
-
-            String requestUri = request.getRequestURI();
-            int status = cachingResponse.getStatus();
-            if (shouldReportResponseStatus(requestUri, status)) {
-                String body =
-                        new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
-                if (!shouldIgnoreReportedStatus(requestUri, status)) {
-                    String error =
-                            String.format("Request to %s returned status %s with body: %s", requestUri, status, body);
-                    BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
-                    SREStats.incrementWebserverRequestErrorCount();
-                    if (status >= START_OF_HTTP_SERVER_ERROR_RANGE) {
-                        RollbarManager.report(ERROR, null, error, null);
-                    }
-                }
-            }
-
-            cachingResponse.copyBodyToResponse();
-        } finally {
-            RollbarManager.clear();
+            throw e;
         }
+
+        String requestUri = request.getRequestURI();
+        int status = cachingResponse.getStatus();
+        if (shouldReportResponseStatus(requestUri, status)) {
+            String body = new String(cachingResponse.getContentAsByteArray(), cachingResponse.getCharacterEncoding());
+            if (!shouldIgnoreReportedStatus(requestUri, status)) {
+                String error =
+                        String.format("Request to %s returned status %s with body: %s", requestUri, status, body);
+                BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
+                SREStats.incrementWebserverRequestErrorCount();
+            }
+        }
+
+        cachingResponse.copyBodyToResponse();
     }
 
     private static boolean shouldReportResponseStatus(String requestUri, int statusCode) {

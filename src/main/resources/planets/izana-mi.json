@@ -1,0 +1,25 @@
+{
+    "id": "izana-mi",
+    "tileId": "fracture36",
+    "name": "Izana-Mi",
+    "aliases": [
+        "izana-mi",
+        "izanami",
+        "mi"
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "izana-mi",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 134.0,
+            "y": 86.0
+        }
+    },
+    "flavorText": "*A somber, dying world shrouded in ash and decay, mirroing the silent oblivion that awaits those who linger too long in here.*",
+    "source": "merford"
+}

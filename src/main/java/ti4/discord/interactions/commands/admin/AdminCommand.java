@@ -8,6 +8,7 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.SubcommandGroup;
 import ti4.helpers.Constants;
 
 public class AdminCommand implements ParentCommand {
@@ -19,9 +20,11 @@ public class AdminCommand implements ParentCommand {
                     new TourneyWinner(),
                     new DeletePersistenceManagerFile(),
                     new CardsInfoForPlayer(),
-                    new UpdateThreadArchiveTime(),
-                    new GetChannelHtml())
+                    new UpdateThreadArchiveTime())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
+    private final Map<String, SubcommandGroup> subcommandGroups = Stream.of(new ChannelExportGroup())
+            .collect(Collectors.toMap(SubcommandGroup::getName, subcommandGroup -> subcommandGroup));
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
@@ -35,11 +38,16 @@ public class AdminCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Admin";
+        return "Admin-only tools: delete games, disable the bot, fix channels and threads";
     }
 
     @Override
     public Map<String, Subcommand> getSubcommands() {
         return subcommands;
+    }
+
+    @Override
+    public Map<String, SubcommandGroup> getSubcommandGroups() {
+        return subcommandGroups;
     }
 }

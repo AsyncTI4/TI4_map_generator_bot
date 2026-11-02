@@ -18,9 +18,9 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
@@ -216,7 +216,7 @@ public class KairnAbilityHandler {
                                 player.factionButtonChecker() + USE_SHARED_DISCOVERIES_PROMPT,
                                 "Use Shared Discoveries",
                                 FactionEmojis.kairn),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(USE_SHARED_DISCOVERIES)
@@ -268,7 +268,7 @@ public class KairnAbilityHandler {
         }
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-            if (!player.getPlanets().contains(planet.getName())) {
+            if (!player.getPlanets().contains(planet.getName()) || planet.isLegendary()) {
                 continue;
             }
             for (String trait : List.of("cultural", "hazardous", "industrial")) {

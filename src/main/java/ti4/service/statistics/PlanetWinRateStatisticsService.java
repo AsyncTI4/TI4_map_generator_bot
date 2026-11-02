@@ -28,9 +28,9 @@ import ti4.game.UnitHolder;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.StringHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 
 @UtilityClass
