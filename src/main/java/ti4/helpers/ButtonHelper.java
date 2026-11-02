@@ -55,6 +55,8 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
@@ -2605,7 +2607,8 @@ public class ButtonHelper {
     }
 
     public static boolean canMoveOutOfLockedSystems(Player player, Game game) {
-        if (game.isDominusOrb()
+        if (DeepBreakthroughHandler.hasEventHorizonAllowance(game, player)
+                || game.isDominusOrb()
                 || game.isL1Hero()
                 || player.hasTech("tf-desperados")
                 || player.hasAbility("desperados_br")
@@ -4718,6 +4721,9 @@ public class ButtonHelper {
                 capacity += 2;
             }
         }
+        if (tile.getPlanetUnitHolders().isEmpty() && game.playerHasLeaderUnlockedOrAlliance(player, "deepcommander")) {
+            numOfCapitalShips = Math.max(0, numOfCapitalShips - 2);
+        }
         if (numOfCapitalShips > fleetCap) {
             fleetSupplyViolated = true;
         }
@@ -5367,6 +5373,7 @@ public class ButtonHelper {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", please choose an edge tile that the new tile will be adjacent to.",
                     buttons);
+            DeepAbilityHandler.offerEnergySiphon(player);
         }
     }
 
@@ -6243,9 +6250,10 @@ public class ButtonHelper {
         if (!FoWHelper.playerHasShipsInSystem(player, tile)) {
             return;
         }
+        boolean hasFrontierToken =
+                tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER));
         if ((player.hasTech("det") || game.isCptiExploreMode() || player.hasTech("antimatter"))
-                && (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))
-                        || MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile))) {
+                && (hasFrontierToken || MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile))) {
             resolveFullFrontierExplore(game, player, tile, event);
             if (player.hasAbility("phantom_energy")) {
                 TyrisAbilityHandler.postPhantomEnergyButtons(game, player, tile);
@@ -9603,15 +9611,28 @@ public class ButtonHelper {
 
     public static void sendMessageToRightStratThread(
             Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
+        sendMessageToRightStratThread(player, game, message, stratName, buttons, null);
+    }
+
+    public static void sendMessageToRightStratThread(
+            Player player,
+            Game game,
+            String message,
+            String stratName,
+            @Nullable List<Button> buttons,
+            @Nullable Consumer<Message> sentMessageConsumer) {
         ThreadChannel threadChannel_ = getRightStratThread(game, stratName);
         if (threadChannel_ != null) {
-            MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                    threadChannel_, message, null, buttons, sentMessageConsumer);
             return;
         }
         if (player != null) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                    player.getCorrectChannel(), message, null, buttons, sentMessageConsumer);
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                    game.getActionsChannel(), message, null, buttons, sentMessageConsumer);
         }
     }
 

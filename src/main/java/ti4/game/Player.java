@@ -51,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
@@ -3745,6 +3746,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (game.getStoredValue("silverFlamed").contains(getFaction())) {
             return null;
+        }
+        if (DeepUnitHandler.isDeepPlayer(this)) {
+            return DeepUnitHandler.getUnitTile(game, this);
         }
         if (getHomeSystemPosition() != null) {
             Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());

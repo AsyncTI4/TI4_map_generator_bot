@@ -27,7 +27,8 @@ enum AdjacencyScenarios {
             "game-with-border-anomalies", game -> activateWithoutMecatolHolding(game, "tf-lazaxgatefolding")),
     ACTIVE_SUNDERED("pbd15036", AdjacencyScenarios::activateSunderedPlayer),
     GHOST_WITH_CRIMSON("game-with-border-anomalies", AdjacencyScenarios::addCrimsonAndEpsilonWormholes),
-    OBSIDIAN_MIRROR("game-with-border-anomalies", AdjacencyScenarios::addMovingOblivionFlagship);
+    OBSIDIAN_MIRROR("game-with-border-anomalies", AdjacencyScenarios::addMovingOblivionFlagship),
+    DEEP_FLAGSHIP("game-with-border-anomalies", AdjacencyScenarios::addDeepFlagship);
 
     final String fixture;
     private final Consumer<Game> setup;
@@ -143,6 +144,14 @@ enum AdjacencyScenarios {
         empty.getFirst().addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, player.getColorID()), 1);
         activate(game, player);
         game.setActiveSystem(empty.getLast().getPosition());
+    }
+
+    private static void addDeepFlagship(Game game) {
+        Player player = game.getRealPlayers().getFirst();
+        player.addOwnedUnitByID("deep_flagship");
+        emptyTiles(game)
+                .getLast()
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, player.getColorID()), 1);
     }
 
     // With Crimson in the game the Ghosts lose their epsilon wormholes, so two epsilon tiles must stop linking for

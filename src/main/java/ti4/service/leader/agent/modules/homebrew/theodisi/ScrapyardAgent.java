@@ -32,7 +32,7 @@ public final class ScrapyardAgent extends AgentModule<Player> {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 activePlayer == agentOwner ? activePlayer.getCorrectChannel() : agentOwner.getCardsInfoThread(),
-                agentOwner.getRepresentation()
+                agentOwner.getRepresentationNoPing()
                         + ", you may exhaust _Rikka \"Razor Fang\" Corvin_ to let the active player swap the movement and combat values "
                         + "of 2 of their units until the end of this tactical action.",
                 offerButtons(activePlayer, agentOwner));

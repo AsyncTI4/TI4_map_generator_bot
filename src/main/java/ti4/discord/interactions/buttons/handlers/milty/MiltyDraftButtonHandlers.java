@@ -80,18 +80,16 @@ class MiltyDraftButtonHandlers {
                 String pick = num.replace("fin", "_");
                 String category = pick.substring(0, pick.indexOf('_'));
                 String item = pick.substring(pick.indexOf('_') + 1);
-                String name =
-                        switch (category) {
-                            case "slice" ->
-                                MiltyDraftEmojis.getMiltyDraftEmoji(item).emojiString();
-                            case "faction" ->
-                                Mapper.getFaction(item).getFactionName() + " "
-                                        + Mapper.getFaction(item).getFactionEmoji();
-                            case "order" ->
-                                MiltyDraftEmojis.getSpeakerPickEmoji(Integer.parseInt(item))
-                                        .emojiString();
-                            default -> "Unknown";
-                        };
+                String name = switch (category) {
+                    case "slice" -> MiltyDraftEmojis.getMiltyDraftEmoji(item).emojiString();
+                    case "faction" ->
+                        Mapper.getFaction(item).getFactionName() + " "
+                                + Mapper.getFaction(item).getFactionEmoji();
+                    case "order" ->
+                        MiltyDraftEmojis.getSpeakerPickEmoji(Integer.parseInt(item))
+                                .emojiString();
+                    default -> "Unknown";
+                };
                 if (item.startsWith("keleres"))
                     name = "The Council Keleres" + " " + Mapper.getFaction(item).getFactionEmoji();
                 msg.append(name);

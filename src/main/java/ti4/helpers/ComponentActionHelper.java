@@ -15,6 +15,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
@@ -707,7 +708,8 @@ public class ComponentActionHelper {
                             "stonebornagentdormant",
                             "stonebornagentunleashed",
                             "ironagent",
-                            "migoagent");
+                            "migoagent",
+                            "deepagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
@@ -1487,6 +1489,7 @@ public class ComponentActionHelper {
                     }
                 } else {
                     ButtonHelperActionCards.resolveResearch(game, player, event);
+                    DeepAbilityHandler.offerEnergySiphon(player);
                 }
             }
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);

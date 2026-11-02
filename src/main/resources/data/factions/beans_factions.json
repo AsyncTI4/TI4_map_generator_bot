@@ -420,5 +420,49 @@
         "complexity": "Medium",
         "preferredColours": ["blk", "copper", "gold", "eme"],
         "source": "beans"
+    },
+    {
+        "alias": "deep",
+        "factionName": "The Deep",
+        "homeSystem": "be10",
+        "startingFleet": "1 cv, 1 cr, 1 ff, 3 inf",
+        "commodities": 4,
+        "factionTech": [
+            "bedeepy",
+            "bedeepg"
+        ],
+        "startingTech": [
+            "det"
+        ],
+        "homePlanets": [],
+        "abilities": [
+            "origin_unknown",
+            "dark_matter_link",
+            "energy_siphon"
+        ],
+        "leaders": [
+            "deepagent",
+            "deepcommander",
+            "deephero"
+        ],
+        "promissoryNotes": [
+            "bepndeep"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "deep_flagship",
+            "deep_thedeep",
+            "infantry",
+            "deep_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["blk", "ppl"],
+        "source": "beans"
     }
 ]

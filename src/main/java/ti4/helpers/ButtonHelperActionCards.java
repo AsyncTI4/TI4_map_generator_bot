@@ -1297,7 +1297,7 @@ public final class ButtonHelperActionCards {
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
-        CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
+        CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti", "deep");
         if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }

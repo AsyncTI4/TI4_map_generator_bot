@@ -21,6 +21,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExpl
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
@@ -178,6 +180,10 @@ public final class ButtonHelperTacticalAction {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you may exhaust _Petra Unleashed_ to explore 1 planet you control.",
                     buttons);
+        }
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        if (DeepUnitHandler.hasArbiterInSystem(player, activeTile)) {
+            ButtonHelper.resolveFullFrontierExplore(game, player, activeTile, event);
         }
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             if (player.hasUnit("lunarium_carrier2")) {
@@ -383,6 +389,7 @@ public final class ButtonHelperTacticalAction {
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
         SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
         BlueReverieArtifactRelicHandler.clearUnknownArtifactMoveRestriction(game);
+        DeepBreakthroughHandler.clearEventHorizon(game, player);
     }
 
     @ButtonHandler("doneWithTacticalAction")
@@ -573,7 +580,8 @@ public final class ButtonHelperTacticalAction {
                     "vyserix",
                     "myrr",
                     "oblivion",
-                    "thrones");
+                    "thrones",
+                    "deep");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
@@ -927,6 +935,8 @@ public final class ButtonHelperTacticalAction {
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        DeepUnitHandler.offerDrown(game, player, tile);
+        DeepBreakthroughHandler.offerEventHorizon(game, player);
         MigoTechHandler.offerLaghMetalAttractors(game, player, tile);
         NatauBreakthroughHandler.offerTetherOnActivation(game, player, tile);
         BlueReverieTechHelper.offerNetworkedConstructors(game, tile);
@@ -973,6 +983,20 @@ public final class ButtonHelperTacticalAction {
                         valhavnPlayer.getRepresentationNoPing() + ", "
                                 + (game.isFowMode() ? "another player" : player.getRepresentationNoPing())
                                 + " activated a system containing one of your PDS units. You may place 1 mech with one of those units.",
+                        buttons);
+            }
+        }
+        for (Player deepPlayer : game.getRealPlayers()) {
+            if (player != deepPlayer
+                    && game.playerHasLeaderUnlockedOrAlliance(deepPlayer, "deepcommander")
+                    && FoWHelper.playerHasShipsInSystem(deepPlayer, tile)
+                    && tile.getPlanetUnitHolders().isEmpty()) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.addAll(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
+                buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", you must spend 1 influence to activate this system.",
                         buttons);
             }
         }
@@ -1492,7 +1516,6 @@ public final class ButtonHelperTacticalAction {
         }
 
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
-
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();

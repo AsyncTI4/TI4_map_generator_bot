@@ -47,6 +47,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedReso
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
@@ -290,6 +291,9 @@ public final class Helper {
         }
         if (player.hasAbility("nomadic") || player.hasTech("tf-nomadic")) {
             return true;
+        }
+        if (DeepUnitHandler.isDeepPlayer(player) && !DeepUnitHandler.isOnBoard(game, player)) {
+            return false;
         }
         if (player.hasAbility("mobile_command")
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship)
@@ -2658,6 +2662,12 @@ public final class Helper {
                 && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
             productionValueTotal *= 2;
         }
+        if (player.hasTech("bedeepy")
+                && tile.getPlanetUnitHolders().isEmpty()
+                && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                && FoWHelper.playerHasShipsInSystem(player, tile)) {
+            productionValueTotal += 2;
+        }
         productionValueTotal += MigoHarvestHandler.getYellowHarvestProductionBonus(game, player, tile);
         return productionValueTotal;
     }
@@ -2891,6 +2901,22 @@ public final class Helper {
                     Button wsButton = Buttons.green(
                             checker + placePrefix + "_aurelion_" + tp, "Produce Aurelion", UnitEmojis.flagship);
                     unitButtons.add(wsButton);
+                }
+                UnitModel deep = player.getPriorityUnitByAsyncID("thedeep", null);
+                if (deep != null && resourcelimit >= deep.getCost()) {
+                    UnitKey deepKey = Units.getUnitKey(UnitType.Deep, player.getColorID());
+                    String deepRemaining = " (" + ButtonHelperFactionSpecific.remainingUnitsOfType(game, deepKey) + ")";
+                    Button deepButton = Buttons.green(
+                            checker + placePrefix + "_thedeep_" + tp,
+                            "Produce " + deep.getName() + deepRemaining,
+                            UnitEmojis.flagship);
+                    if (!ButtonHelperFactionSpecific.vortexButtonAvailable(game, deepKey)) {
+                        deepButton = Buttons.gray(
+                                checker + placePrefix + "_thedeep_" + tp,
+                                "Produce " + deep.getName() + deepRemaining,
+                                UnitEmojis.flagship);
+                    }
+                    unitButtons.add(deepButton);
                 }
                 Button fsButton = Buttons.green(
                         checker + placePrefix + "_flagship_" + tp, "Produce Flagship" + remaining, UnitEmojis.flagship);

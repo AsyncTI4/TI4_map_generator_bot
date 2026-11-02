@@ -17,6 +17,7 @@ import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
@@ -238,6 +239,7 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "deephero" -> DeepLeadersHandler.resolveHero(event, game, player);
             case "stonebornherodormant" -> StonebornLeadersHandler.drawThreeRelicsAndOfferOne(game, player);
             case "stonebornherounleashed" -> {
                 MessageHelper.sendMessageToChannel(

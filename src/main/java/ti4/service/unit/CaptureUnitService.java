@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -49,6 +50,7 @@ public class CaptureUnitService {
 
     public static List<Player> listCapturingFlagshipPlayers(
             Game game, List<RemovedUnit> allUnits, RemovedUnit removed) {
+        if (DeepUnitHandler.isDeepUnit(removed.getPlayer(game), removed.unitKey())) return Collections.emptyList();
         Tile tile = removed.tile();
 
         // "sigma_vuilraith_flagship_1" does not capture your own units
@@ -80,6 +82,7 @@ public class CaptureUnitService {
     }
 
     public static List<Player> listCapturingCombatPlayers(Game game, RemovedUnit removed) {
+        if (DeepUnitHandler.isDeepUnit(removed.getPlayer(game), removed.unitKey())) return Collections.emptyList();
         UnitHolder combatOnHolder = removed.uh();
         Set<String> counted = new HashSet<>();
         List<Player> playersWithDevour = new ArrayList<>();
@@ -119,6 +122,7 @@ public class CaptureUnitService {
 
     public static void executeCapture(GenericInteractionCreateEvent event, Game game, Player cabal, RemovedUnit unit) {
         Player player = unit.getPlayer(game);
+        if (DeepUnitHandler.isDeepUnit(player, unit.unitKey())) return;
         String name = unit.unitKey().unitName();
         int amt = unit.getTotalRemoved();
         ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, amt, name, event);

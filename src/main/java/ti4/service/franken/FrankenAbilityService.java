@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
@@ -164,7 +165,7 @@ public class FrankenAbilityService {
             if ("custom_rigs".equalsIgnoreCase(abilityID)) {
                 ScrapyardAbilitiesHandler.getScrapyardRigsButtons(player.getGame(), player);
             }
-            if (player.hasAbility("harvest")) {
+            if ("harvest".equalsIgnoreCase(abilityID)) {
                 Tile tileHs = player.getHomeSystemTile();
                 for (Planet planet : tileHs.getPlanetUnitHolders()) {
                     if (planet.getTechSpecialities().isEmpty()) {
@@ -172,6 +173,9 @@ public class FrankenAbilityService {
                     }
                     MigoAbilityHandler.onPlanetGained(player, planet.getName());
                 }
+            }
+            if ("origin_unknown".equalsIgnoreCase(abilityID)) {
+                DeepUnitHandler.offerFrankenSetup(player);
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());

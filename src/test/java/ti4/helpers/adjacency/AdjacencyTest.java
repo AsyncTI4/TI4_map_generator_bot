@@ -8,7 +8,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.persistence.TestGameHarness;
+import ti4.helpers.Constants;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -98,6 +102,26 @@ class AdjacencyTest extends BaseTi4Test {
             assertThat(adjacency.from(HOLDER)).contains(far);
             assertThat(adjacency.from(far)).doesNotContain(HOLDER);
         }
+    }
+
+    // Deep flagship: "During movement, you may treat this unit's system as adjacent to your home system."
+    @Test
+    void deepFlagshipLinksItsSystemToHomeForMovementOnly() {
+        Player deep = game.getRealPlayers().getFirst();
+        deep.addOwnedUnitByID("deep_flagship");
+        String home = deep.getHomeSystemTile().getPosition();
+        String far = AdjacencyScenarios.positions(game).stream()
+                .filter(position -> !home.equals(position)
+                        && !Adjacency.of(game).either(home).contains(position))
+                .findFirst()
+                .orElseThrow();
+        game.getTileByPosition(far).addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, deep.getColorID()), 1);
+
+        Adjacency movement = Adjacency.of(game, deep).forMovement();
+        assertThat(movement.from(far)).contains(home);
+        assertThat(movement.from(home)).contains(far);
+        assertThat(movement.into(home)).contains(far);
+        assertThat(Adjacency.of(game, deep).forEffects().from(far)).doesNotContain(home);
     }
 
     // The position itself only when asked; callers change the returned sets, so a query never hands out its cache.
