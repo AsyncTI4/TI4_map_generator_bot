@@ -1,0 +1,66 @@
+[
+    {
+        "alias": "tknova_aristocratic_genome",
+        "type": "extrarolls",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "tknovaaristocraticagent",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Aristocratic Genome gives +1 die to each of 2 ships"
+            }
+        ]
+    },
+    {
+        "alias": "tknova_aristocratic_genome_single",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "tknovaaristocraticagentSingle",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Aristocratic Genome gives +1 die to the only ship"
+            }
+        ]
+    },
+    {
+        "alias": "tknova_human_genome",
+        "type": "extrarolls",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "tknovahumanagent",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Human Genome gives +1 die to each of 2 ground forces"
+            }
+        ]
+    },
+    {
+        "alias": "tknova_human_genome_single",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "tknovahumanagentSingle",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Human Genome gives +1 die to the only ground force"
+            }
+        ]
+    }
+]

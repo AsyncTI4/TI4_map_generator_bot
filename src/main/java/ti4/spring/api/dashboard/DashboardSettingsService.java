@@ -6,7 +6,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.helpers.AliasHandler;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 

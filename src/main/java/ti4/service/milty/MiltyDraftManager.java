@@ -22,15 +22,16 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -307,11 +308,16 @@ public class MiltyDraftManager {
 
     @JsonIgnore
     public void doMiltyPick(GenericInteractionCreateEvent event, Game game, String buttonID, Player player) {
+        if (applyMiltyPick(event, game, buttonID, player)) {
+            ButtonHelper.updateMap(game, event);
+        }
+    }
+
+    private boolean applyMiltyPick(GenericInteractionCreateEvent event, Game game, String buttonID, Player player) {
         String userId = player.getUserID();
         MessageChannel mainGameChannel = game.getMainGameChannel();
         if (draftIndex >= draftOrder.size()) {
-            FinishDraftService.finishDraft(event, this, game);
-            return;
+            return FinishDraftService.finishDraft(event, this, game);
         }
         if (getCurrentDraftPlayer() == null || !userId.equals(getCurrentDraftPlayer())) {
             if (event instanceof ButtonInteractionEvent bevent) {
@@ -324,7 +330,7 @@ public class MiltyDraftManager {
                         .sendMessage("Something went wrong")
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            return;
+            return false;
         }
 
         boolean auto = buttonID.startsWith("miltyAuto_");
@@ -355,8 +361,10 @@ public class MiltyDraftManager {
             } else {
                 event.getMessageChannel().sendMessage(errorMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            return;
+            return false;
         }
+
+        MiltyDraftEventRecorder.recordPick(game, player, category, item, pickSource(auto, force, queue));
 
         // Send success message
         String middle = " drafted ";
@@ -384,8 +392,9 @@ public class MiltyDraftManager {
             MiltyService.offerKeleresSetupButtons(this, player);
         }
 
+        boolean mapChanged = false;
         try {
-            MiltyDraftHelper.buildPartialMap(game, event);
+            mapChanged = MiltyDraftHelper.buildPartialMap(game);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, game), "err", e);
         }
@@ -407,10 +416,10 @@ public class MiltyDraftManager {
             }
 
             if (fauxPlayerPick != null) {
-                doMiltyPick(event, game, fauxPlayerPick, nextDrafter);
+                mapChanged |= applyMiltyPick(event, game, fauxPlayerPick, nextDrafter);
             } else {
                 if (getQueuedPick(nextDrafter, game) != null) {
-                    doMiltyPick(event, game, getQueuedPick(nextDrafter, game), nextDrafter);
+                    mapChanged |= applyMiltyPick(event, game, getQueuedPick(nextDrafter, game), nextDrafter);
                 } else {
                     MiltyDraftDisplayService.updateDraftInformation(event, this, game, category);
                     MiltyDraftDisplayService.pingCurrentDraftPlayer(this, game, false);
@@ -428,9 +437,17 @@ public class MiltyDraftManager {
             MessageHelper.sendMessageToChannel(
                     mainGameChannel,
                     game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
-            FinishDraftService.finishDraft(event, this, game);
+            mapChanged |= FinishDraftService.finishDraft(event, this, game);
             game.updateActivePlayer(null);
         }
+        return mapChanged;
+    }
+
+    private static String pickSource(boolean auto, boolean force, boolean queue) {
+        if (auto) return "AUTO";
+        if (force) return "FORCE";
+        if (queue) return "QUEUE";
+        return "BUTTON";
     }
 
     private String getQueuedPick(Player player, Game game) {
@@ -580,7 +597,7 @@ public class MiltyDraftManager {
             String current = getCurrentDraftPlayer();
             if (next != null && p.equals(getNextDraftPlayer())) sb.append("*");
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("**__");
-            sb.append(player.getUserName());
+            sb.append(player == null ? "Unknown player" : player.getUserName());
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
             if (next != null && p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
             if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("__**");
@@ -695,7 +712,7 @@ public class MiltyDraftManager {
             MiltyDraftHelper.addDraftTile(this, tileId);
             TileModel tileRequested = TileHelper.getTileById(tileId);
             if (tileRequested == null) {
-                throw new Exception("Could not find tile for tile ID [" + id + "]");
+                throw unknownTile(id);
             }
             Set<ComponentSource> currentsources = all.stream()
                     .map(t -> t.getTile().getTileModel().getSource())
@@ -710,9 +727,15 @@ public class MiltyDraftManager {
                     .findFirst()
                     .orElse(null);
             if (result == null) {
-                throw new Exception("Could not find tile for tile ID [" + id + "]");
+                throw unknownTile(id);
             }
         }
         return result;
+    }
+
+    private static Exception unknownTile(String id) {
+        String shown = id.length() > 40 ? id.substring(0, 40) + "..." : id;
+        return new Exception("Could not find tile `" + shown
+                + "`. Separate tiles within a slice with commas and slices with `;` or `|`.");
     }
 }

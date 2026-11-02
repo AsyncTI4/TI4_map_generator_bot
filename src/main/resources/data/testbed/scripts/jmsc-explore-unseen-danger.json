@@ -1,0 +1,15 @@
+{
+  "name": "jmsc-explore-unseen-danger",
+  "description": "Unseen Danger destroys Arborec's ships in the frontier system, places an asteroid field token and offers Antimass Deflectors (Arborec does not start with it).",
+  "preset": "jmsc-explore-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "arborec.techs", "notContains": "amd" } },
+    { "expect": { "state": "tile.317.units", "contains": "space:{arborec.color}_dd=2" } },
+    { "do": "stackExplore", "value": "unseendangerjmsc" },
+    { "as": "arborec", "pressId": "FFCC_{arborec.faction}_exploreFront_317" },
+    { "expect": { "state": "tile.317.units", "notContains": "{arborec.color}_dd" } },
+    { "expect": { "state": "tile.317.tokens", "contains": "asteroids" } },
+    { "expect": { "in": "arborec:cards-info", "buttons": ["getTech_amd__noPay__comp"] } }
+  ]
+}

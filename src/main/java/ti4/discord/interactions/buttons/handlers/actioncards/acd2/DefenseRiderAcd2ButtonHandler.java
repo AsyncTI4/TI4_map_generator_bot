@@ -68,7 +68,7 @@ class DefenseRiderAcd2ButtonHandler {
                     player.getRepresentation() + " has no planets available for _Defense Rider_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         String message = remainingPds > 1
                 ? player.getRepresentationUnfogged() + ", choose a planet to place a PDS on with _Defense Rider_."

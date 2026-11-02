@@ -19,7 +19,7 @@ public class TransactionCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "transaction";
+        return "Trade goods, commodities, promissory notes and more with other players";
     }
 
     @Override

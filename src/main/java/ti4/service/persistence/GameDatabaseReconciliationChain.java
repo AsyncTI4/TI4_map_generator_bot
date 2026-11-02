@@ -15,6 +15,7 @@ class GameDatabaseReconciliationChain {
     private final TaskQueue taskQueue;
     private final BooleanSupplier maintenanceModeOn;
     private final AtomicBoolean running = new AtomicBoolean();
+    private Supplier<Run> pendingRun;
 
     GameDatabaseReconciliationChain(String taskName, TaskQueue taskQueue, BooleanSupplier maintenanceModeOn) {
         this.taskName = taskName;
@@ -22,7 +23,7 @@ class GameDatabaseReconciliationChain {
         this.maintenanceModeOn = maintenanceModeOn;
     }
 
-    boolean start(Supplier<Run> newRun) {
+    synchronized boolean start(Supplier<Run> newRun) {
         if (!running.compareAndSet(false, true)) {
             BotLogger.info(taskName + " is already running, so the request to start another run was ignored.");
             return false;
@@ -33,6 +34,21 @@ class GameDatabaseReconciliationChain {
         });
         if (!queued) running.set(false);
         return queued;
+    }
+
+    synchronized boolean startAfterCurrentRun(Supplier<Run> newRun) {
+        if (running.get()) {
+            pendingRun = newRun;
+            return true;
+        }
+        return start(newRun);
+    }
+
+    private synchronized void complete() {
+        running.set(false);
+        Supplier<Run> nextRun = pendingRun;
+        pendingRun = null;
+        if (nextRun != null) start(nextRun);
     }
 
     boolean isRunning() {
@@ -72,7 +88,7 @@ class GameDatabaseReconciliationChain {
         } catch (Exception e) {
             BotLogger.error("**" + taskName + " failed.**", e);
         } finally {
-            if (!queuedNext) running.set(false);
+            if (!queuedNext) complete();
         }
     }
 

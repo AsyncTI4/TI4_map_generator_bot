@@ -12,9 +12,9 @@ import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class NaaluCommanderService {
@@ -59,7 +59,7 @@ public class NaaluCommanderService {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("naaluCPN", "View Promissory Notes"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event, "You can press this button if you wish to view your neighbors promissory notes", buttons);
     }

@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.JdaService;
+import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
@@ -37,6 +39,10 @@ class GameEnd extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "`/game end` must be executed in game channel only!");
             return;
         }
+        if (!mayEndGame(game, event)) {
+            MessageHelper.replyToMessage(event, "Only players in this game or bothelpers may end it.");
+            return;
+        }
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (!"YES".equals(option.getAsString())) {
             MessageHelper.replyToMessage(
@@ -50,5 +56,12 @@ class GameEnd extends GameStateSubcommand {
                 event.getOption(Constants.ARCHIVE_CHANNELS, Boolean.TRUE, OptionMapping::getAsBoolean);
         boolean rematch = event.getOption(Constants.REMATCH, Boolean.FALSE, OptionMapping::getAsBoolean);
         EndGameService.secondHalfOfGameEnd(event, game, publish, archiveChannels, rematch);
+    }
+
+    static boolean mayEndGame(Game game, SlashCommandInteractionEvent event) {
+        return CommandHelper.hasRole(event, JdaService.bothelperRoles)
+                || CommandHelper.getPlayerFromGame(
+                                game, event.getMember(), event.getUser().getId())
+                        != null;
     }
 }

@@ -185,6 +185,60 @@ class GameDatabaseReconciliationChainTest {
         assertThat(chain.isRunning()).isFalse();
     }
 
+    @Test
+    void catchUpDuringAnActiveRunStartsAFreshRunAfterItFinishes() {
+        chain.start(() -> new RecordingRun(List.of("pbd1")));
+        executor.poll().run();
+        assertThat(chain.startAfterCurrentRun(() -> new RecordingRun(List.of("pbd2", "pbd1"))))
+                .isTrue();
+
+        drain();
+
+        assertThat(events).containsExactly("start", "pbd1", "finish", "start", "pbd2", "pbd1", "finish");
+        assertThat(chain.isRunning()).isFalse();
+    }
+
+    @Test
+    void repeatedCatchUpRequestsCoalesceIntoOneFreshRun() {
+        chain.start(() -> new RecordingRun(List.of()));
+        chain.startAfterCurrentRun(() -> new RecordingRun(List.of("obsolete")));
+        chain.startAfterCurrentRun(() -> new RecordingRun(List.of("latest")));
+
+        drain();
+
+        assertThat(events).containsExactly("start", "finish", "start", "latest", "finish");
+    }
+
+    @Test
+    void catchUpStillRunsWhenTheCurrentRunFails() {
+        onReconcile.put("broken", () -> {
+            throw new IllegalStateException("boom");
+        });
+        chain.start(() -> new RecordingRun(List.of("broken")));
+        chain.startAfterCurrentRun(() -> new RecordingRun(List.of("recovered")));
+
+        drain();
+
+        assertThat(events).containsExactly("start", "broken", "start", "recovered", "finish");
+        assertThat(chain.isRunning()).isFalse();
+    }
+
+    @Test
+    void shutdownRejectingPendingCatchUpReleasesTheChain() {
+        chain.start(() -> new RecordingRun(List.of("pbd1")));
+        chain.startAfterCurrentRun(() -> new RecordingRun(List.of("pbd2")));
+        shuttingDown = true;
+
+        drain();
+
+        assertThat(events).containsExactly("start");
+        assertThat(chain.isRunning()).isFalse();
+        shuttingDown = false;
+        chain.start(() -> new RecordingRun(List.of()));
+        drain();
+        assertThat(events).containsExactly("start", "start", "finish");
+    }
+
     private boolean queueTask(String taskName, int warningThresholdSeconds, Runnable task) {
         if (shuttingDown) return false;
         taskNames.add(taskName);

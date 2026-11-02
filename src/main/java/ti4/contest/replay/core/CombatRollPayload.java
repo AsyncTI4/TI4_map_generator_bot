@@ -51,7 +51,7 @@ public record CombatRollPayload(
         GRAVLEASH_REST,
         JOL_NAR_COMMANDER_REROLL_MISSES,
         JOL_NAR_COMMANDER_REROLL_HITS,
-        IRON_COMMANDER_REROLL_MISSES,
+        TOLDAR_COMMANDER_REROLL_MISS,
         KALTRIM_COMMANDER_REROLL_ONES,
         MUNITIONS_RESERVES_REROLL
     }
@@ -98,6 +98,7 @@ public record CombatRollPayload(
             int value,
             Integer maxDice,
             String type,
+            String valueScalingType,
             String scopeUnitAsyncId,
             String scopeDisplay,
             Map<String, Integer> effectiveValueByUnitAsyncId) {

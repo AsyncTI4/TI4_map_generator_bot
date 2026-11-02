@@ -1,0 +1,30 @@
+{
+    "id": "celyon",
+    "tileId": "th33",
+    "name": "Celyon",
+    "aliases": [
+        "celyon"
+    ],
+    "resources": 3,
+    "influence": 1,
+    "planetTypes": [
+        "CULTURAL",
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName": "Ghastly Projections",
+    "legendaryAbilityText": "At the end of your action you may exhaust this card to commit 1 infantry from your reinforcements to a planet in a system adjacent to a planet you control. Then, resolve combat on that planet.",
+    "planetLayout": {
+        "unitHolderName": "celyon",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 145,
+            "y": 112
+        },
+        "planetRadius": 88
+    },
+    "positionInTile": {
+        "x": 145,
+        "y": 112
+    },
+    "source": "theodisi"
+}

@@ -12,7 +12,6 @@ import java.util.Set;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Helper;
-import ti4.image.PositionMapper;
 
 @Data
 public class MapTemplateModel implements ModelInterface {
@@ -106,7 +105,7 @@ public class MapTemplateModel implements ModelInterface {
         List<Point> displayCoords = new ArrayList<>();
         int minx = 10_000, miny = 10_000;
         for (String pos : emulate) {
-            Point p = PositionMapper.getTilePosition(pos);
+            Point p = MapPositionMapper.getTilePosition(pos);
             if (p == null) continue;
 
             displayCoords.add(p);

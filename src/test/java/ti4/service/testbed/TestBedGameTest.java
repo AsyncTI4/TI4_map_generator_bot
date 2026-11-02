@@ -17,16 +17,22 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.image.Mapper;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
+import ti4.image.map.MapSegment;
+import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedScript.Shortcut;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedPanelService.PageRef;
 import ti4.service.testbed.TestBedResetService.ResetResult;
 import ti4.service.testbed.TestBedShortcuts.ButtonGroup;
@@ -149,6 +155,38 @@ class TestBedGameTest extends BaseTi4Test {
         assertFalse(TestBedService.isMarkedAsTestBed(game));
     }
 
+    // Fog options and stored values from a preset are what the map code reads: options switch on, and segment
+    // definitions (which contain the `:` the script `setStored` guard refuses) arrive intact.
+    @Test
+    void presetFogOptionsAndStoredValuesReachTheMapCode() {
+        game.setFowMode(true);
+        TestBedPreset preset = TestBedPresetService.parse("""
+                { "fowOptions": ["map_connections", "GHOST_HEXES"],
+                  "stored": { "fowMapSegments": "core=000:3;outpost=a000:1" } }""");
+
+        TestBedComponentService.applyGameState(game, preset, new ArrayList<>());
+
+        assertTrue(game.getFowOption(FOWOption.MAP_CONNECTIONS));
+        assertTrue(game.getFowOption(FOWOption.GHOST_HEXES));
+        assertEquals(
+                List.of(new MapSegment("core", "000", 3), new MapSegment("outpost", "a000", 1)),
+                MapSegment.stored(game));
+    }
+
+    // A timed-out step says what the game is still waiting on, per seat.
+    @Test
+    void waitReasonsNameWhatIsPending() {
+        game.setPhaseOfGame("statusScoring");
+        game.updateActivePlayer(nekro);
+        game.setStoredValue("solround" + game.getRound() + "PO", "done");
+
+        List<String> nekroWaits = TestBedWaitReasons.forSeat(game, nekro);
+        assertTrue(
+                nekroWaits.containsAll(List.of("its turn", "public scoring", "secret scoring")), nekroWaits.toString());
+        assertEquals(List.of("secret scoring"), TestBedWaitReasons.forSeat(game, developer));
+        assertTrue(TestBedWaitReasons.describe(game).startsWith("phase statusScoring"));
+    }
+
     // Preset components land where the game keeps them; every state path scripts can read exists; placeholders
     // turn card ids into hand numbers; a requested card is found wherever it is.
     @Test
@@ -175,6 +213,21 @@ class TestBedGameTest extends BaseTi4Test {
             assertFalse(resolve("game." + field).startsWith("<"), field);
         }
         assertEquals("corner", resolve("nekro.posScored"));
+
+        // Tile and planet paths read the board itself.
+        Tile wellon = game.getTileByPosition("101");
+        wellon.getSpaceUnitHolder().addUnit(Units.getUnitKey(UnitType.Destroyer, "blue"), 2);
+        wellon.getSpaceUnitHolder().addCC("blue");
+        nekro.addPlanet("wellon");
+        assertEquals("space:blue_dd=2", resolve("tile.101.units"));
+        assertTrue(resolve("tile.101.ccs").contains("blue"), resolve("tile.101.ccs"));
+        assertEquals("wellon", resolve("tile.101.planets"));
+        assertEquals("nekro", resolve("planet.wellon.owner"));
+        assertEquals("<no tile at 999>", resolve("tile.999.units"));
+        assertEquals(null, TestBedStateResolver.validatePath("tile.101.units"));
+        assertEquals(null, TestBedStateResolver.validatePath("planet.wellon.owner"));
+        assertTrue(TestBedStateResolver.validatePath("tile.101.mood").contains("unknown tile."));
+        assertTrue(TestBedStateResolver.validatePath("tile.units").contains("must be"));
 
         game.drawSpecificActionCard("sabo1", nekro.getUserID());
         String resolved = TestBedPlaceholders.resolve(
@@ -209,8 +262,28 @@ class TestBedGameTest extends BaseTi4Test {
                 .mapToObj(i -> Buttons.green("FFCC_nekro_option" + i, "Option " + i))
                 .toList();
         TurnButtons turn = new TurnButtons(nekro, null, turnButtons);
-        assertWithinLimits(TestBedPanelService.turnComponents(turn));
+        assertWithinLimits(TestBedPanelService.turnComponents(game, turn));
         assertTrue(TestBedPanelService.turnContent(game, turn, null).contains("nekro"));
+
+        // In a combat thread the page also offers a "Roll as" button per side, so it keeps 15 buttons instead.
+        Player other = game.getRealPlayers().stream()
+                .filter(seat -> seat != nekro)
+                .findFirst()
+                .orElseThrow();
+        MessageChannelUnion thread = mock(MessageChannelUnion.class);
+        when(thread.getName()).thenReturn(game.getName() + "-round-1-system-101-turn-1-nekro-vs-" + other.getFaction());
+        when(thread.getAsMention()).thenReturn("<#1>");
+        Message combatMessage = mock(Message.class);
+        when(combatMessage.getChannel()).thenReturn(thread);
+        TurnButtons combat = new TurnButtons(nekro, combatMessage, turnButtons, other, true);
+        List<ActionRow> combatRows = TestBedPanelService.turnComponents(game, combat);
+        assertWithinLimits(combatRows);
+        assertEquals(15, combat.shown().size());
+        List<String> rollAs = combatRows.get(combatRows.size() - 2).getButtons().stream()
+                .map(Button::getLabel)
+                .toList();
+        assertEquals(2, rollAs.size());
+        assertTrue(rollAs.containsAll(List.of("Roll as nekro", "Roll as " + other.getFaction())), rollAs.toString());
 
         Shortcut shortcut = new Shortcut();
         shortcut.setLabel("A shortcut label that is rather long to see the truncation stay within limits ok");

@@ -1,0 +1,14 @@
+{
+  "name": "30k-fog-4p",
+  "description": "Fog game in the action phase using the 30k decks; you neighbour seat1, seat3 is far away. For leak checks on 30k cards.",
+  "fog": true,
+  "decks": { "ac": "action_cards_30k", "so": "secret_objectives_30k", "relic": "relics_30k", "explore": "explores_30k" },
+  "you": { "faction": "letnev", "color": "red", "home": "301", "speaker": true, "sc": 1 },
+  "seats": [
+    { "faction": "nekro", "color": "blue", "home": "304", "sc": 3 },
+    { "faction": "hacan", "color": "green", "home": "307", "sc": 5 },
+    { "faction": "sol", "color": "yellow", "home": "310", "sc": 7 }
+  ],
+  "defaults": { "tg": 3, "commodities": 2, "ccs": "3/3/2" },
+  "start": "action"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "30k-relic-chrono-stasis",
+  "description": "Chrono Stasis removes 1 of Hacan's infantry from a planet and remembers it for Hacan's next turn start.",
+  "preset": "30k-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "do": "hand", "as": "sol", "hand": { "relics": ["chronostasis30k"] } },
+    { "do": "hand", "as": "hacan", "hand": { "units": { "home": "2 gf" } } },
+    { "as": "sol", "pressId": "FFCC_sol_componentActionRes_relic_chronostasis30k" },
+    { "as": "sol", "press": "thirtyKChronoOwner_hacan" },
+    { "as": "sol", "press": "thirtyKChronoPlanet_hacan_" },
+    { "expect": { "state": "stored:thirtyKChronoStasis", "contains": "hacan+" } },
+    { "expect": { "in": "hacan:cards-info", "contains": "Chrono Stasis" } }
+  ]
+}

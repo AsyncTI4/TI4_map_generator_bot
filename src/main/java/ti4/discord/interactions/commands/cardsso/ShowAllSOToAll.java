@@ -10,6 +10,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.SecretObjectiveInfoService;
 
 class ShowAllSOToAll extends GameStateSubcommand {
@@ -55,6 +57,7 @@ class ShowAllSOToAll extends GameStateSubcommand {
                     .append('\n');
             index++;
         }
+        KnownCardsService.recordHandShownToAll(getGame(), player, KnownCardType.SECRET_OBJECTIVE);
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

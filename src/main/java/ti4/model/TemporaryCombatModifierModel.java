@@ -1,7 +1,6 @@
 package ti4.model;
 
 import lombok.Data;
-import ti4.image.Mapper;
 
 /// Internal model for combat modifier
 @Data

@@ -121,7 +121,7 @@ public void handleMyButton(ButtonInteractionEvent event, Game game, Player playe
 
 ### 4. Data / Content System
 
-- **`Mapper`** (in `ti4.image`): static utility class; loaded at startup via `Mapper.init()`. Provides access to all game content: factions, tiles, planets, technologies, colors, leaders, etc.
+- **`Mapper`** (in `ti4.model`): static utility class; loaded at startup via `Mapper.init()`. Provides access to all game content: factions, tiles, planets, technologies, colors, leaders, etc.
   - `Mapper.getColors()` returns a new `ArrayList` from a `HashMap`-backed map — order is not guaranteed.
   - `Mapper.getColor("null")` returns `null` — always guard against this.
 - **`TileHelper`**: maps tile IDs to `TileModel`, planet IDs to `PlanetModel`.
@@ -133,7 +133,7 @@ public void handleMyButton(ButtonInteractionEvent event, Game game, Player playe
 
 - Map images are generated via `MapRenderPipeline` using Java AWT.
 - Tile images, player area images, and other visuals are composed from PNG assets under `src/main/resources/`.
-- `PositionMapper` maps tile positions to pixel coordinates.
+- `MapPositionMapper` maps tile positions to pixel coordinates.
 
 ### 6. Emojis
 
@@ -192,9 +192,10 @@ Scheduled tasks live in `ti4.cron.*`. They are started by `JdaService` after bot
 
 ## Testing
 
-- Tests extend `BaseTi4Test` which calls `globalBeforeAll()` once to initialize `Mapper`, `TileHelper`, `AliasHandler`, `PositionMapper`, `SelectionManager`, and spoof emojis.
+- Tests extend `BaseTi4Test` which calls `globalBeforeAll()` once to initialize `Mapper`, `TileHelper`, `AliasHandler`, `MapPositionMapper`, `SelectionManager`, and spoof emojis.
 - JUnit 5; run with `mvn test`.
 - No Discord connection is made during tests (`JdaService.testingMode = true`).
+- `*DatabaseTest` classes run against a real PostgreSQL and are skipped unless `TI4_TEST_POSTGRES_URL` is set. CI sets it and provides a Postgres 16 service container. To run them locally, see "Database Tests" in `CONTRIBUTING.md` (use `docker-compose.test.yml` and extend `ti4.test.PostgresDatabaseTest`; only database/user `tibot_ci_test` are allowed: the tests drop and recreate their tables).
 
 ---
 

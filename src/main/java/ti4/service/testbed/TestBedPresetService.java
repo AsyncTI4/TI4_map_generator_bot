@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -18,14 +19,17 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
+import ti4.model.BoardPosition;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
+import ti4.model.TileHelper;
+import ti4.service.map.CustomHyperlaneService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
@@ -124,6 +128,19 @@ public class TestBedPresetService {
         }
     }
 
+    private static void validateTeamMateYou(TestBedPreset preset, List<Seat> seats, List<String> errors) {
+        long teamSeats = seats.stream().filter(Seat::isTeamMateYou).count();
+        if (teamSeats == 0) return;
+        if (preset.getYou() != null) errors.add("`teamMateYou` needs a preset without `you`.");
+        if (teamSeats > 1) errors.add("Only one seat may set `teamMateYou`.");
+    }
+
+    private static void validateBotAccount(List<Seat> seats, List<String> errors) {
+        if (seats.stream().filter(Seat::isBotAccount).count() > 1) {
+            errors.add("Only one seat may set `botAccount`.");
+        }
+    }
+
     public static Seat withDefaults(Seat seat, @Nullable Seat defaults) {
         if (defaults == null) return seat;
         Seat merged = new Seat();
@@ -131,6 +148,8 @@ public class TestBedPresetService {
         merged.setColor(seat.getColor());
         merged.setHome(seat.getHome());
         merged.setSpeaker(seat.isSpeaker());
+        merged.setTeamMateYou(seat.isTeamMateYou());
+        merged.setBotAccount(seat.isBotAccount());
         merged.setSc(seat.getSc());
         merged.setAcs(firstNonNull(seat.getAcs(), defaults.getAcs()));
         merged.setSos(firstNonNull(seat.getSos(), defaults.getSos()));
@@ -166,7 +185,7 @@ public class TestBedPresetService {
         }
         validateMapString(preset.getMapString(), errors);
         for (String position : preset.getCombat()) {
-            if (!PositionMapper.isTilePositionValid(position)) {
+            if (!MapPositionMapper.isTilePositionValid(position)) {
                 errors.add("Unknown `combat` position `" + position + "`.");
             }
         }
@@ -174,6 +193,8 @@ public class TestBedPresetService {
             errors.add("`combat` needs `start` to be `action`.");
         }
         validateSeatIdentities(seats, errors);
+        validateTeamMateYou(preset, seats, errors);
+        validateBotAccount(seats, errors);
         validateGameState(preset, errors);
         TestBedScriptService.validateShortcuts(
                 preset.getShortcuts(), TestBedScriptService.knownSeatNames(preset), errors);
@@ -219,7 +240,7 @@ public class TestBedPresetService {
             if (seat.getHome() == null) {
                 seatsWithoutHome++;
             } else {
-                if (!PositionMapper.isTilePositionValid(seat.getHome())) {
+                if (!MapPositionMapper.isTilePositionValid(seat.getHome())) {
                     errors.add("Unknown home position `" + seat.getHome() + "`.");
                 }
                 if (!homes.add(seat.getHome())) errors.add("Home position `" + seat.getHome() + "` is used twice.");
@@ -256,7 +277,7 @@ public class TestBedPresetService {
             errors.add(label + ": `ccs` must look like `3/3/2` (tactic/fleet/strategy).");
         }
         for (String location : seat.getUnits().keySet()) {
-            if (!HOME_UNIT_LOCATION.equalsIgnoreCase(location) && !PositionMapper.isTilePositionValid(location)) {
+            if (!HOME_UNIT_LOCATION.equalsIgnoreCase(location) && !MapPositionMapper.isTilePositionValid(location)) {
                 errors.add(label + ": unknown unit position `" + location + "` (use a tile position or `home`).");
             }
         }
@@ -290,12 +311,67 @@ public class TestBedPresetService {
                 errors);
         for (Map.Entry<String, List<String>> entry : preset.getTokens().entrySet()) {
             String where = entry.getKey();
-            if (!PositionMapper.isTilePositionValid(where)
+            if (!MapPositionMapper.isTilePositionValid(where)
                     && !Mapper.isValidPlanet(AliasHandler.resolvePlanet(where.toLowerCase()))) {
                 errors.add("preset: `tokens` target `" + where + "` is neither a tile position nor a planet.");
             }
             validateIds(entry.getValue(), TestBedPresetService::isKnownToken, "preset", "token", errors);
         }
+        preset.getBorderAnomalies().forEach((position, borders) -> {
+            if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
+                errors.add("preset: `borderAnomalies` position `" + position + "` is not a tile position.");
+            }
+            for (String border : borders) {
+                if (TestBedComponentService.borderDirection(border) == null
+                        || Mapper.resolveBorderAnomaly(TestBedComponentService.borderType(border)) == null) {
+                    errors.add("preset: `borderAnomalies` entry `" + border + "` at `" + position
+                            + "` must be `<n|ne|se|s|sw|nw>:<border type>`.");
+                }
+            }
+        });
+        preset.getTiles().forEach((position, tileId) -> {
+            if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
+                errors.add("preset: `tiles` position `" + position + "` is not a tile position.");
+            }
+            if (!TileHelper.isValidTile(tileId.toLowerCase())) {
+                errors.add("preset: unknown tile `" + tileId + "` at `" + position + "` in `tiles`.");
+            }
+        });
+        preset.getDecks().forEach((slot, deckId) -> {
+            String problem = TestBedComponentService.deckProblem(slot, deckId);
+            if (problem != null) errors.add("preset: " + problem);
+        });
+        for (String option : preset.getFowOptions()) {
+            if (Arrays.stream(FOWOption.values())
+                    .noneMatch(known -> known.name().equalsIgnoreCase(option))) {
+                errors.add("preset: unknown fog option `" + option + "` in `fowOptions`.");
+            }
+        }
+        preset.getCustomHyperlanes().forEach((position, matrix) -> {
+            if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
+                errors.add("preset: `customHyperlanes` position `" + position + "` is not a tile position.");
+            }
+            if (!CustomHyperlaneService.isValidConnectionMatrix(matrix)) {
+                errors.add("preset: `customHyperlanes` at `" + position
+                        + "` needs a 6x6 matrix of 0/1, rows split by `;`, cells by `,`.");
+            }
+        });
+        boolean placesExtraMaps = Stream.concat(
+                        preset.getTiles().keySet().stream(), preset.getCustomHyperlanes().keySet().stream())
+                .anyMatch(position -> BoardPosition.isBoardPosition(position.toLowerCase()));
+        if (placesExtraMaps && !Boolean.TRUE.equals(preset.getFog())) {
+            errors.add("preset: `tiles` on maps A-G (`a000`-`g848`) need `\"fog\": true`; extra maps are fog-only.");
+        }
+        if (!preset.getFowOptions().isEmpty() && Boolean.FALSE.equals(preset.getFog())) {
+            errors.add("preset: `fowOptions` need a fog game; drop `\"fog\": false`.");
+        }
+        preset.getStored().forEach((key, value) -> {
+            if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
+        });
+        preset.getGameOptions().forEach((key, value) -> {
+            String problem = TestBedComponentService.gameOptionProblem(key, value);
+            if (problem != null) errors.add("preset: " + problem);
+        });
         for (Seat seat : preset.allSeats()) {
             if (seat.getScoredObjectives() == null) continue;
             for (String objective : seat.getScoredObjectives()) {

@@ -10,7 +10,7 @@ import ti4.spring.service.statistics.ListTitlesGivenService;
 class ListTitlesGiven extends Subcommand {
 
     ListTitlesGiven() {
-        super(Constants.LIST_TITLES_GIVEN, "List the frequency with which slash commands are used");
+        super(Constants.LIST_TITLES_GIVEN, "List how often each title has been given, and to whom");
         addOptions(new OptionData(OptionType.STRING, Constants.TITLE, "Breakdown for a specific title"));
     }
 

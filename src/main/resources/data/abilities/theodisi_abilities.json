@@ -204,7 +204,7 @@
         "name": "Cycle of Reclamation",
         "faction": "aeterna",
         "window": "During setup:",
-       "windowEffect": "Place the moon phase cards in your play area.\n\nOnce per action, except during your tactical actions and whenever you use a unit ability: if a unit is destroyed in a system containing or adjacent to a system containing 1 of your ships, you may capture 1 neutral destroyer.",
+       "windowEffect": "Place the moon phase cards in your play area.\n\nOnce per action, when a unit is destroyed in a system containing or adjacent to your units, capture 1 neutral destroyer.",
         "source": "theodisi"
     },
     {
@@ -320,8 +320,8 @@
         "id": "fragmentum_unleashed",
         "name": "Fragmentum Unleashed",
         "faction": "stoneborn",
-        "window": "When you would purge 1 or more relic fragments:",
-        "windowEffect": "You may place a corresponding Fragmentum Token on your faction sheet that matches 1 of those fragments.",
+        "window": "After you purge 1 or more relic fragments:",
+        "windowEffect": "You may place 1 fragmentum token on your faction sheet that matches the color of 1 of those fragments.",
         "source": "theodisi"
     },
     {
@@ -329,7 +329,7 @@
         "name": "Adaptive",
         "faction": "stoneborn",
         "window": "During setup:",
-        "windowEffect": "Gain each of your components' \"Dormant\" counterparts. Components with an UNLEASH effect gain the following:\nAt the start of your turn, you may pay the listed cost and purge this component to gain that component's corresponding \"Unleashed\" counterpart.",
+        "windowEffect": "Gain the dormant version of each of your faction components. Each of your components with an UNLEASH ability gains the following ability text:\nAt the start of your turn, you may pay this component's listed UNLEASH cost and purge it to gain its corresponding Unleashed counterpart. If the purged component was exhausted, gain its Unleashed counterpart exhausted.",
         "notes": "This does not mean you gain your starting techs. Just that you start the game with the \"Dormant\" versions of all your components.",
         "source": "theodisi"
     },
@@ -368,7 +368,7 @@
         "id": "celestial_envoys",
         "name": "Celestial Envoys",
         "faction": "thurviali",
-        "window": "Once per your strategic actions, when a player performs the secondary ability of that strategy card:",
+        "window": "Once per your strategic actions, when a player performs the secondary ability of your strategy card:",
         "windowEffect": "Place 1 infantry into coexistence on a non-home planet that contains their ground forces.",
         "source": "theodisi"
     },

@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
+import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -75,6 +75,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public TI4Emoji getLeaderEmoji() {
         return LeaderEmojis.getLeaderEmoji(getHomebrewReplacesID().orElse(id));
+    }
+
+    public String getName(Game game) {
+        return game != null && game.isTwilightsFallMode() ? getTFNameIfAble() : name;
     }
 
     public Optional<String> getTFName() {
@@ -236,7 +240,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         Emoji emoji = getLeaderEmoji().asEmoji();
         if (emoji instanceof CustomEmoji customEmoji) {
-            eb.setThumbnail(customEmoji.getImageUrl());
+            eb.setThumbnail(customEmoji.getImageUrl(), name);
         }
 
         // DESCRIPTION

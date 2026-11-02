@@ -1,0 +1,54 @@
+on: workflow_dispatch
+name: FixPostgresListen
+concurrency:
+  group: "FixPostgresListen"
+jobs:
+  fix:
+    name: Fix Postgres listen address
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          script: |
+            set -u
+            GW="$(ip -4 addr show docker0 | awk '/inet /{print $2}' | cut -d/ -f1)"
+            echo "docker gateway: $GW"
+            [ -z "$GW" ] && { echo "ABORT: could not determine docker0 address"; exit 1; }
+
+            echo "=== BEFORE ==="
+            ss -lntp | grep 5432 || true
+            grep -n "^listen_addresses" /etc/postgresql/*/main/postgresql.conf || echo "(no uncommented listen_addresses)"
+            ls -la /etc/postgresql/*/main/*.dpkg-* 2>/dev/null || echo "(no dpkg conffile leftovers)"
+
+            for CONF in /etc/postgresql/*/main/postgresql.conf; do
+              HBA="$(dirname "$CONF")/pg_hba.conf"
+              echo "=== patching $CONF ==="
+              cp -a "$CONF" "$CONF.bak-$(date +%s)"
+              cp -a "$HBA"  "$HBA.bak-$(date +%s)"
+
+              if grep -q "^listen_addresses = 'localhost,$GW'" "$CONF"; then
+                echo "listen_addresses already set"
+              else
+                printf "\n# allow docker containers via host-gateway\nlisten_addresses = 'localhost,%s'\n" "$GW" >> "$CONF"
+              fi
+
+              if grep -q "172.16.0.0/12" "$HBA"; then
+                echo "pg_hba already allows the bridge subnet"
+              else
+                echo "host    all    all    172.16.0.0/12    scram-sha-256" >> "$HBA"
+              fi
+            done
+
+            echo "=== restarting ==="
+            systemctl restart postgresql
+            sleep 5
+
+            echo "=== AFTER ==="
+            ss -lntp | grep 5432 || echo "nothing listening"
+            pg_isready -h "$GW" -p 5432 || true
+            docker ps --format '{{.Names}}\t{{.Status}}'

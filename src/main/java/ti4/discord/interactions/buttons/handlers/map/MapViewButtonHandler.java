@@ -13,7 +13,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
-import ti4.image.TileGenerator;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -107,7 +107,7 @@ class MapViewButtonHandler {
         Player p1 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
         Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[2]);
         String groundOrSpace = rest.split("_")[3];
-        try (FileUpload systemWithContext = new TileGenerator(game, event, null, 0, pos).createFileUpload()) {
+        try (FileUpload systemWithContext = SystemContextImage.upload(game, event, 0, pos)) {
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
             List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);

@@ -307,17 +307,13 @@ public class CrystellumUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", place up to 2 fighters in "
+                        + ", place 1 fighter in "
                         + tile.getRepresentationForButtons(game, player)
                         + " with the Shard Swarm (the Crystellum fighter).",
                 List.of(
                         Buttons.green(
                                 player.factionButtonChecker() + PLACE_SHARD_SWARM + position + "_1",
                                 "Place 1 Fighter",
-                                UnitEmojis.fighter),
-                        Buttons.green(
-                                player.factionButtonChecker() + PLACE_SHARD_SWARM + position + "_2",
-                                "Place 2 Fighters",
                                 UnitEmojis.fighter),
                         Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline")));
     }
@@ -342,20 +338,14 @@ public class CrystellumUnitHandler {
             return;
         }
 
-        amount = Math.min(2, Math.max(1, amount));
+        amount = 1;
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " fighter");
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation()
-                        + " placed "
-                        + amount
-                        + " fighter"
-                        + (amount == 1 ? "" : "s")
-                        + " in "
-                        + tile.getRepresentationForButtons(game, player)
-                        + " with the Shard Swarm (the Crystellum fighter).");
+                player.getRepresentation() + " placed 1 fighter in " + tile.getRepresentationForButtons(game, player)
+                        + "with the Shard Swarm (the Crystellum fighter).");
     }
 
     private static List<Button> getShardSwarmSystemButtons(Game game, Player player) {

@@ -1,0 +1,31 @@
+{
+    "id": "lekythoi",
+    "tileId": "fracture25",
+    "name": "Lekythoi",
+    "aliases": [
+        "lekythoi",
+        "leky",
+        "fracture25",
+        "frac25"
+    ],
+    "resources": 0,
+    "influence": 5,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "techSpecialties": ["WARFARE"],
+    "legendaryAbilityName": "Override Clause",
+    "legendaryAbilityText": "When you pass, you may exhaust this card to immediately score 1 public objective if you fulfill its requirements.",
+    "legendaryAbilityFlavourText": "Let's drink. For Hades is our common harbor.",
+    "planetLayout": {
+        "unitHolderName": "styx",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 169.0,
+            "y": 151.0
+        }
+    },
+    "flavourText": "*A world sized tomb carved from crimson granite, holding the silent ashes and preserved memories of empires that fell long before the Lazax ever looked to the stars.*",
+    "contrastColor": "orange",
+    "source": "merford"
+}

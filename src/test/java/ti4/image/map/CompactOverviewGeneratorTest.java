@@ -1,0 +1,152 @@
+package ti4.image.map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.DisplayType;
+import ti4.image.map.CompactOverviewGenerator.Layout;
+import ti4.image.map.CompactOverviewGenerator.Panel;
+import ti4.image.map.CompactOverviewGenerator.Placed;
+import ti4.model.GalaxyNames;
+import ti4.testUtils.BaseTi4Test;
+
+class CompactOverviewGeneratorTest extends BaseTi4Test {
+
+    private Game game;
+    private Player player;
+
+    @BeforeEach
+    void setUp() {
+        game = new Game();
+        game.newGameSetup();
+        game.setName("compact-overview-test");
+        game.setFowMode(true);
+        player = game.addPlayer("player-id", "sol");
+        player.setFaction("sol");
+        player.setColor("blue");
+
+        // Two far-apart sectors on the main map, plus map A with a sector and an unsectored rest.
+        MapFrame.positionsWithin("000", 1).forEach(position -> game.setTile(new Tile("19", position)));
+        MapFrame.positionsWithin("1237", 1).forEach(position -> game.setTile(new Tile("20", position)));
+        MapFrame.positionsWithin("a000", 1).forEach(position -> game.setTile(new Tile("21", position)));
+        game.setTile(new Tile("22", "a301"));
+        game.setTile(new Tile("23", "tl"));
+        MapSegment.put(game, new MapSegment("core", "000", 1));
+        MapSegment.put(game, new MapSegment("south", "1237", 1));
+        MapSegment.put(game, new MapSegment("outpost", "a000", 1));
+    }
+
+    private static Set<String> titles(List<Panel> panels) {
+        return panels.stream().map(Panel::title).collect(Collectors.toSet());
+    }
+
+    private static Set<String> positions(List<Panel> panels) {
+        return panels.stream().flatMap(panel -> panel.hexes().keySet().stream()).collect(Collectors.toSet());
+    }
+
+    @Test
+    void theGmSeesOnePanelPerSectorPlusTheLeftoversAndCorners() {
+        List<Panel> panels = CompactOverviewGenerator.gmPanels(game);
+        String galaxyA = GalaxyNames.name(game, "a");
+        String main = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+
+        assertEquals(
+                Set.of(main + " / core", main + " / south", galaxyA + " / outpost", galaxyA, "corners"),
+                titles(panels));
+        assertEquals(new HashSet<>(game.getTileMap().keySet()), positions(panels), "every placed tile is shown");
+    }
+
+    @Test
+    void aPlayerOnlyGetsPanelsAndHexesTheyKnow() {
+        // The player knows the core and one hex of the outpost; south, map A's rest and the corner are unknown.
+        Set<String> known = new HashSet<>(MapFrame.positionsWithin("000", 1));
+        known.add("a000");
+        game.getTileByPosition("000")
+                .addUnit(
+                        "space",
+                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
+                        1);
+        player.addFogTile("21", "a000", "Rnd 1");
+
+        List<Panel> panels = CompactOverviewGenerator.playerPanels(game, player, known);
+
+        String main = GalaxyNames.name(game, GalaxyNames.MAIN_ID);
+        String galaxyA = GalaxyNames.name(game, "a");
+        assertEquals(Set.of(main + " / core", galaxyA + " / outpost"), titles(panels));
+        assertEquals(known, positions(panels), "no unknown hex of a known sector is drawn");
+        assertFalse(positions(panels).contains("a101"));
+    }
+
+    @Test
+    void packedPanelsNeverOverlapAndFitTheSizeCap() {
+        Layout layout = CompactOverviewGenerator.layout(
+                CompactOverviewGenerator.gmPanels(game), CompactOverviewGenerator.MAX_SIZE);
+
+        List<Placed> placed = layout.placed();
+        for (int i = 0; i < placed.size(); i++) {
+            for (int j = i + 1; j < placed.size(); j++) {
+                assertFalse(box(placed.get(i)).intersects(box(placed.get(j))), "panels overlap");
+            }
+        }
+        assertTrue(layout.canvasWidth() <= CompactOverviewGenerator.MAX_SIZE);
+        assertTrue(layout.canvasHeight() <= CompactOverviewGenerator.MAX_SIZE);
+    }
+
+    @Test
+    void onlyFeatureOverlaysAreDrawnAsOverviews() {
+        assertTrue(CompactOverviewGenerator.drawsOverlay(DisplayType.wormholes));
+        assertTrue(CompactOverviewGenerator.drawsOverlay(DisplayType.spacecannon));
+        // Map variants keep the normal full-size map.
+        assertFalse(CompactOverviewGenerator.drawsOverlay(DisplayType.shipless));
+        assertFalse(CompactOverviewGenerator.drawsOverlay(DisplayType.unlocked));
+        assertFalse(CompactOverviewGenerator.drawsOverlay(DisplayType.map));
+    }
+
+    @Test
+    void overlayOverviewsRenderForTheGmAndAPlayer() {
+        game.getTileByPosition("000")
+                .addUnit(
+                        "space",
+                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
+                        1);
+
+        assertNotNull(CompactOverviewGenerator.gmImage(game, DisplayType.spacecannon));
+        assertNotNull(CompactOverviewGenerator.playerImage(game, player, DisplayType.wormholes));
+    }
+
+    @Test
+    void aPlayerOverviewDrawsBordersOfSystemsTheySee() {
+        game.getTileByPosition("000")
+                .addUnit(
+                        "space",
+                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
+                        1);
+        BufferedImage withoutBorder = CompactOverviewGenerator.playerImage(game, player);
+        game.addBorderAnomaly("000", 0, "spatial_tear");
+
+        BufferedImage withBorder = CompactOverviewGenerator.playerImage(game, player);
+        assertFalse(Arrays.equals(pixels(withoutBorder), pixels(withBorder)), "the border is drawn");
+    }
+
+    private static int[] pixels(BufferedImage image) {
+        return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+    }
+
+    private static Rectangle box(Placed placed) {
+        return new Rectangle(placed.x(), placed.y(), placed.width(), placed.height());
+    }
+}

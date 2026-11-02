@@ -1,8 +1,8 @@
 package ti4.service.draft;
 
 import ti4.game.Game;
-import ti4.image.Mapper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 
 // TODO: Dangerous Wilds balance (1-2 hazardous planets per core slice, 0-2 per player slice)
 public record NucleusSpecs(

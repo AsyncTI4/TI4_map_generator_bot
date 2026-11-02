@@ -1,0 +1,30 @@
+{
+    "id": "thren",
+    "tileId": "th34",
+    "name": "Thren",
+    "aliases": [
+        "thren"
+    ],
+    "resources": 1,
+    "influence": 3,
+    "planetTypes": [
+        "HAZARDOUS",
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName": "Remote Factory",
+    "legendaryAbilityText": "When you activate a non-home system you may exhaust this card: That system gains PRODUCTION 3 as if it were a unit you control until the end of that tactical action.",
+    "planetLayout": {
+        "unitHolderName": "thren",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 172,
+            "y": 146
+        },
+        "planetRadius": 96
+    },
+    "positionInTile": {
+        "x": 172,
+        "y": 146
+    },
+    "source": "theodisi"
+}

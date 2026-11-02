@@ -18,7 +18,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.logging.RollbarManager;
 import ti4.message.MessageHelper;
 import ti4.service.game.GameNameService;
 import ti4.settings.users.UserActiveHourRecorder;
@@ -123,8 +122,6 @@ public class ButtonProcessor {
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, context), "Something went wrong with button interaction", e);
-        } finally {
-            RollbarManager.clear();
         }
 
         timeline.markFinished();
@@ -135,10 +132,6 @@ public class ButtonProcessor {
 
     private static void log(ButtonInteractionEvent event) {
         BotLogger.logButton(event);
-        // TODO: Check whether Rollbar is still configured and read; if not, drop this per-press metadata.
-        RollbarManager.putInteractionMetadata("button", event);
-        RollbarManager.put("button_id", event.getButton().getCustomId());
-        RollbarManager.put("game_name", GameNameService.getGameNameFromChannel(event));
 
         UserActiveHourRecorder.record(event.getUser().getId());
     }

@@ -1,0 +1,14 @@
+{
+  "name": "30k-explore-shared-wealth-fog",
+  "description": "Fog: Shared Wealth on Quann offers Nekro (adjacent destroyer) an action card; Nekro draws and Letnev gains 1 trade good, without naming factions in the main channel.",
+  "preset": "30k-explore-fog-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "letnev.tg", "equals": "3" } },
+    { "do": "stackExplore", "value": "sharedwealth30k" },
+    { "as": "letnev", "pressId": "FFCC_{letnev.faction}_movedNExplored_filler_quann_cultural" },
+    { "as": "nekro", "press": "thirtyKSharedWealthDraw_letnev" },
+    { "expect": { "state": "letnev.tg", "equals": "4" } },
+    { "expect": { "in": "main", "noFactionLeak": true, "since": "start" } }
+  ]
+}

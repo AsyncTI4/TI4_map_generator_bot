@@ -1,0 +1,18 @@
+{
+    "id": "fracture35",
+    "name": "Makara",
+    "aliases": [
+        "fracture35",
+        "makara",
+        "mak",
+        "frac35"
+    ],
+    "imagePath": "fracture35.png",
+    "planets": [
+        "makara"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

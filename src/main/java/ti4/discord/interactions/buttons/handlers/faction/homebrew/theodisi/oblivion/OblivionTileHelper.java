@@ -15,9 +15,9 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
-import ti4.image.TileHelper;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.service.map.AddTileService;
@@ -87,7 +87,7 @@ public class OblivionTileHelper {
         List<Button> buttons = new ArrayList<>();
         Set<String> offeredPositions = new LinkedHashSet<>();
         for (Tile tile : game.getTileMap().values()) {
-            for (String position : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
+            for (String position : MapPositionMapper.getAdjacentTilePositions(tile.getPosition())) {
                 if (!offeredPositions.add(position) || !isLegalDestination(game, tileId, position)) {
                     continue;
                 }
@@ -108,7 +108,7 @@ public class OblivionTileHelper {
             return false;
         }
         for (Tile tile : game.getTileMap().values()) {
-            for (String position : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
+            for (String position : MapPositionMapper.getAdjacentTilePositions(tile.getPosition())) {
                 if (isLegalDestination(game, tileId, position)) {
                     return true;
                 }
@@ -143,7 +143,7 @@ public class OblivionTileHelper {
     }
 
     private static List<Tile> getAdjacentSystems(Game game, String position) {
-        return PositionMapper.getAdjacentTilePositions(position).stream()
+        return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .map(game::getTileByPosition)
                 .filter(tile -> tile != null
                         && !"silver_flame".equals(tile.getTileID())

@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
@@ -109,6 +110,14 @@ public class AutoPingMetadataManager {
         }
 
         return autoPings.gameNameToAutoPing.get(gameName);
+    }
+
+    public static synchronized Set<String> getGameNamesWithAutoPing() {
+        AutoPings autoPings = readFile();
+        if (autoPings == null) {
+            return Set.of();
+        }
+        return Set.copyOf(autoPings.gameNameToAutoPing.keySet());
     }
 
     private static AutoPings readFile() {

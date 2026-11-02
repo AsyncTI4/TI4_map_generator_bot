@@ -51,7 +51,7 @@ class StasisHaulAcd2ButtonHandler {
                             + ", you have no ships with a capacity value for _Stasis Haul_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -77,7 +77,7 @@ class StasisHaulAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "stasisHaulComm", "Gain 1 Commodity (per system)", MiscEmojis.comm));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + "'s " + type.humanReadableName() + " in " + where

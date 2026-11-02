@@ -11,10 +11,11 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
+import ti4.service.leader.genome.homebrew.tknova.ActionGenome;
 
 @UtilityClass
 public class EdictPhaseHandler {
@@ -43,6 +44,7 @@ public class EdictPhaseHandler {
                     proceedToStrategyPhase);
             return;
         }
+        ActionGenome.offerWhileEdictsAreDrawn(game, tyrant, edicts.subList(0, 3));
         for (int x = 0; x < 3; x++) {
             AgendaModel edict = Mapper.getAgenda(edicts.get(x));
             buttons.add(

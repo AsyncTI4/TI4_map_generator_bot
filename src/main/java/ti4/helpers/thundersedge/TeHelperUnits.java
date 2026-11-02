@@ -25,8 +25,8 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -84,10 +84,12 @@ public final class TeHelperUnits {
     }
 
     public static boolean affectedByQuietus(Game game, Player player, Tile tile) {
+        if (player.hasTech("dsxinystar")) return false;
         return affectedByQuietus(game, player, tile.getSpaceUnitHolder());
     }
 
     public static boolean affectedByQuietus(Game game, Player player, UnitHolder uh) {
+        if (player.hasTech("dsxinystar")) return false;
         // Get the actual space unit holder if able
         if (!"space".equals(uh.getName())) {
             Tile t = game.getTileFromPlanet(uh.getName());

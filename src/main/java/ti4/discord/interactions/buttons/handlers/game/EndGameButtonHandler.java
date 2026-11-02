@@ -22,6 +22,12 @@ class EndGameButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler(EndGameService.MOST_POINTS_END_GAME_BUTTON_ID)
+    public static void gameEndWithMostPointsWinner(ButtonInteractionEvent event, Game game) {
+        EndGameService.recordMostPointsWinner(game, event.getMessageChannel());
+        gameEnd(event, game);
+    }
+
     @ButtonHandler("gameEndConfirmation")
     public static void gameEndConfirmation(ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();

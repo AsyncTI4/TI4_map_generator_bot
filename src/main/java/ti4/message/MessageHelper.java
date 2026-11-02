@@ -1,9 +1,7 @@
 package ti4.message;
 
-import static ti4.discord.utility.DiscordErrorUtility.isDiscordServerError;
-import static ti4.discord.utility.DiscordErrorUtility.isIgnorableError;
-import static ti4.discord.utility.DiscordErrorUtility.isUnknownEmojiError;
-import static ti4.discord.utility.DiscordErrorUtility.isUnknownMessageError;
+import static ti4.discord.utility.ButtonEmojiStripper.*;
+import static ti4.discord.utility.DiscordErrorUtility.*;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -59,7 +57,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
@@ -418,13 +415,41 @@ public class MessageHelper {
             BotLogger.error(new LogOrigin(event), "FileUpload null");
             return;
         }
-        if (event instanceof ButtonInteractionEvent button)
+        if (event instanceof ButtonInteractionEvent button) {
+            String msg = "Here is your requested image";
+            if (button.getButton().getCustomId().contains("ringTile")) {
+                msg = "Here is a picture of the active system";
+            }
             button.getHook()
+                    .sendMessage(msg)
+                    .addFiles(fileUpload)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        } else if (event instanceof SlashCommandInteractionEvent slash)
+            slash.getHook()
                     .sendMessage("Here is your requested image")
                     .addFiles(fileUpload)
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (event instanceof SlashCommandInteractionEvent slash)
+    }
+
+    public static void sendEphemeralFileInResponseToButtonPressComplete(
+            FileUpload fileUpload, GenericInteractionCreateEvent event) {
+        if (fileUpload == null) {
+            BotLogger.error(new LogOrigin(event), "FileUpload null");
+            return;
+        }
+        if (event instanceof ButtonInteractionEvent button) {
+            String msg = "Here is your requested image";
+            if (button.getButton().getCustomId().contains("ringTile")) {
+                msg = "Here is a picture of the active system";
+            }
+            button.getHook()
+                    .sendMessage(msg)
+                    .addFiles(fileUpload)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        } else if (event instanceof SlashCommandInteractionEvent slash)
             slash.getHook()
                     .sendMessage("Here is your requested image")
                     .addFiles(fileUpload)
@@ -723,7 +748,7 @@ public class MessageHelper {
 
         String gameName = GameNameService.getGameNameFromChannel(channel);
         if (shouldInjectRules(GameManager.getManagedGame(gameName))) {
-            messageText = injectRules(messageText);
+            messageText = RulesLinkInjector.inject(messageText);
         }
 
         String finalMessageText = messageText;
@@ -853,6 +878,23 @@ public class MessageHelper {
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
                                         "Discord server error while sending message in channel " + channel.getId());
+                            }
+                            if (isInvalidComponentEmojiError(error) && hasButtonEmoji(messageCreateData)) {
+                                BotLogger.warning(
+                                        getRestActionFailureMessage(
+                                                channel,
+                                                errorHeader + " (retrying without button emoji)",
+                                                messageCreateData,
+                                                error),
+                                        error);
+                                sendMessageWithRetry(
+                                        channel,
+                                        withoutButtonEmoji(messageCreateData),
+                                        successAction,
+                                        errorHeader,
+                                        remainingAttempts,
+                                        queuePosition);
+                                return;
                             }
                             boolean shouldRetry = error instanceof ErrorResponseException
                                     && error.getCause() instanceof SocketTimeoutException
@@ -1433,32 +1475,5 @@ public class MessageHelper {
 
     static boolean shouldInjectRules(ManagedGame managedGame) {
         return managedGame != null && managedGame.isInjectRules() && !managedGame.isFowMode();
-    }
-
-    private static String injectRules(String message) {
-        if (message == null) {
-            return null;
-        }
-        try {
-            StringBuilder edited = new StringBuilder(message);
-            StringBuilder copy = new StringBuilder(message.toLowerCase());
-            for (String keyWord : AliasHandler.getInjectedRules()) {
-                if ("bombardment".equals(keyWord) && message.contains("Tactical Bombardment")) continue;
-                if ("production".equals(keyWord) && message.contains("Monopolize Production")) continue;
-                if (copy.indexOf(keyWord) > -1) {
-                    String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
-                    int firstIndex = copy.indexOf(keyWord);
-                    int lastIndex = firstIndex + keyWord.length() + 1;
-                    copy.insert(firstIndex, "[");
-                    copy.insert(lastIndex, replace);
-                    edited.insert(firstIndex, "[");
-                    edited.insert(lastIndex, replace);
-                }
-            }
-            return edited.toString();
-        } catch (Exception e) {
-            BotLogger.error("Issue injecting Rules into message: " + message, e);
-            return message;
-        }
     }
 }

@@ -14,8 +14,9 @@ import ti4.helpers.BombardmentAssignment;
 import ti4.helpers.BombardmentAssignmentType;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
 import ti4.model.UnitModel;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class BombardmentService {
@@ -50,6 +51,18 @@ public class BombardmentService {
             if (entry.getKey().getValue().getName().equalsIgnoreCase(planet)) {
                 continue;
             }
+            if (player.hasRelic("salvage_war_sun") && entry.getKey().getKey().getUnitType() == UnitType.Warsun) {
+                for (String bombardablePlanet : getBombardablePlanets(player, game, tile)) {
+                    int planetGalvanizedCount = galvanizedCount;
+                    for (int x = 0; x < entry.getValue(); x++) {
+                        String asyncId = entry.getKey().getKey().getAsyncId();
+                        assignments.add(new BombardmentAssignment(
+                                asyncId, bombardablePlanet, planetGalvanizedCount > 0, BombardmentAssignmentType.UNIT));
+                        planetGalvanizedCount--;
+                    }
+                }
+                continue;
+            }
             for (int x = 0; x < entry.getValue(); x++) {
                 String asyncId = entry.getKey().getKey().getAsyncId();
                 assignments.add(new BombardmentAssignment(
@@ -65,7 +78,8 @@ public class BombardmentService {
                     new BombardmentAssignment("argentcommander", planet, false, BombardmentAssignmentType.LEADER));
         }
         game.setStoredValue(
-                "assignedBombardment" + player.getFaction(), new ObjectMapper().writeValueAsString(assignments));
+                "assignedBombardment" + player.getFaction(),
+                JsonMapperManager.basic().writeValueAsString(assignments));
     }
 
     private static String getBestBombardablePlanet(Player player, Game game, Tile tile) {

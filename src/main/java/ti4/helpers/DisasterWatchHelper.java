@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Tile;
-import ti4.image.TileGenerator;
+import ti4.image.tile.SystemContextImage;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -27,8 +27,7 @@ public class DisasterWatchHelper {
         TextChannel watchParty = JdaService.guildPrimary
                 .getTextChannelsByName("disaster-watch-party", true)
                 .getFirst();
-        try (FileUpload systemWithContext =
-                new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload()) {
+        try (FileUpload systemWithContext = SystemContextImage.upload(game, event, rings, tile.getPosition())) {
             MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
         } catch (IOException e) {
             BotLogger.error(new LogOrigin(event, game), "Exception while closing FileUpload", e);
@@ -47,8 +46,7 @@ public class DisasterWatchHelper {
         TextChannel watchParty = JdaService.guildPrimary
                 .getTextChannelsByName("silver-flame-watch-party", true)
                 .getFirst();
-        try (FileUpload systemWithContext =
-                new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload()) {
+        try (FileUpload systemWithContext = SystemContextImage.upload(game, event, rings, tile.getPosition())) {
             MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
         } catch (IOException e) {
             BotLogger.error(new LogOrigin(event, game), "Exception while closing FileUpload", e);

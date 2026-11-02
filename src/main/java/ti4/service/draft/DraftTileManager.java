@@ -15,8 +15,8 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.image.TileHelper;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
 import ti4.model.WormholeModel;
@@ -76,6 +76,9 @@ public class DraftTileManager {
         for (TileModel tileModel : allTiles) {
             if (isNotDraftable(tileModel)) continue;
             if (!sources.contains(tileModel.getSource())) continue;
+            if (tileModel.getSource() == ComponentSource.theodisi && !TileHelper.isLostLegaciesTile(tileModel)) {
+                continue;
+            }
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
@@ -196,6 +199,9 @@ public class DraftTileManager {
         }
         if (game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.uncharted_space);
+        }
+        if (game.isLostLegaciesTiles()) {
+            sources.add(ComponentSource.theodisi);
         }
         return sources;
     }

@@ -49,9 +49,9 @@ class DatabasePersistence extends Subcommand {
             return "This process is not running scheduled work, so no catch-up reconciliation was queued."
                     + " The nightly reconciliation will catch up on game syncs skipped during maintenance.";
         }
-        if (GameDatabaseReconciler.queueReconciliation()) {
-            return "Queued a full database reconciliation to catch up on game syncs skipped during maintenance.";
+        if (GameDatabaseReconciler.queueCatchUpReconciliation()) {
+            return "Queued a full database reconciliation after any current run to catch up on game syncs skipped during maintenance.";
         }
-        return "No catch-up reconciliation was queued because one is already running or the bot is shutting down.";
+        return "No catch-up reconciliation was queued because the bot is shutting down.";
     }
 }

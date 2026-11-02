@@ -1,0 +1,15 @@
+{
+    "id": "th46",
+    "name": "Nebula/Gravity Rift",
+    "aliases": [
+        "th46",
+        "nebulagravityrift"
+    ],
+    "imagePath": "th46.png",
+    "planets": [],
+    "shipPositionsType": "TYPE08",
+    "tileBack": "red",
+    "isNebula": true,
+    "isGravityRift": true,
+    "source": "theodisi"
+}

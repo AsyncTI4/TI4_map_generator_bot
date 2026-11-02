@@ -1,0 +1,17 @@
+{
+    "id": "th22",
+    "name": "Karst/Karst Station",
+    "aliases": [
+        "th22",
+        "karst",
+        "karststation"
+    ],
+    "imagePath": "th22.png",
+    "planets": [
+        "karst",
+        "karststation"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

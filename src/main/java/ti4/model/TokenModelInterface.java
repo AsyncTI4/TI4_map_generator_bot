@@ -2,8 +2,6 @@ package ti4.model;
 
 // Interface mostly only needs to know how to display a token
 public interface TokenModelInterface extends ModelInterface {
-    String getFilePath();
-
     String getFileName();
 
     UnitHolderType getUnitHolderType();

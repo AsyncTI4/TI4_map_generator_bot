@@ -1,0 +1,28 @@
+{
+    "id": "sephis",
+    "tileId": "th39",
+    "name": "Sephis",
+    "aliases": [
+        "sephis"
+    ],
+    "resources": 1,
+    "influence": 3,
+    "planetTypes": [
+        "CULTURAL",
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "sephis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 203,
+            "y": 209
+        },
+        "planetRadius": 64
+    },
+    "positionInTile": {
+            "x": 203,
+            "y": 209
+    },
+    "source": "theodisi"
+}

@@ -2,6 +2,10 @@ package ti4.discord.interactions.buttons.handlers.promissory;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -10,12 +14,14 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 
 @UtilityClass
 class PlayerPromissoryButtonHandler {
@@ -23,20 +29,41 @@ class PlayerPromissoryButtonHandler {
     @ButtonHandler("resolvePNPlay_")
     public static void resolvePNPlay(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pnID = buttonID.replace("resolvePNPlay_", "");
-
+        String tech = null;
         if (pnID.contains("ra_")) {
-            String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
-            TechnologyModel techModel = Mapper.getTech(tech);
+            tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
             pnID = pnID.replace("_" + tech, "");
+        }
+
+        if (!canPlayFromHand(player, pnID)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event,
+                    "You can't play this promissory note: it has already been played, is no longer in your hand,"
+                            + " or is your own.");
+            return;
+        }
+
+        if (tech != null) {
+            TechnologyModel techModel = Mapper.getTech(tech);
             String message = player.getRepresentationNoPing() + " acquired the technology "
                     + techModel.getRepresentation(false) + " via _Research Agreement_.";
             player.addTech(tech);
+            NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);
+            NetrunnersTechHandler.resolveDataMining(event, game, player, tech);
+            NetrunnersAgent.offerAfterGainingTech(event, game, player, tech);
+            NetrunnersUnitHandler.offerNimdaDeploy(game, player);
             TechSummariesMetadataManager.addTech(game, player, tech, true);
             ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
+            CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "netrunners", "mirveda");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         PromissoryNoteHelper.resolvePNPlay(pnID, player, game, event);
+        if ("bepniron".equals(pnID)) {
+            IronPromissoryHandler.resolveRetrofittingPlay(event, game, player);
+        }
+        if ("thpnmorpha".equals(pnID)) {
+            HydromorphicHelper.draw(game, player, 2);
+        }
         if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
             ButtonHelper.deleteMessage(event);
         }
@@ -49,5 +76,11 @@ class PlayerPromissoryButtonHandler {
                     player.getCardsInfoThread(),
                     "Combat modifier will be applied next time you push the \"Combat Roll\" button.");
         }
+    }
+
+    private static boolean canPlayFromHand(Player player, String pnID) {
+        String cardID = "bmfNotHand".equalsIgnoreCase(pnID) ? "bmf" : pnID;
+        return player.hasPlayablePromissoryInHand(cardID)
+                && !player.getPromissoryNotesInPlayArea().contains(cardID);
     }
 }

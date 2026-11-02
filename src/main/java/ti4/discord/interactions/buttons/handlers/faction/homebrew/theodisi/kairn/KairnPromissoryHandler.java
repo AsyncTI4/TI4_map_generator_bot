@@ -65,7 +65,7 @@ public class KairnPromissoryHandler {
                     player.factionButtonChecker() + KAIRN_PN_ATTACH + tile.getPosition() + "|" + planetName,
                     Helper.getPlanetRepresentation(planetName, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

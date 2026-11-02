@@ -1,0 +1,19 @@
+{
+    "id": "th21",
+    "name": "Edran",
+    "aliases": [
+        "th21",
+        "edran"
+    ],
+    "imagePath": "th21.png",
+    "planets": [
+        "edran"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "ALPHA",
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

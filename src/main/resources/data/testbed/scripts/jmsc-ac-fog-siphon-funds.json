@@ -1,0 +1,51 @@
+{
+  "name": "jmsc-ac-fog-siphon-funds",
+  "description": "Fog: Letnev siphons 1 commodity from far-away Hacan; no faction is named in the main channel.",
+  "preset": "jmsc-fog-4p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "do": "hand",
+      "as": "letnev",
+      "hand": {
+        "acs": [
+          "siphonfundsjmsc2"
+        ]
+      }
+    },
+    {
+      "as": "letnev",
+      "press": "ac_play_from_hand_{ac:siphonfundsjmsc2}",
+      "in": "letnev:cards-info"
+    },
+    {
+      "as": "letnev",
+      "press": "thkAcSiphonStart",
+      "in": "letnev"
+    },
+    {
+      "as": "letnev",
+      "press": "thkAcSiphon_{hacan.color}_comm",
+      "in": "letnev"
+    },
+    {
+      "expect": {
+        "state": "hacan.commodities",
+        "equals": "1"
+      }
+    },
+    {
+      "expect": {
+        "state": "letnev.tg",
+        "equals": "4"
+      }
+    },
+    {
+      "expect": {
+        "in": "main",
+        "noFactionLeak": true,
+        "since": "start"
+      }
+    }
+  ]
+}

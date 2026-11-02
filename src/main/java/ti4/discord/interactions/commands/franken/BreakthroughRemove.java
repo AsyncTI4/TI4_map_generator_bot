@@ -8,13 +8,13 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class BreakthroughRemove extends GameStateSubcommand {
 
     public BreakthroughRemove() {
-        super(Constants.BREAKTHROUGH_REMOVE, "Set the breakthrough you are using", true, true);
+        super(Constants.BREAKTHROUGH_REMOVE, "Remove a breakthrough from your faction", true, true);
         addOption(OptionType.STRING, Constants.BREAKTHROUGH, "Which breakthrough to remove", true, true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction to remove the breakthrough", false, true);
     }

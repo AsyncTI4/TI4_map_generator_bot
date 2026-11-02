@@ -5,8 +5,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.SearchGameForFactionHelper;
+import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class FactionGames extends Subcommand {
 
@@ -22,7 +25,12 @@ class FactionGames extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, Boolean.FALSE, OptionMapping::getAsBoolean);
-        String faction = event.getOption(Constants.FACTION, OptionMapping::getAsString);
+        String rawFaction = event.getOption(Constants.FACTION, OptionMapping::getAsString);
+        String faction = AliasHandler.resolveFaction(rawFaction);
+        if (!Mapper.isValidFaction(faction)) {
+            MessageHelper.sendMessageToEventChannel(event, "Faction `" + rawFaction + "` is not valid.");
+            return;
+        }
         SearchGameForFactionHelper.searchGames(faction, event, includeEndedGames);
     }
 }

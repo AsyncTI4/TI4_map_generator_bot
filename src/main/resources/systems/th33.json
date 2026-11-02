@@ -1,0 +1,18 @@
+{
+    "id": "th33",
+    "name": "Celyon",
+    "aliases": [
+        "th33",
+        "celyon"
+    ],
+    "imagePath": "th33.png",
+    "planets": [
+        "celyon"
+    ],
+    "shipPositionsType": "TYPE04",
+    "wormholes": [
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

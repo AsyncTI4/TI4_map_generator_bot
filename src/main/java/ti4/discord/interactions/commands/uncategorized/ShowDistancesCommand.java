@@ -13,9 +13,9 @@ import ti4.game.Tile;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.image.MapRenderPipeline;
-import ti4.image.TileHelper;
+import ti4.image.map.MapRenderPipeline;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 
 public class ShowDistancesCommand extends GameStateCommand {
 
@@ -37,7 +37,8 @@ public class ShowDistancesCommand extends GameStateCommand {
     public List<OptionData> getOptions() {
         List<OptionData> options = new ArrayList<>();
         options.add(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name", true, true));
-        options.add(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+        options.add(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")
+                .setRequiredRange(0, 30));
         options.add(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color", false, true));
         return options;
     }

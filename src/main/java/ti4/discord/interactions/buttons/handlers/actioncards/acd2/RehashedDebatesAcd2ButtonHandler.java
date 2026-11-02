@@ -11,9 +11,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 
 @UtilityClass

@@ -1,0 +1,24 @@
+{
+    "id": "th45",
+    "name": "Osslet Station",
+    "aliases": [
+        "th45",
+        "osslet",
+        "ossletstation"
+    ],
+    "imagePath": "th45.png",
+    "planets": [
+        "ossletstation"
+    ],
+    "shipPositionsType": "TYPE08",
+    "wormholes": [
+        "ALPHA",
+        "BETA",
+        "GAMMA"
+    ],
+    "tileBack": "red",
+    "isAsteroidField": true,
+    "isNebula": true,
+    "isGravityRift": true,
+    "source": "theodisi"
+}

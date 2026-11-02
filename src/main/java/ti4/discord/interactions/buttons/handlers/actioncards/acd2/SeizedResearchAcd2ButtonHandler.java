@@ -19,6 +19,7 @@ import ti4.model.BreakthroughModel;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
@@ -159,7 +160,8 @@ class SeizedResearchAcd2ButtonHandler {
                         planet != null && !planet.getTechSpecialities().isEmpty())
                 .map(planet -> Buttons.green(
                         player.factionButtonChecker() + "seizedResearchPlanet_" + planet.getName(),
-                        Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet.getName(), game)))
+                        Helper.getPlanetRepresentation(planet.getName(), game),
+                        PlanetEmojis.getPlanetEmojiOrNull(planet.getName())))
                 .toList();
     }
 

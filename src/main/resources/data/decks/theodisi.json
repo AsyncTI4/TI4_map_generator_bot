@@ -66,7 +66,7 @@
         "description": "Prophecy of Kings, Thunder's Edge, Uncharted Space, Blue Reverie, and Lost Legacies relics.",
         "cardIDs": [
             "codex", "dominusorb", "dynamiscore", "emelpar", "emphidia", "mawofworlds", "nanoforge", "obsidian", "prophetstears", "shard", "stellarconverter", "thalnos", "titanprototype",
-            "bookoflatvinia", "circletofthevoid", "heartofixth", "lightrailordnance", "metalivoidarmaments", "metalivoidshielding", "neuraloop", "quantumcore", "thesilverflame", "thetriad",
+            "bookoflatvinia", "circletofthevoid", "heartofixth", "lightrailordnance_br", "metalivoidarmaments", "metalivoidshielding", "neuraloop", "quantumcore", "thesilverflame", "thetriad",
             "boon_of_the_cerulean_god", "decrypted_cartoglyph", "e6-g0_network", "eye_of_vogul", "starfall_array", "throne_of_the_false_emperor", "twilight_mirror",
             "aendstorch", "matjeksdragoncage", "gedustation", "kadlinsstaff", "theantipode", "taraniscrest",
             "ancient_radar", "horn_of_the_abyss", "specialized_augmentations", "quantum_entangler", "volatile_mutagenics", "alluringthrone"
@@ -96,7 +96,7 @@
             "codex", "absol_dominusorb", "dynamiscore", "emelpar", "emphidia", "absol_mawofworlds", "nanoforge", "obsidian", "prophetstears", "absol_stellarconverter", "thalnos", "titanprototype",
             "absol_luxarchtreatise", "absol_plenaryorbital", "absol_quantumcore", "absol_shardofthethrone1", "absol_syncretone", "absol_tyrantslament",
             "boon_of_the_cerulean_god", "decrypted_cartoglyph", "e6-g0_network", "eye_of_vogul", "starfall_array", "throne_of_the_false_emperor", "twilight_mirror",
-            "neuraloop", "circletofthevoid", "bookoflatvinia", "thetriad", "lightrailordnance", "metalivoidshielding", "metalivoidarmaments",
+            "neuraloop", "circletofthevoid", "bookoflatvinia", "thetriad", "lightrailordnance_br", "metalivoidshielding", "metalivoidarmaments",
             "aendstorch", "matjeksdragoncage", "gedustation", "kadlinsstaff", "theantipode", "taraniscrest",
             "ancient_radar", "horn_of_the_abyss", "specialized_augmentations", "quantum_entangler", "volatile_mutagenics", "alluringthrone"
         ],

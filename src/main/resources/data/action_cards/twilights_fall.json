@@ -167,6 +167,7 @@
         "name": "Irradiate",
         "phase": "Action",
         "window": "Action",
+        "notes": "This can be used as just a stall if the unit deck is empty.",
         "text": "Choose 1 unit type other than a flagship; reveal cards from the unit upgrade deck until you reveal a card of that type, if able. Then, gain that card and shuffle the rest back into the unit upgrade deck.",
         "source": "twilights_fall"
     },

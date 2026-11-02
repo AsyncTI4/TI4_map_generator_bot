@@ -22,10 +22,10 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TechEmojis;
@@ -180,7 +180,7 @@ class TechUseButtonHandler {
                         + " used their industrial juggernaut ability to replace a spacedock in tile "
                         + tile.getRepresentationForButtons() + " with a warsun for the cost of 6r.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", use these buttons to pay the 6 resources.",

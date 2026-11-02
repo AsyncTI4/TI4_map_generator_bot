@@ -1,37 +1,26 @@
 package ti4;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Pattern;
+import java.util.Optional;
 import javax.annotation.Nullable;
-import ti4.helpers.Constants;
-import ti4.helpers.RandomHelper;
+import ti4.cache.CacheManager;
 import ti4.helpers.Storage;
-import ti4.helpers.Units.UnitKey;
 
 public final class ResourceHelper {
 
-    private static final Pattern UNIT_DD_PATTERN = Pattern.compile(Constants.UNIT_DD);
-    private static ResourceHelper resourceHelper;
-    private final Map<String, String> unitCache = new HashMap<>();
-    private final Map<String, String> decalCache = new HashMap<>();
-    private final Map<String, String> spoopyCache = new HashMap<>();
-    private final Map<String, String> ccCache = new HashMap<>();
-    private final Map<String, String> peekMarkerCache = new HashMap<>();
-    private final Map<String, String> factionCache = new HashMap<>();
-    private final Map<String, String> generalCache = new HashMap<>();
-    private final Map<String, String> planetCache = new HashMap<>();
+    private static final int MAX_REMEMBERED_PATHS = 10_000;
+    private static final Cache<String, Optional<String>> RESOLVED_PATHS = Caffeine.newBuilder()
+            .maximumSize(MAX_REMEMBERED_PATHS)
+            .recordStats()
+            .build();
+
+    static {
+        CacheManager.registerCache("resourcePathCache", RESOLVED_PATHS);
+    }
 
     private ResourceHelper() {}
-
-    public static ResourceHelper getInstance() {
-        if (resourceHelper == null) {
-            resourceHelper = new ResourceHelper();
-        }
-        return resourceHelper;
-    }
 
     @Nullable
     public static String getPositionFile(String name) {
@@ -39,110 +28,15 @@ public final class ResourceHelper {
     }
 
     @Nullable
-    public static String getTileFile(String name) {
-        return getResourceFromFolder("tiles/", name);
-    }
-
-    @Nullable
-    public String getFactionFile(String name) {
-        return getCachedResource(factionCache, "factions/", name);
-    }
-
-    @Nullable
-    public String getGeneralFile(String name) {
-        return getCachedResource(generalCache, "general/", name);
-    }
-
-    // @Deprecated
-    @Nullable
-    public String getUnitFile(String name) {
-        if (name.endsWith(Constants.UNIT_DD) && RandomHelper.isOneInX(Constants.EYE_CHANCE)) {
-            name = UNIT_DD_PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE);
-        }
-        return getCachedResource(unitCache, "units/", name);
-    }
-
-    @Nullable
-    public String getUnitFile(UnitKey unit) {
-        String name = unit.getFileName();
-        return getCachedResource(unitCache, "units/", name);
-    }
-
-    @Nullable
-    public String getUnitFile(UnitKey unit, boolean eyes) {
-        String name = unit.getFileName(eyes);
-        return getCachedResource(unitCache, "units/", name);
-    }
-
-    @Nullable
-    public String getDecalFile(String name) {
-        return getCachedResource(decalCache, "decals/", name);
-    }
-
-    @Nullable
-    public String getSpoopyFile() {
-        // overlay_jackolantern_1
-        int face = ThreadLocalRandom.current().nextInt(1, 4);
-        String name = "overlay_jackolantern_" + face + ".png";
-        return getCachedResource(spoopyCache, "decals/", name);
-    }
-
-    @Nullable
-    public String getCCFile(String name) {
-        return getCachedResource(ccCache, "command_token/", name);
-    }
-
-    @Nullable
-    public String getPeekMarkerFile(String name) {
-        return getCachedResource(peekMarkerCache, "peek_marker/", name);
-    }
-
-    @Nullable
-    public String getAttachmentFile(String name) {
-        File attachmentFile = getFile("attachment_token/", name);
-        if (attachmentFile.exists()) {
-            return attachmentFile.getAbsolutePath();
-        }
-        return getTokenFile(name);
-    }
-
-    @Nullable
-    public String getPlanetResource(String name) {
-        return getCachedResource(planetCache, "planet_cards/", name);
-    }
-
-    @Nullable
-    public static String getPAResource(String name) {
-        return getResourceFromFolder("player_area/", name);
-    }
-
-    @Nullable
-    public String getTokenFile(String name) {
-        return getResourceFromFolder("tokens/", name);
-    }
-
-    @Nullable
-    public static String getExtraFile(String name) {
-        return getResourceFromFolder("extra/", name);
-    }
-
-    private static String getCachedResource(Map<String, String> cache, String folder, String name) {
-        if (cache.containsKey(name)) {
-            return cache.get(name);
-        }
-        String resourcePath = getResourceFromFolder(folder, name);
-        cache.put(name, resourcePath);
-        return resourcePath;
-    }
-
-    @Nullable
     public static String getResourceFromFolder(String folder, String name) {
         File resourceFile = getFile(folder, name);
-        if (resourceFile.exists()) {
-            return resourceFile.getAbsolutePath();
-        }
-        // BotLogger.log("Could not find resource file: " + resourceFile.getAbsolutePath());
-        return null;
+        return RESOLVED_PATHS
+                .get(resourceFile.getPath(), _ -> existingPath(resourceFile))
+                .orElse(null);
+    }
+
+    private static Optional<String> existingPath(File file) {
+        return file.exists() ? Optional.of(file.getAbsolutePath()) : Optional.empty();
     }
 
     public static File getFile(String folder, String name) {

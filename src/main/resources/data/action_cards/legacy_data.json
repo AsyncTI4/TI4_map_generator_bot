@@ -1449,15 +1449,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "hijacked_signal",
-        "name": "Hijacked Signal",
-        "phase": "Any",
-        "window": "After you resolve the secondary ability of another player's strategy card",
-        "text": "Place 1 command token from that player's reinforcements in any non-home system.",
-        "flavorText": "The Hacan paid heavily to contain the breach. 2RAM identified the culprit as Acidos and warned them that the worst was yet to come.",
-        "source": "deprecated"
-    },
-    {
         "alias": "proclamation",
         "name": "Proclamation",
         "phase": "Any",
@@ -1667,15 +1658,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "oracle",
-        "name": "Oracle",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Look at each unrevealed public objective and the top 5 cards of the secret objective deck. Then, shuffle the secret objective deck.",
-        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
-        "source": "deprecated"
-    },
-    {
         "alias": "survey1",
         "name": "Survey",
         "phase": "Action",
@@ -1822,6 +1804,34 @@
         "window": "ACTION",
         "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "compounding_interests",
+        "name": "Compounding Interests",
+        "phase": "Action",
+        "window": "At the end of your turn",
+        "text": "For each of your command tokens on the game board, either gain 1 commodity or convert 1 of your commodities to a trade good.",
+        "flavorText": "\"A station over Ordinian? What could we gain from such a venture?\" Carth hissed. \"Nothing,\" Harrugh snapped. \"Everything.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "false_flag",
+        "name": "False Flag",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Remove 1 of another player's command tokens from the game board and place it in a system that contains your units.",
+        "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "fractured_reality",
+        "name": "Fractured Reality",
+        "phase": "Action",
+        "window": "When you would roll a die",
+        "text": "Roll 2 dice instead; you may cancel 1 of those results.",
+        "automationID": "fractured_reality",
+        "flavorText": "\"Shen're Ix Ianovar,\" Ahk-Syl Siven murmured, seeming afraid to invoke the name. \"Al'Raith Ix Ianovar,\" he continued, his voice barely a whisper.",
         "source": "deprecated"
     }
 ]

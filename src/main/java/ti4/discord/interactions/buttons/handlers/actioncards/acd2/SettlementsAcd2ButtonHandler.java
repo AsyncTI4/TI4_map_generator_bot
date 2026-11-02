@@ -145,7 +145,7 @@ public class SettlementsAcd2ButtonHandler {
             // is checked when the placement resolves.
             List<Button> fogButtons = PlanetTargetService.targetButtons(
                     game, player, placeOnSpec(game, player, remaining), new ArrayList<>());
-            fogButtons.add(Buttons.red("deleteButtons", "Done"));
+            fogButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             String fogRemaining = remaining == 1 ? "your last infantry" : "an infantry (" + remaining + " remaining)";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -175,7 +175,7 @@ public class SettlementsAcd2ButtonHandler {
                     player.factionButtonChecker() + "settlementsPlaceOn_" + remaining + "_" + planet,
                     Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         String remainingText = remaining == 1 ? "your last infantry" : "an infantry (" + remaining + " remaining)";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

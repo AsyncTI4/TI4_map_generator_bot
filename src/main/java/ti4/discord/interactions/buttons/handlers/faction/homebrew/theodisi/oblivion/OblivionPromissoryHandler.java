@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -16,8 +17,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 
 @UtilityClass
 public class OblivionPromissoryHandler {
@@ -179,6 +180,7 @@ public class OblivionPromissoryHandler {
             owner.removeOwnedPromissoryNoteByID(SHARD_OF_NOTHINGNESS);
         }
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         if (owner != null && owner != player) {

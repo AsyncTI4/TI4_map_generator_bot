@@ -11,9 +11,9 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.spring.service.persistence.GameEntityMapper;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
@@ -35,7 +35,11 @@ public class GameDatabaseReconciler {
         return CHAIN.start(Reconciliation::new);
     }
 
-    private static final class Reconciliation implements GameDatabaseReconciliationChain.Run {
+    public static boolean queueCatchUpReconciliation() {
+        return CHAIN.startAfterCurrentRun(Reconciliation::new);
+    }
+
+    static final class Reconciliation implements GameDatabaseReconciliationChain.Run {
 
         private final List<String> discrepancies = new ArrayList<>();
         private final Set<String> existingGameNames = new HashSet<>();
@@ -86,9 +90,9 @@ public class GameDatabaseReconciler {
                         () -> persistenceService.delete(persistedGameName)));
             }
 
-            reconcileUnreferencedUsers().ifPresent(discrepancies::add);
+            Optional<String> userCleanup = reconcileUnreferencedUsers();
 
-            report(discrepancies, gameCount);
+            report(discrepancies, userCleanup, gameCount);
         }
     }
 
@@ -145,8 +149,7 @@ public class GameDatabaseReconciler {
 
     private static Game loadGame(String gameName) {
         try {
-            ManagedGame managedGame = GameManager.getManagedGame(gameName);
-            return managedGame == null ? null : managedGame.getGame();
+            return GameManager.loadForDatabaseReconciliation(gameName);
         } catch (Exception e) {
             BotLogger.error(TASK_NAME + " could not load game " + gameName + ".", e);
             return null;
@@ -169,24 +172,29 @@ public class GameDatabaseReconciler {
         }
     }
 
-    private static void report(List<String> discrepancies, int gameCount) {
+    private static void report(List<String> discrepancies, Optional<String> userCleanup, int gameCount) {
         if (discrepancies.isEmpty()) {
-            BotLogger.logCron(String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount));
+            String inSync = String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount);
+            BotLogger.logCron(
+                    userCleanup.map(cleanup -> inSync + "\n- " + cleanup).orElse(inSync));
             return;
         }
 
         StringBuilder report = new StringBuilder(String.format(
-                "**%s found %,d games out of sync with their game files and updated the database:**",
-                TASK_NAME, discrepancies.size()));
+                "**%s found %s out of sync with their game files and updated the database:**",
+                TASK_NAME, StringHelper.pluralize(discrepancies.size(), "game")));
+        int cleanupLength = userCleanup.map(cleanup -> cleanup.length() + 3).orElse(0);
+        int reportLimit = MAX_REPORT_LENGTH - cleanupLength - 40;
         int reported = 0;
         for (String discrepancy : discrepancies) {
-            if (report.length() + discrepancy.length() + 3 > MAX_REPORT_LENGTH) break;
+            if (report.length() + discrepancy.length() + 3 > reportLimit) break;
             report.append("\n- ").append(discrepancy);
             reported++;
         }
         if (reported < discrepancies.size()) {
             report.append(String.format("\n...and %,d more.", discrepancies.size() - reported));
         }
+        userCleanup.ifPresent(cleanup -> report.append("\n- ").append(cleanup));
         BotLogger.error(report.toString());
     }
 }

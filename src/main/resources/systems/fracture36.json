@@ -1,0 +1,21 @@
+{
+    "id": "fracture36",
+    "name": "Izana-gi / Izana-mi",
+    "aliases": [
+        "fracture36",
+        "izana-mi",
+        "izana-gi",
+        "mi",
+        "gi",
+        "frac36"
+    ],
+    "imagePath": "fracture36.png",
+    "planets": [
+        "izana-mi",
+        "izana-gi"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

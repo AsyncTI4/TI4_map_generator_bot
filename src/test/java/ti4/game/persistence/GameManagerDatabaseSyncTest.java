@@ -136,6 +136,20 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         }
     }
 
+    @Test
+    void reconciliationLoadFailureDoesNotQueueDelete() {
+        String gameName = uniqueName("db-reconcile-unloadable");
+        try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+                MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            gameLoadService.when(() -> GameLoadService.load(gameName)).thenReturn(null);
+
+            assertThat(GameManager.loadForDatabaseReconciliation(gameName)).isNull();
+
+            gameLoadService.verify(() -> GameLoadService.load(gameName));
+            pipeline.verifyNoInteractions();
+        }
+    }
+
     private static Game newGame(String prefix) {
         Game game = new Game();
         game.setName(uniqueName(prefix));

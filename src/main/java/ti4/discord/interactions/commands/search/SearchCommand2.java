@@ -18,6 +18,7 @@ public class SearchCommand2 implements ParentCommand {
                     new SearchDecksSubcommand(),
                     new SearchEventsSubcommand(),
                     new SearchFactionsSubcommand(),
+                    new SearchFactionComponentsSubcommand(),
                     // no /search franken_errata yet
                     // no /search generic_cards yet
                     // no /search map_templates yet
@@ -36,7 +37,7 @@ public class SearchCommand2 implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Search game component descriptions";
+        return "Search commands, decks, events, factions, strategy cards, sources, emojis, titles";
     }
 
     @Override

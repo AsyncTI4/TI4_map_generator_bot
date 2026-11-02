@@ -44,6 +44,11 @@ public class MiltyDraftDisplayService {
     public void repostDraftInformation(MiltyDraftManager manager, Game game) {
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
+        if (manager.getSlices().isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    channel, "This draft has no slices. File a bug report if this seems incorrect.");
+            return;
+        }
 
         String draftSummary = manager.getOverallSummaryString(game);
         MiltyDraftHelper.generateAndPostSlices(game);

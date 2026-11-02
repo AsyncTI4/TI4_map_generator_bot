@@ -26,8 +26,8 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -372,7 +372,7 @@ public class LostLegciesExploreHandler {
 
         List<Button> buttons = List.of(
                 Buttons.green(player.factionButtonChecker() + USE_POLY + planetName, "Use Polymorphism"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()

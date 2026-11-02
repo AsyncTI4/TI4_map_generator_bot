@@ -11,8 +11,8 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.info.LeaderInfoService;
 
 abstract class LeaderAddRemove extends GameStateSubcommand {

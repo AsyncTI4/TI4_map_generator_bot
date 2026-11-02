@@ -1,0 +1,45 @@
+{
+  "name": "jmsc-ac-fog-unverified-forgeries",
+  "description": "Fog: Letnev plays Unverified Forgeries on far-away Hacan, who spends 2 trade goods; no faction is named in the main channel.",
+  "preset": "jmsc-fog-4p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "do": "hand",
+      "as": "letnev",
+      "hand": {
+        "acs": [
+          "unverifiedforgeriesjmsc"
+        ]
+      }
+    },
+    {
+      "as": "letnev",
+      "press": "ac_play_from_hand_{ac:unverifiedforgeriesjmsc}",
+      "in": "letnev:cards-info"
+    },
+    {
+      "as": "letnev",
+      "press": "thkAcForgeries_{hacan.color}",
+      "in": "letnev"
+    },
+    {
+      "as": "hacan",
+      "press": "thkAcForgeriesPay_{letnev.color}",
+      "in": "hacan"
+    },
+    {
+      "expect": {
+        "state": "hacan.tg",
+        "equals": "1"
+      }
+    },
+    {
+      "expect": {
+        "in": "main",
+        "noFactionLeak": true,
+        "since": "start"
+      }
+    }
+  ]
+}

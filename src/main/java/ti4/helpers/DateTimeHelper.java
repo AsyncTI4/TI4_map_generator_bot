@@ -80,4 +80,10 @@ public class DateTimeHelper {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
         return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
+
+    @NotNull
+    public static String getFormattedTimestampWithMillis() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss.SSS");
+        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
+    }
 }

@@ -4,14 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.helpers.PatternHelper;
-import ti4.image.Mapper;
 import ti4.model.BreakthroughModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.TI4Emoji;
 
 public class BreakthroughDraftItem extends DraftItem {
@@ -43,6 +45,28 @@ public class BreakthroughDraftItem extends DraftItem {
     public String getLongDescriptionImpl() {
         BreakthroughModel breakthroughModel = getBreakthroughModel();
         return breakthroughModel.getText() + "\n";
+    }
+
+    @JsonIgnore
+    @Override
+    public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr, boolean useAlternateText) {
+        List<TextDisplay> displays = new ArrayList<>(super.getTextDisplays(game, player, showDescr, useAlternateText));
+        getBreakthroughModel()
+                .getLinkedUnitUpgrade()
+                .map(upgrade -> DraftItem.generate(DraftCategory.UNIT, upgrade.getId()))
+                .ifPresent(upgrade -> displays.addAll(upgrade.getTextDisplays(game, player, true, useAlternateText)));
+        return displays;
+    }
+
+    @JsonIgnore
+    @Override
+    public List<TextDisplay> getPlainTextDisplays(Game game) {
+        List<TextDisplay> displays = new ArrayList<>(super.getPlainTextDisplays(game));
+        getBreakthroughModel()
+                .getLinkedUnitUpgrade()
+                .map(upgrade -> DraftItem.generate(DraftCategory.UNIT, upgrade.getId()))
+                .ifPresent(upgrade -> displays.addAll(upgrade.getPlainTextDisplays(game)));
+        return displays;
     }
 
     @JsonIgnore

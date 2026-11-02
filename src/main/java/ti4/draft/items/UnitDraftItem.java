@@ -6,8 +6,8 @@ import java.util.List;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
-import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.TI4Emoji;
 
@@ -47,7 +47,11 @@ public class UnitDraftItem extends DraftItem {
         if (unit.getCost() > 0) {
             sb.append("Cost: ");
             float cost = unit.getCost();
-            sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
+            if (cost == 0.5f) {
+                sb.append("1(x2)");
+            } else {
+                sb.append(cost == (int) cost ? "" + (int) cost : "" + cost);
+            }
         }
         if (unit.getCombatHitsOn() > 0) {
             sb.append(" Combat: ");

@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data

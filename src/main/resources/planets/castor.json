@@ -1,0 +1,26 @@
+{
+    "id": "castor",
+    "tileId": "fracture32",
+    "name": "Castor",
+    "aliases": [
+        "fracture32",
+        "castor",
+        "cas",
+        "frac32"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "castor",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 171.0,
+            "y": 131.0
+        }
+    },
+    "flavorText": "*Exposing its layed, hollow interior, this hollowed-out sister world channels harvested gravitational energy directly into Pollux's stabilizing arrays.*",
+    "source": "merford"
+}
