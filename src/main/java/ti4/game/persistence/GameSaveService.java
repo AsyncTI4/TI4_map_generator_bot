@@ -149,7 +149,7 @@ class GameSaveService {
 
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
-        writer.write(PERSISTENCE_REVISION + " " + Objects.requireNonNullElse(game.getRevisionKey(), ""));
+        writer.write(REVISION_KEY + " " + Objects.requireNonNullElse(game.getRevisionKey(), ""));
         writer.write(System.lineSeparator());
         // game information
         writer.write(Constants.LATEST_COMMAND + " " + game.getLatestCommand());

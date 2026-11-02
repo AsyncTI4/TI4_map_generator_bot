@@ -26,7 +26,7 @@ public class GameEntity {
     private String gameName;
 
     @Column(name = "source_revision")
-    private String sourceRevision;
+    private String revisionKey;
 
     @Column(name = "mapping_version")
     private Integer mappingVersion;

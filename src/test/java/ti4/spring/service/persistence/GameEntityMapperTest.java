@@ -10,7 +10,7 @@ import ti4.testUtils.BaseTi4Test;
 class GameEntityMapperTest extends BaseTi4Test {
 
     @Test
-    void snapshotCapturesSourceRevisionAndMappingVersion() {
+    void snapshotCapturesRevisionKeyAndMappingVersion() {
         Game game = new Game();
         game.setName("mapper-revision");
         game.setRevisionKey("saved-revision");
@@ -18,7 +18,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
         game.setRevisionKey("later-revision");
 
-        assertThat(snapshot.game().getSourceRevision()).isEqualTo("saved-revision");
+        assertThat(snapshot.game().getRevisionKey()).isEqualTo("saved-revision");
         assertThat(snapshot.game().getMappingVersion()).isEqualTo(GameEntityMapper.MAPPING_VERSION);
     }
 

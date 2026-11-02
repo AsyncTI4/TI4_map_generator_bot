@@ -11,7 +11,7 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
 
     public record GameColumns(
             String gameName,
-            String sourceRevision,
+            String revisionKey,
             Integer mappingVersion,
             long creationEpochMilliseconds,
             Long endedEpochMilliseconds,
@@ -49,7 +49,7 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     public boolean matchesRevision(String revision) {
         return revision != null
                 && !revision.isBlank()
-                && revision.equals(game.sourceRevision())
+                && revision.equals(game.revisionKey())
                 && Objects.equals(game.mappingVersion(), GameEntityMapper.MAPPING_VERSION);
     }
 
@@ -113,7 +113,7 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     private static GameColumns toGameColumns(GameEntity game) {
         return new GameColumns(
                 game.getGameName(),
-                game.getSourceRevision(),
+                game.getRevisionKey(),
                 game.getMappingVersion(),
                 game.getCreationEpochMilliseconds(),
                 game.getEndedEpochMilliseconds(),

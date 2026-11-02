@@ -48,7 +48,7 @@ class PersistedGameStateTest {
     @Test
     void revisionMatchRequiresBothSourceAndMappingVersions() {
         GameEntity entity = game(1);
-        entity.setSourceRevision("revision-a");
+        entity.setRevisionKey("revision-a");
         entity.setMappingVersion(GameEntityMapper.MAPPING_VERSION);
         PersistedGameState state = PersistedGameState.of(entity, List.of(), List.of());
         assertThat(state.matchesRevision("revision-a")).isTrue();
