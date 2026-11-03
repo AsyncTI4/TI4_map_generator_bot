@@ -71,8 +71,8 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService
-                    .when(() -> GameLoadService.tryLoad(reloadedGame.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(reloadedGame));
+                    .when(() -> GameLoadService.load(reloadedGame.getName()))
+                    .thenReturn(reloadedGame);
 
             assertThat(GameManager.reload(reloadedGame.getName())).isSameAs(reloadedGame);
 
@@ -89,8 +89,8 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService
-                    .when(() -> GameLoadService.tryLoad(recoveredGame.getName()))
-                    .thenReturn(corruptResult());
+                    .when(() -> GameLoadService.load(recoveredGame.getName()))
+                    .thenReturn(null);
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(recoveredGame.getName()))
                     .thenReturn(recoveredGame);
@@ -109,9 +109,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(missingGameName))
-                    .thenReturn(new GameLoadResult.Missing());
+            gameLoadService.when(() -> GameLoadService.load(missingGameName)).thenReturn(null);
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(missingGameName))
                     .thenReturn(null);
@@ -127,13 +125,15 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     void reloadOfCorruptGameWithNoUsableUndoQueuesNoDelete() {
         Game game = newGame("db-sync-corrupt-reload");
 
-        try (MockedStatic<GameSaveService> gameSaveService = mockStatic(GameSaveService.class);
+        try (var harness = TestGameHarness.forDefaultMap();
+                MockedStatic<GameSaveService> gameSaveService = mockStatic(GameSaveService.class);
                 MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            game.setName(harness.getGameName());
             gameSaveService.when(() -> GameSaveService.save(game, "test save")).thenReturn(true);
             GameManager.save(game, "test save");
-            gameLoadService.when(() -> GameLoadService.tryLoad(game.getName())).thenReturn(corruptResult());
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(null);
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(game.getName()))
                     .thenReturn(null);
@@ -179,10 +179,6 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(game));
             pipeline.verifyNoMoreInteractions();
         }
-    }
-
-    private static GameLoadResult.Corrupt corruptResult() {
-        return new GameLoadResult.Corrupt(0L, new IllegalStateException("unparseable game file"));
     }
 
     private static Game newGame(String prefix) {

@@ -62,8 +62,8 @@ class GameManagerManagedPlayerTest extends BaseTi4Test {
                     .when(() -> GameSaveService.save(any(Game.class), anyString()))
                     .thenReturn(true);
             gameLoadService
-                    .when(() -> GameLoadService.tryLoad(savedGame.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(reloadedGame));
+                    .when(() -> GameLoadService.load(savedGame.getName()))
+                    .thenReturn(reloadedGame);
 
             GameManager.save(savedGame, "both players");
             GameManager.reload(savedGame.getName());

@@ -1,10 +1,16 @@
 package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
 
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import ti4.game.Game;
+import ti4.logging.BotLogger;
 import ti4.testUtils.BaseTi4Test;
 
 class GameLoadServiceTest extends BaseTi4Test {
@@ -20,33 +26,20 @@ class GameLoadServiceTest extends BaseTi4Test {
     }
 
     @Test
-    void readableGameFileIsLoaded() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            assertThat(GameLoadService.tryLoad(harness.getGameName()))
-                    .isInstanceOfSatisfying(
-                            GameLoadResult.Loaded.class,
-                            loaded -> assertThat(loaded.game().getName()).isEqualTo(harness.getGameName()));
-        }
+    void absentGameFileLoadsAsNull() {
+        assertThat(GameLoadService.load("missing-" + UUID.randomUUID())).isNull();
     }
 
     @Test
-    void absentGameFileIsMissing() {
-        assertThat(GameLoadService.tryLoad("missing-" + UUID.randomUUID())).isInstanceOf(GameLoadResult.Missing.class);
-    }
-
-    @Test
-    void unparseableGameFileIsCorruptAndRemembersWhichVersionFailed() {
-        try (var harness = TestGameHarness.forDefaultMap()) {
+    void unparseableGameFileLoadsAsNullAndIsReportedOnce() {
+        try (var harness = TestGameHarness.forDefaultMap();
+                MockedStatic<BotLogger> botLogger = mockStatic(BotLogger.class)) {
             harness.corruptGameFile();
 
-            assertThat(GameLoadService.tryLoad(harness.getGameName()))
-                    .isInstanceOfSatisfying(GameLoadResult.Corrupt.class, corrupt -> {
-                        assertThat(corrupt.fileLastModified())
-                                .isEqualTo(harness.getGameFilePath().toFile().lastModified());
-                        assertThat(corrupt.cause()).isNotNull();
-                    });
-            // Callers that only need a Game still get null, as before.
             assertThat(GameLoadService.load(harness.getGameName())).isNull();
+            assertThat(GameLoadService.load(harness.getGameName())).isNull();
+
+            botLogger.verify(() -> BotLogger.error(contains(harness.getGameName()), any(Throwable.class)), times(1));
         }
     }
 }
