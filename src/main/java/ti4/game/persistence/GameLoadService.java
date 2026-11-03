@@ -19,7 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -93,22 +95,10 @@ class GameLoadService {
         }
     }
 
+    private static final Set<String> reportedUnreadableFiles = ConcurrentHashMap.newKeySet();
+
     @Nullable
     public static Game load(String gameName) {
-        return switch (tryLoad(gameName)) {
-            case GameLoadResult.Loaded(Game game) -> game;
-            case GameLoadResult.Corrupt corrupt -> {
-                BotLogger.critical(
-                        "Encountered fatal error loading game file: " + gameName + GAME_FILE_EXTENSION
-                                + ". Load aborted.",
-                        corrupt.cause());
-                yield null;
-            }
-            case GameLoadResult.Missing() -> null;
-        };
-    }
-
-    static GameLoadResult tryLoad(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);
@@ -119,15 +109,24 @@ class GameLoadService {
         return fileName.substring(0, fileName.length() - GAME_FILE_EXTENSION.length());
     }
 
-    private static GameLoadResult readGame(@NotNull File gameFile) {
+    @Nullable
+    private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
             BotLogger.critical("Could not load map, file does not exist: " + gameFile.getAbsolutePath());
-            return new GameLoadResult.Missing();
+            return null;
         }
         try {
-            return new GameLoadResult.Loaded(readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset())));
+            Game game = readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            reportedUnreadableFiles.remove(gameFile.getName());
+            return game;
         } catch (Exception e) {
-            return new GameLoadResult.Corrupt(gameFile.lastModified(), e);
+            if (reportedUnreadableFiles.add(gameFile.getName())) {
+                BotLogger.error(
+                        "The game file " + gameFile.getName() + " could not be loaded and may be corrupt."
+                                + " A bothelper can run `/bothelper reload_game` to restore it from its latest undo.",
+                        e);
+            }
+            return null;
         }
     }
 

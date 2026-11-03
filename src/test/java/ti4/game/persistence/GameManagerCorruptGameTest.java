@@ -9,9 +9,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +23,7 @@ import ti4.testUtils.BaseTi4Test;
 class GameManagerCorruptGameTest extends BaseTi4Test {
 
     @Test
-    void corruptGameIsReportedOncePerFileVersion() throws IOException {
+    void corruptGameIsReportedOnceUntilItLoadsAgain() throws IOException {
         try (var harness = TestGameHarness.forDefaultMap();
                 MockedStatic<BotLogger> botLogger = mockStatic(BotLogger.class)) {
             String gameName = harness.getGameName();
@@ -40,11 +37,10 @@ class GameManagerCorruptGameTest extends BaseTi4Test {
                             and(contains(gameName), contains("/bothelper reload_game")), any(Throwable.class)),
                     times(1));
 
-            // Any write to the file is a new version, so a file that is still corrupt is reported again.
-            Path gameFile = harness.getGameFilePath();
-            Files.setLastModifiedTime(
-                    gameFile,
-                    FileTime.fromMillis(Files.getLastModifiedTime(gameFile).toMillis() + 60_000));
+            // Once the file loads again, a later corruption is a new problem and is reported again.
+            harness.restoreGameFile();
+            GameManager.get(gameName);
+            harness.corruptGameFile();
             GameManager.get(gameName);
 
             botLogger.verify(() -> BotLogger.error(contains(gameName), any(Throwable.class)), times(2));
@@ -67,37 +63,41 @@ class GameManagerCorruptGameTest extends BaseTi4Test {
     @Test
     void staleCorruptResultDoesNotEvictAGameRepairedMeanwhile() {
         String userId = uniqueName("user");
-        Game game = newGame("stale-corrupt");
-        game.addPlayer(userId, "User");
-        Game repaired = new Game();
-        repaired.setName(game.getName());
-        repaired.setLastModifiedDate(1);
-        repaired.addPlayer(userId, "User");
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = newGame("stale-corrupt");
+            game.setName(harness.getGameName());
+            game.addPlayer(userId, "User");
+            Game repaired = new Game();
+            repaired.setName(game.getName());
+            repaired.setLastModifiedDate(1);
+            repaired.addPlayer(userId, "User");
 
-        try (MockedStatic<GameSaveService> saves = mockStatic(GameSaveService.class);
-                MockedStatic<GameLoadService> loads = mockStatic(GameLoadService.class);
-                MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class);
-                MockedStatic<BotLogger> ignoredLogs = mockStatic(BotLogger.class)) {
-            saves.when(() -> GameSaveService.save(any(Game.class), anyString())).thenReturn(true);
-            GameManager.save(game, "initial");
-            ManagedGame examined = GameManager.getManagedGame(game.getName());
+            try (MockedStatic<GameSaveService> saves = mockStatic(GameSaveService.class);
+                    MockedStatic<GameLoadService> loads = mockStatic(GameLoadService.class);
+                    MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class);
+                    MockedStatic<BotLogger> ignoredLogs = mockStatic(BotLogger.class)) {
+                saves.when(() -> GameSaveService.save(any(Game.class), anyString()))
+                        .thenReturn(true);
+                GameManager.save(game, "initial");
+                ManagedGame examined = GameManager.getManagedGame(game.getName());
 
-            // The file is read as corrupt, then a repair lands before that result is handled.
-            loads.when(() -> GameLoadService.tryLoad(game.getName())).thenAnswer(_ -> {
-                GameManager.save(repaired, "repair");
-                return new GameLoadResult.Corrupt(0, new IOException("truncated"));
-            });
+                // The file is read as corrupt, then a repair lands before that result is handled.
+                loads.when(() -> GameLoadService.load(game.getName())).thenAnswer(_ -> {
+                    GameManager.save(repaired, "repair");
+                    return null;
+                });
 
-            assertThat(GameManager.get(game.getName())).isNull();
+                assertThat(GameManager.get(game.getName())).isNull();
 
-            ManagedGame current = GameManager.getManagedGames().stream()
-                    .filter(managedGame -> managedGame.getName().equals(game.getName()))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(current).isNotSameAs(examined);
-            assertThat(GameManager.getManagedPlayer(userId).getGames())
-                    .extracting(ManagedGame::getName)
-                    .contains(game.getName());
+                ManagedGame current = GameManager.getManagedGames().stream()
+                        .filter(managedGame -> managedGame.getName().equals(game.getName()))
+                        .findFirst()
+                        .orElseThrow();
+                assertThat(current).isNotSameAs(examined);
+                assertThat(GameManager.getManagedPlayer(userId).getGames())
+                        .extracting(ManagedGame::getName)
+                        .contains(game.getName());
+            }
         }
     }
 
@@ -106,16 +106,19 @@ class GameManagerCorruptGameTest extends BaseTi4Test {
         Game corrupt = newGame("bulk-corrupt");
         Game healthy = newGame("bulk-healthy");
 
-        try (MockedStatic<GameSaveService> saves = mockStatic(GameSaveService.class);
+        try (var corruptFile = TestGameHarness.forDefaultMap();
+                var healthyFile = TestGameHarness.forDefaultMap();
+                MockedStatic<GameSaveService> saves = mockStatic(GameSaveService.class);
                 MockedStatic<GameLoadService> loads = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class);
                 MockedStatic<BotLogger> ignoredLogs = mockStatic(BotLogger.class)) {
             saves.when(() -> GameSaveService.save(any(Game.class), anyString())).thenReturn(true);
+            corrupt.setName(corruptFile.getGameName());
+            healthy.setName(healthyFile.getGameName());
             GameManager.save(corrupt, "initial");
             GameManager.save(healthy, "initial");
-            loads.when(() -> GameLoadService.tryLoad(corrupt.getName()))
-                    .thenReturn(new GameLoadResult.Corrupt(0, new IOException("truncated")));
-            loads.when(() -> GameLoadService.tryLoad(healthy.getName())).thenReturn(new GameLoadResult.Loaded(healthy));
+            loads.when(() -> GameLoadService.load(corrupt.getName())).thenReturn(null);
+            loads.when(() -> GameLoadService.load(healthy.getName())).thenReturn(healthy);
             // The first access finds the file corrupt and evicts the cached game, keeping its name.
             GameManager.get(corrupt.getName());
             assertThat(GameManager.isValid(corrupt.getName())).isTrue();

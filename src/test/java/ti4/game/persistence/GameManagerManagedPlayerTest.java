@@ -62,8 +62,8 @@ class GameManagerManagedPlayerTest extends BaseTi4Test {
                     .when(() -> GameSaveService.save(any(Game.class), anyString()))
                     .thenReturn(true);
             gameLoadService
-                    .when(() -> GameLoadService.tryLoad(savedGame.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(reloadedGame));
+                    .when(() -> GameLoadService.load(savedGame.getName()))
+                    .thenReturn(reloadedGame);
 
             GameManager.save(savedGame, "both players");
             GameManager.reload(savedGame.getName());
@@ -95,7 +95,7 @@ class GameManagerManagedPlayerTest extends BaseTi4Test {
                 MockedStatic<GameUndoService> undos = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class)) {
             saves.when(() -> GameSaveService.save(saved, "initial")).thenReturn(true);
-            loads.when(() -> GameLoadService.tryLoad(saved.getName())).thenReturn(new GameLoadResult.Loaded(restored));
+            loads.when(() -> GameLoadService.load(saved.getName())).thenReturn(restored);
             undos.when(() -> GameUndoService.undo(saved)).thenReturn(restored);
             GameManager.save(saved, "initial");
             ManagedGame cached = GameManager.getManagedGame(saved.getName());

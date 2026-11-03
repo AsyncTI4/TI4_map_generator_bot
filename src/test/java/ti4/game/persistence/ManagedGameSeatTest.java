@@ -74,7 +74,7 @@ class ManagedGameSeatTest extends BaseTi4Test {
             assertThat(UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer))
                     .isEqualTo(1);
             gameLoadService.verify(() -> GameLoadService.load(anyString()), never());
-            gameLoadService.verify(() -> GameLoadService.tryLoad(anyString()), never());
+            gameLoadService.verify(() -> GameLoadService.load(anyString()), never());
         }
     }
 

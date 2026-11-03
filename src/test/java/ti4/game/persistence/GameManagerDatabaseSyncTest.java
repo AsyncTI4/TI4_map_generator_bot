@@ -8,7 +8,6 @@ import static org.mockito.Mockito.never;
 
 import java.io.UncheckedIOException;
 import java.nio.charset.MalformedInputException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -96,8 +95,8 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService
-                    .when(() -> GameLoadService.tryLoad(reloadedGame.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(reloadedGame));
+                    .when(() -> GameLoadService.load(reloadedGame.getName()))
+                    .thenReturn(reloadedGame);
             AtomicBoolean syncQueuedUnderWriteLock = recordWriteLockWhenSyncQueued(pipeline, reloadedGame);
 
             assertThat(GameManager.reload(reloadedGame.getName())).isSameAs(reloadedGame);
@@ -116,8 +115,8 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService
-                    .when(() -> GameLoadService.tryLoad(recoveredGame.getName()))
-                    .thenReturn(corruptResult());
+                    .when(() -> GameLoadService.load(recoveredGame.getName()))
+                    .thenReturn(null);
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(recoveredGame.getName()))
                     .thenReturn(recoveredGame);
@@ -136,9 +135,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(missingGameName))
-                    .thenReturn(new GameLoadResult.Missing());
+            gameLoadService.when(() -> GameLoadService.load(missingGameName)).thenReturn(null);
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(missingGameName))
                     .thenReturn(null);
@@ -154,13 +151,16 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     void reloadOfCorruptGameWithNoUsableUndoQueuesNoDelete() {
         Game game = newGame("db-sync-corrupt-reload");
 
-        try (MockedStatic<GameSaveService> gameSaveService = mockStatic(GameSaveService.class);
+        try (var harness = TestGameHarness.forDefaultMap();
+                MockedStatic<GameSaveService> gameSaveService = mockStatic(GameSaveService.class);
                 MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            // A real file on disk is what makes this game corrupt rather than missing.
+            game.setName(harness.getGameName());
             gameSaveService.when(() -> GameSaveService.save(game, "test save")).thenReturn(true);
             GameManager.save(game, "test save");
-            gameLoadService.when(() -> GameLoadService.tryLoad(game.getName())).thenReturn(corruptResult());
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(null);
             gameUndoService
                     .when(() -> GameUndoService.loadUndoForMissingGame(game.getName()))
                     .thenReturn(null);
@@ -208,13 +208,8 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         }
     }
 
-    private static GameLoadResult.Corrupt corruptResult() {
-        return new GameLoadResult.Corrupt(0L, new IllegalStateException("unparseable game file"));
-    }
-
     @Test
     void warmupBuildsManagedGameFromDatabaseRowThatMatchesTheGameFile() {
-        Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         String gameName = uniqueName("warmup-current");
         String userId = uniqueName("warmup-current-user");
         PersistedManagedGame persistedGame = new PersistedManagedGame(managedGameState(gameName, userId));
@@ -224,12 +219,10 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             revisionKeys.when(() -> GameRevisionKeyFile.read(gameName)).thenReturn("row-revision");
 
-            assertThat(GameManager.warmupManagedGame(
-                            gameName, Map.of(gameName, persistedGame), corruptGames, readsOn()))
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), readsOn()))
                     .isTrue();
-            assertThat(corruptGames).isEmpty();
 
-            gameLoadService.verify(() -> GameLoadService.tryLoad(gameName), never());
+            gameLoadService.verify(() -> GameLoadService.load(gameName), never());
             pipeline.verifyNoInteractions();
         }
         ManagedGame managedGame = onlyGameOf(userId);
@@ -244,7 +237,6 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
     @Test
     void warmupLoadsGameFileAndQueuesSyncWhenTheDatabaseRowIsStale() {
-        Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         Game game = newGame("warmup-stale");
         String userId = game.getPlayers().keySet().iterator().next();
         PersistedManagedGame staleRow = new PersistedManagedGame(managedGameState(game.getName(), userId));
@@ -253,14 +245,10 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             revisionKeys.when(() -> GameRevisionKeyFile.read(game.getName())).thenReturn("newer-file-revision");
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(game.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(game));
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            assertThat(GameManager.warmupManagedGame(
-                            game.getName(), Map.of(game.getName(), staleRow), corruptGames, readsOn()))
+            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), staleRow), readsOn()))
                     .isFalse();
-            assertThat(corruptGames).isEmpty();
 
             // The sync reloads the file when it runs, so warmup doesn't hold thousands of snapshots in the queue.
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
@@ -272,18 +260,14 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
     @Test
     void warmupLoadsGameFileAndQueuesSyncWhenTheGameHasNoDatabaseRow() {
-        Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         Game game = newGame("warmup-missing-row");
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(game.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(game));
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(), corruptGames, readsOn()))
+            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(), readsOn()))
                     .isFalse();
-            assertThat(corruptGames).isEmpty();
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
             pipeline.verifyNoMoreInteractions();
@@ -294,18 +278,14 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
     @Test
     void warmupWithoutTheDatabaseLoadsGameFileWithoutQueuingSync() {
-        Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         Game game = newGame("warmup-no-database");
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(game.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(game));
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            assertThat(GameManager.warmupManagedGame(game.getName(), null, corruptGames, readsOn()))
+            assertThat(GameManager.warmupManagedGame(game.getName(), null, readsOn()))
                     .isFalse();
-            assertThat(corruptGames).isEmpty();
 
             // With the database unavailable every sync would fail, so warmup must not flood the queue.
             pipeline.verifyNoInteractions();
@@ -316,30 +296,28 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
     @Test
     void warmupRecordsCorruptGameFileWithoutBuildingOrSyncingIt() {
-        Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         String gameName = uniqueName("warmup-corrupt");
-        GameLoadResult.Corrupt corrupt = corruptResult();
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService.when(() -> GameLoadService.tryLoad(gameName)).thenReturn(corrupt);
+            gameLoadService.when(() -> GameLoadService.load(gameName)).thenReturn(null);
 
-            assertThat(GameManager.warmupManagedGame(gameName, Map.of(), corruptGames, readsOn()))
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(), readsOn()))
                     .isFalse();
 
             // A corrupt file must neither overwrite its database rows nor be treated as deleted.
             pipeline.verifyNoInteractions();
         }
-        assertThat(corruptGames).containsExactly(Map.entry(gameName, corrupt));
+        assertThat(GameManager.getManagedGames())
+                .extracting(ManagedGame::getName)
+                .doesNotContain(gameName);
     }
 
     @Test
     void warmupFallsBackToTheGameFileWhenTheRevisionHeaderCannotBeRead() {
-        Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         String gameName = uniqueName("warmup-unreadable-header");
         PersistedManagedGame persistedGame =
                 new PersistedManagedGame(managedGameState(gameName, uniqueName("warmup-unreadable-user")));
-        GameLoadResult.Corrupt corrupt = corruptResult();
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
@@ -348,15 +326,16 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             revisionKeys
                     .when(() -> GameRevisionKeyFile.read(gameName))
                     .thenThrow(new UncheckedIOException(new MalformedInputException(1)));
-            gameLoadService.when(() -> GameLoadService.tryLoad(gameName)).thenReturn(corrupt);
+            gameLoadService.when(() -> GameLoadService.load(gameName)).thenReturn(null);
 
-            assertThat(GameManager.warmupManagedGame(
-                            gameName, Map.of(gameName, persistedGame), corruptGames, readsOn()))
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), readsOn()))
                     .isFalse();
             pipeline.verifyNoInteractions();
         }
-        // The game is classified and reported like any other corrupt file instead of escaping warmup.
-        assertThat(corruptGames).containsExactly(Map.entry(gameName, corrupt));
+        // Warmup falls back to the file, which reports it like any other unreadable save, instead of throwing.
+        assertThat(GameManager.getManagedGames())
+                .extracting(ManagedGame::getName)
+                .doesNotContain(gameName);
     }
 
     @Test
@@ -380,8 +359,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 return "row-revision";
             });
 
-            assertThat(GameManager.warmupManagedGame(
-                            gameName, Map.of(gameName, persistedGame), new HashMap<>(), readsOn()))
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), readsOn()))
                     .isTrue();
         }
         deletion.get().join(5000);
@@ -399,16 +377,13 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             revisionKeys.when(() -> GameRevisionKeyFile.read(game.getName())).thenReturn("file-revision");
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(game.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(game));
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            assertThat(GameManager.warmupManagedGame(
-                            game.getName(), Map.of(game.getName(), currentRow), new HashMap<>(), check))
+            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), currentRow), check))
                     .isFalse();
 
             // The row is current, so it is only compared: nothing is resynced and the file is what gets cached.
-            gameLoadService.verify(() -> GameLoadService.tryLoad(game.getName()));
+            gameLoadService.verify(() -> GameLoadService.load(game.getName()));
             pipeline.verifyNoInteractions();
         }
         assertThat(check.matchingRows()).isEqualTo(1);
@@ -426,11 +401,9 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(game.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(game));
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), wrongRow), new HashMap<>(), check);
+            GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), wrongRow), check);
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
         }
@@ -448,11 +421,9 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.tryLoad(game.getName()))
-                    .thenReturn(new GameLoadResult.Loaded(game));
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            GameManager.warmupManagedGame(game.getName(), Map.of(), new HashMap<>(), check);
+            GameManager.warmupManagedGame(game.getName(), Map.of(), check);
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
         }
