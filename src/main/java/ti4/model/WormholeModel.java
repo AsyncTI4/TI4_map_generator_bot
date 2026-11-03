@@ -3,6 +3,21 @@ package ti4.model;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class WormholeModel {
+    public enum OneWay {
+        ENTRY("in"),
+        EXIT("out");
+
+        private final String suffix;
+
+        OneWay(String suffix) {
+            this.suffix = suffix;
+        }
+
+        public String suffix() {
+            return suffix;
+        }
+    }
+
     public enum Wormhole {
         ALPHA("α"),
         BETA("β"),

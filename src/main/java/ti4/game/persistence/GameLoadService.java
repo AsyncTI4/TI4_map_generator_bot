@@ -19,7 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -93,12 +95,19 @@ class GameLoadService {
         }
     }
 
+    private static final Set<String> reportedUnreadableFiles = ConcurrentHashMap.newKeySet();
+
     @Nullable
     public static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);
         });
+    }
+
+    static boolean isKnownUnreadable(String gameName) {
+        File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
+        return gameFile.exists() && reportedUnreadableFiles.contains(gameFile.getName());
     }
 
     private static String stripGameFileExtension(String fileName) {
@@ -112,10 +121,16 @@ class GameLoadService {
             return null;
         }
         try {
-            return readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            Game game = readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            reportedUnreadableFiles.remove(gameFile.getName());
+            return game;
         } catch (Exception e) {
-            BotLogger.critical(
-                    "Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.", e);
+            if (reportedUnreadableFiles.add(gameFile.getName())) {
+                BotLogger.critical(
+                        "The game file " + gameFile.getName() + " could not be loaded and may be corrupt."
+                                + " A bothelper can run `/bothelper reload_game` to restore it from its latest undo.",
+                        e);
+            }
             return null;
         }
     }

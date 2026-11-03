@@ -455,6 +455,19 @@ class LoreServiceTest extends BaseTi4Test {
         }
 
         @Test
+        void oneWayWormholeTokenIsPlacedAndRemovedByItsId() {
+            // Generated tokens have no image file; lore must still resolve the id to the stored file name,
+            // and planet lore puts them in space, the only holder that draws their ring.
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!token whalpha_in"), systemTile, "mr", true);
+            var tokens = systemTile.getUnitHolders().get(Constants.SPACE).getTokenList();
+            assertTrue(tokens.contains("token_oneway_whalpha_in.png"));
+            assertFalse(systemTile.getUnitHolders().get("mr").getTokenList().contains("token_oneway_whalpha_in.png"));
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!removetoken whalpha_in"), systemTile, "mr", true);
+            assertFalse(tokens.contains("token_oneway_whalpha_in.png"));
+        }
+
+        @Test
         void attachmentNameResolvesToImageFilenameNotBareModelId() {
             // Regression: "positiveres" is an attachment id (Mapper.getAttachmentInfo), not a
             // generic token — Mapper.getTokenID alone can't resolve it, so it used to be stored as

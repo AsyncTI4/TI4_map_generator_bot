@@ -20,6 +20,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.testUtils.BaseTi4Test;
@@ -319,6 +320,40 @@ class MapJsonIOServiceTest extends BaseTi4Test {
 
         assertEquals(1, LoreService.getGameLore(game).size(), "only the entry with a real planetID must land");
         assertEquals("Real entry", LoreService.getGameLore(game).get("mr").loreText);
+    }
+
+    // One-way wormhole tokens have no image file on disk; they must still survive export + import,
+    // and a hand-written token id must import too.
+    @Test
+    void oneWayWormholeTokensRoundTripAndImportByIdWithoutErrors() {
+        game.getTileByPosition("000").getSpaceUnitHolder().addToken(Mapper.getTokenID("whalpha_in"));
+        String exported = MapJsonIOService.exportMapAsJson(null, game, true, false, false);
+        Game freshGame = new Game();
+        freshGame.setName(REIMPORT_GAME_NAME);
+        Game handWrittenGame = new Game();
+        handWrittenGame.setName(REIMPORT_GAME_NAME);
+        String handWritten = """
+                { "mapInfo": [ { "position": "101", "tileID": "19", "tokens": ["whdelta_out"] } ] }
+                """;
+
+        try (MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class)) {
+            MapJsonIOService.importMapFromJson(freshGame, exported, null);
+            MapJsonIOService.importMapFromJson(handWrittenGame, handWritten, null);
+
+            messages.verify(
+                    () -> MessageHelper.sendMessageToChannel(any(), argThat(msg -> msg.contains("Token not found"))),
+                    never());
+        }
+        assertTrue(freshGame
+                .getTileByPosition("000")
+                .getSpaceUnitHolder()
+                .getTokenList()
+                .contains("token_oneway_whalpha_in.png"));
+        assertTrue(handWrittenGame
+                .getTileByPosition("101")
+                .getSpaceUnitHolder()
+                .getTokenList()
+                .contains("token_oneway_whdelta_out.png"));
     }
 
     @Test
