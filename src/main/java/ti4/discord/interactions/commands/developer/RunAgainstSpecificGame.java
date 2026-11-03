@@ -1,5 +1,8 @@
 package ti4.discord.interactions.commands.developer;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.IntConsumer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -7,8 +10,14 @@ import ti4.discord.interactions.commands.Subcommand;
 import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
+import ti4.game.SanityLimits;
+import ti4.game.Tile;
+import ti4.game.UnitHolder;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
+import ti4.helpers.Units.UnitKey;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -50,7 +59,72 @@ class RunAgainstSpecificGame extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        // do something
-        return false;
+        boolean changed = false;
+        for (Tile tile : game.getTileMap().values()) {
+            changed |= capUnitsInTile(tile);
+        }
+        for (Player player : game.getPlayers().values()) {
+            changed |= capUnitsInTile(player.getNomboxTile());
+            changed |= capPlayerCounts(player);
+            changed |= capDebtTokens(player);
+            for (Leader leader : player.getLeaders()) {
+                if (leader.getTgCount() > SanityLimits.TRADE_GOODS_ON_CARD) {
+                    leader.setTgCount(SanityLimits.TRADE_GOODS_ON_CARD);
+                    changed = true;
+                }
+            }
+        }
+        changed |= capValues(game.getScTradeGoods(), SanityLimits.TRADE_GOODS_ON_CARD);
+        return changed;
+    }
+
+    private static boolean capUnitsInTile(Tile tile) {
+        if (tile == null) return false;
+        boolean changed = false;
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (Map.Entry<UnitKey, List<Integer>> entry :
+                    unitHolder.getUnitsByState().entrySet()) {
+                int max = SanityLimits.unitsInOneHolder(entry.getKey().unitType());
+                List<Integer> capped = UnitHolder.capStates(entry.getValue(), max);
+                if (!capped.equals(entry.getValue())) {
+                    entry.setValue(capped);
+                    changed = true;
+                }
+            }
+        }
+        return changed;
+    }
+
+    private static boolean capPlayerCounts(Player player) {
+        boolean changed = false;
+        changed |= capCount(player.getTacticalCC(), SanityLimits.COMMAND_TOKENS_PER_POOL, player::setTacticalCC);
+        changed |= capCount(player.getFleetCC(), SanityLimits.COMMAND_TOKENS_PER_POOL, player::setFleetCC);
+        changed |= capCount(player.getStrategicCC(), SanityLimits.COMMAND_TOKENS_PER_POOL, player::setStrategicCC);
+        changed |= capCount(player.getTg(), SanityLimits.TRADE_GOODS, player::setTg);
+        changed |= capCount(player.getCommodities(), SanityLimits.COMMODITIES, player::setCommodities);
+        changed |= capCount(player.getStasisInfantry(), SanityLimits.STASIS_UNITS, player::setStasisInfantry);
+        changed |= capCount(player.getStasisFighters(), SanityLimits.STASIS_UNITS, player::setStasisFighters);
+        return changed;
+    }
+
+    private static boolean capCount(int current, int max, IntConsumer setter) {
+        if (current <= max) return false;
+        setter.accept(max);
+        return true;
+    }
+
+    private static boolean capDebtTokens(Player player) {
+        boolean changed = false;
+        for (Map<String, Integer> pool : player.getAllDebtTokens().values()) {
+            changed |= capValues(pool, SanityLimits.DEBT_TOKENS_PER_COLOR);
+        }
+        return changed;
+    }
+
+    private static <K> boolean capValues(Map<K, Integer> counts, int max) {
+        boolean changed =
+                counts.values().stream().anyMatch(count -> count != null && count != SanityLimits.cap(count, max));
+        counts.replaceAll((key, count) -> count == null ? null : SanityLimits.cap(count, max));
+        return changed;
     }
 }

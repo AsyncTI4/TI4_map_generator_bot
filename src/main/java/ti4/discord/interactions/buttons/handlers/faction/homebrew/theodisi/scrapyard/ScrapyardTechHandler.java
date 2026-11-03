@@ -11,8 +11,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 
@@ -25,7 +25,7 @@ public class ScrapyardTechHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + USE_HOTSWAPPING, "Use Hotswapping", FactionEmojis.scrapyard));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         return buttons;
     }

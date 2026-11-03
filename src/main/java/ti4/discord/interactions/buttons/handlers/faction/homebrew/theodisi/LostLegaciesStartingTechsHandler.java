@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -12,8 +13,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.tech.ListTechService;
@@ -72,6 +73,7 @@ public class LostLegaciesStartingTechsHandler {
             case "revenant" -> offerRevenantStartingTechs(game, player);
             case "scrapyard" -> gainRandomScrapyardStartTechs(game, player);
             case "thurviali" -> offerThurvialiStartingTechs(game, player);
+            case "stoneborn" -> offerStonebornStartingTechs(game, player);
             default -> {}
         }
     }
@@ -81,7 +83,7 @@ public class LostLegaciesStartingTechsHandler {
             return false;
         }
         return switch (faction.toLowerCase()) {
-            case "arcanum", "aeterna", "revenant", "scrapyard", "thurviali" -> true;
+            case "arcanum", "aeterna", "revenant", "scrapyard", "thurviali", "stoneborn" -> true;
             default -> false;
         };
     }
@@ -219,6 +221,15 @@ public class LostLegaciesStartingTechsHandler {
                 player.getRepresentationUnfogged() + " choose your second starting technology, or press **Done**. "
                         + rule,
                 true);
+    }
+
+    public static void offerStonebornStartingTechs(Game game, Player player) {
+        List<TechnologyModel> factionTechs = player.getFactionTechs().stream()
+                .map(Mapper::getTech)
+                .filter(Objects::nonNull)
+                .toList();
+        String rule = ", please select which faction tech you would like to start with.";
+        sendTechPrompt(player, factionTechs, player.getRepresentationUnfogged() + rule, false);
     }
 
     public static void gainRandomScrapyardStartTechs(Game game, Player player) {

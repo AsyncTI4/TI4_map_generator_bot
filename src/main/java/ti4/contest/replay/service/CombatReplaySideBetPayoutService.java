@@ -21,9 +21,9 @@ import ti4.game.UnitHolder;
 import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
+import ti4.model.Mapper;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
@@ -99,11 +99,10 @@ public class CombatReplaySideBetPayoutService {
     }
 
     private int boundedDynamicPayout(CombatSideBetType betType, int payout) {
-        int minimumPayout =
-                switch (betType) {
-                    case ROUND_ONE_WHIFF -> 20;
-                    default -> 1;
-                };
+        int minimumPayout = switch (betType) {
+            case ROUND_ONE_WHIFF -> 20;
+            default -> 1;
+        };
         return Math.clamp(minimumPayout, payout, maxDynamicPayout());
     }
 

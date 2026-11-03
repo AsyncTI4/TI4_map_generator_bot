@@ -1,0 +1,28 @@
+on: workflow_dispatch
+name: RestartPostgres
+concurrency:
+  group: "RestartPostgres"
+jobs:
+  restart:
+    name: Restart Postgres via docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          script: |
+            echo "=== BEFORE ==="
+            ss -lntp | grep 5432 || true
+            echo "=== restarting postgresql on the host ==="
+            docker run --rm --privileged --pid=host alpine:3 \
+              nsenter -t 1 -m -u -i -n -p -- systemctl restart postgresql \
+              && echo "restart issued" || echo "restart FAILED"
+            sleep 6
+            echo "=== AFTER ==="
+            ss -lntp | grep 5432 || echo "nothing listening"
+            pg_isready -h 172.17.0.1 -p 5432 2>&1 || true
+            docker ps --format '{{.Names}}\t{{.Status}}'

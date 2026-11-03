@@ -1,0 +1,20 @@
+{
+    "id": "fracture17",
+    "name": "Experiment/Janus",
+    "aliases": [
+        "fracture17",
+        "experiment",
+        "janus",
+        "exp",
+        "frac17"
+    ],
+    "imagePath": "fracture17.png",
+    "planets": [
+        "experiment",
+        "janus"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

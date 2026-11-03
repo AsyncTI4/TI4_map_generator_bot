@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 class RelicReady extends GameStateSubcommand {
 
@@ -31,5 +31,10 @@ class RelicReady extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

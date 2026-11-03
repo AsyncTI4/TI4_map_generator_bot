@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.message.MessageHelper;
 import ti4.service.game.StartPhaseService;
 import ti4.service.player.RefreshCardsService;
@@ -47,6 +48,7 @@ class StrategyPhaseButtonHandler {
                 return;
             }
         }
+        ThirtyKSecretHooks.onAgendaPhaseEnd(game);
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             if (!game.isTwilightsFallMode()) {

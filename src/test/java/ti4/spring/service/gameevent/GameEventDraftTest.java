@@ -89,6 +89,63 @@ class GameEventDraftTest {
     }
 
     @Test
+    void combatAndInvasionSubEventsRoundTripWithTypeDiscriminators() {
+        Game game = new Game();
+        GameEventDraft.open(game);
+        GameEventDraft.stage(
+                game, new GameSubEvent.CombatRoll("combatround", "18", null, "hacan", "sol", 2, 25, Map.of("dn2", 2)));
+        GameEventDraft.stage(
+                game, new GameSubEvent.InvasionCommitted("hacan", "18", Map.of("mecatol", Map.of("gf", 3))));
+        GameEventDraft.stage(
+                game,
+                new GameSubEvent.CombatOutcome("ground", "18", "mecatol", "hacan", Map.of("hacan", Map.of("gf", 1))));
+        GameEventDraft.stage(game, new GameSubEvent.CardCanceled("sol", "Direct Hit", "hacan", "ac"));
+
+        String json = game.getPendingSubEventsJson();
+        List<GameSubEvent> drained = GameEventDraft.drain(game);
+
+        assertThat(json)
+                .contains("\"type\":\"COMBAT_ROLL\"")
+                .contains("\"type\":\"INVASION_COMMITTED\"")
+                .contains("\"type\":\"COMBAT_OUTCOME\"")
+                .contains("\"type\":\"CARD_CANCELED\"");
+        assertThat(drained).hasSize(4);
+        assertThat(drained.get(0))
+                .isEqualTo(new GameSubEvent.CombatRoll(
+                        "combatround", "18", null, "hacan", "sol", 2, 25, Map.of("dn2", 2)));
+    }
+
+    @Test
+    void controlEstablishedKeepsFactionAndPreviousOwnerThroughTheDraft() {
+        Game game = new Game();
+        GameEventDraft.open(game);
+        GameEventDraft.stage(game, new GameSubEvent.ControlEstablished("mecatol", "hacan", "sol"));
+        GameEventDraft.stage(game, new GameSubEvent.ControlEstablished("18"));
+
+        List<GameSubEvent> drained = GameEventDraft.drain(game);
+
+        assertThat(drained)
+                .containsExactly(
+                        new GameSubEvent.ControlEstablished("mecatol", "hacan", "sol"),
+                        new GameSubEvent.ControlEstablished("18", null, null));
+    }
+
+    @Test
+    void leaderPlayedAndProductionStillDeserializeWhenNewFieldsAreAbsent() {
+        Game game = new Game();
+        GameEventDraft.open(game);
+        GameEventDraft.stage(game, new GameSubEvent.LeaderPlayed("hacan", "AGENT", "hacanagent"));
+        GameEventDraft.stage(game, new GameSubEvent.Production("18", Map.of("dn", 1), 4));
+
+        List<GameSubEvent> drained = GameEventDraft.drain(game);
+
+        assertThat(drained)
+                .containsExactly(
+                        new GameSubEvent.LeaderPlayed("hacan", "AGENT", "hacanagent", null),
+                        new GameSubEvent.Production("18", Map.of("dn", 1), 4, null));
+    }
+
+    @Test
     void subEventTypeEnumMatchesJsonDiscriminators() {
         // GameSubEventType documents the wire contract; keep it structurally tied to the @JsonSubTypes names.
         List<String> discriminators = Arrays.stream(

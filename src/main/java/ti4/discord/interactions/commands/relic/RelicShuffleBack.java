@@ -3,11 +3,13 @@ package ti4.discord.interactions.commands.relic;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
+import ti4.service.info.RelicInfoService;
 
 class RelicShuffleBack extends GameStateSubcommand {
 
@@ -25,6 +27,19 @@ class RelicShuffleBack extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         String relicId = event.getOption(Constants.RELIC).getAsString();
+        if (IronSalvageRelicHandler.isSalvageRelic(relicId)) {
+            if (!player.hasRelic(relicId)) {
+                MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic");
+                return;
+            }
+            player.removeRelic(relicId);
+            player.removeExhaustedRelic(relicId);
+            MessageHelper.sendMessageToChannel(
+                    getGame().isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                    "Discarded _" + Mapper.getRelic(relicId).getName() + "_.");
+            RelicInfoService.sendRelicInfo(getGame(), player, event);
+            return;
+        }
         if (player.hasRelic(relicId)) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);

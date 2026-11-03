@@ -72,7 +72,7 @@ public class YinImpulseCoreButtonHandler {
                     "Destroy 1 " + ship.humanReadableName(),
                     ship.unitEmoji()));
         }
-        buttons.add(Buttons.gray("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

@@ -18,9 +18,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MahactKingDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.draft.DraftButtonService;
 import ti4.service.draft.DraftChoice;
 import ti4.service.draft.DraftManager;
@@ -308,15 +308,12 @@ public class MahactKingDraftable extends SinglePickDraftable {
                 }
             }
 
-            boolean first = true;
             List<MessageEmbed> embeds =
                     factions.stream().map(FactionModel::fancyEmbed).toList();
-            for (MessageEmbed e : embeds) {
-                String message = "";
-                if (first) message = player.getRepresentationUnfogged() + ", here is an overview of the factions:";
-                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
-                first = false;
-            }
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", here is an overview of the factions:",
+                    embeds);
         }
     }
 }

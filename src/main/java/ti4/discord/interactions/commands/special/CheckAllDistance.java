@@ -23,7 +23,8 @@ class CheckAllDistance extends GameStateSubcommand {
 
     public CheckAllDistance() {
         super(Constants.CHECK_ALL_DISTANCE, "Check All Distance", false, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")
+                .setRequiredRange(0, 30));
     }
 
     @Override

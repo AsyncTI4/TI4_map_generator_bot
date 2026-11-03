@@ -18,15 +18,15 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -84,10 +84,12 @@ public final class TeHelperUnits {
     }
 
     public static boolean affectedByQuietus(Game game, Player player, Tile tile) {
+        if (player.hasTech("dsxinystar")) return false;
         return affectedByQuietus(game, player, tile.getSpaceUnitHolder());
     }
 
     public static boolean affectedByQuietus(Game game, Player player, UnitHolder uh) {
+        if (player.hasTech("dsxinystar")) return false;
         // Get the actual space unit holder if able
         if (!"space".equals(uh.getName())) {
             Tile t = game.getTileFromPlanet(uh.getName());
@@ -244,7 +246,7 @@ public final class TeHelperUnits {
         // Get the tiles that are valid sources for Forerunner mech
         if (forerunnerMap == null) forerunnerMap = new HashMap<>();
         List<Button> buttons = new ArrayList<>();
-        for (String adj : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String adj : Adjacency.of(game, player).forMovement().into(tile.getPosition())) {
             Tile t = game.getTileByPosition(adj);
             if (t != null
                     && getForerunnerUnitButtonsForSystem(game, player, tile, t, forerunnerMap.get(adj))

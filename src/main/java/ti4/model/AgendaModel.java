@@ -12,7 +12,6 @@ import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -116,7 +115,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
             case "censure" ->
                 "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
             case Constants.VOICE_OF_THE_COUNCIL_ID ->
-                "Use this command to change the electee: `/omegaphase elect_voice_of_the_council`\n";
+                "Use this command to change the electee: `/homebrew omegaphase elect_voice_of_the_council`\n";
             default -> null;
         };
     }

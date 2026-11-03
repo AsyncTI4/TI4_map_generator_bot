@@ -1,17 +1,19 @@
 {
     "tileBack": "green",
     "id": "be4",
-    "name": "Kymore - Iron",
+    "name": "Kymore/Polaris - Iron",
     "aliases": [
         "be4",
         "iron",
-        "kymore"
+        "kymore",
+        "polaris"
     ],
     "imagePath": "be4_ironhs.png",
-    "shipPositionsType": "TYPE01",
+    "shipPositionsType": "TYPE02",
     "wormholes": [],
     "planets": [
-        "kymore"
+        "kymore",
+        "polaris"
     ],
     "source": "beans"
 }

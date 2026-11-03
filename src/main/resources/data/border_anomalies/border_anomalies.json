@@ -1,0 +1,101 @@
+[
+    {
+        "id": "asteroid",
+        "name": "Asteroid Field",
+        "aliasList": ["asteroid field"],
+        "imagePath": "asteroid_border.png",
+        "source": "other",
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on the map only. Players apply the border's effect themselves."
+    },
+    {
+        "id": "gravity_wave",
+        "name": "Gravity Wave",
+        "aliasList": ["gravitywave"],
+        "imagePath": "gravity_wave_border.png",
+        "source": "other",
+        "rules": { "adjacency": { "blocksIn": true, "blocksOut": false } },
+        "automation": "FULL",
+        "automationNotes": "Units cannot move into the bordered system over this edge. Other effects only follow that direction when one-way adjacency is on (always in fog); otherwise the systems stay adjacent both ways."
+    },
+    {
+        "id": "nebula",
+        "name": "Nebula",
+        "imagePath": "nebula_border.png",
+        "source": "other",
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on the map only. Players apply the border's effect themselves."
+    },
+    {
+        "id": "minefield",
+        "name": "Minefield",
+        "imagePath": "minefield_border.png",
+        "source": "other",
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on the map only. Players apply the border's effect themselves."
+    },
+    {
+        "id": "spatial_tear",
+        "name": "Spatial Tear",
+        "aliasList": ["spatialtear"],
+        "imagePath": "spatial_tear_border.png",
+        "source": "other",
+        "rules": { "adjacency": { "blocksIn": true, "blocksOut": true } },
+        "automation": "FULL",
+        "automationNotes": "The two systems sharing this edge are not adjacent in either direction."
+    },
+    {
+        "id": "void_tether",
+        "name": "Void Tether",
+        "aliasList": ["voidtether"],
+        "imagePath": "void_tether.png",
+        "source": "thunders_edge",
+        "rules": { "adjacency": { "blocksIn": true, "blocksOut": true, "exemptHolderOf": "empyreanbt", "oneWayAdjacencyOnly": true } },
+        "automation": "PARTIAL",
+        "automationNotes": "Enforced only with one-way adjacency on (always in fog); in other games the token is drawn but blocks nothing. When enforced, it blocks this edge in either direction and for every effect, for everyone except the player with the Void Tether breakthrough and the colours they allow through this token. Only the edge is blocked: other links between the two systems (wormholes, custom links, ingress/egress) still connect them. Allowances end when the token is moved or removed."
+    },
+    {
+        "id": "core_border",
+        "name": "Core border",
+        "aliasList": ["coreborder"],
+        "imagePath": "core_border.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "rim_border",
+        "name": "Rim border",
+        "aliasList": ["rimborder"],
+        "imagePath": "rim_border.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "yellow",
+        "name": "Yellow",
+        "imagePath": "yellow.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "redorange",
+        "name": "RedOrange",
+        "imagePath": "redorange.png",
+        "source": "pbd100",
+        "automation": "NO_RULES",
+        "automationNotes": "Map marker without rules."
+    },
+    {
+        "id": "ratnest",
+        "name": "Rat Nest",
+        "aliasList": ["rat nest"],
+        "imagePath": "ratnest_border.png",
+        "source": "other",
+        "wholeHex": true,
+        "automation": "MANUAL",
+        "automationNotes": "Drawn on all six borders only. Players apply the border's effect themselves."
+    }
+]

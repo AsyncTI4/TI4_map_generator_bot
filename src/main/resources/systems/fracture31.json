@@ -1,0 +1,15 @@
+{
+    "id": "fracture31",
+    "name": "Fracture Set6 Base Right",
+    "aliases": [
+        "fracture31",
+        "fracrightbase",
+        "frac31",
+        "fracrightbase"
+    ],
+    "imagePath": "fracture31.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "isFracture": true,
+    "source": "merford"
+}

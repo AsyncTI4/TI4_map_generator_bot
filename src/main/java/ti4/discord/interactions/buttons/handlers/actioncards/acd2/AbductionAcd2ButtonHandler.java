@@ -20,7 +20,7 @@ class AbductionAcd2ButtonHandler {
     @ButtonHandler("resolveAbduction")
     public static void resolveAbduction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             if (p2 == player) continue;
             for (Leader leader : p2.getLeaders()) {
                 boolean isAgent = Constants.AGENT.equals(leader.getType());
@@ -43,7 +43,7 @@ class AbductionAcd2ButtonHandler {
                             + ", none of your neighbors have an agent or unlocked commander to take for _Abduction_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

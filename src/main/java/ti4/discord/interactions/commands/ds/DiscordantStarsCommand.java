@@ -10,7 +10,6 @@ import ti4.helpers.Constants;
 public class DiscordantStarsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ZelianHero(),
                     new TrapToken(),
                     new TrapReveal(),
                     new TrapSwap(),

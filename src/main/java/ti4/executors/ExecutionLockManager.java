@@ -2,63 +2,117 @@ package ti4.executors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.cache.CacheManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ExecutionLockManager {
 
-    private static final int LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES = 20;
-    private static final Cache<String, ReentrantReadWriteLock> locks;
+    private static final ConcurrentMap<String, Entry> locks = new ConcurrentHashMap<>();
 
-    static {
-        locks = Caffeine.newBuilder()
-                .expireAfterAccess(LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES, TimeUnit.MINUTES)
-                .recordStats()
-                .build();
-        CacheManager.registerCache("executionLocks", locks);
+    private static final class Entry {
+        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        private int holders;
+
+        private Lock lockOf(ExecutionLockType lockType) {
+            return lockType == ExecutionLockType.READ ? lock.readLock() : lock.writeLock();
+        }
+
+        private boolean currentThreadHoldsOnlyRead() {
+            return lock.getReadHoldCount() > 0 && !lock.isWriteLockedByCurrentThread();
+        }
     }
 
     public static void lock(String lockName, ExecutionLockType lockType) {
-        var lock = getLock(lockName);
-        long lockStartTime = System.currentTimeMillis();
-        if (lockType == ExecutionLockType.READ) {
-            lock.readLock().lock();
-        } else {
-            lock.writeLock().lock();
+        if (lockType == ExecutionLockType.WRITE) {
+            refuseUpgradeFromRead(lockName);
         }
+        Entry entry = acquire(lockName);
+        long lockStartTime = System.currentTimeMillis();
+        entry.lockOf(lockType).lock();
         long timeToGetLock = System.currentTimeMillis() - lockStartTime;
         if (timeToGetLock >= 1000) {
+            warnSlowLockIgnoringLoggingFailures(lockName, timeToGetLock);
+        }
+    }
+
+    private static void refuseUpgradeFromRead(String lockName) {
+        Entry entry = locks.get(lockName);
+        if (entry == null || !entry.currentThreadHoldsOnlyRead()) {
+            return;
+        }
+        IllegalStateException refuseUpgradeException = new IllegalStateException("Cannot take the write lock \""
+                + lockName + "\" while this thread holds its read lock; a read lock cannot be upgraded.");
+        try {
+            BotLogger.error(refuseUpgradeException.getMessage(), refuseUpgradeException);
+        } catch (RuntimeException e) {
+        }
+        throw refuseUpgradeException;
+    }
+
+    private static void warnSlowLockIgnoringLoggingFailures(String lockName, long timeToGetLock) {
+        try {
             BotLogger.warning("Took " + timeToGetLock + " ms to get lock \"" + lockName + "\"");
+        } catch (RuntimeException e) {
         }
     }
 
     private static boolean tryLock(String lockName, ExecutionLockType lockType) {
-        var lock = getLock(lockName);
-        if (lockType == ExecutionLockType.READ) {
-            return lock.readLock().tryLock();
+        Entry entry = acquire(lockName);
+        boolean gotLock = entry.lockOf(lockType).tryLock();
+        if (!gotLock) {
+            release(lockName);
         }
-        return lock.writeLock().tryLock();
+        return gotLock;
     }
 
     public static void unlock(String lockName, ExecutionLockType lockType) {
-        var lock = getLock(lockName);
-        if (lockType == ExecutionLockType.READ) {
-            lock.readLock().unlock();
-        } else {
-            lock.writeLock().unlock();
+        Entry entry = locks.get(lockName);
+        if (entry == null) {
+            throw new IllegalMonitorStateException("Lock \"" + lockName + "\" is not held.");
         }
+        entry.lockOf(lockType).unlock();
+        release(lockName);
     }
 
-    private static ReentrantReadWriteLock getLock(String lockName) {
-        return locks.get(lockName, _ -> new ReentrantReadWriteLock());
+    static int holders(String lockName) {
+        Entry entry = locks.get(lockName);
+        return entry == null ? 0 : entry.holders;
+    }
+
+    static boolean hasQueuedThreads(String lockName) {
+        Entry entry = locks.get(lockName);
+        return entry != null && entry.lock.hasQueuedThreads();
+    }
+
+    private static Entry acquire(String lockName) {
+        return locks.compute(lockName, (_, existing) -> {
+            Entry entry = existing == null ? new Entry() : existing;
+            entry.holders++;
+            return entry;
+        });
+    }
+
+    private static void release(String lockName) {
+        AtomicBoolean wasTracked = new AtomicBoolean(true);
+        locks.compute(lockName, (_, entry) -> {
+            if (entry == null) {
+                wasTracked.set(false);
+                return null;
+            }
+            entry.holders--;
+            return entry.holders > 0 ? entry : null;
+        });
+        if (!wasTracked.get()) {
+            BotLogger.error("Released lock \"" + lockName + "\" that was not tracked.", new IllegalStateException());
+        }
     }
 
     public static Runnable wrapWithTryLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {

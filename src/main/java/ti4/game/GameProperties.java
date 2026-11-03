@@ -74,6 +74,7 @@ public class GameProperties {
     private String pendingSubEventsJson = "";
     // Undo-safe compact movement captured when tactical displacement is committed.
     private String pendingMovementState = "";
+    private String lastPlayerStateJson = "";
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String playersWhoHitPersistentNoAfter = "";
@@ -106,6 +107,7 @@ public class GameProperties {
     private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
+    private boolean oneWayAdjacency;
     private boolean queueSO = true;
     private boolean showBanners = true;
     private boolean showBubbles = true;
@@ -116,6 +118,7 @@ public class GameProperties {
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
     private boolean showOwnedPNsInPlayerArea;
+    private int wormholeTokenMergeFrom;
     private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
@@ -151,6 +154,8 @@ public class GameProperties {
     private @ExportableField boolean feastOrFamineMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
+    private @ExportableField boolean oplusplusRegularMode;
+    private @ExportableField boolean oplusplusCouncilMode;
     private @ExportableField boolean noSwapMode;
     private @ExportableField boolean veiledHeartMode;
     private @ExportableField boolean limitedWhispersMode;
@@ -170,6 +175,7 @@ public class GameProperties {
     private @ExportableField boolean discordantStarsMode;
     private @ExportableField boolean blueReverieMode;
     private @ExportableField boolean unchartedSpaceStuff;
+    private @ExportableField boolean lostLegaciesTiles;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;
     private @ExportableField boolean flagshippingMode;
@@ -208,6 +214,7 @@ public class GameProperties {
     // Decks
     private List<String> secretObjectives;
     private List<String> actionCards;
+    private List<String> hydromorphicCards = new ArrayList<>();
     private List<String> agendas;
     private List<String> mandates;
     private List<String> events; // ignis_aurora

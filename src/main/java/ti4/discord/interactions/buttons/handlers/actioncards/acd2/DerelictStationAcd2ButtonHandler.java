@@ -13,8 +13,8 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 
 @UtilityClass
@@ -25,7 +25,7 @@ class DerelictStationAcd2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("derelictStationFrontier", "Explore a Frontier Token"));
         buttons.add(Buttons.blue("derelictStationComms", "Gain 2 Commodities", MiscEmojis.comm));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -62,7 +62,7 @@ class DerelictStationAcd2ButtonHandler {
                             + " Station_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the system whose frontier token you want to explore.",

@@ -1,0 +1,30 @@
+{
+    "id": "maahes",
+    "tileId": "fracture29",
+    "name": "Maahes",
+    "aliases": [
+        "fracture29",
+        "maahes",
+        "maa",
+        "frac29"
+    ],
+    "resources": 3,
+    "influence": 2,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "legendaryAbilityName": "Radient Energy Tap",
+    "legendaryAbilityText": "At the start of a tactical action, you may exhaust this card to place 1 frontier token into up to 3 fracture systems that do not contain any planets or frontier tokens.",
+    "legendaryAbilityFlavourText": "It moves and breathes like us, but it's more like they are imitating life rather than living.",
+    "planetLayout": {
+        "unitHolderName": "maahes",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 171.0,
+            "y": 131.0
+        }
+    },
+    "flavorText": "*A jagged world of churning magma and sprawling automated forges. Its surfaces constantly tears open from gravitational stress, bleeding raw energy to fuel the empire's war machines.*",
+    "contrastColor": "orange",
+    "source": "merford"
+}

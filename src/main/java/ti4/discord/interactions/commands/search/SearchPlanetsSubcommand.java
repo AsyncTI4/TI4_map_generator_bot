@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 
 class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
 

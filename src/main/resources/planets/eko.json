@@ -25,8 +25,9 @@
     "planetType": "CULTURAL",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "placeholder",
-    "legendaryAbilityText": "foo bar",
+    "legendaryAbilityName": "Temporal Anomaly",
+    "legendaryAbilityText": "At the end of your turn you may exhaust this card to place a frontier token in a system that does not contain a planet or a frontier token.",
+    "legendaryAbilityFlavourText": "An ancient Empyrean artifact at the fringe of a black hole.",
     "unitPositions": {
         "unitHolderName": "eko",
         "coordinateMap": {

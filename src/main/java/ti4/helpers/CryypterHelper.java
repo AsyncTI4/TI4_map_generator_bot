@@ -25,11 +25,12 @@ import ti4.game.Player;
 import ti4.game.Space;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -115,7 +116,7 @@ public final class CryypterHelper {
                                 p2.getColor()));
                     }
                 }
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
             }
         }
@@ -211,7 +212,7 @@ public final class CryypterHelper {
                     buttons2.add(Buttons.gray(buttonText, p2.getColor()));
                 }
             }
-            buttons2.add(Buttons.red("deleteButtons", "Decline"));
+            buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
         }
     }
@@ -357,6 +358,7 @@ public final class CryypterHelper {
                     List<Tile> arboTiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                             game, envoyPlayer, UnitType.Mech, UnitType.Infantry);
                     Map<Planet, Integer> eligiblePlanets = new HashMap<>();
+                    Adjacency adjacency = Adjacency.of(game, envoyPlayer);
 
                     for (Tile arbotile : arboTiles) {
                         Space space = arbotile.getSpaceUnitHolder();
@@ -371,8 +373,7 @@ public final class CryypterHelper {
                             }
                         }
 
-                        Set<String> adjTiles =
-                                FoWHelper.getAdjacentTiles(game, arbotile.getPosition(), null, false, false);
+                        Set<String> adjTiles = adjacency.from(arbotile.getPosition());
                         for (String adjTile : adjTiles) {
                             Tile tile = game.getTileByPosition(adjTile);
                             List<Planet> planets = tile.getPlanetUnitHolders();
@@ -485,7 +486,7 @@ public final class CryypterHelper {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green(
                             envoyPlayer.factionButtonChecker() + "relic_look_top", "Look at top of Relic Deck"));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
 
                     List<Button> buttons2 = new ArrayList<>();
@@ -493,7 +494,7 @@ public final class CryypterHelper {
                             "handleNaazEnvoy_Gain", "Purge 2 fragments to gain relic", ExploreEmojis.Relic));
                     buttons2.add(Buttons.gray("handleNaazEnvoy_Bottom", "Put relic on the bottom of the deck")
                             .withEmoji(Emoji.fromUnicode("🔽")));
-                    buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons2.add(Buttons.DECLINE_DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons2);
                 }
                 if (key.contains("nekroenvoy")) {

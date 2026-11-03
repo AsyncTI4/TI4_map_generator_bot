@@ -11,8 +11,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 
 @UtilityClass
@@ -79,7 +79,7 @@ class MysteriousBrokersAcd2ButtonHandler {
     }
 
     private static int neighborsNotPassed(Player player) {
-        return (int) player.getNeighbouringPlayers(true).stream()
+        return (int) player.getAbilityNeighbours().stream()
                 .filter(p2 -> !p2.isPassed())
                 .count();
     }

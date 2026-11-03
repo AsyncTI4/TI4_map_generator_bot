@@ -25,8 +25,9 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.MonumentsAgendaService;
@@ -202,11 +203,14 @@ public class MonumentsBRButtonHandler {
                 && !MonumentsService.isMonumentOnBoard(game, player, "sarcosa_monument")
                 && tile != null
                 && planet != null
+                && FoWHelper.knowsTile(game, player, tile.getPosition())
                 && !tile.isHomeSystem(game)
                 && !tile.isFracture()
                 && game.getTileMap().values().stream()
                         .filter(system -> FoWHelper.playerHasUnitsInSystem(player, system)
-                                || (neutral != null && FoWHelper.playerHasUnitsInSystem(neutral, system)))
+                                || (neutral != null
+                                        && FoWHelper.knowsTile(game, player, system.getPosition())
+                                        && FoWHelper.playerHasUnitsInSystem(neutral, system)))
                         .flatMap(system ->
                                 FoWHelper.getAdjacentTilesAndNotThisTile(game, system.getPosition(), player, false)
                                         .stream())
@@ -429,7 +433,7 @@ public class MonumentsBRButtonHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + RESOLVE_DEEPMANTLE, "Produce Up to 1 Unit", FactionEmojis.atokera));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -489,7 +493,7 @@ public class MonumentsBRButtonHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationNoPing()
@@ -540,7 +544,8 @@ public class MonumentsBRButtonHandler {
     }
 
     public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
-        return game != null
+        return !player.hasTech("dsxinystar")
+                && game != null
                 && game.getRealPlayersNNeutral().stream()
                         .anyMatch(other -> other != player
                                 && hasArmageddonProjectSuperweapon(game, other, "superweaponglatison")
@@ -583,7 +588,7 @@ public class MonumentsBRButtonHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + ", choose a copied Superweapon text ability to resolve.",
@@ -643,7 +648,8 @@ public class MonumentsBRButtonHandler {
             }
             case "grom" -> {
                 List<Button> buttons = new ArrayList<>();
-                for (String position : FoWHelper.getAdjacentTiles(game, monumentTile.getPosition(), player, true)) {
+                for (String position :
+                        Adjacency.of(game, player).forEffects().withSelf().from(monumentTile.getPosition())) {
                     Tile tile = game.getTileByPosition(position);
                     if (tile != null
                             && FoWHelper.knowsTile(game, player, tile.getPosition())
@@ -665,8 +671,7 @@ public class MonumentsBRButtonHandler {
             }
             case "mors" -> {
                 List<Button> buttons = new ArrayList<>();
-                Set<String> adjacent =
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, true);
+                Set<String> adjacent = Adjacency.of(game, player).forEffects().from(monumentTile.getPosition());
                 for (Tile tile : game.getTileMap().values()) {
                     if (!tile.getPosition().equals(monumentTile.getPosition())
                             && !adjacent.contains(tile.getPosition())

@@ -16,8 +16,8 @@ import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.SourceEmojis;
 import tools.jackson.databind.JsonNode;
@@ -99,11 +99,10 @@ public class FactionDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "homebrewFactionsOnly" -> prioritizeHomebrewFactions();
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "homebrewFactionsOnly" -> prioritizeHomebrewFactions();
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

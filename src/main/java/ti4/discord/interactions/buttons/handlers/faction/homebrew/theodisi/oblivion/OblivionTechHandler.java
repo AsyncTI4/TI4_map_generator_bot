@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -22,9 +23,9 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
@@ -127,6 +128,7 @@ public class OblivionTechHandler {
         player.setUnitCap(unitKey.asyncID(), Math.max(0, player.getUnitCap(unitKey.asyncID()) - 1));
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
+        StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
 
         ButtonHelper.deleteMessage(event);
         String message = player.getRepresentationNoPing() + " purged 1 " + unitKey.humanReadableName()
@@ -242,6 +244,7 @@ public class OblivionTechHandler {
         } else {
             DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             OblivionUnitHandler.doOblivionMechCheck(game, player);
+            StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         }
         ButtonHelper.deleteMessage(event);
     }

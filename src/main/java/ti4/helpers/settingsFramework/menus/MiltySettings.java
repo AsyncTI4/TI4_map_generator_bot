@@ -16,8 +16,8 @@ import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -139,12 +139,11 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "startMilty" -> startDraft(event);
-                    case "startRandomSetup" -> startRandomSetup(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "startMilty" -> startDraft(event);
+            case "startRandomSetup" -> startRandomSetup(event);
+            default -> null;
+        };
         return (error == null ? "success" : error);
     }
 

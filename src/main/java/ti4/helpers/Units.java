@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +15,7 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.jspecify.annotations.NonNull;
 import ti4.discord.JdaService;
-import ti4.image.Mapper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -35,6 +36,11 @@ public class Units {
      * </p>
      */
     public record UnitKey(UnitType unitType, String colorID) {
+
+        @Override
+        public int hashCode() {
+            return 31 * Objects.hashCode(unitType == null ? null : unitType.name()) + Objects.hashCode(colorID);
+        }
 
         @JsonIgnore
         public String getColor() {
@@ -66,7 +72,7 @@ public class Units {
             if (JdaService.testingMode) {
                 return getFileName(false);
             }
-            return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
+            return getFileName(RenderRandom.oneIn("unit.destroyerEye", Constants.EYE_CHANCE));
         }
 
         public String getFileName(boolean eyes) {
@@ -76,7 +82,8 @@ public class Units {
             if (unitType == UnitType.Celagrom
                     || unitType == UnitType.Lady
                     || unitType == UnitType.Cavalry
-                    || unitType == UnitType.Aurelion) {
+                    || unitType == UnitType.Aurelion
+                    || unitType == UnitType.Deep) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
             if (unitType == UnitType.TyrantsLament) {
@@ -126,7 +133,8 @@ public class Units {
         StarfallPds("starfallpds"),
         MetaliVoidArmaments("metalivoidarmaments"),
         ProjectionOfPower("projectionofpower"),
-        ZelianPlanet("zelianplanet");
+        ZelianPlanet("zelianplanet"),
+        Deep("thedeep");
 
         public final String value;
 
@@ -157,6 +165,7 @@ public class Units {
                 case MetaliVoidArmaments -> "Metali Void Armaments";
                 case ProjectionOfPower -> "Projection of Power";
                 case ZelianPlanet -> "Zelian Planet";
+                case Deep -> "The Deep";
             };
         }
 
@@ -183,6 +192,7 @@ public class Units {
                 case MetaliVoidArmaments -> "metalivoidarmaments";
                 case ProjectionOfPower -> "projectionofpower";
                 case ZelianPlanet -> "zelianplanet";
+                case Deep -> "thedeep";
             };
         }
 
@@ -198,7 +208,7 @@ public class Units {
                 case Cruiser -> UnitEmojis.cruiser;
                 case Carrier -> UnitEmojis.carrier;
                 case Dreadnought -> UnitEmojis.dreadnought;
-                case Flagship, Cavalry, Lady, Celagrom, Aurelion -> UnitEmojis.flagship;
+                case Flagship, Cavalry, Lady, Celagrom, Aurelion, Deep -> UnitEmojis.flagship;
                 case TyrantsLament -> UnitEmojis.TyrantsLament;
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
@@ -347,6 +357,7 @@ public class Units {
             case "metaliafb" -> UnitType.MetaliVoidArmaments;
             case "projectionafb" -> UnitType.ProjectionOfPower;
             case "zelianplanet" -> UnitType.ZelianPlanet;
+            case "thedeep" -> UnitType.Deep;
             default -> null;
         };
     }

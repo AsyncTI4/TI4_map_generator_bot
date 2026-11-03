@@ -1,0 +1,59 @@
+{
+  "name": "30k-ac-compound-interest",
+  "description": "Sol plays Compound Interest with 2 of its 3 trade goods and is paid 4 back when the strategy phase starts.",
+  "preset": "30k-2p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "expect": {
+        "state": "sol.tg",
+        "equals": "3"
+      }
+    },
+    {
+      "as": "sol",
+      "press": "ac_play_from_hand_{ac:compoundinterest30k}",
+      "in": "sol:cards-info"
+    },
+    {
+      "expect": {
+        "state": "game.acDiscard",
+        "contains": "compoundinterest30k"
+      }
+    },
+    {
+      "as": "sol",
+      "press": "thkAcCompound_2",
+      "in": "sol"
+    },
+    {
+      "expect": {
+        "state": "sol.tg",
+        "equals": "1"
+      }
+    },
+    {
+      "expect": {
+        "state": "stored:thkCompoundsol",
+        "equals": "2"
+      }
+    },
+    {
+      "do": "startPhase",
+      "value": "strategy"
+    },
+    {
+      "expect": {
+        "state": "sol.tg",
+        "equals": "5"
+      }
+    },
+    {
+      "expect": {
+        "in": "sol",
+        "contains": "Compound Interest",
+        "since": "start"
+      }
+    }
+  ]
+}

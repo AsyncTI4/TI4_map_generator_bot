@@ -20,8 +20,8 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -44,7 +44,7 @@ public class PonthousAbilityHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(
                 Buttons.green(player.factionButtonChecker() + USE_PONTHOUS, "Ready Ponthous", FactionEmojis.ponthous));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         return buttons;
     }

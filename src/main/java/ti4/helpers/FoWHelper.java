@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -18,33 +19,28 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import software.amazon.awssdk.utils.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaCommanderHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.helpers.adjacency.Adjacency;
+import ti4.helpers.adjacency.AdjacencyPurpose;
+import ti4.helpers.adjacency.GridRule;
+import ti4.helpers.adjacency.WormholeRule;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.BorderAnomalyHolder;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TileModel;
-import ti4.model.WormholeModel;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
-import ti4.service.game.MonumentsService;
-import ti4.service.leader.UydaiHeroService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 public final class FoWHelper {
@@ -287,15 +283,32 @@ public final class FoWHelper {
     }
 
     public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
+        return canSeeStatsOfFaction(game, faction, viewingPlayer, true);
+    }
+
+    public static boolean canSeeStatsOfFactionInCurrentFog(Game game, String faction, Player viewingPlayer) {
+        return canSeeStatsOfFaction(game, faction, viewingPlayer, false);
+    }
+
+    private static boolean canSeeStatsOfFaction(
+            Game game, String faction, Player viewingPlayer, boolean initializeFog) {
         for (Player player : game.getRealPlayers()) {
             if (faction.equalsIgnoreCase(player.getFaction())) {
-                return canSeeStatsOfPlayer(game, player, viewingPlayer);
+                return canSeeStatsOfPlayer(game, player, viewingPlayer, initializeFog);
             }
         }
         return false;
     }
 
     public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
+        return canSeeStatsOfPlayer(game, player, viewingPlayer, true);
+    }
+
+    public static boolean canSeeStatsOfPlayerInCurrentFog(Game game, Player player, Player viewingPlayer) {
+        return canSeeStatsOfPlayer(game, player, viewingPlayer, false);
+    }
+
+    private static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer, boolean initializeFog) {
         if (game == null || !player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
             return false;
         }
@@ -311,7 +324,9 @@ public final class FoWHelper {
                         || hasMahactCCInFleet(game, player, viewingPlayer))) {
             return true;
         }
-        initializeFog(game, viewingPlayer, false);
+        if (initializeFog) {
+            initializeFog(game, viewingPlayer, false);
+        }
         return hasHomeSystemInView(player, viewingPlayer);
     }
 
@@ -322,16 +337,19 @@ public final class FoWHelper {
     public static Set<String> fowFilter(Game game, Player player) {
         if (player != null) {
             updateFog(game, player);
-
-            Set<String> systems = new HashSet<>();
-            for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-                if (!tileEntry.getValue().hasFog(player)) {
-                    systems.add(tileEntry.getKey());
-                }
-            }
-            return systems;
+            return visibleSystems(game, player);
         }
         return Collections.emptySet();
+    }
+
+    public static Set<String> visibleSystems(Game game, Player player) {
+        Set<String> systems = new HashSet<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
+            if (!tileEntry.getValue().hasFog(player)) {
+                systems.add(tileEntry.getKey());
+            }
+        }
+        return systems;
     }
 
     private static void initializeFog(Game game, @NotNull Player player, boolean forceRecalculate) {
@@ -469,6 +487,10 @@ public final class FoWHelper {
         if (player != null) initializeFog(game, player, true);
     }
 
+    public static void ensureFogInitialized(Game game, @NotNull Player player) {
+        initializeFog(game, player, false);
+    }
+
     private static void updatePlayerFogTiles(Game game, Player player) {
         for (Tile tileToUpdate : game.getTileMap().values()) {
             if (!tileToUpdate.isValid()) {
@@ -523,247 +545,23 @@ public final class FoWHelper {
      * Includes custom adjacent tiles defined on the map level, hyperlanes, and
      * wormholes
      */
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow) {
         return getAdjacentTiles(game, position, player, toShow, true);
     }
 
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile) {
         return getAdjacentTiles(game, position, player, toShow, includeTile, false);
     }
 
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTiles(
             Game game, String position, Player player, boolean toShow, boolean includeTile, boolean forDistance) {
-        if (FOWPlusService.isVoid(game, position)) return new HashSet<>();
-
-        Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
-
-        List<String> adjacentCustomTiles = game.getCustomAdjacentTiles().get(position);
-
-        List<String> adjacentCustomTiles2 = new ArrayList<>();
-        if (adjacentCustomTiles != null) {
-            if (!toShow) {
-                for (String t : adjacentCustomTiles) {
-                    if (game.getCustomAdjacentTiles().get(t) != null
-                            && game.getCustomAdjacentTiles().get(t).contains(position)) {
-                        adjacentCustomTiles2.add(t);
-                    }
-                }
-                adjacentPositions.addAll(adjacentCustomTiles2);
-            } else {
-                adjacentPositions.addAll(adjacentCustomTiles);
-            }
-        }
-        if (!toShow) {
-            for (String primaryTile : game.getCustomAdjacentTiles().keySet()) {
-                if (game.getCustomAdjacentTiles().get(primaryTile).contains(position)) {
-                    adjacentPositions.add(primaryTile);
-                }
-            }
-        }
-
-        Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player, false, forDistance);
-        adjacentPositions.addAll(wormholeAdjacencies);
-
-        Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
-        adjacentPositions.addAll(otherAdjacencies);
-        AsgardLegendaryService.addBifrostBridgeAdjacencies(game, player, position, adjacentPositions);
-
-        if (player != null
-                && (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
-                        || player.hasTech("tf-starbasewebway"))
-                && player == game.getActivePlayer()
-                && forDistance
-                && !game.getCurrentActiveSystem().isEmpty()
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
-                        .contains(game.getTileByPosition(position))) {
-
-            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
-                if (tile.getPosition().equalsIgnoreCase(position)) {
-                    continue;
-                }
-                adjacentPositions.add(tile.getPosition());
-            }
-        }
-
-        if (player != null && MonumentsService.isMonumentOnBoard(game, player, "saar_monument")) {
-            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "saar_monument");
-            String spaceDockPosition = game.getStoredValue("saarMonumentSpaceDock_" + player.getFaction());
-            Tile spaceDockTile = game.getTileByPosition(spaceDockPosition);
-
-            if (monumentTile != null
-                    && spaceDockTile != null
-                    && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
-                            .contains(spaceDockTile)
-                    && (position.equals(monumentTile.getPosition()) || position.equals(spaceDockPosition))) {
-                adjacentPositions.add(
-                        position.equals(monumentTile.getPosition()) ? spaceDockPosition : monumentTile.getPosition());
-            }
-        }
-
-        if (player != null && MonumentsService.isMonumentOnBoard(game, player, "ghemina_monument")) {
-            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "ghemina_monument");
-
-            if (monumentTile != null) {
-                Set<String> matchingStructureSystems = game.getTileMap().values().stream()
-                        .filter(tile -> tile.getUnitHolders().values().stream()
-                                .flatMap(holder -> holder.getUnitKeysForPlayer(player).stream())
-                                .filter(unitKey -> player.getUnitFromUnitKey(unitKey) != null)
-                                .filter(unitKey ->
-                                        player.getUnitFromUnitKey(unitKey).getIsStructure())
-                                .map(UnitKey::unitType)
-                                .distinct()
-                                .anyMatch(unitType -> tile.getUnitHolders().values().stream()
-                                                .mapToInt(holder -> holder.getUnitCount(unitType, player))
-                                                .sum()
-                                        >= 2))
-                        .map(Tile::getPosition)
-                        .collect(Collectors.toSet());
-
-                if (position.equals(monumentTile.getPosition())) {
-                    adjacentPositions.addAll(matchingStructureSystems);
-                } else if (matchingStructureSystems.contains(position)) {
-                    adjacentPositions.add(monumentTile.getPosition());
-                }
-            }
-        }
-
-        if (forDistance && player != null && MonumentsService.isMonumentOnBoard(game, player, "nivyn_monument")) {
-            Tile monumentTile = MonumentsService.getMonumentTile(game, player, "nivyn_monument");
-            Tile woundTile = game.getTileMap().values().stream()
-                    .filter(tile -> tile.getSpaceUnitHolder().getTokenList().contains("token_ds_wound.png"))
-                    .findFirst()
-                    .orElse(null);
-
-            if (monumentTile != null && woundTile != null) {
-                if (position.equals(monumentTile.getPosition())) {
-                    adjacentPositions.add(woundTile.getPosition());
-                } else if (position.equals(woundTile.getPosition())) {
-                    adjacentPositions.add(monumentTile.getPosition());
-                }
-            }
-        }
-
-        // If player has ghoti commander, is active player and has activated a system
-        if (player != null
-                && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
-                && player == game.getActivePlayer()
-                && !game.getCurrentActiveSystem().isEmpty()) {
-            Set<Player> playersToCheck = new HashSet<>();
-            playersToCheck.add(player);
-            if (game.isAllianceMode()) {
-                playersToCheck.addAll(game.getRealPlayers().stream()
-                        .filter(alliancePlayer -> player.getAllianceMembers().contains(alliancePlayer.getFaction()))
-                        .collect(Collectors.toSet()));
-            }
-
-            // Check that they or their alliance have units in any empty system to be able to see the other empties as
-            // adjacencies
-            Set<Tile> emptyTiles = getEmptyTiles(game);
-            boolean containsUnits =
-                    emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(tile::containsPlayersUnits));
-            if (containsUnits
-                    && game.getTileByPosition(position).getPlanetUnitHolders().isEmpty()) {
-                adjacentPositions.addAll(
-                        emptyTiles.stream().map(Tile::getPosition).collect(Collectors.toSet()));
-            }
-        }
-
-        OblivionUnitHandler.addObsidianMirrorAdjacencies(game, player, position, adjacentPositions);
-        if (!toShow) {
-            UydaiHeroService.addAdjacencies(game, player, position, adjacentPositions);
-        }
-
-        if (player != null) {
-            for (String tilePosition : game.getTileMap().keySet()) {
-                if (SarcosaCommanderHandler.treatsAsAdjacent(game, player, position, tilePosition)) {
-                    adjacentPositions.add(tilePosition);
-                }
-            }
-        }
-
-        if (includeTile) {
-            adjacentPositions.add(position);
-        } else {
-            adjacentPositions.remove(position);
-        }
-        return adjacentPositions;
-    }
-
-    private static Set<String> getNonWormholeAdjacencies(Game game, String position) {
-        Set<String> adjacentPositions = new HashSet<>();
-        Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
-        Tile tile = game.getTileByPosition(position);
-        if (tile == null) {
-            return adjacentPositions;
-        }
-
-        Set<Feature> adjToFeatures = EnumSet.noneOf(Feature.class);
-        if (tile.hasEgress()) adjToFeatures.add(Feature.ingress);
-
-        if (tile.hasIngress()) adjToFeatures.add(Feature.egress);
-
-        if (game.isCosmicPhenomenaeMode()) {
-            if (tile.isScar(game)) {
-                adjToFeatures.add(Feature.scar);
-            }
-        }
-
-        if (game.getActivePlayer() != null
-                && game.getActivePlayer().hasUnlockedBreakthrough("nivynbt")
-                && tile.isScar(game)) {
-            adjToFeatures.add(Feature.egress);
-        }
-
-        if (game.getActivePlayer() != null
-                && game.getActivePlayer().hasTech("tf-fraactalspikedrives")
-                && !tile.getWormholes(game).isEmpty()) {
-            adjToFeatures.add(Feature.egress);
-        }
-
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            for (String token : unitHolder.getTokenList()) {
-                switch (token) {
-                    case Constants.TOKEN_BREACH_ACTIVE -> adjToFeatures.add(Feature.breach);
-                    case Constants.TOKEN_INGRESS -> adjToFeatures.add(Feature.egress);
-                    case Constants.TOKEN_EGRESS -> adjToFeatures.add(Feature.ingress);
-                }
-            }
-        }
-
-        for (Tile t : allTiles) {
-            if (adjToFeatures.contains(Feature.egress) && t.hasEgress()) {
-                adjacentPositions.add(t.getPosition());
-                continue;
-            }
-            if (adjToFeatures.contains(Feature.ingress) && t.hasIngress()) {
-                adjacentPositions.add(t.getPosition());
-                continue;
-            }
-            if (game.isCosmicPhenomenaeMode()) {
-                if (adjToFeatures.contains(Feature.scar) && t.isScar(game)) {
-                    adjacentPositions.add(t.getPosition());
-                    continue;
-                }
-            }
-            for (UnitHolder unitHolder : t.getUnitHolders().values()) {
-                for (String token : unitHolder.getTokenList()) {
-                    if (adjToFeatures.contains(Feature.breach) && Constants.TOKEN_BREACH_ACTIVE.equals(token)) {
-                        adjacentPositions.add(t.getPosition());
-                        break;
-                    }
-                    if (adjToFeatures.contains(Feature.ingress) && Constants.TOKEN_INGRESS.equals(token)) {
-                        adjacentPositions.add(t.getPosition());
-                        break;
-                    }
-                    if (adjToFeatures.contains(Feature.egress) && Constants.TOKEN_EGRESS.equals(token)) {
-                        adjacentPositions.add(t.getPosition());
-                        break;
-                    }
-                }
-            }
-        }
-        return adjacentPositions;
+        Adjacency adjacency =
+                Adjacency.of(game, player).forPurpose(AdjacencyPurpose.fromLegacyFlags(toShow, forDistance));
+        return includeTile ? adjacency.withSelf().from(position) : adjacency.from(position);
     }
 
     public static Set<Tile> getEmptyTiles(Game game) {
@@ -779,6 +577,7 @@ public final class FoWHelper {
         return emptyTiles;
     }
 
+    @Deprecated(forRemoval = true)
     public static Set<String> getAdjacentTilesAndNotThisTile(
             Game game, String position, Player player, boolean toShow) {
         return getAdjacentTiles(game, position, player, toShow, false);
@@ -791,94 +590,20 @@ public final class FoWHelper {
      * Does not traverse wormholes
      */
     public static Set<String> traverseAdjacencies(Game game, boolean naturalMapOnly, String position) {
-        return traverseAdjacencies(game, naturalMapOnly, position, -1, new HashSet<>());
-    }
-
-    /**
-     * Return a list of tile positions that are adjacent to a source position either
-     * directly or via hyperlanes
-     * <p>
-     * Does not traverse wormholes
-     */
-    private static Set<String> traverseAdjacencies(
-            Game game, boolean naturalMapOnly, String position, Integer sourceDirection, Set<String> exploredSet) {
-        Set<String> tiles = new HashSet<>();
-        if (exploredSet.contains(position + sourceDirection)) {
-            // We already explored this tile from this direction!
-            return tiles;
-        }
-        // mark the tile as explored
-        exploredSet.add(position + sourceDirection);
-
-        Tile currentTile = game.getTileByPosition(position);
-        if (currentTile == null) {
-            // could not load the requested tile
-            return tiles;
-        }
-
-        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection, game);
-        if (hyperlaneData != null && hyperlaneData.isEmpty() && !naturalMapOnly) {
-            // We could not load the hyperlane data correctly, quit
-            return tiles;
-        }
-
-        // we are allowed to see this tile
-        tiles.add(position);
-
-        if ((hyperlaneData == null || naturalMapOnly) && sourceDirection != -1) {
-            // do not explore non-hyperlanes except for your starting space
-            return tiles;
-        }
-
-        List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
-        if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
-            // adjacency file for this tile is not filled in
-            return tiles;
-        }
-
-        // for each adjacent tile...
-        for (int i = 0; i < 6; i++) {
-            int dirFrom = (i + 3) % 6;
-            String position_ = directlyAdjacentTiles.get(i);
-            boolean borderBlocked = false;
-            for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
-                if (b == null || b.getTile() == null) continue;
-                if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacencyOut()
-                        || b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacencyIn()) {
-                    borderBlocked = true;
-                }
-            }
-            if (borderBlocked && !naturalMapOnly) continue;
-
-            String override = game.getAdjacentTileOverride(position, i);
-            if (override != null) {
-                if (naturalMapOnly) continue;
-                position_ = override;
-            }
-
-            if ("x".equals(position_) || (hyperlaneData != null && !hyperlaneData.isEmpty() && !hyperlaneData.get(i))) {
-                // the hyperlane doesn't exist & doesn't go that direction, skip.
-                continue;
-            }
-
-            if (!FOWPlusService.shouldTraverseAdjacency(game, position_, dirFrom)) {
-                continue;
-            }
-
-            // explore that tile now!
-            int direcetionFrom = naturalMapOnly ? -2 : dirFrom;
-            Set<String> newTiles = traverseAdjacencies(game, naturalMapOnly, position_, direcetionFrom, exploredSet);
-            tiles.addAll(newTiles);
-        }
-        return tiles;
+        return GridRule.traverse(game, naturalMapOnly, position);
     }
 
     public static boolean isTileInExileRange(Game game, Tile tile, Player player) {
+        return isTileInExileRange(game, tile, player, position -> true);
+    }
+
+    public static boolean isTileInExileRange(Game game, Tile tile, Player player, Predicate<String> seen) {
         if (player.hasUnit("crimson_destroyer")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
+            Adjacency adjacency = Adjacency.of(game, player).withSelf();
+            Set<String> adjacent = seenTilesReaching(adjacency, tile.getPosition(), seen);
             for (Tile tile2 : destroyers) {
-                if (getAdjacentTiles(game, tile.getPosition(), player, false, true)
-                        .contains(tile2.getPosition())) {
+                if (adjacent.contains(tile2.getPosition())) {
                     return true;
                 }
             }
@@ -887,11 +612,17 @@ public final class FoWHelper {
     }
 
     public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player) {
+        return isTileInUpgradedExileRange(game, tile, player, position -> true);
+    }
+
+    public static boolean isTileInUpgradedExileRange(Game game, Tile tile, Player player, Predicate<String> seen) {
         if (player.hasUnit("crimson_destroyer2")) {
             List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Destroyer);
-            for (String adjPos : getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+            Adjacency adjacency = Adjacency.of(game, player).withSelf();
+            for (String adjPos : seenTilesReaching(adjacency, tile.getPosition(), seen)) {
+                Set<String> secondRing = seenTilesReaching(adjacency, adjPos, seen);
                 for (Tile tile2 : destroyers) {
-                    if (getAdjacentTiles(game, adjPos, player, false, true).contains(tile2.getPosition())) {
+                    if (secondRing.contains(tile2.getPosition())) {
                         return true;
                     }
                 }
@@ -900,9 +631,20 @@ public final class FoWHelper {
         return false;
     }
 
+    // TODO: seen-filtering still links two seen tiles through an unseen hyperlane (FoW+ / HIDE_MAP already block it)
+    private static Set<String> seenTilesReaching(Adjacency adjacency, String position, Predicate<String> seen) {
+        Set<String> sources = adjacency.into(position);
+        sources.removeIf(seen.negate());
+        return sources;
+    }
+
     public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player) {
+        return isTileAdjacentToAnAnomaly(game, position, player, adjacent -> true);
+    }
+
+    public static boolean isTileAdjacentToAnAnomaly(Game game, String position, Player player, Predicate<String> seen) {
         for (String adjPos : getAdjacentTilesAndNotThisTile(game, position, player, false)) {
-            if (game.getTileByPosition(adjPos).isAnomaly(game, player)) {
+            if (seen.test(adjPos) && game.getTileByPosition(adjPos).isAnomaly(game, player)) {
                 return true;
             }
         }
@@ -913,136 +655,23 @@ public final class FoWHelper {
         return !getTileWHs(game, position).isEmpty();
     }
 
-    public static Set<String> getTileWHs(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        String ghostFlagshipColor = null;
-        for (Player p : game.getPlayers().values()) {
-            if (p.ownsUnit("ghost_flagship")
-                    || p.ownsUnit("sigma_creuss_flagship_1")
-                    || p.ownsUnit("sigma_creuss_flagship_2")) {
-                ghostFlagshipColor = p.getColor();
-                break;
-            }
-        }
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        // wormholeIDs.add(wh.getWhString());
-                        wormholeIDs.add(wh.toString());
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-            if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                wormholeIDs.add(Constants.DELTA);
-            }
-        }
-
-        return wormholeIDs;
+    public static Set<Wormhole> getTileWHs(Game game, String position) {
+        Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
+        wormholes.addAll(game.getTileByPosition(position).getWormholes(game));
+        return wormholes;
     }
 
     public static boolean doesTileHaveAlphaOrBeta(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.getWhString());
-                        if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
-                            wormholeIDs.add(wh.toString());
-                        }
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-        }
-
-        return (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA));
+        Set<Wormhole> wormholes = getTileWHs(game, position);
+        return wormholes.contains(Wormhole.ALPHA) || wormholes.contains(Wormhole.BETA);
     }
 
     public static boolean doesTileHaveBeta(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.getWhString());
-                        if (!wh.toString().contains("eta") || wh.toString().contains("beta")) {
-                            wormholeIDs.add(wh.toString());
-                        }
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-        }
-
-        return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.BETA));
+        return getTileWHs(game, position).contains(Wormhole.BETA);
     }
 
     public static boolean doesTileHaveAlpha(Game game, String position) {
-        Tile tile = game.getTileByPosition(position);
-
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.getWhString());
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-        }
-
-        return wormholeIDs.stream().anyMatch(id -> id.contains(Constants.ALPHA));
+        return getTileWHs(game, position).contains(Wormhole.ALPHA);
     }
 
     /**
@@ -1051,173 +680,8 @@ public final class FoWHelper {
      * <p>
      * Also takes into account player abilities and agendas
      */
-    private static Set<String> getWormholeAdjacencies(Game game, String position, Player player, boolean neighbors) {
-        return getWormholeAdjacencies(game, position, player, neighbors, false);
-    }
-
-    private static Set<String> getWormholeAdjacencies(
-            Game game, String position, Player player, boolean neighbors, boolean forDistance) {
-        Set<String> adjacentPositions = new HashSet<>();
-        Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
-        Tile tile = game.getTileByPosition(position);
-
-        String ghostFlagshipColor = null;
-        for (Player p : game.getPlayers().values()) {
-            if (p.ownsUnit("ghost_flagship")
-                    || p.ownsUnit("sigma_creuss_flagship_1")
-                    || p.ownsUnit("sigma_creuss_flagship_2")) {
-                ghostFlagshipColor = p.getColor();
-                break;
-            }
-        }
-
-        boolean wh_recon = ButtonHelper.isLawInPlay(game, "wormhole_recon");
-        boolean absol_recon = ButtonHelper.isLawInPlay(game, "absol_recon");
-        if (tile == null || tile.getTileID() == null) {
-            return adjacentPositions;
-        }
-        Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            for (String token : tokenList) {
-                String tokenName =
-                        "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
-                if (!tokenName.contains("champion")) {
-                    tokenName = tokenName.replace("ion", "");
-                }
-                for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
-                    if (tokenName.contains(wh.getWhString())) {
-                        wormholeIDs.add(wh.toString());
-                        break;
-                    }
-                }
-                if (tokenName.contains("sigma_weirdway")) {
-                    wormholeIDs.add(Constants.ALPHA);
-                    wormholeIDs.add(Constants.BETA);
-                }
-            }
-            if (unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                wormholeIDs.add(Constants.DELTA);
-            }
-        }
-
-        boolean hasQuantumEntanglement = player != null && player.hasAbility("quantum_entanglement");
-
-        if (player != null
-                && player.hasAbility("sundered")
-                && player == game.getActivePlayer()
-                && forDistance
-                && !game.getCurrentActiveSystem().isEmpty()) {
-            Set<String> keepers = new HashSet<>(Set.of("epsilon"));
-            if (hasQuantumEntanglement || wh_recon || absol_recon) {
-                keepers.addAll(Set.of("alpha", "beta"));
-            }
-            wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
-        }
-
-        if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
-            Set<String> keepers = new HashSet<>();
-            if (hasQuantumEntanglement || wh_recon || absol_recon) {
-                keepers.addAll(Set.of("alpha", "beta"));
-            }
-            wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
-        }
-
-        if (player != null
-                && "ghost".equals(player.getFaction())
-                && game.getPlayerFromColorOrFaction("crimson") != null) {
-            wormholeIDs.removeIf("epsilon"::equalsIgnoreCase);
-        }
-
-        if (hasQuantumEntanglement || wh_recon || absol_recon) {
-            if (wormholeIDs.contains(Constants.ALPHA)) {
-                wormholeIDs.add(Constants.BETA);
-            } else if (wormholeIDs.contains(Constants.BETA)) {
-                wormholeIDs.add(Constants.ALPHA);
-            }
-        }
-
-        if (player != null
-                && player == game.getActivePlayer()
-                && !game.getCurrentActiveSystem().isEmpty()
-                && player.hasTech("lgf")
-                && !player.getPlanets().contains("mrte")
-                && !player.getPlanets().contains("mr")
-                && (tile.getUnitHolders().containsKey("mrte")
-                        || tile.getUnitHolders().containsKey("mr"))) {
-            wormholeIDs.add(Constants.BETA);
-            wormholeIDs.add(Constants.ALPHA);
-        }
-
-        if (player != null
-                && player == game.getActivePlayer()
-                && !game.getCurrentActiveSystem().isEmpty()
-                && player.hasTech("tf-lazaxgatefolding")) {
-            boolean hasUncontrolledLeg = false;
-            for (Planet planet : tile.getPlanetUnitHolders()) {
-                if (planet.isLegendary() && !player.getPlanets().contains(planet.getName())) {
-                    hasUncontrolledLeg = true;
-                }
-            }
-            if (hasUncontrolledLeg) {
-                wormholeIDs.add(Constants.BETA);
-                wormholeIDs.add(Constants.ALPHA);
-            }
-        }
-        if (!hasQuantumEntanglement
-                && !wh_recon
-                && !absol_recon
-                && forDistance
-                && ButtonHelper.isLawInPlay(game, "travel_ban")
-                && !neighbors) {
-            wormholeIDs.remove(Constants.ALPHA);
-            wormholeIDs.remove(Constants.BETA);
-        }
-
-        if (wormholeIDs.isEmpty()) {
-            return adjacentPositions;
-        }
-
-        Set<String> wormholeTiles = new HashSet<>();
-        for (String wormholeID : wormholeIDs) {
-            wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
-        }
-
-        boolean ghostAgent = player != null
-                && player.isActivePlayer()
-                && !StringUtils.isEmpty(game.getStoredValue("ghostagent_active"))
-                && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
-        for (Tile tile_ : allTiles) {
-            String position_ = tile_.getPosition();
-
-            if (wormholeTiles.contains(tile_.getTileID()) || ghostAgent && doesTileHaveWHs(game, position_)) {
-                adjacentPositions.add(position_);
-                continue;
-            }
-            for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
-                Set<String> tokenList = unitHolder.getTokenList();
-                for (String token : tokenList) {
-                    for (String wormholeID : wormholeIDs) {
-                        if (token.contains(wormholeID)
-                                && !("eta".equals(wormholeID)
-                                        && (token.contains("beta")
-                                                || token.contains("theta")
-                                                || token.contains("zeta")))) {
-                            adjacentPositions.add(position_);
-                        }
-                    }
-                    if (token.contains("sigma_weirdway")
-                            && (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA))) {
-                        adjacentPositions.add(position_);
-                    }
-                }
-                if (wormholeIDs.contains(Constants.DELTA)
-                        && unitHolder.getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
-                    adjacentPositions.add(position_);
-                }
-            }
-        }
-        return adjacentPositions;
+    static Set<String> getWormholeAdjacencies(Game game, String position, Player player) {
+        return WormholeRule.connectionsFrom(game, player, position);
     }
 
     /**
@@ -1227,17 +691,19 @@ public final class FoWHelper {
      * privy to
      */
     public static List<Player> getAdjacentPlayers(Game game, String position, boolean includeSweep) {
+        return getAdjacentPlayers(game, position, includeSweep, AdjacencyPurpose.EFFECTS);
+    }
+
+    public static List<Player> getAdjacentPlayers(
+            Game game, String position, boolean includeSweep, AdjacencyPurpose purpose) {
         List<Player> players = new ArrayList<>();
         if (FOWPlusService.isVoid(game, position)) return players;
 
-        Set<String> tilesToCheck = getAdjacentTiles(game, position, null, false);
         Tile startingTile = game.getTileByPosition(position);
 
         for (Player player_ : game.getRealPlayers()) {
-            Set<String> tiles = new HashSet<>(tilesToCheck);
-            if (player_.hasAbility("quantum_entanglement") || ButtonHelper.isLawInPlay(game, "travel_ban")) {
-                tiles.addAll(getWormholeAdjacencies(game, position, player_, true));
-            }
+            Set<String> tiles =
+                    Adjacency.of(game, player_).forPurpose(purpose).withSelf().into(position);
 
             if (includeSweep && startingTile.hasCC(Mapper.getSweepID(player_.getColor()))) {
                 players.add(player_);
@@ -1269,7 +735,7 @@ public final class FoWHelper {
         }
         if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
             return true;
-        } else if (tile.isMecatol(game) && player.hasIIHQ()) {
+        } else if (player.hasIIHQ() && tile.isMecatol(game)) {
             return true;
         } else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(game, "cabal", player)) {
             return true;
@@ -1407,7 +873,7 @@ public final class FoWHelper {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;
 
-        for (String pos : getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String pos : Adjacency.of(game, player).into(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);
             UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
@@ -1600,20 +1066,17 @@ public final class FoWHelper {
         if (!game.isFowMode() || game.isHasEnded()) {
             return true;
         }
+        return isGameMasterInGmRoom(game, event);
+    }
+
+    public static boolean isGameMasterInGmRoom(Game game, GenericInteractionCreateEvent event) {
         return isGameMaster(event.getUser().getId(), game) && isGmRoom(game, event.getChannel());
     }
 
-    static boolean isGmRoom(Game game, @Nullable Channel channel) {
+    public static boolean isGmRoom(Game game, @Nullable Channel channel) {
         if (channel instanceof ThreadChannel thread) {
             channel = thread.getParentChannel();
         }
         return channel != null && channel.getName().equalsIgnoreCase(game.getName() + "-gm-room");
-    }
-
-    private enum Feature {
-        ingress,
-        egress,
-        breach,
-        scar
     }
 }

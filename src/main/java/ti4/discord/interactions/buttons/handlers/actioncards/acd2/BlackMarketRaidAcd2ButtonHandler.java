@@ -10,8 +10,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 
 @UtilityClass
@@ -72,13 +72,12 @@ class BlackMarketRaidAcd2ButtonHandler {
                 if (purged >= fragsToPurge) break;
                 player.removeFragment(fragId);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                String emoji =
-                        switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
-                            case "cultural" -> ExploreEmojis.CFrag.toString();
-                            case "industrial" -> ExploreEmojis.IFrag.toString();
-                            case "hazardous" -> ExploreEmojis.HFrag.toString();
-                            default -> ExploreEmojis.UFrag.toString();
-                        };
+                String emoji = switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
+                    case "cultural" -> ExploreEmojis.CFrag.toString();
+                    case "industrial" -> ExploreEmojis.IFrag.toString();
+                    case "hazardous" -> ExploreEmojis.HFrag.toString();
+                    default -> ExploreEmojis.UFrag.toString();
+                };
                 fragMsg.append(emoji);
                 purged++;
             }

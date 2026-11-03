@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @UtilityClass

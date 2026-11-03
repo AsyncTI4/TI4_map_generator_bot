@@ -12,6 +12,7 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.service.map.OneWayAdjacencyHintService;
 
 class AddCustomAdjacentTile extends GameStateSubcommand {
 
@@ -19,7 +20,10 @@ class AddCustomAdjacentTile extends GameStateSubcommand {
         super(Constants.ADD_CUSTOM_ADJACENT_TILES, "Add Custom Adjacent Tiles.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary Tile").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ADJACENT_TILES, "Adjacent Tiles").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TWO_WAY, "Are added tiles two way connection"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.TWO_WAY,
+                "Also link the adjacent tiles back to the primary (default: primary reaches them only)"));
     }
 
     @Override
@@ -46,7 +50,9 @@ class AddCustomAdjacentTile extends GameStateSubcommand {
         }
         game.addCustomAdjacentTiles(primaryTile, customTiles);
         OptionMapping twoWayOption = event.getOption(Constants.TWO_WAY);
-        if (twoWayOption != null && twoWayOption.getAsBoolean()) {
+        if (twoWayOption == null || !twoWayOption.getAsBoolean()) {
+            OneWayAdjacencyHintService.hintOnce(game, event.getChannel());
+        } else {
             for (String tile : tiles) {
                 List<String> customReverseTiles =
                         new ArrayList<>(game.getCustomAdjacentTiles().getOrDefault(tile, Collections.emptyList()));

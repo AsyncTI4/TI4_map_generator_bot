@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.SanityLimits;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -29,7 +30,8 @@ public class StrategyCardManager {
     public void setTradeGoodCounts(Map<Integer, Integer> strategyCardToTradeGoodCount) {
         this.strategyCardToTradeGoodCount.clear();
         if (strategyCardToTradeGoodCount != null) {
-            this.strategyCardToTradeGoodCount.putAll(strategyCardToTradeGoodCount);
+            strategyCardToTradeGoodCount.forEach((strategyCard, count) -> this.strategyCardToTradeGoodCount.put(
+                    strategyCard, count == null ? null : SanityLimits.cap(count, SanityLimits.TRADE_GOODS_ON_CARD)));
         }
     }
 
@@ -49,12 +51,13 @@ public class StrategyCardManager {
                                 + "player, as per the text on Speygh, the Kyro Hero.");
             }
         }
-        strategyCardToTradeGoodCount.put(strategyCard, tradeGoodCount);
+        strategyCardToTradeGoodCount.put(
+                strategyCard, SanityLimits.cap(tradeGoodCount, SanityLimits.TRADE_GOODS_ON_CARD));
     }
 
     public int addTradeGoods(int strategyCard, int tradeGoodCount) {
         int oldCount = strategyCardToTradeGoodCount.get(strategyCard);
-        int newCount = oldCount + tradeGoodCount;
+        int newCount = SanityLimits.cappedSum(oldCount, tradeGoodCount, SanityLimits.TRADE_GOODS_ON_CARD);
         strategyCardToTradeGoodCount.put(strategyCard, newCount);
         return newCount;
     }

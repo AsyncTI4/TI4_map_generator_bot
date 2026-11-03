@@ -120,6 +120,14 @@ public class SarcosaHeroHandler {
         ti4.helpers.ButtonHelperTacticalAction.beginTacticalAction(game, player);
     }
 
+    public static boolean beginNeutralControl(Game game, Player player) {
+        if (game.getPlayerFromColorOrFaction("neutral") == null) {
+            return false;
+        }
+        game.setStoredValue(NEUTRAL_CONTROL, player.getFaction());
+        return true;
+    }
+
     @ButtonHandler(DECLINE)
     public static void decline(ButtonInteractionEvent event, Game game, Player player) {
         game.removeStoredValue(REMAINING_ACTIONS + player.getFaction());

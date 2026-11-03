@@ -264,6 +264,15 @@ public enum LeaderEmojis implements TI4Emoji {
     NatauAgent,
     NatauCommander,
     NatauHero,
+    ValhavnAgent,
+    ValhavnCommander,
+    ValhavnHero,
+    MigoAgent,
+    MigoCommander,
+    MigoHero,
+    DeepAgent,
+    DeepCommander,
+    DeepHero,
 
     // Lost Legacies (Theodisi)
     ArdentiaAgent,
@@ -390,6 +399,11 @@ public enum LeaderEmojis implements TI4Emoji {
             case "poisonhero" -> NaaluHero;
             case "voicehero" -> XxchaHero;
             case "witchinghero" -> KeleresHeroOdlynn;
+
+            case "edynagent_br" -> EdynAgent;
+            case "gheminacommander_br" -> GheminaCommander;
+            case "yinhero_br" -> YinHero;
+            case "yssarilagent_br" -> YssarilAgent;
 
             // Franken
             case "mahactcommander_y" -> MahactCommander;

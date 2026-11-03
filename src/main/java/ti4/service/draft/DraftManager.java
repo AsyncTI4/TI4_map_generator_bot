@@ -33,6 +33,9 @@ public class DraftManager extends DraftPlayerManager {
         this.game = game;
     }
 
+    private static final String NO_ORCHESTRATOR_MESSAGE =
+            "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
+
     private final Game game;
 
     private DraftOrchestrator orchestrator;
@@ -87,6 +90,7 @@ public class DraftManager extends DraftPlayerManager {
     public void resetForNewDraft() {
         orchestrator = null;
         draftables.clear();
+        DraftEventRecorder.reset(game);
         super.resetForNewDraft();
     }
 
@@ -137,6 +141,7 @@ public class DraftManager extends DraftPlayerManager {
                         if (DraftButtonService.isError(status)) {
                             return status;
                         }
+                        DraftEventRecorder.recordPick(this, player, d, choice, commandSource);
                         // Side effects, if any
                         d.postApplyDraftPick(event, this, player.getUserID(), choice);
 
@@ -174,6 +179,7 @@ public class DraftManager extends DraftPlayerManager {
             return;
         }
 
+        DraftEventRecorder.recordStarted(this);
         orchestrator.sendDraftButtons(this);
     }
 
@@ -200,7 +206,7 @@ public class DraftManager extends DraftPlayerManager {
             }
         }
         if (orchestrator == null) {
-            return "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
+            return NO_ORCHESTRATOR_MESSAGE;
         }
         return orchestrator.whatsStoppingDraftStart(this);
     }
@@ -223,6 +229,10 @@ public class DraftManager extends DraftPlayerManager {
      * @param event
      */
     public void endDraft(GenericInteractionCreateEvent event) {
+        if (orchestrator == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), NO_ORCHESTRATOR_MESSAGE);
+            return;
+        }
         String blockingReason = whatsStoppingDraftEnd();
         if (blockingReason != null) {
             // If you got this accidentally, it means you called endDraft() instead of
@@ -233,6 +243,7 @@ public class DraftManager extends DraftPlayerManager {
                     event.getMessageChannel(), "WARNING: Forcing the draft to end despite: " + blockingReason);
         }
 
+        DraftEventRecorder.recordEnded(this);
         // Clear active player
         game.updateActivePlayer(null);
 
@@ -268,6 +279,9 @@ public class DraftManager extends DraftPlayerManager {
             if (reason != null) {
                 return reason;
             }
+        }
+        if (orchestrator == null) {
+            return NO_ORCHESTRATOR_MESSAGE;
         }
         return orchestrator.whatsStoppingDraftEnd(this);
     }
@@ -331,6 +345,9 @@ public class DraftManager extends DraftPlayerManager {
             if (result != null) {
                 return result;
             }
+        }
+        if (orchestrator == null) {
+            return NO_ORCHESTRATOR_MESSAGE;
         }
         return orchestrator.whatsStoppingSetup(this);
     }

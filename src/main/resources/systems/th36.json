@@ -1,0 +1,20 @@
+{
+    "id": "th36",
+    "name": "Asterin/Dovan",
+    "aliases": [
+        "th36",
+        "asterin",
+        "dovan"
+    ],
+    "imagePath": "th36.png",
+    "planets": [
+        "asterin",
+        "dovan"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "ALPHA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

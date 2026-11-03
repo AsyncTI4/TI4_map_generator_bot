@@ -17,8 +17,8 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.NewStuffHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.tech.PlayerTechService;
@@ -42,7 +42,7 @@ public class OblivionAbilityHandler {
                         player.factionButtonChecker() + START_IGNO_DISCO,
                         "Use Ignorant Discoveries",
                         FactionEmojis.oblivion),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
 
         return buttons;
     }

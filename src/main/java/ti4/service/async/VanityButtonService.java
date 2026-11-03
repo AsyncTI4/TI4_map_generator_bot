@@ -13,9 +13,9 @@ import org.apache.commons.collections4.ListUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @UtilityClass
@@ -27,15 +27,14 @@ public class VanityButtonService {
         Member member = guild.getMember(event.getUser());
 
         String menu = buttonID.split("_")[1];
-        List<ComponentSource> factionSources =
-                switch (menu) {
-                    case "Base" -> List.of(ComponentSource.base);
-                    case "PoK" -> List.of(ComponentSource.pok);
-                    case "TE" -> List.of(ComponentSource.thunders_edge, ComponentSource.codex3);
-                    case "TF" -> List.of(ComponentSource.twilights_fall);
-                    case "DS" -> List.of(ComponentSource.ds);
-                    default -> List.of();
-                };
+        List<ComponentSource> factionSources = switch (menu) {
+            case "Base" -> List.of(ComponentSource.base);
+            case "PoK" -> List.of(ComponentSource.pok);
+            case "TE" -> List.of(ComponentSource.thunders_edge, ComponentSource.codex3);
+            case "TF" -> List.of(ComponentSource.twilights_fall);
+            case "DS" -> List.of(ComponentSource.ds);
+            default -> List.of();
+        };
 
         List<Button> allButtons = new ArrayList<>();
         for (FactionModel faction : getFactionsForSources(factionSources)) {

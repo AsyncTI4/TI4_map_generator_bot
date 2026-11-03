@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.game.Game;
@@ -13,6 +14,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.model.UnitModel;
 
@@ -20,7 +22,7 @@ public final class PdsCoverageHelper {
 
     /**
      * Calculate PDS coverage for a specific tile, returning comprehensive coverage data per faction.
-     * This method contains all the logic from TileGenerator's SpaceCannon case.
+     * This method contains all the logic from the tile renderer's SpaceCannon step.
      *
      * @param game The game instance
      * @param tile The tile to calculate coverage for
@@ -52,12 +54,12 @@ public final class PdsCoverageHelper {
             }
 
             // Check adjacent tiles for PDS coverage
-            for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {
+            for (String adjTilePos : Adjacency.of(game, player).withSelf().into(tilePos)) {
                 Tile adjTile = game.getTileByPosition(adjTilePos);
                 if (adjTile == null) {
                     continue;
                 }
-                if (adjTile.isScar()) {
+                if (adjTile.isScar() && !player.hasTech("dsxinystar")) {
                     continue;
                 }
                 if (TeHelperUnits.affectedByQuietus(game, player, adjTile)) {
@@ -83,13 +85,20 @@ public final class PdsCoverageHelper {
                         Units.UnitKey unitKey = unitEntry.getKey();
                         Player unitOwner =
                                 game.getPlayerByColorID(unitKey.colorID()).orElse(null);
+                        boolean graveholdControlled = SarcosaBreakthroughHandler.canControlNeutralStructure(
+                                game, player, unitHolder, unitKey);
                         boolean borrowed =
-                                ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitKey);
+                                ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitKey)
+                                        || graveholdControlled;
                         if (unitOwner != player && !borrowed) {
                             continue;
                         }
 
-                        UnitModel model = unitOwner == null ? null : unitOwner.getUnitFromUnitKey(unitKey);
+                        Player effectiveOwner = graveholdControlled ? player : unitOwner;
+                        UnitModel model = graveholdControlled
+                                ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(
+                                        game, player, unitHolder, unitKey)
+                                : unitOwner == null ? null : unitOwner.getUnitFromUnitKey(unitKey);
                         if (model == null
                                 || ("xxcha_mech".equalsIgnoreCase(model.getId())
                                         && ButtonHelper.isLawInPlay(game, "articles_war"))) {
@@ -114,12 +123,14 @@ public final class PdsCoverageHelper {
                         }
 
                         // Check if PDS can shoot (deep space cannon or same tile)
-                        if (model.getDeepSpaceCannon(unitOwner) || sameTile) {
-                            for (int i = model.getSpaceCannonDieCount(unitOwner) * unitEntry.getValue(); i > 0; i--) {
-                                diceCount.add(model.getSpaceCannonHitsOn(unitOwner) - mod - tempMod);
+                        if (model.getDeepSpaceCannon(effectiveOwner) || sameTile) {
+                            for (int i = model.getSpaceCannonDieCount(effectiveOwner) * unitEntry.getValue();
+                                    i > 0;
+                                    i--) {
+                                diceCount.add(model.getSpaceCannonHitsOn(effectiveOwner) - mod - tempMod);
                             }
                         } else if (game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
-                            diceCountMirveda.add(model.getSpaceCannonHitsOn(unitOwner) - mod - tempMod);
+                            diceCountMirveda.add(model.getSpaceCannonHitsOn(effectiveOwner) - mod - tempMod);
                         }
                     }
 

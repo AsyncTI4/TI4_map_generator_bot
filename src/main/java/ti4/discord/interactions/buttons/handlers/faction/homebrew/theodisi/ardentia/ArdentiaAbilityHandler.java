@@ -14,6 +14,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.FoWHelper;
+import ti4.image.io.ImageResources;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 
@@ -63,7 +64,7 @@ public class ArdentiaAbilityHandler {
             return;
         }
 
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -201,7 +202,7 @@ public class ArdentiaAbilityHandler {
                 || FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
             return false;
         }
-        String borrowedCc = Tile.getCCPath(ti4.image.Mapper.getCCID(borrowedColor));
-        return borrowedCc != null && !tile.hasCC(ti4.image.Mapper.getCCID(borrowedColor));
+        String borrowedCc = ImageResources.commandToken(ti4.model.Mapper.getCCID(borrowedColor));
+        return borrowedCc != null && !tile.hasCC(ti4.model.Mapper.getCCID(borrowedColor));
     }
 }

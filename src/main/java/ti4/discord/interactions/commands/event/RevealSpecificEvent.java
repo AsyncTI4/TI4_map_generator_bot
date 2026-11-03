@@ -10,15 +10,15 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
+import ti4.model.Mapper;
 
 class RevealSpecificEvent extends GameStateSubcommand {
 
     public RevealSpecificEvent() {
-        super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck", true, false);
+        super(Constants.REVEAL_SPECIFIC, "Reveal a specific Event by ID", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event ID (text ID found in /search events)")
                 .setRequired(true)
                 .setAutoComplete(true));

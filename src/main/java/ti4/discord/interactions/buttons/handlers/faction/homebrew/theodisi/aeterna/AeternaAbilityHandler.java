@@ -16,11 +16,11 @@ import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.unit.AddUnitService;
@@ -197,7 +197,7 @@ public class AeternaAbilityHandler {
             buttons.add(Buttons.green(player.factionButtonChecker() + "newMoonPlace", "Place a Captured Neutral Unit"));
         }
         buttons.add(Buttons.green(player.factionButtonChecker() + "newMoonCapture", "Capture 1 Neutral Cruiser"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose an effect for _New Moon_.", buttons);
         ButtonHelper.deleteTheOneButton(event);
@@ -294,9 +294,7 @@ public class AeternaAbilityHandler {
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits, boolean combat) {
         if (destroyedUnits.isEmpty()) return;
         for (Player aeterna : game.getRealPlayers()) {
-            boolean duringAeternasTacticalAction = aeterna == game.getActivePlayer()
-                    && !game.getCurrentActiveSystem().isEmpty();
-            if (!aeterna.hasAbility("cycle_of_reclamation") || duringAeternasTacticalAction) continue;
+            if (!aeterna.hasAbility("cycle_of_reclamation")) continue;
             String actionCaptureKey = CYCLE_ACTION_CAPTURE + aeterna.getFaction();
             if (!game.getPhaseOfGame().startsWith("agenda")
                     && !game.getStoredValue(actionCaptureKey).isEmpty()) {
@@ -447,7 +445,7 @@ public class AeternaAbilityHandler {
                         && destroyedUnitModel.getIsShip())) {
             return true;
         }
-        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true).stream()
+        return Adjacency.of(game, player).forEffects().withSelf().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(adjacent -> adjacent != null
                         && adjacent.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip));

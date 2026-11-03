@@ -1,0 +1,30 @@
+{
+    "id": "velis",
+    "tileId": "th26",
+    "name": "Velis",
+    "aliases": [
+        "velis"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "techSpecialties": [
+        "BIOTIC"
+    ],
+    "planetLayout": {
+        "unitHolderName": "velis",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 128,
+            "y": 81
+        },
+        "planetRadius": 60
+    },
+    "positionInTile": {
+        "x": 128,
+        "y": 81
+    },
+    "source": "theodisi"
+}

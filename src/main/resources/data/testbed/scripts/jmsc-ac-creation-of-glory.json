@@ -1,0 +1,38 @@
+{
+  "name": "jmsc-ac-creation-of-glory",
+  "description": "Sol plays Creation of Glory, reveals the top relic and puts it on the bottom of the relic deck.",
+  "preset": "jmsc-2p",
+  "stopOnFail": true,
+  "steps": [
+    {
+      "do": "hand",
+      "as": "sol",
+      "hand": {
+        "acs": [
+          "creationofgloryjmsc"
+        ]
+      }
+    },
+    {
+      "as": "sol",
+      "press": "ac_play_from_hand_{ac:creationofgloryjmsc}",
+      "in": "sol:cards-info"
+    },
+    {
+      "as": "sol",
+      "press": "thkAcRelicReveal_res",
+      "in": "sol"
+    },
+    {
+      "as": "sol",
+      "press": "thkAcRelicBottom_",
+      "in": "sol"
+    },
+    {
+      "expect": {
+        "in": "sol",
+        "contains": "bottom of the relic deck"
+      }
+    }
+  ]
+}

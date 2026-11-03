@@ -26,8 +26,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 /**
  * The single entry point for "let a player pick a planet belonging to someone else".
@@ -341,12 +341,11 @@ public class PlanetTargetService {
         for (Player candidate : game.getRealPlayers()) {
             if (candidate.getColor() == null) continue;
             boolean self = candidate == actor;
-            boolean permitted =
-                    switch (spec.ownership()) {
-                        case ANY -> true;
-                        case EXCLUDE_SELF -> !self;
-                        case SELF_ONLY -> self;
-                    };
+            boolean permitted = switch (spec.ownership()) {
+                case ANY -> true;
+                case EXCLUDE_SELF -> !self;
+                case SELF_ONLY -> self;
+            };
             if (!permitted) continue;
             if (holder.getUnitCount(spec.unit(), candidate.getColor()) > 0) return candidate;
         }

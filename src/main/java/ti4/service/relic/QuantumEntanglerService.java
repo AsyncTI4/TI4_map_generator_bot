@@ -14,8 +14,8 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.RelicHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class QuantumEntanglerService {

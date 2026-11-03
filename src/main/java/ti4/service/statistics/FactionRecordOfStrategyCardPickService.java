@@ -10,46 +10,51 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
-import ti4.game.Player;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.StrategyCardModel;
 
 @UtilityClass
 public class FactionRecordOfStrategyCardPickService {
+
+    private static final int FIRST_ROUND = 1;
+    private static final int LAST_ROUND = 6;
 
     public void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> getFactionStrategyCardPickRecord(event));
     }
 
     private void getFactionStrategyCardPickRecord(SlashCommandInteractionEvent event) {
-        StringBuilder text = new StringBuilder();
-        for (int x = 1; x < 7; x++) {
-            text.append(getSCPick(event, x));
-        }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Strategy Card Pick Record", text.toString());
-    }
-
-    private String getSCPick(SlashCommandInteractionEvent event, int round) {
         String faction = event.getOption(Constants.FACTION, "", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
-            return "UNKNOWN FACTION";
+            return;
         }
-        Map<String, Integer> scsPicked = new HashMap<>();
-        Map<String, Integer> custodians = new HashMap<>();
-        AtomicInteger gamesThatHadThem = new AtomicInteger();
+
+        Map<Integer, RoundRecord> recordsByRound = new HashMap<>();
+        for (int round = FIRST_ROUND; round <= LAST_ROUND; round++) {
+            recordsByRound.put(round, new RoundRecord());
+        }
 
         ConsumeGameUtility.consumeAllGames(
                 GameStatisticsFilterer.getGamesFilter(event),
-                game -> getScPick(game, round, faction, gamesThatHadThem, scsPicked, custodians),
+                game -> recordScPicks(game, faction, recordsByRound),
                 ExecutionLockType.READ);
 
+        boolean sortOrderAscending = event.getOption("ascending", Boolean.FALSE, OptionMapping::getAsBoolean);
+        StringBuilder text = new StringBuilder();
+        for (int round = FIRST_ROUND; round <= LAST_ROUND; round++) {
+            text.append(formatRound(factionM, round, recordsByRound.get(round), sortOrderAscending));
+        }
+        MessageHelper.sendMessageToThread(event.getChannel(), "Strategy Card Pick Record", text.toString());
+    }
+
+    private String formatRound(FactionModel factionM, int round, RoundRecord record, boolean sortOrderAscending) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("## __**SCs Picked By ")
@@ -57,10 +62,9 @@ public class FactionRecordOfStrategyCardPickService {
                 .append(" In Round #")
                 .append(round)
                 .append(" (From ")
-                .append(gamesThatHadThem)
+                .append(record.gamesThatHadThem)
                 .append(" Games)**__\n");
 
-        boolean sortOrderAscending = event.getOption("ascending", Boolean.FALSE, OptionMapping::getAsBoolean);
         Comparator<Map.Entry<String, Integer>> comparator = (o1, o2) -> {
             int o1total = o1.getValue();
             int o2total = o2.getValue();
@@ -69,15 +73,15 @@ public class FactionRecordOfStrategyCardPickService {
 
         AtomicInteger index = new AtomicInteger(1);
 
-        scsPicked.entrySet().stream().sorted(comparator).forEach(techResearched -> {
+        record.scsPicked.entrySet().stream().sorted(comparator).forEach(scPicked -> {
             sb.append('`')
                     .append(Helper.leftpad(String.valueOf(index.get()), 3))
                     .append(". ");
-            sb.append("` ").append(techResearched.getKey());
-            sb.append(": ").append(techResearched.getValue());
-            if (round == 1) {
+            sb.append("` ").append(scPicked.getKey());
+            sb.append(": ").append(scPicked.getValue());
+            if (round == FIRST_ROUND) {
                 sb.append(" (Took Custodians a total of  ")
-                        .append(custodians.getOrDefault(techResearched.getKey(), 0))
+                        .append(record.custodians.getOrDefault(scPicked.getKey(), 0))
                         .append(" times)");
             }
             sb.append('\n');
@@ -87,34 +91,41 @@ public class FactionRecordOfStrategyCardPickService {
         return sb.toString();
     }
 
-    private void getScPick(
-            Game game,
-            int round,
-            String faction,
-            AtomicInteger gamesThatHadThem,
-            Map<String, Integer> scsPicked,
-            Map<String, Integer> custodians) {
-        for (Player player : game.getRealPlayers()) {
+    private void recordScPicks(Game game, String faction, Map<Integer, RoundRecord> recordsByRound) {
+        boolean factionInGame = game.getRealPlayers().stream()
+                .anyMatch(player -> player.getFaction().equalsIgnoreCase(faction));
+        if (!factionInGame) {
+            return;
+        }
+        boolean factionTookCustodians = faction.equalsIgnoreCase(game.getCustodiansTaker());
+        for (int round = FIRST_ROUND; round <= LAST_ROUND; round++) {
             String scs = game.getStoredValue("Round" + round + "SCPickFor" + faction);
-            if (!player.getFaction().equalsIgnoreCase(faction) || scs.isEmpty()) {
+            if (scs.isEmpty()) {
                 continue;
             }
-            gamesThatHadThem.incrementAndGet();
-            String[] scList = scs.split("_");
-            for (String sc : scList) {
+            recordsByRound.get(round).add(game, scs, factionTookCustodians);
+        }
+    }
+
+    private static class RoundRecord {
+        private int gamesThatHadThem;
+        private final Map<String, Integer> scsPicked = new HashMap<>();
+        private final Map<String, Integer> custodians = new HashMap<>();
+
+        private void add(Game game, String scs, boolean factionTookCustodians) {
+            gamesThatHadThem++;
+            for (String sc : scs.split("_")) {
                 if (!Helper.isInteger(sc)) {
                     continue;
                 }
-                int scInitiative = Integer.parseInt(sc);
-                String scName = game.getStrategyCardModelByInitiative(scInitiative)
+                String scName = game.getStrategyCardModelByInitiative(Integer.parseInt(sc))
                         .map(StrategyCardModel::getName)
                         .orElse(null);
                 if (scName == null) {
                     continue;
                 }
                 scsPicked.merge(scName, 1, Integer::sum);
-                String custodianTaker = game.getCustodiansTaker();
-                if (faction.equalsIgnoreCase(custodianTaker)) {
+                if (factionTookCustodians) {
                     custodians.merge(scName, 1, Integer::sum);
                 }
             }

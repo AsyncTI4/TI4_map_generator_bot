@@ -5,12 +5,14 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
 import ti4.helpers.TimedRunnable;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class CronManager {
@@ -19,17 +21,17 @@ public class CronManager {
     private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
 
-    public static void schedulePeriodically(
+    public static ScheduledFuture<?> schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
         CRONS.put(clazz.getSimpleName(), runnable);
-        TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
-        SCHEDULER.scheduleAtFixedRate(timedRunnable, initialDelay, period, unit);
+        Runnable cronTask = nonThrowingCronTask(clazz.getSimpleName(), runnable);
+        return SCHEDULER.scheduleAtFixedRate(cronTask, initialDelay, period, unit);
     }
 
     public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
         CRONS.put(clazz.getSimpleName(), runnable);
-        TimedRunnable timedRunnable = new TimedRunnable(clazz.getSimpleName(), runnable);
-        SCHEDULER.schedule(timedRunnable, initialDelay, unit);
+        Runnable cronTask = nonThrowingCronTask(clazz.getSimpleName(), runnable);
+        SCHEDULER.schedule(cronTask, initialDelay, unit);
     }
 
     public static void schedulePeriodicallyAtTime(
@@ -55,8 +57,7 @@ public class CronManager {
         if (runnable == null) {
             return false;
         }
-        var timedRunnable = new TimedRunnable(cronName, runnable);
-        SCHEDULER.execute(timedRunnable);
+        SCHEDULER.execute(nonThrowingCronTask(cronName, runnable));
         return true;
     }
 
@@ -66,5 +67,16 @@ public class CronManager {
 
     public static ShutdownResult shutdown() {
         return ExecutorUtility.shutdownAndAwaitTermination(SCHEDULER, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private static Runnable nonThrowingCronTask(String cronName, Runnable runnable) {
+        TimedRunnable timedRunnable = new TimedRunnable(cronName, runnable);
+        return () -> {
+            try {
+                timedRunnable.run();
+            } catch (Throwable t) {
+                BotLogger.error("Unhandled exception in cron: " + cronName, t);
+            }
+        };
     }
 }

@@ -27,10 +27,10 @@ import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardPackage;
 import tools.jackson.databind.JsonNode;
@@ -118,12 +118,11 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "presetPackages~MDL" -> getPresetPackagesFromUser(event);
-                    case "presetPackages" -> setPresetPackages(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "presetPackages~MDL" -> getPresetPackagesFromUser(event);
+            case "presetPackages" -> setPresetPackages(event);
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

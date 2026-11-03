@@ -11,7 +11,7 @@ import ti4.service.info.CardsInfoService;
 class CardsInfoForPlayer extends GameStateSubcommand {
 
     CardsInfoForPlayer() {
-        super(Constants.INFO, "Resent all my cards in Private Message", false, true);
+        super(Constants.INFO, "Resend a player's cards info to their cards info thread", false, true);
         addOptions(
                 new OptionData(OptionType.USER, Constants.PLAYER, "Player to resend cards info for").setRequired(true));
     }

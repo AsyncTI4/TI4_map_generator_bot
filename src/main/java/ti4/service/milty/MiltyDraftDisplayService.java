@@ -44,6 +44,11 @@ public class MiltyDraftDisplayService {
     public void repostDraftInformation(MiltyDraftManager manager, Game game) {
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
+        if (manager.getSlices().isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    channel, "This draft has no slices. File a bug report if this seems incorrect.");
+            return;
+        }
 
         String draftSummary = manager.getOverallSummaryString(game);
         MiltyDraftHelper.generateAndPostSlices(game);
@@ -91,13 +96,12 @@ public class MiltyDraftDisplayService {
             case "order" -> POSITION.equals(txt);
             default -> false;
         };
-        List<Button> categoryButtons =
-                switch (category) {
-                    case "slice" -> manager.getSliceButtons();
-                    case "faction" -> manager.getFactionButtons();
-                    case "order" -> manager.getPositionButtons();
-                    default -> Collections.emptyList();
-                };
+        List<Button> categoryButtons = switch (category) {
+            case "slice" -> manager.getSliceButtons();
+            case "faction" -> manager.getFactionButtons();
+            case "order" -> manager.getPositionButtons();
+            default -> Collections.emptyList();
+        };
         String newSummary = manager.getOverallSummaryString(game);
         return hist -> {
             boolean summaryDone = false, categoryDone = false, sliceImgDone = false;

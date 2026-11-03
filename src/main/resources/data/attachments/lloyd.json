@@ -1,71 +1,95 @@
 [
     {
         "id": "lloyd_populationgrowth",
+        "name": "Population Growth",
         "imagePath": "attachment_populationgrowth.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
+        "abilityText": "ATTACH: This planet's resource and influence values are each increased by 1.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_planetaryarcologies",
+        "name": "Planetary Arcologies",
         "imagePath": "attachment_planetaryarcologies.png",
         "influenceModifier": 1,
+        "abilityText": "ATTACH: This planet's influence value is increased by 1.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_industrialboom",
+        "name": "Industrial Boom",
         "imagePath": "attachment_industrialboom.png",
         "resourcesModifier": 2,
         "planetTypes": [
             "industrial"
         ],
+        "abilityText": "ATTACH: This planet is treated as having the Industrial planet trait and its resource value is increased by 2.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_orbitalslingshot",
+        "name": "Orbital Slingshot",
         "imagePath": "attachment_orbitalslingshot.png",
+        "abilityText": "ATTACH: When ships move through or from this planet's system, you may apply +1 to the movement value of 1 of those ships.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_traderoute",
+        "name": "Established Trade Route",
         "imagePath": "attachment_traderoute.png",
+        "abilityText": "ATTACH: When this planet becomes exhausted, choose a player. That player may gain 1 commodity.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_terraformingmilestone",
+        "name": "Terraforming Milestone",
         "imagePath": "attachment_terraformingmilestone.png",
         "resourcesModifier": 2,
         "influenceModifier": 2,
+        "abilityText": "ATTACH: This planet's resource and influence values are each increased by 2.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_galacticfinancialcenter",
+        "name": "Galactic Financial Center",
         "imagePath": "attachment_galacticfinancialcenter.png",
+        "abilityText": "ATTACH: When this planet is readied, choose a player. That player may gain 1 trade good.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_culturalboom",
+        "name": "Cultural Boom",
         "imagePath": "attachment_culturalboom.png",
         "influenceModifier": 2,
         "planetTypes": [
             "cultural"
         ],
+        "abilityText": "ATTACH: This planet is treated as having the Cultural planet trait and its influence value is increased by 2.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_interplanetaryhub",
+        "name": "Interplanetary Hub",
         "imagePath": "attachment_interplanetaryhub.png",
+        "abilityText": "ATTACH: When a player activates this planet's system you may gain 1 action card.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_geothermal",
+        "name": "Geothermal Equilibrium",
         "imagePath": "attachment_geothermal.png",
         "resourcesModifier": 1,
+        "abilityText": "ATTACH: This planet's resource value is increased by 1.",
         "source": "lost_star_charts_of_ixth"
     },
     {
         "id": "lloyd_selfdefense",
+        "name": "Self-Defense Initiative",
         "imagePath": "attachment_selfdefense.png",
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 2,
+        "abilityText": "ATTACH: This planet gains the SPACE CANNON 6 (x2) ability as if it were a unit.",
         "source": "lost_star_charts_of_ixth"
     }
 ]

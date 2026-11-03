@@ -20,13 +20,13 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
 import ti4.helpers.twilightsfall.TwilightsFallInfoHelper;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardPackage;
 

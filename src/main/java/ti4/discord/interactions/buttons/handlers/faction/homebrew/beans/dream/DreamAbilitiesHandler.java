@@ -14,8 +14,8 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.combat.CombatRollService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService;
@@ -96,7 +96,7 @@ public class DreamAbilitiesHandler {
                         "dream_remove_nexus_" + tile.getPosition(),
                         "Remove Nexus From " + tile.getRepresentationForButtons(game, player)));
             }
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -163,7 +163,7 @@ public class DreamAbilitiesHandler {
                     "Remove Dream Flagship",
                     FactionEmojis.dream));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event,

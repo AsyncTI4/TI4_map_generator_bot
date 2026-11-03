@@ -14,5 +14,10 @@
   ],
   "defaults": { "acs": 3, "tg": 4, "ccs": "3/3/2" },
   "start": "action",
-  "combat": ["101"]
+  "combat": ["101"],
+  "shortcuts": [
+    { "label": "Next dice all hit", "steps": [ { "do": "setStored", "key": "testBedDice", "value": "10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10" } ] },
+    { "label": "Next dice all miss", "steps": [ { "do": "setStored", "key": "testBedDice", "value": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1" } ] },
+    { "label": "Back to random dice", "steps": [ { "do": "removeStored", "key": "testBedDice" } ] }
+  ]
 }

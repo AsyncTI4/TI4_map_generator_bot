@@ -9,6 +9,8 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
 public class MutinyAgendaResolver implements AgendaResolver {
+    private static final String BASE_OBJECTIVE_NAME = "Mutiny";
+
     @Override
     public String agendaId() {
         return "mutiny";
@@ -24,17 +26,21 @@ public class MutinyAgendaResolver implements AgendaResolver {
             return;
         }
 
-        Integer poIndex = game.addCustomPO("Mutiny", agendaWentFor ? 1 : -1);
+        String objectiveName = nextMutinyObjectiveName(game);
+        Integer poIndex = game.addCustomPO(objectiveName, agendaWentFor ? 1 : -1);
 
         StringBuilder message = new StringBuilder();
-        message.append("Custom objective _Mutiny_ has been added.\n");
+        message.append("Custom objective _").append(objectiveName).append("_ has been added.\n");
         for (var winningOrLosingPlayer : winningOrLosingPlayers) {
             if (winningOrLosingPlayer.getTotalVictoryPoints() < 1 && !agendaWentFor) {
                 continue;
             }
             game.scorePublicObjective(winningOrLosingPlayer.getUserID(), poIndex);
             if (!game.isFowMode()) {
-                message.append(winningOrLosingPlayer.getRepresentation()).append(" scored _Mutiny_.\n");
+                message.append(winningOrLosingPlayer.getRepresentation())
+                        .append(" scored _")
+                        .append(objectiveName)
+                        .append("_.\n");
             }
             Helper.checkEndGame(game, winningOrLosingPlayer);
             if (winningOrLosingPlayer.getTotalVictoryPoints() >= game.getVp()) {
@@ -42,5 +48,15 @@ public class MutinyAgendaResolver implements AgendaResolver {
             }
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
+    }
+
+    private static String nextMutinyObjectiveName(Game game) {
+        String name = BASE_OBJECTIVE_NAME;
+        int occurrence = 1;
+        while (game.getRevealedPublicObjectives().containsKey(name)) {
+            occurrence++;
+            name = BASE_OBJECTIVE_NAME + " " + occurrence;
+        }
+        return name;
     }
 }

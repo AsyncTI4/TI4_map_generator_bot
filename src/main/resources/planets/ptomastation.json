@@ -1,0 +1,26 @@
+{
+    "id": "ptomastation",
+    "tileId": "fracture26",
+    "name": "Ptoma Station",
+    "aliases": [
+        "ptoma Station",
+        "ptoma"
+
+    ],
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION", 
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "ptomastation",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 169.0,
+            "y": 151.0
+        }
+    },
+    "flavorText": "*Do not weep for the Father, for he cannot be reborn. Ptoma's body has sunk deep into the abyssal zone, a monument, waiting. Feast, my child. Eat until your hulls bulge with stolen gravity. We will grow.*",
+    "source": "merford"
+}

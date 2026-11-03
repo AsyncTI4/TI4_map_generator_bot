@@ -48,17 +48,18 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.json.JsonMapperManager;
 import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.tactical.TacticalActionDisplacementService;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
@@ -124,62 +125,65 @@ class GameLoadService {
             return new GameLoadResult.Missing();
         }
         try {
-            Game game = new Game();
-            Iterator<String> gameFileLines = Files.readAllLines(gameFile.toPath(), Charset.defaultCharset())
-                    .listIterator();
-            game.setOwnerID(gameFileLines.next());
-            game.setOwnerName(gameFileLines.next());
-            game.setName(gameFileLines.next().toLowerCase());
-            while (gameFileLines.hasNext()) {
-                String data = gameFileLines.next();
-                if (MAPINFO.equals(data)) {
-                    continue;
-                }
-                if (ENDMAPINFO.equals(data)) {
-                    break;
-                }
-
-                while (gameFileLines.hasNext()) {
-                    data = gameFileLines.next();
-                    if (GAMEINFO.equals(data)) {
-                        continue;
-                    }
-                    if (ENDGAMEINFO.equals(data)) {
-                        break;
-                    }
-                    readGameInfo(game, data);
-                }
-
-                while (gameFileLines.hasNext()) {
-                    String tmpData = gameFileLines.next();
-                    if (PLAYERINFO.equals(tmpData)) {
-                        continue;
-                    }
-                    if (ENDPLAYERINFO.equals(tmpData)) {
-                        break;
-                    }
-                    Player player = null;
-                    while (gameFileLines.hasNext()) {
-                        data = tmpData != null ? tmpData : gameFileLines.next();
-                        tmpData = null;
-                        if (PLAYER.equals(data)) {
-                            player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
-                            continue;
-                        }
-                        if (ENDPLAYER.equals(data)) {
-                            break;
-                        }
-                        readPlayerInfo(player, data, game);
-                    }
-                }
-            }
-            Map<String, Tile> tileMap = getTileMap(gameFileLines, game);
-            game.setTileMap(tileMap);
-            TransientGameInfoUpdater.update(game);
-            return new GameLoadResult.Loaded(game);
+            return new GameLoadResult.Loaded(readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset())));
         } catch (Exception e) {
             return new GameLoadResult.Corrupt(gameFile.lastModified(), e);
         }
+    }
+
+    static Game readGame(List<String> lines) {
+        Game game = new Game();
+        Iterator<String> gameFileLines = lines.iterator();
+        game.setOwnerID(gameFileLines.next());
+        game.setOwnerName(gameFileLines.next());
+        game.setName(gameFileLines.next().toLowerCase());
+        while (gameFileLines.hasNext()) {
+            String data = gameFileLines.next();
+            if (MAPINFO.equals(data)) {
+                continue;
+            }
+            if (ENDMAPINFO.equals(data)) {
+                break;
+            }
+
+            while (gameFileLines.hasNext()) {
+                data = gameFileLines.next();
+                if (GAMEINFO.equals(data)) {
+                    continue;
+                }
+                if (ENDGAMEINFO.equals(data)) {
+                    break;
+                }
+                readGameInfo(game, data);
+            }
+
+            while (gameFileLines.hasNext()) {
+                String tmpData = gameFileLines.next();
+                if (PLAYERINFO.equals(tmpData)) {
+                    continue;
+                }
+                if (ENDPLAYERINFO.equals(tmpData)) {
+                    break;
+                }
+                Player player = null;
+                while (gameFileLines.hasNext()) {
+                    data = tmpData != null ? tmpData : gameFileLines.next();
+                    tmpData = null;
+                    if (PLAYER.equals(data)) {
+                        player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
+                        continue;
+                    }
+                    if (ENDPLAYER.equals(data)) {
+                        break;
+                    }
+                    readPlayerInfo(player, data, game);
+                }
+            }
+        }
+        Map<String, Tile> tileMap = getTileMap(gameFileLines, game);
+        game.setTileMap(tileMap);
+        TransientGameInfoUpdater.update(game);
+        return game;
     }
 
     private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game) {
@@ -279,6 +283,7 @@ class GameLoadService {
                 case Constants.PHASE_OF_GAME -> game.setPhaseOfGame(info);
                 case Constants.SO -> game.setSecretObjectives(getCardList(info));
                 case Constants.AC -> game.setActionCards(getCardList(info));
+                case Constants.HYDROMORPHIC_CARDS -> game.setHydromorphicCards(getCardList(info));
                 case Constants.PO1 -> game.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> game.setPublicObjectives2(getCardList(info));
                 case Constants.PO1PEAKABLE -> game.setPublicObjectives1Peekable(getCardList(info));
@@ -521,6 +526,7 @@ class GameLoadService {
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
                     Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
                             mapper.readValue(info, new TypeReference<>() {});
+                    TacticalActionDisplacementService.removeEmptyDisplacement(displacedUnits);
                     game.setTacticalActionDisplacement(displacedUnits);
                 }
                 case Constants.FOW_OPTIONS -> {
@@ -566,6 +572,8 @@ class GameLoadService {
                 // TODO: default false here vs true in GameProperties; a missing token reverts to legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
+                case Constants.ONE_WAY_ADJACENCY -> game.setOneWayAdjacency(parseBooleanOrDefault(info, false));
+                case Constants.WORMHOLE_TOKEN_MERGE -> game.setWormholeTokenMergeFrom(wormholeTokenMergeFrom(info));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> game.setHomebrew(parseBooleanOrDefault(info, false));
@@ -615,6 +623,7 @@ class GameLoadService {
                 case Constants.DISCORDANT_STARS_MODE -> game.setDiscordantStarsMode(parseBooleanOrDefault(info, false));
                 case Constants.BLUE_REVERIE_MODE -> game.setBlueReverieMode(parseBooleanOrDefault(info, false));
                 case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(parseBooleanOrDefault(info, false));
+                case Constants.LOST_LEGACIES_TILES -> game.setLostLegaciesTiles(parseBooleanOrDefault(info, false));
                 case Constants.VERBOSITY -> game.setOutputVerbosity(info);
                 case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(parseBooleanOrDefault(info, false));
                 case Constants.AGE_OF_EXPLORATION_MODE ->
@@ -691,6 +700,11 @@ class GameLoadService {
                 case Constants.PENDING_MOVEMENT_STATE -> {
                     if (isNotBlank(info)) {
                         game.setPendingMovementState(info);
+                    }
+                }
+                case Constants.LAST_PLAYER_STATE_JSON -> {
+                    if (isNotBlank(info)) {
+                        game.setLastPlayerStateJson(info);
                     }
                 }
                 case Constants.STARTED_DATE -> {
@@ -784,7 +798,7 @@ class GameLoadService {
         while (mapdata.hasMoreTokens()) {
             StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
             String id = entry.nextToken();
-            String val = entry.nextToken();
+            String val = entry.hasMoreTokens() ? entry.nextToken() : "";
             data.put(id, val);
         }
         return data;
@@ -824,13 +838,13 @@ class GameLoadService {
         while (actionCardToken.hasMoreTokens()) {
             StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
             String id = cardInfo.nextToken();
-            ACStatus status =
-                    switch (cardInfo.nextToken()) {
-                        case "garbozia" -> ACStatus.garbozia;
-                        case "ralnelbt" -> ACStatus.ralnelbt;
-                        case "purged" -> ACStatus.purged;
-                        default -> null;
-                    };
+            ACStatus status = switch (cardInfo.nextToken()) {
+                case "garbozia" -> ACStatus.garbozia;
+                case "ralnelbt" -> ACStatus.ralnelbt;
+                case "morphabt" -> ACStatus.morphabt;
+                case "purged" -> ACStatus.purged;
+                default -> null;
+            };
             cards.put(id, status);
         }
         return cards;
@@ -972,6 +986,15 @@ class GameLoadService {
                         String id = actionCardInfo.nextToken();
                         Integer index = Integer.parseInt(actionCardInfo.nextToken());
                         player.setActionCard(id, index);
+                    }
+                }
+                case Constants.HYDROMORPHIC_CARDS -> {
+                    StringTokenizer hydromorphicCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (hydromorphicCardToken.hasMoreTokens()) {
+                        StringTokenizer hydromorphicCardInfo =
+                                new StringTokenizer(hydromorphicCardToken.nextToken(), ",");
+                        player.setHydromorphicCard(
+                                hydromorphicCardInfo.nextToken(), Integer.parseInt(hydromorphicCardInfo.nextToken()));
                     }
                 }
                 case Constants.EVENTS -> {
@@ -1147,13 +1170,17 @@ class GameLoadService {
                     String filter = tokenizer.nextToken();
                     player.setFogFilter(filter);
                 }
+                case Constants.FOG_GHOST_HEXES -> player.setFogGhostHexes(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG ->
                     player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.OPLUSPLUS_COUNCIL_CONFIRMED ->
+                    player.setOplusplusCouncilConfirmed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.AUTO_PASS_WHENS_N_AFTERS ->
                     player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BOT_PLAYER -> player.setBotPlayer(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.NPC -> player.setNpc(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG ->
                     player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));
@@ -1169,6 +1196,9 @@ class GameLoadService {
                     player.setGhostCommanderCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.MAGEN_INFANTRY_COUNT ->
                     player.setMagenInfantryCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DACXIVE_COUNT -> player.setDacxiveCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.YIN_SPINNER_COUNT ->
+                    player.setYinSpinnerCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
@@ -1207,7 +1237,7 @@ class GameLoadService {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = AliasHandler.resolveTile(tokenizer.nextToken());
         String position = tokenizer.nextToken();
-        if (!PositionMapper.isTilePositionValid(position)) return null;
+        if (!MapPositionMapper.isTilePositionValid(position)) return null;
         return new Tile(tileID, position);
     }
 
@@ -1262,5 +1292,14 @@ class GameLoadService {
         }
 
         return peekedPublicObjectives;
+    }
+
+    private static int wormholeTokenMergeFrom(String info) {
+        if ("true".equalsIgnoreCase(info)) return 2;
+        try {
+            return Integer.parseInt(info.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

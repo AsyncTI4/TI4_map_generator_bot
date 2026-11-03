@@ -20,8 +20,8 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.unit.DestroyUnitService;
@@ -266,7 +266,7 @@ public class ThronesThroneHandler {
                 .collect(Collectors.toSet());
         if (producedAliases.size() != 2) return 0;
 
-        for (Player neighbour : player.getNeighbouringPlayers(true)) {
+        for (Player neighbour : player.getAbilityNeighbours()) {
             boolean neighbourHasAll = true;
             for (String alias : producedAliases) {
                 int neighbourCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, neighbour, alias, false);

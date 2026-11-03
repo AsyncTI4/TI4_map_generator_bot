@@ -14,15 +14,15 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -114,7 +114,7 @@ public final class TeHelperPromissories {
         Tile dest = game.getTileByPosition(destination);
         if (dest == null) return buttons;
 
-        for (String adj : FoWHelper.getAdjacentTilesAndNotThisTile(game, destination, player, false)) {
+        for (String adj : Adjacency.of(game, player).forMovement().into(destination)) {
             Tile tile = game.getTileByPosition(adj);
             if (tile == null || tile.hasPlayerCC(player)) continue;
 

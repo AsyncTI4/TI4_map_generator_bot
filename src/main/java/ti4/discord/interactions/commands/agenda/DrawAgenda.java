@@ -12,7 +12,8 @@ class DrawAgenda extends GameStateSubcommand {
 
     DrawAgenda() {
         super(Constants.DRAW, "Draw Agenda", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1")
+                .setRequiredRange(1, 10));
         addOptions(new OptionData(OptionType.BOOLEAN, "from_bottom", "Whether to draw from bottom, default false"));
     }
 
@@ -21,5 +22,10 @@ class DrawAgenda extends GameStateSubcommand {
         count = Math.max(count, 1);
         var fromBottom = event.getOption("from_bottom", Boolean.FALSE, OptionMapping::getAsBoolean);
         AgendaHelper.drawAgenda(count, fromBottom, getGame(), getPlayer());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

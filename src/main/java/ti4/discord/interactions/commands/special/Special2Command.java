@@ -11,13 +11,14 @@ public class Special2Command implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new SetupNeutralPlayer(),
-                    new GeneratePainBoxMapString(),
                     new SearchWinningPath(),
+                    new ListWinningPaths(),
                     new SetExpedition(),
                     new Galvanize(),
                     new LoreCommand(),
                     new Skulls(),
-                    new ImportDeckConfig())
+                    new ImportDeckConfig(),
+                    new SetupBotPlayer())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

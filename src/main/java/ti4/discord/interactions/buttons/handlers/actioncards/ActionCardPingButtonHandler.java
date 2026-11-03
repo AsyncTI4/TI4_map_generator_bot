@@ -22,6 +22,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.TileModel;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.PlanetTargetService;
@@ -160,6 +161,7 @@ public class ActionCardPingButtonHandler {
         String buttonPrefix = player.factionButtonChecker() + Constants.AC_PING_SYSTEM + "_" + token;
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
+            if (!isSystem(tile)) continue;
             buttons.add(Buttons.gray(
                     buttonPrefix + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
@@ -172,10 +174,6 @@ public class ActionCardPingButtonHandler {
         String payload = buttonID.substring(Constants.AC_PING_SYSTEM.length() + 1);
         String token = tokenFrom(payload);
         String position = payload.substring(token.length() + 1);
-        if (!actorCanSeeSystem(game, player, position)) {
-            PlanetTargetService.fizzle(event, player);
-            return;
-        }
         ButtonHelper.deleteMessage(event);
         offerRouteChoice(player, SYSTEM, position, token);
     }
@@ -239,13 +237,12 @@ public class ActionCardPingButtonHandler {
         String targetKey = parts[3];
 
         String cardTitle = peekCardTitle(game, player, token);
-        boolean sent =
-                switch (type) {
-                    case PLANET -> pingPlanetTarget(game, player, targetKey, isPublic, cardTitle);
-                    case SYSTEM -> pingSystemTarget(game, player, targetKey, isPublic, cardTitle);
-                    case PLAYER -> pingPlayerTarget(game, player, targetKey, isPublic, cardTitle);
-                    default -> false;
-                };
+        boolean sent = switch (type) {
+            case PLANET -> pingPlanetTarget(game, player, targetKey, isPublic, cardTitle);
+            case SYSTEM -> pingSystemTarget(game, player, targetKey, isPublic, cardTitle);
+            case PLAYER -> pingPlayerTarget(game, player, targetKey, isPublic, cardTitle);
+            default -> false;
+        };
         if (sent) {
             ButtonHelper.deleteMessage(event);
         } else {
@@ -295,10 +292,13 @@ public class ActionCardPingButtonHandler {
     }
 
     private static boolean routeSystem(Game game, Player actor, String position, boolean isPublic, String actorLine) {
-        if (!actorCanSeeSystem(game, actor, position)) {
-            return false;
-        }
         Tile tile = game.getTileByPosition(position);
+        if (!isSystem(tile)) {
+            if (!isPublic) {
+                confirmRevealedPing(actor, SYSTEM_EMOJI + " " + position);
+            }
+            return true;
+        }
         if (isPublic) {
             return postPublicly(game, systemPingFor(game, null, tile, actorLine));
         }
@@ -411,12 +411,10 @@ public class ActionCardPingButtonHandler {
                 || PlanetTargetService.knownPlanetIds(game, actor, null).contains(planetId);
     }
 
-    private static boolean actorCanSeeSystem(Game game, Player actor, String position) {
-        if (game.getTileByPosition(position) == null) {
-            return false;
-        }
-        return !game.isFowMode()
-                || FoWHelper.getTilePositionsToShow(game, actor).contains(position);
+    private static boolean isSystem(Tile tile) {
+        if (tile == null) return false;
+        TileModel model = tile.getTileModel();
+        return model != null && !model.isHyperlane();
     }
 
     private static Emoji pingEmoji(String type) {

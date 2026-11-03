@@ -1,7 +1,7 @@
 package ti4.game;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.util.AbstractMap.SimpleEntry;
@@ -46,10 +46,14 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AncientMap
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExtensionRefitLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
@@ -70,6 +74,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
@@ -85,17 +90,18 @@ import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.BoardPosition;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.GalaxyNames;
+import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
@@ -111,13 +117,20 @@ import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties implements StoredValueHelper, TwilightFallDeckFuncs {
     private static final JsonMapper mapper = JsonMapperManager.basic();
+    private static final String RECORDED_WINNER_KEY = "recordedWinner";
+    private static final String STYX_PLANET = "styx";
 
     // TODO (Jazz): Sort through these and add to GameProperties
     @Getter
@@ -322,6 +335,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         publicObjectives2 = Mapper.getShuffledDeck("public_stage_2_objectives_pok");
         setSecretObjectives(Mapper.getShuffledDeck("secret_objectives_pok"));
         setActionCards(Mapper.getShuffledDeck("action_cards_te"));
+        initializeHydromorphicDeck();
         setAgendas(Mapper.getShuffledDeck("agendas_pok"));
         explore = Mapper.getShuffledDeck("explores_pok");
         setRelics(Mapper.getShuffledDeck("relics_pok_te"));
@@ -416,6 +430,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         neutral.addTech("dd2");
         neutral.addTech("cv2");
         neutral.addTech("cr2");
+        neutral.addTech("dn2");
         neutral.addTech("ws");
         return neutral;
     }
@@ -428,8 +443,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     @NotNull
     public Player getNeutral() {
-        if (getPlayerFromColorOrFaction("neutral") == null) return setupNeutralPlayer();
-        return getPlayerFromColorOrFaction("neutral");
+        Player neutral = getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) return setupNeutralPlayer();
+        neutral.addTech("dn2");
+        return neutral;
+    }
+
+    public Optional<Player> findNeutral() {
+        return Optional.ofNullable(getPlayerFromColorOrFaction("neutral"));
     }
 
     @NotNull
@@ -449,8 +470,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return borderAnomalyManager.has(tile, direction);
     }
 
-    public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
-        borderAnomalyManager.add(tile, direction, anomalyType);
+    public void addBorderAnomaly(String tile, Integer direction, String anomalyTypeId) {
+        borderAnomalyManager.add(tile, direction, anomalyTypeId);
     }
 
     public void removeBorderAnomaly(String tile, Integer direction) {
@@ -697,6 +718,65 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Optional<Player> getWinner() {
+        return getWinner(isHasEnded());
+    }
+
+    public Optional<Player> getMostPointsWinner() {
+        List<Player> candidates = getRealPlayersNDummies();
+        int mostPoints = candidates.stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .max()
+                .orElse(0);
+        List<Player> leaders = candidates.stream()
+                .filter(player -> player.getTotalVictoryPoints() == mostPoints)
+                .toList();
+        if (leaders.size() == 1) {
+            return Optional.of(leaders.getFirst());
+        }
+        return getSoleEarliestInitiativePlayer(leaders);
+    }
+
+    public void recordWinner(Player winner) {
+        setStoredValue(RECORDED_WINNER_KEY, winner.getFaction());
+    }
+
+    @Override
+    public void reopen() {
+        super.reopen();
+        removeStoredValue(RECORDED_WINNER_KEY);
+    }
+
+    private Optional<Player> getWinner(boolean includeRecordedWinner) {
+        Optional<Player> winner = getVictoryRequirementWinner();
+        if (winner.isPresent() || !includeRecordedWinner) {
+            return winner;
+        }
+        return getRecordedWinner();
+    }
+
+    private static Optional<Player> getSoleEarliestInitiativePlayer(List<Player> tiedPlayers) {
+        if (tiedPlayers.isEmpty() || !tiedPlayers.stream().allMatch(player -> isNotEmpty(player.getSCs()))) {
+            return Optional.empty();
+        }
+        int earliestInitiative =
+                tiedPlayers.stream().mapToInt(Player::getInitiative).min().getAsInt();
+        List<Player> earliestPlayers = tiedPlayers.stream()
+                .filter(player -> player.getInitiative() == earliestInitiative)
+                .toList();
+        return earliestPlayers.size() == 1 ? Optional.of(earliestPlayers.getFirst()) : Optional.empty();
+    }
+
+    private Optional<Player> getRecordedWinner() {
+        String faction = getStoredValue(RECORDED_WINNER_KEY);
+        if (faction.isEmpty()) {
+            return Optional.empty();
+        }
+        return getRealPlayersNDummies().stream()
+                .filter(player -> faction.equals(player.getFaction()))
+                .findFirst();
+    }
+
+    private Optional<Player> getVictoryRequirementWinner() {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
             if (!meetsVictoryRequirement(player)) {
@@ -721,12 +801,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public List<Player> getWinners() {
-        Optional<Player> winnerOptional = getWinner();
-        if (winnerOptional.isEmpty()) {
-            return Collections.emptyList();
-        }
+        return getWinner().map(this::withAlliancePartners).orElse(Collections.emptyList());
+    }
 
-        Player winner = winnerOptional.get();
+    public List<Player> getWinnersOnceEnded() {
+        return getWinner(true).map(this::withAlliancePartners).orElse(Collections.emptyList());
+    }
+
+    private List<Player> withAlliancePartners(Player winner) {
         List<Player> winners = new ArrayList<>();
         winners.add(winner);
 
@@ -848,7 +930,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             ActionCardModel acModel = Mapper.getActionCard(ac);
             if (acModel.getName().contains(name)) {
                 // true = it cannot be played, false = it's on garbozia
-                return Arrays.asList(null, ACStatus.ralnelbt, ACStatus.purged).contains(status);
+                return Arrays.asList(null, ACStatus.ralnelbt, ACStatus.morphabt, ACStatus.purged)
+                        .contains(status);
             }
         }
         return false;
@@ -875,17 +958,26 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         super.setRound(Math.max(1, round));
     }
 
-    @Override
-    public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
-        boolean isFracturedTIGL = TIGLHelper.isFracturedTIGLGame(this);
-        boolean hasAlwaysIncompatibleMode = isAllianceMode() || isCommunityMode();
-        boolean hasStandardOnlyIncompatibleMode = isAbsolMode()
+    public boolean hasTiglIncompatibleMode() {
+        return isAllianceMode() || isCommunityMode();
+    }
+
+    public boolean hasStandardLadderIncompatibleMode() {
+        return isAbsolMode()
                 || isMiltyModMode()
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
                 || isHomebrewSCMode()
                 || isFowMode();
-        if (hasAlwaysIncompatibleMode || (!isFracturedTIGL && hasStandardOnlyIncompatibleMode)) {
+    }
+
+    public boolean canBeCompetitiveTIGLGame(boolean isFractured) {
+        return !hasTiglIncompatibleMode() && (isFractured || !hasStandardLadderIncompatibleMode());
+    }
+
+    @Override
+    public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
+        if (!canBeCompetitiveTIGLGame(TIGLHelper.isFracturedTIGLGame(this))) {
             competitiveTIGLGame = false;
         }
         super.setCompetitiveTIGLGame(competitiveTIGLGame);
@@ -1048,6 +1140,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !isRapidMobilizationMode()
                 && !isMonumentToTheAgesMode()
                 && !isWeirdWormholesMode()
+                && !isCallOfTheVoidMode()
                 && !isCosmicPhenomenaeMode()
                 && !isWildWildGalaxyMode()
                 && !isZealousOrthodoxyMode()
@@ -1141,6 +1234,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
 
     public TextChannel getActionsChannel() {
         return getMainGameChannel();
+    }
+
+    public TextChannel getTableTalkOrActionsChannel() {
+        TextChannel tableTalk = getTableTalkChannel();
+        return tableTalk == null ? getActionsChannel() : tableTalk;
     }
 
     public ThreadChannel getBotMapUpdatesThread() {
@@ -1460,6 +1558,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !"twilights_fall_sc".equals(getScSetID());
     }
 
+    public boolean usesOneWayAdjacency() {
+        return isFowMode() || isOneWayAdjacency();
+    }
+
     public void resetThalnosUnits() {
         thalnosUnits = new HashMap<>();
     }
@@ -1486,6 +1588,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         AncientMapsLLButtonHandler.clearAncientMaps(this);
         MirrorShieldingLLButtonHandler.clearMirrorShielding(this);
         RaisedMoraleLLButtonHandler.clearRaisedMorale(this);
+        HydromorphicCardHandler.clearCombatEffects(this);
+        IronPromissoryHandler.returnRetrofitting(this);
         PonthousPromissoryHandler.clearThunderbirdPrototype(this);
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
@@ -1848,10 +1952,26 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void removeRevealedObjective(String id) {
-        revealedPublicObjectives.remove(id);
-        soToPoList.remove(id);
-        customPublicVP.remove(id);
-        scoredPublicObjectives.remove(id);
+        soToPoList.stream()
+                .filter(soId -> soId.equals(id) || id.equals(convertedSecretObjectiveName(soId)))
+                .findFirst()
+                .ifPresent(soId -> {
+                    soToPoList.remove(soId);
+                    forgetRevealedObjective(convertedSecretObjectiveName(soId));
+                });
+        forgetRevealedObjective(id);
+    }
+
+    private void forgetRevealedObjective(String key) {
+        if (key == null) return;
+        revealedPublicObjectives.remove(key);
+        customPublicVP.remove(key);
+        scoredPublicObjectives.remove(key);
+    }
+
+    private static String convertedSecretObjectiveName(String secretObjectiveId) {
+        SecretObjectiveModel secretObjective = Mapper.getSecretObjective(secretObjectiveId);
+        return secretObjective == null ? null : secretObjective.getName();
     }
 
     public String getCustodiansTaker() {
@@ -2692,6 +2812,54 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
     }
 
+    public void initializeHydromorphicDeck() {
+        boolean noHydromorphicCardsExist = getHydromorphicCards().isEmpty()
+                && getPlayers().values().stream()
+                        .allMatch(player -> player.getHydromorphicCards().isEmpty());
+        if (noHydromorphicCardsExist) {
+            setHydromorphicCards(new ArrayList<>(Mapper.getHydromorphicCards().keySet()));
+            Collections.shuffle(getHydromorphicCards());
+            setStoredValue("hydromorphicDeck", "initialized");
+        }
+        if (!"2".equals(getStoredValue("hydromorphicDeckVersion"))) {
+            List<String> existingCards = new ArrayList<>(getHydromorphicCards());
+            for (Player player : getPlayers().values()) {
+                existingCards.addAll(player.getHydromorphicCards().keySet());
+            }
+            getHydromorphicCards()
+                    .addAll(Mapper.getHydromorphicCards().keySet().stream()
+                            .filter(card -> !existingCards.contains(card))
+                            .toList());
+            setStoredValue("hydromorphicDeckVersion", "2");
+        }
+    }
+
+    @Nullable
+    public String drawHydromorphicCard(Player player) {
+        initializeHydromorphicDeck();
+        if (getHydromorphicCards().isEmpty()) {
+            return null;
+        }
+        String cardId = getHydromorphicCards().removeFirst();
+        player.setHydromorphicCard(cardId);
+        return cardId;
+    }
+
+    public void returnHydromorphicCard(String cardId) {
+        if (Mapper.getHydromorphicCard(cardId) == null) {
+            return;
+        }
+        if (getHydromorphicCards() == null) {
+            setHydromorphicCards(new ArrayList<>());
+        }
+        getHydromorphicCards().add(cardId);
+        Collections.shuffle(getHydromorphicCards());
+    }
+
+    public int getHydromorphicCardFullDeckSize() {
+        return Mapper.getHydromorphicCards().size();
+    }
+
     // Don't shuffle back cards with a status
     private boolean reshuffleActionCardDiscard() {
         List<String> acsToShuffle = getDiscardActionCards().keySet().stream()
@@ -2734,6 +2902,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
             getActionCards().remove(id);
             player.setActionCard(id);
+            if (player.hasAbility("reflect")) {
+                ButtonHelperFactionSpecific.offerReflect(this, player);
+            }
 
             return player.getActionCards();
         }
@@ -2746,6 +2917,19 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         MessageHelper.sendMessageToChannel(
                 getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty.");
         return player.getActionCards();
+    }
+
+    @Nullable
+    public String drawActionCardToMetamorphic() {
+        if (getActionCards().isEmpty() && !reshuffleActionCardDiscard()) {
+            return null;
+        }
+        if (getActionCards().isEmpty()) {
+            return null;
+        }
+        String actionCardId = getActionCards().removeFirst();
+        setDiscardActionCard(actionCardId, ACStatus.morphabt, false);
+        return actionCardId;
     }
 
     @Nullable
@@ -2889,6 +3073,23 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (Mapper.getExplore(id) != null) {
             discardExplore.add(id);
         }
+    }
+
+    public List<String> peekExploreTop(String reqType, int count) {
+        List<String> deck = getExplores(reqType, explore);
+        if (deck.size() < count) {
+            List<String> discards = new ArrayList<>(getExplores(reqType, discardExplore));
+            Collections.shuffle(discards);
+            discardExplore.removeAll(discards);
+            explore.addAll(discards);
+            deck = getExplores(reqType, explore);
+        }
+        return deck.stream().limit(count).toList();
+    }
+
+    public void placeExploreOnTop(String id) {
+        explore.remove(id);
+        explore.addFirst(id);
     }
 
     public void purgeExplore(String id) {
@@ -3071,6 +3272,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 if (so.getPoints() != type) {
                     continue;
                 }
+                if (getRevealedPublicObjectives().containsKey(so.getAlias())) {
+                    continue;
+                }
+                if (getRevealedPublicObjectives().containsKey(so.getName())) {
+                    continue;
+                }
                 id = so.getAlias();
                 player.setSecret(id);
                 checkSOLimit(player);
@@ -3134,7 +3341,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private void setDiscardActionCard(String id, ACStatus status, boolean played) {
-        Collection<Integer> values = getDiscardActionCards().values();
+        Set<Integer> values = new HashSet<>(getDiscardActionCards().values());
+        getPlayers()
+                .values()
+                .forEach(player -> values.addAll(player.getActionCards().values()));
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -3179,8 +3389,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
             setDiscardActionCard(acID, status, played);
+            if (!played) {
+                GameEventService.commit(
+                        this, GameEventType.CARD_DISCARDED, player, Map.of("cardType", "ACTION_CARD", "cardId", acID));
+            }
+            if (!played && !HydromorphicHelper.hasPendingCard(this, player)) {
+                MorphaUnitHandler.recordCytoplasmicTransportDiscards(this, player, 1);
+            }
+            CommanderUnlockCheckService.checkAllPlayersInGame(this, "morpha");
             return true;
         }
         return false;
@@ -3213,7 +3433,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
+            boolean wasInHand = actionCards.containsKey(acID);
             player.removeActionCard(acIDNumber);
+            if (wasInHand) {
+                KnownCardsService.recordCardLeftHandPublicly(
+                        this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
+            }
             setPurgedActionCard(acID, played);
             return true;
         }
@@ -3324,6 +3549,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             player.setSecretScored(soID);
             return true;
         }
@@ -3346,6 +3573,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
             player.setSecret(soID);
+            KnownCardsService.recordCardShownToAll(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             return true;
         }
         return false;
@@ -3448,15 +3677,13 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         SourceSettings sources = miltySettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
         setMonumentsMode(sources.getMonuments().isVal());
+        setLostLegaciesTiles(sources.getLostLegaciesTiles().isVal());
 
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
 
         if (getMaxSOCountPerPlayer() != 4) {
             setMaxSOCountPerPlayer(settings.getSecrets().getVal());
-        }
-        if (settings.getTigl().isVal()) {
-            TIGLHelper.initializeTIGLGame(this, settings.getTiglFractured().isVal());
         }
         setAllianceMode(settings.getAlliance().isVal());
 
@@ -3478,15 +3705,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         SourceSettings sources = draftSettings.getSourceSettings();
         if (sources.getAbsol().isVal()) setAbsolMode(true);
         setMonumentsMode(sources.getMonuments().isVal());
+        setLostLegaciesTiles(sources.getLostLegaciesTiles().isVal());
 
         setVp(gameSetupSettings.getPointTotal().getVal());
 
         if (getMaxSOCountPerPlayer() != 4) {
             setMaxSOCountPerPlayer(gameSetupSettings.getSecrets().getVal());
-        }
-        if (gameSetupSettings.getTigl().isVal()) {
-            TIGLHelper.initializeTIGLGame(
-                    this, gameSetupSettings.getTiglFractured().isVal());
         }
         setAllianceMode(gameSetupSettings.getAlliance().isVal());
 
@@ -3520,7 +3744,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             if (isOmegaPhaseMode()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
+                        "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/homebrew omegaphase "
                                 + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
             } else {
                 setUpPeekableObjectives(stage1Count, 1);
@@ -3598,6 +3822,63 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         getPlayedActionCards().clear();
         for (Player player : players.values()) {
             player.getActionCards().clear();
+        }
+    }
+
+    public void resetSecretObjectiveDeck(DeckModel deck) {
+        setSoDeckID(deck.getAlias());
+        setSecretObjectives(deck.getNewShuffledDeck());
+        new ArrayList<>(soToPoList).forEach(this::removeRevealedObjective);
+        for (Player player : players.values()) {
+            player.getSecrets().clear();
+            player.getSecretsScored().clear();
+        }
+    }
+
+    public void resetRelicDeck(DeckModel deck) {
+        setRelicDeckID(deck.getAlias());
+        setRelics(deck.getNewShuffledDeck());
+        for (Player player : players.values()) {
+            List<String> deckRelics = player.getRelics().stream()
+                    .filter(relic -> !Mapper.isValidRelic(relic)
+                            || !Mapper.getRelic(relic).isFakeRelic())
+                    .distinct()
+                    .toList();
+            for (String relic : deckRelics) {
+                player.removeRelic(relic);
+                player.getRelics().removeIf(relic::equals);
+                player.getExhaustedRelics().removeIf(relic::equals);
+            }
+        }
+    }
+
+    public void resetAgendaDeck(DeckModel deck) {
+        for (String lawID : new ArrayList<>(laws.keySet())) {
+            if (!Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(lawID)) {
+                removeLaw(lawID);
+            }
+        }
+        discardAgendas.clear();
+        sentAgendas.clear();
+        installAgendaDeck(deck);
+    }
+
+    public void resetEventDeck(DeckModel deck) {
+        setEventDeckID(deck.getAlias());
+        setEvents(deck.getNewShuffledDeck());
+        eventsInEffect.clear();
+        discardedEvents.clear();
+        for (Player player : players.values()) {
+            player.getEvents().clear();
+        }
+    }
+
+    public void resetExplorationDeck(DeckModel deck) {
+        setExplorationDeckID(deck.getAlias());
+        explore = new ArrayList<>(deck.getNewShuffledDeck());
+        discardExplore.clear();
+        for (Player player : players.values()) {
+            player.setFragments(new ArrayList<>());
         }
     }
 
@@ -3719,6 +4000,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                             + "** while there are agendas in the discard pile.");
             return false;
         }
+        installAgendaDeck(deck);
+        return true;
+    }
+
+    private void installAgendaDeck(DeckModel deck) {
         setAgendaDeckID(deck.getAlias());
         setAgendas(deck.getNewShuffledDeck());
         if ("agendas_br".equalsIgnoreCase(deck.getAlias())) {
@@ -3789,7 +4075,6 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             Collections.shuffle(list);
             setMandates(list);
         }
-        return true;
     }
 
     private boolean validateAndSetTechnologyDeck(DeckModel deck) {
@@ -4023,6 +4308,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public void setTile(Tile tile) {
         tileMap.put(tile.getPosition(), tile);
         planets.clear();
+        if (BoardPosition.isBoardPosition(tile.getPosition())) {
+            GalaxyNames.ensureAssigned(this);
+        }
     }
 
     public void removeTile(String position) {
@@ -4119,7 +4407,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
         planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
         planets.put("mobilemountain", new Planet("mobilemountain", new Point(0, 0)));
+        planets.put("thedeep", new Planet("thedeep", new Point(0, 0)));
+        planets.put("thedeepascended", new Planet("thedeepascended", new Point(0, 0)));
         planets.put("gedustation", new Planet("gedustation", new Point(0, 0)));
+        planets.put("tradestation1", new Planet("tradestation1", new Point(0, 0)));
+        planets.put("tradestation2", new Planet("tradestation2", new Point(0, 0)));
         return planets.keySet();
     }
 
@@ -4242,6 +4534,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     public boolean playerHasLeaderUnlockedOrAlliance(Player player, String leaderID) {
         if (player.hasLeaderUnlocked(leaderID)) return true;
         if (!leaderID.contains("commander")) return false;
+        if (IxthLegendaryButtonHandler.hasKwonCommander(this, player, leaderID)) return true;
 
         if (leaderIsFake(leaderID) && !"gateteen".equalsIgnoreCase(getName())) {
             if (!player.getAllianceMembers().isEmpty()) {
@@ -4934,6 +5227,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isDiscordantStarsMode()
                 || isBlueReverieMode()
                 || isUnchartedSpaceStuff()
+                || isLostLegaciesTiles()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
@@ -4942,6 +5236,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isTkNovaCup()
                 || isTfBr()
                 || isTwilightDS()
+                || isProphecyOfKingsGameWithStyx()
                 || isMuaatManiaMode()
                 || isCosmicConvergenceMode()
                 || isLiberationC4Mode()
@@ -4953,6 +5248,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || getSpinMode() != null && !"OFF".equalsIgnoreCase(getSpinMode())
                 || isHomebrewSCMode()
                 || isCommunityMode()
+                || isMonumentsMode()
+                || isOmegaPhaseMode()
+                || isOplusplusRegularMode()
+                || isOplusplusCouncilMode()
+                || isCptiExploreMode()
                 || !checkAllDecksAreOfficial()
                 || !checkAllTilesAreOfficial()
                 || getRealAndEliminatedPlayers().size() < 3
@@ -4967,6 +5267,18 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         .map(Mapper::getLeader)
                         .filter(Objects::nonNull)
                         .anyMatch(leader -> !leader.getSource().isOfficial());
+    }
+
+    private boolean isProphecyOfKingsGameWithStyx() {
+        return isProphecyOfKings() && !isThundersEdge() && includesStyx();
+    }
+
+    private boolean includesStyx() {
+        return getTileMap().values().stream()
+                        .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                        .anyMatch(planet -> STYX_PLANET.equals(planet.getName()))
+                || getRealAndEliminatedPlayers().stream()
+                        .anyMatch(player -> player.getPlanets().contains(STYX_PLANET));
     }
 
     private boolean checkAllDecksAreOfficial() {

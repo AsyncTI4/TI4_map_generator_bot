@@ -15,10 +15,10 @@ import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileHelper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TileEmojis;
@@ -172,11 +172,10 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "toggleAdvanced" -> toggleAdvanced(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "toggleAdvanced" -> toggleAdvanced(event);
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

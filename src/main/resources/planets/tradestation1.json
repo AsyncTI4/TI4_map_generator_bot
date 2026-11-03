@@ -1,0 +1,10 @@
+{
+    "id": "tradestation1",
+    "tileId": null,
+    "name": "Trade Station",
+    "aliases": ["tradestation1"],
+    "resources": 0,
+    "influence": 0,
+    "planetTypes": ["SPACESTATION", "FAKE"],
+    "source": "blue_reverie"
+}

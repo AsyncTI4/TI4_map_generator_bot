@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -147,14 +146,8 @@ public class ListSetting<T> extends SettingInterface {
             }
             return "Could not complete action";
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
-            List<String> itemsToAdd = selectEvent.getValues();
-            if (!CollectionUtils.containsAll(keys, itemsToAdd)) {
-                keys.addAll(itemsToAdd);
-                return null;
-            } else {
-                if (itemsToAdd.isEmpty()) return null;
-                return "The items [" + String.join(",", itemsToAdd) + "] are already in the list.";
-            }
+            keys.addAll(selectEvent.getValues());
+            return null;
         } else {
             return "Could not complete action. Invalid event?";
         }
@@ -172,14 +165,8 @@ public class ListSetting<T> extends SettingInterface {
             }
             return "Could not complete action";
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
-            List<String> itemsToRemove = selectEvent.getValues();
-            if (CollectionUtils.containsAny(keys, itemsToRemove)) {
-                itemsToRemove.forEach(keys::remove);
-                return null;
-            } else {
-                if (itemsToRemove.isEmpty()) return null;
-                return "The items [" + String.join(",", itemsToRemove) + "] are not in the list.";
-            }
+            selectEvent.getValues().forEach(keys::remove);
+            return null;
         } else {
             return "Could not complete action. Invalid event?";
         }

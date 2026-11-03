@@ -66,14 +66,36 @@
         "source": "other"
     },
     {
+        "id": "grouped3D",
+        "initiative": 34,
+        "group": "All",
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "botSCAutomationID": "pok3politics",
+        "imageFileName": "base_game_3",
+        "source": "other"
+    },
+    {
+        "id": "grouped3E",
+        "initiative": 35,
+        "group": "All",
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "botSCAutomationID": "pok3politics",
+        "imageFileName": "base_game_3",
+        "source": "other"
+    },
+    {
         "id": "grouped4A",
         "initiative": 41,
         "group": "A",
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -94,8 +116,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {
@@ -149,8 +171,8 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -171,8 +193,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {
@@ -226,8 +248,8 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -248,8 +270,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {
@@ -303,8 +325,8 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -325,8 +347,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {
@@ -380,8 +402,8 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -402,8 +424,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {
@@ -457,8 +479,8 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -479,8 +501,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {
@@ -534,8 +556,8 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -556,8 +578,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {
@@ -611,8 +633,8 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
+        "botSCAutomationID": "te4construction",
+        "imageFileName": "te_4",
         "source": "other"
     },
     {
@@ -633,8 +655,8 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
-        "imageFileName": "base_game_6",
+        "botSCAutomationID": "te6warfare",
+        "imageFileName": "te_6",
         "source": "other"
     },
     {

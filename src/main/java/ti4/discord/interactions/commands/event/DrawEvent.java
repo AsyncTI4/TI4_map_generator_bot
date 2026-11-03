@@ -13,7 +13,8 @@ class DrawEvent extends GameStateSubcommand {
 
     public DrawEvent() {
         super(Constants.DRAW, "Draw Event", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1")
+                .setRequiredRange(1, 10));
     }
 
     @Override

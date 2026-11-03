@@ -26,8 +26,10 @@
     "planetType": "CULTURAL",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "INTERSTELLAR GATE",
+    "legendaryAbilityName": "Interstellar Gate",
     "legendaryAbilityText": "When this card enters play, attach to it the unlocked commander of a random unchosen faction. While you control this planet, your commodity value is decreased by 1.",
+    "legendaryAbilityFlavourText": "The rulers of another system pledge their allegiance.",
+    "legendaryNotes": "The commander is attached automatically when Kwon is first gained. It works wherever the bot checks for unlocked commanders; resolve anything else manually.",
     "unitPositions": {
         "unitHolderName": "kwon",
         "coordinateMap": {

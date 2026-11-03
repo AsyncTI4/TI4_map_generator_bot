@@ -4,6 +4,10 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class GameEventType {
+    public static final String GAME_STARTED = "GAME_STARTED";
+    public static final String DRAFT_STARTED = "DRAFT_STARTED";
+    public static final String DRAFT_PICK = "DRAFT_PICK";
+    public static final String DRAFT_ENDED = "DRAFT_ENDED";
     public static final String TACTICAL_ACTION = "TACTICAL_ACTION";
     public static final String TURN = "TURN";
     public static final String CARD_PLAY_ACTION_CARD = "CARD_PLAY_ACTION_CARD";
@@ -19,10 +23,19 @@ public class GameEventType {
     public static final String SC_PICKED = "SC_PICKED";
     public static final String OBJECTIVE_SCORED = "OBJECTIVE_SCORED";
     public static final String STATUS_SCORING = "STATUS_SCORING";
+    public static final String PUBLIC_OBJECTIVE_REVEALED = "PUBLIC_OBJECTIVE_REVEALED";
     public static final String AGENDA_RESOLVED = "AGENDA_RESOLVED";
     public static final String TRANSACTION = "TRANSACTION";
     public static final String GAME_ENDED = "GAME_ENDED";
     public static final String PRODUCTION = "PRODUCTION";
+    public static final String CONTROL_ESTABLISHED = "CONTROL_ESTABLISHED";
+    public static final String COMBAT_ROLL = "COMBAT_ROLL";
+    public static final String COMBAT_OUTCOME = "COMBAT_OUTCOME";
+    public static final String INVASION_COMMITTED = "INVASION_COMMITTED";
+    public static final String CARD_CANCELED = "CARD_CANCELED";
+    public static final String CARD_DISCARDED = "CARD_DISCARDED";
+    public static final String CARD_STOLEN = "CARD_STOLEN";
+    public static final String EXPLORE_RESOLVED = "EXPLORE_RESOLVED";
     public static final String MANUAL_COMMAND = "MANUAL_COMMAND";
     public static final String PHASE_STARTED = "PHASE_STARTED";
     public static final String ROUND_STARTED = "ROUND_STARTED";

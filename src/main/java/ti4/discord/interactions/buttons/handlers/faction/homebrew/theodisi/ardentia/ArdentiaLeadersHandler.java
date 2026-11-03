@@ -13,8 +13,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class ArdentiaLeadersHandler {
@@ -23,18 +23,10 @@ public class ArdentiaLeadersHandler {
     private static final String ARDENTIA_HERO_REMOVE = "ardentiaHeroRemoveCC_";
 
     // Agent
-    public static void startArdentiaAgentStep1(Game game, Player targetPlayer) {
-        if (game == null || targetPlayer == null) {
-            return;
-        }
-
+    public static List<Button> agentPaymentButtons(Game game, Player targetPlayer) {
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, targetPlayer));
         buttons.add(Buttons.red(targetPlayer.factionButtonChecker() + AGENT_PAYMENT_DONE, "Done"));
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(),
-                targetPlayer.getRepresentation() + ", please choose how to spend 1 influence.",
-                buttons);
+        return buttons;
     }
 
     @ButtonHandler(AGENT_PAYMENT_DONE)
@@ -73,7 +65,7 @@ public class ArdentiaLeadersHandler {
                         otherPlayer.getFactionEmojiOrColor()));
             }
         }
-        targets.add(Buttons.red("deleteButtons", "Done"));
+        targets.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

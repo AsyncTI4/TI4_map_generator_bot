@@ -1,29 +1,73 @@
 package ti4.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ti4.game.Game;
+import ti4.game.Player;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class BorderAnomalyHolder {
     private String tile;
     private int direction;
-    private BorderAnomalyModel.BorderAnomalyType type;
+    private String type;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<String> allowedColors = new ArrayList<>();
+
+    public BorderAnomalyHolder(String tile, int direction, String type) {
+        this.tile = tile;
+        this.direction = direction;
+        this.type = type;
+    }
+
+    @JsonIgnore
+    public BorderAnomalyModel getModel() {
+        return Mapper.getBorderAnomaly(type);
+    }
+
+    public boolean isType(String typeId) {
+        return type != null && type.equals(typeId);
+    }
 
     public boolean blocksAdjacencyIn() {
-        return switch (type) {
-            case SPATIAL_TEAR, GRAVITY_WAVE -> true;
-            case null, default -> false;
-        };
+        BorderAnomalyModel model = getModel();
+        return model != null && model.blocksAdjacencyIn();
     }
 
     public boolean blocksAdjacencyOut() {
-        return switch (type) {
-            case SPATIAL_TEAR -> true;
-            case GRAVITY_WAVE -> false;
-            case null, default -> false;
-        };
+        BorderAnomalyModel model = getModel();
+        return model != null && model.blocksAdjacencyOut();
+    }
+
+    // TODO: suggestion: enforce the Void Tether in normal games too (drop oneWayAdjacencyOnly in
+    // border_anomalies.json).
+    public boolean isEnforced(Game game) {
+        BorderAnomalyModel model = getModel();
+        return model == null || !model.isOneWayAdjacencyOnly() || game.usesOneWayAdjacency();
+    }
+
+    public boolean exempts(Player player) {
+        if (player == null) return false;
+        BorderAnomalyModel model = getModel();
+        String breakthrough = model == null ? null : model.getExemptHolderOf();
+        if (breakthrough == null) return false;
+        return player.hasBreakthrough(breakthrough) || isAllowed(player.getColor());
+    }
+
+    public boolean isAllowed(String color) {
+        return color != null && allowedColors.contains(color);
+    }
+
+    public void allow(String color) {
+        if (!isAllowed(color)) allowedColors.add(color);
+    }
+
+    public void revoke(String color) {
+        allowedColors.remove(color);
     }
 }

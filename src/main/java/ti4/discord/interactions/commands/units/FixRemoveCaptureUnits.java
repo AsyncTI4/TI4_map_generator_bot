@@ -15,7 +15,11 @@ import ti4.service.unit.ParsedUnit;
 class FixRemoveCaptureUnits extends GameStateSubcommand {
 
     FixRemoveCaptureUnits() {
-        super("fix_remove_units", "Release captured units", true, true);
+        super(
+                "fix_remove_units",
+                "Release captured fighters/infantry stored under a color name, not color ID",
+                true,
+                true);
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.UNIT_NAMES,

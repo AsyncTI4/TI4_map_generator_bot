@@ -18,12 +18,14 @@ import ti4.logging.BotLogger;
 public class EgressClientManager {
 
     @Getter
-    private static final HttpClient httpClient =
-            HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+    private static final HttpClient httpClient = new SlowCallWarningHttpClient(
+            HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build());
 
     @Getter
-    private static final S3AsyncClient s3AsyncClient =
-            S3AsyncClient.builder().region(Region.US_EAST_1).build();
+    private static final S3AsyncClient s3AsyncClient = S3AsyncClient.builder()
+            .region(Region.US_EAST_1)
+            .overrideConfiguration(config -> config.addExecutionInterceptor(new SlowS3CallInterceptor()))
+            .build();
 
     @Getter
     private static final Properties webProperties;

@@ -2,6 +2,7 @@ package ti4.discord.interactions.listeners;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
@@ -18,7 +19,6 @@ import ti4.executors.ExecutionLockType;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
-import ti4.logging.RollbarManager;
 import ti4.service.SusSlashCommandService;
 import ti4.service.game.GameNameService;
 import ti4.spring.context.SpringContext;
@@ -31,6 +31,12 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             Constants.ADD_TILE_LIST_RANDOM,
             Constants.EDIT_TRACK_RECORD,
             Constants.IMPORT_MAP_JSON);
+
+    private static final Set<String> UNECHOED_COMMANDS = Set.of(
+            "rules ask",
+            Constants.FOW + " " + Constants.WHISPER,
+            Constants.BOTHELPER + " impersonate",
+            Constants.BOTHELPER + " " + Constants.PLAYER_GAMES);
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
@@ -69,9 +75,6 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
 
     private void process(SlashCommandInteractionEvent event) {
         long processStartTime = System.currentTimeMillis();
-        RollbarManager.putInteractionMetadata("slash_command", event);
-        RollbarManager.put("command_name", event.getCommandString());
-        RollbarManager.put("game_name", GameNameService.getGameName(event));
 
         ParentCommand command = SlashCommandManager.getCommand(event.getName());
         Command<SlashCommandInteractionEvent> resolvedCommand = getCommand(event);
@@ -98,7 +101,6 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
             if (combatReplayService != null) {
                 CombatReplayService.clearPreInteractionSnapshot();
             }
-            RollbarManager.clear();
         }
 
         warnForLongRunningCommands(event, processStartTime);
@@ -116,9 +118,7 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         String susPrefix = command.isSuspicious(event) ? "sus" : "notSus";
         String commandText =
                 "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
-        if (!event.getCommandString().contains("/rules ask")
-                && !event.getCommandString().contains("/fow whisper")
-                && !event.getCommandString().contains("/bothelper impersonate")) {
+        if (isEchoedInChannel(event)) {
             event.getChannel()
                     .sendMessage(commandText)
                     .queue(
@@ -128,6 +128,10 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
                             },
                             BotLogger::catchRestError);
         }
+    }
+
+    static boolean isEchoedInChannel(SlashCommandInteractionEvent event) {
+        return !UNECHOED_COMMANDS.contains(event.getFullCommandName());
     }
 
     private static ExecutionLockType getLockType(Command<SlashCommandInteractionEvent> command) {

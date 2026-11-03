@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.game.Game;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.DeckModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import tools.jackson.databind.JsonNode;
 

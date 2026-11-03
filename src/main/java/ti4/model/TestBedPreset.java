@@ -25,6 +25,14 @@ public class TestBedPreset {
     private List<String> revealedObjectives = new ArrayList<>();
     private List<String> laws = new ArrayList<>();
     private Map<String, List<String>> tokens = new LinkedHashMap<>();
+    private Map<String, List<String>> borderAnomalies = new LinkedHashMap<>();
+    private Map<String, List<String>> customAdjacencies = new LinkedHashMap<>();
+    private Map<String, String> tiles = new LinkedHashMap<>();
+    private Map<String, String> customHyperlanes = new LinkedHashMap<>();
+    private List<String> fowOptions = new ArrayList<>();
+    private Map<String, String> stored = new LinkedHashMap<>();
+    private Map<String, String> gameOptions = new LinkedHashMap<>();
+    private Map<String, String> decks = new LinkedHashMap<>();
     private List<TestBedScript.Shortcut> shortcuts = new ArrayList<>();
 
     public List<Seat> allSeats() {
@@ -55,6 +63,8 @@ public class TestBedPreset {
         private List<String> scoredObjectives;
         private List<String> fragments;
         private String breakthrough;
+        private boolean teamMateYou;
+        private boolean botAccount;
 
         public boolean hasRandomFaction() {
             return faction == null || faction.isBlank() || "random".equalsIgnoreCase(faction);

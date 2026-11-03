@@ -13,8 +13,9 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
+import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 
 @UtilityClass
@@ -29,10 +30,8 @@ public class NiflheimLegendaryButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (Player target : game.getRealPlayersExcludingThis(player)) {
             if (target.getActionCards().isEmpty()) continue;
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + SELECT_TARGET + target.getFaction(),
-                    "Choose " + target.getFactionNameOrColor(),
-                    target.getFactionEmoji()));
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + SELECT_TARGET + target.getFaction(), "green", target));
         }
         if (buttons.isEmpty()) return;
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Decline"));
@@ -66,7 +65,7 @@ public class NiflheimLegendaryButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged() + ", discard 1 action card due to "
-                        + player.getRepresentationNoPing() + "'s _Hvergelmir's Haze_.",
+                        + FoWHelper.actorOrAnon(game, player, "another player") + "'s _Hvergelmir's Haze_.",
                 buttons);
     }
 

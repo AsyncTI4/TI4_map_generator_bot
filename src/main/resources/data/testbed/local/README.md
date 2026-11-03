@@ -1,7 +1,7 @@
 # Your personal test bed files
 
-Everything in this folder except this README is ignored by git, so it stays on your machine.
-Put your own files in these subfolders (create them as needed):
+Everything in this folder except this README and the empty subfolders is ignored by git, so your files stay on
+your machine. Put them in these subfolders:
 
 | Folder | What | Template |
 | --- | --- | --- |

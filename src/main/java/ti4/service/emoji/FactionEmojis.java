@@ -134,6 +134,9 @@ public enum FactionEmojis implements TI4Emoji {
     dream,
     ashen,
     natau,
+    valhavn,
+    migo,
+    deep,
 
     // luminous
     arachnera,
@@ -386,6 +389,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "qulane" -> Qulane;
             case "company" -> Letnev;
             case "industry" -> Sol;
+            case "ironhull" -> Mentak;
             case "redtf" -> redtf;
             case "orangetf" -> orangetf;
             case "yellowtf" -> yellowtf;
@@ -463,6 +467,9 @@ public enum FactionEmojis implements TI4Emoji {
             case "netrunners" -> netrunners;
             case "crystellum" -> crystellum;
             case "natau" -> natau;
+            case "valhavn" -> valhavn;
+            case "migo" -> migo;
+            case "deep" -> deep;
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;

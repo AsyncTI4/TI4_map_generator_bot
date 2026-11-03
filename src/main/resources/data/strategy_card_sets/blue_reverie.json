@@ -1,0 +1,34 @@
+[
+    {
+        "name": "Blue Reverie Strategy Cards",
+        "alias": "bluerevstrat",
+        "scIDs": [
+            "pok1leadership",
+            "pok2diplomacy",
+            "pok3politics",
+            "te4construction",
+            "br5trade",
+            "te6warfare",
+            "pok7technology",
+            "pok8imperial"
+        ],
+        "description": "Blue Reverie SC's (Normal with new Trade)",
+        "source": "blue_reverie"
+    },
+    {
+        "name": "Blue Reverie Monuments Strategy Cards",
+        "alias": "bluerevstrat_monuments",
+        "scIDs": [
+            "pok1leadership",
+            "pok2diplomacy",
+            "pok3politics",
+            "monuments4construction",
+            "br5trade",
+            "te6warfare",
+            "pok7technology",
+            "pok8imperial"
+        ],
+        "description": "Blue Reverie SC's (Normal with new Trade) for Monuments+ Mode",
+        "source": "blue_reverie"
+    }
+]

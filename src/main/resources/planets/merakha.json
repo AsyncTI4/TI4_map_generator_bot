@@ -1,0 +1,30 @@
+{
+    "id": "merakha",
+    "tileId": "th38",
+    "name": "Merakha",
+    "aliases": [
+        "merakha"
+    ],
+    "resources": 3,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "PROPULSION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "merakha",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 129,
+            "y": 84
+        },
+        "planetRadius": 60
+    },
+    "positionInTile": {
+            "x": 129,
+            "y": 84
+    },
+    "source": "theodisi"
+}

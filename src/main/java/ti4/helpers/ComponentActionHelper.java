@@ -15,6 +15,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
@@ -24,7 +25,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arden
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -37,13 +40,14 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thirtyk.ThirtyKRelics;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.helpers.thundersedge.TeHelperBreakthroughs;
-import ti4.image.Mapper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -55,13 +59,14 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.BlueReverieArtifactService;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.relic.BookOfLatviniaService;
 import ti4.service.relic.MutagenService;
 import ti4.service.relic.QuantumEntanglerService;
@@ -73,6 +78,7 @@ import ti4.service.unit.DestroyUnitService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.TurnActionLog;
 
 @UtilityClass
 public class ComponentActionHelper {
@@ -168,26 +174,27 @@ public class ComponentActionHelper {
         for (BreakthroughModel bt : p1.getBreakthroughModels()) {
             if (bt != null && bt.getText().contains("ACTION:")) {
                 if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                    boolean validAction =
-                            switch (bt.getAlias()) {
-                                case "arborecbt" ->
-                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                                case "crimsonbt" -> true;
-                                case "mahactbt" -> !p1.getTechs().isEmpty();
-                                case "ardentiabt" ->
-                                    game.getRealPlayers().stream()
-                                            .anyMatch(otherPlayer -> otherPlayer != p1
-                                                    && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
-                                                            .isEmpty());
-                                case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
-                                case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
-                                case "saarbt" ->
-                                    game.getTileMap().values().stream()
-                                            .filter(Tile::isAsteroidField)
-                                            .anyMatch(Tile.tileHasPlayerShips(p1));
-                                case "deepwroughtbt" -> true;
-                                default -> true;
-                            };
+                    boolean validAction = switch (bt.getAlias()) {
+                        case "arborecbt" ->
+                            game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                        case "crimsonbt" -> true;
+                        case "mahactbt" -> !p1.getTechs().isEmpty();
+                        case "ardentiabt" ->
+                            game.getRealPlayers().stream()
+                                    .anyMatch(otherPlayer -> otherPlayer != p1
+                                            && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
+                                                    .isEmpty());
+                        case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
+                        case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
+                        case "stonebornbt", "stonebornbtunleashed" ->
+                            !p1.getFragments().isEmpty();
+                        case "saarbt" ->
+                            game.getTileMap().values().stream()
+                                    .filter(Tile::isAsteroidField)
+                                    .anyMatch(Tile.tileHasPlayerShips(p1));
+                        case "deepwroughtbt" -> true;
+                        default -> true;
+                    };
 
                     if (validAction) {
                         TI4Emoji btEmoji = bt.getFactionEmoji();
@@ -210,6 +217,8 @@ public class ComponentActionHelper {
                         factionChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
             }
         }
+
+        compButtons.addAll(IxthLegendaryButtonHandler.getComponentActionButtons(game, p1));
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {
@@ -383,6 +392,11 @@ public class ComponentActionHelper {
                     && (game.getAllRelics().size() < 3 || game.getRealPlayers().size() < 2)) {
                 continue;
             }
+            if (ThirtyKRelics.handlesComponentAction(relic)) {
+                ThirtyKRelics.componentActionButton(game, p1, relic, factionChecker + prefix)
+                        .ifPresent(compButtons::add);
+                continue;
+            }
 
             if (Constants.ENIGMATIC_DEVICE.equalsIgnoreCase(relic)
                     || (!relic.contains("starchart")
@@ -434,6 +448,7 @@ public class ComponentActionHelper {
                                 Buttons.red(factionChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
                 }
+                // TODO: the relic id is stellarconverter; does this "no targets" check ever match?
                 if ("stellar_converter".equalsIgnoreCase(relic)
                         && ButtonHelper.getButtonsForStellar(p1, game).isEmpty()) {
                     continue;
@@ -642,7 +657,7 @@ public class ComponentActionHelper {
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
-        compButtons.add(Buttons.red("deleteButtons", "Cancel"));
+        compButtons.add(Buttons.CANCEL_DELETE_BUTTONS);
 
         return compButtons;
     }
@@ -659,6 +674,7 @@ public class ComponentActionHelper {
 
         String firstPart = buttonID.substring(0, buttonID.indexOf('_'));
         buttonID = buttonID.replace(firstPart + "_", "");
+        TurnActionLog.recordComponent(game, firstPart);
 
         switch (firstPart) {
             case "tech" -> {
@@ -688,19 +704,18 @@ public class ComponentActionHelper {
                             "veyloragent",
                             "taagent",
                             "vanguardagent",
-                            "sarcosaagent");
+                            "sarcosaagent",
+                            "stonebornagentdormant",
+                            "stonebornagentunleashed",
+                            "ironagent",
+                            "migoagent",
+                            "deepagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ExhaustLeaderService.exhaustLeader(
-                                    game, p1, p1.getLeader(buttonID).orElse(null));
-                            ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
-                        } else {
-                            ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
-                        }
+                        AgentLifecycle.press(buttonID, event, game, p1);
                     }
                 } else if (buttonID.contains("hero")) {
                     PlayHeroService.playHero(
@@ -791,8 +806,7 @@ public class ComponentActionHelper {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Please choose the system you wish to replace 1 ship with.";
-                    List<Button> buttons = new ArrayList<>(
-                            Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
+                    List<Button> buttons = ButtonHelperAbilities.getTilesToMutineers(game, p1);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                     String successMessage =
@@ -901,7 +915,6 @@ public class ComponentActionHelper {
                     purgeFragButtons.add(transact3);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
                     DSHelperBreakthroughs.doLanefirBtCheck(game, p1);
-
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     DeepgloomService.spendOneDebt(game, p1, "stall_tactics");
@@ -1328,11 +1341,16 @@ public class ComponentActionHelper {
             MutagenService.resolveMutagenPurge(event, game, player, true);
             return;
         }
+        if (ThirtyKRelics.handlesComponentAction(relicID)) {
+            ThirtyKRelics.resolveComponentAction(game, player, event, relicID);
+            return;
+        }
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the "
                         + Mapper.getRelic(relicID).getName() + " relic.");
         String purgeOrExhaust = "purged";
+        boolean discardedArtifact = false;
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
             List<Button> buttons2 = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
@@ -1348,7 +1366,7 @@ public class ComponentActionHelper {
                     buttons3.add(Buttons.green(
                             "exhaustTCS_" + relicID + "_" + player.getFaction(),
                             "Exhaust Temporal Command Suite to Ready " + relicID));
-                    buttons3.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons3.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String msg = p2.getRepresentationUnfogged()
                             + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + relicID
                             + " and potentially resolve a transaction.";
@@ -1375,7 +1393,7 @@ public class ComponentActionHelper {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -1415,11 +1433,17 @@ public class ComponentActionHelper {
                     event.getMessageChannel(), message, NewStuffHelper.buttonPagination(buttons, buttonPrefix, 0));
 
         } else { // PURGE THE RELIC
-            player.removeRelic(relicID);
-            player.removeExhaustedRelic(relicID);
-            if (!"nanoforge".equals(relicID)) {
+            discardedArtifact = BlueReverieArtifactService.discardArtifact(game, player, relicID);
+            if (!discardedArtifact) {
+                player.removeRelic(relicID);
+                player.removeExhaustedRelic(relicID);
+            } else {
+                purgeOrExhaust = "discarded";
+            }
+            if (!discardedArtifact && !"nanoforge".equals(relicID)) {
                 DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 OblivionUnitHandler.doOblivionMechCheck(game, player);
+                StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
             }
         }
 
@@ -1433,7 +1457,7 @@ public class ComponentActionHelper {
             case "enigmaticdevice" -> {
                 if (game.isTwilightsFallMode()) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                    Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+                    Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Use this to spend 6 resources.", buttons);
@@ -1465,6 +1489,7 @@ public class ComponentActionHelper {
                     }
                 } else {
                     ButtonHelperActionCards.resolveResearch(game, player, event);
+                    DeepAbilityHandler.offerEnergySiphon(player);
                 }
             }
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);

@@ -1,0 +1,13 @@
+{
+  "name": "30k-explore-foresight",
+  "description": "Foresight of Industry on Wellon: choosing the commodities gives Sol 2 commodities.",
+  "preset": "30k-explore-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "sol.commodities", "equals": "2" } },
+    { "do": "stackExplore", "value": "foresightofindustry30k1" },
+    { "as": "sol", "pressId": "FFCC_{sol.faction}_movedNExplored_filler_wellon_industrial" },
+    { "as": "sol", "press": "thirtyKForesightComms" },
+    { "expect": { "state": "sol.commodities", "equals": "4" } }
+  ]
+}

@@ -11,8 +11,8 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 
 @UtilityClass
 public class RevenantAbilityHandler {
@@ -112,15 +112,14 @@ public class RevenantAbilityHandler {
         }
 
         String setId = buttonID.substring(CHOOSE_SET_PREFIX.length());
-        List<String> chosenSet =
-                switch (setId) {
-                    case "set1" -> SET_ONE;
-                    case "set2" -> SET_TWO;
-                    case "set3" -> SET_THREE;
-                    case "set4" -> SET_FOUR;
-                    case "set5" -> SET_FIVE;
-                    default -> List.of();
-                };
+        List<String> chosenSet = switch (setId) {
+            case "set1" -> SET_ONE;
+            case "set2" -> SET_TWO;
+            case "set3" -> SET_THREE;
+            case "set4" -> SET_FOUR;
+            case "set5" -> SET_FIVE;
+            default -> List.of();
+        };
         if (chosenSet.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "That Revenant leader set is no longer valid.");

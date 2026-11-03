@@ -54,10 +54,21 @@ public class GameNameService {
         return null;
     }
 
+    // TODO:  In the future, we should allow specifying alternate game names
+    // Then make this a more generic, "getCanonicalGameName" or some such
+    @Nullable
+    private static String pbd30kHackFix(String gameName) {
+        if ("pbd30k".equalsIgnoreCase(gameName)) {
+            return "pbd100threetythousand";
+        }
+        return gameName;
+    }
+
     private static String getGameNameFromChannelName(String channelName) {
         String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
         gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
         gameName = StringUtils.substringBefore(gameName, "-");
+        gameName = pbd30kHackFix(gameName); // FIXME
         return gameName;
     }
 }

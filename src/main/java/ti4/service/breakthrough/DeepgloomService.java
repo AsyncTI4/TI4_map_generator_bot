@@ -9,9 +9,9 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 
@@ -134,22 +134,20 @@ public final class DeepgloomService {
     }
 
     private static boolean playerAllowedToUseAbilityUnlimited(Player player, String ability) {
-        String factions =
-                switch (ability) {
-                    case "stall_tactics", "stalltactics" -> player.getGame().getStoredValue("stalltacticsFactions");
-                    case "scheming" -> player.getGame().getStoredValue("schemingFactions");
-                    default -> "";
-                };
+        String factions = switch (ability) {
+            case "stall_tactics", "stalltactics" -> player.getGame().getStoredValue("stalltacticsFactions");
+            case "scheming" -> player.getGame().getStoredValue("schemingFactions");
+            default -> "";
+        };
         return factions.contains(player.getFaction());
     }
 
     private static List<Button> getButtonsForAllowRevoke(Game game, Player yssaril, String ability) {
-        AbilityModel model =
-                switch (ability) {
-                    case "scheming" -> Mapper.getAbility("scheming");
-                    case "stall_tactics", "stalltactics" -> Mapper.getAbility("stall_tactics");
-                    default -> null;
-                };
+        AbilityModel model = switch (ability) {
+            case "scheming" -> Mapper.getAbility("scheming");
+            case "stall_tactics", "stalltactics" -> Mapper.getAbility("stall_tactics");
+            default -> null;
+        };
         if (model == null) return List.of();
 
         String abilityPart = "scheming".equals(ability) ? "scheming" : "stalltactics";
@@ -164,19 +162,18 @@ public final class DeepgloomService {
                 buttons.add(Buttons.green(id, "Allow " + model.getName() + " For " + name, p2.fogSafeEmoji()));
             }
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 
     @ButtonHandler("yssarilbtStep2_")
     public static void yssarilbtStep2_(ButtonInteractionEvent event, Game game, Player yssaril, String buttonID) {
         String type = buttonID.split("_")[1];
-        AbilityModel model =
-                switch (type) {
-                    case "scheming" -> Mapper.getAbility("scheming");
-                    case "stalltactics" -> Mapper.getAbility("stall_tactics");
-                    default -> null;
-                };
+        AbilityModel model = switch (type) {
+            case "scheming" -> Mapper.getAbility("scheming");
+            case "stalltactics" -> Mapper.getAbility("stall_tactics");
+            default -> null;
+        };
         if (model == null) return;
 
         String faction = buttonID.split("_")[2];

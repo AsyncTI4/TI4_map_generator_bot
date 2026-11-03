@@ -18,8 +18,8 @@ import ti4.game.Player;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import tools.jackson.databind.JsonNode;
 
@@ -161,11 +161,10 @@ public class PlayerFactionSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "teFactions" -> prioritizeTEFactions();
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "teFactions" -> prioritizeTEFactions();
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

@@ -8,7 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.image.io.ImageResources;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class TileFractureTest extends BaseTi4Test {
@@ -40,7 +41,9 @@ class TileFractureTest extends BaseTi4Test {
         assertTrue(Mapper.isValidToken("fracture"), "`fracture` is not a registered token id");
         String tokenFileName = Mapper.getTokenID(AliasHandler.resolveToken("fracture"));
         assertEquals(Constants.TOKEN_FRACTURE, tokenFileName);
-        assertNotNull(Mapper.getTokenPath(tokenFileName), "token_fracture_async.png is missing from resources/tokens");
+        assertNotNull(
+                ImageResources.tokenOrAttachment(tokenFileName),
+                "token_fracture_async.png is missing from resources/tokens");
     }
 
     @Test

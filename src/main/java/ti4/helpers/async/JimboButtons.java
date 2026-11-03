@@ -16,10 +16,10 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.RegexHelper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 
 // Jazz's Interactive Map Builder
@@ -68,27 +68,24 @@ final class JimboButtons {
 
     public static List<Button> getMenuButtons(String submenu) {
         if (submenu == null) return null;
-        List<Button> buttons =
-                switch (submenu) {
-                    case JimboConst.mainPage ->
-                        List.of(TILE_ACTION, FEATURE_ACTION, TRANSFORM_ACTION, META_ACTION, EXIT);
-                    case JimboConst.featureAction ->
-                        List.of(MAIN_PAGE, TOKEN_ADD, TOKEN_REMOVE, BORDER_ADD, BORDER_REMOVE);
-                    case JimboConst.tileAction -> List.of(MAIN_PAGE, TILE_ADD, TILE_MOVE, TILE_REMOVE);
-                    case JimboConst.transformAction ->
-                        List.of(
-                                MAIN_PAGE,
-                                TRANSFORM_ROTATE_CW,
-                                TRANSFORM_ROTATE_CCW,
-                                TRANSFORM_TRANSLATE_0,
-                                TRANSFORM_TRANSLATE_1,
-                                TRANSFORM_TRANSLATE_2,
-                                TRANSFORM_TRANSLATE_3,
-                                TRANSFORM_TRANSLATE_4,
-                                TRANSFORM_TRANSLATE_5);
-                    case JimboConst.metaAction -> List.of(MAIN_PAGE, META_SYMMETRY_ADD, META_SYMMETRY_REMOVE);
-                    default -> Collections.emptyList();
-                };
+        List<Button> buttons = switch (submenu) {
+            case JimboConst.mainPage -> List.of(TILE_ACTION, FEATURE_ACTION, TRANSFORM_ACTION, META_ACTION, EXIT);
+            case JimboConst.featureAction -> List.of(MAIN_PAGE, TOKEN_ADD, TOKEN_REMOVE, BORDER_ADD, BORDER_REMOVE);
+            case JimboConst.tileAction -> List.of(MAIN_PAGE, TILE_ADD, TILE_MOVE, TILE_REMOVE);
+            case JimboConst.transformAction ->
+                List.of(
+                        MAIN_PAGE,
+                        TRANSFORM_ROTATE_CW,
+                        TRANSFORM_ROTATE_CCW,
+                        TRANSFORM_TRANSLATE_0,
+                        TRANSFORM_TRANSLATE_1,
+                        TRANSFORM_TRANSLATE_2,
+                        TRANSFORM_TRANSLATE_3,
+                        TRANSFORM_TRANSLATE_4,
+                        TRANSFORM_TRANSLATE_5);
+            case JimboConst.metaAction -> List.of(MAIN_PAGE, META_SYMMETRY_ADD, META_SYMMETRY_REMOVE);
+            default -> Collections.emptyList();
+        };
         return new ArrayList<>(buttons);
     }
 

@@ -10,7 +10,8 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
+import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.map.SpinService;
 
 class CustomizationOptions extends GameStateSubcommand {
@@ -80,6 +81,11 @@ class CustomizationOptions extends GameStateSubcommand {
         // anti-bombardment planets"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.WORMHOLE_TOKEN_MERGE,
+                        "Combine a system's wormhole tokens once it has this many (0 = off, 2-9)")
+                .setRequiredRange(0, 9));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
         addOptions(new OptionData(
@@ -88,12 +94,17 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
+                Constants.ONE_WAY_ADJACENCY,
+                "One-way links count one way for everything, not just movement (always on in fog)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
                 Constants.INJECT_RULES_LINKS,
                 "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(
-                OptionType.INTEGER,
-                Constants.FAST_SC_FOLLOW,
-                "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
+                        OptionType.INTEGER,
+                        Constants.FAST_SC_FOLLOW,
+                        "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off")
+                .setRequiredRange(0, 240));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.UNIT_SOURCE,
@@ -177,6 +188,9 @@ class CustomizationOptions extends GameStateSubcommand {
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null) game.setShowGears(showG);
 
+        Integer mergeWormholesFrom = event.getOption(Constants.WORMHOLE_TOKEN_MERGE, null, OptionMapping::getAsInt);
+        if (mergeWormholesFrom != null) game.setWormholeTokenMergeFrom(mergeWormholesFrom);
+
         Boolean showBa = event.getOption(Constants.SHOW_BANNERS, null, OptionMapping::getAsBoolean);
         if (showBa != null) game.setShowBanners(showBa);
 
@@ -190,6 +204,15 @@ class CustomizationOptions extends GameStateSubcommand {
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null) game.setHomebrew(homebrew);
+
+        Boolean oneWayAdjacency = event.getOption(Constants.ONE_WAY_ADJACENCY, null, OptionMapping::getAsBoolean);
+        if (oneWayAdjacency != null) {
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Fog games always use one-way adjacency.");
+            } else {
+                game.setOneWayAdjacency(oneWayAdjacency);
+            }
+        }
 
         Boolean injectRules = event.getOption(Constants.INJECT_RULES_LINKS, null, OptionMapping::getAsBoolean);
         if (injectRules != null) game.setInjectRulesLinks(injectRules);

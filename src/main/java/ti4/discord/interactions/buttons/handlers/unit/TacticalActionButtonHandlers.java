@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -20,11 +21,13 @@ import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
+import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.combat.CombatEventRecorder;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.MonumentsService;
 import ti4.service.regex.RegexService;
@@ -40,6 +43,12 @@ class TacticalActionButtonHandlers {
     @ButtonHandler("unitTacticalMove")
     @ButtonHandler("unitTacticalRemove")
     public static void newTacticalMoveUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (StringUtils.isBlank(game.getActiveSystem())) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "There is no active tactical action, so these buttons are no longer usable.");
+            return;
+        }
+
         String regexSingleUnit = "unitTactical(?<type>Move|Remove)";
         regexSingleUnit += "_" + RegexHelper.posRegex(game);
         regexSingleUnit += "_" + RegexHelper.intRegex("amt");
@@ -293,13 +302,21 @@ class TacticalActionButtonHandlers {
                     String landingMsg = player.fogSafeEmoji() + " landed " + amount + colorMsg + " "
                             + type.humanReadableName() + " on " + planetName + ".";
                     if (!removed.isEmpty()) {
-                        // Announce the landing before adding the units: addUnits can trigger CONTROLLED
-                        // lore (e.g. a troop-removing effect) that posts its own follow-up messages, and
-                        // we want "landed X" to read before those, not after.
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
                         AddUnitService.addUnits(event, game, toAdd);
+                        CombatEventRecorder.recordLanding(game, player, tile, planet, type, amount);
+                        ThirtyKExploreHooks.afterLanding(game, owner, tile, planet, type, amount);
                         if (type == UnitType.Infantry) {
                             MonumentsService.recordNaaluMonumentInfantryCommit(game, owner, tile, planet);
+                            ValhavnPromissoryHandler.offerEinherjarCommit(
+                                    event,
+                                    game,
+                                    owner,
+                                    tile,
+                                    planet,
+                                    removed.stream()
+                                            .mapToInt(RemovedUnit::getTotalRemoved)
+                                            .sum());
                         }
                         if (ArcanumBreakthroughHandler.hasPowerWordWish(owner)) {
                             ArcanumBreakthroughHandler.movePowerWordWishUnitsWithinActiveSystem(

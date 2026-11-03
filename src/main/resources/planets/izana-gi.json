@@ -1,0 +1,25 @@
+{
+    "id": "izana-gi",
+    "tileId": "fracture36",
+    "name": "Izana-Gi",
+    "aliases": [
+        "izana-gi",
+        "izanagi",
+        "gi"
+    ],
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "LIGHTNING"
+    ],
+    "planetLayout": {
+        "unitHolderName": "izana-gi",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 226.0,
+            "y": 200.0
+        }
+    },
+    "flavortext": "*Shimmering with vibrant bioluminescent oceans and crystal growths, this twin world continually births raw, volatile energy to offset Izana-mi's entropy.*",
+    "source": "merford"
+}

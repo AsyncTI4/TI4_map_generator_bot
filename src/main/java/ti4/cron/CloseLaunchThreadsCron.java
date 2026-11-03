@@ -13,11 +13,15 @@ public class CloseLaunchThreadsCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                CloseLaunchThreadsCron.class, CloseLaunchThreadsCron::closeLaunchThreads, 1, 60, TimeUnit.MINUTES);
+                CloseLaunchThreadsCron.class, CloseLaunchThreadsCron::closeLaunchThreads, 5, 60, TimeUnit.MINUTES);
     }
 
     private static void closeLaunchThreads() {
         if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;
+        if (!GameManager.isWarmupFinished()) {
+            BotLogger.logCron("Skipping CloseLaunchThreadsCron because GameManager warmup has not finished.");
+            return;
+        }
         BotLogger.logCron("Running CloneLaunchThreadsCron.");
         for (ManagedGame game : GameManager.getManagedGames()) {
             if (game.getLaunchPostThread() == null) continue;

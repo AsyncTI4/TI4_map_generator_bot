@@ -26,12 +26,13 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.UnusedCommanderHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
-import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.LeaderModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -144,7 +145,7 @@ public class BlueReverieRelicHandler {
                 || getAendsTorchShips(game, player).isEmpty()) return;
         List<Button> buttons = List.of(
                 Buttons.green(player.factionButtonChecker() + USE_AENDS_TORCH + tile.getPosition(), "Use Aend's Torch"),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", you may exhaust _Aend's Torch_ to place a neutral ship in "
@@ -475,6 +476,7 @@ public class BlueReverieRelicHandler {
             return;
         }
         Tile tile = game.getTileByPosition(payload);
+        // TODO: can getTileModel() be null here (custom or removed tile id)? Also in the Entropic Scar button filter.
         if (tile == null || tile.getTileModel().isHyperlane() || !canPlaceEntropicScar(game, player, tile)) {
             ButtonHelper.deleteMessage(event);
             return;
@@ -714,7 +716,7 @@ public class BlueReverieRelicHandler {
 
     private static boolean canPlaceEntropicScar(Game game, Player player, Tile tile) {
         if (tile.containsPlayersUnits(player)) return true;
-        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false).stream()
+        return Adjacency.of(game, player).forEffects().withSelf().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(adjacent -> adjacent != null && adjacent.containsPlayersUnits(player));
     }

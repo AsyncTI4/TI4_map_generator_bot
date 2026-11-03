@@ -1,0 +1,10 @@
+{
+  "name": "30k-2p",
+  "description": "Two seats in the action phase using the 30k decks, holding one known 30k action card, secret objective and relic.",
+  "fog": false,
+  "decks": { "ac": "action_cards_30k", "so": "secret_objectives_30k", "relic": "relics_30k", "explore": "explores_30k" },
+  "you": { "faction": "sol", "home": "301", "sc": 1, "acs": ["compoundinterest30k"], "sos": ["unspentreserves30k"], "relics": ["placebotron30k"] },
+  "seats": [ { "faction": "hacan", "home": "304", "sc": 5, "acs": ["publicreprimand30k"] } ],
+  "defaults": { "tg": 3, "commodities": 2, "ccs": "3/3/2" },
+  "start": "action"
+}

@@ -11,7 +11,8 @@ class DiceLuck extends Subcommand {
 
     DiceLuck() {
         super(Constants.DICE_LUCK, "Dice luck as recorded by the bot");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)")
+                .setRequiredRange(1, 500));
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS,

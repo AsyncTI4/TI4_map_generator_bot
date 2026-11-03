@@ -26,8 +26,8 @@ import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.image.Mapper;
 import ti4.model.FactionModel;
+import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
@@ -41,18 +41,8 @@ public class FrankenSettings extends SettingsMenu {
 
     private static final String MENU_ID = "franken";
     static final String STANDARD_DRAFT = "standard";
-    private static final Set<String> ALWAYS_DISABLED_FACTIONS = Set.of(
-            "lazax",
-            "admins",
-            "franken",
-            "keleresm",
-            "keleresx",
-            "miltymod",
-            "qulane",
-            "neutral",
-            "obsidian",
-            "stoneborn",
-            "morpha");
+    private static final Set<String> ALWAYS_DISABLED_FACTIONS =
+            Set.of("lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "obsidian");
 
     private final ChoiceSetting<String> draftMode;
     private final BooleanSetting force;
@@ -93,7 +83,7 @@ public class FrankenSettings extends SettingsMenu {
                         "Banned Factions",
                         "Ban faction",
                         "Unban faction",
-                        legalFactionOptions(game.isThundersEdge(), false, false, false)
+                        legalFactionOptions(game.isThundersEdge(), false, false, false, false)
                                 .entrySet(),
                         empty,
                         empty) {
@@ -165,11 +155,10 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "startFranken" -> startDraft(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "startFranken" -> startDraft(event);
+            default -> null;
+        };
         return error == null ? "success" : error;
     }
 
@@ -295,6 +284,7 @@ public class FrankenSettings extends SettingsMenu {
         game.setDiscordantStarsMode(isEffectiveDiscordantStarsEnabled());
         game.setBlueReverieMode(isEffectiveBlueReverieEnabled());
         game.setUnchartedSpaceStuff(homebrewSettings.getUnchartedSpace().isVal());
+        game.setLostLegaciesTiles(homebrewSettings.getLostLegaciesTiles().isVal());
         game.setStoredValue(
                 Constants.INCLUDE_ERONOUS_TILES,
                 Boolean.toString(homebrewSettings.getEronous().isVal()));
@@ -332,6 +322,10 @@ public class FrankenSettings extends SettingsMenu {
         return homebrewSettings.getLostLegacies().isVal();
     }
 
+    public boolean isWftvEnabled() {
+        return homebrewSettings.getWftv().isVal();
+    }
+
     boolean isMonumentsEnabled() {
         return homebrewSettings.getMonuments().isVal();
     }
@@ -367,26 +361,24 @@ public class FrankenSettings extends SettingsMenu {
         Map<String, Set<String>> banListSources = selectedBanListSources(Constants.BAN_FACTION);
         Set<String> effectiveBans = new HashSet<>(bannedFactions.getKeys());
         effectiveBans.addAll(banListSources.keySet());
-        if (!banAllDsFactions.isVal()) {
-            Mapper.getFactionsValues().stream()
-                    .filter(f -> f.getSource() == ComponentSource.ds)
-                    .map(FactionModel::getAlias)
-                    .filter(alias -> !ALWAYS_DISABLED_FACTIONS.contains(alias))
-                    .forEach(effectiveBans::add);
-        }
+        Set<ComponentSource> fullyBannedSources = new HashSet<>();
+        if (!banAllDsFactions.isVal()) fullyBannedSources.add(ComponentSource.ds);
+        if (!banAllBrFactions.isVal()) fullyBannedSources.add(ComponentSource.blue_reverie);
 
-        if (!banAllBrFactions.isVal()) {
-            Mapper.getFactionsValues().stream()
-                    .filter(f -> f.getSource() == ComponentSource.blue_reverie)
-                    .map(FactionModel::getAlias)
-                    .filter(alias -> !ALWAYS_DISABLED_FACTIONS.contains(alias))
-                    .forEach(effectiveBans::add);
-        }
-        List<String> values = effectiveBans.stream()
+        List<String> values = new ArrayList<>();
+        if (fullyBannedSources.contains(ComponentSource.ds)) values.add("All DS factions");
+        if (fullyBannedSources.contains(ComponentSource.blue_reverie)) values.add("All BR factions");
+        effectiveBans.stream()
+                .filter(key -> !isFromSource(key, fullyBannedSources))
                 .map(key -> factionBanLabel(key, banListSources.getOrDefault(key, Set.of())))
                 .sorted()
-                .toList();
+                .forEach(values::add);
         return "[" + String.join(",", values) + "]";
+    }
+
+    private static boolean isFromSource(String factionAlias, Set<ComponentSource> sources) {
+        FactionModel faction = Mapper.getFaction(factionAlias);
+        return faction != null && sources.contains(faction.getSource());
     }
 
     private static String frankenNotes() {
@@ -471,9 +463,10 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     private static Map<String, FactionModel> legalFactionOptions(
-            boolean teEnabled, boolean dsEnabled, boolean brEnabled, boolean lostLegaciesEnabled) {
+            boolean teEnabled, boolean dsEnabled, boolean brEnabled, boolean lostLegaciesEnabled, boolean wftvEnabled) {
         return Mapper.getFactionsValues().stream()
-                .filter(faction -> isLegalFrankenFaction(faction, teEnabled, dsEnabled, brEnabled, lostLegaciesEnabled))
+                .filter(faction -> isLegalFrankenFaction(
+                        faction, teEnabled, dsEnabled, brEnabled, lostLegaciesEnabled, wftvEnabled))
                 .collect(Collectors.toMap(FactionModel::getAlias, faction -> faction));
     }
 
@@ -482,7 +475,8 @@ public class FrankenSettings extends SettingsMenu {
                 game.isThundersEdge(),
                 isEffectiveDiscordantStarsEnabled(),
                 isEffectiveBlueReverieEnabled(),
-                isLostLegaciesEnabled());
+                isLostLegaciesEnabled(),
+                isWftvEnabled());
     }
 
     private static boolean isLegalFrankenFaction(
@@ -490,7 +484,8 @@ public class FrankenSettings extends SettingsMenu {
             boolean teEnabled,
             boolean dsEnabled,
             boolean brEnabled,
-            boolean lostLegaciesEnabled) {
+            boolean lostLegaciesEnabled,
+            boolean wftvEnabled) {
         String alias = faction.getAlias();
         if (ALWAYS_DISABLED_FACTIONS.contains(alias)) {
             return false;
@@ -499,6 +494,7 @@ public class FrankenSettings extends SettingsMenu {
         if (dsEnabled && faction.getSource() == ComponentSource.ds) return true;
         if (brEnabled && faction.getSource() == ComponentSource.blue_reverie) return true;
         if (lostLegaciesEnabled && faction.getSource() == ComponentSource.theodisi) return true;
+        if (wftvEnabled && faction.getSource() == ComponentSource.wftv) return true;
         return faction.getSource().isPok();
     }
 

@@ -16,7 +16,8 @@ class DrawBlueBackTile extends GameStateSubcommand {
                 "Draw a random blue back tile (for Star Charts and Decrypted Cartoglyph)",
                 true,
                 true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw? Default: 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw? Default: 1")
+                .setRequiredRange(1, 10));
     }
 
     @Override

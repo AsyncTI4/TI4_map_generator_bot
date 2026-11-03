@@ -1,0 +1,16 @@
+{
+  "name": "30k-smoke",
+  "description": "The 30k decks are in play, 30k cards reach a seat's hand, and stackExplore puts a 30k explore on top of the deck.",
+  "preset": "30k-2p",
+  "stopOnFail": true,
+  "steps": [
+    { "expect": { "state": "game.decks", "contains": "ac:action_cards_30k" } },
+    { "expect": { "state": "game.decks", "contains": "explore:explores_30k" } },
+    { "expect": { "state": "sol.acIds", "contains": "compoundinterest30k" } },
+    { "expect": { "state": "sol.soIds", "contains": "unspentreserves30k" } },
+    { "expect": { "state": "sol.relics", "contains": "placebotron30k" } },
+    { "expect": { "state": "hacan.acIds", "contains": "publicreprimand30k" } },
+    { "do": "stackExplore", "value": "tourismbureau30k" },
+    { "expect": { "state": "game.exploreDeck", "contains": "tourismbureau30k" } }
+  ]
+}

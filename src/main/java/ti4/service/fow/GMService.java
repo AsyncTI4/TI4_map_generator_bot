@@ -33,12 +33,13 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
-import ti4.image.MapRenderPipeline;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
+import ti4.helpers.adjacency.AdjacencyPurpose;
+import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.ShowGameService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
@@ -97,7 +98,7 @@ public final class GMService {
         return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
     }
 
-    private static TextChannel gmRoomOrNull(Game game) {
+    public static TextChannel gmRoomOrNull(Game game) {
         List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? null : channels.getFirst();
     }
@@ -178,7 +179,7 @@ public final class GMService {
     /**
      * Renders the full (unfogged) map and posts it into the FoW activity-log thread. The thread lives
      * in the GM-only channel, so the unfogged view leaks nothing. A null render event keeps the map
-     * unfogged (see {@code MapGenerator.isFowModeActive}). No-op outside FoW.
+     * unfogged (see {@code FogView.of}). No-op outside FoW.
      */
     public static void refreshMapInActivityThread(Game game) {
         if (!game.isFowMode()) return;
@@ -344,14 +345,14 @@ public final class GMService {
     @ModalHandler("gmWhoCanSeeResolve")
     public static void resolveWhoCanSeePosition(ModalInteractionEvent event, Game game) {
         String position = event.getValue(Constants.POSITION).getAsString();
-        if (!PositionMapper.isTilePositionValid(position)) {
+        if (!MapPositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Position '" + position + "' is invalid.");
             return;
         }
 
         StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
-        for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
+        for (Player player : FoWHelper.getAdjacentPlayers(game, position, false, AdjacencyPurpose.VISION)) {
             sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

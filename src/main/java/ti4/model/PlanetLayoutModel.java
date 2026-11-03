@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import ti4.image.UnitTokenPosition;
 
 @Data
 public class PlanetLayoutModel {
@@ -57,18 +56,16 @@ public class PlanetLayoutModel {
     private List<Point> getAttachmentOffsets(int distinctAttachments) {
         List<Point> points = new ArrayList<>();
 
-        double theta =
-                switch (resourcesLocation) {
-                    case BottomRight -> 225.0;
-                    case BottomLeft -> 325.0;
-                    case TopLeft -> 25.0;
-                    case TopRight -> 45.0;
-                };
-        double deltaTheta =
-                switch (resourcesLocation) {
-                    case BottomLeft, TopRight -> 25.0;
-                    case BottomRight, TopLeft -> -25.0;
-                };
+        double theta = switch (resourcesLocation) {
+            case BottomRight -> 225.0;
+            case BottomLeft -> 325.0;
+            case TopLeft -> 25.0;
+            case TopRight -> 45.0;
+        };
+        double deltaTheta = switch (resourcesLocation) {
+            case BottomLeft, TopRight -> 25.0;
+            case BottomRight, TopLeft -> -25.0;
+        };
 
         int rad = 55;
         if (planetRadius != null) {
@@ -85,11 +82,10 @@ public class PlanetLayoutModel {
 
     private Point getStructureOffset(int index) {
         int icons = extraIcons != null ? extraIcons : 0;
-        double deltaTheta =
-                switch (resourcesLocation) {
-                    case BottomLeft, TopRight -> -30.0;
-                    case BottomRight, TopLeft -> 30.0;
-                };
+        double deltaTheta = switch (resourcesLocation) {
+            case BottomLeft, TopRight -> -30.0;
+            case BottomRight, TopLeft -> 30.0;
+        };
 
         int rad = 55;
         if (planetRadius != null) {
@@ -98,15 +94,14 @@ public class PlanetLayoutModel {
         if (rad > 110) deltaTheta /= 2;
 
         double adjustment = icons * deltaTheta;
-        double theta =
-                switch (resourcesLocation) {
-                            case BottomLeft -> 192.0;
-                            case TopLeft -> 165.0;
-                            case BottomRight -> -10.0;
-                            case TopRight -> 12.0;
-                        }
-                        + adjustment
-                        + (deltaTheta * index);
+        double theta = switch (resourcesLocation) {
+                    case BottomLeft -> 192.0;
+                    case TopLeft -> 165.0;
+                    case BottomRight -> -10.0;
+                    case TopRight -> 12.0;
+                }
+                + adjustment
+                + (deltaTheta * index);
 
         return polarToCartesian(theta, rad + 8, true);
     }

@@ -16,15 +16,14 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.GenericCardModel;
+import ti4.model.Mapper;
 import ti4.model.PlanetModel;
+import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.model.TileModel.TileBack;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
@@ -279,7 +278,7 @@ public final class DiscordantStarsHelper {
             String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
                     + ", you may resolve your _Policy - The Economy: Empower ➕_ ability. You gain 1 commodity.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
+            Button getCommButton = Buttons.GAIN_1_COMMODITY;
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "Resolve Ability.", getCommButton);
         }
     }

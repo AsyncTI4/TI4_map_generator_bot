@@ -9,6 +9,7 @@ import static ti4.service.testbed.TestBedFixture.assertContains;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import ti4.game.Game;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
+import ti4.model.TestBedScript;
 import ti4.model.TestBedScript.Shortcut;
 import ti4.model.TestBedScript.Step;
 import ti4.testUtils.BaseTi4Test;
@@ -110,7 +112,10 @@ class TestBedDataTest extends BaseTi4Test {
                     { "expect": { "state": "sol.mood", "equals": "happy" } },
                     { "as": "sol", "press": "ac_play_from_hand_{ac:sabo2}" },
                     { "do": "setStored", "key": "a", "value": "b,c" },
-                    { "as": "sol", "pressId": "%s" }
+                    { "as": "sol", "pressId": "%s" },
+                    { "do": "setGameOption", "key": "show_mood", "value": "true" },
+                    { "do": "setGameOption", "key": "one_way_adjacency", "value": "yes" },
+                    { "do": "setGameOption", "key": "one_way_adjacency", "value": "true" }
                   ] }""".formatted("x".repeat(101))));
         assertContains(
                 scriptErrors,
@@ -120,7 +125,176 @@ class TestBedDataTest extends BaseTi4Test {
                 "step 4: unknown seat field `mood`",
                 "step 5: `{ac:sabo2}` but nothing gives `sabo2` to sol",
                 "step 6: `setStored` key and value may not contain",
-                "step 7: `pressId` is longer than Discord's 100-character limit");
+                "step 7: `pressId` is longer than Discord's 100-character limit",
+                "step 8: unknown game option `show_mood`",
+                "step 9: game option `one_way_adjacency` takes `true` or `false`");
+        assertTrue(scriptErrors.stream().noneMatch(error -> error.startsWith("step 10")), scriptErrors::toString);
+
+        // Fields that a kind of check would silently ignore, typos in scopes, and checks with nothing to check.
+        List<String> expectErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "steps": [
+                    { "expect": { "ephemeral": "for someone else" } },
+                    { "as": "you", "press": "Pass" },
+                    { "expect": { "in": "main", "contains": "x", "equals": "y" } },
+                    { "expect": { "ephemeral": "x", "contains": "y" } },
+                    { "expect": { "state": "game.round", "equals": "2", "noFactionLeak": true } },
+                    { "expect": { "in": "mian", "contains": "x" } },
+                    { "expect": { "in": "main", "contains": "x", "since": "yesterday" } },
+                    { "expect": { "in": "main", "matches": "(" } },
+                    { "expect": { "state": "tile.101.mood", "equals": "x" } }
+                  ] }"""));
+        assertContains(
+                expectErrors,
+                "step 1: an `ephemeral` or `modal` check needs a `press` before it",
+                "step 3: `equals` only works with `state`",
+                "step 4: an `ephemeral` or `modal` check ignores [contains]",
+                "step 5: a `state` check ignores [noFactionLeak]",
+                "step 6: scope `mian` is neither main, actions, gm nor a seat",
+                "step 7: `since` must be",
+                "step 8: `matches` is not a valid regex",
+                "step 9: unknown tile. field `mood`");
+    }
+
+    // Script authors (often agents) learn the vocabulary from DEVELOPER_TESTBED.md; anything the code accepts but the
+    // reference does not mention is invisible to them.
+    @Test
+    void referenceDocumentsEveryVerbActionScopeAndStatePath() throws Exception {
+        String reference = Files.readString(Path.of("DEVELOPER_TESTBED.md"));
+        List<String> names = new ArrayList<>();
+        names.addAll(TestBedScript.VERBS);
+        names.addAll(TestBedScript.ACTIONS);
+        names.addAll(TestBedScriptService.SHARED_SCOPES);
+        names.addAll(TestBedStateResolver.SEAT_FIELDS);
+        names.addAll(TestBedStateResolver.GAME_FIELDS);
+        names.addAll(TestBedStateResolver.TILE_FIELDS);
+        names.addAll(TestBedStateResolver.PLANET_FIELDS);
+        List<String> missing = names.stream()
+                .filter(name -> !reference.contains("`" + name + "`")
+                        && !reference.contains("`" + name + " ")
+                        && !reference.contains("`" + name + "(")
+                        && !reference.contains(" " + name + "`"))
+                .toList();
+        List<String> missingScopes = TestBedScriptService.SEAT_SCOPES.stream()
+                .filter(scope -> !reference.contains("`<seat>:" + scope + "`"))
+                .toList();
+        assertEquals(List.of(), missing, "add these to DEVELOPER_TESTBED.md");
+        assertEquals(List.of(), missingScopes, "add these scopes to DEVELOPER_TESTBED.md");
+    }
+
+    @Test
+    void teamSeatFieldsAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "seats": [{ "teamMateYou": true, "botAccount": true }, { "teamMateYou": true, "botAccount": true }]
+                }""");
+        assertContains(
+                TestBedPresetService.validate(preset),
+                "`teamMateYou` needs a preset without `you`",
+                "Only one seat may set `teamMateYou`",
+                "Only one seat may set `botAccount`");
+    }
+
+    // Map and fog preset fields fail validation up front: bad positions, tiles, lane matrices and fog options, and
+    // maps A-G (fog-only) in a preset that is not a fog preset.
+    @Test
+    void mapAndFogFieldsAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "fog": false,
+                  "you": { "faction": "sol" },
+                  "tiles": { "a000": "39", "h101": "19", "b101": "notatile" },
+                  "customHyperlanes": { "nowhere": "0", "205": "1,2,3" },
+                  "fowOptions": ["map_connections", "make_it_dark"],
+                  "stored": { "fowMapSegments": "" }
+                }""");
+        assertContains(
+                TestBedPresetService.validate(preset),
+                "`tiles` position `h101` is not a tile position",
+                "unknown tile `notatile` at `b101`",
+                "`customHyperlanes` position `nowhere` is not a tile position",
+                "`customHyperlanes` at `205` needs a 6x6 matrix",
+                "unknown fog option `make_it_dark`",
+                "`fowOptions` need a fog game",
+                "`stored` keys and values may not be blank",
+                "maps A-G (`a000`-`g848`) need `\"fog\": true`");
+    }
+
+    // Border entries are `<direction>:<type>`; legacy type spellings are accepted, the retired `arrow` is not.
+    @Test
+    void borderAnomaliesAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "borderAnomalies": {
+                    "202": ["n:spatial_tear", "s:SPATIAL_TEAR", "ne:Gravity Wave"],
+                    "nowhere": ["n:nebula"],
+                    "205": ["up:nebula", "n:arrow", "nebula"]
+                  }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "`borderAnomalies` position `nowhere` is not a tile position",
+                "`borderAnomalies` entry `up:nebula` at `205`",
+                "`borderAnomalies` entry `n:arrow` at `205`",
+                "`borderAnomalies` entry `nebula` at `205`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("at `202`")), String.join("\n", errors));
+    }
+
+    @Test
+    void customAdjacenciesAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "customAdjacencies": { "000": ["201", "TL"], "nowhere": ["101"], "102": ["moon"] }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "`customAdjacencies` position `nowhere` is not a tile position",
+                "`customAdjacencies` target `moon` at `102`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("at `000`")), String.join("\n", errors));
+    }
+
+    // Homebrew card tests switch decks in the preset and stack explores in scripts; wrong slots, unknown decks,
+    // decks of the wrong type and unknown explore ids must be caught before a live run.
+    @Test
+    void decksAndStackExploreAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "decks": { "ac": "action_cards_30k", "so": "relics_30k", "explore": "notadeck", "tech": "x" }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "deck `relics_30k` is not a `so` deck",
+                "unknown deck `notadeck` for `decks.explore`",
+                "unknown `decks` slot `tech`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("action_cards_30k")), String.join("\n", errors));
+
+        List<String> scriptErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "stackExplore", "value": "notanexplore" },
+                    { "do": "stackExplore" },
+                    { "do": "stackExplore", "value": "tourismbureau30k" }
+                  ] }"""));
+        assertContains(scriptErrors, "unknown explore card `notanexplore`", "needs `value`");
+        assertTrue(
+                scriptErrors.stream().noneMatch(error -> error.contains("tourismbureau30k")),
+                String.join("\n", scriptErrors));
+
+        // removeToken needs both the location (key) and the token (value).
+        List<String> removeTokenErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "removeToken", "value": "frontier" },
+                    { "do": "removeToken", "key": "318", "value": "frontier" }
+                  ] }"""));
+        assertContains(removeTokenErrors, "needs `key`");
+        assertEquals(1, removeTokenErrors.size(), String.join("\n", removeTokenErrors));
     }
 
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and

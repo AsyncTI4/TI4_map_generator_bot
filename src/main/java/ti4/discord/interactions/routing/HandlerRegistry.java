@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import ti4.discord.interactions.listeners.context.ListenerContext;
-import ti4.logging.RollbarManager;
 
 public class HandlerRegistry<C extends ListenerContext> {
 
@@ -46,7 +45,6 @@ public class HandlerRegistry<C extends ListenerContext> {
 
         public boolean dispatch(C context) {
             if (!isMatched()) return false;
-            RollbarManager.put("handler_id", key);
             consumer.accept(context);
             return true;
         }

@@ -164,7 +164,7 @@ public class DraftSystemSettings extends SettingsMenu {
     protected List<Button> specialButtons() {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
-        if ("Twilights Fall (Andcat Draft)".equals(preset)) {
+        if ("Twilights Fall (Andcat Draft)".equals(preset) && !sliceSettings.isNucleusMode()) {
             buttons.add(Buttons.blue(prefix + "tfTourney", "TF Tourney Prelims", MiscEmojis.tf_ability));
         }
         buttons.add(Buttons.green(prefix + "startSetup", "Start Draft!"));
@@ -173,12 +173,11 @@ public class DraftSystemSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "startSetup" -> startSetup(event);
-                    case "tfTourney" -> tfTourney(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "startSetup" -> startSetup(event);
+            case "tfTourney" -> tfTourney(event);
+            default -> null;
+        };
         return (error == null ? "success" : error);
     }
 

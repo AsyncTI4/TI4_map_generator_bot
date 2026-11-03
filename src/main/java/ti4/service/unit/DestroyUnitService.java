@@ -12,12 +12,17 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.Iron.IronUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaTechHandler;
@@ -26,14 +31,15 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrap
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.tyris.TyrisAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.xan.XanUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.zephyrion.ZephyrionBountyHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBountyHandler;
 import ti4.discord.interactions.buttons.handlers.planet.MidgardLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
@@ -44,13 +50,16 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DisasterWatchHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
+import ti4.helpers.bluereverie.BlueReverieTechHelper;
+import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
@@ -165,6 +174,9 @@ public class DestroyUnitService {
 
     private static void handleDestroyedUnits(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
+        if (units.isEmpty()) {
+            return;
+        }
         // batch up infantry for INF2-ish effects
         for (Player player : game.getRealPlayersNNeutral()) {
             int numInfantry = 0;
@@ -181,20 +193,40 @@ public class DestroyUnitService {
         }
         if (combat) {
             AeternaTechHandler.offerThanatocyteLattice(event, game, units);
+            ValhavnAbilityHandler.offerValhollsCall(event, game, units);
+
+            for (Player player : game.getRealPlayers()) {
+                Tile tile = units.getFirst().tile();
+                if (IronUnitHandler.canOfferDominionRepair(game, player, tile, units)) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
+                            player.getRepresentation()
+                                    + ", you may repair a unit using the Iron Dominion. This may happen once per round.",
+                            IronUnitHandler.getDominionButton(player, tile));
+                }
+            }
         }
         ScrapyardAbilitiesHandler.offerRepurposedParts(event, game, units, combat);
+        IronSalvageRelicHandler.offerSalvageCollectors(event, game, units, combat);
         ScrapyardBreakthroughHandler.offerCompactorCapture(event, game, units);
         AeternaAbilityHandler.offerCycleOfReclamationCapture(event, game, units, combat);
         AeternaUnitsHandler.addCryptControlTokenForDestroyedFighters(game, units);
         AeternaUnitsHandler.offerGraveyardEffectsForDestroyedUnits(event, game, units);
         AeternaPromissoryHandler.rollForStasisFighters(event, game, units);
+        XinUnitHandler.captureSentinelDestroyedInfantry(event, game, units);
+        UydaiUnitHandler.resolveDeathCommandos(event, game, units);
         TwilightsFallMonumentsButtonHandler.captureBlacktfDestroyedInfantry(event, game, units);
         MonumentsDSButtonHandler.resolveKortaliMonument(event, game, units);
         MonumentsDSButtonHandler.offerKyroReliquaryRelocation(event, game, units);
         if (combat) {
             LostLegaciesRelicHandler.offerNeutralReplacement(event, game, units);
+            if (WarGamesBrActionCardHandler.isCombatActive(game)) {
+                WarGamesBrActionCardHandler.replaceDestroyedNeutralUnits(event, game, units, true);
+            }
         }
         MidgardLegendaryButtonHandler.offerMusterManheim(event, game, units, combat);
+        TeHelperAbilities.offerStrandedStructureRemoval(event, game, units);
+        ThirtyKActionCardHooks.afterUnitsDestroyed(event, game, units);
 
         // Handle other destroyed units individually
         for (RemovedUnit u : units) handleDestroyedUnit(event, game, units, u, combat);
@@ -240,6 +272,7 @@ public class DestroyUnitService {
 
         List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);
         List<Player> devours = CaptureUnitService.listCapturingCombatPlayers(game, unit);
+        Player stasisFieldGeneratorsCapturer = BlueReverieTechHelper.consumeStasisFieldGeneratorsCapture(game, unit);
         if (combat) {
             capturing.addAll(devours);
         }
@@ -248,7 +281,7 @@ public class DestroyUnitService {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos :
-                            FoWHelper.getAdjacentTiles(game, unit.tile().getPosition(), p2, false, true)) {
+                            Adjacency.of(game, p2).withSelf().into(unit.tile().getPosition())) {
                         if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
                             capturing.add(p2);
                             break;
@@ -281,17 +314,9 @@ public class DestroyUnitService {
                 }
             }
             case Mech -> {
-                handleSelfAssemblyRoutines(player, totalAmount, game);
+                handleSelfAssemblyRoutines(event, player, totalAmount, game, combat, unit);
                 if (player != null && player.hasUnit("ashen_mech")) {
                     AshenUnitHandler.resolveAshenMechDestroy(game, player, unit);
-                }
-                if (player.hasUnit("iron_mech") || player.hasUnit("iron_mech2")) {
-                    IronUnitsHandler.resolveRiptideDestroy(event, game, player, unit);
-                }
-                if (combat
-                        && player.getPromissoryNotes().containsKey("bepniron")
-                        && !player.getPromissoryNotesOwned().contains("bepniron")) {
-                    IronUnitsHandler.resolveEjectionDestroy(event, game, player, unit, killers);
                 }
                 if (player.hasUnit("dream_mech")) {
                     DreamUnitsHandler.offerRecurringMechButtons(
@@ -365,10 +390,16 @@ public class DestroyUnitService {
             default -> Consumers.nop();
         }
 
+        if (stasisFieldGeneratorsCapturer != null) {
+            capturing.removeIf(capturer -> capturer == stasisFieldGeneratorsCapturer);
+        }
         Set<String> counted = new HashSet<>();
         for (Player cabal : capturing) {
             if (!counted.add(cabal.getColorID())) continue;
             CaptureUnitService.executeCapture(event, game, cabal, unit);
+        }
+        if (stasisFieldGeneratorsCapturer != null) {
+            BlueReverieTechHelper.captureWithStasisFieldGenerators(event, game, stasisFieldGeneratorsCapturer, unit);
         }
         if (player != null
                 && combat
@@ -476,7 +507,13 @@ public class DestroyUnitService {
         }
     }
 
-    private static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
+    private static void handleSelfAssemblyRoutines(
+            GenericInteractionCreateEvent event,
+            Player player,
+            int min,
+            Game game,
+            boolean combat,
+            RemovedUnit destroyedMech) {
         if (player.hasActiveBreakthrough("naazbt")) {
             BreakthroughCommandHelper.deactivateBreakthrough(player, "naazbt");
         }
@@ -494,6 +531,10 @@ public class DestroyUnitService {
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        }
+        if (combat && destroyedMech.uh() instanceof Planet) {
+            BlueReverieTechHelper.offerSelfAssemblyRoutinesGroundCombatChoice(
+                    event, game, player, destroyedMech.tile(), destroyedMech.uh(), min);
         }
     }
 }

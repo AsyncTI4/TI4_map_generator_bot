@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -33,10 +34,12 @@ public class MidgardLegendaryButtonHandler {
         }
         player.exhaustPlanetAbility("midgard");
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "2 infantry " + planet);
+        String planetRepresentation = game.getUnitHolderFromPlanet(planet).getRepresentation(game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " exhausted _Muster Manheim_ to place 2 infantry on "
-                        + game.getUnitHolderFromPlanet(planet).getRepresentation(game) + ".");
+                        + planetRepresentation + ".");
+        notifyCombatOpponentsInFog(game, player, planetRepresentation);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -62,8 +65,9 @@ public class MidgardLegendaryButtonHandler {
                     player.factionButtonChecker() + "musterManheim_" + combatContext.unitHolderName(),
                     "Use Muster Manheim",
                     PlanetEmojis.getPlanetEmojiOrNull("midgard"));
+            MessageChannel channel = game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel();
             MessageHelper.sendMessageToChannelWithButton(
-                    event.getMessageChannel(),
+                    channel,
                     player.getRepresentation()
                             + ", one of your units was destroyed during ground combat. You may exhaust _Muster Manheim_ to place 2 infantry on "
                             + game.getUnitHolderFromPlanet(combatContext.unitHolderName())
@@ -71,5 +75,17 @@ public class MidgardLegendaryButtonHandler {
                             + ".",
                     button);
         }
+    }
+
+    private static void notifyCombatOpponentsInFog(Game game, Player player, String planetRepresentation) {
+        if (!game.isFowMode()) return;
+        StartCombatService.CurrentCombat combatContext = StartCombatService.getCurrentCombat(game);
+        if (combatContext == null) return;
+        combatContext.factions().stream()
+                .map(game::getPlayerFromColorOrFaction)
+                .filter(opponent -> opponent != null && opponent != player)
+                .forEach(opponent -> MessageHelper.sendMessageToChannel(
+                        opponent.getCorrectChannel(),
+                        player.getFactionEmojiOrColor() + " placed 2 infantry on " + planetRepresentation + "."));
     }
 }

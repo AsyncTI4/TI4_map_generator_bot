@@ -1,0 +1,20 @@
+{
+    "id": "th30",
+    "name": "Ilex/Ombra",
+    "aliases": [
+        "th30",
+        "ilex",
+        "ombra"
+    ],
+    "imagePath": "th30.png",
+    "planets": [
+        "ilex",
+        "ombra"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

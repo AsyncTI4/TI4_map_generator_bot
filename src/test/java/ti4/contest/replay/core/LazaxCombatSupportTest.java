@@ -11,9 +11,9 @@ import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
-import ti4.image.PositionMapper;
 import ti4.model.FactionModel;
+import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
 class LazaxCombatSupportTest extends BaseTi4Test {
@@ -76,7 +76,7 @@ class LazaxCombatSupportTest extends BaseTi4Test {
         }
 
         private String getNextPosition() {
-            for (String position : PositionMapper.getTilePositions()) {
+            for (String position : MapPositionMapper.getTilePositions()) {
                 if (game.getTileByPosition(position) == null) return position;
             }
             return null;

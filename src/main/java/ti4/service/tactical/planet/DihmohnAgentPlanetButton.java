@@ -2,9 +2,8 @@ package ti4.service.tactical.planet;
 
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
-import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.modules.homebrew.DihmohnAgent;
 import ti4.service.tactical.LandingContext;
 import ti4.service.tactical.PlanetAbilityButton;
 
@@ -16,8 +15,6 @@ public final class DihmohnAgentPlanetButton implements PlanetAbilityButton {
     }
 
     public List<Button> build(LandingContext ctx) {
-        String id = "exhaustAgent_dihmohnagent_" + ctx.planetName;
-        String label = "Use Dih-Mohn Agent on " + ctx.planetRep;
-        return List.of(Buttons.green(id, label, FactionEmojis.dihmohn));
+        return List.of(DihmohnAgent.button(ctx.mainPlayer, ctx.planetName, ctx.planetRep));
     }
 }

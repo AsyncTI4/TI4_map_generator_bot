@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.image.PositionMapper;
 import ti4.message.MessageHelper;
+import ti4.model.MapPositionMapper;
 
 class RemoveCustomAdjacentTile extends GameStateSubcommand {
 
@@ -31,7 +31,7 @@ class RemoveCustomAdjacentTile extends GameStateSubcommand {
         } else {
             List<String> primaryTiles = Helper.getListFromCSV(primaryTile);
             for (String tile : primaryTiles) {
-                if (!PositionMapper.isTilePositionValid(tile)) {
+                if (!MapPositionMapper.isTilePositionValid(tile)) {
                     MessageHelper.replyToMessage(event, "Tile position '" + tile + "' is invalid");
                     continue;
                 }

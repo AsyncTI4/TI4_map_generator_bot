@@ -4,11 +4,17 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.time.Duration;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -25,7 +31,9 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.InteractionType;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateRequest;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -38,16 +46,22 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.DiceHelper;
 
 @UtilityClass
 public class TestBedPress {
 
     static final int HISTORY_SIZE = 25;
+    public static final String FORCED_DICE_KEY = "testBedDice";
     private static final long SEARCH_RETRY_MILLIS = 2000;
+    private static final Duration EDIT_WAIT = Duration.ofSeconds(15);
+    private static final List<String> REJECTION_REPLIES =
+            List.of("is not a player of the game", "these buttons are for someone else");
 
     public static final class Recorder {
         private final List<String> replies = new ArrayList<>();
         private final List<String> unsupportedCalls = new ArrayList<>();
+        private final List<String> reposts = new ArrayList<>();
         private String modalId;
 
         synchronized void reply(String text) {
@@ -60,6 +74,14 @@ public class TestBedPress {
 
         synchronized void modal(String id) {
             modalId = id;
+        }
+
+        synchronized void reposted(String jumpUrl) {
+            reposts.add(jumpUrl);
+        }
+
+        public synchronized List<String> reposts() {
+            return List.copyOf(reposts);
         }
 
         public synchronized List<String> replies() {
@@ -76,56 +98,116 @@ public class TestBedPress {
         }
     }
 
-    public record PressResult(boolean pressed, String detail, Recorder recorder) {}
+    public enum Outcome {
+        PRESSED,
+        FORM_OPENED,
+        REJECTED,
+        HANDLER_FAILED,
+        NOT_FOUND
+    }
 
-    private record Found(Message message, Button button) {}
+    public record PressResult(Outcome outcome, String detail, Recorder recorder) {
+        public boolean pressed() {
+            return outcome == Outcome.PRESSED || outcome == Outcome.FORM_OPENED;
+        }
+    }
 
-    public static PressResult pressVisible(
+    record Repost(MessageChannel channel, String seatName) {}
+
+    record Found(Message message, Button button, int otherMatches) {}
+
+    private record Candidate(Message message, Button button, Match match, boolean foreign, boolean stale) {
+        boolean sameRank(Candidate other) {
+            return match == other.match && foreign == other.foreign && stale == other.stale;
+        }
+    }
+
+    static PressResult pressVisible(
             Game game,
             Member developer,
             Player seat,
             Supplier<List<MessageChannel>> channels,
+            TestBedMessageLog log,
             String labelOrId,
             long timeoutMillis) {
         long deadline = System.currentTimeMillis() + timeoutMillis;
         List<String> seen = new ArrayList<>();
-        Found found = find(channels.get(), labelOrId, seen);
+        long mark = log.mark();
+        Found found = find(channels.get(), log::newestFirst, log::arrivedDuringRun, labelOrId, seat.getFaction(), seen);
         while (found == null && System.currentTimeMillis() < deadline) {
-            sleep(SEARCH_RETRY_MILLIS);
+            long left = deadline - System.currentTimeMillis();
+            log.awaitChange(mark, Math.min(left, SEARCH_RETRY_MILLIS));
+            mark = log.mark();
             seen.clear();
-            found = find(channels.get(), labelOrId, seen);
+            found = find(channels.get(), log::newestFirst, log::arrivedDuringRun, labelOrId, seat.getFaction(), seen);
         }
-        if (found != null) return press(game, developer, seat, found.message(), found.button());
-        String visible = seen.isEmpty()
-                ? "no buttons"
-                : String.join(", ", seen.stream().distinct().toList());
-        return new PressResult(
-                false,
-                "no button `" + labelOrId + "` after " + timeoutMillis / 1000 + "s; visible: " + visible,
-                new Recorder());
+        if (found == null) {
+            String visible = seen.isEmpty()
+                    ? "no buttons"
+                    : String.join(", ", seen.stream().distinct().toList());
+            return new PressResult(
+                    Outcome.NOT_FOUND,
+                    "no button `" + labelOrId + "` after " + timeoutMillis / 1000 + "s; visible: " + visible,
+                    new Recorder());
+        }
+        PressResult result = press(game, developer, seat, found.message(), found.button());
+        if (found.otherMatches() == 0) return result;
+        String ambiguity = "; " + found.otherMatches() + " other button(s) also matched, pressed the newest";
+        return new PressResult(result.outcome(), result.detail() + ambiguity, result.recorder());
+    }
+
+    static List<Message> recentHistory(MessageChannel channel) {
+        return channel.getHistory().retrievePast(HISTORY_SIZE).complete();
     }
 
     @Nullable
-    private static Found find(List<MessageChannel> channels, String labelOrId, List<String> seen) {
-        Found prefixMatch = null;
+    static Found find(
+            List<MessageChannel> channels,
+            Function<MessageChannel, List<Message>> reader,
+            Predicate<Message> fresh,
+            String labelOrId,
+            String seatFaction,
+            List<String> seen) {
+        List<Candidate> candidates = new ArrayList<>();
         for (MessageChannel channel : channels) {
             if (channel == null) continue;
-            for (Message message :
-                    channel.getHistory().retrievePast(HISTORY_SIZE).complete()) {
+            for (Message message : reader.apply(channel)) {
                 for (Button button : message.getComponentTree().findAll(Button.class)) {
                     if (button.getCustomId() == null) continue;
-                    if (button.isDisabled()) {
-                        seen.add(button.getLabel() + " (`" + button.getCustomId() + "`, disabled)");
-                        continue;
-                    }
+                    seen.add(describeButton(button));
+                    if (button.isDisabled()) continue;
                     Match match = match(button, labelOrId);
-                    if (match == Match.EXACT) return new Found(message, button);
-                    if (match == Match.PREFIX && prefixMatch == null) prefixMatch = new Found(message, button);
-                    seen.add(button.getLabel() + " (`" + button.getCustomId() + "`)");
+                    if (match == Match.NONE) continue;
+                    candidates.add(new Candidate(
+                            message, button, match, isForeign(button, seatFaction), !fresh.test(message)));
                 }
             }
         }
-        return prefixMatch;
+        if (candidates.isEmpty()) return null;
+        candidates.sort(Comparator.comparing(Candidate::match)
+                .thenComparing(Candidate::foreign)
+                .thenComparing(Candidate::stale)
+                .thenComparing(candidate -> candidate.message().getIdLong(), Comparator.reverseOrder()));
+        Candidate best = candidates.getFirst();
+        int others = (int) candidates.stream().skip(1).filter(best::sameRank).count();
+        return new Found(best.message(), best.button(), others);
+    }
+
+    private static boolean isForeign(Button button, String seatFaction) {
+        String owner = ComponentIdEnvelope.decode(button.getCustomId()).ownerFaction();
+        return owner != null && !owner.equals(seatFaction);
+    }
+
+    static String describeButton(Button button) {
+        ComponentIdEnvelope envelope = ComponentIdEnvelope.decode(button.getCustomId());
+        StringBuilder text = new StringBuilder(button.getLabel())
+                .append(" (`")
+                .append(envelope.handlerId())
+                .append('`');
+        String owner = envelope.ownerFaction() != null ? envelope.ownerFaction() : envelope.spoofedFaction();
+        if (owner != null) text.append(", for ").append(owner);
+        if (button.isDisabled()) text.append(", disabled");
+        return text.append(')').toString();
     }
 
     static void sleep(long millis) {
@@ -179,22 +261,81 @@ public class TestBedPress {
     public static PressResult press(Game game, Member developer, Player seat, Message message, Button button) {
         String developerId = developer.getId();
         Recorder recorder = new Recorder();
+        TestBedSyncMessage synced = new TestBedSyncMessage(message);
         ExecutionLockManager.lock(game.getName(), ExecutionLockType.WRITE);
         try {
             String[] previous = {""};
+            Deque<Integer> dice = new ArrayDeque<>();
             runLocked(game, locked -> {
                 previous[0] = TestBedService.rawActingAs(locked, developerId);
                 TestBedService.setActingAs(locked, developerId, seat);
+                dice.addAll(forcedDice(locked));
             });
             try {
-                ButtonProcessor.processNow(standInEvent(message, button, developer, recorder));
+                ButtonInteractionEvent event =
+                        standInEvent(synced.proxy(), button, developer, recorder, repostFor(game, seat));
+                DiceHelper.withForcedResults(dice, () -> ButtonProcessor.processNow(event));
             } finally {
-                runLocked(game, locked -> TestBedService.restoreActingAs(locked, developerId, previous[0]));
+                runLocked(game, locked -> {
+                    TestBedService.restoreActingAs(locked, developerId, previous[0]);
+                    storeForcedDice(locked, dice);
+                });
             }
         } finally {
             ExecutionLockManager.unlock(game.getName(), ExecutionLockType.WRITE);
         }
-        return new PressResult(true, "pressed `" + button.getLabel() + "` (`" + button.getCustomId() + "`)", recorder);
+        boolean editsLanded = synced.awaitPendingEdits(EDIT_WAIT);
+        Outcome outcome = outcome(synced.handlerFailed(), recorder);
+        String detail = describeOutcome(outcome, button, recorder);
+        if (!editsLanded) detail += "; message edits still pending after " + EDIT_WAIT.toSeconds() + "s";
+        return new PressResult(outcome, detail, recorder);
+    }
+
+    static Outcome outcome(boolean handlerFailed, Recorder recorder) {
+        if (handlerFailed) return Outcome.HANDLER_FAILED;
+        if (rejection(recorder) != null) return Outcome.REJECTED;
+        if (recorder.modalId() != null) return Outcome.FORM_OPENED;
+        return Outcome.PRESSED;
+    }
+
+    @Nullable
+    private static String rejection(Recorder recorder) {
+        return recorder.replies().stream()
+                .filter(reply -> REJECTION_REPLIES.stream().anyMatch(reply::contains))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static String describeOutcome(Outcome outcome, Button button, Recorder recorder) {
+        String pressed = "`" + button.getLabel() + "` (`" + button.getCustomId() + "`)";
+        return switch (outcome) {
+            case PRESSED -> "pressed " + pressed;
+            case FORM_OPENED -> "pressed " + pressed + "; it opened form `" + recorder.modalId() + "`";
+            case REJECTED -> "pressed " + pressed + " but the bot refused: " + rejection(recorder);
+            case HANDLER_FAILED -> "pressed " + pressed + " but the handler threw (see the bot log)";
+            case NOT_FOUND -> "no button " + pressed;
+        };
+    }
+
+    static List<Integer> forcedDice(Game game) {
+        List<Integer> dice = new ArrayList<>();
+        for (String token : game.getStoredValue(FORCED_DICE_KEY).trim().split("\\s+")) {
+            if (!token.matches("\\d{1,2}")) continue;
+            int value = Integer.parseInt(token);
+            if (value >= 1 && value <= 10) dice.add(value);
+        }
+        return dice;
+    }
+
+    private static void storeForcedDice(Game game, Collection<Integer> remaining) {
+        if (remaining.isEmpty()) {
+            game.removeStoredValue(FORCED_DICE_KEY);
+            return;
+        }
+        TestBedService.store(
+                game,
+                FORCED_DICE_KEY,
+                String.join(" ", remaining.stream().map(String::valueOf).toList()));
     }
 
     public static boolean runLocked(Game game, Consumer<Game> action) {
@@ -216,11 +357,27 @@ public class TestBedPress {
         }
     }
 
+    @Nullable
+    static MessageChannel ownChannel(Game game, Player seat) {
+        return game.isFowMode() ? seat.getPrivateChannel() : seat.getCardsInfoThread();
+    }
+
+    @Nullable
+    private static Repost repostFor(Game game, Player seat) {
+        MessageChannel channel = ownChannel(game, seat);
+        return channel == null ? null : new Repost(channel, seat.getFaction());
+    }
+
     static ButtonInteractionEvent standInEvent(Message message, Button button, Member developer, Recorder recorder) {
+        return standInEvent(message, button, developer, recorder, null);
+    }
+
+    static ButtonInteractionEvent standInEvent(
+            Message message, Button button, Member developer, Recorder recorder, @Nullable Repost repost) {
         JDA jda = message.getJDA();
         ButtonInteraction[] self = new ButtonInteraction[1];
-        InvocationHandler handler =
-                (proxy, method, args) -> answerInteraction(self[0], method, args, message, button, developer, recorder);
+        InvocationHandler handler = (proxy, method, args) ->
+                answerInteraction(self[0], method, args, message, button, developer, recorder, repost);
         self[0] = (ButtonInteraction) Proxy.newProxyInstance(
                 ButtonInteraction.class.getClassLoader(), new Class<?>[] {ButtonInteraction.class}, handler);
         return new ButtonInteractionEvent(jda, 0, self[0]);
@@ -233,7 +390,8 @@ public class TestBedPress {
             Message message,
             Button button,
             Member developer,
-            Recorder recorder)
+            Recorder recorder,
+            @Nullable Repost repost)
             throws Throwable {
         String name = method.getName();
         return switch (name) {
@@ -266,7 +424,7 @@ public class TestBedPress {
                 message.getInteractionMetadata() == null
                         ? null
                         : message.getInteractionMetadata().getIntegrationOwners();
-            case "getHook" -> hook(self, message, recorder);
+            case "getHook" -> hook(self, message, recorder, repost);
             case "replyModal" -> {
                 recorder.modal(((Modal) args[0]).getId());
                 yield noOpAction(method.getReturnType(), message.getJDA(), recorder);
@@ -281,12 +439,17 @@ public class TestBedPress {
                 if (!name.startsWith("reply") && !name.startsWith("defer") && !name.startsWith("edit")) {
                     recorder.unsupported(name);
                 }
+                if (createsMessage(method, repost)) {
+                    InteractionHook replyHook = hook(self, message, recorder, repost);
+                    yield capturingAction(method.getReturnType(), message.getJDA(), recorder, repost, replyHook);
+                }
                 yield defaultValue(method, message.getJDA(), recorder);
             }
         };
     }
 
-    private static InteractionHook hook(ButtonInteraction interaction, Message message, Recorder recorder) {
+    private static InteractionHook hook(
+            ButtonInteraction interaction, Message message, Recorder recorder, @Nullable Repost repost) {
         JDA jda = message.getJDA();
         InteractionHook[] self = new InteractionHook[1];
         self[0] = (InteractionHook) Proxy.newProxyInstance(
@@ -305,11 +468,96 @@ public class TestBedPress {
                     if ("retrieveOriginal".equals(name)) {
                         return message.getChannel().retrieveMessageById(message.getId());
                     }
+                    if (createsMessage(method, repost)) {
+                        Object action = capturingAction(method.getReturnType(), jda, recorder, repost, null);
+                        if (!seed(action, method, args)) recordText(recorder, args);
+                        return action;
+                    }
                     recordText(recorder, args);
                     if (returnsSelf(method, proxy)) return proxy;
                     return defaultValue(method, jda, recorder);
                 });
         return self[0];
+    }
+
+    private static boolean createsMessage(Method method, @Nullable Repost repost) {
+        Class<?> type = method.getReturnType();
+        return repost != null && type.isInterface() && MessageCreateRequest.class.isAssignableFrom(type);
+    }
+
+    private static boolean seed(Object action, Method method, @Nullable Object[] args) throws Throwable {
+        if (args == null || args.length != 1) return false;
+        String setter = switch (method.getName()) {
+            case "sendMessage" -> args[0] instanceof MessageCreateData ? "applyData" : "setContent";
+            case "sendMessageEmbeds" -> "setEmbeds";
+            case "sendMessageComponents" -> "setComponents";
+            case "sendFiles" -> "setFiles";
+            default -> null;
+        };
+        if (setter == null) return false;
+        Method target =
+                MethodUtils.getMatchingAccessibleMethod(MessageCreateRequest.class, setter, method.getParameterTypes());
+        if (target == null) return false;
+        invoke(target, action, args);
+        return true;
+    }
+
+    private static Object capturingAction(
+            Class<?> actionType, JDA jda, Recorder recorder, Repost repost, @Nullable Object callbackResult) {
+        MessageCreateBuilder builder = new MessageCreateBuilder();
+        Message[] sent = new Message[1];
+        boolean[] done = new boolean[1];
+        Supplier<Object> send = () -> {
+            if (!done[0]) {
+                done[0] = true;
+                sent[0] = repostIfItHasComponents(builder, repost, recorder);
+            }
+            if (sent[0] == null) return null;
+            return callbackResult != null ? callbackResult : sent[0];
+        };
+        return Proxy.newProxyInstance(
+                actionType.getClassLoader(), new Class<?>[] {actionType}, (proxy, method, args) -> {
+                    String name = method.getName();
+                    if ("queue".equals(name)) {
+                        acceptResult(send.get(), args);
+                        return null;
+                    }
+                    if ("complete".equals(name)) return send.get();
+                    if ("submit".equals(name)) return CompletableFuture.completedFuture(send.get());
+                    if ("getJDA".equals(name)) return jda;
+                    if ("toString".equals(name)) return "TestBedCapturingAction[" + actionType.getSimpleName() + "]";
+                    if ("hashCode".equals(name)) return System.identityHashCode(proxy);
+                    if ("equals".equals(name)) return args[0] == proxy;
+                    recordText(recorder, args);
+                    Method target = MethodUtils.getMatchingAccessibleMethod(
+                            MessageCreateBuilder.class, name, method.getParameterTypes());
+                    if (target != null) invoke(target, builder, args);
+                    if (returnsSelf(method, proxy)) return proxy;
+                    return defaultValue(method, jda, recorder);
+                });
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void acceptResult(@Nullable Object result, @Nullable Object[] args) {
+        if (result == null || args == null || args.length == 0) return;
+        if (args[0] instanceof Consumer<?> success) ((Consumer<Object>) success).accept(result);
+    }
+
+    @Nullable
+    private static Message repostIfItHasComponents(MessageCreateBuilder builder, Repost repost, Recorder recorder) {
+        if (builder.getComponents().isEmpty()) return null;
+        String header = "-# 🧪 test bed: shown only to " + repost.seatName() + " in a real game";
+        String content = builder.getContent();
+        String withHeader = content.isEmpty() ? header : header + "\n" + content;
+        if (withHeader.length() <= Message.MAX_CONTENT_LENGTH) builder.setContent(withHeader);
+        try {
+            Message message = repost.channel().sendMessage(builder.build()).complete();
+            recorder.reposted(message.getJumpUrl());
+            return message;
+        } catch (RuntimeException e) {
+            recorder.unsupported("re-posting ephemeral buttons failed: " + e.getMessage());
+            return null;
+        }
     }
 
     private static boolean isMessageEdit(String name) {

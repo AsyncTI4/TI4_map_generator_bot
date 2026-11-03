@@ -1,0 +1,21 @@
+{
+    "id": "th39",
+    "name": "Akren/Sephis",
+    "aliases": [
+        "th39",
+        "akren",
+        "sephis"
+    ],
+    "imagePath": "th39.png",
+    "planets": [
+        "akren",
+        "sephis"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "ALPHA",
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "theodisi"
+}

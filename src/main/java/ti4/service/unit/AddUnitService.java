@@ -7,8 +7,12 @@ import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
@@ -261,8 +265,18 @@ public class AddUnitService {
         if (unitKey.unitType() == UnitType.Aurelion) {
             ThronesUnitHandler.syncAurelionStation(game, player);
         }
+        if (player.hasUnit("stoneborn_flagship") && unitKey.unitType() == UnitType.Flagship) {
+            StonebornUnitHandler.syncMobileMountain(game, player);
+        }
         if (player.ownsUnit("veylor_mech")) {
             VeylorUnitHandler.checkVeylorMech(game);
+        }
+        if (unitKey.unitType() == UnitType.Mech && player.hasAbility("harvest")) {
+            MigoUnitHandler.syncNevermen(game);
+            CommanderUnlockCheckService.checkPlayer(player, "migo");
+            MigoLeadersHandler.syncMigoCommanderBonus(game);
+            MigoAbilityHandler.reconcileHarvestCards(game, player);
+            MigoAbilityHandler.offerMechHarvestChoices(game, player);
         }
         if (unitKey.unitType() == UnitType.Monument) {
             MonumentsService.syncKyroReliquaryAttachment(game, player);
@@ -277,7 +291,6 @@ public class AddUnitService {
                 player,
                 "dream",
                 "myrr",
-                "natau",
                 "oblivion",
                 "revenantxytheris",
                 "thrones",
@@ -285,7 +298,9 @@ public class AddUnitService {
                 "scrapyard",
                 "thurviali",
                 "sarcosa",
-                "xin");
+                "xin",
+                "valhavn",
+                "deep");
     }
 
     private static void checkFleetCapacity(Tile tile, String color, Game game) {

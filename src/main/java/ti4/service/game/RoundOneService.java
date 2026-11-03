@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.whispers.lunarium.LunariumAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
 import ti4.game.Planet;
@@ -17,20 +16,22 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.image.ImageHelper;
-import ti4.image.Mapper;
+import ti4.helpers.adjacency.Adjacency;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.image.FileUploadService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.tigl.TiglSetupService;
 
 @UtilityClass
 public class RoundOneService {
 
     public static void roundOne(GenericInteractionCreateEvent event, Game game) {
+        TiglSetupService.enforceLadderRules(game, game.getActionsChannel());
         if (game.isAcd2()) {
             BotLogger.info(
                     Constants.privateStaticVoidPing() + " Action Card Deck 2 game has begun: " + game.gameJumpLinks());
@@ -48,7 +49,7 @@ public class RoundOneService {
                             .append(player.getFaction())
                             .append(".");
                 } else {
-                    files.add(FileUploadService.createFileUpload(ImageHelper.read(path), player.getFaction() + "_ref"));
+                    files.add(ImageUploads.createFileUpload(ImageHelper.read(path), player.getFaction() + "_ref"));
                 }
             }
             if (!files.isEmpty() && files.size() <= 10) {
@@ -95,7 +96,11 @@ public class RoundOneService {
         if (game.isCulturalExchangeProgramMode()) {
             List<String> factions = new ArrayList<>(game.getRealFactions());
             Collections.shuffle(factions);
+            factions.remove("firmament");
             for (Player player : game.getRealPlayers()) {
+                if ("firmament".equalsIgnoreCase(player.getFaction())) {
+                    continue;
+                }
                 player.setLeaders(new ArrayList<>());
                 String faction = factions.removeFirst();
                 player.initLeadersForFaction(faction);
@@ -137,10 +142,6 @@ public class RoundOneService {
                 game.setDebtPoolIcon(Constants.VADEN_DEBT_POOL, MiscEmojis.SharkLoan.toString());
             }
 
-            if (player.hasAbility("initiation")) {
-                LunariumAbilityHandler.setFactionSheetCCs(game, player, 1);
-            }
-
             if (player.hasAbility("questing_prince")) {
                 List<Player> others = new ArrayList<>(game.getRealPlayersExcludingThis(player));
                 Collections.shuffle(others);
@@ -148,30 +149,32 @@ public class RoundOneService {
                 for (int i = 0; i < others.size(); i++) {
                     Player target = others.get(i);
                     String shrine = (i == 0 ? "special" : "normal");
+                    // TODO: fog: planet names still show for tiles the target has not seen.
+                    Adjacency adjacency = Adjacency.of(game, target).forEffects();
                     buttons = new ArrayList<>();
                     if (rex != null) {
-                        for (String pos : FoWHelper.getAdjacentTiles(game, rex.getPosition(), target, false, false)) {
+                        for (String pos : adjacency.into(rex.getPosition())) {
                             Tile tile = game.getTileByPosition(pos);
                             if (tile != null) {
                                 for (Planet planet : tile.getPlanetUnitHolders()) {
                                     buttons.add(Buttons.green(
                                             "addShrine_" + planet.getName() + "_" + shrine,
                                             Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
-                                                    + tile.getRepresentationForButtons()));
+                                                    + tile.getRepresentationForButtons(game, target)));
                                 }
                             }
                         }
                     }
                     Tile hs = target.getHomeSystemTile();
                     if (hs != null) {
-                        for (String pos : FoWHelper.getAdjacentTiles(game, hs.getPosition(), target, false, false)) {
+                        for (String pos : adjacency.into(hs.getPosition())) {
                             Tile tile = game.getTileByPosition(pos);
                             if (tile != null) {
                                 for (Planet planet : tile.getPlanetUnitHolders()) {
                                     buttons.add(Buttons.green(
                                             "addShrine_" + planet.getName() + "_" + shrine,
                                             Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
-                                                    + tile.getRepresentationForButtons()));
+                                                    + tile.getRepresentationForButtons(game, target)));
                                 }
                             }
                         }

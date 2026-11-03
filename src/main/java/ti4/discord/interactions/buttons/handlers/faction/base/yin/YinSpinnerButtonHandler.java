@@ -20,8 +20,12 @@ class YinSpinnerButtonHandler {
 
     @ButtonHandler("startYinSpinner")
     public static void startYinSpinner(ButtonInteractionEvent event, Player player, Game game) {
+        player.setYinSpinnerCounter(player.getYinSpinnerCounter() + 2);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), player.getRepresentationNoPing() + " is using _Yin Spinner_.");
+                event.getChannel(),
+                player.getRepresentationNoPing() + " is using _Yin Spinner_."
+                        + "\n-# _Yin Spinner_ has placed " + player.getYinSpinnerCounter()
+                        + " infantry this game so far.");
         List<Button> buttons =
                 new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
         buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));

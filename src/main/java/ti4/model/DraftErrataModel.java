@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
-import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data

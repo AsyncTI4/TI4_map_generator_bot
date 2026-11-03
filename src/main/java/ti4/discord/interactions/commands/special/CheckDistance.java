@@ -11,8 +11,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
-import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
+import ti4.model.TileHelper;
 
 class CheckDistance extends GameStateSubcommand {
 
@@ -21,7 +21,8 @@ class CheckDistance extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")
+                .setRequiredRange(0, 30));
     }
 
     @Override

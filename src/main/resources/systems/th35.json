@@ -1,0 +1,15 @@
+{
+    "id": "th35",
+    "name": "Myphis",
+    "aliases": [
+        "th35",
+        "myphis"
+    ],
+    "imagePath": "th35.png",
+    "planets": [
+        "myphis"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "theodisi"
+}

@@ -14,8 +14,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersFactionTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
@@ -32,12 +30,12 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thundersedge.TeHelperTechs;
-import ti4.image.BannerGenerator;
-import ti4.image.Mapper;
+import ti4.image.card.BannerGenerator;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -52,6 +50,7 @@ import ti4.service.fow.FowScoringStatusService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
@@ -101,7 +100,7 @@ public final class StatusHelper {
                 }
             }
             if (!buttons.isEmpty() && Helper.canPlayerScorePOs(game, player)) {
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 String msg = player.getRepresentation()
                         + ", you may use these buttons to queue a public objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
@@ -122,7 +121,7 @@ public final class StatusHelper {
                 }
             }
             if (!buttons.isEmpty()) {
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 String msg = player.getRepresentation()
                         + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
@@ -154,7 +153,7 @@ public final class StatusHelper {
 
                     List<Button> ralnelHeroButtons = new ArrayList<>();
                     ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
-                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    ralnelHeroButtons.add(Buttons.DELETE_BUTTONS);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
                 }
@@ -170,6 +169,7 @@ public final class StatusHelper {
         VerydithPromissoryHandler.returnPactRenewedAtStartOfStatus(game);
         RevenantPromissoryHandler.returnRebrithAtStartOfStatus(game);
         GameEventService.commit(game, GameEventType.PHASE_STARTED, null, Map.of("phase", "status"));
+        PlayerAreaWarningService.warnAllPlayers(game);
         GameEventDraft.open(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
@@ -187,9 +187,6 @@ public final class StatusHelper {
         for (Player player : game.getRealPlayers()) {
             if (player.getTotalVictoryPoints() > maxVP) {
                 maxVP = player.getTotalVictoryPoints();
-            }
-            if (player.hasAbility("paradigm")) {
-                NatauAbilityHandler.resolveParadigmStartOfStatus(event, game, player);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
@@ -502,7 +499,7 @@ public final class StatusHelper {
     public static void handleStatusPhaseMiddle(Game game) {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
-            for (Player p2 : vaden.getNeighbouringPlayers(true)) {
+            for (Player p2 : vaden.getAbilityNeighbours()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."
@@ -513,9 +510,6 @@ public final class StatusHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
-        }
-        if (game.getRealPlayers().stream().anyMatch(player -> player.hasTech("benetrunnersdm"))) {
-            NetrunnersFactionTechsHandler.resolveDataMining(game);
         }
         MonumentsPoKButtonHandler.sendSpireOfIxthButtons(game);
 
@@ -570,7 +564,7 @@ public final class StatusHelper {
                     && !playerLeader.isLocked()) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("kyroHeroInitiation", "Play Kyro Hero"));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         player.getRepresentation()

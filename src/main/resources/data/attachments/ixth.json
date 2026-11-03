@@ -1,0 +1,34 @@
+[
+    {
+        "id": "ethanbiotic",
+        "name": "Metastability Event (Biotic)",
+        "imagePath": "attachment_ethanbiotic.png",
+        "isFakeAttachment": true,
+        "techSpeciality": ["biotic"],
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "ethancybernetic",
+        "name": "Metastability Event (Cybernetic)",
+        "imagePath": "attachment_ethancybernetic.png",
+        "isFakeAttachment": true,
+        "techSpeciality": ["cybernetic"],
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "ethanpropulsion",
+        "name": "Metastability Event (Propulsion)",
+        "imagePath": "attachment_ethanpropulsion.png",
+        "isFakeAttachment": true,
+        "techSpeciality": ["propulsion"],
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "ethanwarfare",
+        "name": "Metastability Event (Warfare)",
+        "imagePath": "attachment_ethanwarfare.png",
+        "isFakeAttachment": true,
+        "techSpeciality": ["warfare"],
+        "source": "lost_star_charts_of_ixth"
+    }
+]
