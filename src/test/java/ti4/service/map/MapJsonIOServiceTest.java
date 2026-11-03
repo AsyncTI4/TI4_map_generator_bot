@@ -367,4 +367,20 @@ class MapJsonIOServiceTest extends BaseTi4Test {
         assertTrue(reimported.containsKey("action"), "phase lore must round-trip");
         assertEquals(LoreService.TRIGGER.PHASE_END, reimported.get("action").trigger);
     }
+
+    // The import mirrors every 1, so a one-way lane only survives because the export writes it back as a 2.
+    @Test
+    void oneWayHyperlaneRoundTripsThroughExportAndImport() {
+        game.setTile(new Tile("hl", "101"));
+        CustomHyperlaneService.insertData(
+                game, "101", "0,0,0,2,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        String stored = game.getCustomHyperlaneData().get("101");
+
+        String json = MapJsonIOService.exportMapAsJson(null, game, false, false, true);
+        Game freshGame = new Game();
+        freshGame.setName(REIMPORT_GAME_NAME);
+        MapJsonIOService.importMapFromJson(freshGame, json, null);
+
+        assertEquals(stored, freshGame.getCustomHyperlaneData().get("101"));
+    }
 }

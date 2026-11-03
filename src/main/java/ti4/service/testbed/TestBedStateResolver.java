@@ -16,6 +16,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
+import ti4.service.map.CustomHyperlaneService;
 
 @UtilityClass
 public class TestBedStateResolver {
@@ -43,7 +44,8 @@ public class TestBedStateResolver {
             "relicDeck",
             "decks",
             "borderAnomalies",
-            "customAdjacencies");
+            "customAdjacencies",
+            "customHyperlanes");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
             "commodities",
@@ -143,6 +145,10 @@ public class TestBedStateResolver {
             case "customAdjacencies" ->
                 joinSorted(game.getCustomAdjacentTiles().entrySet().stream()
                         .flatMap(entry -> entry.getValue().stream().map(listed -> entry.getKey() + ">" + listed))
+                        .toList());
+            case "customHyperlanes" ->
+                joinSorted(game.getCustomHyperlaneData().entrySet().stream()
+                        .map(entry -> entry.getKey() + ":" + CustomHyperlaneService.toTypedMatrix(entry.getValue()))
                         .toList());
             default -> "<unknown " + field + ">";
         };

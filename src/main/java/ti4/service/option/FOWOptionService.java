@@ -88,6 +88,10 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Hide AC Discard",
                 "Action card discard pile shows only cards that were played"),
+        HIDE_UNSEEN_HYPERLANES(
+                FOWOptionCategory.VISIBILITY,
+                "Hide unseen hyperlanes",
+                "Custom hyperlanes show only the lanes a player's vision runs along; remembered ones show no lanes"),
 
         // Map Options
         CLASSIC_MAP_LAYOUT(

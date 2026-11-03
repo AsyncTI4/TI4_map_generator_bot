@@ -6,12 +6,14 @@ import static ti4.image.tile.TileGeometry.TILE_WIDTH;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
@@ -20,11 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.model.HyperlaneStyle;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.map.HyperlaneStyleService;
 
 public final class HyperlaneTileGenerator {
 
@@ -113,9 +118,17 @@ public final class HyperlaneTileGenerator {
     // Shape templates
     private static final Shape STRAIGHT_LINE_TEMPLATE = new Line2D.Float(CENTER_X, 0, CENTER_X, TILE_HEIGHT);
 
-    private static final Shape SMALL_CURVE_TEMPLATE = new QuadCurve2D.Float(CENTER_X, 0, 197.25f, 106.78f, 302, 75);
+    private static final String UNSEEN_LANES_KEY = "unseenLanes";
+    private static final double PING_INSET = 0.17;
 
-    private static final Shape LARGE_CURVE_TEMPLATE = new QuadCurve2D.Float(CENTER_X, 0, 181.2f, 144.98f, 302, 225);
+    private static final Point2D SMALL_CURVE_CONTROL = new Point2D.Float(197.25f, 106.78f);
+    private static final Point2D LARGE_CURVE_CONTROL = new Point2D.Float(181.2f, 144.98f);
+
+    private static final Shape SMALL_CURVE_TEMPLATE = new QuadCurve2D.Float(
+            CENTER_X, 0, (float) SMALL_CURVE_CONTROL.getX(), (float) SMALL_CURVE_CONTROL.getY(), 302, 75);
+
+    private static final Shape LARGE_CURVE_TEMPLATE = new QuadCurve2D.Float(
+            CENTER_X, 0, (float) LARGE_CURVE_CONTROL.getX(), (float) LARGE_CURVE_CONTROL.getY(), 302, 225);
 
     private static final Shape ROUNDABOUT = new Ellipse2D.Float(112.5f, 90, 120, 120);
 
@@ -139,13 +152,38 @@ public final class HyperlaneTileGenerator {
      * Generates the hyperlane as roundabout if any connections connect to itself
      */
     public static BufferedImage generateHyperlaneTile(Tile tile, Game game) {
+        return generateHyperlaneTile(tile, game, HyperlaneStyleService.gameDefault(game));
+    }
+
+    public static BufferedImage generateHyperlaneTile(Tile tile, Game game, HyperlaneStyle style) {
         String matrix = game.getCustomHyperlaneData().get(tile.getPosition());
+        return generateHyperlaneTile(tile, matrix, matrix, false, style);
+    }
+
+    public static BufferedImage generateHyperlaneTile(
+            Tile tile,
+            @Nullable String backgroundSeed,
+            @Nullable String matrix,
+            boolean lanesHidden,
+            HyperlaneStyle style) {
         boolean asRoundabout = CustomHyperlaneService.hasSelfConnection(matrix);
 
-        BufferedImage hyperlaneBackground = getRandomTransformedBackground(tile, matrix);
+        BufferedImage hyperlaneBackground = getRandomTransformedBackground(tile, backgroundSeed);
 
         // Find canonical matrix and rotation offset
         MatrixRotationResult canonical = getCanonicalMatrix(matrix);
+
+        if (lanesHidden) {
+            drawOverlay(
+                    hyperlaneBackground, HYPERLANE_CACHE.computeIfAbsent(UNSEEN_LANES_KEY, _ -> unseenLanePings()), 0);
+        }
+
+        if (CustomHyperlaneService.hasOneWayLanes(canonical.matrix)) {
+            BufferedImage oneWayOverlay = HYPERLANE_CACHE.computeIfAbsent(
+                    style.name() + ":" + canonical.matrix,
+                    _ -> OneWayHyperlaneOverlay.draw(CustomHyperlaneService.parseMatrix(canonical.matrix), style));
+            return drawOverlay(hyperlaneBackground, oneWayOverlay, canonical.rotation);
+        }
 
         // Use canonical matrix as cache key
         String cacheKey = canonical.matrix == null ? "null" : canonical.matrix;
@@ -176,22 +214,71 @@ public final class HyperlaneTileGenerator {
             return img;
         });
 
+        return drawOverlay(hyperlaneBackground, overlay, canonical.rotation);
+    }
+
+    private static BufferedImage drawOverlay(BufferedImage background, BufferedImage overlay, int rotation) {
         // Rotate overlay if needed
         BufferedImage rotatedOverlay = overlay;
-        if (canonical.rotation != 0) {
+        if (rotation != 0) {
             rotatedOverlay = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = rotatedOverlay.createGraphics();
-            g2.rotate(Math.toRadians(-canonical.rotation), CENTER_X, CENTER_Y);
+            g2.rotate(Math.toRadians(-rotation), CENTER_X, CENTER_Y);
             g2.drawImage(overlay, 0, 0, null);
             g2.dispose();
         }
 
         // Draw overlay on top of background
-        Graphics2D g = hyperlaneBackground.createGraphics();
+        Graphics2D g = background.createGraphics();
         g.drawImage(rotatedOverlay, 0, 0, null);
         g.dispose();
 
-        return hyperlaneBackground;
+        return background;
+    }
+
+    private static BufferedImage unseenLanePings() {
+        BufferedImage img = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        double[][] corners = {
+            {TILE_WIDTH / 4.0, 0}, {TILE_WIDTH * 3 / 4.0, 0}, {TILE_WIDTH, CENTER_Y},
+            {TILE_WIDTH * 3 / 4.0, TILE_HEIGHT}, {TILE_WIDTH / 4.0, TILE_HEIGHT}, {0, CENTER_Y}
+        };
+        for (double[] corner : corners) {
+            double x = corner[0] + (CENTER_X - corner[0]) * PING_INSET;
+            double y = corner[1] + (CENTER_Y - corner[1]) * PING_INSET;
+            drawRipple(g, x, y, Math.atan2(CENTER_Y - y, CENTER_X - x));
+        }
+        g.dispose();
+        return img;
+    }
+
+    private static void drawRipple(Graphics2D g, double x, double y, double towardCenter) {
+        g.setColor(new Color(10, 20, 40, 120));
+        g.fill(new Ellipse2D.Double(x - 19, y - 19, 38, 38));
+        g.setColor(new Color(225, 245, 255));
+        g.fill(new Ellipse2D.Double(x - 1.8, y - 1.8, 3.6, 3.6));
+        g.setStroke(new BasicStroke(1.4f));
+        for (int ring = 1; ring <= 4; ring++) {
+            double radius = 1.8 + ring * 4;
+            Color bright = new Color(80, 190, 255, 255 - ring * 35);
+            Color faded = new Color(80, 190, 255, 0);
+            double dx = Math.cos(towardCenter) * radius, dy = Math.sin(towardCenter) * radius;
+            g.setPaint(new GradientPaint(
+                    (float) (x + dx), (float) (y + dy), bright, (float) (x - dx), (float) (y - dy), faded));
+            g.draw(new Ellipse2D.Double(x - radius, y - radius, 2 * radius, 2 * radius));
+        }
+        g.setPaint(null);
+    }
+
+    @Nullable
+    static Point2D curveControlPoint(int from, int to) {
+        int steps = Math.floorMod(to - from, 6);
+        if (steps == 3) return null;
+        int firstSide = steps < 3 ? from : to;
+        Point2D template = Math.min(steps, 6 - steps) == 1 ? SMALL_CURVE_CONTROL : LARGE_CURVE_CONTROL;
+        return AffineTransform.getRotateInstance(Math.toRadians(firstSide * 60), CENTER_X, CENTER_Y)
+                .transform(template, null);
     }
 
     private static void drawShapes(Graphics2D g, Set<Shape> shapes, HLStroke hlStroke, Color color) {

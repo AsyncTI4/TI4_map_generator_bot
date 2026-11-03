@@ -2664,6 +2664,33 @@ class LoreServiceTest extends BaseTi4Test {
             assertEquals(encoded, storedEncoded());
         }
 
+        // One-way lanes are stored as an asymmetric matrix. Both effects work on the stored form, so they must
+        // not mirror it back into a two-way lane.
+        private static final String ONE_WAY_0_TO_3 =
+                "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        private static final String ONE_WAY_1_TO_4 =
+                "0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+
+        @Test
+        void rotateKeepsAOneWayLaneOneWay() {
+            CustomHyperlaneService.insertStoredData(game, "000", ONE_WAY_0_TO_3);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000"), systemTile, Constants.SPACE, true);
+            assertEquals(ONE_WAY_1_TO_4, game.getCustomHyperlaneData().get("000"));
+        }
+
+        @Test
+        void sethyperlaneKeepsAOneWayLaneOneWay() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player,
+                    game,
+                    entry("!sethyperlane 000 " + CustomHyperlaneService.encodeMatrix(ONE_WAY_0_TO_3)),
+                    systemTile,
+                    Constants.SPACE,
+                    true);
+            assertEquals(ONE_WAY_0_TO_3, game.getCustomHyperlaneData().get("000"));
+        }
+
         @Test
         void refusesToTouchANonHyperlaneTile() {
             LoreEffects.applyLoreEffectsForTest(

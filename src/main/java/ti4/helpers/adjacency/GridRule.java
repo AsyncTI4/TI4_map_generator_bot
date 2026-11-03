@@ -3,6 +3,7 @@ package ti4.helpers.adjacency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -10,7 +11,6 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
 import ti4.service.fow.FOWPlusService;
 
-// TODO: one-way hyperlanes are not supported; CustomHyperlaneService.normalizeMatrix keeps every matrix symmetric.
 public final class GridRule implements AdjacencyRule {
     private static final int START = -1;
     private static final int NATURAL_MAP_ONLY = -2;
@@ -36,6 +36,12 @@ public final class GridRule implements AdjacencyRule {
         return traverse(game, null, naturalMapOnly, position, START, new HashSet<>());
     }
 
+    public static Set<String> hyperlaneLanesFrom(Game game, Player player, String position) {
+        Set<String> lanes = new HashSet<>();
+        traverse(game, player, false, position, START, new HashSet<>(), lanes);
+        return lanes;
+    }
+
     private static Set<String> traverse(
             Game game,
             Player player,
@@ -43,6 +49,17 @@ public final class GridRule implements AdjacencyRule {
             String position,
             int sourceDirection,
             Set<String> explored) {
+        return traverse(game, player, naturalMapOnly, position, sourceDirection, explored, null);
+    }
+
+    private static Set<String> traverse(
+            Game game,
+            Player player,
+            boolean naturalMapOnly,
+            String position,
+            int sourceDirection,
+            Set<String> explored,
+            @Nullable Set<String> lanes) {
         Set<String> tiles = new HashSet<>();
         if (!explored.add(position + sourceDirection)) {
             return tiles;
@@ -72,10 +89,17 @@ public final class GridRule implements AdjacencyRule {
         for (int direction = 0; direction < 6; direction++) {
             String next = step(game, player, naturalMapOnly, position, direction, hyperlaneData, directlyAdjacentTiles);
             if (next == null) continue;
+            if (lanes != null && hyperlaneData != null && sourceDirection >= 0) {
+                lanes.add(lane(position, sourceDirection, direction));
+            }
             int enteredFrom = naturalMapOnly ? NATURAL_MAP_ONLY : (direction + 3) % 6;
-            tiles.addAll(traverse(game, player, naturalMapOnly, next, enteredFrom, explored));
+            tiles.addAll(traverse(game, player, naturalMapOnly, next, enteredFrom, explored, lanes));
         }
         return tiles;
+    }
+
+    public static String lane(String position, int side, int otherSide) {
+        return position + ":" + Math.min(side, otherSide) + ":" + Math.max(side, otherSide);
     }
 
     private static String step(

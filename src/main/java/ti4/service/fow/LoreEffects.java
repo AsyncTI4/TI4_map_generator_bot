@@ -1119,7 +1119,7 @@ final class LoreEffects {
         for (int i = 0; i < normalized; i++) {
             matrix = CustomHyperlaneService.rotateMatrix60(matrix);
         }
-        CustomHyperlaneService.insertData(ctx.game, position, matrix);
+        CustomHyperlaneService.insertStoredData(ctx.game, position, matrix);
         return new EffectDescription(
                 "The hyperlane at " + position + " rotated by " + (normalized * 60) + "°.", true, position);
     }
@@ -1134,7 +1134,7 @@ final class LoreEffects {
         String matrix = decodeHyperlaneMatrixArg(ctx.arg(1));
         if (tile == null || !CustomHyperlaneService.isCustomHyperlaneTile(tile) || matrix == null) return null;
 
-        CustomHyperlaneService.insertData(ctx.game, position, matrix);
+        CustomHyperlaneService.insertStoredData(ctx.game, position, matrix);
         return new EffectDescription("The hyperlane at " + position + " reconfigured.", true, position);
     }
 
@@ -1142,7 +1142,7 @@ final class LoreEffects {
     private static String decodeHyperlaneMatrixArg(String arg) {
         try {
             String matrix = CustomHyperlaneService.decodeMatrix(arg.trim());
-            return CustomHyperlaneService.isValidConnectionMatrix(matrix) ? matrix : null;
+            return CustomHyperlaneService.isValidStoredMatrix(matrix) ? matrix : null;
         } catch (Exception e) {
             return null;
         }

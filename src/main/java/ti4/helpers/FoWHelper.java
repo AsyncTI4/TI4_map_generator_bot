@@ -387,6 +387,16 @@ public final class FoWHelper {
         updatePlayerFogTiles(game, player);
     }
 
+    public static Set<String> getVisibleHyperlaneLanes(Game game, @NotNull Player player) {
+        Set<String> lanes = new HashSet<>();
+        for (Tile tile : new ArrayList<>(game.getTileMap().values())) {
+            if (playerIsInSystem(game, tile, player, false)) {
+                lanes.addAll(GridRule.hyperlaneLanesFrom(game, player, tile.getPosition()));
+            }
+        }
+        return lanes;
+    }
+
     public static Set<String> getTilePositionsToShow(Game game, @NotNull Player player) {
         // Get all tiles with the player in it
         Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
@@ -402,15 +412,20 @@ public final class FoWHelper {
             tilePositionsToShow.addAll(adjacentTiles);
         }
 
+        tilePositionsToShow.addAll(getDirectlyRevealedPositions(game, player));
+        return tilePositionsToShow;
+    }
+
+    public static Set<String> getDirectlyRevealedPositions(Game game, @NotNull Player player) {
+        Set<String> revealed = new HashSet<>();
         String playerSweep = Mapper.getSweepID(player.getColor());
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : new ArrayList<>(game.getTileMap().values())) {
             if (tile.hasCC(playerSweep)) {
-                tilePositionsToShow.add(tile.getPosition());
+                revealed.add(tile.getPosition());
             }
         }
-
-        addFowVisionTiles(game, player, tilePositionsToShow);
-        return tilePositionsToShow;
+        addFowVisionTiles(game, player, revealed);
+        return revealed;
     }
 
     /**

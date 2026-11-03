@@ -82,7 +82,7 @@ public class MapJsonIOService {
                 // custom hyperlane string if present
                 String custom = game.getCustomHyperlaneData().get(tile.getPosition());
                 if (custom != null) {
-                    t.setCustomHyperlaneString(custom);
+                    t.setCustomHyperlaneString(CustomHyperlaneService.toTypedMatrix(custom));
                 }
 
                 // border anomalies

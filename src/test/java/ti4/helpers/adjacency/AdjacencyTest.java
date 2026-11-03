@@ -9,11 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.game.persistence.TestGameHarness;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.model.MapPositionMapper;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.testUtils.BaseTi4Test;
 
 // Board: game-with-border-anomalies with a gravity wave on one edge of 101, so the link runs 101 -> neighbour.
@@ -78,6 +80,32 @@ class AdjacencyTest extends BaseTi4Test {
 
         assertThat(Adjacency.of(game).forEffects().from(HOLDER)).doesNotContain(neighbour);
         assertThat(Adjacency.of(game).forEffects().from(neighbour)).doesNotContain(HOLDER);
+    }
+
+    // A custom hyperlane at 000 with one lane entering at N (from 101) and leaving at S (to 104), typed as a 2.
+    @Test
+    void oneWayHyperlaneFollowsItsLane() {
+        game.setBorderAnomalies(new ArrayList<>());
+        game.setTile(new Tile("hl", "000"));
+        CustomHyperlaneService.insertData(
+                game, "000", "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        List<String> around = MapPositionMapper.getAdjacentTilePositions("000");
+        String entry = around.get(0), exit = around.get(3);
+
+        for (boolean oneWay : new boolean[] {false, true}) {
+            game.setOneWayAdjacency(oneWay);
+            Adjacency movement = Adjacency.of(game).forMovement();
+            assertThat(movement.from(entry)).contains(exit);
+            assertThat(movement.from(exit)).doesNotContain(entry);
+            assertThat(movement.into(exit)).contains(entry);
+            assertThat(movement.into(entry)).doesNotContain(exit);
+            assertThat(Adjacency.of(game).forEffects().from(exit).contains(entry))
+                    .as("effects against the lane, one-way adjacency " + oneWay)
+                    .isEqualTo(!oneWay);
+        }
+        // the lanes a player's vision runs along, for "Hide unseen hyperlanes"
+        assertThat(GridRule.hyperlaneLanesFrom(game, null, entry)).containsExactly("000:0:3");
+        assertThat(GridRule.hyperlaneLanesFrom(game, null, exit)).isEmpty();
     }
 
     // /map add_custom_adjacent_tiles primary:P adjacent:X links P -> X; movement follows it in every mode.
