@@ -33,7 +33,7 @@ class GameManagerCorruptGameTest extends BaseTi4Test {
             GameManager.get(gameName);
 
             botLogger.verify(
-                    () -> BotLogger.error(
+                    () -> BotLogger.critical(
                             and(contains(gameName), contains("/bothelper reload_game")), any(Throwable.class)),
                     times(1));
 
@@ -43,7 +43,7 @@ class GameManagerCorruptGameTest extends BaseTi4Test {
             harness.corruptGameFile();
             GameManager.get(gameName);
 
-            botLogger.verify(() -> BotLogger.error(contains(gameName), any(Throwable.class)), times(2));
+            botLogger.verify(() -> BotLogger.critical(contains(gameName), any(Throwable.class)), times(2));
         }
     }
 
