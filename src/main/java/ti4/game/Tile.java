@@ -635,9 +635,25 @@ public class Tile {
 
     @JsonIgnore
     public List<WormholeModel.Wormhole> getWormholes(Collection<String> creussFlagshipColors) {
+        return getWormholes(creussFlagshipColors, null);
+    }
+
+    @JsonIgnore
+    public List<WormholeModel.Wormhole> getDepartureWormholes(Collection<String> creussFlagshipColors) {
+        return getWormholes(creussFlagshipColors, WormholeModel.OneWay.EXIT);
+    }
+
+    @JsonIgnore
+    public List<WormholeModel.Wormhole> getArrivalWormholes(Collection<String> creussFlagshipColors) {
+        return getWormholes(creussFlagshipColors, WormholeModel.OneWay.ENTRY);
+    }
+
+    private List<WormholeModel.Wormhole> getWormholes(
+            Collection<String> creussFlagshipColors, @Nullable WormholeModel.OneWay excludedOneWay) {
         List<WormholeModel.Wormhole> wormholes = new ArrayList<>(Mapper.getWormholes(tileID));
         for (UnitHolder unitHolder : unitHolders.values()) {
             for (String token : unitHolder.getTokenList()) {
+                if (isOneWayToken(token, excludedOneWay)) continue;
                 wormholes.addAll(Mapper.getTokenWormholes(token));
             }
         }
@@ -647,6 +663,12 @@ public class Tile {
             }
         }
         return wormholes;
+    }
+
+    private static boolean isOneWayToken(String token, @Nullable WormholeModel.OneWay oneWay) {
+        if (oneWay == null) return false;
+        TokenModel oneWayToken = Mapper.getOneWayWormholeToken(token);
+        return oneWayToken != null && oneWayToken.getOneWay() == oneWay;
     }
 
     public static List<String> creussFlagshipColors(Game game) {
