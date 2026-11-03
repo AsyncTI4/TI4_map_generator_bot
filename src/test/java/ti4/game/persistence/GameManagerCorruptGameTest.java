@@ -3,6 +3,7 @@ package ti4.game.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
@@ -11,10 +12,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import ti4.executors.ExecutionLockType;
+import ti4.game.Game;
 import ti4.logging.BotLogger;
+import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.testUtils.BaseTi4Test;
 
 class GameManagerCorruptGameTest extends BaseTi4Test {
@@ -56,5 +62,82 @@ class GameManagerCorruptGameTest extends BaseTi4Test {
             // A game whose file is gone is missing, not corrupt.
             assertThat(GameManager.isCorrupt("missing-" + UUID.randomUUID())).isFalse();
         }
+    }
+
+    @Test
+    void staleCorruptResultDoesNotEvictAGameRepairedMeanwhile() {
+        String userId = uniqueName("user");
+        Game game = newGame("stale-corrupt");
+        game.addPlayer(userId, "User");
+        Game repaired = new Game();
+        repaired.setName(game.getName());
+        repaired.setLastModifiedDate(1);
+        repaired.addPlayer(userId, "User");
+
+        try (MockedStatic<GameSaveService> saves = mockStatic(GameSaveService.class);
+                MockedStatic<GameLoadService> loads = mockStatic(GameLoadService.class);
+                MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class);
+                MockedStatic<BotLogger> ignoredLogs = mockStatic(BotLogger.class)) {
+            saves.when(() -> GameSaveService.save(any(Game.class), anyString())).thenReturn(true);
+            GameManager.save(game, "initial");
+            ManagedGame examined = GameManager.getManagedGame(game.getName());
+
+            // The file is read as corrupt, then a repair lands before that result is handled.
+            loads.when(() -> GameLoadService.tryLoad(game.getName())).thenAnswer(_ -> {
+                GameManager.save(repaired, "repair");
+                return new GameLoadResult.Corrupt(0, new IOException("truncated"));
+            });
+
+            assertThat(GameManager.get(game.getName())).isNull();
+
+            ManagedGame current = GameManager.getManagedGames().stream()
+                    .filter(managedGame -> managedGame.getName().equals(game.getName()))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(current).isNotSameAs(examined);
+            assertThat(GameManager.getManagedPlayer(userId).getGames())
+                    .extracting(ManagedGame::getName)
+                    .contains(game.getName());
+        }
+    }
+
+    @Test
+    void bulkScanSkipsAKnownCorruptGameAndVisitsTheRest() {
+        Game corrupt = newGame("bulk-corrupt");
+        Game healthy = newGame("bulk-healthy");
+
+        try (MockedStatic<GameSaveService> saves = mockStatic(GameSaveService.class);
+                MockedStatic<GameLoadService> loads = mockStatic(GameLoadService.class);
+                MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class);
+                MockedStatic<BotLogger> ignoredLogs = mockStatic(BotLogger.class)) {
+            saves.when(() -> GameSaveService.save(any(Game.class), anyString())).thenReturn(true);
+            GameManager.save(corrupt, "initial");
+            GameManager.save(healthy, "initial");
+            loads.when(() -> GameLoadService.tryLoad(corrupt.getName()))
+                    .thenReturn(new GameLoadResult.Corrupt(0, new IOException("truncated")));
+            loads.when(() -> GameLoadService.tryLoad(healthy.getName())).thenReturn(new GameLoadResult.Loaded(healthy));
+            // The first access finds the file corrupt and evicts the cached game, keeping its name.
+            GameManager.get(corrupt.getName());
+            assertThat(GameManager.isValid(corrupt.getName())).isTrue();
+
+            List<String> visited = new ArrayList<>();
+            ConsumeGameUtility.consumeGames(
+                    List.of(corrupt.getName(), healthy.getName()),
+                    visitedGame -> visited.add(visitedGame.getName()),
+                    ExecutionLockType.READ);
+
+            assertThat(visited).containsExactly(healthy.getName());
+        }
+    }
+
+    private static Game newGame(String prefix) {
+        Game game = new Game();
+        game.setName(uniqueName(prefix));
+        game.setLastModifiedDate(0);
+        return game;
+    }
+
+    private static String uniqueName(String prefix) {
+        return prefix + "-" + UUID.randomUUID();
     }
 }
