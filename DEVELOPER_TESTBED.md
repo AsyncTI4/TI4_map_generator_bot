@@ -79,6 +79,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Token or attachment | game `tokens`: tile position or planet; remove one mid-script with `do: removeToken` | `"tokens": { "101": ["frontier"], "mecatolrex": ["dmz"] }`, `{ "do": "removeToken", "key": "318", "value": "frontier" }` |
 | Border anomaly | game `borderAnomalies`: tile position to `<n\|ne\|se\|s\|sw\|nw>:<type>` | `"borderAnomalies": { "202": ["n:spatial_tear"] }` |
 | Custom adjacency (one-way, like `/map add_custom_adjacent_tiles`) | game `customAdjacencies`: primary position to the positions it reaches; list both ways for a two-way link | `"customAdjacencies": { "000": ["201"] }` |
+| Custom hyperlane | game `customHyperlanes`: position to a 6×6 matrix (row = side entered, column = side left, sides N, NE, SE, S, SW, NW); `1` two-way, `2` one-way; places an `hl` tile | `"customHyperlanes": { "000": "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0" }` |
 | Relic fragment | seat `fragments` | `"fragments": ["crf1"]` |
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
@@ -328,7 +329,7 @@ Every step may also have a `label` for the report.
   `game.` + `activeSystem`, `phase`, `round`, `activePlayer`, `speaker`, `playedScs`, `acDiscard`, `agendaDiscard`,
   `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),
-  `customAdjacencies` (`<primary>><listed>`);
+  `customAdjacencies` (`<primary>><listed>`), `customHyperlanes` (`<position>:<matrix>`, one-way lanes as `2`);
   `tile.<position>.` + `units` (`space:blue_dd=2`), `ccs`, `tokens`, `planets`;
   `planet.<id>.` + `owner`, `units`, `tokens`; `stored:<key>`. Lists are sorted and comma-joined.
 - **Placeholders:** `{ac:<id>}`, `{so:<id>}`, `{pn:<id>}` (the acting seat's hand number), `{<seat>.faction}`,

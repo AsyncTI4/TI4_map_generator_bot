@@ -7,7 +7,16 @@ import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.service.fow.FogViewer;
 
-record TileScene(Game game, @Nullable DisplayType displayType, FogViewer viewer, RenderWarnings warnings) {
+record TileScene(
+        Game game,
+        @Nullable DisplayType displayType,
+        FogViewer viewer,
+        RenderWarnings warnings,
+        HyperlaneView hyperlanes) {
+
+    TileScene(Game game, @Nullable DisplayType displayType, FogViewer viewer, RenderWarnings warnings) {
+        this(game, displayType, viewer, warnings, new HyperlaneView(game, viewer));
+    }
 
     boolean isPrivateView() {
         return viewer.privateView();

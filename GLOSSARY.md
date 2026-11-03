@@ -191,6 +191,9 @@ The Empyrean breakthrough's Border anomaly token. Enforced only with One-way adj
 **Hyperlane**:
 A Tile that is not a System, whose drawn lanes make the Systems at their ends adjacent.
 
+**One-way hyperlane**:
+A lane on a custom Hyperlane (`hl` tile) that units can only follow from one side to the other. In the 6×6 matrix (row = side entered, column = side left, sides N, NE, SE, S, SW, NW) a GM types `2` for it; `1` stays two-way and is mirrored. Stored as an asymmetric 0/1 matrix. Drawn amber in the game's or the viewer's style (Dashed lanes, Arrows, Fading lanes, Entry/exit gates); on a roundabout every side that can be entered reaches every side that can be left (a one-way loop is two-way), so it marks only its entry-only and exit-only connectors. With the fog option "Hide unseen hyperlanes", a Player's own map shows only the lanes their vision runs along, and a remembered hyperlane shows no lanes.
+
 **Frontier token**:
 A marker placed in each System without planets that can be explored for a reward.
 
@@ -327,7 +330,7 @@ A team mode in which Players are paired and share some benefits.
 A mode where a Game is played by a community role rather than individually assigned Players.
 
 **One-way adjacency**:
-A Game setting for one-way links (gravity-wave borders, one-way custom adjacencies, one-way wormholes). When off, the default outside Fog of War, a one-way link only limits movement and counts as Adjacency both ways for everything else. When on, and always in Fog of War, the side that acts needs the link: a PDS fires only along it, and a Player sees only where they could move.
+A Game setting for one-way links (gravity-wave borders, one-way custom adjacencies, one-way wormholes, one-way hyperlanes). When off, the default outside Fog of War, a one-way link only limits movement and counts as Adjacency both ways for everything else. When on, and always in Fog of War, the side that acts needs the link: a PDS fires only along it, and a Player sees only where they could move.
 _Avoid_: Directional mode
 
 **TIGL**:

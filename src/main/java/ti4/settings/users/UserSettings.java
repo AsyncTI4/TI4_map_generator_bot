@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ti4.model.HyperlaneStyle;
 
 @Data
 @NoArgsConstructor // needed for JsonMapper
@@ -32,6 +33,7 @@ public class UserSettings {
     private boolean showTransactables;
     private boolean fogMapOnTurnStart;
     private RefreshMapStyle refreshMapStyle = RefreshMapStyle.COMBINED;
+    private HyperlaneStyle customHyperlaneStyle;
     private String activeHours;
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;

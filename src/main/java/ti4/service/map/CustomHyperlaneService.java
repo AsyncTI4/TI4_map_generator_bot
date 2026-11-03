@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -26,11 +27,14 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
+import ti4.helpers.adjacency.GridRule;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.HyperlaneStyle;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 
@@ -38,6 +42,8 @@ import ti4.model.Mapper;
 public class CustomHyperlaneService {
 
     private static final String HYPERLANE_TILEID = "hl";
+    private static final String ONE_WAY = "2";
+    private static final List<String> SIDE_NAMES = List.of("N", "NE", "SE", "S", "SW", "NW");
 
     private static final List<Button> HYPERLANE_BUTTONS = Arrays.asList(
             Buttons.gray("customHyperlaneRefresh", "Refresh"),
@@ -48,6 +54,7 @@ public class CustomHyperlaneService {
             Buttons.gray("customHyperlaneImport~MDL", "Import", "⬇️"),
             Buttons.gray("customHyperlaneExport", "Export", "⬆️"),
             Buttons.gray("customHyperlaneTransform~MDL", "Transform", "↔️"),
+            Buttons.gray("customHyperlaneStyle", "One-Way Style", "🎨"),
             Buttons.DONE_DELETE_BUTTONS);
 
     public static boolean isCustomHyperlaneTile(Tile tile) {
@@ -124,6 +131,33 @@ public class CustomHyperlaneService {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", HYPERLANE_MORE_BUTTONS);
     }
 
+    @ButtonHandler(value = "customHyperlaneStyle", save = false)
+    public static void offerHyperlaneStyles(ButtonInteractionEvent event, Game game) {
+        HyperlaneStyle current = HyperlaneStyleService.gameDefault(game);
+        List<Button> buttons = new ArrayList<>();
+        for (HyperlaneStyle style : HyperlaneStyle.values()) {
+            String id = "customHyperlaneSetStyle_" + style.name();
+            buttons.add(style == current ? Buttons.green(id, style.getLabel()) : Buttons.gray(id, style.getLabel()));
+        }
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                "How one-way hyperlanes look on this game's shared map. Players can pick their own view for maps"
+                        + " drawn just for them with `/user set_preferred_settings custom_hyperlane_style`.",
+                buttons);
+    }
+
+    @ButtonHandler("customHyperlaneSetStyle_")
+    public static void setHyperlaneStyle(ButtonInteractionEvent event, String buttonID, Game game) {
+        HyperlaneStyle.fromName(StringUtils.substringAfter(buttonID, "customHyperlaneSetStyle_"))
+                .ifPresent(style -> {
+                    HyperlaneStyleService.setGameDefault(game, style);
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(), "One-way hyperlanes now use **" + style.getLabel() + "**.");
+                });
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler(value = "customHyperlaneExport", save = false)
     public static void exportHyperlaneData(ButtonInteractionEvent event, Game game) {
         StringBuilder sb = new StringBuilder();
@@ -167,7 +201,7 @@ public class CustomHyperlaneService {
             }
 
             String matrix = decodeMatrix(data[1].trim());
-            if (!isValidConnectionMatrix(matrix)) {
+            if (!isValidStoredMatrix(matrix)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid connection matrix: `" + matrix + "`");
                 return;
             }
@@ -195,11 +229,11 @@ public class CustomHyperlaneService {
 
         Map<String, String> customHyperlaneData = game.getCustomHyperlaneData();
         if (customHyperlaneData.containsKey(position)) {
-            data.setValue(customHyperlaneData.get(position).replace(";", ";\n"));
+            data.setValue(toTypedMatrix(customHyperlaneData.get(position)).replace(";", ";\n"));
         }
 
         Modal customHyperlaneModal = Modal.create("customHyperlaneSave_" + position, position + " Hyperlane")
-                .addComponents(Label.of("Hyperlane Matrix (clear to delete)", data.build()))
+                .addComponents(Label.of("Matrix: 1 two-way, 2 one-way, clear deletes", data.build()))
                 .build();
 
         event.replyModal(customHyperlaneModal).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -224,12 +258,48 @@ public class CustomHyperlaneService {
 
             insertData(game, position, hyperlaneData);
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Hyperlane data `" + hyperlaneData + "` added to " + position + ".");
+                    event.getChannel(),
+                    "Hyperlane data `" + hyperlaneData + "` added to " + position + "."
+                            + oneWayLanesLine(customHyperlaneData.get(position))
+                            + contradictionsLine(hyperlaneData));
+            if (hasOneWayLanes(customHyperlaneData.get(position))) {
+                OneWayAdjacencyHintService.hintOnce(game, event.getChannel());
+            }
         }
     }
 
+    private static String oneWayLanesLine(String stored) {
+        List<String> lanes = describeOneWayLanes(stored);
+        return lanes.isEmpty() ? "" : "\nOne-way: " + String.join(", ", lanes) + ".";
+    }
+
+    private static String contradictionsLine(String typed) {
+        List<String> lanes = describeContradictions(typed);
+        return lanes.isEmpty()
+                ? ""
+                : "\n-# Typed in both directions, so saved as two-way: " + String.join(", ", lanes) + ".";
+    }
+
+    public static List<String> describeContradictions(String typed) {
+        int[][] grid = parseMatrix(typed);
+        List<String> lanes = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            for (int j = i + 1; j < 6; j++) {
+                boolean oneWayTyped = grid[i][j] == 2 || grid[j][i] == 2;
+                if (oneWayTyped && grid[i][j] != 0 && grid[j][i] != 0) {
+                    lanes.add(SIDE_NAMES.get(i) + " ↔ " + SIDE_NAMES.get(j));
+                }
+            }
+        }
+        return lanes;
+    }
+
     public static void insertData(Game game, String position, String hyperlaneData) {
-        game.getCustomHyperlaneData().put(position, normalizeMatrix(hyperlaneData));
+        game.getCustomHyperlaneData().put(position, toStoredMatrix(hyperlaneData));
+    }
+
+    public static void insertStoredData(Game game, String position, String storedData) {
+        game.getCustomHyperlaneData().put(position, storedData);
     }
 
     @ButtonHandler(value = "customHyperlaneTransform~MDL", save = false)
@@ -298,8 +368,17 @@ public class CustomHyperlaneService {
             }
         }
 
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Transformed: " + success + "\nCould not transform: " + failed);
+        StringBuilder message = new StringBuilder("Transformed: " + success + "\nCould not transform: " + failed);
+        if (!failed.isEmpty() && hasOneWayCustomHyperlane(game, failed.toString())) {
+            message.append("\n-# Hyperlanes with one-way lanes have no static tile and stay custom.");
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+    }
+
+    private static boolean hasOneWayCustomHyperlane(Game game, String positions) {
+        return Arrays.stream(positions.trim().split(" "))
+                .anyMatch(
+                        position -> hasOneWayLanes(game.getCustomHyperlaneData().get(position)));
     }
 
     private static List<String> getStaticHyperlanePositions(Game game) {
@@ -319,33 +398,14 @@ public class CustomHyperlaneService {
     /** Rotates a 6x6 hyperlane connection matrix string by 60 degrees: [i][j] -> [(i+1)%6][(j+1)%6]. */
     public static String rotateMatrix60(String matrix) {
         if (matrix == null) return null;
-        String[] rows = matrix.split(";");
-        int size = 6;
-        int[][] mat = new int[size][size];
-
-        for (int i = 0; i < size; i++) {
-            String[] cols = rows[i].split(",");
-            for (int j = 0; j < size; j++) {
-                mat[i][j] = Integer.parseInt(cols[j].trim());
+        int[][] mat = parseMatrix(matrix);
+        int[][] rotated = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                rotated[(i + 1) % 6][(j + 1) % 6] = mat[i][j];
             }
         }
-
-        int[][] rotated = new int[size][size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                rotated[(i + 1) % size][(j + 1) % size] = mat[i][j];
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < size; i++) {
-            if (i > 0) sb.append(";");
-            for (int j = 0; j < size; j++) {
-                if (j > 0) sb.append(",");
-                sb.append(rotated[i][j]);
-            }
-        }
-        return sb.toString();
+        return formatMatrix(rotated);
     }
 
     public static String encodeMatrix(String matrix) {
@@ -389,36 +449,108 @@ public class CustomHyperlaneService {
 
             for (String cell : cells) {
                 String trimmed = cell.trim();
-                if (!"0".equals(trimmed) && !"1".equals(trimmed)) return false;
+                if (!"0".equals(trimmed) && !"1".equals(trimmed) && !ONE_WAY.equals(trimmed)) return false;
             }
         }
 
         return true;
     }
 
-    // Ensure connections are always marked both ways
-    private static String normalizeMatrix(String matrix) {
+    public static boolean isValidStoredMatrix(String input) {
+        return isValidConnectionMatrix(input) && !input.contains(ONE_WAY);
+    }
+
+    public static String toStoredMatrix(String typed) {
+        int[][] grid = parseMatrix(typed);
+        int[][] stored = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (grid[i][j] == 1) {
+                    stored[i][j] = 1;
+                    stored[j][i] = 1;
+                } else if (grid[i][j] == 2) {
+                    stored[i][j] = 1;
+                }
+            }
+        }
+        connectRoundabout(stored);
+        return formatMatrix(stored);
+    }
+
+    private static void connectRoundabout(int[][] grid) {
+        boolean[] entry = new boolean[6], exit = new boolean[6];
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (i == j || grid[i][j] == 0 || grid[i][i] == 0 || grid[j][j] == 0) continue;
+                entry[i] = true;
+                exit[j] = true;
+            }
+        }
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (i != j && entry[i] && exit[j]) grid[i][j] = 1;
+            }
+        }
+    }
+
+    public static String toTypedMatrix(String stored) {
+        int[][] grid = parseMatrix(stored);
+        int[][] typed = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (grid[i][j] == 1) {
+                    typed[i][j] = grid[j][i] == 1 ? 1 : 2;
+                }
+            }
+        }
+        return formatMatrix(typed);
+    }
+
+    public static String onlyLanes(String stored, String position, Set<String> lanes) {
+        int[][] grid = parseMatrix(stored);
+        int[][] kept = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            for (int j = i; j < 6; j++) {
+                if (!lanes.contains(GridRule.lane(position, i, j))) continue;
+                kept[i][j] = grid[i][j];
+                kept[j][i] = grid[j][i];
+                kept[i][i] = grid[i][i];
+                kept[j][j] = grid[j][j];
+            }
+        }
+        return formatMatrix(kept);
+    }
+
+    public static boolean hasOneWayLanes(String stored) {
+        return stored != null && toTypedMatrix(stored).contains(ONE_WAY);
+    }
+
+    public static List<String> describeOneWayLanes(String stored) {
+        int[][] grid = parseMatrix(stored);
+        List<String> lanes = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (i != j && grid[i][j] == 1 && grid[j][i] == 0) {
+                    lanes.add(SIDE_NAMES.get(i) + " → " + SIDE_NAMES.get(j));
+                }
+            }
+        }
+        return lanes;
+    }
+
+    public static int[][] parseMatrix(String matrix) {
         String[] rows = matrix.split(";");
         int[][] grid = new int[6][6];
-
         for (int i = 0; i < 6; i++) {
             String[] cols = rows[i].split(",");
             for (int j = 0; j < 6; j++) {
                 grid[i][j] = Integer.parseInt(cols[j].trim());
             }
         }
+        return grid;
+    }
 
-        // Make symmetric: if grid[i][j] == 1, then grid[j][i] = 1
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (grid[i][j] == 1 || grid[j][i] == 1) {
-                    grid[i][j] = 1;
-                    grid[j][i] = 1;
-                }
-            }
-        }
-
-        // Rebuild string format
+    public static String formatMatrix(int[][] grid) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 6; i++) {
             if (i > 0) builder.append(";");
@@ -427,7 +559,6 @@ public class CustomHyperlaneService {
                 builder.append(grid[i][j]);
             }
         }
-
         return builder.toString();
     }
 
