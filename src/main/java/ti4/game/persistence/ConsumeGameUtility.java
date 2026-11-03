@@ -29,10 +29,11 @@ public class ConsumeGameUtility {
     public static void consumeGames(
             Iterable<String> gameNames, Predicate<Game> filter, Consumer<Game> consumer, ExecutionLockType lockType) {
         for (String gameName : gameNames) {
-            var managed = GameManager.getManagedGame(gameName);
+            var managed = GameManager.getLoadableManagedGame(gameName);
             if (managed == null) continue;
             ExecutionLockManager.wrapWithLockAndRelease(gameName, lockType, () -> {
                         Game game = managed.getGame();
+                        if (game == null) return;
 
                         if (filter == null || filter.test(game)) {
                             consumer.accept(game);

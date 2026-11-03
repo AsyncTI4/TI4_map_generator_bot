@@ -105,11 +105,12 @@ public class GameManager {
 
     @Nullable
     static Game get(String gameName) {
+        ManagedGame examinedManagedGame = gameNameToManagedGame.get(gameName);
         return switch (GameLoadService.tryLoad(gameName)) {
             case GameLoadResult.Loaded(Game game) -> game;
             case GameLoadResult.Corrupt corrupt -> {
                 reportCorruptGame(gameName, corrupt);
-                evictManagedGame(gameName);
+                evictManagedGameIfUnchanged(gameName, examinedManagedGame);
                 yield null;
             }
             case GameLoadResult.Missing() -> {
@@ -140,6 +141,15 @@ public class GameManager {
         evictManagedGame(gameName);
         LoreService.evictGameLore(gameName);
         GameDatabaseSyncPipeline.queueDelete(gameName);
+    }
+
+    private static void evictManagedGameIfUnchanged(String gameName, ManagedGame examinedManagedGame) {
+        if (examinedManagedGame == null) return;
+        gameNameToManagedGame.computeIfPresent(gameName, (_, managedGame) -> {
+            if (managedGame != examinedManagedGame) return managedGame;
+            managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
+            return null;
+        });
     }
 
     private static void evictManagedGame(String gameName) {
@@ -272,6 +282,25 @@ public class GameManager {
         if (!isValid(gameName)) return null;
         waitFor(gameNamesLoadedLatch);
         return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(loadForManagedGame(gameName)));
+    }
+
+    @Nullable
+    public static ManagedGame getLoadableManagedGame(String gameName) {
+        if (!isValid(gameName)) return null;
+        waitFor(gameNamesLoadedLatch);
+        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> loadManagedGameIfReadable(gameName));
+    }
+
+    @Nullable
+    private static ManagedGame loadManagedGameIfReadable(String gameName) {
+        return switch (GameLoadService.tryLoad(gameName)) {
+            case GameLoadResult.Loaded(Game game) -> new ManagedGame(game);
+            case GameLoadResult.Corrupt corrupt -> {
+                reportCorruptGame(gameName, corrupt);
+                yield null;
+            }
+            case GameLoadResult.Missing() -> null;
+        };
     }
 
     private static Game loadForManagedGame(String gameName) {
