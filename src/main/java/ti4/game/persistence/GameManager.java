@@ -83,9 +83,9 @@ public class GameManager {
         Game game = GameLoadService.load(gameName);
         if (game != null) return game;
         if (gameFileExists(gameName)) {
-            evictManagedGame(gameName, cachedManagedGame);
+            handleCorruptGame(gameName, cachedManagedGame);
         } else {
-            handleManagedGameRemoval(gameName);
+            handleMissingGame(gameName);
         }
         return null;
     }
@@ -98,7 +98,7 @@ public class GameManager {
         return Storage.getGameFile(gameName + Constants.TXT).exists();
     }
 
-    private static void evictManagedGame(String gameName, ManagedGame managedGame) {
+    private static void handleCorruptGame(String gameName, ManagedGame managedGame) {
         if (managedGame == null) return;
         gameNameToManagedGame.computeIfPresent(gameName, (_, current) -> {
             if (current != managedGame) return current;
@@ -107,7 +107,11 @@ public class GameManager {
         });
     }
 
-    private static void handleManagedGameRemoval(String gameName) {
+    private static void handleMissingGame(String gameName) {
+        unregisterGameAndQueueDatabaseDelete(gameName);
+    }
+
+    private static void unregisterGameAndQueueDatabaseDelete(String gameName) {
         gameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
@@ -151,7 +155,7 @@ public class GameManager {
         if (!GameSaveService.delete(gameName)) {
             return false;
         }
-        handleManagedGameRemoval(gameName);
+        unregisterGameAndQueueDatabaseDelete(gameName);
         return true;
     }
 
@@ -210,9 +214,9 @@ public class GameManager {
         }
         if (game == null) {
             if (gameFileExists(gameName)) {
-                evictManagedGame(gameName, cachedManagedGame);
+                handleCorruptGame(gameName, cachedManagedGame);
             } else {
-                handleManagedGameRemoval(gameName);
+                handleMissingGame(gameName);
             }
             return null;
         }
