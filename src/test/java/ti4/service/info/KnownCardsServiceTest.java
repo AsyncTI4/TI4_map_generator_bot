@@ -199,7 +199,8 @@ class KnownCardsServiceTest extends BaseTi4Test {
         // Only the target has known cards, and only action cards, so one embed with no SO section.
         List<MessageEmbed> embeds = KnownCardsService.getKnownCardHandEmbeds(game, viewer);
         assertThat(embeds).hasSize(1);
-        assertThat(embeds.getFirst().getTitle()).isEqualTo("target - " + target.getFactionNameOrColor());
+        assertThat(embeds.getFirst().getTitle())
+                .isEqualTo("target " + target.getFactionEmoji() + " " + target.getFactionNameOrColor());
         assertThat(embeds.getFirst().getDescription()).contains("Action Cards:").doesNotContain("Secret Objectives:");
     }
 
