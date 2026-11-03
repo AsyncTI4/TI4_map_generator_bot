@@ -231,9 +231,6 @@ public class GameManager {
         }
         GameWebStatePipeline.queue(game);
 
-        gameNames.add(game.getName());
-        replaceManagedGame(managedGameState);
-
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
@@ -250,6 +247,8 @@ public class GameManager {
             }
             ManagedGameState managedGameState = ManagedGameState.of(game);
             GameDatabaseSyncPipeline.queueSync(game, managedGameState);
+            gameNames.add(game.getName());
+            replaceManagedGame(managedGameState);
             return managedGameState;
         });
     }

@@ -15,10 +15,12 @@ import ti4.spring.context.SpringContext;
 @RequiredArgsConstructor
 public class PersistedManagedGameService {
 
+    private static final int WARMUP_READ_TIMEOUT_SECONDS = 120;
+
     private final GameEntityRepository gameEntityRepository;
     private final GameParticipantEntityRepository gameParticipantEntityRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, timeout = WARMUP_READ_TIMEOUT_SECONDS)
     public Map<String, PersistedManagedGame> loadAll() {
         Map<String, List<ManagedGameState.Participant>> participantsByGame =
                 gameParticipantEntityRepository.findAllRows().stream()
