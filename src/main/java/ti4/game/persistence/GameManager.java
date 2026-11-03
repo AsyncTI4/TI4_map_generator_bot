@@ -162,6 +162,7 @@ public class GameManager {
                 new LoadedGameFile(game, GameLoadService.getGameFileStamp(gameName));
             case GameLoadResult.Corrupt corrupt -> {
                 reportCorruptGame(gameName, corrupt);
+                evictManagedGame(gameName);
                 yield null;
             }
             case GameLoadResult.Missing() -> null;
@@ -174,6 +175,7 @@ public class GameManager {
             case GameLoadResult.Loaded(Game game) -> game;
             case GameLoadResult.Corrupt corrupt -> {
                 reportCorruptGame(gameName, corrupt);
+                evictManagedGame(gameName);
                 yield null;
             }
             case GameLoadResult.Missing() -> {
@@ -201,12 +203,16 @@ public class GameManager {
 
     private static void handleManagedGameRemoval(String gameName) {
         gameNames.remove(gameName);
+        evictManagedGame(gameName);
+        LoreService.evictGameLore(gameName);
+        GameDatabaseSyncPipeline.queueDelete(gameName);
+    }
+
+    private static void evictManagedGame(String gameName) {
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
             managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
         }
-        LoreService.evictGameLore(gameName);
-        GameDatabaseSyncPipeline.queueDelete(gameName);
     }
 
     public static boolean isValid(String gameName) {

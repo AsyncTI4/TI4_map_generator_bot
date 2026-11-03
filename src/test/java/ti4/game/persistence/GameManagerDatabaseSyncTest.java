@@ -184,7 +184,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     }
 
     @Test
-    void gameWithCorruptFileQueuesNoDeleteAndStaysValid() {
+    void gameWithCorruptFileIsEvictedFromMemoryButKeepsItsNameAndDatabaseRows() {
         try (var harness = TestGameHarness.forDefaultMap();
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             String gameName = harness.getGameName();
@@ -194,8 +194,12 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
             assertThat(GameManager.get(gameName)).isNull();
 
+            // The name stays so /developer reload_corrupted_saves can find it, but nothing iterates a null game.
             assertThat(GameManager.isValid(gameName)).isTrue();
-            assertThat(GameManager.getManagedGame(gameName)).isNotNull();
+            assertThat(GameManager.isCorrupt(gameName)).isTrue();
+            assertThat(GameManager.getManagedGames())
+                    .extracting(ManagedGame::getName)
+                    .doesNotContain(gameName);
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(eq(game), any()));
             pipeline.verifyNoMoreInteractions();
         }
