@@ -203,12 +203,17 @@ public class GameManager {
     @Nullable
     public static Game reload(String gameName) {
         waitFor(gameNamesLoadedLatch);
+        ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
         }
         if (game == null) {
-            if (!gameFileExists(gameName)) handleManagedGameRemoval(gameName);
+            if (gameFileExists(gameName)) {
+                evictManagedGame(gameName, cachedManagedGame);
+            } else {
+                handleManagedGameRemoval(gameName);
+            }
             return null;
         }
         handleMissingMatchingManagedGame(game);
@@ -239,7 +244,11 @@ public class GameManager {
         waitFor(gameNamesLoadedLatch);
         return gameNameToManagedGame.computeIfAbsent(gameName, _ -> {
             Game game = GameLoadService.load(gameName);
-            return game == null ? null : new ManagedGame(game);
+            if (game == null) {
+                BotLogger.error("Failed to load ManagedGame for " + gameName + ".");
+                throw new IllegalStateException("Failed to load ManagedGame for " + gameName);
+            }
+            return new ManagedGame(game);
         });
     }
 
