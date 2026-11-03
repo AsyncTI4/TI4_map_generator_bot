@@ -122,16 +122,65 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     }
 
     @Test
-    void gameThatFailsToLoadQueuesDelete() {
-        String unloadableGameName = uniqueName("db-sync-unloadable");
+    void reloadOfCorruptGameWithNoUsableUndoQueuesNoDelete() {
+        Game game = newGame("db-sync-corrupt-reload");
 
-        try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+        try (var harness = TestGameHarness.forDefaultMap();
+                MockedStatic<GameSaveService> gameSaveService = mockStatic(GameSaveService.class);
+                MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+                MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService.when(() -> GameLoadService.load(unloadableGameName)).thenReturn(null);
+            game.setName(harness.getGameName());
+            gameSaveService.when(() -> GameSaveService.save(game, "test save")).thenReturn(true);
+            GameManager.save(game, "test save");
+            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(null);
+            gameUndoService
+                    .when(() -> GameUndoService.loadUndoForMissingGame(game.getName()))
+                    .thenReturn(null);
 
-            assertThat(GameManager.get(unloadableGameName)).isNull();
+            assertThat(GameManager.reload(game.getName())).isNull();
 
-            pipeline.verify(() -> GameDatabaseSyncPipeline.queueDelete(unloadableGameName));
+            // The file is still on disk, so the game must stay in the bot and keep its database rows,
+            // but its cached copy leaves memory so searches and crons stop seeing it, as get() does.
+            assertThat(GameManager.isValid(game.getName())).isTrue();
+            assertThat(GameManager.getManagedGames())
+                    .extracting(ManagedGame::getName)
+                    .doesNotContain(game.getName());
+            pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(game));
+            pipeline.verifyNoMoreInteractions();
+        }
+    }
+
+    @Test
+    void gameWithNoFileQueuesDelete() {
+        String missingGameName = uniqueName("db-sync-missing-file");
+
+        try (MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            assertThat(GameManager.get(missingGameName)).isNull();
+
+            pipeline.verify(() -> GameDatabaseSyncPipeline.queueDelete(missingGameName));
+            pipeline.verifyNoMoreInteractions();
+        }
+    }
+
+    @Test
+    void gameWithCorruptFileIsEvictedFromMemoryButKeepsItsNameAndDatabaseRows() {
+        try (var harness = TestGameHarness.forDefaultMap();
+                MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            String gameName = harness.getGameName();
+            // Reloading registers the healthy game with the bot before its file gets corrupted.
+            Game game = GameManager.reload(gameName);
+            harness.corruptGameFile();
+
+            assertThat(GameManager.get(gameName)).isNull();
+
+            // The name stays so /developer reload_corrupted_saves can find it, but nothing iterates a null game.
+            assertThat(GameManager.isValid(gameName)).isTrue();
+            assertThat(GameManager.isCorrupt(gameName)).isTrue();
+            assertThat(GameManager.getManagedGames())
+                    .extracting(ManagedGame::getName)
+                    .doesNotContain(gameName);
+            pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(game));
             pipeline.verifyNoMoreInteractions();
         }
     }
