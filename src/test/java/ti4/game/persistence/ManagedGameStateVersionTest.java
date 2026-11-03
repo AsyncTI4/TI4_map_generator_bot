@@ -48,8 +48,8 @@ class ManagedGameStateVersionTest {
 
     @Test
     void changingManagedGameStateRequiresRaisingTheMappingVersion() {
-        boolean shapeUnchanged = componentNames(ManagedGameState.class).equals(SNAPSHOT_STATE_COMPONENTS)
-                && componentNames(ManagedGameState.Participant.class).equals(SNAPSHOT_PARTICIPANT_COMPONENTS);
+        boolean shapeUnchanged = SNAPSHOT_STATE_COMPONENTS.equals(componentNames(ManagedGameState.class))
+                && SNAPSHOT_PARTICIPANT_COMPONENTS.equals(componentNames(ManagedGameState.Participant.class));
 
         assertThat(shapeUnchanged || GameEntityMapper.MAPPING_VERSION > SNAPSHOT_MAPPING_VERSION)
                 .as("ManagedGameState changed shape: raise GameEntityMapper.MAPPING_VERSION so stored rows are"

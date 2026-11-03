@@ -76,7 +76,8 @@ public class GameDatabaseReconciler {
             if (gameFile == null) return;
             existingGameNames.add(gameName);
             if (gameFile.stamp().lastModifiedEpochMilliseconds() > startedAt) return;
-            reconcileGame(gameFile, persistedState, persistenceService, failures).ifPresent(discrepancies::add);
+            reconcileGame(gameFile, persistedState, persistenceService, failures)
+                    .ifPresent(discrepancies::add);
         }
 
         @Override
