@@ -98,7 +98,7 @@ class GameLoadService {
     private static final Set<String> reportedUnreadableFiles = ConcurrentHashMap.newKeySet();
 
     @Nullable
-    public static Game load(String gameName) {
+    static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);

@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -318,9 +320,18 @@ class GameDatabaseReconcilerTest {
         }
 
         private void run() {
-            var run = new GameDatabaseReconciler.Reconciliation();
-            run.start().forEach(run::reconcile);
-            run.finish();
+            Deque<Runnable> tasks = new ArrayDeque<>();
+            try (MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+                pipeline.when(() -> GameDatabaseSyncPipeline.queueReconciliationTask(anyString(), anyInt(), any()))
+                        .thenAnswer(invocation -> {
+                            tasks.add(invocation.getArgument(2));
+                            return true;
+                        });
+                assertThat(GameDatabaseReconciler.queueReconciliation()).isTrue();
+                while (!tasks.isEmpty()) {
+                    tasks.removeFirst().run();
+                }
+            }
         }
 
         @Override

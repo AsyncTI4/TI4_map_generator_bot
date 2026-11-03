@@ -25,7 +25,7 @@ public class GameDatabaseSyncPipeline {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(
             Thread.ofPlatform().name("ti4-game-database-sync-", 0).factory());
 
-    public static void queueSync(@Nullable Game game) {
+    static void queueSync(@Nullable Game game) {
         if (game == null || DatabasePersistenceGate.isDisabled()) return;
         try {
             if (!GameEntityMapper.shouldPersist(game)) {
@@ -39,7 +39,7 @@ public class GameDatabaseSyncPipeline {
         }
     }
 
-    public static void queueDelete(String gameName) {
+    static void queueDelete(String gameName) {
         if (DatabasePersistenceGate.isDisabled()) return;
         queue(gameName, service -> service.delete(gameName));
     }
@@ -49,7 +49,11 @@ public class GameDatabaseSyncPipeline {
                 EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    public static boolean queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
+    static boolean queueReconciliationTask(String taskName, int warningThresholdSeconds, Runnable reconciliationTask) {
+        return queueTask(taskName, warningThresholdSeconds, reconciliationTask);
+    }
+
+    private static boolean queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
         var timedRunnable = new TimedRunnable(taskName, executionTimeWarningThresholdSeconds, runnable);
         try {
             ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
