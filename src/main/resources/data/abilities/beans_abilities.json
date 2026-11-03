@@ -253,7 +253,7 @@
         "name": "Neurotropic Dormant",
         "shortName": "Neuro\nDormant",
         "faction": "bloom",
-        "permanentEffect": "The amount of action cards you can have in your hand is increased by 1.",
+        "permanentEffect": "The amount of action cards you may have in your hand is increased by 1.",
         "source": "beans"
     },
     {
@@ -261,8 +261,8 @@
         "name": "Neurotropic Active",
         "shortName": "Neuro\nActive",
         "faction": "bloom",
-        "permanentEffect": "The amount of action cards you can have in your hand is increased by 2.",
-        "window": "Once per aciton, when a player whose planet you are coexisting on draws 1 or more aciton cards",
+        "permanentEffect": "The amount of action cards you may have in your hand is increased by 2.",
+        "window": "Once per action, when a player whose planet you are coexisting on draws 1 or more aciton cards",
         "windowEffect": "You may draw 1 aciton card.",
         "source": "beans"
     },
