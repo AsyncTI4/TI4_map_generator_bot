@@ -6,11 +6,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 
+import java.io.UncheckedIOException;
+import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
@@ -326,6 +329,59 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             pipeline.verifyNoInteractions();
         }
         assertThat(corruptGames).containsExactly(Map.entry(gameName, corrupt));
+    }
+
+    @Test
+    void warmupFallsBackToTheGameFileWhenTheRevisionHeaderCannotBeRead() {
+        Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
+        String gameName = uniqueName("warmup-unreadable-header");
+        PersistedManagedGame persistedGame =
+                new PersistedManagedGame(managedGameState(gameName, uniqueName("warmup-unreadable-user")));
+        GameLoadResult.Corrupt corrupt = corruptResult();
+
+        try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+                MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
+                MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+            // Invalid UTF-8 in the header surfaces as an UncheckedIOException from the header reader.
+            revisionKeys
+                    .when(() -> GameRevisionKeyFile.read(gameName))
+                    .thenThrow(new UncheckedIOException(new MalformedInputException(1)));
+            gameLoadService.when(() -> GameLoadService.tryLoad(gameName)).thenReturn(corrupt);
+
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), corruptGames))
+                    .isFalse();
+            pipeline.verifyNoInteractions();
+        }
+        // The game is classified and reported like any other corrupt file instead of escaping warmup.
+        assertThat(corruptGames).containsExactly(Map.entry(gameName, corrupt));
+    }
+
+    @Test
+    void warmupFromTheDatabaseHoldsTheGameFileLockUntilTheGameIsCached() throws Exception {
+        String gameName = uniqueName("warmup-delete-race");
+        String userId = uniqueName("warmup-delete-race-user");
+        PersistedManagedGame persistedGame = new PersistedManagedGame(managedGameState(gameName, userId));
+        AtomicBoolean cachedBeforeDelete = new AtomicBoolean();
+        AtomicReference<Thread> deletion = new AtomicReference<>();
+
+        try (MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
+                MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class)) {
+            revisionKeys.when(() -> GameRevisionKeyFile.read(gameName)).thenAnswer(_ -> {
+                // A delete takes the write lock right after the header is read. It must wait until warmup has
+                // cached the game, so its removal runs after the insert instead of being undone by it.
+                Thread thread = Thread.ofPlatform()
+                        .start(() -> GameFileLockManager.wrapWithWriteLock(
+                                gameName, () -> cachedBeforeDelete.set(GameManager.getManagedPlayer(userId) != null)));
+                deletion.set(thread);
+                thread.join(200);
+                return "row-revision";
+            });
+
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), new HashMap<>()))
+                    .isTrue();
+        }
+        deletion.get().join(5000);
+        assertThat(cachedBeforeDelete).isTrue();
     }
 
     private static AtomicBoolean recordWriteLockWhenSyncQueued(

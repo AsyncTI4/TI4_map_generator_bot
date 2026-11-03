@@ -1,5 +1,6 @@
 package ti4.game.persistence;
 
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,16 +68,22 @@ public class GameManager {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
                 Map<String, PersistedManagedGame> persistedGames = loadPersistedManagedGames();
                 Map<String, GameLoadResult.Corrupt> corruptGames = new ConcurrentHashMap<>();
+                Map<String, Exception> failedGames = new ConcurrentHashMap<>();
                 AtomicInteger builtFromDatabase = new AtomicInteger();
                 AtomicInteger builtFromGameFiles = new AtomicInteger();
                 try (ExecutorService executorService =
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
                     gameNames.forEach(name -> executorService.submit(() -> {
-                        boolean fromDatabase = warmupManagedGame(name, persistedGames, corruptGames);
-                        (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
+                        try {
+                            boolean fromDatabase = warmupManagedGame(name, persistedGames, corruptGames);
+                            (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
+                        } catch (Exception e) {
+                            failedGames.put(name, e);
+                        }
                     }));
                 }
                 reportCorruptGamesFoundAtWarmup(corruptGames);
+                reportGamesThatFailedWarmup(failedGames);
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
                         "FINISHED BUILDING MANAGED GAMES: %,d FROM THE DATABASE, %,d FROM GAME FILES",
@@ -111,8 +118,7 @@ public class GameManager {
             @Nullable Map<String, PersistedManagedGame> persistedGames,
             Map<String, GameLoadResult.Corrupt> corruptGames) {
         PersistedManagedGame persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
-        if (persistedGame != null && persistedGame.matchesRevision(GameRevisionKeyFile.read(gameName))) {
-            gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame.state()));
+        if (persistedGame != null && buildManagedGameFromCurrentRow(gameName, persistedGame)) {
             return true;
         }
         switch (buildManagedGameFromGameFile(gameName)) {
@@ -125,6 +131,23 @@ public class GameManager {
             case GameLoadResult.Missing() -> {}
         }
         return false;
+    }
+
+    private static boolean buildManagedGameFromCurrentRow(String gameName, PersistedManagedGame persistedGame) {
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            if (!persistedGame.matchesRevision(readRevisionKeyOrNull(gameName))) return false;
+            gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame.state()));
+            return true;
+        });
+    }
+
+    @Nullable
+    private static String readRevisionKeyOrNull(String gameName) {
+        try {
+            return GameRevisionKeyFile.read(gameName);
+        } catch (UncheckedIOException e) {
+            return null;
+        }
     }
 
     private static GameLoadResult buildManagedGameFromGameFile(String gameName) {
@@ -148,6 +171,18 @@ public class GameManager {
                         + ". A bothelper can run `/bothelper reload_game` on each to restore it from its latest undo."
                         + " The stack trace is from " + firstCorruptGameName + ".",
                 corruptGames.get(firstCorruptGameName).cause());
+    }
+
+    private static void reportGamesThatFailedWarmup(Map<String, Exception> failedGames) {
+        if (failedGames.isEmpty()) return;
+        List<String> failedGameNames = failedGames.keySet().stream().sorted().toList();
+        String firstFailedGameName = failedGameNames.getFirst();
+        BotLogger.error(
+                "Could not build " + StringHelper.pluralize(failedGameNames.size(), "managed game")
+                        + " at startup: " + String.join(", ", failedGameNames)
+                        + ". They stay unloaded until they are next accessed. The stack trace is from "
+                        + firstFailedGameName + ".",
+                failedGames.get(firstFailedGameName));
     }
 
     @Nullable

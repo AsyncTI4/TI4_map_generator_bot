@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -59,6 +60,30 @@ class GameDatabaseReconcilerTest {
             fixture.logs.verify(() -> BotLogger.logCron(argThat(message ->
                     message.contains("in sync with all 1 games") && message.contains("for 1 unchanged game"))));
             fixture.logs.verify(() -> BotLogger.error(anyString()), never());
+        }
+    }
+
+    @Test
+    void legacyFileIsReconciledInTheSameRunThatBackfillsItsKey() {
+        try (Fixture fixture = new Fixture()) {
+            GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
+            fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
+            fixture.loadsSnapshot("legacy", current);
+            fixture.manager.when(() -> GameManager.readRevisionKey("legacy")).thenReturn(null);
+            // Writing the key line moves the file's modification time past the start of the run.
+            AtomicLong lastModified = new AtomicLong();
+            when(fixture.file.lastModified()).thenAnswer(_ -> lastModified.get());
+            fixture.manager
+                    .when(() -> GameManager.backfillRevisionKey("legacy"))
+                    .thenAnswer(_ -> {
+                        lastModified.set(System.currentTimeMillis() + 60_000);
+                        return "revision";
+                    });
+
+            fixture.run();
+
+            // The reconciler's own key write is not a concurrent save, so the row is brought up to date now.
+            verify(fixture.persistence).updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
         }
     }
 

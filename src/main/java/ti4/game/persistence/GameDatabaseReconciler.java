@@ -84,13 +84,15 @@ public class GameDatabaseReconciler {
                 existingGameNames.add(gameName);
                 return;
             }
+            long unchangedSince = startedAt;
             if (fileRevisionKey == null) {
                 GameManager.backfillRevisionKey(gameName);
+                unchangedSince = Math.max(startedAt, lastModified(gameName));
             }
             Game game = loadGameFile(gameName, failures);
             if (game == null) return;
             existingGameNames.add(gameName);
-            if (wasChangedAfter(gameName, startedAt)) return;
+            if (wasChangedAfter(gameName, unchangedSince)) return;
             reconcileGame(game, persistedState, persistenceService, failures, () -> revisionBackfills++)
                     .ifPresent(discrepancies::add);
         }
@@ -217,7 +219,11 @@ public class GameDatabaseReconciler {
     }
 
     private static boolean wasChangedAfter(String gameName, long timestamp) {
-        return Storage.getGameFile(gameName + Constants.TXT).lastModified() > timestamp;
+        return lastModified(gameName) > timestamp;
+    }
+
+    private static long lastModified(String gameName) {
+        return Storage.getGameFile(gameName + Constants.TXT).lastModified();
     }
 
     private static boolean gameFileExists(String gameName) {

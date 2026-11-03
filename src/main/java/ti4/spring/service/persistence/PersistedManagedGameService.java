@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.game.persistence.ManagedGameState;
 import ti4.spring.context.SpringContext;
@@ -20,7 +21,7 @@ public class PersistedManagedGameService {
     private final GameEntityRepository gameEntityRepository;
     private final GameParticipantEntityRepository gameParticipantEntityRepository;
 
-    @Transactional(readOnly = true, timeout = WARMUP_READ_TIMEOUT_SECONDS)
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ, timeout = WARMUP_READ_TIMEOUT_SECONDS)
     public Map<String, PersistedManagedGame> loadAll() {
         Map<String, List<ManagedGameState.Participant>> participantsByGame =
                 gameParticipantEntityRepository.findAllRows().stream()
