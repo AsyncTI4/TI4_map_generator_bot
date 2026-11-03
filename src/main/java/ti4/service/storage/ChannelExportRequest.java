@@ -1,5 +1,6 @@
 package ti4.service.storage;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -7,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 public record ChannelExportRequest(
@@ -26,6 +28,14 @@ public record ChannelExportRequest(
 
     public static String newExportId(Instant now) {
         return EXPORT_ID_FORMAT.format(now);
+    }
+
+    public static Optional<Instant> parseExportId(String exportId) {
+        try {
+            return Optional.of(Instant.from(EXPORT_ID_FORMAT.parse(exportId)));
+        } catch (DateTimeException e) {
+            return Optional.empty();
+        }
     }
 
     public static Map<String, String> resumeDispatchPayload(

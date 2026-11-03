@@ -36,11 +36,14 @@ class ChannelExportLookup {
                 .setRequired(false);
     }
 
+    static boolean isStorageConfigured(SlashCommandInteractionEvent event) {
+        if (Storage.getStoragePath() != null) return true;
+        MessageHelper.sendMessageToEventChannel(event, "Storage path is not configured; exports cannot be found.");
+        return false;
+    }
+
     static Optional<ChannelExportLocation> findForEvent(SlashCommandInteractionEvent event) {
-        if (Storage.getStoragePath() == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Storage path is not configured; exports cannot be found.");
-            return Optional.empty();
-        }
+        if (!isStorageConfigured(event)) return Optional.empty();
         String exportId = event.getOption(Constants.EXPORT_ID, "", OptionMapping::getAsString)
                 .trim();
         if (!ChannelExportLocation.isValidExportId(exportId)) {
