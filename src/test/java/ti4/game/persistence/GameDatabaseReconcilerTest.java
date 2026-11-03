@@ -11,11 +11,15 @@ import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import ti4.game.Game;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
+import ti4.spring.service.persistence.GameEntity;
+import ti4.spring.service.persistence.GameEntityMapper;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
+import ti4.spring.service.persistence.GameEntitySnapshot;
 import ti4.spring.service.persistence.PersistedGameState;
 import ti4.spring.service.persistence.PersistedGameStateService;
 import ti4.spring.service.persistence.UnreferencedUserService;
@@ -32,8 +36,58 @@ class GameDatabaseReconcilerTest {
             fixture.run();
 
             verifyNoInteractions(fixture.persistence);
-            fixture.logs.verify(() -> BotLogger.error(contains("game file may be corrupt")));
+            // Kept corrupt games get one warning of their own, not an error-level "out of sync" report.
+            fixture.logs.verify(() -> BotLogger.warning(contains("1 game whose game files could not be loaded")));
+            fixture.logs.verify(() -> BotLogger.logCron(contains("in sync with all 1 games")));
+            fixture.logs.verify(() -> BotLogger.error(anyString()), never());
         }
+    }
+
+    @Test
+    void rowWithMatchingContentButStaleRevisionIsBackfilledQuietly() {
+        try (Fixture fixture = new Fixture()) {
+            GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
+            fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
+            fixture.loadsSnapshot("legacy", current);
+
+            fixture.run();
+
+            verify(fixture.persistence).updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
+            verify(fixture.persistence, never()).restore(any());
+            verify(fixture.persistence, never()).replace(any());
+            fixture.logs.verify(() -> BotLogger.logCron(argThat(message ->
+                    message.contains("in sync with all 1 games") && message.contains("for 1 unchanged game"))));
+            fixture.logs.verify(() -> BotLogger.error(anyString()), never());
+        }
+    }
+
+    @Test
+    void differingContentIsRestoredWithoutOverwritingUserNames() {
+        try (Fixture fixture = new Fixture()) {
+            GameEntitySnapshot current = snapshot("changed", "revision", GameEntityMapper.MAPPING_VERSION);
+            current.game().setRound(5);
+            fixture.persisted.put("changed", PersistedGameState.of(snapshot("changed", null, null)));
+            fixture.loadsSnapshot("changed", current);
+
+            fixture.run();
+
+            verify(fixture.persistence).restore(current);
+            verify(fixture.persistence, never()).replace(any());
+            verify(fixture.persistence, never()).updateRevision(anyString(), anyString(), any());
+            // Only real content differences are listed; the stale revision columns are not.
+            fixture.logs.verify(() -> BotLogger.error(argThat(message -> message.contains("round (expected 5, found 1)")
+                    && !message.contains("revisionKey")
+                    && !message.contains("mappingVersion"))));
+        }
+    }
+
+    private static GameEntitySnapshot snapshot(String gameName, String revisionKey, Integer mappingVersion) {
+        GameEntity game = new GameEntity();
+        game.setGameName(gameName);
+        game.setRound(1);
+        game.setRevisionKey(revisionKey);
+        game.setMappingVersion(mappingVersion);
+        return new GameEntitySnapshot(game, List.of(), List.of());
     }
 
     @Test
@@ -198,6 +252,7 @@ class GameDatabaseReconcilerTest {
         private final MockedStatic<Storage> storage = mockStatic(Storage.class);
         private final MockedStatic<DatabasePersistenceGate> gate = mockStatic(DatabasePersistenceGate.class);
         private final MockedStatic<BotLogger> logs = mockStatic(BotLogger.class);
+        private final MockedStatic<GameEntityMapper> mapper = mockStatic(GameEntityMapper.class);
         private final GameEntityPersistenceService persistence = mock(GameEntityPersistenceService.class);
         private final PersistedGameStateService states = mock(PersistedGameStateService.class);
         private final UnreferencedUserService users = mock(UnreferencedUserService.class);
@@ -215,6 +270,18 @@ class GameDatabaseReconcilerTest {
             when(states.loadAll()).thenReturn(persisted);
         }
 
+        private void loadsSnapshot(String gameName, GameEntitySnapshot snapshot) {
+            Game game = mock(Game.class);
+            when(game.getName()).thenReturn(gameName);
+            when(file.exists()).thenReturn(true);
+            manager.when(GameManager::getGameNames).thenReturn(List.of(gameName));
+            manager.when(() -> GameManager.readRevisionKey(gameName))
+                    .thenReturn(snapshot.game().getRevisionKey());
+            loader.when(() -> GameLoadService.load(gameName)).thenReturn(game);
+            mapper.when(() -> GameEntityMapper.shouldPersist(game)).thenReturn(true);
+            mapper.when(() -> GameEntityMapper.toSnapshot(game)).thenReturn(snapshot);
+        }
+
         private void run() {
             var run = new GameDatabaseReconciler.Reconciliation();
             run.start().forEach(run::reconcile);
@@ -223,6 +290,7 @@ class GameDatabaseReconcilerTest {
 
         @Override
         public void close() {
+            mapper.close();
             logs.close();
             gate.close();
             storage.close();
