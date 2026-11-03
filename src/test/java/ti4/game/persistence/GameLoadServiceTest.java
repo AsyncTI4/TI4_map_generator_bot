@@ -39,7 +39,7 @@ class GameLoadServiceTest extends BaseTi4Test {
             assertThat(GameLoadService.load(harness.getGameName())).isNull();
             assertThat(GameLoadService.load(harness.getGameName())).isNull();
 
-            botLogger.verify(() -> BotLogger.error(contains(harness.getGameName()), any(Throwable.class)), times(1));
+            botLogger.verify(() -> BotLogger.critical(contains(harness.getGameName()), any(Throwable.class)), times(1));
         }
     }
 }

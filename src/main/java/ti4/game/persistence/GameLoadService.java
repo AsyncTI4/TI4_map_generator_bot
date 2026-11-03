@@ -121,7 +121,7 @@ class GameLoadService {
             return game;
         } catch (Exception e) {
             if (reportedUnreadableFiles.add(gameFile.getName())) {
-                BotLogger.error(
+                BotLogger.critical(
                         "The game file " + gameFile.getName() + " could not be loaded and may be corrupt."
                                 + " A bothelper can run `/bothelper reload_game` to restore it from its latest undo.",
                         e);
