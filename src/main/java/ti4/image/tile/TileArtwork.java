@@ -47,26 +47,28 @@ final class TileArtwork {
         return ImageHelper.read(ImageResources.tilePath(tile));
     }
 
-    private static BufferedImage hyperlaneImage(TileScene scene, Tile tile) {
+    static BufferedImage hyperlaneImage(TileScene scene, Tile tile) {
         HyperlaneView view = scene.hyperlanes();
         String matrix = scene.game().getCustomHyperlaneData().get(tile.getPosition());
         String drawn = matrix;
         String backgroundSeed = matrix;
         boolean lanesHidden = false;
-        if (matrix != null && view.hidesUnseenLanes()) {
+        if (view.hidesUnseenLanes()) {
             backgroundSeed = tile.getPosition();
-            drawn = lanesThePlayerSees(scene, view, tile, matrix);
-            lanesHidden = !CustomHyperlaneService.formatMatrix(CustomHyperlaneService.parseMatrix(matrix))
-                    .equals(drawn);
+            if (scene.hidesFogged(tile)) {
+                drawn = CustomHyperlaneService.formatMatrix(new int[6][6]);
+                lanesHidden = true;
+            } else if (matrix != null) {
+                drawn = lanesThePlayerSees(view, tile, matrix);
+                lanesHidden = !CustomHyperlaneService.formatMatrix(CustomHyperlaneService.parseMatrix(matrix))
+                        .equals(drawn);
+            }
         }
         HyperlaneStyle style = CustomHyperlaneService.hasOneWayLanes(drawn) ? view.style() : HyperlaneStyle.DASHED;
         return HyperlaneTileGenerator.generateHyperlaneTile(tile, backgroundSeed, drawn, lanesHidden, style);
     }
 
-    private static String lanesThePlayerSees(TileScene scene, HyperlaneView view, Tile tile, String matrix) {
-        if (scene.hidesFogged(tile)) {
-            return CustomHyperlaneService.onlyLanes(matrix, tile.getPosition(), Set.of());
-        }
+    private static String lanesThePlayerSees(HyperlaneView view, Tile tile, String matrix) {
         if (view.revealedPositions().contains(tile.getPosition())) {
             return CustomHyperlaneService.formatMatrix(CustomHyperlaneService.parseMatrix(matrix));
         }

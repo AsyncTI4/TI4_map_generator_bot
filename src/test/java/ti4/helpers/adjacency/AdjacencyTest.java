@@ -16,6 +16,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.model.MapPositionMapper;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 // Board: game-with-border-anomalies with a gravity wave on one edge of 101, so the link runs 101 -> neighbour.
@@ -106,6 +107,44 @@ class AdjacencyTest extends BaseTi4Test {
         // the lanes a player's vision runs along, for "Hide unseen hyperlanes"
         assertThat(GridRule.hyperlaneLanesFrom(game, null, entry)).containsExactly("000:0:3");
         assertThat(GridRule.hyperlaneLanesFrom(game, null, exit)).isEmpty();
+    }
+
+    // FoW+ and Hide Unexplored Map gate entry into a hyperlane by the entered side's own lanes, so a one-way
+    // lane is still usable in its direction (the gate used to look at the lanes leaving by that side).
+    @Test
+    void oneWayHyperlaneWorksWithHideUnexploredMap() {
+        game.setBorderAnomalies(new ArrayList<>());
+        game.setTile(new Tile("hl", "000"));
+        CustomHyperlaneService.insertData(
+                game, "000", "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        List<String> around = MapPositionMapper.getAdjacentTilePositions("000");
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_MAP, true);
+
+        assertThat(Adjacency.of(game).forMovement().from(around.get(0))).contains(around.get(3));
+        assertThat(Adjacency.of(game).forMovement().from(around.get(3))).doesNotContain(around.get(0));
+    }
+
+    // Off mode counts each one-way lane both ways for effects, also through a chain of hyperlanes whose lanes
+    // point against each other (000 runs N -> S, the hyperlane south of it S -> N); movement still can't pass.
+    @Test
+    void offModeEffectsReadChainedOneWayHyperlanesBothWays() {
+        game.setBorderAnomalies(new ArrayList<>());
+        String south = MapPositionMapper.getAdjacentTilePositions("000").get(3);
+        game.setTile(new Tile("hl", "000"));
+        game.setTile(new Tile("hl", south));
+        CustomHyperlaneService.insertData(
+                game, "000", "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        CustomHyperlaneService.insertData(
+                game, south, "0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;2,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        String north = MapPositionMapper.getAdjacentTilePositions("000").get(0);
+        String farSouth = MapPositionMapper.getAdjacentTilePositions(south).get(3);
+
+        assertThat(Adjacency.of(game).forEffects().from(north)).contains(farSouth);
+        assertThat(Adjacency.of(game).forEffects().into(farSouth)).contains(north);
+        assertThat(Adjacency.of(game).forMovement().from(north)).doesNotContain(farSouth);
+        game.setOneWayAdjacency(true);
+        assertThat(Adjacency.of(game).forEffects().from(north)).doesNotContain(farSouth);
     }
 
     // /map add_custom_adjacent_tiles primary:P adjacent:X links P -> X; movement follows it in every mode.
