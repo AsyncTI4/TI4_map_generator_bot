@@ -67,6 +67,7 @@ public class GameManager {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
                 Map<String, PersistedManagedGame> persistedGames = loadPersistedManagedGames();
+                DatabaseWarmupCheck databaseCheck = DatabaseWarmupCheck.fromSettings();
                 Map<String, GameLoadResult.Corrupt> corruptGames = new ConcurrentHashMap<>();
                 Map<String, Exception> failedGames = new ConcurrentHashMap<>();
                 AtomicInteger builtFromDatabase = new AtomicInteger();
@@ -75,7 +76,7 @@ public class GameManager {
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
                     gameNames.forEach(name -> executorService.submit(() -> {
                         try {
-                            boolean fromDatabase = warmupManagedGame(name, persistedGames, corruptGames);
+                            boolean fromDatabase = warmupManagedGame(name, persistedGames, corruptGames, databaseCheck);
                             (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
                         } catch (Exception e) {
                             failedGames.put(name, e);
@@ -84,6 +85,9 @@ public class GameManager {
                 }
                 reportCorruptGamesFoundAtWarmup(corruptGames);
                 reportGamesThatFailedWarmup(failedGames);
+                if (persistedGames != null) {
+                    databaseCheck.report();
+                }
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
                         "FINISHED BUILDING MANAGED GAMES: %,d FROM THE DATABASE, %,d FROM GAME FILES",
@@ -116,14 +120,18 @@ public class GameManager {
     static boolean warmupManagedGame(
             String gameName,
             @Nullable Map<String, PersistedManagedGame> persistedGames,
-            Map<String, GameLoadResult.Corrupt> corruptGames) {
+            Map<String, GameLoadResult.Corrupt> corruptGames,
+            DatabaseWarmupCheck databaseCheck) {
         PersistedManagedGame persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
-        if (persistedGame != null && buildManagedGameFromCurrentRow(gameName, persistedGame)) {
+        if (persistedGame != null
+                && databaseCheck.readsEnabled()
+                && buildManagedGameFromCurrentRow(gameName, persistedGame)) {
             return true;
         }
         switch (buildManagedGameFromGameFile(gameName)) {
-            case GameLoadResult.Loaded _ -> {
-                if (persistedGames != null) {
+            case GameLoadResult.Loaded(Game game) -> {
+                if (persistedGames != null
+                        && !databaseCheck.rowMatchesFile(gameName, persistedGame, ManagedGameState.of(game))) {
                     GameDatabaseSyncPipeline.queueSyncFromGameFile(gameName);
                 }
             }
