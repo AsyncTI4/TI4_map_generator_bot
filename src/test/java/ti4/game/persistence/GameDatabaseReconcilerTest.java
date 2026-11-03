@@ -38,8 +38,8 @@ class GameDatabaseReconcilerTest {
             fixture.run();
 
             verifyNoInteractions(fixture.persistence);
-            // Kept corrupt games get one warning of their own, not an error-level "out of sync" report.
-            fixture.logs.verify(() -> BotLogger.warning(contains("1 game whose game files could not be loaded")));
+            // Kept corrupt games get one critical report of their own, not a place in the "out of sync" list.
+            fixture.logs.verify(() -> BotLogger.critical(contains("1 game whose game files could not be loaded")));
             fixture.logs.verify(() -> BotLogger.logCron(contains("in sync with all 1 games")));
             fixture.logs.verify(() -> BotLogger.error(anyString()), never());
         }

@@ -190,7 +190,7 @@ public class GameDatabaseReconciler {
 
     private static void reportUnloadableGames(List<String> gameNames) {
         if (gameNames.isEmpty()) return;
-        BotLogger.warning(StringUtils.abbreviate(
+        BotLogger.critical(StringUtils.abbreviate(
                 String.format(
                         "%s kept the database rows of %s whose game files could not be loaded"
                                 + " (they may be corrupt): %s",
