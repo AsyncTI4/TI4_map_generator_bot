@@ -42,7 +42,7 @@ public class GameDatabaseSyncPipeline {
             GameManager.backfillRevisionKey(gameName);
             Game game = GameManager.loadGameFile(gameName);
             if (game == null) return;
-            service.replace(GameEntityMapper.toSnapshot(game));
+            service.restore(GameEntityMapper.toSnapshot(game));
         });
     }
 

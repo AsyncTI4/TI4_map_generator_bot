@@ -56,6 +56,22 @@ class PersistedGameStateTest {
     }
 
     @Test
+    void staleRevisionColumnsAreNotContentDifferences() {
+        GameEntity current = game(4);
+        current.setRevisionKey("revision");
+        current.setMappingVersion(GameEntityMapper.MAPPING_VERSION);
+        // A row written before revision keys existed has neither column set.
+        GameEntity legacy = game(4);
+
+        PersistedGameState currentState = PersistedGameState.of(current, List.of(), List.of(), List.of());
+        PersistedGameState legacyState = PersistedGameState.of(legacy, List.of(), List.of(), List.of());
+
+        assertThat(currentState.describeDifferencesFrom(legacyState)).isEmpty();
+        assertThat(currentState.hasSameRevisionColumnsAs(legacyState)).isFalse();
+        assertThat(currentState.hasSameRevisionColumnsAs(currentState)).isTrue();
+    }
+
+    @Test
     void revisionMatchRequiresBothSourceAndMappingVersions() {
         GameEntity entity = game(1);
         entity.setRevisionKey("revision-a");

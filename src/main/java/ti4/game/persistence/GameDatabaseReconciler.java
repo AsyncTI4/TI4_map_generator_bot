@@ -43,12 +43,14 @@ public class GameDatabaseReconciler {
     static final class Reconciliation implements GameDatabaseReconciliationChain.Run {
 
         private final List<String> discrepancies = new ArrayList<>();
+        private final List<String> unloadableGameNames = new ArrayList<>();
         private final Failures failures = new Failures();
         private final Set<String> existingGameNames = new HashSet<>();
         private long startedAt;
         private Map<String, PersistedGameState> persistedStates;
         private GameEntityPersistenceService persistenceService;
         private int gameCount;
+        private int revisionBackfills;
 
         @Override
         public List<String> start() {
@@ -89,7 +91,8 @@ public class GameDatabaseReconciler {
             if (game == null) return;
             existingGameNames.add(gameName);
             if (wasChangedAfter(gameName, startedAt)) return;
-            reconcileGame(game, persistedState, persistenceService, failures).ifPresent(discrepancies::add);
+            reconcileGame(game, persistedState, persistenceService, failures, () -> revisionBackfills++)
+                    .ifPresent(discrepancies::add);
         }
 
         @Override
@@ -97,10 +100,7 @@ public class GameDatabaseReconciler {
             for (String persistedGameName : persistedStates.keySet()) {
                 if (existingGameNames.contains(persistedGameName)) continue;
                 if (gameFileExists(persistedGameName)) {
-                    discrepancies.add(describe(
-                            persistedGameName,
-                            "in the database but its game file could not be loaded"
-                                    + " (not repaired: the game file may be corrupt)"));
+                    unloadableGameNames.add(persistedGameName);
                     continue;
                 }
                 discrepancies.add(repair(
@@ -112,7 +112,8 @@ public class GameDatabaseReconciler {
 
             Optional<String> userCleanup = reconcileUnreferencedUsers();
 
-            report(discrepancies, userCleanup, gameCount, failures);
+            reportUnloadableGames(unloadableGameNames);
+            report(discrepancies, userCleanup, gameCount, revisionBackfills, failures);
         }
     }
 
@@ -145,21 +146,54 @@ public class GameDatabaseReconciler {
             Game game,
             PersistedGameState persistedState,
             GameEntityPersistenceService persistenceService,
-            Failures failures) {
+            Failures failures,
+            Runnable onRevisionBackfilled) {
         String gameName = game.getName();
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
         if (persistedState == null) {
             return Optional.of(repair(
-                    gameName, "missing from the database", () -> persistenceService.replace(snapshot), failures));
+                    gameName, "missing from the database", () -> persistenceService.restore(snapshot), failures));
         }
 
-        List<String> differences = PersistedGameState.of(snapshot).describeDifferencesFrom(persistedState);
-        if (differences.isEmpty()) return Optional.empty();
+        PersistedGameState expectedState = PersistedGameState.of(snapshot);
+        List<String> differences = expectedState.describeDifferencesFrom(persistedState);
+        if (differences.isEmpty()) {
+            if (!expectedState.hasSameRevisionColumnsAs(persistedState)) {
+                backfillRevision(snapshot, persistenceService, failures, onRevisionBackfilled);
+            }
+            return Optional.empty();
+        }
         return Optional.of(repair(
                 gameName,
                 "differs in " + String.join("; ", differences),
-                () -> persistenceService.replace(snapshot),
+                () -> persistenceService.restore(snapshot),
                 failures));
+    }
+
+    private static void backfillRevision(
+            GameEntitySnapshot snapshot,
+            GameEntityPersistenceService persistenceService,
+            Failures failures,
+            Runnable onRevisionBackfilled) {
+        if (DatabasePersistenceGate.isDisabled()) return;
+        String gameName = snapshot.game().getGameName();
+        try {
+            persistenceService.updateRevision(
+                    gameName, snapshot.game().getRevisionKey(), snapshot.game().getMappingVersion());
+            onRevisionBackfilled.run();
+        } catch (Exception e) {
+            failures.record(gameName, e);
+        }
+    }
+
+    private static void reportUnloadableGames(List<String> gameNames) {
+        if (gameNames.isEmpty()) return;
+        BotLogger.warning(StringUtils.abbreviate(
+                String.format(
+                        "%s kept the database rows of %s whose game files could not be loaded"
+                                + " (they may be corrupt): %s",
+                        TASK_NAME, StringHelper.pluralize(gameNames.size(), "game"), String.join(", ", gameNames)),
+                MAX_REPORT_LENGTH));
     }
 
     private static Optional<String> reconcileUnreferencedUsers() {
@@ -216,12 +250,17 @@ public class GameDatabaseReconciler {
     }
 
     private static void report(
-            List<String> discrepancies, Optional<String> userCleanup, int gameCount, Failures failures) {
+            List<String> discrepancies,
+            Optional<String> userCleanup,
+            int gameCount,
+            int revisionBackfills,
+            Failures failures) {
         if (!failures.isEmpty()) {
             BotLogger.error(failures.summary(), failures.firstCause);
         }
         if (discrepancies.isEmpty()) {
-            String inSync = String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount);
+            String inSync = String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount)
+                    + describeRevisionBackfills(revisionBackfills);
             BotLogger.logCron(
                     userCleanup.map(cleanup -> inSync + "\n- " + cleanup).orElse(inSync));
             return;
@@ -231,7 +270,8 @@ public class GameDatabaseReconciler {
                 "**%s found %s out of sync with their game files and updated the database:**",
                 TASK_NAME, StringHelper.pluralize(discrepancies.size(), "game")));
         int cleanupLength = userCleanup.map(cleanup -> cleanup.length() + 3).orElse(0);
-        int reportLimit = MAX_REPORT_LENGTH - cleanupLength - 40;
+        String backfills = describeRevisionBackfills(revisionBackfills);
+        int reportLimit = MAX_REPORT_LENGTH - cleanupLength - backfills.length() - 40;
         int reported = 0;
         for (String discrepancy : discrepancies) {
             if (report.length() + discrepancy.length() + 3 > reportLimit) break;
@@ -242,6 +282,14 @@ public class GameDatabaseReconciler {
             report.append(String.format("\n...and %,d more.", discrepancies.size() - reported));
         }
         userCleanup.ifPresent(cleanup -> report.append("\n- ").append(cleanup));
+        if (!backfills.isEmpty()) report.append("\n").append(backfills.strip());
         BotLogger.error(report.toString());
+    }
+
+    private static String describeRevisionBackfills(int revisionBackfills) {
+        if (revisionBackfills == 0) return "";
+        return String.format(
+                " Recorded the current revision key and mapping version for %s.",
+                StringHelper.pluralize(revisionBackfills, "unchanged game"));
     }
 }

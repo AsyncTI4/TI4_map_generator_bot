@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import ti4.game.persistence.ManagedGameState;
 
 public record PersistedGameState(
@@ -73,6 +74,8 @@ public record PersistedGameState(
 
     public record TitleRow(String userId, String title) {}
 
+    private static final Set<String> REVISION_COLUMNS = Set.of("revisionKey", "mappingVersion");
+
     public boolean matchesRevision(String revision) {
         return revision != null
                 && !revision.isBlank()
@@ -110,6 +113,11 @@ public record PersistedGameState(
         return new PersistedGameState(toGameColumns(game), playerRows, participantRows, titleRows);
     }
 
+    public boolean hasSameRevisionColumnsAs(PersistedGameState actual) {
+        return Objects.equals(game.revisionKey(), actual.game.revisionKey())
+                && Objects.equals(game.mappingVersion(), actual.game.mappingVersion());
+    }
+
     public List<String> describeDifferencesFrom(PersistedGameState actual) {
         List<String> differences = new ArrayList<>();
         List<String> differingColumns = differingComponents(game, actual.game);
@@ -137,6 +145,7 @@ public record PersistedGameState(
     private static List<String> differingComponents(Record expected, Record actual) {
         List<String> differing = new ArrayList<>();
         for (RecordComponent component : expected.getClass().getRecordComponents()) {
+            if (REVISION_COLUMNS.contains(component.getName())) continue;
             Object expectedValue = componentValue(component, expected);
             Object actualValue = componentValue(component, actual);
             if (!Objects.equals(expectedValue, actualValue)) {
