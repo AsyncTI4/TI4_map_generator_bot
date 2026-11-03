@@ -63,8 +63,16 @@ public class GameDatabaseReconciler {
 
         @Override
         public void reconcile(String gameName) {
+            try {
+                reconcileOrSkip(gameName);
+            } catch (Exception e) {
+                failures.record(gameName, e);
+            }
+        }
+
+        private void reconcileOrSkip(String gameName) {
             PersistedGameState persistedState = persistedStates.get(gameName);
-            if (isUnchangedSinceLastSync(gameName, persistedState, failures)) {
+            if (isUnchangedSinceLastSync(gameName, persistedState)) {
                 existingGameNames.add(gameName);
                 return;
             }
@@ -104,9 +112,8 @@ public class GameDatabaseReconciler {
         }
     }
 
-    private static boolean isUnchangedSinceLastSync(
-            String gameName, PersistedGameState persistedState, Failures failures) {
-        return matchesManagedRevision(gameName, persistedState, failures)
+    private static boolean isUnchangedSinceLastSync(String gameName, PersistedGameState persistedState) {
+        return matchesManagedRevision(gameName, persistedState)
                 && persistedState.matchesGameFile(gameFileStamp(gameName));
     }
 
@@ -135,16 +142,10 @@ public class GameDatabaseReconciler {
         }
     }
 
-    private static boolean matchesManagedRevision(
-            String gameName, PersistedGameState persistedState, Failures failures) {
+    private static boolean matchesManagedRevision(String gameName, PersistedGameState persistedState) {
         if (persistedState == null) return false;
-        try {
-            ManagedGame managedGame = GameManager.getManagedGame(gameName);
-            return managedGame != null && persistedState.matchesRevision(managedGame.getRevisionKey());
-        } catch (Exception e) {
-            failures.record(gameName, e);
-            return false;
-        }
+        ManagedGame managedGame = GameManager.getLoadedManagedGame(gameName);
+        return managedGame != null && persistedState.matchesRevision(managedGame.getRevisionKey());
     }
 
     private static Optional<String> reconcileGame(

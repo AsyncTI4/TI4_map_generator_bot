@@ -351,6 +351,11 @@ public class GameManager {
     }
 
     @Nullable
+    public static ManagedGame getLoadedManagedGame(String gameName) {
+        return gameNameToManagedGame.get(gameName);
+    }
+
+    @Nullable
     public static ManagedGame getManagedGame(String gameName) {
         if (!isValid(gameName)) return null;
         ManagedGame managedGame = gameNameToManagedGame.get(gameName);

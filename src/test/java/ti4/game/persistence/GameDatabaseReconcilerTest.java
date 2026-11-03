@@ -57,6 +57,29 @@ class GameDatabaseReconcilerTest {
     }
 
     @Test
+    void oneFailingGameIsReportedWithoutStoppingTheRun() {
+        try (Fixture fixture = new Fixture()) {
+            PersistedGameState failing = mock(PersistedGameState.class);
+            when(failing.matchesRevision(anyString())).thenThrow(new IllegalStateException("mapping bug"));
+            fixture.persisted.put("failing", failing);
+            fixture.persisted.put("deleted", mock(PersistedGameState.class));
+            ManagedGame managedGame = mock(ManagedGame.class);
+            when(managedGame.getRevisionKey()).thenReturn("revision");
+            fixture.manager
+                    .when(() -> GameManager.getLoadedManagedGame("failing"))
+                    .thenReturn(managedGame);
+            fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("failing"));
+
+            fixture.run();
+
+            // The run still reaches finish(): the orphaned row is deleted and the failure is reported once.
+            verify(fixture.persistence).delete("deleted");
+            fixture.logs.verify(
+                    () -> BotLogger.error(contains("hit errors on 1 game"), any(Throwable.class)), times(1));
+        }
+    }
+
+    @Test
     void missingFileDeletesItsOrphanedRows() {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("deleted", mock(PersistedGameState.class));
@@ -121,7 +144,9 @@ class GameDatabaseReconcilerTest {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
             ManagedGame managedGame = mock(ManagedGame.class);
             when(managedGame.getRevisionKey()).thenReturn("revision");
-            fixture.manager.when(() -> GameManager.getManagedGame("unchanged")).thenReturn(managedGame);
+            fixture.manager
+                    .when(() -> GameManager.getLoadedManagedGame("unchanged"))
+                    .thenReturn(managedGame);
             when(state.matchesRevision("revision")).thenReturn(true);
             // The game file is unchanged since the row was written, so only its stamp is read.
             when(state.matchesGameFile(any())).thenReturn(true);
@@ -139,7 +164,9 @@ class GameDatabaseReconcilerTest {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
             ManagedGame managedGame = mock(ManagedGame.class);
             when(managedGame.getRevisionKey()).thenReturn("new-revision");
-            fixture.manager.when(() -> GameManager.getManagedGame("changed")).thenReturn(managedGame);
+            fixture.manager
+                    .when(() -> GameManager.getLoadedManagedGame("changed"))
+                    .thenReturn(managedGame);
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
             fixture.manager.verify(() -> GameManager.loadGameFile("changed"));
@@ -147,20 +174,19 @@ class GameDatabaseReconcilerTest {
     }
 
     @Test
-    void failedManagedLookupFallsBackToReadOnlyLoadingAndContinues() {
+    void gameNotLoadedInMemoryFallsBackToReadOnlyLoadingAndContinues() {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("broken", mock(PersistedGameState.class));
             PersistedGameState healthy = mock(PersistedGameState.class);
             fixture.persisted.put("healthy", healthy);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("broken", "healthy"));
-            fixture.manager
-                    .when(() -> GameManager.getManagedGame("broken"))
-                    .thenThrow(new IllegalStateException("unreadable game"));
             ManagedGame managedGame = mock(ManagedGame.class);
             when(managedGame.getRevisionKey()).thenReturn("revision");
             when(healthy.matchesRevision("revision")).thenReturn(true);
             when(healthy.matchesGameFile(any())).thenReturn(true);
-            fixture.manager.when(() -> GameManager.getManagedGame("healthy")).thenReturn(managedGame);
+            fixture.manager
+                    .when(() -> GameManager.getLoadedManagedGame("healthy"))
+                    .thenReturn(managedGame);
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
