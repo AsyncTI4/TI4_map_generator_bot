@@ -26,7 +26,7 @@ class MappingFingerprintTest extends BaseTi4Test {
     // Warmup trusts a stored row, and the nightly reconcile skips a game, only while the row's mapping_version
     // equals GameEntityMapper.MAPPING_VERSION. So any change to what gets stored for a game must raise
     // MAPPING_VERSION, or rows written by the old code are kept forever for games that are never saved again.
-    // ManagedGameStateVersionTest catches added or removed fields. This test catches changed values: it builds
+    // MappingShapeFingerprintTest catches every structural change. This test catches changed values: it builds
     // the stored state of fixture games, serializes it with MAPPING_VERSION, and compares the hash with the one
     // recorded for that version. It only sees logic that the fixtures exercise, so add a variant when you add a
     // derived value.
