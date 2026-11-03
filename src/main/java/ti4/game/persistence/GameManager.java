@@ -20,6 +20,8 @@ import ti4.discord.JdaService;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
 import ti4.service.persistence.GameDatabaseSyncPipeline;
@@ -77,14 +79,39 @@ public class GameManager {
 
     @Nullable
     static Game get(String gameName) {
+        ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
         Game game = GameLoadService.load(gameName);
-        if (game == null) {
-            handleManagedGameRemoval(gameName);
+        if (game != null) return game;
+        if (gameFileExists(gameName)) {
+            handleCorruptGame(gameName, cachedManagedGame);
+        } else {
+            handleMissingGame(gameName);
         }
-        return game;
+        return null;
     }
 
-    private static void handleManagedGameRemoval(String gameName) {
+    public static boolean isCorrupt(String gameName) {
+        return GameLoadService.isKnownUnreadable(gameName);
+    }
+
+    private static boolean gameFileExists(String gameName) {
+        return Storage.getGameFile(gameName + Constants.TXT).exists();
+    }
+
+    private static void handleCorruptGame(String gameName, ManagedGame managedGame) {
+        if (managedGame == null) return;
+        gameNameToManagedGame.computeIfPresent(gameName, (_, current) -> {
+            if (current != managedGame) return current;
+            managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
+            return null;
+        });
+    }
+
+    private static void handleMissingGame(String gameName) {
+        unregisterGameAndQueueDatabaseDelete(gameName);
+    }
+
+    private static void unregisterGameAndQueueDatabaseDelete(String gameName) {
         gameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
@@ -128,7 +155,7 @@ public class GameManager {
         if (!GameSaveService.delete(gameName)) {
             return false;
         }
-        handleManagedGameRemoval(gameName);
+        unregisterGameAndQueueDatabaseDelete(gameName);
         return true;
     }
 
@@ -180,12 +207,17 @@ public class GameManager {
     @Nullable
     public static Game reload(String gameName) {
         waitFor(gameNamesLoadedLatch);
+        ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
         }
         if (game == null) {
-            handleManagedGameRemoval(gameName);
+            if (gameFileExists(gameName)) {
+                handleCorruptGame(gameName, cachedManagedGame);
+            } else {
+                handleMissingGame(gameName);
+            }
             return null;
         }
         handleMissingMatchingManagedGame(game);

@@ -148,7 +148,8 @@ public class KnownCardsService {
                 continue;
             }
             embeds.add(new EmbedBuilder()
-                    .setTitle(target.getUserName() + " - " + target.getFactionNameOrColor())
+                    .setTitle(target.getUserName() + " " + target.getFactionEmoji() + " "
+                            + target.getFactionNameOrColor())
                     .setDescription(description)
                     .setColor(Color.GRAY)
                     .build());
@@ -167,7 +168,7 @@ public class KnownCardsService {
         if (sections.isEmpty()) {
             return "";
         }
-        return target.getFactionEmoji() + "\n" + String.join("\n\n", sections);
+        return String.join("\n\n", sections);
     }
 
     private static String section(Player target, KnownCardType type, List<KnownCard> knownCards) {
