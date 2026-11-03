@@ -310,5 +310,42 @@
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Y’gol na khal. Y’gol na keth. Y’gol na thuun."
+  },
+  {
+    "id": "deepagent",
+    "faction": "deep",
+    "type": "agent",
+    "name": "Nhal",
+    "title": "The First",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Exhaust this card and select another player, that player may explore a frontier token in or adjacent to a system containing one of their ships. If they do, you may place a frontier token in your home system.",
+    "unlockCondition": "Always Unlocked",
+    "source": "beans",
+    "flavorText": "Nhal speaks softly because The Deep has no need to shout."
+  },
+  {
+    "id": "deepcommander",
+    "faction": "deep",
+    "type": "commander",
+    "name": "Othuum",
+    "title": "The Last",
+    "abilityWindow": "Ongoing",
+    "abilityText": "Up to 1 of your non-fighter ships in each system that contains no planets does not count against your fleet pool.\n\nOther players must spend 1 influence to activate a system that contains no planets and 1 or more of your ships.",
+    "unlockCondition": "Have non-fighter ships in 3 systems that do not contain planets.",
+    "source": "beans",
+    "flavorText": "Others hold planets. Othuum holds everything between them."
+  },
+  {
+    "id": "deephero",
+    "faction": "deep",
+    "type": "hero",
+    "name": "Angdama",
+    "title": "The Deep",
+    "abilityName": "Inevitable Ruin - All-Consuming",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Replace The Deep planet card with The Deep, Ascended planet card and its ability card and ready them. For the rest of the game, abilities that refer to The Deep now refer to The Deep, Ascended. Then, purge this card.",
+    "unlockCondition": "Have 3 scored objectives.",
+    "source": "beans",
+    "flavorText": "The stars mistook its slumber for mercy."
   }
 ]

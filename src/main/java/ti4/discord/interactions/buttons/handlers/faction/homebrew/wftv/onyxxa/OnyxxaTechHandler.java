@@ -21,6 +21,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.GameMessage;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -176,9 +177,10 @@ public class OnyxxaTechHandler {
         Set<String> positions = new HashSet<>();
         Player activePlayer = game.getActivePlayer();
         if (activePlayer == null) return positions;
+        Adjacency adjacency = Adjacency.of(game, player).forEffects().withSelf();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(activePlayer, tile)) {
-                positions.addAll(FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true));
+                positions.addAll(adjacency.into(tile.getPosition()));
             }
         }
         return positions;

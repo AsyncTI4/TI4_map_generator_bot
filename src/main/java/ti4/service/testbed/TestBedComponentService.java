@@ -27,21 +27,33 @@ import ti4.service.option.FOWOptionService.FOWOption;
 @UtilityClass
 public class TestBedComponentService {
 
-    static final Map<String, BiConsumer<Game, Integer>> GAME_OPTIONS =
+    static final Map<String, BiConsumer<Game, Integer>> NUMBER_GAME_OPTIONS =
             Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMergeFrom);
+    static final Map<String, BiConsumer<Game, Boolean>> SWITCH_GAME_OPTIONS =
+            Map.of(Constants.ONE_WAY_ADJACENCY, Game::setOneWayAdjacency);
 
     static String gameOptionProblem(String key, String value) {
-        if (!GAME_OPTIONS.containsKey(key)) {
-            return "unknown game option `" + key + "`; use " + GAME_OPTIONS.keySet() + ".";
+        if (NUMBER_GAME_OPTIONS.containsKey(key)) {
+            return value.matches("[0-9]") ? null : "game option `" + key + "` takes a number from 0 to 9.";
         }
-        if (!value.matches("[0-9]")) {
-            return "game option `" + key + "` takes a number from 0 to 9.";
+        if (SWITCH_GAME_OPTIONS.containsKey(key)) {
+            return value.matches("true|false") ? null : "game option `" + key + "` takes `true` or `false`.";
         }
-        return null;
+        return "unknown game option `" + key + "`; use " + new TreeSet<>(gameOptionKeys()) + ".";
     }
 
     static void setGameOption(Game game, String key, String value) {
-        GAME_OPTIONS.get(key).accept(game, Integer.parseInt(value));
+        if (SWITCH_GAME_OPTIONS.containsKey(key)) {
+            SWITCH_GAME_OPTIONS.get(key).accept(game, Boolean.parseBoolean(value));
+        } else {
+            NUMBER_GAME_OPTIONS.get(key).accept(game, Integer.parseInt(value));
+        }
+    }
+
+    private static List<String> gameOptionKeys() {
+        List<String> keys = new ArrayList<>(NUMBER_GAME_OPTIONS.keySet());
+        keys.addAll(SWITCH_GAME_OPTIONS.keySet());
+        return keys;
     }
 
     static void applyGameState(Game game, TestBedPreset preset, List<String> warnings) {
@@ -77,6 +89,10 @@ public class TestBedComponentService {
                 game.addBorderAnomaly(entry.getKey(), borderDirection(border), borderType(border));
             }
         }
+        preset.getCustomAdjacencies()
+                .forEach((primary, listed) -> game.addCustomAdjacentTiles(
+                        primary.toLowerCase(),
+                        listed.stream().map(String::toLowerCase).toList()));
     }
 
     static final Map<String, DeckType> DECK_SLOTS = Map.of(
@@ -105,15 +121,14 @@ public class TestBedComponentService {
         preset.getDecks().forEach((slot, deckId) -> {
             DeckModel deck = Mapper.getDeck(deckId);
             if (deckProblem(slot, deckId) != null) return;
-            boolean applied =
-                    switch (DECK_SLOTS.get(slot)) {
-                        case ACTION_CARD -> game.validateAndSetActionCardDeck(event, deck);
-                        case SECRET_OBJECTIVE -> game.validateAndSetSecretObjectiveDeck(event, deck);
-                        case RELIC -> game.validateAndSetRelicDeck(deck);
-                        case EXPLORE -> game.validateAndSetExploreDeck(event, deck);
-                        case AGENDA -> game.validateAndSetAgendaDeck(event, deck);
-                        default -> false;
-                    };
+            boolean applied = switch (DECK_SLOTS.get(slot)) {
+                case ACTION_CARD -> game.validateAndSetActionCardDeck(event, deck);
+                case SECRET_OBJECTIVE -> game.validateAndSetSecretObjectiveDeck(event, deck);
+                case RELIC -> game.validateAndSetRelicDeck(deck);
+                case EXPLORE -> game.validateAndSetExploreDeck(event, deck);
+                case AGENDA -> game.validateAndSetAgendaDeck(event, deck);
+                default -> false;
+            };
             if (!applied) warnings.add("Could not switch the `" + slot + "` deck to `" + deckId + "`.");
         });
     }

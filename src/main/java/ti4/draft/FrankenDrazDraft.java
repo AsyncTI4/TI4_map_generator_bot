@@ -93,17 +93,16 @@ public class FrankenDrazDraft extends FrankenDraft {
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
         if (isFowExcludedCategory(category)) return 0;
-        int limit =
-                switch (category) {
-                    case ABILITY -> 4;
-                    case TECH, BLUETILE -> 3;
-                    case REDTILE -> 2;
-                    case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
-                    case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
-                    case MONUMENT -> getMonumentKeptLimit();
-                    case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
-                    case FACTION, UNIT, PLOT, MAHACTKING -> 0;
-                };
+        int limit = switch (category) {
+            case ABILITY -> 4;
+            case TECH, BLUETILE -> 3;
+            case REDTILE -> 2;
+            case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
+            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+            case MONUMENT -> getMonumentKeptLimit();
+            case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
+            case FACTION, UNIT, PLOT, MAHACTKING -> 0;
+        };
         if (limit > 0 && hasUnlimitedKeptComponents(getOwner())) {
             return Integer.MAX_VALUE;
         }

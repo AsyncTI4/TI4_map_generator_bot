@@ -16,7 +16,7 @@
         "source": "other",
         "rules": { "adjacency": { "blocksIn": true, "blocksOut": false } },
         "automation": "FULL",
-        "automationNotes": "Systems are not adjacent when crossing into the bordered system over this edge."
+        "automationNotes": "Units cannot move into the bordered system over this edge. Other effects only follow that direction when one-way adjacency is on (always in fog); otherwise the systems stay adjacent both ways."
     },
     {
         "id": "nebula",
@@ -50,8 +50,9 @@
         "aliasList": ["voidtether"],
         "imagePath": "void_tether.png",
         "source": "thunders_edge",
+        "rules": { "adjacency": { "blocksIn": true, "blocksOut": true, "exemptHolderOf": "empyreanbt", "oneWayAdjacencyOnly": true } },
         "automation": "PARTIAL",
-        "automationNotes": "Placing and moving tethers is automated. That other players do not treat the systems as adjacent is not enforced."
+        "automationNotes": "Enforced only with one-way adjacency on (always in fog); in other games the token is drawn but blocks nothing. When enforced, it blocks this edge in either direction and for every effect, for everyone except the player with the Void Tether breakthrough and the colours they allow through this token. Only the edge is blocked: other links between the two systems (wormholes, custom links, ingress/egress) still connect them. Allowances end when the token is moved or removed."
     },
     {
         "id": "core_border",

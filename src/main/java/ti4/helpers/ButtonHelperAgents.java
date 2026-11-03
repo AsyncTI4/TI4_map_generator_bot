@@ -23,6 +23,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
@@ -512,10 +513,11 @@ public final class ButtonHelperAgents {
                 + ", please choose the adjacent system you wish to move the ship to.";
         List<Button> buttons = new ArrayList<>();
         String ogTile = buttonID.split("_")[1];
-        for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, ogTile, player, false)) {
+        for (String pos : Adjacency.of(game, player).forMovement().from(ogTile)) {
             Tile tile = game.getTileByPosition(pos);
             if (tile.getTileModel() != null && tile.getTileModel().isHyperlane()) continue;
 
+            // TODO: Smuggler Routes ignores anomalies and forbids any other units; should it skip these checks?
             if ((tile.isAsteroidField()
                             && !tile.isZelianAsteroidField()
                             && !player.getTechs().contains("amd")

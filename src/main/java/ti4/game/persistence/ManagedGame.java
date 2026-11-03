@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
@@ -28,6 +29,7 @@ public class ManagedGame {
     private final String name;
     private final String revisionKey;
     private final boolean hasEnded;
+    private final boolean competitiveExportEligible;
     private final boolean hasWinner;
     private final boolean vpGoalReached;
     private final boolean fowMode;
@@ -61,6 +63,8 @@ public class ManagedGame {
         name = game.getName();
         revisionKey = game.getRevisionKey();
         hasEnded = game.isHasEnded();
+        competitiveExportEligible = hasEnded
+                && GameStatisticsFilterer.getCompetitiveExportGamesFilter().test(game);
         hasWinner = game.hasWinner();
         vpGoalReached =
                 game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());

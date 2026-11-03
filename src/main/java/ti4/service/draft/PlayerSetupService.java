@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DeepReachesStartingTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
@@ -227,6 +228,9 @@ public class PlayerSetupService {
 
         // STARTING UNITS
         addUnits(factionModel, tile, color, event);
+        if (player.hasAbility("origin_unknown")) {
+            DeepUnitHandler.setup(game, player, tile, event);
+        }
 
         // STARTING TECH
         List<String> startingTech = factionModel.getStartingTech();

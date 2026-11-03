@@ -193,6 +193,7 @@ public final class Constants {
     public static final String SHOW_BUBBLES = "show_bubbles";
     public static final String TRANSACTION_METHOD = "transaction_method";
     public static final String SHOW_GEARS = "show_gears";
+    public static final String ONE_WAY_ADJACENCY = "one_way_adjacency";
     public static final String WORMHOLE_TOKEN_MERGE = "wormhole_token_merge";
     public static final String SHOW_BANNERS = "show_banners";
     public static final String SHOW_HEX_BORDERS = "show_hex_borders";

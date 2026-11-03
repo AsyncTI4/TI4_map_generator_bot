@@ -1963,8 +1963,10 @@ public class TransactionHelper {
             return;
         }
         String playerRepresentation = player.getRepresentation(false, false, true);
-        for (Player neighbor : player.getNeighbouringPlayers(true)) {
-            if (!neighbor.hasAbility("pillage")) {
+        for (Player neighbor : game.getRealPlayers()) {
+            if (neighbor == player
+                    || !neighbor.hasAbility("pillage")
+                    || !neighbor.getAbilityNeighbours().contains(player)) {
                 continue;
             }
             String neighborRepresentation = neighbor.getRepresentation(false, false, true);
@@ -2518,14 +2520,13 @@ public class TransactionHelper {
                 } else {
                     String fragType = amountToTrans.substring(0, 3).toUpperCase();
                     int fragNum = Integer.parseInt(amountToTrans.charAt(3) + "");
-                    String trait =
-                            switch (fragType) {
-                                case "CRF" -> "cultural";
-                                case "HRF" -> "hazardous";
-                                case "IRF" -> "industrial";
-                                case "URF" -> "frontier";
-                                default -> "";
-                            };
+                    String trait = switch (fragType) {
+                        case "CRF" -> "cultural";
+                        case "HRF" -> "hazardous";
+                        case "IRF" -> "industrial";
+                        case "URF" -> "frontier";
+                        default -> "";
+                    };
                     RelicHelper.sendFrags(event, p1, p2, trait, fragNum, game, false);
                     message2 = "";
                 }

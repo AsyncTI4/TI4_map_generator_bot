@@ -76,16 +76,12 @@ public class ScoringStatisticsService {
                 },
                 ExecutionLockType.READ);
 
-        String report =
-                switch (view) {
-                    case TE -> buildReport(thundersEdgeWinners, Optional.empty(), THUNDERS_EDGE_GAMES);
-                    case POK_ONLY -> buildReport(prophecyOfKingsWinners, Optional.empty(), PROPHECY_OF_KINGS_GAMES);
-                    case POK_COMPARE ->
-                        buildReport(
-                                thundersEdgeWinners,
-                                Optional.of(new Sample(prophecyOfKingsWinners)),
-                                THUNDERS_EDGE_GAMES);
-                };
+        String report = switch (view) {
+            case TE -> buildReport(thundersEdgeWinners, Optional.empty(), THUNDERS_EDGE_GAMES);
+            case POK_ONLY -> buildReport(prophecyOfKingsWinners, Optional.empty(), PROPHECY_OF_KINGS_GAMES);
+            case POK_COMPARE ->
+                buildReport(thundersEdgeWinners, Optional.of(new Sample(prophecyOfKingsWinners)), THUNDERS_EDGE_GAMES);
+        };
         MessageHelper.sendMessageToThread(event.getChannel(), "Scoring statistics", report);
     }
 

@@ -22,6 +22,7 @@ import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
@@ -40,7 +41,7 @@ public class ThirtyKCulturalExploreHandler {
     private static final String FAUX_GIVE = "thirtyKFauxGive_";
 
     public static void resolveSharedWealth(GenericInteractionCreateEvent event, Game game, Player player, Tile tile) {
-        List<Player> eligible = playersWithUnitsInOrAdjacent(game, player, tile);
+        List<Player> eligible = playersWithUnitsInOrAdjacent(game, tile);
         if (eligible.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(
                     event, "The colony opens its stores, but no player has units adjacent to this planet.");
@@ -114,8 +115,9 @@ public class ThirtyKCulturalExploreHandler {
 
     private static List<Button> directImportButtons(Game game, Player player, Tile tile) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile adjacent : ThirtyKExploreSupport.tilesInOrAdjacent(game, player, tile)) {
-            if (adjacent == tile) continue;
+        for (String position : Adjacency.of(game, player).forMovement().into(tile.getPosition())) {
+            Tile adjacent = game.getTileByPosition(position);
+            if (adjacent == null) continue;
             for (UnitKey key : adjacent.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
                 if (!ThirtyKExploreSupport.isShip(player, key)) continue;
                 buttons.add(Buttons.green(
@@ -260,7 +262,7 @@ public class ThirtyKCulturalExploreHandler {
     }
 
     public static void resolveFauxAltruisticFestivals(GenericInteractionCreateEvent event, Game game, Player player) {
-        for (Player neighbor : player.getNeighbouringPlayers(false)) {
+        for (Player neighbor : player.getAbilityNeighbours()) {
             List<Button> buttons = new ArrayList<>();
             for (Map.Entry<String, Integer> note : neighbor.getPromissoryNotes().entrySet()) {
                 if (neighbor.getPromissoryNotesInPlayArea().contains(note.getKey())) continue;
@@ -312,10 +314,10 @@ public class ThirtyKCulturalExploreHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static List<Player> playersWithUnitsInOrAdjacent(Game game, Player player, Tile tile) {
-        List<Tile> tiles = ThirtyKExploreSupport.tilesInOrAdjacent(game, player, tile);
+    private static List<Player> playersWithUnitsInOrAdjacent(Game game, Tile tile) {
         List<Player> players = new ArrayList<>();
         for (Player other : game.getRealPlayers()) {
+            List<Tile> tiles = ThirtyKExploreSupport.tilesInOrReaching(game, other, tile);
             if (tiles.stream().anyMatch(nearby -> FoWHelper.playerHasUnitsInSystem(other, nearby))) {
                 players.add(other);
             }

@@ -29,6 +29,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -664,8 +665,8 @@ public final class ButtonHelperActionCards {
                 continue;
             }
             if (p3.getPlayableActionCards().contains("lieinwait")) {
-                if (p3.getNeighbouringPlayers(false).contains(p1)
-                        && p3.getNeighbouringPlayers(false).contains(p2)) {
+                Set<Player> neighbours = p3.getAbilityNeighbours();
+                if (neighbours.contains(p1) && neighbours.contains(p2)) {
                     MessageHelper.sendMessageToChannel(
                             p3.getCardsInfoThread(),
                             p3.getRepresentation()
@@ -1131,8 +1132,9 @@ public final class ButtonHelperActionCards {
     public static void resolveSeizeArtifactStep1(
             Player player, Game game, ButtonInteractionEvent event, String kolleccTech) {
         List<Button> buttons = new ArrayList<>();
+        Set<Player> neighbours = player.getAbilityNeighbours();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player || !player.getNeighbouringPlayers(true).contains(p2)) {
+            if (p2 == player || !neighbours.contains(p2)) {
                 continue;
             }
             if (game.isFowMode()) {
@@ -1295,7 +1297,7 @@ public final class ButtonHelperActionCards {
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
-        CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
+        CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti", "deep");
         if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
@@ -3024,7 +3026,7 @@ public final class ButtonHelperActionCards {
 
     public static List<Button> getPlagiarizeButtons(Game game, Player player) {
         List<String> techToGain = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, game);
         }
         List<Button> techs = new ArrayList<>();
@@ -3146,11 +3148,11 @@ public final class ButtonHelperActionCards {
 
     private static List<Button> getProbeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
+        Adjacency adjacency = Adjacency.of(game, player).forEffects();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
                 boolean hasShips = false;
-                for (String tile2pos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                for (String tile2pos : adjacency.into(tile.getPosition())) {
                     if (FoWHelper.playerHasShipsInSystem(player, game.getTileByPosition(tile2pos))) {
                         hasShips = true;
                     }

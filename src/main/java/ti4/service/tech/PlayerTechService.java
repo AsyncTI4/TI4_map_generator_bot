@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
@@ -57,6 +58,7 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
@@ -319,6 +321,7 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "bedeepg" -> DeepTechHandler.resolveItLooksBack(event, game, player);
             case "ththurvialig" -> {
                 ThurvialiTechHandler.resolveRestructuring(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -487,9 +490,10 @@ public class PlayerTechService {
             case "tf-singularitypoint" -> {
                 deleteTheOneButtonIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
+                Adjacency adjacency = Adjacency.of(game, player).withSelf();
                 for (Tile tile : game.getTileMap().values()) {
                     boolean adjToUnits = false;
-                    for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                    for (String pos2 : adjacency.into(tile.getPosition())) {
                         Tile tile2 = game.getTileByPosition(pos2);
                         if (tile2.containsPlayersUnits(player)) {
                             adjToUnits = true;
@@ -755,6 +759,9 @@ public class PlayerTechService {
                                 + ", please select which planet containing your PDS that you would like to ready using _Völundr Protocol_.",
                         pdsPlanets);
                 ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+            }
+            case "bedeepy" -> {
+                DeepTechHandler.startAbyssalGenesis(event, game, player);
             }
             default ->
                 MessageHelper.sendMessageToChannel(

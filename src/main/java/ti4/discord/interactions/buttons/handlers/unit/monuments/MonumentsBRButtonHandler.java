@@ -25,6 +25,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.RelicModel;
@@ -647,7 +648,8 @@ public class MonumentsBRButtonHandler {
             }
             case "grom" -> {
                 List<Button> buttons = new ArrayList<>();
-                for (String position : FoWHelper.getAdjacentTiles(game, monumentTile.getPosition(), player, true)) {
+                for (String position :
+                        Adjacency.of(game, player).forEffects().withSelf().from(monumentTile.getPosition())) {
                     Tile tile = game.getTileByPosition(position);
                     if (tile != null
                             && FoWHelper.knowsTile(game, player, tile.getPosition())
@@ -669,8 +671,7 @@ public class MonumentsBRButtonHandler {
             }
             case "mors" -> {
                 List<Button> buttons = new ArrayList<>();
-                Set<String> adjacent =
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, monumentTile.getPosition(), player, true);
+                Set<String> adjacent = Adjacency.of(game, player).forEffects().from(monumentTile.getPosition());
                 for (Tile tile : game.getTileMap().values()) {
                     if (!tile.getPosition().equals(monumentTile.getPosition())
                             && !adjacent.contains(tile.getPosition())

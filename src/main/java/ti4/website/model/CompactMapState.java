@@ -81,16 +81,13 @@ public class CompactMapState {
     }
 
     private static List<Object> serializeEntity(WebEntityData entity) {
-        String type =
-                switch (entity.getEntityType()) {
-                    case "unit" -> "u";
-                    case "token" -> "t";
-                    case "attachment" -> "a";
-                    case "actioncard" -> "c";
-                    default ->
-                        throw new IllegalArgumentException(
-                                "Unsupported web map entity type: " + entity.getEntityType());
-                };
+        String type = switch (entity.getEntityType()) {
+            case "unit" -> "u";
+            case "token" -> "t";
+            case "attachment" -> "a";
+            case "actioncard" -> "c";
+            default -> throw new IllegalArgumentException("Unsupported web map entity type: " + entity.getEntityType());
+        };
 
         if (!"u".equals(type)) {
             List<Object> data = new ArrayList<>(3);

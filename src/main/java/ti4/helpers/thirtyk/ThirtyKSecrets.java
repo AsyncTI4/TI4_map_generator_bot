@@ -21,6 +21,7 @@ import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel.Wormhole;
@@ -131,7 +132,7 @@ public class ThirtyKSecrets {
     private static boolean isReclusive(Game game, Player player) {
         Tile home = player.getHomeSystemTile();
         if (home == null) return false;
-        Set<String> allowed = new HashSet<>(FoWHelper.getAdjacentTiles(game, home.getPosition(), player, false, true));
+        Set<String> allowed = Adjacency.of(game, player).forEffects().withSelf().into(home.getPosition());
         allowed.add(home.getPosition());
         return game.getTileMap().values().stream()
                 .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
@@ -155,11 +156,12 @@ public class ThirtyKSecrets {
     }
 
     private static boolean hasShipsNextToEliminatedHome(Game game, Player player) {
+        Adjacency adjacency = Adjacency.of(game, player).forEffects();
         for (Player eliminated : game.getRealAndEliminatedPlayers()) {
             if (!eliminated.isEliminated() || eliminated == player) continue;
             Tile home = eliminated.getHomeSystemTile();
             if (home == null) continue;
-            for (String position : FoWHelper.getAdjacentTiles(game, home.getPosition(), player, false, false)) {
+            for (String position : adjacency.into(home.getPosition())) {
                 Tile adjacent = game.getTileByPosition(position);
                 if (adjacent != null && FoWHelper.playerHasShipsInSystem(player, adjacent)) return true;
             }
@@ -258,8 +260,8 @@ public class ThirtyKSecrets {
     public static Predicate<String> farFromHome(Game game, Player player) {
         Tile home = player.getHomeSystemTile();
         if (home == null) return position -> false;
-        Map<String, Integer> distances = CheckDistanceHelper.getTileDistances(
-                game, null, home.getPosition(), ThirtyKDistance.FAR_AWAY + 1, true);
+        Map<String, Integer> distances =
+                CheckDistanceHelper.getBoardDistances(game, home.getPosition(), ThirtyKDistance.FAR_AWAY + 1);
         return position -> {
             Integer distance = distances.get(position);
             return distance == null || distance > ThirtyKDistance.FAR_AWAY;

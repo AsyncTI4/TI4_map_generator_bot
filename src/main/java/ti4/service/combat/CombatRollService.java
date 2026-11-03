@@ -103,6 +103,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
@@ -1921,18 +1922,17 @@ public class CombatRollService {
                 if (numRolls < 1) {
                     continue;
                 }
-                RollSegmentType segmentType =
-                        switch (singleUnit) {
-                            case "singleUnit" ->
-                                player.hasTech("tf-supercharge")
-                                        ? RollSegmentType.SUPERCHARGE_SELECTED_UNIT
-                                        : RollSegmentType.GRAVLEASH_SELECTED_UNIT;
-                            case "RestOfUnits" ->
-                                player.hasTech("tf-supercharge")
-                                        ? RollSegmentType.SUPERCHARGE_REST
-                                        : RollSegmentType.GRAVLEASH_REST;
-                            default -> RollSegmentType.PRIMARY;
-                        };
+                RollSegmentType segmentType = switch (singleUnit) {
+                    case "singleUnit" ->
+                        player.hasTech("tf-supercharge")
+                                ? RollSegmentType.SUPERCHARGE_SELECTED_UNIT
+                                : RollSegmentType.GRAVLEASH_SELECTED_UNIT;
+                    case "RestOfUnits" ->
+                        player.hasTech("tf-supercharge")
+                                ? RollSegmentType.SUPERCHARGE_REST
+                                : RollSegmentType.GRAVLEASH_REST;
+                    default -> RollSegmentType.PRIMARY;
+                };
                 List<Die> resultRolls;
                 int[] cappedModifiersByDie = new int[numRolls];
                 if (cappedDiceModifiers.isEmpty()) {
@@ -3120,7 +3120,7 @@ public class CombatRollService {
             return;
         }
         List<Pair<UnitModel, UnitHolder>> candidates =
-                FoWHelper.getAdjacentTiles(game, combatTile.getPosition(), player, false, false).stream()
+                Adjacency.of(game, player).into(combatTile.getPosition()).stream()
                         .map(game::getTileByPosition)
                         .filter(Objects::nonNull)
                         .map(Tile::getSpaceUnitHolder)
@@ -3343,7 +3343,7 @@ public class CombatRollService {
         Map<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
         Map<Pair<UnitModel, UnitHolder>, Integer> unitsOnAdjacentTiles = new HashMap<>();
         Set<String> sleipnirCoverage = ValhavnUnitHandler.getSleipnirPdsCoverageSystems(game, player, tile);
-        Set<String> adjTiles = new HashSet<>(FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false));
+        Set<String> adjTiles = Adjacency.of(game, player).into(tile.getPosition());
         adjTiles.addAll(sleipnirCoverage);
         for (String adjacentTilePosition : adjTiles) {
             if (adjacentTilePosition.equals(tile.getPosition())) {

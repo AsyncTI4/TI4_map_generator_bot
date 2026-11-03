@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -98,6 +99,7 @@ public class MutagenService {
         DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
         StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
+        DeepAbilityHandler.offerEnergySiphon(player);
 
         game.setStoredValue(OPTIONS_KEY + player.getFaction(), String.join(",", options));
         game.setStoredValue(REMAINING_KEY + player.getFaction(), volatileMutagenics ? "2" : "1");

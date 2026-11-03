@@ -6,6 +6,7 @@ import ti4.service.leader.agent.AgentCatalog;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.modules.homebrew.beans.AshenAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.DeepAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.MigoAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
@@ -100,6 +101,7 @@ public final class HomebrewAgents implements AgentCatalog {
                             new AtokeraAgent(),
                             new EdynBrAgent(),
                             new CrystellumAgent(),
+                            new DeepAgent(),
                             new ThronesAgent(),
                             new PonthousAgent(),
                             new ScrapyardAgent(),

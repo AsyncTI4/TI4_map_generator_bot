@@ -1443,13 +1443,12 @@ public final class LoreService {
      */
     static List<Player> computeChoiceAudience(
             Game game, LoreEntry loreEntry, Player triggeringPlayer, String position) {
-        List<Player> audience =
-                switch (loreEntry.receiver) {
-                    case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
-                    case ALL -> game.getRealPlayers();
-                    case GM -> List.of();
-                    default -> List.of(triggeringPlayer);
-                };
+        List<Player> audience = switch (loreEntry.receiver) {
+            case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
+            case ALL -> game.getRealPlayers();
+            case GM -> List.of();
+            default -> List.of(triggeringPlayer);
+        };
         // NPC-controlled seats don't get interactive buttons, so they're excluded from the audience
         // entirely rather than being left in it unresolved — otherwise they'd block round completion
         // in maybeCompleteChoiceRound forever.
@@ -1856,12 +1855,11 @@ public final class LoreService {
         // ADJACENT/ALL notify multiple players, but the call above only ever rewards the triggering
         // player. Give every other recipient their own copy of the player-stat effects (map-mutating
         // effects already applied exactly once above and must not repeat).
-        List<Player> extraRecipients =
-                switch (loreEntry.receiver) {
-                    case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
-                    case ALL -> game.getRealPlayers();
-                    default -> List.of();
-                };
+        List<Player> extraRecipients = switch (loreEntry.receiver) {
+            case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
+            case ALL -> game.getRealPlayers();
+            default -> List.of();
+        };
         for (Player other : extraRecipients) {
             if (other.equals(player)) continue;
             LoreEffects.EffectResults otherResults =

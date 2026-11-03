@@ -182,6 +182,9 @@ An Anomaly that adds +1 to the move of ships leaving or passing through it, each
 **Border anomaly**:
 An anomaly attached to a System's edge rather than its interior.
 
+**Void Tether**:
+The Empyrean breakthrough's Border anomaly token. Enforced only with One-way adjacency on (always in fog); otherwise it is drawn but blocks nothing. When enforced, it blocks the shared edge between its two Systems, in either direction and for every purpose, for everyone except the Player holding the breakthrough (`exemptHolderOf` in `border_anomalies.json`) and the colours that Player allows through that token ("unless you allow it", stored on the token, cleared when it is moved or removed). Only the edge is blocked: other links between the same two Systems (matching wormholes, custom links, ingress/egress, …) still connect them. Across it, a Player counts as a Neighbor only from the exempt side.
+
 **Hyperlane**:
 A Tile that is not a System, whose drawn lanes make the Systems at their ends adjacent.
 
@@ -319,6 +322,10 @@ A team mode in which Players are paired and share some benefits.
 
 **Community mode**:
 A mode where a Game is played by a community role rather than individually assigned Players.
+
+**One-way adjacency**:
+A Game setting for one-way links (gravity-wave borders, one-way custom adjacencies). When off, the default outside Fog of War, a one-way link only limits movement and counts as Adjacency both ways for everything else. When on, and always in Fog of War, the side that acts needs the link: a PDS fires only along it, and a Player sees only where they could move.
+_Avoid_: Directional mode
 
 **TIGL**:
 The Twilight Imperium Global Ladder, whose competitive Games report results and move Players through ranks.
@@ -468,6 +475,18 @@ _Avoid_: Seating order
 **Adjacency**:
 The relationship between Systems that touch, share a wormhole type or are joined by hyperlane lines, governing movement.
 _Avoid_: Neighbors (that names Players with pieces in or next to each other's Systems)
+
+**Outbound / inbound adjacency**:
+The two directions of a one-way link: the Systems a System reaches (outbound, `Adjacency.from`) and the Systems that reach it (inbound, `Adjacency.into`). On two-way maps they are the same. The side that acts needs outbound access: a PDS covers a System its own System reaches, and ships score "adjacent to X" when their System reaches X.
+_Avoid_: Forward/backward adjacency
+
+**Either-way adjacency**:
+Outbound and inbound together (`Adjacency.either`), used only for communication such as Transactions and fog whispers.
+_Avoid_: Mutual adjacency (that would need both directions)
+
+**Ability neighbors**:
+The Neighbors an ability, card or objective that says "neighbor" counts for the Player who uses it (`Player.getAbilityNeighbours`): with One-way adjacency on, the Players their Systems reach; otherwise the same as Neighbors.
+_Avoid_: Direct neighbors
 
 **Elimination**:
 A Player's removal from the Game when they control no Planets, have no ground forces on the Map and own no unit with Production.

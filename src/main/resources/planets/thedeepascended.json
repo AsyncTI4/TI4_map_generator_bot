@@ -1,0 +1,17 @@
+{
+    "id": "thedeepascended",
+    "name": "The Deep, Ascended",
+    "aliases": [
+        "thedeepascended"
+    ],
+    "resources": 5,
+    "influence": 3,
+    "planetTypes": [
+        "FAKE",
+        "FACTION"
+    ],
+    "legendaryAbilityName": "Drown",
+    "legendaryAbilityText": "After another player activates this unit's system, you may exhaust this card to remove your command token from its system.",
+    "source": "beans",
+    "flavorText": "*I AM UNENDING*"
+}
