@@ -291,6 +291,13 @@ class TacticalActionButtonHandlers {
                     Tile tile = game.getTileByPosition(pos);
                     UnitHolder removeFromHolder = tile.getSpaceUnitHolder();
                     UnitHolder addToHolder = tile.getUnitHolderFromPlanet(planet);
+                    if (addToHolder == null) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event, "That planet is no longer in this system. No units were moved. Refreshed landing buttons.");
+                        MessageHelper.editMessageButtons(
+                                event, TacticalActionService.getLandingTroopsButtons(game, player, tile));
+                        return;
+                    }
                     // game.setActiveSystem(pos);
 
                     List<RemovedUnit> removed = RemoveUnitService.removeUnit(
