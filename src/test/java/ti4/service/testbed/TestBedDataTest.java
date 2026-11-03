@@ -113,7 +113,9 @@ class TestBedDataTest extends BaseTi4Test {
                     { "as": "sol", "press": "ac_play_from_hand_{ac:sabo2}" },
                     { "do": "setStored", "key": "a", "value": "b,c" },
                     { "as": "sol", "pressId": "%s" },
-                    { "do": "setGameOption", "key": "show_mood", "value": "true" }
+                    { "do": "setGameOption", "key": "show_mood", "value": "true" },
+                    { "do": "setGameOption", "key": "one_way_adjacency", "value": "yes" },
+                    { "do": "setGameOption", "key": "one_way_adjacency", "value": "true" }
                   ] }""".formatted("x".repeat(101))));
         assertContains(
                 scriptErrors,
@@ -124,7 +126,9 @@ class TestBedDataTest extends BaseTi4Test {
                 "step 5: `{ac:sabo2}` but nothing gives `sabo2` to sol",
                 "step 6: `setStored` key and value may not contain",
                 "step 7: `pressId` is longer than Discord's 100-character limit",
-                "step 8: unknown game option `show_mood`");
+                "step 8: unknown game option `show_mood`",
+                "step 9: game option `one_way_adjacency` takes `true` or `false`");
+        assertTrue(scriptErrors.stream().noneMatch(error -> error.startsWith("step 10")), scriptErrors::toString);
 
         // Fields that a kind of check would silently ignore, typos in scopes, and checks with nothing to check.
         List<String> expectErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
@@ -236,6 +240,21 @@ class TestBedDataTest extends BaseTi4Test {
                 "`borderAnomalies` entry `n:arrow` at `205`",
                 "`borderAnomalies` entry `nebula` at `205`");
         assertTrue(errors.stream().noneMatch(error -> error.contains("at `202`")), String.join("\n", errors));
+    }
+
+    @Test
+    void customAdjacenciesAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "customAdjacencies": { "000": ["201", "TL"], "nowhere": ["101"], "102": ["moon"] }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "`customAdjacencies` position `nowhere` is not a tile position",
+                "`customAdjacencies` target `moon` at `102`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("at `000`")), String.join("\n", errors));
     }
 
     // Homebrew card tests switch decks in the preset and stack explores in scripts; wrong slots, unknown decks,

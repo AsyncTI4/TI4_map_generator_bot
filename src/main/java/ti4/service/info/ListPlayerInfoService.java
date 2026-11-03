@@ -19,6 +19,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thirtyk.ThirtyKCards;
 import ti4.helpers.thirtyk.ThirtyKSecrets;
 import ti4.logging.BotLogger;
@@ -519,7 +520,7 @@ public class ListPlayerInfoService {
         switch (objID) {
             case "push_boundaries", "push_boundaries_omegaphase" -> {
                 int aboveN = 0;
-                for (Player p2 : player.getNeighbouringPlayers(true)) {
+                for (Player p2 : player.getAbilityNeighbours()) {
                     int p1count = player.getPlanetsForScoring(false).size();
                     int p2count = p2.getPlanetsForScoring(false).size()
                             - game.getPlanetsPlayerIsCoexistingOn(p2).size();
@@ -665,8 +666,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 Tile mecatol = game.getMecatolTile();
                 if (mecatol == null) return 2;
-                for (String pos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
+                for (String pos : Adjacency.of(game, player).into(mecatol.getPosition())) {
                     Tile tile2 = game.getTileByPosition(pos);
                     if (FoWHelper.playerHasShipsInSystem(player, tile2)) {
                         count++;
@@ -678,8 +678,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 Tile mecatol = game.getMecatolTile();
                 if (mecatol == null) return 3;
-                for (String pos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
+                for (String pos : Adjacency.of(game, player).into(mecatol.getPosition())) {
                     Tile tile2 = game.getTileByPosition(pos);
                     if (tile2.containsPlayersUnits(player)) {
                         count++;
@@ -812,11 +811,12 @@ public class ListPlayerInfoService {
             case "distant_lands", "distant_lands_omegaphase" -> {
                 Set<String> planetsAdjToHomes = new HashSet<>();
                 Set<Tile> homesAdjTo = new HashSet<>();
+                Adjacency adjacency = Adjacency.of(game, player).withSelf();
                 for (Player p2 : game.getRealAndEliminatedPlayers()) {
                     Tile tile = p2.getHomeSystemTile();
                     if (p2 == player || tile == null) continue;
 
-                    Set<String> adjPositions = FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false);
+                    Set<String> adjPositions = adjacency.into(tile.getPosition());
                     Set<Planet> planets = player.getPlanetsForScoring(false);
 
                     for (Planet planet : planets) {
@@ -923,6 +923,7 @@ public class ListPlayerInfoService {
             }
             case "te" -> {
                 int count = 0;
+                Adjacency adjacency = Adjacency.of(game, player);
                 for (Player p2 : game.getRealAndEliminatedPlayers()) {
                     if (p2 == player || "neutral".equalsIgnoreCase(p2.getFaction())) {
                         continue;
@@ -931,7 +932,7 @@ public class ListPlayerInfoService {
                     if (tile == null) {
                         continue;
                     }
-                    for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
+                    for (String pos : adjacency.into(tile.getPosition())) {
                         Tile tile2 = game.getTileByPosition(pos);
                         if (ButtonHelper.checkNumberShips(player, tile2) > 0) {
                             count++;
@@ -1049,7 +1050,7 @@ public class ListPlayerInfoService {
                 return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false, true);
             }
             case "fc" -> {
-                return player.getNeighbourCount(); // neighbors
+                return player.getAbilityNeighbours().size(); // neighbors
             }
             case "dagw" -> {
                 if (!game.isMonumentsMode()) {

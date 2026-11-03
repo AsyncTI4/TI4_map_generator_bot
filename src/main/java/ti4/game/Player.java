@@ -3412,6 +3412,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return new LinkedHashSet<>(graph.directNeighboursOf(this));
     }
 
+    public Set<Player> getAbilityNeighbours() {
+        return getNeighbouringPlayers(!game.usesOneWayAdjacency());
+    }
+
     public boolean isNeighboursWith(Player player) {
         return getNeighbouringPlayers(true).contains(player);
     }

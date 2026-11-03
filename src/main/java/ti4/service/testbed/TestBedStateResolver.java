@@ -42,7 +42,8 @@ public class TestBedStateResolver {
             "exploreDeck",
             "relicDeck",
             "decks",
-            "borderAnomalies");
+            "borderAnomalies",
+            "customAdjacencies");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
             "commodities",
@@ -138,6 +139,10 @@ public class TestBedStateResolver {
             case "borderAnomalies" ->
                 joinSorted(game.getBorderAnomalies().stream()
                         .map(border -> border.getTile() + ":" + border.getDirection() + ":" + border.getType())
+                        .toList());
+            case "customAdjacencies" ->
+                joinSorted(game.getCustomAdjacentTiles().entrySet().stream()
+                        .flatMap(entry -> entry.getValue().stream().map(listed -> entry.getKey() + ">" + listed))
                         .toList());
             default -> "<unknown " + field + ">";
         };

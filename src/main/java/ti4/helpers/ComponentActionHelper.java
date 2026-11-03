@@ -448,6 +448,7 @@ public class ComponentActionHelper {
                                 Buttons.red(factionChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
                 }
+                // TODO: the relic id is stellarconverter; does this "no targets" check ever match?
                 if ("stellar_converter".equalsIgnoreCase(relic)
                         && ButtonHelper.getButtonsForStellar(p1, game).isEmpty()) {
                     continue;

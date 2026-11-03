@@ -329,6 +329,17 @@ public class TestBedPresetService {
                 }
             }
         });
+        preset.getCustomAdjacencies().forEach((primary, listed) -> {
+            if (!MapPositionMapper.isTilePositionValid(primary.toLowerCase())) {
+                errors.add("preset: `customAdjacencies` position `" + primary + "` is not a tile position.");
+            }
+            for (String position : listed) {
+                if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
+                    errors.add("preset: `customAdjacencies` target `" + position + "` at `" + primary
+                            + "` is not a tile position.");
+                }
+            }
+        });
         preset.getTiles().forEach((position, tileId) -> {
             if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
                 errors.add("preset: `tiles` position `" + position + "` is not a tile position.");

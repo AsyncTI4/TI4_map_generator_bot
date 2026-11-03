@@ -299,7 +299,7 @@ public class TeHelperActionCards {
     @ButtonHandler("lieInWait")
     private static void lieInWait(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             if (p2 == player || p2.getAcCount() == 0) {
                 continue;
             }

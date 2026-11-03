@@ -113,6 +113,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
@@ -305,7 +306,7 @@ public class ButtonHelper {
         if (game.isTwilightsFallMode() && tile != null) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.ownsUnit("tf-vortexer")) {
-                    for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
+                    for (String pos : Adjacency.of(game, p2).withSelf().into(tile.getPosition())) {
                         if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, p2, totalAmount, "infantry", null);
                             break;
@@ -1639,7 +1640,7 @@ public class ButtonHelper {
             if ("minister_commerce".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
                         || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
-                    int numOfNeighbors = player.getNeighbourCount();
+                    int numOfNeighbors = player.getAbilityNeighbours().size();
                     String message = player.getRepresentationUnfogged()
                             + " _Minister of Commerce_ triggered, so your trade goods have increased due to your "
                             + numOfNeighbors
@@ -1702,7 +1703,7 @@ public class ButtonHelper {
         }
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (p2.hasTech("tf-smotheringpresence")) {
-                for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
+                for (String tilePos : Adjacency.of(game, p2).withSelf().into(tile.getPosition())) {
                     Tile t2 = game.getTileByPosition(tilePos);
                     for (UnitHolder uH : t2.getUnitHolders().values()) {
                         if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
@@ -1786,8 +1787,7 @@ public class ButtonHelper {
             boolean sent = false;
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
-                    for (String tilePos :
-                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), p2, false, true)) {
+                    for (String tilePos : Adjacency.of(game, p2).withSelf().into(activeSystem.getPosition())) {
                         Tile t2 = game.getTileByPosition(tilePos);
                         for (UnitHolder uH : t2.getUnitHolders().values()) {
                             if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
@@ -1848,9 +1848,9 @@ public class ButtonHelper {
             }
         }
         if (FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
-            for (Player empy : player.getNeighbouringPlayers(false)) {
+            for (Player empy : game.getRealPlayersExcludingThis(player)) {
                 if (empy.hasTech("as")
-                        && empy != player
+                        && empy.getAbilityNeighbours().contains(player)
                         && (!game.isFowMode()
                                 || FoWHelper.getTilePositionsToShow(game, empy).contains(game.getActiveSystem()))) {
                     List<Button> aetherButtons = new ArrayList<>();
@@ -3156,7 +3156,7 @@ public class ButtonHelper {
         int count = 0;
         Tile hs = player.getHomeSystemTile();
         if (hs == null) return 0;
-        var adjacentToHS = FoWHelper.getAdjacentTiles(game, hs.getPosition(), player, false);
+        var adjacentToHS = Adjacency.of(game, player).into(hs.getPosition());
         for (Tile tile : game.getTileMap().values()) {
             if (tile == hs || adjacentToHS.contains(tile.getPosition())) continue;
             for (UnitHolder uh : tile.getUnitHolders().values()) {
@@ -3174,14 +3174,12 @@ public class ButtonHelper {
                     new LogOrigin(player), "not finding a HS for " + player.getFaction() + " in " + game.getName());
             return 0;
         }
-        String hsPos = hs.getPosition();
+        Set<String> adjacentToHS = Adjacency.of(game, player).into(hs.getPosition());
         for (Tile tile : game.getTileMap().values()) {
             if (tile == hs) {
                 continue;
             }
-            if (FoWHelper.playerHasShipsInSystem(player, tile)
-                    && !FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)
-                            .contains(hsPos)) {
+            if (FoWHelper.playerHasShipsInSystem(player, tile) && !adjacentToHS.contains(tile.getPosition())) {
                 count++;
             }
         }
@@ -4882,6 +4880,7 @@ public class ButtonHelper {
                 message);
     }
 
+    // TODO: customRexLegendary and this helper have no callers; remove them?
     private static List<String> getAllPlanetsAdjacentToTileNotOwnedByPlayer(Tile tile, Game game, Player player) {
         List<String> planets = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
@@ -6960,8 +6959,7 @@ public class ButtonHelper {
 
     public static String putInfWithMechsForStarforge(
             String pos, String successMessage, Game game, Player player, ButtonInteractionEvent event) {
-        Set<String> tiles = FoWHelper.getAdjacentTiles(game, pos, player, true);
-        tiles.add(pos);
+        Set<String> tiles = Adjacency.of(game, player).withSelf().into(pos);
         StringBuilder successMessageBuilder = new StringBuilder(successMessage);
         for (String tilePos : tiles) {
             Tile tile = game.getTileByPosition(tilePos);
@@ -8371,6 +8369,7 @@ public class ButtonHelper {
         if (tilesWithBombard.isEmpty()) {
             return buttons;
         }
+        // TODO: should a smothered first bombard tile be skipped here too, like in the loop below?
         Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
                 game, tilesWithBombard.getFirst().getPosition(), player, false);
         for (Tile tile : tilesWithBombard) {
@@ -8479,10 +8478,13 @@ public class ButtonHelper {
     }
 
     public static List<Player> getPlayersWithPds2Cover(Player targetPlayer, Game game, String tilePos) {
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, targetPlayer, false, true);
+        Set<String> adjTiles = new HashSet<>();
         Tile targetTile = game.getTileByPosition(tilePos);
+        Map<Player, Set<String>> reachingTarget = new HashMap<>();
         for (Player p2 : game.getRealPlayers()) {
-            adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
+            Set<String> reaching = Adjacency.of(game, p2).withSelf().into(tilePos);
+            reachingTarget.put(p2, reaching);
+            adjTiles.addAll(reaching);
             adjTiles.addAll(ValhavnUnitHandler.getSleipnirPdsCoverageSystems(game, p2, targetTile));
         }
         List<Player> playersWithPds2 = new ArrayList<>();
@@ -8570,7 +8572,12 @@ public class ButtonHelper {
                                     .contains(adjTilePos);
                     if (owningPlayer == null
                             || playersWithPds2.contains(owningPlayer)
-                            || (!FoWHelper.getAdjacentTiles(game, tilePos, owningPlayer, false, true)
+                            || (!reachingTarget
+                                            .computeIfAbsent(
+                                                    owningPlayer,
+                                                    owner -> Adjacency.of(game, owner)
+                                                            .withSelf()
+                                                            .into(tilePos))
                                             .contains(adjTilePos)
                                     && !sleipnirCoverage)) {
                         continue;
@@ -8650,43 +8657,45 @@ public class ButtonHelper {
     }
 
     public static void sendEBSWarning(Player player, Game game, String tilePos) {
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tilePos, player, false);
-        for (String adjTilePos : adjTiles) {
-            Tile adjTile = game.getTileByPosition(adjTilePos);
-            if (adjTile == null) {
-                BotLogger.warning(
-                        new LogOrigin(player),
-                        "`ButtonHelper.sendEBSWarning` Game: " + game.getName() + " Tile: " + tilePos
-                                + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
+        for (Player owningPlayer : game.getRealPlayersExcludingThis(player)) {
+            if (!owningPlayer.getPlayableActionCards().contains("experimental")) {
                 continue;
             }
-            for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
-                for (Map.Entry<UnitKey, Integer> unitEntry :
-                        unitHolder.getUnits().entrySet()) {
-                    if (unitEntry.getValue() == 0) {
-                        continue;
-                    }
-
-                    UnitKey unitKey = unitEntry.getKey();
-                    Player owningPlayer =
-                            game.getPlayerByColorID(unitKey.colorID()).orElse(null);
-                    if (owningPlayer == null || owningPlayer == player) {
-                        continue;
-                    }
-
-                    UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (owningPlayer.getPlayableActionCards().contains("experimental")
-                            && model != null
-                            && "spacedock".equalsIgnoreCase(model.getBaseType())) {
-                        MessageHelper.sendMessageToChannel(
-                                owningPlayer.getCardsInfoThread(),
-                                owningPlayer.getRepresentation()
-                                        + " this is a reminder that this is the window to play _Experimental Battlestation_.");
-                        return;
-                    }
+            Set<String> adjTiles = Adjacency.of(game, owningPlayer).withSelf().into(tilePos);
+            for (String adjTilePos : adjTiles) {
+                Tile adjTile = game.getTileByPosition(adjTilePos);
+                if (adjTile == null) {
+                    BotLogger.warning(
+                            new LogOrigin(player),
+                            "`ButtonHelper.sendEBSWarning` Game: " + game.getName() + " Tile: " + tilePos
+                                    + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
+                    continue;
+                }
+                if (hasOwnSpaceDock(adjTile, owningPlayer)) {
+                    MessageHelper.sendMessageToChannel(
+                            owningPlayer.getCardsInfoThread(),
+                            owningPlayer.getRepresentation()
+                                    + " this is a reminder that this is the window to play _Experimental Battlestation_.");
+                    return;
                 }
             }
         }
+    }
+
+    private static boolean hasOwnSpaceDock(Tile tile, Player owner) {
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                if (unitEntry.getValue() == 0 || !unitKey.colorID().equals(owner.getColorID())) {
+                    continue;
+                }
+                UnitModel model = owner.getUnitFromUnitKey(unitKey);
+                if (model != null && "spacedock".equalsIgnoreCase(model.getBaseType())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void fixAllianceMembers(Game game) {
@@ -9777,7 +9786,6 @@ public class ButtonHelper {
         Tile homeSystem = homeOwner.getHomeSystemTile();
         if (homeSystem == null) return false;
         if (homeSystem.getPosition().equals(tile.getPosition())) return true;
-        return FoWHelper.getAdjacentTiles(game, homeSystem.getPosition(), activePlayer, false)
-                .contains(tile.getPosition());
+        return Adjacency.of(game, activePlayer).into(homeSystem.getPosition()).contains(tile.getPosition());
     }
 }

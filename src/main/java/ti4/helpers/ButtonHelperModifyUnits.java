@@ -49,6 +49,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
@@ -138,7 +139,7 @@ public final class ButtonHelperModifyUnits {
         if (space
                 && mentakFS != null
                 && mentakFS != player
-                && hasFlagshipInOrAdjacentToSystem(game, player, tile, unitHolder, mentakFS)) {
+                && hasFlagshipInOrAdjacentToSystem(game, tile, unitHolder, mentakFS)) {
             return 0;
         }
         int metali = 0;
@@ -176,7 +177,7 @@ public final class ButtonHelperModifyUnits {
     }
 
     private static boolean hasFlagshipInOrAdjacentToSystem(
-            Game game, Player player, Tile tile, UnitHolder unitHolder, Player flagshipOwner) {
+            Game game, Tile tile, UnitHolder unitHolder, Player flagshipOwner) {
         String color = flagshipOwner.getColor();
         if (unitHolder.getUnitCount(UnitType.Flagship, color) > 0) {
             return true;
@@ -184,7 +185,7 @@ public final class ButtonHelperModifyUnits {
         if (tile == null) {
             return false;
         }
-        for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String adjPos : Adjacency.of(game, flagshipOwner).into(tile.getPosition())) {
             Tile adjTile = game.getTileByPosition(adjPos);
             if (adjTile == null) continue;
             UnitHolder adjSpace = adjTile.getSpaceUnitHolder();
@@ -1197,9 +1198,10 @@ public final class ButtonHelperModifyUnits {
                     == UnitType.Fighter) {
                 for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                     if (p2.ownsUnit("tf-vortexer")) {
-                        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
+                        for (String pos : Adjacency.of(game, p2).withSelf().into(tile.getPosition())) {
                             if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2)
                                     > 0) {
+                                // TODO: break? Carriers in two systems in range capture one fighter twice.
                                 CaptureUnitService.executeCapture(event, game, p2, units.getFirst());
                             }
                         }
@@ -1358,7 +1360,7 @@ public final class ButtonHelperModifyUnits {
     public static List<Button> getRalnelCommanderButtons(Player player, Game game, String pos1) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
-        for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false, false)) {
+        for (String pos2 : Adjacency.of(game, player).forMovement().from(pos1)) {
             Tile targetTile = game.getTileByPosition(pos2);
             if (!canRetreatTo(game, player, targetTile, true, false)) {
                 continue; // skip invalid systems
@@ -1381,7 +1383,7 @@ public final class ButtonHelperModifyUnits {
         if (feint) {
             skilledS += "feint";
         }
-        Set<String> positions = FoWHelper.getAdjacentTiles(game, pos1, player, false);
+        Set<String> positions = Adjacency.of(game, player).forMovement().from(pos1);
         Tile helheimTile = game.getTileFromPlanet("helheim");
         if (player.hasPlanet("helheim")
                 && helheimTile != null

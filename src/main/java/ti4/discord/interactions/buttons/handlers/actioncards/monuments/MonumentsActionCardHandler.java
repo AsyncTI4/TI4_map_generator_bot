@@ -75,7 +75,7 @@ public class MonumentsActionCardHandler {
             }
             case "monuments_rebel_bombing" -> {
                 List<Button> buttons = new ArrayList<>();
-                for (Player neighbor : player.getNeighbouringPlayers(true)) {
+                for (Player neighbor : player.getAbilityNeighbours()) {
                     for (Tile tile : game.getTileMap().values()) {
                         if (tile.isHomeSystem(game)
                                 || (tile.getTileModel() != null
@@ -276,7 +276,7 @@ public class MonumentsActionCardHandler {
                 || unit == null
                 || tile.isHomeSystem(game)
                 || (tile.getTileModel() != null && tile.getTileModel().isHyperlane())
-                || !player.getNeighbouringPlayers(true).contains(target)
+                || !player.getAbilityNeighbours().contains(target)
                 || !unit.getIsStructure()
                 || holder.getUnitCountForState(key, state) < 1) {
             MessageHelper.sendEphemeralMessageToEventChannel(

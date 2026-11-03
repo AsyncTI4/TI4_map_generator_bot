@@ -1092,7 +1092,7 @@ public final class ButtonHelperTacticalAction {
         }
         for (Player consulateOwner : game.getRealPlayers()) {
             if (consulateOwner.ownsUnit("kaltrim_pds")
-                    && consulateOwner.isNeighboursWith(player)
+                    && consulateOwner.getAbilityNeighbours().contains(player)
                     && KaltrimUnitHandler.canDeployConsulate(consulateOwner, game)) {
                 KaltrimUnitHandler.offerConsulateDeploy(consulateOwner, player, game);
             }
