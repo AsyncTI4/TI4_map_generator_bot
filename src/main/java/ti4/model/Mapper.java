@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import ti4.logging.BotLogger;
 import ti4.model.DeckModel.DeckType;
 import ti4.model.GenericCardModel.CardType;
 import ti4.model.Source.ComponentSource;
+import ti4.model.WormholeModel.OneWay;
 import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.CardEmojis;
 import tools.jackson.core.JsonParser;
@@ -98,6 +100,7 @@ public class Mapper {
     private static volatile Map<String, List<Wormhole>> wormholesByImagePath = new HashMap<>();
     private static volatile Map<Wormhole, String> imagePathByWormhole = new HashMap<>();
     private static volatile Set<String> mergeableWormholeImagePaths = new HashSet<>();
+    private static volatile Map<String, TokenModel> oneWayTokensByImagePath = new HashMap<>();
     private static volatile Map<String, String> tokenImagePathByAlias = new HashMap<>();
     private static volatile Map<String, GalacticEventModel> galacticevents = new HashMap<>();
 
@@ -157,9 +160,15 @@ public class Mapper {
 
         Map<String, TokenModel> loadedTokens = importJsonObjectsFromFolder("tokens", TokenModel.class);
         Properties loadedTokenProperties = readData("tokens.properties");
+        Map<String, TokenModel> generatedTokens = oneWayWormholeTokens(loadedTokens);
+        generatedTokens.values().forEach(token -> {
+            loadedTokens.put(token.getId(), token);
+            loadedTokenProperties.setProperty(token.getId(), token.getImagePath());
+        });
         tokens = loadedTokens;
         tokensFromProperties = loadedTokenProperties;
         tokenImagePathByAlias = indexTokenAliases(loadedTokens);
+        oneWayTokensByImagePath = generatedTokens;
         indexFowVisionTokens();
         indexTokenWormholes();
         spaceTokens = importJsonObjectsFromFolder("tokens", SpaceTokenModel.class);
@@ -1302,7 +1311,9 @@ public class Mapper {
             List<Wormhole> wormholes = nonNullWormholes(token.getWormholes());
             if (wormholes.isEmpty()) continue;
             byImagePath.put(token.getImagePath(), wormholes);
-            if (wormholes.size() == 1) byWormhole.putIfAbsent(wormholes.getFirst(), token.getImagePath());
+            if (wormholes.size() == 1 && token.getOneWay() == null) {
+                byWormhole.putIfAbsent(wormholes.getFirst(), token.getImagePath());
+            }
             boolean mergeableToken = wormholes.size() == 1 && !Boolean.FALSE.equals(token.getWormholeIconMerge());
             if (mergeableToken) mergeable.add(token.getImagePath());
             for (String legacyImagePath :
@@ -1332,6 +1343,54 @@ public class Mapper {
 
     public static boolean isMergeableWormholeToken(String tokenFileName) {
         return tokenFileName != null && mergeableWormholeImagePaths.contains(tokenFileName);
+    }
+
+    private static Map<String, TokenModel> oneWayWormholeTokens(Map<String, TokenModel> tokenModels) {
+        Map<String, TokenModel> generated = new HashMap<>();
+        plainWormholeTokens(tokenModels).forEach((wormhole, base) -> {
+            for (OneWay oneWay : OneWay.values()) {
+                TokenModel token = oneWayToken(wormhole, base, oneWay);
+                generated.put(token.getImagePath(), token);
+            }
+        });
+        return generated;
+    }
+
+    // TODO: identity wormhole tokens (creuss*, ionalpha/ionbeta, PoK gamma, vortex) keep their own ids;
+    // renaming them to the wh scheme also needs the code that names them by id updated.
+    private static Map<Wormhole, TokenModel> plainWormholeTokens(Map<String, TokenModel> tokenModels) {
+        Map<Wormhole, TokenModel> byWormhole = new EnumMap<>(Wormhole.class);
+        for (Wormhole wormhole : Wormhole.values()) {
+            TokenModel token = tokenModels.get(wormhole.tokenId());
+            if (token != null && plainWormhole(token) == wormhole) byWormhole.put(wormhole, token);
+        }
+        return byWormhole;
+    }
+
+    @Nullable
+    private static Wormhole plainWormhole(TokenModel token) {
+        List<Wormhole> wormholes = nonNullWormholes(token.getWormholes());
+        boolean mergeable = wormholes.size() == 1 && !Boolean.FALSE.equals(token.getWormholeIconMerge());
+        return mergeable ? wormholes.getFirst() : null;
+    }
+
+    private static TokenModel oneWayToken(Wormhole wormhole, TokenModel base, OneWay oneWay) {
+        String id = wormhole.tokenId() + "_" + oneWay.suffix();
+        TokenModel token = new TokenModel();
+        token.setId(id);
+        token.setImagePath("token_oneway_" + id + ".png");
+        token.setSpaceOrPlanet("space");
+        token.setWormholes(List.of(wormhole));
+        token.setWormholeIconMerge(false);
+        token.setOneWay(oneWay);
+        token.setBaseImagePath(base.getImagePath());
+        token.setSource(base.getSource());
+        return token;
+    }
+
+    @Nullable
+    public static TokenModel getOneWayWormholeToken(String tokenFileName) {
+        return tokenFileName == null ? null : oneWayTokensByImagePath.get(tokenFileName);
     }
 
     public static List<Wormhole> getTokenWormholes(String tokenFileName) {
