@@ -38,6 +38,25 @@ class GameDatabaseReconcilerTest {
     }
 
     @Test
+    void failedRepairsAreReportedInOneMessageInsteadOfOnePerGame() {
+        try (Fixture fixture = new Fixture()) {
+            fixture.persisted.put("deleted-1", mock(PersistedGameState.class));
+            fixture.persisted.put("deleted-2", mock(PersistedGameState.class));
+            fixture.persisted.put("deleted-3", mock(PersistedGameState.class));
+            doThrow(new IllegalStateException("database down"))
+                    .when(fixture.persistence)
+                    .delete(anyString());
+
+            fixture.run();
+
+            fixture.logs.verify(
+                    () -> BotLogger.error(contains("hit errors on 3 games"), any(Throwable.class)), times(1));
+            fixture.logs.verify(() -> BotLogger.error(contains("repair failed")), times(1));
+            fixture.logs.verifyNoMoreInteractions();
+        }
+    }
+
+    @Test
     void missingFileDeletesItsOrphanedRows() {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("deleted", mock(PersistedGameState.class));

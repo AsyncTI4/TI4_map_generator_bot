@@ -42,6 +42,7 @@ public class GameDatabaseReconciler {
     static final class Reconciliation implements GameDatabaseReconciliationChain.Run {
 
         private final List<String> discrepancies = new ArrayList<>();
+        private final Failures failures = new Failures();
         private final Set<String> existingGameNames = new HashSet<>();
         private long startedAt;
         private Map<String, PersistedGameState> persistedStates;
@@ -63,7 +64,7 @@ public class GameDatabaseReconciler {
         @Override
         public void reconcile(String gameName) {
             PersistedGameState persistedState = persistedStates.get(gameName);
-            if (isUnchangedSinceLastSync(gameName, persistedState)) {
+            if (isUnchangedSinceLastSync(gameName, persistedState, failures)) {
                 existingGameNames.add(gameName);
                 return;
             }
@@ -71,11 +72,11 @@ public class GameDatabaseReconciler {
                 existingGameNames.add(gameName);
                 return;
             }
-            LoadedGameFile gameFile = loadGameFile(gameName);
+            LoadedGameFile gameFile = loadGameFile(gameName, failures);
             if (gameFile == null) return;
             existingGameNames.add(gameName);
             if (gameFile.stamp().lastModifiedEpochMilliseconds() > startedAt) return;
-            reconcileGame(gameFile, persistedState, persistenceService).ifPresent(discrepancies::add);
+            reconcileGame(gameFile, persistedState, persistenceService, failures).ifPresent(discrepancies::add);
         }
 
         @Override
@@ -92,27 +93,55 @@ public class GameDatabaseReconciler {
                 discrepancies.add(repair(
                         persistedGameName,
                         "in the database but has no game file",
-                        () -> persistenceService.delete(persistedGameName)));
+                        () -> persistenceService.delete(persistedGameName),
+                        failures));
             }
 
             Optional<String> userCleanup = reconcileUnreferencedUsers();
 
-            report(discrepancies, userCleanup, gameCount);
+            report(discrepancies, userCleanup, gameCount, failures);
         }
     }
 
-    private static boolean isUnchangedSinceLastSync(String gameName, PersistedGameState persistedState) {
-        return matchesManagedRevision(gameName, persistedState)
+    private static boolean isUnchangedSinceLastSync(
+            String gameName, PersistedGameState persistedState, Failures failures) {
+        return matchesManagedRevision(gameName, persistedState, failures)
                 && persistedState.matchesGameFile(gameFileStamp(gameName));
     }
 
-    private static boolean matchesManagedRevision(String gameName, PersistedGameState persistedState) {
+    static final class Failures {
+        private final List<String> gameNames = new ArrayList<>();
+        private Exception firstCause;
+
+        void record(String gameName, Exception cause) {
+            gameNames.add(gameName);
+            if (firstCause == null) firstCause = cause;
+        }
+
+        boolean isEmpty() {
+            return gameNames.isEmpty();
+        }
+
+        String summary() {
+            return StringUtils.abbreviate(
+                    String.format(
+                            "%s hit errors on %s (the stack trace is from %s): %s",
+                            TASK_NAME,
+                            StringHelper.pluralize(gameNames.size(), "game"),
+                            gameNames.getFirst(),
+                            String.join(", ", gameNames)),
+                    MAX_DISCREPANCY_LENGTH);
+        }
+    }
+
+    private static boolean matchesManagedRevision(
+            String gameName, PersistedGameState persistedState, Failures failures) {
         if (persistedState == null) return false;
         try {
             ManagedGame managedGame = GameManager.getManagedGame(gameName);
             return managedGame != null && persistedState.matchesRevision(managedGame.getRevisionKey());
         } catch (Exception e) {
-            BotLogger.error(TASK_NAME + " could not look up managed game " + gameName + ".", e);
+            failures.record(gameName, e);
             return false;
         }
     }
@@ -120,18 +149,22 @@ public class GameDatabaseReconciler {
     private static Optional<String> reconcileGame(
             LoadedGameFile gameFile,
             PersistedGameState persistedState,
-            GameEntityPersistenceService persistenceService) {
+            GameEntityPersistenceService persistenceService,
+            Failures failures) {
         String gameName = gameFile.game().getName();
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(gameFile.game(), gameFile.stamp());
         if (persistedState == null) {
-            return Optional.of(
-                    repair(gameName, "missing from the database", () -> persistenceService.replace(snapshot)));
+            return Optional.of(repair(
+                    gameName, "missing from the database", () -> persistenceService.replace(snapshot), failures));
         }
 
         List<String> differences = PersistedGameState.of(snapshot).describeDifferencesFrom(persistedState);
         if (differences.isEmpty()) return Optional.empty();
         return Optional.of(repair(
-                gameName, "differs in " + String.join("; ", differences), () -> persistenceService.replace(snapshot)));
+                gameName,
+                "differs in " + String.join("; ", differences),
+                () -> persistenceService.replace(snapshot),
+                failures));
     }
 
     private static Optional<String> reconcileUnreferencedUsers() {
@@ -166,11 +199,11 @@ public class GameDatabaseReconciler {
         return Storage.getGameFile(gameName + Constants.TXT).exists();
     }
 
-    private static LoadedGameFile loadGameFile(String gameName) {
+    private static LoadedGameFile loadGameFile(String gameName, Failures failures) {
         try {
             return GameManager.loadGameFile(gameName);
         } catch (Exception e) {
-            BotLogger.error(TASK_NAME + " could not load game " + gameName + ".", e);
+            failures.record(gameName, e);
             return null;
         }
     }
@@ -179,19 +212,23 @@ public class GameDatabaseReconciler {
         return StringUtils.abbreviate(gameName + ": " + discrepancy, MAX_DISCREPANCY_LENGTH);
     }
 
-    private static String repair(String gameName, String discrepancy, Runnable databaseWrite) {
+    private static String repair(String gameName, String discrepancy, Runnable databaseWrite, Failures failures) {
         String description = describe(gameName, discrepancy);
         if (DatabasePersistenceGate.isDisabled()) return description + " (not repaired: database maintenance mode)";
         try {
             databaseWrite.run();
             return description;
         } catch (Exception e) {
-            BotLogger.error(TASK_NAME + " could not repair game " + gameName + ".", e);
+            failures.record(gameName, e);
             return description + " (repair failed)";
         }
     }
 
-    private static void report(List<String> discrepancies, Optional<String> userCleanup, int gameCount) {
+    private static void report(
+            List<String> discrepancies, Optional<String> userCleanup, int gameCount, Failures failures) {
+        if (!failures.isEmpty()) {
+            BotLogger.error(failures.summary(), failures.firstCause);
+        }
         if (discrepancies.isEmpty()) {
             String inSync = String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount);
             BotLogger.logCron(
