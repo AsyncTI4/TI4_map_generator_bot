@@ -167,8 +167,12 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
             assertThat(GameManager.reload(game.getName())).isNull();
 
-            // The file is still on disk, so the game must stay in the bot and keep its database rows.
+            // The file is still on disk, so the game must stay in the bot and keep its database rows,
+            // but its cached copy leaves memory so searches and crons stop seeing it, as get() does.
             assertThat(GameManager.isValid(game.getName())).isTrue();
+            assertThat(GameManager.getManagedGames())
+                    .extracting(ManagedGame::getName)
+                    .doesNotContain(game.getName());
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(eq(game), any()));
             pipeline.verifyNoMoreInteractions();
         }

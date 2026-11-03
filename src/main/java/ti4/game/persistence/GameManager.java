@@ -325,12 +325,17 @@ public class GameManager {
 
     @Nullable
     private static Game reloadGameFile(String gameName) {
+        ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
         }
         if (game == null) {
-            if (!gameFileExists(gameName)) handleManagedGameRemoval(gameName);
+            if (gameFileExists(gameName)) {
+                evictManagedGame(gameName, cachedManagedGame);
+            } else {
+                handleManagedGameRemoval(gameName);
+            }
             return null;
         }
         ManagedGameState managedGameState = ManagedGameState.of(game);
@@ -373,7 +378,10 @@ public class GameManager {
         if (managedGame != null) return managedGame;
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             Game game = GameLoadService.load(gameName);
-            if (game == null) return null;
+            if (game == null) {
+                BotLogger.error("Failed to load ManagedGame for " + gameName + ".");
+                throw new IllegalStateException("Failed to load ManagedGame for " + gameName);
+            }
             return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
         });
     }
