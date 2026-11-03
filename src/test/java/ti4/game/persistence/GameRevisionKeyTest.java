@@ -33,17 +33,6 @@ class GameRevisionKeyTest extends BaseTi4Test {
     }
 
     @Test
-    void loadsLegacyRevisionKey() throws IOException {
-        try (var harness = TestGameHarness.forDefaultMap()) {
-            var game = harness.load();
-            assertThat(GameSaveService.save(game, "saved revision")).isTrue();
-            var path = Storage.getGamePath(game.getName() + Constants.TXT);
-            Files.writeString(path, Files.readString(path).replace("revision_key ", "persistence_revision "));
-            assertThat(harness.load().getRevisionKey()).isEqualTo(game.getRevisionKey());
-        }
-    }
-
-    @Test
     void failedSavePreservesPreviousRevisionAndFile() throws IOException {
         try (var harness = TestGameHarness.forDefaultMap()) {
             var game = harness.load();

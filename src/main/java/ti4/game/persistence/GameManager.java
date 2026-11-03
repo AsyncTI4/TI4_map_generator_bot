@@ -215,6 +215,8 @@ public class GameManager {
         return GameRevisionKeyFile.read(gameName);
     }
 
+    // TODO: Remove with GameRevisionKeyFile.backfill once every save has a revision_key line.
+    @Deprecated(forRemoval = true)
     @Nullable
     public static String backfillRevisionKey(String gameName) {
         return GameRevisionKeyFile.backfill(gameName);
