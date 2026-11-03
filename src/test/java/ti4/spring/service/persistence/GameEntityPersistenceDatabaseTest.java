@@ -21,7 +21,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GameFileStamp;
 import ti4.game.persistence.ManagedGameState;
 import ti4.test.PostgresDatabaseTest;
 import ti4.testUtils.BaseTi4Test;
@@ -84,23 +83,21 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         game.setRound(5);
         game.setActivePlayerID("user-1");
 
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1234, 56)));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game));
 
         PersistedManagedGame persisted = persistedManagedGameService.loadAll().get(game.getName());
         assertThat(persisted.state()).isEqualTo(ManagedGameState.of(game));
-        assertThat(persisted.gameFileStamp().matches(new GameFileStamp(1234, 56)))
-                .isTrue();
     }
 
     @Test
     void resavingAGameReplacesItsParticipants() {
         Game game = gameWithRealPlayers("pbd-db-resave", 3);
         game.addPlayer("spectator-id", "Spectator");
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1, 1)));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game));
 
         game.removePlayer("spectator-id");
         game.addPlayer("newcomer-id", "Newcomer");
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(2, 1)));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game));
 
         assertThat(persistedManagedGameService
                         .loadAll()
@@ -115,7 +112,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     void statisticsIgnoredGameIsStoredWithoutPlayerRows() {
         Game game = gameWithRealPlayers("pbd-db-ignored", 2);
 
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1, 1)));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game));
 
         assertThat(gameRepository.findById(game.getName()))
                 .get()
@@ -143,7 +140,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         Game game = gameWithRealPlayers("pbd-db-reconcile", 4);
         game.addPlayer("spectator-id", "Spectator");
         game.setStoredValue("TitlesForuser-1", "Kingmaker");
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, new GameFileStamp(99, 1));
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         persistenceService.replace(snapshot);
 
@@ -156,7 +153,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     void previousReleaseCanStillDeleteGamesThatHaveParticipants() {
         Game game = gameWithRealPlayers("pbd-db-rollback", 3);
         game.setStoredValue("TitlesForuser-1", "Kingmaker");
-        persistenceService.replace(GameEntityMapper.toSnapshot(game, new GameFileStamp(1, 1)));
+        persistenceService.replace(GameEntityMapper.toSnapshot(game));
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
 
         // The release before game_participant existed deletes title, player and game rows only, so the participant

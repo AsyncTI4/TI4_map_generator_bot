@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
@@ -72,7 +73,8 @@ public class GameDatabaseReconciler {
 
         private void reconcileOrSkip(String gameName) {
             PersistedGameState persistedState = persistedStates.get(gameName);
-            if (isUnchangedSinceLastSync(gameName, persistedState)) {
+            String fileRevisionKey = GameManager.readRevisionKey(gameName);
+            if (persistedState != null && persistedState.matchesRevision(fileRevisionKey)) {
                 existingGameNames.add(gameName);
                 return;
             }
@@ -80,12 +82,14 @@ public class GameDatabaseReconciler {
                 existingGameNames.add(gameName);
                 return;
             }
-            LoadedGameFile gameFile = loadGameFile(gameName, failures);
-            if (gameFile == null) return;
+            if (fileRevisionKey == null) {
+                GameManager.backfillRevisionKey(gameName);
+            }
+            Game game = loadGameFile(gameName, failures);
+            if (game == null) return;
             existingGameNames.add(gameName);
-            if (gameFile.stamp().lastModifiedEpochMilliseconds() > startedAt) return;
-            reconcileGame(gameFile, persistedState, persistenceService, failures)
-                    .ifPresent(discrepancies::add);
+            if (wasChangedAfter(gameName, startedAt)) return;
+            reconcileGame(game, persistedState, persistenceService, failures).ifPresent(discrepancies::add);
         }
 
         @Override
@@ -110,11 +114,6 @@ public class GameDatabaseReconciler {
 
             report(discrepancies, userCleanup, gameCount, failures);
         }
-    }
-
-    private static boolean isUnchangedSinceLastSync(String gameName, PersistedGameState persistedState) {
-        return matchesManagedRevision(gameName, persistedState)
-                && persistedState.matchesGameFile(gameFileStamp(gameName));
     }
 
     static final class Failures {
@@ -142,19 +141,13 @@ public class GameDatabaseReconciler {
         }
     }
 
-    private static boolean matchesManagedRevision(String gameName, PersistedGameState persistedState) {
-        if (persistedState == null) return false;
-        ManagedGame managedGame = GameManager.getLoadedManagedGame(gameName);
-        return managedGame != null && persistedState.matchesRevision(managedGame.getRevisionKey());
-    }
-
     private static Optional<String> reconcileGame(
-            LoadedGameFile gameFile,
+            Game game,
             PersistedGameState persistedState,
             GameEntityPersistenceService persistenceService,
             Failures failures) {
-        String gameName = gameFile.game().getName();
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(gameFile.game(), gameFile.stamp());
+        String gameName = game.getName();
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
         if (persistedState == null) {
             return Optional.of(repair(
                     gameName, "missing from the database", () -> persistenceService.replace(snapshot), failures));
@@ -190,18 +183,14 @@ public class GameDatabaseReconciler {
     }
 
     private static boolean wasChangedAfter(String gameName, long timestamp) {
-        return gameFileStamp(gameName).lastModifiedEpochMilliseconds() > timestamp;
-    }
-
-    private static GameFileStamp gameFileStamp(String gameName) {
-        return GameFileStamp.of(Storage.getGameFile(gameName + Constants.TXT));
+        return Storage.getGameFile(gameName + Constants.TXT).lastModified() > timestamp;
     }
 
     private static boolean gameFileExists(String gameName) {
         return Storage.getGameFile(gameName + Constants.TXT).exists();
     }
 
-    private static LoadedGameFile loadGameFile(String gameName, Failures failures) {
+    private static Game loadGameFile(String gameName, Failures failures) {
         try {
             return GameManager.loadGameFile(gameName);
         } catch (Exception e) {

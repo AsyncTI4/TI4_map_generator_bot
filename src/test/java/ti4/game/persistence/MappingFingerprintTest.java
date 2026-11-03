@@ -31,8 +31,7 @@ class MappingFingerprintTest extends BaseTi4Test {
     // recorded for that version. It only sees logic that the fixtures exercise, so add a variant when you add a
     // derived value.
     private static final String EXPECTED_FINGERPRINT =
-            "0110feb440555617c4d4c8b1aab35ffc882e632ed25d66a410d9554b8274d3a9";
-    private static final GameFileStamp FIXED_STAMP = new GameFileStamp(1L, 1L);
+            "568b08693cf1f7dc5078f19dca653129746e816292d704da68b8254ec162115a";
     private static final Path FINGERPRINT_INPUT = Path.of("target", "mapping-fingerprint.json");
 
     @Test
@@ -104,7 +103,7 @@ class MappingFingerprintTest extends BaseTi4Test {
             variant.accept(game);
             Map<String, Object> state = new LinkedHashMap<>();
             state.put("managedGameState", ManagedGameState.of(game));
-            state.put("rows", PersistedGameState.of(GameEntityMapper.toSnapshot(game, FIXED_STAMP)));
+            state.put("rows", PersistedGameState.of(GameEntityMapper.toSnapshot(game)));
             stored.put(label, state);
         });
         return stored;

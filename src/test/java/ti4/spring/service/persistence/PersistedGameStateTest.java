@@ -36,8 +36,8 @@ class PersistedGameStateTest {
         GameEntity expected = game(5);
         GameEntity actual = game(4);
 
-        expected.setGameFileModifiedEpochMilliseconds(20);
-        actual.setGameFileModifiedEpochMilliseconds(10);
+        expected.setPlayerCount(6);
+        actual.setPlayerCount(5);
 
         PersistedGameState expectedState = PersistedGameState.of(
                 expected,
@@ -49,7 +49,7 @@ class PersistedGameStateTest {
 
         assertThat(expectedState.describeDifferencesFrom(actualState))
                 .containsExactly(
-                        "game columns round (expected 5, found 4), gameFileModifiedEpochMilliseconds (expected 20, found 10)",
+                        "game columns round (expected 5, found 4), playerCount (expected 6, found 5)",
                         "player rows (1 missing, 1 unexpected)",
                         "participant rows (1 missing, 1 unexpected)",
                         "title rows (1 missing, 0 unexpected)");

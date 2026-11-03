@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GameFileStamp;
 import ti4.game.persistence.ManagedGameState;
 import ti4.helpers.TIGLHelper;
 import ti4.service.map.FractureService;
@@ -24,14 +23,13 @@ public class GameEntityMapper {
     private static final String TITLES_KEY_PREFIX = "TitlesFor";
     private static final int MINIMUM_STATISTICS_PLAYER_COUNT = 3;
 
-    public static GameEntitySnapshot toSnapshot(Game game, GameFileStamp gameFileStamp) {
-        return toSnapshot(game, ManagedGameState.of(game), gameFileStamp);
+    public static GameEntitySnapshot toSnapshot(Game game) {
+        return toSnapshot(game, ManagedGameState.of(game));
     }
 
-    public static GameEntitySnapshot toSnapshot(
-            Game game, ManagedGameState managedGameState, GameFileStamp gameFileStamp) {
+    public static GameEntitySnapshot toSnapshot(Game game, ManagedGameState managedGameState) {
         Map<String, UserEntity> users = new LinkedHashMap<>();
-        GameEntity gameEntity = toGameEntity(game, managedGameState, gameFileStamp);
+        GameEntity gameEntity = toGameEntity(game, managedGameState);
         if (gameEntity.isStatisticsIgnored()) {
             return new GameEntitySnapshot(gameEntity, List.of(), List.of());
         }
@@ -73,9 +71,7 @@ public class GameEntityMapper {
                 gameEntity.getLaunchPostThreadId(),
                 participants,
                 ManagedGameState.decodeTeamMateToPrimaryId(gameEntity.getTeamMatePrimaryUserIds()));
-        var gameFileStamp =
-                new GameFileStamp(gameEntity.getGameFileModifiedEpochMilliseconds(), gameEntity.getGameFileSizeBytes());
-        return new PersistedManagedGame(state, gameFileStamp);
+        return new PersistedManagedGame(state);
     }
 
     static boolean hasUnknownName(UserEntity user) {
@@ -86,7 +82,7 @@ public class GameEntityMapper {
         return game.getRealAndEliminatedPlayers().size() >= MINIMUM_STATISTICS_PLAYER_COUNT;
     }
 
-    private static GameEntity toGameEntity(Game game, ManagedGameState managedGameState, GameFileStamp gameFileStamp) {
+    private static GameEntity toGameEntity(Game game, ManagedGameState managedGameState) {
         var gameEntity = new GameEntity();
         gameEntity.setGameName(game.getName());
         gameEntity.setRevisionKey(managedGameState.revisionKey());
@@ -114,8 +110,6 @@ public class GameEntityMapper {
         gameEntity.setTwilightsFall(managedGameState.twilightsFallMode());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
         gameEntity.setStatisticsIgnored(!countsForStatistics(game));
-        gameEntity.setGameFileModifiedEpochMilliseconds(gameFileStamp.lastModifiedEpochMilliseconds());
-        gameEntity.setGameFileSizeBytes(gameFileStamp.sizeBytes());
         setManagedGameColumns(gameEntity, managedGameState);
         return gameEntity;
     }

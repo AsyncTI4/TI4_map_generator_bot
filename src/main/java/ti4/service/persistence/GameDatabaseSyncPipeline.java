@@ -11,7 +11,6 @@ import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
-import ti4.game.persistence.LoadedGameFile;
 import ti4.game.persistence.ManagedGameState;
 import ti4.helpers.TimedRunnable;
 import ti4.logging.BotLogger;
@@ -30,8 +29,7 @@ public class GameDatabaseSyncPipeline {
     public static void queueSync(Game game, ManagedGameState managedGameState) {
         if (DatabasePersistenceGate.isDisabled()) return;
         try {
-            GameEntitySnapshot snapshot =
-                    GameEntityMapper.toSnapshot(game, managedGameState, GameManager.getGameFileStamp(game.getName()));
+            GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, managedGameState);
             queue(game.getName(), service -> service.replace(snapshot));
         } catch (Exception e) {
             BotLogger.error("Failed to prepare database sync for game " + game.getName() + ".", e);
@@ -41,9 +39,10 @@ public class GameDatabaseSyncPipeline {
     public static void queueSyncFromGameFile(String gameName) {
         if (DatabasePersistenceGate.isDisabled()) return;
         queue(gameName, service -> {
-            LoadedGameFile gameFile = GameManager.loadGameFile(gameName);
-            if (gameFile == null) return;
-            service.replace(GameEntityMapper.toSnapshot(gameFile.game(), gameFile.stamp()));
+            GameManager.backfillRevisionKey(gameName);
+            Game game = GameManager.loadGameFile(gameName);
+            if (game == null) return;
+            service.replace(GameEntityMapper.toSnapshot(game));
         });
     }
 

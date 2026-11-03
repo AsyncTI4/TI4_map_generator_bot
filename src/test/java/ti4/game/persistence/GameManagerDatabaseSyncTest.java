@@ -214,14 +214,12 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         String gameName = uniqueName("warmup-current");
         String userId = uniqueName("warmup-current-user");
-        PersistedManagedGame persistedGame =
-                new PersistedManagedGame(managedGameState(gameName, userId), new GameFileStamp(1000, 10));
+        PersistedManagedGame persistedGame = new PersistedManagedGame(managedGameState(gameName, userId));
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+                MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.getGameFileStamp(gameName))
-                    .thenReturn(new GameFileStamp(1000, 10));
+            revisionKeys.when(() -> GameRevisionKeyFile.read(gameName)).thenReturn("row-revision");
 
             assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), corruptGames))
                     .isTrue();
@@ -245,14 +243,12 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         Map<String, GameLoadResult.Corrupt> corruptGames = new HashMap<>();
         Game game = newGame("warmup-stale");
         String userId = game.getPlayers().keySet().iterator().next();
-        PersistedManagedGame staleRow =
-                new PersistedManagedGame(managedGameState(game.getName(), userId), new GameFileStamp(1000, 10));
+        PersistedManagedGame staleRow = new PersistedManagedGame(managedGameState(game.getName(), userId));
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
+                MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService
-                    .when(() -> GameLoadService.getGameFileStamp(game.getName()))
-                    .thenReturn(new GameFileStamp(2000, 10));
+            revisionKeys.when(() -> GameRevisionKeyFile.read(game.getName())).thenReturn("newer-file-revision");
             gameLoadService
                     .when(() -> GameLoadService.tryLoad(game.getName()))
                     .thenReturn(new GameLoadResult.Loaded(game));
@@ -351,7 +347,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     private static ManagedGameState managedGameState(String gameName, String userId) {
         return new ManagedGameState(
                 gameName,
-                null,
+                "row-revision",
                 false,
                 false,
                 false,

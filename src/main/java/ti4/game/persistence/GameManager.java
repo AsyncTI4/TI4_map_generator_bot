@@ -111,8 +111,7 @@ public class GameManager {
             @Nullable Map<String, PersistedManagedGame> persistedGames,
             Map<String, GameLoadResult.Corrupt> corruptGames) {
         PersistedManagedGame persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
-        if (persistedGame != null
-                && persistedGame.gameFileStamp().matches(GameLoadService.getGameFileStamp(gameName))) {
+        if (persistedGame != null && persistedGame.matchesRevision(GameRevisionKeyFile.read(gameName))) {
             gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame.state()));
             return true;
         }
@@ -151,15 +150,10 @@ public class GameManager {
                 corruptGames.get(firstCorruptGameName).cause());
     }
 
-    public static GameFileStamp getGameFileStamp(String gameName) {
-        return GameLoadService.getGameFileStamp(gameName);
-    }
-
     @Nullable
-    public static LoadedGameFile loadGameFile(String gameName) {
+    public static Game loadGameFile(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> switch (GameLoadService.tryLoad(gameName)) {
-            case GameLoadResult.Loaded(Game game) ->
-                new LoadedGameFile(game, GameLoadService.getGameFileStamp(gameName));
+            case GameLoadResult.Loaded(Game game) -> game;
             case GameLoadResult.Corrupt corrupt -> {
                 reportCorruptGame(gameName, corrupt);
                 evictManagedGame(gameName);
@@ -351,8 +345,13 @@ public class GameManager {
     }
 
     @Nullable
-    public static ManagedGame getLoadedManagedGame(String gameName) {
-        return gameNameToManagedGame.get(gameName);
+    public static String readRevisionKey(String gameName) {
+        return GameRevisionKeyFile.read(gameName);
+    }
+
+    @Nullable
+    public static String backfillRevisionKey(String gameName) {
+        return GameRevisionKeyFile.backfill(gameName);
     }
 
     @Nullable

@@ -6,13 +6,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.persistence.GameFileStamp;
 import ti4.game.persistence.ManagedGameState;
 import ti4.testUtils.BaseTi4Test;
 
 class GameEntityMapperTest extends BaseTi4Test {
 
-    private static final GameFileStamp NO_FILE = new GameFileStamp(0, 0);
     private static final List<String> COLORS = List.of("red", "blue", "green", "yellow", "purple", "black");
 
     @Test
@@ -21,7 +19,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         game.setName("mapper-revision");
         game.setRevisionKey("saved-revision");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, NO_FILE);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
         game.setRevisionKey("later-revision");
 
         assertThat(snapshot.game().getRevisionKey()).isEqualTo("saved-revision");
@@ -40,7 +38,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         addRealPlayer(game, "second-id", "hacan");
         addRealPlayer(game, "third-id", "xxcha");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, NO_FILE);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         PlayerEntity playerEntity = playerFor(snapshot, "original-id");
         assertThat(playerEntity.isReplaced()).isTrue();
@@ -65,7 +63,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         addRealPlayer(game, "second-id", "hacan");
         addRealPlayer(game, "third-id", "xxcha");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, NO_FILE);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         UserEntity user = playerFor(snapshot, "original-id").getUser();
         // The placeholder lets GameEntityPersistenceService keep any real name already stored for this user.
@@ -80,7 +78,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         addRealPlayer(game, "second-id", "hacan");
         game.setStoredValue("TitlesForfirst-id", "Kingmaker");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, new GameFileStamp(1234, 56));
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         assertThat(snapshot.game().isStatisticsIgnored()).isTrue();
         // Statistics queries read player and title rows, so an ignored game must not write any.
@@ -90,8 +88,6 @@ class GameEntityMapperTest extends BaseTi4Test {
         assertThat(snapshot.game().getParticipants())
                 .extracting(GameParticipantEntity::getUserId)
                 .containsExactly("first-id", "second-id");
-        assertThat(snapshot.game().getGameFileModifiedEpochMilliseconds()).isEqualTo(1234);
-        assertThat(snapshot.game().getGameFileSizeBytes()).isEqualTo(56);
     }
 
     @Test
@@ -103,7 +99,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         addRealPlayer(game, "third-id", "xxcha");
         game.addPlayer("spectator-id", "Spectator");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, NO_FILE);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         assertThat(snapshot.game().isStatisticsIgnored()).isFalse();
         assertThat(snapshot.game().getPlayers())
@@ -141,7 +137,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         game.setLaunchPostThreadID("444");
         game.setLastModifiedDate(9999);
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, new GameFileStamp(4321, 87));
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
         PersistedManagedGame persisted = GameEntityMapper.toPersistedManagedGame(
                 snapshot.game(), participantsOf(snapshot).reversed());
 
@@ -152,7 +148,6 @@ class GameEntityMapperTest extends BaseTi4Test {
                 .containsExactly("first-id", "second-id", "spectator-id", "third-id");
         assertThat(persisted.state().guildId()).isEqualTo("111");
         assertThat(persisted.state().endedDate()).isEqualTo(5678);
-        assertThat(persisted.gameFileStamp()).isEqualTo(new GameFileStamp(4321, 87));
     }
 
     @Test
@@ -161,7 +156,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         game.setName("mapper-not-ended");
         addRealPlayer(game, "first-id", "sol");
 
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, NO_FILE);
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         assertThat(snapshot.game().getEndedEpochMilliseconds()).isNull();
         assertThat(GameEntityMapper.toPersistedManagedGame(snapshot.game(), participantsOf(snapshot))

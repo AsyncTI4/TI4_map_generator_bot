@@ -121,12 +121,6 @@ public class GameEntity {
     @Column(name = "last_modified_epoch_milliseconds", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private long lastModifiedEpochMilliseconds;
 
-    @Column(name = "game_file_modified_epoch_milliseconds", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
-    private long gameFileModifiedEpochMilliseconds;
-
-    @Column(name = "game_file_size_bytes", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
-    private long gameFileSizeBytes;
-
     @Column(name = "active_player_user_id")
     private String activePlayerUserId;
 

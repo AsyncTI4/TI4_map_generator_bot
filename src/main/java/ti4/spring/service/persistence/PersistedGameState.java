@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import ti4.game.persistence.GameFileStamp;
 import ti4.game.persistence.ManagedGameState;
 
 public record PersistedGameState(
@@ -49,8 +48,6 @@ public record PersistedGameState(
             boolean fastStrategyCardFollowMode,
             boolean injectRulesLinks,
             long lastModifiedEpochMilliseconds,
-            long gameFileModifiedEpochMilliseconds,
-            long gameFileSizeBytes,
             String activePlayerUserId,
             long lastActivePlayerChangeEpochMilliseconds,
             String guildId,
@@ -81,11 +78,6 @@ public record PersistedGameState(
                 && !revision.isBlank()
                 && revision.equals(game.revisionKey())
                 && Objects.equals(game.mappingVersion(), GameEntityMapper.MAPPING_VERSION);
-    }
-
-    public boolean matchesGameFile(GameFileStamp gameFileOnDisk) {
-        return new GameFileStamp(game.gameFileModifiedEpochMilliseconds(), game.gameFileSizeBytes())
-                .matches(gameFileOnDisk);
     }
 
     public static PersistedGameState of(GameEntitySnapshot snapshot) {
@@ -197,8 +189,6 @@ public record PersistedGameState(
                 game.isFastStrategyCardFollowMode(),
                 game.isInjectRulesLinks(),
                 game.getLastModifiedEpochMilliseconds(),
-                game.getGameFileModifiedEpochMilliseconds(),
-                game.getGameFileSizeBytes(),
                 game.getActivePlayerUserId(),
                 game.getLastActivePlayerChangeEpochMilliseconds(),
                 game.getGuildId(),
