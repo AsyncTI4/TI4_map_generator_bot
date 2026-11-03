@@ -62,11 +62,7 @@ class GameDatabaseReconcilerTest {
             when(failing.matchesRevision(anyString())).thenThrow(new IllegalStateException("mapping bug"));
             fixture.persisted.put("failing", failing);
             fixture.persisted.put("deleted", mock(PersistedGameState.class));
-            ManagedGame managedGame = mock(ManagedGame.class);
-            when(managedGame.getRevisionKey()).thenReturn("revision");
-            fixture.manager
-                    .when(() -> GameManager.getLoadedManagedGame("failing"))
-                    .thenReturn(managedGame);
+            fixture.manager.when(() -> GameManager.readRevisionKey("failing")).thenReturn("revision");
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("failing"));
 
             fixture.run();
@@ -75,6 +71,20 @@ class GameDatabaseReconcilerTest {
             verify(fixture.persistence).delete("deleted");
             fixture.logs.verify(
                     () -> BotLogger.error(contains("hit errors on 1 game"), any(Throwable.class)), times(1));
+        }
+    }
+
+    @Test
+    void gameFileWithoutRevisionKeyGetsOneBeforeItIsReconciled() {
+        try (Fixture fixture = new Fixture()) {
+            fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("legacy", "keyed"));
+            fixture.manager.when(() -> GameManager.readRevisionKey("keyed")).thenReturn("revision");
+            when(fixture.file.exists()).thenReturn(true);
+
+            fixture.run();
+
+            fixture.manager.verify(() -> GameManager.backfillRevisionKey("legacy"));
+            fixture.manager.verify(() -> GameManager.backfillRevisionKey("keyed"), never());
         }
     }
 
@@ -141,11 +151,7 @@ class GameDatabaseReconcilerTest {
             PersistedGameState state = mock(PersistedGameState.class);
             fixture.persisted.put("unchanged", state);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
-            ManagedGame managedGame = mock(ManagedGame.class);
-            when(managedGame.getRevisionKey()).thenReturn("revision");
-            fixture.manager
-                    .when(() -> GameManager.getLoadedManagedGame("unchanged"))
-                    .thenReturn(managedGame);
+            fixture.manager.when(() -> GameManager.readRevisionKey("unchanged")).thenReturn("revision");
             when(state.matchesRevision("revision")).thenReturn(true);
             fixture.run();
             fixture.loader.verifyNoInteractions();
@@ -159,11 +165,7 @@ class GameDatabaseReconcilerTest {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("changed", mock(PersistedGameState.class));
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
-            ManagedGame managedGame = mock(ManagedGame.class);
-            when(managedGame.getRevisionKey()).thenReturn("new-revision");
-            fixture.manager
-                    .when(() -> GameManager.getLoadedManagedGame("changed"))
-                    .thenReturn(managedGame);
+            fixture.manager.when(() -> GameManager.readRevisionKey("changed")).thenReturn("new-revision");
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
             fixture.loader.verify(() -> GameLoadService.load("changed"));
@@ -177,12 +179,8 @@ class GameDatabaseReconcilerTest {
             PersistedGameState healthy = mock(PersistedGameState.class);
             fixture.persisted.put("healthy", healthy);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("broken", "healthy"));
-            ManagedGame managedGame = mock(ManagedGame.class);
-            when(managedGame.getRevisionKey()).thenReturn("revision");
             when(healthy.matchesRevision("revision")).thenReturn(true);
-            fixture.manager
-                    .when(() -> GameManager.getLoadedManagedGame("healthy"))
-                    .thenReturn(managedGame);
+            fixture.manager.when(() -> GameManager.readRevisionKey("healthy")).thenReturn("revision");
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();

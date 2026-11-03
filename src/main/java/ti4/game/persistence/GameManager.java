@@ -211,8 +211,13 @@ public class GameManager {
     }
 
     @Nullable
-    public static ManagedGame getLoadedManagedGame(String gameName) {
-        return gameNameToManagedGame.get(gameName);
+    public static String readRevisionKey(String gameName) {
+        return GameRevisionKeyFile.read(gameName);
+    }
+
+    @Nullable
+    public static String backfillRevisionKey(String gameName) {
+        return GameRevisionKeyFile.backfill(gameName);
     }
 
     @Nullable

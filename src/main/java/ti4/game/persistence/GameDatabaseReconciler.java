@@ -73,13 +73,17 @@ public class GameDatabaseReconciler {
 
         private void reconcileOrSkip(String gameName) {
             PersistedGameState persistedState = persistedStates.get(gameName);
-            if (matchesManagedRevision(gameName, persistedState)) {
+            String fileRevisionKey = GameManager.readRevisionKey(gameName);
+            if (persistedState != null && persistedState.matchesRevision(fileRevisionKey)) {
                 existingGameNames.add(gameName);
                 return;
             }
             if (wasChangedAfter(gameName, startedAt)) {
                 existingGameNames.add(gameName);
                 return;
+            }
+            if (fileRevisionKey == null) {
+                GameManager.backfillRevisionKey(gameName);
             }
             Game game = loadGame(gameName, failures);
             if (game == null) return;
@@ -135,12 +139,6 @@ public class GameDatabaseReconciler {
                             String.join(", ", gameNames)),
                     MAX_DISCREPANCY_LENGTH);
         }
-    }
-
-    private static boolean matchesManagedRevision(String gameName, PersistedGameState persistedState) {
-        if (persistedState == null) return false;
-        ManagedGame managedGame = GameManager.getLoadedManagedGame(gameName);
-        return managedGame != null && persistedState.matchesRevision(managedGame.getRevisionKey());
     }
 
     private static Optional<String> reconcileGame(
