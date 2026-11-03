@@ -38,13 +38,12 @@ public record ChannelExportInfo(
 
     private static Optional<String> readStopReason(ChannelExportLocation location, ChannelExportStatus status)
             throws IOException {
-        Path marker =
-                switch (status) {
-                    case FAILED -> location.failedMarker();
-                    case CANCELLED -> location.cancelledMarker();
-                    case PAUSED -> location.pausedMarker();
-                    case NOT_STARTED, RUNNING, DONE -> null;
-                };
+        Path marker = switch (status) {
+            case FAILED -> location.failedMarker();
+            case CANCELLED -> location.cancelledMarker();
+            case PAUSED -> location.pausedMarker();
+            case NOT_STARTED, RUNNING, DONE -> null;
+        };
         return marker == null ? Optional.empty() : Optional.of(location.stopReason(marker));
     }
 
