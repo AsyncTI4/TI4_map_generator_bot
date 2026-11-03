@@ -36,7 +36,7 @@ class MappingShapeFingerprintTest {
     // anywhere in that tree fails the test until MAPPING_VERSION is raised and the fingerprint updated.
     // MappingFingerprintTest covers changes to how values are derived.
     private static final String EXPECTED_FINGERPRINT =
-            "baf6976e6ddddc9119d784992c157c39096939929ae999592d887e48a44cb09d";
+            "ead1ad548fd8e0a64ae545e759d7c3fb706c768102c6b2033567d1661cd3317a";
     private static final List<Class<?>> STORED_ROOTS = List.of(
             ManagedGameState.class,
             PersistedGameState.class,
@@ -52,7 +52,9 @@ class MappingShapeFingerprintTest {
                 .enable(SerializationFeature.INDENT_OUTPUT)
                 .build()
                 .writeValueAsString(typeTree());
-        String fingerprint = sha256("mapping_version=" + GameEntityMapper.MAPPING_VERSION + "\n" + json);
+        // Jackson indents with the platform line separator; hash LF so Windows and CI agree.
+        String fingerprint =
+                sha256("mapping_version=" + GameEntityMapper.MAPPING_VERSION + "\n" + json.replace("\r\n", "\n"));
 
         assertThat(fingerprint)
                 .as("The shape of what is stored for a game changed:\n" + json

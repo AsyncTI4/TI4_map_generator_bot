@@ -31,7 +31,7 @@ class MappingFingerprintTest extends BaseTi4Test {
     // recorded for that version. It only sees logic that the fixtures exercise, so add a variant when you add a
     // derived value.
     private static final String EXPECTED_FINGERPRINT =
-            "568b08693cf1f7dc5078f19dca653129746e816292d704da68b8254ec162115a";
+            "cd61b33dd8d9b430366e6c77a4cec459621c5fc96189282a2262f4d4232646e5";
     private static final Path FINGERPRINT_INPUT = Path.of("target", "mapping-fingerprint.json");
 
     @Test
@@ -41,7 +41,9 @@ class MappingFingerprintTest extends BaseTi4Test {
                 .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
                 .build()
                 .writeValueAsString(storedStateOfFixtures());
-        String fingerprint = sha256("mapping_version=" + GameEntityMapper.MAPPING_VERSION + "\n" + json);
+        // Jackson indents with the platform line separator; hash LF so Windows and CI agree.
+        String fingerprint =
+                sha256("mapping_version=" + GameEntityMapper.MAPPING_VERSION + "\n" + json.replace("\r\n", "\n"));
 
         if (!EXPECTED_FINGERPRINT.equals(fingerprint)) {
             Files.createDirectories(FINGERPRINT_INPUT.getParent());
