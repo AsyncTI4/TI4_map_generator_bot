@@ -48,13 +48,24 @@ class GameManagerCorruptGameTest extends BaseTi4Test {
     }
 
     @Test
-    void onlyAnUnparseableGameFileIsCorrupt() {
+    void aGameIsCorruptOnceItsFileHasFailedToLoad() {
         try (var healthy = TestGameHarness.forDefaultMap();
-                var corrupt = TestGameHarness.forDefaultMap()) {
+                var corrupt = TestGameHarness.forDefaultMap();
+                MockedStatic<BotLogger> ignored = mockStatic(BotLogger.class)) {
             corrupt.corruptGameFile();
+            GameManager.get(healthy.getGameName());
+
+            // Checking reads no files: a corrupt file counts once a load of it has failed.
+            assertThat(GameManager.isCorrupt(corrupt.getGameName())).isFalse();
+            GameManager.get(corrupt.getGameName());
 
             assertThat(GameManager.isCorrupt(healthy.getGameName())).isFalse();
             assertThat(GameManager.isCorrupt(corrupt.getGameName())).isTrue();
+
+            // A successful load clears it again.
+            corrupt.restoreGameFile();
+            GameManager.get(corrupt.getGameName());
+            assertThat(GameManager.isCorrupt(corrupt.getGameName())).isFalse();
             // A game whose file is gone is missing, not corrupt.
             assertThat(GameManager.isCorrupt("missing-" + UUID.randomUUID())).isFalse();
         }
