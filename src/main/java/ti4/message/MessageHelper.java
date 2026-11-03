@@ -442,6 +442,7 @@ public class MessageHelper {
                 msg = "Here is a picture of the active system";
             }
             try {
+                // Use of complete() is intentional here to keep the image before the movement buttons.
                 button.getHook()
                         .sendMessage(msg)
                         .addFiles(fileUpload)
