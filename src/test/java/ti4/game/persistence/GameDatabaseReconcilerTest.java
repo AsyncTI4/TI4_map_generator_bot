@@ -14,7 +14,6 @@ import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.GameEntityMapper;
@@ -116,7 +115,7 @@ class GameDatabaseReconcilerTest {
             when(failing.matchesRevision(anyString())).thenThrow(new IllegalStateException("mapping bug"));
             fixture.persisted.put("failing", failing);
             fixture.persisted.put("deleted", mock(PersistedGameState.class));
-            fixture.manager.when(() -> GameManager.readRevisionKey("failing")).thenReturn("revision");
+            fixture.revisions.when(() -> GameRevisionKeyFile.read("failing")).thenReturn("revision");
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("failing"));
 
             fixture.run();
@@ -132,13 +131,13 @@ class GameDatabaseReconcilerTest {
     void gameFileWithoutRevisionKeyGetsOneBeforeItIsReconciled() {
         try (Fixture fixture = new Fixture()) {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("legacy", "keyed"));
-            fixture.manager.when(() -> GameManager.readRevisionKey("keyed")).thenReturn("revision");
+            fixture.revisions.when(() -> GameRevisionKeyFile.read("keyed")).thenReturn("revision");
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
 
-            fixture.manager.verify(() -> GameManager.backfillRevisionKey("legacy"));
-            fixture.manager.verify(() -> GameManager.backfillRevisionKey("keyed"), never());
+            fixture.revisions.verify(() -> GameRevisionKeyFile.backfill("legacy"));
+            fixture.revisions.verify(() -> GameRevisionKeyFile.backfill("keyed"), never());
         }
     }
 
@@ -205,7 +204,7 @@ class GameDatabaseReconcilerTest {
             PersistedGameState state = mock(PersistedGameState.class);
             fixture.persisted.put("unchanged", state);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
-            fixture.manager.when(() -> GameManager.readRevisionKey("unchanged")).thenReturn("revision");
+            fixture.revisions.when(() -> GameRevisionKeyFile.read("unchanged")).thenReturn("revision");
             when(state.matchesRevision("revision")).thenReturn(true);
             fixture.run();
             fixture.loader.verifyNoInteractions();
@@ -219,7 +218,7 @@ class GameDatabaseReconcilerTest {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("changed", mock(PersistedGameState.class));
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
-            fixture.manager.when(() -> GameManager.readRevisionKey("changed")).thenReturn("new-revision");
+            fixture.revisions.when(() -> GameRevisionKeyFile.read("changed")).thenReturn("new-revision");
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
             fixture.loader.verify(() -> GameLoadService.load("changed"));
@@ -234,7 +233,7 @@ class GameDatabaseReconcilerTest {
             fixture.persisted.put("healthy", healthy);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("broken", "healthy"));
             when(healthy.matchesRevision("revision")).thenReturn(true);
-            fixture.manager.when(() -> GameManager.readRevisionKey("healthy")).thenReturn("revision");
+            fixture.revisions.when(() -> GameRevisionKeyFile.read("healthy")).thenReturn("revision");
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
@@ -245,9 +244,44 @@ class GameDatabaseReconcilerTest {
         }
     }
 
+    @Test
+    void loadFailureIsReportedOnceAndLaterGamesAreReconciled() {
+        try (Fixture fixture = new Fixture()) {
+            GameEntitySnapshot current = snapshot("healthy", "revision", GameEntityMapper.MAPPING_VERSION);
+            fixture.loadsSnapshot("healthy", current);
+            fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("z-broken", "healthy"));
+            IllegalStateException failure = new IllegalStateException("load failed");
+            fixture.loader.when(() -> GameLoadService.load("z-broken")).thenThrow(failure);
+
+            fixture.run();
+
+            verify(fixture.persistence).restore(current);
+            fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
+        }
+    }
+
+    @Test
+    void revisionUpdateFailureIsReportedWithoutCountingABackfill() {
+        try (Fixture fixture = new Fixture()) {
+            GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
+            fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
+            fixture.loadsSnapshot("legacy", current);
+            IllegalStateException failure = new IllegalStateException("update failed");
+            doThrow(failure)
+                    .when(fixture.persistence)
+                    .updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
+
+            fixture.run();
+
+            fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
+            fixture.logs.verify(() -> BotLogger.logCron(contains("Recorded the current revision")), never());
+        }
+    }
+
     private static final class Fixture implements AutoCloseable {
         private final MockedStatic<SpringContext> context = mockStatic(SpringContext.class);
         private final MockedStatic<GameManager> manager = mockStatic(GameManager.class);
+        private final MockedStatic<GameRevisionKeyFile> revisions = mockStatic(GameRevisionKeyFile.class);
         private final MockedStatic<GameLoadService> loader = mockStatic(GameLoadService.class);
         private final MockedStatic<Storage> storage = mockStatic(Storage.class);
         private final MockedStatic<DatabasePersistenceGate> gate = mockStatic(DatabasePersistenceGate.class);
@@ -275,7 +309,8 @@ class GameDatabaseReconcilerTest {
             when(game.getName()).thenReturn(gameName);
             when(file.exists()).thenReturn(true);
             manager.when(GameManager::getGameNames).thenReturn(List.of(gameName));
-            manager.when(() -> GameManager.readRevisionKey(gameName))
+            revisions
+                    .when(() -> GameRevisionKeyFile.read(gameName))
                     .thenReturn(snapshot.game().getRevisionKey());
             loader.when(() -> GameLoadService.load(gameName)).thenReturn(game);
             mapper.when(() -> GameEntityMapper.shouldPersist(game)).thenReturn(true);
@@ -295,6 +330,7 @@ class GameDatabaseReconcilerTest {
             gate.close();
             storage.close();
             loader.close();
+            revisions.close();
             manager.close();
             context.close();
         }

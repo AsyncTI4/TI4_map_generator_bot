@@ -1,7 +1,6 @@
 package ti4.game.persistence;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import ti4.logging.BotLogger;
@@ -14,7 +13,7 @@ class GameDatabaseReconciliationChain {
     private final String taskName;
     private final TaskQueue taskQueue;
     private final BooleanSupplier maintenanceModeOn;
-    private final AtomicBoolean running = new AtomicBoolean();
+    private boolean running;
     private Supplier<Run> pendingRun;
 
     GameDatabaseReconciliationChain(String taskName, TaskQueue taskQueue, BooleanSupplier maintenanceModeOn) {
@@ -24,20 +23,21 @@ class GameDatabaseReconciliationChain {
     }
 
     synchronized boolean start(Supplier<Run> newRun) {
-        if (!running.compareAndSet(false, true)) {
+        if (running) {
             BotLogger.info(taskName + " is already running, so the request to start another run was ignored.");
             return false;
         }
+        running = true;
         boolean queued = queue(" start", START_AND_FINISH_WARNING_THRESHOLD_SECONDS, () -> {
             Run run = newRun.get();
             return queueGame(run, run.start(), 0);
         });
-        if (!queued) running.set(false);
+        if (!queued) running = false;
         return queued;
     }
 
     synchronized boolean startAfterCurrentRun(Supplier<Run> newRun) {
-        if (running.get()) {
+        if (running) {
             pendingRun = newRun;
             return true;
         }
@@ -45,14 +45,14 @@ class GameDatabaseReconciliationChain {
     }
 
     private synchronized void complete() {
-        running.set(false);
+        running = false;
         Supplier<Run> nextRun = pendingRun;
         pendingRun = null;
         if (nextRun != null) start(nextRun);
     }
 
-    boolean isRunning() {
-        return running.get();
+    synchronized boolean isRunning() {
+        return running;
     }
 
     private boolean queueGame(Run run, List<String> gameNames, int index) {

@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.discord.interactions.buttons.handlers.matchmaking.MatchmakingOptions;
-import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 
 @Service

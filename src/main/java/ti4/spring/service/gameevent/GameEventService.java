@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.website.model.CompactMapState;
 

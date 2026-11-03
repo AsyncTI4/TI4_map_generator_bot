@@ -14,8 +14,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.DatabasePersistenceGate;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.service.persistence.GameEntityMapper;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
 import ti4.spring.service.persistence.GameEntitySnapshot;
@@ -75,7 +73,7 @@ public class GameDatabaseReconciler {
 
         private void reconcileOrSkip(String gameName) {
             PersistedGameState persistedState = persistedStates.get(gameName);
-            String fileRevisionKey = GameManager.readRevisionKey(gameName);
+            String fileRevisionKey = GameRevisionKeyFile.read(gameName);
             if (persistedState != null && persistedState.matchesRevision(fileRevisionKey)) {
                 existingGameNames.add(gameName);
                 return;
@@ -85,13 +83,53 @@ public class GameDatabaseReconciler {
                 return;
             }
             if (fileRevisionKey == null) {
-                GameManager.backfillRevisionKey(gameName);
+                GameRevisionKeyFile.backfill(gameName);
             }
-            Game game = loadGame(gameName, failures);
+            Game game = GameLoadService.load(gameName);
             if (game == null) return;
             existingGameNames.add(gameName);
-            reconcileGame(game, persistedStates.get(gameName), persistenceService, failures, () -> revisionBackfills++)
-                    .ifPresent(discrepancies::add);
+            reconcileGame(game, persistedState).ifPresent(discrepancies::add);
+        }
+
+        private Optional<String> reconcileGame(Game game, PersistedGameState persistedState) {
+            String gameName = game.getName();
+            if (!GameEntityMapper.shouldPersist(game)) {
+                if (persistedState == null) return Optional.empty();
+                return Optional.of(repair(
+                        gameName,
+                        "in the database but has fewer than 3 players",
+                        () -> persistenceService.delete(gameName),
+                        failures));
+            }
+
+            GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+            if (persistedState == null) {
+                return Optional.of(repair(
+                        gameName, "missing from the database", () -> persistenceService.restore(snapshot), failures));
+            }
+
+            PersistedGameState expectedState = PersistedGameState.of(snapshot);
+            List<String> differences = expectedState.describeDifferencesFrom(persistedState);
+            if (differences.isEmpty()) {
+                if (!expectedState.hasSameRevisionColumnsAs(persistedState)) {
+                    backfillRevision(snapshot);
+                }
+                return Optional.empty();
+            }
+            return Optional.of(repair(
+                    gameName,
+                    "differs in " + String.join("; ", differences),
+                    () -> persistenceService.restore(snapshot),
+                    failures));
+        }
+
+        private void backfillRevision(GameEntitySnapshot snapshot) {
+            if (DatabasePersistenceGate.isDisabled()) return;
+            persistenceService.updateRevision(
+                    snapshot.game().getGameName(),
+                    snapshot.game().getRevisionKey(),
+                    snapshot.game().getMappingVersion());
+            revisionBackfills++;
         }
 
         @Override
@@ -141,59 +179,6 @@ public class GameDatabaseReconciler {
         }
     }
 
-    private static Optional<String> reconcileGame(
-            Game game,
-            PersistedGameState persistedState,
-            GameEntityPersistenceService persistenceService,
-            Failures failures,
-            Runnable onRevisionBackfilled) {
-        String gameName = game.getName();
-        if (!GameEntityMapper.shouldPersist(game)) {
-            if (persistedState == null) return Optional.empty();
-            return Optional.of(repair(
-                    gameName,
-                    "in the database but has fewer than 3 players",
-                    () -> persistenceService.delete(gameName),
-                    failures));
-        }
-
-        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
-        if (persistedState == null) {
-            return Optional.of(repair(
-                    gameName, "missing from the database", () -> persistenceService.restore(snapshot), failures));
-        }
-
-        PersistedGameState expectedState = PersistedGameState.of(snapshot);
-        List<String> differences = expectedState.describeDifferencesFrom(persistedState);
-        if (differences.isEmpty()) {
-            if (!expectedState.hasSameRevisionColumnsAs(persistedState)) {
-                backfillRevision(snapshot, persistenceService, failures, onRevisionBackfilled);
-            }
-            return Optional.empty();
-        }
-        return Optional.of(repair(
-                gameName,
-                "differs in " + String.join("; ", differences),
-                () -> persistenceService.restore(snapshot),
-                failures));
-    }
-
-    private static void backfillRevision(
-            GameEntitySnapshot snapshot,
-            GameEntityPersistenceService persistenceService,
-            Failures failures,
-            Runnable onRevisionBackfilled) {
-        if (DatabasePersistenceGate.isDisabled()) return;
-        String gameName = snapshot.game().getGameName();
-        try {
-            persistenceService.updateRevision(
-                    gameName, snapshot.game().getRevisionKey(), snapshot.game().getMappingVersion());
-            onRevisionBackfilled.run();
-        } catch (Exception e) {
-            failures.record(gameName, e);
-        }
-    }
-
     private static void reportUnloadableGames(List<String> gameNames) {
         if (gameNames.isEmpty()) return;
         BotLogger.critical(StringUtils.abbreviate(
@@ -230,15 +215,6 @@ public class GameDatabaseReconciler {
 
     private static boolean gameFileExists(String gameName) {
         return Storage.getGameFile(gameName + Constants.TXT).exists();
-    }
-
-    private static Game loadGame(String gameName, Failures failures) {
-        try {
-            return GameLoadService.load(gameName);
-        } catch (Exception e) {
-            failures.record(gameName, e);
-            return null;
-        }
     }
 
     private static String describe(String gameName, String discrepancy) {
