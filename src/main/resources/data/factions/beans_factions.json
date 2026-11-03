@@ -464,5 +464,53 @@
         "complexity": "Medium",
         "preferredColours": ["blk", "ppl"],
         "source": "beans"
+    },
+    {
+        "alias": "bloom",
+        "factionName": "The J'nahfa Bloom",
+        "homeSystem": "be11",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 3 inf j, 1 sd j",
+        "commodities": 3,
+        "factionTech": [
+            "bebloomg",
+            "bebloomcr"
+        ],
+        "startingTechOptions": [
+            "pa",
+            "nm",
+            "aida",
+            "ps"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "jnahfa"
+        ],
+        "abilities": [
+            "sporefall",
+            "strain_dispersal"
+        ],
+        "leaders": [
+            "bloomagent",
+            "bloomcommander",
+            "bloomhero"
+        ],
+        "promissoryNotes": [
+            "bepnbloom"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "bloom_cruiser",
+            "carrier",
+            "dreadnought",
+            "bloom_flagship",
+            "infantry",
+            "bloom_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["blk", "red"],
+        "source": "beans"
     }
 ]

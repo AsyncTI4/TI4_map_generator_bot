@@ -223,5 +223,28 @@
         "faction": "deep",
         "source": "beans",
         "text": "After 1 of your neighbors produces 1 or more units, you may exhaust this card to produce 1 unit of a type that player produced in 1 of your systems that contains a unit with PRODUCTION."
+    },
+    {
+        "alias": "bebloomg",
+        "name": "Hyphal Migration",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "bloom",
+        "source": "beans",
+        "text": "After another player commits units to a planet in or adjacent to a system that contains one of your ground forces, you may exhaust this card to place 1 infantry from your reinforcements into coexistence on that planet."
+    },
+    {
+        "alias": "bebloomcr",
+        "name": "Zygomycete II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GYR",
+        "baseUpgrade": "cr2",
+        "faction": "bloom",
+        "source": "beans",
+        "text": "During movement, if the active system contains 1 or more of your coexisting units, this unit can move through systems that contain other players' ships."
     }
 ]

@@ -273,6 +273,9 @@ public enum LeaderEmojis implements TI4Emoji {
     DeepAgent,
     DeepCommander,
     DeepHero,
+    BloomAgent,
+    BloomCommander,
+    BloomHero,
 
     // Lost Legacies (Theodisi)
     ArdentiaAgent,

@@ -25,7 +25,8 @@ public class DeepTechHandler {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (!FoWHelper.playerHasShipsInSystem(player, tile)
-                    || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                    || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                    || !tile.getPlanetUnitHolders().isEmpty()) {
                 continue;
             }
 
@@ -54,7 +55,8 @@ public class DeepTechHandler {
         Tile tile = game.getTileByPosition(tilePos);
         if (tile == null
                 || !FoWHelper.playerHasShipsInSystem(player, tile)
-                || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                || !tile.getPlanetUnitHolders().isEmpty()) {
             ButtonHelper.deleteMessage(event);
             return;
         }
