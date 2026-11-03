@@ -91,7 +91,7 @@ public class GameManager {
     }
 
     public static boolean isCorrupt(String gameName) {
-        return gameFileExists(gameName) && GameLoadService.load(gameName) == null;
+        return GameLoadService.isKnownUnreadable(gameName);
     }
 
     private static boolean gameFileExists(String gameName) {

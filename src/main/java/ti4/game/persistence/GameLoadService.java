@@ -105,6 +105,11 @@ class GameLoadService {
         });
     }
 
+    static boolean isKnownUnreadable(String gameName) {
+        File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
+        return gameFile.exists() && reportedUnreadableFiles.contains(gameFile.getName());
+    }
+
     private static String stripGameFileExtension(String fileName) {
         return fileName.substring(0, fileName.length() - GAME_FILE_EXTENSION.length());
     }
