@@ -180,7 +180,7 @@ public class GameManager {
             ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
             Game game = GameLoadService.load(gameName);
             if (game == null && gameFileExists(gameName)) {
-                evictManagedGame(gameName, cachedManagedGame);
+                handleCorruptGame(gameName, cachedManagedGame);
             }
             return game;
         });
@@ -192,9 +192,9 @@ public class GameManager {
         Game game = GameLoadService.load(gameName);
         if (game != null) return game;
         if (gameFileExists(gameName)) {
-            evictManagedGame(gameName, cachedManagedGame);
+            handleCorruptGame(gameName, cachedManagedGame);
         } else {
-            handleManagedGameRemoval(gameName);
+            handleMissingGame(gameName);
         }
         return null;
     }
@@ -207,20 +207,27 @@ public class GameManager {
         return Storage.getGameFile(gameName + Constants.TXT).exists();
     }
 
-    private static void handleManagedGameRemoval(String gameName) {
-        gameNames.remove(gameName);
-        evictManagedGame(gameName, gameNameToManagedGame.get(gameName));
-        LoreService.evictGameLore(gameName);
-        GameDatabaseSyncPipeline.queueDelete(gameName);
-    }
-
-    private static void evictManagedGame(String gameName, ManagedGame managedGame) {
+    private static void handleCorruptGame(String gameName, ManagedGame managedGame) {
         if (managedGame == null) return;
         gameNameToManagedGame.computeIfPresent(gameName, (_, current) -> {
             if (current != managedGame) return current;
             managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
             return null;
         });
+    }
+
+    private static void handleMissingGame(String gameName) {
+        unregisterGameAndQueueDatabaseDelete(gameName);
+    }
+
+    private static void unregisterGameAndQueueDatabaseDelete(String gameName) {
+        gameNames.remove(gameName);
+        var managedGame = gameNameToManagedGame.remove(gameName);
+        if (managedGame != null) {
+            managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
+        }
+        LoreService.evictGameLore(gameName);
+        GameDatabaseSyncPipeline.queueDelete(gameName);
     }
 
     public static boolean isValid(String gameName) {
@@ -267,7 +274,7 @@ public class GameManager {
             if (!GameSaveService.delete(gameName)) {
                 return false;
             }
-            handleManagedGameRemoval(gameName);
+            unregisterGameAndQueueDatabaseDelete(gameName);
             return true;
         });
     }
@@ -332,9 +339,9 @@ public class GameManager {
         }
         if (game == null) {
             if (gameFileExists(gameName)) {
-                evictManagedGame(gameName, cachedManagedGame);
+                handleCorruptGame(gameName, cachedManagedGame);
             } else {
-                handleManagedGameRemoval(gameName);
+                handleMissingGame(gameName);
             }
             return null;
         }
@@ -366,6 +373,8 @@ public class GameManager {
         return GameRevisionKeyFile.read(gameName);
     }
 
+    // TODO: Remove with GameRevisionKeyFile.backfill once every save has a revision_key line.
+    @Deprecated(forRemoval = true)
     @Nullable
     public static String backfillRevisionKey(String gameName) {
         return GameRevisionKeyFile.backfill(gameName);

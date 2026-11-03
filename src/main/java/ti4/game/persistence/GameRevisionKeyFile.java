@@ -22,8 +22,6 @@ import ti4.logging.BotLogger;
 
 final class GameRevisionKeyFile {
 
-    private static final String LEGACY_REVISION_KEY = "persistence_revision";
-
     private GameRevisionKeyFile() {}
 
     @Nullable
@@ -31,6 +29,9 @@ final class GameRevisionKeyFile {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> readFrom(gamePath(gameName)));
     }
 
+    // TODO: Remove once every save has a revision_key line (the first nightly reconcile after #5808 adds one to
+    // each). Without it, a keyless file (e.g. restored from an undo older than #5808) is just re-read each night.
+    @Deprecated(forRemoval = true)
     @Nullable
     static String backfill(String gameName) {
         return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
@@ -69,7 +70,7 @@ final class GameRevisionKeyFile {
     private static boolean isRevisionKeyLine(String line) {
         int separator = line.indexOf(' ');
         String key = separator < 0 ? line : line.substring(0, separator);
-        return REVISION_KEY.equals(key) || LEGACY_REVISION_KEY.equals(key);
+        return REVISION_KEY.equals(key);
     }
 
     private static void writeRevisionKey(Path gamePath, String revisionKey) {

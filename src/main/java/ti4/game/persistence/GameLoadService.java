@@ -716,7 +716,7 @@ class GameLoadService {
                         game.setStartedDate(Long.parseLong(info));
                     }
                 }
-                case REVISION_KEY, "persistence_revision" -> game.setRevisionKey(info);
+                case REVISION_KEY -> game.setRevisionKey(info);
                 case Constants.LAST_MODIFIED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setLastModifiedDate(Long.parseLong(info));

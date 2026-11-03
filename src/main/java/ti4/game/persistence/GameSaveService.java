@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -78,7 +79,7 @@ class GameSaveService {
         Path gameSaveDirectory = gameSavePath.getParent();
         Path temporarySavePath = null;
         String previousRevision = game.getRevisionKey();
-        game.setRevisionKey(java.util.UUID.randomUUID().toString());
+        game.setRevisionKey(UUID.randomUUID().toString());
         try {
             temporarySavePath = Files.createTempFile(gameSaveDirectory, game.getName(), ".tmp");
 

@@ -87,3 +87,12 @@ to its wormholes.
 - **Rat race wormholes are separate types** (`ALPHA_RAT` … `KAPPA_RAT`, `Wormhole.isRatRace()`). They
   share the Greek symbol but never match the plain type, and they merge only with each other, with the
   threshold counted per family. Their token ids are `whrat` + type (`whratalpha`).
+- **One-way wormhole tokens are generated, not stored as JSON.** `Mapper` adds `<tokenId>_in`
+  (entry-only) and `<tokenId>_out` (exit-only) for every plain mergeable type, with a virtual image
+  drawn by `OneWayWormholeIcon` (the base token inside an arrow ring with an IN/OUT badge). A link
+  runs from a *departure* wormhole (`Tile.getDepartureWormholes`, no `_out`) to an *arrival*
+  wormhole (`Tile.getArrivalWormholes`, no `_in`); `Tile.getWormholes` still counts both.
+  They have no file on disk: validate tokens with `ImageResources.hasTokenImage`, not
+  `tokenOrAttachment != null`, and never pick one as a type's display image.
+  `WormholeRule` (`ti4.helpers.adjacency`) reads them: movement always follows the direction, every
+  other purpose only with one-way adjacency on (always in fog), otherwise the link counts both ways.
