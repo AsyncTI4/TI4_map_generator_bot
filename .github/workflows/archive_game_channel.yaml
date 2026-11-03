@@ -35,7 +35,8 @@ jobs:
         # unfinished part. A resume may pass a new max_size_mb (0 removes the cap).
         # Layout under exported_channels/<channel id>/:
         #   <export id>/            exported files while the export runs
-        #   <export id>.request     settings saved on first start, reused on resume
+        #   <export id>.request     settings saved on first start, reused on resume, kept after
+        #                           finishing so `/admin channel_export info` can show what it covered
         #   <export id>.progress    finished parts, one per line
         #   <export id>.parts       total number of parts
         #   <export id>.running     present while the exporter runs
@@ -219,7 +220,7 @@ jobs:
             && mv "$EXPORT_BASE.tar.gz.partial" "$EXPORT_BASE.tar.gz" \
             || { rm -f "$EXPORT_BASE.tar.gz.partial"; stop_failed "Could not compress export $EXPORT_ID"; }
           rm -rf "$EXPORT_BASE"
-          rm -f "$EXPORT_BASE.progress" "$EXPORT_BASE.parts" "$EXPORT_BASE.request" "$EXPORT_BASE.cancel" "$EXPORT_BASE.sh"
+          rm -f "$EXPORT_BASE.progress" "$EXPORT_BASE.parts" "$EXPORT_BASE.cancel" "$EXPORT_BASE.sh"
           touch "$EXPORT_BASE.done"
           echo "Export $EXPORT_ID finished"
           WRAPPER
