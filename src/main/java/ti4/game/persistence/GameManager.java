@@ -143,10 +143,10 @@ public class GameManager {
     }
 
     private static void evictManagedGame(String gameName) {
-        var managedGame = gameNameToManagedGame.remove(gameName);
-        if (managedGame != null) {
+        gameNameToManagedGame.computeIfPresent(gameName, (_, managedGame) -> {
             managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
-        }
+            return null;
+        });
     }
 
     public static boolean isValid(String gameName) {
