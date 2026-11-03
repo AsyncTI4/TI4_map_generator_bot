@@ -10,6 +10,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.map.SpinService;
 
@@ -91,6 +92,10 @@ class CustomizationOptions extends GameStateSubcommand {
                         OptionType.STRING, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships")
                 .addChoices(hexBorderChoices));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.ONE_WAY_ADJACENCY,
+                "One-way links count one way for everything, not just movement (always on in fog)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.INJECT_RULES_LINKS,
@@ -199,6 +204,15 @@ class CustomizationOptions extends GameStateSubcommand {
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null) game.setHomebrew(homebrew);
+
+        Boolean oneWayAdjacency = event.getOption(Constants.ONE_WAY_ADJACENCY, null, OptionMapping::getAsBoolean);
+        if (oneWayAdjacency != null) {
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Fog games always use one-way adjacency.");
+            } else {
+                game.setOneWayAdjacency(oneWayAdjacency);
+            }
+        }
 
         Boolean injectRules = event.getOption(Constants.INJECT_RULES_LINKS, null, OptionMapping::getAsBoolean);
         if (injectRules != null) game.setInjectRulesLinks(injectRules);

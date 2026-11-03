@@ -695,7 +695,7 @@ public class StartPhaseService {
                         player2.getRepresentationUnfogged() + ", reminder that this is the window to play _Summit_.");
             }
             if (player2.hasAbility("underhanded_maneuver")
-                    && !player2.getNeighbouringPlayers(true).isEmpty()) {
+                    && !player2.getAbilityNeighbours().isEmpty()) {
                 ArvaxiAbilityHandler.offerUndHandManeuver(player2);
             }
             for (String pn : player2.getPromissoryNotes().keySet()) {

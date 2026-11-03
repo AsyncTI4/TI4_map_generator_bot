@@ -3,8 +3,8 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xyth
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -19,10 +19,10 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
-import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -54,9 +54,7 @@ public class XytherisAbilityHandler {
             return Optional.empty();
         }
 
-        return CheckDistanceHelper.getTileDistances(game, player, tile.getPosition(), 2, true).entrySet().stream()
-                .filter(entry -> entry.getValue() != null && entry.getValue() >= 1 && entry.getValue() <= 2)
-                .map(Map.Entry::getKey)
+        return systemsUpToTwoAway(game, player, tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .filter(remoteTile -> remoteTile != null
                         && !TeHelperUnits.affectedByQuietus(game, player, remoteTile)
@@ -73,6 +71,21 @@ public class XytherisAbilityHandler {
                         candidate -> candidate.getLeft().getCombatDieCountForAbility(rollType, player)
                                 * (10 - candidate.getLeft().getCombatDieHitsOnForAbility(rollType, player))
                                 / 10.0d));
+    }
+
+    private static Set<String> systemsUpToTwoAway(Game game, Player player, String position) {
+        Adjacency adjacency = Adjacency.of(game, player);
+        Set<String> nearby = adjacency.into(position);
+        for (String adjacent : Set.copyOf(nearby)) {
+            Tile adjacentTile = game.getTileByPosition(adjacent);
+            if (adjacentTile != null
+                    && (adjacentTile.getTileModel() == null
+                            || !adjacentTile.getTileModel().isHyperlane())) {
+                nearby.addAll(adjacency.into(adjacent));
+            }
+        }
+        nearby.remove(position);
+        return nearby;
     }
 
     public static List<Button> getStingOfTheHiveHitReplacementButtons(

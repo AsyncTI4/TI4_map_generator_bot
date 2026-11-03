@@ -247,7 +247,8 @@ public class TacticalActionService {
                 "tyris",
                 "lunarium",
                 "zephyrion",
-                "vyserix");
+                "vyserix",
+                "deep");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
         if (tile.isFracture()) {

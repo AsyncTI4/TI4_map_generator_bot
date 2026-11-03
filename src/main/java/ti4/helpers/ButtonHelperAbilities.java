@@ -37,6 +37,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -278,13 +279,14 @@ public final class ButtonHelperAbilities {
                 getTilesToRallyTheHorde(game, player));
     }
 
+    // TODO: nothing emits startBestow anymore (Bestow uses gain_2_comms); remove it and bestowPart2?
     @ButtonHandler("startBestow")
     public static void startBestow(Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("bestowPart2_" + player.getFaction(), "Gain 2 Commodities"));
         buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentation() + " your neighbor " + player.getRepresentationNoPing()
@@ -483,7 +485,7 @@ public final class ButtonHelperAbilities {
         String pos2 = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos2);
         List<Button> buttons = new ArrayList<>();
-        for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String pos : Adjacency.of(game, player).into(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);
             UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
@@ -1416,7 +1418,8 @@ public final class ButtonHelperAbilities {
         }
         switch (name) {
             case "grom" -> {
-                for (String adj : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true)) {
+                for (String adj :
+                        Adjacency.of(game, player).forEffects().withSelf().from(tile.getPosition())) {
                     Tile target = game.getTileByPosition(adj);
                     if (target != null && FoWHelper.knowsTile(game, player, target.getPosition())) {
                         buttons.add(Buttons.gray("gromPart2_" + adj, target.getRepresentationForButtons(game, player)));
@@ -1424,7 +1427,7 @@ public final class ButtonHelperAbilities {
                 }
             }
             case "mors" -> {
-                Set<String> adjPos = FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, true);
+                Set<String> adjPos = Adjacency.of(game, player).forEffects().from(tile.getPosition());
                 for (Tile loc : game.getTileMap().values()) {
                     if (!loc.getPosition().equals(tile.getPosition())
                             && !adjPos.contains(loc.getPosition())
@@ -1996,7 +1999,7 @@ public final class ButtonHelperAbilities {
             if (p2 == player || !p2.hasAbility("pillage")) {
                 continue;
             }
-            if (tg > 2 && player.getNeighbouringPlayers(true).contains(p2)) {
+            if (tg > 2 && p2.getAbilityNeighbours().contains(player)) {
                 return true;
             }
         }
@@ -2084,11 +2087,12 @@ public final class ButtonHelperAbilities {
 
     public static void pillageCheck(Player player, Game game) {
         if (canBePillaged(player, game, player.getTg())) {
-            for (Player neighbor : player.getNeighbouringPlayers(true)) {
-                if (!neighbor.hasAbility("pillage")) {
+            for (Player pillager : game.getRealPlayers()) {
+                if (pillager == player
+                        || !pillager.hasAbility("pillage")
+                        || !pillager.getAbilityNeighbours().contains(player)) {
                     continue;
                 }
-                Player pillager = neighbor;
                 String factionChecker = ComponentIdEnvelope.ownedBy(pillager.getFaction());
                 List<Button> buttons = new ArrayList<>();
                 String playerIdent = player.getRepresentationNoPing();

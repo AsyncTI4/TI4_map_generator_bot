@@ -33,6 +33,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.helpers.adjacency.AdjacencyPurpose;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -351,7 +352,7 @@ public final class GMService {
 
         StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
-        for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
+        for (Player player : FoWHelper.getAdjacentPlayers(game, position, false, AdjacencyPurpose.VISION)) {
             sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

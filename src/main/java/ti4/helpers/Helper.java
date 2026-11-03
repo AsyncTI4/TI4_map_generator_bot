@@ -47,6 +47,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedReso
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPromissoryHandler;
@@ -86,6 +87,7 @@ import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thundersedge.TeHelperUnits;
@@ -289,6 +291,9 @@ public final class Helper {
         }
         if (player.hasAbility("nomadic") || player.hasTech("tf-nomadic")) {
             return true;
+        }
+        if (DeepUnitHandler.isDeepPlayer(player) && !DeepUnitHandler.isOnBoard(game, player)) {
+            return false;
         }
         if (player.hasAbility("mobile_command")
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Flagship)
@@ -2475,7 +2480,7 @@ public final class Helper {
         if (game.isTwilightsFallMode() && !XinTechHandler.hasVeiledNetworkingStar(player)) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.hasTech("tf-smotheringpresence")) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
+                    for (String tilePos : Adjacency.of(game, p2).withSelf().into(tile.getPosition())) {
                         Tile t2 = game.getTileByPosition(tilePos);
                         for (UnitHolder uH : t2.getUnitHolders().values()) {
                             if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
@@ -2656,6 +2661,12 @@ public final class Helper {
                 && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
                 && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
             productionValueTotal *= 2;
+        }
+        if (player.hasTech("bedeepy")
+                && tile.getPlanetUnitHolders().isEmpty()
+                && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                && FoWHelper.playerHasShipsInSystem(player, tile)) {
+            productionValueTotal += 2;
         }
         productionValueTotal += MigoHarvestHandler.getYellowHarvestProductionBonus(game, player, tile);
         return productionValueTotal;
@@ -2890,6 +2901,22 @@ public final class Helper {
                     Button wsButton = Buttons.green(
                             checker + placePrefix + "_aurelion_" + tp, "Produce Aurelion", UnitEmojis.flagship);
                     unitButtons.add(wsButton);
+                }
+                UnitModel deep = player.getPriorityUnitByAsyncID("thedeep", null);
+                if (deep != null && resourcelimit >= deep.getCost()) {
+                    UnitKey deepKey = Units.getUnitKey(UnitType.Deep, player.getColorID());
+                    String deepRemaining = " (" + ButtonHelperFactionSpecific.remainingUnitsOfType(game, deepKey) + ")";
+                    Button deepButton = Buttons.green(
+                            checker + placePrefix + "_thedeep_" + tp,
+                            "Produce " + deep.getName() + deepRemaining,
+                            UnitEmojis.flagship);
+                    if (!ButtonHelperFactionSpecific.vortexButtonAvailable(game, deepKey)) {
+                        deepButton = Buttons.gray(
+                                checker + placePrefix + "_thedeep_" + tp,
+                                "Produce " + deep.getName() + deepRemaining,
+                                UnitEmojis.flagship);
+                    }
+                    unitButtons.add(deepButton);
                 }
                 Button fsButton = Buttons.green(
                         checker + placePrefix + "_flagship_" + tp, "Produce Flagship" + remaining, UnitEmojis.flagship);

@@ -37,7 +37,7 @@ public class ArdentiaPromissoryHandler {
             return;
         }
 
-        int additionalInfluence = player.getNeighbourCount();
+        int additionalInfluence = player.getAbilityNeighbours().size();
         player.addSpentThing("usurpersLease_" + additionalInfluence);
         player.removePromissoryNote(USURPERS_LEASE);
         owner.setPromissoryNote(USURPERS_LEASE);

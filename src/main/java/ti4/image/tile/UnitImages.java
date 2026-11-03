@@ -50,6 +50,9 @@ final class UnitImages {
         if (unitKey.unitType() == UnitType.Aurelion) {
             overlay = aurelionLabel();
         }
+        if (unitKey.unitType() == UnitType.Deep) {
+            overlay = deepLabel(player);
+        }
         if (unitKey.unitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
             overlay = decal("units_ds_ghemina_lord_wht.png");
         }
@@ -66,6 +69,24 @@ final class UnitImages {
         graphics.rotate(Math.PI / 4, 40, 40);
         graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         OutlinedText.draw(graphics, "Aurelion", -1, 45, Color.WHITE, null, null, new BasicStroke(1), Color.BLACK);
+        graphics.dispose();
+        return label;
+    }
+
+    private static BufferedImage deepLabel(Player player) {
+        boolean ascended = player.hasUnit("deep_thedeepascended");
+        String name = ascended ? "The Deep, Ascended" : "The Deep";
+        BufferedImage label = new BufferedImage(81, 80, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = label.createGraphics();
+        graphics.rotate(Math.PI / 4, 40, 40);
+        graphics.setFont(new Font(Font.SANS_SERIF, Font.BOLD, ascended ? 20 : 24));
+        int textWidth = graphics.getFontMetrics().stringWidth(name);
+        double widthScale = Math.min(1.0, 76.0 / textWidth);
+        graphics.translate(40, 0);
+        graphics.scale(widthScale, 1);
+        graphics.translate(-40, 0);
+        OutlinedText.draw(
+                graphics, name, (81 - textWidth) / 2, 47, Color.WHITE, null, null, new BasicStroke(3), Color.BLACK);
         graphics.dispose();
         return label;
     }

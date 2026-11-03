@@ -16,6 +16,9 @@ interface GameEventRepository extends CrudRepository<GameEventEntity, Long> {
             + " order by e.gameName")
     List<String> findGameNamesWithEventsAfter(@Param("since") long since);
 
+    @Query("select distinct e.gameName from GameEventEntity e where e.seq > 0")
+    List<String> findGameNamesWithEvents();
+
     @Query("select e.mapState from GameEventEntity e where e.gameName = :gameName and e.seq <= :seq"
             + " and e.mapState is not null order by e.seq desc")
     List<String> findLatestMapStates(@Param("gameName") String gameName, @Param("seq") long seq, Pageable pageable);

@@ -309,7 +309,8 @@ public class ThirtyKEconomyAcButtonHandler {
     }
 
     private static boolean isPriceTarget(Game game, Player player, Player other) {
-        return ThirtyKDistance.homesMoreThanFiveApart(game, player, other) && !player.isNeighboursWith(other);
+        return ThirtyKDistance.homesMoreThanFiveApart(game, player, other)
+                && !player.getAbilityNeighbours().contains(other);
     }
 
     @ButtonHandler(PRICE)
@@ -559,7 +560,7 @@ public class ThirtyKEconomyAcButtonHandler {
         Player purger = purged == null ? null : game.getPlayerFromColorOrFaction(purged.purgerFaction());
         if (purger == null
                 || purger == player
-                || player.isNeighboursWith(purger)
+                || player.getAbilityNeighbours().contains(purger)
                 || purged.fragments().isEmpty()) {
             ThirtyKAcTargets.noTarget(event, player, "Preservation Act");
             return;

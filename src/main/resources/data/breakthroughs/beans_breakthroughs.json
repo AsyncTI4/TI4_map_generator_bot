@@ -106,5 +106,17 @@
         ],
         "text": "Planets you control that have technology specialties cannot be exhausted by other players. When another player commits units onto one of those planets, you may exhaust 1 technology to force those units into coexistence instead.",
         "source": "beans"
+    },
+    {
+        "alias": "deepbt",
+        "name": "Event Horizon",
+        "shortName": "Event\nHorizon",
+        "faction": "deep",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "Your ships may retreat to any system that contains no planets or no other players' ships.\n\nAfter you activate a system, you may exhaust this card to allow up to 2 of your ships to move out of any systems that contain no planets and your command tokens.",
+        "source": "beans"
     }
 ]

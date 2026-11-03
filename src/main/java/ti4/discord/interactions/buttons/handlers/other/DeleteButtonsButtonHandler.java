@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyA
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
@@ -229,7 +230,9 @@ class DeleteButtonsButtonHandler {
                     && !game.getStoredValue("amalgAmount").isEmpty()) {
                 editedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             }
-            ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+            if (!"Done Producing Units".equalsIgnoreCase(buttonLabel)) {
+                ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+            }
             if ("skarnathBuild".equalsIgnoreCase(buttonID)) {
                 ThronesThroneHandler.clearSkarnathDiscount(game, player);
             }
@@ -279,6 +282,19 @@ class DeleteButtonsButtonHandler {
                         player.getCurrentProducedUnits().entrySet()) {
                     String unitId = entry.getKey().split("_")[0];
                     unitsMap.merge(unitId, entry.getValue(), Integer::sum);
+                }
+                Player productionPlayer = player;
+                if (unitsMap.isEmpty()) {
+                    ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+                } else {
+                    ButtonHelper.sendMessageToRightStratThread(
+                            player,
+                            game,
+                            editedMessage,
+                            buttonID,
+                            null,
+                            productionSummary -> DeepTechHandler.offerItLooksBack(
+                                    game, productionPlayer, productionSummary.getJumpUrl()));
                 }
                 // Only tactical-action builds belong to the tactical draft; the draft is game-global, so an
                 // unscoped stage would swallow other players' warfare/construction builds into the active

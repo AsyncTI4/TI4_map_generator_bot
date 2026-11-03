@@ -127,13 +127,12 @@ public class VeiledHeartService {
             return false;
         }
         VeiledCardType type = optional_type.get();
-        String deckId =
-                switch (type) {
-                    case ABILITY -> game.getAbilitySpliceDeckID();
-                    case UNIT -> game.getUnitSpliceDeckID();
-                    case GENOME -> game.getGenomeSpliceDeckID();
-                    case PARADIGM -> game.getParadigmSpliceDeckID();
-                };
+        String deckId = switch (type) {
+            case ABILITY -> game.getAbilitySpliceDeckID();
+            case UNIT -> game.getUnitSpliceDeckID();
+            case GENOME -> game.getGenomeSpliceDeckID();
+            case PARADIGM -> game.getParadigmSpliceDeckID();
+        };
         return Mapper.getDeck(deckId).getNewDeck().contains(card);
     }
 

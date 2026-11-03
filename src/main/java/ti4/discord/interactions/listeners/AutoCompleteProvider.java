@@ -1495,12 +1495,11 @@ class AutoCompleteProvider {
 
     private static void resolveFindAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
-        List<Command.Choice> options =
-                switch (optionName) {
-                    case Constants.SEARCH_TYPE -> FindService.autoCompleteType(event);
-                    case Constants.SOURCE -> FindService.autoCompleteSource(event);
-                    default -> Collections.emptyList();
-                };
+        List<Command.Choice> options = switch (optionName) {
+            case Constants.SEARCH_TYPE -> FindService.autoCompleteType(event);
+            case Constants.SOURCE -> FindService.autoCompleteSource(event);
+            default -> Collections.emptyList();
+        };
         event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

@@ -8,11 +8,11 @@
         "requirements": "GGG",
         "faction": "diaspora",
          "source": "gamma",
-        "text": "After another player moves ships into a system that contains 1 or more of your planets, you may return any number of captured infantry on planet cards in that system to produce those infantry units on those planets without spending resources."
+        "text": "During invasions, when 1 of your infantry would be destroyed, you may destroy 1 of your infantry in an adjacent system instead."
     },
     {
         "alias": "ggdiacr",
-        "name": "Letani Node II",
+        "name": "Vivace II",
         "types": [
             "UNITUPGRADE"
         ],
@@ -20,7 +20,7 @@
         "faction": "diaspora",
         "baseUpgrade": "cr2",
         "source": "gamma",
-        "text": "Cost 2 Combat 6 Move 2 Capacity 3"
+        "text": "During combat in a system that contains 1 or more structures, apply +1 to the result of this unit's combat rolls.\nCost 2 Combat 6 Move 3 Capacity 1"
     },
     {
         "alias": "gghlry",

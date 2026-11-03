@@ -256,5 +256,19 @@
             "HOMESYSTEM:migo"
         ],
         "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "origin_unknown",
+        "optionalSwaps": [
+            "HERO:deephero"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "STARTINGFLEET",
+        "itemId": "deep",
+        "undraftable": true,
+        "source": "beans"
     }
 ]

@@ -147,25 +147,24 @@ public class VeylorLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        String pool =
-                switch (buttonID.substring(GAIN_HERO_CC.length())) {
-                    case "tactic" -> {
-                        player.setTacticalCC(player.getTacticalCC() + 1);
-                        yield "tactic";
-                    }
-                    case "fleet" -> {
-                        player.setFleetCC(player.getFleetCC() + 1);
-                        yield "fleet";
-                    }
-                    case "strategy" -> {
-                        player.setStrategicCC(player.getStrategicCC() + 1);
-                        yield "strategy";
-                    }
-                    default -> {
-                        ButtonHelper.deleteMessage(event);
-                        yield null;
-                    }
-                };
+        String pool = switch (buttonID.substring(GAIN_HERO_CC.length())) {
+            case "tactic" -> {
+                player.setTacticalCC(player.getTacticalCC() + 1);
+                yield "tactic";
+            }
+            case "fleet" -> {
+                player.setFleetCC(player.getFleetCC() + 1);
+                yield "fleet";
+            }
+            case "strategy" -> {
+                player.setStrategicCC(player.getStrategicCC() + 1);
+                yield "strategy";
+            }
+            default -> {
+                ButtonHelper.deleteMessage(event);
+                yield null;
+            }
+        };
 
         if (pool == null) {
             return;

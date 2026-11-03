@@ -8,10 +8,10 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.service.unit.DestroyUnitService;
 
@@ -25,9 +25,10 @@ public class TravelBanAgendaResolver implements AgendaResolver {
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if (!"for".equalsIgnoreCase(winner)) {
             Set<String> wormholesAndAdj = new HashSet<>();
+            Adjacency adjacency = Adjacency.of(game).forEffects();
             for (Tile tile : ButtonHelper.getAllWormholeTiles(game)) {
                 wormholesAndAdj.add(tile.getPosition());
-                wormholesAndAdj.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), null, false));
+                wormholesAndAdj.addAll(adjacency.into(tile.getPosition()));
             }
             for (String pos : wormholesAndAdj) {
                 Tile t = game.getTileByPosition(pos);

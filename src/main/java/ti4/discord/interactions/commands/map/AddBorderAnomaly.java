@@ -13,6 +13,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.Mapper;
+import ti4.service.map.OneWayAdjacencyHintService;
 
 public class AddBorderAnomaly extends GameStateSubcommand {
 
@@ -85,6 +86,9 @@ public class AddBorderAnomaly extends GameStateSubcommand {
                     .append(anomalyType.getAutomationNotes());
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        if (amountAdded > 0 && anomalyType.isOneWay()) {
+            OneWayAdjacencyHintService.hintOnce(game, event.getChannel());
+        }
     }
 
     static void sendUnknownTypeMessage(SlashCommandInteractionEvent event, String anomalyTypeString) {

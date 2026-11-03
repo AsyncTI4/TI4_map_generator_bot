@@ -237,13 +237,12 @@ public class ActionCardPingButtonHandler {
         String targetKey = parts[3];
 
         String cardTitle = peekCardTitle(game, player, token);
-        boolean sent =
-                switch (type) {
-                    case PLANET -> pingPlanetTarget(game, player, targetKey, isPublic, cardTitle);
-                    case SYSTEM -> pingSystemTarget(game, player, targetKey, isPublic, cardTitle);
-                    case PLAYER -> pingPlayerTarget(game, player, targetKey, isPublic, cardTitle);
-                    default -> false;
-                };
+        boolean sent = switch (type) {
+            case PLANET -> pingPlanetTarget(game, player, targetKey, isPublic, cardTitle);
+            case SYSTEM -> pingSystemTarget(game, player, targetKey, isPublic, cardTitle);
+            case PLAYER -> pingPlayerTarget(game, player, targetKey, isPublic, cardTitle);
+            default -> false;
+        };
         if (sent) {
             ButtonHelper.deleteMessage(event);
         } else {

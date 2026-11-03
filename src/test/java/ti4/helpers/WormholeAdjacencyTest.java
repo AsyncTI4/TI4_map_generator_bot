@@ -44,7 +44,7 @@ class WormholeAdjacencyTest extends BaseTi4Test {
                     "planet".equals(holderB) ? b.getPlanetUnitHolders().getFirst() : b.getSpaceUnitHolder();
             target.addToken(onB);
 
-            assertThat(FoWHelper.getWormholeAdjacencies(game, a.getPosition(), null, false))
+            assertThat(FoWHelper.getWormholeAdjacencies(game, a.getPosition(), null))
                     .as(onA + " -> " + onB)
                     .matches(positions -> positions.contains(b.getPosition()) == adjacent);
         }

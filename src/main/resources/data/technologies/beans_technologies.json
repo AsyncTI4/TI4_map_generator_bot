@@ -201,5 +201,27 @@
         "faction": "migo",
         "source": "beans",
         "text": "After you exhaust a planet that has a technology specialty, you may exhaust this card to ready that planet."
+    },
+    {
+        "alias": "bedeepy",
+        "name": "Abyssal Genesis",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "deep",
+        "source": "beans",
+        "text": "Systems that contain no planets, your ships, and no other player’s ships have PRODUCTION 2 as if they were a unit you control.\n\nACTION: Exhaust this card to produce up to 2 units in a system containing your ships and no other player’s ships."
+    },
+    {
+        "alias": "bedeepg",
+        "name": "It Looks Back",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "deep",
+        "source": "beans",
+        "text": "After 1 of your neighbors produces 1 or more units, you may exhaust this card to produce 1 unit of a type that player produced in 1 of your systems that contains a unit with PRODUCTION."
     }
 ]

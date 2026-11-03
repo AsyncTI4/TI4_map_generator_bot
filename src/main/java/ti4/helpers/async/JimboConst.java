@@ -206,15 +206,14 @@ final class JimboConst {
             if (matcher.find()) baseTile = matcher.replaceFirst("");
 
             String rotationStr = hl.getId().replace(baseTile, "");
-            int rotation =
-                    switch (rotationStr) {
-                        case "1", "60" -> 1;
-                        case "2", "120" -> 2;
-                        case "3", "180" -> 3;
-                        case "4", "240" -> 4;
-                        case "5", "300" -> 5;
-                        default -> 0;
-                    };
+            int rotation = switch (rotationStr) {
+                case "1", "60" -> 1;
+                case "2", "120" -> 2;
+                case "3", "180" -> 3;
+                case "4", "240" -> 4;
+                case "5", "300" -> 5;
+                default -> 0;
+            };
             baseStringOrder.add(baseTile);
             tilesByRotation.get(rotation).put(baseTile, hl);
         }
