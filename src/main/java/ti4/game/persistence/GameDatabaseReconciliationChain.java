@@ -70,7 +70,8 @@ class GameDatabaseReconciliationChain {
     }
 
     private boolean queue(String taskSuffix, int warningThresholdSeconds, Link link) {
-        return taskQueue.queue(taskName + taskSuffix, warningThresholdSeconds, () -> runUnlessStopped(link));
+        return taskQueue.queue(
+                new ReconciliationTask(taskName + taskSuffix, warningThresholdSeconds, () -> runUnlessStopped(link)));
     }
 
     private void runUnlessStopped(Link link) {
@@ -94,7 +95,32 @@ class GameDatabaseReconciliationChain {
 
     @FunctionalInterface
     interface TaskQueue {
-        boolean queue(String taskName, int warningThresholdSeconds, Runnable task);
+        boolean queue(ReconciliationTask task);
+    }
+
+    static final class ReconciliationTask implements Runnable {
+        private final String name;
+        private final int warningThresholdSeconds;
+        private final Runnable action;
+
+        private ReconciliationTask(String name, int warningThresholdSeconds, Runnable action) {
+            this.name = name;
+            this.warningThresholdSeconds = warningThresholdSeconds;
+            this.action = action;
+        }
+
+        String name() {
+            return name;
+        }
+
+        int warningThresholdSeconds() {
+            return warningThresholdSeconds;
+        }
+
+        @Override
+        public void run() {
+            action.run();
+        }
     }
 
     interface Run {

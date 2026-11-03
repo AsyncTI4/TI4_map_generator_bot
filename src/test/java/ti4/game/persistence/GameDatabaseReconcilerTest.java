@@ -322,9 +322,9 @@ class GameDatabaseReconcilerTest {
         private void run() {
             Deque<Runnable> tasks = new ArrayDeque<>();
             try (MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-                pipeline.when(() -> GameDatabaseSyncPipeline.queueReconciliationTask(anyString(), anyInt(), any()))
+                pipeline.when(() -> GameDatabaseSyncPipeline.queueReconciliationTask(any()))
                         .thenAnswer(invocation -> {
-                            tasks.add(invocation.getArgument(2));
+                            tasks.add(invocation.getArgument(0));
                             return true;
                         });
                 assertThat(GameDatabaseReconciler.queueReconciliation()).isTrue();

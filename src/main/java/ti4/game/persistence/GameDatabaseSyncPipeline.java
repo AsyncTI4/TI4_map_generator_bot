@@ -49,8 +49,8 @@ public class GameDatabaseSyncPipeline {
                 EXECUTOR_SERVICE, SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    static boolean queueReconciliationTask(String taskName, int warningThresholdSeconds, Runnable reconciliationTask) {
-        return queueTask(taskName, warningThresholdSeconds, reconciliationTask);
+    static boolean queueReconciliationTask(GameDatabaseReconciliationChain.ReconciliationTask task) {
+        return queueTask(task.name(), task.warningThresholdSeconds(), task);
     }
 
     private static boolean queueTask(String taskName, int executionTimeWarningThresholdSeconds, Runnable runnable) {
