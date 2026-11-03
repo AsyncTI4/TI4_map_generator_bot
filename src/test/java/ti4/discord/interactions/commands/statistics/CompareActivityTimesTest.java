@@ -31,7 +31,7 @@ class CompareActivityTimesTest {
     @Test
     void registersOptionalRoleSelection() {
         assertTrue(command.getOptions().stream()
-                .anyMatch(option -> option.getName().equals(Constants.ROLE1)
+                .anyMatch(option -> Constants.ROLE1.equals(option.getName())
                         && option.getType() == OptionType.ROLE
                         && !option.isRequired()));
     }
@@ -59,7 +59,8 @@ class CompareActivityTimesTest {
 
         try (var generator = mockStatic(CreateGameButtonHandler.class);
                 var messages = mockStatic(MessageHelper.class)) {
-            generator.when(() -> CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false))
+            generator
+                    .when(() -> CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false))
                     .thenReturn("comparison");
 
             command.execute(event);
@@ -97,8 +98,8 @@ class CompareActivityTimesTest {
             command.execute(event);
 
             generator.verifyNoInteractions();
-            messages.verify(() -> MessageHelper.sendMessageToEventChannel(
-                    event, "No valid players or roles provided to compare."));
+            messages.verify(() ->
+                    MessageHelper.sendMessageToEventChannel(event, "No valid players or roles provided to compare."));
         }
     }
 
@@ -118,7 +119,8 @@ class CompareActivityTimesTest {
         when(event.getChannel()).thenReturn(channel);
         try (var generator = mockStatic(CreateGameButtonHandler.class);
                 var messages = mockStatic(MessageHelper.class)) {
-            generator.when(() -> CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false))
+            generator
+                    .when(() -> CreateGameButtonHandler.generateMemberListMessage(members, "Activity Times", false))
                     .thenReturn("comparison");
 
             command.execute(event);
