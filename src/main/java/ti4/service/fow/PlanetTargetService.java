@@ -159,6 +159,15 @@ public class PlanetTargetService {
                     buttonPrefix, ownership, visibility, publicLegality, alwaysInclude, requireController, navPrefix);
         }
 
+        public PlanetTargetSpec withButtonPrefix(String prefix) {
+            return new PlanetTargetSpec(
+                    prefix, ownership, visibility, publicLegality, alwaysInclude, requireController, null);
+        }
+
+        public String targetButtonId(String planetId) {
+            return buttonPrefix + "_" + planetId;
+        }
+
         /** True when this planet is filtered out for the acting player by the ownership axis. */
         boolean ownershipRejects(Player actor, String planetId) {
             boolean mine = actor.getPlanets().contains(planetId);
@@ -513,7 +522,7 @@ public class PlanetTargetService {
                 boolean seeItNow = tile != null && visibleNow.contains(tile.getPosition());
                 if (seeItNow && game.getPlayerThatControlsPlanet(planetId, true) == null) continue;
             }
-            buttons.add(Buttons.gray(spec.buttonPrefix() + "_" + planetId, label.apply(planetId)));
+            buttons.add(Buttons.gray(spec.targetButtonId(planetId), label.apply(planetId)));
         }
         // Sort by label so ordering carries no signal about why a planet is in the list.
         buttons.sort((a, b) -> a.getLabel().compareToIgnoreCase(b.getLabel()));
