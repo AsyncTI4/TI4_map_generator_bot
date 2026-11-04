@@ -21,6 +21,7 @@ public class DeveloperCommand implements ParentCommand {
                     new RestoreGame(),
                     new ReloadCorruptedSaves(),
                     new RunCron(),
+                    new RunningTasks(),
                     new RunAgainstAllGames(),
                     new CustomCommand(),
                     new RunAgainstSpecificGame(),

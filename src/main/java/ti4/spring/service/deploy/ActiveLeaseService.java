@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ti4.AsyncTI4DiscordBot;
+import ti4.executors.RunningTaskRegistry;
 import ti4.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 
@@ -160,6 +161,12 @@ public class ActiveLeaseService {
 
     @Scheduled(fixedDelayString = "#{@leaseProperties.heartbeatIntervalMillis}")
     void maintainLease() {
+        try (var registration = RunningTaskRegistry.start("Scheduled: ActiveLeaseService.maintainLease")) {
+            maintainLeaseState();
+        }
+    }
+
+    private void maintainLeaseState() {
         if (isDraining()) {
             return;
         }

@@ -11,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
+import ti4.executors.RunningTaskRegistry;
 import ti4.logging.BotLogger;
 
 @UtilityClass
@@ -27,12 +28,13 @@ public class CardsInfoPinCleanupService {
 
     static {
         PIN_CLEANUP_DRAIN.scheduleAtFixedRate(
-                CardsInfoPinCleanupService::drainOnePinnedMessageRetrieval,
+                RunningTaskRegistry.wrap(
+                        "Cards info pin retrieval", CardsInfoPinCleanupService::drainOnePinnedMessageRetrieval),
                 PIN_RETRIEVAL_DRAIN_INTERVAL_MILLIS,
                 PIN_RETRIEVAL_DRAIN_INTERVAL_MILLIS,
                 TimeUnit.MILLISECONDS);
         PIN_CLEANUP_DRAIN.scheduleAtFixedRate(
-                CardsInfoPinCleanupService::drainOneUnpin,
+                RunningTaskRegistry.wrap("Cards info unpin", CardsInfoPinCleanupService::drainOneUnpin),
                 UNPIN_DRAIN_INTERVAL_MILLIS,
                 UNPIN_DRAIN_INTERVAL_MILLIS,
                 TimeUnit.MILLISECONDS);

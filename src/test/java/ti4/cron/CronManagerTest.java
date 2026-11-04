@@ -7,8 +7,40 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
+import ti4.executors.RunningTaskRegistry;
 
 class CronManagerTest {
+
+    @Test
+    void reportsRunningCronsAndRemovesThemAfterCompletion() throws Exception {
+        CountDownLatch started = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch completed = new CountDownLatch(1);
+        CronManager.scheduleOnce(
+                TrackedCron.class,
+                () -> {
+                    started.countDown();
+                    try {
+                        if (!release.await(10, TimeUnit.SECONDS))
+                            throw new AssertionError("Timed out waiting for release");
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new AssertionError(e);
+                    }
+                },
+                0,
+                TimeUnit.MILLISECONDS);
+        try {
+            assertThat(started.await(10, TimeUnit.SECONDS)).isTrue();
+            assertThat(RunningTaskRegistry.snapshot()).anyMatch(task -> "Cron: TrackedCron".equals(task.name()));
+        } finally {
+            release.countDown();
+        }
+        // A later task on the single cron thread guarantees the first task has exited its tracking scope.
+        CronManager.scheduleOnce(AfterTrackedCron.class, completed::countDown, 0, TimeUnit.MILLISECONDS);
+        assertThat(completed.await(10, TimeUnit.SECONDS)).isTrue();
+        assertThat(RunningTaskRegistry.snapshot()).noneMatch(task -> "Cron: TrackedCron".equals(task.name()));
+    }
 
     @Test
     void periodicCronStillRunsOnItsNextTickAfterARunThrows() throws InterruptedException {
@@ -36,4 +68,8 @@ class CronManagerTest {
     }
 
     private static final class ThrowingCron {}
+
+    private static final class TrackedCron {}
+
+    private static final class AfterTrackedCron {}
 }
