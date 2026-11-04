@@ -4,7 +4,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionHistoryManager;
@@ -22,8 +21,6 @@ public class GameDatabaseSyncPipeline {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
     private static final int SYNC_EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 5;
-    private static final AtomicInteger QUEUED_RESYNCS = new AtomicInteger();
-    private static final AtomicInteger PENDING_RESYNCS = new AtomicInteger();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor(
             Thread.ofPlatform().name("ti4-game-database-sync-", 0).factory());
 
@@ -39,26 +36,11 @@ public class GameDatabaseSyncPipeline {
 
     static void queueSyncFromGameFile(String gameName) {
         if (DatabasePersistenceGate.isDisabled()) return;
-        QUEUED_RESYNCS.incrementAndGet();
-        PENDING_RESYNCS.incrementAndGet();
-        queue(
-                gameName,
-                service -> {
-                    Game game = GameLoadService.load(gameName);
-                    if (game == null) return;
-                    service.restore(GameEntityMapper.toSnapshot(game));
-                },
-                PENDING_RESYNCS::decrementAndGet);
-    }
-
-    @Deprecated(forRemoval = true)
-    static int pendingResyncs() {
-        return PENDING_RESYNCS.get();
-    }
-
-    @Deprecated(forRemoval = true)
-    static int queuedResyncs() {
-        return QUEUED_RESYNCS.get();
+        queue(gameName, service -> {
+            Game game = GameLoadService.load(gameName);
+            if (game == null) return;
+            service.restore(GameEntityMapper.toSnapshot(game));
+        });
     }
 
     static void queueDelete(String gameName) {
@@ -87,25 +69,17 @@ public class GameDatabaseSyncPipeline {
     }
 
     private static void queue(String gameName, Consumer<GameEntityPersistenceService> databaseWrite) {
-        queue(gameName, databaseWrite, () -> {});
-    }
-
-    private static void queue(
-            String gameName, Consumer<GameEntityPersistenceService> databaseWrite, Runnable afterWrite) {
         Runnable runnable = () -> {
+            if (DatabasePersistenceGate.isDisabled()) return;
             try {
-                if (DatabasePersistenceGate.isDisabled()) return;
                 databaseWrite.accept(GameEntityPersistenceService.getBean());
             } catch (Exception e) {
                 BotLogger.error("Failed to sync game " + gameName + " to the database.", e);
-            } finally {
-                afterWrite.run();
             }
         };
-        boolean queued = queueTask(
+        queueTask(
                 "GameDatabaseSyncPipeline task for `" + gameName + "`",
                 SYNC_EXECUTION_TIME_WARNING_THRESHOLD_SECONDS,
                 runnable);
-        if (!queued) afterWrite.run();
     }
 }

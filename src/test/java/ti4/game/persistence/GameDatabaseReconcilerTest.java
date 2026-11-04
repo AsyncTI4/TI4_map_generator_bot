@@ -137,7 +137,7 @@ class GameDatabaseReconcilerTest {
     }
 
     @Test
-    void gameFileWithoutRevisionKeyGetsOneBeforeItIsReconciled() {
+    void gameFileWithoutRevisionKeyIsReconciledWithoutWritingOne() {
         try (Fixture fixture = new Fixture()) {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("legacy", "keyed"));
             fixture.revisionFile("legacy", null);
@@ -146,7 +146,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            assertThat(fixture.revisionLines("legacy")).anyMatch(line -> line.startsWith("revision_key "));
+            assertThat(fixture.revisionLines("legacy")).noneMatch(line -> line.startsWith("revision_key"));
             assertThat(fixture.revisionLines("keyed")).contains("revision_key revision");
         }
     }

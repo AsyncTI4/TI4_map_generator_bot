@@ -36,17 +36,6 @@ public class PersistedManagedGameService {
         return persistedGames;
     }
 
-    @Deprecated(forRemoval = true)
-    @Transactional(readOnly = true, timeout = WARMUP_READ_TIMEOUT_SECONDS)
-    public Map<String, String> loadCurrentRevisionKeys() {
-        Map<String, String> revisionKeys = new HashMap<>();
-        for (GameRevisionRow row :
-                gameEntityRepository.findRevisionsByMappingVersion(GameEntityMapper.MAPPING_VERSION)) {
-            revisionKeys.put(row.gameName(), row.revisionKey());
-        }
-        return revisionKeys;
-    }
-
     public static PersistedManagedGameService getBean() {
         return SpringContext.getBean(PersistedManagedGameService.class);
     }

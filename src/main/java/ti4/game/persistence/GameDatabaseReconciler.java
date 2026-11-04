@@ -82,9 +82,6 @@ public class GameDatabaseReconciler {
                 existingGameNames.add(gameName);
                 return;
             }
-            if (fileRevisionKey == null) {
-                GameRevisionKeyFile.backfill(gameName);
-            }
             Game game = GameLoadService.load(gameName);
             if (game == null) return;
             existingGameNames.add(gameName);

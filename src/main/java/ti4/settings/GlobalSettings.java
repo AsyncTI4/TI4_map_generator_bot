@@ -33,8 +33,7 @@ public final class GlobalSettings {
         @Deprecated(forRemoval = true, since = "2026-10")
         GAME_MESSAGES_IMPORTED_TO_DATABASE,
         BOT_LOG_WEBHOOK_URL, // Webhook URL to send rogue bot log messages to
-        TESTBED_ENABLED,
-        DATABASE_WARMUP_READS_ENABLED;
+        TESTBED_ENABLED;
 
         @Override
         public String toString() {

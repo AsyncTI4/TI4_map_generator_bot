@@ -64,7 +64,6 @@ public class GameManager {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
                 Map<String, ManagedGameState> persistedGames = loadPersistedManagedGames();
-                DatabaseWarmupCheck databaseCheck = DatabaseWarmupCheck.fromSettings();
                 Map<String, Exception> failedGames = new ConcurrentHashMap<>();
                 AtomicInteger builtFromDatabase = new AtomicInteger();
                 AtomicInteger builtFromGameFiles = new AtomicInteger();
@@ -72,7 +71,7 @@ public class GameManager {
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
                     gameNames.forEach(name -> executorService.submit(() -> {
                         try {
-                            boolean fromDatabase = warmupManagedGame(name, persistedGames, databaseCheck);
+                            boolean fromDatabase = warmupManagedGame(name, persistedGames);
                             (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
                         } catch (Exception e) {
                             failedGames.put(name, e);
@@ -80,10 +79,6 @@ public class GameManager {
                     }));
                 }
                 reportGamesThatFailedWarmup(failedGames);
-                if (persistedGames != null) {
-                    databaseCheck.report();
-                    DatabaseWarmupRollout.recordWarmupCheck(databaseCheck);
-                }
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
                         "FINISHED BUILDING MANAGED GAMES: %,d FROM THE DATABASE, %,d FROM GAME FILES",
@@ -113,20 +108,13 @@ public class GameManager {
         }
     }
 
-    static boolean warmupManagedGame(
-            String gameName,
-            @Nullable Map<String, ManagedGameState> persistedGames,
-            DatabaseWarmupCheck databaseCheck) {
+    static boolean warmupManagedGame(String gameName, @Nullable Map<String, ManagedGameState> persistedGames) {
         ManagedGameState persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
-        if (persistedGame != null
-                && databaseCheck.readsEnabled()
-                && buildManagedGameFromCurrentRow(gameName, persistedGame)) {
+        if (persistedGame != null && buildManagedGameFromCurrentRow(gameName, persistedGame)) {
             return true;
         }
         Game game = buildManagedGameFromGameFile(gameName);
-        if (game != null
-                && persistedGames != null
-                && !databaseCheck.rowMatchesFile(gameName, persistedGame, ManagedGameState.of(game))) {
+        if (game != null && persistedGames != null) {
             GameDatabaseSyncPipeline.queueSyncFromGameFile(gameName);
         }
         return false;

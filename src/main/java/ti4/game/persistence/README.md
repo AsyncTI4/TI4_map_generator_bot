@@ -62,7 +62,7 @@ Every seat in a game gets a `player` row, so warmup can rebuild each
 `ManagedPlayer`. Both user columns link to `user`: `playing_user_id` is whoever
 holds the seat now and `user_id` is the user its statistics count for, which
 differs after a `/replace`. A seat holder's name comes from their shared `user`
-row, so the startup check ignores names when comparing seats.
+row.
 `is_playing` marks real and eliminated seats. Seats still in setup and dummies,
 such as the neutral player, are stored with `is_playing` false, and every
 statistics query on player rows leaves them out. `ManagedGame` derives a seat's
@@ -110,17 +110,11 @@ the file deletion operation succeeds.
 At startup `GameManager.warmup` loads every database row whose mapping version is
 current, then builds each `ManagedGame`:
 
-- With `database_warmup_reads_enabled` on, a row whose revision key matches the
-  game file header builds the `ManagedGame` without parsing the file.
-- Otherwise the file is parsed. Its state is compared with the row: a missing or
-  outdated row queues a resync from the file, and a row with the current key but
-  different content is reported as a mapping bug.
+- A row whose revision key matches the game file header builds the `ManagedGame`
+  without parsing the file.
+- Otherwise the file is parsed, and a missing or outdated row queues a resync from
+  the file.
 
-The setting is read once per startup; turning it off and restarting goes back to
-files only. After a startup with reads off, `DatabaseWarmupRolloutCron` checks every
-2 minutes: it logs the resync backlog while it drains, then turns the setting on
-once no row differed at startup and every game's row has its current revision key.
-The cron is deprecated and goes away with the setting.
 With maintenance mode on, or if the database read fails, every game is built from
 its file and no resync is queued.
 
@@ -170,7 +164,7 @@ flowchart TD
     B -->|Yes| C[Skip parsing and database writes]
     B -->|No| D{File modified after run started?}
     D -->|Yes| E[Skip this game for this run]
-    D -->|No| F[Backfill file revision if missing, then load game]
+    D -->|No| F[Load game]
     F --> G{Loaded?}
     G -->|No| H[Continue; finish checks file existence before deleting rows]
     G -->|Yes| K{Database row exists?}
@@ -185,8 +179,8 @@ than trusting cached `ManagedGame` metadata. A match requires a nonblank revisio
 and the current mapping version. Bump `GameEntityMapper.MAPPING_VERSION` whenever
 snapshot mapping changes require existing database rows to be refreshed.
 
-Legacy saves without revision keys receive a key through a locked temporary-file
-rewrite before comparison. Revision metadata is excluded from content differences:
+A save without a revision key never matches, so it is loaded and compared on every
+run until its next save writes a key. Revision metadata is excluded from content differences:
 an otherwise matching row needs only a revision-column update. Actual repairs use
 `restore`, which preserves existing known user names while inserting missing users
 or replacing unknown-name placeholders.
