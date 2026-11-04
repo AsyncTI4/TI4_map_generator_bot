@@ -118,5 +118,17 @@
         ],
         "text": "Your ships may retreat to any system that contains no planets or no other players' ships.\n\nAfter you activate a system, you may exhaust this card to allow up to 2 of your ships to move out of any systems that contain no planets and your command tokens.",
         "source": "beans"
+    },
+    {
+        "alias": "bloombt",
+        "name": "Mycelial Bridges",
+        "shortName": "Mycelial\nBridges",
+        "faction": "bloom",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "After you produce 1 or more infantry, you may place up to 2  of the produced infantry into coexistence on different planets containing your coexisting units.",
+        "source": "beans"
     }
 ]

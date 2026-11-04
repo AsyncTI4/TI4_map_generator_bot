@@ -3,6 +3,7 @@ package ti4.game.persistence;
 import java.util.ArrayList;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
@@ -46,6 +47,7 @@ class TransientGameInfoUpdater {
             }
             MigoLeadersHandler.syncMigoCommanderBonus(game);
             for (Player player : game.getRealPlayers()) {
+                BloomAbilityHandler.syncCoexistingAbilities(game, player);
                 MigoAbilityHandler.syncHarvestCards(game, player);
                 MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);
                 MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);

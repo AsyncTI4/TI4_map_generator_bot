@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
@@ -242,6 +243,7 @@ public class PlayerTechService {
     public static void exhaustTechAndResolve(
             GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         String pos = "";
+        String hyphalMigrationTarget = "";
         if (tech.contains("dskortg")) {
             String[] splitTech = tech.split("_");
             if (splitTech.length > 1) {
@@ -252,6 +254,10 @@ public class PlayerTechService {
         if (tech.startsWith("aws_")) {
             pos = tech.substring("aws_".length());
             tech = "aws";
+        }
+        if (tech.startsWith("bebloomg_")) {
+            hyphalMigrationTarget = tech.substring("bebloomg_".length());
+            tech = "bebloomg";
         }
         String inf = "";
         if (tech.contains("_inf") && tech.contains("absol_aida")) {
@@ -291,6 +297,13 @@ public class PlayerTechService {
                     event.getMessageChannel(), "No system without planets is available for _Power Word: Plane Shift_.");
             return;
         }
+        if ("bebloomg".equals(tech)
+                && !hyphalMigrationTarget.isEmpty()
+                && event instanceof ButtonInteractionEvent buttonEvent
+                && !canResolveHyphalMigration(game, player, hyphalMigrationTarget)) {
+            deleteIfButtonEvent(buttonEvent);
+            return;
+        }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology "
                 + techModel.getRepresentation(false) + ".";
         game.setStoredValue(
@@ -322,6 +335,12 @@ public class PlayerTechService {
 
         switch (tech) {
             case "bedeepg" -> DeepTechHandler.resolveItLooksBack(event, game, player);
+            case "bebloomg" -> {
+                if (event instanceof ButtonInteractionEvent buttonEvent && !hyphalMigrationTarget.isEmpty()) {
+                    BloomTechHandler.resolveHyphalMigration(buttonEvent, game, player, hyphalMigrationTarget);
+                    deleteIfButtonEvent(buttonEvent);
+                }
+            }
             case "ththurvialig" -> {
                 ThurvialiTechHandler.resolveRestructuring(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -829,6 +848,14 @@ public class PlayerTechService {
         if (event instanceof ButtonInteractionEvent) {
             ((ComponentInteraction) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    private static boolean canResolveHyphalMigration(Game game, Player player, String hyphalMigrationTarget) {
+        String[] payload = hyphalMigrationTarget.split("\\|", 3);
+        Player committer = payload.length == 3 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
+        Tile destination = payload.length == 3 ? game.getTileByPosition(payload[1]) : null;
+        String planetName = payload.length == 3 ? payload[2] : null;
+        return BloomTechHandler.canResolveHyphalMigration(game, player, committer, destination, planetName);
     }
 
     private static void sendNextActionButtonsIfButtonEvent(

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
@@ -305,6 +306,7 @@ class TacticalActionButtonHandlers {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
                         AddUnitService.addUnits(event, game, toAdd);
                         CombatEventRecorder.recordLanding(game, player, tile, planet, type, amount);
+                        BloomTechHandler.offerHyphalMigration(game, player, tile, planet);
                         ThirtyKExploreHooks.afterLanding(game, owner, tile, planet, type, amount);
                         if (type == UnitType.Infantry) {
                             MonumentsService.recordNaaluMonumentInfantryCommit(game, owner, tile, planet);

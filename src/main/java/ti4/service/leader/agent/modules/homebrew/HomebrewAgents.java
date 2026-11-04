@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import ti4.service.leader.agent.AgentCatalog;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.modules.homebrew.beans.AshenAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.BloomAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DeepAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
@@ -109,6 +110,7 @@ public final class HomebrewAgents implements AgentCatalog {
                             new GolgiAgent(),
                             new HopeOfTheCosmosAgent(),
                             new AshenAgent(),
+                            new BloomAgent(),
                             new MigoAgent(),
                             new NetrunnersAgent(),
                             new ValhavnAgent(),

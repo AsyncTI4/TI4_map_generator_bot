@@ -318,7 +318,7 @@
     "name": "Nhal",
     "title": "The First",
     "abilityWindow": "ACTION:",
-    "abilityText": "Exhaust this card and select another player, that player may explore a frontier token in or adjacent to a system containing one of their ships. If they do, you may place a frontier token in your home system.",
+    "abilityText": "Exhaust this card and choose another player. That player may explore a frontier token in or adjacent to a system containing 1 or more of their ships. If they do, you may place a frontier token in your home system.",
     "unlockCondition": "Always Unlocked",
     "source": "beans",
     "flavorText": "Nhal speaks softly because The Deep has no need to shout."
@@ -343,9 +343,46 @@
     "title": "The Deep",
     "abilityName": "Inevitable Ruin - All-Consuming",
     "abilityWindow": "ACTION:",
-    "abilityText": "Replace The Deep planet card with The Deep, Ascended planet card and its ability card and ready them. For the rest of the game, abilities that refer to The Deep now refer to The Deep, Ascended. Then, purge this card.",
+    "abilityText": "Place this card near the game board. Then, replace The Deep planet card with The Deep, Ascended planet card and its legendary ability card and ready them. For the rest of the game, abilities that refer to The Deep One now refer to The Deep, Ascended.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "The stars mistook its slumber for mercy."
+  },
+  {
+    "id": "bloomagent",
+    "faction": "bloom",
+    "type": "agent",
+    "name": "Oo'ka",
+    "title": "The Gardener",
+    "abilityWindow": "ACTION:",
+    "abilityText": "You may exhaust this card and select another player to allow that player to ready 1 planet they control. If they do, you may place 1 infantry into coexistence on a non-home planet that player controls.",
+    "unlockCondition": "Always Unlocked",
+    "source": "beans",
+    "flavorText": "A willing host always bears the richest fruit."
+  },
+  {
+    "id": "bloomcommander",
+    "faction": "bloom",
+    "type": "commander",
+    "name": "Vaa'kul",
+    "title": "The Root-Speaker",
+    "abilityWindow": "When another player activates a system that contains a planet you are coexisting on:",
+    "abilityText": "You may move 1 infantry from another planet you are coexisting on onto that planet.",
+    "unlockCondition": "Have units coexisting on 1 cultural, 1 hazardous, and 1 industrial planet.",
+    "source": "beans",
+    "flavorText": "A root severed in one place still drinks from another."
+  },
+  {
+    "id": "bloomhero",
+    "faction": "bloom",
+    "type": "hero",
+    "name": "Tref'ka",
+    "title": "The Blight",
+    "abilityName": "Fungal Bloom - Rapid Dispersal",
+    "abilityWindow": "ACTION:",
+    "abilityText": "Place 1 infantry from your reinforcements on each planet you are coexisting on. Then, for each of those planets that contains 2 or more of your ground forces, you may place 1 infantry from your reinforcements into coexistence on a non-home planet in or adjacent to that system. Then, purge this card.",
+    "unlockCondition": "Have 3 scored objectives.",
+    "source": "beans",
+    "flavorText": "Bloom."
   }
 ]

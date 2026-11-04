@@ -2,6 +2,7 @@ package ti4.service.leader.agent.modules.homebrew;
 
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -27,6 +28,7 @@ public final class KyroAgent extends TargetedAgent {
         target.setCommodities(target.getCommodities() + commoditiesTotal);
         ButtonHelper.resolveMinisterOfCommerceCheck(use.game(), target, use.event());
         ButtonHelperAgents.cabalAgentInitiation(use.game(), target);
+        BloomStrainHandler.resolveRhizomaticActive(target, use.game());
 
         String message =
                 target.getFactionEmojiOrColor() + " replenished commodities due to " + use.agentNameFor(target) + ".";

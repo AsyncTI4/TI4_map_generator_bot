@@ -2534,6 +2534,12 @@ public class ButtonHelper {
         if (player.getRelics().contains("e6-g0_network")) {
             limit += 2;
         }
+        if (player.hasAbility("neurotropic_dormant")) {
+            limit += 1;
+        }
+        if (player.hasAbility("neurotropic_active")) {
+            limit += 2;
+        }
         return limit;
     }
 
@@ -2607,8 +2613,7 @@ public class ButtonHelper {
     }
 
     public static boolean canMoveOutOfLockedSystems(Player player, Game game) {
-        if (DeepBreakthroughHandler.hasEventHorizonAllowance(game, player)
-                || game.isDominusOrb()
+        if (game.isDominusOrb()
                 || game.isL1Hero()
                 || player.hasTech("tf-desperados")
                 || player.hasAbility("desperados_br")
@@ -2622,7 +2627,9 @@ public class ButtonHelper {
     }
 
     public static boolean canMoveOutOfLockedSystems(Player player, Game game, Tile tile) {
-        return canMoveOutOfLockedSystems(player, game)
+        return (DeepBreakthroughHandler.hasEventHorizonAllowance(game, player)
+                        && tile.getPlanetUnitHolders().isEmpty())
+                || canMoveOutOfLockedSystems(player, game)
                 || NatauLeadersHandler.canMoveOutOfLockedAnomaly(game, player, tile);
     }
 

@@ -270,5 +270,19 @@
         "itemId": "deep",
         "undraftable": true,
         "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "strain_dispersal",
+        "optionalSwaps": [
+            "FLAGSHIP:bloom_flagship"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "bloom_flagship",
+        "undraftable": true,
+        "source": "beans"
     }
 ]
