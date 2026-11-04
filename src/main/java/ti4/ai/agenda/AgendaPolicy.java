@@ -98,7 +98,7 @@ public class AgendaPolicy {
         if (outcomes.isEmpty()) return Optional.empty();
         String agenda = currentAgenda(game);
         AgendaForecast forecast = AgendaForecast.of(game, speaker);
-        if (forecast.hasRivalImperialRider(speaker)) {
+        if (!forecast.isEmpty()) {
             return outcomes.stream()
                     .max(Comparator.comparingDouble(button -> forecast.utility(speaker, outcomeOf(button))));
         }

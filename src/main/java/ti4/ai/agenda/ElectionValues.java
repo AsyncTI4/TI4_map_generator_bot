@@ -53,7 +53,7 @@ class ElectionValues {
     private static final int PROPHECY_HELD_ROUNDS = 2;
     private static final double EXECUTION_SILENCED = 1.0;
     private static final int POINT = 1;
-    private static final double SHARD_KEEP = 0.6;
+    private static final double SHARD_KEEP = 0.8;
     private static final double CROWN_KEEP = 0.85;
     private static final double THALNOS_PER_ROUND = 1.0;
     private static final int STANDARD_TACTIC = 3;

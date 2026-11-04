@@ -31,7 +31,7 @@ class CardElectionValues {
     private static final double DIPLOMACY_SECONDARY = 1.0;
     private static final double CONSTRUCTION_SECONDARY = 2.0;
     private static final double WARFARE_SECONDARY = 2.0;
-    private static final double TECHNOLOGY_SECONDARY_COST = 1.0;
+    private static final double TECHNOLOGY_SECONDARY_COST = 6 * ValueScale.RESOURCE;
     private static final int LEADERSHIP_TOKEN_CAP = 3;
     private static final int LEADERSHIP_INFLUENCE_PER_TOKEN = 3;
     private static final int POLITICS_CARDS = 2;

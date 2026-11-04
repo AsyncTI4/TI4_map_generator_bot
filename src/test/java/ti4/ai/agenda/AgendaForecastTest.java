@@ -185,7 +185,7 @@ class AgendaForecastTest extends BaseTi4Test {
 
     @Test
     void isEmptyOutsideTheAgendaPhaseAndForAnAgendaItCannotEnumerate() {
-        test.game.setCurrentAgendaInfo("Directive_Elect Strategy Card_7_crisis");
+        test.game.setCurrentAgendaInfo("Directive_Elect Something Else_7_not_an_agenda");
         assertThat(forecast().isEmpty()).isTrue();
 
         test.game.setCurrentAgendaInfo(SHARD);

@@ -163,12 +163,15 @@ public class AgendaCardRules {
     static Optional<Choice> bestRider(AiTurnContext context) {
         Game game = context.game();
         Player seat = context.seat();
+        List<String> riders = seat.getActionCards().keySet().stream()
+                .sorted()
+                .filter(alias -> RIDER_TITLES.contains(SabotageWindow.title(alias)))
+                .toList();
+        if (riders.isEmpty()) return Optional.empty();
         AgendaForecast untouched = AgendaForecast.of(game, seat);
         if (untouched.isEmpty()) return Optional.empty();
         double current = AgendaVoting.forecastWithItsBallot(game, seat).expectedUtility(seat);
-        return seat.getActionCards().keySet().stream()
-                .sorted()
-                .filter(alias -> RIDER_TITLES.contains(SabotageWindow.title(alias)))
+        return riders.stream()
                 .map(alias -> bestOutcome(untouched, current, seat, alias))
                 .flatMap(Optional::stream)
                 .filter(choice -> choice.gain() >= ActionCardPrior.keepPrior(choice.alias()))

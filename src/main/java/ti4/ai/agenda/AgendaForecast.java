@@ -19,7 +19,7 @@ import ti4.helpers.Helper;
 public final class AgendaForecast {
 
     private static final int SAMPLES = 256;
-    private static final double TEMPERATURE = 4.0;
+    private static final double TEMPERATURE = 3.0;
     private static final double INDIFFERENT_SPREAD = 1.0;
     private static final double ABSTAINS_WHEN_INDIFFERENT = 0.3;
     private static final String ASSASSINATED = "AssassinatedReps";

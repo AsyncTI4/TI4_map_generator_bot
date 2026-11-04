@@ -175,7 +175,7 @@ class AgendaCardRulesTest extends BaseTi4Test {
     @Test
     void doesNotQueueARiderForAnAgendaItCannotForecast() {
         holds(nekro, IMPERIAL);
-        test.game.setCurrentAgendaInfo("Directive_Elect Strategy Card_7_crisis");
+        test.game.setCurrentAgendaInfo("Directive_Elect Something Else_7_not_an_agenda");
         AiPrompt window = hidden("after", "queueAnAfter", "declineToQueueAnAfter");
 
         assertThat(AgendaCardRules.queueRider(context(nekro, window))).isEmpty();
