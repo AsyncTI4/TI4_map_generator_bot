@@ -31,7 +31,7 @@ class MappingFingerprintTest extends BaseTi4Test {
     // recorded for that version. It only sees logic that the fixtures exercise, so add a variant when you add a
     // derived value.
     private static final String EXPECTED_FINGERPRINT =
-            "cd61b33dd8d9b430366e6c77a4cec459621c5fc96189282a2262f4d4232646e5";
+            "70e9fcb7aaeeb4beb19dc495ea0780d97e835ccfa417c1457883e0ac9a6021df";
     private static final Path FINGERPRINT_INPUT = Path.of("target", "mapping-fingerprint.json");
 
     @Test

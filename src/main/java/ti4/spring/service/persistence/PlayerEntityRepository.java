@@ -15,19 +15,23 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
     @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN FETCH p.game g")
     List<PlayerEntity> findAllWithUsersAndGames();
 
-    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u")
+    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g WHERE g.statisticsIgnored IS FALSE")
     List<PlayerEntity> findAllWithUsers();
 
-    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g WHERE g.completed IS TRUE")
+    @Query(
+            "SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g WHERE g.completed IS TRUE AND g.statisticsIgnored IS FALSE")
     List<PlayerEntity> findAllWithUsersByCompletedGame();
 
-    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g WHERE g.endedEpochMilliseconds IS NULL")
+    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g"
+            + " WHERE g.endedEpochMilliseconds IS NULL AND g.statisticsIgnored IS FALSE")
     List<PlayerEntity> findAllWithUsersByActiveGame();
 
-    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u WHERE u.id IN (:userIds)")
+    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g"
+            + " WHERE u.id IN (:userIds) AND g.statisticsIgnored IS FALSE")
     List<PlayerEntity> findAllWithUsersByUserIdIn(@Param("userIds") List<String> userIds);
 
-    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN FETCH p.game g WHERE u.id IN (:userIds)")
+    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN FETCH p.game g"
+            + " WHERE u.id IN (:userIds) AND g.statisticsIgnored IS FALSE")
     List<PlayerEntity> findAllWithUsersAndGamesByUserIdIn(@Param("userIds") List<String> userIds);
 
     @Query("""
@@ -35,6 +39,7 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
                 JOIN FETCH p.user u
                 JOIN FETCH p.game g
                 WHERE u.id = (:userId)
+                        AND g.statisticsIgnored IS FALSE
                         AND g.completed IS TRUE
                         AND g.playerCount = 6
         """)
@@ -45,6 +50,7 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
                 JOIN FETCH p.user u
                 JOIN FETCH p.game g
                 WHERE g.completed IS TRUE
+                        AND g.statisticsIgnored IS FALSE
                         AND g.playerCount = 6
         """)
     List<PlayerEntity> findAllWithUsersAndSixPlayerCompletedGames();
@@ -54,6 +60,7 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
                 JOIN FETCH p.game g
                 WHERE p.user.id = (:userId)
                         AND p.replaced IS FALSE
+                        AND g.statisticsIgnored IS FALSE
                         AND g.completed IS TRUE
                         AND g.endedEpochMilliseconds IS NOT NULL
         """)
@@ -64,6 +71,7 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
             JOIN FETCH p.user u
             JOIN FETCH p.game g
             WHERE g.completed IS TRUE
+              AND g.statisticsIgnored IS FALSE
               AND g.allianceMode IS FALSE
               AND g.playerCount >= 5
               AND g.playerCount <= 8

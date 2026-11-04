@@ -50,7 +50,8 @@ successful file save.
 The database snapshot includes the saved revision and
 `GameEntityMapper.MAPPING_VERSION`. The pipeline captures it before queuing the
 write. Every game gets a row. Games with fewer than 3 real or eliminated players
-are marked `statistics_ignored` and get no player or title rows. Live writes use
+are stored the same way but marked `statistics_ignored`, and every statistics
+query on player or title rows leaves them out. Live writes use
 `GameEntityPersistenceService.replace`, which also updates user names.
 
 File writes and database writes are not one transaction. In particular, database

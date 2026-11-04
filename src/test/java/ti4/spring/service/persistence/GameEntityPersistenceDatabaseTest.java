@@ -105,17 +105,58 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
-    void statisticsIgnoredGameIsStoredWithoutPlayerRows() {
+    void statisticsIgnoredGameIsStoredWithPlayerAndTitleRows() {
         Game game = gameWithRealPlayers("pbd-db-ignored", 2);
+        game.setStoredValue("TitlesForuser-1", "Kingmaker");
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
-        persistenceService.replace(GameEntityMapper.toSnapshot(game));
+        persistenceService.replace(snapshot);
 
         assertThat(gameRepository.findById(game.getName()))
                 .get()
                 .extracting(GameEntity::isStatisticsIgnored)
                 .isEqualTo(true);
-        assertThat(playerRepository.findAllWithUsers()).isEmpty();
+        assertThat(playerRepository.findAllWithUsersAndGames()).hasSize(2);
+        assertThat(titleRepository.findAllWithUsersAndGames()).hasSize(1);
         assertThat(persistedManagedGameService.loadAll().get(game.getName())).isEqualTo(ManagedGameState.of(game));
+        assertThat(PersistedGameState.of(snapshot)
+                        .describeDifferencesFrom(
+                                persistedGameStateService.loadAll().get(game.getName())))
+                .isEmpty();
+    }
+
+    @Test
+    void statisticsQueriesLeaveOutIgnoredGamesThatHaveEnded() {
+        storeGameForEveryStatisticsQuery("pbd-db-ended-counted", false, 1L);
+        storeGameForEveryStatisticsQuery("pbd-db-ended-ignored", true, 1L);
+        List<String> userIds = List.of("user-1");
+
+        assertOnlyCountedGame(playerRepository.findAllWithUsers(), "pbd-db-ended-counted");
+        assertOnlyCountedGame(playerRepository.findAllWithUsersByCompletedGame(), "pbd-db-ended-counted");
+        assertOnlyCountedGame(playerRepository.findAllWithUsersByUserIdIn(userIds), "pbd-db-ended-counted");
+        assertOnlyCountedGame(playerRepository.findAllWithUsersAndGamesByUserIdIn(userIds), "pbd-db-ended-counted");
+        assertOnlyCountedGame(playerRepository.findAllWithGamesByUserIdEquals("user-1"), "pbd-db-ended-counted");
+        assertOnlyCountedGame(playerRepository.findAllWithUsersAndSixPlayerCompletedGames(), "pbd-db-ended-counted");
+        assertOnlyCountedGame(
+                playerRepository.findAllWithCompletedGamesByUserIdEquals("user-1"), "pbd-db-ended-counted");
+        assertOnlyCountedGame(
+                playerRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(false), "pbd-db-ended-counted");
+        assertOnlyCountedGame(
+                playerRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(true), "pbd-db-ended-counted");
+        assertThat(titleRepository.findAllWithUsers())
+                .extracting(title -> title.getGame().getGameName())
+                .containsOnly("pbd-db-ended-counted");
+        assertThat(titleRepository.findEndedGameTitlesByUserId("user-1"))
+                .extracting(EarnedTitle::source)
+                .containsOnly("pbd-db-ended-counted");
+    }
+
+    @Test
+    void activeGameStatisticsLeaveOutIgnoredGames() {
+        storeGameForEveryStatisticsQuery("pbd-db-active-counted", false, null);
+        storeGameForEveryStatisticsQuery("pbd-db-active-ignored", true, null);
+
+        assertOnlyCountedGame(playerRepository.findAllWithUsersByActiveGame(), "pbd-db-active-counted");
     }
 
     @Test
@@ -160,6 +201,25 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         assertThat(jdbc.queryForObject(
                         "SELECT COUNT(*) FROM game_participant WHERE game_name = ?", Integer.class, game.getName()))
                 .isZero();
+    }
+
+    private void storeGameForEveryStatisticsQuery(
+            String gameName, boolean statisticsIgnored, Long endedEpochMilliseconds) {
+        Game game = gameWithRealPlayers(gameName, 6);
+        game.setStoredValue("TitlesForuser-1", "Kingmaker");
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+        // Every other column matches all the statistics queries, so only the ignored flag decides what they return.
+        GameEntity entity = snapshot.game();
+        entity.setStatisticsIgnored(statisticsIgnored);
+        entity.setEndedEpochMilliseconds(endedEpochMilliseconds);
+        entity.setCompleted(true);
+        entity.setTwilightImperiumGlobalLeague(true);
+        persistenceService.replace(snapshot);
+    }
+
+    private static void assertOnlyCountedGame(List<PlayerEntity> players, String countedGameName) {
+        assertThat(players).isNotEmpty();
+        assertThat(players).extracting(player -> player.getGame().getGameName()).containsOnly(countedGameName);
     }
 
     private static Game gameWithRealPlayers(String gameName, int playerCount) {

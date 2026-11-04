@@ -71,7 +71,7 @@ class GameEntityMapperTest extends BaseTi4Test {
     }
 
     @Test
-    void gameWithFewerThanThreePlayersIsStatisticsIgnoredButKeepsItsParticipants() {
+    void gameWithFewerThanThreePlayersIsStoredLikeAnyOtherButStatisticsIgnored() {
         Game game = new Game();
         game.setName("mapper-two-player-game");
         addRealPlayer(game, "first-id", "sol");
@@ -81,10 +81,11 @@ class GameEntityMapperTest extends BaseTi4Test {
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         assertThat(snapshot.game().isStatisticsIgnored()).isTrue();
-        // Statistics queries read player and title rows, so an ignored game must not write any.
-        assertThat(snapshot.game().getPlayers()).isEmpty();
-        assertThat(snapshot.titles()).isEmpty();
-        assertThat(snapshot.users()).isEmpty();
+        assertThat(snapshot.game().getPlayers())
+                .extracting(player -> player.getUser().getId())
+                .containsExactlyInAnyOrder("first-id", "second-id");
+        assertThat(snapshot.titles()).extracting(TitleEntity::getTitle).containsExactly("Kingmaker");
+        assertThat(snapshot.users()).extracting(UserEntity::getId).containsExactly("first-id", "second-id");
         assertThat(snapshot.game().getParticipants())
                 .extracting(GameParticipantEntity::getUserId)
                 .containsExactly("first-id", "second-id");

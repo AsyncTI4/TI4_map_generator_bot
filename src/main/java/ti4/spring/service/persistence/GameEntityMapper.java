@@ -30,9 +30,6 @@ public class GameEntityMapper {
     public static GameEntitySnapshot toSnapshot(Game game, ManagedGameState managedGameState) {
         Map<String, UserEntity> users = new LinkedHashMap<>();
         GameEntity gameEntity = toGameEntity(game, managedGameState);
-        if (gameEntity.isStatisticsIgnored()) {
-            return new GameEntitySnapshot(gameEntity, List.of(), List.of());
-        }
         for (Player player : game.getRealAndEliminatedPlayers()) {
             gameEntity.getPlayers().add(toPlayerEntity(player, gameEntity, users));
         }
