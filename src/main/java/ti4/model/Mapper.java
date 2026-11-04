@@ -417,7 +417,8 @@ public class Mapper {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
         if (!actionCards.containsKey(id)) {
-            BotLogger.critical("Action card not found: " + id);
+            String message = "Action card not found: " + id;
+            BotLogger.critical(message, new IllegalArgumentException(message));
             return null;
         }
         return actionCards.get(id);
