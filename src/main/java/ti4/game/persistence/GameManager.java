@@ -24,7 +24,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass

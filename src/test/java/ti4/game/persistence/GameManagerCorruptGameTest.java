@@ -17,7 +17,6 @@ import org.mockito.MockedStatic;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.testUtils.BaseTi4Test;
 
 class GameManagerCorruptGameTest extends BaseTi4Test {

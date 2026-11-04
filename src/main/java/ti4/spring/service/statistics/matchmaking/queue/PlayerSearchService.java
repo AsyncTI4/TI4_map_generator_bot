@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;

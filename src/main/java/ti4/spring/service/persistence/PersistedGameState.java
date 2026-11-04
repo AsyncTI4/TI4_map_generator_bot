@@ -6,11 +6,14 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public record PersistedGameState(GameColumns game, List<PlayerRow> players, List<TitleRow> titles) {
 
     public record GameColumns(
             String gameName,
+            String revisionKey,
+            Integer mappingVersion,
             long creationEpochMilliseconds,
             Long endedEpochMilliseconds,
             int round,
@@ -44,6 +47,15 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
 
     public record TitleRow(String userId, String title) {}
 
+    private static final Set<String> REVISION_COLUMNS = Set.of("revisionKey", "mappingVersion");
+
+    public boolean matchesRevision(String revision) {
+        return revision != null
+                && !revision.isBlank()
+                && revision.equals(game.revisionKey())
+                && Objects.equals(game.mappingVersion(), GameEntityMapper.MAPPING_VERSION);
+    }
+
     public static PersistedGameState of(GameEntitySnapshot snapshot) {
         return of(snapshot.game(), snapshot.game().getPlayers(), snapshot.titles());
     }
@@ -58,6 +70,11 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
                 .sorted(Comparator.comparing(TitleRow::toString))
                 .toList();
         return new PersistedGameState(toGameColumns(game), playerRows, titleRows);
+    }
+
+    public boolean hasSameRevisionColumnsAs(PersistedGameState actual) {
+        return Objects.equals(game.revisionKey(), actual.game.revisionKey())
+                && Objects.equals(game.mappingVersion(), actual.game.mappingVersion());
     }
 
     public List<String> describeDifferencesFrom(PersistedGameState actual) {
@@ -84,6 +101,7 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     private static List<String> differingComponents(Record expected, Record actual) {
         List<String> differing = new ArrayList<>();
         for (RecordComponent component : expected.getClass().getRecordComponents()) {
+            if (REVISION_COLUMNS.contains(component.getName())) continue;
             Object expectedValue = componentValue(component, expected);
             Object actualValue = componentValue(component, actual);
             if (!Objects.equals(expectedValue, actualValue)) {
@@ -104,6 +122,8 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     private static GameColumns toGameColumns(GameEntity game) {
         return new GameColumns(
                 game.getGameName(),
+                game.getRevisionKey(),
+                game.getMappingVersion(),
                 game.getCreationEpochMilliseconds(),
                 game.getEndedEpochMilliseconds(),
                 game.getRound(),

@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.game.persistence.GameManager;
-import ti4.service.persistence.DatabasePersistenceGate;
 
 @Service
 @RequiredArgsConstructor

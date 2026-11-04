@@ -1,9 +1,13 @@
 package ti4.spring.service.persistence;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ti4.spring.context.SpringContext;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,19 @@ public class GameEntityPersistenceService {
     }
 
     @Transactional
+    public void restore(GameEntitySnapshot snapshot) {
+        insertMissingUsers(snapshot.users());
+        deleteGameRows(snapshot.game().getGameName());
+        gameEntityRepository.save(snapshot.game());
+        titleEntityRepository.saveAll(snapshot.titles());
+    }
+
+    @Transactional
+    public void updateRevision(String gameName, String revisionKey, Integer mappingVersion) {
+        gameEntityRepository.updateRevision(gameName, revisionKey, mappingVersion);
+    }
+
+    @Transactional
     public void delete(String gameName) {
         deleteGameRows(gameName);
     }
@@ -35,9 +52,30 @@ public class GameEntityPersistenceService {
         userEntityRepository.saveAll(usersToSave);
     }
 
+    private void insertMissingUsers(List<UserEntity> users) {
+        Map<String, UserEntity> existingUsers =
+                userEntityRepository
+                        .findAllById(users.stream().map(UserEntity::getId).toList())
+                        .stream()
+                        .collect(Collectors.toMap(UserEntity::getId, Function.identity()));
+        List<UserEntity> usersToSave = users.stream()
+                .filter(user -> shouldReplaceExistingName(existingUsers.get(user.getId()), user))
+                .toList();
+        userEntityRepository.saveAll(usersToSave);
+    }
+
+    private static boolean shouldReplaceExistingName(UserEntity existing, UserEntity user) {
+        if (existing == null) return true;
+        return GameEntityMapper.hasUnknownName(existing) && !GameEntityMapper.hasUnknownName(user);
+    }
+
     private void deleteGameRows(String gameName) {
         titleEntityRepository.deleteByGameName(gameName);
         playerEntityRepository.deleteByGameName(gameName);
         gameEntityRepository.deleteByGameName(gameName);
+    }
+
+    public static GameEntityPersistenceService getBean() {
+        return SpringContext.getBean(GameEntityPersistenceService.class);
     }
 }

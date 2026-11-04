@@ -16,6 +16,8 @@ import ti4.service.map.FractureService;
 @UtilityClass
 public class GameEntityMapper {
 
+    public static final int MAPPING_VERSION = 1;
+
     static final String UNKNOWN_USER_PREFIX = "UNKNOWN USER ";
     private static final String TITLES_KEY_PREFIX = "TitlesFor";
     private static final int MINIMUM_PERSISTED_PLAYER_COUNT = 3;
@@ -38,6 +40,8 @@ public class GameEntityMapper {
     private static GameEntity toGameEntity(Game game, Map<String, UserEntity> users) {
         var gameEntity = new GameEntity();
         gameEntity.setGameName(game.getName());
+        gameEntity.setRevisionKey(game.getRevisionKey());
+        gameEntity.setMappingVersion(MAPPING_VERSION);
         gameEntity.setRound(game.getRound());
         gameEntity.setVictoryPointGoal(game.getVp());
         gameEntity.setCreationEpochMilliseconds(game.getCreationDateTime());

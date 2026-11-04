@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -73,5 +74,39 @@ class GameEntityPersistenceServiceTest {
         // An existing user keeps its real name; a brand new unknown user still gets a row so its players can
         // reference it.
         verify(userEntityRepository).saveAll(List.of(known, unknownNew));
+    }
+
+    @Test
+    void restoreKeepsExistingUserNamesButReplacesUnknownPlaceholders() {
+        GameEntity game = new GameEntity();
+        game.setGameName("pbd1");
+        // An old game file can hold a name the user has since changed; restoring it must not roll the name back.
+        UserEntity renamed = new UserEntity("1", "old alice");
+        UserEntity nowKnown = new UserEntity("2", "bob");
+        UserEntity stillUnknown = new UserEntity("3", GameEntityMapper.UNKNOWN_USER_PREFIX + "3");
+        UserEntity brandNew = new UserEntity("4", "carol");
+        when(userEntityRepository.findAllById(List.of("1", "2", "3", "4")))
+                .thenReturn(List.of(
+                        new UserEntity("1", "alice"),
+                        new UserEntity("2", GameEntityMapper.UNKNOWN_USER_PREFIX + "2"),
+                        new UserEntity("3", GameEntityMapper.UNKNOWN_USER_PREFIX + "3")));
+        List<TitleEntity> titles = List.of(new TitleEntity());
+
+        service.restore(new GameEntitySnapshot(game, List.of(renamed, nowKnown, stillUnknown, brandNew), titles));
+
+        InOrder order = inOrder(userEntityRepository, titleEntityRepository, gameEntityRepository);
+        order.verify(userEntityRepository).saveAll(List.of(nowKnown, brandNew));
+        order.verify(titleEntityRepository).deleteByGameName("pbd1");
+        order.verify(gameEntityRepository).deleteByGameName("pbd1");
+        order.verify(gameEntityRepository).save(game);
+        order.verify(titleEntityRepository).saveAll(titles);
+    }
+
+    @Test
+    void updateRevisionTouchesOnlyTheRevisionColumns() {
+        service.updateRevision("pbd1", "revision", 2);
+
+        verify(gameEntityRepository).updateRevision("pbd1", "revision", 2);
+        verifyNoInteractions(userEntityRepository, titleEntityRepository, playerEntityRepository);
     }
 }

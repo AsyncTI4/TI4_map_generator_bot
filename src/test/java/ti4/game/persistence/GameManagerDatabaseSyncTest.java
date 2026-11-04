@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.testUtils.BaseTi4Test;
 
 class GameManagerDatabaseSyncTest extends BaseTi4Test {
