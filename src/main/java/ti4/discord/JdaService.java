@@ -73,7 +73,6 @@ import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
-import ti4.logging.LogBufferManager;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TileHelper;
@@ -646,7 +645,7 @@ public class JdaService {
 
             BotLogger.info("SHUTTING DOWN JDA.");
 
-            LogBufferManager.sendBufferedLogsToDiscord();
+            BotLogger.sendBufferedLogsToDiscord();
 
             shutdownJda();
         } catch (Exception e) {

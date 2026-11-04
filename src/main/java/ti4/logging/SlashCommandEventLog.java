@@ -9,17 +9,17 @@ final class SlashCommandEventLog extends AbstractEventLog {
     }
 
     @Override
-    public String getChannelName() {
+    String getChannelName() {
         return "slash-command-log";
     }
 
     @Override
-    public String getThreadName() {
+    String getThreadName() {
         return null;
     }
 
     @Override
-    public String getMessagePrefix() {
+    String getMessagePrefix() {
         return "Response: ";
     }
 }
