@@ -414,6 +414,10 @@ public class BotLogger {
         LogBufferManager.addLogMessage(new CronEventLog(message));
     }
 
+    public static void sendBufferedLogsToDiscord() {
+        LogBufferManager.sendBufferedLogsToDiscord();
+    }
+
     public static void catchRestError(Throwable e) {
         if (isDiscordServerError(e)) {
             CircuitBreaker.incrementThresholdCount("Discord server error during REST call: " + e.getMessage());

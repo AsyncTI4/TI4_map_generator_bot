@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "be11",
+    "name": "J'nahfa - Bloom",
+    "aliases": [
+        "be11",
+        "jnahfa",
+        "bloom"
+    ],
+    "imagePath": "be11_bloomhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "jnahfa"
+    ],
+    "source": "beans"
+}

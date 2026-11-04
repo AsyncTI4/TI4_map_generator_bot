@@ -239,6 +239,10 @@ class GameDatabaseReconciliationChainTest {
         assertThat(events).containsExactly("start", "start", "finish");
     }
 
+    private boolean queueTask(GameDatabaseReconciliationChain.ReconciliationTask task) {
+        return queueTask(task.name(), task.warningThresholdSeconds(), task);
+    }
+
     private boolean queueTask(String taskName, int warningThresholdSeconds, Runnable task) {
         if (shuttingDown) return false;
         taskNames.add(taskName);

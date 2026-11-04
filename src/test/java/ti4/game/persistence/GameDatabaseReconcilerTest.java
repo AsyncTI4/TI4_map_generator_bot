@@ -1,22 +1,26 @@
 package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.GameEntityMapper;
@@ -27,6 +31,8 @@ import ti4.spring.service.persistence.PersistedGameStateService;
 import ti4.spring.service.persistence.UnreferencedUserService;
 
 class GameDatabaseReconcilerTest {
+    @TempDir
+    static Path temporaryDirectory;
 
     @Test
     void unreadableFileKeepsItsDatabaseRows() {
@@ -60,30 +66,6 @@ class GameDatabaseReconcilerTest {
             fixture.logs.verify(() -> BotLogger.logCron(argThat(message ->
                     message.contains("in sync with all 1 games") && message.contains("for 1 unchanged game"))));
             fixture.logs.verify(() -> BotLogger.error(anyString()), never());
-        }
-    }
-
-    @Test
-    void legacyFileIsReconciledInTheSameRunThatBackfillsItsKey() {
-        try (Fixture fixture = new Fixture()) {
-            GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
-            fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
-            fixture.loadsSnapshot("legacy", current);
-            fixture.manager.when(() -> GameManager.readRevisionKey("legacy")).thenReturn(null);
-            // Writing the key line moves the file's modification time past the start of the run.
-            AtomicLong lastModified = new AtomicLong();
-            when(fixture.file.lastModified()).thenAnswer(_ -> lastModified.get());
-            fixture.manager
-                    .when(() -> GameManager.backfillRevisionKey("legacy"))
-                    .thenAnswer(_ -> {
-                        lastModified.set(System.currentTimeMillis() + 60_000);
-                        return "revision";
-                    });
-
-            fixture.run();
-
-            // The reconciler's own key write is not a concurrent save, so the row is brought up to date now.
-            verify(fixture.persistence).updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
         }
     }
 
@@ -142,7 +124,7 @@ class GameDatabaseReconcilerTest {
             when(failing.matchesRevision(anyString())).thenThrow(new IllegalStateException("mapping bug"));
             fixture.persisted.put("failing", failing);
             fixture.persisted.put("deleted", mock(PersistedGameState.class));
-            fixture.manager.when(() -> GameManager.readRevisionKey("failing")).thenReturn("revision");
+            fixture.revisionFile("failing", "revision");
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("failing"));
 
             fixture.run();
@@ -158,13 +140,14 @@ class GameDatabaseReconcilerTest {
     void gameFileWithoutRevisionKeyGetsOneBeforeItIsReconciled() {
         try (Fixture fixture = new Fixture()) {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("legacy", "keyed"));
-            fixture.manager.when(() -> GameManager.readRevisionKey("keyed")).thenReturn("revision");
+            fixture.revisionFile("legacy", null);
+            fixture.revisionFile("keyed", "revision");
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
 
-            fixture.manager.verify(() -> GameManager.backfillRevisionKey("legacy"));
-            fixture.manager.verify(() -> GameManager.backfillRevisionKey("keyed"), never());
+            assertThat(fixture.revisionLines("legacy")).anyMatch(line -> line.startsWith("revision_key "));
+            assertThat(fixture.revisionLines("keyed")).contains("revision_key revision");
         }
     }
 
@@ -189,7 +172,7 @@ class GameDatabaseReconcilerTest {
             fixture.run();
 
             verifyNoInteractions(fixture.persistence);
-            fixture.manager.verify(() -> GameManager.loadGameFile("changed"), never());
+            fixture.loader.verify(() -> GameLoadService.load("changed"), never());
         }
     }
 
@@ -231,11 +214,11 @@ class GameDatabaseReconcilerTest {
             PersistedGameState state = mock(PersistedGameState.class);
             fixture.persisted.put("unchanged", state);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
-            fixture.manager.when(() -> GameManager.readRevisionKey("unchanged")).thenReturn("revision");
+            fixture.revisionFile("unchanged", "revision");
             when(state.matchesRevision("revision")).thenReturn(true);
             fixture.run();
             fixture.loader.verifyNoInteractions();
-            fixture.manager.verify(() -> GameManager.loadGameFile("unchanged"), never());
+            fixture.storage.verify(() -> Storage.getGameFile(anyString()), never());
             verifyNoInteractions(fixture.persistence);
         }
     }
@@ -245,10 +228,10 @@ class GameDatabaseReconcilerTest {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("changed", mock(PersistedGameState.class));
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
-            fixture.manager.when(() -> GameManager.readRevisionKey("changed")).thenReturn("new-revision");
+            fixture.revisionFile("changed", "new-revision");
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
-            fixture.manager.verify(() -> GameManager.loadGameFile("changed"));
+            fixture.loader.verify(() -> GameLoadService.load("changed"));
         }
     }
 
@@ -260,14 +243,48 @@ class GameDatabaseReconcilerTest {
             fixture.persisted.put("healthy", healthy);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("broken", "healthy"));
             when(healthy.matchesRevision("revision")).thenReturn(true);
-            fixture.manager.when(() -> GameManager.readRevisionKey("healthy")).thenReturn("revision");
+            fixture.revisionFile("healthy", "revision");
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
 
-            fixture.manager.verify(() -> GameManager.loadGameFile("broken"));
-            fixture.manager.verify(() -> GameManager.loadGameFile("healthy"), never());
+            fixture.loader.verify(() -> GameLoadService.load("broken"));
+            fixture.loader.verify(() -> GameLoadService.load("healthy"), never());
             verifyNoInteractions(fixture.persistence);
+        }
+    }
+
+    @Test
+    void loadFailureIsReportedOnceAndLaterGamesAreReconciled() {
+        try (Fixture fixture = new Fixture()) {
+            GameEntitySnapshot current = snapshot("healthy", "revision", GameEntityMapper.MAPPING_VERSION);
+            fixture.loadsSnapshot("healthy", current);
+            fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("z-broken", "healthy"));
+            IllegalStateException failure = new IllegalStateException("load failed");
+            fixture.loader.when(() -> GameLoadService.load("z-broken")).thenThrow(failure);
+
+            fixture.run();
+
+            verify(fixture.persistence).restore(current);
+            fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
+        }
+    }
+
+    @Test
+    void revisionUpdateFailureIsReportedWithoutCountingABackfill() {
+        try (Fixture fixture = new Fixture()) {
+            GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
+            fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
+            fixture.loadsSnapshot("legacy", current);
+            IllegalStateException failure = new IllegalStateException("update failed");
+            doThrow(failure)
+                    .when(fixture.persistence)
+                    .updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
+
+            fixture.run();
+
+            fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
+            fixture.logs.verify(() -> BotLogger.logCron(contains("Recorded the current revision")), never());
         }
     }
 
@@ -285,7 +302,11 @@ class GameDatabaseReconcilerTest {
         private final Map<String, PersistedGameState> persisted = new LinkedHashMap<>();
         private final File file = mock(File.class);
 
+        private final Path directory = newDirectory();
+
         private Fixture() {
+            storage.when(() -> Storage.getGamePath(anyString()))
+                    .thenAnswer(invocation -> directory.resolve((String) invocation.getArgument(0)));
             context.when(() -> SpringContext.getBean(GameEntityPersistenceService.class))
                     .thenReturn(persistence);
             context.when(() -> SpringContext.getBean(PersistedGameStateService.class))
@@ -301,16 +322,55 @@ class GameDatabaseReconcilerTest {
             when(game.getName()).thenReturn(gameName);
             when(file.exists()).thenReturn(true);
             manager.when(GameManager::getGameNames).thenReturn(List.of(gameName));
-            manager.when(() -> GameManager.readRevisionKey(gameName))
-                    .thenReturn(snapshot.game().getRevisionKey());
-            manager.when(() -> GameManager.loadGameFile(gameName)).thenReturn(game);
+            revisionFile(gameName, snapshot.game().getRevisionKey());
+            loader.when(() -> GameLoadService.load(gameName)).thenReturn(game);
             mapper.when(() -> GameEntityMapper.toSnapshot(game)).thenReturn(snapshot);
         }
 
+        private static Path newDirectory() {
+            try {
+                return Files.createTempDirectory(temporaryDirectory, "reconcile-");
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        private void revisionFile(String gameName, String revision) {
+            try {
+                Files.write(
+                        directory.resolve(gameName + ".txt"),
+                        revision == null
+                                ? List.of(GamePersistenceKeys.GAMEINFO, GamePersistenceKeys.ENDGAMEINFO)
+                                : List.of(
+                                        GamePersistenceKeys.GAMEINFO,
+                                        GamePersistenceKeys.REVISION_KEY + " " + revision,
+                                        GamePersistenceKeys.ENDGAMEINFO));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        private List<String> revisionLines(String gameName) {
+            try {
+                return Files.readAllLines(directory.resolve(gameName + ".txt"));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
         private void run() {
-            var run = new GameDatabaseReconciler.Reconciliation();
-            run.start().forEach(run::reconcile);
-            run.finish();
+            Deque<Runnable> tasks = new ArrayDeque<>();
+            try (MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
+                pipeline.when(() -> GameDatabaseSyncPipeline.queueReconciliationTask(any()))
+                        .thenAnswer(invocation -> {
+                            tasks.add(invocation.getArgument(0));
+                            return true;
+                        });
+                assertThat(GameDatabaseReconciler.queueReconciliation()).isTrue();
+                while (!tasks.isEmpty()) {
+                    tasks.removeFirst().run();
+                }
+            }
         }
 
         @Override

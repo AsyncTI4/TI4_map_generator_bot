@@ -163,7 +163,7 @@ public class ManagedGame {
         return player != null && playerToStatus.get(player).isRealOrEliminated();
     }
 
-    public boolean matches(Game game) {
+    boolean matches(Game game) {
         return name.equals(game.getName())
                 && lastModifiedDate == game.getLastModifiedDate()
                 && Objects.equals(revisionKey, game.getRevisionKey());

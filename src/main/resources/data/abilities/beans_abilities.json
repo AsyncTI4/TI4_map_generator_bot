@@ -231,5 +231,75 @@
         "window": "When you purge an exploration card for its effect",
         "windowEffect": "Gain 1 command token.",
         "source": "beans"
+    },
+    {
+        "id": "sporefall",
+        "name": "Sporefall",
+        "faction": "bloom",
+        "window": "Once per turn, after another player resolves the secondary ability of a strategy card",
+        "windowEffect": "You may place 1 infantry from your reinforcements into coexistence on a non-home planet they control adjacent to a system that contains 1 of your ground forces.",
+        "source": "beans"
+    },
+    {
+        "id": "strain_dispersal",
+        "name": "Strain Dispersal",
+        "faction": "bloom",
+        "window": "During setup",
+        "windowEffect": "Gain your 3 strain cards and place them in your reinforcements. While you are coexisting on a planet with a trait, place the corresponding card in your play area dormant side up. While you are coexisting on 2 or more planets with the same trait, flip the corresponding card to its active side.",
+        "source": "beans"
+    },
+    {
+        "id": "neurotropic_dormant",
+        "name": "Neurotropic Dormant",
+        "shortName": "Neuro\nDormant",
+        "faction": "bloom",
+        "permanentEffect": "The amount of action cards you may have in your hand is increased by 1.",
+        "source": "beans"
+    },
+    {
+        "id": "neurotropic_active",
+        "name": "Neurotropic Active",
+        "shortName": "Neuro\nActive",
+        "faction": "bloom",
+        "permanentEffect": "The amount of action cards you may have in your hand is increased by 2.",
+        "window": "Once per action, when a player whose planet you are coexisting on draws 1 or more aciton cards",
+        "windowEffect": "You may draw 1 aciton card.",
+        "source": "beans"
+    },
+    {
+        "id": "rhizomatic_dormant",
+        "name": "Rhizomatic Dormant",
+        "shortName": "Rhiz\nDormant",
+        "faction": "bloom",
+        "permanentEffect": "Your commodity value is increased by 1.",
+        "source": "beans"
+    },
+    {
+        "id": "rhizomatic_active",
+        "name": "Rhizomatic Active",
+        "shortName": "Rhiz\nActive",
+        "faction": "bloom",
+        "permanentEffect": "Your commodity value is increased by 2.",
+        "window": "When a player whose planet you are coexisting on replenishes their commodities",
+        "windowEffect": "Gain 1 commodity, or convert 1 commodity to a trade good.",
+        "source": "beans"
+    },
+    {
+        "id": "carnivorous_dormant",
+        "name": "Carnivorous Dormant",
+        "shortName": "Carnivore\nDormant",
+        "faction": "bloom",
+        "permanentEffect": "Apply +1 to the combat rolls of your infantry while you are the defender.",
+        "source": "beans"
+    },
+    {
+        "id": "carnivorous_active",
+        "name": "Carnivorous Active",
+        "shortName": "Carnivore\nActive",
+        "faction": "bloom",
+        "permanentEffect": "Apply +1 to your infantry's combat rolls while you are the defender.",
+        "window": "Once per ground combat, after 1 or more of your opponents infantry are destroyed",
+        "windowEffect": "You may place 1 infantry from your reinforcements on that planet.",
+        "source": "beans"
     }
 ]

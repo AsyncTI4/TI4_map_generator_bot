@@ -371,6 +371,22 @@ public class CommanderUnlockCheckService {
                                 .filter(tile -> ButtonHelper.checkNumberNonFighterShips(player, tile, false) > 0)
                                 .count()
                         >= 3;
+            case "bloom" -> {
+                List<Planet> coexistingPlanets = game.getPlanetsPlayerIsCoexistingOn(player).stream()
+                        .map(game::getUnitHolderFromPlanet)
+                        .filter(Objects::nonNull)
+                        .toList();
+                shouldBeUnlocked = coexistingPlanets.stream()
+                        .filter(planet -> planet.getPlanetTypes().contains("cultural"))
+                        .anyMatch(cultural -> coexistingPlanets.stream()
+                                .filter(planet -> !planet.getName().equals(cultural.getName()))
+                                .filter(planet -> planet.getPlanetTypes().contains("industrial"))
+                                .anyMatch(industrial -> coexistingPlanets.stream()
+                                        .filter(planet -> !planet.getName().equals(cultural.getName()))
+                                        .filter(planet -> !planet.getName().equals(industrial.getName()))
+                                        .anyMatch(planet ->
+                                                planet.getPlanetTypes().contains("hazardous"))));
+            }
 
             // theodisi
             case "ardentia",

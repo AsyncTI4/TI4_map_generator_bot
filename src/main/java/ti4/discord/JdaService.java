@@ -66,6 +66,7 @@ import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
+import ti4.game.persistence.GameDatabaseSyncPipeline;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -73,13 +74,11 @@ import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
-import ti4.logging.LogBufferManager;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TileHelper;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserActiveHourRecorder;
@@ -646,7 +645,7 @@ public class JdaService {
 
             BotLogger.info("SHUTTING DOWN JDA.");
 
-            LogBufferManager.sendBufferedLogsToDiscord();
+            BotLogger.sendBufferedLogsToDiscord();
 
             shutdownJda();
         } catch (Exception e) {

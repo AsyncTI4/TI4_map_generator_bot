@@ -91,7 +91,16 @@
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "text": "ACTION: Place this card face up in your play area and place a frontier token in your home system.\n\nAt the start of The Deep player’s turn, return this card to The Deep player.",
+        "text": "ACTION:\n\nPlace this card face up in your play area and place a frontier token in your home system.\n\nAt the start of The Deep player’s turn, return this card to The Deep player.",
+        "source": "beans"
+    },
+    {
+        "alias": "bepnbloom",
+        "name": "Starter Culture",
+        "faction": "bloom",
+        "color": "",
+        "playArea": false,
+        "text": "ACTION:\n\nYou and the J'nahfa player may agree to place 1 infantry from each of your reinforcements into coexistence on a non-home planet the other player controls that contains their ground forces.\n\nThen, return this card to the J'nahfa player.",
         "source": "beans"
     }
 ]

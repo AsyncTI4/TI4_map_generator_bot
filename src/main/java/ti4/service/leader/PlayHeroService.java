@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
@@ -324,6 +325,7 @@ public class PlayHeroService {
             case "netrunnershero" -> NetrunnersLeadersHandler.startNetrunnersHero(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
             case "migohero" -> MigoLeadersHandler.startMigoHero(event, game, player);
+            case "bloomhero" -> BloomLeadersHandler.startFungalBloom(event, game, player);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
             case "mirvedahero" -> {

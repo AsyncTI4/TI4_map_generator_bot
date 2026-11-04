@@ -18,7 +18,7 @@ final class GameFileLockManager {
         return getLock(gameName).isWriteLockedByCurrentThread();
     }
 
-    public static void wrapWithWriteLock(String gameName, Runnable runnable) {
+    static void wrapWithWriteLock(String gameName, Runnable runnable) {
         ReentrantReadWriteLock lock = getLock(gameName);
         lock.writeLock().lock();
         try {
@@ -28,7 +28,7 @@ final class GameFileLockManager {
         }
     }
 
-    public static <T> T wrapWithWriteLock(String gameName, Supplier<T> supplier) {
+    static <T> T wrapWithWriteLock(String gameName, Supplier<T> supplier) {
         ReentrantReadWriteLock lock = getLock(gameName);
         lock.writeLock().lock();
         try {
@@ -38,7 +38,7 @@ final class GameFileLockManager {
         }
     }
 
-    public static void wrapWithReadLock(String gameName, Runnable runnable) {
+    static void wrapWithReadLock(String gameName, Runnable runnable) {
         ReentrantReadWriteLock lock = getLock(gameName);
         lock.readLock().lock();
         try {
@@ -48,7 +48,7 @@ final class GameFileLockManager {
         }
     }
 
-    public static <T> T wrapWithReadLock(String gameName, Supplier<T> supplier) {
+    static <T> T wrapWithReadLock(String gameName, Supplier<T> supplier) {
         ReentrantReadWriteLock lock = getLock(gameName);
         lock.readLock().lock();
         try {

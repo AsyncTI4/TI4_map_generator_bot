@@ -17,7 +17,7 @@ public class ManagedPlayer {
     // We have to use a map for the "replace" logic to work, a set won't provide an atomic replace
     private final Map<String, ManagedGame> games;
 
-    public ManagedPlayer(ManagedGame game, String id, String name) {
+    ManagedPlayer(ManagedGame game, String id, String name) {
         this.id = id;
         this.name = name;
         games = new ConcurrentHashMap<>();

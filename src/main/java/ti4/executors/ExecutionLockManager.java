@@ -115,11 +115,11 @@ public class ExecutionLockManager {
         }
     }
 
-    public static Runnable wrapWithTryLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {
+    static Runnable wrapWithTryLockAndRelease(String lockName, ExecutionLockType lockType, Runnable task) {
         return wrapWithTryLockAndRelease(lockName, lockType, task, null);
     }
 
-    public static Runnable wrapWithTryLockAndRelease(
+    static Runnable wrapWithTryLockAndRelease(
             String lockName, ExecutionLockType lockType, Runnable task, MessageChannel messageChannel) {
         if (isBlank(lockName)) throw new IllegalArgumentException("Lock name cannot be blank.");
         return () -> {

@@ -18,7 +18,7 @@ import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class LogBufferManager {
+class LogBufferManager {
 
     private static final int MAX_DISCORD_MESSAGE_LENGTH = 2000;
     private static final int LOG_SEND_TIMEOUT_MINUTES = 10;
@@ -34,7 +34,7 @@ public class LogBufferManager {
         }
     }
 
-    public static void sendBufferedLogsToDiscord() {
+    static void sendBufferedLogsToDiscord() {
         Map<LogTarget, StringBuilder> messageBuilders = drainMessageBufferIntoMessageBuilders();
 
         // For each class of message either send by channel (if exists) or thread

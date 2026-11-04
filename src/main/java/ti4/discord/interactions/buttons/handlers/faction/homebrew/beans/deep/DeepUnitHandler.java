@@ -127,7 +127,7 @@ public class DeepUnitHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing()
-                        + ", after exploring a frontier token, you may pay 1 influence to DEPLOY _Null_.",
+                        + ", after exploring a frontier token, you may spend 1 influence to DEPLOY _Null_.",
                 buttons);
     }
 
@@ -141,7 +141,7 @@ public class DeepUnitHandler {
                 Buttons.green(player.factionButtonChecker() + FINISH_NULL_PAYMENT, "Done Paying 1 Influence"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", pay 1 influence to DEPLOY _Null_, then press done.\n"
+                player.getRepresentationNoPing() + ", spend 1 influence to DEPLOY _Null_, then press done.\n"
                         + Helper.buildSpentThingsMessage(player, game, "inf"),
                 paymentButtons);
         ButtonHelper.deleteMessage(event);

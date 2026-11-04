@@ -51,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
@@ -1701,6 +1702,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (MonumentsDSButtonHandler.hasVaylerianMonumentCommodityBonus(game, this)) {
             bonus++;
         }
+        if (hasAbility("rhizomatic_dormant")) {
+            bonus++;
+        }
+        if (hasAbility("rhizomatic_active")) {
+            bonus += 2;
+        }
         bonus += ThirtyKRelicHooks.commodityBonus(game, this);
 
         return bonus;
@@ -2447,6 +2454,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         getFollowedSCs().add(sc);
         if (game != null) {
+            BloomAbilityHandler.offerSporefall(game, this, sc);
             ThurvialiAbilityHandler.offerCelestialEnvoys(game, this, sc);
         }
         if (editSCFollow) {

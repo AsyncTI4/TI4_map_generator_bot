@@ -26,8 +26,6 @@ import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
-import ti4.service.persistence.DatabasePersistenceGate;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.service.persistence.PersistedManagedGame;
 import ti4.spring.service.persistence.PersistedManagedGameService;
 import ti4.spring.websocket.GameWebStatePipeline;
@@ -366,18 +364,6 @@ public class GameManager {
         return gameNameToManagedGame.values().stream()
                 .filter(ManagedGame::isActive)
                 .count();
-    }
-
-    @Nullable
-    public static String readRevisionKey(String gameName) {
-        return GameRevisionKeyFile.read(gameName);
-    }
-
-    // TODO: Remove with GameRevisionKeyFile.backfill once every save has a revision_key line.
-    @Deprecated(forRemoval = true)
-    @Nullable
-    public static String backfillRevisionKey(String gameName) {
-        return GameRevisionKeyFile.backfill(gameName);
     }
 
     @Nullable

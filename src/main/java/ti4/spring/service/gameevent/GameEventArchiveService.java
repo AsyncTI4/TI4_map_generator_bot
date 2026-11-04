@@ -14,12 +14,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.game.Game;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.helpers.Storage;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.DatabasePersistenceGate;
 
 @RequiredArgsConstructor
 @Service

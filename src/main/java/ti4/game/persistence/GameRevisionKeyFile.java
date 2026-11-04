@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 
-final class GameRevisionKeyFile {
-
-    private GameRevisionKeyFile() {}
+@UtilityClass
+class GameRevisionKeyFile {
 
     @Nullable
     static String read(String gameName) {

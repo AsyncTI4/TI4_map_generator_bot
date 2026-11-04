@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.service.persistence.PersistedManagedGame;
 import ti4.testUtils.BaseTi4Test;
 

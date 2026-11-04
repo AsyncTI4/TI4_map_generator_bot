@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.helpers.TIGLHelper;
-import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 
 @Service

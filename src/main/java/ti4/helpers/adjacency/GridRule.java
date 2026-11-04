@@ -1,8 +1,10 @@
 package ti4.helpers.adjacency;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -10,14 +12,21 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
 import ti4.service.fow.FOWPlusService;
 
-// TODO: one-way hyperlanes are not supported; CustomHyperlaneService.normalizeMatrix keeps every matrix symmetric.
 public final class GridRule implements AdjacencyRule {
     private static final int START = -1;
     private static final int NATURAL_MAP_ONLY = -2;
 
     @Override
     public void from(AdjacencyContext context, String position, Set<String> adjacent) {
-        adjacent.addAll(traverse(context.getGame(), context.getPlayer(), false, position, START, new HashSet<>()));
+        adjacent.addAll(traverse(
+                context.getGame(),
+                context.getPlayer(),
+                false,
+                position,
+                START,
+                new HashSet<>(),
+                null,
+                lanesCountBothWays(context)));
     }
 
     @Override
@@ -25,15 +34,38 @@ public final class GridRule implements AdjacencyRule {
         Game game = context.getGame();
         Player player = context.getPlayer();
         Set<String> explored = new HashSet<>();
+        boolean bothWays = lanesCountBothWays(context);
         for (int side = 0; side < 6; side++) {
-            if (canBeEnteredFrom(game, position, side)) {
-                collectSources(game, player, position, side, explored, sources);
+            if (canBeEnteredFrom(game, position, side, bothWays)) {
+                collectSources(game, player, position, side, explored, sources, bothWays);
             }
         }
     }
 
+    private static boolean lanesCountBothWays(AdjacencyContext context) {
+        return !context.isMovement() && !context.getGame().usesOneWayAdjacency();
+    }
+
+    @Nullable
+    private static List<Boolean> lanesFrom(Tile tile, int side, Game game, boolean bothWays) {
+        List<Boolean> lanes = tile.getHyperlaneData(side, game);
+        if (!bothWays || lanes == null || lanes.isEmpty()) return lanes;
+        List<Boolean> combined = new ArrayList<>(lanes);
+        for (int other = 0; other < 6; other++) {
+            List<Boolean> otherLanes = tile.getHyperlaneData(other, game);
+            if (otherLanes != null && otherLanes.get(side)) combined.set(other, true);
+        }
+        return combined;
+    }
+
     public static Set<String> traverse(Game game, boolean naturalMapOnly, String position) {
         return traverse(game, null, naturalMapOnly, position, START, new HashSet<>());
+    }
+
+    public static Set<String> hyperlaneLanesFrom(Game game, Player player, String position) {
+        Set<String> lanes = new HashSet<>();
+        traverse(game, player, false, position, START, new HashSet<>(), lanes, false);
+        return lanes;
     }
 
     private static Set<String> traverse(
@@ -43,6 +75,18 @@ public final class GridRule implements AdjacencyRule {
             String position,
             int sourceDirection,
             Set<String> explored) {
+        return traverse(game, player, naturalMapOnly, position, sourceDirection, explored, null, false);
+    }
+
+    private static Set<String> traverse(
+            Game game,
+            Player player,
+            boolean naturalMapOnly,
+            String position,
+            int sourceDirection,
+            Set<String> explored,
+            @Nullable Set<String> lanes,
+            boolean bothWays) {
         Set<String> tiles = new HashSet<>();
         if (!explored.add(position + sourceDirection)) {
             return tiles;
@@ -53,7 +97,7 @@ public final class GridRule implements AdjacencyRule {
             return tiles;
         }
 
-        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection, game);
+        List<Boolean> hyperlaneData = lanesFrom(currentTile, sourceDirection, game, bothWays);
         if (hyperlaneData != null && hyperlaneData.isEmpty() && !naturalMapOnly) {
             return tiles;
         }
@@ -72,10 +116,17 @@ public final class GridRule implements AdjacencyRule {
         for (int direction = 0; direction < 6; direction++) {
             String next = step(game, player, naturalMapOnly, position, direction, hyperlaneData, directlyAdjacentTiles);
             if (next == null) continue;
+            if (lanes != null && hyperlaneData != null && sourceDirection >= 0) {
+                lanes.add(lane(position, sourceDirection, direction));
+            }
             int enteredFrom = naturalMapOnly ? NATURAL_MAP_ONLY : (direction + 3) % 6;
-            tiles.addAll(traverse(game, player, naturalMapOnly, next, enteredFrom, explored));
+            tiles.addAll(traverse(game, player, naturalMapOnly, next, enteredFrom, explored, lanes, bothWays));
         }
         return tiles;
+    }
+
+    public static String lane(String position, int side, int otherSide) {
+        return position + ":" + Math.min(side, otherSide) + ":" + Math.max(side, otherSide);
     }
 
     private static String step(
@@ -123,15 +174,21 @@ public final class GridRule implements AdjacencyRule {
         return false;
     }
 
-    private static boolean canBeEnteredFrom(Game game, String position, int side) {
+    private static boolean canBeEnteredFrom(Game game, String position, int side, boolean bothWays) {
         Tile tile = game.getTileByPosition(position);
         if (tile == null) return false;
-        List<Boolean> hyperlaneData = tile.getHyperlaneData(side, game);
+        List<Boolean> hyperlaneData = lanesFrom(tile, side, game, bothWays);
         return hyperlaneData == null || !hyperlaneData.isEmpty();
     }
 
     private static void collectSources(
-            Game game, Player player, String position, int enteredFrom, Set<String> explored, Set<String> sources) {
+            Game game,
+            Player player,
+            String position,
+            int enteredFrom,
+            Set<String> explored,
+            Set<String> sources,
+            boolean bothWays) {
         if (!explored.add(position + enteredFrom)) {
             return;
         }
@@ -148,11 +205,11 @@ public final class GridRule implements AdjacencyRule {
             }
 
             for (int side = 0; side < 6; side++) {
-                List<Boolean> hyperlaneData = previousTile.getHyperlaneData(side, game);
+                List<Boolean> hyperlaneData = lanesFrom(previousTile, side, game, bothWays);
                 if (hyperlaneData == null || hyperlaneData.isEmpty()) continue;
                 if (position.equals(
                         step(game, player, false, previous, direction, hyperlaneData, previousNeighbours))) {
-                    collectSources(game, player, previous, side, explored, sources);
+                    collectSources(game, player, previous, side, explored, sources, bothWays);
                 }
             }
         }

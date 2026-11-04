@@ -40,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StasisT
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenFilesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
@@ -133,6 +134,21 @@ public class ActionCardHelper {
      */
     public static boolean isDiscardVisible(Game game, boolean hideUnplayed, String acId) {
         return !hideUnplayed || game.getPlayedActionCards().contains(acId);
+    }
+
+    public static void sendAmendmentReminder(Player player) {
+        if (!player.getPlayableActionCards().contains("amendment")) {
+            return;
+        }
+        List<Button> amendmentButtons = new ArrayList<>();
+        amendmentButtons.add(Buttons.green(
+                player.factionButtonChecker() + "resolveAmendmentStep1", "Resolve Amendment", CardEmojis.ActionCard));
+        amendmentButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", a reminder that this is the window to play _Amendment_."
+                        + " Use the buttons to start the process.",
+                amendmentButtons);
     }
 
     public static void sendActionCardInfo(Game game, Player player) {
@@ -782,6 +798,7 @@ public class ActionCardHelper {
             sendSchemingDiscardButtons(player);
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+        BloomAbilityHandler.offerNeurotropicActive(game, player);
 
         if (!silent) {
             String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
@@ -1510,11 +1527,6 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
-            if ("oracle".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOracle", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
             if ("intrigue".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveIntrigue", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1626,11 +1638,6 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("hijacked_signal".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHijackedSignal", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
             if ("misallocated_funding".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveMisallocatedFunding", buttonLabel));
@@ -1654,6 +1661,16 @@ public class ActionCardHelper {
 
             if ("sacrifice".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSacrifice", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("brokered_alliance".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBrokeredAlliance", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("fractured_reality".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFracturedReality", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 

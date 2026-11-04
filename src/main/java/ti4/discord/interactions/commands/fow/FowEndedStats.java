@@ -5,9 +5,9 @@ import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.service.statistics.FogEndedGameStatisticsService;
 
 class FowEndedStats extends Subcommand {

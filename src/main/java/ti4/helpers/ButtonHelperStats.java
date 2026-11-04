@@ -4,6 +4,7 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -144,6 +145,7 @@ public final class ButtonHelperStats {
         afterGainCommsChecks(game, player, finalComm - initComm);
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
+        BloomStrainHandler.resolveRhizomaticActive(player, game);
         offerBountyBrokerageAfterReplenish(game, player);
         ButtonHelperFactionSpecific.offerThwart(game, player);
     }

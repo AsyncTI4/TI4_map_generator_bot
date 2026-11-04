@@ -708,6 +708,7 @@ public class ComponentActionHelper {
                             "stonebornagentdormant",
                             "stonebornagentunleashed",
                             "ironagent",
+                            "bloomagent",
                             "migoagent",
                             "deepagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
@@ -1169,7 +1170,7 @@ public class ComponentActionHelper {
                                 + " has used to the _Total War_ ability to spend 10 commodities from their home planets to score 1 victory point."
                                 + " They have " + remaining + " commodit" + (remaining == 1 ? "y" : "ies")
                                 + " remaining.");
-                String customPOName = "Total War VPs (" + p1.getFaction() + ")";
+                String customPOName = game.customPONameFor(p1, "Total War VPs");
                 int vp = 1;
                 if (game.getCustomPublicVP().containsKey(customPOName)) {
                     vp = game.getCustomPublicVP().get(customPOName) + 1;
@@ -1231,7 +1232,7 @@ public class ComponentActionHelper {
         String reward = buttonID.split("_")[1];
         switch (reward) {
             case "vp" -> {
-                String customPOName = "Bounty VPs (" + p1.getFaction() + ")";
+                String customPOName = game.customPONameFor(p1, "Bounty VPs");
                 int vp = 1;
                 if (game.getCustomPublicVP().containsKey(customPOName)) {
                     vp = game.getCustomPublicVP().get(customPOName) + 1;

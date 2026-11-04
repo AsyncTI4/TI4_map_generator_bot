@@ -20,6 +20,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Retrofitti
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
@@ -931,10 +933,12 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        BloomAbilityHandler.snapshotCoexistingPlanetsAtAction(game);
         MigoHarvestHandler.offerBlueHarvest(game, player);
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        BloomLeadersHandler.offerCommander(game, player, tile);
         DeepUnitHandler.offerDrown(game, player, tile);
         DeepBreakthroughHandler.offerEventHorizon(game, player);
         MigoTechHandler.offerLaghMetalAttractors(game, player, tile);
@@ -1278,7 +1282,6 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (!game.isL1Hero()) {
-            // All players get to use Magen
             Tile activeSystem = tile;
 
             for (Player archive : game.getRealPlayers()) {
@@ -1458,44 +1461,46 @@ public final class ButtonHelperTacticalAction {
             VoidTetherService.postInitialButtons(game, player, tile);
         }
 
-        if (!game.isFowMode()) {
-            if (!game.isL1Hero()) {
-                ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);
-                Tile activeSystem = tile;
-                for (Player magenPlayer : game.getPlayers().values()) {
-                    boolean has =
-                            activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
-                    if (magenPlayer.hasAbility("byssus")) {
-                        for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
-                            if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
-                                has = true;
-                            }
-                        }
-                    }
-                    for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
-                        for (String token : p.getTokenList()) {
-                            if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
-                                has = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!has || !magenPlayer.hasTech("md")) continue;
-                    TeHelperTechs.resolveMagen(game, magenPlayer, activeSystem, false);
-                }
-
-                for (Player btb : game.getRealPlayers()) {
-                    if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                    if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
-                            .contains(activeSystem)) continue;
-                    TeHelperTechs.resolveMagen(game, btb, activeSystem, true);
-                }
-            }
+        if (!game.isFowMode() && !game.isL1Hero()) {
+            ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);
+        }
+        if (!game.isL1Hero()) {
+            resolveMagenOnActivation(game, tile);
         }
         game.removeStoredValue("crucibleBoost");
         game.removeStoredValue("flankspeedBoost");
         game.removeStoredValue("baldrickGDboost");
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void resolveMagenOnActivation(Game game, Tile activeSystem) {
+        for (Player magenPlayer : game.getPlayers().values()) {
+            boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
+            if (magenPlayer.hasAbility("byssus")) {
+                for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                    if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
+                        has = true;
+                    }
+                }
+            }
+            for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
+                for (String token : p.getTokenList()) {
+                    if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                        has = true;
+                        break;
+                    }
+                }
+            }
+            if (!has || !magenPlayer.hasTech("md")) continue;
+            TeHelperTechs.resolveMagen(game, magenPlayer, activeSystem, false);
+        }
+
+        for (Player btb : game.getRealPlayers()) {
+            if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
+            if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
+                    .contains(activeSystem)) continue;
+            TeHelperTechs.resolveMagen(game, btb, activeSystem, true);
+        }
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {

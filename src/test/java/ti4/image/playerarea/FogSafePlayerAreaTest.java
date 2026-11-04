@@ -31,6 +31,7 @@ class FogSafePlayerAreaTest extends BaseTi4Test {
     private Game game;
     private Player holder;
     private Player owner;
+    private Player onlooker;
     private String factionNote;
 
     @BeforeEach
@@ -41,6 +42,7 @@ class FogSafePlayerAreaTest extends BaseTi4Test {
         MapFrame.positionsWithin("000", 3).forEach(position -> game.setTile(new Tile("19", position)));
         holder = seat("p1", "mahact", "blue");
         owner = seat("p2", "hacan", "yellow");
+        onlooker = seat("p3", "sol", "red");
         factionNote = Mapper.getFaction("hacan").getPromissoryNotes().getFirst();
         owner.addOwnedPromissoryNoteByID(factionNote);
         holder.addPromissoryNoteToPlayArea(factionNote);
@@ -55,23 +57,25 @@ class FogSafePlayerAreaTest extends BaseTi4Test {
         return player;
     }
 
-    private List<WebsiteOverlay> drawHolderArea(boolean fogPrivate) {
+    private List<WebsiteOverlay> drawHolderArea(boolean fogPrivate, Player viewer) {
         BufferedImage image = new BufferedImage(3000, 450, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = image.createGraphics();
         WebsiteOverlays overlays = new WebsiteOverlays();
         PlayerAreaContext ctx = PlayerAreaContext.of(
-                graphics, game, new FogViewer(game, fogPrivate, holder), overlays, new NeighbourMap(game));
+                graphics, game, new FogViewer(game, fogPrivate, viewer), overlays, new NeighbourMap(game));
         PlayerAreas.drawSingle(ctx, holder, new Point(5, 5), 3000);
         graphics.dispose();
         return overlays.asList();
     }
 
-    // The holder's own area is drawn because the viewer is the holder; only the note's owner is out of sight.
-    private List<WebsiteOverlay> drawHolderAreaWithOwnerHidden() {
+    // The viewer can see the holder's stats but not the note's owner.
+    private List<WebsiteOverlay> drawHolderAreaWithOwnerHidden(Player viewer) {
         try (MockedStatic<FoWHelper> fog = mockStatic(FoWHelper.class, Mockito.CALLS_REAL_METHODS)) {
+            fog.when(() -> FoWHelper.canSeeStatsOfPlayerInCurrentFog(any(), eq(holder), any()))
+                    .thenReturn(true);
             fog.when(() -> FoWHelper.canSeeStatsOfPlayerInCurrentFog(any(), eq(owner), any()))
                     .thenReturn(false);
-            return drawHolderArea(true);
+            return drawHolderArea(true, viewer);
         }
     }
 
@@ -85,24 +89,27 @@ class FogSafePlayerAreaTest extends BaseTi4Test {
 
     @Test
     void publicViewNamesTheFactionNoteAndBorrowedCommander() {
-        List<WebsiteOverlay> overlays = drawHolderArea(false);
+        List<WebsiteOverlay> overlays = drawHolderArea(false, holder);
+
+        assertTrue(hasModelOverlay(overlays, factionNote));
+        assertTrue(hasModelOverlay(overlays, "hacancommander"));
+    }
+
+    // The holder knows who gave them the note and whose commander they hold, even with the owner out of sight.
+    @Test
+    void holderSeesOwnFactionNoteAndImperiaCommander() {
+        List<WebsiteOverlay> overlays = drawHolderAreaWithOwnerHidden(holder);
 
         assertTrue(hasModelOverlay(overlays, factionNote));
         assertTrue(hasModelOverlay(overlays, "hacancommander"));
     }
 
     @Test
-    void hiddenOwnerKeepsFactionNoteAnonymous() {
-        List<WebsiteOverlay> overlays = drawHolderAreaWithOwnerHidden();
+    void onlookerSeesFactionNoteAndImperiaCommanderAnonymous() {
+        List<WebsiteOverlay> overlays = drawHolderAreaWithOwnerHidden(onlooker);
 
         assertFalse(hasModelOverlay(overlays, factionNote));
         assertTrue(hasTitledOverlay(overlays, "Promissory Note"));
-    }
-
-    @Test
-    void hiddenOwnerKeepsImperiaCommanderAnonymous() {
-        List<WebsiteOverlay> overlays = drawHolderAreaWithOwnerHidden();
-
         assertFalse(hasModelOverlay(overlays, "hacancommander"));
         assertTrue(hasTitledOverlay(overlays, "Commander"));
     }

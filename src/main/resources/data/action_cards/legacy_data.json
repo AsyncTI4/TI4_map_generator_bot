@@ -1825,13 +1825,21 @@
         "source": "deprecated"
     },
     {
-        "alias": "fractured_reality",
-        "name": "Fractured Reality",
+        "alias": "hijacked_signal",
+        "name": "Hijacked Signal",
+        "phase": "Any",
+        "window": "After you resolve the secondary ability of another player's strategy card",
+        "text": "Place 1 command token from that player's reinforcements in any non-home system.",
+        "flavorText": "The Hacan paid heavily to contain the breach. 2RAM identified the culprit as Acidos and warned them that the worst was yet to come.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "oracle",
+        "name": "Oracle",
         "phase": "Action",
-        "window": "When you would roll a die",
-        "text": "Roll 2 dice instead; you may cancel 1 of those results.",
-        "automationID": "fractured_reality",
-        "flavorText": "\"Shen're Ix Ianovar,\" Ahk-Syl Siven murmured, seeming afraid to invoke the name. \"Al'Raith Ix Ianovar,\" he continued, his voice barely a whisper.",
+        "window": "ACTION",
+        "text": "Look at each unrevealed public objective and the top 5 cards of the secret objective deck. Then, shuffle the secret objective deck.",
+        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
         "source": "deprecated"
     }
 ]

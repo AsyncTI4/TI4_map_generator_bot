@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMora
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -1888,6 +1889,12 @@ public class StartCombatService {
         if (isGroundCombat) {
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
+            if (combatHolder instanceof Planet planet) {
+                BloomStrainHandler.addCarnivorousActiveButton(buttons, game, p1, planet, tile);
+                if (p2 != p1) {
+                    BloomStrainHandler.addCarnivorousActiveButton(buttons, game, p2, planet, tile);
+                }
+            }
             XinUnitHandler.addSentinelRepairButton(buttons, p1, tile, combatHolder);
             XinUnitHandler.addSentinelRepairButton(buttons, p2, tile, combatHolder);
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p1, tile);

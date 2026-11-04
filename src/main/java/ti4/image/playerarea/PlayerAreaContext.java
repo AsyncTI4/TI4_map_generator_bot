@@ -72,4 +72,8 @@ public final class PlayerAreaContext {
     boolean hidesStatsOf(Player player) {
         return fogViewer.privateView() && !fogViewer.canSeeStats(player);
     }
+
+    boolean hidesStatsInArea(Player areaOwner, Player cardOwner) {
+        return areaOwner != viewer() && hidesStatsOf(cardOwner);
+    }
 }
