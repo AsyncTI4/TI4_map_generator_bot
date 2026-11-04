@@ -2154,6 +2154,28 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return false;
     }
 
+    // TODO: fog colour change mid-game orphans the old "(colour)" PO; next score starts a new one, VP stays right.
+    public String customPONameFor(Player player, String label) {
+        String factionName = label + " (" + player.getFaction() + ")";
+        if (!isFowMode()) {
+            return factionName;
+        }
+        String colorName = label + " (" + player.getColor() + ")";
+        renameCustomPO(factionName, colorName);
+        return colorName;
+    }
+
+    private void renameCustomPO(String oldName, String newName) {
+        if (!customPublicVP.containsKey(oldName) || customPublicVP.containsKey(newName)) {
+            return;
+        }
+        int vp = customPublicVP.get(oldName);
+        List<String> scorers = new ArrayList<>(scoredPublicObjectives.getOrDefault(oldName, List.of()));
+        removeCustomPO(oldName);
+        Integer poIndex = addCustomPO(newName, vp);
+        scorers.forEach(userID -> scorePublicObjective(userID, poIndex));
+    }
+
     public boolean addSOToGame(String id) {
         return getSecretObjectives().add(id);
     }
