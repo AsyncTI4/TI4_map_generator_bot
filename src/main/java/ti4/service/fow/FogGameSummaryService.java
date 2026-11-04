@@ -62,6 +62,14 @@ public class FogGameSummaryService {
                 .toList();
     }
 
+    public static String enabledOptionsLine(Game game) {
+        List<String> titles = enabledOptions(game).stream()
+                .filter(option -> option.isVisible() || option == FOWOption.FOW_PLUS)
+                .map(FOWOption::getTitle)
+                .toList();
+        return titles.isEmpty() ? NONE : String.join(", ", titles);
+    }
+
     public static List<MessageEmbed> buildEmbeds(Game game, boolean includeChannels) {
         return buildEmbeds(game, includeChannels, gameMasters(game));
     }

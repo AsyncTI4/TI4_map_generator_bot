@@ -63,8 +63,8 @@ class FogGameSummaryServiceTest extends BaseTi4Test {
         String visibility = fieldValue(embedTitled("Fog options"), "Visibility");
 
         // HIDE_MAP was never set, but the GM still needs to see it as off.
-        assertThat(visibility).startsWith("✅ Bright Novas").contains("🚫 Hide Unexplored Map");
-        assertThat(visibility.indexOf("Bright Novas")).isLessThan(visibility.indexOf("Hide Unexplored Map"));
+        assertThat(visibility).startsWith("✅ Bright novas").contains("🚫 Hide unexplored map");
+        assertThat(visibility.indexOf("Bright novas")).isLessThan(visibility.indexOf("Hide unexplored map"));
     }
 
     @Test

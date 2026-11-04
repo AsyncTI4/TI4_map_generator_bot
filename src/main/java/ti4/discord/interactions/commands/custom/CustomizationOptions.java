@@ -183,7 +183,15 @@ class CustomizationOptions extends GameStateSubcommand {
         if (showB != null) game.setShowBubbles(showB);
 
         Boolean transMethod = event.getOption(Constants.TRANSACTION_METHOD, null, OptionMapping::getAsBoolean);
-        if (transMethod != null) game.setNewTransactionMethod(transMethod);
+        if (transMethod != null) {
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "Fog games use the fog option New transactions instead: `/fow fow_options`, Game flow tab.");
+            } else {
+                game.setNewTransactionMethod(transMethod);
+            }
+        }
 
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null) game.setShowGears(showG);

@@ -30,6 +30,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.search.FindService;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.discord.interactions.commands.uncategorized.ServerPromoteCommand;
+import ti4.discord.interactions.commands.user.SetFowFilter;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -393,8 +394,7 @@ class AutoCompleteProvider {
             }
             case Constants.FOG_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
+                List<Command.Choice> options = mapTo25ChoicesThatContain(SetFowFilter.filterLabels(), enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.PRIMARY_TILE_DIRECTION -> {

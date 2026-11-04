@@ -307,6 +307,14 @@ _Avoid_: FoW (acceptable in code and chat), hidden-information mode
 
 **Light fog**:
 A milder Fog of War in which Players see more of the Map than under full Fog of War.
+_Avoid_: Fog Lite (the old name of the Beginner fog preset)
+
+**FoW+**:
+A stricter Fog of War setting that forces several fog options, swaps in its own explore deck and limits activation to Systems a Player can see, plus a blind activation for the rest.
+_Avoid_: Fog Plus Mode, fowplus
+
+**Fog preset**:
+A named set of fog option values (Standard, Fog+, Normal, Beginner) that the GM applies in one click. Applying one gives the same result whatever was set before; GM tools, map layout and rules options are only changed by a preset that turns them on.
 
 **Absol**:
 A homebrew content mode that substitutes revised cards, technologies and leaders.

@@ -52,7 +52,7 @@ class FogEndedGameStatisticsServiceTest extends BaseTi4Test {
         assertThat(tally.galaxyCounts()).containsEntry(1, 1).containsEntry(2, 1);
         assertThat(tally.sectorGames()).isZero();
         assertThat(tally.factionGames()).containsEntry("sol", 2).containsEntry("hacan", 1);
-        assertThat(tally.report()).contains("**Games:** 2").contains("Hide Unexplored Map: 2/2 (100%)");
+        assertThat(tally.report()).contains("**Games:** 2").contains("Hide unexplored map: 2/2 (100%)");
     }
 
     @Test

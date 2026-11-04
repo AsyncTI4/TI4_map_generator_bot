@@ -16,7 +16,11 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
+import ti4.service.fow.FogGameSummaryService;
+import ti4.service.fow.FogPreset;
+import ti4.service.fow.FogPresetService;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 public class TestBedStateResolver {
@@ -45,7 +49,9 @@ public class TestBedStateResolver {
             "decks",
             "borderAnomalies",
             "customAdjacencies",
-            "customHyperlanes");
+            "customHyperlanes",
+            "fowOptions",
+            "fogPreset");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
             "commodities",
@@ -150,6 +156,12 @@ public class TestBedStateResolver {
                 joinSorted(game.getCustomHyperlaneData().entrySet().stream()
                         .map(entry -> entry.getKey() + ":" + CustomHyperlaneService.toTypedMatrix(entry.getValue()))
                         .toList());
+            case "fowOptions" ->
+                joinSorted(FogGameSummaryService.enabledOptions(game).stream()
+                        .map(FOWOption::toString)
+                        .toList());
+            case "fogPreset" ->
+                FogPresetService.matching(game).map(FogPreset::getId).orElse("custom");
             default -> "<unknown " + field + ">";
         };
     }
