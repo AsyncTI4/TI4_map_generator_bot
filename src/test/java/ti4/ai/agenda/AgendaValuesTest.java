@@ -139,7 +139,7 @@ class AgendaValuesTest extends BaseTi4Test {
         test.points(nekro, 7);
 
         for (String minister : List.of("minister_peace", "minister_war")) {
-            assertThat(value(nekro, minister, "nekro", "")).as(minister).isGreaterThanOrEqualTo(10);
+            assertThat(value(nekro, minister, "nekro", "")).as(minister).isEqualTo(6);
             double leader = value(nekro, minister, "sol", "");
             double trailer = value(nekro, minister, "hacan", "");
             assertThat(trailer).as(minister).isNegative().isGreaterThan(leader);

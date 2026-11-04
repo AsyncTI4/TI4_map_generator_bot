@@ -44,9 +44,9 @@ class ElectionValues {
     private static final double EARLY_PLANETS_PER_ROUND = 1.5;
     private static final double LATE_PLANETS_PER_ROUND = 1.0;
     private static final double INDUSTRY_PER_ROUND = 0.7;
-    private static final double PEACE_VALUE = 10.0;
+    private static final double PEACE_VALUE = 6.0;
     private static final double SCIENCES_RESOURCES_PER_ROUND = 3.0;
-    private static final double WAR_VALUE = 10.0;
+    private static final double WAR_VALUE = 6.0;
     private static final double PROPHECY_BASE = 0.5;
     private static final double PROPHECY_PER_FIGHTER = 0.3;
     private static final double PROPHECY_ROUND_CAP = 3.0;
