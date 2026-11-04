@@ -17,8 +17,9 @@ database rows are a derived view that reconciliation can repair.
 | [GameDatabaseSyncPipeline](GameDatabaseSyncPipeline.java) | Own the single-thread database executor. Only shutdown is public; submission stays inside the package. |
 | [migration/DataMigrationManager](migration/DataMigrationManager.java) | Run game-data migrations. |
 
-The loaders, writers, undo service, file locks, revision-file helper, and
-reconciliation chain are package-private. Callers should use `GameManager` for
+The loaders, writers, undo service, file locks, and reconciliation chain are
+package-private. The revision-file helper is private to `GameDatabaseReconciler`.
+Callers should use `GameManager` for
 game lifecycle operations rather than independently changing files, indexes, or
 database rows. SQL mapping, repositories, and transactions live in
 [`ti4.spring.service.persistence`](../../spring/service/persistence/).

@@ -5,6 +5,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashMap;
@@ -12,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.helpers.Storage;
@@ -26,6 +31,8 @@ import ti4.spring.service.persistence.PersistedGameStateService;
 import ti4.spring.service.persistence.UnreferencedUserService;
 
 class GameDatabaseReconcilerTest {
+    @TempDir
+    static Path temporaryDirectory;
 
     @Test
     void unreadableFileKeepsItsDatabaseRows() {
@@ -117,7 +124,7 @@ class GameDatabaseReconcilerTest {
             when(failing.matchesRevision(anyString())).thenThrow(new IllegalStateException("mapping bug"));
             fixture.persisted.put("failing", failing);
             fixture.persisted.put("deleted", mock(PersistedGameState.class));
-            fixture.revisions.when(() -> GameRevisionKeyFile.read("failing")).thenReturn("revision");
+            fixture.revisionFile("failing", "revision");
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("failing"));
 
             fixture.run();
@@ -133,13 +140,14 @@ class GameDatabaseReconcilerTest {
     void gameFileWithoutRevisionKeyGetsOneBeforeItIsReconciled() {
         try (Fixture fixture = new Fixture()) {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("legacy", "keyed"));
-            fixture.revisions.when(() -> GameRevisionKeyFile.read("keyed")).thenReturn("revision");
+            fixture.revisionFile("legacy", null);
+            fixture.revisionFile("keyed", "revision");
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
 
-            fixture.revisions.verify(() -> GameRevisionKeyFile.backfill("legacy"));
-            fixture.revisions.verify(() -> GameRevisionKeyFile.backfill("keyed"), never());
+            assertThat(fixture.revisionLines("legacy")).anyMatch(line -> line.startsWith("revision_key "));
+            assertThat(fixture.revisionLines("keyed")).contains("revision_key revision");
         }
     }
 
@@ -206,11 +214,11 @@ class GameDatabaseReconcilerTest {
             PersistedGameState state = mock(PersistedGameState.class);
             fixture.persisted.put("unchanged", state);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("unchanged"));
-            fixture.revisions.when(() -> GameRevisionKeyFile.read("unchanged")).thenReturn("revision");
+            fixture.revisionFile("unchanged", "revision");
             when(state.matchesRevision("revision")).thenReturn(true);
             fixture.run();
             fixture.loader.verifyNoInteractions();
-            fixture.storage.verifyNoInteractions();
+            fixture.storage.verify(() -> Storage.getGameFile(anyString()), never());
             verifyNoInteractions(fixture.persistence);
         }
     }
@@ -220,7 +228,7 @@ class GameDatabaseReconcilerTest {
         try (Fixture fixture = new Fixture()) {
             fixture.persisted.put("changed", mock(PersistedGameState.class));
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("changed"));
-            fixture.revisions.when(() -> GameRevisionKeyFile.read("changed")).thenReturn("new-revision");
+            fixture.revisionFile("changed", "new-revision");
             when(fixture.file.exists()).thenReturn(true);
             fixture.run();
             fixture.loader.verify(() -> GameLoadService.load("changed"));
@@ -235,7 +243,7 @@ class GameDatabaseReconcilerTest {
             fixture.persisted.put("healthy", healthy);
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("broken", "healthy"));
             when(healthy.matchesRevision("revision")).thenReturn(true);
-            fixture.revisions.when(() -> GameRevisionKeyFile.read("healthy")).thenReturn("revision");
+            fixture.revisionFile("healthy", "revision");
             when(fixture.file.exists()).thenReturn(true);
 
             fixture.run();
@@ -283,7 +291,6 @@ class GameDatabaseReconcilerTest {
     private static final class Fixture implements AutoCloseable {
         private final MockedStatic<SpringContext> context = mockStatic(SpringContext.class);
         private final MockedStatic<GameManager> manager = mockStatic(GameManager.class);
-        private final MockedStatic<GameRevisionKeyFile> revisions = mockStatic(GameRevisionKeyFile.class);
         private final MockedStatic<GameLoadService> loader = mockStatic(GameLoadService.class);
         private final MockedStatic<Storage> storage = mockStatic(Storage.class);
         private final MockedStatic<DatabasePersistenceGate> gate = mockStatic(DatabasePersistenceGate.class);
@@ -295,7 +302,11 @@ class GameDatabaseReconcilerTest {
         private final Map<String, PersistedGameState> persisted = new LinkedHashMap<>();
         private final File file = mock(File.class);
 
+        private final Path directory = newDirectory();
+
         private Fixture() {
+            storage.when(() -> Storage.getGamePath(anyString()))
+                    .thenAnswer(invocation -> directory.resolve((String) invocation.getArgument(0)));
             context.when(() -> SpringContext.getBean(GameEntityPersistenceService.class))
                     .thenReturn(persistence);
             context.when(() -> SpringContext.getBean(PersistedGameStateService.class))
@@ -311,12 +322,41 @@ class GameDatabaseReconcilerTest {
             when(game.getName()).thenReturn(gameName);
             when(file.exists()).thenReturn(true);
             manager.when(GameManager::getGameNames).thenReturn(List.of(gameName));
-            revisions
-                    .when(() -> GameRevisionKeyFile.read(gameName))
-                    .thenReturn(snapshot.game().getRevisionKey());
+            revisionFile(gameName, snapshot.game().getRevisionKey());
             loader.when(() -> GameLoadService.load(gameName)).thenReturn(game);
             mapper.when(() -> GameEntityMapper.shouldPersist(game)).thenReturn(true);
             mapper.when(() -> GameEntityMapper.toSnapshot(game)).thenReturn(snapshot);
+        }
+
+        private static Path newDirectory() {
+            try {
+                return Files.createTempDirectory(temporaryDirectory, "reconcile-");
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        private void revisionFile(String gameName, String revision) {
+            try {
+                Files.write(
+                        directory.resolve(gameName + ".txt"),
+                        revision == null
+                                ? List.of(GamePersistenceKeys.GAMEINFO, GamePersistenceKeys.ENDGAMEINFO)
+                                : List.of(
+                                        GamePersistenceKeys.GAMEINFO,
+                                        GamePersistenceKeys.REVISION_KEY + " " + revision,
+                                        GamePersistenceKeys.ENDGAMEINFO));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        private List<String> revisionLines(String gameName) {
+            try {
+                return Files.readAllLines(directory.resolve(gameName + ".txt"));
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
 
         private void run() {
@@ -341,7 +381,6 @@ class GameDatabaseReconcilerTest {
             gate.close();
             storage.close();
             loader.close();
-            revisions.close();
             manager.close();
             context.close();
         }
