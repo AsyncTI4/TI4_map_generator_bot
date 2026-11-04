@@ -103,7 +103,8 @@ public class AgendaPolicy {
                     .max(Comparator.comparingDouble(button -> forecast.utility(speaker, outcomeOf(button))));
         }
         return outcomes.stream()
-                .max(Comparator.comparingDouble(button -> score(game, speaker, agenda, outcomeOf(button))));
+                .max(Comparator.comparingDouble(
+                        button -> AgendaUtility.of(game, speaker, true, agenda, outcomeOf(button))));
     }
 
     public static Optional<PromptButton> choosePlanetOwner(Game game, Player speaker, List<PromptButton> owners) {

@@ -1,5 +1,6 @@
 package ti4.ai.agenda;
 
+import java.util.OptionalDouble;
 import lombok.experimental.UtilityClass;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Game;
@@ -13,6 +14,8 @@ class AgendaUtility {
     private static final int POINT = 1;
 
     static double of(Game game, Player voter, boolean readsOwnSecrets, String agenda, String outcome) {
+        OptionalDouble value = AgendaValues.of(game, voter, agenda, outcome, outcome);
+        if (value.isPresent()) return value.getAsDouble() + driveTheDebate(game, voter, readsOwnSecrets, outcome);
         if (AgendaPolicy.givesElectedPlayerAPoint(agenda)) return pointElection(game, voter, outcome);
         double policy = readsOwnSecrets
                 ? AgendaPolicy.score(game, voter, agenda, outcome)
@@ -22,6 +25,11 @@ class AgendaUtility {
 
     static double riderStake(Game game, Player rider) {
         return ScoringStakes.rivalStake(game, rider, POINT);
+    }
+
+    private static double driveTheDebate(Game game, Player voter, boolean readsOwnSecrets, String outcome) {
+        if (!readsOwnSecrets || !AgendaPolicy.holdsDriveTheDebateFor(game, voter, outcome)) return 0;
+        return ScoringStakes.scoreValue(game, voter, POINT);
     }
 
     private static double pointElection(Game game, Player voter, String outcome) {

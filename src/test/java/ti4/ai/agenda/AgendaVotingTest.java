@@ -136,30 +136,86 @@ class AgendaVotingTest extends BaseTi4Test {
         return ti4.helpers.AgendaHelper.getSpecificPlanetsVoteWorth(sol, test.game, "jord");
     }
 
-    // Sol holds Drive the Debate but Xxcha has six times its votes and is backing the leader: Sol cannot win the
-    // election, so it does not spend its votes on itself (it can still back the leader, as it would without the card).
+    // Sol holds Drive the Debate but Xxcha has six times its votes and is backing the leader: on the first agenda Sol
+    // cannot win the election, so it does not spend its votes on itself (it can still back the leader, as it would
+    // without the card).
     @Test
     void castsNoVotesInAnElectionItCannotWinWithDriveTheDebate() {
         driveTheDebateElection(everythingSolHas(), everythingSolHas() * 6);
+        test.game.setStoredValue("agendaCount", "1");
 
         assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
                 .isNotEqualTo(Optional.of("sol"));
     }
 
-    // The same election with the votes on Sol's side: it spends only enough to beat the two votes against it (a tie
-    // goes to Sol as speaker), not everything it has.
+    // The same election with the votes on Sol's side, on the first agenda of the phase: it spends only enough to beat
+    // the two votes against it (a tie goes to Sol as speaker), not everything it has, and keeps a planet back.
     @Test
-    void spendsOnlyEnoughToWinTheElectionWithDriveTheDebate() {
+    void spendsOnlyEnoughToWinTheFirstAgendaWithDriveTheDebate() {
+        test.place("19", AiTestGame.neighbourOf("304"));
+        sol.addPlanet("wellon");
+        int everything =
+                everythingSolHas() + ti4.helpers.AgendaHelper.getSpecificPlanetsVoteWorth(sol, test.game, "wellon");
+        driveTheDebateElection(everything, 2);
+        test.game.setStoredValue("agendaCount", "1");
+
+        Optional<AgendaVoting.Ballot> ballot = AgendaVoting.plan(test.game, sol);
+
+        assertThat(ballot.map(AgendaVoting.Ballot::outcome)).contains("sol");
+        assertThat(ballot.map(AgendaVoting.Ballot::votes).orElse(0)).isBetween(2, everything - 1);
+    }
+
+    // On the second agenda there is nothing left to save votes for, so the same election gets everything.
+    @Test
+    void spendsEverythingOnTheSecondAgenda() {
         test.place("19", AiTestGame.neighbourOf("304"));
         sol.addPlanet("wellon");
         int everything =
                 everythingSolHas() + ti4.helpers.AgendaHelper.getSpecificPlanetsVoteWorth(sol, test.game, "wellon");
         driveTheDebateElection(everything, 2);
 
-        Optional<AgendaVoting.Ballot> ballot = AgendaVoting.plan(test.game, sol);
+        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("sol", "", everything));
+    }
 
-        assertThat(ballot.map(AgendaVoting.Ballot::outcome)).contains("sol");
-        assertThat(ballot.map(AgendaVoting.Ballot::votes).orElse(0)).isBetween(2, everything - 1);
+    // On the first agenda the last planet with votes is always kept for the second agenda (which could be Mutiny, or
+    // anything else where voting matters), even for a point: with only Jord, Sol casts nothing.
+    @Test
+    void keepsItsOnlyPlanetForTheSecondAgenda() {
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+
+        assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
+    }
+
+    // With two planets on the first agenda it may cast votes, but never exhausts the last ready planet with votes:
+    // once Wellon is spent, it finishes instead of pressing Jord.
+    @Test
+    void neverExhaustsTheLastPlanetOnTheFirstAgenda() {
+        test.game.setStoredValue("agendaCount", "1");
+        test.place("19", AiTestGame.neighbourOf("304"));
+        sol.addPlanet("wellon");
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"red\":1,\"black\":0}");
+        test.game.setCurrentAgendaVote("xxcha", "red_1");
+        AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_sol_vote", "FFCC_sol_resolveAgendaVote_0");
+        assertThat(press(start)).isEqualTo("FFCC_sol_vote");
+        AiPrompt outcomes = prompt("outcomes", PromptSource.PUBLIC, NOW, "outcome_nekro", "outcome_sol");
+        assertThat(press(outcomes)).isEqualTo("outcome_sol");
+        AiPrompt planets = prompt(
+                "planets",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of(
+                        "exhaustForVotes_planet_jord",
+                        "exhaustForVotes_planet_wellon",
+                        "FFCC_sol_proceedToFinalizingVote"),
+                List.of("Jord", "Wellon", "Done exhausting planets."));
+        String first = press(planets);
+        assertThat(first).startsWith("exhaustForVotes_planet_");
+
+        sol.addSpentThing("planet_" + first.substring("exhaustForVotes_planet_".length()));
+        assertThat(press(planets)).isEqualTo("FFCC_sol_proceedToFinalizingVote");
     }
 
     // Without Drive the Debate Sol never elects itself to Execution Directive, however many votes it has.
@@ -206,14 +262,26 @@ class AgendaVotingTest extends BaseTi4Test {
         assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
     }
 
-    // Mutiny keeps its own rule, "for" when it would carry.
+    // Mutiny pays a point to everyone who voted "for" when it passes, so with Sol's votes deciding it alone, Sol
+    // votes "for".
     @Test
-    void mutinyKeepsItsRuleWhateverTheRiders() {
-        rivalRacesOnForWith("Imperial Rider");
-        test.game.setCurrentAgendaInfo("Law_For/Against_7_mutiny");
+    void votesForMutinyWhenItsVotesCarryIt() {
+        test.game.setCurrentAgendaInfo("Directive_For/Against_7_mutiny");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"black\":0}");
 
         assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
                 .contains("for");
+    }
+
+    // But a rival one point from winning holds an Imperial Rider on "for": Sol's own point is not worth the rival's
+    // win, so it votes "against" instead.
+    @Test
+    void votesMutinyDownWhenARivalsImperialRiderRidesOnFor() {
+        rivalRacesOnForWith("Imperial Rider");
+        test.game.setCurrentAgendaInfo("Directive_For/Against_7_mutiny");
+
+        assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
+                .contains("against");
     }
 
     // The speaker's tie-break buttons share the confirm prefix; a ballot left in memory must not press them.

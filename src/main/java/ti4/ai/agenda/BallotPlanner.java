@@ -64,10 +64,11 @@ class BallotPlanner {
                 .mapToDouble(outcome -> forecast.utility(seat, outcome))
                 .min()
                 .orElse(0);
-        if (most - least <= INDIFFERENT) return Optional.empty();
+        if (most - least <= INDIFFERENT && most <= INDIFFERENT) return Optional.empty();
         return outcomes.stream()
                 .map(outcome -> new Option(outcome, cap, 0))
-                .max(Comparator.comparingDouble(worth))
+                .max(Comparator.comparingDouble(worth)
+                        .thenComparingDouble(option -> forecast.utility(seat, option.outcome())))
                 .filter(option -> worth.applyAsDouble(option) >= abstain - INDIFFERENT)
                 .map(option -> new Choice(option.outcome(), cap));
     }
@@ -79,7 +80,7 @@ class BallotPlanner {
         Optional<String> best = outcomes.stream().max(Comparator.comparingDouble(value));
         if (best.isEmpty()) return Optional.empty();
         double preference = value.applyAsDouble(best.get()) - least;
-        if (preference <= INDIFFERENT) return Optional.empty();
+        if (preference <= INDIFFERENT && value.applyAsDouble(best.get()) <= INDIFFERENT) return Optional.empty();
         int votes = finalAgenda || preference >= STRONG_PREFERENCE ? cap : (cap + 1) / 2;
         return Optional.of(new Choice(best.get(), votes));
     }

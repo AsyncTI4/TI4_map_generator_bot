@@ -1,5 +1,6 @@
 package ti4.ai.agenda;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,7 @@ public class AgendaVoting {
     private static final String FIELD = "~";
     private static final String GALACTIC_THREAT = "galactic_threat";
     private static final String XXCHA_COMMANDER = "xxchacommander";
+    private static final String ASSASSINATED = "AssassinatedReps";
 
     record Ballot(String outcome, String planetOwner, int votes) {
 
@@ -101,6 +103,19 @@ public class AgendaVoting {
 
     static boolean cannotVote(Game game, Player seat) {
         return seat.hasAbility(GALACTIC_THREAT) && !game.playerHasLeaderUnlockedOrAlliance(seat, XXCHA_COMMANDER);
+    }
+
+    private static boolean sitsOutThisAgenda(Game game, Player seat) {
+        if (game.playerHasLeaderUnlockedOrAlliance(seat, XXCHA_COMMANDER)) return false;
+        return game.getStoredValue(ASSASSINATED).contains(seat.getFaction()) || placedARider(game, seat);
+    }
+
+    private static boolean placedARider(Game game, Player seat) {
+        return game.getCurrentAgendaVotes().values().stream()
+                .flatMap(votes -> Arrays.stream(votes.split(";")))
+                .filter(piece -> piece.contains("Rider") || piece.contains("Sanction"))
+                .map(piece -> StringUtils.substringBefore(piece, "_").toLowerCase())
+                .anyMatch(owner -> game.getPlayerFromColorOrFaction(owner) == seat);
     }
 
     private static long votedAt(AiTurnContext context) {
@@ -173,7 +188,9 @@ public class AgendaVoting {
                 .filter(seat.getPlanets()::contains)
                 .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
                 .sum();
-        int predictive = seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES) ? PREDICTIVE_VOTE_COUNT : 0;
+        boolean countsPredictive = !AgendaRound.isFinalAgenda(game)
+                && seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES);
+        int predictive = countsPredictive ? PREDICTIVE_VOTE_COUNT : 0;
         if (spent + predictive < ballot.votes()) {
             Optional<PromptButton> planet = planetToExhaust(game, seat, prompt, ballot.votes() - spent - predictive);
             if (planet.isPresent())
@@ -236,7 +253,7 @@ public class AgendaVoting {
     }
 
     static Optional<Ballot> plan(Game game, Player seat) {
-        if (cannotVote(game, seat)) return Optional.empty();
+        if (cannotVote(game, seat) || sitsOutThisAgenda(game, seat)) return Optional.empty();
         String agenda = AgendaPolicy.currentAgenda(game);
         AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
         if (model == null || model.getTarget() == null) return Optional.empty();
