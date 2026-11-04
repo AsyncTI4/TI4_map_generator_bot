@@ -7944,7 +7944,9 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
-        List<ColorModel> unusedColors = GameColorsService.getUnusedColors(game);
+        List<ColorModel> unusedColors = GameColorsService.getUnusedColors(game).stream()
+                .filter(color -> ColorChangeHelper.isColorAllowedForPlayer(color.getName(), userId, game))
+                .toList();
 
         List<ColorModel> factionPrefColors = Mapper.getFaction(factionId).getPreferredColours().stream()
                 .map(Mapper::getColor)
@@ -7961,7 +7963,7 @@ public class ButtonHelper {
         List<ColorModel> unusedPrefColors = GameColorsService.getUnusedColorsWithBaseColorsFirst(game);
         unusedPrefColors = ColourHelper.sortColours(factionId, unusedPrefColors);
         for (ColorModel color : unusedPrefColors) {
-            if (factionPrefColors.contains(color)) {
+            if (factionPrefColors.contains(color) || !unusedColors.contains(color)) {
                 continue;
             }
             String colorName = color.getName();
