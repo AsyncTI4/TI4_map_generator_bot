@@ -2,7 +2,6 @@ package ti4.ai.agenda;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,6 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
-import ti4.helpers.AgendaSummaryHelper;
 import ti4.model.AgendaModel;
 import ti4.model.Mapper;
 
@@ -30,15 +28,12 @@ public class AgendaVoting {
     private static final String PLANET_VOTE_PREFIX = "exhaustForVotes_planet_";
     private static final String CONFIRM_PREFIX = "resolveAgendaVote_";
     private static final String PREDICTIVE_VOTES = "predictive_3";
+    private static final int PREDICTIVE_VOTE_COUNT = 3;
     private static final String PREDICTIVE_BUTTON = "exhaustForVotes_" + PREDICTIVE_VOTES;
     private static final String SPENT_PLANET_PREFIX = "planet_";
     private static final String VOTED_AT_KEY = "agendaVotedAt|";
     private static final String GILA_KEY = "agendaGilaTradeGoods|";
     private static final long CLOCK_SKEW_MILLIS = 5_000L;
-    private static final String MUTINY = "mutiny";
-    private static final double ALL_IN_SCORE = 2;
-    private static final double CAN_WIN_ELECTION = 0.25;
-    private static final double SURE_ELECTION = 0.8;
     private static final String FIELD = "~";
     private static final String GALACTIC_THREAT = "galactic_threat";
     private static final String XXCHA_COMMANDER = "xxchacommander";
@@ -178,17 +173,36 @@ public class AgendaVoting {
                 .filter(seat.getPlanets()::contains)
                 .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
                 .sum();
-        if (spent < ballot.votes()) {
-            Optional<PromptButton> planet = prompt.enabledButtons().stream()
-                    .filter(button -> button.isUnowned() && button.handlerId().startsWith(PLANET_VOTE_PREFIX))
-                    .max(Comparator.comparingInt(button -> AgendaHelper.getSpecificPlanetsVoteWorth(
-                            seat, game, StringUtils.removeStart(button.handlerId(), PLANET_VOTE_PREFIX))));
+        int predictive = seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES) ? PREDICTIVE_VOTE_COUNT : 0;
+        if (spent + predictive < ballot.votes()) {
+            Optional<PromptButton> planet = planetToExhaust(game, seat, prompt, ballot.votes() - spent - predictive);
             if (planet.isPresent())
                 return Optional.of(AiDecision.press(prompt, planet.get(), "exhaust a planet for votes"));
         }
         Optional<AiDecision> tradeGoods = spendTradeGoods(context, prompt, ballot, spent);
         if (tradeGoods.isPresent()) return tradeGoods;
         return Optional.of(finish.get().press("finish casting its votes"));
+    }
+
+    private static Optional<PromptButton> planetToExhaust(Game game, Player seat, AiPrompt prompt, int needed) {
+        List<PromptButton> planets = prompt.enabledButtons().stream()
+                .filter(button -> button.isUnowned() && button.handlerId().startsWith(PLANET_VOTE_PREFIX))
+                .filter(button -> planetVotes(game, seat, button) > 0)
+                .filter(button -> !seat.getSpentThingsThisWindow()
+                        .contains(
+                                SPENT_PLANET_PREFIX + StringUtils.removeStart(button.handlerId(), PLANET_VOTE_PREFIX)))
+                .toList();
+        if (!AgendaRound.isFinalAgenda(game) && planets.size() <= 1) return Optional.empty();
+        Comparator<PromptButton> byVotes = Comparator.comparingInt(button -> planetVotes(game, seat, button));
+        return planets.stream()
+                .filter(button -> planetVotes(game, seat, button) >= needed)
+                .min(byVotes)
+                .or(() -> planets.stream().max(byVotes));
+    }
+
+    private static int planetVotes(Game game, Player seat, PromptButton button) {
+        return AgendaHelper.getSpecificPlanetsVoteWorth(
+                seat, game, StringUtils.removeStart(button.handlerId(), PLANET_VOTE_PREFIX));
     }
 
     private static Optional<AiDecision> spendTradeGoods(
@@ -226,54 +240,11 @@ public class AgendaVoting {
         String agenda = AgendaPolicy.currentAgenda(game);
         AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
         if (model == null || model.getTarget() == null) return Optional.empty();
-        int available = seat.getReadiedPlanets().stream()
-                .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
-                .sum();
-        if (available <= 0) return Optional.empty();
-        if (!MUTINY.equals(agenda)) {
-            Optional<String> stopsRider = outcomeThatStopsARivalRider(game, seat, available);
-            if (stopsRider.isPresent()) return ballotFor(game, stopsRider.get(), available);
-        }
-        List<String> outcomes = AgendaOutcomes.of(game);
-        AgendaForecast forecast = AgendaForecast.of(game, seat);
-        Optional<String> best = outcomes.stream()
-                .filter(outcome -> score(game, seat, agenda, outcome, available) > 0)
-                .filter(outcome -> !isLostElection(game, seat, agenda, outcome, available, forecast))
-                .max(Comparator.comparingDouble(outcome -> score(game, seat, agenda, outcome, available)));
-        if (best.isEmpty()) return Optional.empty();
-        double score = score(game, seat, agenda, best.get(), available);
-        int votes = score >= ALL_IN_SCORE
-                ? votesToWin(game, seat, agenda, best.get(), available, forecast)
-                : (available + 1) / 2;
-        return ballotFor(game, best.get(), votes);
-    }
-
-    private static boolean drivesTheDebateAlone(Game game, Player seat, String agenda, String outcome) {
-        return AgendaPolicy.holdsDriveTheDebateFor(game, seat, outcome)
-                && AgendaPolicy.publicScore(game, seat, agenda, outcome) < ALL_IN_SCORE;
-    }
-
-    private static boolean isLostElection(
-            Game game, Player seat, String agenda, String outcome, int available, AgendaForecast forecast) {
-        if (forecast.isEmpty() || !drivesTheDebateAlone(game, seat, agenda, outcome)) return false;
-        return forecast.withVotes(seat, outcome, available).chance(outcome) < CAN_WIN_ELECTION;
-    }
-
-    private static int votesToWin(
-            Game game, Player seat, String agenda, String outcome, int available, AgendaForecast forecast) {
-        if (forecast.isEmpty() || !drivesTheDebateAlone(game, seat, agenda, outcome)) return available;
-        for (int votes = 1; votes < available; votes++) {
-            if (forecast.withVotes(seat, outcome, votes).chance(outcome) >= SURE_ELECTION) return votes;
-        }
-        return available;
-    }
-
-    private static Optional<String> outcomeThatStopsARivalRider(Game game, Player seat, int votes) {
-        AgendaForecast forecast = AgendaForecast.of(game, seat);
-        if (!forecast.hasRivalImperialRider(seat)) return Optional.empty();
-        return AgendaOutcomes.of(game).stream()
-                .max(Comparator.comparingDouble(
-                        outcome -> forecast.withVotes(seat, outcome, votes).expectedUtility(seat)));
+        List<Integer> planetVotes = seat.getReadiedPlanets().stream()
+                .map(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
+                .toList();
+        return BallotPlanner.choose(game, seat, agenda, planetVotes)
+                .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes()));
     }
 
     private static Optional<Ballot> ballotFor(Game game, String outcome, int votes) {
@@ -285,19 +256,6 @@ public class AgendaVoting {
             owner = planetOwner.getFaction();
         }
         return Optional.of(new Ballot(outcome, owner, votes));
-    }
-
-    private static double score(Game game, Player seat, String agenda, String outcome, int available) {
-        if (MUTINY.equals(agenda)) return mutiny(game, outcome, available);
-        return AgendaPolicy.score(game, seat, agenda, outcome);
-    }
-
-    private static double mutiny(Game game, String outcome, int available) {
-        if (!"for".equalsIgnoreCase(outcome)) return 0;
-        Map<String, Integer> tally = AgendaSummaryHelper.getCurrentOutcomeVoteCounts(game);
-        int forVotes = tally.getOrDefault("for", 0) + available;
-        int againstVotes = tally.getOrDefault("against", 0);
-        return forVotes > againstVotes ? ALL_IN_SCORE : 0;
     }
 
     private static boolean ownedOrOpen(PromptButton button, String faction) {

@@ -36,6 +36,8 @@ class AgendaCardRulesTest extends BaseTi4Test {
         nekro = test.nekro;
         sol = test.sol;
         xxcha = test.addSeat(THIRD_ID, "xxcha", "red");
+        // The second agenda of the phase, so no vote has to be kept back for a later one.
+        test.game.setStoredValue("agendaCount", "2");
         test.game.setVp(10);
         test.game.setPhaseOfGame("agendawaiting");
         test.game.setSpeakerUserID(xxcha.getUserID());

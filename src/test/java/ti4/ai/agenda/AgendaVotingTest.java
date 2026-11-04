@@ -25,6 +25,8 @@ class AgendaVotingTest extends BaseTi4Test {
         sol = test.sol;
         test.place("01", "304");
         sol.addPlanet("jord");
+        // The second agenda of the phase, so no vote has to be kept back for a later one.
+        test.game.setStoredValue("agendaCount", "2");
         test.isActive(sol, "agendaVoting");
     }
 
