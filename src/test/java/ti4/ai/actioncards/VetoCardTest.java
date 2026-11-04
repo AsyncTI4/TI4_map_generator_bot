@@ -96,13 +96,22 @@ class VetoCardTest extends BaseTi4Test {
 
     // ---- queueing ------------------------------------------------------------------------------------------------
 
-    // The rule is Political Favor's: an election that costs the seat five units or more is discarded.
+    // Veto is played on an agenda that is very bad for the seat: the forecast expects it to lose 3.5 trade goods or
+    // more, here because the 7 point leader, with 9 votes, is likely to elect itself to Shard of the Throne.
     @Test
     void queuesAVetoForAnElectionItWouldLoseBy() {
         assertThat(pressed(AgendaCardRules.queueVeto(context(whenOffer())))).isEqualTo("queueAWhen");
 
         AiPrompt options = hidden("options", "queueWhen_ac_veto", "declineToQueueAWhen");
         assertThat(pressed(AgendaCardRules.queueVeto(context(options)))).isEqualTo("queueWhen_ac_veto");
+    }
+
+    // Not only elections: Seed of an Empire on "for" gives the leader a point, and the leader carries the vote.
+    @Test
+    void queuesAVetoForAForAgainstAgendaThatGivesTheLeaderAPoint() {
+        test.game.setCurrentAgendaInfo("Directive_For/Against_7_seed_empire");
+
+        assertThat(pressed(AgendaCardRules.queueVeto(context(whenOffer())))).isEqualTo("queueAWhen");
     }
 
     @Test

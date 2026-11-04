@@ -59,7 +59,7 @@ class AgendaNotes {
 
     private static boolean favorWorthIt(Game game, Player seat) {
         Player xxcha = game.getPNOwner(POLITICAL_FAVOR);
-        return xxcha != null && xxcha.getStrategicCC() > 0 && AgendaPolicy.worthDiscarding(game, seat);
+        return xxcha != null && xxcha.getStrategicCC() > 0 && AgendaPolicy.veryBadFor(game, seat);
     }
 
     private static boolean secretWorthIt(Game game, Player seat, Player owner) {

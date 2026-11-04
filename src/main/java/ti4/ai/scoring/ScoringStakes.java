@@ -21,6 +21,9 @@ public class ScoringStakes {
     private static final double CONTENDER_BONUS = 2;
     private static final int RISES_FROM_GOAL = 4;
     private static final double RIVAL_POINT_SHARE = 0.25;
+    private static final double CONTESTED_POINT_SHARE = 0.75;
+    private static final int FAR_BEHIND_MIN_GAP = 3;
+    private static final double FAR_BEHIND_SHARE_OF_GOAL = 0.3;
     private static final int MECATOL_POINTS = 1;
     private static final String PROJECTED_MEMO = "stakes.projectedPoints";
 
@@ -43,6 +46,23 @@ public class ScoringStakes {
     public static double rivalStake(Game game, Player rival, double points) {
         boolean reachesGoal = points > 0 && rival.getTotalVictoryPoints() + points >= game.getVp();
         return scoreValue(game, rival, points) * (reachesGoal ? 1.0 : RIVAL_POINT_SHARE);
+    }
+
+    public static double rivalPointStake(Game game, Player rival, double points) {
+        boolean reachesGoal = points > 0 && rival.getTotalVictoryPoints() + points >= game.getVp();
+        if (reachesGoal) return scoreValue(game, rival, points);
+        double share = farBehind(game, rival) ? RIVAL_POINT_SHARE : CONTESTED_POINT_SHARE;
+        return scoreValue(game, rival, points) * share;
+    }
+
+    public static boolean farBehind(Game game, Player player) {
+        int leader = game.getRealPlayers().stream()
+                .filter(other -> !other.isEliminated())
+                .mapToInt(Player::getTotalVictoryPoints)
+                .max()
+                .orElse(player.getTotalVictoryPoints());
+        int gap = Math.max(FAR_BEHIND_MIN_GAP, (int) Math.round(game.getVp() * FAR_BEHIND_SHARE_OF_GOAL));
+        return leader - player.getTotalVictoryPoints() >= gap;
     }
 
     public static boolean contenderExists(Game game) {

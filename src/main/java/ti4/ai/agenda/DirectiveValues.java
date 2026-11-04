@@ -200,8 +200,11 @@ class DirectiveValues {
     }
 
     private static double pointToEach(Game game, Player voter, List<Player> recipients) {
+        if (recipients.size() == 1) return pointsTo(game, voter, recipients.getFirst(), SEED_POINT);
         return recipients.stream()
-                .mapToDouble(player -> pointsTo(game, voter, player, SEED_POINT))
+                .mapToDouble(player -> player == voter
+                        ? ScoringStakes.scoreValue(game, voter, SEED_POINT)
+                        : -ScoringStakes.rivalStake(game, player, SEED_POINT))
                 .sum();
     }
 

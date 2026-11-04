@@ -67,6 +67,7 @@ public class AgendaPolicy {
             Set.of("core_mining", "demilitarized_zone", "disarmament", "redistribution");
     private static final double FAVOURITE_CHANCE = 0.5;
     private static final double DISCARD_THRESHOLD = 5.0;
+    private static final double VERY_BAD_LOSS = 3.5;
     private static final String ELECT_PLAYER = "elect player";
     private static final Set<String> POINT_ELECTIONS = Set.of("censure", "shard_of_the_throne", "crown_of_emphidia");
 
@@ -125,6 +126,12 @@ public class AgendaPolicy {
 
     public static boolean worthDiscarding(Game game, Player seat) {
         return predictedElectionScore(game, seat, null) <= -DISCARD_THRESHOLD;
+    }
+
+    public static boolean veryBadFor(Game game, Player seat) {
+        OptionalDouble loss = expectedLoss(game, seat);
+        if (loss.isEmpty()) return worthDiscarding(game, seat);
+        return loss.getAsDouble() >= VERY_BAD_LOSS;
     }
 
     public static OptionalDouble expectedLoss(Game game, Player seat) {

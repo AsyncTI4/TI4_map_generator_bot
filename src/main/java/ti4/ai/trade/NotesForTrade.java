@@ -28,7 +28,7 @@ class NotesForTrade {
     static final int LAST_AGENDA_ROUND = 5;
     private static final double OWN_THRONE_BACK = 1.0;
     private static final String POLITICAL_FAVOR = "favor";
-    private static final double FAVOR_PLAY_CHANCE = 0.25;
+    private static final double FAVOR_GIVE_BASE = 5.0;
     private static final double TRADE_GOOD_PER_AGENDA = 1.0;
     private static final int AGREEMENT_DISCOUNT = 1;
     private static final double OWN_FACTION_NOTE_COST = 1.5;
@@ -161,7 +161,7 @@ class NotesForTrade {
     }
 
     private static double politicalFavorCost(Game game) {
-        return CardFacade.strategyToken() * FAVOR_PLAY_CHANCE * agendaPhasesLeft(game);
+        return FAVOR_GIVE_BASE + CardFacade.strategyToken() * agendaPhasesLeft(game);
     }
 
     private static int agendaPhasesLeft(Game game) {

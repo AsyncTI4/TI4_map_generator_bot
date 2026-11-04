@@ -131,6 +131,32 @@ class AgendaValuesTest extends BaseTi4Test {
         assertThat(leader).isLessThan(trailer);
     }
 
+    // The Peace and War ministers are strong one-shot powers: worth chasing for itself, and when a rival must get
+    // one, a rival far behind on points is the cheaper hand to put it in.
+    @Test
+    void peaceAndWarMinistersAreSoughtAndBetterGivenToATrailingRival() {
+        test.points(sol, 8);
+        test.points(nekro, 7);
+
+        for (String minister : List.of("minister_peace", "minister_war")) {
+            assertThat(value(nekro, minister, "nekro", "")).as(minister).isGreaterThanOrEqualTo(10);
+            double leader = value(nekro, minister, "sol", "");
+            double trailer = value(nekro, minister, "hacan", "");
+            assertThat(trailer).as(minister).isNegative().isGreaterThan(leader);
+        }
+    }
+
+    // Mutiny shares its point among everyone on "for", so it stays on the group weighting: with one rival already on
+    // "for", joining it for a point of its own is still better than voting it down to take that rival's point away.
+    @Test
+    void mutinyIsStillWorthJoiningWhenARivalVotedFor() {
+        test.points(sol, 3);
+        test.points(nekro, 3);
+        test.game.setCurrentAgendaVote("for", "blue_3");
+
+        assertThat(value(nekro, "mutiny", "for", "for")).isGreaterThan(value(nekro, "mutiny", "against", "against"));
+    }
+
     // Demilitarized Zone destroys every unit on the planet and forbids rebuilding, so it costs the owner of a planet
     // with a space dock and a PDS on it; on a rival's fortified planet it is good for the voter.
     @Test

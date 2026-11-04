@@ -26,7 +26,7 @@ class BallotPlanner {
         int available = planetVotes.stream().mapToInt(Integer::intValue).sum();
         if (available <= 0) return Optional.empty();
         boolean finalAgenda = AgendaRound.isFinalAgenda(game);
-        int cap = finalAgenda ? available : available - reserve(planetVotes);
+        int cap = AgendaRound.keepsAVoteBack(game) ? available - reserve(planetVotes) : available;
         if (cap <= 0) return Optional.empty();
         List<String> outcomes = AgendaOutcomes.of(game);
         if (outcomes.isEmpty()) return Optional.empty();

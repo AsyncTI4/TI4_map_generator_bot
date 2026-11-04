@@ -39,6 +39,8 @@ class AgendaCardRulesTest extends BaseTi4Test {
         // The second agenda of the phase, so no vote has to be kept back for a later one.
         test.game.setStoredValue("agendaCount", "2");
         test.game.setVp(10);
+        // Sol leads by three, so Nekro is far behind and the voters let its riders through rather than fight them.
+        test.points(sol, 3);
         test.game.setPhaseOfGame("agendawaiting");
         test.game.setSpeakerUserID(xxcha.getUserID());
         agenda(ARMS_REDUCTION, 0, 3, 0);

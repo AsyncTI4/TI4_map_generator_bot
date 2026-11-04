@@ -44,9 +44,9 @@ class ElectionValues {
     private static final double EARLY_PLANETS_PER_ROUND = 1.5;
     private static final double LATE_PLANETS_PER_ROUND = 1.0;
     private static final double INDUSTRY_PER_ROUND = 0.7;
-    private static final double PEACE_VALUE = 4.0;
+    private static final double PEACE_VALUE = 10.0;
     private static final double SCIENCES_RESOURCES_PER_ROUND = 3.0;
-    private static final double WAR_VALUE = 4.0;
+    private static final double WAR_VALUE = 10.0;
     private static final double PROPHECY_BASE = 0.5;
     private static final double PROPHECY_PER_FIGHTER = 0.3;
     private static final double PROPHECY_ROUND_CAP = 3.0;
@@ -70,7 +70,7 @@ class ElectionValues {
         if (elected == null || hasScoredAllSecrets(elected)) return 0;
         if (elected == voter) return SecretDrawValue.of(game, voter);
         double points = SecretDrawValue.hasRoom(elected) ? RIVAL_SECRET_DRAW_POINTS : RIVAL_SECRET_SWAP_POINTS;
-        return -ScoringStakes.rivalStake(game, elected, 1) * points;
+        return -ScoringStakes.rivalPointStake(game, elected, 1) * points;
     }
 
     private static boolean hasScoredAllSecrets(Player player) {
@@ -231,7 +231,7 @@ class ElectionValues {
     }
 
     private static double censuredRival(Game game, Player voter, Player rival) {
-        double stake = ScoringStakes.rivalStake(game, rival, POINT);
+        double stake = ScoringStakes.rivalPointStake(game, rival, POINT);
         if (stake >= ScoringStakes.WIN_VALUE) return -stake;
         return -stake + rivalGainCost(game, voter, rival, actionCardLockout(game, rival));
     }

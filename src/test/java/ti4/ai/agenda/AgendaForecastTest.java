@@ -163,11 +163,12 @@ class AgendaForecastTest extends BaseTi4Test {
         assertThat(withRider.chance("for")).isLessThan(0.1);
     }
 
+    // A point is a big deal for anyone in the race, but a rider owner far behind the leader is no threat yet.
     @Test
-    void anImperialRiderNobodyIsRacingAgainstDoesNotMoveTheVoters() {
+    void anImperialRiderOfASeatFarBehindBarelyMovesTheVoters() {
         test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
         votes(3, 3, 0);
-        points(test.sol, 1);
+        points(test.sol, 4);
         AgendaForecast forecast = forecast();
 
         AgendaForecast withRider = forecast.withRider(xxcha, RiderPayoff.IMPERIAL, "for");

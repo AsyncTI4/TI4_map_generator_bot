@@ -24,7 +24,7 @@ class AgendaUtility {
     }
 
     static double riderStake(Game game, Player rider) {
-        return ScoringStakes.rivalStake(game, rider, POINT);
+        return ScoringStakes.rivalPointStake(game, rider, POINT);
     }
 
     private static double driveTheDebate(Game game, Player voter, boolean readsOwnSecrets, String outcome) {
@@ -36,6 +36,6 @@ class AgendaUtility {
         Player elected = game.getPlayerFromColorOrFaction(outcome);
         if (elected == null || !game.getRealPlayers().contains(elected)) return 0;
         if (elected == voter) return ScoringStakes.scoreValue(game, voter, POINT);
-        return -ScoringStakes.rivalStake(game, elected, POINT);
+        return -ScoringStakes.rivalPointStake(game, elected, POINT);
     }
 }

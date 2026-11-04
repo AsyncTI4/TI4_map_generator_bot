@@ -140,7 +140,7 @@ class PlanetElectionValues {
         if (owner == voter) {
             return holdShare(game, voter) * ScoringStakes.scoreValue(game, voter, HOLY_POINT) - lostProduction;
         }
-        return -holdShare(game, owner) * ScoringStakes.rivalStake(game, owner, HOLY_POINT)
+        return -holdShare(game, owner) * ScoringStakes.rivalPointStake(game, owner, HOLY_POINT)
                 + rivalGainCost(game, voter, owner, lostProduction);
     }
 

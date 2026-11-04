@@ -25,7 +25,7 @@ class AgendaValueMath {
 
     static final String FOR = "for";
     static final String AGAINST = "against";
-    private static final double ORDINARY_RIVAL_STAKE = 1.5;
+    private static final double ORDINARY_RIVAL_STAKE = 4.5;
     private static final double MIN_THREAT = 0.5;
     private static final double MAX_THREAT = 3.0;
     private static final int LAW_ROUNDS_CAP = 5;
@@ -51,7 +51,7 @@ class AgendaValueMath {
     }
 
     static double threat(Game game, Player rival) {
-        return Math.clamp(ScoringStakes.rivalStake(game, rival, 1) / ORDINARY_RIVAL_STAKE, MIN_THREAT, MAX_THREAT);
+        return Math.clamp(ScoringStakes.rivalPointStake(game, rival, 1) / ORDINARY_RIVAL_STAKE, MIN_THREAT, MAX_THREAT);
     }
 
     static double relativeToRivals(Game game, Player voter, ToDoubleFunction<Player> gain) {
@@ -85,7 +85,7 @@ class AgendaValueMath {
 
     static double pointsTo(Game game, Player voter, Player gainer, double points) {
         if (gainer == voter) return ScoringStakes.scoreValue(game, voter, points);
-        return -ScoringStakes.rivalStake(game, gainer, points);
+        return -ScoringStakes.rivalPointStake(game, gainer, points);
     }
 
     static int lawRounds(Game game) {

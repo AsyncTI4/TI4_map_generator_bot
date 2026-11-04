@@ -209,7 +209,7 @@ public class AgendaVoting {
                         .contains(
                                 SPENT_PLANET_PREFIX + StringUtils.removeStart(button.handlerId(), PLANET_VOTE_PREFIX)))
                 .toList();
-        if (!AgendaRound.isFinalAgenda(game) && planets.size() <= 1) return Optional.empty();
+        if (AgendaRound.keepsAVoteBack(game) && planets.size() <= 1) return Optional.empty();
         Comparator<PromptButton> byVotes = Comparator.comparingInt(button -> planetVotes(game, seat, button));
         return planets.stream()
                 .filter(button -> planetVotes(game, seat, button) >= needed)

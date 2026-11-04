@@ -187,6 +187,20 @@ class AgendaVotingTest extends BaseTi4Test {
         assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
     }
 
+    // Once Mutiny is in the discard pile no later agenda can force a vote, so the first agenda may use the last planet.
+    @Test
+    void spendsItsOnlyPlanetOnTheFirstAgendaOnceMutinyIsDiscarded() {
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.getDiscardAgendas().put("mutiny", 1);
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":1,\"black\":0}");
+        test.game.setCurrentAgendaVote("xxcha", "red_1");
+
+        assertThat(AgendaVoting.plan(test.game, sol))
+                .hasValueSatisfying(ballot -> assertThat(ballot.outcome()).isEqualTo("sol"));
+    }
+
     // With two planets on the first agenda it may cast votes, but never exhausts the last ready planet with votes:
     // once Wellon is spent, it finishes instead of pressing Jord.
     @Test

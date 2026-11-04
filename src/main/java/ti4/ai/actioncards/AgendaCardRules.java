@@ -130,7 +130,7 @@ public class AgendaCardRules {
                 .sorted()
                 .filter(alias -> AgendaCards.VETO_TITLE.equals(SabotageWindow.title(alias)))
                 .findFirst();
-        if (veto.isEmpty() || !AgendaPolicy.worthDiscarding(game, seat)) return Optional.empty();
+        if (veto.isEmpty() || !AgendaPolicy.veryBadFor(game, seat)) return Optional.empty();
         return pressHidden(context, QUEUE_WHEN_PREFIX + veto.get(), "queue Veto")
                 .or(() -> pressHidden(context, OPEN_WHENS, "look at its when options to play Veto"));
     }

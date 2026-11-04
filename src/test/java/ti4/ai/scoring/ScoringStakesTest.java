@@ -65,6 +65,27 @@ class ScoringStakesTest extends BaseTi4Test {
         assertThat(ScoringStakes.rivalStake(test.game, test.sol, 1)).isCloseTo(ScoringStakes.WIN_VALUE, within(EXACT));
     }
 
+    // A point to a rival in the race costs three quarters of its worth to them; a rival three or more points behind
+    // the leader is no threat yet, so its point costs a quarter. A winning point counts in full either way.
+    @Test
+    void aRivalsPointIsABigDealUnlessTheRivalIsFarBehind() {
+        points(test.sol, 5);
+        points(test.nekro, 4);
+
+        double solWorth = ScoringStakes.scoreValue(test.game, test.sol, 1);
+        assertThat(ScoringStakes.rivalPointStake(test.game, test.sol, 1)).isCloseTo(0.75 * solWorth, within(EXACT));
+        assertThat(ScoringStakes.farBehind(test.game, test.nekro)).isFalse();
+
+        Player hacan = test.addSeat("300000000000000003", "hacan", "yellow");
+        assertThat(ScoringStakes.farBehind(test.game, hacan)).isTrue();
+        double hacanWorth = ScoringStakes.scoreValue(test.game, hacan, 1);
+        assertThat(ScoringStakes.rivalPointStake(test.game, hacan, 1)).isCloseTo(0.25 * hacanWorth, within(EXACT));
+
+        points(test.sol, 4);
+        assertThat(ScoringStakes.rivalPointStake(test.game, test.sol, 1))
+                .isCloseTo(ScoringStakes.WIN_VALUE, within(EXACT));
+    }
+
     // Negotiate Trade Routes (5 trade goods) is the one point Nekro qualifies for.
     @Test
     void pointsInReachAreThePublicsAPlayerQualifiesForLimitedByItsScoringChances() {
