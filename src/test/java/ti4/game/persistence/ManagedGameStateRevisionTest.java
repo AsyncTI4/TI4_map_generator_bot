@@ -1,25 +1,23 @@
-package ti4.spring.service.persistence;
+package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import ti4.game.persistence.ManagedGameState;
 
-class PersistedManagedGameTest {
+class ManagedGameStateRevisionTest {
 
     @Test
     void rowIsTrustedOnlyWhenTheGameFileHasTheSameRevisionKey() {
-        PersistedManagedGame row = new PersistedManagedGame(stateWithRevision("revision-1"));
+        ManagedGameState row = stateWithRevision("revision-1");
 
         assertThat(row.matchesRevision("revision-1")).isTrue();
         assertThat(row.matchesRevision("revision-2")).isFalse();
         // A save file written before revision keys existed has none, so its row is never trusted.
         assertThat(row.matchesRevision(null)).isFalse();
         assertThat(row.matchesRevision(" ")).isFalse();
-        assertThat(new PersistedManagedGame(stateWithRevision(null)).matchesRevision(null))
-                .isFalse();
+        assertThat(stateWithRevision(null).matchesRevision(null)).isFalse();
     }
 
     private static ManagedGameState stateWithRevision(String revisionKey) {

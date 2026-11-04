@@ -37,7 +37,7 @@ public class GameDatabaseSyncPipeline {
     static void queueSyncFromGameFile(String gameName) {
         if (DatabasePersistenceGate.isDisabled()) return;
         queue(gameName, service -> {
-            Game game = GameManager.loadGameFile(gameName);
+            Game game = GameLoadService.load(gameName);
             if (game == null) return;
             service.restore(GameEntityMapper.toSnapshot(game));
         });

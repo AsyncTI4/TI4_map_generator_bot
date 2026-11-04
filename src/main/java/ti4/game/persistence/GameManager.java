@@ -26,7 +26,6 @@ import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
-import ti4.spring.service.persistence.PersistedManagedGame;
 import ti4.spring.service.persistence.PersistedManagedGameService;
 import ti4.spring.websocket.GameWebStatePipeline;
 
@@ -64,7 +63,7 @@ public class GameManager {
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
-                Map<String, PersistedManagedGame> persistedGames = loadPersistedManagedGames();
+                Map<String, ManagedGameState> persistedGames = loadPersistedManagedGames();
                 DatabaseWarmupCheck databaseCheck = DatabaseWarmupCheck.fromSettings();
                 Map<String, Exception> failedGames = new ConcurrentHashMap<>();
                 AtomicInteger builtFromDatabase = new AtomicInteger();
@@ -99,7 +98,7 @@ public class GameManager {
     }
 
     @Nullable
-    private static Map<String, PersistedManagedGame> loadPersistedManagedGames() {
+    private static Map<String, ManagedGameState> loadPersistedManagedGames() {
         if (DatabasePersistenceGate.isDisabled()) {
             BotLogger.info("Database maintenance mode is on, so every managed game will be built from its game file.");
             return null;
@@ -115,9 +114,9 @@ public class GameManager {
 
     static boolean warmupManagedGame(
             String gameName,
-            @Nullable Map<String, PersistedManagedGame> persistedGames,
+            @Nullable Map<String, ManagedGameState> persistedGames,
             DatabaseWarmupCheck databaseCheck) {
-        PersistedManagedGame persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
+        ManagedGameState persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
         if (persistedGame != null
                 && databaseCheck.readsEnabled()
                 && buildManagedGameFromCurrentRow(gameName, persistedGame)) {
@@ -132,12 +131,10 @@ public class GameManager {
         return false;
     }
 
-    private static boolean buildManagedGameFromCurrentRow(String gameName, PersistedManagedGame persistedGame) {
-        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
-            if (!persistedGame.matchesRevision(readRevisionKeyOrNull(gameName))) return false;
-            gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame.state()));
-            return true;
-        });
+    private static boolean buildManagedGameFromCurrentRow(String gameName, ManagedGameState persistedGame) {
+        if (!persistedGame.matchesRevision(readRevisionKeyOrNull(gameName))) return false;
+        gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame));
+        return true;
     }
 
     @Nullable
@@ -151,13 +148,11 @@ public class GameManager {
 
     @Nullable
     private static Game buildManagedGameFromGameFile(String gameName) {
-        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
-            Game game = GameLoadService.load(gameName);
-            if (game != null) {
-                gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
-            }
-            return game;
-        });
+        Game game = GameLoadService.load(gameName);
+        if (game != null) {
+            gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
+        }
+        return game;
     }
 
     private static void reportGamesThatFailedWarmup(Map<String, Exception> failedGames) {
@@ -170,18 +165,6 @@ public class GameManager {
                         + ". They stay unloaded until they are next accessed. The stack trace is from "
                         + firstFailedGameName + ".",
                 failedGames.get(firstFailedGameName));
-    }
-
-    @Nullable
-    public static Game loadGameFile(String gameName) {
-        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
-            ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
-            Game game = GameLoadService.load(gameName);
-            if (game == null && gameFileExists(gameName)) {
-                handleCorruptGame(gameName, cachedManagedGame);
-            }
-            return game;
-        });
     }
 
     @Nullable
@@ -238,11 +221,17 @@ public class GameManager {
         boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
                 .orElse(false);
-        ManagedGameState managedGameState = saveAndQueueDatabaseSync(game, reason);
-        if (managedGameState == null) {
+        if (!GameSaveService.save(game, reason)) {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
+        // TODO: Queued after the file write lock is released, so two concurrent saves of one game can reach the
+        // database out of order and leave the older state until the next save or the nightly reconciliation.
+        ManagedGameState managedGameState = ManagedGameState.of(game);
+        GameDatabaseSyncPipeline.queueSync(game, managedGameState);
+
+        gameNames.add(game.getName());
+        replaceManagedGame(managedGameState);
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
@@ -252,35 +241,20 @@ public class GameManager {
         }
     }
 
-    @Nullable
-    private static ManagedGameState saveAndQueueDatabaseSync(Game game, String reason) {
-        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
-            if (!GameSaveService.save(game, reason)) {
-                return null;
-            }
-            ManagedGameState managedGameState = ManagedGameState.of(game);
-            GameDatabaseSyncPipeline.queueSync(game, managedGameState);
-            gameNames.add(game.getName());
-            replaceManagedGame(managedGameState);
-            return managedGameState;
-        });
-    }
-
     public static boolean delete(String gameName) {
         waitFor(warmupFinishedLatch);
-        return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
-            if (!GameSaveService.delete(gameName)) {
-                return false;
-            }
-            unregisterGameAndQueueDatabaseDelete(gameName);
-            return true;
-        });
+        if (!GameSaveService.delete(gameName)) {
+            return false;
+        }
+        unregisterGameAndQueueDatabaseDelete(gameName);
+        return true;
     }
 
     @Nullable
     public static Game undo(Game game) {
         waitFor(gameNamesLoadedLatch);
-        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> handleUndo(GameUndoService.undo(game)));
+        Game undo = GameUndoService.undo(game);
+        return handleUndo(undo);
     }
 
     private static Game handleUndo(Game undo) {
@@ -318,18 +292,13 @@ public class GameManager {
     @Nullable
     public static Game undo(Game game, int undoIndex) {
         waitFor(gameNamesLoadedLatch);
-        return GameFileLockManager.wrapWithWriteLock(
-                game.getName(), () -> handleUndo(GameUndoService.undo(game, undoIndex)));
+        Game undo = GameUndoService.undo(game, undoIndex);
+        return handleUndo(undo);
     }
 
     @Nullable
     public static Game reload(String gameName) {
         waitFor(gameNamesLoadedLatch);
-        return GameFileLockManager.wrapWithWriteLock(gameName, () -> reloadGameFile(gameName));
-    }
-
-    @Nullable
-    private static Game reloadGameFile(String gameName) {
         ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
         Game game = GameLoadService.load(gameName);
         if (game == null) {
@@ -369,15 +338,14 @@ public class GameManager {
     @Nullable
     public static ManagedGame getManagedGame(String gameName) {
         if (!isValid(gameName)) return null;
-        ManagedGame managedGame = gameNameToManagedGame.get(gameName);
-        if (managedGame != null) return managedGame;
-        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+        waitFor(gameNamesLoadedLatch);
+        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> {
             Game game = GameLoadService.load(gameName);
             if (game == null) {
                 BotLogger.error("Failed to load ManagedGame for " + gameName + ".");
                 throw new IllegalStateException("Failed to load ManagedGame for " + gameName);
             }
-            return gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
+            return new ManagedGame(game);
         });
     }
 

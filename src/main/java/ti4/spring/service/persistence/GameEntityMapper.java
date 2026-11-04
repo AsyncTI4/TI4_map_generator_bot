@@ -40,9 +40,9 @@ public class GameEntityMapper {
         return new GameEntitySnapshot(gameEntity, List.copyOf(users.values()), titles);
     }
 
-    public static PersistedManagedGame toPersistedManagedGame(
+    public static ManagedGameState toManagedGameState(
             GameEntity gameEntity, List<ManagedGameState.Participant> participants) {
-        var state = new ManagedGameState(
+        return new ManagedGameState(
                 gameEntity.getGameName(),
                 gameEntity.getRevisionKey(),
                 gameEntity.isEnded(),
@@ -71,7 +71,6 @@ public class GameEntityMapper {
                 gameEntity.getLaunchPostThreadId(),
                 participants,
                 ManagedGameState.decodeTeamMateToPrimaryId(gameEntity.getTeamMatePrimaryUserIds()));
-        return new PersistedManagedGame(state);
     }
 
     static boolean hasUnknownName(UserEntity user) {

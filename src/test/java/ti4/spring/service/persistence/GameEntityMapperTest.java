@@ -138,16 +138,16 @@ class GameEntityMapperTest extends BaseTi4Test {
         game.setLastModifiedDate(9999);
 
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
-        PersistedManagedGame persisted = GameEntityMapper.toPersistedManagedGame(
+        ManagedGameState persisted = GameEntityMapper.toManagedGameState(
                 snapshot.game(), participantsOf(snapshot).reversed());
 
         // Warmup rebuilds ManagedGames from this state, so it must match what the game file would produce.
-        assertThat(persisted.state()).isEqualTo(ManagedGameState.of(game));
-        assertThat(persisted.state().participants())
+        assertThat(persisted).isEqualTo(ManagedGameState.of(game));
+        assertThat(persisted.participants())
                 .extracting(ManagedGameState.Participant::userId)
                 .containsExactly("first-id", "second-id", "spectator-id", "third-id");
-        assertThat(persisted.state().guildId()).isEqualTo("111");
-        assertThat(persisted.state().endedDate()).isEqualTo(5678);
+        assertThat(persisted.guildId()).isEqualTo("111");
+        assertThat(persisted.endedDate()).isEqualTo(5678);
     }
 
     @Test
@@ -159,8 +159,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         assertThat(snapshot.game().getEndedEpochMilliseconds()).isNull();
-        assertThat(GameEntityMapper.toPersistedManagedGame(snapshot.game(), participantsOf(snapshot))
-                        .state())
+        assertThat(GameEntityMapper.toManagedGameState(snapshot.game(), participantsOf(snapshot)))
                 .isEqualTo(ManagedGameState.of(game));
     }
 

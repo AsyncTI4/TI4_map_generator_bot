@@ -85,8 +85,8 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         persistenceService.replace(GameEntityMapper.toSnapshot(game));
 
-        PersistedManagedGame persisted = persistedManagedGameService.loadAll().get(game.getName());
-        assertThat(persisted.state()).isEqualTo(ManagedGameState.of(game));
+        ManagedGameState persisted = persistedManagedGameService.loadAll().get(game.getName());
+        assertThat(persisted).isEqualTo(ManagedGameState.of(game));
     }
 
     @Test
@@ -99,11 +99,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         game.addPlayer("newcomer-id", "Newcomer");
         persistenceService.replace(GameEntityMapper.toSnapshot(game));
 
-        assertThat(persistedManagedGameService
-                        .loadAll()
-                        .get(game.getName())
-                        .state()
-                        .participants())
+        assertThat(persistedManagedGameService.loadAll().get(game.getName()).participants())
                 .extracting(ManagedGameState.Participant::userId)
                 .containsExactly("newcomer-id", "user-1", "user-2", "user-3");
     }
@@ -119,8 +115,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
                 .extracting(GameEntity::isStatisticsIgnored)
                 .isEqualTo(true);
         assertThat(playerRepository.findAllWithUsers()).isEmpty();
-        assertThat(persistedManagedGameService.loadAll().get(game.getName()).state())
-                .isEqualTo(ManagedGameState.of(game));
+        assertThat(persistedManagedGameService.loadAll().get(game.getName())).isEqualTo(ManagedGameState.of(game));
     }
 
     @Test

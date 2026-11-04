@@ -34,11 +34,10 @@ flowchart TD
     C --> D[Write temporary save file and replace game file]
     D -->|Write fails| E[Restore previous in-memory revision and report failure]
     E --> F[GameManager throws; no sync is queued]
-    D -->|Write succeeds| G[Attempt undo copy]
-    G --> I[Capture database snapshot and queue sync]
+    D -->|Write succeeds| G[Attempt undo copy and release file lock]
+    G --> H[Queue web state update]
+    H --> I[Capture database snapshot and queue sync]
     I --> J[Refresh managed-game and player indexes]
-    J --> R[Release file lock]
-    R --> H[Queue web state update]
     I -. asynchronous .-> K[Single-thread database executor]
     K --> L[Persist snapshot in a database transaction]
 ```
@@ -51,12 +50,13 @@ successful file save.
 The database snapshot includes the saved revision and
 `GameEntityMapper.MAPPING_VERSION`. The pipeline captures it before queuing the
 write. Every game gets a row. Games with fewer than 3 real or eliminated players
-are marked `statistics_ignored` and get no player or title rows. Live writes use `GameEntityPersistenceService.replace`, which also
-updates user names.
+are marked `statistics_ignored` and get no player or title rows. Live writes use
+`GameEntityPersistenceService.replace`, which also updates user names.
 
-File writes and database writes are not one transaction. Syncs are queued while
-the file write lock is held, so they reach the executor in file-write order, but a
-failed or skipped database write still leaves the row behind. Reconciliation compares the
+File writes and database writes are not one transaction. In particular, database
+submission happens after releasing the file lock, so concurrent saves can enqueue
+their database updates out of file-write order. Warmup only trusts a row whose
+revision key matches the file, so such a row is rebuilt from its file. Reconciliation compares the
 database revision with the revision on disk to detect this drift.
 
 ## Loading, missing files, and corrupt files

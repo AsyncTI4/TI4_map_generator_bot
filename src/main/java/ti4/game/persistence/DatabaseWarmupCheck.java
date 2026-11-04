@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.settings.GlobalSettings;
-import ti4.spring.service.persistence.PersistedManagedGame;
 
 final class DatabaseWarmupCheck {
 
@@ -36,26 +35,18 @@ final class DatabaseWarmupCheck {
         return readsEnabled;
     }
 
-    boolean rowMatchesFile(String gameName, @Nullable PersistedManagedGame persistedGame, ManagedGameState fileState) {
+    boolean rowMatchesFile(String gameName, @Nullable ManagedGameState persistedGame, ManagedGameState fileState) {
         if (persistedGame == null || !persistedGame.matchesRevision(fileState.revisionKey())) {
             outdatedRows.incrementAndGet();
             return false;
         }
-        List<String> differingFields = differingFields(fileState, persistedGame.state());
+        List<String> differingFields = differingFields(fileState, persistedGame);
         if (!differingFields.isEmpty()) {
             differingRows.put(gameName, differingFields);
             return false;
         }
         matchingRows.incrementAndGet();
         return true;
-    }
-
-    int matchingRows() {
-        return matchingRows.get();
-    }
-
-    int outdatedRows() {
-        return outdatedRows.get();
     }
 
     List<String> differingGameNames() {

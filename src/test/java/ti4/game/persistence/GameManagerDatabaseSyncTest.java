@@ -11,12 +11,9 @@ import java.nio.charset.MalformedInputException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
-import ti4.spring.service.persistence.PersistedManagedGame;
 import ti4.testUtils.BaseTi4Test;
 
 class GameManagerDatabaseSyncTest extends BaseTi4Test {
@@ -29,14 +26,6 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameSaveService.when(() -> GameSaveService.save(game, "test save")).thenReturn(true);
             gameSaveService.when(() -> GameSaveService.delete(game.getName())).thenReturn(true);
-            AtomicBoolean syncQueuedUnderWriteLock = recordWriteLockWhenSyncQueued(pipeline, game);
-            AtomicBoolean deleteQueuedUnderWriteLock = new AtomicBoolean();
-            pipeline.when(() -> GameDatabaseSyncPipeline.queueDelete(game.getName()))
-                    .thenAnswer(_ -> {
-                        deleteQueuedUnderWriteLock.set(
-                                GameFileLockManager.isWriteLockedByCurrentThread(game.getName()));
-                        return null;
-                    });
 
             GameManager.save(game, "test save");
             GameManager.delete(game.getName());
@@ -44,9 +33,6 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(eq(game), any()));
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueDelete(game.getName()));
             pipeline.verifyNoMoreInteractions();
-            // Queuing while the game file is still locked keeps database writes in the same order as file writes.
-            assertThat(syncQueuedUnderWriteLock).isTrue();
-            assertThat(deleteQueuedUnderWriteLock).isTrue();
         }
     }
 
@@ -77,13 +63,11 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         try (MockedStatic<GameUndoService> gameUndoService = mockStatic(GameUndoService.class);
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameUndoService.when(() -> GameUndoService.undo(sourceGame)).thenReturn(undoneGame);
-            AtomicBoolean syncQueuedUnderWriteLock = recordWriteLockWhenSyncQueued(pipeline, undoneGame);
 
             assertThat(GameManager.undo(sourceGame)).isSameAs(undoneGame);
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(eq(undoneGame), any()));
             pipeline.verifyNoMoreInteractions();
-            assertThat(syncQueuedUnderWriteLock).isTrue();
         }
     }
 
@@ -96,13 +80,11 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             gameLoadService
                     .when(() -> GameLoadService.load(reloadedGame.getName()))
                     .thenReturn(reloadedGame);
-            AtomicBoolean syncQueuedUnderWriteLock = recordWriteLockWhenSyncQueued(pipeline, reloadedGame);
 
             assertThat(GameManager.reload(reloadedGame.getName())).isSameAs(reloadedGame);
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSync(eq(reloadedGame), any()));
             pipeline.verifyNoMoreInteractions();
-            assertThat(syncQueuedUnderWriteLock).isTrue();
         }
     }
 
@@ -215,7 +197,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     void warmupBuildsManagedGameFromDatabaseRowThatMatchesTheGameFile() {
         String gameName = uniqueName("warmup-current");
         String userId = uniqueName("warmup-current-user");
-        PersistedManagedGame persistedGame = new PersistedManagedGame(managedGameState(gameName, userId));
+        ManagedGameState persistedGame = managedGameState(gameName, userId);
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
@@ -242,7 +224,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     void warmupLoadsGameFileAndQueuesSyncWhenTheDatabaseRowIsStale() {
         Game game = newGame("warmup-stale");
         String userId = game.getPlayers().keySet().iterator().next();
-        PersistedManagedGame staleRow = new PersistedManagedGame(managedGameState(game.getName(), userId));
+        ManagedGameState staleRow = managedGameState(game.getName(), userId);
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
@@ -319,8 +301,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     @Test
     void warmupFallsBackToTheGameFileWhenTheRevisionHeaderCannotBeRead() {
         String gameName = uniqueName("warmup-unreadable-header");
-        PersistedManagedGame persistedGame =
-                new PersistedManagedGame(managedGameState(gameName, uniqueName("warmup-unreadable-user")));
+        ManagedGameState persistedGame = managedGameState(gameName, uniqueName("warmup-unreadable-user"));
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
                 MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
@@ -342,38 +323,10 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
     }
 
     @Test
-    void warmupFromTheDatabaseHoldsTheGameFileLockUntilTheGameIsCached() throws Exception {
-        String gameName = uniqueName("warmup-delete-race");
-        String userId = uniqueName("warmup-delete-race-user");
-        PersistedManagedGame persistedGame = new PersistedManagedGame(managedGameState(gameName, userId));
-        AtomicBoolean cachedBeforeDelete = new AtomicBoolean();
-        AtomicReference<Thread> deletion = new AtomicReference<>();
-
-        try (MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
-                MockedStatic<GameDatabaseSyncPipeline> ignored = mockStatic(GameDatabaseSyncPipeline.class)) {
-            revisionKeys.when(() -> GameRevisionKeyFile.read(gameName)).thenAnswer(_ -> {
-                // A delete takes the write lock right after the header is read. It must wait until warmup has
-                // cached the game, so its removal runs after the insert instead of being undone by it.
-                Thread thread = Thread.ofPlatform()
-                        .start(() -> GameFileLockManager.wrapWithWriteLock(
-                                gameName, () -> cachedBeforeDelete.set(GameManager.getManagedPlayer(userId) != null)));
-                deletion.set(thread);
-                thread.join(200);
-                return "row-revision";
-            });
-
-            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), readsOn()))
-                    .isTrue();
-        }
-        deletion.get().join(5000);
-        assertThat(cachedBeforeDelete).isTrue();
-    }
-
-    @Test
     void readsOffBuildsFromTheFileAndSkipsTheResyncWhenTheRowMatches() {
         Game game = newGame("reads-off-match");
         game.setRevisionKey("file-revision");
-        PersistedManagedGame currentRow = new PersistedManagedGame(ManagedGameState.of(game));
+        ManagedGameState currentRow = ManagedGameState.of(game);
         DatabaseWarmupCheck check = new DatabaseWarmupCheck(false);
 
         try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
@@ -389,7 +342,6 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             gameLoadService.verify(() -> GameLoadService.load(game.getName()));
             pipeline.verifyNoInteractions();
         }
-        assertThat(check.matchingRows()).isEqualTo(1);
         assertThat(check.summary()).contains("1 match", "0 outdated", "0 differ", "can be turned on");
     }
 
@@ -398,7 +350,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         Game game = newGame("reads-off-differs");
         game.setRevisionKey("file-revision");
         game.setFowMode(true);
-        PersistedManagedGame wrongRow = new PersistedManagedGame(ManagedGameState.of(game));
+        ManagedGameState wrongRow = ManagedGameState.of(game);
         game.setFowMode(false);
         DatabaseWarmupCheck check = new DatabaseWarmupCheck(false);
 
@@ -411,7 +363,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
         }
         assertThat(check.differingGameNames()).containsExactly(game.getName());
-        assertThat(DatabaseWarmupCheck.differingFields(ManagedGameState.of(game), wrongRow.state()))
+        assertThat(DatabaseWarmupCheck.differingFields(ManagedGameState.of(game), wrongRow))
                 .containsExactly("fowMode");
         assertThat(check.summary()).doesNotContain("can be turned on");
     }
@@ -430,22 +382,11 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
         }
-        assertThat(check.outdatedRows()).isEqualTo(1);
         assertThat(check.summary()).contains("1 outdated").doesNotContain("can be turned on");
     }
 
     private static DatabaseWarmupCheck readsOn() {
         return new DatabaseWarmupCheck(true);
-    }
-
-    private static AtomicBoolean recordWriteLockWhenSyncQueued(
-            MockedStatic<GameDatabaseSyncPipeline> pipeline, Game game) {
-        AtomicBoolean queuedUnderWriteLock = new AtomicBoolean();
-        pipeline.when(() -> GameDatabaseSyncPipeline.queueSync(eq(game), any())).thenAnswer(_ -> {
-            queuedUnderWriteLock.set(GameFileLockManager.isWriteLockedByCurrentThread(game.getName()));
-            return null;
-        });
-        return queuedUnderWriteLock;
     }
 
     private static ManagedGame onlyGameOf(String userId) {

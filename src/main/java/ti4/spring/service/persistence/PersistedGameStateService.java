@@ -24,10 +24,7 @@ public class PersistedGameStateService {
         Map<String, List<PlayerEntity>> playersByGame = playerEntityRepository.findAllWithUsersAndGames().stream()
                 .collect(Collectors.groupingBy(player -> player.getGame().getGameName()));
         Map<String, List<ManagedGameState.Participant>> participantsByGame =
-                gameParticipantEntityRepository.findAllRows().stream()
-                        .collect(Collectors.groupingBy(
-                                GameParticipantRow::gameName,
-                                Collectors.mapping(GameParticipantRow::toParticipant, Collectors.toList())));
+                gameParticipantEntityRepository.findAllParticipantsByGameName();
         Map<String, List<TitleEntity>> titlesByGame = titleEntityRepository.findAllWithUsersAndGames().stream()
                 .collect(Collectors.groupingBy(title -> title.getGame().getGameName()));
 

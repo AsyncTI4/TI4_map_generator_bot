@@ -93,6 +93,10 @@ public record ManagedGameState(
                 collectTeamMates(game));
     }
 
+    public boolean matchesRevision(String fileRevisionKey) {
+        return StringUtils.isNotBlank(fileRevisionKey) && fileRevisionKey.equals(revisionKey);
+    }
+
     public String encodedTeamMateToPrimaryId() {
         if (teamMateToPrimaryId.isEmpty()) return null;
         return teamMateToPrimaryId.entrySet().stream()
