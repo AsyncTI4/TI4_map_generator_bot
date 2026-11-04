@@ -35,6 +35,9 @@ class RemoveFogTile extends GameStateSubcommand {
         if (targetPlayers.isEmpty()) {
             targetPlayers.add(getPlayer());
         }
+        if (FogTileTargets.refusedForOtherSeats(event, getGame(), getPlayer(), targetPlayers)) {
+            return;
+        }
 
         Set<String> positions = new HashSet<>(Helper.getListFromCSV(positionMapping));
         StringBuilder sb = new StringBuilder();

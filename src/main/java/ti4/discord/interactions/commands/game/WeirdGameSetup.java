@@ -20,6 +20,7 @@ import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.FogPreset;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
@@ -81,7 +82,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.FOW_PLUS.toString(),
-                "True to enable FoW+ Mode (only in Fog of War games)"));
+                "True to enable FoW+ (fog games only; also in /fow fow_options)"));
     }
 
     @Override
@@ -92,7 +93,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (communityMode != null) game.setCommunityMode(communityMode);
 
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
-        if (fowMode != null) game.setFowMode(fowMode);
+        if (fowMode != null) {
+            game.setFowMode(fowMode);
+            if (fowMode) suggestFullFogSetup(event, game);
+        }
 
         Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
         if (tfMode != null) {
@@ -213,7 +217,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
-        if (riftsetMode != null && game.isFowMode()) {
+        if (Boolean.TRUE.equals(riftsetMode) && game.isFowMode()) {
             RiftSetModeService.activate(event, game);
         }
 
@@ -221,6 +225,18 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);
         }
+    }
+
+    private static void suggestFullFogSetup(SlashCommandInteractionEvent event, Game game) {
+        if (game.getGuild() == null || GMService.gmRoomOrNull(game) != null) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Fog of War is on, but this game has no GM room and no fog preset yet. For a full fog setup"
+                        + " (GM room, Standard preset, setup wizard) use `/fow create_fow_game_button` instead."
+                        + " To keep this game, you can still apply a preset here.",
+                List.of(Buttons.blue("fowPresetPreview_" + FogPreset.STANDARD.getId(), "Preview Standard preset")));
     }
 
     /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Thunder's Edge mode. */

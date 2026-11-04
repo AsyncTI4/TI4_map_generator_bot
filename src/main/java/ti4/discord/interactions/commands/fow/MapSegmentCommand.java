@@ -27,7 +27,7 @@ class MapSegmentCommand extends GameStateSubcommand {
 
     MapSegmentCommand() {
         super(
-                Constants.MAP_SEGMENT,
+                Constants.FOW_MAP_SEGMENT,
                 "GM: split the map into sectors shown on their own (no options lists them)",
                 true,
                 true);
