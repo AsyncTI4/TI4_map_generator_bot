@@ -30,6 +30,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.PatternHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -696,6 +697,7 @@ final class FowSetupFactionService {
         FowSetupWizardService.saveState(game, state);
 
         List<ColorModel> unusedColors = GameColorsService.getUnusedColors(game).stream()
+                .filter(color -> ColorChangeHelper.isColorAllowedForPlayer(color.getName(), player))
                 .sorted(Comparator.comparing(ColorModel::getName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
         if (unusedColors.isEmpty()) {

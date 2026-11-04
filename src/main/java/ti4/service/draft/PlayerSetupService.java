@@ -35,6 +35,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -98,6 +99,14 @@ public class PlayerSetupService {
                     return;
                 }
             }
+        }
+
+        if (color != null && !ColorChangeHelper.isColorAllowedForPlayer(color, player)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Setup Warning - Color " + color + " is reserved for its creator."
+                            + " So, we will give you a different color...");
+            color = null;
         }
 
         if (player.isRealPlayer() && player.getSo() > 0) {
