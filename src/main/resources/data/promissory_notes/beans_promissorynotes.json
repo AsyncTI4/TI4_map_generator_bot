@@ -100,7 +100,7 @@
         "faction": "bloom",
         "color": "",
         "playArea": false,
-        "text": "ACTION:\n\nChoose 1 non-home planet you control that contains 1 or more of your ground forces. The J'nahfa player may place 1 infantry from their reinforcements into coexistence on that planet. If they do, ready that planet.\n\nThen, return this card to the J'nahfa player.",
+        "text": "ACTION:\n\nYou and the J'nahfa player may agree to place 1 infantry from each of your reinforcements into coexistence on a non-home planet the other player controls that contains their ground forces.\n\nThen, return this card to the J'nahfa player.",
         "source": "beans"
     }
 ]

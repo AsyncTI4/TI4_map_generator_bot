@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DeepReachesStartingTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
@@ -600,6 +601,7 @@ public class PlayerSetupService {
                 MigoAbilityHandler.onPlanetGained(player, planet.getName());
             }
         }
+        BloomAbilityHandler.syncCoexistingAbilities(game, player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
         if (!game.isFowMode()) {

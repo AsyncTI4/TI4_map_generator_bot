@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
@@ -413,6 +414,15 @@ public class TacticalActionOutputService {
                 && isSacredPassageOrigin(game, player, tile, allMovingUnits)) {
             output.append(
                     " (Receives +1 from _Sacred Passage_ due to starting its movement in The Fracture or an anomaly.)");
+        }
+        if (unitModel != null
+                && "bloom_cruiser2".equals(unitModel.getId())
+                && BloomTechHandler.canZygomyceteIIMoveThroughShips(game, player)) {
+            distance = CheckDistanceHelper.getDistanceIgnoringOtherShips(
+                    game, player, tile.getPosition(), game.getActiveSystem(), true);
+            riftDistance = CheckDistanceHelper.getDistanceIgnoringOtherShips(
+                    game, player, tile.getPosition(), game.getActiveSystem(), false);
+            output.append(" (May move through systems containing other players' ships due to _Zygomycete II_)");
         }
         if (unitModel != null && "qhet_cruiser2".equals(unitModel.getId())) {
             int battlecruiserDistance = CheckDistanceHelper.getDistanceIgnoringOtherShips(

@@ -355,7 +355,7 @@
     "name": "Oo'ka",
     "title": "The Gardener",
     "abilityWindow": "ACTION:",
-    "abilityText": "You may exhaust this card and select another player to allow that player to ready 1 planet they control. If they do, you may place 1 infantry into coexistence on a planet that player controls.",
+    "abilityText": "You may exhaust this card and select another player to allow that player to ready 1 planet they control. If they do, you may place 1 infantry into coexistence on a non-home planet that player controls.",
     "unlockCondition": "Always Unlocked",
     "source": "beans",
     "flavorText": "A willing host always bears the richest fruit."
@@ -380,7 +380,7 @@
     "title": "The Blight",
     "abilityName": "Fungal Bloom - Rapid Dispersal",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place 1 infantry from your reinforcements on each planet you are coexisting on. Then, for each of those planets that contains 2 or more of your ground forces, you may place 1 infantry from your reinforcements into coexistence on an eligible planet in or adjacent to that system. Then, purge this card.",
+    "abilityText": "Place 1 infantry from your reinforcements on each planet you are coexisting on. Then, for each of those planets that contains 2 or more of your ground forces, you may place 1 infantry from your reinforcements into coexistence on a non-home planet in or adjacent to that system. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Bloom."

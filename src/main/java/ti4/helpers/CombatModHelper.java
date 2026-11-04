@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
@@ -42,6 +43,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.genome.homebrew.tknova.AristocraticGenome;
@@ -564,6 +566,31 @@ public class CombatModHelper {
                     }
                 }
             }
+            case "ground_combat_defender" -> {
+                StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
+                meetsCondition = combat != null
+                        && combat.unitHolderName() != null
+                        && !Constants.SPACE.equals(combat.unitHolderName())
+                        && tile != null
+                        && combat.tilePosition().equals(tile.getPosition())
+                        && combat.factions().contains(player.getFaction())
+                        && game.getActivePlayer() != null
+                        && player != game.getActivePlayer();
+            }
+            case "bloom_mech_defender" -> {
+                StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
+                meetsCondition = combat != null
+                        && combat.unitHolderName() != null
+                        && !Constants.SPACE.equals(combat.unitHolderName())
+                        && tile != null
+                        && combat.tilePosition().equals(tile.getPosition())
+                        && combat.factions().contains(player.getFaction())
+                        && player != game.getActivePlayer()
+                        && BloomAbilityHandler.wasCoexistingAtStartOfAction(game, player, combat.unitHolderName());
+            }
+            case "bloom_flagship_in_combat" ->
+                meetsCondition = unitsByQuantity != null
+                        && unitsByQuantity.keySet().stream().anyMatch(unit -> "bloom_flagship".equals(unit.getAlias()));
             case "vaylerianhero" -> {
                 if (player == game.getActivePlayer()
                         && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {
@@ -860,6 +887,20 @@ public class CombatModHelper {
                 case "code" ->
                     scalingCount = player.getAbilities().stream()
                             .filter(CODE_CARD_ABILITIES::contains)
+                            .count();
+                case "bloom_dormant_strains" ->
+                    scalingCount = player.getAbilities().stream()
+                            .filter(ability -> ability.endsWith("_dormant"))
+                            .filter(ability -> ability.startsWith("neurotropic")
+                                    || ability.startsWith("rhizomatic")
+                                    || ability.startsWith("carnivorous"))
+                            .count();
+                case "bloom_active_strains" ->
+                    scalingCount = player.getAbilities().stream()
+                            .filter(ability -> ability.endsWith("_active"))
+                            .filter(ability -> ability.startsWith("neurotropic")
+                                    || ability.startsWith("rhizomatic")
+                                    || ability.startsWith("carnivorous"))
                             .count();
                 case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {

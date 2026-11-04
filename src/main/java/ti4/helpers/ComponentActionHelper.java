@@ -708,6 +708,7 @@ public class ComponentActionHelper {
                             "stonebornagentdormant",
                             "stonebornagentunleashed",
                             "ironagent",
+                            "bloomagent",
                             "migoagent",
                             "deepagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {

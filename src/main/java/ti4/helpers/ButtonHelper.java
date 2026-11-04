@@ -2534,6 +2534,12 @@ public class ButtonHelper {
         if (player.getRelics().contains("e6-g0_network")) {
             limit += 2;
         }
+        if (player.hasAbility("neurotropic_dormant")) {
+            limit += 1;
+        }
+        if (player.hasAbility("neurotropic_active")) {
+            limit += 2;
+        }
         return limit;
     }
 

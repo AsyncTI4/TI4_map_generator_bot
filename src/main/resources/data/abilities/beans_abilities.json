@@ -236,8 +236,8 @@
         "id": "sporefall",
         "name": "Sporefall",
         "faction": "bloom",
-        "window": "Once per turn, when a player resolves the secondary ability of a strategy card",
-        "windowEffect": "You may place 1 infantry from your reinforcements into coexistence on a planet they control adjacent to a system that contains 1 of your ground forces.",
+        "window": "Once per turn, after another player resolves the secondary ability of a strategy card",
+        "windowEffect": "You may place 1 infantry from your reinforcements into coexistence on a non-home planet they control adjacent to a system that contains 1 of your ground forces.",
         "source": "beans"
     },
     {

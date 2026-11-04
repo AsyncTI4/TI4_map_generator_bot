@@ -558,7 +558,7 @@
         "capacityValue": 3,
         "capacityUsed": 1,
         "cost": 8,
-        "combatHitsOn": 6,
+        "combatHitsOn": 7,
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,

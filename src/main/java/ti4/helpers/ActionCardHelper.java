@@ -40,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StasisT
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenFilesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
@@ -782,6 +783,7 @@ public class ActionCardHelper {
             sendSchemingDiscardButtons(player);
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+        BloomAbilityHandler.offerNeurotropicActive(game, player);
 
         if (!silent) {
             String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")

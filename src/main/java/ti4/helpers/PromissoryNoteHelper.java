@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauPromissoryHandler;
@@ -337,6 +338,9 @@ public class PromissoryNoteHelper {
 
         if ("bepncryst".equalsIgnoreCase(id)) {
             CrystellumPromissoryHandler.resolveFracture(game, player, event);
+        }
+        if ("bepnbloom".equalsIgnoreCase(id)) {
+            BloomPromissoryHandler.offerStarterCulture(game, player);
         }
         if ("bepnnatau".equalsIgnoreCase(id)) {
             NatauPromissoryHandler.offerRuptureSystems(game, player);
