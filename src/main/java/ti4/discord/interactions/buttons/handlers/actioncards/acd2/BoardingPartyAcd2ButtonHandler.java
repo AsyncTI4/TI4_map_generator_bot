@@ -34,7 +34,7 @@ class BoardingPartyAcd2ButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", choose the type of ship you destroyed (cost 4 or less) to place 1 undamaged ship"
+                        + ", choose the type of ship you destroyed (cost 4 or less) to place 1 ship"
                         + " of that type from your reinforcements.",
                 buttons);
     }
@@ -55,8 +55,7 @@ class BoardingPartyAcd2ButtonHandler {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " placed 1 undamaged " + unit.getName()
-                        + " for _Boarding Party_.");
+                player.getRepresentationUnfogged() + " placed 1 " + unit.getName() + " for _Boarding Party_.");
     }
 
     static List<UnitModel> getEligibleShips(Player player, Game game, Tile tile) {

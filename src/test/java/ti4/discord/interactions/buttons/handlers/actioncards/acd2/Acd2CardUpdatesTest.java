@@ -106,7 +106,7 @@ class Acd2CardUpdatesTest extends BaseTi4Test {
     }
 
     @Test
-    void boardingPartyPlacesExactlyOneUndamagedFighter() {
+    void boardingPartyPlacesExactlyOneFighter() {
         try (var messages = mockStatic(MessageHelper.class);
                 var buttons = mockStatic(ButtonHelper.class);
                 var units = mockStatic(AddUnitService.class)) {
