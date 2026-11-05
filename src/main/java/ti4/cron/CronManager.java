@@ -17,9 +17,15 @@ import ti4.logging.BotLogger;
 @UtilityClass
 public class CronManager {
 
-    private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledThreadPoolExecutor(1);
+    private static final ScheduledThreadPoolExecutor SCHEDULER = newScheduler();
     private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
+
+    static ScheduledThreadPoolExecutor newScheduler() {
+        ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1);
+        scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        return scheduler;
+    }
 
     public static ScheduledFuture<?> schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
