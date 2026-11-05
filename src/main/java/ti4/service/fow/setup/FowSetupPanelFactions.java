@@ -231,7 +231,7 @@ final class FowSetupPanelFactions {
             addPaging(buttons, userId, AUTO, page, pages);
             buttons.add(Buttons.gray(POSITION_CLEAR_PREFIX + userId, "Change position"));
         } else {
-            text.append(placed ? "Placed on the map." : "Set up, but not on a home-system tile of this map.");
+            text.append("Placed on the map.");
             if (FowSetupFactionService.gateFactionHomeTile(player) != null) {
                 text.append("\nGate faction: the real home system is a separate tile. Choose where it goes")
                         .append(" (now `")

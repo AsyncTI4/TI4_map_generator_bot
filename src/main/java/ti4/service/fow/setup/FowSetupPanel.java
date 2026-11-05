@@ -301,8 +301,9 @@ public final class FowSetupPanel {
 
     static String urlOrFile(ModalInteractionEvent event) {
         ModalMapping file = event.getValue("file");
-        if (file != null && !file.getAsAttachmentList().isEmpty()) {
-            return file.getAsAttachmentList().getFirst().getUrl();
+        List<Message.Attachment> attachments = file == null ? List.of() : file.getAsAttachmentList();
+        if (!attachments.isEmpty()) {
+            return attachments.getFirst().getUrl();
         }
         ModalMapping url = event.getValue("url");
         return url == null ? "" : url.getAsString().trim();
