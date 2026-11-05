@@ -89,6 +89,22 @@ flowchart LR
 | [ViewMatchmakingQueueService](queue/ViewMatchmakingQueueService.java) | The "View Queue" embeds. |
 | [GameConfig](queue/GameConfig.java), [MatchedGame](queue/MatchedGame.java), [QueuedParty](queue/QueuedParty.java), [GroupVerificationResult](queue/GroupVerificationResult.java) | Records passed between the classes above. |
 
+### Visibility
+
+Only the types that other packages call are public:
+
+- **Ratings:** `MatchmakingRatingEventService` (statistics, commands and the queue's skill check), `SkillTier`
+  (statistics filters) and `MatchmakingGameInfo` (the queue's default rating).
+- **Queue:** the services the Discord handlers and `MatchmakerCron` call (`MatchmakerService`,
+  `MatchmakingQueueSearchService`, `PlayerSearchService`, `ViewMatchmakingQueueService`), `PartyValidator` (the
+  modals' valid paces and restrictions), `MatchQualityCalculator` (used by the ratings package), and the records
+  they exchange (`PlayerSearchCriteria`, `JoinBlocker`, `GroupVerificationResult`).
+
+Everything else is package-private. The queue entities, repositories and `MatchmakingQueueStore` are only reached
+through the services, so all queue writes go through `MatchmakerService`, `MatchmakingQueueSearchService` and
+`PlayerSearchService`. Members used by one class only are private; package-private members exist for the rest of
+the package or its tests.
+
 ## Ratings
 
 Nothing is stored. Ratings are recomputed by replaying every completed, non-alliance, 5 to 8 player game that
