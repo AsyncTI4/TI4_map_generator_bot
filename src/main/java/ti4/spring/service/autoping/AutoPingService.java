@@ -2,7 +2,6 @@ package ti4.spring.service.autoping;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -52,20 +51,5 @@ public class AutoPingService {
         stored.retainAll(new HashSet<>(gameNames));
         if (stored.isEmpty()) return;
         transactionTemplate.executeWithoutResult(_ -> repository.deleteAllByIdInBatch(stored));
-    }
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    public int importMissing(Map<String, AutoPing> autoPingsByGameName) {
-        Integer imported = transactionTemplate.execute(_ -> {
-            Set<String> stored = new HashSet<>(repository.findAllGameNames());
-            int count = 0;
-            for (Map.Entry<String, AutoPing> entry : autoPingsByGameName.entrySet()) {
-                if (entry.getValue() == null || !stored.add(entry.getKey())) continue;
-                repository.save(new AutoPingEntity(entry.getKey(), entry.getValue()));
-                count++;
-            }
-            return count;
-        });
-        return imported == null ? 0 : imported;
     }
 }

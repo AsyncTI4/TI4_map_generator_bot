@@ -90,25 +90,6 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         assertThat(userSettingsRepository.count()).isEqualTo(1);
     }
 
-    // The legacy file import must never overwrite settings already saved to the database since the switch-over.
-    @Test
-    void importingALegacyFileNeverOverwritesNewerDatabaseSettings() {
-        UserSettings current = userSettings("100");
-        current.setGameLimit(9);
-        userSettingsService.save(current);
-        UserSettings legacy = userSettings("100");
-        legacy.setGameLimit(2);
-
-        assertThat(userSettingsService.insertIfAbsent(legacy)).isFalse();
-        assertThat(userSettingsService.insertIfAbsent(userSettings("200"))).isTrue();
-
-        assertThat(userSettingsService.find("100"))
-                .get()
-                .extracting(UserSettings::getGameLimit)
-                .isEqualTo(9);
-        assertThat(userSettingsService.find("200")).isPresent();
-    }
-
     @Test
     void updateReadsModifiesAndWritesInOneStep() {
         userSettingsService.update("300", () -> userSettings("300"), settings -> settings.setGameLimit(4));
@@ -146,18 +127,6 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         autoPingService.delete(endedGames);
 
         assertThat(autoPingService.gameNames()).isEmpty();
-    }
-
-    @Test
-    void autoPingImportOnlyAddsMissingGames() {
-        autoPingService.compute("pbd1", _ -> new AutoPing(500, 5, false));
-
-        int imported = autoPingService.importMissing(
-                Map.of("pbd1", new AutoPing(1, 1, false), "pbd2", new AutoPing(2, 2, true)));
-
-        assertThat(imported).isEqualTo(1);
-        assertThat(autoPingService.find("pbd1")).contains(new AutoPing(500, 5, false));
-        assertThat(autoPingService.find("pbd2")).contains(new AutoPing(2, 2, true));
     }
 
     @Test

@@ -4,31 +4,21 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import ti4.json.LegacyPersistenceFile;
 import ti4.logging.BotLogger;
 import ti4.spring.service.autoping.AutoPingService;
 
 @UtilityClass
 public class AutoPingMetadataManager {
 
-    // TODO: Remove the AutoPing.json import (this constant, legacyFileChecked, importLegacyFileOnce and
-    // LegacyAutoPings) once every environment has imported it.
-    @Deprecated(forRemoval = true, since = "2026-11")
-    private static final String LEGACY_AUTO_PING_FILE = "AutoPing.json";
-
     private static final Duration MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS = Duration.ofMinutes(1);
     private static final Cache<String, Boolean> recentlyDelayedGameNames = Caffeine.newBuilder()
             .expireAfterWrite(MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS)
             .build();
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    private static boolean legacyFileChecked;
 
     public static void setupAutoPing(String gameName) {
         run(service -> service.compute(gameName, _ -> new AutoPing(System.currentTimeMillis(), 0, false)));
@@ -82,25 +72,12 @@ public class AutoPingMetadataManager {
     private static synchronized <T> T call(Function<AutoPingService, T> operation, T fallback) {
         try {
             AutoPingService service = AutoPingService.getBean();
-            importLegacyFileOnce(service);
             return operation.apply(service);
         } catch (Exception e) {
             BotLogger.error("Failed to read or write auto pings.", e);
             return fallback;
         }
     }
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    private static synchronized void importLegacyFileOnce(AutoPingService service) {
-        if (legacyFileChecked) return;
-        legacyFileChecked = LegacyPersistenceFile.importIfPresent(
-                LEGACY_AUTO_PING_FILE,
-                LegacyAutoPings.class,
-                legacy -> legacy.gameNameToAutoPing() == null ? 0 : service.importMissing(legacy.gameNameToAutoPing()));
-    }
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    private record LegacyAutoPings(Map<String, AutoPing> gameNameToAutoPing) {}
 
     public record AutoPing(long lastPingTimeEpochMilliseconds, int pingCount, boolean quickPing) {}
 }

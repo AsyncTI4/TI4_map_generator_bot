@@ -10,20 +10,11 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.json.LegacyPersistenceFile;
 import ti4.logging.BotLogger;
 import ti4.spring.service.techsummary.TechSummaryService;
 
 @UtilityClass
 public class TechSummariesMetadataManager {
-
-    // TODO: Remove the TechSummaries.json import (this constant, legacyFileChecked and importLegacyFileOnce) once
-    // every environment has imported it.
-    @Deprecated(forRemoval = true, since = "2026-11")
-    private static final String LEGACY_TECH_SUMMARIES_FILE = "TechSummaries.json";
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    private static boolean legacyFileChecked;
 
     public static synchronized void addTech(Game game, Player player, String techId, boolean isResearchAgreement) {
         if (game.isFowMode() || game.isHomebrewSCMode()) {
@@ -31,7 +22,7 @@ public class TechSummariesMetadataManager {
         }
 
         try {
-            TechSummaryService service = serviceWithLegacyImported();
+            TechSummaryService service = TechSummaryService.getBean();
             RoundTechSummaries roundTechSummaries = service.find(game.getName())
                     .filter(summaries -> summaries.round == game.getRound())
                     .orElseGet(() -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
@@ -61,7 +52,7 @@ public class TechSummariesMetadataManager {
         TechSummaryService service;
         Map<String, RoundTechSummaries> summariesByGameName;
         try {
-            service = serviceWithLegacyImported();
+            service = TechSummaryService.getBean();
             summariesByGameName = service.findAll();
         } catch (Exception e) {
             BotLogger.error("Failed to read tech summaries.", e);
@@ -76,23 +67,6 @@ public class TechSummariesMetadataManager {
         } catch (Exception e) {
             BotLogger.error("Failed to write tech summaries.", e);
         }
-    }
-
-    private static TechSummaryService serviceWithLegacyImported() {
-        TechSummaryService service = TechSummaryService.getBean();
-        importLegacyFileOnce(service);
-        return service;
-    }
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    private static void importLegacyFileOnce(TechSummaryService service) {
-        if (legacyFileChecked) return;
-        legacyFileChecked = LegacyPersistenceFile.importIfPresent(
-                LEGACY_TECH_SUMMARIES_FILE,
-                TechSummaries.class,
-                legacy -> legacy.gameNameToTechSummary() == null
-                        ? 0
-                        : service.importMissing(legacy.gameNameToTechSummary()));
     }
 
     public record TechSummaries(Map<String, RoundTechSummaries> gameNameToTechSummary) {}

@@ -56,20 +56,6 @@ public class TechSummaryService {
         });
     }
 
-    @Deprecated(forRemoval = true, since = "2026-11")
-    public int importMissing(Map<String, RoundTechSummaries> summariesByGameName) {
-        Integer imported = transactionTemplate.execute(_ -> {
-            int count = 0;
-            for (Map.Entry<String, RoundTechSummaries> entry : summariesByGameName.entrySet()) {
-                if (entry.getValue() == null || repository.existsById(entry.getKey())) continue;
-                upsert(entry.getKey(), entry.getValue());
-                count++;
-            }
-            return count;
-        });
-        return imported == null ? 0 : imported;
-    }
-
     private void upsert(String gameName, RoundTechSummaries summaries) {
         String json = JSON_MAPPER.writeValueAsString(summaries.techSummaries());
         repository

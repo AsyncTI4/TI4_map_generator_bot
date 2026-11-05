@@ -39,15 +39,6 @@ public class UserSettingsService {
         transactionTemplate.executeWithoutResult(_ -> upsert(userSettings));
     }
 
-    @Deprecated(forRemoval = true, since = "2026-11")
-    public boolean insertIfAbsent(UserSettings userSettings) {
-        return Boolean.TRUE.equals(transactionTemplate.execute(_ -> {
-            if (repository.existsById(userSettings.getUserId())) return false;
-            repository.save(new UserSettingsEntity(userSettings.getUserId(), toJson(userSettings)));
-            return true;
-        }));
-    }
-
     public void update(String userId, Supplier<UserSettings> whenAbsent, Consumer<UserSettings> change) {
         transactionTemplate.executeWithoutResult(_ -> {
             UserSettings userSettings = find(userId).orElseGet(whenAbsent);
