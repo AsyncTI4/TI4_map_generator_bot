@@ -333,25 +333,29 @@ class ComponentValuesTest extends BaseTi4Test {
     @Test
     void ceasefire() {
         assertThat(receiveValue("blue_cf")).isCloseTo(0.25, within(EXACT));
-        assertThat(giveCost("black_cf")).isCloseTo(2.5, within(EXACT));
+        assertThat(giveCost("black_cf")).isCloseTo(6.0, within(EXACT));
         assertThat(receiveValue("black_cf")).isCloseTo(1.0, within(EXACT));
 
         table.nekroAndSolNeighbour();
         assertThat(receiveValue("blue_cf")).isCloseTo(0.5, within(EXACT));
     }
 
-    // Political Secret is worth 1 per agenda phase still to come, through round 5: in round 3, rounds 4 and 5 before
-    // the custodians are taken, rounds 3 to 5 after; afterwards only the 0.25 floor every note keeps.
+    // A Political Secret is priced by whose note it is: 3 normally, 8 during the agenda phase when an agenda that
+    // matters
+    // to its owner is out, 0.25 for Nekro (it cannot vote anyway), 1 for Xxcha, and 2 for either while that owner holds
+    // a
+    // Rider it would lose the chance to play.
     @Test
     void politicalSecret() {
-        assertThat(receiveValue("blue_ps")).isCloseTo(2, within(EXACT));
+        assertThat(receiveValue("blue_ps")).isCloseTo(3, within(EXACT));
+        assertThat(giveCost("black_ps")).isCloseTo(0.25, within(EXACT));
+
+        nekro.setActionCard("tech_rider", 40);
         assertThat(giveCost("black_ps")).isCloseTo(2, within(EXACT));
 
-        table.custodiansTaken(letnev);
-        assertThat(receiveValue("blue_ps")).isCloseTo(3, within(EXACT));
-
-        table.game.setRound(6);
-        assertThat(receiveValue("blue_ps")).isCloseTo(0.25, within(EXACT));
+        table.game.setPhaseOfGame("agendawaiting");
+        table.game.setCurrentAgendaInfo("Elect Player_1_test_censure");
+        assertThat(receiveValue("blue_ps")).isCloseTo(8, within(EXACT));
     }
 
     // The AI keeps its own faction note unless paid.
@@ -379,8 +383,8 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(NotesForTrade.giveCost(table.game, nekro, letnev, "red_ta")).isCloseTo(2 - 1 - 0.3, within(EXACT));
     }
 
-    // A "TBD" note requested from the AI costs its least harmful note, never Support for the Throne. Its Alliance costs
-    // 60% of the 2 Letnev would pay for it.
+    // A "TBD" note requested from the AI costs its least harmful note, never Support for the Throne. Nekro cannot vote,
+    // so its Political Secret (0.25) is cheaper than its Alliance.
     @Test
     void genericNoteCostsTheLeastHarmfulNote() {
         nekro.setPromissoryNote("black_sftt", 11);
@@ -389,8 +393,8 @@ class ComponentValuesTest extends BaseTi4Test {
 
         nekro.setPromissoryNote("black_ps", 13);
         nekro.setPromissoryNote("black_an", 12);
-        assertThat(NotesForTrade.leastHarmful(table.game, nekro, sol)).contains("black_an");
-        assertThat(ComponentValues.give(table.game, nekro, sol, generic, 0.8)).isCloseTo(0.6 * 2, within(EXACT));
+        assertThat(NotesForTrade.leastHarmful(table.game, nekro, sol)).contains("black_ps");
+        assertThat(ComponentValues.give(table.game, nekro, sol, generic, 0.8)).isCloseTo(0.25, within(EXACT));
     }
 
     // A note in a deal is named by its owner's hand id: the value comes from the note it names.
@@ -402,7 +406,7 @@ class ComponentValuesTest extends BaseTi4Test {
         assertThat(ComponentValues.receive(table.game, nekro, sol, item("sendingsol_receivingnekro_PNs_17"), 0.8))
                 .isCloseTo(3.0, within(EXACT));
         assertThat(ComponentValues.give(table.game, nekro, sol, item("sendingnekro_receivingsol_PNs_23"), 0.8))
-                .isCloseTo(2.5, within(EXACT));
+                .isCloseTo(6.0, within(EXACT));
         assertThat(ComponentValues.give(table.game, nekro, sol, item("sendingnekro_receivingsol_PNs_99"), 0.8))
                 .isInfinite();
     }

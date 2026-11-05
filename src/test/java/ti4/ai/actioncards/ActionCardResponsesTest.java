@@ -89,6 +89,17 @@ class ActionCardResponsesTest extends BaseTi4Test {
         assertThat(pressed(ActionCardResponses.respond(test.context(choose)))).isEqualTo("naaluHeroSend_sol_12");
     }
 
+    // A forced note goes by trade price: Ceasefire (6 trade goods) is kept while a cheaper Trade Agreement is on offer.
+    @Test
+    void keepsItsCeasefireWhenForcedToGiveANote() {
+        test.nekro.addOwnedPromissoryNoteByID("black_cf");
+        test.nekro.addOwnedPromissoryNoteByID("black_ta");
+        test.nekro.setPromissoryNote("black_ta", 15);
+        AiPrompt forced = notePrompt(FORCED, "naaluHeroSend_sol_11", "naaluHeroSend_sol_15");
+
+        assertThat(pressed(ActionCardResponses.respond(test.context(forced)))).isEqualTo("naaluHeroSend_sol_15");
+    }
+
     // This prompt follows a deal, not an action card, so an open Sabotage window does not hold it up.
     @Test
     void doesNotWaitForSabotageAfterADeal() {

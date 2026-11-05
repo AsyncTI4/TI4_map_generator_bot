@@ -16,6 +16,7 @@ import ti4.ai.promissory.NoteGiving;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.TacticalRules;
+import ti4.ai.trade.TradeRules;
 import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.Player;
@@ -78,6 +79,10 @@ public class ActionCardResponses {
             }
             PromptButton give = gives.stream()
                     .min(Comparator.comparing((PromptButton button) -> withheld(context, notes, button))
+                            .thenComparing(button -> noteFor(notes, button)
+                                    .filter(NoteGiving::isThroneOrAlliance)
+                                    .isPresent())
+                            .thenComparingDouble(button -> giveCost(context, notes, button))
                             .thenComparingInt(button -> NoteGiving.giveRank(
                                     game, noteFor(notes, button).orElse(""), receiverOf(button))))
                     .orElseThrow();
@@ -105,6 +110,13 @@ public class ActionCardResponses {
                 .filter(entry -> entry.getValue() == wanted)
                 .map(Map.Entry::getKey)
                 .findFirst();
+    }
+
+    private static double giveCost(AiTurnContext context, Map<String, Integer> notes, PromptButton button) {
+        Player receiver = context.game().getPlayerFromColorOrFaction(receiverOf(button));
+        Optional<String> note = noteFor(notes, button);
+        if (receiver == null || note.isEmpty()) return Double.MAX_VALUE;
+        return TradeRules.noteGiveCost(context.game(), context.seat(), receiver, note.get());
     }
 
     private static String receiverOf(PromptButton button) {

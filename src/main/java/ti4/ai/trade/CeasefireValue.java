@@ -18,7 +18,7 @@ class CeasefireValue {
     private static final double MECATOL_SHARE = 0.5;
     private static final double AVOID_FIGHT_NEIGHBOUR = 0.5;
     private static final double AVOID_FIGHT_AFAR = 0.2;
-    private static final double GIVE_COST = 2.5;
+    private static final double GIVE_COST = 6.0;
     private static final double GIVE_UNDER_DURESS = 0.5;
     private static final double OFFENSE_SHARE = 0.5;
     static final double OWN_BACK = 1.0;

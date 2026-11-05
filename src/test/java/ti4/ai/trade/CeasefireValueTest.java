@@ -35,7 +35,7 @@ class CeasefireValueTest extends BaseTi4Test {
     @Test
     void noThreatNoDuress() {
         assertThat(CeasefireValue.underDuress(test.game, test.nekro, test.sol)).isFalse();
-        assertThat(CeasefireValue.givenCost(test.game, test.nekro, test.sol)).isCloseTo(2.5, within(EXACT));
+        assertThat(CeasefireValue.givenCost(test.game, test.nekro, test.sol)).isCloseTo(6.0, within(EXACT));
     }
 
     // Two Sol dreadnoughts next door outgun an empty home: losing it costs a point's worth (6) and 2 more.
@@ -48,8 +48,8 @@ class CeasefireValueTest extends BaseTi4Test {
         assertThat(NotesForTrade.receiveValue(test.game, test.nekro, "blue_cf"))
                 .isCloseTo(0.75 * (6 + 2), within(EXACT));
         assertThat(CeasefireValue.givenCost(test.game, test.nekro, test.sol)).isCloseTo(0.5, within(EXACT));
-        // Sol, for its part, gives up half of what it could take.
-        assertThat(CeasefireValue.givenCost(test.game, test.sol, test.nekro)).isCloseTo(0.5 * (6 + 2), within(EXACT));
+        // Sol, for its part, now never gives it away for less than the 6 trade good floor.
+        assertThat(CeasefireValue.givenCost(test.game, test.sol, test.nekro)).isCloseTo(6.0, within(EXACT));
     }
 
     // A lone destroyer within reach of an empty home is no real threat: a fleet must be worth 8 resources.

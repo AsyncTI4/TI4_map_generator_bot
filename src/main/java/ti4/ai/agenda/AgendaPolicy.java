@@ -128,6 +128,12 @@ public class AgendaPolicy {
         return predictedElectionScore(game, seat, null) <= -DISCARD_THRESHOLD;
     }
 
+    public static boolean importantFor(Game game, Player seat) {
+        String agenda = currentAgenda(game);
+        if (agenda.isEmpty()) return false;
+        return givesElectedPlayerAPoint(agenda) || veryBadFor(game, seat);
+    }
+
     public static boolean veryBadFor(Game game, Player seat) {
         OptionalDouble loss = expectedLoss(game, seat);
         if (loss.isEmpty()) return worthDiscarding(game, seat);

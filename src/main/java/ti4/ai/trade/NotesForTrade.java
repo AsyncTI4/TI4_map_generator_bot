@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.brain.SearchMemo;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.strategy.CardFacade;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.model.Mapper;
 
 @UtilityClass
 class NotesForTrade {
@@ -29,7 +31,14 @@ class NotesForTrade {
     private static final double OWN_THRONE_BACK = 1.0;
     private static final String POLITICAL_FAVOR = "favor";
     private static final double FAVOR_GIVE_BASE = 5.0;
-    private static final double TRADE_GOOD_PER_AGENDA = 1.0;
+    private static final double SECRET_NORMAL = 3.0;
+    private static final double SECRET_IMPORTANT_AGENDA = 8.0;
+    private static final double SECRET_NON_VOTER = 0.25;
+    private static final double SECRET_XXCHA = 1.0;
+    private static final double SECRET_WITH_RIDER = 2.0;
+    private static final String GALACTIC_THREAT = "galactic_threat";
+    private static final String XXCHA = "xxcha";
+    private static final String RIDER = "Rider";
     private static final int AGREEMENT_DISCOUNT = 1;
     private static final double OWN_FACTION_NOTE_COST = 1.5;
     private static final double RETURN_DISCOUNT = 0.3;
@@ -91,8 +100,8 @@ class NotesForTrade {
         if (alias.endsWith(CEASEFIRE)) {
             return own ? CeasefireValue.OWN_BACK : CeasefireValue.received(game, seat, owner);
         }
-        if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game);
-        if (ConvoysValue.isConvoys(alias)) return own ? ConvoysValue.OWN_BACK : ConvoysValue.received(game, seat);
+        if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game, owner, seat);
+        if (ConvoysValue.isConvoys(alias)) return own ? ConvoysValue.OWN_BACK : ConvoysValue.WORTH;
         if (MilitarySupport.ALIAS.equals(alias)) return own ? 0 : MilitarySupport.receivedBy(game, seat);
         return NOTES_IT_PLAYS.getOrDefault(alias, OTHER_NOTE);
     }
@@ -118,7 +127,7 @@ class NotesForTrade {
         }
         if (alias.endsWith(TRADE_AGREEMENT)) return agreementValue(seat);
         if (alias.endsWith(CEASEFIRE)) return CeasefireValue.givenCost(game, seat, receiver);
-        if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game);
+        if (alias.endsWith(POLITICAL_SECRET)) return politicalSecretValue(game, owner, seat);
         if (POLITICAL_FAVOR.equals(alias)) return politicalFavorCost(game);
         if (MilitarySupport.ALIAS.equals(alias)) return MilitarySupport.givenCost(game, seat, receiver);
         if (ConvoysValue.isConvoys(alias)) return ConvoysValue.GIVE_COST;
@@ -156,8 +165,21 @@ class NotesForTrade {
         return owner == null ? OTHER_NOTE : Math.max(0, owner.getCommoditiesTotal() - AGREEMENT_DISCOUNT);
     }
 
-    static double politicalSecretValue(Game game) {
-        return TRADE_GOOD_PER_AGENDA * agendaPhasesLeft(game);
+    static double politicalSecretValue(Game game, Player owner, Player viewer) {
+        if (owner == null) return SECRET_NORMAL;
+        boolean weakVoter = owner.hasAbility(GALACTIC_THREAT) || XXCHA.equals(owner.getFaction());
+        if (weakVoter) {
+            if (Standings.same(owner, viewer) && holdsRider(owner)) return SECRET_WITH_RIDER;
+            return owner.hasAbility(GALACTIC_THREAT) ? SECRET_NON_VOTER : SECRET_XXCHA;
+        }
+        if (TradeLegality.isAgendaPhase(game) && AgendaPolicy.importantFor(game, owner)) return SECRET_IMPORTANT_AGENDA;
+        return SECRET_NORMAL;
+    }
+
+    private static boolean holdsRider(Player owner) {
+        return owner.getActionCards().keySet().stream()
+                .map(Mapper::getActionCard)
+                .anyMatch(card -> card != null && card.getName().endsWith(RIDER));
     }
 
     private static double politicalFavorCost(Game game) {

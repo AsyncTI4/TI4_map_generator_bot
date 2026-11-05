@@ -85,6 +85,10 @@ public class TradeRules {
         return HumanDealWatch.pending(context);
     }
 
+    public static double noteGiveCost(Game game, Player giver, Player receiver, String alias) {
+        return NotesForTrade.giveCost(game, giver, receiver, alias);
+    }
+
     public static boolean carthAccepts(Game game, Player hacan, Player target, int gain) {
         return CarthDeals.acceptable(game, target, hacan, gain);
     }
