@@ -37,10 +37,58 @@ class CronManagerTest {
     }
 
     @Test
+    void oneOffTasksAreNotOfferedToRunCron() {
+        CronManager.scheduleOnce(OneOffTask.class, () -> {}, 0, TimeUnit.MILLISECONDS);
+
+        assertThat(CronManager.getCronNames()).doesNotContain(OneOffTask.class.getSimpleName());
+        assertThat(CronManager.runCron(OneOffTask.class.getSimpleName())).isFalse();
+    }
+
+    @Test
+    void manualOnlyJobsRunOnlyWhenAskedFor() throws InterruptedException {
+        CountDownLatch ran = new CountDownLatch(1);
+        CronManager.registerManualOnly(ManualOnlyCron.class, ran::countDown);
+
+        // Nothing is scheduled, so the job must not run on its own.
+        assertThat(ran.await(200, TimeUnit.MILLISECONDS)).isFalse();
+
+        assertThat(CronManager.runCron(ManualOnlyCron.class.getSimpleName())).isTrue();
+        assertThat(ran.await(10, TimeUnit.SECONDS)).isTrue();
+    }
+
+    @Test
+    void leaseStartJobsWaitForTheLeaseAndRunAgainOnEachAcquisition() throws InterruptedException {
+        CountDownLatch firstRun = new CountDownLatch(1);
+        CountDownLatch secondRun = new CountDownLatch(2);
+        Runnable job = () -> {
+            firstRun.countDown();
+            secondRun.countDown();
+        };
+
+        // The only test in this JVM that calls runLeaseStartJobs, so the lease has not been acquired yet.
+        CronManager.scheduleOnceAfterLeaseAcquired(LeaseStartCron.class, job, 0, TimeUnit.MILLISECONDS);
+        assertThat(firstRun.await(200, TimeUnit.MILLISECONDS))
+                .as("job waits for the lease")
+                .isFalse();
+        assertThat(CronManager.getCronNames()).contains(LeaseStartCron.class.getSimpleName());
+
+        CronManager.runLeaseStartJobs();
+        assertThat(firstRun.await(10, TimeUnit.SECONDS))
+                .as("job runs once the lease is acquired")
+                .isTrue();
+
+        // Losing the lease and acquiring it again later reruns the startup jobs.
+        CronManager.runLeaseStartJobs();
+        assertThat(secondRun.await(10, TimeUnit.SECONDS))
+                .as("job runs on reacquisition")
+                .isTrue();
+    }
+
+    @Test
     void pendingDelayedTaskDoesNotHoldUpShutdown() throws InterruptedException {
-        // CardsInfoPinCleanupCron registers a manual-only task delayed by Long.MAX_VALUE days. Before the
-        // shutdown policy was set, that task kept the scheduler alive, so every deploy waited the full
-        // graceful window (15 s) before the lease could be handed over.
+        // A far-off delayed task, such as a circuit breaker reset, must not keep the scheduler alive. Before the
+        // shutdown policy was set, one always did, so every deploy waited the full graceful window (15 s) before
+        // the lease could be handed over.
         ScheduledThreadPoolExecutor scheduler = CronManager.newScheduler();
         scheduler.schedule(() -> {}, Long.MAX_VALUE, TimeUnit.DAYS);
 
@@ -78,4 +126,10 @@ class CronManagerTest {
     }
 
     private static final class ThrowingCron {}
+
+    private static final class OneOffTask {}
+
+    private static final class ManualOnlyCron {}
+
+    private static final class LeaseStartCron {}
 }
