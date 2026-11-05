@@ -15,6 +15,7 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.map.MapSegment;
+import ti4.json.JsonMapperManager;
 import ti4.model.GalaxyNames;
 import ti4.model.SegmentNames;
 import ti4.service.map.MapJsonIOService.MapDataIO;
@@ -478,6 +479,96 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
         assertThat(MapSegment.stored(game)).hasSize(MapSegment.MAX_SEGMENTS);
         assertThat(MapSegment.find(game, "one-too-many")).isEmpty();
         assertThat(errors.toString()).contains("maximum of " + MapSegment.MAX_SEGMENTS);
+    }
+
+    // Sector part of a real map builder export (hex-Custom-async-ti-hyperlink buildSectorExport, 2026-11-05):
+    // a circle and a cluster on tiles (also written per tile), a circle on an empty hex, and a painted shape.
+    private static final String MAP_BUILDER_EXPORT = """
+            { "mapInfo": [
+                { "position": "000", "tileID": "19", "sector": { "type": "manual_circle", "distance": 1, "name": "core" } },
+                { "position": "101", "tileID": "19" }, { "position": "102", "tileID": "19" },
+                { "position": "103", "tileID": "19" }, { "position": "104", "tileID": "19" },
+                { "position": "105", "tileID": "19" }, { "position": "106", "tileID": "19" },
+                { "position": "310", "tileID": "19", "sector": { "type": "manual_auto", "distance": 0, "name": "rim" } },
+                { "position": "311", "tileID": "19" }, { "position": "301", "tileID": "19" },
+                { "position": "302", "tileID": "19" }, { "position": "401", "tileID": "19" },
+                { "position": "402", "tileID": "19" } ],
+              "sectors": [
+                { "name": "core", "positions": ["000","101","102","103","104","105","106"],
+                  "type": "manual_circle", "centre": "000", "distance": 1 },
+                { "name": "rim", "positions": ["310","311"], "type": "manual_auto", "centre": "310", "distance": 0 },
+                { "name": "void-dot", "positions": ["415"], "type": "manual_circle", "centre": "415", "distance": 0 },
+                { "name": "wedge", "positions": ["201","202","301","302"] } ] }
+            """;
+
+    private static final List<String> MAP_BUILDER_SECTORS = List.of(
+            "core|CIRCLE|[000, 101, 102, 103, 104, 105, 106]",
+            "rim|CLUSTER|[310, 311]",
+            "void-dot|CIRCLE|[415]",
+            "wedge|SHAPE|[201, 202, 301, 302]");
+
+    private void loadMapBuilderExport() {
+        data = JsonMapperManager.basic().readValue(MAP_BUILDER_EXPORT, MapDataIO.class);
+        data.getMapInfo().forEach(tile -> game.setTile(new Tile(tile.getTileID(), tile.getPosition())));
+    }
+
+    @Test
+    void mapBuilderExportImportsEverySectorOnceAndExportsTheSameList() {
+        loadMapBuilderExport();
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(errors).isEmpty();
+        assertThat(describe(game)).containsExactlyElementsOf(MAP_BUILDER_SECTORS);
+        assertThat(export().getSectors().stream().map(MapSectorJsonServiceTest::listedForm))
+                .containsExactlyInAnyOrderElementsOf(data.getSectors().stream()
+                        .map(MapSectorJsonServiceTest::listedForm)
+                        .toList());
+    }
+
+    // Normal games: the same file imports its tiles and keeps the sectors with one warning, as per-tile sectors did.
+    @Test
+    void mapBuilderExportInANormalGameStoresSectorsWithOneWarning() {
+        game.setFowMode(false);
+        loadMapBuilderExport();
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(describe(game)).containsExactlyElementsOf(MAP_BUILDER_SECTORS);
+        assertThat(errors.toString().lines())
+                .containsExactly(
+                        "- sectors: map sectors are only used in Fog of War games; they were stored but have no effect in this game.");
+    }
+
+    // The whole /map import_json path: tiles placed through AddTileService, then sectors, in fog and normal games.
+    @Test
+    void mapBuilderExportGoesThroughTheFullImportInFogAndNormalGames() {
+        for (boolean fog : new boolean[] {true, false}) {
+            Game imported = new Game();
+            imported.setName("sector-json-full-import");
+            imported.setFowMode(fog);
+
+            MapJsonIOService.importMapFromJson(imported, MAP_BUILDER_EXPORT, null);
+
+            assertThat(imported.getTileMap()).hasSize(13);
+            assertThat(describe(imported)).containsExactlyElementsOf(MAP_BUILDER_SECTORS);
+        }
+    }
+
+    @Test
+    void normalGameWithoutSectorsExportsNoSectorFields() {
+        game.setFowMode(false);
+        place("000");
+        place("101");
+
+        String json = MapJsonIOService.exportMapAsJson(null, game, false, false, false);
+
+        assertThat(json).doesNotContain("sector").doesNotContain("galaxies");
+    }
+
+    private static String listedForm(SectorListIO sector) {
+        return sector.getName() + "|" + sector.getType() + "|" + sector.getCentre() + "|" + sector.getDistance() + "|"
+                + sector.getPositions();
     }
 
     private MapDataIO export() {
