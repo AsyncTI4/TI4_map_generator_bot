@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.executors.RunningTaskRegistry;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -43,8 +44,11 @@ public final class ChannelExportWatcher implements Runnable {
         ACTIVE_WATCHERS.computeIfAbsent(location.log(), key -> {
             ChannelExportWatcher watcher = new ChannelExportWatcher(location, responseChannel, maxUploadBytes);
             long intervalSeconds = POLL_INTERVAL.toSeconds();
-            watcher.future =
-                    SCHEDULER.scheduleWithFixedDelay(watcher, intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
+            watcher.future = SCHEDULER.scheduleWithFixedDelay(
+                    RunningTaskRegistry.wrap("Channel export watcher: " + location.exportId(), watcher),
+                    intervalSeconds,
+                    intervalSeconds,
+                    TimeUnit.SECONDS);
             return watcher;
         });
     }

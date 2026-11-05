@@ -76,7 +76,7 @@ public class CronManager {
     }
 
     private static Runnable nonThrowingCronTask(String cronName, Runnable runnable) {
-        TimedRunnable timedRunnable = new TimedRunnable(cronName, runnable);
+        TimedRunnable timedRunnable = new TimedRunnable("Cron: " + cronName, runnable);
         return () -> {
             try {
                 timedRunnable.run();

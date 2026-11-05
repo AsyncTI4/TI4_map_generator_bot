@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.Objects;
 import lombok.Getter;
 import org.apache.commons.lang3.time.StopWatch;
+import ti4.executors.RunningTaskRegistry;
 import ti4.logging.BotLogger;
 
 public class TimedRunnable implements Runnable {
@@ -28,7 +29,7 @@ public class TimedRunnable implements Runnable {
     @Override
     public void run() {
         StopWatch stopWatch = StopWatch.createStarted();
-        try {
+        try (var registration = RunningTaskRegistry.start(name)) {
             delegate.run();
         } finally {
             stopWatch.stop();
