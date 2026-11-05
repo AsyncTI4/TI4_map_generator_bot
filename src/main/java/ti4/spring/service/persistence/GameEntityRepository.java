@@ -12,13 +12,4 @@ public interface GameEntityRepository extends JpaRepository<GameEntity, String> 
     @Modifying
     @Query("DELETE FROM GameEntity g WHERE g.gameName = :gameName")
     void deleteByGameName(@Param("gameName") String gameName);
-
-    @Deprecated(forRemoval = true)
-    @Modifying
-    @Query("UPDATE GameEntity g SET g.revisionKey = :revisionKey, g.mappingVersion = :mappingVersion"
-            + " WHERE g.gameName = :gameName")
-    int updateRevision(
-            @Param("gameName") String gameName,
-            @Param("revisionKey") String revisionKey,
-            @Param("mappingVersion") Integer mappingVersion);
 }

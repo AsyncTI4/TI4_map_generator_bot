@@ -30,7 +30,6 @@ import ti4.spring.service.persistence.PersistedGameState;
 import ti4.spring.service.persistence.PersistedGameStateService;
 import ti4.spring.service.persistence.UnreferencedUserService;
 
-@SuppressWarnings("removal")
 class GameDatabaseReconcilerTest {
     @TempDir
     static Path temporaryDirectory;
@@ -53,7 +52,7 @@ class GameDatabaseReconcilerTest {
     }
 
     @Test
-    void rowWithMatchingContentButStaleRevisionIsBackfilledQuietly() {
+    void rowWithMatchingContentButStaleRevisionIsRewritten() {
         try (Fixture fixture = new Fixture()) {
             GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
             fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
@@ -61,12 +60,9 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
-            verify(fixture.persistence, never()).restore(any());
+            verify(fixture.persistence).restore(current);
             verify(fixture.persistence, never()).replace(any());
-            fixture.logs.verify(() -> BotLogger.logCron(argThat(message ->
-                    message.contains("in sync with all 1 games") && message.contains("for 1 unchanged game"))));
-            fixture.logs.verify(() -> BotLogger.error(anyString()), never());
+            fixture.logs.verify(() -> BotLogger.error(contains("legacy: has an outdated revision key")));
         }
     }
 
@@ -82,7 +78,6 @@ class GameDatabaseReconcilerTest {
 
             verify(fixture.persistence).restore(current);
             verify(fixture.persistence, never()).replace(any());
-            verify(fixture.persistence, never()).updateRevision(anyString(), anyString(), any());
             // Only real content differences are listed; the stale revision columns are not.
             fixture.logs.verify(() -> BotLogger.error(argThat(message -> message.contains("round (expected 5, found 1)")
                     && !message.contains("revisionKey")
@@ -268,24 +263,6 @@ class GameDatabaseReconcilerTest {
 
             verify(fixture.persistence).restore(current);
             fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
-        }
-    }
-
-    @Test
-    void revisionUpdateFailureIsReportedWithoutCountingABackfill() {
-        try (Fixture fixture = new Fixture()) {
-            GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
-            fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
-            fixture.loadsSnapshot("legacy", current);
-            IllegalStateException failure = new IllegalStateException("update failed");
-            doThrow(failure)
-                    .when(fixture.persistence)
-                    .updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
-
-            fixture.run();
-
-            fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
-            fixture.logs.verify(() -> BotLogger.logCron(contains("Recorded the current revision")), never());
         }
     }
 

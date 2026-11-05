@@ -34,12 +34,6 @@ public class GameEntityPersistenceService {
         titleEntityRepository.saveAll(snapshot.titles());
     }
 
-    @Deprecated(forRemoval = true)
-    @Transactional
-    public void updateRevision(String gameName, String revisionKey, Integer mappingVersion) {
-        gameEntityRepository.updateRevision(gameName, revisionKey, mappingVersion);
-    }
-
     @Transactional
     public void delete(String gameName) {
         deleteGameRows(gameName);
