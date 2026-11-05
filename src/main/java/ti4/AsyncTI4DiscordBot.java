@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import ti4.cron.CronManager;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.ButtonProcessor;
 import ti4.discord.interactions.listeners.ModalListener;
@@ -58,6 +59,7 @@ public class AsyncTI4DiscordBot {
     }
 
     private static void runLeaseOwnedStartupWork() {
+        CronManager.runLeaseStartJobs();
         BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
         GameManager.warmup();
         DataMigrationManager.runMigrations();
