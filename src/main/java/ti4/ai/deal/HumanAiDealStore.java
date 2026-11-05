@@ -2,6 +2,7 @@ package ti4.ai.deal;
 
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiGameWrites;
 import ti4.game.Game;
 
 @UtilityClass
@@ -9,6 +10,18 @@ public class HumanAiDealStore {
 
     private static final String DEAL_KEY = "humanAiDeal|";
     private static final String LATEST_KEY = "humanAiDealLatest|";
+    private static final String SAVE_REASON = "AI trade offer";
+
+    public static void persist(Game game, HumanAiDeal deal) {
+        AiGameWrites.persist(game, SAVE_REASON, latest -> save(latest, deal));
+    }
+
+    public static void persistAsNew(Game game, HumanAiDeal deal) {
+        AiGameWrites.persist(game, SAVE_REASON, latest -> {
+            replaceLatest(latest, deal.aiFaction());
+            save(latest, deal);
+        });
+    }
 
     public static void save(Game game, HumanAiDeal deal) {
         game.setStoredValue(DEAL_KEY + deal.id(), deal.encode());

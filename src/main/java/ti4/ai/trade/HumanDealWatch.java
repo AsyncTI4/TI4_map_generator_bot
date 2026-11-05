@@ -26,7 +26,7 @@ class HumanDealWatch {
         HumanAiDeal deal = latest.get();
         if (deal.status() == HumanAiDeal.Status.PENDING && HumanAiDealRunner.expired(game, deal, context.now())) {
             deal = deal.withStatus(HumanAiDeal.Status.EXPIRED);
-            HumanAiDealStore.save(game, deal);
+            HumanAiDealStore.persist(game, deal);
             HumanAiDealMessage.disable(deal);
         }
         boolean turnedDown = deal.status() == HumanAiDeal.Status.DENIED || deal.status() == HumanAiDeal.Status.EXPIRED;

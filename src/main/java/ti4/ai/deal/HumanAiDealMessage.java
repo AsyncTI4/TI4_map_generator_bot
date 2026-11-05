@@ -31,14 +31,13 @@ public class HumanAiDealMessage {
         Player human = game.getPlayerFromColorOrFaction(deal.humanFaction());
         MessageChannel channel = channelFor(game, human);
         if (ai == null || human == null || channel == null) return;
-        HumanAiDealStore.replaceLatest(game, deal.aiFaction());
-        HumanAiDealStore.save(game, deal);
+        HumanAiDealStore.persistAsNew(game, deal);
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 channel,
                 human.getRepresentationUnfogged() + ", " + ai.getFactionEmojiOrColor() + " has an offer for you.",
                 List.of(embed(game, deal)),
                 buttons(deal),
-                message -> HumanAiDealStore.save(game, deal.withMessage(message.getChannelId(), message.getId())));
+                message -> HumanAiDealStore.persist(game, deal.withMessage(message.getChannelId(), message.getId())));
     }
 
     public static void disable(HumanAiDeal deal) {
