@@ -121,7 +121,7 @@ class FracturedRealityAcd2ButtonHandler {
             case 1 -> "\"I'm melting! Melting!\" — Wicked Witch of the West, _The Wizard of Oz_";
             case 2, 3 -> "\"It's alive! It's alive!\" — Henry Frankenstein, _Frankenstein_";
             case 4, 5, 6, 7 -> "\"Be afraid. Be very afraid.\" — Veronica Quaife, _The Fly_";
-            case 8, 9, 10 -> "\"You're gonna need a bigger boat.\" — Chief Brody, _Jaws_";
+            case 8, 9, 10 -> "\"That's no moon.\" — Obi-Wan Kenobi, _Star Wars_";
             default -> null;
         };
     }
