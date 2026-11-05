@@ -76,13 +76,21 @@ class FracturedRealityAcd2ButtonHandler {
                         player.factionButtonChecker() + "fracturedRealityPlace_" + replacement.getAsyncId(),
                         replacement.getName()))
                 .toList();
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " rolled " + DiceHelper.formatDiceOutput(dice)
-                        + " for _Fractured Reality_ and removed their " + unit.getName() + " in "
-                        + tile.getRepresentationForButtons(game, player)
-                        + ". Choose 1 replacement unit with a cost value of " + result + " or less.",
-                buttons);
+        StringBuilder message = new StringBuilder(player.getRepresentationUnfogged())
+                .append(" rolled ")
+                .append(DiceHelper.formatDiceOutput(dice))
+                .append(" for _Fractured Reality_ and removed their ")
+                .append(unit.getName())
+                .append(" in ")
+                .append(tile.getRepresentationForButtons(game, player))
+                .append(". Choose 1 replacement unit with a cost value of ")
+                .append(result)
+                .append(" or less.");
+        String loreQuip = getFracturedRealityLoreQuip(result);
+        if (loreQuip != null) {
+            message.append("\n").append(loreQuip);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message.toString(), buttons);
     }
 
     @ButtonHandler("fracturedRealityPlace_")
@@ -106,6 +114,16 @@ class FracturedRealityAcd2ButtonHandler {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " placed 1 " + unit.getName() + " for _Fractured Reality_.");
+    }
+
+    private static String getFracturedRealityLoreQuip(int result) {
+        return switch (result) {
+            case 1 -> "\"I'm melting! Melting!\" — Wicked Witch of the West, _The Wizard of Oz_";
+            case 2, 3 -> "\"It's alive! It's alive!\" — Henry Frankenstein, _Frankenstein_";
+            case 4, 5, 6, 7 -> "\"Be afraid. Be very afraid.\" — Veronica Quaife, _The Fly_";
+            case 8, 9, 10 -> "\"That's no moon.\" — Obi-Wan Kenobi, _Star Wars_";
+            default -> null;
+        };
     }
 
     private static String pendingReplacementKey(Player player) {
