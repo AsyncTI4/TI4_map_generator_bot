@@ -54,6 +54,10 @@ are stored the same way but marked `statistics_ignored`, and every statistics
 query on player or title rows leaves them out. Live writes use
 `GameEntityPersistenceService.replace`, which also updates user names.
 
+Rows are unique per game and seat holder, `(game_name, playing_user_id)`. Stats
+users can repeat: a replaced player who stays seated has their own row, and their
+old seat still counts its statistics for them.
+
 Every seat in a game gets a `player` row, so warmup can rebuild each
 `ManagedPlayer`. Both user columns link to `user`: `playing_user_id` is whoever
 holds the seat now and `user_id` is the user its statistics count for, which
@@ -114,7 +118,7 @@ current, then builds each `ManagedGame`:
 
 The setting is read once per startup; turning it off and restarting goes back to
 files only. After a startup with reads off, `DatabaseWarmupRolloutCron` checks every
-10 minutes: it logs the resync backlog while it drains, then turns the setting on
+2 minutes: it logs the resync backlog while it drains, then turns the setting on
 once no row differed at startup and every game's row has its current revision key.
 The cron is deprecated and goes away with the setting.
 With maintenance mode on, or if the database read fails, every game is built from

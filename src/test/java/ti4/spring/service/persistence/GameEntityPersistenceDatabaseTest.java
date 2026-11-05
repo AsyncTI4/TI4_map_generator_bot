@@ -1,6 +1,7 @@
 package ti4.spring.service.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 import java.util.Map;
@@ -103,6 +104,39 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         assertThat(persistedManagedGameService.loadCurrentRevisionKeys())
                 .containsExactlyEntriesOf(Map.of(current.getName(), "current-revision"));
+    }
+
+    @Test
+    void replacedPlayerWhoStaysSeatedIsStoredBesideTheSeatThatStillTracksThem() {
+        // pbd23770b: user-1 was replaced on their seat but stayed in the game without a faction, so their old seat
+        // and their own seat both name user-1 as the stats user.
+        Game game = gameWithRealPlayers("pbd-db-replaced-and-seated", 3);
+        Player replacedSeat = game.getPlayer("user-1");
+        game.getPlayers().remove("user-1");
+        replacedSeat.setUserID("replacement-id");
+        replacedSeat.setUserName("Replacement");
+        replacedSeat.setStatsTrackedUserID("user-1");
+        game.getPlayers().put("replacement-id", replacedSeat);
+        game.addPlayer("user-1", "User 1");
+
+        persistenceService.replace(GameEntityMapper.toSnapshot(game));
+
+        assertThat(playerRepository.findAllWithUsersAndGames())
+                .filteredOn(player -> "user-1".equals(player.getStatsUser().getId()))
+                .extracting(player -> player.getPlayingUser().getId(), PlayerEntity::isPlaying)
+                .containsExactlyInAnyOrder(tuple("replacement-id", true), tuple("user-1", false));
+        assertThat(persistedManagedGameService.loadAll().get(game.getName())).isEqualTo(ManagedGameState.of(game));
+    }
+
+    @Test
+    void playerRowsAreUniquePerSeatHolder() {
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+
+        assertThat(jdbc.queryForList(
+                        "SELECT pg_get_constraintdef(oid) FROM pg_constraint"
+                                + " WHERE conrelid = 'player'::regclass AND contype = 'u'",
+                        String.class))
+                .containsExactly("UNIQUE (game_name, playing_user_id)");
     }
 
     @Test

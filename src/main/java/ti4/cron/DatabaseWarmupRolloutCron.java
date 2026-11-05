@@ -9,7 +9,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 public class DatabaseWarmupRolloutCron {
 
-    private static final int INTERVAL_MINUTES = 10;
+    private static final int INTERVAL_MINUTES = 2;
 
     public static void register() {
         CronManager.schedulePeriodically(

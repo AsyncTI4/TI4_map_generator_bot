@@ -19,7 +19,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "player", uniqueConstraints = @UniqueConstraint(columnNames = {"game_name", "user_id"}))
+@Table(
+        name = "player",
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_player_game_playing_user",
+                        columnNames = {"game_name", "playing_user_id"}))
 public class PlayerEntity {
 
     @Id
