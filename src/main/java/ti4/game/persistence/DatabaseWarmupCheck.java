@@ -68,7 +68,8 @@ final class DatabaseWarmupCheck {
                 " Database rows checked against game files: %,d match, %,d outdated or missing (resync queued), %,d differ.",
                 matchingRows.get(), outdatedRows.get(), differingRows.size());
         if (readsEnabled || outdatedRows.get() > 0 || !differingRows.isEmpty()) return mode + counts;
-        return mode + counts + " Every row matches its game file, so `database_warmup_reads_enabled` can be turned on.";
+        return mode + counts
+                + " Every row matches its game file, so DatabaseWarmupRolloutCron will turn on `database_warmup_reads_enabled`.";
     }
 
     private String differingRowsReport() {

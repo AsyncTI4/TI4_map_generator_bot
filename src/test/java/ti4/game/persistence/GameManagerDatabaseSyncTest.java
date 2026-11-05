@@ -342,7 +342,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             gameLoadService.verify(() -> GameLoadService.load(game.getName()));
             pipeline.verifyNoInteractions();
         }
-        assertThat(check.summary()).contains("1 match", "0 outdated", "0 differ", "can be turned on");
+        assertThat(check.summary()).contains("1 match", "0 outdated", "0 differ", "will turn on");
     }
 
     @Test
@@ -365,7 +365,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         assertThat(check.differingGameNames()).containsExactly(game.getName());
         assertThat(DatabaseWarmupCheck.differingFields(ManagedGameState.of(game), wrongRow))
                 .containsExactly("fowMode");
-        assertThat(check.summary()).doesNotContain("can be turned on");
+        assertThat(check.summary()).doesNotContain("will turn on");
     }
 
     @Test
@@ -382,7 +382,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
         }
-        assertThat(check.summary()).contains("1 outdated").doesNotContain("can be turned on");
+        assertThat(check.summary()).contains("1 outdated").doesNotContain("will turn on");
     }
 
     private static DatabaseWarmupCheck readsOn() {

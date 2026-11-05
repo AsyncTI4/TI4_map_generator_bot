@@ -3,6 +3,7 @@ package ti4.spring.service.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,6 +88,21 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         ManagedGameState persisted = persistedManagedGameService.loadAll().get(game.getName());
         assertThat(persisted).isEqualTo(ManagedGameState.of(game));
+    }
+
+    @Test
+    @SuppressWarnings("removal")
+    void currentRevisionKeysLeaveOutRowsFromAnOlderMapping() {
+        Game current = gameWithRealPlayers("pbd-db-revision-current", 3);
+        current.setRevisionKey("current-revision");
+        persistenceService.replace(GameEntityMapper.toSnapshot(current));
+        Game older = gameWithRealPlayers("pbd-db-revision-older", 3);
+        older.setRevisionKey("older-revision");
+        persistenceService.replace(GameEntityMapper.toSnapshot(older));
+        persistenceService.updateRevision(older.getName(), "older-revision", GameEntityMapper.MAPPING_VERSION - 1);
+
+        assertThat(persistedManagedGameService.loadCurrentRevisionKeys())
+                .containsExactlyEntriesOf(Map.of(current.getName(), "current-revision"));
     }
 
     @Test

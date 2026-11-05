@@ -82,6 +82,7 @@ public class GameManager {
                 reportGamesThatFailedWarmup(failedGames);
                 if (persistedGames != null) {
                     databaseCheck.report();
+                    DatabaseWarmupRollout.recordWarmupCheck(databaseCheck);
                 }
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(

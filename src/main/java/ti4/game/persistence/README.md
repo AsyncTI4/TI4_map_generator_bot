@@ -110,8 +110,11 @@ current, then builds each `ManagedGame`:
   outdated row queues a resync from the file, and a row with the current key but
   different content is reported as a mapping bug.
 
-The setting is read once per startup. The summary log says when every row matches,
-so reads can be turned on; turning it off and restarting goes back to files only.
+The setting is read once per startup; turning it off and restarting goes back to
+files only. After a startup with reads off, `DatabaseWarmupRolloutCron` checks every
+10 minutes: it logs the resync backlog while it drains, then turns the setting on
+once no row differed at startup and every game's row has its current revision key.
+The cron is deprecated and goes away with the setting.
 With maintenance mode on, or if the database read fails, every game is built from
 its file and no resync is queued.
 
