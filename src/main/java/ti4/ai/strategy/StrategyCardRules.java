@@ -170,6 +170,16 @@ public class StrategyCardRules {
                         context.now() + SecondaryQueue.RECHECK_MILLIS, "the secondary of its card from " + player));
     }
 
+    public static boolean followsPending(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        return game.getPlayedSCs().stream()
+                .filter(initiative -> !seat.getSCs().contains(initiative))
+                .anyMatch(initiative -> SecondaryQueue.followOpen(game, seat, initiative, context.now())
+                        || (!seat.hasFollowedSC(initiative)
+                                && CardMessages.cardMessage(context, initiative).isPresent()));
+    }
+
     public static Optional<AiDecision> awaitFollowTurn(AiTurnContext context) {
         Game game = context.game();
         Player seat = context.seat();

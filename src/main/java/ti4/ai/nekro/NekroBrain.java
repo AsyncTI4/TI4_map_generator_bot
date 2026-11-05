@@ -527,6 +527,7 @@ public class NekroBrain implements FactionBrain {
             return Optional.empty();
         }
         if (TacticalRules.inProgress(context)) return TacticalRules.continueAction(context);
+        if (StrategyCardRules.followsPending(context)) return finishFollowsFirst(context);
         Optional<AiDecision> slay = SlayIntent.announce(context);
         if (slay.isPresent()) return slay;
         Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(context);
@@ -700,6 +701,12 @@ public class NekroBrain implements FactionBrain {
 
     private static boolean unplayed(Game game, int initiative) {
         return initiative > 0 && !game.getPlayedSCs().contains(initiative);
+    }
+
+    private Optional<AiDecision> finishFollowsFirst(AiTurnContext context) {
+        return StrategyCardRules.follow(context)
+                .or(() -> declineStrategyCardFollow(context))
+                .or(() -> StrategyCardRules.awaitFollowTurn(context));
     }
 
     private Optional<AiDecision> declineStrategyCardFollow(AiTurnContext context) {
