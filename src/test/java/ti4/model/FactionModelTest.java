@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
 
@@ -23,6 +24,28 @@ class FactionModelTest extends BaseTi4Test {
             assertTrue(validatePromissoryNotes(faction), faction.getAlias() + ": invalid PromissoryNotes");
             assertTrue(validateUnits(faction), faction.getAlias() + ": invalid Units");
             assertTrue(validateHomebrewReplacesID(faction), faction.getAlias() + ": invalid HomebrewReplacesID");
+        }
+    }
+
+    @Test
+    void testFancyEmbedsStayWithinDiscordLimits() {
+        for (FactionModel faction : Mapper.getFactionsValues()) {
+            for (MessageEmbed embed : faction.fancyEmbeds()) {
+                assertTrue(
+                        embed.getLength() <= MessageEmbed.EMBED_MAX_LENGTH_BOT,
+                        faction.getAlias() + ": fancy embed exceeds Discord's total character limit");
+                assertTrue(
+                        embed.getFields().size() <= 25,
+                        faction.getAlias() + ": fancy embed exceeds Discord's field limit");
+                for (MessageEmbed.Field field : embed.getFields()) {
+                    assertTrue(
+                            field.getName().length() <= MessageEmbed.TITLE_MAX_LENGTH,
+                            faction.getAlias() + ": fancy embed field name exceeds Discord's character limit");
+                    assertTrue(
+                            field.getValue().length() <= MessageEmbed.VALUE_MAX_LENGTH,
+                            faction.getAlias() + ": fancy embed field value exceeds Discord's character limit");
+                }
+            }
         }
     }
 
