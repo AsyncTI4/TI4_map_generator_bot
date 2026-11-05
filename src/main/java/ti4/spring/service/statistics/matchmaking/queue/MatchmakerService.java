@@ -74,7 +74,6 @@ public class MatchmakerService {
                     queueStore.findParty(member.getPartyId()).orElse(null);
             if (party != null) {
                 if (party.isQueued()) return Optional.of("You are already queued for a game.");
-                if (tigl) return Optional.of("You cannot queue for TIGL as a group. Leave your group first.");
 
                 queueStore.markQueued(party, queuerId, tigl);
                 return Optional.empty();
