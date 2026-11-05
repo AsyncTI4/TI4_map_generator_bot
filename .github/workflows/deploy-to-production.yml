@@ -51,6 +51,24 @@ jobs:
     name: Pull & Deploy Bot
     runs-on: ubuntu-latest
     steps:
+      # The failures are TCP connect timeouts to the SSH port that can last 10+ minutes, so wait
+      # for the port to answer before connecting, giving up after about 15 minutes.
+      - name: Wait for the SSH port to answer
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
+        run: |
+          for attempt in $(seq 1 30); do
+            if timeout 5 bash -c "</dev/tcp/$SSH_HOST/$SSH_PORT" 2>/dev/null; then
+              echo "SSH port reachable on probe $attempt"
+              exit 0
+            fi
+            echo "SSH port unreachable on probe $attempt, waiting 25s"
+            sleep 25
+          done
+          echo "SSH port still unreachable after ~15 minutes"
+          exit 1
+
       - name: Execute remote ssh commands
         uses: appleboy/ssh-action@master
         env:

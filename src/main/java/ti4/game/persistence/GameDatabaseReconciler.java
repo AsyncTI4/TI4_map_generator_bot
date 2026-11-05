@@ -1,17 +1,5 @@
 package ti4.game.persistence;
 
-import static ti4.game.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.game.persistence.GamePersistenceKeys.REVISION_KEY;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -19,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
@@ -62,7 +48,6 @@ public class GameDatabaseReconciler {
         private Map<String, PersistedGameState> persistedStates;
         private GameEntityPersistenceService persistenceService;
         private int gameCount;
-        private int revisionBackfills;
 
         @Override
         public List<String> start() {
@@ -96,9 +81,6 @@ public class GameDatabaseReconciler {
                 existingGameNames.add(gameName);
                 return;
             }
-            if (fileRevisionKey == null) {
-                GameRevisionKeyFile.backfill(gameName);
-            }
             Game game = GameLoadService.load(gameName);
             if (game == null) return;
             existingGameNames.add(gameName);
@@ -107,15 +89,6 @@ public class GameDatabaseReconciler {
 
         private Optional<String> reconcileGame(Game game, PersistedGameState persistedState) {
             String gameName = game.getName();
-            if (!GameEntityMapper.shouldPersist(game)) {
-                if (persistedState == null) return Optional.empty();
-                return Optional.of(repair(
-                        gameName,
-                        "in the database but has fewer than 3 players",
-                        () -> persistenceService.delete(gameName),
-                        failures));
-            }
-
             GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
             if (persistedState == null) {
                 return Optional.of(repair(
@@ -124,26 +97,13 @@ public class GameDatabaseReconciler {
 
             PersistedGameState expectedState = PersistedGameState.of(snapshot);
             List<String> differences = expectedState.describeDifferencesFrom(persistedState);
-            if (differences.isEmpty()) {
-                if (!expectedState.hasSameRevisionColumnsAs(persistedState)) {
-                    backfillRevision(snapshot);
-                }
+            if (differences.isEmpty() && expectedState.hasSameRevisionColumnsAs(persistedState)) {
                 return Optional.empty();
             }
-            return Optional.of(repair(
-                    gameName,
-                    "differs in " + String.join("; ", differences),
-                    () -> persistenceService.restore(snapshot),
-                    failures));
-        }
-
-        private void backfillRevision(GameEntitySnapshot snapshot) {
-            if (DatabasePersistenceGate.isDisabled()) return;
-            persistenceService.updateRevision(
-                    snapshot.game().getGameName(),
-                    snapshot.game().getRevisionKey(),
-                    snapshot.game().getMappingVersion());
-            revisionBackfills++;
+            String description = differences.isEmpty()
+                    ? "has an outdated revision key"
+                    : "differs in " + String.join("; ", differences);
+            return Optional.of(repair(gameName, description, () -> persistenceService.restore(snapshot), failures));
         }
 
         @Override
@@ -225,8 +185,8 @@ public class GameDatabaseReconciler {
                 BotLogger.error(failures.summary(), failures.firstCause);
             }
             if (discrepancies.isEmpty()) {
-                String inSync = String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount)
-                        + describeRevisionBackfills(revisionBackfills);
+                String inSync =
+                        String.format("%s found the database in sync with all %,d games.", TASK_NAME, gameCount);
                 BotLogger.logCron(
                         userCleanup.map(cleanup -> inSync + "\n- " + cleanup).orElse(inSync));
                 return;
@@ -236,9 +196,8 @@ public class GameDatabaseReconciler {
                     "**%s found %s out of sync with their game files and updated the database:**",
                     TASK_NAME, StringHelper.pluralize(discrepancies.size(), "game")));
             int cleanupLength = userCleanup.map(cleanup -> cleanup.length() + 3).orElse(0);
-            String backfills = describeRevisionBackfills(revisionBackfills);
             String remainingGames = String.format("\n...and %,d more.", discrepancies.size());
-            int reportLimit = MAX_REPORT_LENGTH - cleanupLength - backfills.length() - remainingGames.length();
+            int reportLimit = MAX_REPORT_LENGTH - cleanupLength - remainingGames.length();
             int reported = 0;
             for (String discrepancy : discrepancies) {
                 if (report.length() + discrepancy.length() + 3 > reportLimit) break;
@@ -249,15 +208,7 @@ public class GameDatabaseReconciler {
                 report.append(String.format("\n...and %,d more.", discrepancies.size() - reported));
             }
             userCleanup.ifPresent(cleanup -> report.append("\n- ").append(cleanup));
-            if (!backfills.isEmpty()) report.append("\n").append(backfills.strip());
             BotLogger.error(report.toString());
-        }
-
-        private static String describeRevisionBackfills(int revisionBackfills) {
-            if (revisionBackfills == 0) return "";
-            return String.format(
-                    " Recorded the current revision key and mapping version for %s.",
-                    StringHelper.pluralize(revisionBackfills, "unchanged game"));
         }
 
         private static final class Failures {
@@ -283,109 +234,6 @@ public class GameDatabaseReconciler {
                                 String.join(", ", gameNames)),
                         MAX_DISCREPANCY_LENGTH);
             }
-        }
-    }
-
-    private static final class GameRevisionKeyFile {
-
-        private GameRevisionKeyFile() {}
-
-        @Nullable
-        private static String read(String gameName) {
-            return GameFileLockManager.wrapWithReadLock(gameName, () -> readFrom(gamePath(gameName)));
-        }
-
-        // TODO: Remove once every save has a revision_key line (the first nightly reconcile after #5808 adds one to
-        // each). Without it, a keyless file (e.g. restored from an undo older than #5808) is just re-read each night.
-        @Deprecated(forRemoval = true)
-        @Nullable
-        private static String backfill(String gameName) {
-            return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
-                Path gamePath = gamePath(gameName);
-                if (!Files.exists(gamePath)) return null;
-                String existingRevisionKey = readFrom(gamePath);
-                if (existingRevisionKey != null) return existingRevisionKey;
-                String revisionKey = UUID.randomUUID().toString();
-                writeRevisionKey(gamePath, revisionKey);
-                return revisionKey;
-            });
-        }
-
-        @Nullable
-        private static String readFrom(Path gamePath) {
-            try (BufferedReader reader = Files.newBufferedReader(gamePath, StandardCharsets.UTF_8)) {
-                boolean inGameInfo = false;
-                for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-                    if (GAMEINFO.equals(line)) {
-                        inGameInfo = true;
-                    } else if (ENDGAMEINFO.equals(line)) {
-                        return null;
-                    } else if (inGameInfo && isRevisionKeyLine(line)) {
-                        String revisionKey =
-                                line.substring(line.indexOf(' ') + 1).trim();
-                        return revisionKey.isEmpty() ? null : revisionKey;
-                    }
-                }
-                return null;
-            } catch (NoSuchFileException e) {
-                return null;
-            } catch (IOException e) {
-                throw new UncheckedIOException("Could not read the revision key of " + gamePath, e);
-            }
-        }
-
-        private static boolean isRevisionKeyLine(String line) {
-            int separator = line.indexOf(' ');
-            String key = separator < 0 ? line : line.substring(0, separator);
-            return REVISION_KEY.equals(key);
-        }
-
-        private static void writeRevisionKey(Path gamePath, String revisionKey) {
-            Path temporaryPath = null;
-            try {
-                List<String> lines = withRevisionKey(Files.readAllLines(gamePath, StandardCharsets.UTF_8), revisionKey);
-                temporaryPath = Files.createTempFile(
-                        gamePath.getParent(), gamePath.getFileName().toString(), ".tmp");
-                Files.write(temporaryPath, lines, StandardCharsets.UTF_8);
-                PosixFileSystemUtility.setPermissionsIfPosix(temporaryPath);
-                Files.move(temporaryPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                throw new UncheckedIOException("Could not write a revision key to " + gamePath, e);
-            } finally {
-                deleteIfPresent(temporaryPath);
-            }
-        }
-
-        private static List<String> withRevisionKey(List<String> lines, String revisionKey) {
-            int gameInfoIndex = lines.indexOf(GAMEINFO);
-            if (gameInfoIndex < 0) {
-                throw new IllegalStateException("Game file has no " + GAMEINFO + " section");
-            }
-            List<String> updatedLines = new ArrayList<>(lines);
-            String revisionKeyLine = REVISION_KEY + " " + revisionKey;
-            for (int i = gameInfoIndex + 1; i < updatedLines.size(); i++) {
-                String line = updatedLines.get(i);
-                if (ENDGAMEINFO.equals(line)) break;
-                if (isRevisionKeyLine(line)) {
-                    updatedLines.set(i, revisionKeyLine);
-                    return updatedLines;
-                }
-            }
-            updatedLines.add(gameInfoIndex + 1, revisionKeyLine);
-            return updatedLines;
-        }
-
-        private static void deleteIfPresent(@Nullable Path path) {
-            if (path == null) return;
-            try {
-                Files.deleteIfExists(path);
-            } catch (IOException e) {
-                BotLogger.error("Failed to delete temporary file: " + path, e);
-            }
-        }
-
-        private static Path gamePath(String gameName) {
-            return Storage.getGamePath(gameName + Constants.TXT);
         }
     }
 }

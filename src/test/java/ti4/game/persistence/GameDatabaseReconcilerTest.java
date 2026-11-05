@@ -52,7 +52,7 @@ class GameDatabaseReconcilerTest {
     }
 
     @Test
-    void rowWithMatchingContentButStaleRevisionIsBackfilledQuietly() {
+    void rowWithMatchingContentButStaleRevisionIsRewritten() {
         try (Fixture fixture = new Fixture()) {
             GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
             fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
@@ -60,12 +60,9 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
-            verify(fixture.persistence, never()).restore(any());
+            verify(fixture.persistence).restore(current);
             verify(fixture.persistence, never()).replace(any());
-            fixture.logs.verify(() -> BotLogger.logCron(argThat(message ->
-                    message.contains("in sync with all 1 games") && message.contains("for 1 unchanged game"))));
-            fixture.logs.verify(() -> BotLogger.error(anyString()), never());
+            fixture.logs.verify(() -> BotLogger.error(contains("legacy: has an outdated revision key")));
         }
     }
 
@@ -81,7 +78,6 @@ class GameDatabaseReconcilerTest {
 
             verify(fixture.persistence).restore(current);
             verify(fixture.persistence, never()).replace(any());
-            verify(fixture.persistence, never()).updateRevision(anyString(), anyString(), any());
             // Only real content differences are listed; the stale revision columns are not.
             fixture.logs.verify(() -> BotLogger.error(argThat(message -> message.contains("round (expected 5, found 1)")
                     && !message.contains("revisionKey")
@@ -137,7 +133,7 @@ class GameDatabaseReconcilerTest {
     }
 
     @Test
-    void gameFileWithoutRevisionKeyGetsOneBeforeItIsReconciled() {
+    void gameFileWithoutRevisionKeyIsReconciledWithoutWritingOne() {
         try (Fixture fixture = new Fixture()) {
             fixture.manager.when(GameManager::getGameNames).thenReturn(List.of("legacy", "keyed"));
             fixture.revisionFile("legacy", null);
@@ -146,7 +142,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            assertThat(fixture.revisionLines("legacy")).anyMatch(line -> line.startsWith("revision_key "));
+            assertThat(fixture.revisionLines("legacy")).noneMatch(line -> line.startsWith("revision_key"));
             assertThat(fixture.revisionLines("keyed")).contains("revision_key revision");
         }
     }
@@ -270,24 +266,6 @@ class GameDatabaseReconcilerTest {
         }
     }
 
-    @Test
-    void revisionUpdateFailureIsReportedWithoutCountingABackfill() {
-        try (Fixture fixture = new Fixture()) {
-            GameEntitySnapshot current = snapshot("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
-            fixture.persisted.put("legacy", PersistedGameState.of(snapshot("legacy", null, null)));
-            fixture.loadsSnapshot("legacy", current);
-            IllegalStateException failure = new IllegalStateException("update failed");
-            doThrow(failure)
-                    .when(fixture.persistence)
-                    .updateRevision("legacy", "revision", GameEntityMapper.MAPPING_VERSION);
-
-            fixture.run();
-
-            fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
-            fixture.logs.verify(() -> BotLogger.logCron(contains("Recorded the current revision")), never());
-        }
-    }
-
     private static final class Fixture implements AutoCloseable {
         private final MockedStatic<SpringContext> context = mockStatic(SpringContext.class);
         private final MockedStatic<GameManager> manager = mockStatic(GameManager.class);
@@ -324,7 +302,6 @@ class GameDatabaseReconcilerTest {
             manager.when(GameManager::getGameNames).thenReturn(List.of(gameName));
             revisionFile(gameName, snapshot.game().getRevisionKey());
             loader.when(() -> GameLoadService.load(gameName)).thenReturn(game);
-            mapper.when(() -> GameEntityMapper.shouldPersist(game)).thenReturn(true);
             mapper.when(() -> GameEntityMapper.toSnapshot(game)).thenReturn(snapshot);
         }
 

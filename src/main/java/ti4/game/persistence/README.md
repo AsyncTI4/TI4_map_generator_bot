@@ -18,7 +18,8 @@ database rows are a derived view that reconciliation can repair.
 | [migration/DataMigrationManager](migration/DataMigrationManager.java) | Run game-data migrations. |
 
 The loaders, writers, undo service, file locks, and reconciliation chain are
-package-private. The revision-file helper is private to `GameDatabaseReconciler`.
+package-private. The revision-file helper, `GameRevisionKeyFile`, is shared by
+reconciliation and warmup.
 Callers should use `GameManager` for
 game lifecycle operations rather than independently changing files, indexes, or
 database rows. SQL mapping, repositories, and transactions live in
@@ -48,13 +49,30 @@ successful file save.
 
 The database snapshot includes the saved revision and
 `GameEntityMapper.MAPPING_VERSION`. The pipeline captures it before queuing the
-write. Games excluded by `GameEntityMapper.shouldPersist` queue a database delete
-instead. Live writes use `GameEntityPersistenceService.replace`, which also
-updates user names.
+write. Every game gets a row. Games with fewer than 3 real or eliminated players
+are stored the same way but marked `statistics_ignored`, and every statistics
+query on player or title rows leaves them out. Live writes use
+`GameEntityPersistenceService.replace`, which also updates user names.
+
+Rows are unique per game and seat holder, `(game_name, playing_user_id)`. Stats
+users can repeat: a replaced player who stays seated has their own row, and their
+old seat still counts its statistics for them.
+
+Every seat in a game gets a `player` row, so warmup can rebuild each
+`ManagedPlayer`. Both user columns link to `user`: `playing_user_id` is whoever
+holds the seat now and `user_id` is the user its statistics count for, which
+differs after a `/replace`. A seat holder's name comes from their shared `user`
+row.
+`is_playing` marks real and eliminated seats. Seats still in setup and dummies,
+such as the neutral player, are stored with `is_playing` false, and every
+statistics query on player rows leaves them out. `ManagedGame` derives a seat's
+status from `is_playing`, `is_eliminated`, `is_npc` and whether the game has
+ended.
 
 File writes and database writes are not one transaction. In particular, database
 submission happens after releasing the file lock, so concurrent saves can enqueue
-their database updates out of file-write order. Reconciliation compares the
+their database updates out of file-write order. Warmup only trusts a row whose
+revision key matches the file, so such a row is rebuilt from its file. Reconciliation compares the
 database revision with the revision on disk to detect this drift.
 
 ## Loading, missing files, and corrupt files
@@ -86,6 +104,19 @@ reload refreshes the managed entry when needed and queues database sync. Undo
 restores the saved state's revision; the next ordinary save assigns a new one.
 Explicit deletion unregisters the game and queues database deletion only after
 the file deletion operation succeeds.
+
+## Warmup
+
+At startup `GameManager.warmup` loads every database row whose mapping version is
+current, then builds each `ManagedGame`:
+
+- A row whose revision key matches the game file header builds the `ManagedGame`
+  without parsing the file.
+- Otherwise the file is parsed, and a missing or outdated row queues a resync from
+  the file.
+
+With maintenance mode on, or if the database read fails, every game is built from
+its file and no resync is queued.
 
 ## Reconciliation scheduling
 
@@ -133,12 +164,10 @@ flowchart TD
     B -->|Yes| C[Skip parsing and database writes]
     B -->|No| D{File modified after run started?}
     D -->|Yes| E[Skip this game for this run]
-    D -->|No| F[Backfill file revision if missing, then load game]
+    D -->|No| F[Load game]
     F --> G{Loaded?}
     G -->|No| H[Continue; finish checks file existence before deleting rows]
-    G -->|Yes| I{Eligible for database persistence?}
-    I -->|No| J[Delete existing database rows if present]
-    I -->|Yes| K{Database row exists?}
+    G -->|Yes| K{Database row exists?}
     K -->|No| L[Restore database snapshot]
     K -->|Yes| M{Content differs?}
     M -->|Yes| L
@@ -150,8 +179,8 @@ than trusting cached `ManagedGame` metadata. A match requires a nonblank revisio
 and the current mapping version. Bump `GameEntityMapper.MAPPING_VERSION` whenever
 snapshot mapping changes require existing database rows to be refreshed.
 
-Legacy saves without revision keys receive a key through a locked temporary-file
-rewrite before comparison. Revision metadata is excluded from content differences:
+A save without a revision key never matches, so it is loaded and compared on every
+run until its next save writes a key. Revision metadata is excluded from content differences:
 an otherwise matching row needs only a revision-column update. Actual repairs use
 `restore`, which preserves existing known user names while inserting missing users
 or replacing unknown-name placeholders.

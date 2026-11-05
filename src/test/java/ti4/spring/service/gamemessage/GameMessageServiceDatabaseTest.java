@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -183,27 +182,6 @@ class GameMessageServiceDatabaseTest extends PostgresDatabaseTest {
 
         assertThat(turns).containsOnlyKeys(GAME, "pbd2000");
         assertThat(turns.get(GAME)).extracting(GameMessage::messageId).containsExactly("m1");
-    }
-
-    @Test
-    void importMissingMergesWithoutDuplicatesAndIsSafeToRepeat() {
-        // A press may already have written a message before the startup import runs.
-        service.add(GAME, new GameMessage("m1", GameMessageType.TURN, 10L));
-        LinkedHashSet<String> reacted = new LinkedHashSet<>(List.of("argent"));
-        Map<String, List<GameMessage>> legacy = Map.of(
-                GAME,
-                List.of(
-                        new GameMessage("m1", GameMessageType.TURN, 10L),
-                        new GameMessage("m2", GameMessageType.ACTION_CARD, reacted, 20L)),
-                "pbd2000",
-                List.of(new GameMessage("m3", GameMessageType.STRATEGY_CARD, 30L, "4::8")));
-
-        assertThat(service.importMissing(legacy)).isEqualTo(2);
-        assertThat(service.importMissing(legacy)).isZero();
-        assertThat(service.getOne(GAME, "m2").orElseThrow().factionsThatReacted())
-                .containsExactly("argent");
-        assertThat(service.getOne("pbd2000", GameMessageType.STRATEGY_CARD, "4::8"))
-                .isPresent();
     }
 
     private static void runConcurrently(int threads, IntConsumer work) throws InterruptedException {

@@ -145,8 +145,9 @@ class MiltyDraftButtonHandlers {
                 displayFactions.addAll(game.getMiltyDraftManager().remainingFactions());
         }
 
-        List<MessageEmbed> embeds =
-                displayFactions.stream().map(FactionModel::fancyEmbed).toList();
+        List<MessageEmbed> embeds = displayFactions.stream()
+                .flatMap(faction -> faction.fancyEmbeds().stream())
+                .toList();
         MessageHelper.sendMessageToChannelWithEmbeds(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " Here's an overview of the factions:",

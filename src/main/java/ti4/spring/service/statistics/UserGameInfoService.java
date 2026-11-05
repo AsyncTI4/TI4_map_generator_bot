@@ -34,7 +34,7 @@ public class UserGameInfoService {
     public Map<String, List<Integer>> getThreeFastestDaysToComplete6PlayerGamesByUserId() {
         return playerEntityRepository.findAllWithUsersAndSixPlayerCompletedGames().stream()
                 .collect(Collectors.groupingBy(
-                        player -> player.getUser().getId(),
+                        player -> player.getStatsUser().getId(),
                         Collectors.collectingAndThen(
                                 Collectors.toList(), UserGameInfoService::toFastestDaysToComplete)));
     }
@@ -102,8 +102,8 @@ public class UserGameInfoService {
         Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
             UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(
-                    player.getUser().getId(),
-                    _ -> new UserGameStatsAccumulator(player.getUser().getName()));
+                    player.getStatsUser().getId(),
+                    _ -> new UserGameStatsAccumulator(player.getStatsUser().getName()));
 
             if (player.getGame().getEndedEpochMilliseconds() == null) {
                 if (player.isReplaced()) {

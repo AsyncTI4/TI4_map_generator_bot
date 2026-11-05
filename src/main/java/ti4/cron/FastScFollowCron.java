@@ -2,8 +2,10 @@ package ti4.cron;
 
 import static java.util.function.Predicate.not;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
@@ -49,23 +51,38 @@ public class FastScFollowCron {
     }
 
     private static void handleFastScFollow(Game game) {
+        List<Runnable> afterSave = new ArrayList<>();
         try {
             boolean changed = false;
             if (game.isFastSCFollowMode()) {
-                handleFastScFollowMode(game);
+                handleFastScFollowMode(game, afterSave::add);
                 changed = true;
             }
-            changed |= FowAutoDeclineService.resolveDue(game, FastScFollowCron::handleSecretObjectiveDrawOrder);
+            changed |= FowAutoDeclineService.resolveDue(
+                    game, FastScFollowCron::handleSecretObjectiveDrawOrder, afterSave::add);
             if (changed) {
                 GameManager.save(
                         game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
+            return;
+        }
+        runAfterSave(game, afterSave);
+    }
+
+    private static void runAfterSave(Game game, List<Runnable> afterSave) {
+        for (Runnable step : afterSave) {
+            try {
+                step.run();
+            } catch (Exception e) {
+                BotLogger.error(
+                        new LogOrigin(game), "FastScFollowCron follow-up failed for game: " + game.getName(), e);
+            }
         }
     }
 
-    private static void handleFastScFollowMode(Game game) {
+    private static void handleFastScFollowMode(Game game, Consumer<Runnable> afterSave) {
         for (Player player : game.getRealPlayers()) {
             for (int sc : game.getPlayedSCsInOrder(player)) {
                 if (player.hasFollowedSC(sc)) continue;
@@ -96,17 +113,20 @@ public class FastScFollowCron {
                             .append(
                                     " has been played and now it has been half the allotted time and you haven't reacted. Please do so, or after another")
                             .append(" half you will be marked as not following.");
-                    appendScMessages(game, player, scMessage, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
+                    afterSave.accept(() -> appendScMessages(game, player, scMessage, sb));
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !"2".equalsIgnoreCase(timesPinged)) {
                     String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game)
                             + " has been played and now it has been the allotted time and they haven't reacted, so they have"
                             + " been marked as not following.\n";
-                    ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
-                    ReactionService.addReaction(player, true, "not following.", "", scMessage.messageId(), game);
+                    afterSave.accept(() -> {
+                        ButtonHelper.sendMessageToRightStratThread(
+                                player, game, message, ButtonHelper.getStratName(sc));
+                        ReactionService.addReaction(player, true, "not following.", "", scMessage.messageId(), game);
+                    });
 
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
