@@ -2419,6 +2419,11 @@ public class TransactionHelper {
                 }
             }
             case "Hydromorphic" -> {
+                if (!p1.hasAbility("fluid_transfer")) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "Hydromorphic cards require _Fluid Transfer_ to be transacted.");
+                    return;
+                }
                 int cardNumber = Integer.parseInt(amountToTrans);
                 String cardId = p1.removeHydromorphicCard(cardNumber);
                 if (cardId == null) {
@@ -2741,7 +2746,8 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getColor() + "_" + p2.getColor(), "Action Cards"));
         }
-        if (!seeP1 || !p1.getHydromorphicCards().isEmpty()) {
+        if (p1.hasAbility("fluid_transfer")
+                && (!seeP1 || !p1.getHydromorphicCards().isEmpty())) {
             stuffToTransButtons.add(Buttons.green(
                     "newTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor(), "Hydromorphic Cards"));
         }
@@ -2958,7 +2964,7 @@ public class TransactionHelper {
                 && p1.getAcCount() + getMetamorphicActionCardCount(game, p1) > 0) {
             stuffToTransButtons.add(Buttons.green(factionChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
-        if (!p1.getHydromorphicCards().isEmpty()) {
+        if (p1.hasAbility("fluid_transfer") && !p1.getHydromorphicCards().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.green(factionChecker + "transact_Hydromorphic_" + p2.getFaction(), "Hydromorphic Cards"));
         }

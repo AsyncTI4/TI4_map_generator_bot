@@ -369,8 +369,8 @@ public class ComponentActionHelper {
         }
 
         // Relics
-        if (p1.hasRelicReady("new_moonphase")) {
-            compButtons.add(AeternaAbilityHandler.getNewMoonButton(p1));
+        if (p1.hasRelicReady("half_moonphase")) {
+            compButtons.add(AeternaAbilityHandler.getHalfMoonButton(p1));
         }
         boolean enigmaticSeen = false;
         for (String relic : p1.getRelics()) {
@@ -379,6 +379,7 @@ public class ComponentActionHelper {
                             "waxing_moonphase",
                             "waning_moonphase",
                             "new_moonphase",
+                            "half_moonphase",
                             "lunar_eclipse_moonphase")
                     .contains(relic)) {
                 continue;
