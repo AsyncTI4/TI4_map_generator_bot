@@ -108,6 +108,17 @@ import ti4.spring.service.gameevent.TurnActionLog;
 public class PlayerTechService {
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
+        String resolvedTechId = AliasHandler.resolveTech(techID);
+        if (player.hasAbility("forbidden_knowledge")
+                && !player.hasTech(resolvedTechId)
+                && ArcanumPrimordialTechHandler.isPrimordialTechnology(resolvedTechId)
+                && !ArcanumPrimordialTechHandler.canGainPrimordialTechnology(player, resolvedTechId)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    player.getRepresentationNoPing()
+                            + " cannot gain that primordial technology until they own 4 technologies of its color.");
+            return;
+        }
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
         BlueReverieHelper.checkXinHarmony(game, player);

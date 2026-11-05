@@ -489,6 +489,7 @@
     "requirements": "BB",
     "faction": "thurviali",
     "source": "theodisi",
-    "text": "You may use the PRODUCTION, SPACE CANNON, or PLANETARY SHIELD abilities of structures with which your units are coexisting.\nACTION: Exhaust this card and choose 1 other player. That player may place 1 structure from their reinforcements into coexistence on a planet you control. If they do, they gain 1 command token."
-  }
+    "text": "You may use the PRODUCTION, SPACE CANNON, or PLANETARY SHIELD abilities of structures with which your units are coexisting.\nACTION: Exhaust this card and choose 1 other player. That player may place 1 structure from their reinforcements into coexistence on a planet you control. If they do, they gain 1 command token.",
+    "notes": "It wont show you as able to use space cannon, production it will calculate when it is usable."
+}
 ]

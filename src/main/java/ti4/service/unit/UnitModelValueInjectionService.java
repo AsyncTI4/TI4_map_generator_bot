@@ -409,7 +409,7 @@ public class UnitModelValueInjectionService {
         }
 
         if (player.hasAbility("destroyer_customrig") && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
-            integers.combatHitsOn(-2);
+            integers.combatHitsOn(-1);
         }
 
         if (player.hasRelic("salvage_war_sun") && unit.getUnitType() == UnitType.Warsun) {

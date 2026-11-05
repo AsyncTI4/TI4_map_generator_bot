@@ -598,12 +598,11 @@ public class PlayStrategyCardService {
                 }
             }
         }
-        if (player.hasRelicReady("lunar_eclipse_moonphase")
-                && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
+        if (player.hasRelicReady("new_moonphase")) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " may use _Lunar Eclipse_ after performing this strategic action.",
-                    List.of(AeternaAbilityHandler.getLunarEclipseButton(player), Buttons.DECLINE_DELETE_BUTTONS));
+                    player.getRepresentation() + " may use _New Moon_ after performing this strategic action.",
+                    List.of(AeternaAbilityHandler.getNewMoonButton(player), Buttons.DECLINE_DELETE_BUTTONS));
         }
         if (player.hasPlayablePromissoryInHand("thpnverydith")) {
             VerydithPromissoryHandler.usePactRenewed(player);

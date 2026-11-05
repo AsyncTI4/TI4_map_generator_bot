@@ -191,6 +191,10 @@ public class CommandCounterButtonHandler {
                     properGain += 1;
                     reasons += (properGain == 3 ? "" : ", ") + "_Inheritance Systems_";
                 }
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "ardentiacommander")) {
+                    properGain += 1;
+                    reasons += (properGain == 3 ? "" : ", ") + "_Serisi Sithis_, the Ardentia Commander";
+                }
                 if (cyber) {
                     properGain += 1;
                     reasons += (properGain == 3 ? "" : ", ") + "_Cybernetic Enhancements_";

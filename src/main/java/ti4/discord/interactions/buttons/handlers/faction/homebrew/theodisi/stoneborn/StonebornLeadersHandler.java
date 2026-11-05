@@ -14,6 +14,7 @@ import ti4.game.Leader;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperExplore;
 import ti4.helpers.ButtonHelperStats;
@@ -31,7 +32,7 @@ public class StonebornLeadersHandler {
     private static final String PURGE_HAZORUS_FRAGMENT = "purgeHazorusFragment_";
     private static final String EXPLORE_HAZORUS = "exploreHazorus_";
     private static final String GAIN_TEMPUS_UNLEASHED_TG = "gainTempusUnleashedTG";
-    private static final String EXPLORE_TEMPUS_UNLEASHED = "exploreTempusUnleashed";
+    private static final String DRAW_TEMPUS_UNLEASHED_AC = "drawTempusUnleashedAc";
     private static final String CHOOSE_METEORIME_RELIC = "chooseMeteorimeRelic_";
     private static final String METEORIME_DRAWN_RELICS = "stonebornMeteorimeDrawnRelics_";
     private static final List<String> HAZORUS_AGENTS = List.of("stonebornagentdormant", "stonebornagentunleashed");
@@ -78,10 +79,7 @@ public class StonebornLeadersHandler {
                                 player.factionButtonChecker() + GAIN_TEMPUS_UNLEASHED_TG,
                                 "Gain 1 Trade Good",
                                 FactionEmojis.stoneborn),
-                        Buttons.green(
-                                player.factionButtonChecker() + EXPLORE_TEMPUS_UNLEASHED,
-                                "Explore 1 Planet You Control",
-                                FactionEmojis.stoneborn)));
+                        Buttons.green(player.factionButtonChecker() + DRAW_TEMPUS_UNLEASHED_AC, "Draw 1 Action Card")));
         return true;
     }
 
@@ -94,35 +92,16 @@ public class StonebornLeadersHandler {
         ButtonHelper.deleteAllButtons(event);
     }
 
-    @ButtonHandler(EXPLORE_TEMPUS_UNLEASHED)
-    public static void exploreTempusUnleashed(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler(DRAW_TEMPUS_UNLEASHED_AC)
+    public static void drawTempusUnleashedActionCard(Game game, Player player, ButtonInteractionEvent event) {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "stoneborncommanderunleashed")) {
             return;
         }
-        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        String message = player.getRepresentation() + ", choose 1 planet to explore with _Tempus Unleashed_.";
-        if (NewStuffHelper.turnPage(
-                event,
-                buttonID,
-                message,
-                () -> ButtonHelper.getButtonsToExploreAllPlanets(player, game),
-                List.of(),
-                player.factionButtonChecker() + EXPLORE_TEMPUS_UNLEASHED)) {
-            return;
-        }
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + " has no eligible planet to explore with _Tempus Unleashed_.");
-        } else {
-            NewStuffHelper.sendPaginated(
-                    player.getCorrectChannel(),
-                    message,
-                    buttons,
-                    List.of(),
-                    player.factionButtonChecker() + EXPLORE_TEMPUS_UNLEASHED);
-        }
-        ButtonHelper.deleteAllButtons(event);
+        ActionCardHelper.drawActionCards(player, 1);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " drew 1 action card with _Tempus Unleashed_.");
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static void resolveTempusAfterNonActionCardComponentPurge(Game game, Player player) {
