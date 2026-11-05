@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,47 @@ class CronManagerTest {
         assertThat(secondRun.await(10, TimeUnit.SECONDS))
                 .as("job runs on reacquisition")
                 .isTrue();
+    }
+
+    @Test
+    void pendingDelayedTaskDoesNotHoldUpShutdown() throws InterruptedException {
+        // A far-off delayed task, such as a circuit breaker reset, must not keep the scheduler alive. Before the
+        // shutdown policy was set, one always did, so every deploy waited the full graceful window (15 s) before
+        // the lease could be handed over.
+        ScheduledThreadPoolExecutor scheduler = CronManager.newScheduler();
+        scheduler.schedule(() -> {}, Long.MAX_VALUE, TimeUnit.DAYS);
+
+        scheduler.shutdown();
+
+        assertThat(scheduler.awaitTermination(1, TimeUnit.SECONDS)).isTrue();
+    }
+
+    @Test
+    void shutdownStillWaitsForACronThatIsAlreadyRunning() throws InterruptedException {
+        ScheduledThreadPoolExecutor scheduler = CronManager.newScheduler();
+        CountDownLatch started = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicBoolean finished = new AtomicBoolean();
+        scheduler.execute(() -> {
+            started.countDown();
+            try {
+                release.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            finished.set(true);
+        });
+        assertThat(started.await(5, TimeUnit.SECONDS)).isTrue();
+
+        scheduler.shutdown();
+        assertThat(scheduler.awaitTermination(200, TimeUnit.MILLISECONDS))
+                .as("scheduler waits while a cron is mid-run")
+                .isFalse();
+
+        release.countDown();
+        assertThat(scheduler.awaitTermination(5, TimeUnit.SECONDS)).isTrue();
+        assertThat(finished).isTrue();
     }
 
     private static final class ThrowingCron {}

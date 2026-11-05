@@ -70,44 +70,89 @@ class MatchmakingNotifier {
                 extrasText);
     }
 
-    static void postMatchedGames(List<MatchedGame> gamesToCreate) {
+    interface MatchPostOutcome {
+        void posted(MatchedGame game);
+
+        void notPosted(MatchedGame game);
+
+        void membersLeftGuild(MatchedGame game, List<Long> partyIdsWithDepartedMembers);
+    }
+
+    static void postMatchedGames(List<MatchedGame> gamesToCreate, MatchPostOutcome outcome) {
+        if (gamesToCreate.isEmpty()) return;
         Guild guild = JdaService.guildPrimary;
-        if (gamesToCreate.isEmpty() || guild == null) return;
+        if (guild == null) {
+            gamesToCreate.forEach(game -> report(game, outcome::notPosted));
+            return;
+        }
 
         Map<String, ForumChannel> forumByNameCache = new HashMap<>();
         for (MatchedGame game : gamesToCreate) {
-            String forumName = !game.tiglRanks().isEmpty()
-                    ? CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL
-                    : CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL;
-            ForumChannel forum = forumByNameCache.computeIfAbsent(forumName, name -> findForum(guild, name));
-            if (forum == null) continue;
+            try {
+                postMatchedGame(guild, forumByNameCache, game, outcome);
+            } catch (Exception e) {
+                BotLogger.error("Matchmaking queue: failed to post a matched game; its parties stay queued.", e);
+                report(game, outcome::notPosted);
+            }
+        }
+    }
 
-            List<MatchmakingQueueMember> queueMembers = game.members();
-            List<Member> members = queueMembers.stream()
-                    .map(member -> guild.getMemberById(member.getUserId()))
-                    .filter(Objects::nonNull)
-                    .toList();
-            if (members.size() != queueMembers.size()) continue;
+    private static void postMatchedGame(
+            Guild guild, Map<String, ForumChannel> forumByNameCache, MatchedGame game, MatchPostOutcome outcome) {
+        String forumName = !game.tiglRanks().isEmpty()
+                ? CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL
+                : CreateGameLaunchPostService.MAKING_NEW_GAMES_CHANNEL;
+        ForumChannel forum = forumByNameCache.computeIfAbsent(forumName, name -> findForum(guild, name));
+        if (forum == null) {
+            report(game, outcome::notPosted);
+            return;
+        }
 
-            String gameFunName = CreateGameService.autoGenerateGameName();
-            String threadTitle = MatchDescriber.threadTitle(game);
-            String setupMessage = MatchDescriber.setupBody(game);
-            // Forum channels require an initial message payload, so the setup text becomes the post body.
-            forum.createForumPost(threadTitle, MessageCreateData.fromContent(setupMessage))
-                    .queue(
-                            forumPost -> {
-                                ThreadChannel thread = forumPost.getThreadChannel();
-                                Consumer<Message> onLaunchPosted = message -> {
-                                    if (getPlayersNeeded(game) > 0) {
-                                        MatchmakingQueueSearchService.get()
-                                                .register(thread.getId(), message.getId(), toSearchCriteria(game));
-                                    }
-                                    postLfgPing(thread, game);
-                                };
-                                CreateGameLaunchPostService.postLaunchButtons(
-                                        thread, members, gameFunName, onLaunchPosted);
-                            },
-                            BotLogger::catchRestError);
+        List<Long> partyIdsWithDepartedMembers = game.members().stream()
+                .filter(member -> guild.getMemberById(member.getUserId()) == null)
+                .map(MatchmakingQueueMember::getPartyId)
+                .distinct()
+                .toList();
+        if (!partyIdsWithDepartedMembers.isEmpty()) {
+            BotLogger.info("Matchmaking queue: not posting a match because parties " + partyIdsWithDepartedMembers
+                    + " have members who left the server; removing those parties and keeping the rest queued.");
+            report(game, matched -> outcome.membersLeftGuild(matched, partyIdsWithDepartedMembers));
+            return;
+        }
+
+        List<Member> members = game.members().stream()
+                .map(member -> guild.getMemberById(member.getUserId()))
+                .filter(Objects::nonNull)
+                .toList();
+        String gameFunName = CreateGameService.autoGenerateGameName();
+        String threadTitle = MatchDescriber.threadTitle(game);
+        String setupMessage = MatchDescriber.setupBody(game);
+        // Forum channels require an initial message payload, so the setup text becomes the post body.
+        forum.createForumPost(threadTitle, MessageCreateData.fromContent(setupMessage))
+                .queue(
+                        forumPost -> {
+                            report(game, outcome::posted);
+                            ThreadChannel thread = forumPost.getThreadChannel();
+                            Consumer<Message> onLaunchPosted = message -> {
+                                if (getPlayersNeeded(game) > 0) {
+                                    MatchmakingQueueSearchService.get()
+                                            .register(thread.getId(), message.getId(), toSearchCriteria(game));
+                                }
+                                postLfgPing(thread, game);
+                            };
+                            CreateGameLaunchPostService.postLaunchButtons(thread, members, gameFunName, onLaunchPosted);
+                        },
+                        error -> {
+                            report(game, outcome::notPosted);
+                            BotLogger.catchRestError(error);
+                        });
+    }
+
+    private static void report(MatchedGame game, Consumer<MatchedGame> outcomeStep) {
+        try {
+            outcomeStep.accept(game);
+        } catch (Exception e) {
+            BotLogger.error("Matchmaking queue: failed to update the queue after a match post.", e);
         }
     }
 

@@ -91,7 +91,6 @@ Times marked ET are `America/New_York`.
 | [`LogCacheStatsCron`](LogCacheStatsCron.java) | 1 h | 4 h | Log cache statistics. |
 | [`LogButtonRuntimeStatisticsCron`](LogButtonRuntimeStatisticsCron.java) | 1 h | 4 h | Log button processing statistics. |
 | [`KeepThreadsAliveCron`](KeepThreadsAliveCron.java) | 10 min | 6 h | Refresh threads registered with `KeepThreadAliveService` so Discord doesn't archive them. |
-| [`CategoryCleanupCron`](CategoryCleanupCron.java) | 6 h | 24 h | Delete empty `PBD #` categories. |
 
 ### Daily
 
@@ -103,6 +102,7 @@ Times marked ET are `America/New_York`.
 | [`DiskUsageCron`](DiskUsageCron.java) | 04:00 ET | Log a disk usage report, on its own virtual thread. |
 | [`GameMessageCleanupCron`](GameMessageCleanupCron.java) | 04:00 ET | Remove stale tracked game messages. |
 | [`WinningPathCron`](WinningPathCron.java) | 04:00 ET | Recompute the winning path statistics file. |
+| [`CategoryCleanupCron`](CategoryCleanupCron.java) | 05:00 ET | Delete empty `PBD #` categories. |
 | [`UploadStatsCron`](UploadStatsCron.java) | 13:30 UTC | Upload all game statistics, ahead of an external 14:00 UTC pull. |
 | [`UploadRecentStatsCron`](UploadRecentStatsCron.java) | 13:45 UTC | Upload recent game statistics, ahead of the same pull. |
 
@@ -165,7 +165,7 @@ uses [`ExecutorUtility.shutdownAndAwaitTermination`](../executors/README.md#shut
 with a 30-second budget: 15 seconds to finish gracefully, then `shutdownNow()`
 and up to 15 more.
 
-`shutdown()` cancels periodic jobs, but `ScheduledThreadPoolExecutor` keeps
-one-off delayed tasks by default and waits for them. A pending startup job or
-circuit breaker reset can therefore hold up the graceful wait until it runs or
-the 15 seconds run out.
+`shutdown()` cancels periodic jobs. `CronManager` also turns off the
+`ScheduledThreadPoolExecutor` default of still running one-off delayed tasks
+after shutdown, so pending startup jobs and circuit breaker resets are dropped.
+Only a job that is already running holds up the graceful wait.
