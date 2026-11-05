@@ -72,6 +72,7 @@ public class SecondaryQueue {
         if (isOpen(game, primaryKey(game, initiative), now)) return Optional.of("the primary ability");
         for (Player earlier : order) {
             if (earlier == seat) break;
+            if (takesItsTurn(game, earlier, holder)) continue;
             Optional<String> unfinished = unfinishedSecondary(game, earlier, holder, initiative, now);
             if (unfinished.isPresent()) return unfinished;
         }
@@ -86,6 +87,10 @@ public class SecondaryQueue {
             if (unfinished.isPresent()) return unfinished;
         }
         return Optional.empty();
+    }
+
+    private static boolean takesItsTurn(Game game, Player earlier, Player holder) {
+        return earlier != holder && earlier == game.getActivePlayer();
     }
 
     private static Optional<String> unfinishedSecondary(

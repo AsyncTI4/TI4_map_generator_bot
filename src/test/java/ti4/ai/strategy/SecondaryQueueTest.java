@@ -82,6 +82,16 @@ class SecondaryQueueTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // Once the holder ends their turn, the next player in follow order may become the active player and get busy with
+    // their own action; the players behind them follow without waiting for that.
+    @Test
+    void doesNotWaitForAnEarlierPlayerWhoIsTakingTheirTurn() {
+        test.isActive(human, "action");
+
+        assertThat(SecondaryQueue.blockerFor(test.game, test.nekro, IMPERIAL, NOW))
+                .isEmpty();
+    }
+
     @Test
     void theFirstFollowerNeverWaitsForThoseBehindIt() {
         assertThat(SecondaryQueue.blockerFor(test.game, human, IMPERIAL, NOW)).isEmpty();
