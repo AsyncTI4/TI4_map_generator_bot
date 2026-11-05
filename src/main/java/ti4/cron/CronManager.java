@@ -2,6 +2,8 @@ package ti4.cron;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +22,8 @@ public class CronManager {
     private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledThreadPoolExecutor(1);
     private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
+    private static final List<LeaseStartJob> LEASE_START_JOBS = new ArrayList<>();
+    private static boolean leaseAcquired;
 
     public static ScheduledFuture<?> schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
@@ -29,14 +33,31 @@ public class CronManager {
     }
 
     public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
-        CRONS.put(clazz.getSimpleName(), runnable);
         Runnable cronTask = nonThrowingCronTask(clazz.getSimpleName(), runnable);
         SCHEDULER.schedule(cronTask, initialDelay, unit);
     }
 
+    public static void registerManualOnly(Class<?> clazz, Runnable runnable) {
+        CRONS.put(clazz.getSimpleName(), runnable);
+    }
+
+    public static synchronized void scheduleOnceAfterLeaseAcquired(
+            Class<?> clazz, Runnable runnable, long delay, TimeUnit unit) {
+        CRONS.put(clazz.getSimpleName(), runnable);
+        LeaseStartJob job = new LeaseStartJob(clazz, runnable, delay, unit);
+        LEASE_START_JOBS.add(job);
+        if (leaseAcquired) {
+            job.schedule();
+        }
+    }
+
+    public static synchronized void runLeaseStartJobs() {
+        leaseAcquired = true;
+        LEASE_START_JOBS.forEach(LeaseStartJob::schedule);
+    }
+
     public static void schedulePeriodicallyAtTime(
             Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
-        CRONS.put(clazz.getSimpleName(), runnable);
         long initialDelaySeconds = calculateInitialDelaySeconds(hour, minute, zoneId);
         long periodSeconds = TimeUnit.DAYS.toSeconds(1);
         schedulePeriodically(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
@@ -78,5 +99,11 @@ public class CronManager {
                 BotLogger.error("Unhandled exception in cron: " + cronName, t);
             }
         };
+    }
+
+    private record LeaseStartJob(Class<?> clazz, Runnable runnable, long delay, TimeUnit unit) {
+        void schedule() {
+            scheduleOnce(clazz, runnable, delay, unit);
+        }
     }
 }

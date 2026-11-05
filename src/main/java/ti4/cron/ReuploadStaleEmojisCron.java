@@ -10,7 +10,7 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 public class ReuploadStaleEmojisCron {
 
     public static void register() {
-        CronManager.scheduleOnce(
+        CronManager.scheduleOnceAfterLeaseAcquired(
                 ReuploadStaleEmojisCron.class,
                 ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging,
                 2,
