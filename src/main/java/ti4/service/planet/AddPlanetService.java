@@ -58,6 +58,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -92,7 +93,11 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean setupRequested = setup;
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
+        boolean newlyControlled = !player.getPlanets().contains(planet);
         player.addPlanet(planet);
+        if (newlyControlled && !setup) {
+            FogSecretHooks.onPlanetGained(game, player, planet);
+        }
         DiscordantStarsHelper.checkBRTaranisCrest(game);
         EronousPlanetService.resolveCantrisPO(game, planet, player);
         IxthLegendaryButtonHandler.onPlanetGained(game, player, planet);

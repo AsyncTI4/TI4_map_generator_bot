@@ -331,6 +331,10 @@ Prophecy of Kings, the first Twilight Imperium 4th Edition expansion, whose cont
 **TE**:
 Thunder's Edge, the Twilight Imperium 4th Edition expansion that follows PoK and adds Breakthroughs, Expeditions and the Fracture; statistics filters name it `te`.
 
+**Fog secret objectives**:
+A set of 32 homebrew secret objectives any Fog of War game can shuffle into its deck with the "Fog secret objectives" FoW option. They reward scouting (systems a Player has found, meaning in their fog memory or current vision), hiding (nothing in another Player's view) and watching (another Player's units in your view). Status ones are checked by the bot; action and agenda ones are offered with a score button when the bot sees the moment happen.
+_Avoid_: FoW SOs, vision secrets
+
 **Alliance mode**:
 A team mode in which Players are paired and share some benefits.
 

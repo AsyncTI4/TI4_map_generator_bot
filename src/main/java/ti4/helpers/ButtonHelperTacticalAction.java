@@ -133,6 +133,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -937,6 +938,7 @@ public final class ButtonHelperTacticalAction {
         MigoHarvestHandler.offerBlueHarvest(game, player);
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
+        FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
         BloomLeadersHandler.offerCommander(game, player, tile);
         DeepUnitHandler.offerDrown(game, player, tile);

@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -22,6 +23,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.regex.RegexService;
 import ti4.spring.service.gameevent.GameEventDraft;
 
@@ -194,6 +196,8 @@ public class TacticalActionDisplacementService {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
         removeEmptyDisplacement(game.getTacticalActionDisplacement());
+        FogSecretHooks.onUnitsMovedIn(
+                game, game.getActivePlayer(), tile, originPositions(game.getTacticalActionDisplacement()));
         GameEventDraft.stageMovement(game, tile.getPosition(), game.getTacticalActionDisplacement());
         for (Entry<String, Map<UnitKey, List<Integer>>> e :
                 game.getTacticalActionDisplacement().entrySet()) {
@@ -204,6 +208,17 @@ public class TacticalActionDisplacementService {
         }
         game.getTacticalActionDisplacement().clear();
         return moved;
+    }
+
+    private static Set<String> originPositions(Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        Set<String> origins = new HashSet<>();
+        for (Entry<String, Map<UnitKey, List<Integer>>> e : displacement.entrySet()) {
+            boolean anyUnits = e.getValue().values().stream()
+                    .anyMatch(states ->
+                            states.stream().mapToInt(Integer::intValue).sum() > 0);
+            if (anyUnits) origins.add(StringUtils.substringBefore(e.getKey(), "-"));
+        }
+        return origins;
     }
 
     /**
