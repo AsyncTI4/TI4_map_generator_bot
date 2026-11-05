@@ -66,6 +66,7 @@ public class StrategyCardRules {
     private static final int PDS_CODE = 0;
     private static final int SPACE_DOCK_CODE = 1;
     private static final String GET_TECH = "getTech_";
+    private static final String TECH_TYPE = "getAllTechOfType_";
     private static final String AI_DEVELOPMENT = "aida";
     private static final String AIDA_EXHAUST = "exhaustTech_aida";
     static final String AIDA_RESEARCH_KEY = "aidaResearch|";
@@ -689,7 +690,7 @@ public class StrategyCardRules {
                 options.putIfAbsent(alias, new Match(prompt, button));
             }
         }
-        if (options.isEmpty()) return Optional.empty();
+        if (options.isEmpty()) return chooseResearchType(context, since);
         Game game = context.game();
         Player seat = context.seat();
         context.memory().remove(requestKey(context, RESEARCH_KEY));
@@ -708,6 +709,29 @@ public class StrategyCardRules {
         PaymentRules.expect(
                 context, "a technology", withSkipPlanets(payment.get(), skips), PaymentRules.TECHNOLOGY_DONE);
         return Optional.of(options.get(best.get()).press("research " + best.get()));
+    }
+
+    private static Optional<AiDecision> chooseResearchType(AiTurnContext context, long since) {
+        List<Match> types = new ArrayList<>();
+        for (AiPrompt prompt : CardMessages.hiddenSince(context, since)) {
+            for (PromptButton button : prompt.enabledButtons()) {
+                if (button.isOwnedBy(context.faction())
+                        && button.handlerId().startsWith(TECH_TYPE)
+                        && !context.alreadyPressed(prompt, button)) {
+                    types.add(new Match(prompt, button));
+                }
+            }
+        }
+        if (types.isEmpty()) return Optional.empty();
+        Optional<String> wanted = ResearchPolicy.bestResearchable(context.game(), context.seat())
+                .map(Mapper::getTech)
+                .map(tech -> TECH_TYPE + tech.getFirstType());
+        Match chosen = types.stream()
+                .filter(match ->
+                        wanted.map(match.button().handlerId()::startsWith).orElse(false))
+                .findFirst()
+                .orElse(types.getFirst());
+        return Optional.of(chosen.press("choose the kind of technology to research"));
     }
 
     private static void rememberProphetsTears(AiTurnContext context, PrerequisiteSkips.Plan skips) {

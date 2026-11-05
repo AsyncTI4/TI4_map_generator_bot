@@ -74,6 +74,30 @@ class RiderPayoutsTest extends BaseTi4Test {
                 .isPresent();
     }
 
+    // Outside the Technology strategy card, Get a Technology first asks which type of technology to get, then lists
+    // that type; the bot answers the type question before picking from the list.
+    @Test
+    void picksATechnologyTypeWhenAskedBeforeTheList() {
+        AiPrompt message = research(sol.getRepresentation() + TECHNOLOGY_MESSAGE, NOW);
+        assertThat(pressed(RiderPayouts.technology(context(sol, NOW, Set.of(), message))))
+                .isEqualTo("acquireATech");
+
+        AiPrompt types = AiTestGame.prompt(
+                "types",
+                PromptSource.AI_THREAD,
+                NOW,
+                "FFCC_sol_getAllTechOfType_propulsion",
+                "FFCC_sol_getAllTechOfType_biotic",
+                "FFCC_sol_getAllTechOfType_cybernetic",
+                "FFCC_sol_getAllTechOfType_warfare");
+        assertThat(pressed(StrategyCardRules.chooseTechnology(context(sol, NOW, Set.of(), types))))
+                .startsWith("FFCC_sol_getAllTechOfType_");
+
+        AiPrompt options = AiTestGame.prompt("options", PromptSource.AI_THREAD, NOW, "FFCC_sol_getTech_cl2__noPay");
+        assertThat(StrategyCardRules.chooseTechnology(context(sol, NOW, Set.of(), types, options)))
+                .isPresent();
+    }
+
     @Test
     void leavesAGetATechnologyButtonThatIsNotForItsRider() {
         AiPrompt focusedResearch =
