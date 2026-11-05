@@ -321,7 +321,7 @@ public class CommanderUnlockCheckService {
                     Tile tile = game.getTileFromPlanet(planetName);
                     Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
 
-                    if (planet == null || !TaAbilityHandler.planetHasAnyAttachment(tile, planetName)) {
+                    if (planet == null || !TaAbilityHandler.planetHasNonWorldshaperAttachment(tile, planetName)) {
                         continue;
                     }
 

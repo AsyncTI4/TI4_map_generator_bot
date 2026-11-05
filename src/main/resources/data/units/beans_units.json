@@ -50,7 +50,7 @@
         "afbDieCount": 2,
         "sustainDamage": false,
         "isShip": true,
-        "ability": "At the end of a tactical action in this unit's system, you may place or move 1 nexus token into this system."
+        "ability": "At the end of a tactical action in this unit's system, if it is a non-home system, you may place or move 1 nexus token into this system."
     },
     {
         "id": "dream_destroyer2",
@@ -139,7 +139,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During your tactical actions, for each infantry destroyed by this unit's BOMBARDMENT ability, place 1 captured infantry from your faction sheet on that planet."
+        "ability": "During your tactical actions, for each infantry destroyed by this unit's BOMBARDMENT ability, place 1 infantry on that planet."
     },
     {
         "id": "ashen_mech",
@@ -227,7 +227,7 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "DEPLOY: At the start of a round of ground combat on a planet you control, you may place 1 captured infantry on that planet."
+        "ability": "DEPLOY: At the start of a round of ground combat on a planet you control, you may place 1 infantry on that planet."
     },
     {
         "id": "iron_flagship",
@@ -496,7 +496,7 @@
         "productionValue": 5,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "The system that contains this unit is treated as your home system. It cannot be captured and you cannot score public objectives if it is not on the game board."
+        "ability": "This unit’s system is your home system. It cannot be captured and you cannot score public objectives if it is not on the game board."
     },
     {
         "id": "deep_thedeepascended",
@@ -512,7 +512,7 @@
         "productionValue": 7,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "The system that contains this unit is treated as your home system. It cannot be captured and you cannot score public objectives if it is not on the game board."
+        "ability": "The unit’s system is your home system. It cannot be captured and you cannot score public objectives if it is not on the game board. Abilities that refer to The Deep refer to this unit instead."
     },
     {
         "id": "deep_flagship",
@@ -578,7 +578,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "During a ground combat in which you are the defender, if you were coexisting on this planet at the start of this action, apply +1 to this unit's combat rolls during this combat."
+        "ability": "During a ground combat in which you are the defender, if your units participating in that combat stopped coexisting during this action, apply +1 to this unit's combat rolls during this combat."
     },
     {
         "id": "bloom_cruiser",

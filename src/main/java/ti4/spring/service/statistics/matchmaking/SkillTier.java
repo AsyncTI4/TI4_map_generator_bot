@@ -47,14 +47,14 @@ public enum SkillTier {
         return displayRating >= minimumDisplayRatingInclusive && displayRating < maximumDisplayRatingExclusive;
     }
 
-    public static SkillTier fromDisplayRating(long displayRating) {
+    static SkillTier fromDisplayRating(long displayRating) {
         return Arrays.stream(values())
                 .filter(skillTier -> skillTier.contains(displayRating))
                 .findFirst()
                 .orElseThrow();
     }
 
-    public static SkillTier fromOptionValue(String optionValue) {
+    static SkillTier fromOptionValue(String optionValue) {
         if (optionValue == null || optionValue.isBlank()) {
             return null;
         }

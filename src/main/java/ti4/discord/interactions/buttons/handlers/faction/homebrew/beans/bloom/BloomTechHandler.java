@@ -95,6 +95,7 @@ public class BloomTechHandler {
                 || committer == null
                 || bloomPlayer == committer
                 || destination == null
+                || destination.isHomeSystem(game)
                 || destination.getUnitHolderFromPlanet(planetName) == null) {
             return false;
         }
