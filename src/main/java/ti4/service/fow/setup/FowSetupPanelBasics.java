@@ -23,6 +23,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
+import ti4.helpers.async.JimboHandlers;
 import ti4.logging.BotLogger;
 import ti4.service.game.StartPhaseService;
 import ti4.service.map.AddTileListService;
@@ -41,6 +42,7 @@ final class FowSetupPanelBasics {
     private static final String MAP_STRING_MODAL = "fowWizMapString~MDL";
     private static final String MAP_STRING_RESOLVE = "fowWizMapStringResolve";
     private static final String MAP_DEV_TILES = "fowWizMapDevTiles";
+    private static final String MAP_BUILDER = "fowWizMapBuilder";
     private static final String DEAL_SO = "fowWizDealSo";
     private static final String START = "fowWizStartAsk";
     private static final String START_CONFIRM = "fowWizStartConfirm";
@@ -167,7 +169,7 @@ final class FowSetupPanelBasics {
         List<Button> buttons = List.of(
                 Buttons.blue(MAP_JSON_MODAL, "Import JSON (URL or file)"),
                 Buttons.blue(MAP_STRING_MODAL, "Import map string"),
-                Buttons.green("fowSetupMapBuilder", "Interactive builder"),
+                Buttons.green(MAP_BUILDER, "Interactive builder"),
                 Buttons.gray(MAP_DEV_TILES, "Dev: test tiles"));
         return FowSetupPanel.View.of(body, List.of(ActionRow.of(buttons)));
     }
@@ -199,8 +201,11 @@ final class FowSetupPanelBasics {
             FowSetupPanel.show(event, game, "Could not read the map JSON. Nothing was imported.");
             return;
         }
-        MapJsonIOService.importMapFromJson(game, json, event.getMessageChannel());
-        FowSetupPanel.show(event, game, "Map imported.");
+        boolean imported = MapJsonIOService.importMapFromJson(game, json, event.getMessageChannel());
+        FowSetupPanel.show(
+                event,
+                game,
+                imported ? "Map imported." : "The map import failed. The error is posted in this channel.");
     }
 
     @ButtonHandler(MAP_STRING_MODAL)
@@ -217,8 +222,20 @@ final class FowSetupPanelBasics {
             FowSetupPanel.show(event, game, "The map string was empty. Nothing was imported.");
             return;
         }
-        AddTileListService.addTileListToMap(game, mapString, event);
-        FowSetupPanel.show(event, game, "Map string imported.");
+        boolean imported = AddTileListService.addTileListToMap(game, mapString, event);
+        FowSetupPanel.show(
+                event,
+                game,
+                imported
+                        ? "Map string imported."
+                        : "The map string import failed. The error is posted in this channel.");
+    }
+
+    @ButtonHandler(MAP_BUILDER)
+    static void openMapBuilder(ButtonInteractionEvent event, Game game) {
+        if (!FowSetupWizardService.requireGM(event, game)) return;
+        JimboHandlers.sendMainMenu(event.getMessageChannel(), game);
+        FowSetupPanel.show(event, game, "Interactive builder posted below.");
     }
 
     @ButtonHandler(MAP_DEV_TILES)
@@ -240,10 +257,11 @@ final class FowSetupPanelBasics {
             return FowSetupPanel.View.sub(body, List.of(ActionRow.of(buttons)), checklist.warning());
         }
         List<ContainerChildComponent> body = List.of(TextDisplay.of(checklist.text()
-                + "\n-# Dealing gives every real player 2 secret objectives; players who already have some are"
-                + " skipped."));
+                + "\n-# Dealing gives every real player 2 secret objectives. It only works while nobody has any"
+                + " yet; give a player who is missing them some with `/so draw`."));
+        Button deal = Buttons.green(DEAL_SO, "Deal 2 secret objectives to all");
         List<Button> buttons =
-                List.of(Buttons.green(DEAL_SO, "Deal 2 secret objectives to all"), Buttons.green(START, "Start game"));
+                List.of(anyoneHasSecrets(game) ? deal.asDisabled() : deal, Buttons.green(START, "Start game"));
         return FowSetupPanel.View.main(body, List.of(ActionRow.of(buttons)), checklist.warning());
     }
 
@@ -256,8 +274,7 @@ final class FowSetupPanelBasics {
                         FowSetupFactionService.isPlacedOnMap(game, player) && StringUtils.isNotBlank(player.getColor()))
                 .count();
         long withSecrets = game.getRealPlayers().stream()
-                .filter(player -> !player.getSecretsUnscored().isEmpty()
-                        || !player.getSecretsScored().isEmpty())
+                .filter(FowSetupPanelBasics::hasSecrets)
                 .count();
         int tiles = game.getTileMap().size();
         Player speaker = game.getSpeaker();
@@ -288,11 +305,28 @@ final class FowSetupPanelBasics {
         return (ok ? "✅ " : "⚠️ ") + text;
     }
 
+    static boolean anyoneHasSecrets(Game game) {
+        return game.getRealPlayers().stream().anyMatch(FowSetupPanelBasics::hasSecrets);
+    }
+
+    private static boolean hasSecrets(Player player) {
+        return !player.getSecretsUnscored().isEmpty()
+                || !player.getSecretsScored().isEmpty();
+    }
+
     @ButtonHandler(DEAL_SO)
     static void dealSecrets(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        if (anyoneHasSecrets(game)) {
+            FowSetupPanel.show(
+                    event,
+                    game,
+                    "Secret objectives were already dealt, so nothing was dealt again. Use `/so draw` for a"
+                            + " player who is missing them.");
+            return;
+        }
         DrawSecretService.dealSOToAll(event, 2, game);
-        FowSetupPanel.show(event, game);
+        FowSetupPanel.show(event, game, "Dealt 2 secret objectives to every player.");
     }
 
     @ButtonHandler(START)

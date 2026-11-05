@@ -193,7 +193,12 @@ final class FowSetupPanelDecks {
             FowSetupPanel.show(event, game, "Could not read the config. Nothing was imported.");
             return;
         }
-        DeckConfigImportService.importDeckConfig(event, game, json);
-        FowSetupPanel.show(event, game, "Deck-editor config imported.");
+        boolean imported = DeckConfigImportService.importDeckConfig(event, game, json);
+        FowSetupPanel.show(
+                event,
+                game,
+                imported
+                        ? "Deck-editor config imported. The summary is posted in this channel."
+                        : "The Deck-editor config import failed. The error is posted in this channel.");
     }
 }

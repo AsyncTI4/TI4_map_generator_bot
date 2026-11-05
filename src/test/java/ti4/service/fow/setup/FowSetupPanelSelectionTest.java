@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.option.FOWOptionService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -57,6 +59,35 @@ class FowSetupPanelSelectionTest extends BaseTi4Test {
                 .filteredOn(StringSelectMenu.class::isInstance)
                 .map(component -> ((StringSelectMenu) component).getCustomId())
                 .contains("fowWizStep");
+    }
+
+    // dealSOToAll deals to everyone again, so the panel must stop a second deal once anyone holds a secret.
+    @Test
+    void dealButtonTurnsOffOnceAnyoneHasASecret() {
+        Game game = new Game();
+        game.setName("fow-panel-deal-once");
+        game.setFowMode(true);
+        Player player = game.addPlayer("player-1", "player-1");
+        player.setFaction(game, "arborec");
+        player.setColor("red");
+        FowSetupWizardState state = new FowSetupWizardState();
+        state.setStep(FowSetupStep.DEAL_SO);
+
+        assertThat(dealButton(game, state).isDisabled()).isFalse();
+
+        player.setSecret("cm");
+
+        assertThat(dealButton(game, state).isDisabled()).isTrue();
+    }
+
+    private static Button dealButton(Game game, FowSetupWizardState state) {
+        return FowSetupPanel.build(game, state, null).stream()
+                .filter(ActionRow.class::isInstance)
+                .map(ActionRow.class::cast)
+                .flatMap(row -> row.getButtons().stream())
+                .filter(button -> "fowWizDealSo".equals(button.getCustomId()))
+                .findFirst()
+                .orElseThrow();
     }
 
     @Test
