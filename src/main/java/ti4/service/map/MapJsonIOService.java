@@ -519,6 +519,17 @@ public class MapJsonIOService {
         private Map<String, List<LoreIO>> phaseLore;
         private Map<String, String> galaxies;
         private Integer sectorGap;
+        private List<SectorListIO> sectors;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SectorListIO {
+        private String name;
+        private List<String> positions;
+        private String type;
+        private String centre;
+        private Integer distance;
     }
 
     @Data
