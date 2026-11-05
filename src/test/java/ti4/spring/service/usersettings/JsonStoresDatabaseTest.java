@@ -90,6 +90,23 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         assertThat(userSettingsRepository.count()).isEqualTo(1);
     }
 
+    // The managers read and write the legacy JSON files until each table has rows (or no legacy file is left), so
+    // these checks decide when the bot switches over to the database.
+    @Test
+    void emptinessChecksDecideTheSwitchToTheDatabase() {
+        assertThat(userSettingsService.hasAnySettings()).isFalse();
+        assertThat(autoPingService.hasAny()).isFalse();
+        assertThat(techSummaryService.hasAny()).isFalse();
+
+        userSettingsService.save(userSettings("100"));
+        autoPingService.compute("pbd1", _ -> new AutoPing(1, 0, false));
+        techSummaryService.save("pbd1", summaries(1, "sol", "fl"));
+
+        assertThat(userSettingsService.hasAnySettings()).isTrue();
+        assertThat(autoPingService.hasAny()).isTrue();
+        assertThat(techSummaryService.hasAny()).isTrue();
+    }
+
     // The legacy file import must never overwrite settings already saved to the database since the switch-over.
     @Test
     void importingALegacyFileNeverOverwritesNewerDatabaseSettings() {
@@ -99,8 +116,8 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         UserSettings legacy = userSettings("100");
         legacy.setGameLimit(2);
 
-        assertThat(userSettingsService.insertIfAbsent(legacy)).isFalse();
-        assertThat(userSettingsService.insertIfAbsent(userSettings("200"))).isTrue();
+        assertThat(userSettingsService.importMissing(List.of(legacy, userSettings("200"))))
+                .isEqualTo(1);
 
         assertThat(userSettingsService.find("100"))
                 .get()

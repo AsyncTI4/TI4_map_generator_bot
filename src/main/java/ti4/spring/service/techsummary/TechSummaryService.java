@@ -57,6 +57,11 @@ public class TechSummaryService {
     }
 
     @Deprecated(forRemoval = true, since = "2026-11")
+    public boolean hasAny() {
+        return repository.count() > 0;
+    }
+
+    @Deprecated(forRemoval = true, since = "2026-11")
     public int importMissing(Map<String, RoundTechSummaries> summariesByGameName) {
         Integer imported = transactionTemplate.execute(_ -> {
             int count = 0;
