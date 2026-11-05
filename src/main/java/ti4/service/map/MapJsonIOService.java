@@ -183,7 +183,7 @@ public class MapJsonIOService {
 
     // Package-private for tests — allows calling directly with a JSON string and an in-memory
     // Game, without needing a fake ModalInteractionEvent/URL fetch.
-    static void importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
+    public static void importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
         StringBuilder errorSb = new StringBuilder();
         try {
             MapDataIO mapData = mapper.readValue(jsonString, MapDataIO.class);
