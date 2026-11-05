@@ -89,10 +89,11 @@ class TroAgentRulesTest extends BaseTi4Test {
                 .isEqualTo("FFCC_sardakk_exhaustAgent_sardakkagent_" + lodorOffer());
     }
 
-    // Nothing threatens the planet and tokens remain for later actions, so a better window may still come.
+    // Nothing threatens the planet and tokens remain for later actions, so a better window may still come. The bot
+    // presses Decline so the open offer does not hold up the end of its turn.
     @Test
-    void keepsTheAgentForABetterWindowWhileTokensRemain() {
-        assertThat(afterTacticalAction(offer(lodorOffer()))).isEmpty();
+    void declinesTheOfferToKeepTheAgentForABetterWindowWhileTokensRemain() {
+        assertThat(pressed(afterTacticalAction(offer(lodorOffer())))).isEqualTo("deleteButtons");
     }
 
     // With one token left this is among the last windows of the round, and the agent refreshes next round anyway.
@@ -122,11 +123,11 @@ class TroAgentRulesTest extends BaseTi4Test {
     }
 
     @Test
-    void doesNothingWithoutAnyInfantryLeftInReinforcements() {
+    void declinesTheOfferWithoutAnyInfantryLeftInReinforcements() {
         sardakk.setTacticalCC(0);
         sardakk.setUnitCap("gf", 2);
 
-        assertThat(afterTacticalAction(offer(lodorOffer()))).isEmpty();
+        assertThat(pressed(afterTacticalAction(offer(lodorOffer())))).isEqualTo("deleteButtons");
     }
 
     @Test
@@ -165,7 +166,7 @@ class TroAgentRulesTest extends BaseTi4Test {
             sardakk.addPlanet(outpost[2]);
         }
         sardakk.addPlanet("starpoint");
-        assertThat(afterTacticalAction(offer(lodorOffer()))).isEmpty();
+        assertThat(pressed(afterTacticalAction(offer(lodorOffer())))).isEqualTo("deleteButtons");
 
         test.game.getRevealedPublicObjectives().put("expand_borders", 1);
 

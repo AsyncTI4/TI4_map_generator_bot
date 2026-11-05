@@ -30,6 +30,7 @@ public class TroAgentRules {
 
     public static final String USE_PREFIX = "exhaustAgent_sardakkagent_";
     private static final String AGENT = "sardakkagent";
+    private static final String DECLINE = "deleteButtons";
     private static final String PLANETS_TAKEN = "planetsTakenThisRound";
     private static final int INFANTRY_PLACED = 2;
     private static final double GUARD_SHARE = 0.5;
@@ -45,10 +46,10 @@ public class TroAgentRules {
     public static Optional<AiDecision> afterTacticalAction(AiTurnContext context) {
         Player seat = context.seat();
         if (!seat.hasUnexhaustedLeader(AGENT) || !context.isActivePlayer()) return Optional.empty();
-        int placed = Math.min(INFANTRY_PLACED, infantryRoom(context.game(), seat));
-        if (placed == 0) return Optional.empty();
         List<Offer> offers = offers(context);
         if (offers.isEmpty()) return Optional.empty();
+        int placed = Math.min(INFANTRY_PLACED, infantryRoom(context.game(), seat));
+        if (placed == 0) return decline(offers, "no infantry left in reinforcements");
         ObjectiveValue objectives = new ObjectiveValue(context.game(), seat);
         Optional<Offer> best = offers.stream()
                 .max(Comparator.comparingDouble((Offer offer) -> special(context, offer, objectives))
@@ -56,12 +57,19 @@ public class TroAgentRules {
                         .thenComparing(offer -> offer.planet().getName(), Comparator.reverseOrder()));
         if (best.isEmpty()) return Optional.empty();
         double special = special(context, best.get(), objectives);
-        if (special < WORTH_SPENDING_NOW && !lastWindowsOfTheRound(context)) return Optional.empty();
+        if (special < WORTH_SPENDING_NOW && !lastWindowsOfTheRound(context)) {
+            return decline(offers, "keep T'ro An for a better window");
+        }
         String why = special >= WORTH_SPENDING_NOW ? "to hold" : "before the round runs out";
         return Optional.of(best.get()
                 .match()
                 .press("use T'ro An to place " + placed + " infantry on "
                         + best.get().planet().getName() + " " + why));
+    }
+
+    private static Optional<AiDecision> decline(List<Offer> offers, String why) {
+        AiPrompt prompt = offers.getFirst().match().prompt();
+        return prompt.enabledHandler(DECLINE).map(button -> AiDecision.press(prompt, button, "decline: " + why));
     }
 
     private static List<Offer> offers(AiTurnContext context) {
