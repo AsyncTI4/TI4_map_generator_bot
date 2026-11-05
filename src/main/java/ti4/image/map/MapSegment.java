@@ -35,6 +35,7 @@ public record MapSegment(
     public enum Kind {
         CIRCLE,
         CLUSTER,
+        SHAPE,
         AUTO,
         FRACTURE,
         BOARD
@@ -51,6 +52,7 @@ public record MapSegment(
     private static final String GAP_KEY = "fowMapSegmentGap";
     private static final String PIN_KEY = "fowMapSectorNames";
     private static final String CLUSTER_TOKEN = "c";
+    private static final String SHAPE_TOKEN = "s";
     private static final List<String> FRACTURE_POSITIONS =
             IntStream.rangeClosed(1, 25).mapToObj(i -> "frac" + i).toList();
 
@@ -60,6 +62,14 @@ public record MapSegment(
 
     public static MapSegment cluster(String name, String centre, int radiusCap) {
         return new MapSegment(name, centre, radiusCap, Kind.CLUSTER, null);
+    }
+
+    public static MapSegment shape(String name, Set<String> positions) {
+        return new MapSegment(name, anchorOf(positions), 0, Kind.SHAPE, Set.copyOf(positions));
+    }
+
+    public boolean isManual() {
+        return kind == Kind.CIRCLE || kind == Kind.CLUSTER || kind == Kind.SHAPE;
     }
 
     public record Dormant(String name, @Nullable String mergedInto) {}
@@ -279,7 +289,7 @@ public record MapSegment(
     }
 
     public String anchor() {
-        return kind == Kind.CIRCLE || kind == Kind.CLUSTER ? centre : anchorOf(positions());
+        return isManual() ? centre : anchorOf(positions());
     }
 
     public static boolean canJoinSector(String position) {
@@ -317,11 +327,9 @@ public record MapSegment(
 
     @Nullable
     public static String validate(Game game, String name, String centre, @Nullable Integer radius, boolean cluster) {
-        if (!SegmentNames.isValid(name)) {
-            return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
-        }
-        if (SegmentNames.isReserved(name)) {
-            return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are reserved segment names.";
+        String nameProblem = nameProblem(name);
+        if (nameProblem != null) {
+            return nameProblem;
         }
         if (radius == null && !cluster) {
             return "Give a `radius`, or set `cluster` to true.";
@@ -335,9 +343,76 @@ public record MapSegment(
         if (cluster && game.getTileByPosition(centre) == null) {
             return "There is no tile at `" + centre + "` to grow a cluster from.";
         }
-        boolean isNew =
-                stored(game).stream().noneMatch(segment -> segment.name().equals(name));
-        if (isNew && stored(game).size() >= MAX_SEGMENTS) {
+        return capacityProblem(game, name);
+    }
+
+    @Nullable
+    public static String validateShape(Game game, String name, Set<String> positions) {
+        String nameProblem = nameProblem(name);
+        if (nameProblem != null) {
+            return nameProblem;
+        }
+        if (positions.isEmpty()) {
+            return "A sector shape needs at least one position that can join a sector.";
+        }
+        return capacityProblem(game, name);
+    }
+
+    @Nullable
+    public static String editShape(Game game, String name, Set<String> added, Set<String> removed) {
+        if (isAutoSectors(game)) {
+            return "Automatic sectors are on. Turn them off before editing sectors by hand.";
+        }
+        Optional<MapSegment> existing = stored(game).stream()
+                .filter(segment -> segment.name().equals(name))
+                .findFirst();
+        if (existing.isPresent() && existing.get().kind() != Kind.SHAPE) {
+            String what = existing.get().kind() == Kind.CLUSTER ? "a cluster, which grows from the map," : "a circle";
+            return "`" + name + "` is " + what + " so it cannot be edited by hand. Remove it and build it again"
+                    + " with `add_positions`.";
+        }
+        if (existing.isEmpty() && added.isEmpty()) {
+            return "No sector called `" + name + "` to remove positions from.";
+        }
+        List<String> unusable = added.stream()
+                .filter(position -> !canJoinSector(position))
+                .sorted()
+                .toList();
+        if (!unusable.isEmpty()) {
+            return "These positions cannot be part of a sector (unknown, fracture or corner): "
+                    + String.join(", ", unusable) + ".";
+        }
+        Set<String> positions =
+                new HashSet<>(existing.map(MapSegment::positions).orElse(Set.of()));
+        positions.addAll(added);
+        positions.removeAll(removed);
+        if (positions.isEmpty()) {
+            return "That would leave `" + name + "` with no positions. Use `remove: true` to delete it.";
+        }
+        String problem = validateShape(game, name, positions);
+        if (problem != null) {
+            return problem;
+        }
+        put(game, shape(name, positions));
+        return null;
+    }
+
+    @Nullable
+    private static String nameProblem(String name) {
+        if (!SegmentNames.isValid(name)) {
+            return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
+        }
+        if (SegmentNames.isReserved(name)) {
+            return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are reserved segment names.";
+        }
+        return null;
+    }
+
+    @Nullable
+    private static String capacityProblem(Game game, String name) {
+        List<MapSegment> stored = stored(game);
+        boolean isNew = stored.stream().noneMatch(segment -> segment.name().equals(name));
+        if (isNew && stored.size() >= MAX_SEGMENTS) {
             return "This game already has the maximum of " + MAX_SEGMENTS + " segments.";
         }
         return null;
@@ -480,7 +555,12 @@ public record MapSegment(
                 game,
                 stored(game).stream()
                         .map(segment -> segment.name().equals(from)
-                                ? new MapSegment(to, segment.centre(), segment.radius(), segment.kind(), null)
+                                ? new MapSegment(
+                                        to,
+                                        segment.centre(),
+                                        segment.radius(),
+                                        segment.kind(),
+                                        segment.fixedPositions())
                                 : segment)
                         .toList());
     }
@@ -583,6 +663,10 @@ public record MapSegment(
         return fixedPositions != null ? fixedPositions : MapFrame.positionsWithin(centre, radius);
     }
 
+    public List<String> sortedPositions() {
+        return positions().stream().sorted(MapFrame.POSITION_ORDER).toList();
+    }
+
     public String describe() {
         return switch (kind) {
             case FRACTURE -> "`" + name + "`: the Fracture (built in, from the FoW option)";
@@ -594,6 +678,9 @@ public record MapSegment(
                 "`" + name + "`: cluster around " + centre + (radius > 0 ? ", at most radius " + radius : "")
                         + (fixedPositions == null ? "" : " (" + fixedPositions.size() + " systems)");
             case CIRCLE -> "`" + name + "`: centre " + centre + ", radius " + radius;
+            case SHAPE ->
+                "`" + name + "`: fixed shape from " + centre + " ("
+                        + positions().size() + " positions)";
         };
     }
 
@@ -603,6 +690,9 @@ public record MapSegment(
     }
 
     private String format() {
+        if (kind == Kind.SHAPE) {
+            return name + "=" + centre + ":" + SHAPE_TOKEN + String.join(",", sortedPositions());
+        }
         if (kind == Kind.CLUSTER) {
             return name + "=" + centre + ":" + CLUSTER_TOKEN + (radius > 0 ? radius : "");
         }
@@ -619,6 +709,9 @@ public record MapSegment(
                 || MapPositionMapper.getTilePosition(centre) == null) {
             return Optional.empty();
         }
+        if (extent.startsWith(SHAPE_TOKEN)) {
+            return parseShape(name, extent.substring(SHAPE_TOKEN.length()));
+        }
         boolean cluster = extent.startsWith(CLUSTER_TOKEN);
         String radiusText = cluster ? extent.substring(CLUSTER_TOKEN.length()) : extent;
         if (cluster && radiusText.isEmpty()) {
@@ -633,5 +726,13 @@ public record MapSegment(
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    private static Optional<MapSegment> parseShape(String name, String positionList) {
+        Set<String> positions = Arrays.stream(positionList.split(","))
+                .map(String::trim)
+                .filter(MapSegment::canJoinSector)
+                .collect(Collectors.toSet());
+        return positions.isEmpty() ? Optional.empty() : Optional.of(shape(name, positions));
     }
 }

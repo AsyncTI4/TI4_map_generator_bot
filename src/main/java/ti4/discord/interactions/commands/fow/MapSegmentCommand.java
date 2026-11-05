@@ -1,7 +1,10 @@
 package ti4.discord.interactions.commands.fow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -24,6 +27,8 @@ class MapSegmentCommand extends GameStateSubcommand {
     private static final String AUTO_SECTORS = "auto_sectors";
     private static final String GAP = "gap";
     private static final String RENAME = "rename";
+    private static final String ADD_POSITIONS = "add_positions";
+    private static final String REMOVE_POSITIONS = "remove_positions";
 
     MapSegmentCommand() {
         super(
@@ -45,6 +50,12 @@ class MapSegmentCommand extends GameStateSubcommand {
                 new OptionData(OptionType.INTEGER, GAP, "Empty hexes a cluster may jump (0-" + MapSegment.MAX_GAP + ")")
                         .setRequiredRange(0, MapSegment.MAX_GAP));
         addOptions(new OptionData(OptionType.STRING, RENAME, "New name for the segment given in name"));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                ADD_POSITIONS,
+                "Hand-drawn sector: positions to add, e.g. 301,302 (makes it if new)"));
+        addOptions(new OptionData(
+                OptionType.STRING, REMOVE_POSITIONS, "Hand-drawn sector: positions to take out, e.g. 301,302"));
     }
 
     @Override
@@ -100,6 +111,18 @@ class MapSegmentCommand extends GameStateSubcommand {
         if (centre != null) {
             replies.add(saveSegment(event, game, name, centre.trim()));
         }
+        Set<String> added = positionsOption(event, ADD_POSITIONS);
+        Set<String> removed = positionsOption(event, REMOVE_POSITIONS);
+        if (!added.isEmpty() || !removed.isEmpty()) {
+            String problem = MapSegment.editShape(game, name, added, removed);
+            replies.add(
+                    problem != null
+                            ? problem
+                            : "Saved segment "
+                                    + MapSegment.find(game, name)
+                                            .map(MapSegment::describe)
+                                            .orElse("`" + name + "`") + ".");
+        }
         Boolean makeDefault = event.getOption(MAKE_DEFAULT, null, OptionMapping::getAsBoolean);
         if (makeDefault != null) {
             replies.add(updateDefault(game, name, makeDefault));
@@ -124,6 +147,14 @@ class MapSegmentCommand extends GameStateSubcommand {
                 : new MapSegment(name, centre, radius);
         MapSegment.put(game, segment);
         return "Saved segment " + MapSegment.find(game, name).orElse(segment).describe() + ".";
+    }
+
+    private static Set<String> positionsOption(SlashCommandInteractionEvent event, String option) {
+        String raw = event.getOption(option, "", OptionMapping::getAsString);
+        return Arrays.stream(raw.split("[,\\s]+"))
+                .map(position -> position.trim().toLowerCase(Locale.ROOT))
+                .filter(position -> !position.isEmpty())
+                .collect(Collectors.toSet());
     }
 
     private static String updateDefault(Game game, String name, boolean makeDefault) {

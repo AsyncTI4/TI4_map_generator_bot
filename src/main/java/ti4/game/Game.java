@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -2154,26 +2155,61 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return false;
     }
 
-    // TODO: fog colour change mid-game orphans the old "(colour)" PO; next score starts a new one, VP stays right.
     public String customPONameFor(Player player, String label) {
-        String factionName = label + " (" + player.getFaction() + ")";
         if (!isFowMode()) {
-            return factionName;
+            return label + " (" + player.getFaction() + ")";
         }
-        String colorName = label + " (" + player.getColor() + ")";
-        renameCustomPO(factionName, colorName);
-        return colorName;
+        anonymizeIdentifiedCustomPOs(player, label);
+        List<String> neutralNames = neutralCustomPONames(label);
+        return neutralNames.stream()
+                .filter(name -> customPOScorers(name).contains(player.getUserID()))
+                .findFirst()
+                .or(() -> neutralNames.stream()
+                        .filter(name -> customPOScorers(name).isEmpty())
+                        .findFirst())
+                .orElseGet(() -> nextNeutralCustomPOName(label));
     }
 
-    private void renameCustomPO(String oldName, String newName) {
+    private boolean anonymizeIdentifiedCustomPOs(Player player, String label) {
+        boolean renamed = false;
+        for (String identity : new String[] {player.getFaction(), player.getColor()}) {
+            if (identity != null) {
+                renamed |= renameCustomPO(label + " (" + identity + ")", nextNeutralCustomPOName(label));
+            }
+        }
+        return renamed;
+    }
+
+    private List<String> neutralCustomPONames(String label) {
+        String numbered = Pattern.quote(label) + " \\d+";
+        return customPublicVP.keySet().stream()
+                .filter(name -> name.equals(label) || name.matches(numbered))
+                .sorted(Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder()))
+                .toList();
+    }
+
+    private String nextNeutralCustomPOName(String label) {
+        String name = label;
+        for (int number = 2; customPublicVP.containsKey(name); number++) {
+            name = label + " " + number;
+        }
+        return name;
+    }
+
+    private List<String> customPOScorers(String name) {
+        return scoredPublicObjectives.getOrDefault(name, List.of());
+    }
+
+    private boolean renameCustomPO(String oldName, String newName) {
         if (!customPublicVP.containsKey(oldName) || customPublicVP.containsKey(newName)) {
-            return;
+            return false;
         }
         int vp = customPublicVP.get(oldName);
         List<String> scorers = new ArrayList<>(scoredPublicObjectives.getOrDefault(oldName, List.of()));
         removeCustomPO(oldName);
         Integer poIndex = addCustomPO(newName, vp);
         scorers.forEach(userID -> scorePublicObjective(userID, poIndex));
+        return true;
     }
 
     public boolean addSOToGame(String id) {

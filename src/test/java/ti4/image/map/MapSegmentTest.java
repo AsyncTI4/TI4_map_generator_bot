@@ -44,6 +44,34 @@ class MapSegmentTest extends BaseTi4Test {
         return MapSegment.all(game).stream().map(MapSegment::name).toList();
     }
 
+    // 201 and 202 have no system yet: a GM may reserve hexes the sector grows into later.
+    @Test
+    void handEditsCreateGrowAndShrinkAShape() {
+        assertNull(MapSegment.editShape(game, "wedge", Set.of("301", "201"), Set.of()));
+        assertNull(MapSegment.editShape(game, "wedge", Set.of("202"), Set.of("201")));
+
+        assertEquals(
+                MapSegment.Kind.SHAPE,
+                MapSegment.find(game, "wedge").orElseThrow().kind());
+        assertEquals(Set.of("301", "202"), positionsOf("wedge"));
+        assertNotNull(MapSegment.editShape(game, "wedge", Set.of(), Set.of("301", "202")), "last positions stay");
+        assertNotNull(MapSegment.editShape(game, "wedge", Set.of("frac1", "tl"), Set.of()), "fracture and corner");
+        assertNotNull(MapSegment.editShape(game, "nothing", Set.of(), Set.of("301")), "nothing to remove from");
+        assertEquals(Set.of("301", "202"), positionsOf("wedge"));
+    }
+
+    @Test
+    void handEditsRefuseCirclesClustersAndAutomaticMode() {
+        MapSegment.put(game, new MapSegment("core", "000", 1));
+        MapSegment.put(game, MapSegment.cluster("open", "000", 0));
+        assertNotNull(MapSegment.editShape(game, "core", Set.of("301"), Set.of()));
+        assertNotNull(MapSegment.editShape(game, "open", Set.of("301"), Set.of()));
+
+        MapSegment.setAutoSectors(game, true);
+        assertNotNull(MapSegment.editShape(game, "wedge", Set.of("301"), Set.of()));
+        assertTrue(MapSegment.find(game, "wedge").isEmpty());
+    }
+
     @Test
     void segmentsAreSavedReplacedAndRemoved() {
         MapSegment.put(game, new MapSegment("home", "000", 3));

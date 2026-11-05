@@ -16,6 +16,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.map.MapSegment;
 import ti4.service.fow.FogGameSummaryService;
 import ti4.service.fow.FogPreset;
 import ti4.service.fow.FogPresetService;
@@ -51,7 +52,8 @@ public class TestBedStateResolver {
             "customAdjacencies",
             "customHyperlanes",
             "fowOptions",
-            "fogPreset");
+            "fogPreset",
+            "sectors");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
             "commodities",
@@ -162,6 +164,16 @@ public class TestBedStateResolver {
                         .toList());
             case "fogPreset" ->
                 FogPresetService.matching(game).map(FogPreset::getId).orElse("custom");
+            case "sectors" ->
+                joinSorted(MapSegment.all(game).stream()
+                        .map(segment -> segment.name() + ":"
+                                + segment.kind().name().toLowerCase() + ":"
+                                + String.join(
+                                        " ",
+                                        segment.sortedPositions().stream()
+                                                .filter(game.getTileMap()::containsKey)
+                                                .toList()))
+                        .toList());
             default -> "<unknown " + field + ">";
         };
     }

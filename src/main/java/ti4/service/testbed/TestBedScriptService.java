@@ -17,6 +17,7 @@ import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.logging.BotLogger;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
@@ -24,6 +25,7 @@ import ti4.model.TestBedScript;
 import ti4.model.TestBedScript.Expect;
 import ti4.model.TestBedScript.Shortcut;
 import ti4.model.TestBedScript.Step;
+import ti4.model.TileHelper;
 import tools.jackson.core.JacksonException;
 
 @UtilityClass
@@ -311,6 +313,18 @@ public class TestBedScriptService {
             case "removeToken" -> {
                 requireValue(step.getKey(), "key", label, errors);
                 requireValue(step.getValue(), "value", label, errors);
+            }
+            case "placeTile" -> {
+                requireValue(step.getKey(), "key", label, errors);
+                requireValue(step.getValue(), "value", label, errors);
+                if (step.getKey() != null
+                        && !MapPositionMapper.isTilePositionValid(step.getKey().toLowerCase())) {
+                    errors.add(label + ": `placeTile` key `" + step.getKey() + "` is not a tile position.");
+                }
+                if (step.getValue() != null
+                        && !TileHelper.isValidTile(step.getValue().toLowerCase())) {
+                    errors.add(label + ": unknown tile `" + step.getValue() + "`.");
+                }
             }
             case "setActivePlayer" -> requireSeat(step, label, errors);
             case "sendAnonComms" -> {

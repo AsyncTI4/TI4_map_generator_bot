@@ -19,6 +19,7 @@ import ti4.model.GalaxyNames;
 import ti4.model.SegmentNames;
 import ti4.service.map.MapJsonIOService.MapDataIO;
 import ti4.service.map.MapJsonIOService.SectorIO;
+import ti4.service.map.MapJsonIOService.SectorListIO;
 import ti4.service.map.MapJsonIOService.TileIO;
 import ti4.testUtils.BaseTi4Test;
 
@@ -59,6 +60,20 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
         sector.setType(type);
         sector.setDistance(distance);
         sector.setName(name);
+        return sector;
+    }
+
+    private SectorListIO listed(String name, String type, String centre, Integer distance, String... positions) {
+        SectorListIO sector = new SectorListIO();
+        sector.setName(name);
+        sector.setType(type);
+        sector.setCentre(centre);
+        sector.setDistance(distance);
+        sector.setPositions(List.of(positions));
+        if (data.getSectors() == null) {
+            data.setSectors(new ArrayList<>());
+        }
+        data.getSectors().add(sector);
         return sector;
     }
 
@@ -315,6 +330,134 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
         MapSectorJsonService.importSectors(game, data, errors);
         assertThat(errors).isEmpty();
 
+        StringBuilder reimportErrors = new StringBuilder();
+        Game reimported = reimport(export(), reimportErrors);
+
+        assertThat(reimportErrors).isEmpty();
+        assertThat(describe(reimported)).isEqualTo(describe(game));
+        assertThat(GalaxyNames.name(reimported, "a")).isEqualTo("andromeda");
+        assertThat(MapSegment.gap(reimported)).isEqualTo(MapSegment.gap(game));
+    }
+
+    @Test
+    void listOnlyImportCreatesACircleAClusterAndAShape() {
+        place("000");
+        place("101");
+        place("401");
+        place("402");
+        place("201");
+        listed("core", "manual_circle", "000", 1, "000", "101");
+        listed("rim", "cluster", "401", 0, "401", "402");
+        listed("wedge", null, null, null, "201", "202", "306");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(errors).isEmpty();
+        assertThat(segmentNamed("core").kind()).isEqualTo(MapSegment.Kind.CIRCLE);
+        assertThat(segmentNamed("core").radius()).isEqualTo(1);
+        assertThat(segmentNamed("rim").kind()).isEqualTo(MapSegment.Kind.CLUSTER);
+        assertThat(segmentNamed("rim").positions()).containsExactlyInAnyOrder("401", "402");
+        // A shape keeps empty positions (202, 306), as a circle does.
+        assertThat(segmentNamed("wedge").kind()).isEqualTo(MapSegment.Kind.SHAPE);
+        assertThat(segmentNamed("wedge").positions()).containsExactlyInAnyOrder("201", "202", "306");
+    }
+
+    // Files from the map builder carry a circle both in the list and on its centre system.
+    @Test
+    void listEntryWinsOverAPerTileEntryWithTheSameName() {
+        place("000").setSector(sector("manual_circle", 0, "core"));
+        place("101");
+        listed("core", "manual_circle", "000", 1, "000", "101");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(MapSegment.stored(game)).hasSize(1);
+        assertThat(segmentNamed("core").radius()).isEqualTo(1);
+        assertThat(errors).isEmpty();
+    }
+
+    // The per-tile form cannot carry either sector: 000 has no system, and both share that centre.
+    @Test
+    void circlesOnAnEmptySharedCentreSurviveExportAndImport() {
+        place("101");
+        MapSegment.put(game, new MapSegment("hollow", "000", 1));
+        MapSegment.put(game, new MapSegment("dot", "000", 0));
+
+        MapDataIO exported = export();
+        StringBuilder reimportErrors = new StringBuilder();
+        Game reimported = reimport(exported, reimportErrors);
+
+        assertThat(exported.getSectors().stream().map(SectorListIO::getCentre)).containsOnly("000");
+        assertThat(reimportErrors).isEmpty();
+        assertThat(describe(reimported)).isEqualTo(describe(game));
+    }
+
+    @Test
+    void automaticListEntryNamesItsClusterWhenNoSystemDoes() {
+        place("401");
+        place("402");
+        listed("orion", "automatic", null, null, "401", "402");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(MapSegment.isAutoSectors(game)).isTrue();
+        assertThat(segmentNamed("orion").positions()).containsExactlyInAnyOrder("401", "402");
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void perTileAutomaticNameWinsOverTheList() {
+        place("401").setSector(sector("automatic", 0, "far-reach"));
+        place("402");
+        listed("orion", "automatic", null, null, "401", "402");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(segmentNamed("far-reach").positions()).containsExactlyInAnyOrder("401", "402");
+        assertThat(MapSegment.find(game, "orion")).isEmpty();
+    }
+
+    // Unrenamed automatic names come from a hash of the game name, so only the list keeps them across games.
+    @Test
+    void unrenamedAutomaticSectorKeepsItsNameThroughExportAndImport() {
+        place("401").setSector(sector("automatic", 0, null));
+        place("402");
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        StringBuilder reimportErrors = new StringBuilder();
+        Game reimported = reimport(export(), reimportErrors);
+
+        assertThat(reimportErrors).isEmpty();
+        assertThat(describe(reimported)).isEqualTo(describe(game));
+    }
+
+    @Test
+    void manualListEntryWithoutACentreBecomesAShape() {
+        place("401");
+        listed("rim", "manual_circle", null, 1, "401", "402");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(segmentNamed("rim").kind()).isEqualTo(MapSegment.Kind.SHAPE);
+        assertThat(segmentNamed("rim").positions()).containsExactlyInAnyOrder("401", "402");
+        assertThat(errors.toString()).contains("imported as a fixed shape");
+    }
+
+    @Test
+    void segmentCapCountsShapes() {
+        for (int i = 1; i <= MapSegment.MAX_SEGMENTS; i++) {
+            listed("shape-" + i, null, null, null, String.format("4%02d", i));
+        }
+        listed("one-too-many", "manual_circle", "000", 0);
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(MapSegment.stored(game)).hasSize(MapSegment.MAX_SEGMENTS);
+        assertThat(MapSegment.find(game, "one-too-many")).isEmpty();
+        assertThat(errors.toString()).contains("maximum of " + MapSegment.MAX_SEGMENTS);
+    }
+
+    private MapDataIO export() {
         MapDataIO exported = new MapDataIO();
         exported.setMapInfo(game.getTileMap().values().stream()
                 .map(tile -> {
@@ -325,18 +468,16 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
                 })
                 .collect(Collectors.toCollection(ArrayList::new)));
         MapSectorJsonService.exportSectors(game, exported);
+        return exported;
+    }
 
+    private Game reimport(MapDataIO exported, StringBuilder reimportErrors) {
         Game reimported = new Game();
         reimported.setName("sector-json-reimport");
         reimported.setFowMode(true);
         game.getTileMap().values().forEach(tile -> reimported.setTile(new Tile(tile.getTileID(), tile.getPosition())));
-        StringBuilder reimportErrors = new StringBuilder();
         MapSectorJsonService.importSectors(reimported, exported, reimportErrors);
-
-        assertThat(reimportErrors).isEmpty();
-        assertThat(describe(reimported)).isEqualTo(describe(game));
-        assertThat(GalaxyNames.name(reimported, "a")).isEqualTo("andromeda");
-        assertThat(MapSegment.gap(reimported)).isEqualTo(MapSegment.gap(game));
+        return reimported;
     }
 
     private static List<String> describe(Game game) {
