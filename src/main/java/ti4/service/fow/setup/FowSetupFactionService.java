@@ -60,7 +60,7 @@ final class FowSetupFactionService {
      * Reachable whenever a GM sets up the neutral player and then steps back to Factions. Also excludes
      * whoever the PLAYER_ROLES step marked GM/observer (see {@link FowSetupPlayerRolesService}).
      */
-    private static List<Player> setupCandidates(Game game, FowSetupWizardState state) {
+    static List<Player> setupCandidates(Game game, FowSetupWizardState state) {
         return game.getPlayers().values().stream()
                 .filter(player -> FowSetupPlayerRolesService.isPlayerCandidate(player, state))
                 .toList();
@@ -82,6 +82,24 @@ final class FowSetupFactionService {
             sb.append("⚠ A draft is currently running. Assign positions **after** it finishes - starting or ")
                     .append("restarting a draft resets every player to a temporary off-map position.\n\n");
         }
+        sb.append(playerStatusLines(game, state));
+        buttons.add(Buttons.blue("fowSetupFactionManual", "Assign Faction Manually"));
+        buttons.add(Buttons.blue("fowSetupDealFactions~MDL", "Deal Factions (Mini Draft)"));
+        buttons.add(Buttons.gray("fowSetupBanFactionsMenu", "Ban Factions"));
+        buttons.add(Buttons.green("fowSetupPositionsManual", "Assign Position (one player)"));
+        buttons.add(Buttons.green("fowSetupPositionsRandomize", "Randomize All Positions"));
+        buttons.add(Buttons.gray("fowSetupShowBoards", "Show All Player Boards"));
+
+        // Alliance Mode is set on the Game Options step - pairing needs faction+color, so it only
+        // makes sense here once players are real. Hidden entirely for non-Alliance games.
+        if (game.isAllianceMode()) {
+            sb.append("\n### Alliance pairs\n").append(alliancePairLines(game));
+            buttons.add(Buttons.blue("fowSetupAlliancePick1", "Pair Alliance Members"));
+        }
+    }
+
+    static String playerStatusLines(Game game, FowSetupWizardState state) {
+        StringBuilder sb = new StringBuilder();
         for (Player player : setupCandidates(game, state)) {
             String effective = effectiveFaction(state, player);
             String pos = effectivePosition(player);
@@ -100,38 +118,31 @@ final class FowSetupFactionService {
                                     : " _(picking from " + dealt.size() + " dealt)_")
                     .append('\n');
         }
-        buttons.add(Buttons.blue("fowSetupFactionManual", "Assign Faction Manually"));
-        buttons.add(Buttons.blue("fowSetupDealFactions~MDL", "Deal Factions (Mini Draft)"));
-        buttons.add(Buttons.gray("fowSetupBanFactionsMenu", "Ban Factions"));
-        buttons.add(Buttons.green("fowSetupPositionsManual", "Assign Position (one player)"));
-        buttons.add(Buttons.green("fowSetupPositionsRandomize", "Randomize All Positions"));
-        buttons.add(Buttons.gray("fowSetupShowBoards", "Show All Player Boards"));
+        return sb.toString();
+    }
 
-        // Alliance Mode is set on the Game Options step - pairing needs faction+color, so it only
-        // makes sense here once players are real. Hidden entirely for non-Alliance games.
-        if (game.isAllianceMode()) {
-            sb.append("\n### Alliance pairs\n");
-            List<Player> realPlayers = game.getRealPlayers();
-            boolean anyPairs = false;
-            for (int i = 0; i < realPlayers.size(); i++) {
-                for (int j = i + 1; j < realPlayers.size(); j++) {
-                    Player a = realPlayers.get(i);
-                    Player b = realPlayers.get(j);
-                    if (a.isPlayerMemberOfAlliance(b)) {
-                        sb.append("> ")
-                                .append(a.getUserName())
-                                .append(" <-> ")
-                                .append(b.getUserName())
-                                .append('\n');
-                        anyPairs = true;
-                    }
+    static String alliancePairLines(Game game) {
+        StringBuilder sb = new StringBuilder();
+        List<Player> realPlayers = game.getRealPlayers();
+        boolean anyPairs = false;
+        for (int i = 0; i < realPlayers.size(); i++) {
+            for (int j = i + 1; j < realPlayers.size(); j++) {
+                Player a = realPlayers.get(i);
+                Player b = realPlayers.get(j);
+                if (a.isPlayerMemberOfAlliance(b)) {
+                    sb.append("> ")
+                            .append(a.getUserName())
+                            .append(" <-> ")
+                            .append(b.getUserName())
+                            .append('\n');
+                    anyPairs = true;
                 }
             }
-            if (!anyPairs) {
-                sb.append("> _no pairs yet_\n");
-            }
-            buttons.add(Buttons.blue("fowSetupAlliancePick1", "Pair Alliance Members"));
         }
+        if (!anyPairs) {
+            sb.append("> _no pairs yet_\n");
+        }
+        return sb.toString();
     }
 
     // --- Alliance Mode pairing: pick player 1, then player 2, then apply ---
@@ -204,7 +215,7 @@ final class FowSetupFactionService {
         if (nowBanned) {
             banned.add(alias);
         }
-        game.setStoredValue(BANNED_FACTIONS_KEY, String.join("finSep", banned));
+        saveBannedFactions(game, banned);
         String leadNote = Mapper.getFaction(alias).getFactionName() + (nowBanned ? " banned." : " unbanned.");
         postBanFactionsMenu(event, game, leadNote);
     }
@@ -262,7 +273,11 @@ final class FowSetupFactionService {
         FowSetupWizardService.saveState(game, state);
     }
 
-    private static List<String> bannedFactionAliases(Game game) {
+    static void saveBannedFactions(Game game, List<String> banned) {
+        game.setStoredValue(BANNED_FACTIONS_KEY, String.join("finSep", banned));
+    }
+
+    static List<String> bannedFactionAliases(Game game) {
         String stored = game.getStoredValue(BANNED_FACTIONS_KEY);
         if (StringUtils.isBlank(stored)) return new ArrayList<>();
         List<String> aliases = new ArrayList<>(Arrays.asList(PatternHelper.FIN_SEPERATOR_PATTERN.split(stored)));
@@ -313,7 +328,11 @@ final class FowSetupFactionService {
         String[] parts = buttonID.replace("fowSetupDealFactionsGo_", "").split("_", 2);
         boolean allowDuplicates = "dup".equals(parts[0]);
         int count = Integer.parseInt(parts[1]);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), dealFactions(game, count, allowDuplicates));
+        FowSetupWizardService.openOrRefresh(game);
+    }
 
+    static String dealFactions(Game game, int count, boolean allowDuplicates) {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         List<Player> targets = new ArrayList<>();
         for (Player player : setupCandidates(game, state)) {
@@ -333,26 +352,19 @@ final class FowSetupFactionService {
             if (game.getPlayers().isEmpty()) {
                 sb.append("> (no players are in this game at all - has anyone joined yet?)\n");
             }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-            return;
+            return sb.toString();
         }
 
         List<FactionModel> pool = new ArrayList<>(FrankenDraft.getDraftableFactionsForGame(game));
         Collections.shuffle(pool);
         if (pool.size() < count) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Only " + pool.size() + " factions are available after bans, but you asked for " + count
-                            + " per player. Ban fewer factions or lower the count.");
-            return;
+            return "Only " + pool.size() + " factions are available after bans, but you asked for " + count
+                    + " per player. Ban fewer factions or lower the count.";
         }
         if (!allowDuplicates && pool.size() < targets.size() * count) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Need " + (targets.size() * count) + " distinct factions for " + targets.size()
-                            + " players with no duplicates, but only " + pool.size()
-                            + " are available. Ban fewer factions, lower the count, or allow duplicates.");
-            return;
+            return "Need " + (targets.size() * count) + " distinct factions for " + targets.size()
+                    + " players with no duplicates, but only " + pool.size()
+                    + " are available. Ban fewer factions, lower the count, or allow duplicates.";
         }
 
         int cursor = 0;
@@ -384,11 +396,8 @@ final class FowSetupFactionService {
                     factionButtons);
         }
         FowSetupWizardService.saveState(game, state);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "Dealt " + count + " factions each to " + targets.size()
-                        + " players. They'll pick in their own channel.");
-        FowSetupWizardService.openOrRefresh(game);
+        return "Dealt " + count + " factions each to " + targets.size()
+                + " players. They'll pick in their own channel.";
     }
 
     @ButtonHandler("fowSetupFactionDealtPick_")
@@ -435,7 +444,7 @@ final class FowSetupFactionService {
         return StringUtils.isNotBlank(value) && !"null".equals(value);
     }
 
-    private static String effectiveFaction(FowSetupWizardState state, Player player) {
+    static String effectiveFaction(FowSetupWizardState state, Player player) {
         String pending = state.getPendingFactionByUserId().get(player.getUserID());
         if (isSetValue(pending)) return pending;
         String faction = player.getFaction();
@@ -448,7 +457,7 @@ final class FowSetupFactionService {
      * getPlayerStatsAnchorPosition() instead (mirrors the precedence Player.getHomeSystemTile() itself
      * uses). Both fields return the literal string "null" when unset rather than real null.
      */
-    private static String effectivePosition(Player player) {
+    static String effectivePosition(Player player) {
         String override = player.getHomeSystemPosition();
         if (isSetValue(override)) return override;
         String anchor = player.getPlayerStatsAnchorPosition();
@@ -462,7 +471,7 @@ final class FowSetupFactionService {
      * {@code PlayerSetupService.setupPlayer} records the anchor without ever placing a tile. Treating that
      * as "already placed" is what made "Assign Position" report everyone as done in a Twilight's Fall game.
      */
-    private static boolean isPlacedOnMap(Game game, Player player) {
+    static boolean isPlacedOnMap(Game game, Player player) {
         String position = effectivePosition(player);
         if (position == null) return false;
         Tile tile = game.getTileByPosition(position);
@@ -512,13 +521,8 @@ final class FowSetupFactionService {
         Player player = game.getPlayer(userId);
         if (player == null) return;
 
-        List<FactionModel> factions = FrankenDraft.getDraftableFactionsForGame(game).stream()
-                .sorted(Comparator.comparing(FactionModel::getFactionName, String.CASE_INSENSITIVE_ORDER))
-                .toList();
-        List<SelectOption> options = factions.stream()
-                .map(faction -> SelectOption.of(faction.getFactionName(), faction.getAlias())
-                        .withEmoji(
-                                FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji()))
+        List<SelectOption> options = assignableFactions(game).stream()
+                .map(FowSetupFactionService::factionOption)
                 .toList();
         MessageHelper.sendPagedSelectMenus(
                 event.getMessageChannel(),
@@ -535,23 +539,39 @@ final class FowSetupFactionService {
         if (player == null) return;
 
         String faction = event.getValues().getFirst();
-        FowSetupWizardState state = FowSetupWizardService.loadState(game);
-        for (Player other : game.getPlayers().values()) {
-            if (other != player && faction.equals(effectiveFaction(state, other))) {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Player " + other.getUserName() + " already has faction " + faction + ". Not saved.");
-                return;
-            }
+        String error = assignPendingFaction(game, player, faction);
+        if (error != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+            return;
         }
-
-        state.getPendingFactionByUserId().put(userId, faction);
-        FowSetupWizardService.saveState(game, state);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getUserName() + " will be set up as **"
                         + Mapper.getFaction(faction).getFactionName() + "**.");
         FowSetupWizardService.openOrRefresh(game);
+    }
+
+    static String assignPendingFaction(Game game, Player player, String faction) {
+        FowSetupWizardState state = FowSetupWizardService.loadState(game);
+        for (Player other : game.getPlayers().values()) {
+            if (other != player && faction.equals(effectiveFaction(state, other))) {
+                return "Player " + other.getUserName() + " already has faction " + faction + ". Not saved.";
+            }
+        }
+        state.getPendingFactionByUserId().put(player.getUserID(), faction);
+        FowSetupWizardService.saveState(game, state);
+        return null;
+    }
+
+    static List<FactionModel> assignableFactions(Game game) {
+        return FrankenDraft.getDraftableFactionsForGame(game).stream()
+                .sorted(Comparator.comparing(FactionModel::getFactionName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+    }
+
+    static SelectOption factionOption(FactionModel faction) {
+        return SelectOption.of(faction.getFactionName(), faction.getAlias())
+                .withEmoji(FactionEmojis.getFactionIcon(faction.getAlias()).asEmoji());
     }
 
     // --- Position assignment: pick player, then modal for position ---
@@ -653,15 +673,15 @@ final class FowSetupFactionService {
      * had no suggestions to offer anyway. The wizard's step order already puts Load the Map first; this stops
      * the out-of-order case rather than relying on the GM following it.
      */
-    private static boolean mapIsEmpty(Game game) {
+    static boolean mapIsEmpty(Game game) {
         return game.getTileMap().isEmpty();
     }
 
-    private static final String NO_MAP_MESSAGE =
+    static final String NO_MAP_MESSAGE =
             "The map is empty - build or import it on the **Load the Map** step first. Home positions have to "
                     + "point at tiles that already exist, otherwise you'd strand a home system in empty space.";
 
-    private static List<String> availableHomeSystemPositions(Game game) {
+    static List<String> availableHomeSystemPositions(Game game) {
         List<String> takenPositions = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
             String pos = effectivePosition(player);
@@ -680,26 +700,13 @@ final class FowSetupFactionService {
 
     private static void startColorPick(GenericInteractionCreateEvent event, Game game, Player player, String position) {
         String userId = player.getUserID();
-        // Common funnel for both the position-button and the typed-custom-position paths, so the empty-map
-        // guard here covers the modal route that bypasses pickPlayerForPosition's own check.
-        if (mapIsEmpty(game)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), NO_MAP_MESSAGE);
+        String error = pendPosition(game, player, position);
+        if (error != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
             return;
         }
-        FowSetupWizardState state = FowSetupWizardService.loadState(game);
-        String faction = effectiveFaction(state, player);
-        if (StringUtils.isBlank(faction)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getUserName() + " has no faction yet.");
-            return;
-        }
-        state.getPendingPositionByUserId().put(userId, position);
-        FowSetupWizardService.saveState(game, state);
-
-        List<ColorModel> unusedColors = GameColorsService.getUnusedColors(game).stream()
-                .filter(color -> ColorChangeHelper.isColorAllowedForPlayer(color.getName(), player))
-                .sorted(Comparator.comparing(ColorModel::getName, String.CASE_INSENSITIVE_ORDER))
-                .toList();
+        String faction = effectiveFaction(FowSetupWizardService.loadState(game), player);
+        List<ColorModel> unusedColors = colorsFor(game, player);
         if (unusedColors.isEmpty()) {
             // No free colors somehow - fall back to auto-pick rather than block setup entirely.
             finishPositionAssignment(event, game, player, faction, position, null);
@@ -711,6 +718,29 @@ final class FowSetupFactionService {
                 "fowSetupColorSelect_" + userId,
                 FowSetupNeutralPlayerService.colorSelectOptions(unusedColors),
                 "Pick a color for " + player.getUserName() + ":");
+    }
+
+    static String pendPosition(Game game, Player player, String position) {
+        // Common funnel for both the position-button and the typed-custom-position paths, so the empty-map
+        // guard here covers the modal route that bypasses pickPlayerForPosition's own check.
+        if (mapIsEmpty(game)) return NO_MAP_MESSAGE;
+        if (!MapPositionMapper.isTilePositionValid(position)) {
+            return "Tile position `" + position + "` is not valid. Nothing was changed.";
+        }
+        FowSetupWizardState state = FowSetupWizardService.loadState(game);
+        if (StringUtils.isBlank(effectiveFaction(state, player))) {
+            return player.getUserName() + " has no faction yet.";
+        }
+        state.getPendingPositionByUserId().put(player.getUserID(), position);
+        FowSetupWizardService.saveState(game, state);
+        return null;
+    }
+
+    static List<ColorModel> colorsFor(Game game, Player player) {
+        return GameColorsService.getUnusedColors(game).stream()
+                .filter(color -> ColorChangeHelper.isColorAllowedForPlayer(color.getName(), player))
+                .sorted(Comparator.comparing(ColorModel::getName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     @SelectionHandler("fowSetupColorSelect_")
@@ -740,14 +770,7 @@ final class FowSetupFactionService {
             String faction,
             String position,
             String color) {
-        String userId = player.getUserID();
-        PlayerSetupState setupState = new PlayerSetupState(color, faction, position, false);
-        PlayerSetupService.setupPlayer(setupState, player, game, event);
-
-        FowSetupWizardState state = FowSetupWizardService.loadState(game);
-        state.getPendingFactionByUserId().remove(userId);
-        state.getPendingPositionByUserId().remove(userId);
-        FowSetupWizardService.saveState(game, state);
+        completeSetup(event, game, player, faction, position, color);
         FowSetupWizardService.openOrRefresh(game);
 
         // Gate factions get a second tile. setupPlayer either drops it on an arbitrary corner (ghost,
@@ -758,6 +781,23 @@ final class FowSetupFactionService {
         if (realHomeTile != null) {
             promptGateHomeSystem(event, game, player, realHomeTile);
         }
+    }
+
+    static void completeSetup(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            String faction,
+            String position,
+            String color) {
+        String userId = player.getUserID();
+        PlayerSetupState setupState = new PlayerSetupState(color, faction, position, false);
+        PlayerSetupService.setupPlayer(setupState, player, game, event);
+
+        FowSetupWizardState state = FowSetupWizardService.loadState(game);
+        state.getPendingFactionByUserId().remove(userId);
+        state.getPendingPositionByUserId().remove(userId);
+        FowSetupWizardService.saveState(game, state);
     }
 
     // --- Gate factions (Ghosts of Creuss variants, Crimson): a second, GM-placed home-system tile ---
@@ -771,7 +811,7 @@ final class FowSetupFactionService {
     private static final Map<String, String> GATE_TILE_TO_HOME_TILE = Map.of("17", "51", "94", "118");
 
     /** The real home-system tile id for a gate faction, or null if this faction isn't one. */
-    private static String gateFactionHomeTile(Player player) {
+    static String gateFactionHomeTile(Player player) {
         FactionModel faction = player.getFactionSetupInfo();
         if (faction == null) return null;
         String gateTile = AliasHandler.resolveTile(faction.getHomeSystem());
@@ -834,12 +874,22 @@ final class FowSetupFactionService {
     private static void placeGateHomeSystem(
             GenericInteractionCreateEvent event, Game game, Player player, String position) {
         if (player == null) return;
-        String realHomeTile = gateFactionHomeTile(player);
-        if (realHomeTile == null) return;
-        if (!MapPositionMapper.isTilePositionValid(position)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Tile position `" + position + "` is not valid. Nothing was changed.");
+        if (gateFactionHomeTile(player) == null) return;
+        String error = placeGateHome(game, player, position);
+        if (error != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
             return;
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), player.getUserName() + "'s home system placed at `" + position + "`.");
+        FowSetupWizardService.openOrRefresh(game);
+    }
+
+    static String placeGateHome(Game game, Player player, String position) {
+        String realHomeTile = gateFactionHomeTile(player);
+        if (realHomeTile == null) return player.getUserName() + " does not play a gate faction.";
+        if (!MapPositionMapper.isTilePositionValid(position)) {
+            return "Tile position `" + position + "` is not valid. Nothing was changed.";
         }
         // Clear whatever setupPlayer guessed, so overriding doesn't leave a duplicate home system behind.
         String previous = player.getHomeSystemPosition();
@@ -851,18 +901,18 @@ final class FowSetupFactionService {
         }
         game.setTile(new Tile(realHomeTile, position));
         player.setHomeSystemPosition(position);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), player.getUserName() + "'s home system placed at `" + position + "`.");
-        FowSetupWizardService.openOrRefresh(game);
+        return null;
     }
 
     @ButtonHandler("fowSetupPositionsRandomize")
     static void randomizePositions(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
-        if (mapIsEmpty(game)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), NO_MAP_MESSAGE);
-            return;
-        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), placeAtRandomPositions(event, game));
+        FowSetupWizardService.openOrRefresh(game);
+    }
+
+    static String placeAtRandomPositions(GenericInteractionCreateEvent event, Game game) {
+        if (mapIsEmpty(game)) return NO_MAP_MESSAGE;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
 
         List<Player> needsPosition = new ArrayList<>();
@@ -871,20 +921,15 @@ final class FowSetupFactionService {
                 needsPosition.add(player);
             }
         }
-        if (needsPosition.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No players need a position right now.");
-            return;
-        }
+        if (needsPosition.isEmpty()) return "No players need a position right now.";
 
         List<String> availablePositions = new ArrayList<>(availableHomeSystemPositions(game));
         Collections.shuffle(availablePositions);
 
-        if (availablePositions.size() < needsPosition.size()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "Only " + availablePositions.size() + " open home positions for " + needsPosition.size()
-                            + " players needing one. Placing as many as possible.");
-        }
+        String summary = availablePositions.size() < needsPosition.size()
+                ? "Only " + availablePositions.size() + " open home positions for " + needsPosition.size()
+                        + " players needing one. Placed as many as possible."
+                : "Placed " + needsPosition.size() + " player(s) at random home positions.";
 
         for (int i = 0; i < needsPosition.size() && i < availablePositions.size(); i++) {
             Player player = needsPosition.get(i);
@@ -894,7 +939,7 @@ final class FowSetupFactionService {
             state.getPendingFactionByUserId().remove(player.getUserID());
         }
         FowSetupWizardService.saveState(game, state);
-        FowSetupWizardService.openOrRefresh(game);
+        return summary;
     }
 
     @ButtonHandler("fowSetupShowBoards")

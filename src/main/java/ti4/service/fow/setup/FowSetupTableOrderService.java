@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
@@ -38,21 +39,14 @@ final class FowSetupTableOrderService {
      * creation, so the roll buttons can be delivered regardless. Also excludes whoever the PLAYER_ROLES
      * step marked GM/observer (see {@link FowSetupPlayerRolesService}).
      */
-    private static List<Player> seatCandidates(Game game, FowSetupWizardState state) {
+    static List<Player> seatCandidates(Game game, FowSetupWizardState state) {
         return game.getPlayers().values().stream()
                 .filter(player -> FowSetupPlayerRolesService.isPlayerCandidate(player, state))
                 .toList();
     }
 
     static void render(Game game, FowSetupWizardState state, StringBuilder sb, List<Button> buttons) {
-        sb.append("### Current player order\n");
-        int i = 1;
-        for (Player player : seatCandidates(game, state)) {
-            sb.append("> ").append(i).append(". ").append(player.getUserName());
-            i++;
-            if (player.isSpeaker()) sb.append(" (speaker)");
-            sb.append('\n');
-        }
+        sb.append("### Current player order\n").append(orderLines(game, state));
         sb.append("\n**a. Manual** - pick players one at a time in seat order.\n");
         sb.append("**b. Dice** - configure dice count/sides; a roll button gets posted to each player's ")
                 .append("own private channel so nobody sees anyone else's roll; then resolve.\n");
@@ -63,19 +57,36 @@ final class FowSetupTableOrderService {
         buttons.add(Buttons.gray("fowSetupPickSpeaker", "Set Speaker"));
 
         if (!state.getDiceRolls().isEmpty()) {
-            sb.append("\n### Rolls so far\n");
-            for (Map.Entry<String, Integer> entry : state.getDiceRolls().entrySet()) {
-                Player p = game.getPlayer(entry.getKey());
-                sb.append("> ")
-                        .append(p == null ? entry.getKey() : p.getUserName())
-                        .append(": ")
-                        .append(entry.getValue())
-                        .append('\n');
-            }
+            sb.append("\n### Rolls so far\n").append(rollLines(game, state));
             buttons.add(Buttons.green("fowSetupOrderResolveAsc", "Resolve: Ascending (lowest = 1st)"));
             buttons.add(Buttons.green("fowSetupOrderResolveMid50", "Resolve: Closest to 50"));
             buttons.add(Buttons.gray("fowSetupOrderResolveManual", "Resolve: Manual"));
         }
+    }
+
+    static String orderLines(Game game, FowSetupWizardState state) {
+        StringBuilder sb = new StringBuilder();
+        int i = 1;
+        for (Player player : seatCandidates(game, state)) {
+            sb.append("> ").append(i).append(". ").append(player.getUserName());
+            i++;
+            if (player.isSpeaker()) sb.append(" (speaker)");
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+
+    static String rollLines(Game game, FowSetupWizardState state) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : state.getDiceRolls().entrySet()) {
+            Player p = game.getPlayer(entry.getKey());
+            sb.append("> ")
+                    .append(p == null ? entry.getKey() : p.getUserName())
+                    .append(": ")
+                    .append(entry.getValue())
+                    .append('\n');
+        }
+        return sb.toString();
     }
 
     // --- Manual order picking ---
@@ -189,10 +200,12 @@ final class FowSetupTableOrderService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Dice count and sides must be numbers.");
             return;
         }
-        if (count < 1 || sides < 2) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Need at least 1 die with at least 2 sides.");
-            return;
-        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), configureDice(game, count, sides));
+        FowSetupWizardService.openOrRefresh(game);
+    }
+
+    static String configureDice(Game game, int count, int sides) {
+        if (count < 1 || sides < 2) return "Need at least 1 die with at least 2 sides.";
 
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.setDiceCount(count);
@@ -226,8 +239,7 @@ final class FowSetupTableOrderService {
                     .append(String.join(", ", missingPrivateChannel))
                     .append(". Run `/fow check_channels` to fix this, then re-open Configure Dice to resend.");
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), confirmation.toString());
-        FowSetupWizardService.openOrRefresh(game);
+        return confirmation.toString();
     }
 
     @ButtonHandler("fowSetupDiceRoll")
@@ -284,19 +296,29 @@ final class FowSetupTableOrderService {
         FowSetupWizardService.openOrRefresh(game);
     }
 
+    static final Comparator<Map.Entry<String, Integer>> LOWEST_FIRST = Comparator.comparingInt(Map.Entry::getValue);
+    static final Comparator<Map.Entry<String, Integer>> CLOSEST_TO_50 =
+            Comparator.comparingInt(e -> Math.abs(e.getValue() - 50));
+
     @ButtonHandler("fowSetupOrderResolveAsc")
     static void resolveAscending(ButtonInteractionEvent event, Game game) {
-        resolveDiceOrder(event, game, Comparator.comparingInt(Map.Entry::getValue));
+        resolveDiceOrder(event, game, LOWEST_FIRST);
     }
 
     @ButtonHandler("fowSetupOrderResolveMid50")
     static void resolveClosestTo50(ButtonInteractionEvent event, Game game) {
-        resolveDiceOrder(event, game, Comparator.comparingInt(e -> Math.abs(e.getValue() - 50)));
+        resolveDiceOrder(event, game, CLOSEST_TO_50);
     }
 
     private static void resolveDiceOrder(
             ButtonInteractionEvent event, Game game, Comparator<Map.Entry<String, Integer>> comparator) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        applyDiceOrder(event, game, comparator);
+        FowSetupWizardService.openOrRefresh(game);
+    }
+
+    static void applyDiceOrder(
+            GenericInteractionCreateEvent event, Game game, Comparator<Map.Entry<String, Integer>> comparator) {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
 
         List<String> ordered = new ArrayList<>(state.getDiceRolls().entrySet().stream()
@@ -314,11 +336,10 @@ final class FowSetupTableOrderService {
         state.setDiceCount(null);
         state.setDiceSides(null);
         FowSetupWizardService.saveState(game, state);
-        FowSetupWizardService.openOrRefresh(game);
     }
 
-    private static void finalizeOrder(
-            ButtonInteractionEvent event, Game game, FowSetupWizardState state, List<String> orderedUserIds) {
+    static void finalizeOrder(
+            GenericInteractionCreateEvent event, Game game, FowSetupWizardState state, List<String> orderedUserIds) {
         List<User> users = new ArrayList<>();
         for (String userId : orderedUserIds) {
             Player player = game.getPlayer(userId);
