@@ -30,6 +30,7 @@ import ti4.spring.service.persistence.PersistedGameState;
 import ti4.spring.service.persistence.PersistedGameStateService;
 import ti4.spring.service.persistence.UnreferencedUserService;
 
+@SuppressWarnings("removal")
 class GameDatabaseReconcilerTest {
     @TempDir
     static Path temporaryDirectory;

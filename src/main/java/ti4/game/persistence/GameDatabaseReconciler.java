@@ -111,6 +111,9 @@ public class GameDatabaseReconciler {
                     failures));
         }
 
+        // TODO: Remove once every save has a revision key (keyless undo copies from before #5808 age out). Without
+        // it, a row that matches its file but has a stale key is fully rewritten instead.
+        @Deprecated(forRemoval = true)
         private void backfillRevision(GameEntitySnapshot snapshot) {
             if (DatabasePersistenceGate.isDisabled()) return;
             persistenceService.updateRevision(

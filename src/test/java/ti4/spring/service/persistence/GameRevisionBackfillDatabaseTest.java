@@ -27,6 +27,7 @@ import ti4.test.PostgresDatabaseTest;
         classes = GameRevisionBackfillDatabaseTest.TestConfig.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = "spring.jpa.hibernate.ddl-auto=create-drop")
+@SuppressWarnings("removal")
 class GameRevisionBackfillDatabaseTest extends PostgresDatabaseTest {
 
     @Autowired
