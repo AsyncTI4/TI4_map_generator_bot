@@ -22,7 +22,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalM
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnAbilityHandler;
@@ -119,7 +118,6 @@ public class StartTurnService {
         MorphaBreakthroughHandler.clearMetamorphicDrawCount(game, player);
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         VanguardPromissoryHandler.returnGuildCallAtOwnerTurnStart(event, game, player);
-        DeepPromissoryHandler.returnDarkMatterAtOwnerTurnStart(event, game, player);
         PoliticalMarriageLLButtonHandler.clearExpiredRestriction(game, player);
         if (BorrowedTimeLLButtonHandler.skipTurnIfNecessary(event, game, player)) {
             return;

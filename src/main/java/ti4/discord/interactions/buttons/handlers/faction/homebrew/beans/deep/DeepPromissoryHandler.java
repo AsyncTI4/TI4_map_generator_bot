@@ -30,10 +30,9 @@ public class DeepPromissoryHandler {
                         + " placed a frontier token in their home system using _Dark Matter_.");
     }
 
-    public static void returnDarkMatterAtOwnerTurnStart(GenericInteractionCreateEvent event, Game game, Player owner) {
-        if (game.getPNOwner(DARK_MATTER) != owner) {
-            return;
-        }
+    public static void returnDarkMatterAtStatusStart(GenericInteractionCreateEvent event, Game game) {
+        Player owner = game.getPNOwner(DARK_MATTER);
+        if (owner == null) return;
         for (Player holder : game.getRealPlayers()) {
             if (holder != owner && holder.getPromissoryNotesInPlayArea().contains(DARK_MATTER)) {
                 SendPromissoryService.returnPromissoryFromPlayAreaToOwner(event, game, holder, owner, DARK_MATTER);
