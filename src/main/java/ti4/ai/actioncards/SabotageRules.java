@@ -136,13 +136,23 @@ public class SabotageRules {
 
     private static long passDelayMillis(AiTurnContext context, AiPrompt prompt) {
         int seed = prompt.messageId().hashCode() ^ (int) context.profile().seed();
-        if (AiSeats.isSelfPlay(context.game())) {
+        if (AiSeats.isSelfPlay(context.game()) || everyHumanAnswered(context, prompt)) {
             return TimeUnit.SECONDS.toMillis(
                     MIN_SELF_PLAY_PASS_DELAY_SECONDS + Math.floorMod(seed, SELF_PLAY_PASS_DELAY_SPREAD_SECONDS));
         }
         long spread =
                 Math.floorMod(prompt.messageId().hashCode() ^ context.profile().seed(), PASS_DELAY_SPREAD_MINUTES);
         return TimeUnit.MINUTES.toMillis(MIN_PASS_DELAY_MINUTES + spread);
+    }
+
+    private static boolean everyHumanAnswered(AiTurnContext context, AiPrompt window) {
+        Optional<GameMessage> entry = GameMessageManager.getOne(context.game().getName(), window.messageId());
+        if (entry.isEmpty()) return false;
+        String cardPlayer = SabotagePolicy.cardPlayerFaction(window).orElse("");
+        return context.game().getRealPlayers().stream()
+                .filter(player ->
+                        !AiSeats.isAiSeat(player) && !player.getFaction().equals(cardPlayer))
+                .allMatch(player -> entry.get().factionsThatReacted().contains(player.getFaction()));
     }
 
     private static boolean windowClosedFor(AiTurnContext context, AiPrompt prompt) {
