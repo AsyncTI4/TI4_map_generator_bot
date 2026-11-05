@@ -71,8 +71,7 @@ public class AutoPingMetadataManager {
 
     private static synchronized <T> T call(Function<AutoPingService, T> operation, T fallback) {
         try {
-            AutoPingService service = AutoPingService.getBean();
-            return operation.apply(service);
+            return operation.apply(AutoPingService.getBean());
         } catch (Exception e) {
             BotLogger.error("Failed to read or write auto pings.", e);
             return fallback;
