@@ -230,7 +230,7 @@ class StatisticsReportsDatabaseTest extends PostgresDatabaseTest {
     private static PlayerEntity player(GameEntity game, UserEntity user, boolean winner) {
         PlayerEntity player = new PlayerEntity();
         player.setGame(game);
-        player.setUser(user);
+        player.setStatsUser(user);
         player.setWinner(winner);
         player.setScore(winner ? 10 : 7);
         player.setTotalNumberOfTurns(TURNS_PER_PLAYER);

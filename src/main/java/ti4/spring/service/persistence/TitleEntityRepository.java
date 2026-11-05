@@ -11,11 +11,12 @@ public interface TitleEntityRepository extends JpaRepository<TitleEntity, Long> 
     @Query("SELECT t FROM TitleEntity t JOIN FETCH t.user JOIN FETCH t.game")
     List<TitleEntity> findAllWithUsersAndGames();
 
-    @Query("SELECT t FROM TitleEntity t JOIN FETCH t.user")
+    @Query("SELECT t FROM TitleEntity t JOIN FETCH t.user WHERE t.game.statisticsIgnored IS FALSE")
     List<TitleEntity> findAllWithUsers();
 
     @Query("SELECT new ti4.spring.service.persistence.EarnedTitle(t.title, t.game.gameName) FROM TitleEntity t"
-            + " WHERE t.user.id = :userId AND t.game.endedEpochMilliseconds IS NOT NULL")
+            + " WHERE t.user.id = :userId AND t.game.endedEpochMilliseconds IS NOT NULL"
+            + " AND t.game.statisticsIgnored IS FALSE")
     List<EarnedTitle> findEndedGameTitlesByUserId(@Param("userId") String userId);
 
     @Modifying

@@ -9,7 +9,8 @@ import org.springframework.data.repository.query.Param;
 public interface UserEntityRepository extends JpaRepository<UserEntity, String> {
 
     String UNREFERENCED_USER_CONDITION = """
-            NOT EXISTS (SELECT 1 FROM PlayerEntity p WHERE p.user = u)
+            NOT EXISTS (SELECT 1 FROM PlayerEntity p WHERE p.statsUser = u)
+            AND NOT EXISTS (SELECT 1 FROM PlayerEntity p WHERE p.playingUser = u)
             AND NOT EXISTS (SELECT 1 FROM TitleEntity t WHERE t.user = u)
             AND NOT EXISTS (SELECT 1 FROM StandaloneTitleEntity s WHERE s.user = u)
             """;

@@ -33,6 +33,9 @@ class PersistedGameStateTest {
         GameEntity expected = game(5);
         GameEntity actual = game(4);
 
+        expected.setPlayerCount(6);
+        actual.setPlayerCount(5);
+
         PersistedGameState expectedState = PersistedGameState.of(
                 expected, List.of(player(expected, alice, "sol")), List.of(title(expected, alice, "Kingmaker")));
         PersistedGameState actualState =
@@ -40,7 +43,7 @@ class PersistedGameStateTest {
 
         assertThat(expectedState.describeDifferencesFrom(actualState))
                 .containsExactly(
-                        "game columns round (expected 5, found 4)",
+                        "game columns round (expected 5, found 4), playerCount (expected 6, found 5)",
                         "player rows (1 missing, 1 unexpected)",
                         "title rows (1 missing, 0 unexpected)");
     }
@@ -89,7 +92,7 @@ class PersistedGameStateTest {
     private static PlayerEntity player(GameEntity game, UserEntity user, String faction) {
         PlayerEntity player = new PlayerEntity();
         player.setGame(game);
-        player.setUser(user);
+        player.setStatsUser(user);
         player.setFactionName(faction);
         return player;
     }

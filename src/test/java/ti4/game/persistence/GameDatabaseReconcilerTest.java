@@ -324,7 +324,6 @@ class GameDatabaseReconcilerTest {
             manager.when(GameManager::getGameNames).thenReturn(List.of(gameName));
             revisionFile(gameName, snapshot.game().getRevisionKey());
             loader.when(() -> GameLoadService.load(gameName)).thenReturn(game);
-            mapper.when(() -> GameEntityMapper.shouldPersist(game)).thenReturn(true);
             mapper.when(() -> GameEntityMapper.toSnapshot(game)).thenReturn(snapshot);
         }
 
