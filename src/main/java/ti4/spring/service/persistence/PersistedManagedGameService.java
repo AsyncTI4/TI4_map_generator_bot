@@ -18,12 +18,12 @@ public class PersistedManagedGameService {
     private static final int WARMUP_READ_TIMEOUT_SECONDS = 120;
 
     private final GameEntityRepository gameEntityRepository;
-    private final GameParticipantEntityRepository gameParticipantEntityRepository;
+    private final PlayerEntityRepository playerEntityRepository;
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ, timeout = WARMUP_READ_TIMEOUT_SECONDS)
     public Map<String, ManagedGameState> loadAll() {
         Map<String, List<ManagedGameState.Participant>> participantsByGame =
-                gameParticipantEntityRepository.findAllParticipantsByGameName();
+                playerEntityRepository.findAllParticipantsByGameName();
 
         Map<String, ManagedGameState> persistedGames = new HashMap<>();
         for (GameEntity game : gameEntityRepository.findAll()) {

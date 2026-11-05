@@ -157,9 +157,6 @@ public class GameEntity {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PlayerEntity> players = new ArrayList<>();
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<GameParticipantEntity> participants = new ArrayList<>();
-
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;

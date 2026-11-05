@@ -1,6 +1,7 @@
 package ti4.spring.service.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,8 @@ class GameEntityMapperTest extends BaseTi4Test {
 
         PlayerEntity playerEntity = playerFor(snapshot, "original-id");
         assertThat(playerEntity.isReplaced()).isTrue();
-        assertThat(playerEntity.getUser().getId()).isEqualTo("original-id");
-        assertThat(playerEntity.getUser().getName()).isEqualTo("Original");
+        assertThat(playerEntity.getStatsUser().getId()).isEqualTo("original-id");
+        assertThat(playerEntity.getStatsUser().getName()).isEqualTo("Original");
         // Only users a player or title row points at are written, otherwise the nightly reconciler would
         // delete the replacement's unreferenced user row and report it every night.
         assertThat(snapshot.users())
@@ -65,7 +66,7 @@ class GameEntityMapperTest extends BaseTi4Test {
 
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
-        UserEntity user = playerFor(snapshot, "original-id").getUser();
+        UserEntity user = playerFor(snapshot, "original-id").getStatsUser();
         // The placeholder lets GameEntityPersistenceService keep any real name already stored for this user.
         assertThat(GameEntityMapper.hasUnknownName(user)).isTrue();
     }
@@ -82,17 +83,14 @@ class GameEntityMapperTest extends BaseTi4Test {
 
         assertThat(snapshot.game().isStatisticsIgnored()).isTrue();
         assertThat(snapshot.game().getPlayers())
-                .extracting(player -> player.getUser().getId())
+                .extracting(player -> player.getStatsUser().getId())
                 .containsExactlyInAnyOrder("first-id", "second-id");
         assertThat(snapshot.titles()).extracting(TitleEntity::getTitle).containsExactly("Kingmaker");
         assertThat(snapshot.users()).extracting(UserEntity::getId).containsExactly("first-id", "second-id");
-        assertThat(snapshot.game().getParticipants())
-                .extracting(GameParticipantEntity::getUserId)
-                .containsExactly("first-id", "second-id");
     }
 
     @Test
-    void seatsWithoutAFactionAreParticipantsButNotPlayers() {
+    void seatWithoutAFactionIsStoredAsAPlayerRowThatIsNotPlaying() {
         Game game = new Game();
         game.setName("mapper-unseated-participant");
         addRealPlayer(game, "first-id", "sol");
@@ -103,16 +101,64 @@ class GameEntityMapperTest extends BaseTi4Test {
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
 
         assertThat(snapshot.game().isStatisticsIgnored()).isFalse();
+        assertThat(snapshot.game().getPlayerCount()).isEqualTo(3);
         assertThat(snapshot.game().getPlayers())
-                .extracting(player -> player.getUser().getId())
+                .filteredOn(PlayerEntity::isPlaying)
+                .extracting(player -> player.getStatsUser().getId())
                 .containsExactlyInAnyOrder("first-id", "second-id", "third-id");
-        assertThat(snapshot.game().getParticipants())
-                .filteredOn(participant -> "spectator-id".equals(participant.getUserId()))
-                .singleElement()
-                .satisfies(participant -> {
-                    assertThat(participant.getUserName()).isEqualTo("Spectator");
-                    assertThat(participant.isRealPlayer()).isFalse();
-                });
+        PlayerEntity spectator = playerFor(snapshot, "spectator-id");
+        assertThat(spectator.isPlaying()).isFalse();
+        assertThat(spectator.getPlayingUserId()).isEqualTo("spectator-id");
+        assertThat(spectator.getPlayingUserName()).isEqualTo("Spectator");
+    }
+
+    @Test
+    void everyKindOfSeatIsStoredWithWhatWarmupNeedsToTellThemApart() {
+        Game game = new Game();
+        game.setName("mapper-seat-kinds");
+        addRealPlayer(game, "first-id", "sol");
+        Player replacement = game.addPlayer("replacement-id", "Replacement");
+        replacement.setFaction("hacan");
+        replacement.setColor("blue");
+        replacement.setStatsTrackedUserID("original-id");
+        replacement.setStatsTrackedUserName("Original");
+        Player npc = game.addPlayer("npc-id", "Npc");
+        npc.setFaction("xxcha");
+        npc.setColor("green");
+        npc.setNpc(true);
+        Player eliminated = game.addPlayer("eliminated-id", "Eliminated");
+        eliminated.setFaction("letnev");
+        eliminated.setColor("yellow");
+        eliminated.setEliminated(true);
+        eliminated.setDummy(true);
+        Player dummy = game.addPlayer("dummy-id", "Dummy");
+        dummy.setFaction("mentak");
+        dummy.setColor("purple");
+        dummy.setDummy(true);
+        // A seat whose stats tracking points elsewhere but that is not playing counts for nobody, so it keeps
+        // its own user and cannot collide with the user whose stats it once tracked.
+        Player setup = game.addPlayer("setup-id", "Setup");
+        setup.setStatsTrackedUserID("first-id");
+
+        GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
+
+        assertThat(snapshot.game().getPlayers())
+                .extracting(
+                        player -> player.getStatsUser().getId(),
+                        PlayerEntity::getPlayingUserId,
+                        PlayerEntity::isPlaying,
+                        PlayerEntity::isEliminated,
+                        PlayerEntity::isNpc,
+                        PlayerEntity::isReplaced)
+                .containsExactlyInAnyOrder(
+                        tuple("first-id", "first-id", true, false, false, false),
+                        tuple("original-id", "replacement-id", true, false, false, true),
+                        tuple("npc-id", "npc-id", true, false, true, false),
+                        tuple("eliminated-id", "eliminated-id", true, true, false, false),
+                        tuple("dummy-id", "dummy-id", false, false, false, false),
+                        tuple("setup-id", "setup-id", false, false, false, false));
+        assertThat(GameEntityMapper.toManagedGameState(snapshot.game(), participantsOf(snapshot)))
+                .isEqualTo(ManagedGameState.of(game));
     }
 
     @Test
@@ -171,18 +217,21 @@ class GameEntityMapperTest extends BaseTi4Test {
     }
 
     private static List<ManagedGameState.Participant> participantsOf(GameEntitySnapshot snapshot) {
-        return snapshot.game().getParticipants().stream()
-                .map(participant -> new ManagedGameState.Participant(
-                        participant.getUserId(),
-                        participant.getUserName(),
-                        participant.isRealPlayer(),
-                        participant.isRealOrEliminated()))
+        return snapshot.game().getPlayers().stream()
+                .map(player -> new ParticipantRow(
+                                player.getGame().getGameName(),
+                                player.getPlayingUserId(),
+                                player.getPlayingUserName(),
+                                player.isPlaying(),
+                                player.isEliminated(),
+                                player.isNpc())
+                        .toParticipant())
                 .toList();
     }
 
-    private static PlayerEntity playerFor(GameEntitySnapshot snapshot, String userId) {
+    private static PlayerEntity playerFor(GameEntitySnapshot snapshot, String statsUserId) {
         return snapshot.game().getPlayers().stream()
-                .filter(player -> player.getUser().getId().equals(userId))
+                .filter(player -> player.getStatsUser().getId().equals(statsUserId))
                 .findFirst()
                 .orElseThrow();
     }

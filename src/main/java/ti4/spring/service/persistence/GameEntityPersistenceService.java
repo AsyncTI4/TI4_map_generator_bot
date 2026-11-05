@@ -15,7 +15,6 @@ public class GameEntityPersistenceService {
 
     private final GameEntityRepository gameEntityRepository;
     private final PlayerEntityRepository playerEntityRepository;
-    private final GameParticipantEntityRepository gameParticipantEntityRepository;
     private final TitleEntityRepository titleEntityRepository;
     private final UserEntityRepository userEntityRepository;
 
@@ -73,7 +72,6 @@ public class GameEntityPersistenceService {
     private void deleteGameRows(String gameName) {
         titleEntityRepository.deleteByGameName(gameName);
         playerEntityRepository.deleteByGameName(gameName);
-        gameParticipantEntityRepository.deleteByGameName(gameName);
         gameEntityRepository.deleteByGameName(gameName);
     }
 

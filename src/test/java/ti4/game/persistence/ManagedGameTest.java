@@ -75,12 +75,49 @@ class ManagedGameTest extends BaseTi4Test {
         assertThat(managedGame.getPlayer(userId).getGames()).contains(managedGame);
     }
 
+    @Test
+    void seatStatusComesFromPlayingEliminatedAndNpc() {
+        String real = uniqueUserId();
+        String npc = uniqueUserId();
+        String eliminated = uniqueUserId();
+        String seated = uniqueUserId();
+        List<ManagedGameState.Participant> participants = List.of(
+                new ManagedGameState.Participant(real, "Real", true, false, false),
+                new ManagedGameState.Participant(npc, "Npc", true, false, true),
+                new ManagedGameState.Participant(eliminated, "Eliminated", true, true, false),
+                new ManagedGameState.Participant(seated, "Seated", false, false, false));
+
+        ManagedGame running = new ManagedGame(state(null, null, null, false, participants));
+        ManagedGame ended = new ManagedGame(state(null, null, null, true, participants));
+
+        assertThat(running.getPlayerIds()).containsExactlyInAnyOrder(real, npc, eliminated, seated);
+        assertThat(running.getRealPlayers()).extracting(ManagedPlayer::getId).containsExactly(real);
+        assertThat(running.countRealAndEliminatedPlayers()).isEqualTo(3);
+        assertThat(running.isRealOrEliminatedPlayer(seated)).isFalse();
+        // Once a game ends, its eliminated players count as real players again, as Game.getRealPlayers() does not.
+        assertThat(ended.getRealPlayers()).extracting(ManagedPlayer::getId).containsExactlyInAnyOrder(real, eliminated);
+    }
+
     private static ManagedGameState state(
             String guildId, String mainGameChannelId, String tableTalkChannelId, String userId) {
+        return state(
+                guildId,
+                mainGameChannelId,
+                tableTalkChannelId,
+                false,
+                List.of(new ManagedGameState.Participant(userId, "Someone", true, false, false)));
+    }
+
+    private static ManagedGameState state(
+            String guildId,
+            String mainGameChannelId,
+            String tableTalkChannelId,
+            boolean hasEnded,
+            List<ManagedGameState.Participant> participants) {
         return new ManagedGameState(
                 "managed-game-" + UUID.randomUUID(),
                 null,
-                false,
+                hasEnded,
                 false,
                 false,
                 false,
@@ -104,7 +141,7 @@ class ManagedGameTest extends BaseTi4Test {
                 mainGameChannelId,
                 tableTalkChannelId,
                 null,
-                List.of(new ManagedGameState.Participant(userId, "Someone", true, true)),
+                participants,
                 Map.of());
     }
 

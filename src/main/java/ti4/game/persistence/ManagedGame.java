@@ -93,7 +93,9 @@ public class ManagedGame {
                 .map(participant -> GameManager.addOrMergePlayer(this, participant))
                 .collect(toUnmodifiableSet());
         playerToStatus = state.participants().stream()
-                .collect(Collectors.toUnmodifiableMap(participant -> getPlayer(participant.userId()), Status::of));
+                .collect(Collectors.toUnmodifiableMap(
+                        participant -> getPlayer(participant.userId()),
+                        participant -> Status.of(participant, hasEnded)));
         teamMateToPrimaryId = state.teamMateToPrimaryId();
     }
 
@@ -190,14 +192,14 @@ public class ManagedGame {
         REAL_OR_ELIMINATED,
         OTHER;
 
-        static Status of(ManagedGameState.Participant participant) {
-            if (participant.realPlayer()) {
+        static Status of(ManagedGameState.Participant participant, boolean hasEnded) {
+            if (!participant.playing()) {
+                return OTHER;
+            }
+            if (participant.eliminated() ? hasEnded : !participant.npc()) {
                 return REAL;
             }
-            if (participant.realOrEliminated()) {
-                return REAL_OR_ELIMINATED;
-            }
-            return OTHER;
+            return REAL_OR_ELIMINATED;
         }
 
         boolean isRealOrEliminated() {

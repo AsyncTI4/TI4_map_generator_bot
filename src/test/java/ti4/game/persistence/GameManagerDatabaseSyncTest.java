@@ -423,7 +423,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 null,
                 null,
                 null,
-                List.of(new ManagedGameState.Participant(userId, "Warmup User", true, true)),
+                List.of(new ManagedGameState.Participant(userId, "Warmup User", true, false, false)),
                 Map.of());
     }
 

@@ -7,13 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import ti4.game.persistence.ManagedGameState;
 
-public record PersistedGameState(
-        GameColumns game,
-        List<PlayerRow> players,
-        List<ManagedGameState.Participant> participants,
-        List<TitleRow> titles) {
+public record PersistedGameState(GameColumns game, List<PlayerRow> players, List<TitleRow> titles) {
 
     public record GameColumns(
             String gameName,
@@ -61,7 +56,11 @@ public record PersistedGameState(
             String teamMatePrimaryUserIds) {}
 
     public record PlayerRow(
-            String userId,
+            String statsUserId,
+            String playingUserId,
+            String playingUserName,
+            boolean playing,
+            boolean npc,
             String factionName,
             int score,
             int totalNumberOfTurns,
@@ -84,33 +83,19 @@ public record PersistedGameState(
     }
 
     public static PersistedGameState of(GameEntitySnapshot snapshot) {
-        List<ManagedGameState.Participant> participants = snapshot.game().getParticipants().stream()
-                .map(participant -> new ManagedGameState.Participant(
-                        participant.getUserId(),
-                        participant.getUserName(),
-                        participant.isRealPlayer(),
-                        participant.isRealOrEliminated()))
-                .toList();
-        return of(snapshot.game(), snapshot.game().getPlayers(), participants, snapshot.titles());
+        return of(snapshot.game(), snapshot.game().getPlayers(), snapshot.titles());
     }
 
-    static PersistedGameState of(
-            GameEntity game,
-            Collection<PlayerEntity> players,
-            Collection<ManagedGameState.Participant> participants,
-            Collection<TitleEntity> titles) {
+    static PersistedGameState of(GameEntity game, Collection<PlayerEntity> players, Collection<TitleEntity> titles) {
         List<PlayerRow> playerRows = players.stream()
                 .map(PersistedGameState::toPlayerRow)
                 .sorted(Comparator.comparing(PlayerRow::toString))
-                .toList();
-        List<ManagedGameState.Participant> participantRows = participants.stream()
-                .sorted(Comparator.comparing(ManagedGameState.Participant::toString))
                 .toList();
         List<TitleRow> titleRows = titles.stream()
                 .map(title -> new TitleRow(title.getUser().getId(), title.getTitle()))
                 .sorted(Comparator.comparing(TitleRow::toString))
                 .toList();
-        return new PersistedGameState(toGameColumns(game), playerRows, participantRows, titleRows);
+        return new PersistedGameState(toGameColumns(game), playerRows, titleRows);
     }
 
     public boolean hasSameRevisionColumnsAs(PersistedGameState actual) {
@@ -126,9 +111,6 @@ public record PersistedGameState(
         }
         if (!players.equals(actual.players)) {
             differences.add(describeRowDifference("player", players, actual.players));
-        }
-        if (!participants.equals(actual.participants)) {
-            differences.add(describeRowDifference("participant", participants, actual.participants));
         }
         if (!titles.equals(actual.titles)) {
             differences.add(describeRowDifference("title", titles, actual.titles));
@@ -212,7 +194,11 @@ public record PersistedGameState(
 
     private static PlayerRow toPlayerRow(PlayerEntity player) {
         return new PlayerRow(
-                player.getUser().getId(),
+                player.getStatsUser().getId(),
+                player.getPlayingUserId(),
+                player.getPlayingUserName(),
+                player.isPlaying(),
+                player.isNpc(),
                 player.getFactionName(),
                 player.getScore(),
                 player.getTotalNumberOfTurns(),

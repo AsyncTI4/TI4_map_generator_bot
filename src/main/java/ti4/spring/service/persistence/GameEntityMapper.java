@@ -30,7 +30,7 @@ public class GameEntityMapper {
     public static GameEntitySnapshot toSnapshot(Game game, ManagedGameState managedGameState) {
         Map<String, UserEntity> users = new LinkedHashMap<>();
         GameEntity gameEntity = toGameEntity(game, managedGameState);
-        for (Player player : game.getRealAndEliminatedPlayers()) {
+        for (Player player : game.getPlayers().values()) {
             gameEntity.getPlayers().add(toPlayerEntity(player, gameEntity, users));
         }
         List<TitleEntity> titles = toTitleEntities(game, gameEntity, users);
@@ -132,20 +132,6 @@ public class GameEntityMapper {
         gameEntity.setAutoPingEnabled(managedGameState.autoPingEnabled());
         gameEntity.setTemporaryPingDisabled(managedGameState.temporaryPingDisable());
         gameEntity.setTeamMatePrimaryUserIds(managedGameState.encodedTeamMateToPrimaryId());
-        for (ManagedGameState.Participant participant : managedGameState.participants()) {
-            gameEntity.getParticipants().add(toParticipantEntity(participant, gameEntity));
-        }
-    }
-
-    private static GameParticipantEntity toParticipantEntity(
-            ManagedGameState.Participant participant, GameEntity gameEntity) {
-        var participantEntity = new GameParticipantEntity();
-        participantEntity.setGame(gameEntity);
-        participantEntity.setUserId(participant.userId());
-        participantEntity.setUserName(participant.userName());
-        participantEntity.setRealPlayer(participant.realPlayer());
-        participantEntity.setRealOrEliminated(participant.realOrEliminated());
-        return participantEntity;
     }
 
     private static Long toNullableEpochMilliseconds(long epochMilliseconds) {
@@ -162,15 +148,24 @@ public class GameEntityMapper {
         playerEntity.setActualHits(player.getActualHits());
         playerEntity.setEliminated(player.isEliminated());
         playerEntity.setWinner(player.getGame().getWinners().contains(player));
-        playerEntity.setReplaced(!Objects.equals(player.getUserID(), player.getStatsTrackedUserID()));
+        playerEntity.setReplaced(!Objects.equals(player.getUserID(), statsUserId(player)));
+        playerEntity.setPlayingUserId(player.getUserID());
+        playerEntity.setPlayingUserName(player.getUserName());
+        playerEntity.setPlaying(ManagedGameState.isPlaying(player));
+        playerEntity.setNpc(player.isNpc());
         playerEntity.setGame(gameEntity);
-        playerEntity.setUser(users.computeIfAbsent(
-                player.getStatsTrackedUserID(), userId -> toUserEntity(userId, statsTrackedUserName(player))));
+        playerEntity.setStatsUser(
+                users.computeIfAbsent(statsUserId(player), userId -> toUserEntity(userId, statsUserName(player))));
         return playerEntity;
     }
 
-    private static String statsTrackedUserName(Player player) {
-        if (Objects.equals(player.getUserID(), player.getStatsTrackedUserID())) return player.getUserName();
+    private static String statsUserId(Player player) {
+        if (!ManagedGameState.isPlaying(player)) return player.getUserID();
+        return player.getStatsTrackedUserID();
+    }
+
+    private static String statsUserName(Player player) {
+        if (Objects.equals(player.getUserID(), statsUserId(player))) return player.getUserName();
         return player.getStatsTrackedUserName();
     }
 

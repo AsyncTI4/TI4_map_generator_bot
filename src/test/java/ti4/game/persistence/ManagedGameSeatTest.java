@@ -24,7 +24,9 @@ class ManagedGameSeatTest extends BaseTi4Test {
         Game game = newGame();
         String realUser = seat(game, 0).getUserID();
         Player eliminated = seat(game, 1);
+        // Elimination turns the seat into a dummy as well, as ButtonHelper does.
         eliminated.setEliminated(true);
+        eliminated.setDummy(true);
         Player npc = seat(game, 2);
         npc.setNpc(true);
         Player dummy = seat(game, 3);
@@ -44,10 +46,10 @@ class ManagedGameSeatTest extends BaseTi4Test {
         assertThat(managedGame.isRealOrEliminatedPlayer(dummy.getUserID())).isFalse();
         assertThat(managedGame.isRealOrEliminatedPlayer(spectator)).isFalse();
         assertThat(managedGame.isRealOrEliminatedPlayer(uniqueName("stranger"))).isFalse();
-        // An eliminated seat keeps its faction and color, so it still counts as real; only the NPC drops out.
+        // While the game runs, only seats still playing for themselves are real players.
         assertThat(managedGame.getRealPlayers())
                 .extracting(ManagedPlayer::getId)
-                .containsExactlyInAnyOrder(realUser, eliminated.getUserID());
+                .containsExactly(realUser);
     }
 
     @Test

@@ -97,7 +97,7 @@ class GameRevisionBackfillDatabaseTest extends PostgresDatabaseTest {
     private static PlayerEntity player(GameEntity game, UserEntity user) {
         PlayerEntity player = new PlayerEntity();
         player.setGame(game);
-        player.setUser(user);
+        player.setStatsUser(user);
         player.setFactionName("sol" + user.getId());
         return player;
     }

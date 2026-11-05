@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import ti4.game.persistence.ManagedGameState;
 
 class PersistedGameStateTest {
 
@@ -18,12 +17,10 @@ class PersistedGameStateTest {
         PersistedGameState expectedState = PersistedGameState.of(
                 expected,
                 List.of(player(expected, alice, "sol"), player(expected, bob, "hacan")),
-                List.of(participant("1", true), participant("2", true)),
                 List.of(title(expected, alice, "Kingmaker")));
         PersistedGameState actualState = PersistedGameState.of(
                 actual,
                 List.of(player(actual, bob, "hacan"), player(actual, alice, "sol")),
-                List.of(participant("2", true), participant("1", true)),
                 List.of(title(actual, alice, "Kingmaker")));
 
         assertThat(expectedState).isEqualTo(actualState);
@@ -40,18 +37,14 @@ class PersistedGameStateTest {
         actual.setPlayerCount(5);
 
         PersistedGameState expectedState = PersistedGameState.of(
-                expected,
-                List.of(player(expected, alice, "sol")),
-                List.of(participant("1", true)),
-                List.of(title(expected, alice, "Kingmaker")));
-        PersistedGameState actualState = PersistedGameState.of(
-                actual, List.of(player(actual, alice, "hacan")), List.of(participant("1", false)), List.of());
+                expected, List.of(player(expected, alice, "sol")), List.of(title(expected, alice, "Kingmaker")));
+        PersistedGameState actualState =
+                PersistedGameState.of(actual, List.of(player(actual, alice, "hacan")), List.of());
 
         assertThat(expectedState.describeDifferencesFrom(actualState))
                 .containsExactly(
                         "game columns round (expected 5, found 4), playerCount (expected 6, found 5)",
                         "player rows (1 missing, 1 unexpected)",
-                        "participant rows (1 missing, 1 unexpected)",
                         "title rows (1 missing, 0 unexpected)");
     }
 
@@ -63,8 +56,8 @@ class PersistedGameStateTest {
         // A row written before revision keys existed has neither column set.
         GameEntity legacy = game(4);
 
-        PersistedGameState currentState = PersistedGameState.of(current, List.of(), List.of(), List.of());
-        PersistedGameState legacyState = PersistedGameState.of(legacy, List.of(), List.of(), List.of());
+        PersistedGameState currentState = PersistedGameState.of(current, List.of(), List.of());
+        PersistedGameState legacyState = PersistedGameState.of(legacy, List.of(), List.of());
 
         assertThat(currentState.describeDifferencesFrom(legacyState)).isEmpty();
         assertThat(currentState.hasSameRevisionColumnsAs(legacyState)).isFalse();
@@ -76,18 +69,16 @@ class PersistedGameStateTest {
         GameEntity entity = game(1);
         entity.setRevisionKey("revision-a");
         entity.setMappingVersion(GameEntityMapper.MAPPING_VERSION);
-        PersistedGameState state = PersistedGameState.of(entity, List.of(), List.of(), List.of());
+        PersistedGameState state = PersistedGameState.of(entity, List.of(), List.of());
         assertThat(state.matchesRevision("revision-a")).isTrue();
         assertThat(state.matchesRevision("revision-b")).isFalse();
         assertThat(state.matchesRevision(null)).isFalse();
         assertThat(state.matchesRevision("")).isFalse();
         entity.setMappingVersion(null);
-        assertThat(PersistedGameState.of(entity, List.of(), List.of(), List.of())
-                        .matchesRevision("revision-a"))
+        assertThat(PersistedGameState.of(entity, List.of(), List.of()).matchesRevision("revision-a"))
                 .isFalse();
         entity.setMappingVersion(GameEntityMapper.MAPPING_VERSION - 1);
-        assertThat(PersistedGameState.of(entity, List.of(), List.of(), List.of())
-                        .matchesRevision("revision-a"))
+        assertThat(PersistedGameState.of(entity, List.of(), List.of()).matchesRevision("revision-a"))
                 .isFalse();
     }
 
@@ -101,13 +92,9 @@ class PersistedGameStateTest {
     private static PlayerEntity player(GameEntity game, UserEntity user, String faction) {
         PlayerEntity player = new PlayerEntity();
         player.setGame(game);
-        player.setUser(user);
+        player.setStatsUser(user);
         player.setFactionName(faction);
         return player;
-    }
-
-    private static ManagedGameState.Participant participant(String userId, boolean realPlayer) {
-        return new ManagedGameState.Participant(userId, "user " + userId, realPlayer, realPlayer);
     }
 
     private static TitleEntity title(GameEntity game, UserEntity user, String title) {

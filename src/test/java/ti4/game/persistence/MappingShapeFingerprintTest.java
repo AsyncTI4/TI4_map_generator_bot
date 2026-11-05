@@ -19,7 +19,6 @@ import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
 import ti4.spring.service.persistence.GameEntity;
 import ti4.spring.service.persistence.GameEntityMapper;
-import ti4.spring.service.persistence.GameParticipantEntity;
 import ti4.spring.service.persistence.PersistedGameState;
 import ti4.spring.service.persistence.PlayerEntity;
 import ti4.spring.service.persistence.TitleEntity;
@@ -36,12 +35,11 @@ class MappingShapeFingerprintTest {
     // anywhere in that tree fails the test until MAPPING_VERSION is raised and the fingerprint updated.
     // MappingFingerprintTest covers changes to how values are derived.
     private static final String EXPECTED_FINGERPRINT =
-            "ead1ad548fd8e0a64ae545e759d7c3fb706c768102c6b2033567d1661cd3317a";
+            "d5510cd63055360880c855810c1a4a4f503ca1b0b94884a09d2929c2465ec01c";
     private static final List<Class<?>> STORED_ROOTS = List.of(
             ManagedGameState.class,
             PersistedGameState.class,
             GameEntity.class,
-            GameParticipantEntity.class,
             PlayerEntity.class,
             TitleEntity.class,
             UserEntity.class);

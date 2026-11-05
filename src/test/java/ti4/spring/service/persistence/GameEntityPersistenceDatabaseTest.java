@@ -90,7 +90,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
-    void resavingAGameReplacesItsParticipants() {
+    void resavingAGameReplacesItsSeats() {
         Game game = gameWithRealPlayers("pbd-db-resave", 3);
         game.addPlayer("spectator-id", "Spectator");
         persistenceService.replace(GameEntityMapper.toSnapshot(game));
@@ -152,6 +152,29 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
+    void statisticsQueriesLeaveOutSeatsThatAreNotPlaying() {
+        storeGameForEveryStatisticsQuery("pbd-db-seated-counted", false, 1L);
+        List<String> seatedUserIds = List.of("seated-id");
+
+        assertThat(playerRepository.findAllWithUsersAndGames())
+                .filteredOn(player -> !player.isPlaying())
+                .extracting(PlayerEntity::getPlayingUserId)
+                .containsExactly("seated-id");
+        assertThat(playerRepository.findAllWithUsers()).allMatch(PlayerEntity::isPlaying);
+        assertThat(playerRepository.findAllWithUsersByCompletedGame()).allMatch(PlayerEntity::isPlaying);
+        assertThat(playerRepository.findAllWithUsersByUserIdIn(seatedUserIds)).isEmpty();
+        assertThat(playerRepository.findAllWithUsersAndGamesByUserIdIn(seatedUserIds))
+                .isEmpty();
+        assertThat(playerRepository.findAllWithGamesByUserIdEquals("seated-id")).isEmpty();
+        assertThat(playerRepository.findAllWithUsersAndSixPlayerCompletedGames())
+                .allMatch(PlayerEntity::isPlaying);
+        assertThat(playerRepository.findAllWithCompletedGamesByUserIdEquals("seated-id"))
+                .isEmpty();
+        assertThat(playerRepository.findAllWithUsersAndGamesByCompletedNonAllianceGame(false))
+                .allMatch(PlayerEntity::isPlaying);
+    }
+
+    @Test
     void activeGameStatisticsLeaveOutIgnoredGames() {
         storeGameForEveryStatisticsQuery("pbd-db-active-counted", false, null);
         storeGameForEveryStatisticsQuery("pbd-db-active-ignored", true, null);
@@ -186,26 +209,34 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
-    void previousReleaseCanStillDeleteGamesThatHaveParticipants() {
-        Game game = gameWithRealPlayers("pbd-db-rollback", 3);
-        game.setStoredValue("TitlesForuser-1", "Kingmaker");
+    void playerRowWrittenByThePreviousReleaseCountsAsPlaying() {
+        Game game = gameWithRealPlayers("pbd-db-previous-release", 3);
         persistenceService.replace(GameEntityMapper.toSnapshot(game));
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
 
-        // The release before game_participant existed deletes title, player and game rows only, so the participant
-        // foreign key must cascade or every one of its syncs would fail after a rollback.
-        jdbc.update("DELETE FROM title WHERE game_name = ?", game.getName());
-        jdbc.update("DELETE FROM player WHERE game_name = ?", game.getName());
-        jdbc.update("DELETE FROM game WHERE game_name = ?", game.getName());
+        // The previous release writes only real and eliminated seats and knows nothing of the seat columns, so a
+        // row it inserts during a rolling deploy must default to a playing, non-NPC seat.
+        jdbc.update("DELETE FROM player WHERE game_name = ? AND user_id = ?", game.getName(), "user-1");
+        jdbc.update(
+                "INSERT INTO player (user_id, game_name, faction_name, score, total_number_of_turns, total_turn_time,"
+                        + " expected_hits, actual_hits, is_eliminated, is_winner, is_replaced)"
+                        + " VALUES (?, ?, 'sol', 0, 0, 0, 0, 0, FALSE, FALSE, FALSE)",
+                "user-1",
+                game.getName());
 
-        assertThat(jdbc.queryForObject(
-                        "SELECT COUNT(*) FROM game_participant WHERE game_name = ?", Integer.class, game.getName()))
-                .isZero();
+        assertThat(playerRepository.findAllWithUsersByUserIdIn(List.of("user-1")))
+                .singleElement()
+                .satisfies(player -> {
+                    assertThat(player.isPlaying()).isTrue();
+                    assertThat(player.isNpc()).isFalse();
+                    assertThat(player.getPlayingUserId()).isNull();
+                });
     }
 
     private void storeGameForEveryStatisticsQuery(
             String gameName, boolean statisticsIgnored, Long endedEpochMilliseconds) {
         Game game = gameWithRealPlayers(gameName, 6);
+        game.addPlayer("seated-id", "Seated");
         game.setStoredValue("TitlesForuser-1", "Kingmaker");
         GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
         // Every other column matches all the statistics queries, so only the ignored flag decides what they return.
@@ -220,6 +251,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     private static void assertOnlyCountedGame(List<PlayerEntity> players, String countedGameName) {
         assertThat(players).isNotEmpty();
         assertThat(players).extracting(player -> player.getGame().getGameName()).containsOnly(countedGameName);
+        assertThat(players).allMatch(PlayerEntity::isPlaying);
     }
 
     private static Game gameWithRealPlayers(String gameName, int playerCount) {

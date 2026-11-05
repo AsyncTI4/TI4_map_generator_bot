@@ -46,7 +46,7 @@ public record ManagedGameState(
     private static final String TEAM_MATE_ENTRY_SEPARATOR = ",";
     private static final String TEAM_MATE_PRIMARY_SEPARATOR = ":";
 
-    public record Participant(String userId, String userName, boolean realPlayer, boolean realOrEliminated) {}
+    public record Participant(String userId, String userName, boolean playing, boolean eliminated, boolean npc) {}
 
     public ManagedGameState {
         participants = sortedByUserId(participants);
@@ -88,7 +88,7 @@ public record ManagedGameState(
                 resolvedOrStoredId(game.getTableTalkChannel(), game.getTableTalkChannelID()),
                 numericOrNull(game.getLaunchPostThreadID()),
                 game.getPlayers().values().stream()
-                        .map(player -> toParticipant(game, player))
+                        .map(ManagedGameState::toParticipant)
                         .toList(),
                 collectTeamMates(game));
     }
@@ -117,10 +117,13 @@ public record ManagedGameState(
         return teamMateToPrimaryId;
     }
 
-    private static Participant toParticipant(Game game, Player player) {
-        boolean realPlayer = (player.isRealPlayer() && !player.isNpc()) || (player.isEliminated() && game.isHasEnded());
-        boolean realOrEliminated = player.isRealPlayer() || player.isEliminated();
-        return new Participant(player.getUserID(), player.getUserName(), realPlayer, realOrEliminated);
+    public static boolean isPlaying(Player player) {
+        return player.isRealPlayer() || player.isEliminated();
+    }
+
+    private static Participant toParticipant(Player player) {
+        return new Participant(
+                player.getUserID(), player.getUserName(), isPlaying(player), player.isEliminated(), player.isNpc());
     }
 
     private static Map<String, String> collectTeamMates(Game game) {

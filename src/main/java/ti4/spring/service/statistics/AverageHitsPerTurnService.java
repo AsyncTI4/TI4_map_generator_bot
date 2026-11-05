@@ -82,7 +82,7 @@ public class AverageHitsPerTurnService {
             // Ignore anomaly games (infinite combats, spamming buttons, Franken/TF madness)
             if (player.getExpectedHits() >= ANOMALOUS_NUMBER_OF_HITS_THRESHOLD) continue;
             userToAccumulators
-                    .computeIfAbsent(player.getUser(), user -> new HitsPerTurnAccumulator(user.getName()))
+                    .computeIfAbsent(player.getStatsUser(), user -> new HitsPerTurnAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getTotalNumberOfTurns());
         }
         return userToAccumulators;
