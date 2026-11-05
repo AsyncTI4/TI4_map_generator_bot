@@ -101,7 +101,7 @@
         "color": "",
         "playArea": true,
         "playImmediately": false,
-        "text": "Place this card face up in your play area. You and the J'nahfa player may agree to place 1 infantry from each of your reinforcements into coexistence on a non-home planet the other player controls that contains their ground forces.\n\nAt the start of the status phase, return this card to the J'nahfa player.",
+        "text": "ACTION:\n\nPlace this card face up in your play area. You and the J'nahfa player may agree to place 1 infantry from each of your reinforcements into coexistence on a non-home planet the other player controls that contains their ground forces.\n\nAt the start of the status phase, return this card to the J'nahfa player.",
         "source": "beans"
     }
 ]
