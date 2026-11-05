@@ -53,22 +53,6 @@ class GameRevisionBackfillDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
-    void updateRevisionSetsOnlyTheRevisionColumns() {
-        UserEntity alice = userRepository.save(new UserEntity("1", "alice"));
-        GameEntity legacy = game("pbd1", 3);
-        legacy.getPlayers().add(player(legacy, alice));
-        gameRepository.save(legacy);
-
-        service.updateRevision("pbd1", "revision", GameEntityMapper.MAPPING_VERSION);
-
-        GameEntity updated = gameRepository.findById("pbd1").orElseThrow();
-        assertThat(updated.getRevisionKey()).isEqualTo("revision");
-        assertThat(updated.getMappingVersion()).isEqualTo(GameEntityMapper.MAPPING_VERSION);
-        assertThat(updated.getRound()).isEqualTo(3);
-        assertThat(playerRepository.count()).isEqualTo(1);
-    }
-
-    @Test
     void restoreRewritesTheGameWithoutRenamingExistingUsers() {
         userRepository.save(new UserEntity("1", "alice"));
         userRepository.save(new UserEntity("2", GameEntityMapper.UNKNOWN_USER_PREFIX + "2"));

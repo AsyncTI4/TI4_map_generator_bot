@@ -26,47 +26,40 @@ import ti4.testUtils.BaseTi4Test;
 class GameRevisionKeyFileTest extends BaseTi4Test {
 
     @Test
-    void backfillWritesOneKeyThatLoadingAndLaterReadsSee() throws IOException {
+    void reconciliationReadsAKeylessFileWithoutRewritingIt() throws IOException {
         try (var harness = TestGameHarness.forDefaultMap()) {
             String gameName = harness.getGameName();
             List<String> linesBefore = Files.readAllLines(gamePath(harness), StandardCharsets.UTF_8);
-            assertThat(GameLoadService.load(gameName).getRevisionKey()).isNull();
+            assertThat(GameRevisionKeyFile.read(gameName)).isNull();
 
             reconcile(gameName);
-            String revisionKey = GameLoadService.load(gameName).getRevisionKey();
 
-            assertThat(revisionKey).isNotBlank();
-            assertThat(GameLoadService.load(gameName).getRevisionKey()).isEqualTo(revisionKey);
-            reconcile(gameName);
-            assertThat(GameLoadService.load(gameName).getRevisionKey()).isEqualTo(revisionKey);
-            Game game = GameLoadService.load(gameName);
-            assertThat(game).isNotNull();
-            assertThat(game.getRevisionKey()).isEqualTo(revisionKey);
-
-            // Only the key line is added; every other line of the save is untouched.
-            List<String> linesAfter = Files.readAllLines(gamePath(harness), StandardCharsets.UTF_8);
-            List<String> withoutKey = new ArrayList<>(linesAfter);
-            withoutKey.remove(GamePersistenceKeys.REVISION_KEY + " " + revisionKey);
-            assertThat(withoutKey).isEqualTo(linesBefore);
+            assertThat(Files.readAllLines(gamePath(harness), StandardCharsets.UTF_8))
+                    .isEqualTo(linesBefore);
+            assertThat(GameRevisionKeyFile.read(gameName)).isNull();
         }
     }
 
     @Test
-    void blankKeyLineIsReplacedRatherThanDuplicated() throws IOException {
+    void blankKeyLineReadsAsNoKey() throws IOException {
         try (var harness = TestGameHarness.forDefaultMap()) {
             List<String> lines = new ArrayList<>(Files.readAllLines(gamePath(harness), StandardCharsets.UTF_8));
             lines.add(lines.indexOf(GamePersistenceKeys.GAMEINFO) + 1, GamePersistenceKeys.REVISION_KEY + " ");
             Files.write(gamePath(harness), lines, StandardCharsets.UTF_8);
-            assertThat(GameLoadService.load(harness.getGameName()).getRevisionKey())
-                    .isNullOrEmpty();
 
-            reconcile(harness.getGameName());
-            String revisionKey = GameLoadService.load(harness.getGameName()).getRevisionKey();
+            assertThat(GameRevisionKeyFile.read(harness.getGameName())).isNull();
+        }
+    }
 
-            List<String> keyLines = Files.readAllLines(gamePath(harness), StandardCharsets.UTF_8).stream()
-                    .filter(line -> line.startsWith(GamePersistenceKeys.REVISION_KEY))
-                    .toList();
-            assertThat(keyLines).containsExactly(GamePersistenceKeys.REVISION_KEY + " " + revisionKey);
+    @Test
+    void savedKeyIsReadFromTheHeader() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = GameLoadService.load(harness.getGameName());
+            GameSaveService.save(game, "test");
+
+            assertThat(GameRevisionKeyFile.read(harness.getGameName()))
+                    .isNotBlank()
+                    .isEqualTo(game.getRevisionKey());
         }
     }
 
@@ -88,6 +81,7 @@ class GameRevisionKeyFileTest extends BaseTi4Test {
 
         Path path = Storage.getGamePath(gameName + Constants.TXT);
         assertThat(path).doesNotExist();
+        assertThat(GameRevisionKeyFile.read(gameName)).isNull();
         reconcile(gameName);
         assertThat(path).doesNotExist();
     }

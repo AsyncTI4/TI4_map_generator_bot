@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
-import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,21 +88,6 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         ManagedGameState persisted = persistedManagedGameService.loadAll().get(game.getName());
         assertThat(persisted).isEqualTo(ManagedGameState.of(game));
-    }
-
-    @Test
-    @SuppressWarnings("removal")
-    void currentRevisionKeysLeaveOutRowsFromAnOlderMapping() {
-        Game current = gameWithRealPlayers("pbd-db-revision-current", 3);
-        current.setRevisionKey("current-revision");
-        persistenceService.replace(GameEntityMapper.toSnapshot(current));
-        Game older = gameWithRealPlayers("pbd-db-revision-older", 3);
-        older.setRevisionKey("older-revision");
-        persistenceService.replace(GameEntityMapper.toSnapshot(older));
-        persistenceService.updateRevision(older.getName(), "older-revision", GameEntityMapper.MAPPING_VERSION - 1);
-
-        assertThat(persistedManagedGameService.loadCurrentRevisionKeys())
-                .containsExactlyEntriesOf(Map.of(current.getName(), "current-revision"));
     }
 
     @Test
@@ -279,31 +263,6 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         PersistedGameState persisted = persistedGameStateService.loadAll().get(game.getName());
         assertThat(PersistedGameState.of(snapshot).describeDifferencesFrom(persisted))
                 .isEmpty();
-    }
-
-    @Test
-    void playerRowWrittenByThePreviousReleaseCountsAsPlaying() {
-        Game game = gameWithRealPlayers("pbd-db-previous-release", 3);
-        persistenceService.replace(GameEntityMapper.toSnapshot(game));
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-
-        // The previous release writes only real and eliminated seats and knows nothing of the seat columns, so a
-        // row it inserts during a rolling deploy must default to a playing, non-NPC seat.
-        jdbc.update("DELETE FROM player WHERE game_name = ? AND user_id = ?", game.getName(), "user-1");
-        jdbc.update(
-                "INSERT INTO player (user_id, game_name, faction_name, score, total_number_of_turns, total_turn_time,"
-                        + " expected_hits, actual_hits, is_eliminated, is_winner, is_replaced)"
-                        + " VALUES (?, ?, 'sol', 0, 0, 0, 0, 0, FALSE, FALSE, FALSE)",
-                "user-1",
-                game.getName());
-
-        assertThat(playerRepository.findAllWithUsersByUserIdIn(List.of("user-1")))
-                .singleElement()
-                .satisfies(player -> {
-                    assertThat(player.isPlaying()).isTrue();
-                    assertThat(player.isNpc()).isFalse();
-                    assertThat(player.getPlayingUser()).isNull();
-                });
     }
 
     private void storeGameForEveryStatisticsQuery(

@@ -11,15 +11,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.logging.BotLogger;
 
 @UtilityClass
 class GameRevisionKeyFile {
@@ -27,22 +22,6 @@ class GameRevisionKeyFile {
     @Nullable
     static String read(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> readFrom(gamePath(gameName)));
-    }
-
-    // TODO: Remove once every save has a revision_key line (the first nightly reconcile after #5808 adds one to
-    // each). Without it, a keyless file (e.g. restored from an undo older than #5808) is just re-read each night.
-    @Deprecated(forRemoval = true)
-    @Nullable
-    static String backfill(String gameName) {
-        return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
-            Path gamePath = gamePath(gameName);
-            if (!Files.exists(gamePath)) return null;
-            String existingRevisionKey = readFrom(gamePath);
-            if (existingRevisionKey != null) return existingRevisionKey;
-            String revisionKey = UUID.randomUUID().toString();
-            writeRevisionKey(gamePath, revisionKey);
-            return revisionKey;
-        });
     }
 
     @Nullable
@@ -71,50 +50,6 @@ class GameRevisionKeyFile {
         int separator = line.indexOf(' ');
         String key = separator < 0 ? line : line.substring(0, separator);
         return REVISION_KEY.equals(key);
-    }
-
-    private static void writeRevisionKey(Path gamePath, String revisionKey) {
-        Path temporaryPath = null;
-        try {
-            List<String> lines = withRevisionKey(Files.readAllLines(gamePath, StandardCharsets.UTF_8), revisionKey);
-            temporaryPath = Files.createTempFile(
-                    gamePath.getParent(), gamePath.getFileName().toString(), ".tmp");
-            Files.write(temporaryPath, lines, StandardCharsets.UTF_8);
-            PosixFileSystemUtility.setPermissionsIfPosix(temporaryPath);
-            Files.move(temporaryPath, gamePath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Could not write a revision key to " + gamePath, e);
-        } finally {
-            deleteIfPresent(temporaryPath);
-        }
-    }
-
-    private static List<String> withRevisionKey(List<String> lines, String revisionKey) {
-        int gameInfoIndex = lines.indexOf(GAMEINFO);
-        if (gameInfoIndex < 0) {
-            throw new IllegalStateException("Game file has no " + GAMEINFO + " section");
-        }
-        List<String> updatedLines = new ArrayList<>(lines);
-        String revisionKeyLine = REVISION_KEY + " " + revisionKey;
-        for (int i = gameInfoIndex + 1; i < updatedLines.size(); i++) {
-            String line = updatedLines.get(i);
-            if (ENDGAMEINFO.equals(line)) break;
-            if (isRevisionKeyLine(line)) {
-                updatedLines.set(i, revisionKeyLine);
-                return updatedLines;
-            }
-        }
-        updatedLines.add(gameInfoIndex + 1, revisionKeyLine);
-        return updatedLines;
-    }
-
-    private static void deleteIfPresent(@Nullable Path path) {
-        if (path == null) return;
-        try {
-            Files.deleteIfExists(path);
-        } catch (IOException e) {
-            BotLogger.error("Failed to delete temporary file: " + path, e);
-        }
     }
 
     private static Path gamePath(String gameName) {

@@ -204,7 +204,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             revisionKeys.when(() -> GameRevisionKeyFile.read(gameName)).thenReturn("row-revision");
 
-            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), readsOn()))
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame)))
                     .isTrue();
 
             gameLoadService.verify(() -> GameLoadService.load(gameName), never());
@@ -232,7 +232,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
             revisionKeys.when(() -> GameRevisionKeyFile.read(game.getName())).thenReturn("newer-file-revision");
             gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), staleRow), readsOn()))
+            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), staleRow)))
                     .isFalse();
 
             // The sync reloads the file when it runs, so warmup doesn't hold thousands of snapshots in the queue.
@@ -251,8 +251,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(), readsOn()))
-                    .isFalse();
+            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of())).isFalse();
 
             pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
             pipeline.verifyNoMoreInteractions();
@@ -269,8 +268,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
 
-            assertThat(GameManager.warmupManagedGame(game.getName(), null, readsOn()))
-                    .isFalse();
+            assertThat(GameManager.warmupManagedGame(game.getName(), null)).isFalse();
 
             // With the database unavailable every sync would fail, so warmup must not flood the queue.
             pipeline.verifyNoInteractions();
@@ -287,8 +285,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
             gameLoadService.when(() -> GameLoadService.load(gameName)).thenReturn(null);
 
-            assertThat(GameManager.warmupManagedGame(gameName, Map.of(), readsOn()))
-                    .isFalse();
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of())).isFalse();
 
             // A corrupt file must neither overwrite its database rows nor be treated as deleted.
             pipeline.verifyNoInteractions();
@@ -312,7 +309,7 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                     .thenThrow(new UncheckedIOException(new MalformedInputException(1)));
             gameLoadService.when(() -> GameLoadService.load(gameName)).thenReturn(null);
 
-            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame), readsOn()))
+            assertThat(GameManager.warmupManagedGame(gameName, Map.of(gameName, persistedGame)))
                     .isFalse();
             pipeline.verifyNoInteractions();
         }
@@ -320,73 +317,6 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
         assertThat(GameManager.getManagedGames())
                 .extracting(ManagedGame::getName)
                 .doesNotContain(gameName);
-    }
-
-    @Test
-    void readsOffBuildsFromTheFileAndSkipsTheResyncWhenTheRowMatches() {
-        Game game = newGame("reads-off-match");
-        game.setRevisionKey("file-revision");
-        ManagedGameState currentRow = ManagedGameState.of(game);
-        DatabaseWarmupCheck check = new DatabaseWarmupCheck(false);
-
-        try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
-                MockedStatic<GameRevisionKeyFile> revisionKeys = mockStatic(GameRevisionKeyFile.class);
-                MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            revisionKeys.when(() -> GameRevisionKeyFile.read(game.getName())).thenReturn("file-revision");
-            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
-
-            assertThat(GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), currentRow), check))
-                    .isFalse();
-
-            // The row is current, so it is only compared: nothing is resynced and the file is what gets cached.
-            gameLoadService.verify(() -> GameLoadService.load(game.getName()));
-            pipeline.verifyNoInteractions();
-        }
-        assertThat(check.summary()).contains("1 match", "0 outdated", "0 differ", "will turn on");
-    }
-
-    @Test
-    void readsOffReportsARowThatDiffersFromItsFileAndResyncsIt() {
-        Game game = newGame("reads-off-differs");
-        game.setRevisionKey("file-revision");
-        game.setFowMode(true);
-        ManagedGameState wrongRow = ManagedGameState.of(game);
-        game.setFowMode(false);
-        DatabaseWarmupCheck check = new DatabaseWarmupCheck(false);
-
-        try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
-                MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
-
-            GameManager.warmupManagedGame(game.getName(), Map.of(game.getName(), wrongRow), check);
-
-            pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
-        }
-        assertThat(check.differingGameNames()).containsExactly(game.getName());
-        assertThat(DatabaseWarmupCheck.differingFields(ManagedGameState.of(game), wrongRow))
-                .containsExactly("fowMode");
-        assertThat(check.summary()).doesNotContain("will turn on");
-    }
-
-    @Test
-    void readsOffCountsAnOutdatedOrMissingRowAndResyncsIt() {
-        Game game = newGame("reads-off-outdated");
-        game.setRevisionKey("file-revision");
-        DatabaseWarmupCheck check = new DatabaseWarmupCheck(false);
-
-        try (MockedStatic<GameLoadService> gameLoadService = mockStatic(GameLoadService.class);
-                MockedStatic<GameDatabaseSyncPipeline> pipeline = mockStatic(GameDatabaseSyncPipeline.class)) {
-            gameLoadService.when(() -> GameLoadService.load(game.getName())).thenReturn(game);
-
-            GameManager.warmupManagedGame(game.getName(), Map.of(), check);
-
-            pipeline.verify(() -> GameDatabaseSyncPipeline.queueSyncFromGameFile(game.getName()));
-        }
-        assertThat(check.summary()).contains("1 outdated").doesNotContain("will turn on");
-    }
-
-    private static DatabaseWarmupCheck readsOn() {
-        return new DatabaseWarmupCheck(true);
     }
 
     private static ManagedGame onlyGameOf(String userId) {
@@ -425,21 +355,6 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 null,
                 List.of(new ManagedGameState.Participant(userId, "Warmup User", true, false, false)),
                 Map.of());
-    }
-
-    @Test
-    void startupCheckIgnoresASeatHolderRenamedInTheUserTable() {
-        Game game = newGame("renamed-seat-holder");
-        ManagedGameState fileState = ManagedGameState.of(game);
-        game.getPlayers().values().forEach(player -> player.setUserName("Renamed In Another Game"));
-        ManagedGameState rowState = ManagedGameState.of(game);
-
-        // Seat holder names come from the shared user row, which another game's save may have renamed.
-        assertThat(DatabaseWarmupCheck.differingFields(fileState, rowState)).isEmpty();
-
-        game.getPlayers().values().forEach(player -> player.setNpc(true));
-        assertThat(DatabaseWarmupCheck.differingFields(fileState, ManagedGameState.of(game)))
-                .containsExactly("participants");
     }
 
     private static Game newGame(String prefix) {
