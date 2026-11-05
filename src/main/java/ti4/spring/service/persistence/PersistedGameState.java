@@ -58,7 +58,6 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     public record PlayerRow(
             String statsUserId,
             String playingUserId,
-            String playingUserName,
             boolean playing,
             boolean npc,
             String factionName,
@@ -195,8 +194,7 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     private static PlayerRow toPlayerRow(PlayerEntity player) {
         return new PlayerRow(
                 player.getStatsUser().getId(),
-                player.getPlayingUserId(),
-                player.getPlayingUserName(),
+                player.getPlayingUser() == null ? null : player.getPlayingUser().getId(),
                 player.isPlaying(),
                 player.isNpc(),
                 player.getFactionName(),

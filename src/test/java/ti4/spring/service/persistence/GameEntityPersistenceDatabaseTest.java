@@ -106,6 +106,29 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
+    void seatHolderLinkedOnlyAsThePlayingUserIsNotAnUnreferencedUser() {
+        Game game = gameWithRealPlayers("pbd-db-replaced-seat", 3);
+        Player replacement = game.getPlayer("user-1");
+        game.getPlayers().remove("user-1");
+        replacement.setUserID("replacement-id");
+        replacement.setUserName("Replacement");
+        replacement.setStatsTrackedUserID("user-1");
+        game.getPlayers().put("replacement-id", replacement);
+
+        persistenceService.replace(GameEntityMapper.toSnapshot(game));
+
+        assertThat(userRepository.findById("replacement-id"))
+                .get()
+                .extracting(UserEntity::getName)
+                .isEqualTo("Replacement");
+        assertThat(userRepository.findUnreferencedUserIds()).doesNotContain("replacement-id", "user-1");
+        assertThat(persistedManagedGameService.loadAll().get(game.getName()).participants())
+                .extracting(ManagedGameState.Participant::userId)
+                .contains("replacement-id")
+                .doesNotContain("user-1");
+    }
+
+    @Test
     void resavingAGameReplacesItsSeats() {
         Game game = gameWithRealPlayers("pbd-db-resave", 3);
         game.addPlayer("spectator-id", "Spectator");
@@ -174,7 +197,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         assertThat(playerRepository.findAllWithUsersAndGames())
                 .filteredOn(player -> !player.isPlaying())
-                .extracting(PlayerEntity::getPlayingUserId)
+                .extracting(player -> player.getPlayingUser().getId())
                 .containsExactly("seated-id");
         assertThat(playerRepository.findAllWithUsers()).allMatch(PlayerEntity::isPlaying);
         assertThat(playerRepository.findAllWithUsersByCompletedGame()).allMatch(PlayerEntity::isPlaying);
@@ -245,7 +268,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
                 .satisfies(player -> {
                     assertThat(player.isPlaying()).isTrue();
                     assertThat(player.isNpc()).isFalse();
-                    assertThat(player.getPlayingUserId()).isNull();
+                    assertThat(player.getPlayingUser()).isNull();
                 });
     }
 

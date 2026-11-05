@@ -35,7 +35,7 @@ class MappingShapeFingerprintTest {
     // anywhere in that tree fails the test until MAPPING_VERSION is raised and the fingerprint updated.
     // MappingFingerprintTest covers changes to how values are derived.
     private static final String EXPECTED_FINGERPRINT =
-            "d5510cd63055360880c855810c1a4a4f503ca1b0b94884a09d2929c2465ec01c";
+            "152cbd98f80a4b7a7b229dafa15e93166aef5a76b5e5767066cfb825b2819e70";
     private static final List<Class<?>> STORED_ROOTS = List.of(
             ManagedGameState.class,
             PersistedGameState.class,

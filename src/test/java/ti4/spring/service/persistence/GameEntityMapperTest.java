@@ -45,11 +45,12 @@ class GameEntityMapperTest extends BaseTi4Test {
         assertThat(playerEntity.isReplaced()).isTrue();
         assertThat(playerEntity.getStatsUser().getId()).isEqualTo("original-id");
         assertThat(playerEntity.getStatsUser().getName()).isEqualTo("Original");
-        // Only users a player or title row points at are written, otherwise the nightly reconciler would
-        // delete the replacement's unreferenced user row and report it every night.
+        assertThat(playerEntity.getPlayingUser().getId()).isEqualTo("replacement-id");
+        assertThat(playerEntity.getPlayingUser().getName()).isEqualTo("Replacement");
+        // Both the stats user and the seat holder get user rows, since the player row links to both.
         assertThat(snapshot.users())
                 .extracting(UserEntity::getId)
-                .containsExactlyInAnyOrder("original-id", "second-id", "third-id");
+                .containsExactlyInAnyOrder("original-id", "replacement-id", "second-id", "third-id");
     }
 
     @Test
@@ -108,8 +109,8 @@ class GameEntityMapperTest extends BaseTi4Test {
                 .containsExactlyInAnyOrder("first-id", "second-id", "third-id");
         PlayerEntity spectator = playerFor(snapshot, "spectator-id");
         assertThat(spectator.isPlaying()).isFalse();
-        assertThat(spectator.getPlayingUserId()).isEqualTo("spectator-id");
-        assertThat(spectator.getPlayingUserName()).isEqualTo("Spectator");
+        assertThat(spectator.getPlayingUser().getId()).isEqualTo("spectator-id");
+        assertThat(spectator.getPlayingUser().getName()).isEqualTo("Spectator");
     }
 
     @Test
@@ -145,7 +146,7 @@ class GameEntityMapperTest extends BaseTi4Test {
         assertThat(snapshot.game().getPlayers())
                 .extracting(
                         player -> player.getStatsUser().getId(),
-                        PlayerEntity::getPlayingUserId,
+                        player -> player.getPlayingUser().getId(),
                         PlayerEntity::isPlaying,
                         PlayerEntity::isEliminated,
                         PlayerEntity::isNpc,
@@ -220,8 +221,8 @@ class GameEntityMapperTest extends BaseTi4Test {
         return snapshot.game().getPlayers().stream()
                 .map(player -> new ParticipantRow(
                                 player.getGame().getGameName(),
-                                player.getPlayingUserId(),
-                                player.getPlayingUserName(),
+                                player.getPlayingUser().getId(),
+                                player.getPlayingUser().getName(),
                                 player.isPlaying(),
                                 player.isEliminated(),
                                 player.isNpc())

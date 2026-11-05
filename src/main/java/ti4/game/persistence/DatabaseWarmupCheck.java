@@ -98,7 +98,21 @@ final class DatabaseWarmupCheck {
                 differing.add(component.getName());
             }
         }
+        if (differing.remove("participants") && !sameSeatsIgnoringNames(expected, actual)) {
+            differing.add("participants");
+        }
         return differing;
+    }
+
+    private static boolean sameSeatsIgnoringNames(ManagedGameState expected, ManagedGameState actual) {
+        return withoutNames(expected).equals(withoutNames(actual));
+    }
+
+    private static List<ManagedGameState.Participant> withoutNames(ManagedGameState state) {
+        return state.participants().stream()
+                .map(participant -> new ManagedGameState.Participant(
+                        participant.userId(), null, participant.playing(), participant.eliminated(), participant.npc()))
+                .toList();
     }
 
     private static Object valueOf(RecordComponent component, ManagedGameState state) {

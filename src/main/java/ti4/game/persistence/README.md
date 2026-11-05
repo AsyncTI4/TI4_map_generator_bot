@@ -55,8 +55,10 @@ query on player or title rows leaves them out. Live writes use
 `GameEntityPersistenceService.replace`, which also updates user names.
 
 Every seat in a game gets a `player` row, so warmup can rebuild each
-`ManagedPlayer`. `playing_user_id` is whoever holds the seat now and `user_id`
-is the user its statistics count for, which differs after a `/replace`.
+`ManagedPlayer`. Both user columns link to `user`: `playing_user_id` is whoever
+holds the seat now and `user_id` is the user its statistics count for, which
+differs after a `/replace`. A seat holder's name comes from their shared `user`
+row, so the startup check ignores names when comparing seats.
 `is_playing` marks real and eliminated seats. Seats still in setup and dummies,
 such as the neutral player, are stored with `is_playing` false, and every
 statistics query on player rows leaves them out. `ManagedGame` derives a seat's

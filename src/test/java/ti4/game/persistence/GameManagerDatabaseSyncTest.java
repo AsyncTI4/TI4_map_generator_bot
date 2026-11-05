@@ -427,6 +427,21 @@ class GameManagerDatabaseSyncTest extends BaseTi4Test {
                 Map.of());
     }
 
+    @Test
+    void startupCheckIgnoresASeatHolderRenamedInTheUserTable() {
+        Game game = newGame("renamed-seat-holder");
+        ManagedGameState fileState = ManagedGameState.of(game);
+        game.getPlayers().values().forEach(player -> player.setUserName("Renamed In Another Game"));
+        ManagedGameState rowState = ManagedGameState.of(game);
+
+        // Seat holder names come from the shared user row, which another game's save may have renamed.
+        assertThat(DatabaseWarmupCheck.differingFields(fileState, rowState)).isEmpty();
+
+        game.getPlayers().values().forEach(player -> player.setNpc(true));
+        assertThat(DatabaseWarmupCheck.differingFields(fileState, ManagedGameState.of(game)))
+                .containsExactly("participants");
+    }
+
     private static Game newGame(String prefix) {
         Game game = new Game();
         game.setName(uniqueName(prefix));

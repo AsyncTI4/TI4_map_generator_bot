@@ -30,11 +30,9 @@ public class PlayerEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity statsUser;
 
-    @Column(name = "playing_user_id")
-    private String playingUserId;
-
-    @Column(name = "playing_user_name")
-    private String playingUserName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playing_user_id")
+    private UserEntity playingUser;
 
     @Column(name = "is_playing", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean playing = true;

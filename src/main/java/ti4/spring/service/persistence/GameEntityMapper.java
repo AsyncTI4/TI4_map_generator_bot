@@ -149,8 +149,8 @@ public class GameEntityMapper {
         playerEntity.setEliminated(player.isEliminated());
         playerEntity.setWinner(player.getGame().getWinners().contains(player));
         playerEntity.setReplaced(!Objects.equals(player.getUserID(), statsUserId(player)));
-        playerEntity.setPlayingUserId(player.getUserID());
-        playerEntity.setPlayingUserName(player.getUserName());
+        playerEntity.setPlayingUser(
+                users.computeIfAbsent(player.getUserID(), userId -> toUserEntity(userId, player.getUserName())));
         playerEntity.setPlaying(ManagedGameState.isPlaying(player));
         playerEntity.setNpc(player.isNpc());
         playerEntity.setGame(gameEntity);
