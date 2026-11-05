@@ -3,6 +3,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
@@ -16,6 +17,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
+import ti4.service.transaction.SendPromissoryService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -42,6 +44,16 @@ public class BloomPromissoryHandler {
                 buttons,
                 List.of(Buttons.DECLINE_DELETE_BUTTONS),
                 getBloomPlanetPrefix(holder));
+    }
+
+    public static void returnStarterCultureAtStatusStart(GenericInteractionCreateEvent event, Game game) {
+        Player owner = game.getPNOwner(STARTER_CULTURE);
+        if (owner == null) return;
+        for (Player holder : game.getRealPlayers()) {
+            if (holder != owner && holder.getPromissoryNotesInPlayArea().contains(STARTER_CULTURE)) {
+                SendPromissoryService.returnPromissoryFromPlayAreaToOwner(event, game, holder, owner, STARTER_CULTURE);
+            }
+        }
     }
 
     @ButtonHandler(SELECT_BLOOM_PLANET)
