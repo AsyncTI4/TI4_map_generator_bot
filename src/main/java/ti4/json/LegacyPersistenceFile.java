@@ -10,6 +10,7 @@ import ti4.logging.BotLogger;
 
 // TODO: Remove once every environment has run with AutoPing and TechSummaries in the database and pm_json holds
 // only their .imported copies (moved to the database on 2026-11-05).
+@Deprecated(forRemoval = true, since = "2026-11")
 @UtilityClass
 public class LegacyPersistenceFile {
 

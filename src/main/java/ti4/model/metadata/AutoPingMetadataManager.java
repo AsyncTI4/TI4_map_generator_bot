@@ -17,11 +17,17 @@ import ti4.spring.service.autoping.AutoPingService;
 @UtilityClass
 public class AutoPingMetadataManager {
 
+    // TODO: Remove the AutoPing.json import (this constant, legacyFileChecked, importLegacyFileOnce and
+    // LegacyAutoPings) once every environment has imported it.
+    @Deprecated(forRemoval = true, since = "2026-11")
     private static final String LEGACY_AUTO_PING_FILE = "AutoPing.json";
+
     private static final Duration MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS = Duration.ofMinutes(1);
     private static final Cache<String, Boolean> recentlyDelayedGameNames = Caffeine.newBuilder()
             .expireAfterWrite(MINIMUM_TIME_BETWEEN_PERSISTED_DELAYS)
             .build();
+
+    @Deprecated(forRemoval = true, since = "2026-11")
     private static boolean legacyFileChecked;
 
     public static void setupAutoPing(String gameName) {
@@ -84,6 +90,7 @@ public class AutoPingMetadataManager {
         }
     }
 
+    @Deprecated(forRemoval = true, since = "2026-11")
     private static synchronized void importLegacyFileOnce(AutoPingService service) {
         if (legacyFileChecked) return;
         legacyFileChecked = LegacyPersistenceFile.importIfPresent(
@@ -92,6 +99,7 @@ public class AutoPingMetadataManager {
                 legacy -> legacy.gameNameToAutoPing() == null ? 0 : service.importMissing(legacy.gameNameToAutoPing()));
     }
 
+    @Deprecated(forRemoval = true, since = "2026-11")
     private record LegacyAutoPings(Map<String, AutoPing> gameNameToAutoPing) {}
 
     public record AutoPing(long lastPingTimeEpochMilliseconds, int pingCount, boolean quickPing) {}

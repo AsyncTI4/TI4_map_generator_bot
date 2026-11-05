@@ -17,7 +17,12 @@ import ti4.spring.service.techsummary.TechSummaryService;
 @UtilityClass
 public class TechSummariesMetadataManager {
 
+    // TODO: Remove the TechSummaries.json import (this constant, legacyFileChecked and importLegacyFileOnce) once
+    // every environment has imported it.
+    @Deprecated(forRemoval = true, since = "2026-11")
     private static final String LEGACY_TECH_SUMMARIES_FILE = "TechSummaries.json";
+
+    @Deprecated(forRemoval = true, since = "2026-11")
     private static boolean legacyFileChecked;
 
     public static synchronized void addTech(Game game, Player player, String techId, boolean isResearchAgreement) {
@@ -75,15 +80,19 @@ public class TechSummariesMetadataManager {
 
     private static TechSummaryService serviceWithLegacyImported() {
         TechSummaryService service = TechSummaryService.getBean();
-        if (!legacyFileChecked) {
-            legacyFileChecked = LegacyPersistenceFile.importIfPresent(
-                    LEGACY_TECH_SUMMARIES_FILE,
-                    TechSummaries.class,
-                    legacy -> legacy.gameNameToTechSummary() == null
-                            ? 0
-                            : service.importMissing(legacy.gameNameToTechSummary()));
-        }
+        importLegacyFileOnce(service);
         return service;
+    }
+
+    @Deprecated(forRemoval = true, since = "2026-11")
+    private static void importLegacyFileOnce(TechSummaryService service) {
+        if (legacyFileChecked) return;
+        legacyFileChecked = LegacyPersistenceFile.importIfPresent(
+                LEGACY_TECH_SUMMARIES_FILE,
+                TechSummaries.class,
+                legacy -> legacy.gameNameToTechSummary() == null
+                        ? 0
+                        : service.importMissing(legacy.gameNameToTechSummary()));
     }
 
     public record TechSummaries(Map<String, RoundTechSummaries> gameNameToTechSummary) {}

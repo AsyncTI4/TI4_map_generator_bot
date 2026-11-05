@@ -62,12 +62,15 @@ public class UserSettingsManager {
         return service.find(userId).or(() -> importLegacyFile(userId)).orElseGet(() -> new UserSettings(userId));
     }
 
+    // TODO: Remove with LegacyUserSettingsFiles once every environment has imported its user_settings files.
+    @Deprecated(forRemoval = true, since = "2026-11")
     private static void importLegacyFileIfPresent(String userId) {
         if (UserSettingsService.getBean().find(userId).isEmpty()) {
             importLegacyFile(userId);
         }
     }
 
+    @Deprecated(forRemoval = true, since = "2026-11")
     private static Optional<UserSettings> importLegacyFile(String userId) {
         UserSettings legacy = LegacyUserSettingsFiles.read(userId);
         if (legacy == null) return Optional.empty();

@@ -13,6 +13,7 @@ import ti4.logging.BotLogger;
 
 // TODO: Remove once every environment has run with database-backed user settings and the user_settings
 // directory holds only .imported files (moved to the database on 2026-11-05).
+@Deprecated(forRemoval = true, since = "2026-11")
 @UtilityClass
 class LegacyUserSettingsFiles {
 

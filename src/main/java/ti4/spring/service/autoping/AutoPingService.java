@@ -54,6 +54,7 @@ public class AutoPingService {
         transactionTemplate.executeWithoutResult(_ -> repository.deleteAllByIdInBatch(stored));
     }
 
+    @Deprecated(forRemoval = true, since = "2026-11")
     public int importMissing(Map<String, AutoPing> autoPingsByGameName) {
         Integer imported = transactionTemplate.execute(_ -> {
             Set<String> stored = new HashSet<>(repository.findAllGameNames());
