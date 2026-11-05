@@ -384,5 +384,42 @@
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Bloom."
+  },
+  {
+    "id": "choiragent",
+    "faction": "choir",
+    "type": "agent",
+    "name": "Lyra of the Crypt",
+    "title": "The Keeper in Silence",
+    "abilityWindow": "At the start of a player's turn:",
+    "abilityText": "You may exhaust this card to allow that player to repair 1 of their damaged ships on the game board. If that player was another player, you may ready 1 exhausted planet you control with a resource value less than that ship's cost.",
+    "unlockCondition": "Always Unlocked",
+    "source": "beans",
+    "flavorText": "Be still, O’ living one. The pain shall pass, but its song shall remain."
+  },
+  {
+    "id": "choircommander",
+    "faction": "choir",
+    "type": "commander",
+    "name": "Keyn of the Hollow",
+    "title": "The Watcher in Silence",
+    "abilityWindow": "After an agenda is revealed:",
+    "abilityText": "You may predict aloud an outcome of that agenda. If your prediction is correct, repair one of your units. If the outcome you voted for was not resolved, damage one of your units instead.",
+    "unlockCondition": "There are 3 damaged ships on the game board.",
+    "source": "beans",
+    "flavorText": "I have heard ten thousand final breaths. Not one was truly silent."
+  },
+  {
+    "id": "choirhero",
+    "faction": "choir",
+    "type": "hero",
+    "name": "Mortua of the Tributary",
+    "title": "The Conductor",
+    "abilityName": "Funeral Procession - Last Communion",
+    "abilityWindow": "At the start of a space combat you are participating in:",
+    "abilityText": "Place this card near the game board. Then, damage any number of ships in this system. Your damaged units may move out of systems that contain your command tokens. At the end of this game round, purge this card.",
+    "unlockCondition": "Have 3 scored objectives.",
+    "source": "beans",
+    "flavorText": "Bloom."
   }
 ]

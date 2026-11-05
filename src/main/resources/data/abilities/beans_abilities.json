@@ -301,5 +301,20 @@
         "window": "Once per ground combat, after 1 or more of your opponents infantry are destroyed",
         "windowEffect": "You may place 1 infantry from your reinforcements on that planet.",
         "source": "beans"
+    },
+    {
+        "id": "deaths_refrain",
+        "name": "Death's Refrain",
+        "faction": "choir",
+        "window": "During the \"Repair Units\" step of the status phase",
+        "windowEffect": "You may choose up to 2 of your damaged units on the game board; those units are not repaired.",
+        "source": "beans"
+    },
+    {
+        "id": "morbid_harmony",
+        "name": "Morbid Harmony",
+        "faction": "choir",
+        "permanentEffect": "At any time, if you have more damaged units on the board than not damaged, flip your faction technologies and mech to their requiem side, otherwise, flip them to their lament side; the other side has no effect.",
+        "source": "beans"
     }
 ]

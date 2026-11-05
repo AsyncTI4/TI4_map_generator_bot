@@ -194,6 +194,7 @@ public enum TileEmojis implements TI4Emoji {
     be9_migohs,
     be10_deephs,
     be11_bloomhs,
+    be12_choirhs,
     th1_ardentiahs,
     th2_verydithhs,
     th3_veylorhs,
@@ -460,6 +461,7 @@ public enum TileEmojis implements TI4Emoji {
             case "be9" -> be9_migohs;
             case "be10" -> be10_deephs;
             case "be11" -> be11_bloomhs;
+            case "be12" -> be12_choirhs;
             case "th1" -> th1_ardentiahs;
             case "th2" -> th2_verydithhs;
             case "th3" -> th3_veylorhs;

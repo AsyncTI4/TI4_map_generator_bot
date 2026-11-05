@@ -138,6 +138,7 @@ public enum FactionEmojis implements TI4Emoji {
     migo,
     deep,
     bloom,
+    choir,
 
     // luminous
     arachnera,
@@ -472,6 +473,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "migo" -> migo;
             case "deep" -> deep;
             case "bloom" -> bloom;
+            case "choir" -> choir;
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;
