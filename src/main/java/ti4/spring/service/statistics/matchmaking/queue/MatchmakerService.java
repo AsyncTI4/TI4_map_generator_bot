@@ -19,6 +19,7 @@ import ti4.spring.context.SpringContext;
 public class MatchmakerService {
 
     private final MatchmakingQueueStore queueStore;
+    private final PendingMatchPosts pendingMatchPosts;
 
     public static boolean isQueueingDisabled() {
         return DatabasePersistenceGate.isDisabled();
@@ -149,8 +150,9 @@ public class MatchmakerService {
         List<MatchedGame> gamesToCreate;
         MatchmakingQueueLock.LOCK.lock();
         try {
-            Map<Boolean, List<QueuedParty>> queuedPartyByExpired = queueStore.loadQueuedParties().stream()
-                    .collect(Collectors.partitioningBy(MatchmakerService::isExpired));
+            Map<Boolean, List<QueuedParty>> queuedPartyByExpired =
+                    pendingMatchPosts.withoutHeld(queueStore.loadQueuedParties()).stream()
+                            .collect(Collectors.partitioningBy(MatchmakerService::isExpired));
             expiredParties = queuedPartyByExpired.get(true);
 
             if (!expiredParties.isEmpty()) {
@@ -161,13 +163,7 @@ public class MatchmakerService {
 
             List<QueuedParty> activeParties = queuedPartyByExpired.get(false);
             gamesToCreate = MatchmakingGrouper.formGames(activeParties);
-
-            if (!gamesToCreate.isEmpty()) {
-                queueStore.deleteParties(gamesToCreate.stream()
-                        .flatMap(game -> game.parties().stream())
-                        .map(MatchmakingQueueParty::getId)
-                        .toList());
-            }
+            gamesToCreate.forEach(game -> pendingMatchPosts.hold(partyIds(game)));
         } finally {
             MatchmakingQueueLock.LOCK.unlock();
         }
@@ -175,7 +171,39 @@ public class MatchmakerService {
         if (!expiredParties.isEmpty()) {
             MatchmakingNotifier.notifyExpired(expiredParties);
         }
-        MatchmakingNotifier.postMatchedGames(gamesToCreate);
+        MatchmakingNotifier.postMatchedGames(gamesToCreate, new QueueUpdatingOutcome());
+    }
+
+    private static List<Long> partyIds(MatchedGame game) {
+        return game.parties().stream().map(MatchmakingQueueParty::getId).toList();
+    }
+
+    private void removeFromQueueAndRelease(List<Long> partyIdsToRemove, List<Long> partyIdsToRelease) {
+        MatchmakingQueueLock.LOCK.lock();
+        try {
+            queueStore.deleteParties(partyIdsToRemove);
+        } finally {
+            pendingMatchPosts.release(partyIdsToRelease);
+            MatchmakingQueueLock.LOCK.unlock();
+        }
+    }
+
+    private class QueueUpdatingOutcome implements MatchmakingNotifier.MatchPostOutcome {
+
+        @Override
+        public void posted(MatchedGame game) {
+            removeFromQueueAndRelease(partyIds(game), partyIds(game));
+        }
+
+        @Override
+        public void notPosted(MatchedGame game) {
+            pendingMatchPosts.release(partyIds(game));
+        }
+
+        @Override
+        public void membersLeftGuild(MatchedGame game, List<Long> partyIdsWithDepartedMembers) {
+            removeFromQueueAndRelease(partyIdsWithDepartedMembers, partyIds(game));
+        }
     }
 
     private static boolean isExpired(QueuedParty queuedParty) {
