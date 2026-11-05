@@ -140,6 +140,44 @@ public class SilverFlameService {
         FractureService.enterPlayOrExplain(null, game, player, null);
     }
 
+    Map<UnitKey, Integer> countUnitsToPurge(Tile homeSystem) {
+        Map<UnitKey, Integer> allUnitsCount = new HashMap<>();
+        List<UnitType> singles = List.of(UnitType.Infantry, UnitType.Fighter);
+        for (UnitHolder uh : homeSystem.getUnitHolders().values()) {
+            for (UnitKey key : uh.getUnitsByState().keySet()) {
+                int uhAmt = singles.contains(key.unitType()) ? 1 : uh.getUnitCount(key);
+                allUnitsCount.put(key, allUnitsCount.getOrDefault(key, 0) + uhAmt);
+            }
+        }
+        return allUnitsCount;
+    }
+
+    void reduceUnitCaps(Game game, Map<UnitKey, Integer> unitsToPurge) {
+        for (Entry<UnitKey, Integer> entry : unitsToPurge.entrySet()) {
+            UnitKey key = entry.getKey();
+            Player owner = game.getPlayerFromColorOrFaction(key.colorID());
+            if (owner == null) continue;
+            owner.setUnitCap(key.asyncID(), owner.getUnitCap(key.asyncID()) - entry.getValue());
+        }
+    }
+
+    private StringBuilder describePurgedUnits(Game game, Map<UnitKey, Integer> unitsToPurge) {
+        StringBuilder purgedUnitList = new StringBuilder("Also purged the following units from the game:");
+        for (Entry<UnitKey, Integer> entry : unitsToPurge.entrySet()) {
+            UnitKey key = entry.getKey();
+            Player owner = game.getPlayerFromColorOrFaction(key.colorID());
+            if (owner == null) continue;
+            purgedUnitList
+                    .append("\n> ")
+                    .append(owner.fogSafeEmoji())
+                    .append(key.unitEmoji())
+                    .append(" (x")
+                    .append(entry.getValue())
+                    .append(")");
+        }
+        return purgedUnitList;
+    }
+
     private void resolveSilverFlamePurge(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile homeSystem = player.getHomeSystemTile();
         if (homeSystem == null) {
@@ -150,33 +188,9 @@ public class SilverFlameService {
 
         game.setStoredValue("silverFlamed", player.getFaction());
 
-        // count units
-        Map<UnitKey, Integer> allUnitsCount = new HashMap<>();
-        List<UnitType> singles = List.of(UnitType.Infantry, UnitType.Fighter);
-        for (UnitHolder uh : homeSystem.getUnitHolders().values()) {
-            for (UnitKey key : uh.getUnitsByState().keySet()) {
-                int uhAmt = singles.contains(key.unitType()) ? 1 : uh.getUnitCount(key);
-                allUnitsCount.put(key, allUnitsCount.getOrDefault(key, 0) + uhAmt);
-            }
-        }
-
-        // purge units
-        StringBuilder purgedUnitList = new StringBuilder("Also purged the following units from the game:");
-        for (Entry<UnitKey, Integer> entry : allUnitsCount.entrySet()) {
-            UnitKey key = entry.getKey();
-            Player owner = game.getPlayerFromColorOrFaction(key.colorID());
-            if (owner == null) continue;
-
-            int quantity = entry.getValue();
-            owner.setUnitCap(key.asyncID(), owner.getUnitCap(key.asyncID()) - quantity);
-            purgedUnitList
-                    .append("\n> ")
-                    .append(owner.fogSafeEmoji())
-                    .append(key.unitEmoji())
-                    .append(" (x")
-                    .append(quantity)
-                    .append(")");
-        }
+        Map<UnitKey, Integer> allUnitsCount = countUnitsToPurge(homeSystem);
+        reduceUnitCaps(game, allUnitsCount);
+        StringBuilder purgedUnitList = describePurgedUnits(game, allUnitsCount);
 
         // Post messages
         String message = "## " + rep() + " was used to purge the " + player.fogSafeEmoji() + " home system in "
