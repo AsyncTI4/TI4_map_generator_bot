@@ -20,6 +20,7 @@ import ti4.spring.context.SpringContext;
 public class PlayerSearchService {
 
     private final MatchmakingQueueStore queueStore;
+    private final PendingMatchPosts pendingMatchPosts;
 
     public static PlayerSearchService get() {
         return SpringContext.getBean(PlayerSearchService.class);
@@ -51,7 +52,7 @@ public class PlayerSearchService {
             Duration hostWait,
             int targetSize,
             int openSlots) {
-        List<QueuedParty> queued = new ArrayList<>(queueStore.loadQueuedParties());
+        List<QueuedParty> queued = new ArrayList<>(pendingMatchPosts.withoutHeld(queueStore.loadQueuedParties()));
         queued.sort(Comparator.comparing(party -> party.party().getQueuedAt()));
 
         Map<MatchmakingQueueMember, PlayerMatchmakingData> partyData =
