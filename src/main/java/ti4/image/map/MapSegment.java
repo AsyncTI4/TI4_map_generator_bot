@@ -53,6 +53,8 @@ public record MapSegment(
     private static final String PIN_KEY = "fowMapSectorNames";
     private static final String CLUSTER_TOKEN = "c";
     private static final String SHAPE_TOKEN = "s";
+    private static final String INVALID_NAME =
+            "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
     private static final List<String> FRACTURE_POSITIONS =
             IntStream.rangeClosed(1, 25).mapToObj(i -> "frac" + i).toList();
 
@@ -400,7 +402,7 @@ public record MapSegment(
     @Nullable
     private static String nameProblem(String name) {
         if (!SegmentNames.isValid(name)) {
-            return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
+            return INVALID_NAME;
         }
         if (SegmentNames.isReserved(name)) {
             return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are reserved segment names.";
@@ -486,7 +488,7 @@ public record MapSegment(
     @Nullable
     public static String rename(Game game, String from, String to) {
         if (!SegmentNames.isValid(to)) {
-            return "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
+            return INVALID_NAME;
         }
         if (SegmentNames.isReserved(from) || SegmentNames.isReserved(to)) {
             return "`" + MAIN + "`, `" + FRACTURE + "` and `board-a` to `board-g` are built in and cannot be renamed or"
@@ -655,8 +657,8 @@ public record MapSegment(
                 .collect(Collectors.toSet());
     }
 
-    public boolean isDerivedFromMap() {
-        return kind == Kind.CLUSTER || kind == Kind.AUTO;
+    public boolean hidesUnknownPositions() {
+        return kind == Kind.CLUSTER || kind == Kind.AUTO || kind == Kind.SHAPE;
     }
 
     public Set<String> positions() {

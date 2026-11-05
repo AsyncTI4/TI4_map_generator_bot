@@ -40,6 +40,21 @@ class CustomPONameForTest extends BaseTi4Test {
         assertThat(game.customPONameFor(arborec, "Total War VPs")).isEqualTo("Total War VPs 2");
     }
 
+    // A PO left without scorers (GM unscore, removed Cathedral monument) must not hand its VP to the next scorer,
+    // since Total War and Bounty add 1 to whatever the named PO already holds.
+    @Test
+    void unscoredNeutralPOIsDroppedNotHandedToTheNextScorer() {
+        Game game = new Game();
+        game.setFowMode(true);
+        Player mentak = seat(game, "user-1", "mentak", "red");
+        Player arborec = seat(game, "user-2", "arborec", "plum");
+        score(game, mentak, "Total War VPs", 3);
+        game.unscorePublicObjective(mentak.getUserID(), "Total War VPs");
+
+        assertThat(game.customPONameFor(arborec, "Total War VPs")).isEqualTo("Total War VPs");
+        assertThat(game.getCustomPublicVP()).doesNotContainKey("Total War VPs");
+    }
+
     // Faction- and colour-named POs from before the fix lose their identity on the owner's next score, keeping VP and
     // scorer.
     @Test

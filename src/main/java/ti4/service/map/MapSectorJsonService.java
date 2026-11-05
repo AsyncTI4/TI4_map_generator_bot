@@ -367,6 +367,9 @@ class MapSectorJsonService {
         Set<String> namedByTiles =
                 positionsByName.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
         for (ListedSector sector : listedAutomatic) {
+            if (positionsByName.size() >= MapSegment.MAX_SEGMENTS) {
+                return;
+            }
             Set<String> positions = sector.positions().stream()
                     .filter(MapSegment::canJoinSector)
                     .collect(Collectors.toSet());
@@ -468,8 +471,9 @@ class MapSectorJsonService {
             attachSector(
                     tilesByPosition, segment.centre(), sectorIO(manualType(segment), segment.radius(), segment.name()));
         }
+        List<MapSegment> segments = MapSegment.all(game);
         if (MapSegment.isAutoSectors(game)) {
-            for (MapSegment segment : MapSegment.all(game)) {
+            for (MapSegment segment : segments) {
                 if (segment.kind() != MapSegment.Kind.AUTO) {
                     continue;
                 }
@@ -478,7 +482,7 @@ class MapSectorJsonService {
                         tilesByPosition, segment.anchor(), sectorIO(SectorType.AUTOMATIC, MapSegment.gap(game), name));
             }
         }
-        List<SectorListIO> listed = MapSegment.all(game).stream()
+        List<SectorListIO> listed = segments.stream()
                 .map(MapSectorJsonService::listedSector)
                 .flatMap(Optional::stream)
                 .toList();

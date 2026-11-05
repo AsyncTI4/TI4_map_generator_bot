@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.AliasHandler;
 import ti4.logging.BotLogger;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
@@ -322,7 +323,8 @@ public class TestBedScriptService {
                     errors.add(label + ": `placeTile` key `" + step.getKey() + "` is not a tile position.");
                 }
                 if (step.getValue() != null
-                        && !TileHelper.isValidTile(step.getValue().toLowerCase())) {
+                        && !TileHelper.isValidTile(
+                                AliasHandler.resolveTile(step.getValue().toLowerCase()))) {
                     errors.add(label + ": unknown tile `" + step.getValue() + "`.");
                 }
             }

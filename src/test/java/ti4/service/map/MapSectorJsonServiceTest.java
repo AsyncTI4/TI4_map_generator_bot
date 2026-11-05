@@ -405,6 +405,29 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
         assertThat(errors).isEmpty();
     }
 
+    // A clean export lists every automatic sector; a map with more than 20 must still re-import without errors.
+    @Test
+    void listedAutomaticNamesStopAtThePinCapWithoutErrors() {
+        List<String> separate = new ArrayList<>();
+        for (int index = 1; index <= 23; index += 2) {
+            separate.add(String.format("4%02d", index));
+        }
+        for (int index = 1; index <= 17; index += 2) {
+            separate.add(String.format("6%02d", index));
+        }
+        for (int index = 0; index < separate.size(); index++) {
+            place(separate.get(index));
+            listed("sector-" + index, "automatic", null, null, separate.get(index));
+        }
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(errors).isEmpty();
+        assertThat(MapSegment.all(game).stream().map(MapSegment::name))
+                .contains("sector-0", "sector-19")
+                .doesNotContain("sector-20");
+    }
+
     @Test
     void perTileAutomaticNameWinsOverTheList() {
         place("401").setSector(sector("automatic", 0, "far-reach"));

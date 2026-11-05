@@ -2160,30 +2160,31 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             return label + " (" + player.getFaction() + ")";
         }
         anonymizeIdentifiedCustomPOs(player, label);
-        List<String> neutralNames = neutralCustomPONames(label);
-        return neutralNames.stream()
+        removeUnscoredNeutralCustomPOs(label);
+        return neutralCustomPONames(label).stream()
                 .filter(name -> customPOScorers(name).contains(player.getUserID()))
                 .findFirst()
-                .or(() -> neutralNames.stream()
-                        .filter(name -> customPOScorers(name).isEmpty())
-                        .findFirst())
                 .orElseGet(() -> nextNeutralCustomPOName(label));
     }
 
-    private boolean anonymizeIdentifiedCustomPOs(Player player, String label) {
-        boolean renamed = false;
+    private void anonymizeIdentifiedCustomPOs(Player player, String label) {
         for (String identity : new String[] {player.getFaction(), player.getColor()}) {
             if (identity != null) {
-                renamed |= renameCustomPO(label + " (" + identity + ")", nextNeutralCustomPOName(label));
+                renameCustomPO(label + " (" + identity + ")", nextNeutralCustomPOName(label));
             }
         }
-        return renamed;
+    }
+
+    private void removeUnscoredNeutralCustomPOs(String label) {
+        neutralCustomPONames(label).stream()
+                .filter(name -> customPOScorers(name).isEmpty())
+                .forEach(this::removeCustomPO);
     }
 
     private List<String> neutralCustomPONames(String label) {
-        String numbered = Pattern.quote(label) + " \\d+";
+        Pattern numbered = Pattern.compile(Pattern.quote(label) + " \\d+");
         return customPublicVP.keySet().stream()
-                .filter(name -> name.equals(label) || name.matches(numbered))
+                .filter(name -> name.equals(label) || numbered.matcher(name).matches())
                 .sorted(Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder()))
                 .toList();
     }
@@ -2200,16 +2201,15 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return scoredPublicObjectives.getOrDefault(name, List.of());
     }
 
-    private boolean renameCustomPO(String oldName, String newName) {
+    private void renameCustomPO(String oldName, String newName) {
         if (!customPublicVP.containsKey(oldName) || customPublicVP.containsKey(newName)) {
-            return false;
+            return;
         }
         int vp = customPublicVP.get(oldName);
         List<String> scorers = new ArrayList<>(scoredPublicObjectives.getOrDefault(oldName, List.of()));
         removeCustomPO(oldName);
         Integer poIndex = addCustomPO(newName, vp);
         scorers.forEach(userID -> scorePublicObjective(userID, poIndex));
-        return true;
     }
 
     public boolean addSOToGame(String id) {

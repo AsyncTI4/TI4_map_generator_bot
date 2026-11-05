@@ -60,6 +60,15 @@ class MapSegmentTest extends BaseTi4Test {
         assertEquals(Set.of("301", "202"), positionsOf("wedge"));
     }
 
+    // A hand-drawn shape can trace the real systems, so a player's view must not draw hexes they have not seen;
+    // a circle's outline gives nothing away.
+    @Test
+    void privateViewsDrawOnlyKnownHexesOfShapesClustersAndAutoSectors() {
+        assertTrue(MapSegment.shape("wedge", Set.of("301")).hidesUnknownPositions());
+        assertTrue(MapSegment.cluster("open", "000", 0).hidesUnknownPositions());
+        assertFalse(new MapSegment("core", "000", 1).hidesUnknownPositions());
+    }
+
     @Test
     void handEditsRefuseCirclesClustersAndAutomaticMode() {
         MapSegment.put(game, new MapSegment("core", "000", 1));
