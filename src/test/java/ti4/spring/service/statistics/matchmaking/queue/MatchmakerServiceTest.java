@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -146,6 +147,23 @@ class MatchmakerServiceTest extends BaseTi4Test {
                 .satisfies(game -> assertThat(game.members())
                         .extracting(MatchmakingQueueMember::getUserId)
                         .containsExactlyInAnyOrder("p2", "p3", "p4"));
+    }
+
+    // Groups used to be refused with "You cannot queue for TIGL as a group".
+    @Test
+    void aFormedGroupCanQueueForTigl() {
+        MatchmakingQueueMember member = new MatchmakingQueueMember();
+        member.setUserId("p1");
+        member.setPartyId(7L);
+        MatchmakingQueueParty group = new MatchmakingQueueParty();
+        group.setId(7L);
+        when(queueStore.findMember("p1")).thenReturn(Optional.of(member));
+        when(queueStore.findParty(7L)).thenReturn(Optional.of(group));
+
+        Optional<String> error = matchmakerService.queue("p1", true);
+
+        assertThat(error).isEmpty();
+        verify(queueStore).markQueued(group, "p1", true);
     }
 
     private record PostedMatches(List<MatchedGame> games, MatchmakingNotifier.MatchPostOutcome outcome) {}

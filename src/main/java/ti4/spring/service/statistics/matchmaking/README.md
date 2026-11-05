@@ -139,13 +139,13 @@ flowchart TD
 ## Queueing
 
 The queue buttons are posted with `/developer post_matchmaking_buttons [tigl]`: Queue for Game (or Queue for
-TIGL), Leave Queue, View Queue, Form Group (non-TIGL only) and Additional Settings (max queue time, avoid list).
+TIGL), Leave Queue, View Queue, Form Group and Additional Settings (max queue time, avoid list).
 
 ```mermaid
 flowchart TD
     A[Click Queue for Game or Queue for TIGL] --> B{Queueing disabled<br/>or already queued?}
     B -->|Yes| X[Ephemeral refusal]
-    B -->|No| C{TIGL and in a group?}
+    B -->|No| C{TIGL and group<br/>larger than 6?}
     C -->|Yes| X
     C -->|No| D["Preferences modal<br/>(options filtered by group size,<br/>valid paces and restrictions)"]
     D --> E[Submit: check game limits]
@@ -160,8 +160,9 @@ flowchart TD
 - **Groups.** Form Group picks up to 7 others. It refuses anyone already in a group or the queue, avoid-list
   conflicts within the group, and members over their game limit. The group is stored unqueued until a member
   queues it; that member's preferences become the group's.
-- **TIGL** is solo only, always 6 players with Prophecy of Kings and Thunder's Edge, and offers only ranks at or
-  below the player's own TIGL rank.
+- **TIGL** is always 6 players with Prophecy of Kings and Thunder's Edge, and offers only ranks at or below the
+  player's own TIGL rank. A group of up to 6 may queue for TIGL; it uses its highest-ranked member's rank, so
+  lower-ranked members can play up with a higher-ranked partner.
 - **Leaving.** Leave Queue removes the player's whole party. Joining a game thread, being added to one, or
   launching a game also takes a player out of the queue.
 
@@ -197,8 +198,8 @@ sequenceDiagram
 ```
 
 **Expiry.** A party expires once `queuedAt` plus the leader's max queue time has passed. The options are 4 hours,
-8 hours, 1 day, 2 days and 1 week. The modal defaults to 8 hours, but a missing or unknown setting falls back to
-48 hours. Expired solo players get a DM; every expired party is logged.
+8 hours, 1 day, 2 days and 1 week. The modal defaults to 2 days, and a missing or unknown setting also falls
+back to 48 hours (both read `MatchmakingOptions.DEFAULT_MAX_QUEUE_TIME_OPTION`). Expired solo players get a DM; every expired party is logged.
 
 **Forming games** (`MatchmakingGrouper.formGames`):
 
@@ -209,8 +210,10 @@ sequenceDiagram
    game and the others join while they fit and every pair of players is compatible. For TIGL the whole game must
    still share a rank. If the game doesn't fill, the seed is dropped and the next party seeds.
 4. A full game's restrictions are the union of its leaders' restrictions; its TIGL ranks are the shared ranks.
-5. **Near matches.** Leftover groups exactly one player short also become games when some party has waited 24
-   hours, or when some party is within 1 hour of expiring. They post with a standing search for the last seat.
+5. **Near matches.** Leftover groups short of a full game but holding at least half the seats plus one (3 of 4,
+   4 of 5 or 6) also become games when some party has waited 24 hours, or when some party is within 1 hour of
+   expiring. The fullest groups go first. They post with a standing search for the open seats. A 2-player game
+   has no near match.
 
 **Compatibility** (`MatchmakingCompatibilityService.areIncompatible`), checked in this order:
 
@@ -330,9 +333,6 @@ sequenceDiagram
 
 ## Known quirks
 
-- The two max-queue-time defaults disagree: the modal preselects 8 hours, `MatchmakingOptions.getHours` falls
-  back to 48.
-- A near match is always exactly one player short, so its "at least half the seats plus one" check always passes
-  for games of 3 or more.
-- The javadoc on `MatchmakingQueueLock` still describes a single-connection database pool; the database is now
-  Postgres with a normal connection pool.
+- When a recruiting TIGL thread's roster changes, `updateForRoster` narrows its ranks to those at or below the
+  lowest-ranked member, while a group queues at its highest-ranked member's rank. A group-matched game queued for
+  Minister and Hero can drop to Minister. It never empties the ranks.

@@ -38,9 +38,7 @@ class PostMatchmakingButtons extends Subcommand {
         buttons.add(queueButton);
         buttons.add(Buttons.red(LEAVE_QUEUE_BUTTON_ID, "Leave Queue"));
         buttons.add(Buttons.blue(VIEW_QUEUE_BUTTON_ID, "View Queue"));
-        if (!tigl) {
-            buttons.add(Buttons.green(FORM_GROUP_BUTTON_ID, "Form Group"));
-        }
+        buttons.add(Buttons.green(FORM_GROUP_BUTTON_ID, "Form Group"));
         buttons.add(Buttons.gray(ADDITIONAL_SETTINGS_BUTTON_ID, "Additional Settings"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),

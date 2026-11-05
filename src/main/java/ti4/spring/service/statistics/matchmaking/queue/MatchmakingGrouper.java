@@ -44,9 +44,6 @@ class MatchmakingGrouper {
         return gamesToCreate;
     }
 
-    // Detect candidates from the parties that ended up in no full game; a candidate is a compatible
-    // group one player short of a full game that either has a player who waited the full long-queue
-    // duration, or has a near-expiry player.
     private static void formNearMatches(
             List<GameConfig> configsToTry,
             Map<GameConfig, List<QueuedParty>> partiesByConfig,
@@ -56,12 +53,15 @@ class MatchmakingGrouper {
         Instant now = Instant.now();
         List<NearMatchCandidate> candidates = new ArrayList<>();
         for (GameConfig config : configsToTry) {
-            int targetSize = config.playerCountValue() - 1;
-            if (targetSize < 1) continue;
+            int fullPlayerCount = config.playerCountValue();
             List<QueuedParty> available = ungrouped(partiesByConfig.get(config), partiesAddedToGames);
-            for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, playerMatchmakingData)) {
-                if (qualifiesAsNearMatch(group, config.playerCountValue(), now)) {
-                    candidates.add(new NearMatchCandidate(config, group));
+            for (int targetSize = fullPlayerCount - 1;
+                    targetSize >= minPlayersForNearMatch(fullPlayerCount);
+                    targetSize--) {
+                for (List<QueuedParty> group : formGroupsOfSize(available, targetSize, playerMatchmakingData)) {
+                    if (qualifiesAsNearMatch(group, now)) {
+                        candidates.add(new NearMatchCandidate(config, group));
+                    }
                 }
             }
         }
@@ -76,11 +76,8 @@ class MatchmakingGrouper {
         }
     }
 
-    private static boolean qualifiesAsNearMatch(List<QueuedParty> group, int fullPlayerCount, Instant now) {
-        boolean longestQueuedWaitedLongEnough = group.stream().anyMatch(party -> hasLongQueueDuration(party, now));
-        boolean nearExpiryAndHasMinimumPlayerCount = totalPlayers(group) >= minPlayersForNearMatch(fullPlayerCount)
-                && group.stream().anyMatch(party -> isNearExpiry(party, now));
-        return longestQueuedWaitedLongEnough || nearExpiryAndHasMinimumPlayerCount;
+    private static boolean qualifiesAsNearMatch(List<QueuedParty> group, Instant now) {
+        return group.stream().anyMatch(party -> hasLongQueueDuration(party, now) || isNearExpiry(party, now));
     }
 
     private static int minPlayersForNearMatch(int fullPlayerCount) {
