@@ -305,7 +305,7 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         LabelChildComponent ranks = buildMultiSelect(
                 TIGL_RANKS_ID,
-                MatchmakingOptions.TIGL_RANK_OPTIONS,
+                allowedTiglRanks(List.of(event.getUser()), MatchmakingOptions.TIGL_RANK_OPTIONS),
                 userSettings.getMatchmakingTiglRanks(),
                 DEFAULT_TIGL_RANK_OPTIONS,
                 REQUIRE_SELECTION);
@@ -391,11 +391,7 @@ class MatchmakingButtonHandler {
                 groupPaceOptions(gameMemberIds),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS);
-        List<String> rankOptions = TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(
-                memberUsers(gameMembers), MatchmakingOptions.TIGL_RANK_OPTIONS);
-        if (rankOptions.isEmpty()) {
-            rankOptions = List.of(MatchmakingOptions.UNRANKED_OPTION);
-        }
+        List<String> rankOptions = allowedTiglRanks(memberUsers(gameMembers), MatchmakingOptions.TIGL_RANK_OPTIONS);
         LabelChildComponent ranks = buildMultiSelect(
                 TIGL_RANKS_ID, rankOptions, userSettings.getMatchmakingTiglRanks(), DEFAULT_TIGL_RANK_OPTIONS, true);
         Modal.Builder modal = Modal.create(SEARCH_FOR_PLAYERS_TIGL_MODAL_ID, "Search for Players")
@@ -685,8 +681,14 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
                 .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
                 .toList());
-        userSettings.setMatchmakingTiglRanks(getSelectedValues(event, TIGL_RANKS_ID));
+        userSettings.setMatchmakingTiglRanks(
+                allowedTiglRanks(List.of(event.getUser()), getSelectedValues(event, TIGL_RANKS_ID)));
         UserSettingsManager.save(userSettings);
+    }
+
+    static List<String> allowedTiglRanks(List<User> users, List<String> requestedRanks) {
+        List<String> allowed = TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(users, requestedRanks);
+        return allowed.isEmpty() ? List.of(MatchmakingOptions.UNRANKED_OPTION) : allowed;
     }
 
     private static boolean isPlayerAtGameLimit(ModalInteractionEvent event, String userId, UserSettings userSettings) {
