@@ -319,6 +319,15 @@ public class TaAbilityHandler {
                 && planet.getTokenList().stream().anyMatch(token -> Mapper.getAttachmentInfo(token) != null);
     }
 
+    public static boolean planetHasNonWorldshaperAttachment(Tile tile, String planetName) {
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+        return planet != null
+                && planet.getTokenList().stream()
+                        .map(Mapper::getAttachmentInfo)
+                        .anyMatch(attachment ->
+                                attachment != null && !attachment.getAlias().startsWith("worldshaper"));
+    }
+
     public static boolean planetHasGrandDesignAttached(Tile tile, String planetName) {
         Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
         if (planet == null) {

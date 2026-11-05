@@ -50,7 +50,7 @@ public final class TestBedScriptRunner {
     private static final int MAX_DETAIL = 160;
     private static final int SNAPSHOT_MESSAGES = 5;
     private static final Set<String> STATE_ONLY_ACTIONS =
-            Set.of("setStored", "removeStored", "actAs", "stackExplore", "removeToken", "setGameOption");
+            Set.of("setStored", "removeStored", "actAs", "stackExplore", "removeToken", "setGameOption", "placeTile");
 
     private enum Status {
         PASS,
@@ -495,6 +495,10 @@ public final class TestBedScriptRunner {
             }
             case "removeToken" -> {
                 String problem = TestBedComponentService.removeToken(game, step.getKey(), step.getValue());
+                if (problem != null) problems.add(problem);
+            }
+            case "placeTile" -> {
+                String problem = TestBedComponentService.placeTile(game, step.getKey(), step.getValue());
                 if (problem != null) problems.add(problem);
             }
             case "setActivePlayer" -> {

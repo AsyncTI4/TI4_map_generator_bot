@@ -269,7 +269,9 @@ public class DreamUnitsHandler {
     }
 
     private static List<Tile> getLiturgyDestinations(Game game, Player player, Tile activeTile) {
-        if (!hasLiturgyII(player, activeTile)) return List.of(activeTile);
+        if (!hasLiturgyII(player, activeTile)) {
+            return activeTile.isHomeSystem(game) ? List.of() : List.of(activeTile);
+        }
 
         return game.getTileMap().values().stream()
                 .filter(tile -> !tile.isHomeSystem(game))

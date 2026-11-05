@@ -210,7 +210,7 @@
     "name": "Serael",
     "title": "The Shepherd",
     "unlockCondition": "Always Unlocked",
-    "abilityWindow": "After a player activates a system",
+    "abilityWindow": "After a player activates a non-home system",
     "abilityText": "You may exhaust this card to allow that player to choose 1 system that contains a non-home anomaly. That player may treat that system as adjacent to the active system during this tactical action.",
     "source": "beans"
   },
@@ -293,7 +293,7 @@
     "name": "Khal'Yth",
     "title": "The Preserver",
     "abilityWindow": "Ongoing",
-    "abilityText": "Apply +1 to the resource and influence values of planets you control that have technology specialties.",
+    "abilityText": "Planets you control that have technology specialties have their resource and influence values increased by 1.",
     "unlockCondition": "Control 3 planets that have technology specialties.",
     "source": "beans",
     "flavorText": "Keth y’gol. Keth n’gha. Keth vorr."
@@ -306,7 +306,7 @@
     "title": "The Ascendant Mind",
     "abilityName": "Xenobiological Feedback - Perfect Loop",
     "abilityWindow": "ACTION:",
-    "abilityText": "Ready up to 4 technologies or planets that have a technology specialty.",
+    "abilityText": "Ready up to 4 technologies or planets that have a technology specialty, then purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Y’gol na khal. Y’gol na keth. Y’gol na thuun."
@@ -343,7 +343,7 @@
     "title": "The Deep",
     "abilityName": "Inevitable Ruin - All-Consuming",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place this card near the game board. Then, replace The Deep planet card with The Deep, Ascended planet card and its legendary ability card and ready them. For the rest of the game, abilities that refer to The Deep One now refer to The Deep, Ascended.",
+    "abilityText": "Replace The Deep planet card and its unit card with The Deep, Ascended planet card, its unit card, and its legendary ability card and ready them. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "The stars mistook its slumber for mercy."
@@ -366,7 +366,7 @@
     "type": "commander",
     "name": "Vaa'kul",
     "title": "The Root-Speaker",
-    "abilityWindow": "When another player activates a system that contains a planet you are coexisting on:",
+    "abilityWindow": "When another player activates a system that contains a planet your units are coexisting on:",
     "abilityText": "You may move 1 infantry from another planet you are coexisting on onto that planet.",
     "unlockCondition": "Have units coexisting on 1 cultural, 1 hazardous, and 1 industrial planet.",
     "source": "beans",
@@ -380,7 +380,7 @@
     "title": "The Blight",
     "abilityName": "Fungal Bloom - Rapid Dispersal",
     "abilityWindow": "ACTION:",
-    "abilityText": "Place 1 infantry from your reinforcements on each planet you are coexisting on. Then, for each of those planets that contains 2 or more of your ground forces, you may place 1 infantry from your reinforcements into coexistence on a non-home planet in or adjacent to that system. Then, purge this card.",
+    "abilityText": "Place 1 infantry from your reinforcements on each planet your units are coexisting on. Then, for each of those planets that contains 2 or more of your ground forces, you may place 1 infantry from your reinforcements into coexistence on a non-home planet in or adjacent to that system. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Bloom."

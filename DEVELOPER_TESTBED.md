@@ -302,7 +302,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -331,7 +331,9 @@ Every step may also have a `label` for the report.
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),
   `customAdjacencies` (`<primary>><listed>`), `customHyperlanes` (`<position>:<matrix>`, one-way lanes as `2`),
   `fowOptions` (enabled fog options, e.g. `fow_plus,ghost_hexes`; includes `disable_fracture`), `fogPreset`
-  (`standard`, `plus`, `normal`, `beginner` or `custom`);
+  (`standard`, `plus`, `normal`, `beginner` or `custom`), `sectors` (every map sector as
+  `<name>:<kind>:<positions with a system>`, e.g. `rim:shape:a101 a102`; kinds `circle`, `cluster`, `shape`,
+  `auto`, `board`, `fracture`);
   `tile.<position>.` + `units` (`space:blue_dd=2`), `ccs`, `tokens`, `planets`;
   `planet.<id>.` + `owner`, `units`, `tokens`; `stored:<key>`. Lists are sorted and comma-joined.
 - **Placeholders:** `{ac:<id>}`, `{so:<id>}`, `{pn:<id>}` (the acting seat's hand number), `{<seat>.faction}`,
