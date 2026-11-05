@@ -494,8 +494,9 @@ public class FactionDraftable extends SinglePickDraftable {
                 }
             }
 
-            List<MessageEmbed> embeds =
-                    factions.stream().map(FactionModel::fancyEmbed).toList();
+            List<MessageEmbed> embeds = factions.stream()
+                    .flatMap(faction -> faction.fancyEmbeds().stream())
+                    .toList();
             MessageHelper.sendMessageToChannelWithEmbeds(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + ", here is an overview of the factions.",
