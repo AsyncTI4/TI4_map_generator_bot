@@ -1,6 +1,7 @@
 package ti4.spring.service.usersettings;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,12 @@ public class UserSettingsService {
 
     public Optional<UserSettings> find(String userId) {
         return repository.findById(userId).map(UserSettingsService::toUserSettings);
+    }
+
+    public List<UserSettings> findAllById(Collection<String> userIds) {
+        return repository.findAllById(userIds).stream()
+                .map(UserSettingsService::toUserSettings)
+                .toList();
     }
 
     public List<UserSettings> findAll() {
