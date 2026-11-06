@@ -432,6 +432,10 @@ public final class ButtonHelperTacticalAction {
         String message3 = "You have "
                 + Helper.getProductionValue(player, game, game.getTileByPosition(pos), false)
                 + " PRODUCTION value in this system.\n";
+        String fleetSummary = ButtonHelper.fleetAndCapacitySummary(player, game, game.getTileByPosition(pos));
+        if (!fleetSummary.isEmpty()) {
+            message3 += fleetSummary + "\n";
+        }
         if (player.hasUnit("myrr_dreadnought") || player.hasUnit("myrr_dreadnought2")) {
             message3 += MyrrUnitsHandler.getReplicatorProductionReminder(player, game.getTileByPosition(pos));
         }
@@ -1436,10 +1440,13 @@ public final class ButtonHelperTacticalAction {
         if (!game.isFowMode()) {
             MessageHelper.sendEphemeralFileInResponseToButtonPressComplete(file, event);
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
-                systemButtons);
+        String moveFromMessage =
+                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.";
+        String activeSystemFleetSummary = ButtonHelper.fleetAndCapacitySummary(player, game, tile);
+        if (!activeSystemFleetSummary.isEmpty()) {
+            moveFromMessage += "\n-# Active system: " + activeSystemFleetSummary;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), moveFromMessage, systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {

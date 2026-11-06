@@ -36,7 +36,7 @@ final class FowSetupGameOptionsService {
 
     private FowSetupGameOptionsService() {}
 
-    private enum Category {
+    enum Category {
         HOMEBREW(
                 "Homebrew Options",
                 List.of(Homebrew.HBVOTC, Homebrew.HBHBSC, Homebrew.HBREMOVESFTT, Homebrew.HBLOSTLEGACIESTILES)),
@@ -141,7 +141,7 @@ final class FowSetupGameOptionsService {
         }
 
         if (category == Category.HOMEBREW) {
-            boolean tiglOn = TIGLHelper.isFracturedTIGLGame(game) && game.isCompetitiveTIGLGame();
+            boolean tiglOn = isTiglOn(game);
             sb.append(tiglOn ? "✅ " : "🚫 ")
                     .append("**Fractured TIGL**\n-# Standard TIGL can't combine with FoW - this flags the game ")
                     .append("as Fractured-ladder TIGL instead, the only variant compatible with FoW mode.\n");
@@ -166,7 +166,7 @@ final class FowSetupGameOptionsService {
         MessageHelper.postOrEditWithButtons(event, sb.toString(), buttons, editInPlace);
     }
 
-    private static boolean isOptionOn(Game game, FowSetupWizardState state, Homebrew hb) {
+    static boolean isOptionOn(Game game, FowSetupWizardState state, Homebrew hb) {
         return switch (hb) {
             case HBVOTC -> game.isVotcMode();
             case HBHBSC -> game.isHomebrewSCMode();
@@ -191,7 +191,11 @@ final class FowSetupGameOptionsService {
         String[] parts = buttonID.replace("fowSetupOptionToggle_", "").split("_", 2);
         Category category = Category.valueOf(parts[0]);
         Homebrew hb = Homebrew.valueOf(parts[1]);
+        String leadNote = toggle(event, game, hb);
+        postCategoryButtons(event, game, category, true, leadNote);
+    }
 
+    static String toggle(ButtonInteractionEvent event, Game game, Homebrew hb) {
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         boolean turningOn = !isOptionOn(game, state, hb);
 
@@ -207,7 +211,7 @@ final class FowSetupGameOptionsService {
             leadNote = hb.name + " turned **off**." + (caveat == null ? "" : " " + caveat);
         }
         FowSetupWizardService.saveState(game, state);
-        postCategoryButtons(event, game, category, true, leadNote);
+        return leadNote;
     }
 
     /** Flips the flag back off where possible. Returns a caveat about what was NOT reverted, or null if clean. */
@@ -261,11 +265,15 @@ final class FowSetupGameOptionsService {
     static void removeAllHomebrews(ButtonInteractionEvent event, Game game, String buttonID) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
         Category category = Category.valueOf(buttonID.replace("fowSetupOptionsRemoveAllHomebrews_", ""));
+        removeAllHomebrews(event, game);
+        postCategoryButtons(event, game, category, true, null);
+    }
+
+    static void removeAllHomebrews(ButtonInteractionEvent event, Game game) {
         HomebrewService.removeHomebrew(game, event);
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.getEnabledGameOptions().clear();
         FowSetupWizardService.saveState(game, state);
-        postCategoryButtons(event, game, category, true, null);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -281,7 +289,15 @@ final class FowSetupGameOptionsService {
     @ButtonHandler("fowSetupToggleTigl")
     static void toggleTigl(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
-        boolean tiglOn = TIGLHelper.isFracturedTIGLGame(game) && game.isCompetitiveTIGLGame();
+        postCategoryButtons(event, game, Category.HOMEBREW, true, toggleTigl(game));
+    }
+
+    static boolean isTiglOn(Game game) {
+        return TIGLHelper.isFracturedTIGLGame(game) && game.isCompetitiveTIGLGame();
+    }
+
+    static String toggleTigl(Game game) {
+        boolean tiglOn = isTiglOn(game);
         String leadNote;
         if (tiglOn) {
             game.setCompetitiveTIGLGame(false);
@@ -294,18 +310,21 @@ final class FowSetupGameOptionsService {
                     : "Could not enable TIGL - see the message above for why (likely a missing TIGL admin "
                             + "thread/role, or a player not in the TIGL hub server).";
         }
-        postCategoryButtons(event, game, Category.HOMEBREW, true, leadNote);
+        return leadNote;
     }
 
     /** Simple flag - {@code Game.setAllianceMode} already forces TIGL off internally when enabling. */
     @ButtonHandler("fowSetupToggleAlliance")
     static void toggleAlliance(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        postCategoryButtons(event, game, Category.HOMEBREW, true, toggleAllianceMode(game));
+    }
+
+    static String toggleAllianceMode(Game game) {
         boolean allianceOn = game.isAllianceMode();
         game.setAllianceMode(!allianceOn);
-        String leadNote = "Alliance Mode turned **" + (!allianceOn ? "on" : "off") + "**."
+        return "Alliance Mode turned **" + (!allianceOn ? "on" : "off") + "**."
                 + (!allianceOn ? " Pair specific players together on the Factions step." : "");
-        postCategoryButtons(event, game, Category.HOMEBREW, true, leadNote);
     }
 
     /** Own button id (not the raw {@code setupHomebrew_} one) to avoid its delete-clicked-button side
@@ -357,6 +376,11 @@ final class FowSetupGameOptionsService {
     @ModalHandler("fowSetupCustomScoringResolve")
     static void resolveCustomScoringModal(ModalInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), applyCustomScoring(event, game));
+        FowSetupWizardService.openOrRefresh(game);
+    }
+
+    static String applyCustomScoring(ModalInteractionEvent event, Game game) {
         StringBuilder applied = new StringBuilder();
         StringBuilder problems = new StringBuilder();
         applyIntIfPresent(event, "vp", "VP", game::setVp, applied, problems);
@@ -373,8 +397,7 @@ final class FowSetupGameOptionsService {
             if (!applied.isEmpty()) summary.append("Updated:\n").append(applied);
             if (!problems.isEmpty()) summary.append("Skipped:\n").append(problems);
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), summary.toString());
-        FowSetupWizardService.openOrRefresh(game);
+        return summary.toString();
     }
 
     private static void applyIntIfPresent(

@@ -406,6 +406,14 @@ _Avoid_: Mod, admin
 **Testbed**:
 A developer-only harness for driving a Game through scripted actions on a development bot.
 
+**Panel**:
+A single Components V2 message that the bot edits in place as it is used, with tabs, on/off switches and select menus instead of a trail of button messages. `/fow fow_options` and the FoW setup panel are panels.
+_Avoid_: Menu message, button wall
+
+**FoW setup panel**:
+The panel version of the FoW setup wizard, opened with `/fow setup_beta` while it is tested next to the button wizard of `/fow setup`. Both share the same saved wizard state.
+_Avoid_: Wizard v2
+
 ### Rules concepts
 
 **Exhausted / Readied**:

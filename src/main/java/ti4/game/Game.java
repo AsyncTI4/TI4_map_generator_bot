@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -2154,15 +2155,50 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return false;
     }
 
-    // TODO: fog colour change mid-game orphans the old "(colour)" PO; next score starts a new one, VP stays right.
     public String customPONameFor(Player player, String label) {
-        String factionName = label + " (" + player.getFaction() + ")";
         if (!isFowMode()) {
-            return factionName;
+            return label + " (" + player.getFaction() + ")";
         }
-        String colorName = label + " (" + player.getColor() + ")";
-        renameCustomPO(factionName, colorName);
-        return colorName;
+        anonymizeIdentifiedCustomPOs(player, label);
+        removeUnscoredNeutralCustomPOs(label);
+        return neutralCustomPONames(label).stream()
+                .filter(name -> customPOScorers(name).contains(player.getUserID()))
+                .findFirst()
+                .orElseGet(() -> nextNeutralCustomPOName(label));
+    }
+
+    private void anonymizeIdentifiedCustomPOs(Player player, String label) {
+        for (String identity : new String[] {player.getFaction(), player.getColor()}) {
+            if (identity != null) {
+                renameCustomPO(label + " (" + identity + ")", nextNeutralCustomPOName(label));
+            }
+        }
+    }
+
+    private void removeUnscoredNeutralCustomPOs(String label) {
+        neutralCustomPONames(label).stream()
+                .filter(name -> customPOScorers(name).isEmpty())
+                .forEach(this::removeCustomPO);
+    }
+
+    private List<String> neutralCustomPONames(String label) {
+        Pattern numbered = Pattern.compile(Pattern.quote(label) + " \\d+");
+        return customPublicVP.keySet().stream()
+                .filter(name -> name.equals(label) || numbered.matcher(name).matches())
+                .sorted(Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder()))
+                .toList();
+    }
+
+    private String nextNeutralCustomPOName(String label) {
+        String name = label;
+        for (int number = 2; customPublicVP.containsKey(name); number++) {
+            name = label + " " + number;
+        }
+        return name;
+    }
+
+    private List<String> customPOScorers(String name) {
+        return scoredPublicObjectives.getOrDefault(name, List.of());
     }
 
     private void renameCustomPO(String oldName, String newName) {

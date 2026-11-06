@@ -81,12 +81,19 @@ class MapJsonIOServiceTest extends BaseTi4Test {
                 }
                 """;
 
-        MapJsonIOService.importMapFromJson(game, json, null);
+        assertTrue(MapJsonIOService.importMapFromJson(game, json, null));
 
         LoreEntry stored = LoreService.getGameLore(game).get("000");
         assertNotNull(stored);
         assertEquals("An old beacon flickers.", stored.loreText);
         assertEquals(LoreService.TRIGGER.CONTROLLED, stored.trigger);
+    }
+
+    // The FoW setup panel shows its success notice from this result, so a parse failure must report false.
+    @Test
+    void malformedJsonReportsFailureAndKeepsTheMap() {
+        assertFalse(MapJsonIOService.importMapFromJson(game, "{ not json", null));
+        assertNotNull(game.getTileByPosition("000"));
     }
 
     // Lore is validated against the map, so it must be imported after every tile is placed: a target on a tile

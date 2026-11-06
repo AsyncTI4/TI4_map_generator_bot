@@ -22,7 +22,8 @@ public class TestBedScript {
             "sendAnonComms",
             "stackExplore",
             "removeToken",
-            "setGameOption");
+            "setGameOption",
+            "placeTile");
 
     private String name;
     private String description;

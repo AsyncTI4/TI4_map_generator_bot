@@ -135,7 +135,7 @@ public class FrankenAbilityService {
                 player.addRelic("waxing_moonphase");
                 player.addRelic("waning_moonphase");
                 player.addRelic("full_moonphase");
-                player.addRelic("lunar_eclipse_moonphase");
+                player.addRelic("half_moonphase");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()

@@ -40,7 +40,7 @@ public class LostLegaciesCommanderUnlockHandler {
                         qualifyingSystems++;
                     }
                 }
-                yield qualifyingSystems >= 4;
+                yield qualifyingSystems >= 5;
             }
             case "verydith" -> {
                 boolean unlocked = false;
