@@ -40,6 +40,7 @@ public class AsyncTI4DiscordBot {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AsyncTI4DiscordBot.class, args);
         applicationContext.getBean(JdaLifecycleService.class);
         ActiveLeaseService activeLeaseService = applicationContext.getBean(ActiveLeaseService.class);
+        GameManager.preloadManagedGames();
 
         String[] resolvedArgs = resolveSourceArgs(args);
         JdaService.startJdaAndRegisterListeners(resolvedArgs);
@@ -48,7 +49,6 @@ public class AsyncTI4DiscordBot {
             throw new IllegalStateException("Failed to initialize JDA and guilds");
         }
         JdaService.loadStaticDataAndResources();
-        GameManager.preloadManagedGames();
         BotLogger.info("WARMING INTERACTION HANDLERS");
         ButtonProcessor.checkButtonHandlersSetup();
         SelectionMenuProcessor.checkSelectionMenuHandlersSetup();
