@@ -90,42 +90,6 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         assertThat(userSettingsRepository.count()).isEqualTo(1);
     }
 
-    // The managers read and write the legacy JSON files until each table has rows (or no legacy file is left), so
-    // these checks decide when the bot switches over to the database.
-    @Test
-    void emptinessChecksDecideTheSwitchToTheDatabase() {
-        assertThat(userSettingsService.hasAnySettings()).isFalse();
-        assertThat(autoPingService.hasAny()).isFalse();
-        assertThat(techSummaryService.hasAny()).isFalse();
-
-        userSettingsService.save(userSettings("100"));
-        autoPingService.compute("pbd1", _ -> new AutoPing(1, 0, false));
-        techSummaryService.save("pbd1", summaries(1, "sol", "fl"));
-
-        assertThat(userSettingsService.hasAnySettings()).isTrue();
-        assertThat(autoPingService.hasAny()).isTrue();
-        assertThat(techSummaryService.hasAny()).isTrue();
-    }
-
-    // The legacy file import must never overwrite settings already saved to the database since the switch-over.
-    @Test
-    void importingALegacyFileNeverOverwritesNewerDatabaseSettings() {
-        UserSettings current = userSettings("100");
-        current.setGameLimit(9);
-        userSettingsService.save(current);
-        UserSettings legacy = userSettings("100");
-        legacy.setGameLimit(2);
-
-        assertThat(userSettingsService.importMissing(List.of(legacy, userSettings("200"))))
-                .isEqualTo(1);
-
-        assertThat(userSettingsService.find("100"))
-                .get()
-                .extracting(UserSettings::getGameLimit)
-                .isEqualTo(9);
-        assertThat(userSettingsService.find("200")).isPresent();
-    }
-
     @Test
     void updateReadsModifiesAndWritesInOneStep() {
         userSettingsService.update("300", () -> userSettings("300"), settings -> settings.setGameLimit(4));
@@ -163,18 +127,6 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         autoPingService.delete(endedGames);
 
         assertThat(autoPingService.gameNames()).isEmpty();
-    }
-
-    @Test
-    void autoPingImportOnlyAddsMissingGames() {
-        autoPingService.compute("pbd1", _ -> new AutoPing(500, 5, false));
-
-        int imported = autoPingService.importMissing(
-                Map.of("pbd1", new AutoPing(1, 1, false), "pbd2", new AutoPing(2, 2, true)));
-
-        assertThat(imported).isEqualTo(1);
-        assertThat(autoPingService.find("pbd1")).contains(new AutoPing(500, 5, false));
-        assertThat(autoPingService.find("pbd2")).contains(new AutoPing(2, 2, true));
     }
 
     @Test

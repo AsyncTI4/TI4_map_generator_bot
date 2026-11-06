@@ -48,7 +48,6 @@ import ti4.cron.FlushUserActiveHoursCron;
 import ti4.cron.GameDatabaseReconciliationCron;
 import ti4.cron.GameMessageCleanupCron;
 import ti4.cron.InteractionLogCron;
-import ti4.cron.JsonStoreRolloverCron;
 import ti4.cron.KeepThreadsAliveCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
@@ -342,7 +341,6 @@ public class JdaService {
         CardsInfoPinCleanupCron.register();
         LogButtonRuntimeStatisticsCron.register();
         FlushUserActiveHoursCron.register();
-        JsonStoreRolloverCron.register();
         TechSummaryCron.register();
         SabotageAutoReactCron.register();
         FastScFollowCron.register();

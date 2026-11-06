@@ -1,6 +1,5 @@
 package ti4.spring.service.usersettings;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -38,25 +37,6 @@ public class UserSettingsService {
 
     public void save(UserSettings userSettings) {
         transactionTemplate.executeWithoutResult(_ -> upsert(userSettings));
-    }
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    public boolean hasAnySettings() {
-        return repository.count() > 0;
-    }
-
-    @Deprecated(forRemoval = true, since = "2026-11")
-    public int importMissing(Collection<UserSettings> legacySettings) {
-        Integer imported = transactionTemplate.execute(_ -> {
-            int count = 0;
-            for (UserSettings userSettings : legacySettings) {
-                if (repository.existsById(userSettings.getUserId())) continue;
-                repository.save(new UserSettingsEntity(userSettings.getUserId(), toJson(userSettings)));
-                count++;
-            }
-            return count;
-        });
-        return imported == null ? 0 : imported;
     }
 
     public void update(String userId, Supplier<UserSettings> whenAbsent, Consumer<UserSettings> change) {
