@@ -1,78 +1,138 @@
 package ti4.service.tech;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Space;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
+import ti4.testUtils.BaseTi4Test;
 
-class EntropicScarServiceTest {
+/**
+ * Sol's faction technologies (Spec Ops II and Advanced Carrier II) are both unit upgrades, so they move progress
+ * on Develop Weaponry ("own 2 unit upgrade technologies") and Revolutionize Warfare ("own 3").
+ */
+class EntropicScarServiceTest extends BaseTi4Test {
+
+    private static final String SCAR_TOKEN = "token_entropicscar_async.png";
 
     private Game game;
-    private Player player;
-    private Tile scar;
+    private Player sol;
 
     @BeforeEach
     void setUp() {
-        game = mock(Game.class);
-        player = mock(Player.class);
-        scar = mock(Tile.class);
-        Space space = mock(Space.class);
-
-        when(game.getTileMap()).thenReturn(Map.of("210", scar));
-        when(scar.isScar()).thenReturn(true);
-        when(scar.getSpaceUnitHolder()).thenReturn(space);
-        when(space.getUnitKeys()).thenReturn(Set.of());
-        when(scar.containsPlayersUnitsWithModelCondition(eq(player), any())).thenReturn(true);
-        when(player.getFactionTechs()).thenReturn(new ArrayList<>(List.of("ff2")));
-        when(player.getTechs()).thenReturn(new ArrayList<>());
-        when(player.getStrategicCC()).thenReturn(1);
+        game = new Game();
+        game.setName("entropic-scar-test");
+        game.newGameSetup();
+        sol = game.addPlayer("sol-id", "sol");
+        sol.setFaction(game, "sol");
+        sol.setColor("blue");
+        sol.addOwnedUnitByID("carrier");
+        sol.addFactionTech("so2");
+        sol.addFactionTech("ac2");
+        sol.setStrategicCC(2);
     }
 
     @Test
-    void offersUnownedFactionTechnologyWhenPlayerCanPay() {
-        assertThat(EntropicScarService.getAvailableTechnologies(game, player)).contains("ff2");
-        assertThat(EntropicScarService.hasPendingTechnologyChoice(game, player)).isTrue();
+    void offersUnownedFactionTechnologies() {
+        assertThat(EntropicScarService.getAvailableTechnologies(game, sol)).containsExactlyInAnyOrder("so2", "ac2");
+
+        sol.addTech("so2");
+
+        assertThat(EntropicScarService.getAvailableTechnologies(game, sol)).containsExactly("ac2");
     }
 
     @Test
-    void readyScepterCanPayInsteadOfStrategyToken() {
-        when(player.getStrategicCC()).thenReturn(0);
-        when(player.hasRelicReady("emelpar")).thenReturn(true);
+    void scarTechnologyThatCompletesTechnologyObjectiveKeepsPlayerInScoring() {
+        // Destroyer II plus one Scar unit upgrade reaches the 2 unit upgrades Develop Weaponry needs.
+        revealStageOne("develop");
+        sol.addTech("dd2");
+        addScarWithCarrier("101", "37");
 
-        assertThat(EntropicScarService.hasPendingTechnologyChoice(game, player)).isTrue();
+        assertThat(EntropicScarService.couldScorePublicObjectiveAfterScar(game, sol))
+                .isTrue();
+        assertThat(sol.getTechs())
+                .as("the hypothetical technologies are removed again")
+                .containsExactly("dd2");
     }
 
     @Test
-    void noPaymentSourceLeavesNoPendingChoice() {
-        when(player.getStrategicCC()).thenReturn(0);
+    void objectiveOutOfReachOfScarTechnologiesDoesNotKeepPlayerInScoring() {
+        // One Scar gives one technology, and Sol owns no unit upgrades, so Develop Weaponry stays one short.
+        revealStageOne("develop");
+        addScarWithCarrier("101", "37");
 
-        assertThat(EntropicScarService.hasPendingTechnologyChoice(game, player)).isFalse();
+        assertThat(EntropicScarService.couldScorePublicObjectiveAfterScar(game, sol))
+                .isFalse();
     }
 
     @Test
-    void ownedFactionTechnologiesLeaveNoPendingChoice() {
-        when(player.getTechs()).thenReturn(new ArrayList<>(List.of("ff2")));
+    void shipsInTwoScarsCanGainBothTechnologies() {
+        revealStageOne("develop");
+        addScarWithCarrier("101", "37");
+        addScarWithCarrier("102", "38");
 
-        assertThat(EntropicScarService.getAvailableTechnologies(game, player)).isEmpty();
-        assertThat(EntropicScarService.hasPendingTechnologyChoice(game, player)).isFalse();
+        assertThat(EntropicScarService.couldScorePublicObjectiveAfterScar(game, sol))
+                .isTrue();
     }
 
     @Test
-    void noShipInScarLeavesNoPendingChoice() {
-        when(scar.containsPlayersUnitsWithModelCondition(eq(player), any())).thenReturn(false);
+    void secondScarTechnologyNeedsASecondToken() {
+        revealStageOne("develop");
+        addScarWithCarrier("101", "37");
+        addScarWithCarrier("102", "38");
+        sol.setStrategicCC(1);
 
-        assertThat(EntropicScarService.hasPendingTechnologyChoice(game, player)).isFalse();
+        assertThat(EntropicScarService.couldScorePublicObjectiveAfterScar(game, sol))
+                .isFalse();
+    }
+
+    @Test
+    void objectiveThatIgnoresTechnologiesDoesNotKeepPlayerInScoring() {
+        // Before the narrowing, any Scar holder with a payable technology escaped the automatic no-score.
+        revealStageOne("corner");
+        sol.addTech("dd2");
+        addScarWithCarrier("101", "37");
+
+        assertThat(EntropicScarService.couldScorePublicObjectiveAfterScar(game, sol))
+                .isFalse();
+    }
+
+    @Test
+    void noPaymentSourceMeansNoScarTechnology() {
+        revealStageOne("develop");
+        sol.addTech("dd2");
+        addScarWithCarrier("101", "37");
+        sol.setStrategicCC(0);
+
+        assertThat(EntropicScarService.couldScorePublicObjectiveAfterScar(game, sol))
+                .isFalse();
+    }
+
+    @Test
+    void shipsOutsideScarsGainNothing() {
+        revealStageOne("develop");
+        sol.addTech("dd2");
+        Tile tile = new Tile("37", "101");
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, sol.getColor()), 1);
+        game.setTile(tile);
+
+        assertThat(EntropicScarService.couldScorePublicObjectiveAfterScar(game, sol))
+                .isFalse();
+    }
+
+    private void revealStageOne(String objective) {
+        assertThat(game.revealSpecificStage1(objective)).isTrue();
+    }
+
+    private void addScarWithCarrier(String position, String tileId) {
+        Tile tile = new Tile(tileId, position);
+        tile.addToken(SCAR_TOKEN, Constants.SPACE);
+        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Carrier, sol.getColor()), 1);
+        game.setTile(tile);
     }
 }

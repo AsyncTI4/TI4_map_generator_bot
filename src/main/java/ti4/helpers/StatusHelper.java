@@ -333,16 +333,16 @@ public final class StatusHelper {
             }
 
             boolean canScorePublicObjectives = Helper.canPlayerScorePOs(game, player);
-            boolean hasPendingScarChoice = scorables.isEmpty()
+            boolean scarTechnologyCouldEnableScoring = scorables.isEmpty()
                     && canScorePublicObjectives
-                    && EntropicScarService.hasPendingTechnologyChoice(game, player);
+                    && EntropicScarService.couldScorePublicObjectiveAfterScar(game, player);
 
             if (!game.getStoredValue(keyV).isEmpty()
                     && canScorePublicObjectives
                     && scorableInts.contains(Integer.parseInt(game.getStoredValue(keyV)))) {
                 poScoring(null, player, game.getStoredValue(keyV), game, player.getCorrectChannel());
             } else {
-                if (hasPendingScarChoice) {
+                if (scarTechnologyCouldEnableScoring) {
                     messageText = player.getRepresentation()
                             + ", you may become eligible to score a public objective after resolving Entropic Scar. Resolve that choice before choosing whether to score a public objective.";
                 } else if (scorables.isEmpty()) {
@@ -362,7 +362,8 @@ public final class StatusHelper {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
             }
 
-            if (shouldAutoMarkNoPublicObjective(!scorables.isEmpty(), canScorePublicObjectives, hasPendingScarChoice)) {
+            if (shouldAutoMarkNoPublicObjective(
+                    !scorables.isEmpty(), canScorePublicObjectives, scarTechnologyCouldEnableScoring)) {
                 String message = player.getRepresentation()
                         + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -495,8 +496,8 @@ public final class StatusHelper {
     }
 
     static boolean shouldAutoMarkNoPublicObjective(
-            boolean hasScorableObjectives, boolean canScorePublicObjectives, boolean hasPendingScarChoice) {
-        return !canScorePublicObjectives || (!hasScorableObjectives && !hasPendingScarChoice);
+            boolean hasScorableObjectives, boolean canScorePublicObjectives, boolean scarTechnologyCouldEnableScoring) {
+        return !canScorePublicObjectives || (!hasScorableObjectives && !scarTechnologyCouldEnableScoring);
     }
 
     public static List<Player> getPlayersInScoringOrder(Game game) {
