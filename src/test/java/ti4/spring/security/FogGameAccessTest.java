@@ -12,6 +12,8 @@ class FogGameAccessTest extends BaseTi4Test {
     private static final String OWNER_ID = "100";
     private static final String SEATED_ID = "200";
     private static final String SPECTATOR_ID = "300";
+    private static final String TEAMMATE_ID = "400";
+    private static final String OTHER_SEATED_ID = "500";
 
     @Test
     void anonymousUserHasNoAccess() {
@@ -41,6 +43,54 @@ class FogGameAccessTest extends BaseTi4Test {
 
         assertThat(access.role()).isEqualTo(FogGameAccess.Role.PLAYER);
         assertThat(access.seat().getFaction()).isEqualTo("hacan");
+    }
+
+    @Test
+    void teammateSeesTheSeatTheyAreOn() {
+        Game game = fogGame();
+        game.getPlayer(SEATED_ID).addTeamMateID(TEAMMATE_ID);
+
+        FogGameAccess access = FogGameAccess.of(game, TEAMMATE_ID);
+
+        assertThat(access.role()).isEqualTo(FogGameAccess.Role.PLAYER);
+        assertThat(access.seat().getUserID()).isEqualTo(SEATED_ID);
+    }
+
+    @Test
+    void factionlessRosterEntryOnATeamSeesThatSeat() {
+        // Someone added to the game without a faction, then made a teammate, still gets the team's view.
+        Game game = fogGame();
+        game.getPlayer(SEATED_ID).addTeamMateID(SPECTATOR_ID);
+
+        FogGameAccess access = FogGameAccess.of(game, SPECTATOR_ID);
+
+        assertThat(access.role()).isEqualTo(FogGameAccess.Role.PLAYER);
+        assertThat(access.seat().getFaction()).isEqualTo("hacan");
+    }
+
+    @Test
+    void ownerOnATeamOnlySeesThatSeat() {
+        // Being part of a seat must win over GM rights, or the team would see past its own fog.
+        Game game = fogGame();
+        game.getPlayer(SEATED_ID).addTeamMateID(OWNER_ID);
+
+        FogGameAccess access = FogGameAccess.of(game, OWNER_ID);
+
+        assertThat(access.role()).isEqualTo(FogGameAccess.Role.PLAYER);
+        assertThat(access.seat().getUserID()).isEqualTo(SEATED_ID);
+    }
+
+    @Test
+    void seatedPlayerListedOnAnotherTeamKeepsTheirOwnSeat() {
+        Game game = fogGame();
+        Player other = game.addPlayer(OTHER_SEATED_ID, "Other");
+        other.setFaction(game, "jolnar");
+        other.setColor("blue");
+        game.getPlayer(SEATED_ID).addTeamMateID(OTHER_SEATED_ID);
+
+        FogGameAccess access = FogGameAccess.of(game, OTHER_SEATED_ID);
+
+        assertThat(access.seat().getFaction()).isEqualTo("jolnar");
     }
 
     @Test
