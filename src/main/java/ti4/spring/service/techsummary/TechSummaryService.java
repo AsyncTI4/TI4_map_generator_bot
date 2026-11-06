@@ -52,20 +52,41 @@ public class TechSummaryService {
             Set<String> removed = new HashSet<>(previousGameNames);
             removed.removeAll(summariesByGameName.keySet());
             if (!removed.isEmpty()) repository.deleteAllByIdInBatch(removed);
-            summariesByGameName.forEach(this::upsert);
+            Map<String, TechSummaryEntity> existingByGameName = new HashMap<>();
+            repository
+                    .findAllById(summariesByGameName.keySet())
+                    .forEach(entity -> existingByGameName.put(entity.getGameName(), entity));
+            List<TechSummaryEntity> created = new ArrayList<>();
+            summariesByGameName.forEach((gameName, summaries) -> {
+                TechSummaryEntity entity = existingByGameName.get(gameName);
+                if (entity == null) {
+                    created.add(newEntity(gameName, summaries));
+                } else {
+                    applyTo(entity, summaries);
+                }
+            });
+            repository.saveAll(created);
         });
     }
 
     private void upsert(String gameName, RoundTechSummaries summaries) {
-        String json = JSON_MAPPER.writeValueAsString(summaries.techSummaries());
         repository
                 .findById(gameName)
                 .ifPresentOrElse(
-                        entity -> {
-                            entity.setRound(summaries.round());
-                            entity.setFactionSummariesJson(json);
-                        },
-                        () -> repository.save(new TechSummaryEntity(gameName, summaries.round(), json)));
+                        entity -> applyTo(entity, summaries), () -> repository.save(newEntity(gameName, summaries)));
+    }
+
+    private static void applyTo(TechSummaryEntity entity, RoundTechSummaries summaries) {
+        entity.setRound(summaries.round());
+        entity.setFactionSummariesJson(toJson(summaries));
+    }
+
+    private static TechSummaryEntity newEntity(String gameName, RoundTechSummaries summaries) {
+        return new TechSummaryEntity(gameName, summaries.round(), toJson(summaries));
+    }
+
+    private static String toJson(RoundTechSummaries summaries) {
+        return JSON_MAPPER.writeValueAsString(summaries.techSummaries());
     }
 
     private static RoundTechSummaries toRoundTechSummaries(TechSummaryEntity entity) {

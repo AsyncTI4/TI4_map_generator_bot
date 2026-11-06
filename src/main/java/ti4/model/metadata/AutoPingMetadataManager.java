@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -56,8 +56,8 @@ public class AutoPingMetadataManager {
         return call(service -> service.find(gameName).orElse(null), null);
     }
 
-    public static Set<String> getGameNamesWithAutoPing() {
-        return call(AutoPingService::gameNames, Set.of());
+    public static Map<String, AutoPing> getAllAutoPings() {
+        return call(AutoPingService::findAll, Map.of());
     }
 
     private static void run(Consumer<AutoPingService> operation) {

@@ -1,6 +1,7 @@
 package ti4.spring.api.webdata;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,10 +15,14 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.persistence.GameSnapshots;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.json.JsonMapperManager;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FogMemoryService;
 import ti4.service.fow.FogViewer;
+import ti4.service.fow.RiftSetModeService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.spring.security.FogGameAccess;
 import ti4.website.model.WebTilePositions;
 import ti4.website.model.WebTileUnitData;
@@ -35,6 +40,8 @@ public class FogWebDataService {
     private static final Set<String> HIDDEN_PER_FACTION_FIELDS =
             Set.of("factionProgress", "scoreBreakdowns", "statTilePositions");
     private static final Set<String> KEPT_IDENTITY_FIELDS = Set.of("color", "colorDisplayName");
+    private static final List<String> EXPLORE_TYPES =
+            List.of(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER);
 
     public String forSeat(Game liveGame, String faction) {
         return serialize(foggedWebData(liveGame, faction, playerFogView(faction)));
@@ -72,9 +79,58 @@ public class FogWebDataService {
         ObjectNode tree = MAPPER.valueToTree(webData);
         forgetActivityInUnseenSystems(tree, visibleSystems);
         forgetRememberedTileContents(tree, fogTiles.keySet());
+        hideDeckInfo(tree, game);
         anonymize(tree, anonymousIds);
         tree.set("fogView", MAPPER.valueToTree(fogView));
         return tree;
+    }
+
+    static void hideDeckInfo(ObjectNode tree, Game game) {
+        if (!(tree.get("cardPool") instanceof ObjectNode cardPool)) return;
+        cardPool.putArray("secretObjectiveDeck");
+        hideUnplayedActionCardDiscards(cardPool, game);
+        if (exploreDecksHidden(game)) {
+            for (String type : EXPLORE_TYPES) {
+                cardPool.putArray(type + "ExploreDeck");
+                cardPool.putArray(type + "ExploreDiscard");
+            }
+            cardPool.putArray("relicDeck");
+            return;
+        }
+        for (String type : EXPLORE_TYPES) {
+            sortCards(cardPool, type + "ExploreDiscard");
+        }
+    }
+
+    private static boolean exploreDecksHidden(Game game) {
+        return "action".equalsIgnoreCase(game.getPhaseOfGame())
+                || game.getFowOption(FOWOption.HIDE_EXPLORES)
+                || FOWPlusService.isActive(game)
+                || RiftSetModeService.isActive(game);
+    }
+
+    private static void hideUnplayedActionCardDiscards(ObjectNode cardPool, Game game) {
+        if (!game.getFowOption(FOWOption.HIDE_AC_DISCARD)) return;
+        List<String> visible = cardsOf(cardPool, "actionCardDiscard").stream()
+                .filter(acId -> ActionCardHelper.isDiscardVisible(game, true, acId))
+                .toList();
+        ArrayNode discard = cardPool.putArray("actionCardDiscard");
+        visible.forEach(discard::add);
+    }
+
+    private static void sortCards(ObjectNode cardPool, String field) {
+        List<String> sorted = new ArrayList<>(cardsOf(cardPool, field));
+        Collections.sort(sorted);
+        ArrayNode cards = cardPool.putArray(field);
+        sorted.forEach(cards::add);
+    }
+
+    private static List<String> cardsOf(ObjectNode cardPool, String field) {
+        List<String> cards = new ArrayList<>();
+        if (cardPool.get(field) instanceof ArrayNode array) {
+            array.forEach(card -> cards.add(card.asText()));
+        }
+        return cards;
     }
 
     @Nullable
