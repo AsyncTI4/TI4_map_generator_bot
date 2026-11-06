@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +22,12 @@ import lombok.Setter;
 @Table(name = "title", indexes = @Index(name = "idx_title_user", columnList = "user_id"))
 public class TitleEntity {
 
+    static final String ID_SEQUENCE = "title_id_seq";
+    static final int ID_ALLOCATION_SIZE = 50;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = ID_SEQUENCE)
+    @SequenceGenerator(name = ID_SEQUENCE, sequenceName = ID_SEQUENCE, allocationSize = ID_ALLOCATION_SIZE)
     private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
