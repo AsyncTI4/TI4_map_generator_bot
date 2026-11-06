@@ -1,5 +1,6 @@
 package ti4.settings.users;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,20 @@ public class UserSettingsManager {
             BotLogger.error("Failed to read user settings for user " + userId + ".", e);
             return new UserSettings(userId);
         }
+    }
+
+    public static Map<String, UserSettings> getAll(Collection<String> userIds) {
+        Map<String, UserSettings> settingsByUserId = new HashMap<>();
+        if (userIds.isEmpty()) return settingsByUserId;
+        try {
+            UserSettingsService.getBean()
+                    .findAllById(userIds)
+                    .forEach(userSettings -> settingsByUserId.put(userSettings.getUserId(), userSettings));
+        } catch (RuntimeException e) {
+            BotLogger.error(
+                    "Failed to read user settings for " + StringHelper.pluralize(userIds.size(), "user") + ".", e);
+        }
+        return settingsByUserId;
     }
 
     public static void save(UserSettings userSettings) {

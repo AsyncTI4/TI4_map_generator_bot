@@ -55,7 +55,7 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
     @BeforeEach
     void clearTables() {
         userSettingsRepository.deleteAll();
-        autoPingService.delete(autoPingService.gameNames());
+        autoPingService.delete(autoPingService.findAll().keySet());
         techSummaryService.replaceAll(techSummaryService.findAll().keySet(), Map.of());
     }
 
@@ -132,7 +132,27 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         assertThat(autoPingService.find("pbd2")).isEmpty();
 
         autoPingService.delete(List.of("pbd1", "pbd-never-stored"));
-        assertThat(autoPingService.gameNames()).isEmpty();
+        assertThat(autoPingService.findAll()).isEmpty();
+    }
+
+    @Test
+    void autoPingFindAllReturnsEveryStoredPingByGame() {
+        autoPingService.compute("pbd1", _ -> new AutoPing(10, 1, false));
+        autoPingService.compute("pbd2", _ -> new AutoPing(20, 2, true));
+
+        assertThat(autoPingService.findAll())
+                .containsOnly(
+                        Map.entry("pbd1", new AutoPing(10, 1, false)), Map.entry("pbd2", new AutoPing(20, 2, true)));
+    }
+
+    @Test
+    void userSettingsFindAllByIdReturnsOnlyStoredUsers() {
+        userSettingsService.save(userSettings("500"));
+        userSettingsService.save(userSettings("501"));
+
+        assertThat(userSettingsService.findAllById(List.of("500", "501", "never-stored")))
+                .extracting(UserSettings::getUserId)
+                .containsExactlyInAnyOrder("500", "501");
     }
 
     // AutoPingCron passes every ended game (tens of thousands of names) on each run; only stored ones are deleted,
@@ -146,7 +166,7 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
 
         autoPingService.delete(endedGames);
 
-        assertThat(autoPingService.gameNames()).isEmpty();
+        assertThat(autoPingService.findAll()).isEmpty();
     }
 
     @Test

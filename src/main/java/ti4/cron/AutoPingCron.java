@@ -3,9 +3,11 @@ package ti4.cron;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -20,8 +22,10 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.model.metadata.AutoPingMetadataManager.AutoPing;
 import ti4.service.button.ReactionService;
 import ti4.service.fow.GMService;
+import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
@@ -99,12 +103,19 @@ public class AutoPingCron {
 
         removeEndedGamesFromAutoPingMetadata();
 
-        Set<String> gamesWithAutoPing = AutoPingMetadataManager.getGameNamesWithAutoPing();
-        GameManager.getManagedGames().stream()
-                .filter(managedGame -> isDueForAutoPingCheck(managedGame, gamesWithAutoPing))
-                .map(ManagedGame::getGame)
+        Map<String, AutoPing> autoPingsByGameName = AutoPingMetadataManager.getAllAutoPings();
+        List<ManagedGame> gamesToCheck = GameManager.getManagedGames().stream()
+                .filter(managedGame -> isDueForAutoPingCheck(managedGame, autoPingsByGameName.keySet()))
+                .toList();
+        Map<String, UserSettings> activePlayerSettings = UserSettingsManager.getAll(gamesToCheck.stream()
+                .map(ManagedGame::getActivePlayerId)
                 .filter(Objects::nonNull)
-                .forEach(AutoPingCron::autoPingGame);
+                .collect(Collectors.toSet()));
+        for (ManagedGame managedGame : gamesToCheck) {
+            Game game = managedGame.getGame();
+            if (game == null) continue;
+            autoPingGame(game, autoPingsByGameName.get(game.getName()), activePlayerSettings);
+        }
 
         BotLogger.logCron("Finished AutoPingCron.");
     }
@@ -124,16 +135,17 @@ public class AutoPingCron {
         AutoPingMetadataManager.remove(endedGames);
     }
 
-    private static void autoPingGame(Game game) {
+    private static void autoPingGame(
+            Game game, AutoPing latestAutoPing, Map<String, UserSettings> activePlayerSettings) {
         try {
-            handleAutoPing(game);
+            handleAutoPing(game, latestAutoPing, activePlayerSettings);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "AutoPing failed for game: " + game.getName(), e);
         }
     }
 
-    private static void handleAutoPing(Game game) {
-        AutoPingMetadataManager.AutoPing latestAutoPing = AutoPingMetadataManager.getLatestAutoPing(game.getName());
+    private static void handleAutoPing(
+            Game game, AutoPing latestAutoPing, Map<String, UserSettings> activePlayerSettings) {
         if (latestAutoPing == null) {
             return;
         }
@@ -157,7 +169,7 @@ public class AutoPingCron {
             return;
         }
 
-        int spacer = getPingIntervalInHours(game, player);
+        int spacer = getPingIntervalInHours(game, settingsFor(player, activePlayerSettings));
         if (spacer == 0) {
             return;
         }
@@ -345,8 +357,13 @@ public class AutoPingCron {
         }
     }
 
-    private static int getPingIntervalInHours(Game game, Player player) {
-        int personalPingInterval = UserSettingsManager.get(player.getUserID()).getPersonalPingInterval();
+    private static UserSettings settingsFor(Player player, Map<String, UserSettings> activePlayerSettings) {
+        UserSettings preloaded = activePlayerSettings.get(player.getUserID());
+        return preloaded != null ? preloaded : UserSettingsManager.get(player.getUserID());
+    }
+
+    private static int getPingIntervalInHours(Game game, UserSettings activePlayerSettings) {
+        int personalPingInterval = activePlayerSettings.getPersonalPingInterval();
         int gamePingInterval = game.getAutoPingSpacer();
         int pingIntervalInHours = DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS;
         if (personalPingInterval > 0 && gamePingInterval > 0) {
