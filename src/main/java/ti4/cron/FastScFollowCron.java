@@ -3,7 +3,9 @@ package ti4.cron;
 import static java.util.function.Predicate.not;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
@@ -18,6 +20,8 @@ import ti4.helpers.Helper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.GameMessage;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
@@ -55,8 +59,7 @@ public class FastScFollowCron {
         try {
             boolean changed = false;
             if (game.isFastSCFollowMode()) {
-                handleFastScFollowMode(game, afterSave::add);
-                changed = true;
+                changed = handleFastScFollowMode(game, afterSave::add);
             }
             changed |= FowAutoDeclineService.resolveDue(
                     game, FastScFollowCron::handleSecretObjectiveDrawOrder, afterSave::add);
@@ -82,14 +85,18 @@ public class FastScFollowCron {
         }
     }
 
-    private static void handleFastScFollowMode(Game game, Consumer<Runnable> afterSave) {
+    private static boolean handleFastScFollowMode(Game game, Consumer<Runnable> afterSave) {
+        boolean changed = false;
+        Map<String, GameMessage> strategyCardMessagesByKey = null;
         for (Player player : game.getRealPlayers()) {
             for (int sc : game.getPlayedSCsInOrder(player)) {
                 if (player.hasFollowedSC(sc)) continue;
 
-                GameMessage scMessage = StrategyCardMessageService.getStrategyCardMessage(
-                                game.getName(), game.getRound(), sc)
-                        .orElse(null);
+                if (strategyCardMessagesByKey == null) {
+                    strategyCardMessagesByKey = strategyCardMessagesByKey(game);
+                }
+                GameMessage scMessage =
+                        strategyCardMessagesByKey.get(StrategyCardMessageService.getKey(game.getRound(), sc));
                 if (scMessage == null) continue;
 
                 int twenty4 = 24;
@@ -114,6 +121,7 @@ public class FastScFollowCron {
                                     " has been played and now it has been half the allotted time and you haven't reacted. Please do so, or after another")
                             .append(" half you will be marked as not following.");
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
+                    changed = true;
                     afterSave.accept(() -> appendScMessages(game, player, scMessage, sb));
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !"2".equalsIgnoreCase(timesPinged)) {
@@ -122,6 +130,7 @@ public class FastScFollowCron {
                             + " been marked as not following.\n";
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
+                    changed = true;
                     afterSave.accept(() -> {
                         ButtonHelper.sendMessageToRightStratThread(
                                 player, game, message, ButtonHelper.getStratName(sc));
@@ -136,6 +145,17 @@ public class FastScFollowCron {
                 }
             }
         }
+        return changed;
+    }
+
+    private static Map<String, GameMessage> strategyCardMessagesByKey(Game game) {
+        Map<String, GameMessage> messagesByKey = new HashMap<>();
+        for (GameMessage message : GameMessageManager.getAll(game.getName(), GameMessageType.STRATEGY_CARD)) {
+            if (message.key() != null) {
+                messagesByKey.putIfAbsent(message.key(), message);
+            }
+        }
+        return messagesByKey;
     }
 
     private static void appendScMessages(Game game, Player player, GameMessage scMessage, StringBuilder sb) {
