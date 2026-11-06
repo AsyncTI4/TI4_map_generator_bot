@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-final class UserSettingsFileLockManager {
+final class UserSettingsLockManager {
 
     private static final int LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES = 20;
     private static final Cache<String, ReentrantReadWriteLock> locks = Caffeine.newBuilder()

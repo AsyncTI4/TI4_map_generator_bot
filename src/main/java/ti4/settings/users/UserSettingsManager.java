@@ -1,110 +1,117 @@
 package ti4.settings.users;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
-import ti4.helpers.Storage;
-import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
+import ti4.spring.service.usersettings.UserSettingsService;
 
 @UtilityClass
 public class UserSettingsManager {
 
-    private static final String USER_SETTINGS_PATH = Storage.getStoragePath() + File.separator + "user_settings";
+    // TODO: Remove the file fallback (ROLLOVER_LOCK, databaseInUse, onRolloverStore, usesDatabase and
+    // importLegacyFiles) with JsonStoreRolloverCron once every environment has imported its user_settings files.
+    @Deprecated(forRemoval = true, since = "2026-11")
+    private static final ReentrantReadWriteLock ROLLOVER_LOCK = new ReentrantReadWriteLock();
+
+    @Deprecated(forRemoval = true, since = "2026-11")
+    private static volatile boolean databaseInUse;
 
     public static UserSettings get(String userId) {
-        var userSettings = readFile(userId);
-        if (userSettings == null) {
-            userSettings = new UserSettings(userId);
+        try {
+            return onRolloverStore(
+                    () -> UserSettingsService.getBean().find(userId).orElseGet(() -> new UserSettings(userId)),
+                    () -> Objects.requireNonNullElseGet(
+                            LegacyUserSettingsFiles.read(userId), () -> new UserSettings(userId)));
+        } catch (RuntimeException e) {
+            BotLogger.error("Failed to read user settings for user " + userId + ".", e);
+            return new UserSettings(userId);
         }
-        return userSettings;
     }
 
     public static void save(UserSettings userSettings) {
-        persistFile(userSettings);
+        try {
+            UserSettingsLockManager.wrapWithWriteLock(
+                    userSettings.getUserId(),
+                    () -> onRolloverStore(
+                            () -> {
+                                UserSettingsService.getBean().save(userSettings);
+                                return null;
+                            },
+                            () -> {
+                                LegacyUserSettingsFiles.write(userSettings);
+                                return null;
+                            }));
+        } catch (RuntimeException e) {
+            BotLogger.error("Failed to save user settings for user " + userSettings.getUserId() + ".", e);
+        }
     }
 
     static void addActiveHourCheckins(String userId, int[] checkinsByUtcHour) {
         try {
-            UserSettingsFileLockManager.wrapWithWriteLock(userId, () -> {
-                try {
-                    UserSettings userSettings =
-                            Objects.requireNonNullElseGet(readFileWithoutLock(userId), () -> new UserSettings(userId));
-                    userSettings.addActiveHourCheckins(checkinsByUtcHour);
-                    writeFileWithoutLock(userSettings);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+            UserSettingsLockManager.wrapWithWriteLock(
+                    userId,
+                    () -> onRolloverStore(
+                            () -> {
+                                UserSettingsService.getBean()
+                                        .update(
+                                                userId,
+                                                () -> new UserSettings(userId),
+                                                userSettings -> userSettings.addActiveHourCheckins(checkinsByUtcHour));
+                                return null;
+                            },
+                            () -> {
+                                UserSettings userSettings = Objects.requireNonNullElseGet(
+                                        LegacyUserSettingsFiles.read(userId), () -> new UserSettings(userId));
+                                userSettings.addActiveHourCheckins(checkinsByUtcHour);
+                                LegacyUserSettingsFiles.write(userSettings);
+                                return null;
+                            }));
         } catch (RuntimeException e) {
             BotLogger.error("Failed to record active hours for user " + userId + ".", e);
         }
     }
 
-    private static UserSettings readFile(String userId) {
-        try {
-            return UserSettingsFileLockManager.wrapWithReadLock(userId, () -> {
-                try {
-                    return readFileWithoutLock(userId);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        } catch (UncheckedIOException e) {
-            BotLogger.error("Failed to read json data for UserSettingsManager.", e);
-            return null;
-        }
-    }
-
-    private static void persistFile(UserSettings userSettings) {
-        try {
-            UserSettingsFileLockManager.wrapWithWriteLock(userSettings.getUserId(), () -> {
-                try {
-                    writeFileWithoutLock(userSettings);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        } catch (UncheckedIOException e) {
-            BotLogger.error("Failed to write json data for UserSettingsManager.", e);
-        }
-    }
-
-    private static UserSettings readFileWithoutLock(String userId) throws IOException {
-        return PersistenceManager.readObjectFromJsonFile(USER_SETTINGS_PATH, userId + ".json", UserSettings.class);
-    }
-
-    private static void writeFileWithoutLock(UserSettings userSettings) throws IOException {
-        PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
-    }
-
     public static List<UserSettings> getAllUserSettings() {
-        File settingsDirectory = new File(USER_SETTINGS_PATH);
-        if (!settingsDirectory.exists() || !settingsDirectory.isDirectory()) {
-            return Collections.emptyList();
+        try {
+            return onRolloverStore(() -> UserSettingsService.getBean().findAll(), LegacyUserSettingsFiles::readAll);
+        } catch (RuntimeException e) {
+            BotLogger.error("Failed to read all user settings.", e);
+            return List.of();
         }
+    }
 
-        File[] settingsFiles = settingsDirectory.listFiles((dir, name) -> name.endsWith(".json"));
-        if (settingsFiles == null) return Collections.emptyList();
-
-        List<UserSettings> allUserSettings = new ArrayList<>();
-        for (File file : settingsFiles) {
-            try {
-                String userId = file.getName().replace(".json", "");
-                UserSettings userSettings = readFile(userId);
-                if (userSettings != null) {
-                    allUserSettings.add(userSettings);
-                }
-            } catch (Exception e) {
-                BotLogger.error("Failed to read user settings from file: " + file.getName(), e);
-            }
+    @Deprecated(forRemoval = true, since = "2026-11")
+    public static int importLegacyFiles() {
+        ROLLOVER_LOCK.writeLock().lock();
+        try {
+            if (usesDatabase()) return 0;
+            int imported = UserSettingsService.getBean().importMissing(LegacyUserSettingsFiles.readAll());
+            databaseInUse = true;
+            return imported;
+        } finally {
+            ROLLOVER_LOCK.writeLock().unlock();
         }
+    }
 
-        return allUserSettings;
+    @Deprecated(forRemoval = true, since = "2026-11")
+    private static <T> T onRolloverStore(Supplier<T> database, Supplier<T> legacyFiles) {
+        if (databaseInUse) return database.get();
+        ROLLOVER_LOCK.readLock().lock();
+        try {
+            return usesDatabase() ? database.get() : legacyFiles.get();
+        } finally {
+            ROLLOVER_LOCK.readLock().unlock();
+        }
+    }
+
+    @Deprecated(forRemoval = true, since = "2026-11")
+    private static boolean usesDatabase() {
+        if (!databaseInUse && (UserSettingsService.getBean().hasAnySettings() || !LegacyUserSettingsFiles.anyExist())) {
+            databaseInUse = true;
+        }
+        return databaseInUse;
     }
 }
