@@ -32,7 +32,8 @@ flowchart TD
   `if (!ActiveLeaseService.shouldCurrentProcessRunScheduledWork()) return;`. During
   a deploy two bot processes run at once, and only the one that holds the active
   lease, and is not draining, does scheduled work. Jobs are registered in every
-  process; the check happens on each run.
+  process; the check happens on each run. See [DEPLOYMENT.md](../../../../../DEPLOYMENT.md)
+  for the full rollover.
 
 ### One slow job delays all of them
 
