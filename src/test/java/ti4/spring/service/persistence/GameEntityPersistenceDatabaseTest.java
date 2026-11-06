@@ -3,6 +3,7 @@ package ti4.spring.service.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
@@ -74,6 +75,63 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         titleRepository.deleteAll();
         gameRepository.deleteAll();
         userRepository.deleteAll();
+    }
+
+    @Test
+    void replaceDoesNotOverwriteAKnownUserNameWithAnUnknownPlaceholder() {
+        persistenceService.replace(snapshotWithUsers("pbd-names-1", new UserEntity("2", "bob")));
+
+        persistenceService.replace(snapshotWithUsers(
+                "pbd-names-2",
+                new UserEntity("1", "alice"),
+                new UserEntity("2", GameEntityMapper.UNKNOWN_USER_PREFIX + "2"),
+                new UserEntity("3", GameEntityMapper.UNKNOWN_USER_PREFIX + "3")));
+
+        // An existing user keeps its real name; a brand new unknown user still gets a row so its players can
+        // reference it.
+        assertThat(userNames("1", "2", "3"))
+                .containsExactly("alice", "bob", GameEntityMapper.UNKNOWN_USER_PREFIX + "3");
+    }
+
+    @Test
+    void replaceUpdatesAnExistingUserNameWhenTheNewNameIsKnown() {
+        persistenceService.replace(snapshotWithUsers("pbd-rename-1", new UserEntity("1", "alice")));
+
+        persistenceService.replace(snapshotWithUsers("pbd-rename-2", new UserEntity("1", "alicia")));
+
+        assertThat(userNames("1")).containsExactly("alicia");
+    }
+
+    @Test
+    void restoreKeepsExistingUserNamesButReplacesUnknownPlaceholders() {
+        persistenceService.replace(snapshotWithUsers(
+                "pbd-restore-1",
+                new UserEntity("1", "alice"),
+                new UserEntity("2", GameEntityMapper.UNKNOWN_USER_PREFIX + "2"),
+                new UserEntity("3", GameEntityMapper.UNKNOWN_USER_PREFIX + "3")));
+
+        // An old game file can hold a name the user has since changed; restoring it must not roll the name back.
+        persistenceService.restore(snapshotWithUsers(
+                "pbd-restore-2",
+                new UserEntity("1", "old alice"),
+                new UserEntity("2", "bob"),
+                new UserEntity("3", GameEntityMapper.UNKNOWN_USER_PREFIX + "3"),
+                new UserEntity("4", "carol")));
+
+        assertThat(userNames("1", "2", "3", "4"))
+                .containsExactly("alice", "bob", GameEntityMapper.UNKNOWN_USER_PREFIX + "3", "carol");
+    }
+
+    private static GameEntitySnapshot snapshotWithUsers(String gameName, UserEntity... users) {
+        GameEntity game = new GameEntity();
+        game.setGameName(gameName);
+        return new GameEntitySnapshot(game, List.of(users), List.of());
+    }
+
+    private List<String> userNames(String... userIds) {
+        return Arrays.stream(userIds)
+                .map(id -> userRepository.findById(id).map(UserEntity::getName).orElse(null))
+                .toList();
     }
 
     @Test
