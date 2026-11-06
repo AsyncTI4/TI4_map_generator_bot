@@ -539,6 +539,7 @@ class GameLoadService {
                         StringTokenizer dataInfoTokens = new StringTokenizer(fowOptions.nextToken(), ",");
                         String optionName = dataInfoTokens.nextToken();
                         String optionValue = dataInfoTokens.nextToken();
+                        if (!FOWOption.exists(optionName)) continue;
                         game.setFowOption(FOWOption.fromString(optionName), Boolean.parseBoolean(optionValue));
                     }
                 }

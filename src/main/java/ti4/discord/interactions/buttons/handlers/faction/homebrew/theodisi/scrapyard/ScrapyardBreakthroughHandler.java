@@ -16,6 +16,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
@@ -37,7 +38,12 @@ public class ScrapyardBreakthroughHandler {
             }
             Map<UnitKey, Integer> unitsToCapture = new LinkedHashMap<>();
             for (RemovedUnit destroyedUnit : destroyedUnits) {
-                if (player.unitBelongsToPlayer(destroyedUnit.unitKey()) && destroyedUnit.getTotalRemoved() > 0) {
+                UnitModel unit = player.getUnitFromUnitKey(destroyedUnit.unitKey());
+                if (player.unitBelongsToPlayer(destroyedUnit.unitKey())
+                        && destroyedUnit.unitKey().unitType() != UnitType.Fighter
+                        && unit != null
+                        && unit.getIsShip()
+                        && destroyedUnit.getTotalRemoved() > 0) {
                     unitsToCapture.merge(destroyedUnit.unitKey(), destroyedUnit.getTotalRemoved(), Integer::sum);
                 }
             }

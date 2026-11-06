@@ -1,110 +1,52 @@
 package ti4.settings.users;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
-import ti4.helpers.Storage;
-import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
+import ti4.spring.service.usersettings.UserSettingsService;
 
 @UtilityClass
 public class UserSettingsManager {
 
-    private static final String USER_SETTINGS_PATH = Storage.getStoragePath() + File.separator + "user_settings";
-
     public static UserSettings get(String userId) {
-        var userSettings = readFile(userId);
-        if (userSettings == null) {
-            userSettings = new UserSettings(userId);
+        try {
+            return UserSettingsService.getBean().find(userId).orElseGet(() -> new UserSettings(userId));
+        } catch (RuntimeException e) {
+            BotLogger.error("Failed to read user settings for user " + userId + ".", e);
+            return new UserSettings(userId);
         }
-        return userSettings;
     }
 
     public static void save(UserSettings userSettings) {
-        persistFile(userSettings);
+        try {
+            UserSettingsLockManager.wrapWithWriteLock(
+                    userSettings.getUserId(),
+                    () -> UserSettingsService.getBean().save(userSettings));
+        } catch (RuntimeException e) {
+            BotLogger.error("Failed to save user settings for user " + userSettings.getUserId() + ".", e);
+        }
     }
 
     static void addActiveHourCheckins(String userId, int[] checkinsByUtcHour) {
         try {
-            UserSettingsFileLockManager.wrapWithWriteLock(userId, () -> {
-                try {
-                    UserSettings userSettings =
-                            Objects.requireNonNullElseGet(readFileWithoutLock(userId), () -> new UserSettings(userId));
-                    userSettings.addActiveHourCheckins(checkinsByUtcHour);
-                    writeFileWithoutLock(userSettings);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+            UserSettingsLockManager.wrapWithWriteLock(
+                    userId,
+                    () -> UserSettingsService.getBean()
+                            .update(
+                                    userId,
+                                    () -> new UserSettings(userId),
+                                    userSettings -> userSettings.addActiveHourCheckins(checkinsByUtcHour)));
         } catch (RuntimeException e) {
             BotLogger.error("Failed to record active hours for user " + userId + ".", e);
         }
     }
 
-    private static UserSettings readFile(String userId) {
-        try {
-            return UserSettingsFileLockManager.wrapWithReadLock(userId, () -> {
-                try {
-                    return readFileWithoutLock(userId);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        } catch (UncheckedIOException e) {
-            BotLogger.error("Failed to read json data for UserSettingsManager.", e);
-            return null;
-        }
-    }
-
-    private static void persistFile(UserSettings userSettings) {
-        try {
-            UserSettingsFileLockManager.wrapWithWriteLock(userSettings.getUserId(), () -> {
-                try {
-                    writeFileWithoutLock(userSettings);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        } catch (UncheckedIOException e) {
-            BotLogger.error("Failed to write json data for UserSettingsManager.", e);
-        }
-    }
-
-    private static UserSettings readFileWithoutLock(String userId) throws IOException {
-        return PersistenceManager.readObjectFromJsonFile(USER_SETTINGS_PATH, userId + ".json", UserSettings.class);
-    }
-
-    private static void writeFileWithoutLock(UserSettings userSettings) throws IOException {
-        PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
-    }
-
     public static List<UserSettings> getAllUserSettings() {
-        File settingsDirectory = new File(USER_SETTINGS_PATH);
-        if (!settingsDirectory.exists() || !settingsDirectory.isDirectory()) {
-            return Collections.emptyList();
+        try {
+            return UserSettingsService.getBean().findAll();
+        } catch (RuntimeException e) {
+            BotLogger.error("Failed to read all user settings.", e);
+            return List.of();
         }
-
-        File[] settingsFiles = settingsDirectory.listFiles((dir, name) -> name.endsWith(".json"));
-        if (settingsFiles == null) return Collections.emptyList();
-
-        List<UserSettings> allUserSettings = new ArrayList<>();
-        for (File file : settingsFiles) {
-            try {
-                String userId = file.getName().replace(".json", "");
-                UserSettings userSettings = readFile(userId);
-                if (userSettings != null) {
-                    allUserSettings.add(userSettings);
-                }
-            } catch (Exception e) {
-                BotLogger.error("Failed to read user settings from file: " + file.getName(), e);
-            }
-        }
-
-        return allUserSettings;
     }
 }

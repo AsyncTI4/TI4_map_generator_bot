@@ -78,6 +78,7 @@ import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
@@ -588,6 +589,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
+        FogSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
         LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1128,6 +1130,7 @@ public final class ButtonHelperModifyUnits {
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
             ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
+            FogSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
             ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, "spacecombat");
             ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, "spacecombat");
             if (sustainedFlagbearer) {

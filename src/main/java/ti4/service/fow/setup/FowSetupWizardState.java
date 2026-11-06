@@ -15,8 +15,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FowSetupWizardState {
 
+    public enum PanelStyle {
+        LEGACY,
+        CONTAINER
+    }
+
     private FowSetupStep step = FowSetupStep.GAME_TYPE;
     private Long panelMessageId;
+    private PanelStyle panelStyle = PanelStyle.LEGACY;
+    private String subView;
+    private String stepTab;
     private Set<FowSetupStep> infoThreadsPosted = EnumSet.noneOf(FowSetupStep.class);
     private boolean introShown;
 

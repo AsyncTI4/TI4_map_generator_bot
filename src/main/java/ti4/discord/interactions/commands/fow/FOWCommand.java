@@ -21,6 +21,7 @@ public class FOWCommand implements ParentCommand {
             new RemoveFogTile(),
             new GMCommand(),
             new SetupWizard(),
+            new SetupWizardBeta(),
             new FOWOptions(),
             new AddVisionToken(),
             new RemoveVisionToken(),

@@ -15,11 +15,10 @@ import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.logging.BotLogger;
+import ti4.message.componentsV2.ComponentPanel;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FogPreset;
@@ -199,6 +198,10 @@ public class FOWOptionService {
             return visible;
         }
 
+        public static boolean exists(String value) {
+            return Arrays.stream(values()).anyMatch(option -> option.name().equalsIgnoreCase(value));
+        }
+
         public static FOWOption fromString(String value) {
             for (FOWOption option : values()) {
                 if (option.name().equalsIgnoreCase(value)) {
@@ -227,10 +230,29 @@ public class FOWOptionService {
     public static List<MessageTopLevelComponent> optionsPanel(Game game, FOWOptionCategory tab) {
         List<ContainerChildComponent> body = new ArrayList<>();
         body.add(TextDisplay.of(panelHeader(game, tab)));
+        body.addAll(optionSections(game, tab, OPTION_PREFIX));
+        return List.of(
+                Container.of(body), ActionRow.of(tabButtons(tab, TAB_PREFIX)), ActionRow.of(utilityButtons(game, tab)));
+    }
+
+    public static List<ContainerChildComponent> optionSections(Game game, FOWOptionCategory tab, String togglePrefix) {
+        List<ContainerChildComponent> sections = new ArrayList<>();
         for (FOWOption option : optionsIn(tab)) {
-            body.add(optionSection(game, tab, option));
+            sections.add(optionSection(game, tab, option, togglePrefix));
         }
-        return List.of(Container.of(body), ActionRow.of(tabButtons(tab)), ActionRow.of(utilityButtons(game, tab)));
+        return sections;
+    }
+
+    public static List<Button> tabButtons(FOWOptionCategory selected, String tabPrefix) {
+        return ComponentPanel.tabButtons(
+                Arrays.asList(FOWOptionCategory.values()),
+                selected,
+                tab -> tabPrefix + tab,
+                FOWOptionCategory::getTitle);
+    }
+
+    public static String status(Game game) {
+        return FogPresetService.status(game) + " · FoW+ " + (FOWPlusService.isActive(game) ? "on" : "off");
     }
 
     public static List<MessageTopLevelComponent> presetMenu(Game game) {
@@ -258,6 +280,16 @@ public class FOWOptionService {
 
     public static List<MessageTopLevelComponent> fowPlusMenu(Game game) {
         boolean active = FOWPlusService.isActive(game);
+        Button toggle = active
+                ? Buttons.red(FOWPLUS_SET_PREFIX + false, "Turn FoW+ off")
+                : Buttons.green(FOWPLUS_SET_PREFIX + true, "Turn FoW+ on");
+        return List.of(
+                Container.of(TextDisplay.of(fowPlusText(game))),
+                ActionRow.of(toggle, Buttons.gray(TAB_PREFIX + FOWOptionCategory.COMMS, "Back to options")));
+    }
+
+    public static String fowPlusText(Game game) {
+        boolean active = FOWPlusService.isActive(game);
         StringBuilder text = new StringBuilder("### FoW+ is ")
                 .append(active ? "on" : "off")
                 .append("\nFoW+ forces these options while it is on:\n");
@@ -272,26 +304,22 @@ public class FOWOptionService {
                 .append(FOWPlusService.FOWPLUS_PLAY_CHANGES)
                 .append("\nTurning it off keeps the forced options as they are and puts back the explore deck")
                 .append(" the game had before, if the bot saved it.");
-        Button toggle = active
-                ? Buttons.red(FOWPLUS_SET_PREFIX + false, "Turn FoW+ off")
-                : Buttons.green(FOWPLUS_SET_PREFIX + true, "Turn FoW+ on");
-        return List.of(
-                Container.of(TextDisplay.of(text.toString())),
-                ActionRow.of(toggle, Buttons.gray(TAB_PREFIX + FOWOptionCategory.COMMS, "Back to options")));
+        return text.toString();
     }
 
     private static String panelHeader(Game game, FOWOptionCategory tab) {
-        return "### Fog options · " + tab.getTitle() + "\n" + FogPresetService.status(game) + " · FoW+ "
-                + (FOWPlusService.isActive(game) ? "on" : "off");
+        return "### Fog options · " + tab.getTitle() + "\n" + status(game);
     }
 
-    private static Section optionSection(Game game, FOWOptionCategory tab, FOWOption option) {
-        String text = "**" + option.getTitle() + "** " + valueRepresentation(isEnabled(game, option)) + "\n-# "
-                + option.getDescription();
-        return Section.of(accessory(game, tab, option), TextDisplay.of(text));
+    private static Section optionSection(Game game, FOWOptionCategory tab, FOWOption option, String togglePrefix) {
+        return ComponentPanel.toggleSection(
+                option.getTitle(),
+                option.getDescription(),
+                isEnabled(game, option),
+                accessory(game, tab, option, togglePrefix));
     }
 
-    private static Button accessory(Game game, FOWOptionCategory tab, FOWOption option) {
+    private static Button accessory(Game game, FOWOptionCategory tab, FOWOption option, String togglePrefix) {
         if (isLockedByFowPlus(game, option)) {
             return Buttons.gray(LOCKED_PREFIX + option, "Locked by FoW+").asDisabled();
         }
@@ -299,16 +327,7 @@ public class FOWOptionService {
             return Buttons.gray(LOCKED_PREFIX + option, "No effect under FoW+").asDisabled();
         }
         boolean enabled = isEnabled(game, option);
-        String id = OPTION_PREFIX + tab + "_" + !enabled + "_" + option;
-        return enabled ? Buttons.red(id, "Turn off") : Buttons.green(id, "Turn on");
-    }
-
-    private static List<Button> tabButtons(FOWOptionCategory selected) {
-        return Arrays.stream(FOWOptionCategory.values())
-                .map(tab -> tab == selected
-                        ? Buttons.gray(TAB_PREFIX + tab, tab.getTitle())
-                        : Buttons.blue(TAB_PREFIX + tab, tab.getTitle()))
-                .toList();
+        return ComponentPanel.toggleButton(togglePrefix + tab + "_" + !enabled + "_" + option, enabled);
     }
 
     private static List<Button> utilityButtons(Game game, FOWOptionCategory tab) {
@@ -331,29 +350,26 @@ public class FOWOptionService {
     }
 
     private static void post(MessageChannel channel, List<MessageTopLevelComponent> components) {
-        channel.sendMessageComponents(components).useComponentsV2().queue(Consumers.nop(), BotLogger::catchRestError);
+        ComponentPanel.post(channel, components);
     }
 
     private static void show(ButtonInteractionEvent event, List<MessageTopLevelComponent> components) {
-        if (!event.getMessage().isUsingComponentsV2()) {
-            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-            post(event.getMessageChannel(), components);
-            return;
-        }
-        event.getHook()
-                .editOriginalComponents(components)
-                .useComponentsV2()
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        ComponentPanel.show(event, components);
     }
 
     @ButtonHandler(OPTION_PREFIX)
     public static void changeFOWOptions(ButtonInteractionEvent event, Game game, String buttonID) {
-        String[] parts = buttonID.substring(OPTION_PREFIX.length()).split("_", 3);
+        FOWOption option = applyToggle(game, buttonID.substring(OPTION_PREFIX.length()));
+        show(event, optionsPanel(game, option.getCategory()));
+    }
+
+    public static FOWOption applyToggle(Game game, String toggle) {
+        String[] parts = toggle.split("_", 3);
         FOWOption option = FOWOption.fromString(parts[2]);
         if (!isLockedByFowPlus(game, option)) {
             writeOption(game, option, Boolean.parseBoolean(parts[1]));
         }
-        show(event, optionsPanel(game, option.getCategory()));
+        return option;
     }
 
     @ButtonHandler(TAB_PREFIX)

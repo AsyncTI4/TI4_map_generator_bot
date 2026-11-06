@@ -152,10 +152,10 @@ final class FrameResolver {
         }
         Set<String> knownInSegment = new HashSet<>(known);
         knownInSegment.retainAll(inSegment);
-        if (knownInSegment.isEmpty() && segment.isDerivedFromMap()) {
+        if (knownInSegment.isEmpty() && segment.hidesUnknownPositions()) {
             return null;
         }
-        if (segment.isDerivedFromMap()) {
+        if (segment.hidesUnknownPositions()) {
             segmentDrawPositions = knownInSegment;
             return withNearbyStatTiles(knownInSegment);
         }

@@ -87,6 +87,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedService;
 import ti4.service.unit.AddUnitService;
@@ -587,6 +588,7 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(),
                     "## The speaker has broken the tie for \"" + getAgendaOutcomeName(game, winner, true) + "\".");
+            FogSecretHooks.onSpeakerBrokeTie(game);
         }
         if (resolveTime) {
             resolveTime(game, winner);

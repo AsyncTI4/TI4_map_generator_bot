@@ -21,7 +21,9 @@ import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
+import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.map.AddTileService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -219,6 +221,18 @@ public class TestBedComponentService {
         if (file == null) file = Mapper.getTokenID(AliasHandler.resolveToken(token));
         if (file == null) return "Unknown token `" + token + "`.";
         if (!tile.removeToken(file, holder)) return "No token `" + token + "` at `" + where + "`.";
+        return null;
+    }
+
+    @Nullable
+    static String placeTile(Game game, String position, String tileId) {
+        String lower = position.toLowerCase();
+        if (!MapPositionMapper.isTilePositionValid(game, lower)) {
+            return "`" + position + "` is not a tile position in this game.";
+        }
+        String resolved = AliasHandler.resolveTile(tileId.toLowerCase());
+        if (!TileHelper.isValidTile(resolved)) return "Unknown tile `" + tileId + "`.";
+        AddTileService.addTile(game, new Tile(resolved, lower));
         return null;
     }
 
