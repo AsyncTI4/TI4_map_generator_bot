@@ -93,9 +93,10 @@ public class AddPlanetService {
             Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean setupRequested = setup;
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
-        boolean newlyControlled = !player.getPlanets().contains(planet);
+        boolean fogSecretGain =
+                !setup && FogSecretHooks.inPlay(game) && !player.getPlanets().contains(planet);
         player.addPlanet(planet);
-        if (newlyControlled && !setup) {
+        if (fogSecretGain) {
             FogSecretHooks.onPlanetGained(game, player, planet);
         }
         DiscordantStarsHelper.checkBRTaranisCrest(game);

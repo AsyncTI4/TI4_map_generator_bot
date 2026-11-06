@@ -19,6 +19,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
@@ -40,7 +41,9 @@ public class FogSecretHooks {
     static final String READ_THE_ROOM = "readroomfog";
     static final String DECIDING_WORD = "decidingwordfog";
     static final int LONG_RANGE_RECON_SYSTEMS = 3;
-    static final int CONSENSUS_EARLIER_VOTERS = 2;
+    static final int CONSENSUS_OTHER_VOTERS = 2;
+    private static final String ONLY_IF_YOU_WIN =
+            "\n**Only press Score if you win this combat, with your own units surviving it.**";
 
     static final String SIGHT_KEY = "fogSecretSight";
     static final String FOUND_KEY = "fogSecretFound";
@@ -48,10 +51,15 @@ public class FogSecretHooks {
     static final String LANDED_KEY = "fogSecretLanded";
     static final String READ_ROOM_KEY = "fogSecretReadRoom";
     private static final String PROMPTED_KEY = "fogSecretPrompts";
+    private static final List<String> TURN_KEYS = List.of(SIGHT_KEY, FOUND_KEY, ORIGINS_KEY, LANDED_KEY, PROMPTED_KEY);
     private static final String SEPARATOR = ";";
 
+    public static boolean inPlay(Game game) {
+        return game != null && game.isFowMode() && FogSecrets.usesFogDeck(game);
+    }
+
     public static void onSystemActivated(Game game, Player player) {
-        if (game == null || player == null || !game.isFowMode()) return;
+        if (!inPlay(game)) return;
         if (!holdsAny(player, STRIKE_FROM_FOG, APPEAR_FROM_NOWHERE, INTO_THE_UNKNOWN, LONG_RANGE_RECON)) return;
         clearTurnState(game);
         storePositions(game, FOUND_KEY + player.getFaction(), FogSight.found(game, player));
@@ -62,9 +70,11 @@ public class FogSecretHooks {
         }
     }
 
-    public static void onUnitsMovedIn(Game game, Player player, Tile activeTile, Set<String> origins) {
-        if (game == null || player == null || activeTile == null || !game.isFowMode()) return;
-        Set<String> movedFrom = new HashSet<>(origins);
+    public static void onUnitsMovedIn(
+            Game game, Player player, Tile activeTile, Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        if (!inPlay(game) || activeTile == null) return;
+        if (!holdsAny(player, STRIKE_FROM_FOG, APPEAR_FROM_NOWHERE)) return;
+        Set<String> movedFrom = originPositions(displacement);
         movedFrom.remove(activeTile.getPosition());
         if (movedFrom.isEmpty()) return;
         if (holdsAny(player, STRIKE_FROM_FOG)) {
@@ -78,6 +88,19 @@ public class FogSecretHooks {
                     APPEAR_FROM_NOWHERE,
                     "your ships arrived next to a home system from space its owner was not watching.");
         }
+    }
+
+    static Set<String> originPositions(Map<String, Map<UnitKey, List<Integer>>> displacement) {
+        Set<String> origins = new HashSet<>();
+        for (Map.Entry<String, Map<UnitKey, List<Integer>>> entry : displacement.entrySet()) {
+            boolean anyUnits = entry.getValue().values().stream()
+                    .anyMatch(states ->
+                            states.stream().mapToInt(Integer::intValue).sum() > 0);
+            int split = entry.getKey().indexOf('-');
+            if (anyUnits)
+                origins.add(split < 0 ? entry.getKey() : entry.getKey().substring(0, split));
+        }
+        return origins;
     }
 
     private static boolean appearedNextToUnwatchingHome(
@@ -96,8 +119,10 @@ public class FogSecretHooks {
     }
 
     public static void afterCombatHits(Game game, Player loser, Tile tile, UnitHolder holder, String assignHitsType) {
-        if (game == null || loser == null || tile == null || assignHitsType == null || !game.isFowMode()) return;
+        if (!inPlay(game) || loser == null || tile == null || assignHitsType == null) return;
         if (!assignHitsType.contains("combat")) return;
+        if (game.getRealPlayers().stream()
+                .noneMatch(p -> holdsAny(p, STRIKE_FROM_FOG, INTO_THE_UNKNOWN, BLIND_THEM, WITNESS_THE_FALL))) return;
         if (assignHitsType.contains("ground") || holder instanceof Planet) {
             checkGroundCombatWin(game, tile);
             return;
@@ -119,14 +144,15 @@ public class FogSecretHooks {
         String position = tile.getPosition();
         boolean winnerIsActive = winner == game.getActivePlayer();
         if (winnerIsActive && struckFromTheFog(game, winner, loser)) {
-            offerScore(
+            offerScoreIfWon(
                     game,
                     winner,
                     STRIKE_FROM_FOG,
-                    "you won a space combat after striking from systems your opponent could not see.");
+                    "the enemy fleet fell after you struck from systems your opponent could not see.");
         }
         if (winnerIsActive && wasUnknownAtStart(game, winner, position)) {
-            offerScore(game, winner, INTO_THE_UNKNOWN, "you won a combat in a system you had not found before.");
+            offerScoreIfWon(
+                    game, winner, INTO_THE_UNKNOWN, "the enemy fleet fell in a system you had not found before.");
         }
         if (loser.isRealPlayer()
                 && holdsAny(winner, BLIND_THEM)
@@ -158,7 +184,7 @@ public class FogSecretHooks {
                                 .filter(p -> p != active)
                                 .noneMatch(p -> FoWHelper.playerHasUnitsOnPlanet(p, planet)));
         if (wonAPlanet) {
-            offerScore(game, active, INTO_THE_UNKNOWN, "you won a combat in a system you had not found before.");
+            offerScoreIfWon(game, active, INTO_THE_UNKNOWN, "the defenders fell in a system you had not found before.");
         }
     }
 
@@ -172,7 +198,7 @@ public class FogSecretHooks {
     }
 
     public static void onPlanetGained(Game game, Player player, String planet) {
-        if (game == null || player == null || !game.isFowMode()) return;
+        if (!inPlay(game) || !holdsAny(player, INTO_THE_UNKNOWN, SILENT_LANDING)) return;
         if (player != game.getActivePlayer() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) return;
         Tile tile = game.getTileFromPlanet(planet);
         if (tile == null || !tile.getPosition().equals(game.getActiveSystem())) return;
@@ -189,7 +215,7 @@ public class FogSecretHooks {
     }
 
     public static void onTurnEnd(Game game, Player player) {
-        if (game == null || !game.isFowMode()) return;
+        if (!inPlay(game)) return;
         if (player != null) {
             checkLongRangeRecon(game, player);
             checkSilentLanding(game, player);
@@ -231,35 +257,55 @@ public class FogSecretHooks {
     }
 
     public static void onAgendaResolved(Game game, String winner) {
-        if (game == null || winner == null) return;
+        if (!inPlay(game) || winner == null) return;
         if (game.getRealPlayers().stream().noneMatch(p -> holdsAny(p, JOIN_THE_CONSENSUS, KINGMAKER, READ_THE_ROOM)))
             return;
-        Map<String, LinkedHashMap<Player, Integer>> votes = votesByOutcome(game);
-        Map<String, Integer> totals = totalsByOutcome(game);
-        String winningOutcome = winner.toLowerCase();
-        LinkedHashMap<Player, Integer> winningVotes = votes.getOrDefault(winningOutcome, new LinkedHashMap<>());
-        List<Player> winningVoters = new ArrayList<>(winningVotes.keySet());
-        for (int i = CONSENSUS_EARLIER_VOTERS; i < winningVoters.size(); i++) {
-            offerScoreEveryTime(
-                    winningVoters.get(i), JOIN_THE_CONSENSUS, "you joined the consensus behind the elected outcome.");
-        }
-        int winningTotal = totals.getOrDefault(winningOutcome, 0);
-        int bestOtherTotal = totals.entrySet().stream()
-                .filter(entry -> !entry.getKey().equals(winningOutcome))
-                .mapToInt(Map.Entry::getValue)
-                .max()
-                .orElse(0);
-        for (Map.Entry<Player, Integer> vote : winningVotes.entrySet()) {
-            if (winningTotal - vote.getValue() <= bestOtherTotal) {
-                offerScoreEveryTime(vote.getKey(), KINGMAKER, "your votes decided that agenda.");
+        String outcome = winner.toLowerCase();
+        List<Player> winningVoters = new ArrayList<>(winningVotes(game, outcome).keySet());
+        if (isConsensus(game, outcome)) {
+            for (Player voter : winningVoters) {
+                offerScoreEveryTime(
+                        voter, JOIN_THE_CONSENSUS, "every vote cast on that agenda went to the outcome you backed.");
             }
         }
+        for (Player kingmaker : kingmakers(game, outcome)) {
+            offerScoreEveryTime(kingmaker, KINGMAKER, "your votes decided that agenda.");
+        }
+        if (opposingVotes(game, outcome) == 0) return;
         for (Player voter : winningVoters) {
             if (recordReadTheRoom(game, voter) >= 2) {
                 offerScoreEveryTime(
-                        voter, READ_THE_ROOM, "you voted for the elected outcome of both agendas this agenda phase.");
+                        voter,
+                        READ_THE_ROOM,
+                        "you voted for the contested elected outcome of both agendas this agenda phase.");
             }
         }
+    }
+
+    static boolean isConsensus(Game game, String outcome) {
+        return opposingVotes(game, outcome) == 0 && winningVotes(game, outcome).size() > CONSENSUS_OTHER_VOTERS;
+    }
+
+    static List<Player> kingmakers(Game game, String outcome) {
+        int winningTotal = totalsByOutcome(game).getOrDefault(outcome, 0);
+        int opposing = opposingVotes(game, outcome);
+        if (winningTotal <= opposing) return List.of();
+        return winningVotes(game, outcome).entrySet().stream()
+                .filter(vote -> winningTotal - vote.getValue() < opposing)
+                .map(Map.Entry::getKey)
+                .toList();
+    }
+
+    private static LinkedHashMap<Player, Integer> winningVotes(Game game, String outcome) {
+        return votesByOutcome(game).getOrDefault(outcome, new LinkedHashMap<>());
+    }
+
+    private static int opposingVotes(Game game, String outcome) {
+        return totalsByOutcome(game).entrySet().stream()
+                .filter(entry -> !entry.getKey().equals(outcome))
+                .mapToInt(Map.Entry::getValue)
+                .max()
+                .orElse(0);
     }
 
     private static int recordReadTheRoom(Game game, Player voter) {
@@ -274,7 +320,7 @@ public class FogSecretHooks {
     }
 
     public static void onSpeakerBrokeTie(Game game) {
-        if (game == null) return;
+        if (!inPlay(game)) return;
         Player speaker = game.getSpeaker();
         if (speaker != null && holdsAny(speaker, DECIDING_WORD)) {
             offerScoreEveryTime(speaker, DECIDING_WORD, "as the speaker, you broke the tie on that agenda.");
@@ -336,7 +382,16 @@ public class FogSecretHooks {
         offerScoreEveryTime(holder, soID, reason);
     }
 
+    private static void offerScoreIfWon(Game game, Player holder, String soID, String reason) {
+        if (!markOnce(game, soID + "+" + holder.getFaction())) return;
+        offerScoreEveryTime(holder, soID, reason, ONLY_IF_YOU_WIN);
+    }
+
     static void offerScoreEveryTime(Player holder, String soID, String reason) {
+        offerScoreEveryTime(holder, soID, reason, "");
+    }
+
+    private static void offerScoreEveryTime(Player holder, String soID, String reason, String condition) {
         if (!holdsAny(holder, soID)) return;
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         if (so == null) return;
@@ -350,7 +405,8 @@ public class FogSecretHooks {
                 Buttons.red(holder.factionButtonChecker() + "deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 holder.getCardsInfoThread(),
-                holder.getRepresentationUnfogged() + ", " + reason + " You may score _" + so.getName() + "_.",
+                holder.getRepresentationUnfogged() + ", " + reason + " You may score _" + so.getName() + "_."
+                        + condition,
                 buttons);
     }
 
@@ -376,8 +432,6 @@ public class FogSecretHooks {
     }
 
     static void clearTurnState(Game game) {
-        for (String prefix : List.of(SIGHT_KEY, FOUND_KEY, ORIGINS_KEY, LANDED_KEY, PROMPTED_KEY)) {
-            game.getStoredValueMap().keySet().removeIf(key -> key.startsWith(prefix));
-        }
+        game.getStoredValueMap().keySet().removeIf(key -> TURN_KEYS.stream().anyMatch(key::startsWith));
     }
 }

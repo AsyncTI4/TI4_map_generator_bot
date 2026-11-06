@@ -136,7 +136,7 @@ public class ListPlayerInfoService {
     }
 
     private static int homebrewSecretThreshold(String objID, Game game) {
-        if (FogSecrets.isFogSecret(objID)) return FogSecrets.threshold(objID, game);
+        if (FogSecrets.isFogSecret(game, objID)) return FogSecrets.threshold(objID, game);
         return ThirtyKSecrets.threshold(objID);
     }
 
@@ -523,7 +523,7 @@ public class ListPlayerInfoService {
             }
         }
         if (ThirtyKCards.isSecretObjective(objID)) return ThirtyKSecrets.progress(objID, game, player);
-        if (FogSecrets.isFogSecret(objID)) return FogSecrets.progress(objID, game, player);
+        if (FogSecrets.isFogSecret(game, objID)) return FogSecrets.progress(objID, game, player);
         switch (objID) {
             case "push_boundaries", "push_boundaries_omegaphase" -> {
                 int aboveN = 0;

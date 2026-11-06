@@ -3,13 +3,14 @@ package ti4.service.objectives.fog;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.service.info.ListPlayerInfoService;
@@ -17,6 +18,7 @@ import ti4.testUtils.BaseTi4Test;
 
 class FogSecretsTest extends BaseTi4Test {
 
+    private static final String POK_FOG_DECK = "secret_objectives_pok_fog";
     private Game game;
     private Player sol;
     private Player hacan;
@@ -26,6 +28,7 @@ class FogSecretsTest extends BaseTi4Test {
         game = new Game();
         game.newGameSetup();
         game.setFowMode(true);
+        game.resetSecretObjectiveDeck(Mapper.getDeck(POK_FOG_DECK));
         game.setRound(3);
         game.setTile(new Tile("18", "000"));
         for (int ring = 1; ring <= 3; ring++) {
@@ -60,15 +63,17 @@ class FogSecretsTest extends BaseTi4Test {
     }
 
     @Test
-    void ghostFleetCountsOnlyWhileNoOtherPlayerCanSeeIt() {
+    void ghostFleetCountsOnlyShipsNoOtherPlayerCanSee() {
         addShips(sol, "304", UnitType.Cruiser, 5);
         addShips(hacan, "310", UnitType.Cruiser, 1);
 
         assertThat(FogSecrets.progress(FogSecrets.GHOST_FLEET, game, sol)).isEqualTo(5);
 
-        // A hacan ship next door puts the whole fleet in view.
+        // A hacan ship next door puts 304 in view; a second, unseen fleet still counts.
         addShips(hacan, "305", UnitType.Cruiser, 1);
         assertThat(FogSecrets.progress(FogSecrets.GHOST_FLEET, game, sol)).isZero();
+        addShips(sol, "313", UnitType.Cruiser, 5);
+        assertThat(FogSecrets.progress(FogSecrets.GHOST_FLEET, game, sol)).isEqualTo(5);
     }
 
     @Test
@@ -111,25 +116,38 @@ class FogSecretsTest extends BaseTi4Test {
     void statusFogSecretsFeedTheGenericObjectiveProgress() {
         sol.addFogTile("18", "000", null);
 
+        // Mecatol Rex plus its six neighbours.
         assertThat(ListPlayerInfoService.getObjectiveThreshold(FogSecrets.FIND_MECATOL, game))
-                .isEqualTo(1);
+                .isEqualTo(7);
         assertThat(ListPlayerInfoService.getPlayerProgressOnObjective(FogSecrets.FIND_MECATOL, game, sol))
                 .isEqualTo(1);
     }
 
     @Test
-    void loadingTheFogDeckShufflesEveryFogSecretInOnce() {
-        List<String> fogSecrets = Mapper.getDeck(FogSecrets.DECK).getNewDeck();
-        int deckSize = game.getSecretObjectives().size();
-
-        FogSecrets.setLoaded(game, true);
-        FogSecrets.setLoaded(game, true);
+    void combinedDeckIsThePokDeckPlusEveryFogSecret() {
+        List<String> fogSecrets = Mapper.getDeck(FogSecrets.DECK).getCardIDs();
+        List<String> pok = Mapper.getDeck("secret_objectives_pok").getCardIDs();
 
         assertThat(fogSecrets).hasSize(32).allMatch(FogSecrets::isFogSecret);
-        assertThat(game.getSecretObjectives()).hasSize(deckSize + 32).containsAll(fogSecrets);
+        assertThat(Mapper.getDeck(POK_FOG_DECK).getCardIDs())
+                .hasSize(72)
+                .containsAll(pok)
+                .containsAll(fogSecrets);
+        assertThat(FogSecrets.usesFogDeck(game)).isTrue();
+    }
 
-        FogSecrets.setLoaded(game, false);
-        assertThat(game.getSecretObjectives()).hasSize(deckSize).doesNotContainAnyElementsOf(fogSecrets);
+    @Test
+    void nothingRunsWithoutTheFogDeckOrOutsideFog() {
+        sol.setSecret(FogSecretHooks.STRIKE_FROM_FOG);
+        game.setSoDeckID("secret_objectives_pok");
+        FogSecretHooks.onSystemActivated(game, sol);
+        FogSecretHooks.afterCombatHits(game, hacan, game.getTileByPosition("306"), null, "spacecombat");
+        assertThat(game.getStoredValueMap().keySet()).noneMatch(key -> key.startsWith("fogSecret"));
+
+        game.setFowMode(false);
+        assertThat(ListPlayerInfoService.getObjectiveThreshold(FogSecrets.FIND_MECATOL, game))
+                .isZero();
+        assertThat(FogSecrets.isFogSecret(game, FogSecrets.FIND_MECATOL)).isFalse();
     }
 
     @Test
@@ -143,6 +161,31 @@ class FogSecretsTest extends BaseTi4Test {
     }
 
     @Test
+    void kingmakersAreVotersWithoutWhomTheOutcomeLoses() {
+        addPlayer("jolnar-id", "jolnar", "red", "307");
+        game.setCurrentAgendaVote("For", "blue_6;green_1");
+        game.setCurrentAgendaVote("Against", "red_4");
+        assertThat(FogSecretHooks.kingmakers(game, "for")).containsExactly(sol);
+
+        // A tie broken by the speaker has no kingmaker.
+        game.setCurrentAgendaVote("For", "blue_3;green_1");
+        assertThat(FogSecretHooks.kingmakers(game, "for")).isEmpty();
+    }
+
+    @Test
+    void consensusNeedsThreeVotersAndNoOpposition() {
+        Player jolnar = addPlayer("jolnar-id", "jolnar", "red", "307");
+        game.setCurrentAgendaVote("For", "blue_3;green_2");
+        assertThat(FogSecretHooks.isConsensus(game, "for")).isFalse();
+
+        game.setCurrentAgendaVote("For", "blue_3;green_2;red_1");
+        assertThat(FogSecretHooks.isConsensus(game, "for")).isTrue();
+
+        game.setCurrentAgendaVote("Against", jolnar.getColor() + "_1");
+        assertThat(FogSecretHooks.isConsensus(game, "for")).isFalse();
+    }
+
+    @Test
     void strikeFromTheFogQualifiesWhenTheDefenderNeverSawTheOrigin() {
         sol.setSecret(FogSecretHooks.STRIKE_FROM_FOG);
         Tile battlefield = game.getTileByPosition("306");
@@ -151,7 +194,7 @@ class FogSecretsTest extends BaseTi4Test {
 
         // Hacan's only ship sits in 306, so at activation it sees 305-307 but not 304.
         FogSecretHooks.onSystemActivated(game, sol);
-        FogSecretHooks.onUnitsMovedIn(game, sol, battlefield, Set.of("304"));
+        FogSecretHooks.onUnitsMovedIn(game, sol, battlefield, movedFrom(sol, "304"));
         battlefield.removeAllUnits(hacan.getColor());
         addShips(sol, "306", UnitType.Cruiser, 2);
 
@@ -168,7 +211,7 @@ class FogSecretsTest extends BaseTi4Test {
         addShips(sol, "305", UnitType.Cruiser, 2);
 
         FogSecretHooks.onSystemActivated(game, sol);
-        FogSecretHooks.onUnitsMovedIn(game, sol, battlefield, Set.of("305"));
+        FogSecretHooks.onUnitsMovedIn(game, sol, battlefield, movedFrom(sol, "305"));
 
         assertThat(FogSecretHooks.struckFromTheFog(game, sol, hacan)).isFalse();
     }
@@ -194,6 +237,10 @@ class FogSecretsTest extends BaseTi4Test {
             player.addOwnedUnitByID(unit);
         }
         return player;
+    }
+
+    private static Map<String, Map<UnitKey, List<Integer>>> movedFrom(Player player, String position) {
+        return Map.of(position + "-space", Map.of(Units.getUnitKey(UnitType.Cruiser, player.getColorID()), List.of(2)));
     }
 
     private void addShips(Player player, String position, UnitType type, int count) {

@@ -1,6 +1,5 @@
 package ti4.service.objectives.fog;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,10 +36,6 @@ class FogSight {
 
     static boolean seenByAny(Map<Player, Set<String>> visionOfOthers, String position) {
         return visionOfOthers.values().stream().anyMatch(seen -> seen.contains(position));
-    }
-
-    static boolean seenByAny(Map<Player, Set<String>> visionOfOthers, Collection<String> positions) {
-        return positions.stream().anyMatch(position -> seenByAny(visionOfOthers, position));
     }
 
     static List<Player> others(Game game, Player player) {

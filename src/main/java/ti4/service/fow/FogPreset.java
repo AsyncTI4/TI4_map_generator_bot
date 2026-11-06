@@ -4,7 +4,6 @@ import static ti4.service.option.FOWOptionService.FOWOption.BRIGHT_NOVAS;
 import static ti4.service.option.FOWOptionService.FOWOption.CLASSIC_MAP_LAYOUT;
 import static ti4.service.option.FOWOptionService.FOWOption.DISABLE_FRACTURE;
 import static ti4.service.option.FOWOptionService.FOWOption.FOG_QOL_01;
-import static ti4.service.option.FOWOptionService.FOWOption.FOG_SECRETS;
 import static ti4.service.option.FOWOptionService.FOWOption.FRACTURE_SEPARATE_MAP;
 import static ti4.service.option.FOWOptionService.FOWOption.GHOST_HEXES;
 import static ti4.service.option.FOWOptionService.FOWOption.GM_TURN_MAP;
@@ -51,7 +50,6 @@ public enum FogPreset {
             FOG_QOL_01,
             STATUS_SUMMARY,
             DISABLE_FRACTURE,
-            FOG_SECRETS,
             OPTIONAL_PILLAGABLE_TG,
             CLASSIC_MAP_LAYOUT,
             FRACTURE_SEPARATE_MAP);

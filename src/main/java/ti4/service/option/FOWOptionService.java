@@ -25,7 +25,6 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FogPreset;
 import ti4.service.fow.FogPresetService;
 import ti4.service.fow.GMService;
-import ti4.service.objectives.fog.FogSecrets;
 
 @UtilityClass
 public class FOWOptionService {
@@ -164,10 +163,6 @@ public class FOWOptionService {
                 FOWOptionCategory.FLOW,
                 "Disable Fracture",
                 "The Fracture can never enter play. Same setting as /game weird_game_setup no_fracture"),
-        FOG_SECRETS(
-                FOWOptionCategory.FLOW,
-                "Fog secret objectives",
-                "Shuffle the 32 fog secret objectives (scouting, hiding, watching) into the secret objective deck"),
 
         FOW_PLUS(
                 null, "FoW+", "Harder fog: forces stricter options, its own explore deck and blind activations", false),
@@ -202,6 +197,10 @@ public class FOWOptionService {
 
         public boolean isVisible() {
             return visible;
+        }
+
+        public static boolean exists(String value) {
+            return Arrays.stream(values()).anyMatch(option -> option.name().equalsIgnoreCase(value));
         }
 
         public static FOWOption fromString(String value) {
@@ -406,9 +405,6 @@ public class FOWOptionService {
             game.setNoFractureMode(value);
         } else {
             game.setFowOption(option, value);
-        }
-        if (option == FOWOption.FOG_SECRETS) {
-            FogSecrets.setLoaded(game, value);
         }
         if (value) disableConflictingCommsOption(game, option);
     }

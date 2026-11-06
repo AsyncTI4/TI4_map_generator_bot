@@ -327,7 +327,8 @@ Every step may also have a `label` for the report.
   `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`, `exhaustedPlanetAbilities`, `commodityValue`
   (commodity value, not the commodities held);
   `game.` + `activeSystem`, `phase`, `round`, `activePlayer`, `speaker`, `playedScs`, `acDiscard`, `agendaDiscard`,
-  `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`,
+  `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`, `soDeck` (secret objectives
+  still in the deck), `soDeckSize`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),
   `customAdjacencies` (`<primary>><listed>`), `customHyperlanes` (`<position>:<matrix>`, one-way lanes as `2`),
   `fowOptions` (enabled fog options, e.g. `fow_plus,ghost_hexes`; includes `disable_fracture`), `fogPreset`

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -17,10 +18,11 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.adjacency.Adjacency;
+import ti4.model.DeckModel;
+import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel.Wormhole;
-import ti4.service.objectives.SecretObjectiveDeckService;
 
 @UtilityClass
 public class FogSecrets {
@@ -50,25 +52,33 @@ public class FogSecrets {
     static final String MARK_FLAGSHIPS = "markflagshipsfog";
     static final String WIDE_NET = "widenetfog";
 
+    private static final Map<String, Boolean> FOG_DECKS = new ConcurrentHashMap<>();
     private static final Set<UnitType> CAPITAL_SHIPS =
             EnumSet.of(UnitType.Flagship, UnitType.Warsun, UnitType.Dreadnought, UnitType.Carrier);
 
-    public static boolean isFogSecret(String soID) {
-        return Mapper.getDeck(DECK).getNewDeck().contains(soID);
+    public static boolean isFogSecret(Game game, String soID) {
+        return game != null && game.isFowMode() && isFogSecret(soID);
     }
 
-    public static void setLoaded(Game game, boolean loaded) {
-        List<String> fogSecrets = Mapper.getDeck(DECK).getNewDeck();
-        if (loaded) {
-            SecretObjectiveDeckService.shuffleIntoDeck(game, fogSecrets);
-        } else {
-            SecretObjectiveDeckService.removeFromDeck(game, fogSecrets);
-        }
+    public static boolean isFogSecret(String soID) {
+        return Mapper.getDeck(DECK).getCardIDs().contains(soID);
+    }
+
+    public static boolean usesFogDeck(Game game) {
+        String deckId = game.getSoDeckID();
+        if (deckId == null) return false;
+        return FOG_DECKS.computeIfAbsent(deckId, FogSecrets::containsFogSecrets);
+    }
+
+    private static boolean containsFogSecrets(String deckId) {
+        DeckModel deck = Mapper.getDeck(deckId);
+        return deck != null && deck.getCardIDs().stream().anyMatch(FogSecrets::isFogSecret);
     }
 
     public static int threshold(String soID, Game game) {
         return switch (soID) {
-            case FIND_MECATOL, MASTER_CARTOGRAPHER, HIDDEN_SHIPYARD, SHROUD_THRONE, SECRET_PASSAGE, WATCH_LEADER -> 1;
+            case MASTER_CARTOGRAPHER, HIDDEN_SHIPYARD, SHROUD_THRONE, SECRET_PASSAGE, WATCH_LEADER -> 1;
+            case FIND_MECATOL -> Math.max(1, mecatolCore(game).size());
             case SURVEY_ROCKS -> mapScaledTarget(countSystems(game, Tile::isAsteroidField), 8);
             case WORMHOLE_CARTOGRAPHER ->
                 mapScaledTarget(wormholeTypes(game, allSystemPositions(game)).size(), 2);
@@ -86,7 +96,7 @@ public class FogSecrets {
 
     public static int progress(String soID, Game game, Player player) {
         return switch (soID) {
-            case FIND_MECATOL -> asProgress(foundMecatol(game, player));
+            case FIND_MECATOL -> foundMecatolCore(game, player);
             case SURVEY_ROCKS -> countFound(game, player, Tile::isAsteroidField);
             case WORMHOLE_CARTOGRAPHER ->
                 wormholeTypes(game, FogSight.found(game, player)).size();
@@ -99,11 +109,11 @@ public class FogSecrets {
             case KNOW_MORE -> gated(game, playersOutscouted(game, player), 2);
             case RUN_SILENT -> gated(game, unseenShips(game, player, CAPITAL_SHIPS::contains, false), 3);
             case GHOST_FLEET -> gated(game, unseenShips(game, player, type -> type != UnitType.Fighter, true), 5);
-            case HIDDEN_SHIPYARD -> asProgress(hasHiddenShipyard(game, player));
-            case DARK_COLONY -> hiddenColonies(game, player);
+            case HIDDEN_SHIPYARD -> gated(game, asProgress(hasHiddenShipyard(game, player)), 1);
+            case DARK_COLONY -> gated(game, hiddenColonies(game, player), 3);
             case SHROUD_THRONE -> gated(game, asProgress(homeIsHidden(game, player)), 1);
-            case SECRET_PASSAGE -> asProgress(holdsPrivatePassage(game, player));
-            case LURK_NEBULA -> largestHiddenNebulaFleet(game, player);
+            case SECRET_PASSAGE -> gated(game, asProgress(holdsPrivatePassage(game, player)), 1);
+            case LURK_NEBULA -> gated(game, largestHiddenNebulaFleet(game, player), 3);
             case EYES_THRONE -> homeSystemsInView(game, player);
             case WATCH_LEADER -> asProgress(watchesLeader(game, player));
             case SHADOW_RIVALS -> rivalsInView(game, player);
@@ -149,9 +159,22 @@ public class FogSecrets {
                 .count();
     }
 
-    private static boolean foundMecatol(Game game, Player player) {
+    private static int foundMecatolCore(Game game, Player player) {
+        Set<String> found = FogSight.found(game, player);
+        return (int) mecatolCore(game).stream().filter(found::contains).count();
+    }
+
+    private static Set<String> mecatolCore(Game game) {
         Tile mecatol = game.getMecatolTile();
-        return mecatol != null && FogSight.found(game, player).contains(mecatol.getPosition());
+        if (mecatol == null) return Set.of();
+        Set<String> core = new HashSet<>();
+        core.add(mecatol.getPosition());
+        List<String> around = MapPositionMapper.getAdjacentTilePositions(mecatol.getPosition());
+        if (around == null) return core;
+        around.stream()
+                .filter(position -> FogSight.isCountableSystem(game.getTileByPosition(position)))
+                .forEach(core::add);
+        return core;
     }
 
     private static Set<Wormhole> wormholeTypes(Game game, Set<String> positions) {
@@ -207,16 +230,13 @@ public class FogSecrets {
 
     private static int unseenShips(Game game, Player player, Predicate<UnitType> counted, boolean outsideHome) {
         Tile home = player.getHomeSystemTile();
-        List<String> positions = new ArrayList<>();
+        Map<Player, Set<String>> vision = FogSight.visionOfOthers(game, player);
         int ships = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (outsideHome && tile == home) continue;
-            int here = shipsIn(player, tile, counted);
-            if (here == 0) continue;
-            ships += here;
-            positions.add(tile.getPosition());
+            if (FogSight.seenByAny(vision, tile.getPosition())) continue;
+            ships += shipsIn(player, tile, counted);
         }
-        if (FogSight.seenByAny(FogSight.visionOfOthers(game, player), positions)) return 0;
         return ships;
     }
 
@@ -336,23 +356,25 @@ public class FogSecrets {
                 .map(Tile::getPosition)
                 .toList();
         Adjacency adjacency = Adjacency.of(game, player).forEffects();
-        return largestSpread(positions, adjacency, 0, new ArrayList<>(), target, 0);
+        return largestSpread(positions, adjacency, 0, new ArrayList<>(), target);
     }
 
     private static int largestSpread(
-            List<String> positions, Adjacency adjacency, int index, List<String> chosen, int target, int best) {
-        best = Math.max(best, chosen.size());
-        if (best >= target || index >= positions.size()) return best;
-        if (chosen.size() + positions.size() - index <= best) return best;
-        String candidate = positions.get(index);
-        if (chosen.stream()
-                .noneMatch(
-                        picked -> adjacency.isAdjacent(picked, candidate) || adjacency.isAdjacent(candidate, picked))) {
+            List<String> positions, Adjacency adjacency, int start, List<String> chosen, int target) {
+        int best = chosen.size();
+        for (int i = start; i < positions.size() && best < target; i++) {
+            if (chosen.size() + positions.size() - i <= best) break;
+            String candidate = positions.get(i);
+            if (touchesAny(adjacency, chosen, candidate)) continue;
             chosen.add(candidate);
-            best = largestSpread(positions, adjacency, index + 1, chosen, target, best);
+            best = Math.max(best, largestSpread(positions, adjacency, i + 1, chosen, target));
             chosen.removeLast();
-            if (best >= target) return best;
         }
-        return largestSpread(positions, adjacency, index + 1, chosen, target, best);
+        return best;
+    }
+
+    private static boolean touchesAny(Adjacency adjacency, List<String> chosen, String candidate) {
+        return chosen.stream()
+                .anyMatch(picked -> adjacency.isAdjacent(picked, candidate) || adjacency.isAdjacent(candidate, picked));
     }
 }

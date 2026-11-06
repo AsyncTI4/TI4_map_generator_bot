@@ -18,6 +18,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.objectives.fog.FogSecrets;
 
 @UtilityClass
 public class SecretObjectiveInfoService {
@@ -157,7 +158,12 @@ public class SecretObjectiveInfoService {
                     index++;
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
-                    if (threshold > 0) {
+                    if (threshold > 0 && FogSecrets.isFogSecret(game, so.getKey())) {
+                        if (ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player)
+                                >= threshold) {
+                            sb.append(" ✅");
+                        }
+                    } else if (threshold > 0) {
                         sb.append(" (")
                                 .append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player))
                                 .append('/')
