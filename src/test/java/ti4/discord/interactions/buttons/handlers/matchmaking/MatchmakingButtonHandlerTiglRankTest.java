@@ -86,25 +86,25 @@ class MatchmakingButtonHandlerTiglRankTest extends BaseTi4Test {
     }
 
     @Test
-    void groupQueuesAtItsHighestRankedMembersRank() {
+    void ministerQueueingWithHeroIsCappedAtMinister() {
         giveUserRank(TIGLRank.MINISTER);
         User heroPartner = userWithRank("222", TIGLRank.HERO);
 
-        List<String> allowed = MatchmakingButtonHandler.allowedGroupTiglRanks(
+        List<String> allowed = MatchmakingButtonHandler.allowedTiglRanks(
                 List.of(user, heroPartner), MatchmakingOptions.TIGL_RANK_OPTIONS);
 
-        assertEquals(MatchmakingOptions.TIGL_RANK_OPTIONS, allowed);
+        assertEquals(List.of("Unranked", "Minister"), allowed);
     }
 
     @Test
-    void groupCannotQueueAboveItsHighestRankedMember() {
+    void groupCannotQueueAboveItsLowestRankedMember() {
         giveUserRank(TIGLRank.MINISTER);
         User agentPartner = userWithRank("222", TIGLRank.AGENT);
 
-        List<String> allowed =
-                MatchmakingButtonHandler.allowedGroupTiglRanks(List.of(user, agentPartner), List.of("Hero", "Agent"));
+        List<String> allowed = MatchmakingButtonHandler.allowedTiglRanks(
+                List.of(user, agentPartner), List.of("Hero", "Minister", "Agent"));
 
-        assertEquals(List.of("Agent"), allowed);
+        assertEquals(List.of("Minister"), allowed);
     }
 
     // Each user gets its own role id so the two ranks don't collide in the role-id-to-rank map.

@@ -311,8 +311,7 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         LabelChildComponent ranks = buildMultiSelect(
                 TIGL_RANKS_ID,
-                allowedGroupTiglRanks(
-                        groupUsers(event.getUser(), groupMemberIds), MatchmakingOptions.TIGL_RANK_OPTIONS),
+                allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), MatchmakingOptions.TIGL_RANK_OPTIONS),
                 userSettings.getMatchmakingTiglRanks(),
                 DEFAULT_TIGL_RANK_OPTIONS,
                 REQUIRE_SELECTION);
@@ -693,18 +692,13 @@ class MatchmakingButtonHandler {
                 .toList());
         List<String> groupMemberIds =
                 MatchmakerService.get().partyMemberIds(event.getUser().getId());
-        userSettings.setMatchmakingTiglRanks(allowedGroupTiglRanks(
-                groupUsers(event.getUser(), groupMemberIds), getSelectedValues(event, TIGL_RANKS_ID)));
+        userSettings.setMatchmakingTiglRanks(
+                allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), getSelectedValues(event, TIGL_RANKS_ID)));
         UserSettingsManager.save(userSettings);
     }
 
     static List<String> allowedTiglRanks(List<User> users, List<String> requestedRanks) {
         return unrankedIfEmpty(TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(users, requestedRanks));
-    }
-
-    static List<String> allowedGroupTiglRanks(List<User> groupUsers, List<String> requestedRanks) {
-        return unrankedIfEmpty(
-                TIGLHelper.filterStandardTiglRankOptionsAtOrBelowHighestRankAmong(groupUsers, requestedRanks));
     }
 
     private static List<String> unrankedIfEmpty(List<String> ranks) {
