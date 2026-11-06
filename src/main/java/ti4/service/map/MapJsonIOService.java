@@ -412,7 +412,8 @@ public class MapJsonIOService {
         }
 
         for (LoreIO io : entries) {
-            if (io == null || StringUtils.isBlank(io.getLoreText())) continue;
+            if (io == null || (StringUtils.isBlank(io.getLoreText()) && StringUtils.isBlank(io.getFooterText())))
+                continue;
 
             // One entry's failure — expected (bad enum) or not (any other exception) — must not
             // stop the rest of this target's entries, or the target after it, from importing.

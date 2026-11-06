@@ -706,7 +706,10 @@ public class PlayStrategyCardService {
                     }
                 }
                 if (!applyPreDecline(playersToReact, game, p2, scToPlay, stratCardName, event)) {
-                    if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
+                    if (scToPlay == 8
+                            && p2.getSoScored() == p2.getMaxSOCount()
+                            && !game.isTwilightsFallMode()
+                            && !game.isSecretsOnlyMode()) {
                         markPlayerAsAutoFollowing(playersToReact, game, p2, 8, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
@@ -1095,8 +1098,8 @@ public class PlayStrategyCardService {
         List<Player> players = getPlayersInFollowOrder(game, imperialHolder);
         if (game.isQueueSO()) {
             for (Player player : players) {
-                if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
-                        || player.getSoScored() == player.getMaxSOCount()
+                if (player.getSecretsCountedTowardLimit() < player.getMaxSOCount()
+                        || (player.getSoScored() == player.getMaxSOCount() && !game.isSecretsOnlyMode())
                         || (player == imperialHolder
                                 && player.controlsMecatol(true)
                                 && !game.getPhaseOfGame().contains("agenda"))) {

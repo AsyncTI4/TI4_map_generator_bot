@@ -154,6 +154,7 @@ public class GameProperties {
     private @ExportableField boolean monumentsMode;
     private @ExportableField boolean wildWildGalaxyMode;
     private @ExportableField boolean feastOrFamineMode;
+    private @ExportableField boolean secretsOnlyMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean oplusplusRegularMode;

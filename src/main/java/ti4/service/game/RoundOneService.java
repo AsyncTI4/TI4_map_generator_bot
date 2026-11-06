@@ -25,6 +25,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.tigl.TiglSetupService;
 
 @UtilityClass
@@ -69,6 +70,9 @@ public class RoundOneService {
             game.removeRelicFromGame("quantumcore");
             game.removeRelicFromGame("thesilverflame");
             game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
+        }
+        if (game.isSecretsOnlyMode()) {
+            SecretsOnlyService.addModeCards(game);
         }
         game.removeOverruleIfPurged();
         game.setupNeutralPlayer();

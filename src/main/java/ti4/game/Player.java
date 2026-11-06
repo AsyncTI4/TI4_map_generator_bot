@@ -1411,6 +1411,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return maxSOCount + Math.max(bonus, getBonusScoredSecrets());
     }
 
+    public int getSecretsCountedTowardLimit() {
+        int inHand = getSecretsUnscored().size();
+        return game.isSecretsOnlyMode() ? inHand : inHand + secretsScored.size();
+    }
+
     public void setSecret(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");

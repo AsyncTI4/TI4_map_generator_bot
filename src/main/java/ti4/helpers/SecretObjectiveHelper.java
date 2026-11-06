@@ -36,6 +36,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.objectives.fog.FogSecrets;
 
 @UtilityClass
@@ -46,11 +47,21 @@ public class SecretObjectiveHelper {
         if (EndedGameScoringGuardService.sendPromptIfGameEnded(game, channel)) {
             return false;
         }
+        if (game.isSecretsOnlyMode() && SecretsOnlyService.hasAlreadyScored(player, soID)) {
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "You have already scored that secret objective, and no player may score the same one twice.");
+            return false;
+        }
+        SecretObjectiveModel scoring = player.getSecret(soID);
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return false;
+        }
+        if (game.isSecretsOnlyMode() && scoring != null) {
+            SecretsOnlyService.recordScore(game, player, scoring.getAlias());
         }
 
         StringBuilder message = new StringBuilder(player.getRepresentation() + " scored ");
@@ -205,6 +216,9 @@ public class SecretObjectiveHelper {
                 List<Button> buttons = ActionCardHelper.getDiscardActionCardButtonsWithSuffix(player, "retain");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
+        }
+        if (game.isSecretsOnlyMode()) {
+            message.append("-# It has been shuffled back into the secret objective deck.\n");
         }
         if (event != null
                 && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {

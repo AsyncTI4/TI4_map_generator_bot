@@ -655,6 +655,7 @@ class GameLoadService {
                     game.setRapidMobilizationMode(parseBooleanOrDefault(info, false));
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(parseBooleanOrDefault(info, false));
                 case Constants.FEAST_OR_FAMINE_MODE -> game.setFeastOrFamineMode(parseBooleanOrDefault(info, false));
+                case Constants.SECRETS_ONLY_MODE -> game.setSecretsOnlyMode(parseBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(parseBooleanOrDefault(info, false));
                 case Constants.COSMIC_CONVERGENCE_MODE ->
                     game.setCosmicConvergenceMode(parseBooleanOrDefault(info, false));

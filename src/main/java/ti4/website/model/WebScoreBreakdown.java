@@ -661,8 +661,7 @@ public class WebScoreBreakdown {
 
         // Check secret limit
         int maxSecrets = player.getMaxSOCount();
-        int currentSecrets =
-                player.getSecrets().size() + player.getSecretsScored().size();
+        int currentSecrets = player.getSecretsCountedTowardLimit();
 
         // Can draw a secret if not at cap
         return currentSecrets < maxSecrets;
@@ -673,8 +672,7 @@ public class WebScoreBreakdown {
 
         // Check secret limit
         int maxSecrets = player.getMaxSOCount();
-        int currentSecrets =
-                player.getSecrets().size() + player.getSecretsScored().size();
+        int currentSecrets = player.getSecretsCountedTowardLimit();
         if (currentSecrets >= maxSecrets) {
             return false;
         }

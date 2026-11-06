@@ -310,7 +310,7 @@ public class RelicHelper {
             case "thetriad" -> p1.removePlanet("triad");
             case "gedustation" -> p1.removePlanet("gedustation");
             case "obsidian", "absol_obsidian" -> {
-                if (p1.getSoScored() > p1.getMaxSOCount()) {
+                if (!game.isSecretsOnlyMode() && p1.getSoScored() > p1.getMaxSOCount()) {
                     // do something for 4 scored secrets
                     p1.setBonusScoredSecrets(p1.getBonusScoredSecrets() + 1);
                 }

@@ -84,7 +84,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
 | Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
-| Game option (`/custom` setting; currently `wormhole_token_merge`, `one_way_adjacency`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
+| Game option (`/custom` setting or game mode; currently `wormhole_token_merge`, `one_way_adjacency`, `secrets_only_mode`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
 | Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
 | Next explore card | script `do: stackExplore` (value: explore id) puts the card on top of its deck | `{ "do": "stackExplore", "value": "tourismbureau30k" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
@@ -272,7 +272,7 @@ copy-paste templates.
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
-| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens) and `one_way_adjacency` (`true` or `false`). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
+| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens) `one_way_adjacency` (`true` or `false`) and `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
 | `decks` | Deck ids switched on before seats get cards, so `acs`, `sos` and `relics` can give cards from homebrew decks. Slots: `ac`, `so`, `relic`, `explore`, `agenda`. |
 | `shortcuts` | Test buttons for the **Preset** group. |
 

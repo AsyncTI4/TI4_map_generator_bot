@@ -34,6 +34,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.objectives.fog.FogSecrets;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -137,6 +138,8 @@ public class ListPlayerInfoService {
 
     private static int homebrewSecretThreshold(String objID, Game game) {
         if (FogSecrets.isFogSecret(game, objID)) return FogSecrets.threshold(objID, game);
+        int secretsOnlyThreshold = SecretsOnlyService.threshold(objID);
+        if (secretsOnlyThreshold > 0) return secretsOnlyThreshold;
         return ThirtyKSecrets.threshold(objID);
     }
 
@@ -398,14 +401,11 @@ public class ListPlayerInfoService {
         StringBuilder representation = new StringBuilder("### Scored Secret Objective Count\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation
-                        .append(player.getFactionEmoji())
-                        .append(": ")
-                        .append(player.getSoScored())
-                        .append('/')
-                        .append(player.getMaxSOCount())
-                        .append(UnitEmojis.Blank)
-                        .append(UnitEmojis.Blank);
+                representation.append(player.getFactionEmoji()).append(": ").append(player.getSoScored());
+                if (!game.isSecretsOnlyMode()) {
+                    representation.append('/').append(player.getMaxSOCount());
+                }
+                representation.append(UnitEmojis.Blank).append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -524,6 +524,7 @@ public class ListPlayerInfoService {
         }
         if (ThirtyKCards.isSecretObjective(objID)) return ThirtyKSecrets.progress(objID, game, player);
         if (FogSecrets.isFogSecret(game, objID)) return FogSecrets.progress(objID, game, player);
+        if (SecretsOnlyService.threshold(objID) > 0) return SecretsOnlyService.progress(objID, game, player);
         switch (objID) {
             case "push_boundaries", "push_boundaries_omegaphase" -> {
                 int aboveN = 0;
