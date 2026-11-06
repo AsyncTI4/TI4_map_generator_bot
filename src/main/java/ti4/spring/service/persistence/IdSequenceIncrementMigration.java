@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ti4.logging.BotLogger;
 
+@Deprecated(forRemoval = true)
 @Component
 @RequiredArgsConstructor
 class IdSequenceIncrementMigration implements ApplicationRunner {
