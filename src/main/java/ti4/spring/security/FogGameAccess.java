@@ -28,6 +28,10 @@ public record FogGameAccess(Role role, @Nullable Player seat) {
         if (holdsSeat(player)) {
             return new FogGameAccess(Role.PLAYER, player);
         }
+        Player teamSeat = seatWithTeammate(game, userId);
+        if (teamSeat != null) {
+            return new FogGameAccess(Role.PLAYER, teamSeat);
+        }
         if (isGameMaster(game, userId)) {
             return new FogGameAccess(Role.GAME_MASTER, null);
         }
@@ -45,6 +49,15 @@ public record FogGameAccess(Role role, @Nullable Player seat) {
             return auth.getName();
         }
         return null;
+    }
+
+    @Nullable
+    private static Player seatWithTeammate(Game game, String userId) {
+        return game.getRealPlayers().stream()
+                .filter(FogGameAccess::holdsSeat)
+                .filter(player -> player.getTeamMateIDs().contains(userId))
+                .findFirst()
+                .orElse(null);
     }
 
     private static boolean isGameMaster(Game game, String userId) {
