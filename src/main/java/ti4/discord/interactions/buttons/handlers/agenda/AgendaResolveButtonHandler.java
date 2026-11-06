@@ -75,6 +75,7 @@ import ti4.model.Mapper;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.turn.StartTurnService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -187,6 +188,7 @@ class AgendaResolveButtonHandler {
         checkFlorzenUnlock(voters, riders);
         processRiders(game, riders);
         ThirtyKSecretHooks.onAgendaResolved(game);
+        FogSecretHooks.onAgendaResolved(game, winner);
         String resMes = buildResolutionMessage(game, winner);
         int aCount = computeNextAgendaCount(game);
         List<Button> buttons = buildNextButtons(game, aCount);
