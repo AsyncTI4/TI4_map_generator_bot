@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
@@ -5157,6 +5158,10 @@ public class ButtonHelper {
         Button celyonButton = TheodisiLegendaryButtonHandler.getCelyonEndTurnButton(player);
         if (celyonButton != null) {
             endButtons.add(celyonButton);
+        }
+        Button seatOfPowerButton = TheodisiAgendaResolver.getSeatOfPowerButton(game, player);
+        if (seatOfPowerButton != null) {
+            endButtons.add(seatOfPowerButton);
         }
 
         // Legendary Planets

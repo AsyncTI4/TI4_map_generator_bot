@@ -18,6 +18,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRid
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
@@ -243,18 +245,85 @@ public class AgendaRiderHelper {
         if (agendaDetails.contains("unit upgrade")) {
             return getUnitUpgradeOutcomeButtons(game, riderName, prefix);
         }
+        if (lower.contains("system")) {
+            return getSystemOutcomeButtons(game, riderName, prefix, lower.contains("fracture"));
+        }
+        if (lower.contains("relic")) {
+            return getRelicOutcomeButtons(game, riderName, prefix);
+        }
+        if (lower.contains("leader type")) {
+            return getLeaderTypeOutcomeButtons(riderName, prefix);
+        }
+        if (lower.contains("unit type")) {
+            return getUnitTypeOutcomeButtons(riderName, prefix);
+        }
         if (lower.contains("unit")) {
             return getUnitOutcomeButtons(game, riderName, prefix);
         }
         return getLawOutcomeButtons(game, riderName, prefix);
     }
 
+    public static List<Button> getSystemOutcomeButtons(Game game, String rider, String prefix, boolean fractureOnly) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (fractureOnly && !tile.isFracture()) continue;
+            String label = "System " + tile.getPosition();
+            Button button = rider == null
+                    ? Buttons.blue(prefix + "_" + tile.getPosition(), label)
+                    : Buttons.blue(prefix + "rider_system;" + tile.getPosition() + "_" + rider, label);
+            buttons.add(button);
+        }
+        return buttons;
+    }
+
+    public static List<Button> getRelicOutcomeButtons(Game game, String rider, String prefix) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            for (String relic : player.getRelics()) {
+                var relicModel = Mapper.getRelic(relic);
+                if (relicModel == null) continue;
+                Button button = rider == null
+                        ? Buttons.blue(prefix + "_" + relic, relicModel.getName())
+                        : Buttons.blue(prefix + "rider_relic;" + relic + "_" + rider, relicModel.getName());
+                buttons.add(button);
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> getLeaderTypeOutcomeButtons(String rider, String prefix) {
+        return List.of("agent", "commander", "hero").stream()
+                .map(type -> rider == null
+                        ? Buttons.blue(prefix + "_" + type, StringUtils.capitalize(type))
+                        : Buttons.blue(prefix + "rider_leadertype;" + type + "_" + rider, StringUtils.capitalize(type)))
+                .toList();
+    }
+
+    public static List<Button> getUnitTypeOutcomeButtons(String rider, String prefix) {
+        return List.of(
+                        UnitType.Infantry,
+                        UnitType.Mech,
+                        UnitType.Pds,
+                        UnitType.Spacedock,
+                        UnitType.Fighter,
+                        UnitType.Destroyer,
+                        UnitType.Cruiser,
+                        UnitType.Carrier,
+                        UnitType.Dreadnought,
+                        UnitType.Flagship,
+                        UnitType.Warsun)
+                .stream()
+                .map(type -> rider == null
+                        ? Buttons.blue(prefix + "_" + type.humanReadableName(), type.humanReadableName())
+                        : Buttons.blue(
+                                prefix + "rider_unittype;" + type.humanReadableName() + "_" + rider,
+                                type.humanReadableName()))
+                .toList();
+    }
+
     @ButtonHandler("planetRider_")
     public static void planetRider(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         buttonID = buttonID.replace("planetRider_", "");
-        // A page-nav press re-enters this same handler (see paginatedPlanetOutcomeButtons's navPrefix) with
-        // a trailing "pageN". Stripping it first, before the color/rider split below, means a fresh press
-        // and a page-N press reduce to the identical "color_rider" string either way.
         int page = 0;
         Matcher pageMatch = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
         if (pageMatch.find()) {
@@ -266,8 +335,6 @@ public class AgendaRiderHelper {
         String voteMessage = "Chose to Rider for one of " + factionOrColor + "'s planets. Please choose which one.";
 
         String rider = buttonID.replace(factionOrColor + "_", "");
-        // Reuses the presser's own gate, matching the real target buttons built one line below - only the
-        // player who opened this list can page through it.
         String navPrefix = player.factionButtonChecker() + "planetRider_" + factionOrColor + "_" + rider;
         List<Button> outcomeActionRow = paginatedPlanetOutcomeButtons(
                 planetOwner, player, game, player.factionButtonChecker(), rider, navPrefix, page);

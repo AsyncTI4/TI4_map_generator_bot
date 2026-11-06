@@ -17,6 +17,7 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
@@ -370,7 +371,7 @@ public final class ButtonHelperSCs {
     @ButtonHandler("score_imperial")
     public static void scoreImperial(Game game, Player player, ButtonInteractionEvent event) {
         if (player == null || game == null) return;
-        if (!player.controlsMecatol(true)) {
+        if (!player.controlsMecatol(true) && !TheodisiAgendaResolver.hasSeatOfPower(game, player)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Only the player who controls Mecatol Rex may score the **Imperial** victory point.");
@@ -1841,6 +1842,15 @@ public final class ButtonHelperSCs {
             return msgStart + " You are elected for _Endorse_, so you do not spend a token.";
         }
 
+        StrategyCardModel strategyCard = scNum == -1
+                ? null
+                : game.getStrategyCardModelByInitiative(scNum).orElse(null);
+        if (ButtonHelper.isLawInPlay(game, "freemarketcapitalism")
+                && strategyCard != null
+                && strategyCard.usesAutomationForSCID("pok5trade")) {
+            return msgStart + " No command token was spent due to _Free Market Capitalism_.";
+        }
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander") && scNum == 7) {
             return msgStart + " No command token was spent due to **Tek Mir-un**, the Net-Runners commander.";
         }
@@ -1855,6 +1865,7 @@ public final class ButtonHelperSCs {
         strategicCC--;
         player.setStrategicCC(strategicCC);
         VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
+        TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
         if (scNum != -1 && player.hasAbility("strategic_fluidity")) {
             OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
         }

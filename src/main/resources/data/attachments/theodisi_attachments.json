@@ -1,5 +1,13 @@
 [
     {
+        "id": "ministerthrone",
+        "name": "Minister of the Throne",
+        "imagePath": "attachment_ministerthrone.png",
+        "isLegendary": true,
+        "isFakeAttachment": true,
+        "source": "theodisi"
+    },
+    {
         "id": "factoryleaseh",
         "name": "Factory Lease: Hazardous",
         "imagePath": "attachment_factoryleaseh.png",

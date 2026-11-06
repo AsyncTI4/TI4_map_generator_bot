@@ -200,7 +200,7 @@
       "PROPULSION",
       "BIOTIC"
     ],
-    "text": "**UNLEASH**: Remove 2 Fragmentum tokens of the same color from your faction sheet.\n\nACTION: Purge 1 relic fragment from your play area. Then, you may gain 1 purged relic fragment of any other color.",
+    "text": "**UNLEASH**: Remove 2 Fragmentum tokens of the same color from your faction sheet.\n\nACTION: Exhaust this card and purge 1 relic fragment from your play area. Then, you may gain 1 purged relic fragment of any other color.",
     "source": "theodisi"
   },
   {
@@ -212,7 +212,7 @@
       "PROPULSION",
       "BIOTIC"
     ],
-    "text": "ACTION: Purge 1 relic fragment from your play area. Then, you may gain 2 purged relic fragments of any other color.",
+    "text": "ACTION: Exhaust this card and purge 1 relic fragment from your play area. Then, you may gain 2 purged relic fragments of any other color.",
     "source": "theodisi"
   },
   {

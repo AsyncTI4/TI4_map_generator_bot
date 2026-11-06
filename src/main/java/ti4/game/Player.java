@@ -1640,6 +1640,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (hasTech("tf-corporateimperialism")) {
             bonus += 4;
         }
+        if (ButtonHelper.isLawInPlay(game, "privateequity")) {
+            try {
+                bonus += Integer.parseInt(game.getStoredValue("theodisiPrivateEquity"));
+            } catch (NumberFormatException ignored) {
+            }
+        }
 
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(

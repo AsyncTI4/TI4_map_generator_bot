@@ -2543,6 +2543,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 }
             }
         }
+        if ("ministerthrone".equalsIgnoreCase(id)) {
+            String planetName = getStoredValue("theodisiMinisterThronePlanet");
+            Planet planet = getUnitHolderFromPlanet(planetName);
+            if (planet != null) planet.removeToken("attachment_ministerthrone.png");
+            removeStoredValue("theodisiMinisterThronePlanet");
+        }
 
         laws.remove(id);
         lawsInfo.remove(id);
@@ -2569,6 +2575,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             removeSearchWarrant(id);
         } else if ("censure".equalsIgnoreCase(id)) {
             removePoliticalCensure();
+        } else if ("ministerthrone".equalsIgnoreCase(id)) {
+            String planetName = getStoredValue("theodisiMinisterThronePlanet");
+            Planet planet = getUnitHolderFromPlanet(planetName);
+            if (planet != null) planet.removeToken("attachment_ministerthrone.png");
+            removeStoredValue("theodisiMinisterThronePlanet");
         }
 
         laws.remove(id);
