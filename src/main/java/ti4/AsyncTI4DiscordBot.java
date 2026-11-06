@@ -48,6 +48,7 @@ public class AsyncTI4DiscordBot {
             throw new IllegalStateException("Failed to initialize JDA and guilds");
         }
         JdaService.loadStaticDataAndResources();
+        GameManager.preloadManagedGames();
         BotLogger.info("WARMING INTERACTION HANDLERS");
         ButtonProcessor.checkButtonHandlersSetup();
         SelectionMenuProcessor.checkSelectionMenuHandlersSetup();

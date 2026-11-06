@@ -36,6 +36,14 @@ public class PersistedManagedGameService {
         return persistedGames;
     }
 
+    public Map<String, String> loadRevisionKeys() {
+        Map<String, String> revisionKeys = new HashMap<>();
+        for (GameRevisionRow row : gameEntityRepository.findRevisionRows(GameEntityMapper.MAPPING_VERSION)) {
+            revisionKeys.put(row.gameName(), row.revisionKey());
+        }
+        return revisionKeys;
+    }
+
     public static PersistedManagedGameService getBean() {
         return SpringContext.getBean(PersistedManagedGameService.class);
     }
