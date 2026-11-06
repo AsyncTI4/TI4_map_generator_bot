@@ -55,7 +55,7 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
     @BeforeEach
     void clearTables() {
         userSettingsRepository.deleteAll();
-        autoPingService.delete(autoPingService.gameNames());
+        autoPingService.delete(autoPingService.findAll().keySet());
         techSummaryService.replaceAll(techSummaryService.findAll().keySet(), Map.of());
     }
 
@@ -103,6 +103,26 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
+    void updateAllChangesExistingAndCreatesMissingSettingsInOneCall() {
+        userSettingsService.update("400", () -> userSettings("400"), settings -> settings.setGameLimit(2));
+
+        userSettingsService.updateAll(
+                Map.of(
+                        "400", settings -> settings.setGameLimit(settings.getGameLimit() + 1),
+                        "401", settings -> settings.setGameLimit(7)),
+                JsonStoresDatabaseTest::userSettings);
+
+        assertThat(userSettingsService.find("400"))
+                .get()
+                .extracting(UserSettings::getGameLimit)
+                .isEqualTo(3);
+        assertThat(userSettingsService.find("401"))
+                .get()
+                .extracting(UserSettings::getGameLimit)
+                .isEqualTo(7);
+    }
+
+    @Test
     void autoPingComputeUpdateAndDelete() {
         autoPingService.compute("pbd1", _ -> new AutoPing(10, 0, false));
         autoPingService.compute("pbd1", ping -> new AutoPing(20, ping.pingCount() + 1, ping.quickPing()));
@@ -112,7 +132,27 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         assertThat(autoPingService.find("pbd2")).isEmpty();
 
         autoPingService.delete(List.of("pbd1", "pbd-never-stored"));
-        assertThat(autoPingService.gameNames()).isEmpty();
+        assertThat(autoPingService.findAll()).isEmpty();
+    }
+
+    @Test
+    void autoPingFindAllReturnsEveryStoredPingByGame() {
+        autoPingService.compute("pbd1", _ -> new AutoPing(10, 1, false));
+        autoPingService.compute("pbd2", _ -> new AutoPing(20, 2, true));
+
+        assertThat(autoPingService.findAll())
+                .containsOnly(
+                        Map.entry("pbd1", new AutoPing(10, 1, false)), Map.entry("pbd2", new AutoPing(20, 2, true)));
+    }
+
+    @Test
+    void userSettingsFindAllByIdReturnsOnlyStoredUsers() {
+        userSettingsService.save(userSettings("500"));
+        userSettingsService.save(userSettings("501"));
+
+        assertThat(userSettingsService.findAllById(List.of("500", "501", "never-stored")))
+                .extracting(UserSettings::getUserId)
+                .containsExactlyInAnyOrder("500", "501");
     }
 
     // AutoPingCron passes every ended game (tens of thousands of names) on each run; only stored ones are deleted,
@@ -126,7 +166,7 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
 
         autoPingService.delete(endedGames);
 
-        assertThat(autoPingService.gameNames()).isEmpty();
+        assertThat(autoPingService.findAll()).isEmpty();
     }
 
     @Test
@@ -146,6 +186,20 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
         techSummaryService.replaceAll(previous, all);
 
         assertThat(techSummaryService.findAll()).containsOnlyKeys("pbd1");
+    }
+
+    @Test
+    void replaceAllUpdatesExistingInsertsNewAndDropsRemovedGamesTogether() {
+        techSummaryService.save("pbd1", summaries(3, "sol", "fl"));
+        techSummaryService.save("pbd2", summaries(2, "hacan", "sdn"));
+
+        techSummaryService.replaceAll(
+                Set.of("pbd1", "pbd2"), Map.of("pbd1", summaries(4, "sol", "gd"), "pbd3", summaries(1, "xxcha", "nm")));
+
+        Map<String, RoundTechSummaries> all = techSummaryService.findAll();
+        assertThat(all).containsOnlyKeys("pbd1", "pbd3");
+        assertThat(all.get("pbd1").round()).isEqualTo(4);
+        assertThat(all.get("pbd3").round()).isEqualTo(1);
     }
 
     @Test

@@ -345,5 +345,29 @@
         "itemId": "celestial_envoys",
 		"undraftable": true,
         "source": "theodisi"
-    } 
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "hydromorphic",
+        "additionalComponents": [
+            "ABILITY:fluid_transfer"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "thmorphag",
+        "additionalComponents": [
+            "ABILITY:fluid_transfer"
+        ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "thpnmorpha",
+        "additionalComponents": [
+            "ABILITY:fluid_transfer"
+        ],
+        "source": "theodisi"
+    }
 ]

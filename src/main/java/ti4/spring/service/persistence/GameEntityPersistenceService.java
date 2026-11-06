@@ -1,9 +1,11 @@
 package ti4.spring.service.persistence;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.BiPredicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,20 +20,25 @@ public class GameEntityPersistenceService {
     private final TitleEntityRepository titleEntityRepository;
     private final UserEntityRepository userEntityRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Transactional
     public void replace(GameEntitySnapshot snapshot) {
-        upsertUsers(snapshot.users());
+        Map<String, UserEntity> users =
+                saveUsers(snapshot.users(), (existing, incoming) -> !GameEntityMapper.hasUnknownName(incoming));
         deleteGameRows(snapshot.game().getGameName());
-        gameEntityRepository.save(snapshot.game());
-        titleEntityRepository.saveAll(snapshot.titles());
+        insertGameRows(snapshot, users);
     }
 
     @Transactional
     public void restore(GameEntitySnapshot snapshot) {
-        insertMissingUsers(snapshot.users());
+        Map<String, UserEntity> users = saveUsers(
+                snapshot.users(),
+                (existing, incoming) ->
+                        GameEntityMapper.hasUnknownName(existing) && !GameEntityMapper.hasUnknownName(incoming));
         deleteGameRows(snapshot.game().getGameName());
-        gameEntityRepository.save(snapshot.game());
-        titleEntityRepository.saveAll(snapshot.titles());
+        insertGameRows(snapshot, users);
     }
 
     @Transactional
@@ -39,29 +46,42 @@ public class GameEntityPersistenceService {
         deleteGameRows(gameName);
     }
 
-    private void upsertUsers(List<UserEntity> users) {
-        List<UserEntity> usersToSave = users.stream()
-                .filter(user ->
-                        !GameEntityMapper.hasUnknownName(user) || !userEntityRepository.existsById(user.getId()))
-                .toList();
-        userEntityRepository.saveAll(usersToSave);
+    private Map<String, UserEntity> saveUsers(
+            List<UserEntity> users, BiPredicate<UserEntity, UserEntity> shouldReplaceExistingName) {
+        Map<String, UserEntity> managedUsers = new HashMap<>();
+        userEntityRepository
+                .findAllById(users.stream().map(UserEntity::getId).toList())
+                .forEach(user -> managedUsers.put(user.getId(), user));
+        for (UserEntity user : users) {
+            UserEntity existing = managedUsers.get(user.getId());
+            if (existing == null) {
+                entityManager.persist(user);
+                managedUsers.put(user.getId(), user);
+            } else if (shouldReplaceExistingName.test(existing, user)) {
+                existing.setName(user.getName());
+            }
+        }
+        return managedUsers;
     }
 
-    private void insertMissingUsers(List<UserEntity> users) {
-        Map<String, UserEntity> existingUsers =
-                userEntityRepository
-                        .findAllById(users.stream().map(UserEntity::getId).toList())
-                        .stream()
-                        .collect(Collectors.toMap(UserEntity::getId, Function.identity()));
-        List<UserEntity> usersToSave = users.stream()
-                .filter(user -> shouldReplaceExistingName(existingUsers.get(user.getId()), user))
-                .toList();
-        userEntityRepository.saveAll(usersToSave);
+    private void insertGameRows(GameEntitySnapshot snapshot, Map<String, UserEntity> managedUsers) {
+        GameEntity game = snapshot.game();
+        for (PlayerEntity player : game.getPlayers()) {
+            player.setStatsUser(managed(player.getStatsUser(), managedUsers));
+            player.setPlayingUser(managed(player.getPlayingUser(), managedUsers));
+        }
+        entityManager.persist(game);
+        for (TitleEntity title : snapshot.titles()) {
+            title.setGame(game);
+            title.setUser(managed(title.getUser(), managedUsers));
+            entityManager.persist(title);
+        }
     }
 
-    private static boolean shouldReplaceExistingName(UserEntity existing, UserEntity user) {
-        if (existing == null) return true;
-        return GameEntityMapper.hasUnknownName(existing) && !GameEntityMapper.hasUnknownName(user);
+    private UserEntity managed(UserEntity user, Map<String, UserEntity> managedUsers) {
+        if (user == null) return null;
+        UserEntity managedUser = managedUsers.get(user.getId());
+        return managedUser != null ? managedUser : entityManager.getReference(UserEntity.class, user.getId());
     }
 
     private void deleteGameRows(String gameName) {

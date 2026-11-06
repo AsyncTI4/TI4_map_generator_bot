@@ -1,7 +1,12 @@
 package ti4.settings.users;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.spring.service.usersettings.UserSettingsService;
 
@@ -17,6 +22,20 @@ public class UserSettingsManager {
         }
     }
 
+    public static Map<String, UserSettings> getAll(Collection<String> userIds) {
+        Map<String, UserSettings> settingsByUserId = new HashMap<>();
+        if (userIds.isEmpty()) return settingsByUserId;
+        try {
+            UserSettingsService.getBean()
+                    .findAllById(userIds)
+                    .forEach(userSettings -> settingsByUserId.put(userSettings.getUserId(), userSettings));
+        } catch (RuntimeException e) {
+            BotLogger.error(
+                    "Failed to read user settings for " + StringHelper.pluralize(userIds.size(), "user") + ".", e);
+        }
+        return settingsByUserId;
+    }
+
     public static void save(UserSettings userSettings) {
         try {
             UserSettingsLockManager.wrapWithWriteLock(
@@ -27,17 +46,21 @@ public class UserSettingsManager {
         }
     }
 
-    static void addActiveHourCheckins(String userId, int[] checkinsByUtcHour) {
+    static boolean addActiveHourCheckins(Map<String, int[]> checkinsByUserId) {
+        Map<String, Consumer<UserSettings>> changesByUserId = new HashMap<>();
+        checkinsByUserId.forEach((userId, checkins) ->
+                changesByUserId.put(userId, userSettings -> userSettings.addActiveHourCheckins(checkins)));
         try {
-            UserSettingsLockManager.wrapWithWriteLock(
-                    userId,
-                    () -> UserSettingsService.getBean()
-                            .update(
-                                    userId,
-                                    () -> new UserSettings(userId),
-                                    userSettings -> userSettings.addActiveHourCheckins(checkinsByUtcHour)));
+            UserSettingsLockManager.wrapWithWriteLocks(
+                    checkinsByUserId.keySet(),
+                    () -> UserSettingsService.getBean().updateAll(changesByUserId, UserSettings::new));
+            return true;
         } catch (RuntimeException e) {
-            BotLogger.error("Failed to record active hours for user " + userId + ".", e);
+            BotLogger.error(
+                    "Failed to record active hours for " + StringHelper.pluralize(checkinsByUserId.size(), "user")
+                            + ".",
+                    e);
+            return false;
         }
     }
 

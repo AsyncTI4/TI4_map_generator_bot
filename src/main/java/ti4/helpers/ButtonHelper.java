@@ -55,6 +55,7 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
@@ -145,6 +146,7 @@ import ti4.service.RemoveCommandCounterService;
 import ti4.service.ShowGameService;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.CorruptionTimingService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
@@ -1520,6 +1522,7 @@ public class ButtonHelper {
         List<String> modifiers = new ArrayList<>();
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
+        boolean heldCorruptionBeforeDraw = CorruptionTimingService.isHeld(player);
 
         if (player.hasTech("nm")) {
             modifiers.add(TechEmojis.BioticTech + " _Neural Motivator_ (+1 action card)");
@@ -1581,6 +1584,7 @@ public class ButtonHelper {
             }
         }
 
+        CorruptionTimingService.markIfDrawnSince(game, player, heldCorruptionBeforeDraw);
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
@@ -5175,6 +5179,10 @@ public class ButtonHelper {
         Button celyonButton = TheodisiLegendaryButtonHandler.getCelyonEndTurnButton(player);
         if (celyonButton != null) {
             endButtons.add(celyonButton);
+        }
+        Button seatOfPowerButton = TheodisiAgendaResolver.getSeatOfPowerButton(game, player);
+        if (seatOfPowerButton != null) {
+            endButtons.add(seatOfPowerButton);
         }
 
         // Legendary Planets

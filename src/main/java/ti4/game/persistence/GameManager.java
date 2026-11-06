@@ -93,8 +93,9 @@ public class GameManager {
                 reportGamesThatFailedWarmup(failedGames);
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
-                        "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED: %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE, %,d FROM GAME FILES",
+                        "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD): %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE, %,d FROM GAME FILES",
                         System.currentTimeMillis() - warmupStartedAt,
+                        sources.preloadWaitMillis(),
                         builtFromPreload.get(),
                         builtFromDatabase.get(),
                         builtFromGameFiles.get()));
@@ -108,14 +109,19 @@ public class GameManager {
         });
     }
 
-    private record WarmupSources(@Nullable Map<String, ManagedGameState> persistedGames, Set<String> preloadedNames) {}
+    private record WarmupSources(
+            @Nullable Map<String, ManagedGameState> persistedGames,
+            Set<String> preloadedNames,
+            long preloadWaitMillis) {}
 
     private static WarmupSources warmupSources() {
+        long waitStartedAt = System.currentTimeMillis();
         ManagedGamePreload.Snapshot preload = ManagedGamePreload.take();
+        long preloadWaitMillis = System.currentTimeMillis() - waitStartedAt;
         if (preload == null) {
-            return new WarmupSources(loadPersistedManagedGames(), Set.of());
+            return new WarmupSources(loadPersistedManagedGames(), Set.of(), preloadWaitMillis);
         }
-        return new WarmupSources(preload.rows(), preload.stillCurrent(loadCurrentRevisionKeys()));
+        return new WarmupSources(preload.rows(), preload.stillCurrent(loadCurrentRevisionKeys()), preloadWaitMillis);
     }
 
     private static Map<String, String> loadCurrentRevisionKeys() {

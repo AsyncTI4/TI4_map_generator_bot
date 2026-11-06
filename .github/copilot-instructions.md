@@ -201,8 +201,7 @@ Scheduled tasks live in `ti4.cron.*`. They are started by `JdaService` after bot
 
 ## Deployment Notes
 
-- The bot is deployed on a Hostinger server via SSH. Deployment workflows are in `.github/workflows/`.
-- The bot runs as a JAR: `java -jar <jar> <discordBotToken> <discordUserID> <discordServerID>`.
+- The bot is deployed on a Hostinger server via SSH as a Docker container behind Traefik. See [DEPLOYMENT.md](../DEPLOYMENT.md) for the deploy workflow and how the active lease hands over between the old and new process.
 - Spring Boot serves on port 8081 (internal metrics/API).
 - Images and data are uploaded to S3 via Python scripts in `scripts/`.
 

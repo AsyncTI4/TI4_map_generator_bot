@@ -1,7 +1,9 @@
 package ti4.spring.service.autoping;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -26,8 +28,12 @@ public class AutoPingService {
         return repository.findById(gameName).map(AutoPingEntity::toAutoPing);
     }
 
-    public Set<String> gameNames() {
-        return Set.copyOf(repository.findAllGameNames());
+    public Map<String, AutoPing> findAll() {
+        Map<String, AutoPing> autoPingsByGameName = new HashMap<>();
+        for (AutoPingEntity entity : repository.findAll()) {
+            autoPingsByGameName.put(entity.getGameName(), entity.toAutoPing());
+        }
+        return autoPingsByGameName;
     }
 
     public void compute(String gameName, UnaryOperator<AutoPing> change) {
