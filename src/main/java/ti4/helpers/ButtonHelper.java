@@ -146,6 +146,7 @@ import ti4.service.RemoveCommandCounterService;
 import ti4.service.ShowGameService;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.CorruptionTimingService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
@@ -1521,6 +1522,7 @@ public class ButtonHelper {
         List<String> modifiers = new ArrayList<>();
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
+        boolean heldCorruptionBeforeDraw = CorruptionTimingService.isHeld(player);
 
         if (player.hasTech("nm")) {
             modifiers.add(TechEmojis.BioticTech + " _Neural Motivator_ (+1 action card)");
@@ -1582,6 +1584,7 @@ public class ButtonHelper {
             }
         }
 
+        CorruptionTimingService.markIfDrawnSince(game, player, heldCorruptionBeforeDraw);
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);

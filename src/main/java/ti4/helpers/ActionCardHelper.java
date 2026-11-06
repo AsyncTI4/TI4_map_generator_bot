@@ -64,6 +64,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.CorruptionTimingService;
 import ti4.service.actioncard.OracleDrawService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -845,6 +846,9 @@ public class ActionCardHelper {
                 && !game.isTwilightsFallMode()) {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
                     + " You may fix this with `/player turn_start`. Until then, you are #denied.";
+        }
+        if (CorruptionTimingService.isBlocked(game, player, acID)) {
+            return CorruptionTimingService.blockedMessage(player);
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentationUnfogged()
