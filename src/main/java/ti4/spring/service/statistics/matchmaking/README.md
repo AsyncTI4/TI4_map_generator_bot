@@ -161,8 +161,8 @@ flowchart TD
   conflicts within the group, and members over their game limit. The group is stored unqueued until a member
   queues it; that member's preferences become the group's.
 - **TIGL** is always 6 players with Prophecy of Kings and Thunder's Edge, and offers only ranks at or below the
-  player's own TIGL rank. A group of up to 6 may queue for TIGL; it uses its highest-ranked member's rank, so
-  lower-ranked members can play up with a higher-ranked partner.
+  player's own TIGL rank. A group of up to 6 may queue for TIGL; it is capped by its lowest-ranked member's rank, so
+  a Minister queueing with a Hero can only play Minister games or lower.
 - **Leaving.** Leave Queue removes the player's whole party. Joining a game thread, being added to one, or
   launching a game also takes a player out of the queue.
 
@@ -334,5 +334,4 @@ sequenceDiagram
 ## Known quirks
 
 - When a recruiting TIGL thread's roster changes, `updateForRoster` narrows its ranks to those at or below the
-  lowest-ranked member, while a group queues at its highest-ranked member's rank. A group-matched game queued for
-  Minister and Hero can drop to Minister. It never empties the ranks.
+  lowest-ranked member. It never empties the ranks.
