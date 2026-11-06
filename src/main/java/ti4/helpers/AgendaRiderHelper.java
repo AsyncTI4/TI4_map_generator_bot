@@ -313,11 +313,12 @@ public class AgendaRiderHelper {
                         UnitType.Flagship,
                         UnitType.Warsun)
                 .stream()
-                .map(type -> rider == null
-                        ? Buttons.blue(prefix + "_" + type.humanReadableName(), type.humanReadableName())
-                        : Buttons.blue(
-                                prefix + "rider_unittype;" + type.humanReadableName() + "_" + rider,
-                                type.humanReadableName()))
+                .map(type -> {
+                    String unitTypeName = type.humanReadableName();
+                    return rider == null
+                            ? Buttons.blue(prefix + "_" + unitTypeName, unitTypeName)
+                            : Buttons.blue(prefix + "rider_unittype;" + unitTypeName + "_" + rider, unitTypeName);
+                })
                 .toList();
     }
 
