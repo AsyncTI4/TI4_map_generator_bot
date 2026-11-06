@@ -58,7 +58,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.HydromorphicCardHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
@@ -1858,14 +1857,6 @@ public final class Helper {
         }
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
-        String remoteWorkforcePosition =
-                game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
-        boolean remoteWorkforceBuild = player.hasUnlockedBreakthrough("myrrbt")
-                && player.isBreakthroughExhausted("myrrbt")
-                && !remoteWorkforcePosition.isEmpty()
-                && !player.getCurrentProducedUnits().isEmpty()
-                && player.getCurrentProducedUnits().keySet().stream()
-                        .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]));
         if (unitCount <= 1) {
             msg.append("For a cost of ")
                     .append(cost)
@@ -1953,12 +1944,6 @@ public final class Helper {
         }
         if (ArcanumBreakthroughHandler.hasPowerWordWishProductionDiscount(game, player)) {
             msg.append("\n-1 from Power Word: Wish");
-        }
-        if (remoteWorkforceBuild) {
-            msg.append("\n-1 from Remote Workforce");
-        }
-        if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
-            msg.append("\n-1 from Echo of the Anvil");
         }
         if (ThurvialiLeadersHandler.hasThurvialiHeroProductionDiscount(game, player)) {
             msg.append("\n-4 from Synergistic Radiance");
@@ -2734,19 +2719,6 @@ public final class Helper {
                 if (neighborDiscount > 0) {
                     cost = Math.max(0, cost - neighborDiscount);
                 }
-            }
-            String remoteWorkforcePosition =
-                    game.getStoredValue(MyrrBreakthroughHandler.REMOTE_WORKFORCE_KEY + player.getFaction());
-            if (player.hasUnlockedBreakthrough("myrrbt")
-                    && player.isBreakthroughExhausted("myrrbt")
-                    && !remoteWorkforcePosition.isEmpty()
-                    && !producedUnits.isEmpty()
-                    && producedUnits.keySet().stream()
-                            .allMatch(unit -> remoteWorkforcePosition.equals(unit.split("_")[1]))) {
-                cost = Math.max(0, cost - 1);
-            }
-            if (MyrrAbilitiesHandler.hasEchoOfTheAnvilDiscount(player)) {
-                cost = Math.max(0, cost - 1);
             }
             cost = Math.max(0, cost - MigoHarvestHandler.getYellowHarvestProductionDiscount(game, player));
             cost = Math.max(0, cost - ThirtyKExploreHooks.productionDiscount(game, producedUnits));

@@ -213,7 +213,7 @@
         "name": "Origin Unknown",
         "faction": "deep",
         "window": "When you create the game board",
-        "windowEffect": "Place the Deep Space tile where your home system would normally be placed; it is not a home system. During setup, gain and ready The Deep planet card; you cannot lose it.",
+        "windowEffect": "Place the Deep Space tile where your home system would normally be placed; Deep Space is not a home system. During setup, gain and ready The Deep planet card and its unit card; you cannot lose these cards.",
         "source": "beans"
     },
     {
@@ -245,7 +245,7 @@
         "name": "Strain Dispersal",
         "faction": "bloom",
         "window": "During setup",
-        "windowEffect": "Gain your 3 strain cards and place them in your reinforcements. While you are coexisting on a planet with a trait, place the corresponding card in your play area dormant side up. While you are coexisting on 2 or more planets with the same trait, flip the corresponding card to its active side.",
+        "windowEffect": "Gain your 3 strain cards and place them in your reinforcements. While your units are coexisting on a planet with a trait, place the corresponding card in your play area dormant side up. While you are coexisting on 2 or more planets with the same trait, flip the corresponding card to its active side.",
         "source": "beans"
     },
     {

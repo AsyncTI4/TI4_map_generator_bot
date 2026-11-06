@@ -254,7 +254,7 @@ public class ThurvialiTechHandler {
                         + " with _Mutualism_ and gains 1 command token.",
                 ButtonHelper.getGainCCButtons(player));
         ButtonHelper.deleteMessage(event);
-        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, owner);
     }
 
     @ButtonHandler(SELECT_RESTRUCTURING_STRUCTURE)

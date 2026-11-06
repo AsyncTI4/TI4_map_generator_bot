@@ -25,7 +25,7 @@ class AutoPingCronTest {
 
         assertThat(AutoPingCron.isDueForAutoPingCheck(new ManagedGame(enabled), withMetadata))
                 .isTrue();
-        // No AutoPing.json entry means handleAutoPing would return without pinging.
+        // No stored auto ping for the game means handleAutoPing would return without pinging.
         assertThat(AutoPingCron.isDueForAutoPingCheck(new ManagedGame(enabled), Set.of()))
                 .isFalse();
         assertThat(AutoPingCron.isDueForAutoPingCheck(new ManagedGame(paused), withMetadata))

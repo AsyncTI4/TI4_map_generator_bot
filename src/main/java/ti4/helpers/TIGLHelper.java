@@ -401,6 +401,15 @@ public final class TIGLHelper {
                 getLowestCommonRankBetweenPlayers(users, false).getIndex(), options);
     }
 
+    public static List<String> filterStandardTiglRankOptionsAtOrBelowHighestRankAmong(
+            List<User> users, List<String> options) {
+        int highestIndex = users.stream()
+                .mapToInt(user -> getUsersHighestTIGLRank(user, false).getIndex())
+                .max()
+                .orElse(-1);
+        return filterStandardTiglRankOptionsAtOrBelow(highestIndex, options);
+    }
+
     private static List<String> filterStandardTiglRankOptionsAtOrBelow(int maxIndex, List<String> options) {
         return options.stream()
                 .filter(opt -> {

@@ -178,7 +178,7 @@
         "requirements": "RY",
         "faction": "valhavn",
         "source": "beans",
-        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet.\nSPACE CANNON 4, PLANETARY SHIELD"
+        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet.\nSPACE CANNON 4, PLANETARY SHIELD"
     },
     {
         "alias": "bemigob",
@@ -211,7 +211,7 @@
         "requirements": "YY",
         "faction": "deep",
         "source": "beans",
-        "text": "Systems that contain no planets, your ships, and no other player’s ships have PRODUCTION 2 as if they were a unit you control.\n\nACTION: Exhaust this card to produce up to 2 units in a system containing your ships and no other player’s ships."
+        "text": "Systems that contain no planets and your ships gain PRODUCTION 2 as if they were 1 of your units.\n\nACTION: Exhaust this card to produce up to 2 units in a system containing your ships and no other player’s ships."
     },
     {
         "alias": "bedeepg",
@@ -233,7 +233,7 @@
         "requirements": "G",
         "faction": "bloom",
         "source": "beans",
-        "text": "After another player commits units to a planet in or adjacent to a non-home system that contains one of your ground forces, you may exhaust this card to place 1 infantry from your reinforcements into coexistence on that planet."
+        "text": "After another player commits units to a planet you do not control in or adjacent to a non-home system that contains one of your ground forces, you may exhaust this card to place 1 infantry from your reinforcements into coexistence on that planet."
     },
     {
         "alias": "bebloomcr",
@@ -245,6 +245,6 @@
         "baseUpgrade": "cr2",
         "faction": "bloom",
         "source": "beans",
-        "text": "During movement, if the active system contains 1 or more of your coexisting units, this unit can move through systems that contain other players' ships."
+        "text": "If the active system contains 1 or more of your coexisting units, this unit can move through systems that contain other players' ships. "
     }
 ]

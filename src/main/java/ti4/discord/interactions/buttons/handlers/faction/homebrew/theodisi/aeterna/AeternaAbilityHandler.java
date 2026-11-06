@@ -33,8 +33,13 @@ public class AeternaAbilityHandler {
     private static final String WAXING_MOON = "waxing_moonphase";
     private static final String WANING_MOON = "waning_moonphase";
     private static final String NEW_MOON = "new_moonphase";
-    private static final String LUNAR_ECLIPSE = "lunar_eclipse_moonphase";
+    private static final String HALF_MOON = "half_moonphase";
     private static final String MOON_RETURN_COST = "moonReturnCost_";
+    private static final String HALF_MOON_PLACEMENT = "halfMoonPlacement_";
+    private static final String HALF_MOON_SYSTEM = "halfMoonSystem_";
+    private static final String HALF_MOON_UNIT = "halfMoonUnit_";
+    private static final String HALF_MOON_DONE = "halfMoonDone";
+    private static final String HALF_MOON_CANCEL = "halfMoonCancel";
 
     public static Button getWaxingMoonButton(Player player) {
         return Buttons.green(player.factionButtonChecker() + "startMoonReturn_" + WAXING_MOON, "Use Waxing Moon");
@@ -48,12 +53,12 @@ public class AeternaAbilityHandler {
         return Buttons.green(player.factionButtonChecker() + "startMoonReturn_" + WANING_MOON, "Use Waning Moon");
     }
 
-    public static Button getLunarEclipseButton(Player player) {
-        return Buttons.green(player.factionButtonChecker() + "startMoonReturn_" + LUNAR_ECLIPSE, "Use Lunar Eclipse");
+    public static Button getHalfMoonButton(Player player) {
+        return Buttons.green(player.factionButtonChecker() + "newMoonChoose", "Use Half Moon");
     }
 
     public static Button getNewMoonButton(Player player) {
-        return Buttons.green(player.factionButtonChecker() + "newMoonChoose", "Use New Moon");
+        return Buttons.green(player.factionButtonChecker() + "newMoonCapture", "Use New Moon");
     }
 
     public static boolean canReturnCapturedNeutralUnits(Game game, Player player, int minimumCost) {
@@ -187,25 +192,21 @@ public class AeternaAbilityHandler {
 
     @ButtonHandler("newMoonChoose")
     public static void chooseNewMoon(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.isActivePlayer() || !player.hasRelicReady(NEW_MOON)) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "_New Moon_ may only be used during your action.");
+        if (!player.isActivePlayer() || !player.hasRelicReady(HALF_MOON)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "_Half Moon_ may only be used during your action.");
             return;
         }
-
-        List<Button> buttons = new ArrayList<>();
-        if (!getCapturedNeutralUnits(game, player).isEmpty()) {
-            buttons.add(Buttons.green(player.factionButtonChecker() + "newMoonPlace", "Place a Captured Neutral Unit"));
+        if (getCapturedNeutralUnits(game, player).isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "You have no captured neutral units to place.");
+            return;
         }
-        buttons.add(Buttons.green(player.factionButtonChecker() + "newMoonCapture", "Capture 1 Neutral Cruiser"));
-        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Please choose an effect for _New Moon_.", buttons);
+        sendHalfMoonSystemButtons(event, game, player, 0);
         ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("newMoonCapture")
     public static void captureNeutralCruiser(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.isActivePlayer() || !player.hasRelicReady(NEW_MOON)) return;
+        if (!player.hasRelicReady(NEW_MOON)) return;
         player.addExhaustedRelic(NEW_MOON);
         AddUnitService.addUnits(
                 event, player.getNomboxTile(), game, game.getNeutral().getColor(), "1 cruiser");
@@ -216,79 +217,138 @@ public class AeternaAbilityHandler {
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
     }
 
-    @ButtonHandler("newMoonPlace")
-    public static void chooseNewMoonUnit(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.isActivePlayer() || !player.hasRelicReady(NEW_MOON)) return;
-        List<Button> buttons = getCapturedNeutralUnits(game, player).stream()
-                .map(unitKey -> Buttons.green(
-                        player.factionButtonChecker() + "newMoonUnit_" + unitKey.asyncID(),
-                        "Place " + unitKey.humanReadableName()))
-                .toList();
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), "Please choose the captured neutral unit to place.", buttons);
+    @ButtonHandler(HALF_MOON_SYSTEM)
+    public static void chooseHalfMoonSystem(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!player.isActivePlayer() || !player.hasRelicReady(HALF_MOON)) return;
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                getHalfMoonSystemButtons(game, player),
+                "Please choose the system in which to place captured neutral units with _Half Moon_.",
+                player.factionButtonChecker() + HALF_MOON_SYSTEM,
+                buttonID)) {
+            return;
+        }
+        String position = buttonID.substring(HALF_MOON_SYSTEM.length());
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null || tile.isHomeSystem(game) || hasPlayersShips(tile, game)) return;
+
+        game.setStoredValue(getHalfMoonPlacementKey(player), position + "|0");
+        sendHalfMoonUnitButtons(event, game, player, tile, 0);
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("newMoonUnit_")
-    public static void chooseNewMoonSystem(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.isActivePlayer() || !player.hasRelicReady(NEW_MOON)) return;
-        String unitID = buttonID.substring("newMoonUnit_".length());
-        if (getCapturedNeutralUnits(game, player).stream()
-                .noneMatch(unit -> unit.asyncID().equals(unitID))) return;
+    @ButtonHandler(HALF_MOON_UNIT)
+    public static void placeHalfMoonUnit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        HalfMoonPlacement placement = getHalfMoonPlacement(game, player);
+        if (!player.isActivePlayer() || !player.hasRelicReady(HALF_MOON) || placement == null) return;
 
-        List<Button> buttons = getNewMoonSystemButtons(game, player, unitID);
+        UnitKey unitKey = getCapturedNeutralUnits(game, player).stream()
+                .filter(unit -> unit.asyncID().equals(buttonID.substring(HALF_MOON_UNIT.length())))
+                .findFirst()
+                .orElse(null);
+        Tile tile = game.getTileByPosition(placement.position());
+        if (unitKey == null || tile == null || tile.isHomeSystem(game) || hasPlayersShips(tile, game)) return;
+
+        player.getNomboxTile().getSpaceUnitHolder().removeUnit(unitKey, 1);
+        AddUnitService.addUnits(event, tile, game, game.getNeutral().getColor(), "1 " + unitKey.unitName());
+        int placedUnits = placement.placedUnits() + 1;
+        game.setStoredValue(getHalfMoonPlacementKey(player), placement.position() + "|" + placedUnits);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " placed 1 neutral " + unitKey.humanReadableName() + " in "
+                        + tile.getRepresentationForButtons(game, player) + " with _Half Moon_.");
+        sendHalfMoonUnitButtons(event, game, player, tile, placedUnits);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(HALF_MOON_DONE)
+    public static void finishHalfMoon(ButtonInteractionEvent event, Game game, Player player) {
+        HalfMoonPlacement placement = getHalfMoonPlacement(game, player);
+        if (placement == null || placement.placedUnits() < 1 || !player.hasRelicReady(HALF_MOON)) return;
+
+        player.addExhaustedRelic(HALF_MOON);
+        game.removeStoredValue(getHalfMoonPlacementKey(player));
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation() + " exhausted _Half Moon_ after placing "
+                        + placement.placedUnits() + " captured neutral "
+                        + (placement.placedUnits() == 1 ? "unit." : "units."));
+        ButtonHelper.deleteMessage(event);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+    }
+
+    @ButtonHandler(HALF_MOON_CANCEL)
+    public static void cancelHalfMoon(ButtonInteractionEvent event, Game game, Player player) {
+        HalfMoonPlacement placement = getHalfMoonPlacement(game, player);
+        if (placement != null && placement.placedUnits() > 0) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "You have already placed a unit; finish resolving _Half Moon_.");
+            return;
+        }
+        game.removeStoredValue(getHalfMoonPlacementKey(player));
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getHalfMoonSystemButtons(Game game, Player player) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> !tile.getTileModel().isHyperlane())
+                .filter(tile -> !tile.isHomeSystem(game))
+                .filter(tile -> !hasPlayersShips(tile, game))
+                .sorted(Comparator.comparing(Tile::getPosition))
+                .map(tile -> Buttons.green(
+                        player.factionButtonChecker() + HALF_MOON_SYSTEM + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)))
+                .toList();
+    }
+
+    private static void sendHalfMoonSystemButtons(
+            GenericInteractionCreateEvent event, Game game, Player player, int page) {
+        List<Button> buttons = getHalfMoonSystemButtons(game, player);
         if (buttons.isEmpty()) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "There are no eligible systems.");
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Please choose a system in which to place the neutral unit.",
-                NewStuffHelper.buttonPagination(
-                        buttons, player.factionButtonChecker() + "newMoonSystem_" + unitID + "|", 0));
-        ButtonHelper.deleteMessage(event);
+                "Please choose the system in which to place captured neutral units with _Half Moon_.",
+                NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + HALF_MOON_SYSTEM, page));
     }
 
-    @ButtonHandler("newMoonSystem_")
-    public static void placeNewMoonUnit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!player.isActivePlayer() || !player.hasRelicReady(NEW_MOON)) return;
-        String[] parts = buttonID.substring("newMoonSystem_".length()).split("\\|", 2);
-        if (parts.length != 2) return;
-        String message = "Please choose a system in which to place the neutral unit.";
-        List<Button> systemButtons = getNewMoonSystemButtons(game, player, parts[0]);
-        String buttonPrefix = player.factionButtonChecker() + "newMoonSystem_" + parts[0] + "|";
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, event.getMessageChannel(), systemButtons, message, buttonPrefix, buttonID)) {
-            return;
+    private static void sendHalfMoonUnitButtons(
+            ButtonInteractionEvent event, Game game, Player player, Tile tile, int placedUnits) {
+        List<Button> buttons = getCapturedNeutralUnits(game, player).stream()
+                .map(unitKey -> Buttons.green(
+                        player.factionButtonChecker() + HALF_MOON_UNIT + unitKey.asyncID(),
+                        "Place " + unitKey.humanReadableName()))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        if (placedUnits > 0) {
+            buttons.add(Buttons.green(player.factionButtonChecker() + HALF_MOON_DONE, "Done Placing Units"));
+        } else {
+            buttons.add(Buttons.red(player.factionButtonChecker() + HALF_MOON_CANCEL, "Cancel"));
         }
-        UnitKey unitKey = getCapturedNeutralUnits(game, player).stream()
-                .filter(unit -> unit.asyncID().equals(parts[0]))
-                .findFirst()
-                .orElse(null);
-        Tile tile = game.getTileByPosition(parts[1]);
-        if (unitKey == null || tile == null || hasOtherPlayersShips(tile, game, player)) return;
-
-        player.addExhaustedRelic(NEW_MOON);
-        player.getNomboxTile().getSpaceUnitHolder().removeUnit(unitKey, 1);
-        AddUnitService.addUnits(event, tile, game, game.getNeutral().getColor(), "1 " + unitKey.unitName());
-        MessageHelper.sendMessageToChannel(
+        MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + " exhausted _New Moon_ and placed 1 neutral " + unitKey.humanReadableName()
-                        + " in " + tile.getRepresentationForButtons(game, player) + ".");
-        ButtonHelper.deleteMessage(event);
-        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+                "Please choose captured neutral units to place in " + tile.getRepresentationForButtons(game, player)
+                        + " with _Half Moon_.",
+                buttons);
     }
 
-    private static List<Button> getNewMoonSystemButtons(Game game, Player player, String unitID) {
-        return game.getTileMap().values().stream()
-                .filter(tile -> !tile.getTileModel().isHyperlane())
-                .filter(tile -> !hasOtherPlayersShips(tile, game, player))
-                .sorted(Comparator.comparing(Tile::getPosition))
-                .map(tile -> Buttons.green(
-                        player.factionButtonChecker() + "newMoonSystem_" + unitID + "|" + tile.getPosition(),
-                        tile.getRepresentationForButtons(game, player)))
-                .toList();
+    private static HalfMoonPlacement getHalfMoonPlacement(Game game, Player player) {
+        String[] values = game.getStoredValue(getHalfMoonPlacementKey(player)).split("\\|", 2);
+        if (values.length != 2) return null;
+        try {
+            return new HalfMoonPlacement(values[0], Integer.parseInt(values[1]));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
+
+    private static String getHalfMoonPlacementKey(Player player) {
+        return HALF_MOON_PLACEMENT + player.getFaction();
+    }
+
+    private record HalfMoonPlacement(String position, int placedUnits) {}
 
     public static void offerCycleOfReclamationCapture(
             GenericInteractionCreateEvent event, Game game, List<RemovedUnit> destroyedUnits, boolean combat) {
@@ -369,12 +429,6 @@ public class AeternaAbilityHandler {
                         Buttons.green(
                                 player.factionButtonChecker() + "getAllTechOfType_allTechResearchable_noPay",
                                 "Research a Technology"));
-            case LUNAR_ECLIPSE ->
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", please choose where to gain 1 command token due to _Lunar Eclipse_.",
-                        ButtonHelper.getGainCCButtons(player));
             default -> {}
         }
     }
@@ -389,7 +443,7 @@ public class AeternaAbilityHandler {
 
     public static void clearMoonReturnStoredValues(Game game) {
         for (Player player : game.getRealPlayers()) {
-            for (String relic : List.of(FULL_MOON, WAXING_MOON, WANING_MOON, LUNAR_ECLIPSE)) {
+            for (String relic : List.of(FULL_MOON, WAXING_MOON, WANING_MOON)) {
                 game.removeStoredValue(getMoonReturnCostKey(player, relic));
             }
         }
@@ -418,7 +472,7 @@ public class AeternaAbilityHandler {
     private static int getMoonReturnMinimumCost(String relic) {
         return switch (relic) {
             case FULL_MOON -> 4;
-            case WAXING_MOON, LUNAR_ECLIPSE -> 2;
+            case WAXING_MOON -> 2;
             case WANING_MOON -> 5;
             default -> 0;
         };
@@ -428,11 +482,11 @@ public class AeternaAbilityHandler {
         return MOON_RETURN_COST + player.getFaction() + "_" + relic;
     }
 
-    private static boolean hasOtherPlayersShips(Tile tile, Game game, Player player) {
+    private static boolean hasPlayersShips(Tile tile, Game game) {
         return tile.getSpaceUnitHolder().getUnitKeys().stream().anyMatch(unitKey -> {
             Player owner = game.getPlayerFromColorOrFaction(unitKey.colorID());
             UnitModel model = owner == null ? null : owner.getUnitFromUnitKey(unitKey);
-            return owner != null && owner != player && model != null && model.getIsShip();
+            return owner != null && owner.isRealPlayer() && model != null && model.getIsShip();
         });
     }
 

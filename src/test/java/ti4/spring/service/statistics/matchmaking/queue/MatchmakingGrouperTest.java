@@ -152,6 +152,32 @@ class MatchmakingGrouperTest extends BaseTi4Test {
                 .containsExactlyInAnyOrder("p1", "p2", "p3", "p4");
     }
 
+    // Near matches used to require exactly one open seat; a 6p game now forms with half the seats plus one.
+    @Test
+    void formsNearMatchTwoShortOfASixPlayerGame() {
+        addParty(List.of("p1"), List.of(), List.of("6"), Duration.ofHours(7).plusMinutes(30));
+        addParty(List.of("p2"), List.of(), List.of("6"), Duration.ZERO);
+        addParty(List.of("p3"), List.of(), List.of("6"), Duration.ZERO);
+        addParty(List.of("p4"), List.of(), List.of("6"), Duration.ZERO);
+
+        List<MatchedGame> games = MatchmakingGrouper.formGames(parties);
+
+        assertThat(games).singleElement().satisfies(game -> {
+            assertThat(game.playerCount()).isEqualTo("6");
+            assertThat(game.members()).hasSize(4);
+        });
+    }
+
+    // 3 of 6 is not more than half, so even a near-expiry player can't start that game.
+    @Test
+    void doesNotFormNearMatchAtHalfTheSeats() {
+        addParty(List.of("p1"), List.of(), List.of("6"), Duration.ofHours(7).plusMinutes(30));
+        addParty(List.of("p2"), List.of(), List.of("6"), Duration.ZERO);
+        addParty(List.of("p3"), List.of(), List.of("6"), Duration.ZERO);
+
+        assertThat(MatchmakingGrouper.formGames(parties)).isEmpty();
+    }
+
     @Test
     void doesNotFormNearMatchWhenNoOneIsNearExpiryOrLongQueued() {
         addParty(List.of("p1"), List.of(), List.of("3"), Duration.ZERO);

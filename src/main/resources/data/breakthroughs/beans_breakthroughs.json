@@ -116,7 +116,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "Your ships may retreat to any system that contains no planets or no other players' ships.\n\nAfter you activate a system, you may exhaust this card to allow up to 2 of your ships to move out of any systems that contain no planets and your command tokens.",
+        "text": "You may treat systems that contain no planets as if they were adjacent to the active system for the purpose of declaring and resolving retreats.\n\nAfter you activate a system, you may exhaust this card to allow up to 2 of your ships to move out of any systems that contain no planets and your command tokens.",
         "source": "beans"
     },
     {
