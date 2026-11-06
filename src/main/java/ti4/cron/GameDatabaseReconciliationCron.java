@@ -2,9 +2,9 @@ package ti4.cron;
 
 import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
+import ti4.game.persistence.DatabasePersistenceGate;
+import ti4.game.persistence.GameDatabaseReconciler;
 import ti4.logging.BotLogger;
-import ti4.service.persistence.DatabasePersistenceGate;
-import ti4.service.persistence.GameDatabaseReconciler;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
 @UtilityClass

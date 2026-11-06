@@ -21,6 +21,9 @@ public class ActiveLeaseService {
     private final ActiveLeaseRepository activeLeaseRepository;
     private final LeaseProperties leaseProperties;
     private final ActiveLeaseTransactionService activeLeaseTransactionService;
+    private final LeaseReleaseListener leaseReleaseListener;
+
+    private static final String POLL_SOURCE = "poll";
 
     private final AtomicBoolean active = new AtomicBoolean(false);
     private final AtomicBoolean draining = new AtomicBoolean(false);
@@ -30,18 +33,19 @@ public class ActiveLeaseService {
 
     public void beginLeaseParticipation(Runnable onLeaseAcquired) {
         this.onLeaseAcquired = Objects.requireNonNull(onLeaseAcquired);
-        leaseParticipationEnabled.set(true);
 
-        boolean acquired = tryAcquireLease(onLeaseAcquired);
-        if (acquired) {
+        tryAcquireLease();
+        if (isActive()) {
             BotLogger.info("Acquired active lease for instance " + AsyncTI4DiscordBot.INSTANCE_ID);
         } else {
             BotLogger.warning("Did not acquire active lease on startup for instance " + AsyncTI4DiscordBot.INSTANCE_ID);
         }
+        leaseParticipationEnabled.set(true);
+        leaseReleaseListener.start(this::takeOverLeaseIfStandby);
     }
 
-    private boolean tryAcquireLease() {
-        if (!activeLeaseTransactionService.tryAcquireLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
+    private synchronized boolean tryAcquireLease() {
+        if (isActive() || !activeLeaseTransactionService.tryAcquireLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
             return false;
         }
 
@@ -51,15 +55,16 @@ public class ActiveLeaseService {
         return true;
     }
 
-    private boolean tryAcquireLease(Runnable onLeaseAcquired) {
-        if (!activeLeaseTransactionService.tryAcquireLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
-            return false;
+    private synchronized void takeOverLeaseIfStandby(String source) {
+        if (isDraining() || !leaseParticipationEnabled.get()) {
+            return;
         }
 
-        setActive(true);
-        setDraining(false);
-        onLeaseAcquired.run();
-        return true;
+        if (tryAcquireLease()) {
+            setReady(true);
+            BotLogger.info(
+                    "Inactive instance acquired active lease (" + source + "): " + AsyncTI4DiscordBot.INSTANCE_ID);
+        }
     }
 
     private void renewLease() {
@@ -75,6 +80,8 @@ public class ActiveLeaseService {
     }
 
     public void releaseLease() {
+        leaseParticipationEnabled.set(false);
+        leaseReleaseListener.stop();
         activeLeaseTransactionService.releaseLease(AsyncTI4DiscordBot.INSTANCE_ID);
         setActive(false);
     }
@@ -169,14 +176,7 @@ public class ActiveLeaseService {
             return;
         }
 
-        if (!leaseParticipationEnabled.get()) {
-            return;
-        }
-
-        if (tryAcquireLease()) {
-            setReady(true);
-            BotLogger.info("Inactive instance acquired active lease: " + AsyncTI4DiscordBot.INSTANCE_ID);
-        }
+        takeOverLeaseIfStandby(POLL_SOURCE);
     }
 
     public static boolean isCurrentProcessReady() {

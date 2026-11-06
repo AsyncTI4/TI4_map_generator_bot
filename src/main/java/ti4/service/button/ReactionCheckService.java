@@ -239,7 +239,7 @@ public class ReactionCheckService {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(), "Please proceed to the Edict Phase now.", buttons);
                     } else {
-                        Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                        Button flipAgenda = Buttons.FLIP_AGENDA;
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(), "Please flip agenda now.", buttons);
@@ -269,7 +269,7 @@ public class ReactionCheckService {
                                 "Please proceed to Edict Phase after the last person finishing doing gaining and redistributing command tokens.",
                                 buttons);
                     } else {
-                        Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
+                        Button flipAgenda = Buttons.FLIP_AGENDA;
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),

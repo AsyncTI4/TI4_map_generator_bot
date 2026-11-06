@@ -5,11 +5,14 @@
         "mobilemountain",
         "mountain"
     ],
-    "resources":1,
-    "influence":3,
+    "resources":2,
+    "influence":2,
     "planetTypes":[
         "FAKE",
-        "FACTION"
+        "FACTION",
+        "CULTURAL",
+        "INDUSTRIAL",
+        "HAZARDOUS"
     ],
     "source":"theodisi"
 }

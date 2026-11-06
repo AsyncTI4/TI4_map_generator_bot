@@ -303,12 +303,11 @@ final class LoreEffects {
             if (p == null) continue;
             String where = " (in `!" + line + "`)";
             List<String> a = p.args();
-            boolean colorImplicit =
-                    switch (p.verb()) {
-                        case "unit", "plastic", "removeunit" -> !a.isEmpty() && isSignedInt(a, 0);
-                        case "cc", "removecc" -> a.isEmpty();
-                        default -> false;
-                    };
+            boolean colorImplicit = switch (p.verb()) {
+                case "unit", "plastic", "removeunit" -> !a.isEmpty() && isSignedInt(a, 0);
+                case "cc", "removecc" -> a.isEmpty();
+                default -> false;
+            };
             if (colorImplicit) {
                 problems.add("`" + p.verb() + "` needs an explicit color in phase lore — there is no triggering player"
                         + where);
@@ -710,11 +709,12 @@ final class LoreEffects {
     private static EffectDescription effectToken(EffectContext ctx) {
         if (ctx.tile == null || ctx.args.length == 0) return null;
         String tokenId = resolveTokenOrAttachment(ctx.arg(0));
-        ctx.tile.addToken(tokenId, ctx.holder);
+        String holder = Mapper.getOneWayWormholeToken(tokenId) != null ? Constants.SPACE : ctx.holder;
+        ctx.tile.addToken(tokenId, holder);
         String readableName = PNG_FILE_SUFFIX_PATTERN
                 .matcher(tokenId.replaceFirst("^token_", ""))
                 .replaceFirst("");
-        String location = ctx.tile.getPosition() + (Constants.SPACE.equals(ctx.holder) ? "" : " (" + ctx.holder + ")");
+        String location = ctx.tile.getPosition() + (Constants.SPACE.equals(holder) ? "" : " (" + holder + ")");
         return new EffectDescription(
                 "Placed " + readableName + " token in " + location + ".", true, ctx.tile.getPosition());
     }
@@ -724,7 +724,7 @@ final class LoreEffects {
         if (ctx.tile == null || ctx.args.length == 0) return null;
         String tokenId = resolveTokenOrAttachment(ctx.arg(0));
 
-        String holder = ctx.holder;
+        String holder = Mapper.getOneWayWormholeToken(tokenId) != null ? Constants.SPACE : ctx.holder;
         if (ctx.args.length >= 2) {
             String planetArg = AliasHandler.resolvePlanet(ctx.arg(1));
             if (ctx.tile.getUnitHolders().containsKey(planetArg)) {
@@ -1120,7 +1120,7 @@ final class LoreEffects {
         for (int i = 0; i < normalized; i++) {
             matrix = CustomHyperlaneService.rotateMatrix60(matrix);
         }
-        CustomHyperlaneService.insertData(ctx.game, position, matrix);
+        CustomHyperlaneService.insertStoredData(ctx.game, position, matrix);
         return new EffectDescription(
                 "The hyperlane at " + position + " rotated by " + (normalized * 60) + "°.", true, position);
     }
@@ -1135,7 +1135,7 @@ final class LoreEffects {
         String matrix = decodeHyperlaneMatrixArg(ctx.arg(1));
         if (tile == null || !CustomHyperlaneService.isCustomHyperlaneTile(tile) || matrix == null) return null;
 
-        CustomHyperlaneService.insertData(ctx.game, position, matrix);
+        CustomHyperlaneService.insertStoredData(ctx.game, position, matrix);
         return new EffectDescription("The hyperlane at " + position + " reconfigured.", true, position);
     }
 
@@ -1143,7 +1143,7 @@ final class LoreEffects {
     private static String decodeHyperlaneMatrixArg(String arg) {
         try {
             String matrix = CustomHyperlaneService.decodeMatrix(arg.trim());
-            return CustomHyperlaneService.isValidConnectionMatrix(matrix) ? matrix : null;
+            return CustomHyperlaneService.isValidStoredMatrix(matrix) ? matrix : null;
         } catch (Exception e) {
             return null;
         }

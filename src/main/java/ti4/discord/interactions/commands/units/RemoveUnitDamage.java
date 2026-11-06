@@ -4,6 +4,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateCommand;
 import ti4.game.Game;
@@ -55,9 +56,10 @@ public class RemoveUnitDamage extends GameStateCommand {
 
         String color = getPlayer().getColor();
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
-        ParseUnitService.getParsedUnits(event, color, tile, unitList)
-                .forEach(parsedUnit ->
-                        tile.removeUnitDamage(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count()));
+        ParseUnitService.getParsedUnits(event, color, tile, unitList).forEach(parsedUnit -> {
+            tile.removeUnitDamage(parsedUnit.location(), parsedUnit.unitKey(), parsedUnit.count());
+            StonebornUnitHandler.syncMobileMountainDamage(game, getPlayer(), parsedUnit.unitKey());
+        });
 
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }

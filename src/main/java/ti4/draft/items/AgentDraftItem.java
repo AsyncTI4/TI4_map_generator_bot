@@ -30,7 +30,7 @@ public class AgentDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getTitle(Game game) {
-        if (game.isTwilightsFallMode()) return getLeader().getTFNameRepresentation();
+        if (game != null && game.isTwilightsFallMode()) return getLeader().getTFNameRepresentation();
         return getLeader().getNameRepresentation();
     }
 
@@ -59,7 +59,7 @@ public class AgentDraftItem extends DraftItem {
     public String getLongDescriptionImpl(Game game) {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            if (game.isTwilightsFallMode()) {
+            if (game != null && game.isTwilightsFallMode()) {
                 return "*" + leader.getTFAbilityWindowIfAble() + "* " + leader.getTFAbilityTextIfAble();
             } else {
                 return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();

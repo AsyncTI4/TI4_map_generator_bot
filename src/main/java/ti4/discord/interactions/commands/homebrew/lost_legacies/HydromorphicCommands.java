@@ -18,7 +18,8 @@ import ti4.service.emoji.CardEmojis;
 class HydromorphicDraw extends GameStateSubcommand {
     HydromorphicDraw() {
         super("hc_draw", "Draw Hydromorphic cards", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Cards to draw, default 1, max 10"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Cards to draw, default 1, max 10")
+                .setRequiredRange(1, 10));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color").setAutoComplete(true));
     }

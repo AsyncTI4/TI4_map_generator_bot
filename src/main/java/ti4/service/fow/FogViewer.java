@@ -49,9 +49,11 @@ public record FogViewer(
         if (explicitViewer != null) {
             return explicitViewer;
         }
-        if (event == null) {
-            return null;
-        }
+        return event == null ? null : seatOf(game, event);
+    }
+
+    @Nullable
+    public static Player seatOf(Game game, GenericInteractionCreateEvent event) {
         Player eventPlayer = CommandHelper.getPlayerFromGame(
                 game, event.getMember(), event.getUser().getId());
         return TestBedService.resolveActingPlayer(game, event, eventPlayer);

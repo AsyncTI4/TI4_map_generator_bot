@@ -8,9 +8,9 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
@@ -33,6 +33,7 @@ import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.game.MonumentsService;
+import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantArcanumAgent;
 import ti4.service.unit.AddUnitService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -52,13 +53,14 @@ public class PassService {
         UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
 
         player.setPassed(true);
+        MigoAbilityHandler.offerCerebralArchiveResearch(game, player);
         ThirtyKSecretHooks.onPassed(game, player);
         GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, true));
         ButtonHelperFactionSpecific.offerDeathBinding(game, player);
         SarcosaHeroHandler.offerPassAbility(game, player);
         NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
-        RevenantLeadersHandler.offerRevArcanumAgentButtons(game, player);
+        RevenantArcanumAgent.offerAfterPass(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
@@ -70,7 +72,7 @@ public class PassService {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "planetAbilityExhaust_petra",
                     "Use " + Mapper.getPlanet("petra").getLegendaryAbilityName()));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -168,7 +170,7 @@ public class PassService {
         //     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         //     List<Button> buttons = new ArrayList<>();
         //     buttons.add(Buttons.green("startBestow", "Allow Neighbors To Gain 2 Commodities"));
-        //     buttons.add(Buttons.red("deleteButtons", "Decline"));
+        //     buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         //     MessageHelper.sendMessageToChannelWithButtons(
         //             player.getCorrectChannel(), "Use buttons to resolve.", buttons);
         // }

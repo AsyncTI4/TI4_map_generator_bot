@@ -198,7 +198,7 @@
     {
         "itemCategory": "STARTINGFLEET",
         "itemId": "scrapyard",
-        "alternateText": "During setup, place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, & 2 structures in your home system. THIS IS NOT AUTOMATED. Use `/modify_units` to set them yourself.",
+        "alternateText": "During setup, place non-fighter ships with a combined cost of 8, fighters and infantry with a combined cost of 3, & 2 structures in your home system.",
         "source": "theodisi"
     },
 	{

@@ -5,11 +5,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.discord.interactions.commands.franken.DisableFactionSource;
+import ti4.discord.interactions.commands.franken.EnableFactionSource;
+import ti4.discord.interactions.commands.franken.ShowFactionDraftables;
 import ti4.helpers.Constants;
 
 public class FrankenCommand2 implements ParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(new PlotAdd(), new PlotRemove())
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new PlotAdd(),
+                    new PlotRemove(),
+                    new ShowFactionDraftables(),
+                    new EnableFactionSource(),
+                    new DisableFactionSource())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

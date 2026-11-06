@@ -25,6 +25,8 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.leader.genome.homebrew.tknova.AristocraticGenome;
+import ti4.service.leader.genome.homebrew.tknova.HumanGenome;
 
 public final class CombatMessageHelper {
     private static final Pattern MENTIONS_DICE =
@@ -342,6 +344,12 @@ public final class CombatMessageHelper {
                 }
                 if (game.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction())) {
                     game.setStoredValue("letnevagent", "");
+                }
+                if (game.getStoredValue(HumanGenome.ID).equalsIgnoreCase(player.getFaction())) {
+                    game.setStoredValue(HumanGenome.ID, "");
+                }
+                if (game.getStoredValue(AristocraticGenome.ID).equalsIgnoreCase(player.getFaction())) {
+                    game.setStoredValue(AristocraticGenome.ID, "");
                 }
                 if (game.getStoredValue("classifiedWeapons").startsWith(player.getFaction() + ";")) {
                     game.setStoredValue("classifiedWeapons", "");

@@ -147,7 +147,22 @@ _Avoid_: Unit tech
 The System a Faction starts in and defends.
 
 **Wormhole**:
-A System feature that links it to other Systems bearing the same wormhole type.
+A System feature that links it to other Systems bearing the same wormhole type. It comes from the System tile or from a wormhole token or attachment in the System. Several wormholes of the same type count separately (LRR 101, note II), e.g. for Particle Synthesis.
+
+**Weirdway**:
+A Sigma planet attachment that gives its System an alpha and a beta wormhole and -1 move to ships of players who don't control the planet.
+
+**Lambda wormhole**:
+A Sigma wormhole carried by the three lambda wormhole tokens. Lambda wormholes only connect to each other.
+
+**Rat race wormhole**:
+A wormhole on a rat race token (`whratalpha` to `whratkappa`). It is its own type: an alpha rat wormhole only connects to alpha rat wormholes, never to a plain alpha. Laws and abilities that name alpha or beta do not affect it.
+
+**Rat nest**:
+The rat race border anomaly `ratnest`: one hex-sized frame that sits on all six borders of a System. Its effect is not automated; players apply it themselves.
+
+**Entry-only / exit-only wormhole**:
+A one-way wormhole token (`whalpha_in`, `whalpha_out`, …), drawn with a green (IN) or red (OUT) arrow ring. Units can leave a system through an entry-only wormhole and arrive through an exit-only one, never the other way; two entry-only (or two exit-only) wormholes never connect. Movement always follows the direction; everything else only with One-way adjacency on.
 
 **Wormhole nexus**:
 The extra System where alpha, beta and gamma wormholes converge, which starts with only its gamma wormhole and becomes active when a unit enters it or Mallice is controlled.
@@ -170,8 +185,14 @@ An Anomaly that adds +1 to the move of ships leaving or passing through it, each
 **Border anomaly**:
 An anomaly attached to a System's edge rather than its interior.
 
+**Void Tether**:
+The Empyrean breakthrough's Border anomaly token. Enforced only with One-way adjacency on (always in fog); otherwise it is drawn but blocks nothing. When enforced, it blocks the shared edge between its two Systems, in either direction and for every purpose, for everyone except the Player holding the breakthrough (`exemptHolderOf` in `border_anomalies.json`) and the colours that Player allows through that token ("unless you allow it", stored on the token, cleared when it is moved or removed). Only the edge is blocked: other links between the same two Systems (matching wormholes, custom links, ingress/egress, …) still connect them. Across it, a Player counts as a Neighbor only from the exempt side.
+
 **Hyperlane**:
 A Tile that is not a System, whose drawn lanes make the Systems at their ends adjacent.
+
+**One-way hyperlane**:
+A lane on a custom Hyperlane (`hl` tile) that units can only follow from one side to the other. In the 6×6 matrix (row = side entered, column = side left, sides N, NE, SE, S, SW, NW) a GM types `2` for it; `1` stays two-way and is mirrored. Stored as an asymmetric 0/1 matrix. Drawn amber in the game's or the viewer's style (Dashed lanes, Arrows, Fading lanes, Entry/exit gates); on a roundabout every side that can be entered reaches every side that can be left (a one-way loop is two-way), so it marks only its entry-only and exit-only connectors. With the fog option "Hide unseen hyperlanes", a Player's own map shows only the lanes their vision runs along, and a remembered hyperlane shows no lanes.
 
 **Frontier token**:
 A marker placed in each System without planets that can be explored for a reward.
@@ -236,6 +257,13 @@ A Thunder's Edge Faction card that is unlocked and then used for a powerful effe
 **Expedition**:
 A Thunder's Edge shared objective that one Faction completes first for a reward.
 
+**Genome**:
+A Twilight's Fall splice card that plays like a Faction's agent under a new name; in the bot it is a separate module that leans on the matching agent module instead of being one.
+_Avoid_: Agent (when the game is Twilight's Fall)
+
+**TK Nova genome**:
+A homebrew genome from the TK Nova Cup that replaces an official agent with its own text and works in any game it is drafted into.
+
 **Splice**:
 A Twilight's Fall card (ability, genome, paradigm or unit) drawn and distributed to shape a Faction.
 
@@ -279,6 +307,14 @@ _Avoid_: FoW (acceptable in code and chat), hidden-information mode
 
 **Light fog**:
 A milder Fog of War in which Players see more of the Map than under full Fog of War.
+_Avoid_: Fog Lite (the old name of the Beginner fog preset)
+
+**FoW+**:
+A stricter Fog of War setting that forces several fog options, swaps in its own explore deck and limits activation to Systems a Player can see, plus a blind activation for the rest.
+_Avoid_: Fog Plus Mode, fowplus
+
+**Fog preset**:
+A named set of fog option values (Standard, Fog+, Normal, Beginner) that the GM applies in one click. Applying one gives the same result whatever was set before; GM tools, map layout and rules options are only changed by a preset that turns them on.
 
 **Absol**:
 A homebrew content mode that substitutes revised cards, technologies and leaders.
@@ -300,6 +336,10 @@ A team mode in which Players are paired and share some benefits.
 
 **Community mode**:
 A mode where a Game is played by a community role rather than individually assigned Players.
+
+**One-way adjacency**:
+A Game setting for one-way links (gravity-wave borders, one-way custom adjacencies, one-way wormholes, one-way hyperlanes). When off, the default outside Fog of War, a one-way link only limits movement and counts as Adjacency both ways for everything else. When on, and always in Fog of War, the side that acts needs the link: a PDS fires only along it, and a Player sees only where they could move.
+_Avoid_: Directional mode
 
 **TIGL**:
 The Twilight Imperium Global Ladder, whose competitive Games report results and move Players through ranks.
@@ -361,6 +401,14 @@ _Avoid_: Mod, admin
 
 **Testbed**:
 A developer-only harness for driving a Game through scripted actions on a development bot.
+
+**Panel**:
+A single Components V2 message that the bot edits in place as it is used, with tabs, on/off switches and select menus instead of a trail of button messages. `/fow fow_options` and the FoW setup panel are panels.
+_Avoid_: Menu message, button wall
+
+**FoW setup panel**:
+The panel version of the FoW setup wizard, opened with `/fow setup_beta` while it is tested next to the button wizard of `/fow setup`. Both share the same saved wizard state.
+_Avoid_: Wizard v2
 
 ### Rules concepts
 
@@ -449,6 +497,18 @@ _Avoid_: Seating order
 **Adjacency**:
 The relationship between Systems that touch, share a wormhole type or are joined by hyperlane lines, governing movement.
 _Avoid_: Neighbors (that names Players with pieces in or next to each other's Systems)
+
+**Outbound / inbound adjacency**:
+The two directions of a one-way link: the Systems a System reaches (outbound, `Adjacency.from`) and the Systems that reach it (inbound, `Adjacency.into`). On two-way maps they are the same. The side that acts needs outbound access: a PDS covers a System its own System reaches, and ships score "adjacent to X" when their System reaches X.
+_Avoid_: Forward/backward adjacency
+
+**Either-way adjacency**:
+Outbound and inbound together (`Adjacency.either`), used only for communication such as Transactions and fog whispers.
+_Avoid_: Mutual adjacency (that would need both directions)
+
+**Ability neighbors**:
+The Neighbors an ability, card or objective that says "neighbor" counts for the Player who uses it (`Player.getAbilityNeighbours`): with One-way adjacency on, the Players their Systems reach; otherwise the same as Neighbors.
+_Avoid_: Direct neighbors
 
 **Elimination**:
 A Player's removal from the Game when they control no Planets, have no ground forces on the Map and own no unit with Production.

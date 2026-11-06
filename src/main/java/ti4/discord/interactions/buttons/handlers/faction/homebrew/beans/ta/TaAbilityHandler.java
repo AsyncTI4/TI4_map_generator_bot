@@ -116,7 +116,7 @@ public class TaAbilityHandler {
                             + design,
                     "Attach " + getDesignName(design)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         String message = player.getRepresentationUnfogged()
                 + ", you may attach 1 design from your reinforcements to "
@@ -317,6 +317,15 @@ public class TaAbilityHandler {
         Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
         return planet != null
                 && planet.getTokenList().stream().anyMatch(token -> Mapper.getAttachmentInfo(token) != null);
+    }
+
+    public static boolean planetHasNonWorldshaperAttachment(Tile tile, String planetName) {
+        Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
+        return planet != null
+                && planet.getTokenList().stream()
+                        .map(Mapper::getAttachmentInfo)
+                        .anyMatch(attachment ->
+                                attachment != null && !attachment.getAlias().startsWith("worldshaper"));
     }
 
     public static boolean planetHasGrandDesignAttached(Tile tile, String planetName) {

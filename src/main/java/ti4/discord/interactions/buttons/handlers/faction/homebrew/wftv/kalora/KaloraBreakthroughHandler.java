@@ -40,7 +40,7 @@ public class KaloraBreakthroughHandler {
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "kaloraCommitInfantry_" + bombardPlanet,
                 "Commit 1 Infantry to " + Helper.getPlanetRepresentation(bombardPlanet, game)));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         String msg = player.getRepresentation()
                 + ", if you just destroyed the last of the controlling player's ground forces on "
                 + Helper.getPlanetRepresentation(bombardPlanet, game)

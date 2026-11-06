@@ -112,7 +112,10 @@ class TestBedDataTest extends BaseTi4Test {
                     { "expect": { "state": "sol.mood", "equals": "happy" } },
                     { "as": "sol", "press": "ac_play_from_hand_{ac:sabo2}" },
                     { "do": "setStored", "key": "a", "value": "b,c" },
-                    { "as": "sol", "pressId": "%s" }
+                    { "as": "sol", "pressId": "%s" },
+                    { "do": "setGameOption", "key": "show_mood", "value": "true" },
+                    { "do": "setGameOption", "key": "one_way_adjacency", "value": "yes" },
+                    { "do": "setGameOption", "key": "one_way_adjacency", "value": "true" }
                   ] }""".formatted("x".repeat(101))));
         assertContains(
                 scriptErrors,
@@ -122,7 +125,10 @@ class TestBedDataTest extends BaseTi4Test {
                 "step 4: unknown seat field `mood`",
                 "step 5: `{ac:sabo2}` but nothing gives `sabo2` to sol",
                 "step 6: `setStored` key and value may not contain",
-                "step 7: `pressId` is longer than Discord's 100-character limit");
+                "step 7: `pressId` is longer than Discord's 100-character limit",
+                "step 8: unknown game option `show_mood`",
+                "step 9: game option `one_way_adjacency` takes `true` or `false`");
+        assertTrue(scriptErrors.stream().noneMatch(error -> error.startsWith("step 10")), scriptErrors::toString);
 
         // Fields that a kind of check would silently ignore, typos in scopes, and checks with nothing to check.
         List<String> expectErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
@@ -236,6 +242,21 @@ class TestBedDataTest extends BaseTi4Test {
         assertTrue(errors.stream().noneMatch(error -> error.contains("at `202`")), String.join("\n", errors));
     }
 
+    @Test
+    void customAdjacenciesAreValidated() {
+        TestBedPreset preset = TestBedPresetService.parse("""
+                {
+                  "you": { "faction": "sol" },
+                  "customAdjacencies": { "000": ["201", "TL"], "nowhere": ["101"], "102": ["moon"] }
+                }""");
+        List<String> errors = TestBedPresetService.validate(preset);
+        assertContains(
+                errors,
+                "`customAdjacencies` position `nowhere` is not a tile position",
+                "`customAdjacencies` target `moon` at `102`");
+        assertTrue(errors.stream().noneMatch(error -> error.contains("at `000`")), String.join("\n", errors));
+    }
+
     // Homebrew card tests switch decks in the preset and stack explores in scripts; wrong slots, unknown decks,
     // decks of the wrong type and unknown explore ids must be caught before a live run.
     @Test
@@ -274,6 +295,18 @@ class TestBedDataTest extends BaseTi4Test {
                   ] }"""));
         assertContains(removeTokenErrors, "needs `key`");
         assertEquals(1, removeTokenErrors.size(), String.join("\n", removeTokenErrors));
+
+        // placeTile needs a real position (key) and a real tile (value); tile aliases resolve as they do at run time.
+        List<String> placeTileErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "placeTile", "key": "999x", "value": "19" },
+                    { "do": "placeTile", "key": "a102", "value": "notatile" },
+                    { "do": "placeTile", "key": "a102", "value": "19" },
+                    { "do": "placeTile", "key": "a103", "value": "83a0" }
+                  ] }"""));
+        assertContains(placeTileErrors, "`999x` is not a tile position", "unknown tile `notatile`");
+        assertEquals(2, placeTileErrors.size(), String.join("\n", placeTileErrors));
     }
 
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and

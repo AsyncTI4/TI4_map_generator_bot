@@ -232,7 +232,8 @@ public class ThirtyKActionCardHooks {
         if (!ThirtyKCards.inUse(game)) return;
         if (fragments == null || fragments.isEmpty()) return;
         List<Player> holders = holdersOf(game, PRESERVATION_ACT).stream()
-                .filter(holder -> holder != purger && !holder.isNeighboursWith(purger))
+                .filter(holder ->
+                        holder != purger && !holder.getAbilityNeighbours().contains(purger))
                 .toList();
         if (holders.isEmpty()) return;
         ThirtyKAcState.setPurgedFragments(game, purger, fragments);
@@ -295,7 +296,7 @@ public class ThirtyKActionCardHooks {
             break;
         }
         if (buttons.isEmpty()) return;
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 holder.getCardsInfoThread(), holder.getRepresentationUnfogged() + ", " + reason, buttons);
     }

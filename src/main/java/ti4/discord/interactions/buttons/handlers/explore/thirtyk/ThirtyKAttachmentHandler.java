@@ -107,7 +107,7 @@ public class ThirtyKAttachmentHandler {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planetID);
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
         buttons.removeIf(button -> isSpendButtonFor(button, planetID));
-        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "The colony rallies: " + player.getRepresentationNoPing() + " readies "

@@ -3,6 +3,7 @@ package ti4.service.leader;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
@@ -20,6 +21,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -89,7 +91,7 @@ public class CommanderUnlockCheckService {
             case "naalu" -> {
                 Tile rex = game.getMecatolTile();
                 if (rex != null) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, rex.getPosition(), player, false)) {
+                    for (String tilePos : Adjacency.of(game, player).withSelf().into(rex.getPosition())) {
                         Tile tile = game.getTileByPosition(tilePos);
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                             if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
@@ -156,8 +158,8 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = (num >= 6);
             }
             case "empyrean" ->
-                shouldBeUnlocked =
-                        (player.getNeighbourCount() >= (game.getRealPlayers().size() - 1));
+                shouldBeUnlocked = (player.getAbilityNeighbours().size()
+                        >= (game.getRealPlayers().size() - 1));
             case "mahact" -> shouldBeUnlocked = (player.getMahactCC().size() >= 2);
             case "mahact_y" -> shouldBeUnlocked = (player.getMahactCC().size() >= 3);
             case "naaz" ->
@@ -319,7 +321,7 @@ public class CommanderUnlockCheckService {
                     Tile tile = game.getTileFromPlanet(planetName);
                     Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(planetName);
 
-                    if (planet == null || !TaAbilityHandler.planetHasAnyAttachment(tile, planetName)) {
+                    if (planet == null || !TaAbilityHandler.planetHasNonWorldshaperAttachment(tile, planetName)) {
                         continue;
                     }
 
@@ -345,6 +347,46 @@ public class CommanderUnlockCheckService {
                         .map(game::getTileFromPlanet)
                         .filter(Objects::nonNull)
                         .anyMatch(Tile::isFracture);
+            case "valhavn" ->
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                                .flatMap(tile -> tile.getPlanetUnitHolders().stream())
+                                .filter(planet -> planet.getUnitCount(UnitType.Pds, player) > 0)
+                                .filter(planet -> planet.getUnitCount(UnitType.Infantry, player) >= 3)
+                                .count()
+                        >= 3;
+            case "migo" -> {
+                int techSpecialtyPlanets = player.getPlanets().stream()
+                        .map(game.getPlanetsInfo()::get)
+                        .filter(Objects::nonNull)
+                        .filter(planet -> !planet.getTechSpecialities().isEmpty())
+                        .map(Planet::getName)
+                        .collect(Collectors.toSet())
+                        .size();
+
+                shouldBeUnlocked = techSpecialtyPlanets >= 3;
+            }
+            case "deep" ->
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                                .filter(tile -> tile.getPlanetUnitHolders().isEmpty())
+                                .filter(tile -> ButtonHelper.checkNumberNonFighterShips(player, tile, false) > 0)
+                                .count()
+                        >= 3;
+            case "bloom" -> {
+                List<Planet> coexistingPlanets = game.getPlanetsPlayerIsCoexistingOn(player).stream()
+                        .map(game::getUnitHolderFromPlanet)
+                        .filter(Objects::nonNull)
+                        .toList();
+                shouldBeUnlocked = coexistingPlanets.stream()
+                        .filter(planet -> planet.getPlanetTypes().contains("cultural"))
+                        .anyMatch(cultural -> coexistingPlanets.stream()
+                                .filter(planet -> !planet.getName().equals(cultural.getName()))
+                                .filter(planet -> planet.getPlanetTypes().contains("industrial"))
+                                .anyMatch(industrial -> coexistingPlanets.stream()
+                                        .filter(planet -> !planet.getName().equals(cultural.getName()))
+                                        .filter(planet -> !planet.getName().equals(industrial.getName()))
+                                        .anyMatch(planet ->
+                                                planet.getPlanetTypes().contains("hazardous"))));
+            }
 
             // theodisi
             case "ardentia",

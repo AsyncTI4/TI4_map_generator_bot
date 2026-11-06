@@ -142,7 +142,7 @@ public class MonumentsPoKButtonHandler {
                         hitButtons.add(sustain.withCustomId(sustain.getCustomId() + "deleteThisMessage"));
                     }
 
-                    hitButtons.add(Buttons.gray("deleteButtons", "Cancel the Hit"));
+                    hitButtons.add(Buttons.CANCEL_THE_HIT);
 
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getMessageChannel(),

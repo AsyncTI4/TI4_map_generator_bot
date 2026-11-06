@@ -373,7 +373,7 @@ public final class RiftSetModeService {
                     model.getBaseType(),
                     model.getUnitEmoji()));
         }
-        buttonsToReleaseUnits.add(Buttons.red("deleteButtons", "Done"));
+        buttonsToReleaseUnits.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 "Use buttons to release up to 3 of your non-fighter units from the Cabal.",

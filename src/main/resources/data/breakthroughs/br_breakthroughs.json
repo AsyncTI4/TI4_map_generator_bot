@@ -21,7 +21,7 @@
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "If you have the Infantry II technology, flip this card and place it on top of Infantry II.\n\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place that unit on this card, otherwise destroy up to 1 infantry unit on this planet. At the end of your turn, place each unit that is on this card on a legendary planet you control.\nCost 1(x2), Combat 7",
+        "text": "If you have the Infantry II technology, flip this card and place it on top of Infantry II.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/uydaibt.webp?raw=true",
         "source": "blue_reverie"
     },

@@ -19,6 +19,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
@@ -92,13 +93,12 @@ public class AeternaUnitsHandler {
 
             for (UnitState state : holder.getNonZeroUnitStates(unitKey)) {
                 int count = holder.getUnitCountForState(unitKey, state);
-                String stateText =
-                        switch (state) {
-                            case dmg -> "damaged ";
-                            case glv -> "galvanized ";
-                            case dmg_glv -> "damaged galvanized ";
-                            default -> "";
-                        };
+                String stateText = switch (state) {
+                    case dmg -> "damaged ";
+                    case glv -> "galvanized ";
+                    case dmg_glv -> "damaged galvanized ";
+                    default -> "";
+                };
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + CHOOSE_MECH + tile.getPosition() + "|" + holder.getName() + "|"
                                 + opponent.getFaction() + "|" + unitKey.asyncID() + "|" + state,
@@ -217,13 +217,12 @@ public class AeternaUnitsHandler {
                 if (count < 1) {
                     continue;
                 }
-                String stateText =
-                        switch (state) {
-                            case dmg -> "damaged ";
-                            case glv -> "galvanized ";
-                            case dmg_glv -> "damaged galvanized ";
-                            default -> "";
-                        };
+                String stateText = switch (state) {
+                    case dmg -> "damaged ";
+                    case glv -> "galvanized ";
+                    case dmg_glv -> "damaged galvanized ";
+                    default -> "";
+                };
                 buttons.add(Buttons.red(
                         player.factionButtonChecker() + DESTROY_GROUND_FORCE + tile.getPosition() + "|"
                                 + holder.getName() + "|" + opponent.getFaction() + "|" + unitKey.asyncID() + "|" + state
@@ -521,7 +520,7 @@ public class AeternaUnitsHandler {
         if (ButtonHelper.doesPlayerHaveFSHere("aeterna_flagship", player, tile)) {
             return true;
         }
-        return FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false).stream()
+        return Adjacency.of(game, player).forEffects().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(adjacentTile -> ButtonHelper.doesPlayerHaveFSHere("aeterna_flagship", player, adjacentTile));
     }

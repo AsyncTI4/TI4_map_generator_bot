@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -31,21 +30,12 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
-import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 @UtilityClass
 public class MyrrLeadersHandler {
-    private static final String AGENT = "myrragent";
-    private static final String AGENT_USE = "useMyrrAgent_";
-    private static final String AGENT_OTHER = "useMyrrAgentOnActivePlayer";
-    private static final String AGENT_DESTROY = "myrrAgentDestroy_";
-    private static final String AGENT_PRODUCTION = "myrrAgentProduction_";
-    private static final String AGENT_POSITION = "myrrAgentPosition_";
     private static final String COMMANDER_USES = "myrrCommanderUses_";
 
     private static final String HERO_REMOVE = "myrrHeroRemove_";
@@ -54,154 +44,6 @@ public class MyrrLeadersHandler {
     private static final String HERO_PLACE = "myrrHeroPlace_";
     private static final String HERO_ACTIVE = "myrrHeroActive_";
     private static final String HERO_UNITS = "myrrHeroUnits_";
-
-    public static void offerMyrrAgent(Game game, Player activatingPlayer, Tile tile) {
-        if (game == null || activatingPlayer == null || tile == null) {
-            return;
-        }
-
-        if (activatingPlayer.hasUnexhaustedLeader(AGENT)
-                && !getAgentShips(activatingPlayer, tile).isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    activatingPlayer.getCorrectChannel(),
-                    activatingPlayer.getRepresentation() + ", you may exhaust Kelron Dross, the Myrr agent.",
-                    List.of(
-                            Buttons.gray(
-                                    activatingPlayer.factionButtonChecker() + AGENT_USE + activatingPlayer.getFaction()
-                                            + "|" + tile.getPosition(),
-                                    "Use Myrr Agent",
-                                    FactionEmojis.myrr),
-                            Buttons.red("deleteButtons", "Decline")));
-        }
-    }
-
-    public static Button getMyrrAgentCardsInfoButton(Player player) {
-        return Buttons.gray(player.factionButtonChecker() + AGENT_OTHER, "Use Myrr Agent", FactionEmojis.myrr);
-    }
-
-    @ButtonHandler(AGENT_OTHER)
-    public static void useMyrrAgentOnActivePlayer(ButtonInteractionEvent event, Game game, Player player) {
-        Player target = game == null ? null : game.getActivePlayer();
-        Tile tile = game == null ? null : game.getTileByPosition(game.getActiveSystem());
-        if (target == null || tile == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Kelron Dross, the Myrr agent, requires an active system.");
-            return;
-        }
-        startMyrrAgent(event, game, player, target, tile);
-    }
-
-    @ButtonHandler(AGENT_USE)
-    public static void useMyrrAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(AGENT_USE.length()).split("\\|", 2);
-        Player target = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
-        Tile tile = payload.length == 2 ? game.getTileByPosition(payload[1]) : null;
-        startMyrrAgent(event, game, player, target, tile);
-    }
-
-    private static void startMyrrAgent(
-            ButtonInteractionEvent event, Game game, Player agentOwner, Player target, Tile tile) {
-        if (agentOwner == null
-                || target == null
-                || tile == null
-                || !agentOwner.hasUnexhaustedLeader(AGENT)
-                || !tile.getPosition().equals(game.getActiveSystem())
-                || target != game.getActivePlayer()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Kelron Dross, the Myrr agent, cannot be used right now.");
-            return;
-        }
-
-        List<Button> buttons = getAgentShips(target, tile).stream()
-                .map(unitKey -> Buttons.red(
-                        target.factionButtonChecker() + AGENT_DESTROY + agentOwner.getFaction() + "|"
-                                + tile.getPosition() + "|" + unitKey.asyncID(),
-                        "Destroy 1 " + unitKey.humanReadableName(),
-                        unitKey.unitEmoji()))
-                .collect(Collectors.toCollection(ArrayList::new));
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    target.getRepresentation() + " has no eligible ship for Kelron Dross, the Myrr agent.");
-            return;
-        }
-
-        ExhaustLeaderService.exhaustLeader(game, agentOwner, agentOwner.unsafeGetLeader(AGENT));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                target.getCorrectChannel(),
-                target.getRepresentation()
-                        + ", Kelron Dross, the Myrr agent, allows you to destroy 1 non-fighter ship with a cost less than 4 in the activated system.",
-                buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler(AGENT_DESTROY)
-    public static void destroyShipForMyrrAgent(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(AGENT_DESTROY.length()).split("\\|", 3);
-        Player agentOwner = payload.length == 3 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
-        Tile tile = payload.length == 3 ? game.getTileByPosition(payload[1]) : null;
-        UnitHolder space = tile == null ? null : tile.getSpaceUnitHolder();
-        UnitKey unitKey = space == null
-                ? null
-                : getAgentShips(player, tile).stream()
-                        .filter(key -> key.asyncID().equals(payload[2]))
-                        .findFirst()
-                        .orElse(null);
-        UnitModel unit = unitKey == null ? null : player.getPriorityUnitByAsyncID(unitKey.asyncID(), space);
-        if (agentOwner == null
-                || unit == null
-                || !agentOwner.hasLeader(AGENT)
-                || !tile.getPosition().equals(game.getActiveSystem())) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-
-        int production = Math.round(unit.getCost()) + 2;
-        DestroyUnitService.destroyUnit(event, tile, game, unitKey, 1, space, false);
-        game.setStoredValue(AGENT_PRODUCTION + player.getFaction(), Integer.toString(production));
-        game.setStoredValue(AGENT_POSITION + player.getFaction(), tile.getPosition());
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentation() + " destroyed 1 " + unit.getName() + " using Kelron Dross, the Myrr agent. "
-                        + tile.getRepresentationForButtons(game, player) + " gained PRODUCTION " + production + ".");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static int getMyrrAgentProduction(Game game, Player player, Tile tile) {
-        if (game == null
-                || player == null
-                || tile == null
-                || !tile.getPosition().equals(game.getStoredValue(AGENT_POSITION + player.getFaction()))) {
-            return 0;
-        }
-        String value = game.getStoredValue(AGENT_PRODUCTION + player.getFaction());
-        try {
-            return value.isEmpty() ? 0 : Integer.parseInt(value);
-        } catch (NumberFormatException ignored) {
-            return 0;
-        }
-    }
-
-    public static void clearMyrrAgent(Game game) {
-        for (Player player : game.getRealPlayers()) {
-            game.removeStoredValue(AGENT_PRODUCTION + player.getFaction());
-            game.removeStoredValue(AGENT_POSITION + player.getFaction());
-        }
-    }
-
-    private static List<UnitKey> getAgentShips(Player player, Tile tile) {
-        UnitHolder space = tile.getSpaceUnitHolder();
-        return space.getUnitKeysForPlayer(player).stream()
-                .filter(key -> space.getUnitCount(key) > 0)
-                .filter(key -> key.unitType() != UnitType.Fighter)
-                .filter(key -> {
-                    UnitModel unit = player.getPriorityUnitByAsyncID(key.asyncID(), space);
-                    return unit != null && unit.getIsShip() && unit.getCost() <= 4;
-                })
-                .toList();
-    }
 
     public static void resolveMyrrCommander(
             GenericInteractionCreateEvent event,

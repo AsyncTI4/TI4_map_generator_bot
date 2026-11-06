@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,11 +21,42 @@ import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
+import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.map.AddTileService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 public class TestBedComponentService {
+
+    static final Map<String, BiConsumer<Game, Integer>> NUMBER_GAME_OPTIONS =
+            Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMergeFrom);
+    static final Map<String, BiConsumer<Game, Boolean>> SWITCH_GAME_OPTIONS =
+            Map.of(Constants.ONE_WAY_ADJACENCY, Game::setOneWayAdjacency);
+
+    static String gameOptionProblem(String key, String value) {
+        if (NUMBER_GAME_OPTIONS.containsKey(key)) {
+            return value.matches("[0-9]") ? null : "game option `" + key + "` takes a number from 0 to 9.";
+        }
+        if (SWITCH_GAME_OPTIONS.containsKey(key)) {
+            return value.matches("true|false") ? null : "game option `" + key + "` takes `true` or `false`.";
+        }
+        return "unknown game option `" + key + "`; use " + new TreeSet<>(gameOptionKeys()) + ".";
+    }
+
+    static void setGameOption(Game game, String key, String value) {
+        if (SWITCH_GAME_OPTIONS.containsKey(key)) {
+            SWITCH_GAME_OPTIONS.get(key).accept(game, Boolean.parseBoolean(value));
+        } else {
+            NUMBER_GAME_OPTIONS.get(key).accept(game, Integer.parseInt(value));
+        }
+    }
+
+    private static List<String> gameOptionKeys() {
+        List<String> keys = new ArrayList<>(NUMBER_GAME_OPTIONS.keySet());
+        keys.addAll(SWITCH_GAME_OPTIONS.keySet());
+        return keys;
+    }
 
     static void applyGameState(Game game, TestBedPreset preset, List<String> warnings) {
         for (String option : preset.getFowOptions()) {
@@ -36,6 +68,7 @@ public class TestBedComponentService {
             }
         }
         preset.getStored().forEach(game::setStoredValue);
+        preset.getGameOptions().forEach((key, value) -> setGameOption(game, key, value));
         for (String objective : preset.getRevealedObjectives()) {
             if (!game.revealSpecificStage1(objective) && !game.revealSpecificStage2(objective)) {
                 warnings.add("Objective `" + objective + "` is not in this game's objective decks.");
@@ -58,6 +91,10 @@ public class TestBedComponentService {
                 game.addBorderAnomaly(entry.getKey(), borderDirection(border), borderType(border));
             }
         }
+        preset.getCustomAdjacencies()
+                .forEach((primary, listed) -> game.addCustomAdjacentTiles(
+                        primary.toLowerCase(),
+                        listed.stream().map(String::toLowerCase).toList()));
     }
 
     static final Map<String, DeckType> DECK_SLOTS = Map.of(
@@ -86,15 +123,14 @@ public class TestBedComponentService {
         preset.getDecks().forEach((slot, deckId) -> {
             DeckModel deck = Mapper.getDeck(deckId);
             if (deckProblem(slot, deckId) != null) return;
-            boolean applied =
-                    switch (DECK_SLOTS.get(slot)) {
-                        case ACTION_CARD -> game.validateAndSetActionCardDeck(event, deck);
-                        case SECRET_OBJECTIVE -> game.validateAndSetSecretObjectiveDeck(event, deck);
-                        case RELIC -> game.validateAndSetRelicDeck(deck);
-                        case EXPLORE -> game.validateAndSetExploreDeck(event, deck);
-                        case AGENDA -> game.validateAndSetAgendaDeck(event, deck);
-                        default -> false;
-                    };
+            boolean applied = switch (DECK_SLOTS.get(slot)) {
+                case ACTION_CARD -> game.validateAndSetActionCardDeck(event, deck);
+                case SECRET_OBJECTIVE -> game.validateAndSetSecretObjectiveDeck(event, deck);
+                case RELIC -> game.validateAndSetRelicDeck(deck);
+                case EXPLORE -> game.validateAndSetExploreDeck(event, deck);
+                case AGENDA -> game.validateAndSetAgendaDeck(event, deck);
+                default -> false;
+            };
             if (!applied) warnings.add("Could not switch the `" + slot + "` deck to `" + deckId + "`.");
         });
     }
@@ -185,6 +221,18 @@ public class TestBedComponentService {
         if (file == null) file = Mapper.getTokenID(AliasHandler.resolveToken(token));
         if (file == null) return "Unknown token `" + token + "`.";
         if (!tile.removeToken(file, holder)) return "No token `" + token + "` at `" + where + "`.";
+        return null;
+    }
+
+    @Nullable
+    static String placeTile(Game game, String position, String tileId) {
+        String lower = position.toLowerCase();
+        if (!MapPositionMapper.isTilePositionValid(game, lower)) {
+            return "`" + position + "` is not a tile position in this game.";
+        }
+        String resolved = AliasHandler.resolveTile(tileId.toLowerCase());
+        if (!TileHelper.isValidTile(resolved)) return "Unknown tile `" + tileId + "`.";
+        AddTileService.addTile(game, new Tile(resolved, lower));
         return null;
     }
 

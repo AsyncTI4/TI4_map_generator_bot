@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -77,6 +78,8 @@ class GameSaveService {
         Path gameSavePath = Storage.getGamePath(game.getName() + Constants.TXT);
         Path gameSaveDirectory = gameSavePath.getParent();
         Path temporarySavePath = null;
+        String previousRevision = game.getRevisionKey();
+        game.setRevisionKey(UUID.randomUUID().toString());
         try {
             temporarySavePath = Files.createTempFile(gameSaveDirectory, game.getName(), ".tmp");
 
@@ -86,6 +89,7 @@ class GameSaveService {
 
             Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
+            game.setRevisionKey(previousRevision);
             BotLogger.critical(new LogOrigin(game), "Could not save map: " + game.getName(), e);
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(), "Failed to save the game during the last command.");
@@ -145,6 +149,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(GAMEINFO);
+        writer.write(System.lineSeparator());
+        writer.write(REVISION_KEY + " " + Objects.requireNonNullElse(game.getRevisionKey(), ""));
         writer.write(System.lineSeparator());
         // game information
         writer.write(Constants.LATEST_COMMAND + " " + game.getLatestCommand());
@@ -478,6 +484,10 @@ class GameSaveService {
         writer.write(Constants.HOMEBREW_MODE + " " + game.isHomebrew());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_GEARS + " " + game.isShowGears());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ONE_WAY_ADJACENCY + " " + game.isOneWayAdjacency());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.WORMHOLE_TOKEN_MERGE + " " + game.getWormholeTokenMergeFrom());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_BANNERS + " " + game.isShowBanners());
         writer.write(System.lineSeparator());
@@ -850,6 +860,9 @@ class GameSaveService {
             writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.BOT_PLAYER + " " + player.isBotPlayer());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.NPC + " " + player.isNpc());
             writer.write(System.lineSeparator());
 
@@ -883,6 +896,12 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.MAGEN_INFANTRY_COUNT + " " + player.getMagenInfantryCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.DACXIVE_COUNT + " " + player.getDacxiveCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.YIN_SPINNER_COUNT + " " + player.getYinSpinnerCounter());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());

@@ -11,6 +11,7 @@
         "wormholes": [
             "GAMMA"
         ],
+        "wormholeIconMerge": false,
         "source": "pok"
     },
     {
@@ -77,6 +78,7 @@
         "wormholes": [
             "ALPHA"
         ],
+        "wormholeIconMerge": false,
         "source": "pok"
     },
     {
@@ -90,6 +92,7 @@
         "wormholes": [
             "BETA"
         ],
+        "wormholeIconMerge": false,
         "source": "pok"
     },
     {

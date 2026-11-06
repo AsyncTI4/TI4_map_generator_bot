@@ -164,7 +164,7 @@ public class RelitigateLLButtonHandler {
             MessageHelper.sendMessageToChannelWithButton(
                     game.getMainGameChannel(),
                     "_Relitigate_ was canceled. Please flip the normal agenda.",
-                    Buttons.blue("flip_agenda", "Flip Agenda"));
+                    Buttons.FLIP_AGENDA);
         }
     }
 

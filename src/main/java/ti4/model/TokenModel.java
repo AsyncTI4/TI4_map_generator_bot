@@ -6,6 +6,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
+import ti4.model.WormholeModel.OneWay;
 import ti4.model.WormholeModel.Wormhole;
 
 @Data
@@ -27,6 +28,15 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private Boolean isFowVision;
     private List<String> aliasList;
     private List<Wormhole> wormholes;
+    private List<String> legacyImagePaths;
+    private Boolean wormholeIconMerge;
+
+    @JsonIgnore
+    private OneWay oneWay;
+
+    @JsonIgnore
+    private String baseImagePath;
+
     private ComponentSource source;
     private String placement;
     private Double scale;
@@ -95,8 +105,8 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         eb.setFooter(sb.toString());
 
         eb.setThumbnail(
-                "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/" + imagePath
-                        + "?raw=true",
+                "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
+                        + (baseImagePath != null ? baseImagePath : imagePath) + "?raw=true",
                 id);
 
         return eb.build();

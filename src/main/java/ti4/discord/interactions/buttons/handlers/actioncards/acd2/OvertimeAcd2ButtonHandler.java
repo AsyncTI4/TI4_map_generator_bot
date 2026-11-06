@@ -99,7 +99,7 @@ class OvertimeAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         String message = remainingComponents > 1
                 ? player.getRepresentationUnfogged() + ", choose a component to ready with _Overtime_."

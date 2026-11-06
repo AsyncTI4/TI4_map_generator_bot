@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntity;
@@ -29,10 +28,10 @@ public class TiglGamesInfoService {
             TIGLRank.IXTHLORD,
             TIGLRank.ARCHON);
 
-    @Transactional(readOnly = true)
     public String getOngoingGamesByRankMessage(boolean showGameIds) {
         List<GameEntity> ongoingTiglGames =
-                gameEntityRepository.findByTwilightImperiumGlobalLeagueTrueAndEndedEpochMillisecondsIsNull();
+                gameEntityRepository
+                        .findByTwilightImperiumGlobalLeagueTrueAndStatisticsIgnoredFalseAndEndedEpochMillisecondsIsNull();
 
         List<ParsedTiglGame> parsedGames = ongoingTiglGames.stream()
                 .map(game -> {

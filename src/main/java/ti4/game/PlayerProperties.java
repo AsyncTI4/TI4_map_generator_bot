@@ -42,6 +42,7 @@ public class PlayerProperties {
     private boolean oplusplusCouncilConfirmed;
     private boolean searchWarrant;
     private boolean dummy;
+    private boolean botPlayer;
     private boolean npc;
     private boolean autoPassOnWhensAfters;
     private boolean eliminated;
@@ -102,6 +103,8 @@ public class PlayerProperties {
     private int pillageCounter;
     private int magenInfantryCounter;
     private int ghostCommanderCounter;
+    private int dacxiveCounter;
+    private int yinSpinnerCounter;
 
     // Omega Phase
     private int priorityPosition;

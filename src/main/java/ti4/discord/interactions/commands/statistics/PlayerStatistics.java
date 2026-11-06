@@ -22,8 +22,8 @@ class PlayerStatistics extends Subcommand {
                 OptionType.INTEGER,
                 MINIMUM_GAME_COUNT_FILTER,
                 "Filter by the minimum number of games player has played, default 10"));
-        addOptions(
-                new OptionData(OptionType.INTEGER, MAX_LIST_SIZE, "The maximum number of players listed, default 50"));
+        addOptions(new OptionData(OptionType.INTEGER, MAX_LIST_SIZE, "The maximum number of players listed, default 50")
+                .setRequiredRange(1, 500));
     }
 
     @Override

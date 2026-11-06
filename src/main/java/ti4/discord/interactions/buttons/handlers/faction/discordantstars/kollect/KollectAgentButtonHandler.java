@@ -1,13 +1,8 @@
 package ti4.discord.interactions.buttons.handlers.faction.discordantstars.kollect;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,22 +15,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
 class KollectAgentButtonHandler {
-
-    @ButtonHandler("kolleccAgentRes_")
-    public static void kolleccAgentResStep1(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String faction = buttonID.split("_")[1];
-        Player p2 = game.getPlayerFromColorOrFaction(faction);
-        String msg2 = player.getFactionEmojiOrColor() + " selected "
-                + p2.getFactionEmojiOrColor() + " as user of "
-                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Captain Dust, the Kollecc" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                + " agent.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        List<Button> buttons = getKolleccAgentButtons(game, p2);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), p2.getRepresentationUnfogged() + " use buttons to resolve", buttons);
-        ButtonHelper.deleteMessage(event);
-    }
 
     @ButtonHandler("kolleccAgentResStep2_")
     public static void kolleccAgentResStep2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
@@ -56,22 +35,5 @@ class KollectAgentButtonHandler {
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         ButtonHelper.deleteMessage(event);
-    }
-
-    private static List<Button> getKolleccAgentButtons(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        Set<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(game, player);
-        for (String type : types) {
-            if ("industrial".equals(type)) {
-                buttons.add(Buttons.green("kolleccAgentResStep2_industrial", "Explore Industrials X 2"));
-            }
-            if ("cultural".equals(type)) {
-                buttons.add(Buttons.blue("kolleccAgentResStep2_cultural", "Explore Culturals X 2"));
-            }
-            if ("hazardous".equals(type)) {
-                buttons.add(Buttons.red("kolleccAgentResStep2_hazardous", "Explore Hazardous X 2"));
-            }
-        }
-        return buttons;
     }
 }

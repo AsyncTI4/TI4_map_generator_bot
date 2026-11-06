@@ -43,6 +43,8 @@ public class GameProperties {
     @Deprecated // can be removed?
     private @ExportableField long startedDate;
 
+    private String revisionKey;
+
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
@@ -107,6 +109,7 @@ public class GameProperties {
     private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
+    private boolean oneWayAdjacency;
     private boolean queueSO = true;
     private boolean showBanners = true;
     private boolean showBubbles = true;
@@ -117,6 +120,7 @@ public class GameProperties {
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
     private boolean showOwnedPNsInPlayerArea;
+    private int wormholeTokenMergeFrom;
     private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;

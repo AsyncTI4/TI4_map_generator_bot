@@ -134,6 +134,10 @@ public enum FactionEmojis implements TI4Emoji {
     dream,
     ashen,
     natau,
+    valhavn,
+    migo,
+    deep,
+    bloom,
 
     // luminous
     arachnera,
@@ -464,6 +468,10 @@ public enum FactionEmojis implements TI4Emoji {
             case "netrunners" -> netrunners;
             case "crystellum" -> crystellum;
             case "natau" -> natau;
+            case "valhavn" -> valhavn;
+            case "migo" -> migo;
+            case "deep" -> deep;
+            case "bloom" -> bloom;
 
             case "arachnera" -> arachnera;
             case "psm" -> psm;

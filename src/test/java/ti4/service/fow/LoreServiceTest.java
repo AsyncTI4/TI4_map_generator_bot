@@ -455,6 +455,19 @@ class LoreServiceTest extends BaseTi4Test {
         }
 
         @Test
+        void oneWayWormholeTokenIsPlacedAndRemovedByItsId() {
+            // Generated tokens have no image file; lore must still resolve the id to the stored file name,
+            // and planet lore puts them in space, the only holder that draws their ring.
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!token whalpha_in"), systemTile, "mr", true);
+            var tokens = systemTile.getUnitHolders().get(Constants.SPACE).getTokenList();
+            assertTrue(tokens.contains("token_oneway_whalpha_in.png"));
+            assertFalse(systemTile.getUnitHolders().get("mr").getTokenList().contains("token_oneway_whalpha_in.png"));
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!removetoken whalpha_in"), systemTile, "mr", true);
+            assertFalse(tokens.contains("token_oneway_whalpha_in.png"));
+        }
+
+        @Test
         void attachmentNameResolvesToImageFilenameNotBareModelId() {
             // Regression: "positiveres" is an attachment id (Mapper.getAttachmentInfo), not a
             // generic token — Mapper.getTokenID alone can't resolve it, so it used to be stored as
@@ -2662,6 +2675,33 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!sethyperlane 000 " + encoded), systemTile, Constants.SPACE, true);
             assertEquals(encoded, storedEncoded());
+        }
+
+        // One-way lanes are stored as an asymmetric matrix. Both effects work on the stored form, so they must
+        // not mirror it back into a two-way lane.
+        private static final String ONE_WAY_0_TO_3 =
+                "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        private static final String ONE_WAY_1_TO_4 =
+                "0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+
+        @Test
+        void rotateKeepsAOneWayLaneOneWay() {
+            CustomHyperlaneService.insertStoredData(game, "000", ONE_WAY_0_TO_3);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000"), systemTile, Constants.SPACE, true);
+            assertEquals(ONE_WAY_1_TO_4, game.getCustomHyperlaneData().get("000"));
+        }
+
+        @Test
+        void sethyperlaneKeepsAOneWayLaneOneWay() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player,
+                    game,
+                    entry("!sethyperlane 000 " + CustomHyperlaneService.encodeMatrix(ONE_WAY_0_TO_3)),
+                    systemTile,
+                    Constants.SPACE,
+                    true);
+            assertEquals(ONE_WAY_0_TO_3, game.getCustomHyperlaneData().get("000"));
         }
 
         @Test

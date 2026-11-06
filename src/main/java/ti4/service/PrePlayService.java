@@ -71,7 +71,7 @@ public class PrePlayService {
     public static void sendPrePlayButtons(Player player, String card, String msg, String buttonLabel) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(PREFIX + card, buttonLabel));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 

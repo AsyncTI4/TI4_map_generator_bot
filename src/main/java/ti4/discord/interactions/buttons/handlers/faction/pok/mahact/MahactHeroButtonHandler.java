@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -17,6 +18,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
@@ -91,6 +93,7 @@ class MahactHeroButtonHandler {
             AddUnitService.addUnits(event, tile2, game, player.getColor(), totalUnits + " " + unitName);
             if (damagedUnits > 0) {
                 game.getTileByPosition(pos2).addUnitDamage("space", unitKey, damagedUnits);
+                StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
             }
         }
         // this will catch all the capacity units left behind in the previous iteration
@@ -115,6 +118,7 @@ class MahactHeroButtonHandler {
             AddUnitService.addUnits(event, tile2, game, player.getColor(), totalUnits + " " + unitName);
             if (damagedUnits > 0) {
                 game.getTileByPosition(pos2).addUnitDamage(Constants.SPACE, unitKey, damagedUnits);
+                StonebornUnitHandler.syncMobileMountainDamage(game, player, unitKey);
             }
         }
 
@@ -157,7 +161,8 @@ class MahactHeroButtonHandler {
         if (!players2.isEmpty()) {
             player = players2.getFirst();
         }
-        for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false)) {
+        // TODO: Benediction moves ships; should it obey Travel Ban (mahact.md VIII) via forMovement()?
+        for (String pos2 : Adjacency.of(game, player).forEffects().from(pos1)) {
             if (pos1.equalsIgnoreCase(pos2)) {
                 continue;
             }

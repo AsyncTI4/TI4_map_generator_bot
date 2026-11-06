@@ -12,7 +12,9 @@ class SteelBalanceCount extends GameStateSubcommand {
 
     public SteelBalanceCount() {
         super("steelbalance_count", "Set steel balance amount", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, "count", "Count")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
     }
 
     @Override

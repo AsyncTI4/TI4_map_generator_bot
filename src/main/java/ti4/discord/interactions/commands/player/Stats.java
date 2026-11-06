@@ -57,10 +57,12 @@ class Stats extends GameStateSubcommand {
                         OptionType.STRING,
                         Constants.COMMODITIES,
                         "Commodity count - can use +1/-1 etc. to add/subtract"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_BASE, "Base commodity value"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_BASE, "Base commodity value")
+                        .setRequiredRange(0, 99))
                 .addOptions(
                         new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "Number of turns this round"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "Number of turns this round")
+                        .setRequiredRange(0, 99))
                 .addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.SC_PLAYED,

@@ -113,7 +113,7 @@ public class XinHeroHandler {
         resolveTarget(player, target);
         List<Button> buttons =
                 new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, strategyCard));
-        buttons.add(Buttons.red(player.factionButtonChecker() + COMPLETE_SECONDARY, "Done Resolving"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + COMPLETE_SECONDARY, "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is resolving the secondary ability of **"

@@ -60,7 +60,7 @@ class IxthianGiftAcd2ButtonHandler {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No valid target for _Ixthian Gift_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -93,7 +93,7 @@ class IxthianGiftAcd2ButtonHandler {
                     target.getRepresentationNoPing() + " controls no non-home planet for _Ixthian Gift_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose a non-home planet " + target.getRepresentationNoPing()

@@ -15,6 +15,8 @@ import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.SecretObjectiveInfoService;
 
 @UtilityClass
@@ -94,6 +96,8 @@ class BlackMarketIntelAcd2ButtonHandler {
 
         player.removeSecret(soIdentifier);
         target.setSecret(soID);
+        KnownCardsService.recordCardPassed(
+                player, target, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
 
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, target);

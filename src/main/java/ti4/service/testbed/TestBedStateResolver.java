@@ -16,6 +16,12 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
+import ti4.image.map.MapSegment;
+import ti4.service.fow.FogGameSummaryService;
+import ti4.service.fow.FogPreset;
+import ti4.service.fow.FogPresetService;
+import ti4.service.map.CustomHyperlaneService;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 public class TestBedStateResolver {
@@ -42,7 +48,12 @@ public class TestBedStateResolver {
             "exploreDeck",
             "relicDeck",
             "decks",
-            "borderAnomalies");
+            "borderAnomalies",
+            "customAdjacencies",
+            "customHyperlanes",
+            "fowOptions",
+            "fogPreset",
+            "sectors");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
             "commodities",
@@ -138,6 +149,30 @@ public class TestBedStateResolver {
             case "borderAnomalies" ->
                 joinSorted(game.getBorderAnomalies().stream()
                         .map(border -> border.getTile() + ":" + border.getDirection() + ":" + border.getType())
+                        .toList());
+            case "customAdjacencies" ->
+                joinSorted(game.getCustomAdjacentTiles().entrySet().stream()
+                        .flatMap(entry -> entry.getValue().stream().map(listed -> entry.getKey() + ">" + listed))
+                        .toList());
+            case "customHyperlanes" ->
+                joinSorted(game.getCustomHyperlaneData().entrySet().stream()
+                        .map(entry -> entry.getKey() + ":" + CustomHyperlaneService.toTypedMatrix(entry.getValue()))
+                        .toList());
+            case "fowOptions" ->
+                joinSorted(FogGameSummaryService.enabledOptions(game).stream()
+                        .map(FOWOption::toString)
+                        .toList());
+            case "fogPreset" ->
+                FogPresetService.matching(game).map(FogPreset::getId).orElse("custom");
+            case "sectors" ->
+                joinSorted(MapSegment.all(game).stream()
+                        .map(segment -> segment.name() + ":"
+                                + segment.kind().name().toLowerCase() + ":"
+                                + String.join(
+                                        " ",
+                                        segment.sortedPositions().stream()
+                                                .filter(game.getTileMap()::containsKey)
+                                                .toList()))
                         .toList());
             default -> "<unknown " + field + ">";
         };

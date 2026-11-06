@@ -15,7 +15,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "After you roll for a round of combat, you may spend 1 command token from your strategy pool to produce 2 additional hits."
+    "ability": "After you roll for a round of combat: You may spend 1 command token from your strategy pool to produce 2 additional hits."
   },
   {
     "id": "ardentia_mech",
@@ -30,7 +30,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: During the Commit Ground Forces step in a system adjacent to or containing a planet you control, you may spend 3 influence to commit 1 mech and 1 infantry from your reinforcements."
+    "ability": "DEPLOY: During the \"Commit Ground Forces\" step in a system adjacent to or containing a planet you control: You may spend 3 influence to commit 1 mech from your reinforcements."
   },
   {
     "id": "verydith_flagship",
@@ -48,7 +48,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Non-fighter ships in this system roll 1 additional combat die if this system contains another player's command token."
+    "ability": "Non-fighter ships in this system roll 1 additional die during combat if this system contains another player's command token."
   },
   {
     "id": "verydith_mech",
@@ -63,7 +63,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "Other players must spend 1 influence or destroy 1 unit they control in order to return a token from a system that contains exactly 1 of your mechs to their reinforcements."
+    "ability": "Other players must spend 1 influence or destroy 1 unit they control in order to return a token from a system that contains this unit to their reinforcements."
   },
   {
     "id": "veylor_flagship",
@@ -81,7 +81,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "At the end of a round of space combat involving this unit, you may discard 1 action card to assign 1 hit to a non-carrier ship in this system."
+    "ability": "When this unit produces 1 or more hits: You may discard any number of action cards to assign that many of those hits to an opponent's ship in this system."
   },
   {
     "id": "veylor_mech",
@@ -92,11 +92,11 @@
     "faction": "veylor",
     "capacityUsed": 1,
     "cost": 2,
-    "combatHitsOn": 5,
+    "combatHitsOn": 6,
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When you exhaust this unit's planet to vote, cast 2 additional votes."
+    "ability": "When you exhaust this unit's planet to cast votes: Cast 2 additional votes."
   },
   {
     "id": "myrr_flagship",
@@ -129,7 +129,7 @@
     "combatDieCount": 2,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: After movement, you may remove 2 of your fighters or infantry from the space area of the active system to place 1 mech from your reinforcements with your units in the active system."
+    "ability": "DEPLOY: After movement: You may remove 2 of your fighters or infantry from the active system to place 1 mech from your reinforcements with your units in that system."
   },
   {
     "id": "myrr_dreadnought",
@@ -151,7 +151,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-     "ability": "This unit can only produce dreadnoughts or units that can be transported that are in the space area of this system."
+     "ability": "This unit can only produce units of the same type as those that are in the space area of its system."
   },
   {
     "id": "myrr_dreadnought2",
@@ -174,7 +174,7 @@
     "sustainDamage": true,
     "canBeDirectHit": false,
     "isShip": true,
-    "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. This unit can only produce dreadnoughts or units that can be transported that are in the space area of this system."
+    "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. This unit can only produce units of the same type as those in its system."
   },
   {
     "id": "kairn_flagship",
@@ -192,7 +192,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "When you gain control of a planet in this unit's system, gain 1 commodity."
+    "ability": "When you gain control of a planet in this unit's system: Gain 1 commodity."
   },
   {
     "id": "kairn_mech",
@@ -207,7 +207,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "Once per action, at the end of a tactical action, if a planet in the active system contains exactly 2 of your mechs, you may explore that planet."
+    "ability": "Once per action, at the end of a tactical action, if a planet in the active system contains exactly 2 of your mechs: You may explore that planet."
   },
   {
     "id": "kryxos_flagship",
@@ -251,7 +251,7 @@
     "afbHitsOn": 6,
     "afbDieCount": 2,
     "isShip": true,
-    "ability": "When you would research or gain a technology, you may flip this card instead."
+    "ability": "When you would research a technology: You may flip this card instead."
   },
   {
     "id": "kryxos_flagship3",
@@ -262,8 +262,8 @@
     "requiredTechId": "thkryxosfs2",
     "source": "theodisi",
     "faction": "kryxos",
-    "moveValue": 4,
-    "capacityValue": 12,
+    "moveValue": 3,
+    "capacityValue": 9,
     "capacityUsed": 1,
     "cost": 8,
     "combatHitsOn": 2,
@@ -273,7 +273,7 @@
     "afbHitsOn": 4,
     "afbDieCount": 3,
     "isShip": true,
-    "ability": "When this unit uses SUSTAIN DAMAGE, cancel an additional hit."
+    "ability": "When this unit uses SUSTAIN DAMAGE: Cancel an additional hit."
   },
   {
     "id": "kryxos_mech",
@@ -306,12 +306,12 @@
     "capacityUsed": 1,
     "cost": 2,
     "combatHitsOn": 6,
-    "combatDieCount": 2,
+    "combatDieCount": 1,
     "sustainDamage": true,
     "bombardHitsOn": 6,
     "bombardDieCount": 2,
     "isGroundForce": true,
-    "ability": "When you research or gain a technology, you may flip this card instead."
+    "ability": "When you would research a technology: You may flip this card instead."
   },
   {
     "id": "kryxos_mech3",
@@ -324,13 +324,13 @@
     "faction": "kryxos",
     "capacityUsed": 1,
     "cost": 2,
-    "combatHitsOn": 4,
+    "combatHitsOn": 6,
     "combatDieCount": 2,
     "sustainDamage": true,
-    "bombardHitsOn": 4,
+    "bombardHitsOn": 6,
     "bombardDieCount": 2,
     "isGroundForce": true,
-    "ability": "When this unit produces a hit, you may SUSTAIN DAMAGE to place infantry with this unit up to the number of hits produced."
+    "ability": "When this unit produces 1 or more hits: You may damage it to place up to that many infantry from your reinforcements with this unit."
   },
   {
     "id": "arcanum_flagship",
@@ -348,7 +348,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "At the start of combat in this system, select 1 technology color. This unit rolls additional combat dice equal to the number of technologies you own of that color."
+    "ability": "At the start of combat in this system: Select 1 technology color. This unit rolls additional combat dice equal to the number of technologies you own of that color."
   },
   {
     "id": "arcanum_mech",
@@ -363,7 +363,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When you research a technology you may damage this unit to ignore any 1 prerequisite on that technology."
+    "ability": "When you research a technology: You may damage this unit to ignore any 1 prerequisite on that technology."
   },
   {
     "id": "xytheris_flagship",
@@ -388,7 +388,7 @@
     "canBeDirectHit": true,
     "isShip": true,
     "notes": "This unit's extra dice are auto-calculated based on how many ground forces are in its space area, assuming the flagship is getting filled first.",
-    "ability": "During your tactical actions, this unit rolls additional combat and unit ability dice equal to the number of ground forces it transported."
+    "ability": "During your tactical actions: This unit rolls additional combat and unit ability dice equal to the number of ground forces it transported."
   },
   {
     "id": "xytheris_mech",
@@ -405,7 +405,7 @@
     "spaceCannonHitsOn": 9,
     "spaceCannonDieCount": 2,
     "isGroundForce": true,
-    "ability": "DEPLOY: After a player moves ships, if the active system contains a planet you control, pay 2 trade goods to replace 1 of your infantry in that system with a mech from reinforcements."
+    "ability": "DEPLOY: After a player moves ships into a system containing a planet you control: You may spend 2 trade goods to place 1 mech from your reinforcements on a planet you control in that system."
   },
   {
     "id": "xytheris_destroyer",
@@ -457,7 +457,7 @@
     "source": "theodisi",
     "faction": "oblivion",
     "moveValue": 1,
-    "capacityValue": 3,
+    "capacityValue": 5,
     "capacityUsed": 1,
     "cost": 8,
     "combatHitsOn": 5,
@@ -465,7 +465,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "If this unit's system contains no planets, you may treat this unit's system as adjacent to all non-fracture systems that contain no planets. During movement, this ship may move before or after your other ships."
+    "ability": "You may treat this ship as adjacent to all systems that contain no planets."
   },
   {
     "id": "oblivion_mech",
@@ -480,7 +480,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you purge 1 or more components, place 1 mech from your reinforcements on a planet you control."
+    "ability": "DEPLOY: When you purge 1 or more components: Place 1 mech from your reinforcements on a planet you control."
   },
   {
     "id": "revenant_flagship",
@@ -513,7 +513,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "DEPLOY: When you exhaust an agent for its effect, place 1 mech on a planet you control."
+    "ability": "DEPLOY: When you exhaust an agent to resolve its ability: You may damage this unit to place 1 infantry from your reinforcements on this unit's planet."
   },
   {
     "id": "thrones_flagship",
@@ -523,15 +523,15 @@
     "source": "theodisi",
     "faction": "thrones",
     "moveValue": 2,
-    "capacityValue": 6,
+    "capacityValue": 4,
     "capacityUsed": 1,
     "cost": 8,
-    "combatHitsOn": 5,
+    "combatHitsOn": 7,
     "combatDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "This unit's system is always treated as a nebula."
+    "ability": "You may treat this unit's system as a nebula."
   },
   {
     "id": "thrones_mech",
@@ -546,7 +546,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "When 1 or more dice are rolled, you may destroy this unit to increase the value of 1 die by 3.",
+    "ability": "When 1 or more dice are rolled: You may destroy this unit to apply +3 to the result of 1 of those rolls.",
     "notes": "After rolling dice, the bot offers a button to destroy a Ghola. If a die can become a hit with +3, the highest eligible die produces 1 additional hit."
   },
   {
@@ -573,7 +573,7 @@
     "bombardHitsOn": 5,
     "bombardDieCount": 2,
     "isShip": true,
-    "ability": "The Aurelion Station token is also a ship that can be produced. While you control this unit, gain the Aurelion station card."
+    "ability": "The Aurelion Station token is also a ship that can be produced. While you control this unit: Gain the Aurelion station card."
   },
   {
     "id": "aeterna_flagship",
@@ -591,7 +591,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Once per action, when a fighter is destroyed in a system containing or adjacent to this unit, place 1 control token on this card. Increase this unit's capacity by 2 for each control token on this unit."
+    "ability": "Once per action, when a fighter is destroyed in a system containing or adjacent to this unit: Place 1 control token on this card. Increase this unit's capacity value by 2 for each control token on this card."
   },
   {
     "id": "aeterna_mech",
@@ -606,7 +606,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "After a round of ground combat, you may destroy this unit to destroy 2 of your opponent's ground forces on that planet."
+    "ability": "After a round of ground combat: You may destroy this unit to destroy 2 of your opponent's ground forces on that planet."
   },
   {
     "id": "aeterna_spacedock",
@@ -618,7 +618,7 @@
     "faction": "aeterna",
     "productionValue": 6,
     "isStructure": true,
-    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity, or you may produce 1 unit of the same type in this system, if able. Up to 4 fighters in this unit's system do not count against capacity."
+    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed: Gain 1 commodity, or you may produce 1 unit of the same type in this system, if able. Up to 4 fighters in this unit's system do not count against capacity."
   },
   {
     "id": "aeterna_spacedock2",
@@ -631,7 +631,7 @@
     "faction": "aeterna",
     "productionValue": 8,
     "isStructure": true,
-    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity, and you may produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
+    "ability": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed: Gain 1 commodity, and you may produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
   },
   {
     "id": "ponthous_flagship",
@@ -649,7 +649,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "At the start of combat in this unit's system, you may damage this unit to give up to 2 fighters in this system SUSTAIN DAMAGE until the end of that combat.",
+    "ability": "At the start of combat in this unit's system: You may damage this unit to give up to 2 fighters in this system SUSTAIN DAMAGE until the end of that combat.",
     "notes": "There is no way to show which fighters are sustained, you will have to keep track. However, the manual assign and auto-assign don't offer fighter sustains past when 2 fighters are sustained."
   },
   {
@@ -665,7 +665,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "The first time this unit would be destroyed during each combat, it is not."
+    "ability": "The first time this unit would be destroyed during each combat: It is not."
   },
   {
     "id": "ponthous_destroyer",
@@ -724,7 +724,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "When this unit uses SUSTAIN DAMAGE, you may destroy it to cancel up to 4 additional hits your opponent produced."
+    "ability": "When this unit uses SUSTAIN DAMAGE to cancel a hit produced by your opponent's units: You may destroy it to cancel up to 4 additional hits your opponent produced."
   },
   {
     "id": "vanguard_mech",
@@ -739,7 +739,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "After you activate a system, you may give one ship in this unit’s system SUSTAIN DAMAGE until the end of that action."
+    "ability": "After you activate a system: You may give 1 ship in this unit's system SUSTAIN DAMAGE until the end of that action."
   },
   {
     "id": "scrapyard_flagship",
@@ -752,12 +752,12 @@
     "capacityValue": 2,
     "capacityUsed": 1,
     "cost": 6,
-    "combatHitsOn": 7,
+    "combatHitsOn": 9,
     "combatDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "Apply +1 to the MOVE values of units that start their movement in this system if this unit does not move."
+    "ability": "Apply +1 to the move values of units that start their movement in this system if this unit does not move."
   },
   {
     "id": "scrapyard_mech",
@@ -772,7 +772,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "During the \"Assign Hits\" step of space combat, if this unit is in the space area of that system, you may damage this unit to produce 1 additional hit."
+    "ability": "During the \"Assign Hits\" step of space combat, if this unit is in the space area of that system: You may damage this unit to produce 1 additional hit."
   },
   {
     "id": "scrapyard_fighter",
@@ -787,7 +787,7 @@
     "combatHitsOn": 9,
     "combatDieCount": 1,
     "isShip": true,
-    "ability": "After you activate a system, destroy any number of your fighters; apply +1 to the move value of 1 ship during this action for every 4 fighters you destroy."
+    "ability": "After you activate a system: Destroy any number of your fighters; apply +1 to the move value of 1 ship during this action for every 4 fighters you destroy."
   },
   {
     "id": "scrapyard_fighter2",
@@ -804,7 +804,7 @@
     "combatHitsOn": 8,
     "combatDieCount": 1,
     "isShip": true,
-    "ability": "After you activate a system, destroy any number of your fighters to apply +1 to the move value of 1 of your ships during this action for every 2 fighters you destroy. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+    "ability": "After you activate a system: Destroy any number of your fighters to apply +1 to the move value of 1 of your ships during this action for every 2 fighters you destroy. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
   },
   {
     "id": "stoneborn_flagship",
@@ -822,7 +822,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "While you control this unit, gain the \"Mobile Mountain\" planet card."
+    "ability": "This unit is also a planet of each trait. When you would exhaust this planet's planet card: Damage this unit instead. Units cannot be placed on or committed to this planet. You cannot lose control of this planet while you control this unit."
   },
   {
     "id": "stoneborn_mechdormant",
@@ -837,7 +837,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "At the end of the status phase, you may remove 3 of your mechs from the same planet to draw 1 random Stoneborn relic fragment.\n\n**UNLEASH**: Return 2 red fragmentum tokens from your player sheet."
+    "ability": "**UNLEASH**: Return 1 red and 1 blue Fragmentum token from your faction sheet.\n\nWhen you explore a planet that contains this unit: You may damage this unit to draw 1 additional exploration card. Choose 1 of the drawn cards to resolve and shuffle the remaining card into that exploration deck."
   },
   {
     "id": "stoneborn_mechunleashed",
@@ -852,7 +852,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "At the end of the status phase, you may remove 2 of your mechs from the same planet to draw 1 random Stoneborn relic fragment."
+    "ability": "When you explore a planet that contains this unit: You may draw 1 additional exploration card. Choose 1 of the drawn cards to resolve and shuffle the remaining card into that exploration deck."
   },
   {
     "id": "stoneborn_dreadnought",
@@ -873,7 +873,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "DEPLOY: At the start of your turn, you may purge 2 relic fragments to place 1 dreadnought in a system containing your ships."
+    "ability": "DEPLOY: Once per turn, at the end of your turn: You may purge 2 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships."
   },
   {
     "id": "stoneborn_dreadnought2dormant",
@@ -895,7 +895,7 @@
     "sustainDamage": true,
     "canBeDirectHit": false,
     "isShip": true,
-    "ability": "DEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards.\nUNLEASH: Return 2 blue fragmentum tokens from your player sheet."
+    "ability": "**UNLEASH**: Return 2 blue Fragmentum tokens from your faction sheet.\n\nDEPLOY: Once per turn, at the end of your turn: You may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" action cards."
   },
   {
     "id": "stoneborn_dreadnought2unleashed",
@@ -913,11 +913,11 @@
     "combatHitsOn": 5,
     "combatDieCount": 2,
     "bombardHitsOn": 5,
-    "bombardDieCount": 1,
+    "bombardDieCount": 2,
     "sustainDamage": true,
     "canBeDirectHit": false,
     "isShip": true,
-    "ability": "DEPLOY: At the start of your turn, you may purge 1 relic fragment to place 1 dreadnought in a system containing your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+    "ability": "DEPLOY: Once per turn, at the end of your turn: You may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" action cards."
   },
   {
     "id": "morpha_flagship",
@@ -935,7 +935,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "DEPLOY: At the end of movement in a system that contains your ships, you may discard 1 action card to place this unit in the active system. At the end of that tactical action, return this unit to your reinforcements."
+    "ability": "DEPLOY: At the end of movement in a system that contains your ships: You may discard 1 action card to place this unit in the active system. At the end of that tactical action: Return this unit to your reinforcements."
   },
   {
     "id": "morpha_mech",
@@ -950,7 +950,7 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "Action cards cannot be used during a combat in a system that contains at least 2 of your mechs."
+    "ability": "Action cards cannot be played during combat in a system that contains at least 2 of your mechs."
   },
   {
     "id": "morpha_carrier",
@@ -968,7 +968,7 @@
     "combatDieCount": 1,
     "isShip": true,
     "notes": "Will only trigger off discards of 2 or more that happen at once. Anytime you discard more than 1 manually it won't trigger.",
-    "ability": "Once per action, when you discard 2 or more action cards, you may either produce 1 carrier in a system containing your ships, or move 1 carrier you control to a system that contains 1 of your space docks (it may transport units)."
+    "ability": "Once per action, when you discard 2 or more action cards: You may either produce 1 carrier in a system containing your ships or move 1 carrier you control to your home system if it contains no other player's ships. That carrier may transport units."
   },
   {
     "id": "morpha_carrier2",
@@ -986,7 +986,7 @@
     "combatHitsOn": 9,
     "combatDieCount": 1,
     "isShip": true,
-    "ability": "Once per action, when you discard 1 or more action cards, you may either produce 1 carrier in a system containing your ships, or move 1 carrier you control to a system that contains 1 of your space docks (it may transport units)."
+    "ability": "Once per action, when you discard 1 or more action cards: You may either produce 1 carrier in a system containing your ships or move 1 carrier you control to your home system if it contains no other player's ships. That carrier may transport units."
   },
   {
     "id": "thurviali_flagship",
@@ -1004,7 +1004,7 @@
     "sustainDamage": true,
     "canBeDirectHit": true,
     "isShip": true,
-    "ability": "DEPLOY: At any time, you may remove 2 structures from a planet you control in a system that contains your ships to place this unit from your reinforcements in that system."
+    "ability": "DEPLOY: At any time: You may remove 2 structures from a planet you control in a system that contains your ships to place this unit from your reinforcements in that system."
   },
   {
     "id": "thurviali_mech",
@@ -1019,6 +1019,6 @@
     "combatDieCount": 1,
     "sustainDamage": true,
     "isGroundForce": true,
-    "ability": "Your mechs have the text abilities of the mechs of each player you are currently coexisting with."
+    "ability": "Your mechs have the ability text of the mechs of each player with whom your units are coexisting."
   }
 ]

@@ -38,7 +38,7 @@ public class XytherisUnitHandler {
                         PlanetEmojis.getPlanetEmoji(planet.getName())));
             }
         }
-        planets.add(Buttons.red("deleteButtons", "Decline"));
+        planets.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

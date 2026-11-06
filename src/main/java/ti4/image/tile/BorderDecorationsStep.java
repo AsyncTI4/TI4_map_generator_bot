@@ -1,10 +1,20 @@
 package ti4.image.tile;
 
+import static ti4.image.tile.TileGeometry.TILE_HEIGHT;
+import static ti4.image.tile.TileGeometry.TILE_PADDING;
+import static ti4.image.tile.TileGeometry.TILE_WIDTH;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
@@ -48,11 +58,19 @@ final class BorderDecorationsStep implements TileStepPainter {
         Game game = scene.game();
         Tile tile = layer.tile();
         List<String> orderedAdjacentPositions = MapPositionMapper.getAdjacentTilePositions(tile.getPosition());
+        Map<BorderAnomalyModel, Set<Integer>> wholeHexEdges = new LinkedHashMap<>();
         game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
             BorderAnomalyModel anomalyModel = borderAnomalyHolder.getModel();
-            if (anomalyModel != null
-                    && borderAnomalyHolder.getTile().equals(tile.getPosition())
-                    && isVisible(scene, tile, borderAnomalyHolder, orderedAdjacentPositions)) {
+            if (anomalyModel == null
+                    || !borderAnomalyHolder.getTile().equals(tile.getPosition())
+                    || !isVisible(scene, tile, borderAnomalyHolder, orderedAdjacentPositions)) {
+                return;
+            }
+            if (anomalyModel.isWholeHex()) {
+                wholeHexEdges
+                        .computeIfAbsent(anomalyModel, model -> new TreeSet<>())
+                        .add(borderAnomalyHolder.getDirection());
+            } else {
                 drawDecoration(
                         borderAnomalyHolder.getDirection(),
                         null,
@@ -60,6 +78,39 @@ final class BorderDecorationsStep implements TileStepPainter {
                         ImageResources.border(anomalyModel.getImagePath()));
             }
         });
+        wholeHexEdges.forEach((anomalyModel, directions) -> drawWholeHex(layer.g(), anomalyModel, directions));
+    }
+
+    private static void drawWholeHex(
+            Graphics2D tileGraphics, BorderAnomalyModel anomalyModel, Set<Integer> directions) {
+        String imagePath = ImageResources.border(anomalyModel.getImagePath());
+        BufferedImage image = imagePath == null ? null : ImageHelper.read(imagePath);
+        if (image == null) {
+            return;
+        }
+        Graphics2D edges = (Graphics2D) tileGraphics.create();
+        edges.clip(edgeWedges(directions));
+        edges.drawImage(
+                image,
+                TILE_PADDING + (TILE_WIDTH - image.getWidth()) / 2,
+                TILE_PADDING + (TILE_HEIGHT - image.getHeight()) / 2,
+                null);
+        edges.dispose();
+    }
+
+    private static Shape edgeWedges(Set<Integer> directions) {
+        double centerX = TILE_PADDING + HEX_CENTER_X;
+        double centerY = TILE_PADDING + HEX_CENTER_Y;
+        Path2D wedges = new Path2D.Double();
+        for (int direction : directions) {
+            wedges.moveTo(centerX, centerY);
+            for (int cornerOffset : new int[] {-30, 30}) {
+                double angle = Math.toRadians(60.0 * direction + cornerOffset);
+                wedges.lineTo(centerX + TILE_WIDTH * Math.sin(angle), centerY - TILE_WIDTH * Math.cos(angle));
+            }
+            wedges.closePath();
+        }
+        return wedges;
     }
 
     private static boolean isVisible(

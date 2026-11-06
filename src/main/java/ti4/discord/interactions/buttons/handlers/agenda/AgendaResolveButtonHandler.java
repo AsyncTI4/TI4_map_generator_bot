@@ -459,11 +459,11 @@ class AgendaResolveButtonHandler {
             }
             if (aCount < 3) {
                 electVoiceOfTheCouncil = Buttons.gray("elect_voice_of_the_council", electVoiceText);
-                proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to scoring objectives");
+                proceedToScoring = Buttons.PROCEED_TO_SCORING_OBJECTIVES;
             } else {
                 electVoiceOfTheCouncil = Buttons.green("elect_voice_of_the_council", electVoiceText);
                 if (mustElectVoice) {
-                    proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to Scoring Objectives");
+                    proceedToScoring = Buttons.PROCEED_TO_SCORING_OBJECTIVES;
                 } else {
                     String speakerUserID = game.getSpeakerUserID();
                     Player speaker = game.getPlayer(speakerUserID);

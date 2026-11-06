@@ -37,7 +37,8 @@ public class ShowDistancesCommand extends GameStateCommand {
     public List<OptionData> getOptions() {
         List<OptionData> options = new ArrayList<>();
         options.add(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name", true, true));
-        options.add(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+        options.add(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")
+                .setRequiredRange(0, 30));
         options.add(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color", false, true));
         return options;
     }

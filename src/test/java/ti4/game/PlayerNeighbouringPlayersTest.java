@@ -13,12 +13,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ti4.game.persistence.TestGameHarness;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
+import ti4.helpers.adjacency.WormholeRule;
 import ti4.model.ColorModel;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
+import ti4.service.fow.FOWPlusService;
 import ti4.testUtils.BaseTi4Test;
 
 class PlayerNeighbouringPlayersTest extends BaseTi4Test {
@@ -84,6 +88,55 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
         }
     }
 
+    // One-way adjacency on (and fog): abilities use the acting player's own rules. Creuss (Lodor, alpha) reaches Hacan
+    // (Quann, beta) through Quantum Entanglement; ghost.md QE II makes them neighbours from Hacan's side too.
+    @Test
+    void quantumEntanglementNeighboursBothWaysWithOneWayAdjacency() {
+        Game game = directedGame("26", "101", "25", "104");
+        Player creuss = seat(game, "ghost", "blue", "101");
+        Player hacan = seat(game, "hacan", "yellow", "104");
+
+        assertThat(creuss.getAbilityNeighbours()).containsExactly(hacan);
+        assertThat(hacan.getAbilityNeighbours()).containsExactly(creuss);
+    }
+
+    // Travel Ban must not let another player's holder-only links count: Lazax Gate Folding links Mecatol to Hacan's
+    // alpha system (Lodor, 201) only for the folding Winnu player.
+    @Test
+    void travelBanDoesNotLendAnotherPlayersGateFolding() {
+        Game game = directedGame("26", "201");
+        game.addLaw("travel_ban", null);
+        Player winnu = seat(game, "winnu", "green", "000");
+        Player hacan = seat(game, "hacan", "yellow", "201");
+        winnu.addTech("lgf");
+        game.setActivePlayerID(winnu.getUserID());
+        game.setActiveSystem("000");
+
+        assertThat(winnu.getAbilityNeighbours()).containsExactly(hacan);
+        assertThat(hacan.getAbilityNeighbours()).isEmpty();
+    }
+
+    // Mecatol plus the given tile id/position pairs, one-way adjacency on.
+    private static Game directedGame(String... tilesAndPositions) {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("directed-neighbours");
+        game.setTile(new Tile("18", "000"));
+        for (int i = 0; i < tilesAndPositions.length; i += 2) {
+            game.setTile(new Tile(tilesAndPositions[i], tilesAndPositions[i + 1]));
+        }
+        game.setOneWayAdjacency(true);
+        return game;
+    }
+
+    private static Player seat(Game game, String faction, String color, String cruiserAt) {
+        Player player = game.addPlayer(faction + "-user", faction);
+        player.setFaction(game, faction);
+        player.setColor(color);
+        game.getTileByPosition(cruiserAt).addUnit("space", Units.getUnitKey(UnitType.Cruiser, player.getColorID()), 1);
+        return player;
+    }
+
     private static void assertMatchesLegacy(Game game) {
         List<Player> everyone = new ArrayList<>(game.getPlayers().values());
         assertThat(everyone).isNotEmpty();
@@ -113,7 +166,7 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
         }
 
         for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(game, tile.getPosition(), false));
+            adjacentPlayers.addAll(legacyAdjacentPlayers(game, tile.getPosition()));
             if (realPlayers.size() == adjacentPlayers.size()) break;
         }
         adjacentPlayers.remove(self);
@@ -126,6 +179,27 @@ class PlayerNeighbouringPlayersTest extends BaseTi4Test {
             }
         }
         return adjacentPlayers;
+    }
+
+    // FoWHelper.getAdjacentPlayers as it was before PR-D turned it to the systems that reach the position.
+    private static List<Player> legacyAdjacentPlayers(Game game, String position) {
+        List<Player> players = new ArrayList<>();
+        if (FOWPlusService.isVoid(game, position)) return players;
+        Set<String> tilesToCheck = Adjacency.of(game).withSelf().from(position);
+        for (Player player : game.getRealPlayers()) {
+            Set<String> tiles = new HashSet<>(tilesToCheck);
+            if (player.hasAbility("quantum_entanglement") || ButtonHelper.isLawInPlay(game, "travel_ban")) {
+                tiles.addAll(WormholeRule.connectionsFrom(game, player, position));
+            }
+            for (String other : tiles) {
+                Tile tile = game.getTileByPosition(other);
+                if (tile != null && FoWHelper.playerIsInSystem(game, tile, player, true)) {
+                    players.add(player);
+                    break;
+                }
+            }
+        }
+        return players;
     }
 
     static Game syntheticGame(int playerCount, int rings, long seed, boolean quantumEntanglement, boolean travelBan) {

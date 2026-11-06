@@ -1,0 +1,18 @@
+services:
+  postgres-test:
+    image: postgres:16
+    ports:
+      - "127.0.0.1:55432:5432"
+    environment:
+      POSTGRES_DB: tibot_ci_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ci_bootstrap_only
+    volumes:
+      - ./src/test/resources/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tibot_ci_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

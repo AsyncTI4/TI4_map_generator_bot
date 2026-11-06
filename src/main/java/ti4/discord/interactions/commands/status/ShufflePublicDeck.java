@@ -12,7 +12,9 @@ public class ShufflePublicDeck extends GameStateSubcommand {
 
     ShufflePublicDeck() {
         super("shuffle_public_objective_deck", "Shuffle Public Objective deck", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, STAGE_OPTION_NAME, "1 or 2").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, STAGE_OPTION_NAME, "1 or 2")
+                .setRequiredRange(1, 2)
+                .setRequired(true));
     }
 
     @Override

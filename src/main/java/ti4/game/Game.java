@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -117,6 +118,8 @@ import ti4.service.draft.DraftTileManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -1138,6 +1141,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !isRapidMobilizationMode()
                 && !isMonumentToTheAgesMode()
                 && !isWeirdWormholesMode()
+                && !isCallOfTheVoidMode()
                 && !isCosmicPhenomenaeMode()
                 && !isWildWildGalaxyMode()
                 && !isZealousOrthodoxyMode()
@@ -1553,6 +1557,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !"base_game".equals(getScSetID())
                 && !"te".equals(getScSetID())
                 && !"twilights_fall_sc".equals(getScSetID());
+    }
+
+    public boolean usesOneWayAdjacency() {
+        return isFowMode() || isOneWayAdjacency();
     }
 
     public void resetThalnosUnits() {
@@ -2145,6 +2153,63 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             return true;
         }
         return false;
+    }
+
+    public String customPONameFor(Player player, String label) {
+        if (!isFowMode()) {
+            return label + " (" + player.getFaction() + ")";
+        }
+        anonymizeIdentifiedCustomPOs(player, label);
+        removeUnscoredNeutralCustomPOs(label);
+        return neutralCustomPONames(label).stream()
+                .filter(name -> customPOScorers(name).contains(player.getUserID()))
+                .findFirst()
+                .orElseGet(() -> nextNeutralCustomPOName(label));
+    }
+
+    private void anonymizeIdentifiedCustomPOs(Player player, String label) {
+        for (String identity : new String[] {player.getFaction(), player.getColor()}) {
+            if (identity != null) {
+                renameCustomPO(label + " (" + identity + ")", nextNeutralCustomPOName(label));
+            }
+        }
+    }
+
+    private void removeUnscoredNeutralCustomPOs(String label) {
+        neutralCustomPONames(label).stream()
+                .filter(name -> customPOScorers(name).isEmpty())
+                .forEach(this::removeCustomPO);
+    }
+
+    private List<String> neutralCustomPONames(String label) {
+        Pattern numbered = Pattern.compile(Pattern.quote(label) + " \\d+");
+        return customPublicVP.keySet().stream()
+                .filter(name -> name.equals(label) || numbered.matcher(name).matches())
+                .sorted(Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder()))
+                .toList();
+    }
+
+    private String nextNeutralCustomPOName(String label) {
+        String name = label;
+        for (int number = 2; customPublicVP.containsKey(name); number++) {
+            name = label + " " + number;
+        }
+        return name;
+    }
+
+    private List<String> customPOScorers(String name) {
+        return scoredPublicObjectives.getOrDefault(name, List.of());
+    }
+
+    private void renameCustomPO(String oldName, String newName) {
+        if (!customPublicVP.containsKey(oldName) || customPublicVP.containsKey(newName)) {
+            return;
+        }
+        int vp = customPublicVP.get(oldName);
+        List<String> scorers = new ArrayList<>(scoredPublicObjectives.getOrDefault(oldName, List.of()));
+        removeCustomPO(oldName);
+        Integer poIndex = addCustomPO(newName, vp);
+        scorers.forEach(userID -> scorePublicObjective(userID, poIndex));
     }
 
     public boolean addSOToGame(String id) {
@@ -3382,6 +3447,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!acID.isEmpty()) {
             player.removeActionCard(acIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             ACStatus status = shouldPutCardOnRalnel(player) ? ACStatus.ralnelbt : null;
             setDiscardActionCard(acID, status, played);
             if (!played) {
@@ -3424,7 +3491,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             }
         }
         if (!acID.isEmpty()) {
+            boolean wasInHand = actionCards.containsKey(acID);
             player.removeActionCard(acIDNumber);
+            if (wasInHand) {
+                KnownCardsService.recordCardLeftHandPublicly(
+                        this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
+            }
             setPurgedActionCard(acID, played);
             return true;
         }
@@ -3535,6 +3607,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
+            KnownCardsService.recordCardLeftHandPublicly(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             player.setSecretScored(soID);
             return true;
         }
@@ -3557,6 +3631,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
             player.setSecret(soID);
+            KnownCardsService.recordCardShownToAll(
+                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
             return true;
         }
         return false;
@@ -4389,6 +4465,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
         planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
         planets.put("mobilemountain", new Planet("mobilemountain", new Point(0, 0)));
+        planets.put("thedeep", new Planet("thedeep", new Point(0, 0)));
+        planets.put("thedeepascended", new Planet("thedeepascended", new Point(0, 0)));
         planets.put("gedustation", new Planet("gedustation", new Point(0, 0)));
         planets.put("tradestation1", new Planet("tradestation1", new Point(0, 0)));
         planets.put("tradestation2", new Planet("tradestation2", new Point(0, 0)));
@@ -5228,6 +5306,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || getSpinMode() != null && !"OFF".equalsIgnoreCase(getSpinMode())
                 || isHomebrewSCMode()
                 || isCommunityMode()
+                || isMonumentsMode()
+                || isOmegaPhaseMode()
+                || isOplusplusRegularMode()
+                || isOplusplusCouncilMode()
+                || isCptiExploreMode()
                 || !checkAllDecksAreOfficial()
                 || !checkAllTilesAreOfficial()
                 || getRealAndEliminatedPlayers().size() < 3

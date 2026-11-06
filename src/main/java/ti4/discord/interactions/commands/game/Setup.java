@@ -17,7 +17,8 @@ class Setup extends GameStateSubcommand {
         super(Constants.SETUP, "Game Setup", true, false);
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game victory point count. Default is 10"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game victory point count. Default is 10")
+                .setRequiredRange(1, 99));
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 Constants.SC_COUNT_FOR_MAP,
@@ -26,7 +27,10 @@ class Setup extends GameStateSubcommand {
                 OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of secret objectives per player. Default 3"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
         addOptions(new OptionData(
-                OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
+                        OptionType.INTEGER,
+                        Constants.AUTO_PING,
+                        "Hours between auto pings. Min 1. Enter 0 to turn off.")
+                .setRequiredRange(0, 240));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.WHISPERS_ENABLED, "True to allow whispers in this game."));
     }

@@ -37,6 +37,7 @@ class HomebrewCommandTest {
                         "hc_draw",
                         "hc_draw_specific",
                         "hc_send",
+                        "purged_stoneborn_frags",
                         "remove_fragmentum_token",
                         "relic_trading_hub",
                         "rev_leader_fix",

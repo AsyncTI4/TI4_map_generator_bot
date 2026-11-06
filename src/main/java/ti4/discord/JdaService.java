@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -66,6 +67,7 @@ import ti4.discord.interactions.selections.SelectionManager;
 import ti4.executors.ExecutorServiceManager;
 import ti4.executors.ExecutorUtility;
 import ti4.executors.ShutdownResult;
+import ti4.game.persistence.GameDatabaseSyncPipeline;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -73,13 +75,11 @@ import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
-import ti4.logging.LogBufferManager;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TileHelper;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserActiveHourRecorder;
@@ -113,6 +113,7 @@ public class JdaService {
     //       should actually have admin rights
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
+    public static final Set<Role> tiglAdminRoles = new HashSet<>();
     public static final Set<Role> bothelperRoles = new HashSet<>();
     private static final Pattern NUMERIC_GUILD_ID_PATTERN = Pattern.compile("\\b[0-9]+\\b");
 
@@ -520,10 +521,17 @@ public class JdaService {
 
         developerRoles.removeIf(Objects::isNull);
 
+        // TIGL ADMIN ROLES
+
+        tiglAdminRoles.add(jda.getRoleById("1440088130261745845")); // TIGL Admin
+
+        tiglAdminRoles.removeIf(Objects::isNull);
+
         // BOTHELPER ROLES
 
         bothelperRoles.addAll(developerRoles); // developers may also execute bothelper commands
         bothelperRoles.addAll(adminRoles); // admins can also execute bothelper commands
+        bothelperRoles.addAll(tiglAdminRoles); // TIGL admins may also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)
@@ -614,36 +622,67 @@ public class JdaService {
     }
 
     public static void shutdown() {
-        try {
-            AsyncTI4DiscordBot.markShuttingDown();
+        runShutdownSteps(List.of(
+                new ShutdownStep("mark shutting down", AsyncTI4DiscordBot::markShuttingDown),
+                new ShutdownStep("set shutdown presence", JdaService::setShutdownPresence),
+                new ShutdownStep("stop accepting commands", JdaService::stopAcceptingCommands),
+                executorStep(JDA_EVENT_POOL_NAME, JdaService::shutdownEventExecutor),
+                executorStep(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager::shutdown),
+                executorStep(CronManager.class.getSimpleName(), CronManager::shutdown),
+                new ShutdownStep("flush user active hours", UserActiveHourRecorder::flush),
+                executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
+                executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
+                executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown),
+                executorStep(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline::shutdown),
+                executorStep(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown),
+                new ShutdownStep("release active lease", JdaService::releaseActiveLease),
+                new ShutdownStep("send buffered logs", JdaService::sendBufferedLogsBeforeJdaShutdown),
+                new ShutdownStep("shut down JDA", JdaService::shutdownJda)));
+    }
 
-            jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-            BotLogger.info("SHUTDOWN PROCESS STARTED");
+    record ShutdownStep(String name, Runnable action) {}
 
-            ActiveLeaseService.setCurrentProcessReady(false);
-            BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-
-            logShutdownResult(JDA_EVENT_POOL_NAME, shutdownEventExecutor());
-            logShutdownResult(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager.shutdown());
-            logShutdownResult(CronManager.class.getSimpleName(), CronManager.shutdown());
-            UserActiveHourRecorder.flush();
-            logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
-            logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
-            logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
-            logShutdownResult(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline.shutdown());
-            logShutdownResult(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline.shutdown());
-
-            SpringContext.getBean(ActiveLeaseService.class).releaseLease();
-            BotLogger.info("RELEASED ACTIVE LEASE");
-
-            BotLogger.info("SHUTTING DOWN JDA.");
-
-            LogBufferManager.sendBufferedLogsToDiscord();
-
-            shutdownJda();
-        } catch (Exception e) {
-            BotLogger.error("Error encountered within shutdown process:\n> ", e);
+    static void runShutdownSteps(List<ShutdownStep> steps) {
+        for (ShutdownStep step : steps) {
+            try {
+                step.action().run();
+            } catch (Exception e) {
+                reportFailedShutdownStep(step.name(), e);
+            }
         }
+    }
+
+    private static void reportFailedShutdownStep(String stepName, Exception failure) {
+        try {
+            BotLogger.error("Shutdown step failed: " + stepName, failure);
+        } catch (Exception loggingFailure) {
+            System.err.println("Shutdown step failed: " + stepName);
+            failure.printStackTrace();
+        }
+    }
+
+    private static ShutdownStep executorStep(String executorName, Supplier<ShutdownResult> shutdown) {
+        return new ShutdownStep(executorName, () -> logShutdownResult(executorName, shutdown.get()));
+    }
+
+    private static void setShutdownPresence() {
+        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
+        BotLogger.info("SHUTDOWN PROCESS STARTED");
+    }
+
+    private static void stopAcceptingCommands() {
+        ActiveLeaseService.setCurrentProcessReady(false);
+        BotLogger.info("NO LONGER ACCEPTING COMMANDS");
+    }
+
+    private static void releaseActiveLease() {
+        SpringContext.getBean(ActiveLeaseService.class).releaseLease();
+        BotLogger.info("RELEASED ACTIVE LEASE");
+    }
+
+    private static void sendBufferedLogsBeforeJdaShutdown() {
+        BotLogger.info("SHUTTING DOWN JDA.");
+        BotLogger.sendBufferedLogsToDiscord();
     }
 
     private static ShutdownResult shutdownEventExecutor() {

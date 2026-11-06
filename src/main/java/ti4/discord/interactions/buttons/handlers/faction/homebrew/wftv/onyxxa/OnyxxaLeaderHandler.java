@@ -21,9 +21,7 @@ import ti4.service.leader.UnlockLeaderService;
 @UtilityClass
 public class OnyxxaLeaderHandler {
 
-    public static void postAgentMoveShipButtons(Game game, Player targetPlayer) {
-        String msg = targetPlayer.getRepresentationUnfogged()
-                + ", please choose the system that you wish to move a ship from.";
+    public static List<Button> agentMoveShipButtons(Game game, Player targetPlayer) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasShipsInSystem(targetPlayer, tile)) {
@@ -32,14 +30,14 @@ public class OnyxxaLeaderHandler {
                         tile.getRepresentationForButtons(game, targetPlayer)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), msg, buttons);
+        return buttons;
     }
 
     // Commander: Strategist Kreel — unlock condition:
     // "Resolve the primary ability of a strategy card in 1 of your neighbors' play areas."
     public static void checkCommanderUnlock(Game game, Player player, Player holder) {
         if (!player.hasLeader("onyxxacommander") || player.hasLeaderUnlocked("onyxxacommander")) return;
-        if (!player.isNeighboursWith(holder)) return;
+        if (!player.getAbilityNeighbours().contains(holder)) return;
         UnlockLeaderService.unlockLeader("onyxxacommander", game, player);
     }
 
@@ -68,7 +66,7 @@ public class OnyxxaLeaderHandler {
                         tile.getRepresentationForButtons(game, player)));
             }
         }
-        buttons.add(Buttons.red("onyxxaHeroDone", "Done Resolving"));
+        buttons.add(Buttons.red("onyxxaHeroDone", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", please use buttons to resolve your _Continental Drift_ hero ability.",

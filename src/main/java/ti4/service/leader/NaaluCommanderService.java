@@ -59,7 +59,7 @@ public class NaaluCommanderService {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("naaluCPN", "View Promissory Notes"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event, "You can press this button if you wish to view your neighbors promissory notes", buttons);
     }
@@ -73,7 +73,7 @@ public class NaaluCommanderService {
 
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (Player player_ : player.getNeighbouringPlayers(true)) {
+        for (Player player_ : player.getAbilityNeighbours()) {
             if (!first) sb.append("\n\n");
             first = false;
             sb.append("## ").append(player_.getRepresentation(false, false)).append("'s ");

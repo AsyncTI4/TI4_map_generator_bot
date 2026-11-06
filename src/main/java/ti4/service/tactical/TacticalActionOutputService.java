@@ -15,11 +15,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.FrameShiftBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamFactionTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
@@ -47,6 +48,7 @@ import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
+import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -181,15 +183,19 @@ public class TacticalActionOutputService {
 
         String header = (condensed ? "-# From system " : "From system ");
         StringBuilder summary = new StringBuilder(header).append(tile.getRepresentationForButtons(game, player));
-        if (!condensed) {
-            summary.append(" (")
-                    .append(distance)
-                    .append(" tile")
-                    .append(distance == 1 ? "" : "s")
-                    .append(" away)")
-                    .append('\n');
+        if (distance < 95) {
+            if (!condensed) {
+                summary.append(" (")
+                        .append(distance)
+                        .append(" tile")
+                        .append(distance == 1 ? "" : "s")
+                        .append(" away)")
+                        .append('\n');
+            } else {
+                summary.append(" (").append(distance).append(" away)").append('\n');
+            }
         } else {
-            summary.append(" (").append(distance).append(" away)").append('\n');
+            summary.append("(NO LEGAL PATH FOUND)").append('\n');
         }
         if (movingUnitsFromTile.isEmpty()) {
             if (condensed) return null;
@@ -399,14 +405,28 @@ public class TacticalActionOutputService {
         UnitModel unitModel = player.getUnitFromUnitKey(unit);
         if (unitModel != null
                 && unitModel.getIsShip()
+                && MigoTechHandler.hasLaghMetalAttractorsMovementBonus(game, player)) {
+            output.append(" (Applies +1 to their ships MOVE value due to _Lagh-Metal Attractors_)");
+        }
+        if (unitModel != null
+                && unitModel.getIsShip()
                 && player.hasAbility("sacred_passage")
                 && isSacredPassageOrigin(game, player, tile, allMovingUnits)) {
             output.append(
                     " (Receives +1 from _Sacred Passage_ due to starting its movement in The Fracture or an anomaly.)");
         }
+        if (unitModel != null
+                && "bloom_cruiser2".equals(unitModel.getId())
+                && BloomTechHandler.canZygomyceteIIMoveThroughShips(game, player)) {
+            distance = CheckDistanceHelper.getDistanceIgnoringOtherShips(
+                    game, player, tile.getPosition(), game.getActiveSystem(), true);
+            riftDistance = CheckDistanceHelper.getDistanceIgnoringOtherShips(
+                    game, player, tile.getPosition(), game.getActiveSystem(), false);
+            output.append(" (May move through systems containing other players' ships due to _Zygomycete II_)");
+        }
         if (unitModel != null && "qhet_cruiser2".equals(unitModel.getId())) {
-            int battlecruiserDistance = CheckDistanceHelper.getDistanceBetweenTwoTiles(
-                    game, null, tile.getPosition(), game.getActiveSystem(), true);
+            int battlecruiserDistance = CheckDistanceHelper.getDistanceIgnoringOtherShips(
+                    game, player, tile.getPosition(), game.getActiveSystem(), true);
             output.append(" (May move through systems that contain different other players' ships, distance is ")
                     .append(battlecruiserDistance)
                     .append(")");
@@ -450,7 +470,7 @@ public class TacticalActionOutputService {
         if (tile.isNebula(game)
                 && !RealityFieldImpactorService.nullifies(game, tile)
                 && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
-                && !DreamLeadersHandler.playerIgnoresDreamAgentAnomaly(game, player, tile)
+                && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")
@@ -483,6 +503,9 @@ public class TacticalActionOutputService {
                     .max(Integer::compare)
                     .orElse(baseMoveValue);
             bonusMoveValue = maxBase - baseMoveValue;
+        }
+        if (model.getIsShip() && MigoTechHandler.hasLaghMetalAttractorsMovementBonus(game, player)) {
+            bonusMoveValue++;
         }
 
         boolean tileHasBreach = tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);

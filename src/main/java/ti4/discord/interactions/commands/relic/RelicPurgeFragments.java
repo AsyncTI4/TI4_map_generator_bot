@@ -85,9 +85,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         if (fragmentsToPurge.size() == 1) {
             String fragid = fragmentsToPurge.getFirst();
             activePlayer.removeFragment(fragid);
-            if (!StonebornAbilityHandler.returnPurgedFragment(game, fragid)) {
-                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-            }
+            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
             switch (fragid) {
                 case "crf1",
                         "crf2",
@@ -147,9 +145,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
         } else {
             for (String fragid : fragmentsToPurge) {
                 activePlayer.removeFragment(fragid);
-                if (!StonebornAbilityHandler.returnPurgedFragment(game, fragid)) {
-                    game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                }
+                game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                 switch (fragid) {
                     case "crf1",
                             "crf2",

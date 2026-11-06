@@ -427,9 +427,12 @@ public final class ButtonHelperTwilightsFall {
 
     @ButtonHandler("chooseHomeSystem_")
     public static void chooseHomeSystem(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+
         String oldFactionHS = FrankenHomeService.getPlayerHsFaction(player);
-        DraftItem oldFactionItem = new HomeSystemDraftItem(oldFactionHS);
-        FrankenButtonHandler.resolveFrankenItemRemove(event, player, oldFactionItem);
+        if (oldFactionHS != null && Mapper.getFaction(oldFactionHS) != null) {
+            DraftItem oldFactionItem = new HomeSystemDraftItem(oldFactionHS);
+            FrankenButtonHandler.resolveFrankenItemRemove(event, player, oldFactionItem);
+        }
 
         String newFactionHS = buttonID.split("_")[1];
         DraftItem newHomeItem = new HomeSystemDraftItem(newFactionHS);
@@ -716,7 +719,7 @@ public final class ButtonHelperTwilightsFall {
 
         if (splice == 7) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
-            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
@@ -725,7 +728,7 @@ public final class ButtonHelperTwilightsFall {
         }
         if (splice == 6) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), player.getRepresentation() + ", please pay 4 resources.", buttons);
@@ -906,7 +909,7 @@ public final class ButtonHelperTwilightsFall {
                         buttons2.add(Buttons.green(
                                 "drawSingularNewSpliceCard_" + type,
                                 "Draw 1 " + StringUtils.capitalize(type) + " Card"));
-                        buttons2.add(Buttons.gray("deleteButtons", "Decline"));
+                        buttons2.add(Buttons.DECLINE_DELETE_BUTTONS_GRAY);
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation()
@@ -1084,7 +1087,7 @@ public final class ButtonHelperTwilightsFall {
             }
         }
         if (!buttons.isEmpty()) {
-            buttons.add(Buttons.red("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", please choose a card to reveal.",
@@ -1122,7 +1125,7 @@ public final class ButtonHelperTwilightsFall {
                 player.getCorrectChannel(),
                 "The **Magus** holder has chosen to pay the 3 resources and 3 influence for an extra draw.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
-        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT;
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), "Please pay the 3 resources and 3 influence.", buttons);

@@ -431,7 +431,10 @@ public class AgendaRiderHelper {
     public static List<Button> getPlayerOutcomeButtons(Game game, String rider, String prefix, String planetRes) {
         List<Button> playerOutcomeButtons = new ArrayList<>();
         List<Player> players = game.getRealPlayers();
-        if (prefix.contains("solagent") || prefix.contains("letnevagent")) {
+        if (prefix.contains("solagent")
+                || prefix.contains("letnevagent")
+                || prefix.contains("tknovahumanagent")
+                || prefix.contains("tknovaaristocraticagent")) {
             players = game.getRealPlayersNNeutral();
         }
         if (prefix.contains("yinHero")) {

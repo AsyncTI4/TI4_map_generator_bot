@@ -42,7 +42,7 @@ class SimulacrumAcd2ButtonHandler {
                         buttonPrefix + leaderModel.getName()));
             }
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose an agent to ready or exhaust.",

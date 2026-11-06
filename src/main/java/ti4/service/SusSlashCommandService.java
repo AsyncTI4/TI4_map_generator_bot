@@ -105,18 +105,6 @@ public class SusSlashCommandService {
         MessageHelper.sendMessageToChannel(moderationLogChannel, message.toString());
     }
 
-    public static void reportModeratorCheck(SlashCommandInteractionEvent event) {
-        TextChannel susLogChannel = JdaService.guildPrimary == null
-                ? null
-                : JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
-                        .findFirst()
-                        .orElse(null);
-        if (susLogChannel == null) return;
-        String message =
-                "Moderator check: " + event.getUser().getEffectiveName() + " `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToChannel(susLogChannel, message);
-    }
-
     private static void reportToSusSlashCommandLog(
             SlashCommandInteractionEvent event, String jumpUrl, String gameName) {
         TextChannel moderationLogChannel =

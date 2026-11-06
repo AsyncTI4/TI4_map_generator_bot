@@ -110,7 +110,7 @@ public class ScrapyardAbilitiesHandler {
                         "Use " + Mapper.getAbility(rig).getName()))
                 .toList());
         if (!buttons.isEmpty()) {
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you may exhaust one or more Custom Rigs for this tactical action:",
@@ -205,7 +205,7 @@ public class ScrapyardAbilitiesHandler {
                         "Use Repurposed Parts (" + entry.getValue().getName() + ")",
                         entry.getValue().getUnitEmoji()));
             }
-            buttons.add(Buttons.gray("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS_GRAY);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you may use _Repurposed Parts_ to produce 1 unit with a lower "

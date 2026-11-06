@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.json.JsonMapperManager;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
-import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.context.SpringContext;
 import ti4.website.model.CompactMapState;
 
@@ -89,19 +89,31 @@ public class GameEventService {
 
     public List<GameEventDto> getEvents(Game game) {
         if (DatabasePersistenceGate.isDisabled()) return List.of();
-        return getEventsForGame(game).stream()
-                .map(event -> new GameEventDto(
-                        event.getSeq(),
-                        event.getArchetype(),
-                        event.getRound(),
-                        event.getPhase(),
-                        event.getFaction(),
-                        event.getTimestampEpochMillis(),
-                        JsonMapperManager.basic().readTree(event.getPayload()),
-                        event.getMapState(),
-                        event.getMovementState(),
-                        event.getPlayerState()))
+        return getEventsForGame(game).stream().map(GameEventService::toDto).toList();
+    }
+
+    public List<GameEventDto> getEventsSince(Game game, long sinceEpochMillis) {
+        if (DatabasePersistenceGate.isDisabled()) return List.of();
+        return gameEventRepository
+                .findByGameNameAndSeqLessThanEqualAndTimestampEpochMillisGreaterThanOrderBySeqAsc(
+                        game.getName(), game.getEventSequenceCounter(), sinceEpochMillis)
+                .stream()
+                .map(GameEventService::toDto)
                 .toList();
+    }
+
+    private static GameEventDto toDto(GameEventEntity event) {
+        return new GameEventDto(
+                event.getSeq(),
+                event.getArchetype(),
+                event.getRound(),
+                event.getPhase(),
+                event.getFaction(),
+                event.getTimestampEpochMillis(),
+                JsonMapperManager.basic().readTree(event.getPayload()),
+                event.getMapState(),
+                event.getMovementState(),
+                event.getPlayerState());
     }
 
     List<GameEventEntity> getEventsForGame(Game game) {

@@ -81,14 +81,17 @@ public class ScorePublicObjectiveService {
             if (player.getPromissoryNotesInPlayArea().contains("bapnkalo")) {
                 KaloraAbilityHandler.sharedTreasure(player, game);
             }
-            for (Player p2 : player.getNeighbouringPlayers(true)) {
-                if (p2.hasLeaderUnlocked("syndicatecommander")) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.hasLeaderUnlocked("syndicatecommander")
+                        && p2.getAbilityNeighbours().contains(player)) {
                     p2.setTg(p2.getTg() + 1);
+                    // TODO: message names the Tnelis commander (Fillipo Rois); should it be the Syndicate commander?
                     String msg = p2.getRepresentationUnfogged() + ", you gained 1 trade good"
                             + " due to your neighbor scoring a public objective while you have Fillipo Rois, the Tnelis commander."
                             + " Your trade goods went from " + (p2.getTg() - 1) + " -> " + p2.getTg() + ".";
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
                     ButtonHelperAbilities.pillageCheck(p2, game);
+                    // TODO: p2 gained the trade good; should this be resolveArtunoCheck(p2, 1)?
                     ButtonHelperAgents.resolveArtunoCheck(player, 1);
                 }
             }
@@ -157,10 +160,10 @@ public class ScorePublicObjectiveService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+            buttons.add(Buttons.DRAW_1_ABILITY);
+            buttons.add(Buttons.DRAW_1_UNIT_UPGRADE);
             buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
@@ -231,7 +234,7 @@ public class ScorePublicObjectiveService {
                 message2 += "\n" + Helper.buildSpentThingsMessage(player, game, "both");
                 buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             }
-            Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }

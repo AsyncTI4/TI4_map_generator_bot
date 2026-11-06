@@ -277,15 +277,8 @@ public final class FOWPlusService {
         }
 
         if (targetTile.getTileModel() != null && targetTile.getTileModel().isHyperlane()) {
-            boolean hasHyperlaneConnection = false;
-            for (int i = 0; i < 6; i++) {
-                List<Boolean> targetHyperlaneData = targetTile.getHyperlaneData(i, game);
-                if (targetHyperlaneData != null && !targetHyperlaneData.isEmpty() && targetHyperlaneData.get(dirFrom)) {
-                    hasHyperlaneConnection = true;
-                    break;
-                }
-            }
-            return hasHyperlaneConnection;
+            List<Boolean> lanesFromEntry = targetTile.getHyperlaneData(dirFrom, game);
+            return lanesFromEntry != null && lanesFromEntry.contains(true);
         }
 
         return true;
@@ -389,7 +382,7 @@ public final class FOWPlusService {
                                 Buttons.gray(
                                         "fowplus_sacrifice_" + planetID,
                                         "Destroy ground forces on " + Helper.getPlanetRepresentation(planetID, game)),
-                                Buttons.red("deleteButtons", "Done Resolving")));
+                                Buttons.DONE_RED_DELETE_BUTTONS));
                 break;
         }
     }

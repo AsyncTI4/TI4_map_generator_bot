@@ -3,7 +3,7 @@
         "alias": "amendment",
         "name": "Amendment",
         "phase": "Action",
-        "window": "At the end of the status phase",
+        "window": "After a public objective is revealed",
         "text": "Purge 1 public objective you have scored. Then, draw and reveal 1 card from either public objective deck and place it near the other public objectives.",
         "notes": "Players do not lose points when an objective they have scored is purged.",
         "automationID": "amendment",
@@ -73,7 +73,7 @@
         "name": "Boarding Party",
         "phase": "Action",
         "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
-        "text": "Place 1 damaged ship of that type from your reinforcements in the active system.",
+        "text": "Place 1 ship of that type from your reinforcements in the active system.",
         "notes": "If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.",
         "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
         "source": "action_deck_2"
@@ -144,6 +144,16 @@
         "window": "When 1 or more of your units make a combat or unit ability roll",
         "text": "Choose 1 of those units to roll 2 additional dice.",
         "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. Now, administer this harsh lesson.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "concord",
+        "name": "Concord",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Each other player must give you 1 promissory note from their hand. Then, give each other player 1 card from your hand or promissory note from your play area.",
+        "automationID": "concord",
+        "flavorText": "Maeve weaved through the symposium, binding old wounds into new alliances. A web of promises, each strengthening the rest into a shield against the galaxy's multitude of dooms.",
         "source": "action_deck_2"
     },
     {
@@ -337,7 +347,7 @@
         "name": "Graviton Negators",
         "phase": "Action",
         "window": "At the start of a ground combat",
-        "text": "Choose 1 of your non-fighter ships in the active system. That ship participates in the \"Roll Dice\" step of this combat as if it were a ground force on the planet.",
+        "text": "Choose 1 of your ships in the active system. That ship participates in the \"Roll Dice\" step of this combat as if it were a ground force on the planet.",
         "flavorText": "The battle seemed to freeze as the J.N.S. Hylarim entered low orbit, its shadow eclipsing the conflict—and the hopes of its enemies.",
         "source": "action_deck_2"
     },
@@ -348,15 +358,6 @@
         "window": "ACTION",
         "text": "Look at the top 2 cards of the secret objective deck; you may replace 1 of your unscored secret objectives with 1 of those cards. Then, shuffle the secret objective deck.",
         "flavorText": "M'aban sighed at the man's pleas. The hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "hijacked_signal",
-        "name": "Hijacked Signal",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Swap the position of 2 command tokens that belong to different players and are in different non-home systems.",
-        "flavorText": "The massive swarm that was devouring Meer ground to a halt as a fevered discorporation, led by trjn.desgn.ALIZARIN, transported its malice far away, to breathe a silent death into the Council's logistics systems.",
         "source": "action_deck_2"
     },
     {
@@ -518,15 +519,6 @@
         "window": "At the start of your turn",
         "text": "Produce up to 4 units in a system that contains 1 of your command tokens and no other players' units.",
         "flavorText": "The relay assembly left no time for the Hylar to prepare. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "oracle",
-        "name": "Oracle",
-        "phase": "Any",
-        "window": "When you draw a card",
-        "text": "Draw 2 additional cards. Then, purge all but 1 of those cards.",
-        "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it.\"",
         "source": "action_deck_2"
     },
     {
@@ -797,6 +789,16 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "scorched_earth",
+        "name": "Scorched Earth",
+        "phase": "Action",
+        "window": "At the end of a ground combat that you are participating in on a non-home planet",
+        "text": "Destroy up to 2 of another player's units on that planet. Then, if that planet does not contain units, return its planet card to the planet card deck.",
+        "automationID": "scorched_earth",
+        "flavorText": "\"One cannot control a thing without possessing the power to destroy it,\" Ibna Vel Syd reflected.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "shock_troops",
         "name": "Shock Troops",
         "phase": "Action",
@@ -934,7 +936,7 @@
         "window": "When you would spend a command token from your strategy pool",
         "text": "Remove 1 of your command tokens from the game board instead.",
         "automationID": "unexpected_strategy",
-        "flavorText": "Kyver shivered as he slipped undetected past the Nekro fleet. Why? They had no way of knowing his plans—yet, he saw no sign of the Alastor and its escort.",
+        "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
     {
@@ -973,8 +975,8 @@
         "alias": "artifact_research",
         "name": "Artifact Research",
         "phase": "Action",
-        "window": "When a player researches a technology",
-        "text": "That player ignores a number of prerequisites equal to the number of different types of relic fragments you own.",
+        "window": "ACTION",
+        "text": "Discard 1 or more relic fragments to gain 1 technology with a number of prerequisites equal to or less than the number of relic fragments you discarded.",
         "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
         "source": "action_deck_2"
     },
@@ -1169,13 +1171,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "concord",
-        "name": "Concord",
+        "alias": "brokered_alliance",
+        "name": "Brokered Alliance",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Each other player must give you 1 promissory note from their hand. Then, give each other player 1 card from your hand or promissory note from your play area.",
-        "automationID": "concord",
-        "flavorText": "Maeve weaved through the symposium, binding old wounds into new alliances. A web of promises, each strengthening the rest into a shield against the galaxy's multitude of dooms.",
+        "text": "Spend 3 trade goods to reveal the alliance ability of a random, unused faction and choose 1 player; that player gains that ability.",
+        "flavorText": "\"Once enemies,\" Maeve smiled as Rowl growled at Sh'val's terms, \"now kith!\"",
         "source": "action_deck_2"
     },
     {
@@ -1188,12 +1189,21 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "fractured_reality",
+        "name": "Fractured Reality",
+        "phase": "Any",
+        "window": "After 1 of your ships moves using an ingress, egress, or wormhole",
+        "text": "Roll 1 die. Replace that ship with 1 unit from your reinforcements with a cost value equal to or less than the result of that die.",
+        "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we were for ours.\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "misallocated_funding",
         "name": "Misallocated Funding",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-faction, non-unit upgrade technology that another player owns. That player must return that technology to their technology deck and research a technology of a different color.",
-        "flavorText": "\"At last, functioning neural implants, linking both of you!\" Dart facepalmed Tai in confusion as a multitude of mingling memories flooded his mind. \"Wait... didn't we order gravity drives?\"",
+        "text": "Choose 1 non-faction, non-unit upgrade technology that another player owns. That player returns that technology to their deck and researches a technology of a different color.",
+        "flavorText": "\"At last, functioning neural links!\" Dart facepalmed Tai in confusion as a multitude of mingling memories flooded his mind. \"Wait... didn't we order gravity drives?\"",
         "source": "action_deck_2"
     },
     {
@@ -1280,19 +1290,9 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Destroy each unit on a planet that contains 2 of your units to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
+        "text": "Choose 1 system that contains your units. Destroy each of your units in that system to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that system.",
         "automationID": "sacrifice",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "scorched_earth",
-        "name": "Scorched Earth",
-        "phase": "Action",
-        "window": "At the end of a ground combat that you are participating in on a non-home planet",
-        "text": "Destroy up to 2 of another player's units on that planet. Then, if that planet does not contain units, return its planet card to the planet card deck.",
-        "automationID": "scorched_earth",
-        "flavorText": "\"One cannot control a thing without possessing the power to destroy it,\" Ibna Vel Syd reflected.",
         "source": "action_deck_2"
     },
     {

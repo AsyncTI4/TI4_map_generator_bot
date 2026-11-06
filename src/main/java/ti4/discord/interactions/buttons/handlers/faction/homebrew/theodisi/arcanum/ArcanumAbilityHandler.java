@@ -176,9 +176,7 @@ public class ArcanumAbilityHandler {
 
         player.removeFragment(fragmentId);
         game.purgeExplore(fragmentId);
-        if (!StonebornAbilityHandler.returnPurgedFragment(game, fragmentId)) {
-            game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-        }
+        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
         StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, List.of(fragmentId));
         if (fragmentId.startsWith("supermassive")) {
             ButtonHelperExplore.offerSupermassiveFragmentGainIfApplicable(game, player, event, fragmentId);

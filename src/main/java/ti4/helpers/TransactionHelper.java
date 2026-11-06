@@ -61,6 +61,8 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
@@ -1961,8 +1963,10 @@ public class TransactionHelper {
             return;
         }
         String playerRepresentation = player.getRepresentation(false, false, true);
-        for (Player neighbor : player.getNeighbouringPlayers(true)) {
-            if (!neighbor.hasAbility("pillage")) {
+        for (Player neighbor : game.getRealPlayers()) {
+            if (neighbor == player
+                    || !neighbor.hasAbility("pillage")
+                    || !neighbor.getAbilityNeighbours().contains(player)) {
                 continue;
             }
             String neighborRepresentation = neighbor.getRepresentation(false, false, true);
@@ -2394,6 +2398,8 @@ public class TransactionHelper {
                 } else {
                     p1.removeActionCard(acNum);
                     p2.setActionCard(acID);
+                    KnownCardsService.recordCardPassed(
+                            p1, p2, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
                 }
                 ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
@@ -2413,6 +2419,11 @@ public class TransactionHelper {
                 }
             }
             case "Hydromorphic" -> {
+                if (!p1.hasAbility("fluid_transfer")) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "Hydromorphic cards require _Fluid Transfer_ to be transacted.");
+                    return;
+                }
                 int cardNumber = Integer.parseInt(amountToTrans);
                 String cardId = p1.removeHydromorphicCard(cardNumber);
                 if (cardId == null) {
@@ -2483,6 +2494,8 @@ public class TransactionHelper {
 
                 p1.removeSecret(soNum);
                 p2.setSecret(soID);
+                KnownCardsService.recordCardPassed(
+                        p1, p2, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
 
                 if (oldWay) {
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p1, event);
@@ -2512,14 +2525,13 @@ public class TransactionHelper {
                 } else {
                     String fragType = amountToTrans.substring(0, 3).toUpperCase();
                     int fragNum = Integer.parseInt(amountToTrans.charAt(3) + "");
-                    String trait =
-                            switch (fragType) {
-                                case "CRF" -> "cultural";
-                                case "HRF" -> "hazardous";
-                                case "IRF" -> "industrial";
-                                case "URF" -> "frontier";
-                                default -> "";
-                            };
+                    String trait = switch (fragType) {
+                        case "CRF" -> "cultural";
+                        case "HRF" -> "hazardous";
+                        case "IRF" -> "industrial";
+                        case "URF" -> "frontier";
+                        default -> "";
+                    };
                     RelicHelper.sendFrags(event, p1, p2, trait, fragNum, game, false);
                     message2 = "";
                 }
@@ -2734,7 +2746,8 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getColor() + "_" + p2.getColor(), "Action Cards"));
         }
-        if (!seeP1 || !p1.getHydromorphicCards().isEmpty()) {
+        if (p1.hasAbility("fluid_transfer")
+                && (!seeP1 || !p1.getHydromorphicCards().isEmpty())) {
             stuffToTransButtons.add(Buttons.green(
                     "newTransact_Hydromorphic_" + p1.getColor() + "_" + p2.getColor(), "Hydromorphic Cards"));
         }
@@ -2951,7 +2964,7 @@ public class TransactionHelper {
                 && p1.getAcCount() + getMetamorphicActionCardCount(game, p1) > 0) {
             stuffToTransButtons.add(Buttons.green(factionChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
-        if (!p1.getHydromorphicCards().isEmpty()) {
+        if (p1.hasAbility("fluid_transfer") && !p1.getHydromorphicCards().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.green(factionChecker + "transact_Hydromorphic_" + p2.getFaction(), "Hydromorphic Cards"));
         }

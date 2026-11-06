@@ -39,7 +39,7 @@ class HijackedSignalAcd2ButtonHandler {
                             + CARD + ".");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the first command token to swap for " + CARD + ".",
@@ -67,7 +67,7 @@ class HijackedSignalAcd2ButtonHandler {
                             + ".");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose the command token to swap with the one in "

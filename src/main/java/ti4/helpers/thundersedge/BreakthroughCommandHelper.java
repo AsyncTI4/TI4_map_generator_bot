@@ -445,7 +445,7 @@ public final class BreakthroughCommandHelper {
                         p2.getFactionEmojiOrColor()));
             }
         }
-        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 

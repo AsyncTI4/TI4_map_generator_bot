@@ -24,6 +24,11 @@ into `BorderAnomalyModel` by `Mapper`.
   never `==`.
 - **Ids are lower case.** Legacy spellings resolve through `Mapper.resolveBorderAnomaly` at the
   boundaries (commands, game load, map import). Hot paths use `Mapper.getBorderAnomaly`.
+- **Whole-hex types (`"wholeHex": true`, e.g. `ratnest`) are still stored per edge.**
+  `/map add_border_anomaly` places them on all six sides and needs no direction;
+  `BorderDecorationsStep` draws their hex-sized image once, centered and unrotated, clipped to the
+  edges that hold it and are visible (fog), so a partial one only shows its own edges. Rules added
+  later apply per edge like any other border.
 - **Adding or changing a type means updating `BorderAnomalyModelTest`.** `Mapper` only logs JSON
   import errors, and Jackson ignores misspelt keys, so the test asserts the exact ids and rule values.
 
@@ -51,3 +56,43 @@ Action cards, explores, relics and secret objectives may carry an optional `auto
   - A 30k card added by hand to such a game shows its text but is not automated.
 - **"More than 5 hexes away"** is adjacency distance on the map: use `ThirtyKDistance`.
 - **"The Fracture"** is any tile where `Tile.isFracture()` is true.
+
+## Wormholes
+
+A system's wormholes come only from data: the `wormholes` field of the tile JSON, of the token JSON
+(`data/tokens/`) and of the attachment JSON (`data/attachments/`). `Tile.getWormholes(game)` adds
+them up, plus the Creuss flagship's delta. `Mapper.getTokenWormholes` maps a stored token file name
+to its wormholes.
+
+- **Never detect a wormhole from a file name or id.** No `contains("alpha")` on tokens. Read
+  `Tile.getWormholes`, `FoWHelper.getTileWHs` or `Mapper.getTokenWormholes`, and compare
+  `WormholeModel.Wormhole` values, not strings.
+- **A new wormhole token or attachment declares `wormholes` in its JSON.** Without it the token is
+  only a picture. `WormholeDataTest` fails for wormhole-looking token images without wormholes.
+- **Entries that share an image declare the same wormholes.** The lookup is by image file name.
+- **Renamed images go in `legacyImagePaths`** on the token, because saves keep the old file name.
+- **Renamed enum constants keep their old name as `@JsonAlias`.** Custom tiles in storage may still
+  use it.
+- **One entry per source.** Two alpha tokens are two alpha wormholes (LRR 101, note II).
+- **Merged token icons are display only.** With the game option `wormhole_token_merge` set to N (2-9), `SpaceTokens` draws
+  the plain wormhole tokens of a space area as wedge icons once it holds at least N of them (`WormholeTokenMerge`,
+  at most 3 per icon, split evenly, far-apart colours dealt into the same icon). Game state
+  keeps the single tokens. A token with its own identity (Creuss, Ion Storm, Vortex) sets
+  `"wormholeIconMerge": false` and stays a separate icon.
+- **Plain wormhole token ids are `wh` + family + type** (`Wormhole.tokenId()`): `whalpha`,
+  `whlambda`. A renamed id stays usable as an `aliasList` entry in the token JSON
+  (`Mapper.getTokenID` and `isValidToken` resolve aliases), e.g. `sigma_lamdba_wormhole`,
+  `custom_eronous_whiota`. Identity tokens (Creuss, Ion Storm, PoK `gamma`, `vortex`) keep their ids
+  for now. Image file names never change; saves store them.
+- **Rat race wormholes are separate types** (`ALPHA_RAT` … `KAPPA_RAT`, `Wormhole.isRatRace()`). They
+  share the Greek symbol but never match the plain type, and they merge only with each other, with the
+  threshold counted per family. Their token ids are `whrat` + type (`whratalpha`).
+- **One-way wormhole tokens are generated, not stored as JSON.** `Mapper` adds `<tokenId>_in`
+  (entry-only) and `<tokenId>_out` (exit-only) for every plain mergeable type, with a virtual image
+  drawn by `OneWayWormholeIcon` (the base token inside an arrow ring with an IN/OUT badge). A link
+  runs from a *departure* wormhole (`Tile.getDepartureWormholes`, no `_out`) to an *arrival*
+  wormhole (`Tile.getArrivalWormholes`, no `_in`); `Tile.getWormholes` still counts both.
+  They have no file on disk: validate tokens with `ImageResources.hasTokenImage`, not
+  `tokenOrAttachment != null`, and never pick one as a type's display image.
+  `WormholeRule` (`ti4.helpers.adjacency`) reads them: movement always follows the direction, every
+  other purpose only with one-way adjacency on (always in fog), otherwise the link counts both ways.

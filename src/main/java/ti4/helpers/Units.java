@@ -82,7 +82,8 @@ public class Units {
             if (unitType == UnitType.Celagrom
                     || unitType == UnitType.Lady
                     || unitType == UnitType.Cavalry
-                    || unitType == UnitType.Aurelion) {
+                    || unitType == UnitType.Aurelion
+                    || unitType == UnitType.Deep) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
             if (unitType == UnitType.TyrantsLament) {
@@ -132,7 +133,8 @@ public class Units {
         StarfallPds("starfallpds"),
         MetaliVoidArmaments("metalivoidarmaments"),
         ProjectionOfPower("projectionofpower"),
-        ZelianPlanet("zelianplanet");
+        ZelianPlanet("zelianplanet"),
+        Deep("thedeep");
 
         public final String value;
 
@@ -163,6 +165,7 @@ public class Units {
                 case MetaliVoidArmaments -> "Metali Void Armaments";
                 case ProjectionOfPower -> "Projection of Power";
                 case ZelianPlanet -> "Zelian Planet";
+                case Deep -> "The Deep";
             };
         }
 
@@ -189,6 +192,7 @@ public class Units {
                 case MetaliVoidArmaments -> "metalivoidarmaments";
                 case ProjectionOfPower -> "projectionofpower";
                 case ZelianPlanet -> "zelianplanet";
+                case Deep -> "thedeep";
             };
         }
 
@@ -204,7 +208,7 @@ public class Units {
                 case Cruiser -> UnitEmojis.cruiser;
                 case Carrier -> UnitEmojis.carrier;
                 case Dreadnought -> UnitEmojis.dreadnought;
-                case Flagship, Cavalry, Lady, Celagrom, Aurelion -> UnitEmojis.flagship;
+                case Flagship, Cavalry, Lady, Celagrom, Aurelion, Deep -> UnitEmojis.flagship;
                 case TyrantsLament -> UnitEmojis.TyrantsLament;
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
@@ -353,6 +357,7 @@ public class Units {
             case "metaliafb" -> UnitType.MetaliVoidArmaments;
             case "projectionafb" -> UnitType.ProjectionOfPower;
             case "zelianplanet" -> UnitType.ZelianPlanet;
+            case "thedeep" -> UnitType.Deep;
             default -> null;
         };
     }

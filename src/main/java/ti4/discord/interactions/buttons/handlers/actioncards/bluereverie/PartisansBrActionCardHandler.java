@@ -82,7 +82,7 @@ public class PartisansBrActionCardHandler {
             return;
         }
         String planetName = values.length == 2 ? values[1] : "";
-        if (!isSupportedUnit(unit) || !isEligiblePlanet(game, player, planetName)) {
+        if (!isSupportedUnit(unit) || !isEligiblePlanet(game, player.getAbilityNeighbours(), planetName)) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "That _Partisans_ placement is no longer eligible.");
             return;
@@ -117,9 +117,10 @@ public class PartisansBrActionCardHandler {
     private static List<Button> getPlanetButtons(Game game, Player player, String unit) {
         if (!isSupportedUnit(unit)) return List.of();
         Set<String> knownPlanets = PlanetTargetService.knownPlanetIds(game, player, Set.of());
+        Set<Player> neighbours = player.getAbilityNeighbours();
         List<Button> buttons = new ArrayList<>();
         for (String planetName : knownPlanets.stream().sorted().toList()) {
-            if (!isEligiblePlanet(game, player, planetName)) continue;
+            if (!isEligiblePlanet(game, neighbours, planetName)) continue;
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + PLACE_UNIT + unit + "|" + planetName,
                     Helper.getPlanetRepresentation(planetName, game)));
@@ -127,7 +128,7 @@ public class PartisansBrActionCardHandler {
         return buttons;
     }
 
-    private static boolean isEligiblePlanet(Game game, Player player, String planetName) {
+    private static boolean isEligiblePlanet(Game game, Set<Player> neighbours, String planetName) {
         Planet planet = game.getUnitHolderFromPlanet(planetName);
         Tile tile = game.getTileFromPlanet(planetName);
         Player controller = game.getPlayerThatControlsPlanet(planetName, true);
@@ -137,7 +138,7 @@ public class PartisansBrActionCardHandler {
                 && !planet.isSpaceStation()
                 && !tile.isHomeSystem(game)
                 && controller != null
-                && player.getNeighbouringPlayers(true).contains(controller);
+                && neighbours.contains(controller);
     }
 
     private static int unitCount(String unit) {

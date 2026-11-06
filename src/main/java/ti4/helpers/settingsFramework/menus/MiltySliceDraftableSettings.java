@@ -103,13 +103,12 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "scpt2025finals" -> scpt2025finals(event);
-                    case "richPreset" -> richGalaxy();
-                    case "poorPreset" -> poorGalaxy();
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "scpt2025finals" -> scpt2025finals(event);
+            case "richPreset" -> richGalaxy();
+            case "poorPreset" -> poorGalaxy();
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

@@ -64,7 +64,7 @@ public class TaUnitHandler {
                         player.factionButtonChecker() + DEPLOY_MECH_PREFIX + tile.getPosition() + "|" + planetName,
                         "Pay 1 Resource to Deploy Mech",
                         FactionEmojis.ta),
-                Buttons.red("deleteButtons", "Decline"));
+                Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -105,7 +105,7 @@ public class TaUnitHandler {
                         + " using its DEPLOY ability.");
 
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()

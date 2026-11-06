@@ -179,7 +179,7 @@ public class ThirtyKPlayAreaExploreHandler {
             GenericInteractionCreateEvent event, Game game, Player player, int cost, String cardName) {
         player.resetSpentThings();
         List<Button> buttons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
-        buttons.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
+        buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentation() + ", please spend " + cost + " resources for _" + cardName + "_.",

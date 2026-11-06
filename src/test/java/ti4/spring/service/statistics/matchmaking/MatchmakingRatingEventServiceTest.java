@@ -189,7 +189,7 @@ class MatchmakingRatingEventServiceTest {
         for (int place = 0; place < usersInFinishingOrder.size(); place++) {
             PlayerEntity player = new PlayerEntity();
             player.setGame(game);
-            player.setUser(usersInFinishingOrder.get(place));
+            player.setStatsUser(usersInFinishingOrder.get(place));
             player.setWinner(place == 0);
             player.setScore(VICTORY_POINT_GOAL - place);
             players.add(player);

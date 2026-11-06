@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,8 +24,11 @@ import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.button.ReactionService;
-import ti4.service.emoji.FactionEmojis;
+import ti4.service.info.KnownCardsService;
+import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -91,6 +93,8 @@ class ActionCardHandButtonHandler {
         }
         player.removeActionCard(acIndex);
         receiver.setActionCard(acID);
+        KnownCardsService.recordCardPassed(
+                player, receiver, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
                 player.getRepresentationNoPing() + " gave an action card to " + receiver.getRepresentationNoPing()
@@ -199,9 +203,7 @@ class ActionCardHandButtonHandler {
             }
             if (player.hasUnexhaustedLeader("cymiaeagent")) {
                 List<Button> buttons2 = new ArrayList<>();
-                Button hacanButton = Buttons.gray(
-                        "exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
-                buttons2.add(hacanButton);
+                buttons2.add(CymiaeAgent.button(player));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
@@ -213,7 +215,7 @@ class ActionCardHandButtonHandler {
                         buttons2);
             }
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
-            ArvaxiLeaderHandler.postAgentOfferButtons(game, player, acID);
+            ArvaxiAgent.postAgentOfferButtons(game, player, acID);
             if (player.hasAbility("scrap_metal")) {
                 String message2 =
                         player.getRepresentationUnfogged() + ", please **Scrap Metal** by using these buttons.";

@@ -329,6 +329,17 @@ public class TestBedPresetService {
                 }
             }
         });
+        preset.getCustomAdjacencies().forEach((primary, listed) -> {
+            if (!MapPositionMapper.isTilePositionValid(primary.toLowerCase())) {
+                errors.add("preset: `customAdjacencies` position `" + primary + "` is not a tile position.");
+            }
+            for (String position : listed) {
+                if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
+                    errors.add("preset: `customAdjacencies` target `" + position + "` at `" + primary
+                            + "` is not a tile position.");
+                }
+            }
+        });
         preset.getTiles().forEach((position, tileId) -> {
             if (!MapPositionMapper.isTilePositionValid(position.toLowerCase())) {
                 errors.add("preset: `tiles` position `" + position + "` is not a tile position.");
@@ -367,6 +378,10 @@ public class TestBedPresetService {
         }
         preset.getStored().forEach((key, value) -> {
             if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
+        });
+        preset.getGameOptions().forEach((key, value) -> {
+            String problem = TestBedComponentService.gameOptionProblem(key, value);
+            if (problem != null) errors.add("preset: " + problem);
         });
         for (Seat seat : preset.allSeats()) {
             if (seat.getScoredObjectives() == null) continue;

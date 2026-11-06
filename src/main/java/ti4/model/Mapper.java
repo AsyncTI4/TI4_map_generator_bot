@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -39,6 +41,8 @@ import ti4.logging.BotLogger;
 import ti4.model.DeckModel.DeckType;
 import ti4.model.GenericCardModel.CardType;
 import ti4.model.Source.ComponentSource;
+import ti4.model.WormholeModel.OneWay;
+import ti4.model.WormholeModel.Wormhole;
 import ti4.service.emoji.CardEmojis;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -93,6 +97,11 @@ public class Mapper {
     private static volatile Map<String, TokenModel> tokens = new HashMap<>();
     // ids + image paths of tokens flagged isFowVision; precomputed so per-tile fog checks avoid getTokenKey's scan
     private static volatile Set<String> fowVisionTokenIds = new HashSet<>();
+    private static volatile Map<String, List<Wormhole>> wormholesByImagePath = new HashMap<>();
+    private static volatile Map<Wormhole, String> imagePathByWormhole = new HashMap<>();
+    private static volatile Set<String> mergeableWormholeImagePaths = new HashSet<>();
+    private static volatile Map<String, TokenModel> oneWayTokensByImagePath = new HashMap<>();
+    private static volatile Map<String, String> tokenImagePathByAlias = new HashMap<>();
     private static volatile Map<String, GalacticEventModel> galacticevents = new HashMap<>();
 
     @Getter
@@ -149,8 +158,19 @@ public class Mapper {
         technologies = importJsonObjectsFromFolder("technologies", TechnologyModel.class);
         galacticevents = importJsonObjectsFromFolder("galactic_events", GalacticEventModel.class);
 
-        tokens = importJsonObjectsFromFolder("tokens", TokenModel.class);
+        Map<String, TokenModel> loadedTokens = importJsonObjectsFromFolder("tokens", TokenModel.class);
+        Properties loadedTokenProperties = readData("tokens.properties");
+        Map<String, TokenModel> generatedTokens = oneWayWormholeTokens(loadedTokens);
+        generatedTokens.values().forEach(token -> {
+            loadedTokens.put(token.getId(), token);
+            loadedTokenProperties.setProperty(token.getId(), token.getImagePath());
+        });
+        tokens = loadedTokens;
+        tokensFromProperties = loadedTokenProperties;
+        tokenImagePathByAlias = indexTokenAliases(loadedTokens);
+        oneWayTokensByImagePath = generatedTokens;
         indexFowVisionTokens();
+        indexTokenWormholes();
         spaceTokens = importJsonObjectsFromFolder("tokens", SpaceTokenModel.class);
         units = importJsonObjectsFromFolder("units", UnitModel.class);
         frankenErrata = importJsonObjectsFromFolder("franken_errata", DraftErrataModel.class);
@@ -158,7 +178,6 @@ public class Mapper {
         general = readData("general.properties");
         hyperlaneAdjacencies = readData("hyperlanes.properties");
         specialCase = readData("special_case.properties");
-        tokensFromProperties = readData("tokens.properties");
 
         colorsByAnyName = indexColorsByAnyName(colors);
         unitAsyncIds = Collections.unmodifiableSet(
@@ -398,7 +417,8 @@ public class Mapper {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
         if (!actionCards.containsKey(id)) {
-            BotLogger.critical("Action card not found: " + id);
+            String message = "Action card not found: " + id;
+            BotLogger.critical(message, new IllegalArgumentException(message));
             return null;
         }
         return actionCards.get(id);
@@ -942,16 +962,15 @@ public class Mapper {
         } else if (templates.size() == 1) {
             mapTemplate = templates.getFirst();
         } else {
-            String defaultMapTemplate =
-                    switch (players) {
-                        case 3 -> "3pHyperlanes";
-                        case 4 -> "4pHyperlanes";
-                        case 5 -> "5pHyperlanes";
-                        case 6 -> "6pStandard";
-                        case 7 -> "7pHyperlanes";
-                        case 8 -> "8pHyperlanes";
-                        default -> null;
-                    };
+            String defaultMapTemplate = switch (players) {
+                case 3 -> "3pHyperlanes";
+                case 4 -> "4pHyperlanes";
+                case 5 -> "5pHyperlanes";
+                case 6 -> "6pStandard";
+                case 7 -> "7pHyperlanes";
+                case 8 -> "8pHyperlanes";
+                default -> null;
+            };
             if (defaultMapTemplate == null) {
                 mapTemplate = templates.getFirst(); // just get whatever template lol
             } else {
@@ -1282,8 +1301,119 @@ public class Mapper {
         return tokenId != null && fowVisionTokenIds.contains(tokenId);
     }
 
+    private static void indexTokenWormholes() {
+        Map<String, List<Wormhole>> byImagePath = new HashMap<>();
+        Map<Wormhole, String> byWormhole = new HashMap<>();
+        Set<String> mergeable = new HashSet<>();
+        List<TokenModel> tokensById = tokens.values().stream()
+                .sorted(Comparator.comparing(TokenModel::getId))
+                .toList();
+        for (TokenModel token : tokensById) {
+            List<Wormhole> wormholes = nonNullWormholes(token.getWormholes());
+            if (wormholes.isEmpty()) continue;
+            byImagePath.put(token.getImagePath(), wormholes);
+            if (wormholes.size() == 1 && token.getOneWay() == null) {
+                byWormhole.putIfAbsent(wormholes.getFirst(), token.getImagePath());
+            }
+            boolean mergeableToken = wormholes.size() == 1 && !Boolean.FALSE.equals(token.getWormholeIconMerge());
+            if (mergeableToken) mergeable.add(token.getImagePath());
+            for (String legacyImagePath :
+                    Optional.ofNullable(token.getLegacyImagePaths()).orElse(List.of())) {
+                byImagePath.put(legacyImagePath, wormholes);
+                if (mergeableToken) mergeable.add(legacyImagePath);
+            }
+        }
+        for (AttachmentModel attachment : attachments.values()) {
+            List<Wormhole> wormholes = nonNullWormholes(attachment.getWormholes());
+            if (!wormholes.isEmpty()) byImagePath.put(attachment.getImagePath(), wormholes);
+        }
+        wormholesByImagePath = byImagePath;
+        imagePathByWormhole = byWormhole;
+        mergeableWormholeImagePaths = mergeable;
+    }
+
+    private static List<Wormhole> nonNullWormholes(List<Wormhole> wormholes) {
+        if (wormholes == null) return List.of();
+        return wormholes.stream().filter(Objects::nonNull).toList();
+    }
+
+    @Nullable
+    public static String getWormholeTokenImagePath(Wormhole wormhole) {
+        return imagePathByWormhole.get(wormhole);
+    }
+
+    public static boolean isMergeableWormholeToken(String tokenFileName) {
+        return tokenFileName != null && mergeableWormholeImagePaths.contains(tokenFileName);
+    }
+
+    private static Map<String, TokenModel> oneWayWormholeTokens(Map<String, TokenModel> tokenModels) {
+        Map<String, TokenModel> generated = new HashMap<>();
+        plainWormholeTokens(tokenModels).forEach((wormhole, base) -> {
+            for (OneWay oneWay : OneWay.values()) {
+                TokenModel token = oneWayToken(wormhole, base, oneWay);
+                generated.put(token.getImagePath(), token);
+            }
+        });
+        return generated;
+    }
+
+    // TODO: identity wormhole tokens (creuss*, ionalpha/ionbeta, PoK gamma, vortex) keep their own ids;
+    // renaming them to the wh scheme also needs the code that names them by id updated.
+    private static Map<Wormhole, TokenModel> plainWormholeTokens(Map<String, TokenModel> tokenModels) {
+        Map<Wormhole, TokenModel> byWormhole = new EnumMap<>(Wormhole.class);
+        for (Wormhole wormhole : Wormhole.values()) {
+            TokenModel token = tokenModels.get(wormhole.tokenId());
+            if (token != null && plainWormhole(token) == wormhole) byWormhole.put(wormhole, token);
+        }
+        return byWormhole;
+    }
+
+    @Nullable
+    private static Wormhole plainWormhole(TokenModel token) {
+        List<Wormhole> wormholes = nonNullWormholes(token.getWormholes());
+        boolean mergeable = wormholes.size() == 1 && !Boolean.FALSE.equals(token.getWormholeIconMerge());
+        return mergeable ? wormholes.getFirst() : null;
+    }
+
+    private static TokenModel oneWayToken(Wormhole wormhole, TokenModel base, OneWay oneWay) {
+        String id = wormhole.tokenId() + "_" + oneWay.suffix();
+        TokenModel token = new TokenModel();
+        token.setId(id);
+        token.setImagePath("token_oneway_" + id + ".png");
+        token.setSpaceOrPlanet("space");
+        token.setWormholes(List.of(wormhole));
+        token.setWormholeIconMerge(false);
+        token.setOneWay(oneWay);
+        token.setBaseImagePath(base.getImagePath());
+        token.setSource(base.getSource());
+        return token;
+    }
+
+    @Nullable
+    public static TokenModel getOneWayWormholeToken(String tokenFileName) {
+        return tokenFileName == null ? null : oneWayTokensByImagePath.get(tokenFileName);
+    }
+
+    public static List<Wormhole> getTokenWormholes(String tokenFileName) {
+        if (tokenFileName == null) return List.of();
+        return wormholesByImagePath.getOrDefault(tokenFileName, List.of());
+    }
+
     public static boolean isValidToken(String id) {
-        return getTokensFromProperties().contains(id);
+        if (id == null) return false;
+        return getTokensFromProperties().contains(id) || tokenImagePathByAlias.containsKey(id.toLowerCase());
+    }
+
+    // TODO: identity wormhole tokens (creuss*, ionalpha/ionbeta, PoK gamma, vortex) keep their own ids;
+    // renaming them to the wh scheme also needs the code that names them by id updated.
+    private static Map<String, String> indexTokenAliases(Map<String, TokenModel> tokenModels) {
+        Map<String, String> byAlias = new HashMap<>();
+        for (TokenModel token : tokenModels.values()) {
+            for (String alias : Optional.ofNullable(token.getAliasList()).orElse(List.of())) {
+                byAlias.putIfAbsent(alias.toLowerCase(), token.getImagePath());
+            }
+        }
+        return byAlias;
     }
 
     public static List<String> getTokensSources(ComponentSource compSource) {
@@ -1314,7 +1444,8 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
-        return tokensFromProperties.getProperty(tokenID);
+        String imagePath = tokensFromProperties.getProperty(tokenID);
+        return imagePath != null ? imagePath : tokenImagePathByAlias.get(tokenID.toLowerCase());
     }
 
     public static String getTokenKey(String tokenID) {
@@ -1516,29 +1647,13 @@ public class Mapper {
 
     // Wormholes
 
-    public static Set<String> getWormholes(String tileID) {
-        if (tileID == null
-                || TileHelper.getTileById(tileID) == null
-                || TileHelper.getTileById(tileID).getWormholes() == null) {
-            return new HashSet<>();
+    public static Set<Wormhole> getWormholes(String tileID) {
+        Set<Wormhole> wormholes = EnumSet.noneOf(Wormhole.class);
+        TileModel tile = tileID == null ? null : TileHelper.getTileById(tileID);
+        if (tile != null && tile.getWormholes() != null) {
+            tile.getWormholes().stream().filter(Objects::nonNull).forEach(wormholes::add);
         }
-        return TileHelper.getTileById(tileID).getWormholes().stream()
-                .filter(Objects::nonNull)
-                .map(WormholeModel.Wormhole::toString)
-                .collect(Collectors.toSet());
-    }
-
-    public static Set<String> getWormholesTiles(String wormholeID) {
-        WormholeModel.Wormhole wormhole = WormholeModel.getWormholeFromString(wormholeID);
-        if (wormhole == null) {
-            return new HashSet<>();
-        }
-
-        return TileHelper.getAllTileModels().stream()
-                .filter(tileModel -> tileModel.getWormholes() != null
-                        && tileModel.getWormholes().contains(wormhole))
-                .map(TileModel::getId)
-                .collect(Collectors.toSet());
+        return wormholes;
     }
 
     private static class ColorDeserializer extends ValueDeserializer<Color> {

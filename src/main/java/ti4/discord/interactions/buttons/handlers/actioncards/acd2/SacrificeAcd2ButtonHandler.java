@@ -8,12 +8,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
@@ -26,47 +25,51 @@ class SacrificeAcd2ButtonHandler {
     @ButtonHandler("resolveSacrifice")
     public static void resolveSacrifice(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanets()) {
-            Planet uH = game.getUnitHolderFromPlanet(planet);
-            if (uH != null && uH.getUnitCount(player.getColorID()) >= 2) {
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile != null && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 buttons.add(Buttons.green(
-                        player.factionButtonChecker() + "sacrificePlanet_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
+                        player.factionButtonChecker() + "sacrificeSystem_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)));
             }
         }
         ButtonHelper.deleteMessage(event);
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you do not control a planet that contains 2 of your units"
-                            + " for _Sacrifice_.");
+                    player.getRepresentationUnfogged() + ", you have no system that contains your units for"
+                            + " _Sacrifice_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose the planet whose units you will sacrifice.",
+                player.getRepresentationUnfogged() + ", choose the system whose units you will sacrifice.",
                 buttons);
     }
 
-    @ButtonHandler("sacrificePlanet_")
-    public static void resolveSacrificePlanet(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.replace("sacrificePlanet_", "");
+    @ButtonHandler("sacrificeSystem_")
+    public static void resolveSacrificeSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String position = buttonID.replace("sacrificeSystem_", "");
+        Tile tile = game.getTileByPosition(position);
+        ButtonHelper.deleteMessage(event);
+        if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Sacrifice_.");
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                player.factionButtonChecker() + "sacrificeReward_so_" + planet,
+                player.factionButtonChecker() + "sacrificeReward_so_" + position,
                 "Draw 1 Secret Objective",
                 CardEmojis.SecretObjective));
         buttons.add(Buttons.blue(
-                player.factionButtonChecker() + "sacrificeReward_breakthrough_" + planet, "Gain Your Breakthrough"));
+                player.factionButtonChecker() + "sacrificeReward_breakthrough_" + position, "Gain Your Breakthrough"));
         buttons.add(Buttons.gray(
-                player.factionButtonChecker() + "sacrificeReward_ingress_" + planet,
+                player.factionButtonChecker() + "sacrificeReward_ingress_" + position,
                 "Move an Ingress Token into the System"));
-        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose what to gain by sacrificing your units on "
-                        + Helper.getPlanetRepresentation(planet, game) + ".",
+                player.getRepresentationUnfogged() + ", choose what to gain by destroying each of your units in "
+                        + tile.getRepresentationForButtons(game, player) + ".",
                 buttons);
     }
 
@@ -80,20 +83,21 @@ class SacrificeAcd2ButtonHandler {
             return;
         }
         String reward = payload.substring(0, separator);
-        String planet = payload.substring(separator + 1);
-        Planet unitHolder = game.getUnitHolderFromPlanet(planet);
-        Tile tile = game.getTileFromPlanet(planet);
-        if (unitHolder == null || tile == null) {
+        String position = payload.substring(separator + 1);
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null
+                || !FoWHelper.playerHasUnitsInSystem(player, tile)
+                || !List.of("so", "breakthrough", "ingress").contains(reward)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Sacrifice_.");
             ButtonHelper.deleteMessage(event);
             return;
         }
 
-        DestroyUnitService.destroyAllPlayerUnits(event, game, player, tile, unitHolder, false);
+        DestroyUnitService.destroyAllPlayerUnitsInSystem(event, game, player, tile, false);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " destroyed all of their units on "
-                        + Helper.getPlanetRepresentation(planet, game) + " for _Sacrifice_.");
+                player.getRepresentationNoPing() + " destroyed each of their units in "
+                        + tile.getRepresentationForButtons(game, player) + " for _Sacrifice_.");
         ButtonHelper.deleteMessage(event);
 
         switch (reward) {
@@ -159,7 +163,7 @@ class SacrificeAcd2ButtonHandler {
                             + " _Sacrifice_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which ingress token to move into the system.",

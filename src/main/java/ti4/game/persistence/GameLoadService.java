@@ -19,7 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -93,12 +95,19 @@ class GameLoadService {
         }
     }
 
+    private static final Set<String> reportedUnreadableFiles = ConcurrentHashMap.newKeySet();
+
     @Nullable
-    public static Game load(String gameName) {
+    static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);
         });
+    }
+
+    static boolean isKnownUnreadable(String gameName) {
+        File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
+        return gameFile.exists() && reportedUnreadableFiles.contains(gameFile.getName());
     }
 
     private static String stripGameFileExtension(String fileName) {
@@ -112,10 +121,16 @@ class GameLoadService {
             return null;
         }
         try {
-            return readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            Game game = readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            reportedUnreadableFiles.remove(gameFile.getName());
+            return game;
         } catch (Exception e) {
-            BotLogger.critical(
-                    "Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.", e);
+            if (reportedUnreadableFiles.add(gameFile.getName())) {
+                BotLogger.critical(
+                        "The game file " + gameFile.getName() + " could not be loaded and may be corrupt."
+                                + " A bothelper can run `/bothelper reload_game` to restore it from its latest undo.",
+                        e);
+            }
             return null;
         }
     }
@@ -561,6 +576,8 @@ class GameLoadService {
                 // TODO: default false here vs true in GameProperties; a missing token reverts to legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
+                case Constants.ONE_WAY_ADJACENCY -> game.setOneWayAdjacency(parseBooleanOrDefault(info, false));
+                case Constants.WORMHOLE_TOKEN_MERGE -> game.setWormholeTokenMergeFrom(wormholeTokenMergeFrom(info));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> game.setHomebrew(parseBooleanOrDefault(info, false));
@@ -699,6 +716,7 @@ class GameLoadService {
                         game.setStartedDate(Long.parseLong(info));
                     }
                 }
+                case REVISION_KEY -> game.setRevisionKey(info);
                 case Constants.LAST_MODIFIED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setLastModifiedDate(Long.parseLong(info));
@@ -825,14 +843,13 @@ class GameLoadService {
         while (actionCardToken.hasMoreTokens()) {
             StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
             String id = cardInfo.nextToken();
-            ACStatus status =
-                    switch (cardInfo.nextToken()) {
-                        case "garbozia" -> ACStatus.garbozia;
-                        case "ralnelbt" -> ACStatus.ralnelbt;
-                        case "morphabt" -> ACStatus.morphabt;
-                        case "purged" -> ACStatus.purged;
-                        default -> null;
-                    };
+            ACStatus status = switch (cardInfo.nextToken()) {
+                case "garbozia" -> ACStatus.garbozia;
+                case "ralnelbt" -> ACStatus.ralnelbt;
+                case "morphabt" -> ACStatus.morphabt;
+                case "purged" -> ACStatus.purged;
+                default -> null;
+            };
             cards.put(id, status);
         }
         return cards;
@@ -1168,6 +1185,7 @@ class GameLoadService {
                     player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BOT_PLAYER -> player.setBotPlayer(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.NPC -> player.setNpc(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG ->
                     player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));
@@ -1183,6 +1201,9 @@ class GameLoadService {
                     player.setGhostCommanderCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.MAGEN_INFANTRY_COUNT ->
                     player.setMagenInfantryCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DACXIVE_COUNT -> player.setDacxiveCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.YIN_SPINNER_COUNT ->
+                    player.setYinSpinnerCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
@@ -1276,5 +1297,14 @@ class GameLoadService {
         }
 
         return peekedPublicObjectives;
+    }
+
+    private static int wormholeTokenMergeFrom(String info) {
+        if ("true".equalsIgnoreCase(info)) return 2;
+        try {
+            return Integer.parseInt(info.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

@@ -11,7 +11,6 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
@@ -28,18 +27,6 @@ public class VeylorLeadersHandler {
     private static final String DONE = "doneVeylorCommander";
     private static final String GAIN_HERO_CC = "gainVeylorHeroCC_";
     private static final String CHOOSE_COMMANDER_SYSTEM = "veylorCommanderSelectSystem_";
-
-    // Agent
-    public static void startVeylorAgent(Game game, Player target) {
-        if (game == null || target == null) {
-            return;
-        }
-
-        ActionCardHelper.drawActionCards(target, 1);
-        AgendaHelper.drawAgenda(1, game, target);
-
-        MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentation() + " drew 1 agenda.");
-    }
 
     // Commander
     public static Button offerVeylorCommanderUnlock(Player player) {
@@ -160,25 +147,24 @@ public class VeylorLeadersHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        String pool =
-                switch (buttonID.substring(GAIN_HERO_CC.length())) {
-                    case "tactic" -> {
-                        player.setTacticalCC(player.getTacticalCC() + 1);
-                        yield "tactic";
-                    }
-                    case "fleet" -> {
-                        player.setFleetCC(player.getFleetCC() + 1);
-                        yield "fleet";
-                    }
-                    case "strategy" -> {
-                        player.setStrategicCC(player.getStrategicCC() + 1);
-                        yield "strategy";
-                    }
-                    default -> {
-                        ButtonHelper.deleteMessage(event);
-                        yield null;
-                    }
-                };
+        String pool = switch (buttonID.substring(GAIN_HERO_CC.length())) {
+            case "tactic" -> {
+                player.setTacticalCC(player.getTacticalCC() + 1);
+                yield "tactic";
+            }
+            case "fleet" -> {
+                player.setFleetCC(player.getFleetCC() + 1);
+                yield "fleet";
+            }
+            case "strategy" -> {
+                player.setStrategicCC(player.getStrategicCC() + 1);
+                yield "strategy";
+            }
+            default -> {
+                ButtonHelper.deleteMessage(event);
+                yield null;
+            }
+        };
 
         if (pool == null) {
             return;

@@ -125,6 +125,15 @@ public class FactionDraftItem extends DraftItem {
 
     @JsonIgnore
     public List<DraftItem> getComponents(Game game) {
+        return getComponents(game, false);
+    }
+
+    @JsonIgnore
+    public List<DraftItem> getAllComponentsIgnoringErrata() {
+        return getComponents(null, true);
+    }
+
+    private List<DraftItem> getComponents(Game game, boolean ignoreErrata) {
         FactionModel faction = getFaction();
         if (faction == null) {
             return List.of();
@@ -132,10 +141,10 @@ public class FactionDraftItem extends DraftItem {
 
         List<DraftItem> components = new ArrayList<>();
         for (String ability : faction.getAbilities()) {
-            addIfAllowed(game, components, DraftCategory.ABILITY, ability, ability);
+            addIfAllowed(game, components, DraftCategory.ABILITY, ability, ability, ignoreErrata);
         }
         for (String tech : faction.getFactionTech()) {
-            addIfAllowed(game, components, DraftCategory.TECH, tech, tech);
+            addIfAllowed(game, components, DraftCategory.TECH, tech, tech, ignoreErrata);
         }
         for (String leader : faction.getLeaders()) {
             LeaderModel model = Mapper.getLeader(leader);
@@ -143,9 +152,10 @@ public class FactionDraftItem extends DraftItem {
                 continue;
             }
             switch (model.getType()) {
-                case "agent" -> addIfAllowed(game, components, DraftCategory.AGENT, leader, leader);
-                case "commander" -> addIfAllowed(game, components, DraftCategory.COMMANDER, leader, leader);
-                case "hero" -> addIfAllowed(game, components, DraftCategory.HERO, leader, leader);
+                case "agent" -> addIfAllowed(game, components, DraftCategory.AGENT, leader, leader, ignoreErrata);
+                case "commander" ->
+                    addIfAllowed(game, components, DraftCategory.COMMANDER, leader, leader, ignoreErrata);
+                case "hero" -> addIfAllowed(game, components, DraftCategory.HERO, leader, leader, ignoreErrata);
                 default -> {}
             }
         }
@@ -155,54 +165,63 @@ public class FactionDraftItem extends DraftItem {
                 continue;
             }
             switch (model.getBaseType()) {
-                case "mech" -> addIfAllowed(game, components, DraftCategory.MECH, unit, faction.getAlias());
-                case "flagship" -> addIfAllowed(game, components, DraftCategory.FLAGSHIP, unit, faction.getAlias());
+                case "mech" ->
+                    addIfAllowed(game, components, DraftCategory.MECH, unit, faction.getAlias(), ignoreErrata);
+                case "flagship" ->
+                    addIfAllowed(game, components, DraftCategory.FLAGSHIP, unit, faction.getAlias(), ignoreErrata);
                 default -> {}
             }
         }
-        addIfAllowed(game, components, DraftCategory.COMMODITIES, faction.getAlias(), faction.getAlias());
+        addIfAllowed(game, components, DraftCategory.COMMODITIES, faction.getAlias(), faction.getAlias(), ignoreErrata);
         for (String pn : faction.getPromissoryNotes()) {
-            addIfAllowed(game, components, DraftCategory.PN, pn, pn);
+            addIfAllowed(game, components, DraftCategory.PN, pn, pn, ignoreErrata);
         }
-        addIfAllowed(game, components, DraftCategory.HOMESYSTEM, faction.getAlias(), faction.getAlias());
-        addIfAllowed(game, components, DraftCategory.STARTINGTECH, faction.getAlias(), faction.getAlias());
-        addIfAllowed(game, components, DraftCategory.STARTINGFLEET, faction.getAlias(), faction.getAlias());
+        addIfAllowed(game, components, DraftCategory.HOMESYSTEM, faction.getAlias(), faction.getAlias(), ignoreErrata);
+        addIfAllowed(
+                game, components, DraftCategory.STARTINGTECH, faction.getAlias(), faction.getAlias(), ignoreErrata);
+        addIfAllowed(
+                game, components, DraftCategory.STARTINGFLEET, faction.getAlias(), faction.getAlias(), ignoreErrata);
 
         String breakthrough = faction.getBreakthrough();
         if (Mapper.isValidBreakthrough(breakthrough)) {
-            addIfAllowed(game, components, DraftCategory.BREAKTHROUGH, breakthrough, breakthrough);
+            addIfAllowed(game, components, DraftCategory.BREAKTHROUGH, breakthrough, breakthrough, ignoreErrata);
         }
-        if (game.isMonumentsMode() && game.getActiveBagDraft() instanceof FrankenDrazDraft) {
+        if (game != null && game.isMonumentsMode() && game.getActiveBagDraft() instanceof FrankenDrazDraft) {
             Mapper.getUnits().values().stream()
                     .filter(UnitModel::getIsMonument)
                     .filter(unit -> faction.getAlias().equals(unit.getFaction().orElse(null)))
                     .filter(unit -> MonumentDraftItem.isAvailable(game, unit.getId()))
                     .findFirst()
-                    .ifPresent(
-                            unit -> addIfAllowed(game, components, DraftCategory.MONUMENT, unit.getId(), unit.getId()));
+                    .ifPresent(unit -> addIfAllowed(
+                            game, components, DraftCategory.MONUMENT, unit.getId(), unit.getId(), ignoreErrata));
         }
         return components;
     }
 
     private static void addIfAllowed(
-            Game game, List<DraftItem> components, DraftCategory category, String itemId, String banValue) {
+            Game game,
+            List<DraftItem> components,
+            DraftCategory category,
+            String itemId,
+            String banValue,
+            boolean ignoreErrata) {
         String resolvedItemId = resolveFrankenReplacement(game, category, itemId);
         if (resolvedItemId == null) {
             return;
         }
         String resolvedBanValue = itemId.equals(banValue) ? resolvedItemId : banValue;
-        if (isBanned(game, category, resolvedBanValue)) {
+        if (!ignoreErrata && game != null && isBanned(game, category, resolvedBanValue)) {
             return;
         }
         DraftItem item = generate(category, resolvedItemId);
-        if (Boolean.TRUE.equals(item.getErrata().getUndraftable())) {
+        if (!ignoreErrata && Boolean.TRUE.equals(item.getErrata().getUndraftable())) {
             return;
         }
         components.add(item);
     }
 
     private static String resolveFrankenReplacement(Game game, DraftCategory category, String itemId) {
-        if (!game.isFrankenGame()) {
+        if (game == null || !game.isFrankenGame()) {
             return itemId;
         }
 

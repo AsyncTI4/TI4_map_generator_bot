@@ -10,12 +10,12 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.game.Game;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.persistence.DatabasePersistenceGate;
 import ti4.spring.service.gameevent.GameEventService;
 
 class ExportFinishedGame extends Subcommand {

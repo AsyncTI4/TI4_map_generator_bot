@@ -1,9 +1,7 @@
 package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -25,23 +23,23 @@ public class MyrrAbilitiesHandler {
     private static final String FACTORY_LEASE_SYSTEM = "myrrFactoryLeaseSystem_";
     private static final String FACTORY_LEASE_PRODUCE = "myrrFactoryLeaseProduce_";
 
-    public static boolean hasEchoOfTheAnvilDiscount(Player player) {
-        if (!player.hasAbility("echo_of_the_anvil")) {
-            return false;
+    public static void resolveEchoOfTheAnvil(Player player) {
+        if (player == null || !player.hasAbility("echo_of_the_anvil")) {
+            return;
         }
-
-        Map<String, Integer> producedByType = new HashMap<>();
-        int totalProduced = 0;
-
-        for (Map.Entry<String, Integer> entry : player.getCurrentProducedUnits().entrySet()) {
-            String unitType = entry.getKey().split("_", 2)[0];
-            int count = entry.getValue();
-
-            totalProduced += count;
-            producedByType.merge(unitType, count, Integer::sum);
+        boolean producedMatchingNonFighterShips = player.getCurrentProducedUnits().entrySet().stream()
+                .filter(entry -> entry.getValue() >= 2)
+                .map(entry -> entry.getKey().split("_", 2)[0])
+                .map(player::getUnitByBaseType)
+                .anyMatch(unit -> unit != null && unit.getIsShip() && !"fighter".equalsIgnoreCase(unit.getBaseType()));
+        if (!producedMatchingNonFighterShips) {
+            return;
         }
-
-        return totalProduced >= 2 && producedByType.values().stream().anyMatch(count -> count >= 2);
+        player.gainTG(1);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " gained 1 trade good from _Echo of the Anvil_.");
+        player.resetProducedUnits();
     }
 
     public static void offerFactoryLeaseProduction(Game game) {
@@ -75,7 +73,7 @@ public class MyrrAbilitiesHandler {
                             player.factionButtonChecker() + FACTORY_LEASE_SYSTEM + tile.getPosition() + "|" + lease,
                             "Produce in " + tile.getRepresentationForButtons(game, player)));
                 }
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()

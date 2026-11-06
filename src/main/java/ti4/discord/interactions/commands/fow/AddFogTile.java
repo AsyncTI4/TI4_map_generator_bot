@@ -37,6 +37,9 @@ class AddFogTile extends GameStateSubcommand {
         if (targetPlayers.isEmpty()) {
             targetPlayers.add(getPlayer());
         }
+        if (FogTileTargets.refusedForOtherSeats(event, getGame(), getPlayer(), targetPlayers)) {
+            return;
+        }
 
         String planetTileName = AliasHandler.resolveTile(
                 event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());

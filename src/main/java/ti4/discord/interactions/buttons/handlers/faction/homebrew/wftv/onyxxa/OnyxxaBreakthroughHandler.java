@@ -39,7 +39,7 @@ public class OnyxxaBreakthroughHandler {
         buttons.add(Buttons.green(
                 player.factionButtonChecker() + "onyxxabtMechPlacement_" + tile.getPosition() + "_" + planetName,
                 "Replace 1 Infantry with 1 Mech (" + infantryCount + " available)"));
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -71,7 +71,7 @@ public class OnyxxaBreakthroughHandler {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "onyxxabtMechPlacement_" + pos + "_" + planetName,
                     "Replace 1 Infantry with 1 Mech (" + remaining + " remaining)"));
-            buttons.add(Buttons.red("deleteButtons", "Done"));
+            buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
             MessageHelper.editMessageButtons(event, buttons);
         }
     }

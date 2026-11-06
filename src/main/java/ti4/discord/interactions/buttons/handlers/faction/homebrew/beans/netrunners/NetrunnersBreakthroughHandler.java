@@ -45,7 +45,7 @@ public class NetrunnersBreakthroughHandler {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", choose a player for _Emotet_.",
+                player.getRepresentation() + ", choose a player for _Emotet_.",
                 NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + TARGET, 0));
     }
 
@@ -74,7 +74,7 @@ public class NetrunnersBreakthroughHandler {
         paymentButtons.add(Buttons.red(target.factionButtonChecker() + DECLINE + player.getFaction(), "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCorrectChannel(),
-                target.getRepresentationNoPing() + ", " + player.getFactionEmojiOrColor()
+                target.getRepresentation() + ", " + player.getFactionEmojiOrColor()
                         + " used _Emotet_. You may spend 2 trade goods to research 1 non-faction technology.",
                 paymentButtons);
         ButtonHelper.deleteMessage(event);
@@ -123,7 +123,7 @@ public class NetrunnersBreakthroughHandler {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 owner.getCorrectChannel(),
-                owner.getRepresentationNoPing() + ", " + target.getFactionEmojiOrColor() + " researched "
+                owner.getRepresentation() + ", " + target.getFactionEmojiOrColor() + " researched "
                         + technology.getNameRepresentation()
                         + " with _Emotet_. You may return their control token to gain it.",
                 List.of(
@@ -169,7 +169,7 @@ public class NetrunnersBreakthroughHandler {
         PlayerTechService.getTech(game, owner, event, "getTech_" + technology.getAlias() + "__noPay");
         MessageHelper.sendMessageToChannel(
                 owner.getCorrectChannel(),
-                owner.getRepresentationNoPing() + " resolved _Emotet_: " + target.getRepresentationNoPing()
+                owner.getRepresentation() + " resolved _Emotet_: " + target.getRepresentationNoPing()
                         + " researched " + technology.getNameRepresentation() + ", and "
                         + owner.getRepresentationNoPing() + " returned " + target.getFactionEmojiOrColor()
                         + "'s control token from the Hacker Man pool to gain that technology.");
@@ -254,8 +254,8 @@ public class NetrunnersBreakthroughHandler {
     }
 
     private static String planetChoiceMessage(Player owner, Player target) {
-        return owner.getRepresentationNoPing() + ", choose a non-home planet controlled by "
-                + target.getFactionEmojiOrColor() + " to place 1 infantry into coexistence.";
+        return owner.getRepresentation() + ", choose a non-home planet controlled by " + target.getFactionEmojiOrColor()
+                + " to place 1 infantry into coexistence.";
     }
 
     private static List<Button> getTechButtons(Player owner, Player target) {

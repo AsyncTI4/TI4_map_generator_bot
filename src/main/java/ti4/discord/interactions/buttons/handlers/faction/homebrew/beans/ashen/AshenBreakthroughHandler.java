@@ -23,6 +23,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.BombardmentService;
@@ -30,7 +31,6 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class AshenBreakthroughHandler {
@@ -138,12 +138,8 @@ public class AshenBreakthroughHandler {
                 getRollContextKey(player), "pending|" + selected.source().getPosition() + "|" + target.planet());
         game.setStoredValue(
                 "assignedBombardment" + player.getFaction(),
-                new ObjectMapper()
-                        .writeValueAsString(List.of(new BombardmentAssignment(
-                                selected.unit().getAsyncId(),
-                                target.planet(),
-                                false,
-                                BombardmentAssignmentType.UNIT))));
+                JsonMapperManager.basic()
+                        .writeValueAsString(buildBombardmentAssignments(game, player, selected, target.planet())));
         game.setStoredValue("bombardmentTarget" + player.getFaction(), target.planet());
         CombatRollService.secondHalfOfCombatRoll(
                 player, game, event, selected.source(), "space", CombatRollType.bombardment, false);
@@ -252,7 +248,10 @@ public class AshenBreakthroughHandler {
                     }
                     UnitModel unit = player.getUnitFromUnitKey(unitKey);
                     if (unit != null && unit.getBombardDieCount(player) > 0) {
-                        choices.add(new UnitChoice(tile, unit));
+                        choices.add(new UnitChoice(
+                                tile,
+                                unit,
+                                holder.getGalvanizedUnitCount(unit.getUnitType(), player.getColorID()) > 0));
                     }
                 }
             }
@@ -303,6 +302,22 @@ public class AshenBreakthroughHandler {
                 .toList();
     }
 
+    private static List<BombardmentAssignment> buildBombardmentAssignments(
+            Game game, Player player, UnitChoice selected, String targetPlanet) {
+        List<BombardmentAssignment> assignments = new ArrayList<>();
+        assignments.add(new BombardmentAssignment(
+                selected.unit().getAsyncId(), targetPlanet, selected.galvanized(), BombardmentAssignmentType.UNIT));
+        if (player.hasTech("ps") || player.hasTech("absol_ps")) {
+            assignments.add(
+                    new BombardmentAssignment("plasmascoring", targetPlanet, false, BombardmentAssignmentType.TECH));
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander") || player.hasTech("tf-zealous")) {
+            assignments.add(new BombardmentAssignment(
+                    "argentcommander", targetPlanet, false, BombardmentAssignmentType.LEADER));
+        }
+        return assignments;
+    }
+
     private static String getRollContextKey(Player player) {
         return ROLL_CONTEXT + player.getFaction();
     }
@@ -319,7 +334,7 @@ public class AshenBreakthroughHandler {
         }
     }
 
-    private record UnitChoice(Tile source, UnitModel unit) {}
+    private record UnitChoice(Tile source, UnitModel unit, boolean galvanized) {}
 
     private record PlanetChoice(Tile tile, String planet) {}
 

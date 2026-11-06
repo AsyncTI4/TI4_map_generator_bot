@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.image.map.CompactOverviewGenerator;
 import ti4.image.map.MapOverviewGenerator;
@@ -19,7 +20,11 @@ class MapOverviewCommand extends GameStateSubcommand {
     private static final String COMPACT = "compact";
 
     MapOverviewCommand() {
-        super("map_overview", "GM: the whole unfogged map, Fracture included, scaled to fit one image", false, true);
+        super(
+                Constants.FOW_MAP_OVERVIEW,
+                "GM: the whole unfogged map, Fracture included, scaled to fit one image",
+                false,
+                true);
         addOptions(
                 new OptionData(
                         OptionType.BOOLEAN, COMPACT, "False: true map positions instead of packed sector panels"),

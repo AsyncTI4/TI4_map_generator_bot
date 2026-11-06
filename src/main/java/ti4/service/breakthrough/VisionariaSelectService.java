@@ -141,7 +141,7 @@ public class VisionariaSelectService {
         }
         if (firstTime) {
             respondToVisionaria(event, game, player);
-            String msg = player.getRepresentationNoPing() + " is using _Visionaria Select_.";
+            String msg = " is using _Visionaria Select_.";
             ReactionService.addReaction(event, player.getGame(), player, msg);
         }
     }

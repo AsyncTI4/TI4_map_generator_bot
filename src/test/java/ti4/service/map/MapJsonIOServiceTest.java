@@ -20,6 +20,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.Mapper;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.testUtils.BaseTi4Test;
@@ -80,12 +81,19 @@ class MapJsonIOServiceTest extends BaseTi4Test {
                 }
                 """;
 
-        MapJsonIOService.importMapFromJson(game, json, null);
+        assertTrue(MapJsonIOService.importMapFromJson(game, json, null));
 
         LoreEntry stored = LoreService.getGameLore(game).get("000");
         assertNotNull(stored);
         assertEquals("An old beacon flickers.", stored.loreText);
         assertEquals(LoreService.TRIGGER.CONTROLLED, stored.trigger);
+    }
+
+    // The FoW setup panel shows its success notice from this result, so a parse failure must report false.
+    @Test
+    void malformedJsonReportsFailureAndKeepsTheMap() {
+        assertFalse(MapJsonIOService.importMapFromJson(game, "{ not json", null));
+        assertNotNull(game.getTileByPosition("000"));
     }
 
     // Lore is validated against the map, so it must be imported after every tile is placed: a target on a tile
@@ -321,6 +329,40 @@ class MapJsonIOServiceTest extends BaseTi4Test {
         assertEquals("Real entry", LoreService.getGameLore(game).get("mr").loreText);
     }
 
+    // One-way wormhole tokens have no image file on disk; they must still survive export + import,
+    // and a hand-written token id must import too.
+    @Test
+    void oneWayWormholeTokensRoundTripAndImportByIdWithoutErrors() {
+        game.getTileByPosition("000").getSpaceUnitHolder().addToken(Mapper.getTokenID("whalpha_in"));
+        String exported = MapJsonIOService.exportMapAsJson(null, game, true, false, false);
+        Game freshGame = new Game();
+        freshGame.setName(REIMPORT_GAME_NAME);
+        Game handWrittenGame = new Game();
+        handWrittenGame.setName(REIMPORT_GAME_NAME);
+        String handWritten = """
+                { "mapInfo": [ { "position": "101", "tileID": "19", "tokens": ["whdelta_out"] } ] }
+                """;
+
+        try (MockedStatic<MessageHelper> messages = mockStatic(MessageHelper.class)) {
+            MapJsonIOService.importMapFromJson(freshGame, exported, null);
+            MapJsonIOService.importMapFromJson(handWrittenGame, handWritten, null);
+
+            messages.verify(
+                    () -> MessageHelper.sendMessageToChannel(any(), argThat(msg -> msg.contains("Token not found"))),
+                    never());
+        }
+        assertTrue(freshGame
+                .getTileByPosition("000")
+                .getSpaceUnitHolder()
+                .getTokenList()
+                .contains("token_oneway_whalpha_in.png"));
+        assertTrue(handWrittenGame
+                .getTileByPosition("101")
+                .getSpaceUnitHolder()
+                .getTokenList()
+                .contains("token_oneway_whdelta_out.png"));
+    }
+
     @Test
     void exportThenReimportRoundTripsTaggedAndPhaseLore() {
         LoreEntry bare = new LoreEntry("Bare system lore");
@@ -366,5 +408,21 @@ class MapJsonIOServiceTest extends BaseTi4Test {
 
         assertTrue(reimported.containsKey("action"), "phase lore must round-trip");
         assertEquals(LoreService.TRIGGER.PHASE_END, reimported.get("action").trigger);
+    }
+
+    // The import mirrors every 1, so a one-way lane only survives because the export writes it back as a 2.
+    @Test
+    void oneWayHyperlaneRoundTripsThroughExportAndImport() {
+        game.setTile(new Tile("hl", "101"));
+        CustomHyperlaneService.insertData(
+                game, "101", "0,0,0,2,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        String stored = game.getCustomHyperlaneData().get("101");
+
+        String json = MapJsonIOService.exportMapAsJson(null, game, false, false, true);
+        Game freshGame = new Game();
+        freshGame.setName(REIMPORT_GAME_NAME);
+        MapJsonIOService.importMapFromJson(freshGame, json, null);
+
+        assertEquals(stored, freshGame.getCustomHyperlaneData().get("101"));
     }
 }

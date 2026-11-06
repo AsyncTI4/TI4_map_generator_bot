@@ -216,7 +216,7 @@ public class KairnAbilityHandler {
                                 player.factionButtonChecker() + USE_SHARED_DISCOVERIES_PROMPT,
                                 "Use Shared Discoveries",
                                 FactionEmojis.kairn),
-                        Buttons.red("deleteButtons", "Decline")));
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(USE_SHARED_DISCOVERIES)

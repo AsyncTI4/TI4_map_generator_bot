@@ -25,19 +25,18 @@ final class ControlBorder {
         if (("off".equals(game.getHexBorderStyle()) && !unlocked) || controllingPlayer == null || layer.isSpiral()) {
             return;
         }
-        List<Integer> openSides = sidesSharedWith(game, tile, controllingPlayer);
-        if (scene.isPrivateView() && scene.fowPlayer() == null) openSides.clear();
+        List<Integer> openSides = sidesSharedWith(scene, tile, controllingPlayer);
         String hexBorderStyle = unlocked ? "solid" : game.getHexBorderStyle();
         BufferedImage border =
                 HexOverlays.border(hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
         layer.g().drawImage(border, TILE_PADDING, TILE_PADDING, null);
     }
 
-    private static List<Integer> sidesSharedWith(Game game, Tile tile, Player controllingPlayer) {
+    private static List<Integer> sidesSharedWith(TileScene scene, Tile tile, Player controllingPlayer) {
         int sideNum = 0;
         List<Integer> openSides = new ArrayList<>();
         for (String adj : MapPositionMapper.getAdjacentTilePositions(tile.getPosition())) {
-            if (game.getPlayerThatControlsTile(adj) == controllingPlayer) {
+            if (scene.seesPosition(adj) && scene.game().getPlayerThatControlsTile(adj) == controllingPlayer) {
                 openSides.add(sideNum);
             }
             sideNum++;

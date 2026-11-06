@@ -185,17 +185,22 @@ public abstract class DraftItem {
      */
     @JsonIgnore
     public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr) {
+        return getTextDisplays(game, player, showDescr, false);
+    }
+
+    @JsonIgnore
+    public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr, boolean useAlternateText) {
         List<TextDisplay> textFields = new ArrayList<>();
 
         String details = getTitle(game);
         if (showDescr || DraftCategory.showDescrByDefault()) {
-            String descr = getDisplayDescription(game, getLongDescriptionImpl(game));
+            String descr = getDisplayDescription(game, getLongDescriptionImpl(game), useAlternateText);
             descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
             details += System.lineSeparator() + "> " + descr;
         }
         textFields.add(TextDisplay.of(details));
 
-        if (hasAdditionalComponents() && !game.isTwilightsFallMode()) {
+        if (hasAdditionalComponents() && (game == null || !game.isTwilightsFallMode())) {
             List<String> adds = new ArrayList<>();
             adds.add("**__Additional Added Components:__**");
             for (DraftErrataModel i2 : Errata.getAdditionalComponents()) {
@@ -206,7 +211,7 @@ public abstract class DraftItem {
         }
 
         List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
-        if (!optionalSwaps.isEmpty() && !game.isTwilightsFallMode()) {
+        if (!optionalSwaps.isEmpty() && (game == null || !game.isTwilightsFallMode())) {
             List<String> swaps = new ArrayList<>();
             swaps.add("**__Optional Component Swaps:__**");
             for (DraftErrataModel i2 : optionalSwaps) {
@@ -216,6 +221,13 @@ public abstract class DraftItem {
             textFields.add(TextDisplay.of(String.join(System.lineSeparator(), swaps)));
         }
         return textFields;
+    }
+
+    @JsonIgnore
+    public List<TextDisplay> getPlainTextDisplays(Game game) {
+        String descr = getLongDescriptionImpl(game).trim().replace("\n> ", "\n").replace("\n", "\n> ");
+        String details = getTitle(game) + System.lineSeparator() + "> " + descr;
+        return List.of(TextDisplay.of(details));
     }
 
     @JsonIgnore
@@ -245,7 +257,7 @@ public abstract class DraftItem {
 
     @JsonIgnore
     public String getLongDescription(Game game) {
-        StringBuilder sb = new StringBuilder(getDisplayDescription(game, getLongDescriptionImpl(game)));
+        StringBuilder sb = new StringBuilder(getDisplayDescription(game, getLongDescriptionImpl(game), false));
         if (hasAdditionalComponents()) {
             sb.append("\n>  - *Also adds: ");
             for (DraftErrataModel i : Errata.getAdditionalComponents()) {
@@ -271,12 +283,13 @@ public abstract class DraftItem {
     private List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
         return Errata.getOptionalSwaps().stream()
                 .filter(item -> item.getItemCategory() != DraftCategory.MONUMENT
+                        || game == null
                         || MonumentDraftItem.isAvailable(game, item.getItemId()))
                 .toList();
     }
 
-    private String getDisplayDescription(Game game, String defaultDescription) {
-        if (game == null || !game.isFrankenGame()) {
+    private String getDisplayDescription(Game game, String defaultDescription, boolean useAlternateText) {
+        if (!useAlternateText && (game == null || !game.isFrankenGame())) {
             return defaultDescription;
         }
         String alternateText = Errata.getAlternateText();

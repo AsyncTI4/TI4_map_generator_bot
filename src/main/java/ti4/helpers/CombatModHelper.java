@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
@@ -28,6 +29,8 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
+import ti4.json.JsonMapperManager;
 import ti4.model.AbilityModel;
 import ti4.model.AgendaModel;
 import ti4.model.BreakthroughModel;
@@ -40,11 +43,13 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
+import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.game.MonumentsService;
+import ti4.service.leader.genome.homebrew.tknova.AristocraticGenome;
+import ti4.service.leader.genome.homebrew.tknova.HumanGenome;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
 
 @UtilityClass
 public class CombatModHelper {
@@ -364,6 +369,22 @@ public class CombatModHelper {
                 modifier, onTile, player, opponent, unitsByQuantity, opponentUnitsByQuantity, null, game);
     }
 
+    private static boolean genomeBoostsSeveralUnits(
+            Game game, Player player, String genomeId, Map<UnitModel, Integer> unitsByQuantity) {
+        return game.getStoredValue(genomeId).contains(player.getFaction()) && unitCount(unitsByQuantity) >= 2;
+    }
+
+    private static boolean genomeBoostsOneUnit(
+            Game game, Player player, String genomeId, Map<UnitModel, Integer> unitsByQuantity) {
+        return game.getStoredValue(genomeId).contains(player.getFaction()) && unitCount(unitsByQuantity) == 1;
+    }
+
+    private static int unitCount(Map<UnitModel, Integer> unitsByQuantity) {
+        return unitsByQuantity == null
+                ? 0
+                : unitsByQuantity.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
     private static Boolean checkModPassesCondition(
             CombatModifierModel modifier,
             TileModel onTile,
@@ -545,6 +566,31 @@ public class CombatModHelper {
                     }
                 }
             }
+            case "ground_combat_defender" -> {
+                StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
+                meetsCondition = combat != null
+                        && combat.unitHolderName() != null
+                        && !Constants.SPACE.equals(combat.unitHolderName())
+                        && tile != null
+                        && combat.tilePosition().equals(tile.getPosition())
+                        && combat.factions().contains(player.getFaction())
+                        && game.getActivePlayer() != null
+                        && player != game.getActivePlayer();
+            }
+            case "bloom_mech_defender" -> {
+                StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
+                meetsCondition = combat != null
+                        && combat.unitHolderName() != null
+                        && !Constants.SPACE.equals(combat.unitHolderName())
+                        && tile != null
+                        && combat.tilePosition().equals(tile.getPosition())
+                        && combat.factions().contains(player.getFaction())
+                        && player != game.getActivePlayer()
+                        && BloomAbilityHandler.wasCoexistingAtStartOfAction(game, player, combat.unitHolderName());
+            }
+            case "bloom_flagship_in_combat" ->
+                meetsCondition = unitsByQuantity != null
+                        && unitsByQuantity.keySet().stream().anyMatch(unit -> "bloom_flagship".equals(unit.getAlias()));
             case "vaylerianhero" -> {
                 if (player == game.getActivePlayer()
                         && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {
@@ -567,6 +613,14 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "tknovahumanagent" ->
+                meetsCondition = genomeBoostsSeveralUnits(game, player, HumanGenome.ID, unitsByQuantity);
+            case "tknovahumanagentSingle" ->
+                meetsCondition = genomeBoostsOneUnit(game, player, HumanGenome.ID, unitsByQuantity);
+            case "tknovaaristocraticagent" ->
+                meetsCondition = genomeBoostsSeveralUnits(game, player, AristocraticGenome.ID, unitsByQuantity);
+            case "tknovaaristocraticagentSingle" ->
+                meetsCondition = genomeBoostsOneUnit(game, player, AristocraticGenome.ID, unitsByQuantity);
             case "letnevagent" -> {
                 if (game.getStoredValue("letnevagent").contains(player.getFaction())) {
                     meetsCondition = true;
@@ -691,8 +745,7 @@ public class CombatModHelper {
                     List<Tile> tilesToCheck = new ArrayList<>();
                     tilesToCheck.add(tile);
                     if (unitsByQuantity.keySet().stream().anyMatch(UnitModel::getDeepSpaceCannon)) {
-                        for (String adjPos :
-                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                        for (String adjPos : Adjacency.of(game, player).into(tile.getPosition())) {
                             Tile adjTile = game.getTileByPosition(adjPos);
                             if (adjTile != null) {
                                 tilesToCheck.add(adjTile);
@@ -751,8 +804,7 @@ public class CombatModHelper {
                         "sigma_argent_flagship_1", player, game.getTileByPosition(game.getActiveSystem()));
             case "sigma_argent_flagship_2" -> {
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, tile);
-                for (String adjPos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                for (String adjPos : Adjacency.of(game, player).into(tile.getPosition())) {
                     meetsCondition |= ButtonHelper.doesPlayerHaveFSHere(
                             "sigma_argent_flagship_2", player, game.getTileByPosition(adjPos));
                 }
@@ -836,6 +888,20 @@ public class CombatModHelper {
                     scalingCount = player.getAbilities().stream()
                             .filter(CODE_CARD_ABILITIES::contains)
                             .count();
+                case "bloom_dormant_strains" ->
+                    scalingCount = player.getAbilities().stream()
+                            .filter(ability -> ability.endsWith("_dormant"))
+                            .filter(ability -> ability.startsWith("neurotropic")
+                                    || ability.startsWith("rhizomatic")
+                                    || ability.startsWith("carnivorous"))
+                            .count();
+                case "bloom_active_strains" ->
+                    scalingCount = player.getAbilities().stream()
+                            .filter(ability -> ability.endsWith("_active"))
+                            .filter(ability -> ability.startsWith("neurotropic")
+                                    || ability.startsWith("rhizomatic")
+                                    || ability.startsWith("carnivorous"))
+                            .count();
                 case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {
@@ -898,8 +964,7 @@ public class CombatModHelper {
                     }
                 }
                 case "adjacent_anomaly" -> {
-                    for (String pos :
-                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true, true)) {
+                    for (String pos : Adjacency.of(game, player).withSelf().from(activeSystem.getPosition())) {
                         Tile tile = game.getTileByPosition(pos);
                         if (tile.isAnomaly(game, player)) {
                             scalingCount += 1;
@@ -1080,8 +1145,7 @@ public class CombatModHelper {
         }
         Set<UnitHolder> holders = Collections.newSetFromMap(new IdentityHashMap<>());
         holders.add(unitHolder);
-        for (String adjacentPosition :
-                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+        for (String adjacentPosition : Adjacency.of(game, player).withSelf().into(activeSystem.getPosition())) {
             holders.addAll(
                     game.getTileByPosition(adjacentPosition).getUnitHolders().values());
         }
@@ -1100,7 +1164,7 @@ public class CombatModHelper {
 
         if (isBombardment) {
             String bombardmentTarget = game.getStoredValue("bombardmentTarget" + player.getFaction());
-            List<BombardmentAssignment> bombardmentAssignments = new ObjectMapper()
+            List<BombardmentAssignment> bombardmentAssignments = JsonMapperManager.basic()
                     .readValue(
                             game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
             return bombardmentAssignments.stream()

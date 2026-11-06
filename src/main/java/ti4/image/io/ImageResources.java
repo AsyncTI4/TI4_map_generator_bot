@@ -158,6 +158,10 @@ public final class ImageResources {
         return attachment != null ? attachment : token(name);
     }
 
+    public static boolean hasTokenImage(String tokenFileName) {
+        return Mapper.getOneWayWormholeToken(tokenFileName) != null || tokenOrAttachment(tokenFileName) != null;
+    }
+
     @Nullable
     public static String tokenOrAttachment(String tokenID) {
         String tokenPath = attachment(tokenID);

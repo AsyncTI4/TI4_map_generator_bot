@@ -2,14 +2,50 @@ on:
   workflow_dispatch:
   workflow_call:
   schedule:
-    - cron: "0 * * * *"
+    # Off the top of the hour: GitHub delays and drops many ":00" scheduled runs.
+    - cron: "23 * * * *"
 name: ForceSaveFileBackup
 concurrency:
   group: "Start Bot"
+env:
+  BACKUP_SCRIPT: |
+    set -eu
+    cd ${{ vars.HOST_TI4_SAVES_DIR }}
+    echo "FORCING BACKUP OF SAVE FILES"
+    rm -f .git/index.lock
+    git fetch origin master
+    git reset --mixed origin/master
+    grep -qxF "*.bak" .git/info/exclude || printf "\n# Managed by ForceSaveFileBackup\n*.bak\n*.bak.*\n" >> .git/info/exclude
+    git add -A -- . ':(glob,exclude)*.bak' ':(glob,exclude)**/*.bak' ':(glob,exclude)*.bak.*' ':(glob,exclude)**/*.bak.*'
+    oversized_files="$(mktemp)"
+    git diff --cached --name-only | while IFS= read -r file; do
+      if [ -f "$file" ]; then
+        size="$(wc -c < "$file" | tr -d ' ')"
+        if [ "$size" -gt 95000000 ]; then
+          printf '%s (%s bytes)\n' "$file" "$size" >> "$oversized_files"
+          git reset -q HEAD -- "$file"
+        fi
+      fi
+    done
+    if [ -s "$oversized_files" ]; then
+      echo "Skipped files larger than GitHub's 100 MB limit:"
+      cat "$oversized_files"
+    fi
+    rm -f "$oversized_files"
+    if git diff --cached --quiet; then
+      echo "No changes to commit"
+    else
+      git commit -m "save files"
+    fi
+    git push
+    curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' "$DISCORD_WEBHOOK_URL"
+    echo "DONE!"
 jobs:
   save:
     name: Backup Game Saves
     runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.backup.outcome == 'success' }}
     steps:
       - name: executing remote ssh commands using password
         id: backup
@@ -24,41 +60,33 @@ jobs:
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           timeout: 60s
           envs: DISCORD_WEBHOOK_URL
-          script: |
-            set -eu
-            cd ${{ vars.HOST_TI4_SAVES_DIR }}
-            echo "FORCING BACKUP OF SAVE FILES"
-            rm -f .git/index.lock
-            git fetch origin master
-            git reset --mixed origin/master
-            grep -qxF "*.bak" .git/info/exclude || printf "\n# Managed by ForceSaveFileBackup\n*.bak\n*.bak.*\n" >> .git/info/exclude
-            git add -A -- . ':(glob,exclude)*.bak' ':(glob,exclude)**/*.bak' ':(glob,exclude)*.bak.*' ':(glob,exclude)**/*.bak.*'
-            oversized_files="$(mktemp)"
-            git diff --cached --name-only | while IFS= read -r file; do
-              if [ -f "$file" ]; then
-                size="$(wc -c < "$file" | tr -d ' ')"
-                if [ "$size" -gt 95000000 ]; then
-                  printf '%s (%s bytes)\n' "$file" "$size" >> "$oversized_files"
-                  git reset -q HEAD -- "$file"
-                fi
-              fi
-            done
-            if [ -s "$oversized_files" ]; then
-              echo "Skipped files larger than GitHub's 100 MB limit:"
-              cat "$oversized_files"
+          script: ${{ env.BACKUP_SCRIPT }}
+
+  # The failures are TCP connect timeouts to the SSH port that can last 10+ minutes, so retry
+  # from a new runner once the port answers again, giving up after about 15 minutes.
+  retry:
+    name: Retry Backup From A New Runner
+    needs: save
+    if: ${{ needs.save.outputs.ok != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: wait for the SSH port to answer
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
+        run: |
+          for attempt in $(seq 1 30); do
+            if timeout 5 bash -c "</dev/tcp/$SSH_HOST/$SSH_PORT" 2>/dev/null; then
+              echo "SSH port reachable on probe $attempt"
+              exit 0
             fi
-            rm -f "$oversized_files"
-            if git diff --cached --quiet; then
-              echo "No changes to commit"
-            else
-              git commit -m "save files"
-            fi
-            git push
-            curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
-            echo "DONE!"
+            echo "SSH port unreachable on probe $attempt, waiting 25s"
+            sleep 25
+          done
+          echo "SSH port still unreachable after ~15 minutes"
+          exit 1
 
       - name: retry executing remote ssh commands using password
-        if: steps.backup.outcome == 'failure'
         uses: appleboy/ssh-action@master
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -69,41 +97,15 @@ jobs:
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           timeout: 60s
           envs: DISCORD_WEBHOOK_URL
-          script: |
-            set -eu
-            cd ${{ vars.HOST_TI4_SAVES_DIR }}
-            echo "FORCING BACKUP OF SAVE FILES (retry)"
-            rm -f .git/index.lock
-            git fetch origin master
-            git reset --mixed origin/master
-            grep -qxF "*.bak" .git/info/exclude || printf "\n# Managed by ForceSaveFileBackup\n*.bak\n*.bak.*\n" >> .git/info/exclude
-            git add -A -- . ':(glob,exclude)*.bak' ':(glob,exclude)**/*.bak' ':(glob,exclude)*.bak.*' ':(glob,exclude)**/*.bak.*'
-            oversized_files="$(mktemp)"
-            git diff --cached --name-only | while IFS= read -r file; do
-              if [ -f "$file" ]; then
-                size="$(wc -c < "$file" | tr -d ' ')"
-                if [ "$size" -gt 95000000 ]; then
-                  printf '%s (%s bytes)\n' "$file" "$size" >> "$oversized_files"
-                  git reset -q HEAD -- "$file"
-                fi
-              fi
-            done
-            if [ -s "$oversized_files" ]; then
-              echo "Skipped files larger than GitHub's 100 MB limit:"
-              cat "$oversized_files"
-            fi
-            rm -f "$oversized_files"
-            if git diff --cached --quiet; then
-              echo "No changes to commit"
-            else
-              git commit -m "save files"
-            fi
-            git push
-            curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
-            echo "DONE!"
+          script: ${{ env.BACKUP_SCRIPT }}
 
+  notify:
+    name: Notify Discord on failure
+    needs: [save, retry]
+    if: ${{ always() && needs.save.outputs.ok != 'true' && needs.retry.result != 'success' }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Notify Discord on failure
-        if: ${{ always() && (failure() || cancelled()) }}
         env:
           DISCORD_ERROR_WEBHOOK_URL: ${{ secrets.DISCORD_ERROR_WEBHOOK_URL }}
         run: |

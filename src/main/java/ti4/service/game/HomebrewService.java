@@ -96,6 +96,7 @@ public class HomebrewService {
 
     @ButtonHandler("setupHomebrewNone")
     public static void removeHomebrew(Game game, ButtonInteractionEvent event) {
+        game.setHomebrew(false);
         game.setHomebrewSCMode(false);
         game.setRedTapeMode(false);
         game.setDiscordantStarsMode(false);

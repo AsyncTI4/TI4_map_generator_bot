@@ -11,7 +11,8 @@ class MedianTurnTime extends Subcommand {
 
     MedianTurnTime() {
         super(Constants.MEDIAN_TURN_TIME, "Median turn time across all games for all players");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)")
+                .setRequiredRange(1, 500));
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 Constants.MINIMUM_NUMBER_OF_TURNS,

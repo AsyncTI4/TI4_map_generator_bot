@@ -120,7 +120,7 @@ final class BoardSection {
     }
 
     @Nullable
-    private static TileStep displayTypeStep(DisplayType displayType) {
+    static TileStep displayTypeStep(DisplayType displayType) {
         return switch (displayType) {
             case wormholes -> TileStep.Wormholes;
             case anomalies -> TileStep.Anomalies;

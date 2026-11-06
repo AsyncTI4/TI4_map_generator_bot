@@ -12,7 +12,8 @@ class DrawRedBackTile extends GameStateSubcommand {
 
     public DrawRedBackTile() {
         super(Constants.DRAW_RED_BACK_TILE, "Draw a random red back tile (for Dane's mystery tweet)", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw? Default: 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw? Default: 1")
+                .setRequiredRange(1, 10));
     }
 
     @Override

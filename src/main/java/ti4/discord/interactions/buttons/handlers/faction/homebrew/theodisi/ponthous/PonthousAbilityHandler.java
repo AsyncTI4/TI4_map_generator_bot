@@ -44,7 +44,7 @@ public class PonthousAbilityHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(
                 Buttons.green(player.factionButtonChecker() + USE_PONTHOUS, "Ready Ponthous", FactionEmojis.ponthous));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         return buttons;
     }

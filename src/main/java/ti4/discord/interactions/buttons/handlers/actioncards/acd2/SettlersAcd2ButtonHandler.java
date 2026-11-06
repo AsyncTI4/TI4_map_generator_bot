@@ -44,7 +44,7 @@ class SettlersAcd2ButtonHandler {
                             + ", there are no non-home planets containing another player's units for _Settlers_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose another player to target with _Settlers_.",
@@ -71,7 +71,7 @@ class SettlersAcd2ButtonHandler {
                     target.getRepresentationNoPing() + " has no units on a non-home planet to target with _Settlers_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose a non-home planet that contains "

@@ -12,6 +12,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
@@ -53,6 +56,8 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
+import ti4.service.leader.agent.modules.homebrew.VaylerianAgent;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -202,7 +207,7 @@ public class AddPlanetService {
                 String message2 = player.getRepresentationUnfogged()
                         + ", choose the planets you wish to exhaust to spend " + MiscEmojis.Influence_6 + ".";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-                Button doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+                Button doneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS;
                 buttons.add(doneExhausting);
                 if (!player.hasAbility("blood_ties")) {
                     MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
@@ -242,6 +247,7 @@ public class AddPlanetService {
                         ButtonHelperAgents.resolveArtunoCheck(player_, 1);
                     }
                     player_.removePlanet(planet);
+                    MigoAbilityHandler.reconcileHarvestCards(game, player_);
                     ThirtyKSecretHooks.onPlanetLost(game, player_, unitHolder);
                     CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());
@@ -312,7 +318,7 @@ public class AddPlanetService {
                         buttons.add(Buttons.green(
                                 player_.dummyPlayerSpoof() + "exchangeProgramPart3_" + planet,
                                 "Place Enemy into Coexistence"));
-                        buttons.add(Buttons.red("deleteButtons", "Decline"));
+                        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentation() + " you can place a " + player_.getFactionEmoji()
@@ -351,6 +357,12 @@ public class AddPlanetService {
             }
         }
         ThirtyKActionCardHooks.onPlanetControlChanged(game, player, previousOwner, planet);
+        if (!doubleCheck && !setup) {
+            MigoAbilityHandler.onPlanetGained(player, planet);
+            MigoUnitHandler.syncNevermen(game);
+            MigoAbilityHandler.reconcileHarvestCards(game, player);
+            MigoAbilityHandler.offerMechHarvestChoices(game, player);
+        }
         if ((!alreadyOwned && player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
                 && !doubleCheck
@@ -420,7 +432,7 @@ public class AddPlanetService {
                     player.factionButtonChecker() + "useHydroExtract_" + planet,
                     "Use Hydrospheric Extraction",
                     FactionEmojis.morpha));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
@@ -539,8 +551,8 @@ public class AddPlanetService {
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove Command Token"));
-            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Technology"));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.RESEARCH_A_TECHNOLOGY);
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -609,15 +621,10 @@ public class AddPlanetService {
                 && player.hasUnexhaustedLeader("vaylerianagent")
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green(
-                    "exhaustAgent_vaylerianagent_" + player.getFaction(),
-                    "Use Vaylerian Agent",
-                    FactionEmojis.vaylerian));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(VaylerianAgent.button(player));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String msg2 = player.getRepresentationUnfogged() + " you may use "
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, to draw 1 action card.";
+                    + AgentLifecycle.agentNameForHolder(game, player, "vaylerianagent") + ", to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
         if (game.getActivePlayerID() != null
@@ -626,7 +633,7 @@ public class AddPlanetService {
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("scourPlanet_" + planet, "Use Scour", FactionEmojis.vaylerian));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String msg2 = player.getRepresentationUnfogged()
                     + " if you have not already used **Scour** this tactical action, you may discard 1 action card to ready "
                     + Helper.getPlanetRepresentation(planet, game) + ".";
@@ -644,7 +651,7 @@ public class AddPlanetService {
                     "produceOneUnitInTile_" + tile.getPosition() + "_sling",
                     "Produce 1 Ship",
                     FactionEmojis.freesystems));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             String msg2 = player.getRepresentationUnfogged()
                     + ", you may produce 1 ship in the system due to President Cyhn, the Free Systems Commander.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
@@ -655,7 +662,7 @@ public class AddPlanetService {
             saarButton.add(Buttons.green(
                     "cymiaeCommanderRes_" + planet,
                     "Discard Action Card for Mech on " + Helper.getPlanetRepresentation(planet, game)));
-            saarButton.add(Buttons.red("deleteButtons", "Decline"));
+            saarButton.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
@@ -672,7 +679,7 @@ public class AddPlanetService {
                 && !doubleCheck) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("deployMykoSD_" + planet, "Deploy Space Dock " + planet));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
@@ -729,7 +736,7 @@ public class AddPlanetService {
             saarButton.add(Buttons.green(
                     "saarMechRes_" + planet,
                     "Pay 1 Trade Good for a Mech on " + Helper.getPlanetRepresentation(planet, game)));
-            saarButton.add(Buttons.red("deleteButtons", "Decline"));
+            saarButton.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
@@ -743,11 +750,12 @@ public class AddPlanetService {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.blue(
                     "integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, game)));
-            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(
-                player, "sol", "vaylerian", "olradin", "xxcha", "sardakk", "revenantoblivion", "kairn");
+                player, "sol", "vaylerian", "olradin", "xxcha", "sardakk", "revenantoblivion", "kairn", "migo");
+        MigoLeadersHandler.syncMigoCommanderBonus(game);
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
         if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");

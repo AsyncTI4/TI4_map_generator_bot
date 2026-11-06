@@ -1,13 +1,12 @@
 package ti4.spring.api.dashboard;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
-import ti4.helpers.TIGLHelper;
 import ti4.model.EventModel;
 import ti4.model.Mapper;
 import ti4.service.game.ManagedGameService;
@@ -79,16 +77,15 @@ class DashboardService {
 
         List<ManagedGame> playerGames = managedPlayer.getGames().stream()
                 .filter(game -> isRealParticipant(game, userId))
-                .sorted(Comparator.comparingLong(DashboardService::getCreationDateTimeEpochMs)
+                .sorted(Comparator.comparingLong(ManagedGame::getCreationDateTime)
                         .reversed())
                 .toList();
 
         String userName = managedPlayer.getName();
-        String latestTiglRank =
-                getLatestTiglRankAtGameStart(userId, playerGames).orElse(null);
+        DashboardGameScan scan = scanGames(userId, playerGames);
 
         PlayerDashboardResponse.TitleSummary titleSummary = getTitleSummary(userId);
-        PlayerDashboardResponse.DiceLuckSummary diceLuckSummary = getDiceLuckSummary(userId, playerGames);
+        PlayerDashboardResponse.DiceLuckSummary diceLuckSummary = scan.diceLuckSummary();
 
         int gamesPlayed = playerGames.size();
         int activeGames =
@@ -98,33 +95,32 @@ class DashboardService {
         int abandonedGames = (int) playerGames.stream()
                 .filter(game -> game.isHasEnded() && !game.isHasWinner())
                 .count();
-        int wins = (int) playerGames.stream()
-                .map(ManagedGame::getGame)
-                .filter(Objects::nonNull)
-                .filter(game -> game.isHasEnded() && game.hasWinner())
-                .filter(game -> game.getWinners().stream().anyMatch(winner -> userId.equals(winner.getUserID())))
-                .count();
+        int wins = scan.wins();
 
         int finishedWithWinner = (int) playerGames.stream()
                 .filter(game -> game.isHasEnded() && game.isHasWinner())
                 .count();
         Double winPercent = finishedWithWinner == 0 ? null : (wins * 100.0) / finishedWithWinner;
 
-        List<PlayerDashboardResponse.DashboardGame> games = playerGames.stream()
-                .map(managedGame -> toDashboardGame(managedGame, userId))
-                .filter(Objects::nonNull)
-                .toList();
+        List<PlayerDashboardResponse.DashboardGame> games = List.copyOf(scan.games());
 
         PlayerDashboardResponse.DashboardSummary dashboardSummary = new PlayerDashboardResponse.DashboardSummary(
                 gamesPlayed, activeGames, finishedGames, abandonedGames, wins, winPercent);
         PlayerDashboardResponse.PlayerInsights insights =
-                DashboardBadgeEngine.analyze(userId, playerGames, games, titleSummary);
+                DashboardBadgeEngine.analyze(userId, scan.totalTurns(), scan.totalTurnTimeMs(), games, titleSummary);
         PlayerDashboardResponse.PlayerAggregates aggregates =
-                playerAggregatesService.getOrQueueRefresh(userId, playerGames);
+                playerAggregatesService.getOrQueueRefresh(userId, scan.trackedCompletedGameNames());
 
         return new PlayerDashboardResponse(
                 new PlayerDashboardResponse.PlayerProfile(
-                        userId, userName, null, latestTiglRank, titleSummary, diceLuckSummary, insights, aggregates),
+                        userId,
+                        userName,
+                        null,
+                        scan.latestTiglRank(),
+                        titleSummary,
+                        diceLuckSummary,
+                        insights,
+                        aggregates),
                 dashboardSummary,
                 games);
     }
@@ -133,24 +129,99 @@ class DashboardService {
         return managedGame.getRealPlayers().stream().anyMatch(player -> userId.equals(player.getId()));
     }
 
-    private static long getCreationDateTimeEpochMs(ManagedGame managedGame) {
-        Game game = managedGame.getGame();
-        if (game == null) {
-            return 0;
+    static DashboardGameScan scanGames(String userId, List<ManagedGame> playerGames) {
+        DashboardGameScan scan = new DashboardGameScan(userId);
+        for (ManagedGame managedGame : playerGames) {
+            Game game = managedGame.getGame();
+            if (game != null) {
+                scan.add(managedGame, game);
+            }
         }
-        return game.getCreationDateTime();
+        return scan;
     }
 
-    private static Optional<String> getLatestTiglRankAtGameStart(String userId, List<ManagedGame> playerGames) {
-        return playerGames.stream()
-                .map(ManagedGame::getGame)
-                .filter(Objects::nonNull)
-                .map(game -> game.getPlayer(userId))
-                .filter(Objects::nonNull)
-                .map(Player::getPlayerTIGLRankAtGameStart)
-                .filter(Objects::nonNull)
-                .map(TIGLHelper.TIGLRank::getName)
-                .findFirst();
+    private static String getTiglRankAtGameStart(Game game, String userId) {
+        Player player = game.getPlayer(userId);
+        if (player == null || player.getPlayerTIGLRankAtGameStart() == null) {
+            return null;
+        }
+        return player.getPlayerTIGLRankAtGameStart().getName();
+    }
+
+    private static boolean isWinner(Game game, String userId) {
+        return game.isHasEnded()
+                && game.hasWinner()
+                && game.getWinners().stream().anyMatch(winner -> userId.equals(winner.getUserID()));
+    }
+
+    static final class DashboardGameScan {
+        private final String userId;
+        private final List<PlayerDashboardResponse.DashboardGame> games = new ArrayList<>();
+        private final List<String> trackedCompletedGameNames = new ArrayList<>();
+        private String latestTiglRank;
+        private int wins;
+        private double expectedHits;
+        private double actualHits;
+        private int totalTurns;
+        private long totalTurnTimeMs;
+
+        private DashboardGameScan(String userId) {
+            this.userId = userId;
+        }
+
+        private void add(ManagedGame managedGame, Game game) {
+            if (latestTiglRank == null) {
+                latestTiglRank = getTiglRankAtGameStart(game, userId);
+            }
+            if (isWinner(game, userId)) {
+                wins++;
+            }
+            for (Player player : game.getRealPlayers()) {
+                if (!userId.equals(player.getStatsTrackedUserID())) {
+                    continue;
+                }
+                expectedHits += player.getExpectedHitsTimes10() / 10.0;
+                actualHits += player.getActualHits();
+                totalTurns += Math.max(player.getNumberOfTurns(), 0);
+                totalTurnTimeMs += Math.max(player.getTotalTurnTime(), 0);
+            }
+            PlayerDashboardResponse.DashboardGame dashboardGame = toDashboardGame(managedGame, game, userId);
+            if (dashboardGame != null) {
+                games.add(dashboardGame);
+            }
+            if (PlayerAggregatesService.isTrackedCompletedGame(managedGame, game)) {
+                trackedCompletedGameNames.add(managedGame.getName());
+            }
+        }
+
+        PlayerDashboardResponse.DiceLuckSummary diceLuckSummary() {
+            Double ratio = expectedHits > 0 ? actualHits / expectedHits : null;
+            return new PlayerDashboardResponse.DiceLuckSummary(actualHits, expectedHits, ratio);
+        }
+
+        List<PlayerDashboardResponse.DashboardGame> games() {
+            return games;
+        }
+
+        int wins() {
+            return wins;
+        }
+
+        int totalTurns() {
+            return totalTurns;
+        }
+
+        long totalTurnTimeMs() {
+            return totalTurnTimeMs;
+        }
+
+        List<String> trackedCompletedGameNames() {
+            return trackedCompletedGameNames;
+        }
+
+        String latestTiglRank() {
+            return latestTiglRank;
+        }
     }
 
     PlayerDashboardResponse.TitleSummary getTitleSummary(String userId) {
@@ -187,36 +258,8 @@ class DashboardService {
         return new PlayerDashboardResponse.TitleSummary(totalCount, titleItems);
     }
 
-    private static PlayerDashboardResponse.DiceLuckSummary getDiceLuckSummary(
-            String userId, List<ManagedGame> playerGames) {
-        double expectedHits = 0;
-        double actualHits = 0;
-
-        for (ManagedGame managedGame : playerGames) {
-            Game game = managedGame.getGame();
-            if (game == null) {
-                continue;
-            }
-
-            for (Player player : game.getRealPlayers()) {
-                if (!userId.equals(player.getStatsTrackedUserID())) {
-                    continue;
-                }
-                expectedHits += player.getExpectedHitsTimes10() / 10.0;
-                actualHits += player.getActualHits();
-            }
-        }
-
-        Double ratio = expectedHits > 0 ? actualHits / expectedHits : null;
-        return new PlayerDashboardResponse.DiceLuckSummary(actualHits, expectedHits, ratio);
-    }
-
-    private static PlayerDashboardResponse.DashboardGame toDashboardGame(ManagedGame managedGame, String userId) {
-        Game game = managedGame.getGame();
-        if (game == null) {
-            return null;
-        }
-
+    private static PlayerDashboardResponse.DashboardGame toDashboardGame(
+            ManagedGame managedGame, Game game, String userId) {
         Player you = game.getPlayer(userId);
         if (you == null) {
             return null;

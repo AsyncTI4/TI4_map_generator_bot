@@ -47,39 +47,6 @@ public final class TeHelperTechs {
     private static final String BLUE_REVERIE_EXECUTIVE_ORDER = "executiveOrderBr";
 
     // Generic Tech
-    @ButtonHandler("useMagenDefense_")
-    private static void useMagenDefenseGrid(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "useMagenDefense_" + RegexHelper.posRegex(game);
-        RegexService.runMatcher(regex, buttonID, matcher -> {
-            Tile tile = game.getTileByPosition(matcher.group("pos"));
-            boolean bulwark = player.hasUnit("tk-blacktrenchbulwark");
-            resolveMagen(game, player, tile, bulwark);
-            ButtonHelper.deleteMessage(event);
-        });
-    }
-
-    public static void revertMagen(Game game, Tile tile) {
-        clearMagenPlacement(game, tile, true);
-    }
-
-    public static void clearMagenStoredValues(Game game, Tile tile) {
-        clearMagenPlacement(game, tile, false);
-    }
-
-    private static void clearMagenPlacement(Game game, Tile tile, boolean removeInfantry) {
-        if (tile == null) return;
-        for (Player p : game.getRealPlayers()) {
-            UnitKey infKey = removeInfantry ? Units.getUnitKey(UnitType.Infantry, p.getColorID()) : null;
-            for (UnitHolder uh : tile.getUnitHolders().values()) {
-                String stored = game.getStoredValue("magenPlaced" + p.getFaction() + uh.getName());
-                if (!stored.isEmpty()) {
-                    if (removeInfantry) uh.removeUnit(infKey, Integer.parseInt(stored));
-                    game.removeStoredValue("magenPlaced" + p.getFaction() + uh.getName());
-                }
-            }
-        }
-    }
-
     public static void resolveMagen(Game game, Player player, Tile tile, boolean bulwark) {
         int total = 0;
         UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());

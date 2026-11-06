@@ -11,7 +11,9 @@ class ATS extends GameStateSubcommand {
 
     public ATS() {
         super(Constants.LANEFIR_ATS_COUNT, "Set commodity count on the ATS Armaments technology", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, "count", "Count")
+                .setRequiredRange(0, 99)
+                .setRequired(true));
     }
 
     @Override

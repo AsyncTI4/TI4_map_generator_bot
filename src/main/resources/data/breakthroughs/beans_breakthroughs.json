@@ -82,5 +82,53 @@
         ],
         "text": "After another player activates an anomaly that contains your command token and 1 or more of your units, you may exhaust this card to remove your command token from that system. Then, you may remove 1 of your non-fighter ships from another system that contains an anomaly and place it in the active system.",
         "source": "beans"
+    },
+    {
+        "alias": "valhavnbt",
+        "name": "Yggdrasil Cannon",
+        "shortName": "Yggdrasil\nCannon",
+        "faction": "valhavn",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "After 1 or more of your units produces a hit during SPACE CANNON OFFENSE in a system containing your ships: You may cancel 1 of those hits to remove 1 ship from that unit's system and place it into the active system.",
+        "source": "beans"
+    },
+    {
+        "alias": "migobt",
+        "name": "Ythic Symbiosis",
+        "shortName": "Ythic\nSymbiosis",
+        "faction": "migo",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "Planets you control that have technology specialties cannot be exhausted by other players. When another player commits units onto one of those planets, you may exhaust 1 technology to force those units into coexistence instead.",
+        "source": "beans"
+    },
+    {
+        "alias": "deepbt",
+        "name": "Event Horizon",
+        "shortName": "Event\nHorizon",
+        "faction": "deep",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "You may treat systems that contain no planets as if they were adjacent to the active system for the purpose of declaring and resolving retreats.\n\nAfter you activate a system, you may exhaust this card to allow up to 2 of your ships to move out of any systems that contain no planets and your command tokens.",
+        "source": "beans"
+    },
+    {
+        "alias": "bloombt",
+        "name": "Mycelial Bridges",
+        "shortName": "Mycelial\nBridges",
+        "faction": "bloom",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "After you produce 1 or more infantry, you may place up to 2  of the produced infantry into coexistence on different planets containing your coexisting units.",
+        "source": "beans"
     }
 ]

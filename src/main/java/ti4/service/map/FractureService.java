@@ -183,7 +183,7 @@ public class FractureService {
                                         + player.getRepresentationUnfoggedNoPing() + "."
                                 : player.getRepresentation() + ", please choose a system with a " + type.emoji()
                                         + " to place an Ingress token.";
-                        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                        buttons.add(Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(),
                                 msg,
@@ -378,7 +378,7 @@ public class FractureService {
                             + player.getRepresentationUnfoggedNoPing() + "."
                     : player.getRepresentation() + ", please choose a system with a " + type.emoji()
                             + " to place an Ingress token.";
-            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(), msg, buttons);
             if (!game.isFowMode() && !goneThrough) {

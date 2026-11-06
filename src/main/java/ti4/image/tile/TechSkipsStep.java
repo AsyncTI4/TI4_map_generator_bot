@@ -5,7 +5,6 @@ import static ti4.image.tile.TileGeometry.TILE_PADDING;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.image.draw.IconHalo;
@@ -20,9 +19,8 @@ final class TechSkipsStep implements TileStepPainter {
 
     @Override
     public void paint(TileScene scene, TileLayer layer) {
-        Game game = scene.game();
         Tile tile = layer.tile();
-        if (HighlightGuards.isFogOrHyperlane(game, tile) || HighlightGuards.isTileImageMissing(tile)) {
+        if (HighlightGuards.isHiddenOrHyperlane(scene, tile) || HighlightGuards.isTileImageMissing(tile)) {
             return;
         }
         if (tile.getPlanetUnitHolders().isEmpty()) {

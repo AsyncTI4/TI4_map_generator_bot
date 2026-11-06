@@ -26,32 +26,14 @@ public class KryxosLeadersHandler {
     private static final String GAIN_KRYXOS_HERO_TECH = "gainKryxosHeroTech_";
 
     // Agent
-    public static void startKryxosAgent(Game game, Player target) {
-        if (game == null || target == null) {
-            return;
-        }
-
-        List<Button> buttons = target.getTechs().stream()
+    public static List<Button> agentReturnTechButtons(Player target) {
+        return target.getTechs().stream()
                 .map(Mapper::getTech)
                 .filter(Objects::nonNull)
                 .filter(tech -> tech.getFaction().isEmpty())
                 .map(tech ->
                         Buttons.green(target.factionButtonChecker() + RETURN_TECH + tech.getAlias(), tech.getName()))
                 .toList();
-
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(),
-                    target.getRepresentationUnfogged()
-                            + " has no non-faction technology available to return for Dravok Veyl.");
-            return;
-        }
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(),
-                target.getRepresentationUnfogged()
-                        + ", please choose the non-faction technology to return for Dravok Veyl, the Kryxos agent.",
-                buttons);
     }
 
     @ButtonHandler(RETURN_TECH)
@@ -159,14 +141,13 @@ public class KryxosLeadersHandler {
         }
 
         for (char prerequisite : tech.getRequirements().orElse("").toLowerCase().toCharArray()) {
-            String techType =
-                    switch (prerequisite) {
-                        case 'b' -> TechnologyModel.TechnologyType.PROPULSION.toString();
-                        case 'g' -> TechnologyModel.TechnologyType.BIOTIC.toString();
-                        case 'y' -> TechnologyModel.TechnologyType.CYBERNETIC.toString();
-                        case 'r' -> TechnologyModel.TechnologyType.WARFARE.toString();
-                        default -> "";
-                    };
+            String techType = switch (prerequisite) {
+                case 'b' -> TechnologyModel.TechnologyType.PROPULSION.toString();
+                case 'g' -> TechnologyModel.TechnologyType.BIOTIC.toString();
+                case 'y' -> TechnologyModel.TechnologyType.CYBERNETIC.toString();
+                case 'r' -> TechnologyModel.TechnologyType.WARFARE.toString();
+                default -> "";
+            };
             if (techType.isEmpty()) {
                 continue;
             }

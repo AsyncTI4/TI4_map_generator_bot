@@ -22,6 +22,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
     private final BooleanSetting lostLegacies;
     private final BooleanSetting monuments;
     private final BooleanSetting echoesOfYggdrasil;
+    private final BooleanSetting wftv;
 
     FrankenHomebrewSettings(Game game, JsonNode json, SettingsMenu parent) {
         super(
@@ -38,6 +39,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
         monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
         echoesOfYggdrasil = new BooleanSetting("EchoesOfYggdrasil", "Echoes of Yggdrasil", false);
+        wftv = new BooleanSetting("Wftv", "WFTV", false);
 
         discoStars.setEmoji(SourceEmojis.DiscordantStars);
         unchartedSpace.setEmoji(SourceEmojis.DiscordantStars);
@@ -51,6 +53,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
         lostLegacies.setExtraInfo("Adds Lost Legacies factions only.");
         monuments.setExtraInfo("Adds Monuments+ cards and enables Monument drafting.");
         echoesOfYggdrasil.setExtraInfo("Adds the nine Echoes of Yggdrasil tiles to the draft tile pool.");
+        wftv.setExtraInfo("Adds WFTV factions.");
 
         if (json != null && json.has("homebrewSettings")) json = json.get("homebrewSettings");
         if (json != null
@@ -64,6 +67,7 @@ class FrankenHomebrewSettings extends SettingsMenu {
             lostLegacies.initialize(json.get("lostLegacies"));
             monuments.initialize(json.get("monuments"));
             echoesOfYggdrasil.initialize(json.get("echoesOfYggdrasil"));
+            wftv.initialize(json.get("wftv"));
         }
     }
 
@@ -85,7 +89,8 @@ class FrankenHomebrewSettings extends SettingsMenu {
                 eronous,
                 lostLegacies,
                 monuments,
-                echoesOfYggdrasil));
+                echoesOfYggdrasil,
+                wftv));
     }
 
     @Override

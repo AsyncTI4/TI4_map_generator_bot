@@ -330,5 +330,187 @@
         "complexity": "High",
         "preferredColours": ["ppl", "nvy", "gold", "gray"],
         "source": "beans"
+    },
+    {
+        "alias": "valhavn",
+        "factionName": "The Valhavn Star-Reavers",
+        "homeSystem": "be8",
+        "startingFleet": "1 cv, 1 dd, 2 ff, 2 inf valhavn, 2 inf vigrid, 1 sd valhavn, 1 pds vigrid",
+        "commodities": 3,
+        "factionTech": [
+            "bevalhavng",
+            "bevalhavnpd"
+        ],
+        "startingTechOptions": [
+            "md",
+            "dxa"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "valhavn",
+            "vigrid"
+        ],
+        "abilities": [
+            "valholls_call",
+            "reave",
+            "bloodlust"
+        ],
+        "leaders": [
+            "valhavnagent",
+            "valhavncommander",
+            "valhavnhero"
+        ],
+        "promissoryNotes": [
+            "bepnvalhavn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "valhavn_flagship",
+            "infantry",
+            "valhavn_mech",
+            "valhavn_pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["gcr", "nvy", "gray", "blu"],
+        "source": "beans"
+    },
+    {
+        "alias": "migo",
+        "factionName": "Mi-Go Yth",
+        "homeSystem": "be9",
+        "startingFleet": "2 cv, 1 dd, 2 ff, 4 inf yuggoth, 1 sd yuggoth",
+        "commodities": 3,
+        "factionTech": [
+            "bemigob",
+            "bemigog"
+        ],
+        "startingTech": [],
+        "homePlanets": [
+            "yuggoth"
+        ],
+        "abilities": [
+            "harvest",
+            "pseudomorphism"
+        ],
+        "leaders": [
+            "migoagent",
+            "migocommander",
+            "migohero"
+        ],
+        "promissoryNotes": [
+            "bepnmigo"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "migo_flagship",
+            "infantry",
+            "migo_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["blk", "copper", "gold", "eme"],
+        "source": "beans"
+    },
+    {
+        "alias": "deep",
+        "factionName": "The Deep",
+        "homeSystem": "be10",
+        "startingFleet": "1 cv, 1 cr, 1 ff, 3 inf",
+        "commodities": 4,
+        "factionTech": [
+            "bedeepy",
+            "bedeepg"
+        ],
+        "startingTech": [
+            "det"
+        ],
+        "homePlanets": [],
+        "abilities": [
+            "origin_unknown",
+            "dark_matter_link",
+            "energy_siphon"
+        ],
+        "leaders": [
+            "deepagent",
+            "deepcommander",
+            "deephero"
+        ],
+        "promissoryNotes": [
+            "bepndeep"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "deep_flagship",
+            "deep_thedeep",
+            "infantry",
+            "deep_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["blk", "ppl"],
+        "source": "beans"
+    },
+    {
+        "alias": "bloom",
+        "factionName": "The J'nahfa Bloom",
+        "homeSystem": "be11",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 3 inf j, 1 sd j",
+        "commodities": 3,
+        "factionTech": [
+            "bebloomg",
+            "bebloomcr"
+        ],
+        "startingTechOptions": [
+            "pa",
+            "nm",
+            "aida",
+            "ps"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "jnahfa"
+        ],
+        "abilities": [
+            "sporefall",
+            "strain_dispersal"
+        ],
+        "leaders": [
+            "bloomagent",
+            "bloomcommander",
+            "bloomhero"
+        ],
+        "promissoryNotes": [
+            "bepnbloom"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "bloom_cruiser",
+            "carrier",
+            "dreadnought",
+            "bloom_flagship",
+            "infantry",
+            "bloom_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["blk", "red"],
+        "source": "beans"
     }
 ]

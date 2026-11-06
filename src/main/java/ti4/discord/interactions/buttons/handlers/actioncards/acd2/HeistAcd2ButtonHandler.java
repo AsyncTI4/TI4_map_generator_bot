@@ -29,7 +29,7 @@ class HeistAcd2ButtonHandler {
             String id = player.factionButtonChecker() + "heistStep2_" + p2.getFaction() + "_2";
             buttons.add(Buttons.gray(id, p2.getColor()).withEmoji(Emoji.fromFormatted(p2.fogSafeEmoji())));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -77,7 +77,7 @@ class HeistAcd2ButtonHandler {
                             + " has no relic fragments, trade goods, or commodities left to take for _Heist_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         String remainingText = remaining == 1 ? "1 item remaining" : remaining + " items remaining";
         MessageHelper.sendMessageToChannelWithButtons(

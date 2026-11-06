@@ -1,0 +1,310 @@
+package ti4.service.leader.agent;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.contest.replay.service.CombatReplayService;
+import ti4.discord.interactions.buttons.ids.AgentButtonIds;
+import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.game.Game;
+import ti4.game.Leader;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelper;
+import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
+import ti4.model.LeaderModel;
+import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.LeaderAgents;
+import ti4.service.leader.agent.AgentOutcome.Message;
+import ti4.service.tech.TemporalCommandSuiteService;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
+import ti4.spring.service.gameevent.GameSubEvent;
+
+@UtilityClass
+public class AgentLifecycle {
+
+    private static final List<String> MESSAGES_TO_DELETE_WHOLE = List.of(
+            "choose the user of the agent",
+            "please choose the target",
+            "please choose the faction to give",
+            "choose the target of the agent");
+
+    @ButtonHandler(AgentButtonIds.PREFIX)
+    public static void press(String buttonID, GenericInteractionCreateEvent event, Game game, Player player) {
+        AgentButtonIds.Parsed parsed = AgentButtonIds.parse(buttonID);
+        run(LeaderAgents.find(game, parsed.agentId()), parsed, event, game, player, true);
+    }
+
+    public static void pressLegacyButton(
+            GenericInteractionCreateEvent event, Game game, Player player, String agentId, String payload) {
+        String buttonId = payload.isEmpty() ? AgentButtonIds.format(agentId) : AgentButtonIds.format(agentId, payload);
+        press(buttonId, event, game, player);
+    }
+
+    public static boolean use(
+            Game game, Player player, String agentId, String payload, GenericInteractionCreateEvent event) {
+        AgentModule<?> module = LeaderAgents.findRegistered(game, agentId)
+                .orElseThrow(() -> new IllegalArgumentException("No agent module for " + agentId));
+        return run(module, new AgentButtonIds.Parsed(agentId, payload), event, game, player, false);
+    }
+
+    static boolean refuseIfExhausted(GenericInteractionCreateEvent event, Player player, Leader leader) {
+        if (!leader.isExhausted()) {
+            return false;
+        }
+        String message = leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId())
+                + " is already exhausted, so it cannot be used again until it is readied.";
+        if (event == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
+        } else {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, message);
+        }
+        return true;
+    }
+
+    private static void exhaust(Game game, Player player, Leader leader, String agentId, String target) {
+        recordGameEvent(game, player, agentId, target);
+        ExhaustLeaderService.exhaustLeader(game, player, leader);
+        leader.getLeaderModel().ifPresent(model -> {
+            mirrorToCombatReplay(game, player, model);
+            recordInActionSummary(game, player, model);
+        });
+    }
+
+    private static void finish(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            String agentId,
+            boolean viaYssaril,
+            boolean deleteWholePressedMessage) {
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            cleanUpPressedButton(buttonEvent, deleteWholePressedMessage);
+        }
+        TemporalCommandSuiteService.offer(game, player, agentId, viaYssaril);
+    }
+
+    private static void mirrorToCombatReplay(Game game, Player player, LeaderModel model) {
+        if (!SpringContext.isInitialized()) {
+            return;
+        }
+        SpringContext.getBean(CombatReplayService.class)
+                .mirrorLeaderPlayed(
+                        game,
+                        player,
+                        model.getAlias(),
+                        player.getCorrectChannel().getName());
+    }
+
+    public static String agentNameForHolder(Game game, Player holder, String leaderId) {
+        return agentName(game, leaderId, holdsOnlyAYssarilCopy(holder, leaderId));
+    }
+
+    public static String agentNameShownTo(
+            Game game, Player reader, Player holder, String leaderId, boolean viaYssaril) {
+        if (game.isFowMode() && reader != holder) {
+            return AgentUse.FOG_SAFE_AGENT_NAME;
+        }
+        return agentName(game, leaderId, viaYssaril);
+    }
+
+    public static String stepAgentName(Game game, Player presser, String leaderId, boolean viaYssaril) {
+        boolean presserHoldsIt =
+                presser.hasLeader(leaderId) || (viaYssaril && holdsOnlyAYssarilCopy(presser, leaderId));
+        return agentNameShownTo(game, presser, presserHoldsIt ? presser : null, leaderId, viaYssaril);
+    }
+
+    public static String agentName(Game game, String leaderId, boolean viaYssaril) {
+        AgentModule<?> module = LeaderAgents.find(game, leaderId);
+        return module.reference(module.displayName(leaderId), viaYssaril);
+    }
+
+    static boolean holdsOnlyAYssarilCopy(Player player, String agentId) {
+        return !player.hasLeader(agentId) && player.hasExternalAccessToLeader(agentId);
+    }
+
+    private static <P> boolean run(
+            AgentModule<P> module,
+            AgentButtonIds.Parsed parsed,
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            boolean pressedAgentButton) {
+        String agentId = parsed.agentId();
+        Leader leader = player.getLeader(agentId).orElse(null);
+        if (leader == null || refuseIfExhausted(pressedAgentButton ? event : null, player, leader)) {
+            return false;
+        }
+        boolean viaYssaril = !leader.getId().equalsIgnoreCase(agentId);
+        String agentName = agentName(game, agentId, viaYssaril);
+        MessageChannel replyChannel = replyChannel(player, pressedAgentButton ? event : null);
+        Optional<P> payload = module.decode(game, player, parsed.payload());
+        if (payload.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    replyChannel, "Could not work out how to resolve " + agentName + ", so it was not exhausted.");
+            return false;
+        }
+        Optional<String> unusable = module.unusableReason(game, player, payload.get());
+        if (unusable.isPresent()) {
+            MessageHelper.sendMessageToChannel(
+                    replyChannel, unusable.get() + ", so " + agentName + " was not exhausted.");
+            return false;
+        }
+
+        exhaust(game, player, leader, agentId, parsed.hasPayload() ? parsed.payload() : null);
+        AgentUse<P> use = new AgentUse<>(game, player, payload.get(), agentName, viaYssaril, event);
+        GenericInteractionCreateEvent pressedButton = pressedAgentButton ? event : null;
+        announceExhaustion(module, use, pressedButton);
+        AgentOutcome outcome = module.resolve(use);
+        deliver(outcome, pressedButton, player);
+        if (pressedAgentButton) {
+            finish(event, game, player, agentId, viaYssaril, outcome.deletesPressedMessage());
+        } else {
+            TemporalCommandSuiteService.offer(game, player, agentId, viaYssaril);
+        }
+        return true;
+    }
+
+    private static <P> void announceExhaustion(
+            AgentModule<P> module, AgentUse<P> use, GenericInteractionCreateEvent pressedButton) {
+        String announcement = module.exhaustAnnouncementAfterName(use);
+        Optional<MessageChannel> channel = module.announcementChannel(use);
+        if (channel.isPresent()) {
+            MessageHelper.sendMessageToChannel(channel.get(), use.user().getRepresentationNoPing() + announcement);
+            return;
+        }
+        deliver(
+                AgentOutcome.of(Message.addressedTo(use.user(), announcement).forEveryone()),
+                pressedButton,
+                use.user());
+    }
+
+    private static MessageChannel replyChannel(Player player, GenericInteractionCreateEvent pressedButton) {
+        return pressedButton != null ? pressedButton.getMessageChannel() : player.getCorrectChannel();
+    }
+
+    private static void recordGameEvent(Game game, Player player, String agentId, String target) {
+        if (GameEventDraft.stage(game, new GameSubEvent.LeaderPlayed(player.getFaction(), "AGENT", agentId, target))) {
+            return;
+        }
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("cardId", agentId);
+        payload.put("target", target);
+        GameEventService.commit(game, GameEventType.CARD_PLAY_AGENT, player, payload);
+    }
+
+    private static void recordInActionSummary(Game game, Player player, LeaderModel model) {
+        String key = "currentActionSummary" + player.getFaction();
+        game.setStoredValue(key, game.getStoredValue(key) + " Exhausted the " + model.getAlias() + " leader.");
+    }
+
+    public static void deliver(AgentOutcome outcome, GenericInteractionCreateEvent pressedButton, Player presser) {
+        Set<Player> sentButtonsElsewhere = new LinkedHashSet<>();
+        for (Message message : outcome.messages()) {
+            MessageChannel channel = deliveryChannel(message, pressedButton, presser);
+            String text = message.namesRecipient()
+                    ? addresseeName(message.recipient(), channel, pressedButton, presser) + message.text()
+                    : message.text();
+            send(channel, text, message);
+            if (sentAnotherPlayerButtonsElsewhere(message, channel, pressedButton, presser)) {
+                sentButtonsElsewhere.add(message.recipient());
+            }
+        }
+        for (Player recipient : sentButtonsElsewhere) {
+            MessageHelper.sendMessageToChannel(
+                    replyChannel(presser, pressedButton), sentButtonsConfirmation(recipient));
+        }
+        if (outcome.pressedMessageEdit() != null && pressedButton instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent
+                    .getMessage()
+                    .editMessage(outcome.pressedMessageEdit())
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    private static void send(MessageChannel channel, String text, Message message) {
+        List<Button> buttons = new ArrayList<>(message.buttons());
+        if (message.pagedButtons()) {
+            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, text, buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(channel, text, buttons);
+        }
+    }
+
+    static boolean sentAnotherPlayerButtonsElsewhere(
+            Message message, MessageChannel deliveredTo, GenericInteractionCreateEvent pressedButton, Player presser) {
+        return pressedButton != null
+                && message.recipient() != presser
+                && !message.buttons().isEmpty()
+                && !sameChannel(deliveredTo, pressedButton.getMessageChannel());
+    }
+
+    static String sentButtonsConfirmation(Player recipient) {
+        String who = recipient.getGame().isFowMode() ? "the chosen player" : recipient.getRepresentationNoPing();
+        return "Sent the buttons to " + who + ".";
+    }
+
+    static String addresseeName(
+            Player recipient, MessageChannel channel, GenericInteractionCreateEvent pressedButton, Player presser) {
+        boolean presserIsReadingThisChannel = recipient == presser
+                && pressedButton != null
+                && sameChannel(channel, pressedButton.getMessageChannel());
+        return presserIsReadingThisChannel
+                ? recipient.getRepresentationNoPing()
+                : recipient.getRepresentationUnfogged();
+    }
+
+    static MessageChannel deliveryChannel(
+            Message message, GenericInteractionCreateEvent pressedButton, Player presser) {
+        Player recipient = message.recipient();
+        if (message.route() == Message.Route.CARDS_INFO_THREAD) {
+            return recipient.getCardsInfoThread();
+        }
+        if (message.route() == Message.Route.EVERYONE && pressedInPrivateThread(pressedButton)) {
+            return recipient.getCorrectChannel();
+        }
+        if (recipient != presser && (presser.getGame().isFowMode() || pressedInPrivateThread(pressedButton))) {
+            return recipient.getCorrectChannel();
+        }
+        return replyChannel(presser, pressedButton);
+    }
+
+    private static boolean pressedInPrivateThread(GenericInteractionCreateEvent pressedButton) {
+        return pressedButton != null && pressedButton.getMessageChannel().getType() == ChannelType.GUILD_PRIVATE_THREAD;
+    }
+
+    private static boolean sameChannel(MessageChannel first, MessageChannel second) {
+        return first != null && second != null && first.getId().equals(second.getId());
+    }
+
+    private static void cleanUpPressedButton(ButtonInteractionEvent buttonEvent, boolean deleteWholeMessage) {
+        if (deletesWholeMessage(buttonEvent.getMessage().getContentRaw(), deleteWholeMessage)) {
+            ButtonHelper.deleteMessage(buttonEvent);
+        } else {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
+        }
+    }
+
+    static boolean deletesWholeMessage(String pressedMessage, boolean outcomeAsksForIt) {
+        return outcomeAsksForIt || isTargetPicker(pressedMessage);
+    }
+
+    private static boolean isTargetPicker(String pressedMessage) {
+        return pressedMessage.toLowerCase().contains("wanna ")
+                || MESSAGES_TO_DELETE_WHOLE.stream().anyMatch(pressedMessage::contains);
+    }
+}

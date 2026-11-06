@@ -19,10 +19,13 @@ class DacxiveButtonHandler {
         String planet = buttonID.replace("dacxive_", "");
         AddUnitService.addUnits(
                 event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(), "infantry " + planet);
+        player.setDacxiveCounter(player.getDacxiveCounter() + 1);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getFactionEmojiOrColor() + " placed 1 infantry on "
-                        + Helper.getPlanetRepresentation(planet, game) + " via _Dacxive Animators_.");
+                        + Helper.getPlanetRepresentation(planet, game) + " via _Dacxive Animators_."
+                        + "\n-# _Dacxive Animators_ has placed " + player.getDacxiveCounter()
+                        + " infantry this game so far.");
         ButtonHelper.deleteMessage(event);
     }
 }

@@ -60,5 +60,71 @@
                 "alias": "natau_flagship"
             }
         ]
+    },
+    {
+        "alias": "carnivorous_strain_bonus",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "ground_combat_defender",
+        "scope": "gf",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "carnivorous_dormant"
+            },
+            {
+                "type": "ability",
+                "alias": "carnivorous_active"
+            }
+        ]
+    },
+    {
+        "alias": "bloom_flagship_dormant_strain_bonus",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "bloom_dormant_strains",
+        "persistenceType": "CONDITIONAL",
+        "condition": "bloom_flagship_in_combat",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bloom_flagship"
+            }
+        ]
+    },
+    {
+        "alias": "bloom_flagship_active_strain_die",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "bloom_active_strains",
+        "persistenceType": "CONDITIONAL",
+        "condition": "bloom_flagship_in_combat",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bloom_flagship"
+            }
+        ]
+    },
+    {
+        "alias": "bloom_mech_defender_bonus",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "bloom_mech_defender",
+        "scope": "mf",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bloom_mech"
+            }
+        ]
     }
 ]

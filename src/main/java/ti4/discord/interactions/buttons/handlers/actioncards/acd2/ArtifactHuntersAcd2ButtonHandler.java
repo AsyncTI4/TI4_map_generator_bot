@@ -67,7 +67,7 @@ class ArtifactHuntersAcd2ButtonHandler {
                     "Purge " + fragmentLabel(fragId),
                     fragmentEmoji(fragId)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(

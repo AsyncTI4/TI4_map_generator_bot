@@ -127,13 +127,12 @@ public class VeiledHeartService {
             return false;
         }
         VeiledCardType type = optional_type.get();
-        String deckId =
-                switch (type) {
-                    case ABILITY -> game.getAbilitySpliceDeckID();
-                    case UNIT -> game.getUnitSpliceDeckID();
-                    case GENOME -> game.getGenomeSpliceDeckID();
-                    case PARADIGM -> game.getParadigmSpliceDeckID();
-                };
+        String deckId = switch (type) {
+            case ABILITY -> game.getAbilitySpliceDeckID();
+            case UNIT -> game.getUnitSpliceDeckID();
+            case GENOME -> game.getGenomeSpliceDeckID();
+            case PARADIGM -> game.getParadigmSpliceDeckID();
+        };
         return Mapper.getDeck(deckId).getNewDeck().contains(card);
     }
 
@@ -330,7 +329,7 @@ public class VeiledHeartService {
         if (buttons.isEmpty()) {
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentation() + " select a veiled "

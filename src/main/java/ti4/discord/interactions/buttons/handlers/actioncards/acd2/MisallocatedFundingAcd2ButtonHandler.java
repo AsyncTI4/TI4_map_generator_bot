@@ -42,7 +42,7 @@ class MisallocatedFundingAcd2ButtonHandler {
                             + ", no other player owns a non-faction, non-unit upgrade technology for " + CARD + ".");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which player must return a technology for " + CARD + ".",
@@ -72,7 +72,7 @@ class MisallocatedFundingAcd2ButtonHandler {
                             + CARD + ".");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        buttons.add(Buttons.CANCEL_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", choose which of " + target.getRepresentationNoPing()

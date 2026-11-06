@@ -89,7 +89,7 @@ class PropagandaAcd2ButtonHandler {
                     player.getRepresentationUnfogged() + " has no eligible planets remaining for _Propaganda_.");
             return;
         }
-        buttons.add(Buttons.red("deleteButtons", "Done"));
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         String remainingText = remaining == 1 ? "1 planet remaining" : remaining + " planets remaining";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

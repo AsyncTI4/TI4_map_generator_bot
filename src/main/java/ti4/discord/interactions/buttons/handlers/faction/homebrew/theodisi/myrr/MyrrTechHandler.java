@@ -44,7 +44,7 @@ public class MyrrTechHandler {
         }
         buttons.add(Buttons.blue(
                 player.factionButtonChecker() + SEGMENTED_USE + tile.getPosition(), "Use Segmented Structuring"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
     }
 
     public static void offerSegmentedStructuring(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
@@ -266,13 +266,12 @@ public class MyrrTechHandler {
             count = 2;
             unit = unit.substring(1);
         }
-        String unitAlias =
-                switch (unit) {
-                    case "ff" -> "fighter";
-                    case "gf" -> "infantry";
-                    case "mf" -> "mech";
-                    default -> unit;
-                };
+        String unitAlias = switch (unit) {
+            case "ff" -> "fighter";
+            case "gf" -> "infantry";
+            case "mf" -> "mech";
+            default -> unit;
+        };
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitAlias), player.getColorID());
         if (unitKey == null) {
             return null;

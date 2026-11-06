@@ -15,6 +15,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
@@ -63,9 +64,9 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.game.MonumentsService;
-import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.relic.BookOfLatviniaService;
 import ti4.service.relic.MutagenService;
 import ti4.service.relic.QuantumEntanglerService;
@@ -173,28 +174,27 @@ public class ComponentActionHelper {
         for (BreakthroughModel bt : p1.getBreakthroughModels()) {
             if (bt != null && bt.getText().contains("ACTION:")) {
                 if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                    boolean validAction =
-                            switch (bt.getAlias()) {
-                                case "arborecbt" ->
-                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                                case "crimsonbt" -> true;
-                                case "mahactbt" -> !p1.getTechs().isEmpty();
-                                case "ardentiabt" ->
-                                    game.getRealPlayers().stream()
-                                            .anyMatch(otherPlayer -> otherPlayer != p1
-                                                    && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
-                                                            .isEmpty());
-                                case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
-                                case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
-                                case "stonebornbt", "stonebornbtunleashed" ->
-                                    !p1.getFragments().isEmpty();
-                                case "saarbt" ->
-                                    game.getTileMap().values().stream()
-                                            .filter(Tile::isAsteroidField)
-                                            .anyMatch(Tile.tileHasPlayerShips(p1));
-                                case "deepwroughtbt" -> true;
-                                default -> true;
-                            };
+                    boolean validAction = switch (bt.getAlias()) {
+                        case "arborecbt" ->
+                            game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                        case "crimsonbt" -> true;
+                        case "mahactbt" -> !p1.getTechs().isEmpty();
+                        case "ardentiabt" ->
+                            game.getRealPlayers().stream()
+                                    .anyMatch(otherPlayer -> otherPlayer != p1
+                                            && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
+                                                    .isEmpty());
+                        case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
+                        case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
+                        case "stonebornbt", "stonebornbtunleashed" ->
+                            !p1.getFragments().isEmpty();
+                        case "saarbt" ->
+                            game.getTileMap().values().stream()
+                                    .filter(Tile::isAsteroidField)
+                                    .anyMatch(Tile.tileHasPlayerShips(p1));
+                        case "deepwroughtbt" -> true;
+                        default -> true;
+                    };
 
                     if (validAction) {
                         TI4Emoji btEmoji = bt.getFactionEmoji();
@@ -369,8 +369,8 @@ public class ComponentActionHelper {
         }
 
         // Relics
-        if (p1.hasRelicReady("new_moonphase")) {
-            compButtons.add(AeternaAbilityHandler.getNewMoonButton(p1));
+        if (p1.hasRelicReady("half_moonphase")) {
+            compButtons.add(AeternaAbilityHandler.getHalfMoonButton(p1));
         }
         boolean enigmaticSeen = false;
         for (String relic : p1.getRelics()) {
@@ -379,6 +379,7 @@ public class ComponentActionHelper {
                             "waxing_moonphase",
                             "waning_moonphase",
                             "new_moonphase",
+                            "half_moonphase",
                             "lunar_eclipse_moonphase")
                     .contains(relic)) {
                 continue;
@@ -448,6 +449,7 @@ public class ComponentActionHelper {
                                 Buttons.red(factionChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
                 }
+                // TODO: the relic id is stellarconverter; does this "no targets" check ever match?
                 if ("stellar_converter".equalsIgnoreCase(relic)
                         && ButtonHelper.getButtonsForStellar(p1, game).isEmpty()) {
                     continue;
@@ -656,7 +658,7 @@ public class ComponentActionHelper {
         // Generic
         Button genButton = Buttons.gray(factionChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
-        compButtons.add(Buttons.red("deleteButtons", "Cancel"));
+        compButtons.add(Buttons.CANCEL_DELETE_BUTTONS);
 
         return compButtons;
     }
@@ -704,19 +706,18 @@ public class ComponentActionHelper {
                             "taagent",
                             "vanguardagent",
                             "sarcosaagent",
-                            "ironagent");
+                            "stonebornagentdormant",
+                            "stonebornagentunleashed",
+                            "ironagent",
+                            "bloomagent",
+                            "migoagent",
+                            "deepagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ExhaustLeaderService.exhaustLeader(
-                                    game, p1, p1.getLeader(buttonID).orElse(null));
-                            ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
-                        } else {
-                            ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
-                        }
+                        AgentLifecycle.press(buttonID, event, game, p1);
                     }
                 } else if (buttonID.contains("hero")) {
                     PlayHeroService.playHero(
@@ -1170,7 +1171,7 @@ public class ComponentActionHelper {
                                 + " has used to the _Total War_ ability to spend 10 commodities from their home planets to score 1 victory point."
                                 + " They have " + remaining + " commodit" + (remaining == 1 ? "y" : "ies")
                                 + " remaining.");
-                String customPOName = "Total War VPs (" + p1.getFaction() + ")";
+                String customPOName = game.customPONameFor(p1, "Total War VPs");
                 int vp = 1;
                 if (game.getCustomPublicVP().containsKey(customPOName)) {
                     vp = game.getCustomPublicVP().get(customPOName) + 1;
@@ -1232,7 +1233,7 @@ public class ComponentActionHelper {
         String reward = buttonID.split("_")[1];
         switch (reward) {
             case "vp" -> {
-                String customPOName = "Bounty VPs (" + p1.getFaction() + ")";
+                String customPOName = game.customPONameFor(p1, "Bounty VPs");
                 int vp = 1;
                 if (game.getCustomPublicVP().containsKey(customPOName)) {
                     vp = game.getCustomPublicVP().get(customPOName) + 1;
@@ -1367,7 +1368,7 @@ public class ComponentActionHelper {
                     buttons3.add(Buttons.green(
                             "exhaustTCS_" + relicID + "_" + player.getFaction(),
                             "Exhaust Temporal Command Suite to Ready " + relicID));
-                    buttons3.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons3.add(Buttons.DECLINE_DELETE_BUTTONS);
                     String msg = p2.getRepresentationUnfogged()
                             + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + relicID
                             + " and potentially resolve a transaction.";
@@ -1394,7 +1395,7 @@ public class ComponentActionHelper {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-            Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -1458,7 +1459,7 @@ public class ComponentActionHelper {
             case "enigmaticdevice" -> {
                 if (game.isTwilightsFallMode()) {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                    Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+                    Button DoneExhausting = Buttons.DONE_EXHAUSTING_PLANETS_FINISH_COMPONENT_ACTION;
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Use this to spend 6 resources.", buttons);
@@ -1490,6 +1491,7 @@ public class ComponentActionHelper {
                     }
                 } else {
                     ButtonHelperActionCards.resolveResearch(game, player, event);
+                    DeepAbilityHandler.offerEnergySiphon(player);
                 }
             }
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);

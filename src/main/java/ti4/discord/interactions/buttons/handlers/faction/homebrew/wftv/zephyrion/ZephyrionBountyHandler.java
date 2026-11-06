@@ -178,7 +178,7 @@ public class ZephyrionBountyHandler {
                     bountyHolder.factionButtonChecker() + "zephHeroRes_" + faction + "_" + unitTypeString,
                     StringUtils.capitalize(ship),
                     FactionEmojis.zephyrion));
-            buttons.add(Buttons.red("deleteButtons", "Delete These"));
+            buttons.add(Buttons.DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(
                     bountyHolder.getCardsInfoThread(),
                     bountyHolder.getRepresentation() + ", you may use Monturak Homotol, the Zephyrion hero.",

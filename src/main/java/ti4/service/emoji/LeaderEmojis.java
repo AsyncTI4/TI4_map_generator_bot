@@ -264,6 +264,18 @@ public enum LeaderEmojis implements TI4Emoji {
     NatauAgent,
     NatauCommander,
     NatauHero,
+    ValhavnAgent,
+    ValhavnCommander,
+    ValhavnHero,
+    MigoAgent,
+    MigoCommander,
+    MigoHero,
+    DeepAgent,
+    DeepCommander,
+    DeepHero,
+    BloomAgent,
+    BloomCommander,
+    BloomHero,
 
     // Lost Legacies (Theodisi)
     ArdentiaAgent,

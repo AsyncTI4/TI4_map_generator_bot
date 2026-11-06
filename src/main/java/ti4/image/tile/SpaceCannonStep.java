@@ -30,6 +30,10 @@ final class SpaceCannonStep implements TileStepPainter {
     @Override
     public void paint(TileScene scene, TileLayer layer) {
         Game game = scene.game();
+        if (game.isFowMode()) {
+            FogPdsMarks.paint(scene, layer);
+            return;
+        }
         Tile tile = layer.tile();
         Map<String, PdsCoverage> pdsCoverageMap = PdsCoverageHelper.calculatePdsCoverage(game, tile);
         if (HighlightGuards.isTileImageMissing(tile)) {

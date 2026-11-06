@@ -5,6 +5,7 @@ import ti4.service.tactical.planet.BlackPyramidDeployButton;
 import ti4.service.tactical.planet.CrimsonDeployButton;
 import ti4.service.tactical.planet.DihmohnAgentPlanetButton;
 import ti4.service.tactical.planet.TnelisDeployButton;
+import ti4.service.tactical.planet.ValhavnPdsCommitButton;
 
 public final class PlanetAbilityButtons {
     private PlanetAbilityButtons() {}
@@ -13,5 +14,6 @@ public final class PlanetAbilityButtons {
             new DihmohnAgentPlanetButton(),
             new TnelisDeployButton(),
             new CrimsonDeployButton(),
-            new BlackPyramidDeployButton());
+            new BlackPyramidDeployButton(),
+            new ValhavnPdsCommitButton());
 }

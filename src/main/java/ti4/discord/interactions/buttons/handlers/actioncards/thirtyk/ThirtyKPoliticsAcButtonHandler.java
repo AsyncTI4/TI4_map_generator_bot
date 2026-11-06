@@ -158,7 +158,7 @@ public class ThirtyKPoliticsAcButtonHandler {
         }
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>(StrategyCardSecondaryButtonService.getSecondaryAbilityButtons(game, sc));
-        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done Resolving"));
+        buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Done"));
         ThirtyKAcTargets.send(
                 player,
                 player.getRepresentationUnfogged() + ", your agents subvert " + game.getSCName(sc)
@@ -174,13 +174,16 @@ public class ThirtyKPoliticsAcButtonHandler {
 
     public static List<Button> extendedCampaigningButtons(Game game, Player player) {
         return ThirtyKAcTargets.otherPlayerButtons(
-                game, player, EXTENDED_CAMPAIGNING, other -> !player.isNeighboursWith(other));
+                game,
+                player,
+                EXTENDED_CAMPAIGNING,
+                other -> !player.getAbilityNeighbours().contains(other));
     }
 
     @ButtonHandler(EXTENDED_CAMPAIGNING)
     public static void extendedCampaigning(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = ThirtyKAcTargets.target(game, buttonID, EXTENDED_CAMPAIGNING);
-        if (target == null || target == player || player.isNeighboursWith(target)) {
+        if (target == null || target == player || player.getAbilityNeighbours().contains(target)) {
             PlanetTargetService.fizzle(event, player);
             return;
         }

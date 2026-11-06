@@ -1,0 +1,51 @@
+package ti4.service.leader.agent.modules.homebrew;
+
+import net.dv8tion.jda.api.components.buttons.Button;
+import ti4.discord.interactions.buttons.Buttons;
+import ti4.game.Player;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.leader.agent.AgentOutcome;
+import ti4.service.leader.agent.AgentOutcome.Message;
+import ti4.service.leader.agent.AgentUse;
+import ti4.service.leader.agent.TargetedAgent;
+
+public final class AugersAgent extends TargetedAgent {
+
+    static final String ID = "augersagent";
+    private static final int TRADE_GOODS_GAINED = 2;
+
+    public AugersAgent() {
+        super(ID, "Clodho, the Ilyxum");
+    }
+
+    public static Button button(Player augers, Player explorer) {
+        return Buttons.green(
+                ownedButtonId(augers, ID, explorer.getFaction()),
+                useLabel(augers, ID, "Ilyxum Agent on " + explorer.getColor()),
+                FactionEmojis.augers);
+    }
+
+    @Override
+    public AgentOutcome resolve(AgentUse<Player> use) {
+        Player target = use.payload();
+        int oldTg = target.getTg();
+        target.setTg(oldTg + TRADE_GOODS_GAINED);
+
+        AgentOutcome outcome = AgentOutcome.of(Message.plain(
+                target,
+                target.getFactionEmojiOrColor() + " gained " + TRADE_GOODS_GAINED + " trade goods from "
+                        + use.agentNameFor(target) + ", being used (" + oldTg + "->" + target.getTg() + ")."));
+        if (use.game().isFowMode()) {
+            outcome = outcome.and(Message.plain(
+                    use.user(),
+                    target.getFactionEmojiOrColor() + " gained " + TRADE_GOODS_GAINED
+                            + " trade goods due to agent usage."));
+        }
+
+        ButtonHelperAbilities.pillageCheck(target, use.game());
+        ButtonHelperAgents.resolveArtunoCheck(target, TRADE_GOODS_GAINED);
+        return outcome;
+    }
+}
