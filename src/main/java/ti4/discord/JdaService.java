@@ -72,6 +72,7 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
@@ -629,7 +630,7 @@ public class JdaService {
                 executorStep(JDA_EVENT_POOL_NAME, JdaService::shutdownEventExecutor),
                 executorStep(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager::shutdown),
                 executorStep(CronManager.class.getSimpleName(), CronManager::shutdown),
-                new ShutdownStep("flush user active hours", UserActiveHourRecorder::flush),
+                new ShutdownStep("flush user active hours", JdaService::flushUserActiveHours),
                 executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
                 executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
                 executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown),
@@ -673,6 +674,14 @@ public class JdaService {
     private static void stopAcceptingCommands() {
         ActiveLeaseService.setCurrentProcessReady(false);
         BotLogger.info("NO LONGER ACCEPTING COMMANDS");
+    }
+
+    private static void flushUserActiveHours() {
+        long startedAt = System.currentTimeMillis();
+        int flushedUsers = UserActiveHourRecorder.flush();
+        BotLogger.info(String.format(
+                "FLUSHED ACTIVE HOURS FOR %s IN %,d MS",
+                StringHelper.pluralize(flushedUsers, "USER", "USERS"), System.currentTimeMillis() - startedAt));
     }
 
     private static void releaseActiveLease() {

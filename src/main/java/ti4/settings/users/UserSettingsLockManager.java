@@ -2,6 +2,10 @@ package ti4.settings.users;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
@@ -26,6 +30,20 @@ final class UserSettingsLockManager {
             runnable.run();
         } finally {
             lock.writeLock().unlock();
+        }
+    }
+
+    public static void wrapWithWriteLocks(Collection<String> userIds, Runnable runnable) {
+        List<ReentrantReadWriteLock> heldLocks = new ArrayList<>();
+        try {
+            for (String userId : new TreeSet<>(userIds)) {
+                ReentrantReadWriteLock lock = getLock(userId);
+                lock.writeLock().lock();
+                heldLocks.add(lock);
+            }
+            runnable.run();
+        } finally {
+            heldLocks.reversed().forEach(lock -> lock.writeLock().unlock());
         }
     }
 

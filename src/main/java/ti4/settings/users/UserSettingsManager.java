@@ -1,7 +1,11 @@
 package ti4.settings.users;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.spring.service.usersettings.UserSettingsService;
 
@@ -27,17 +31,21 @@ public class UserSettingsManager {
         }
     }
 
-    static void addActiveHourCheckins(String userId, int[] checkinsByUtcHour) {
+    static boolean addActiveHourCheckins(Map<String, int[]> checkinsByUserId) {
+        Map<String, Consumer<UserSettings>> changesByUserId = new HashMap<>();
+        checkinsByUserId.forEach((userId, checkins) ->
+                changesByUserId.put(userId, userSettings -> userSettings.addActiveHourCheckins(checkins)));
         try {
-            UserSettingsLockManager.wrapWithWriteLock(
-                    userId,
-                    () -> UserSettingsService.getBean()
-                            .update(
-                                    userId,
-                                    () -> new UserSettings(userId),
-                                    userSettings -> userSettings.addActiveHourCheckins(checkinsByUtcHour)));
+            UserSettingsLockManager.wrapWithWriteLocks(
+                    checkinsByUserId.keySet(),
+                    () -> UserSettingsService.getBean().updateAll(changesByUserId, UserSettings::new));
+            return true;
         } catch (RuntimeException e) {
-            BotLogger.error("Failed to record active hours for user " + userId + ".", e);
+            BotLogger.error(
+                    "Failed to record active hours for " + StringHelper.pluralize(checkinsByUserId.size(), "user")
+                            + ".",
+                    e);
+            return false;
         }
     }
 
