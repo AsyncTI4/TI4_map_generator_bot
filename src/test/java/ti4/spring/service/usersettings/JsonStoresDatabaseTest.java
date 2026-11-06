@@ -103,6 +103,26 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
+    void updateAllChangesExistingAndCreatesMissingSettingsInOneCall() {
+        userSettingsService.update("400", () -> userSettings("400"), settings -> settings.setGameLimit(2));
+
+        userSettingsService.updateAll(
+                Map.of(
+                        "400", settings -> settings.setGameLimit(settings.getGameLimit() + 1),
+                        "401", settings -> settings.setGameLimit(7)),
+                JsonStoresDatabaseTest::userSettings);
+
+        assertThat(userSettingsService.find("400"))
+                .get()
+                .extracting(UserSettings::getGameLimit)
+                .isEqualTo(3);
+        assertThat(userSettingsService.find("401"))
+                .get()
+                .extracting(UserSettings::getGameLimit)
+                .isEqualTo(7);
+    }
+
+    @Test
     void autoPingComputeUpdateAndDelete() {
         autoPingService.compute("pbd1", _ -> new AutoPing(10, 0, false));
         autoPingService.compute("pbd1", ping -> new AutoPing(20, ping.pingCount() + 1, ping.quickPing()));
