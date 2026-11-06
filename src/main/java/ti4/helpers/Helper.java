@@ -2726,7 +2726,7 @@ public final class Helper {
             } else {
                 cost += ((numInf + 1) / 2);
             }
-            cost += ((numFF + 1) / 2);
+            cost += ButtonHelper.isLawInPlay(game, "fleetpoolingenforcement") ? ((numFF + 2) / 3) : ((numFF + 1) / 2);
         }
         totalUnits += numInf + numFF;
         if (wantCost) {

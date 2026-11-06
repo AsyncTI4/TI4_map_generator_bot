@@ -10,6 +10,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 
 final class IngressEgressRule implements AdjacencyRule {
@@ -112,6 +113,9 @@ final class IngressEgressRule implements AdjacencyRule {
         private boolean actsAsIngress(Tile tile) {
             return tile.hasIngress()
                     || hasToken(tile, Constants.TOKEN_INGRESS)
+                    || (ButtonHelper.isLawInPlay(game, "darkinvasion")
+                            && player != null
+                            && tile == player.getHomeSystemTile())
                     || scarAsIngress && tile.isScar(game)
                     || wormholeAsIngress && !tile.getWormholes(game).isEmpty()
                     || anomalyAsIngress && tile.isAnomaly(game, player);

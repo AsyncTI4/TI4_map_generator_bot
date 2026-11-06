@@ -20,6 +20,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -686,6 +687,7 @@ public class StartPhaseService {
         }
 
         for (Player player2 : game.getRealPlayers()) {
+            TheodisiAgendaResolver.resolveMinisterFools(game, player2);
             if (player2.hasAbility("hydromorphic")) {
                 HydromorphicHelper.draw(game, player2, 2);
                 ActionCardHelper.drawActionCards(player2, 2);
@@ -1286,6 +1288,8 @@ public class StartPhaseService {
         }
 
         List<Player> actionPhaseTurnOrder = game.getActionPhaseTurnOrder();
+        TheodisiAgendaResolver.grantUnchosenTradeStrategyCard(game);
+        actionPhaseTurnOrder = game.getActionPhaseTurnOrder();
         if (actionPhaseTurnOrder.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Unable to start Action Phase: no turn order set.");

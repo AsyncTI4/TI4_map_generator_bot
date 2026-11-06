@@ -944,6 +944,12 @@ public final class ButtonHelperTacticalAction {
         ThirtyKSecretHooks.onSystemActivated(game, player);
         FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        if (ButtonHelper.isLawInPlay(game, "lightspeedregulations")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", _Light Speed Regulations_ is in play. Technologies that increase move values have no effect.");
+        }
         BloomLeadersHandler.offerCommander(game, player, tile);
         DeepUnitHandler.offerDrown(game, player, tile);
         DeepBreakthroughHandler.offerEventHorizon(game, player);

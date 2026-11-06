@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageA
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExplorationRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
@@ -2961,6 +2962,10 @@ public final class AgendaHelper {
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + ", an agenda has been revealed.";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
+        if (TheodisiAgendaResolver.onAgendaRevealed(game, event, agendaID)) {
+            revealAgenda(event, revealFromBottom, game, channel);
+            return;
+        }
         KaltrimUnitHandler.offerJewelOfTheRose(game, agendaID);
         if (!action && aCount == 1) {
             VeylorAbilitiesHandler.offerTightScheduling(game);

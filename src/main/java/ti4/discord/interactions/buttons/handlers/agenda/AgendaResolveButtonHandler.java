@@ -51,6 +51,7 @@ import ti4.discord.interactions.buttons.handlers.agenda.resolver.SchematicsAgend
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.SeedEmpireAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.SharedResearchAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.StandardizationAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TravelBanAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.UnconventionalAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.VoiceOfTheCouncilLawAgendaResolver;
@@ -133,6 +134,27 @@ class AgendaResolveButtonHandler {
         AGENDA_HANDLERS.put("warrant", new WarrantAgendaResolver());
         AGENDA_HANDLERS.put("wormhole_recon", new WormholeReconAgendaResolver());
         AGENDA_HANDLERS.put("wormhole_research", new WormholeResearchAgendaResolver());
+
+        AGENDA_HANDLERS.put("districtredraw", new TheodisiAgendaResolver("districtredraw"));
+        AGENDA_HANDLERS.put("reappropriation", new TheodisiAgendaResolver("reappropriation"));
+        AGENDA_HANDLERS.put("peacesummit", new TheodisiAgendaResolver("peacesummit"));
+        AGENDA_HANDLERS.put("pirateuprising", new TheodisiAgendaResolver("pirateuprising"));
+        AGENDA_HANDLERS.put("culturalredistribution", new TheodisiAgendaResolver("culturalredistribution"));
+        AGENDA_HANDLERS.put("ministercontrol", new TheodisiAgendaResolver("ministercontrol"));
+        AGENDA_HANDLERS.put("ministerrelations", new TheodisiAgendaResolver("ministerrelations"));
+        AGENDA_HANDLERS.put("ministerthrone", new TheodisiAgendaResolver("ministerthrone"));
+        AGENDA_HANDLERS.put("ministerfools", new TheodisiAgendaResolver("ministerfools"));
+        AGENDA_HANDLERS.put("darkinvasion", new TheodisiAgendaResolver("darkinvasion"));
+        AGENDA_HANDLERS.put("fleetpoolingenforcement", new TheodisiAgendaResolver("fleetpoolingenforcement"));
+        AGENDA_HANDLERS.put("lightspeedregulations", new TheodisiAgendaResolver("lightspeedregulations"));
+        AGENDA_HANDLERS.put("freemarketcapitalism", new TheodisiAgendaResolver("freemarketcapitalism"));
+        AGENDA_HANDLERS.put("legislativeanarchy", new TheodisiAgendaResolver("legislativeanarchy"));
+        AGENDA_HANDLERS.put("reelectioncampaign", new TheodisiAgendaResolver("reelectioncampaign"));
+        AGENDA_HANDLERS.put("falseprophets", new TheodisiAgendaResolver("falseprophets"));
+        AGENDA_HANDLERS.put("opensourcerobotics", new TheodisiAgendaResolver("opensourcerobotics"));
+        AGENDA_HANDLERS.put("explorationcharter", new TheodisiAgendaResolver("explorationcharter"));
+        AGENDA_HANDLERS.put("privateequity", new TheodisiAgendaResolver("privateequity"));
+        AGENDA_HANDLERS.put("acculturation", new TheodisiAgendaResolver("acculturation"));
 
         AGENDA_HANDLERS.put("cathedralofixth", new MonumentsAgendaResolver("cathedralofixth"));
         AGENDA_HANDLERS.put("ministerofculture", new MonumentsAgendaResolver("ministerofculture"));
@@ -270,18 +292,14 @@ class AgendaResolveButtonHandler {
         if (!game.getCurrentAgendaInfo().startsWith("Law")) {
             return;
         }
-        if (game.getCurrentAgendaInfo().contains("Player")) {
-            Player player2 = game.getPlayerFromColorOrFaction(winner);
-            if (player2 != null) {
-                game.addLaw(aID, winner);
-            }
-            MessageHelper.sendMessageToChannel(event.getChannel(), "# Added Law with " + winner + " as the elected!");
-        } else {
-            if ("for".equalsIgnoreCase(winner)) {
-                game.addLaw(aID, null);
-                MessageHelper.sendMessageToChannel(event.getChannel(), game.getPing() + " Added law to map!");
-            }
+        if (game.getCurrentAgendaInfo().contains("For")) {
+            if (!"for".equalsIgnoreCase(winner)) return;
+            game.addLaw(aID, null);
+            MessageHelper.sendMessageToChannel(event.getChannel(), game.getPing() + " Added law to map!");
+            return;
         }
+        game.addLaw(aID, winner);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "# Added Law with " + winner + " as the elected!");
     }
 
     private static void handleSecretToPublicLaw(Game game, int aID, String winner, ButtonInteractionEvent event) {
