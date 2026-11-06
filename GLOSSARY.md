@@ -84,7 +84,7 @@ A Faction-limited stock of goods that a Player cannot spend but that converts to
 _Avoid_: Refill
 
 **Transaction**:
-A voluntary exchange between two neighboring Players of Trade goods, Commodities, relic fragments and up to one promissory note each way, agreed before anything changes hands.
+A voluntary exchange between two neighboring Players of Trade goods, Commodities, relic fragments and up to one promissory note each way, agreed before anything changes hands. Transactions happen only in the action phase, on the active Player's turn with each of their neighbors (LRR 94.1), and in the agenda phase, once per agenda with any other Player (LRR 94.6). Never in the strategy or status phase.
 _Avoid_: Trade, deal
 
 **Deal**:

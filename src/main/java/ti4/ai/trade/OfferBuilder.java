@@ -107,7 +107,10 @@ class OfferBuilder {
     }
 
     static Optional<AiDecision> start(AiTurnContext context, Player partner, Deal target, Purpose purpose) {
-        if (active(context) || PendingOffers.with(context, partner) || !buildable(context.seat(), partner, target)) {
+        if (active(context)
+                || PendingOffers.with(context, partner)
+                || !buildable(context.seat(), partner, target)
+                || !TradeLegality.isLegal(context.game(), context.seat(), partner, target)) {
             return Optional.empty();
         }
         Optional<AiDecision> entry = TradeEntry.open(context);
@@ -129,7 +132,10 @@ class OfferBuilder {
 
     static Optional<AiDecision> startCounter(
             AiTurnContext context, IncomingOffer offer, Player offerer, Deal target, Purpose purpose) {
-        if (active(context) || target.isEmpty() || !buildable(context.seat(), offerer, target)) {
+        if (active(context)
+                || target.isEmpty()
+                || !buildable(context.seat(), offerer, target)
+                || !TradeLegality.isLegal(context.game(), context.seat(), offerer, target)) {
             return Optional.empty();
         }
         Draft.fresh(
@@ -190,6 +196,7 @@ class OfferBuilder {
             return true;
         }
         if (draft.purpose() == Purpose.CLEANUP) return false;
+        if (!TradeLegality.isLegal(build.game(), build.seat(), build.partner(), draft.target())) return true;
         return PendingOffers.with(context, build.partner())
                 || IncomingOffer.live(context).stream()
                         .anyMatch(offer -> offer.isFrom(build.game(), build.partner())

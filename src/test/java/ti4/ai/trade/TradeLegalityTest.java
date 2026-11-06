@@ -47,7 +47,7 @@ class TradeLegalityTest extends BaseTi4Test {
         assertThat(TradeLegality.legalPartners(table.game, table.nekro)).containsExactly(table.sol);
     }
 
-    // Outside the action phase the neighbour rule is lifted (the agenda phase is when debts get settled).
+    // In the agenda phase the neighbour rule is lifted (LRR 94.6; it is also when debts get settled).
     @Test
     void anyoneMayTransactInTheAgendaPhase() {
         table.game.setPhaseOfGame("agendawaiting");
@@ -55,6 +55,23 @@ class TradeLegalityTest extends BaseTi4Test {
         assertThat(canTransact()).isTrue();
         assertThat(TradeLegality.canTransactInActionPhase(table.game, table.nekro, table.sol))
                 .isFalse();
+    }
+
+    // LRR 94.1 and 94.6: transactions happen only on the active player's turn or while resolving an agenda, so the
+    // strategy and status phases are closed even to neighbours (a Letnev AI once offered Support for the Throne swaps
+    // in the status phase).
+    @Test
+    void noOneMayTransactInTheStrategyOrStatusPhase() {
+        table.presence(table.sol, TradeTable.BESIDE_NEKRO);
+
+        for (String phase : List.of("strategy", "status", "statusScoring", "playerSetup")) {
+            table.game.setPhaseOfGame(phase);
+
+            assertThat(canTransact()).as(phase).isFalse();
+            assertThat(TradeLegality.legalPartners(table.game, table.nekro))
+                    .as(phase)
+                    .isEmpty();
+        }
     }
 
     // Hacan's Guild Ships let it transact with everyone.

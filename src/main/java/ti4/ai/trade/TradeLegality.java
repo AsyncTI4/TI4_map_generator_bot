@@ -55,7 +55,8 @@ class TradeLegality {
 
     static boolean canTransact(Game game, Player first, Player second) {
         if (censured(game, first) || censured(game, second)) return false;
-        return Standings.same(first, second) || !isActionPhase(game) || openInActionPhase(game, first, second);
+        if (Standings.same(first, second) || isAgendaPhase(game)) return true;
+        return isActionPhase(game) && openInActionPhase(game, first, second);
     }
 
     static boolean canTransactInActionPhase(Game game, Player first, Player second) {

@@ -197,7 +197,8 @@ class PendingOffers {
             return Optional.of(Stale.REJECTED);
         if (crossed(context, partner, pending)) return Optional.of(Stale.CROSSED);
         if (context.now() > pending.expiresAt()) return Optional.of(Stale.EXPIRED);
-        if (!pending.openKey().equals(TradeLegality.openKey(game, pending.purpose(), deal))) {
+        if (!pending.openKey().equals(TradeLegality.openKey(game, pending.purpose(), deal))
+                || !TradeLegality.isLegal(game, seat, partner, deal)) {
             return Optional.of(Stale.WINDOW_CLOSED);
         }
         if (!stillCovered(seat, partner, deal)) return Optional.of(Stale.UNCOVERABLE);
