@@ -40,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StasisT
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenFilesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.secretsonly.CovertExchangeActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
@@ -1161,6 +1162,9 @@ public class ActionCardHelper {
             }
             if ("stolen_files".equals(automationID)) {
                 StolenFilesBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if (CovertExchangeActionCardHandler.AUTOMATION_ID.equals(automationID)) {
+                CovertExchangeActionCardHandler.offerResolution(player, introMsg);
             }
             if ("unconventional_diplomacy".equals(automationID)) {
                 UnconventionalDiplomacyBrActionCardHandler.offerResolution(game, player, introMsg);

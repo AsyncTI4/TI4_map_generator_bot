@@ -24,6 +24,7 @@ import ti4.model.TestBedPreset.Seat;
 import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.map.AddTileService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -31,8 +32,11 @@ public class TestBedComponentService {
 
     static final Map<String, BiConsumer<Game, Integer>> NUMBER_GAME_OPTIONS =
             Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMergeFrom);
-    static final Map<String, BiConsumer<Game, Boolean>> SWITCH_GAME_OPTIONS =
-            Map.of(Constants.ONE_WAY_ADJACENCY, Game::setOneWayAdjacency);
+    static final Map<String, BiConsumer<Game, Boolean>> SWITCH_GAME_OPTIONS = Map.of(
+            Constants.ONE_WAY_ADJACENCY,
+            Game::setOneWayAdjacency,
+            Constants.SECRETS_ONLY_MODE,
+            SecretsOnlyService::apply);
 
     static String gameOptionProblem(String key, String value) {
         if (NUMBER_GAME_OPTIONS.containsKey(key)) {

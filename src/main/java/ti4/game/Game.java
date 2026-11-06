@@ -122,6 +122,7 @@ import ti4.service.info.KnownCardsService;
 import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.objectives.SecretObjectiveDeckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -1072,6 +1073,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Muaat Mania", isMuaatManiaMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Feast or Famine", isFeastOrFamineMode());
+        gameModes.put("Secrets Only", isSecretsOnlyMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
@@ -3288,7 +3290,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public static void checkSOLimit(Player player) {
-        if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()
+        if (player.getSecretsCountedTowardLimit() > player.getMaxSOCount()
                 && !player.getSecretsUnscored().isEmpty()) {
             String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
                     + player.getMaxSOCount()
@@ -3315,6 +3317,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         String id = getSecretObjectives().getFirst();
         Player player = getPlayer(userID);
+        if (isSecretsOnlyMode() && player != null) {
+            id = nextSecretObjectiveScorableBy(player);
+            if (id == null) {
+                return null;
+            }
+        }
 
         if (isErwansGambitMode() && "mentak".equalsIgnoreCase(player.getFaction())) {
             List<SecretObjectiveModel> heistObbies =
@@ -3348,6 +3356,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             checkSOLimit(player);
         }
         return id;
+    }
+
+    @Nullable
+    public String nextSecretObjectiveScorableBy(Player player) {
+        return getSecretObjectives().stream()
+                .filter(soID -> !player.getSecretsScored().containsKey(soID))
+                .findFirst()
+                .orElse(null);
     }
 
     @Nullable
@@ -3605,14 +3621,32 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 break;
             }
         }
-        if (!soID.isEmpty()) {
-            player.removeSecret(soIDNumber);
-            KnownCardsService.recordCardLeftHandPublicly(
-                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
-            player.setSecretScored(soID);
-            return true;
+        if (soID.isEmpty()) {
+            return false;
         }
-        return false;
+        String scoredID = soID.replace("extra1", "").replace("extra2", "");
+        if (isSecretsOnlyMode() && player.getSecretsScored().containsKey(scoredID)) {
+            return false;
+        }
+        player.removeSecret(soIDNumber);
+        KnownCardsService.recordCardLeftHandPublicly(
+                this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
+        player.setSecretScored(soID);
+        if (isSecretsOnlyMode()) {
+            returnSecretObjectiveToDeck(scoredID);
+        }
+        return true;
+    }
+
+    private void returnSecretObjectiveToDeck(String soID) {
+        if (isSecretsOnlyMode()) {
+            SecretObjectiveDeckService.shuffleIntoDeck(this, List.of(soID));
+            return;
+        }
+        if (!getSecretObjectives().contains(soID)) {
+            getSecretObjectives().add(soID);
+        }
+        Collections.shuffle(getSecretObjectives());
     }
 
     public boolean unscoreSecretObjective(String userID, Integer soIDNumber) {
@@ -3630,6 +3664,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
+            if (isSecretsOnlyMode()) {
+                removeSOFromGame(soID);
+            }
             player.setSecret(soID);
             KnownCardsService.recordCardShownToAll(
                     this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
@@ -3653,8 +3690,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
-            getSecretObjectives().add(soID);
-            Collections.shuffle(getSecretObjectives());
+            returnSecretObjectiveToDeck(soID);
             return true;
         }
         return false;
@@ -3676,6 +3712,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
             if (Mapper.getSecretObjective(soID).getSource() == ComponentSource.erwans_gambit) {
+                return true;
+            }
+            if (isSecretsOnlyMode()) {
+                SecretObjectiveDeckService.shuffleIntoDeck(this, List.of(soID));
                 return true;
             }
             getSecretObjectives().add(soID);
@@ -5299,6 +5339,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isCosmicConvergenceMode()
                 || isLiberationC4Mode()
                 || isErwansGambitMode()
+                || isSecretsOnlyMode()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()

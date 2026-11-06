@@ -69,6 +69,28 @@ public class DrawSecretService {
         }
     }
 
+    public static void dealStartingSecretObjectives(GenericInteractionCreateEvent event, Game game) {
+        if (!game.isSecretsOnlyMode()) {
+            dealSOToAll(event, 2, game);
+            return;
+        }
+        SecretsOnlyService.addModeCards(game);
+        SecretsOnlyService.offerStartingSecretObjectives(game);
+        game.getRealPlayers().forEach(player -> offerSecretDrawAbilities(game, player));
+        if (game.getRound() == 1) {
+            RoundOneService.roundOne(event, game);
+        }
+    }
+
+    private static void offerSecretDrawAbilities(Game game, Player player) {
+        if (player.hasAbility("multitasking")) {
+            LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
+        }
+        if (player.hasUnlockedBreakthrough("lunariumbt")) {
+            LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
+        }
+    }
+
     public static void dealSOToAll(GenericInteractionCreateEvent event, int count, Game game) {
         if (count > 0) {
             for (Player player : game.getRealPlayers()) {
@@ -82,12 +104,7 @@ public class DrawSecretService {
                             player.getRepresentation()
                                     + " due to **Plausible Deniability**, you were dealt an extra secret objective. Thus, you must also discard an extra secret objective.");
                 }
-                if (player.hasAbility("multitasking")) {
-                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
-                }
-                if (player.hasUnlockedBreakthrough("lunariumbt")) {
-                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
-                }
+                offerSecretDrawAbilities(game, player);
                 SecretObjectiveInfoService.sendSecretObjectiveInfoWithHeaderText(
                         game,
                         player,

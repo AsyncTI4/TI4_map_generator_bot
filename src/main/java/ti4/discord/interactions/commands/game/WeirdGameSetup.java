@@ -24,6 +24,7 @@ import ti4.service.fow.FogPreset;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
 import ti4.service.tigl.TiglSetupService;
@@ -75,6 +76,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.FEAST_OR_FAMINE_MODE, "True to enable Feast or Famine Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MONUMENTS_MODE, "True to enable Monuments+"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.SECRETS_ONLY_MODE,
+                "True to enable Secrets Only (homebrew: no public objectives, recycled secrets, 10 VP)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -183,6 +188,11 @@ public class WeirdGameSetup extends GameStateSubcommand {
                                         ? ". Faction monuments are not added in Franken games."
                                         : ", and added each player's faction monument."));
             }
+        }
+
+        Boolean secretsOnlyMode = event.getOption(Constants.SECRETS_ONLY_MODE, null, OptionMapping::getAsBoolean);
+        if (secretsOnlyMode != null) {
+            SecretsOnlyService.setActive(event, game, secretsOnlyMode);
         }
 
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);

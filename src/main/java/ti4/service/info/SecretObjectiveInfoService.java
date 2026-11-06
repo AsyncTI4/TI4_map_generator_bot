@@ -109,12 +109,11 @@ public class SecretObjectiveInfoService {
         int index = 1;
 
         // SCORED SECRET OBJECTIVES
-        sb.append("__Scored Secret Objectives__ (")
-                .append(player.getSoScored())
-                .append('/')
-                .append(player.getMaxSOCount())
-                .append("):")
-                .append('\n');
+        sb.append("__Scored Secret Objectives__ (").append(player.getSoScored());
+        if (!game.isSecretsOnlyMode()) {
+            sb.append('/').append(player.getMaxSOCount());
+        }
+        sb.append("):").append('\n');
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -134,7 +133,15 @@ public class SecretObjectiveInfoService {
         sb.append('\n');
 
         // UNSCORED SECRET OBJECTIVES
-        sb.append("__Unscored Secret Objectives:__").append('\n');
+        sb.append("__Unscored Secret Objectives");
+        if (game.isSecretsOnlyMode()) {
+            sb.append(" (")
+                    .append(player.getSecretsUnscored().size())
+                    .append('/')
+                    .append(player.getMaxSOCount())
+                    .append(')');
+        }
+        sb.append(":__").append('\n');
         if (secretObjective != null) {
             if (secretObjective.isEmpty()) {
                 sb.append("> None");

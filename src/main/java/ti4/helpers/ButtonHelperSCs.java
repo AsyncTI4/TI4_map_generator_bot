@@ -495,9 +495,7 @@ public final class ButtonHelperSCs {
                 if (!game.isFowMode()) {
                     message += "\n" + player2.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on.";
-                    if (player2.getSecretsScored().size()
-                                    + player2.getSecretsUnscored().size()
-                            >= player2.getMaxSOCount()) {
+                    if (player2.getSecretsCountedTowardLimit() >= player2.getMaxSOCount()) {
                         message +=
                                 " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
                     }

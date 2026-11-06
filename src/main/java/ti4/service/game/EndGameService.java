@@ -202,7 +202,7 @@ public class EndGameService {
     }
 
     public static boolean objectivesHaveRunOut(Game game) {
-        if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
+        if (game.isRedTapeMode() || game.isCivilizedSocietyMode() || game.isSecretsOnlyMode()) {
             return false;
         }
         return finalObjectiveWasRevealedBefore(game) || endGameDeckIsEmpty(game);

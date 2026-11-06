@@ -335,6 +335,13 @@ Thunder's Edge, the Twilight Imperium 4th Edition expansion that follows PoK and
 A set of 32 homebrew secret objectives for Fog of War games, played by choosing the `secret_objectives_pok_fog` secret objective deck (the PoK deck plus the 32). They reward scouting (systems a Player has found, meaning in their fog memory or current vision), hiding (nothing in another Player's view) and watching (another Player's units in your view). Status ones are checked by the bot; action and agenda ones are offered with a score button when the bot sees the moment happen.
 _Avoid_: FoW SOs, vision secrets
 
+**Secrets Only**:
+A homebrew mode, set through weird game setup, where no public objectives are revealed and Players race to 10 victory points with secret objectives. Each Player holds up to 4 unscored secret objectives, keeps 2 of 4 at setup and 1 of 2 each status phase, and a scored secret objective is shuffled back into the deck for others to draw. No Player may score the same one twice.
+_Avoid_: SO-only, secret race
+
+**Secret objective offer**:
+In Secrets Only, the cards a Player is shown to keep some from (2 of 4 at setup, 1 of 2 each status phase). Offered cards leave the deck until the Player picks; the rest are shuffled back.
+
 **Alliance mode**:
 A team mode in which Players are paired and share some benefits.
 

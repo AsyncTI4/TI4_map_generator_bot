@@ -87,7 +87,7 @@ public class FogSecrets {
             case FIND_THRONES, DARK_COLONY, RUN_SILENT, LURK_NEBULA -> 3;
             case EDGE_OF_MAP, SHADOW_RIVALS -> 4;
             case CHART_EXPANSE ->
-                Math.max(1, ceilDiv(2 * FogSight.countableSystems(game).size(), 3));
+                Math.max(1, ceilDiv(FogSight.countableSystems(game).size(), 3));
             case KNOW_MORE, EYES_THRONE, MARK_FLAGSHIPS -> 2;
             case GHOST_FLEET, WIDE_NET -> 5;
             default -> 0;
