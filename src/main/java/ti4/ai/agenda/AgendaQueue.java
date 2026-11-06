@@ -14,6 +14,8 @@ public class AgendaQueue {
     private static final String QUEUED_WHEN_OF = "queuedWhensFor";
     private static final String QUEUED_AFTERS = "queuedAfters";
     private static final String QUEUED_AFTER_OF = "queuedAftersFor";
+    private static final String DECLINED_WHENS = "declinedWhens";
+    private static final String DECLINED_AFTERS = "declinedAfters";
 
     public static boolean whenWindowOpen(Game game) {
         return WHEN_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())
@@ -26,6 +28,14 @@ public class AgendaQueue {
 
     public static boolean holdsQueuedAfter(Game game, Player seat) {
         return queuedAfter(game, seat).isPresent();
+    }
+
+    public static boolean passedOnWhens(Game game, Player seat) {
+        return game.getStoredValue(DECLINED_WHENS).contains(seat.getFaction() + "_");
+    }
+
+    public static boolean passedOnAfters(Game game, Player seat) {
+        return game.getStoredValue(DECLINED_AFTERS).contains(seat.getFaction() + "_");
     }
 
     public static Optional<String> queuedWhen(Game game, Player seat) {

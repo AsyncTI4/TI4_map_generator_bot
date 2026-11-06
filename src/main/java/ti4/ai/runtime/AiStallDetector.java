@@ -69,8 +69,11 @@ class AiStallDetector {
                     "discarding a starting secret objective",
                     prompt -> prompt.isHidden() && prompt.hasHandlerPrefix("discardSecret_")));
         }
+        boolean whenOpen = !AgendaQueue.passedOnWhens(game, seat);
+        boolean afterOpen = !AgendaQueue.passedOnAfters(game, seat);
         Predicate<AiPrompt> agendaQueue = prompt -> prompt.isHidden()
-                && (prompt.hasHandlerPrefix("declineToQueueAWhen") || prompt.hasHandlerPrefix("declineToQueueAnAfter"));
+                && ((whenOpen && prompt.hasHandlerPrefix("declineToQueueAWhen"))
+                        || (afterOpen && prompt.hasHandlerPrefix("declineToQueueAnAfter")));
         boolean waitingInTheQueue = AgendaQueue.holdsQueuedWhen(game, seat)
                 || AgendaQueue.holdsQueuedAfter(game, seat)
                 || AgendaCardRules.vetoPlayedAndPending(game, seat);

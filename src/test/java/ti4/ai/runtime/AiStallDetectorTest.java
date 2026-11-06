@@ -115,6 +115,26 @@ class AiStallDetectorTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // A seat that already passed is waiting on the others, even if an older "Pass On" prompt is still showing. A
+    // Letnev AI once timed out here while a human decided on an "after" and pressed Pass a second time.
+    @Test
+    void aSeatThatAlreadyPassedIsNotWaitingOnADecision() {
+        game.setPhaseOfGame("agendawaiting");
+        AiPrompt passOnWhens = prompt("whens", PromptSource.AI_THREAD, NOW, "declineToQueueAWhen");
+        AiPrompt passOnAfters = prompt("afters", PromptSource.AI_THREAD, NOW, "declineToQueueAnAfter");
+
+        game.setStoredValue("declinedAfters", "sol_nekro_");
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnAfters)))
+                .isEmpty();
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnWhens)))
+                .extracting(WaitReason::description)
+                .containsExactly("a \"when\"/\"after\" decision");
+
+        game.setStoredValue("declinedWhens", "nekro_");
+        assertThat(AiStallDetector.waitReasons(game, nekro, List.of(passOnWhens, passOnAfters)))
+                .isEmpty();
+    }
+
     private static List<String> relatedTo(List<WaitReason> reasons, AiPrompt... prompts) {
         List<String> related = new ArrayList<>();
         for (AiPrompt prompt : prompts) {
