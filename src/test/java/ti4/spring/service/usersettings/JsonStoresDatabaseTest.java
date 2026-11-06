@@ -149,6 +149,20 @@ class JsonStoresDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
+    void replaceAllUpdatesExistingInsertsNewAndDropsRemovedGamesTogether() {
+        techSummaryService.save("pbd1", summaries(3, "sol", "fl"));
+        techSummaryService.save("pbd2", summaries(2, "hacan", "sdn"));
+
+        techSummaryService.replaceAll(
+                Set.of("pbd1", "pbd2"), Map.of("pbd1", summaries(4, "sol", "gd"), "pbd3", summaries(1, "xxcha", "nm")));
+
+        Map<String, RoundTechSummaries> all = techSummaryService.findAll();
+        assertThat(all).containsOnlyKeys("pbd1", "pbd3");
+        assertThat(all.get("pbd1").round()).isEqualTo(4);
+        assertThat(all.get("pbd3").round()).isEqualTo(1);
+    }
+
+    @Test
     void techSummaryListsLoadMutable() {
         techSummaryService.save("pbd1", summaries(1, "sol", "fl"));
 
