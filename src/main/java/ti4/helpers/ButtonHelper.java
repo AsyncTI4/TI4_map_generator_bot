@@ -4401,6 +4401,16 @@ public class ButtonHelper {
         return assessFleetAndCapacity(player, game, tile, ignoreFighters).counts();
     }
 
+    public static String fleetAndCapacitySummary(Player player, Game game, Tile tile) {
+        FleetAssessment assessment = assessFleetAndCapacity(player, game, tile, false);
+        if (!assessment.wasAssessed()) {
+            return "";
+        }
+        int[] counts = assessment.counts();
+        return "Fleet pool used: " + counts[0] + "/" + assessment.fleetLimit() + ". Capacity used: " + counts[1] + "/"
+                + (counts[2] + counts[3]) + ".";
+    }
+
     private static void remindAboutFlotilla(Player player, Game game, Tile tile, FleetAssessment assessment) {
         if (!player.hasAbility("flotilla")) {
             return;
@@ -4440,18 +4450,24 @@ public class ButtonHelper {
     private record FleetAssessment(
             int[] counts,
             boolean wasAssessed,
+            int fleetLimit,
             int capitalShips,
             boolean fleetSupplyViolated,
             boolean violated,
             String message) {
 
         static FleetAssessment unassessed(int[] counts) {
-            return new FleetAssessment(counts, false, 0, false, false, "");
+            return new FleetAssessment(counts, false, 0, 0, false, false, "");
         }
 
         static FleetAssessment assessed(
-                int[] counts, int capitalShips, boolean fleetSupplyViolated, boolean violated, String message) {
-            return new FleetAssessment(counts, true, capitalShips, fleetSupplyViolated, violated, message);
+                int[] counts,
+                int fleetLimit,
+                int capitalShips,
+                boolean fleetSupplyViolated,
+                boolean violated,
+                String message) {
+            return new FleetAssessment(counts, true, fleetLimit, capitalShips, fleetSupplyViolated, violated, message);
         }
 
         boolean unlocksLetnevCommander() {
@@ -4859,6 +4875,7 @@ public class ButtonHelper {
 
             return FleetAssessment.assessed(
                     capNCap,
+                    fleetCap / 2,
                     numOfCapitalShips,
                     fleetSupplyViolated,
                     capacityViolated
@@ -4877,6 +4894,7 @@ public class ButtonHelper {
         };
         return FleetAssessment.assessed(
                 capNCap2,
+                fleetCap / 2,
                 numOfCapitalShips,
                 fleetSupplyViolated,
                 capacityViolated

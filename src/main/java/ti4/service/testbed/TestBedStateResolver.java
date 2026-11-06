@@ -47,6 +47,8 @@ public class TestBedStateResolver {
             "exploreDiscard",
             "exploreDeck",
             "relicDeck",
+            "soDeck",
+            "soDeckSize",
             "decks",
             "borderAnomalies",
             "customAdjacencies",
@@ -143,6 +145,8 @@ public class TestBedStateResolver {
             case "exploreDiscard" -> joinSorted(game.getAllExploreDiscard());
             case "exploreDeck" -> joinSorted(game.getAllExplores());
             case "relicDeck" -> joinSorted(game.getAllRelics());
+            case "soDeck" -> joinSorted(game.getSecretObjectives());
+            case "soDeckSize" -> String.valueOf(game.getSecretObjectives().size());
             case "decks" ->
                 "ac:" + game.getAcDeckID() + ",so:" + game.getSoDeckID() + ",relic:" + game.getRelicDeckID()
                         + ",explore:" + game.getExplorationDeckID() + ",agenda:" + game.getAgendaDeckID();

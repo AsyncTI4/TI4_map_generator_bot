@@ -198,6 +198,10 @@ public class FOWOptionService {
             return visible;
         }
 
+        public static boolean exists(String value) {
+            return Arrays.stream(values()).anyMatch(option -> option.name().equalsIgnoreCase(value));
+        }
+
         public static FOWOption fromString(String value) {
             for (FOWOption option : values()) {
                 if (option.name().equalsIgnoreCase(value)) {

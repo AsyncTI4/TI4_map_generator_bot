@@ -91,6 +91,20 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     }
 
     @Test
+    void revisionKeysAreReadForEveryGameWithoutLoadingTheRows() {
+        Game first = gameWithRealPlayers("pbd-db-revision-first", 3);
+        Game second = gameWithRealPlayers("pbd-db-revision-second", 3);
+        first.setRevisionKey("revision-first");
+        second.setRevisionKey("revision-second");
+        persistenceService.replace(GameEntityMapper.toSnapshot(first));
+        persistenceService.replace(GameEntityMapper.toSnapshot(second));
+
+        assertThat(persistedManagedGameService.loadRevisionKeys())
+                .containsEntry(first.getName(), first.getRevisionKey())
+                .containsEntry(second.getName(), second.getRevisionKey());
+    }
+
+    @Test
     void replacedPlayerWhoStaysSeatedIsStoredBesideTheSeatThatStillTracksThem() {
         // pbd23770b: user-1 was replaced on their seat but stayed in the game without a faction, so their old seat
         // and their own seat both name user-1 as the stats user.

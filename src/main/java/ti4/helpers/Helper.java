@@ -1792,6 +1792,25 @@ public final class Helper {
         return msg.toString();
     }
 
+    private static void appendFleetAndCapacitySummaries(
+            StringBuilder msg, Player player, Game game, List<String> uniquePlaces) {
+        uniquePlaces.stream()
+                .map(place -> place.split("_")[0])
+                .distinct()
+                .map(game::getTileByPosition)
+                .filter(Objects::nonNull)
+                .forEach(tile -> {
+                    String summary = ButtonHelper.fleetAndCapacitySummary(player, game, tile);
+                    if (!summary.isEmpty()) {
+                        msg.append("-# ")
+                                .append(tile.getRepresentationForButtons(game, player))
+                                .append(": ")
+                                .append(summary)
+                                .append('\n');
+                    }
+                });
+    }
+
     public static String buildProducedUnitsMessage(Player player, Game game) {
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         StringBuilder msg = new StringBuilder();
@@ -1855,6 +1874,7 @@ public final class Helper {
             }
             msg.append(localPlace);
         }
+        appendFleetAndCapacitySummaries(msg, player, game, uniquePlaces);
         int cost = calculateCostOfProducedUnits(player, game, true);
         int unitCount = calculateCostOfProducedUnits(player, game, false);
         if (unitCount <= 1) {

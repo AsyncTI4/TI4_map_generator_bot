@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
@@ -26,6 +27,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FowScoringStatusService;
+import ti4.service.fow.GMService;
 import ti4.service.game.EndedGameScoringGuardService;
 import ti4.service.info.KnownCardsService;
 import ti4.service.info.KnownCardsService.KnownCardType;
@@ -34,6 +36,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.objectives.fog.FogSecrets;
 
 @UtilityClass
 public class SecretObjectiveHelper {
@@ -56,7 +59,8 @@ public class SecretObjectiveHelper {
                 continue;
             }
             StatusHelper.recordObjectiveScored(game, player, entry.getKey(), "SECRET");
-            if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0) {
+            if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0
+                    && !FogSecrets.isFogSecret(game, entry.getKey())) {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
                 message.append(" (")
                         .append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player))
@@ -345,7 +349,7 @@ public class SecretObjectiveHelper {
     }
 
     public static void showUnscored(Game game, GenericInteractionCreateEvent event) {
-        if (game.isFowMode()) {
+        if (game.isFowMode() && !isGmRoom(game, event.getMessageChannel())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode.");
             return;
         }
@@ -427,6 +431,11 @@ public class SecretObjectiveHelper {
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+    }
+
+    private static boolean isGmRoom(Game game, MessageChannel channel) {
+        TextChannel gmRoom = GMService.gmRoomOrNull(game);
+        return gmRoom != null && channel != null && gmRoom.getId().equals(channel.getId());
     }
 
     private static String getSecretObjectiveProgress(Game game, String id) {
