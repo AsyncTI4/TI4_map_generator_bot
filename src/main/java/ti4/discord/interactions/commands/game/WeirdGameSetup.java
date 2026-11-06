@@ -79,7 +79,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.SECRETS_ONLY_MODE,
-                "True to enable Secrets Only (homebrew: no public objectives, recycled secrets, 10 VP)"));
+                "True to enable Secrets Only (Fog of War homebrew: no public objectives, recycled secrets, 10 VP)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -191,7 +191,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
         }
 
         Boolean secretsOnlyMode = event.getOption(Constants.SECRETS_ONLY_MODE, null, OptionMapping::getAsBoolean);
-        if (secretsOnlyMode != null) {
+        if (Boolean.TRUE.equals(secretsOnlyMode) && !game.isFowMode()) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Secrets Only can only be used in Fog of War games. It was not enabled.");
+        } else if (secretsOnlyMode != null) {
             SecretsOnlyService.setActive(event, game, secretsOnlyMode);
         }
 

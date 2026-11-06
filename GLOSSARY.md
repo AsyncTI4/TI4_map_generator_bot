@@ -336,7 +336,7 @@ A set of 32 homebrew secret objectives for Fog of War games, played by choosing 
 _Avoid_: FoW SOs, vision secrets
 
 **Secrets Only**:
-A homebrew mode, set through weird game setup, where no public objectives are revealed and Players race to 10 victory points with secret objectives. Each Player holds up to 4 unscored secret objectives, keeps 2 of 4 at setup and 1 of 2 each status phase, and a scored secret objective is shuffled back into the deck for others to draw. No Player may score the same one twice.
+A Fog of War homebrew mode, set through weird game setup, where no public objectives are revealed and Players race to 10 victory points with secret objectives. Each Player holds up to 4 unscored secret objectives, keeps 2 of 4 at setup and 1 of 2 each status phase, and a scored secret objective is shuffled back into the deck for others to draw. No Player may score the same one twice.
 _Avoid_: SO-only, secret race
 
 **Secret objective offer**:
