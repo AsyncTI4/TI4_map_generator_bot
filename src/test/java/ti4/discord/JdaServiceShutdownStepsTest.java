@@ -180,16 +180,41 @@ class JdaServiceShutdownStepsTest {
                     .as(pipeline.getSimpleName())
                     .isGreaterThan(workers);
         }
-        // Everything above can save a game, which queues onto the persistence pipelines.
+        // Workers, crons and slice generation save games, which queues onto the persistence pipelines.
+        int sliceGeneration = phaseOf(phases, SliceGenerationPipeline.class.getSimpleName());
         for (Class<?> pipeline : List.of(GameWebStatePipeline.class, GameDatabaseSyncPipeline.class)) {
-            int persistence = phaseOf(phases, pipeline.getSimpleName());
-            assertThat(persistence)
+            assertThat(phaseOf(phases, pipeline.getSimpleName()))
                     .as(pipeline.getSimpleName())
                     .isGreaterThan(workers)
                     .isGreaterThan(crons)
-                    .isGreaterThan(phaseOf(phases, SliceGenerationPipeline.class.getSimpleName()))
-                    .isGreaterThan(phaseOf(phases, MapRenderPipeline.class.getSimpleName()))
+                    .isGreaterThan(sliceGeneration);
+        }
+    }
+
+    @Test
+    void theLeaseWaitsForGameFileWritersAndNothingElse() {
+        // The new process loads games from the shared game files once it holds the lease, so every step that can
+        // save a game must finish first. Render, statistics and web state only read, and database sync writes are
+        // skipped when the game file has moved on, so those drain after the handover.
+        List<List<String>> phases = JdaService.shutdownPhases().stream()
+                .map(phase -> phase.stream().map(ShutdownStep::name).toList())
+                .toList();
+        int lease = phaseOf(phases, JdaService.RELEASE_ACTIVE_LEASE);
+
+        for (Class<?> gameWriter :
+                List.of(ExecutorServiceManager.class, CronManager.class, SliceGenerationPipeline.class)) {
+            assertThat(phaseOf(phases, gameWriter.getSimpleName()))
+                    .as(gameWriter.getSimpleName())
                     .isLessThan(lease);
+        }
+        for (Class<?> readerOrGuardedWriter : List.of(
+                MapRenderPipeline.class,
+                StatisticsPipeline.class,
+                GameWebStatePipeline.class,
+                GameDatabaseSyncPipeline.class)) {
+            assertThat(phaseOf(phases, readerOrGuardedWriter.getSimpleName()))
+                    .as(readerOrGuardedWriter.getSimpleName())
+                    .isGreaterThan(lease);
         }
     }
 

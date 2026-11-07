@@ -28,7 +28,9 @@ public class GameDatabaseSyncPipeline {
         if (DatabasePersistenceGate.isDisabled()) return;
         try {
             GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game, managedGameState);
-            queue(game.getName(), service -> service.replace(snapshot));
+            queue(
+                    game.getName(),
+                    service -> service.replaceIfCurrent(snapshot, () -> GameRevisionKeyFile.read(game.getName())));
         } catch (Exception e) {
             BotLogger.error("Failed to prepare database sync for game " + game.getName() + ".", e);
         }
@@ -39,7 +41,7 @@ public class GameDatabaseSyncPipeline {
         queue(gameName, service -> {
             Game game = GameLoadService.load(gameName);
             if (game == null) return;
-            service.restore(GameEntityMapper.toSnapshot(game));
+            service.restoreIfCurrent(GameEntityMapper.toSnapshot(game), () -> GameRevisionKeyFile.read(gameName));
         });
     }
 

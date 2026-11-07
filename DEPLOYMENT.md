@@ -125,7 +125,7 @@ sequenceDiagram
     Old->>Old: draining = true, ready = false,<br/>stop participating, close Spring context
     Traefik->>Old: GET /api/public/ready
     Old-->>Traefik: 503 (Traefik stops routing to Old)
-    Old->>Old: Shutdown steps: executors, crons, pipelines,<br/>flush active hours
+    Old->>Old: Drain game writers: workers, crons,<br/>slice generation
     Old->>DB: releaseLease (expire it, pg_notify)
     DB-->>New: NOTIFY active_lease_released
     New->>DB: tryAcquireLease
@@ -133,7 +133,7 @@ sequenceDiagram
     New->>New: active = true: lease start jobs,<br/>GameManager.warmup, data migrations, ready = true
     Traefik->>New: GET /api/public/ready
     New-->>Traefik: 200 (Traefik routes to New)
-    Old->>Old: send buffered logs, shut down JDA, exit
+    Old->>Old: drain render, stats, web state, DB sync,<br/>flush active hours, send logs, shut down JDA, exit
     Script->>Old: docker stop --time 600, docker rm
 ```
 
@@ -191,30 +191,41 @@ thread is interrupted:
 1. Mark the process as shutting down, set the shutdown presence, stop accepting commands,
    then close the JDA event pool.
 2. **In parallel:** `ExecutorServiceManager` and `CronManager`.
-3. **In parallel:** `SliceGenerationPipeline`, `MapRenderPipeline`, `StatisticsPipeline` and the
-   user active-hours flush.
-4. **In parallel:** `GameWebStatePipeline` and `GameDatabaseSyncPipeline`.
-5. **One after another:** release the active lease, send buffered logs, shut down JDA.
+3. `SliceGenerationPipeline`.
+4. Release the active lease.
+5. **In parallel:** `MapRenderPipeline`, `StatisticsPipeline`, `GameWebStatePipeline`,
+   `GameDatabaseSyncPipeline` and the user active-hours flush.
+6. **One after another:** send buffered logs, shut down JDA.
 
-The phases follow who hands work to whom:
+**The lease waits only for the steps that write game files.** Once the new process holds the
+lease, it loads games from the shared game files, and game file locks only work inside one
+process. So every step that can save a game (workers, crons and slice generation) finishes
+before the lease is released. The rest drain after the handover:
+- Render, statistics and web state only read game state.
+- Database sync writes go through `replaceIfCurrent` / `restoreIfCurrent`. Each write takes a
+  per-game Postgres advisory lock, then compares the snapshot's revision key with the one in
+  the game file. If the file has moved on, a newer save has already queued its own sync, so the
+  stale write is skipped. This also keeps two quick saves of one game from reaching the database
+  out of order.
+
+The phases also follow who hands work to whom:
 - Event handlers queue work onto the workers and pipelines.
 - Worker tasks start renders, slice generation and statistics jobs, and record user active
-  hours, so the flush waits for them.
+  hours, so those wait for the workers.
 - Workers and crons can drain together. Workers do schedule on the cron scheduler (circuit
   breaker resets, rate-limited log messages), but `CronManager.scheduleOnce` returns `false`
   instead of throwing once the scheduler is shut down. Anything scheduled after that point would
   never run anyway.
 - Anything that saves a game (`GameManager.save`) queues onto the web-state and database-sync
-  pipelines, so they close last.
-- The lease is released after the database sync phase.
+  pipelines, so they close after every game writer.
 
 This ordering is best effort, bounded by each executor's timeout (see Known gaps). When you add
-an executor, put it in the phase after everything that submits to it.
-`JdaServiceShutdownStepsTest` checks the order.
+an executor, put it in the phase after everything that submits to it, and before the lease only
+if it writes game files. `JdaServiceShutdownStepsTest` checks the order.
 
-The new process can't take over until the lease is released, so phases 1–4 also set how long
-interactions go unanswered during a rollover. In the worst case, where every executor runs to
-its timeout, the old sequential order took about 235 s and the phased order takes about 165 s:
+Interactions go unanswered from the start of the drain until the new process holds the lease.
+In the worst case, where every executor runs to its timeout, the original sequential order
+released the lease after about 195 s. The phased order releases it after about 95 s:
 
 ```mermaid
 gantt
@@ -232,6 +243,7 @@ gantt
     StatisticsPipeline        :b7, after b6, 10s
     GameWebStatePipeline      :b8, after b7, 10s
     GameDatabaseSyncPipeline  :b9, after b8, 30s
+    Lease released            :milestone, b11, after b9, 0s
     JDA shutdown              :crit, b10, after b9, 40s
 
     section After (phased)
@@ -239,32 +251,34 @@ gantt
     ExecutorServiceManager    :a2, after a1, 60s
     CronManager               :a3, after a1, 30s
     SliceGenerationPipeline   :a5, after a2, 30s
-    MapRenderPipeline         :a6, after a2, 20s
-    StatisticsPipeline        :a7, after a2, 10s
-    Active-hours flush        :milestone, a4, after a2, 0s
+    Lease released            :milestone, a11, after a5, 0s
+    MapRenderPipeline         :a6, after a5, 20s
+    StatisticsPipeline        :a7, after a5, 10s
     GameWebStatePipeline      :a8, after a5, 10s
     GameDatabaseSyncPipeline  :a9, after a5, 30s
+    Active-hours flush        :milestone, a4, after a5, 0s
     JDA shutdown              :crit, a10, after a9, 40s
 ```
 
 Each bar is that executor's timeout (JDA gets 20 s, then 20 s more after `shutdownNow`). The
 active-hours flush, the lease release and sending buffered logs have no timeout. They are
-usually quick, so they are drawn as a point or left out. Real shutdowns are usually much faster,
-because most executors are idle.
+usually quick, so they are drawn as points or left out. The whole shutdown still takes up to
+about 165 s, but the new process takes over 100 s sooner in the worst case. Real shutdowns are
+usually much faster, because most executors are idle.
 
 ## Known gaps
 
 - **Interactions in the handover window go unanswered.** The old process stops handling
   Discord events the moment it starts draining, and the new one only starts once it holds the
-  lease, after the old one's shutdown steps finish. Interactions in between get no reply.
+  lease, after the old one has drained every step that writes game files. Interactions in
+  between get no reply.
 - **A crashed active process blocks takeover for up to an hour.** Only a clean shutdown
   releases the lease. If the active JVM dies without running its shutdown steps, the lease
   stays valid until it expires (up to 3600 s after the last renewal). A restarted container
   gets a new `INSTANCE_ID`, so it cannot reclaim the old lease either.
 - **Shutdown ordering is bounded by timeouts.** An executor that hits its timeout may still be
-  running when the next phase starts. If `GameDatabaseSyncPipeline` times out, the lease is
-  released anyway, and the old process may still be finishing a write after the new one takes
-  over.
+  running when the next phase starts. A worker or cron that runs past its timeout can still save
+  a game after the lease is released, overwriting the new process's change to that game file.
 - **JDA callbacks outlive the executors.** REST callbacks (`queue(success, failure)`) run on
   JDA's own threads until JDA shuts down in the last phase. One that saves a game, queues a render
   or schedules a cron after its executor has closed has that work refused. The persistence

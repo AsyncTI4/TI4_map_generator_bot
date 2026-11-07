@@ -5,7 +5,9 @@ import jakarta.persistence.PersistenceContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,28 @@ public class GameEntityPersistenceService {
                         GameEntityMapper.hasUnknownName(existing) && !GameEntityMapper.hasUnknownName(incoming));
         deleteGameRows(snapshot.game().getGameName());
         insertGameRows(snapshot, users);
+    }
+
+    @Transactional
+    public boolean replaceIfCurrent(GameEntitySnapshot snapshot, Supplier<String> currentRevisionKey) {
+        if (!lockAndCheckCurrent(snapshot, currentRevisionKey)) return false;
+        replace(snapshot);
+        return true;
+    }
+
+    @Transactional
+    public boolean restoreIfCurrent(GameEntitySnapshot snapshot, Supplier<String> currentRevisionKey) {
+        if (!lockAndCheckCurrent(snapshot, currentRevisionKey)) return false;
+        restore(snapshot);
+        return true;
+    }
+
+    private boolean lockAndCheckCurrent(GameEntitySnapshot snapshot, Supplier<String> currentRevisionKey) {
+        entityManager
+                .createNativeQuery("select 1 from pg_advisory_xact_lock(hashtext(?1))")
+                .setParameter(1, snapshot.game().getGameName())
+                .getSingleResult();
+        return Objects.equals(snapshot.game().getRevisionKey(), currentRevisionKey.get());
     }
 
     @Transactional
