@@ -641,15 +641,16 @@ public class JdaService {
                 List.of(
                         executorStep(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager::shutdown),
                         executorStep(CronManager.class.getSimpleName(), CronManager::shutdown)),
-                List.of(executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown)),
+                List.of(
+                        executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
+                        new ShutdownStep(FLUSH_USER_ACTIVE_HOURS, JdaService::flushUserActiveHours)),
                 List.of(new ShutdownStep(RELEASE_ACTIVE_LEASE, JdaService::releaseActiveLease)),
                 List.of(
                         executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
                         executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown),
                         executorStep(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline::shutdown),
                         executorStep(
-                                GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown),
-                        new ShutdownStep(FLUSH_USER_ACTIVE_HOURS, JdaService::flushUserActiveHours)),
+                                GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown)),
                 List.of(new ShutdownStep("send buffered logs", JdaService::sendBufferedLogsBeforeJdaShutdown)),
                 List.of(new ShutdownStep("shut down JDA", JdaService::shutdownJda)));
     }

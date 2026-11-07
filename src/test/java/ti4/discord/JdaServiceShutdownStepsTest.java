@@ -194,8 +194,9 @@ class JdaServiceShutdownStepsTest {
     @Test
     void theLeaseWaitsForGameFileWritersAndNothingElse() {
         // The new process loads games from the shared game files once it holds the lease, so every step that can
-        // save a game must finish first. Render, statistics and web state only read, and database sync writes are
-        // skipped when the game file has moved on, so those drain after the handover.
+        // save a game must finish first. The active-hours flush also goes first: it rewrites whole user settings rows
+        // with no cross-process guard, so after the handover it could overwrite a setting the new process just saved.
+        // Database sync writes are skipped when the game file has moved on, so they drain after the handover.
         List<List<String>> phases = JdaService.shutdownPhases().stream()
                 .map(phase -> phase.stream().map(ShutdownStep::name).toList())
                 .toList();
@@ -207,6 +208,7 @@ class JdaServiceShutdownStepsTest {
                     .as(gameWriter.getSimpleName())
                     .isLessThan(lease);
         }
+        assertThat(phaseOf(phases, JdaService.FLUSH_USER_ACTIVE_HOURS)).isLessThan(lease);
         for (Class<?> readerOrGuardedWriter : List.of(
                 MapRenderPipeline.class,
                 StatisticsPipeline.class,
