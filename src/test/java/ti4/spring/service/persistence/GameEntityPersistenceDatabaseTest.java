@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,6 +122,66 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         assertThat(userNames("1", "2", "3", "4"))
                 .containsExactly("alice", "bob", GameEntityMapper.UNKNOWN_USER_PREFIX + "3", "carol");
+    }
+
+    @Test
+    void aSyncWhoseRevisionTheGameFileHasMovedPastIsSkipped() {
+        // During a rollover the old process can still be draining a sync for a state the new process has already
+        // saved over. That stale write must not replace the newer rows.
+        assertThat(persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-stale", "newer"), () -> "newer"))
+                .isTrue();
+
+        assertThat(persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-stale", "older"), () -> "newer"))
+                .isFalse();
+        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-stale", "older"), () -> "newer"))
+                .isFalse();
+
+        assertThat(gameRepository.findById("pbd-stale").map(GameEntity::getRevisionKey))
+                .contains("newer");
+    }
+
+    @Test
+    void guardedWritesOfOneGameWaitForEachOther() throws Exception {
+        // The revision check and the write happen under one per-game lock, so a write that checks after another
+        // process saved the game file cannot land after that process's own sync.
+        CountDownLatch firstHoldsTheLock = new CountDownLatch(1);
+        CountDownLatch releaseFirst = new CountDownLatch(1);
+        Thread first = Thread.ofVirtual()
+                .start(() -> persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-locked", "first"), () -> {
+                    firstHoldsTheLock.countDown();
+                    awaitQuietly(releaseFirst);
+                    return "first";
+                }));
+        assertThat(firstHoldsTheLock.await(10, TimeUnit.SECONDS)).isTrue();
+
+        CountDownLatch secondFinished = new CountDownLatch(1);
+        Thread second = Thread.ofVirtual().start(() -> {
+            persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-locked", "second"), () -> "second");
+            secondFinished.countDown();
+        });
+
+        assertThat(secondFinished.await(500, TimeUnit.MILLISECONDS))
+                .as("second write waits while the first holds the game's lock")
+                .isFalse();
+        releaseFirst.countDown();
+        first.join(10_000);
+        second.join(10_000);
+        assertThat(gameRepository.findById("pbd-locked").map(GameEntity::getRevisionKey))
+                .contains("second");
+    }
+
+    private static GameEntitySnapshot snapshotAtRevision(String gameName, String revisionKey) {
+        GameEntitySnapshot snapshot = snapshotWithUsers(gameName);
+        snapshot.game().setRevisionKey(revisionKey);
+        return snapshot;
+    }
+
+    private static void awaitQuietly(CountDownLatch latch) {
+        try {
+            latch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static GameEntitySnapshot snapshotWithUsers(String gameName, UserEntity... users) {
