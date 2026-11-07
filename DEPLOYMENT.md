@@ -12,7 +12,7 @@ The pieces:
 | Container setup (Traefik + `tibot`) | [docker-compose.production.yml](docker-compose.production.yml) |
 | Image build | [Dockerfile](Dockerfile) |
 | Startup order | [AsyncTI4DiscordBot.java](src/main/java/ti4/AsyncTI4DiscordBot.java) |
-| Shutdown order | `JdaService.shutdown()` in [JdaService.java](src/main/java/ti4/discord/JdaService.java) |
+| Shutdown order | `JdaService.shutdown()` in [JdaService.java](src/main/java/ti4/discord/JdaService.java), see [Shutdown steps](#shutdown-steps) |
 | Active lease | [ti4.spring.service.deploy](src/main/java/ti4/spring/service/deploy) |
 | Health, readiness, drain endpoints | [PingController](src/main/java/ti4/spring/api/PingController.java), [ReadyController](src/main/java/ti4/spring/api/publicstatus/ReadyController.java), [DeployController](src/main/java/ti4/spring/api/publicstatus/DeployController.java) |
 
@@ -181,6 +181,68 @@ lease-acquired callback rather than in `main`: `CronManager.runLeaseStartJobs()`
 `GameManager.warmup()` and `DataMigrationManager.runMigrations()`. The managed game
 preload, by contrast, starts right away on the standby, so the warmup after takeover can build
 most games from the preload instead of from scratch.
+
+### Shutdown steps
+
+`JdaService.shutdown()` drains the old process in phases. The steps inside a phase run at the
+same time, and each phase waits for the one before it:
+
+1. Mark the process as shutting down, set the shutdown presence, stop accepting commands,
+   then close the JDA event pool.
+2. **In parallel:** `ExecutorServiceManager`, `CronManager` and the user active-hours flush.
+3. **In parallel:** `SliceGenerationPipeline`, `MapRenderPipeline` and `StatisticsPipeline`.
+4. **In parallel:** `GameWebStatePipeline` and `GameDatabaseSyncPipeline`.
+5. **One after another:** release the active lease, send buffered logs, shut down JDA.
+
+The phases follow who hands work to whom, so no executor closes while something upstream can
+still submit to it:
+- Event handlers queue work onto the workers and pipelines.
+- Worker tasks start renders, slice generation and statistics jobs.
+- Anything that saves a game (`GameManager.save`) queues onto the web-state and database-sync
+  pipelines.
+- The lease is released only after the database sync drains, so the new process never starts
+  writing before the old one finishes.
+
+When you add an executor, put it in the phase after everything that submits to it.
+
+The new process can't take over until the lease is released, so phases 1–4 also set how long
+interactions go unanswered during a rollover (see Known gaps). In the worst case, where every
+step runs to its timeout, the old sequential order took about 235 s and the phased order takes
+about 165 s:
+
+```mermaid
+gantt
+    title Worst-case shutdown timeline (seconds)
+    dateFormat X
+    axisFormat %s
+
+    section Before (sequential)
+    JDA event pool            :b1, 0, 5s
+    ExecutorServiceManager    :b2, after b1, 60s
+    CronManager               :b3, after b2, 30s
+    Active-hours flush        :b4, after b3, 1s
+    SliceGenerationPipeline   :b5, after b4, 30s
+    MapRenderPipeline         :b6, after b5, 20s
+    StatisticsPipeline        :b7, after b6, 10s
+    GameWebStatePipeline      :b8, after b7, 10s
+    GameDatabaseSyncPipeline  :b9, after b8, 30s
+    Lease, logs, JDA          :crit, b10, after b9, 40s
+
+    section After (phased)
+    JDA event pool            :a1, 0, 5s
+    ExecutorServiceManager    :a2, after a1, 60s
+    CronManager               :a3, after a1, 30s
+    Active-hours flush        :a4, after a1, 1s
+    SliceGenerationPipeline   :a5, after a2, 30s
+    MapRenderPipeline         :a6, after a2, 20s
+    StatisticsPipeline        :a7, after a2, 10s
+    GameWebStatePipeline      :a8, after a5, 10s
+    GameDatabaseSyncPipeline  :a9, after a5, 30s
+    Lease, logs, JDA          :crit, a10, after a9, 40s
+```
+
+Each bar is that step's timeout. The flush has no timeout and is drawn as 1 s. Real shutdowns
+are usually much faster, because most executors are idle.
 
 ## Known gaps
 
