@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
@@ -89,6 +90,7 @@ public class GameManager {
             return;
         }
         long warmupStartedAt = System.currentTimeMillis();
+        CompletableFuture<Map<String, String>> currentRevisionKeys = startReadingCurrentRevisionKeys();
 
         try {
             gameNames.addAll(GameLoadService.loadGameNames());
@@ -105,7 +107,7 @@ public class GameManager {
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
-                WarmupSources sources = warmupSources();
+                WarmupSources sources = warmupSources(currentRevisionKeys);
                 int keptFromStandby =
                         discardOutdatedPrebuiltManagedGames(sources.prebuiltManagedGames(), sources.preloadedNames());
                 long buildStartedAt = System.currentTimeMillis();
@@ -135,7 +137,7 @@ public class GameManager {
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
                         "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD,"
-                                + " %,d MS READING REVISION KEYS, %,d MS READING %,d CHANGED ROWS, %,d MS BUILDING):"
+                                + " %,d MS CHECKING REVISION KEYS, %,d MS READING %,d CHANGED ROWS, %,d MS BUILDING):"
                                 + " %,d BUILT ON THE STANDBY, %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE,"
                                 + " %,d FROM GAME FILES",
                         System.currentTimeMillis() - warmupStartedAt,
@@ -167,7 +169,14 @@ public class GameManager {
             long changedRowsMillis,
             int changedRowCount) {}
 
-    private static WarmupSources warmupSources() {
+    private static CompletableFuture<Map<String, String>> startReadingCurrentRevisionKeys() {
+        if (DatabasePersistenceGate.isDisabled()) return CompletableFuture.completedFuture(Map.of());
+        return CompletableFuture.supplyAsync(
+                GameManager::loadCurrentRevisionKeys,
+                task -> Thread.ofPlatform().name("revision-key-read").daemon().start(task));
+    }
+
+    private static WarmupSources warmupSources(CompletableFuture<Map<String, String>> currentRevisionKeysRead) {
         long waitStartedAt = System.currentTimeMillis();
         ManagedGamePreload.Snapshot preload = ManagedGamePreload.take();
         long preloadWaitMillis = System.currentTimeMillis() - waitStartedAt;
@@ -178,7 +187,7 @@ public class GameManager {
         }
 
         long revisionKeysStartedAt = System.currentTimeMillis();
-        Map<String, String> currentRevisionKeys = loadCurrentRevisionKeys();
+        Map<String, String> currentRevisionKeys = currentRevisionKeysRead.join();
         Set<String> stillCurrent = preload.stillCurrent(currentRevisionKeys);
         long revisionKeysMillis = System.currentTimeMillis() - revisionKeysStartedAt;
 
