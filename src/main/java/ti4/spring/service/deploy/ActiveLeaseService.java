@@ -84,6 +84,7 @@ public class ActiveLeaseService {
         leaseReleaseListener.stop();
         activeLeaseTransactionService.releaseLease(AsyncTI4DiscordBot.INSTANCE_ID);
         setActive(false);
+        setDraining(true);
     }
 
     public boolean stillOwnsLease() {
