@@ -263,6 +263,9 @@ public class CardsInfoService {
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
         }
+        if (IsPlayerElectedService.isPlayerElected(game, player, "ministercontrol")) {
+            buttons.add(Buttons.gray("theodisiMinisterControl", "Discard Minister of Control", CardEmojis.Agenda));
+        }
         if (!game.isFowMode()
                         && game.getPlayers().values().stream()
                                 .anyMatch(p -> p.getAbilities().contains("galvanize"))

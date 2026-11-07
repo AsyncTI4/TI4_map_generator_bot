@@ -28,6 +28,7 @@ import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.objectives.RevealPublicObjectiveService;
+import ti4.service.objectives.SecretsOnlyService;
 
 @UtilityClass
 class StatusPhaseButtonHandler {
@@ -65,7 +66,7 @@ class StatusPhaseButtonHandler {
             game.setStoredValue("revealedPOInRound" + game.getRound(), "Yes");
         }
         String revealedObjective = null;
-        if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode()) {
+        if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode() && !game.isSecretsOnlyMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event);
             } else if (stage.contains("2position_")) {
@@ -98,6 +99,9 @@ class StatusPhaseButtonHandler {
                 StatusCleanupService.runStatusCleanup(game);
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
+            }
+            if (game.isSecretsOnlyMode()) {
+                SecretsOnlyService.offerStatusPhaseSecretObjectives(game);
             }
         }
 

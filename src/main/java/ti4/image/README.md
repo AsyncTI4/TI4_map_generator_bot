@@ -37,15 +37,10 @@ flowchart TD
     card --> draw
     draft --> draw
     draw --> io
-    map -.-> draw
-    map -.-> io
-    playerarea -.-> io
-    tile -.-> io
-    card -.-> io
-    draft -.-> io
 ```
 
-Dotted edges are allowed direct dependencies that skip a layer.
+Layers may also skip ahead. Every package above may import `io` directly, and `map`
+may import `draw` directly. The chart leaves those edges out.
 
 ## Full map render
 
@@ -299,8 +294,12 @@ flowchart LR
     Read --> Cache{ImageCache<br/>file cache hit?}
     Cache -- yes --> Img[BufferedImage]
     Cache -- no --> Disk[ImageIO from resources] --> Store[store in cache] --> Img
-    Url[Discord avatar / emoji URL] --> Remote[RemoteImages<br/>2 s timeout, one retry]
-    Remote --> UrlCache[ImageCache url cache] --> Img
+    Url[Discord avatar / emoji URL] --> Remote[RemoteImages.readScaled<br/>url, width, height]
+    Remote --> UrlCache{ImageCache<br/>url cache hit?<br/>key: size + url}
+    UrlCache -- yes --> Img
+    UrlCache -- no --> Fetch[HTTP GET<br/>2 s timeout, one retry<br/>on a network error]
+    Fetch -- "failed" --> Null[null, not cached]
+    Fetch -- ok --> Scale[square if width = height<br/>then scale] --> UrlStore[store in cache] --> Img
 ```
 
 Both caches are Caffeine caches (default 2000 entries, 8 hours), registered with

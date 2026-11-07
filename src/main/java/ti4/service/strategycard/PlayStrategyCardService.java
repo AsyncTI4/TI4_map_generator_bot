@@ -598,12 +598,11 @@ public class PlayStrategyCardService {
                 }
             }
         }
-        if (player.hasRelicReady("lunar_eclipse_moonphase")
-                && AeternaAbilityHandler.canReturnCapturedNeutralUnits(game, player, 2)) {
+        if (player.hasRelicReady("new_moonphase")) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " may use _Lunar Eclipse_ after performing this strategic action.",
-                    List.of(AeternaAbilityHandler.getLunarEclipseButton(player), Buttons.DECLINE_DELETE_BUTTONS));
+                    player.getRepresentation() + " may use _New Moon_ after performing this strategic action.",
+                    List.of(AeternaAbilityHandler.getNewMoonButton(player), Buttons.DECLINE_DELETE_BUTTONS));
         }
         if (player.hasPlayablePromissoryInHand("thpnverydith")) {
             VerydithPromissoryHandler.usePactRenewed(player);
@@ -707,7 +706,10 @@ public class PlayStrategyCardService {
                     }
                 }
                 if (!applyPreDecline(playersToReact, game, p2, scToPlay, stratCardName, event)) {
-                    if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
+                    if (scToPlay == 8
+                            && p2.getSoScored() == p2.getMaxSOCount()
+                            && !game.isTwilightsFallMode()
+                            && !game.isSecretsOnlyMode()) {
                         markPlayerAsAutoFollowing(playersToReact, game, p2, 8, event);
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
@@ -1096,8 +1098,8 @@ public class PlayStrategyCardService {
         List<Player> players = getPlayersInFollowOrder(game, imperialHolder);
         if (game.isQueueSO()) {
             for (Player player : players) {
-                if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
-                        || player.getSoScored() == player.getMaxSOCount()
+                if (player.getSecretsCountedTowardLimit() < player.getMaxSOCount()
+                        || (player.getSoScored() == player.getMaxSOCount() && !game.isSecretsOnlyMode())
                         || (player == imperialHolder
                                 && player.controlsMecatol(true)
                                 && !game.getPhaseOfGame().contains("agenda"))) {

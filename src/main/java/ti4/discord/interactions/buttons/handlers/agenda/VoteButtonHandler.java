@@ -124,12 +124,21 @@ class VoteButtonHandler {
                             + " You will then be given a list of their planets to vote for.";
                     outcomeActionRow = AgendaRiderHelper.getPlayerOutcomeButtons(game, null, "planetOutcomes", null);
                 }
+            } else if (agendaDetails.contains("System") || agendaDetails.contains("system")) {
+                outcomeActionRow = AgendaRiderHelper.getSystemOutcomeButtons(
+                        game, null, "outcome", agendaDetails.toLowerCase().contains("fracture"));
+            } else if (agendaDetails.contains("Relic") || agendaDetails.contains("relic")) {
+                outcomeActionRow = AgendaRiderHelper.getRelicOutcomeButtons(game, null, "outcome");
+            } else if (agendaDetails.contains("Leader Type") || agendaDetails.contains("leader type")) {
+                outcomeActionRow = AgendaRiderHelper.getLeaderTypeOutcomeButtons(null, "outcome");
             } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
                 outcomeActionRow = AgendaRiderHelper.getSecretOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
                 outcomeActionRow = AgendaRiderHelper.getStrategyOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("unit upgrade")) {
                 outcomeActionRow = AgendaRiderHelper.getUnitUpgradeOutcomeButtons(game, null, "outcome");
+            } else if (agendaDetails.contains("Unit Type") || agendaDetails.contains("unit type")) {
+                outcomeActionRow = AgendaRiderHelper.getUnitTypeOutcomeButtons(null, "outcome");
             } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
                 outcomeActionRow = AgendaRiderHelper.getUnitOutcomeButtons(game, null, "outcome");
             } else {
@@ -239,9 +248,11 @@ class VoteButtonHandler {
         if (agendaInfo.length < 2) return null;
         String agendaDetails = agendaInfo[1].toLowerCase();
         boolean nonHome = agendaDetails.contains("non-home");
+        boolean nonLegendary = agendaDetails.contains("non-legendary");
         return PlanetTargetSpec.of(prefix)
                 .where(planet -> {
                     if (planet.isSpaceStation(game)) return false;
+                    if (nonLegendary && planet.isLegendary()) return false;
                     if (!nonHome) return true;
                     Tile tile = game.getTileFromPlanet(planet.getName());
                     if (tile != null && tile.isHomeSystem(game)) return false;
@@ -286,6 +297,7 @@ class VoteButtonHandler {
                     continue;
                 }
             }
+            if (agendaDetails.contains("non-legendary") && p != null && p.isLegendary()) continue;
             Button button;
             TI4Emoji planetEmoji = PlanetEmojis.getPlanetEmoji(planet);
             if (rider == null) {

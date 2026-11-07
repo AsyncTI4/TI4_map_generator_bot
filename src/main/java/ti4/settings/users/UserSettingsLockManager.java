@@ -2,13 +2,17 @@ package ti4.settings.users;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-final class UserSettingsFileLockManager {
+final class UserSettingsLockManager {
 
     private static final int LOCK_EXPIRE_AFTER_ACCESS_TIME_MINUTES = 20;
     private static final Cache<String, ReentrantReadWriteLock> locks = Caffeine.newBuilder()
@@ -26,6 +30,20 @@ final class UserSettingsFileLockManager {
             runnable.run();
         } finally {
             lock.writeLock().unlock();
+        }
+    }
+
+    public static void wrapWithWriteLocks(Collection<String> userIds, Runnable runnable) {
+        List<ReentrantReadWriteLock> heldLocks = new ArrayList<>();
+        try {
+            for (String userId : new TreeSet<>(userIds)) {
+                ReentrantReadWriteLock lock = getLock(userId);
+                lock.writeLock().lock();
+                heldLocks.add(lock);
+            }
+            runnable.run();
+        } finally {
+            heldLocks.reversed().forEach(lock -> lock.writeLock().unlock());
         }
     }
 

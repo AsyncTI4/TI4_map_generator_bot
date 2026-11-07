@@ -904,9 +904,21 @@ public class ExploreService {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 5 action cards.");
                 }
             }
-            case "dv1", "dv2" -> {
-                message = new StringBuilder("Drew a secret objective.");
-                game.drawSecretObjective(player.getUserID());
+            case "dv1",
+                    "dv2",
+                    "sodossierc1",
+                    "sodossierc2",
+                    "sodossierh1",
+                    "sodossierh2",
+                    "sodossieri1",
+                    "sodossieri2",
+                    "sodossierf1",
+                    "sodossierf2" -> {
+                boolean drew = game.drawSecretObjective(player.getUserID()) != null;
+                message = new StringBuilder(
+                        drew
+                                ? "Drew a secret objective."
+                                : "Could not draw a secret objective: no drawable secret objective is left in the deck.");
                 if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, message.toString());
                 }

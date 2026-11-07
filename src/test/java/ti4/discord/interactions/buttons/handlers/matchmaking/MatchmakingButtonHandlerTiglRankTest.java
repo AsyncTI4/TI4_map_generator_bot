@@ -86,6 +86,41 @@ class MatchmakingButtonHandlerTiglRankTest extends BaseTi4Test {
     }
 
     @Test
+    void ministerQueueingWithHeroIsCappedAtMinister() {
+        giveUserRank(TIGLRank.MINISTER);
+        User heroPartner = userWithRank("222", TIGLRank.HERO);
+
+        List<String> allowed = MatchmakingButtonHandler.allowedTiglRanks(
+                List.of(user, heroPartner), MatchmakingOptions.TIGL_RANK_OPTIONS);
+
+        assertEquals(List.of("Unranked", "Minister"), allowed);
+    }
+
+    @Test
+    void groupCannotQueueAboveItsLowestRankedMember() {
+        giveUserRank(TIGLRank.MINISTER);
+        User agentPartner = userWithRank("222", TIGLRank.AGENT);
+
+        List<String> allowed = MatchmakingButtonHandler.allowedTiglRanks(
+                List.of(user, agentPartner), List.of("Hero", "Minister", "Agent"));
+
+        assertEquals(List.of("Minister"), allowed);
+    }
+
+    // Each user gets its own role id so the two ranks don't collide in the role-id-to-rank map.
+    private User userWithRank(String id, TIGLRank rank) {
+        Role role = mock(Role.class);
+        when(role.getIdLong()).thenReturn(2000L + rank.ordinal());
+        when(guild.getRolesByName(rank.getName(), false)).thenReturn(List.of(role));
+        Member member = mock(Member.class);
+        when(member.getRoles()).thenReturn(List.of(role));
+        when(guild.getMemberById(id)).thenReturn(member);
+        User partner = mock(User.class);
+        when(partner.getId()).thenReturn(id);
+        return partner;
+    }
+
+    @Test
     void userWithoutAnyRankRoleOnlyGetsUnranked() {
         Member member = mock(Member.class);
         when(guild.getMemberById(USER_ID)).thenReturn(member);

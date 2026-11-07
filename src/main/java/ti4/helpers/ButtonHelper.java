@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
@@ -147,6 +148,7 @@ import ti4.service.RemoveCommandCounterService;
 import ti4.service.ShowGameService;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.CorruptionTimingService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
@@ -1522,6 +1524,7 @@ public class ButtonHelper {
         List<String> modifiers = new ArrayList<>();
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
+        boolean heldCorruptionBeforeDraw = CorruptionTimingService.isHeld(player);
 
         if (player.hasTech("nm")) {
             modifiers.add(TechEmojis.BioticTech + " _Neural Motivator_ (+1 action card)");
@@ -1583,6 +1586,7 @@ public class ButtonHelper {
             }
         }
 
+        CorruptionTimingService.markIfDrawnSince(game, player, heldCorruptionBeforeDraw);
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
@@ -4404,6 +4408,16 @@ public class ButtonHelper {
         return assessFleetAndCapacity(player, game, tile, ignoreFighters).counts();
     }
 
+    public static String fleetAndCapacitySummary(Player player, Game game, Tile tile) {
+        FleetAssessment assessment = assessFleetAndCapacity(player, game, tile, false);
+        if (!assessment.wasAssessed()) {
+            return "";
+        }
+        int[] counts = assessment.counts();
+        return "Fleet pool used: " + counts[0] + "/" + assessment.fleetLimit() + ". Capacity used: " + counts[1] + "/"
+                + (counts[2] + counts[3]) + ".";
+    }
+
     private static void remindAboutFlotilla(Player player, Game game, Tile tile, FleetAssessment assessment) {
         if (!player.hasAbility("flotilla")) {
             return;
@@ -4443,18 +4457,24 @@ public class ButtonHelper {
     private record FleetAssessment(
             int[] counts,
             boolean wasAssessed,
+            int fleetLimit,
             int capitalShips,
             boolean fleetSupplyViolated,
             boolean violated,
             String message) {
 
         static FleetAssessment unassessed(int[] counts) {
-            return new FleetAssessment(counts, false, 0, false, false, "");
+            return new FleetAssessment(counts, false, 0, 0, false, false, "");
         }
 
         static FleetAssessment assessed(
-                int[] counts, int capitalShips, boolean fleetSupplyViolated, boolean violated, String message) {
-            return new FleetAssessment(counts, true, capitalShips, fleetSupplyViolated, violated, message);
+                int[] counts,
+                int fleetLimit,
+                int capitalShips,
+                boolean fleetSupplyViolated,
+                boolean violated,
+                String message) {
+            return new FleetAssessment(counts, true, fleetLimit, capitalShips, fleetSupplyViolated, violated, message);
         }
 
         boolean unlocksLetnevCommander() {
@@ -4862,6 +4882,7 @@ public class ButtonHelper {
 
             return FleetAssessment.assessed(
                     capNCap,
+                    fleetCap / 2,
                     numOfCapitalShips,
                     fleetSupplyViolated,
                     capacityViolated
@@ -4880,6 +4901,7 @@ public class ButtonHelper {
         };
         return FleetAssessment.assessed(
                 capNCap2,
+                fleetCap / 2,
                 numOfCapitalShips,
                 fleetSupplyViolated,
                 capacityViolated
@@ -5164,6 +5186,10 @@ public class ButtonHelper {
         Button celyonButton = TheodisiLegendaryButtonHandler.getCelyonEndTurnButton(player);
         if (celyonButton != null) {
             endButtons.add(celyonButton);
+        }
+        Button seatOfPowerButton = TheodisiAgendaResolver.getSeatOfPowerButton(game, player);
+        if (seatOfPowerButton != null) {
+            endButtons.add(seatOfPowerButton);
         }
 
         // Legendary Planets

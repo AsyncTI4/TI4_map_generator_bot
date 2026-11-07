@@ -11,6 +11,7 @@ import static ti4.helpers.StringHelper.pluralize;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -34,6 +35,7 @@ import net.dv8tion.jda.api.interactions.modals.ModalInteraction;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -83,7 +85,7 @@ class MatchmakingButtonHandler {
     private static final String GROUP_MEMBERS_ID = "queue_group_members";
     private static final String TIGL_RANKS_ID = "queue_tigl_ranks";
 
-    private static final String DEFAULT_MAX_QUEUE_TIME = "8 hours";
+    private static final String DEFAULT_MAX_QUEUE_TIME = MatchmakingOptions.DEFAULT_MAX_QUEUE_TIME_OPTION;
     private static final List<String> DEFAULT_EXPANSION_OPTIONS =
             List.of(MatchmakingOptions.POK_AND_TE_EXPANSION_OPTION);
     private static final List<String> DEFAULT_PLAYER_COUNT_OPTIONS = List.of("6");
@@ -94,6 +96,7 @@ class MatchmakingButtonHandler {
     private static final List<String> DEFAULT_TIGL_RANK_OPTIONS = List.of(MatchmakingOptions.UNRANKED_OPTION);
 
     private static final int MAX_GROUP_MEMBERS = 7;
+    private static final int TIGL_PLAYER_COUNT = 6;
     private static final int MAX_AVOID_PLAYERS = 25;
 
     @ButtonHandler(value = QUEUE_FOR_GAME_BUTTON_ID, save = false)
@@ -106,9 +109,11 @@ class MatchmakingButtonHandler {
     @ButtonHandler(value = QUEUE_FOR_TIGL_BUTTON_ID, save = false)
     public static void offerQueueForTiglModal(ButtonInteractionEvent event) {
         if (cannotQueue(event)) return;
-        if (MatchmakerService.get().isUserInParty(event.getUser().getId())) {
-            event.reply(
-                            "You cannot queue for TIGL as part of a group. Use the Leave Queue button to leave your group first.")
+        int groupSize =
+                MatchmakerService.get().partyMemberIds(event.getUser().getId()).size();
+        if (groupSize > TIGL_PLAYER_COUNT) {
+            event.reply("Your group has " + groupSize + " players, but TIGL games are for " + TIGL_PLAYER_COUNT
+                            + ". Use the Leave Queue button to leave your group first.")
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
@@ -289,6 +294,7 @@ class MatchmakingButtonHandler {
     private static Modal buildTiglQueueModal(ButtonInteractionEvent event, String modalId, String title) {
         String userId = event.getUser().getId();
         UserSettings userSettings = UserSettingsManager.get(userId);
+        List<String> groupMemberIds = MatchmakerService.get().partyMemberIds(userId);
 
         final boolean REQUIRE_SELECTION = true;
         LabelChildComponent victoryPoints = buildMultiSelect(
@@ -299,13 +305,13 @@ class MatchmakingButtonHandler {
                 REQUIRE_SELECTION);
         LabelChildComponent paces = buildMultiSelect(
                 PACE_RESTRICTIONS_ID,
-                PartyValidator.getValidPaces(List.of(userId)),
+                groupPaceOptions(groupMemberIds),
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
         LabelChildComponent ranks = buildMultiSelect(
                 TIGL_RANKS_ID,
-                allowedTiglRanks(List.of(event.getUser()), MatchmakingOptions.TIGL_RANK_OPTIONS),
+                allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), MatchmakingOptions.TIGL_RANK_OPTIONS),
                 userSettings.getMatchmakingTiglRanks(),
                 DEFAULT_TIGL_RANK_OPTIONS,
                 REQUIRE_SELECTION);
@@ -314,7 +320,7 @@ class MatchmakingButtonHandler {
                 .addComponents(Label.of("Pace", paces))
                 .addComponents(Label.of("Rank", ranks));
 
-        List<String> restrictionOptions = groupRestrictionOptions(List.of(userId));
+        List<String> restrictionOptions = groupRestrictionOptions(groupMemberIds);
         if (!restrictionOptions.isEmpty()) {
             CheckboxGroup restrictions = buildCheckboxGroup(
                     RESTRICTIONS_ID,
@@ -515,7 +521,10 @@ class MatchmakingButtonHandler {
             return;
         }
 
-        replyEphemeral(event, "You have been added to the TIGL matchmaking queue.");
+        replyEphemeral(
+                event,
+                "You have been added to the TIGL matchmaking queue"
+                        + (MatchmakerService.get().partyMemberIds(userId).size() > 1 ? " with your group." : "."));
     }
 
     @ModalHandler(SEARCH_FOR_PLAYERS_MODAL_ID)
@@ -641,7 +650,7 @@ class MatchmakingButtonHandler {
         replyEphemeral(
                 event,
                 "Group formed with " + (memberIds.size() + 1)
-                        + " players. Click **Queue for Game** to enter the queue together.");
+                        + " players. Click **Queue for Game** or **Queue for TIGL** to enter the queue together.");
     }
 
     @ModalHandler(ADDITIONAL_SETTINGS_MODAL_ID)
@@ -681,14 +690,29 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingRestrictions(getSelectedValues(event, RESTRICTIONS_ID).stream()
                 .filter(restriction -> !PACE_RESTRICTION_OPTIONS.contains(restriction))
                 .toList());
+        List<String> groupMemberIds =
+                MatchmakerService.get().partyMemberIds(event.getUser().getId());
         userSettings.setMatchmakingTiglRanks(
-                allowedTiglRanks(List.of(event.getUser()), getSelectedValues(event, TIGL_RANKS_ID)));
+                allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), getSelectedValues(event, TIGL_RANKS_ID)));
         UserSettingsManager.save(userSettings);
     }
 
     static List<String> allowedTiglRanks(List<User> users, List<String> requestedRanks) {
-        List<String> allowed = TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(users, requestedRanks);
-        return allowed.isEmpty() ? List.of(MatchmakingOptions.UNRANKED_OPTION) : allowed;
+        return unrankedIfEmpty(TIGLHelper.filterStandardTiglRankOptionsAtOrBelow(users, requestedRanks));
+    }
+
+    private static List<String> unrankedIfEmpty(List<String> ranks) {
+        return ranks.isEmpty() ? List.of(MatchmakingOptions.UNRANKED_OPTION) : ranks;
+    }
+
+    private static List<User> groupUsers(User presser, List<String> groupMemberIds) {
+        List<User> users = new ArrayList<>(List.of(presser));
+        groupMemberIds.stream()
+                .filter(id -> !id.equals(presser.getId()))
+                .map(JdaService.jda::getUserById)
+                .filter(Objects::nonNull)
+                .forEach(users::add);
+        return users;
     }
 
     private static boolean isPlayerAtGameLimit(ModalInteractionEvent event, String userId, UserSettings userSettings) {

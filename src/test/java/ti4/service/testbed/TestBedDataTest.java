@@ -295,6 +295,18 @@ class TestBedDataTest extends BaseTi4Test {
                   ] }"""));
         assertContains(removeTokenErrors, "needs `key`");
         assertEquals(1, removeTokenErrors.size(), String.join("\n", removeTokenErrors));
+
+        // placeTile needs a real position (key) and a real tile (value); tile aliases resolve as they do at run time.
+        List<String> placeTileErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "placeTile", "key": "999x", "value": "19" },
+                    { "do": "placeTile", "key": "a102", "value": "notatile" },
+                    { "do": "placeTile", "key": "a102", "value": "19" },
+                    { "do": "placeTile", "key": "a103", "value": "83a0" }
+                  ] }"""));
+        assertContains(placeTileErrors, "`999x` is not a tile position", "unknown tile `notatile`");
+        assertEquals(2, placeTileErrors.size(), String.join("\n", placeTileErrors));
     }
 
     // Short forms parse, typos in field names are rejected, steps survive the JSON round trip the runner uses, and

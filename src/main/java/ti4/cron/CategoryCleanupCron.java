@@ -1,6 +1,6 @@
 package ti4.cron;
 
-import java.util.concurrent.TimeUnit;
+import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
@@ -11,8 +11,8 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 public class CategoryCleanupCron {
 
     public static void register() {
-        CronManager.schedulePeriodically(
-                CategoryCleanupCron.class, CategoryCleanupCron::cleanupCategories, 6, 24, TimeUnit.HOURS);
+        CronManager.schedulePeriodicallyAtTime(
+                CategoryCleanupCron.class, CategoryCleanupCron::cleanupCategories, 5, 0, ZoneId.of("America/New_York"));
     }
 
     private static void cleanupCategories() {

@@ -17,6 +17,8 @@ import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfigu
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import ti4.game.Game;
 import ti4.test.PostgresDatabaseTest;
 
@@ -35,6 +37,9 @@ class GameEventSinceDatabaseTest extends PostgresDatabaseTest {
 
     @Autowired
     private GameEventRepository repository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @BeforeEach
     void clearTable() {
@@ -72,6 +77,24 @@ class GameEventSinceDatabaseTest extends PostgresDatabaseTest {
         save("pbd3", 1, 100);
 
         assertThat(repository.findGameNamesWithEventsAfter(100)).containsExactly("pbd1", "pbd2");
+    }
+
+    @Test
+    void bulkDeleteRemovesOnlyLaterEventsOfThatGame() {
+        save("pbd1", 1, 100);
+        save("pbd1", 2, 200);
+        save("pbd1", 3, 300);
+        save("pbd2", 3, 300);
+
+        int deleted = new TransactionTemplate(transactionManager)
+                .execute(_ -> repository.deleteByGameNameAndSeqGreaterThan("pbd1", 1));
+
+        assertThat(deleted).isEqualTo(2);
+        assertThat(repository.findByGameNameAndSeqLessThanEqualOrderBySeqAsc("pbd1", 10))
+                .extracting(GameEventEntity::getSeq)
+                .containsExactly(1L);
+        assertThat(repository.findByGameNameAndSeqLessThanEqualOrderBySeqAsc("pbd2", 10))
+                .hasSize(1);
     }
 
     private void save(String gameName, long seq, long timestamp) {

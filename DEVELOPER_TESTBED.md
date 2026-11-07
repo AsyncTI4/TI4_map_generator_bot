@@ -84,7 +84,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
 | Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
-| Game option (`/custom` setting; currently `wormhole_token_merge`, `one_way_adjacency`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
+| Game option (`/custom` setting or game mode; currently `wormhole_token_merge`, `one_way_adjacency`, `secrets_only_mode`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
 | Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
 | Next explore card | script `do: stackExplore` (value: explore id) puts the card on top of its deck | `{ "do": "stackExplore", "value": "tourismbureau30k" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
@@ -272,7 +272,7 @@ copy-paste templates.
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
-| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens) and `one_way_adjacency` (`true` or `false`). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
+| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens) `one_way_adjacency` (`true` or `false`) and `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
 | `decks` | Deck ids switched on before seats get cards, so `acs`, `sos` and `relics` can give cards from homebrew decks. Slots: `ac`, `so`, `relic`, `explore`, `agenda`. |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
@@ -302,7 +302,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -327,11 +327,14 @@ Every step may also have a `label` for the report.
   `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`, `exhaustedPlanetAbilities`, `commodityValue`
   (commodity value, not the commodities held);
   `game.` + `activeSystem`, `phase`, `round`, `activePlayer`, `speaker`, `playedScs`, `acDiscard`, `agendaDiscard`,
-  `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`,
+  `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`, `soDeck` (secret objectives
+  still in the deck), `soDeckSize`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),
   `customAdjacencies` (`<primary>><listed>`), `customHyperlanes` (`<position>:<matrix>`, one-way lanes as `2`),
   `fowOptions` (enabled fog options, e.g. `fow_plus,ghost_hexes`; includes `disable_fracture`), `fogPreset`
-  (`standard`, `plus`, `normal`, `beginner` or `custom`);
+  (`standard`, `plus`, `normal`, `beginner` or `custom`), `sectors` (every map sector as
+  `<name>:<kind>:<positions with a system>`, e.g. `rim:shape:a101 a102`; kinds `circle`, `cluster`, `shape`,
+  `auto`, `board`, `fracture`);
   `tile.<position>.` + `units` (`space:blue_dd=2`), `ccs`, `tokens`, `planets`;
   `planet.<id>.` + `owner`, `units`, `tokens`; `stored:<key>`. Lists are sorted and comma-joined.
 - **Placeholders:** `{ac:<id>}`, `{so:<id>}`, `{pn:<id>}` (the acting seat's hand number), `{<seat>.faction}`,

@@ -43,10 +43,15 @@ public class GameManager {
     private static final CountDownLatch warmupFinishedLatch = new CountDownLatch(1);
     private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 40;
 
+    public static void preloadManagedGames() {
+        ManagedGamePreload.start();
+    }
+
     public static void warmup() {
         if (!warmupStarted.compareAndSet(false, true)) {
             return;
         }
+        long warmupStartedAt = System.currentTimeMillis();
 
         try {
             gameNames.addAll(GameLoadService.loadGameNames());
@@ -63,15 +68,22 @@ public class GameManager {
         ExecutorServiceManager.runAsync("GameManager warmup", () -> {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
-                Map<String, ManagedGameState> persistedGames = loadPersistedManagedGames();
+                WarmupSources sources = warmupSources();
                 Map<String, Exception> failedGames = new ConcurrentHashMap<>();
+                AtomicInteger builtFromPreload = new AtomicInteger();
                 AtomicInteger builtFromDatabase = new AtomicInteger();
                 AtomicInteger builtFromGameFiles = new AtomicInteger();
                 try (ExecutorService executorService =
                         Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
                     gameNames.forEach(name -> executorService.submit(() -> {
                         try {
-                            boolean fromDatabase = warmupManagedGame(name, persistedGames);
+                            if (sources.preloadedNames().contains(name)) {
+                                buildManagedGameFromPreload(
+                                        sources.persistedGames().get(name));
+                                builtFromPreload.incrementAndGet();
+                                return;
+                            }
+                            boolean fromDatabase = warmupManagedGame(name, sources.persistedGames());
                             (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
                         } catch (Exception e) {
                             failedGames.put(name, e);
@@ -81,8 +93,12 @@ public class GameManager {
                 reportGamesThatFailedWarmup(failedGames);
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
-                        "FINISHED BUILDING MANAGED GAMES: %,d FROM THE DATABASE, %,d FROM GAME FILES",
-                        builtFromDatabase.get(), builtFromGameFiles.get()));
+                        "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD): %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE, %,d FROM GAME FILES",
+                        System.currentTimeMillis() - warmupStartedAt,
+                        sources.preloadWaitMillis(),
+                        builtFromPreload.get(),
+                        builtFromDatabase.get(),
+                        builtFromGameFiles.get()));
                 if (JdaService.jda != null) {
                     JdaService.updatePresence();
                 }
@@ -91,6 +107,34 @@ public class GameManager {
                 JdaService.shutdown();
             }
         });
+    }
+
+    private record WarmupSources(
+            @Nullable Map<String, ManagedGameState> persistedGames,
+            Set<String> preloadedNames,
+            long preloadWaitMillis) {}
+
+    private static WarmupSources warmupSources() {
+        long waitStartedAt = System.currentTimeMillis();
+        ManagedGamePreload.Snapshot preload = ManagedGamePreload.take();
+        long preloadWaitMillis = System.currentTimeMillis() - waitStartedAt;
+        if (preload == null) {
+            return new WarmupSources(loadPersistedManagedGames(), Set.of(), preloadWaitMillis);
+        }
+        return new WarmupSources(preload.rows(), preload.stillCurrent(loadCurrentRevisionKeys()), preloadWaitMillis);
+    }
+
+    private static Map<String, String> loadCurrentRevisionKeys() {
+        try {
+            return PersistedManagedGameService.getBean().loadRevisionKeys();
+        } catch (Exception e) {
+            BotLogger.error("Could not read current revision keys, so the standby preload will be rechecked.", e);
+            return Map.of();
+        }
+    }
+
+    private static void buildManagedGameFromPreload(ManagedGameState preloadedGame) {
+        gameNameToManagedGame.computeIfAbsent(preloadedGame.name(), _ -> new ManagedGame(preloadedGame));
     }
 
     @Nullable
@@ -262,7 +306,7 @@ public class GameManager {
         }
     }
 
-    private static void replaceManagedGame(ManagedGameState managedGameState) {
+    static void replaceManagedGame(ManagedGameState managedGameState) {
         gameNameToManagedGame.compute(managedGameState.name(), (_, previousManagedGame) -> {
             ManagedGame managedGame = new ManagedGame(managedGameState);
             if (previousManagedGame != null) {
@@ -336,6 +380,11 @@ public class GameManager {
             }
             return new ManagedGame(game);
         });
+    }
+
+    @Nullable
+    static ManagedGame peekManagedGame(String gameName) {
+        return gameNameToManagedGame.get(gameName);
     }
 
     public static boolean isWarmupFinished() {

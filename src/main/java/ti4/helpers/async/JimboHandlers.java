@@ -72,7 +72,11 @@ public final class JimboHandlers {
 
     public static void postMainMenu(GenericInteractionCreateEvent event, Game game) {
         ButtonHelper.deleteMessage(event);
-        menu(null, event.getMessageChannel(), game, JimboConst.mainPage);
+        sendMainMenu(event.getMessageChannel(), game);
+    }
+
+    public static void sendMainMenu(MessageChannel channel, Game game) {
+        menu(null, channel, game, JimboConst.mainPage);
     }
 
     // Completed

@@ -21,7 +21,10 @@ import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
+import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.map.AddTileService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -29,8 +32,11 @@ public class TestBedComponentService {
 
     static final Map<String, BiConsumer<Game, Integer>> NUMBER_GAME_OPTIONS =
             Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMergeFrom);
-    static final Map<String, BiConsumer<Game, Boolean>> SWITCH_GAME_OPTIONS =
-            Map.of(Constants.ONE_WAY_ADJACENCY, Game::setOneWayAdjacency);
+    static final Map<String, BiConsumer<Game, Boolean>> SWITCH_GAME_OPTIONS = Map.of(
+            Constants.ONE_WAY_ADJACENCY,
+            Game::setOneWayAdjacency,
+            Constants.SECRETS_ONLY_MODE,
+            SecretsOnlyService::apply);
 
     static String gameOptionProblem(String key, String value) {
         if (NUMBER_GAME_OPTIONS.containsKey(key)) {
@@ -219,6 +225,18 @@ public class TestBedComponentService {
         if (file == null) file = Mapper.getTokenID(AliasHandler.resolveToken(token));
         if (file == null) return "Unknown token `" + token + "`.";
         if (!tile.removeToken(file, holder)) return "No token `" + token + "` at `" + where + "`.";
+        return null;
+    }
+
+    @Nullable
+    static String placeTile(Game game, String position, String tileId) {
+        String lower = position.toLowerCase();
+        if (!MapPositionMapper.isTilePositionValid(game, lower)) {
+            return "`" + position + "` is not a tile position in this game.";
+        }
+        String resolved = AliasHandler.resolveTile(tileId.toLowerCase());
+        if (!TileHelper.isValidTile(resolved)) return "Unknown tile `" + tileId + "`.";
+        AddTileService.addTile(game, new Tile(resolved, lower));
         return null;
     }
 

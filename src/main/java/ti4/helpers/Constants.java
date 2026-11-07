@@ -753,6 +753,7 @@ public final class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
+    public static final String SETUP_BETA = "setup_beta";
     public static final String SETUP_BOT_PLAYER = "setup_bot_player";
     public static final String SETUP_STARTING_FLEET = "setup_starting_fleet";
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
@@ -1396,6 +1397,7 @@ public final class Constants {
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
     public static final String WILD_WILD_GALAXY_MODE = "wild_wild_galaxy_mode";
     public static final String FEAST_OR_FAMINE_MODE = "feast_or_famine_mode";
+    public static final String SECRETS_ONLY_MODE = "secrets_only_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";

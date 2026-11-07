@@ -62,6 +62,7 @@ public class Source {
         expanded_fracture,
         muaat_mania,
         erwans_gambit,
+        secrets_only,
         goose,
         thirtyk,
 
@@ -249,6 +250,7 @@ public class Source {
                 case oplusplus -> "O++ [Homebrew]";
                 case goose -> "Homebrew from Goose [Homebrew]";
                 case thirtyk -> "30k Content Lab / JMSC [Homebrew]";
+                case secrets_only -> "Secrets Only [Homebrew Game Mode]";
                 default -> toString();
             };
         }

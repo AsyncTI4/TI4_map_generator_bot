@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.Iro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
@@ -100,20 +101,6 @@ class DeleteButtonsButtonHandler {
                 boolean cyber = false;
                 boolean malevolency = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
-                if (netGain > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "ardentiacommander")) {
-                    int commsBefore = player.getCommodities();
-                    player.gainCommodities(netGain);
-                    int commsGained = player.getCommodities() - commsBefore;
-
-                    if (commsGained > 0) {
-                        MessageHelper.sendMessageToChannel(
-                                game.getActionsChannel(),
-                                player.getRepresentation()
-                                        + " gained "
-                                        + commsGained
-                                        + " commodities due to _High Marshall Serisi_.");
-                    }
-                }
                 finalCCs += ". You gained a net total of " + StringHelper.pluralize(netGain, "command token");
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
@@ -146,6 +133,10 @@ class DeleteButtonsButtonHandler {
                         if (player.hasTech("tf-inheritancesystems")) {
                             properGain += 1;
                             reasons += (properGain == 3 ? "" : ", ") + "_Inheritance Systems_";
+                        }
+                        if (game.playerHasLeaderUnlockedOrAlliance(player, "ardentiacommander")) {
+                            properGain += 1;
+                            reasons += (properGain == 3 ? "" : ", ") + "_Serisi Sithis_, the Ardentia Commander";
                         }
                         if (malevolency) {
                             properGain -= 1;
@@ -491,6 +482,7 @@ class DeleteButtonsButtonHandler {
             RevenantTechHandler.clearLazarusProduction(game, player);
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
+            MyrrAbilitiesHandler.resolveEchoOfTheAnvil(player);
             EmergencyAppropriationsLLButtonHandler.clear(game, player);
             PriorityRequisitionLLButtonHandler.clear(game, player);
             SharedResourcesLLButtonHandler.clear(game, player);

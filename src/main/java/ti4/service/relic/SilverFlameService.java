@@ -168,7 +168,7 @@ public class SilverFlameService {
             if (owner == null) continue;
 
             int quantity = entry.getValue();
-            owner.setUnitCap(key.asyncID(), player.getUnitCap(key.asyncID()) - quantity);
+            owner.setUnitCap(key.asyncID(), owner.getUnitCap(key.asyncID()) - quantity);
             purgedUnitList
                     .append("\n> ")
                     .append(owner.fogSafeEmoji())

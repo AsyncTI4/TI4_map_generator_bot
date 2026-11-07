@@ -591,6 +591,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.FEAST_OR_FAMINE_MODE + " " + game.isFeastOrFamineMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SECRETS_ONLY_MODE + " " + game.isSecretsOnlyMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.COSMIC_PHENOMENAE_MODE + " " + game.isCosmicPhenomenaeMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.MERCENARIES_FOR_HIRE_MODE + " " + game.isMercenariesForHireMode());

@@ -8,7 +8,7 @@
     "requirements": "G",
     "faction": "ardentia",
     "source": "theodisi",
-    "text": "When you would spend a command token from your strategy pool, you may exhaust this card to instead spend a command token from your reinforcements."
+    "text": "When you would spend a command token from your strategy pool: You may exhaust this card to instead spend a command token from your reinforcements."
   },
   {
     "alias": "thardentiar",
@@ -19,7 +19,7 @@
     "requirements": "RR",
     "faction": "ardentia",
     "source": "theodisi",
-    "text": "When you activate a system or a system containing your units is activated, you may exhaust this card to treat 1 of your units as Galvanized during this tactical action for each command token in your tactic pool."
+    "text": "When you activate a system or a system containing your units is activated: You may exhaust this card to treat 1 of your units as galvanized during this tactical action for each command token in your tactic pool."
   },
   {
     "alias": "thverydithy",
@@ -30,7 +30,7 @@
     "requirements": "Y",
     "faction": "verydith",
     "source": "theodisi",
-    "text": "You may treat systems that contain command tokens as units with PRODUCTION equal to the number of command tokens in those systems."
+    "text": "You may treat command tokens in systems that contain your ships as units with PRODUCTION 1."
   },
   {
     "alias": "thverydithg",
@@ -41,7 +41,7 @@
     "requirements": "GGG",
     "faction": "verydith",
     "source": "theodisi",
-    "text": "When you perform the primary effect of a strategy card, you may exhaust this card to perform the secondary effect of that strategy card without spending a command token."
+    "text": "When you resolve the primary ability of a strategy card: You may exhaust this card to resolve the secondary ability of that strategy card without spending a command token."
   },
   {
     "alias": "thveylorg",
@@ -63,7 +63,7 @@
     "requirements": "YY",
     "faction": "veylor",
     "source": "theodisi",
-    "text": "After an agenda is revealed, you may exhaust this card and predict aloud the outcome of that agenda. If your prediction is correct, perform the secondary ability of a strategy card without spending a command token. If that agenda is not resolved, ready this card."
+    "text": "After an agenda is revealed: You may exhaust this card and predict aloud the outcome of that agenda. If your prediction is correct, resolve the secondary ability of a strategy card without spending a command token. If that agenda is resolved with no effect, ready this card."
   },
   {
     "alias": "thmyrry",
@@ -74,7 +74,7 @@
     "requirements": "Y",
     "faction": "myrr",
     "source": "theodisi",
-    "text": "After movement, you may remove any number of your non-flagship ships from the active system. Place a number of units up to the combined PRODUCTION value of your units in that system whose combined cost is equal to or less than that of the removed units."
+    "text": "At any time: You may exhaust this card and remove 1 of your ships from the game board. Place non-fighter ships of the same type in that unit's system with a combined cost equal to or less than that unit's cost."
   },
   {
     "alias": "thmyrrdn",
@@ -86,7 +86,7 @@
     "faction": "myrr",
     "baseUpgrade": "dn2",
     "source": "theodisi",
-    "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. This unit can produce only dreadnoughts or units that can be transported that are in the space area of this system."
+    "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. This unit can only produce units of the same type as those in its system."
   },
   {
     "alias": "thkairny",
@@ -97,7 +97,7 @@
     "requirements": "Y",
     "faction": "kairn",
     "source": "theodisi",
-    "text": "Once per action, at the end of a tactical action, you may exhaust this card to explore 1 planet you control in the active system. When you gain a relic fragment during exploration, you may remove 1 infantry from the explored planet to ready this card."
+    "text": "Once per action, at the end of a tactical action: You may exhaust this card to explore 1 planet you control in the active system. When you gain a relic fragment during exploration: You may remove 1 infantry from the explored planet to ready this card."
   },
   {
     "alias": "thkairng",
@@ -108,7 +108,7 @@
     "requirements": "GG",
     "faction": "kairn",
     "source": "theodisi",
-    "text": "Increase your commodity value by 1 for each non-home planet trait you control."
+    "text": "Increase your commodity value by 1 for each different planet trait among non-home planets you control."
   },
   {
     "alias": "thkryxosfs",
@@ -119,7 +119,7 @@
     "requirements": "GBY",
     "faction": "kryxos",
     "source": "theodisi",
-    "text": "When you research or gain a technology, you may flip this card instead."
+    "text": "When you would research a technology: You may flip this card instead."
   },
   {
     "alias": "thkryxosfs2",
@@ -130,7 +130,7 @@
     "requirements": "GBY",
     "faction": "kryxos",
     "source": "theodisi",
-    "text": "Cost 8, Combat 2(x3), Move 4, Capacity 12\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 3(x3)\nWhen this unit uses SUSTAIN DAMAGE, cancel an additional hit."
+    "text": "Cost 8, Combat 2(x3), Move 3, Capacity 9\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 4(x3)\nWhen this unit uses SUSTAIN DAMAGE: Cancel an additional hit."
   },
   {
     "alias": "thkryxosmf",
@@ -141,7 +141,7 @@
     "requirements": "BYR",
     "faction": "kryxos",
     "source": "theodisi",
-    "text": "When you research or gain a technology, you may flip this card instead."
+    "text": "When you would research a technology: You may flip this card instead."
   },
   {
     "alias": "thkryxosmf2",
@@ -152,7 +152,7 @@
     "requirements": "BYR",
     "faction": "kryxos",
     "source": "theodisi",
-    "text": "Cost 2, Combat 4(x2), BOMBARDMENT 4(x2)\nSUSTAIN DAMAGE\nWhen this unit produces a hit, you may SUSTAIN DAMAGE to place infantry with this unit up to the number of hits produced."
+    "text": "Cost 2, Combat 6(x2), BOMBARDMENT 6(x2)\nSUSTAIN DAMAGE\nWhen this unit produces 1 or more hits: You may damage it to place up to that many infantry from your reinforcements with this unit."
   },
   {
     "alias": "tharcanumbg",
@@ -164,7 +164,7 @@
     "requirements": "BG",
     "faction": "arcanum",
     "source": "theodisi",
-    "text": "This technology may be treated as either a biotic or propulsion technology.\n\nACTION: Exhaust this card to shuffle up to 1 purged exploration card that does not place a token on the game board into its respective deck. Then, explore a planet you control."
+    "text": "This technology may be treated as either a biotic (green) or propulsion (blue) technology.\n\nACTION: Exhaust this card to shuffle up to 1 purged exploration card that does not place a token on the game board into its respective exploration deck. Then, explore a planet you control."
   },
   {
     "alias": "tharcanumry",
@@ -176,7 +176,7 @@
     "requirements": "RY",
     "faction": "arcanum",
     "source": "theodisi",
-    "text": "This technology may be treated as either a warfare or cybernetic technology.\n\nWhen you move ships into a non-home system, you may exhaust this card. That system gains SPACE CANNON 5 (x3) and PRODUCTION 3 as if it were a unit until the end of that tactical action."
+    "text": "This technology may be treated as either a warfare (red) or cybernetic (yellow) technology.\n\nWhen you move ships into a non-home system: You may exhaust this card to give that system SPACE CANNON 5 (x3) and PRODUCTION 3 as if it were a unit until the end of that tactical action."
   },
   {
     "alias": "tharcanumpmy",
@@ -187,7 +187,7 @@
     "requirements": "YYYY",
     "faction": "arcanum",
     "source": "theodisi",
-    "text": "Gain the Fabricate Station planet card and its legendary ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it."
+    "text": "Gain the Fabricate Station planet card and its legendary planet ability card, and ready them. You cannot lose these cards."
   },
   {
     "alias": "tharcanumpmg",
@@ -198,7 +198,7 @@
     "requirements": "GGGG",
     "faction": "arcanum",
     "source": "theodisi",
-    "text": "ACTION: Exhaust this card and do each of the following: Discard 1 action card and draw 2 action cards. Gain 1 command token. Place up to 4 infantry on planets you control."
+    "text": "ACTION: Exhaust this card to gain 1 command token in your tactic pool, draw 1 action card, and place 3 infantry from your reinforcements on a planet you control."
   },
   {
     "alias": "tharcanumpmr",
@@ -209,7 +209,7 @@
     "requirements": "RRRR",
     "faction": "arcanum",
     "source": "theodisi",
-    "text": "At the start of a combat involving your units, you may produce 1 hit against your opponent's units. At the start of a combat involving your units, you may exhaust this card to destroy 1 unit involved in that combat."
+    "text": "At the start of each round of combat involving your units: You may produce 1 hit against your opponent's units. Then, you may exhaust this card to destroy 1 unit participating in that combat."
   },
   {
     "alias": "tharcanumpmb",
@@ -220,7 +220,7 @@
     "requirements": "BBBB",
     "faction": "arcanum",
     "source": "theodisi",
-    "text": "ACTION: Exhaust this card to perform a tactical action in a system that contains no planets without spending a command token. Ignore the effects of anomalies during this tactical action."
+    "text": "ACTION: Exhaust this card to perform a tactical action in a system that contains no planets without placing a command token. Ignore the effects of anomalies during this tactical action."
   },
   {
     "alias": "thxytherisr",
@@ -231,7 +231,7 @@
     "requirements": "R",
     "faction": "xytheris",
     "source": "theodisi",
-    "text": "When you produce 1 or more hits with a unit ability, you may place 1 ship in a system that contains your ships with a cost less than the number of hits produced."
+    "text": "When you produce 1 or more hits with a unit ability: You may produce 1 ship with a cost less than the number of hits produced in a system that contains your ships. Reduce that unit's cost by 1 for each die that produced a result of 9 or 10."
   },
   {
     "alias": "thxytherisdd",
@@ -254,7 +254,7 @@
     "requirements": "R",
     "faction": "oblivion",
     "source": "theodisi",
-    "text": "At the end of a round of space combat, you may purge 1 non-fighter ship you control in that system with a cost of 4 or less. Produce and assign hits equal to half its cost (rounded up) against your opponent's units in that system."
+    "text": "At the end of a round of space combat: You may purge 1 non-fighter ship you control in that system. Produce and assign hits equal to half its cost (rounded up) against your opponent's units in that system."
   },
   {
     "alias": "thobliviong",
@@ -273,10 +273,10 @@
     "types": [
       "CYBERNETIC"
     ],
-    "requirements": "YY",
+    "requirements": "Y",
     "faction": "revenant",
     "source": "theodisi",
-    "text": "When you exhaust an agent for its effect or purge a hero for its effect, you may produce 2 units in a system that contains 1 of your ships."
+    "text": "When you exhaust an agent to resolve its ability: You may produce 1 unit in a system that contains 1 of your ships.\n\nWhen you purge a hero to resolve its ability: You may produce 2 units in a system that contains 1 or more of your ships."
   },
   {
     "alias": "threvenantr",
@@ -287,7 +287,7 @@
     "requirements": "R",
     "faction": "revenant",
     "source": "theodisi",
-    "text": "During the first round of combat, you may cancel hits equal to the number of leader types you have unlocked, unexhausted, and unpurged."
+    "text": "During the first round of combat: You may cancel a number of hits equal to the number of leader types you have unlocked, unexhausted, and unpurged."
   },
   {
     "alias": "ththronesb",
@@ -298,7 +298,7 @@
     "requirements": "B",
     "faction": "thrones",
     "source": "theodisi",
-    "text": "At the end of a tactical action, you may exhaust this card to move 1 of your ships from the active system into a system that contains no other player's ships. This ship may transport units."
+    "text": "At the end of a tactical action: You may exhaust this card to move 1 of your ships from the active system into an adjacent system that contains no other player's ships. This ship may transport units."
   },
   {
     "alias": "ththronesr",
@@ -309,7 +309,7 @@
     "requirements": "RR",
     "faction": "thrones",
     "source": "theodisi",
-    "text": "When you activate a system or a system containing your units is activated, you may exhaust this card to treat 1 system that contains the active player's units as a gravity rift until the end of this action."
+    "text": "When you activate a system or a system containing your units is activated: You may exhaust this card to treat 1 system that contains the active player's units as a gravity rift until the end of this action."
   },
   {
     "alias": "thaeternar",
@@ -320,7 +320,7 @@
     "requirements": "R",
     "faction": "aeterna",
     "source": "theodisi",
-    "text": "Once per combat round, when a unit is destroyed, you may assign 1 hit to a unit of the same type as that destroyed unit."
+    "text": "Once per round of combat, when a unit is destroyed: You may assign 1 hit to an opponent's unit of the same type in that system."
   },
   {
     "alias": "thaeternasd",
@@ -332,7 +332,7 @@
     "faction": "aeterna",
     "baseUpgrade": "sd2",
     "source": "theodisi",
-    "text": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed, gain 1 commodity and produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
+    "text": "Once per action, if a unit in a system containing or adjacent to this unit is destroyed: Gain 1 commodity, and you may produce 1 unit of the same type in this system, if able. Up to 8 fighters in this unit's system do not count against capacity."
   },
   {
     "alias": "thponthousr",
@@ -343,7 +343,7 @@
     "requirements": "R",
     "faction": "ponthous",
     "source": "theodisi",
-    "text": "At the start of space combat involving your units, select 2 of your ground forces in that system. Those units participate in space combat as if they were ships, and you may treat them as Galvanized until the end of the combat."
+    "text": "At the start of space combat involving your units: Select 2 of your ground forces in that system. Those units participate in space combat as if they were ships, and you may treat them as galvanized until the end of the combat."
   },
   {
     "alias": "thponthousdd",
@@ -365,7 +365,7 @@
     ],
     "faction": "vanguard",
     "source": "theodisi",
-    "text": "Once per combat round when one of your units uses SUSTAIN DAMAGE during combat, roll a die. If the result is equal to or greater than the unit's combat value, produce one hit against your opponent's units."
+    "text": "Once per round of combat, when 1 of your units uses SUSTAIN DAMAGE during combat: Roll 1 die. If the result is equal to or greater than that unit's combat value, produce 1 hit against your opponent's units."
   },
   {
     "alias": "thvanguardy",
@@ -375,7 +375,7 @@
     ],
     "faction": "vanguard",
     "source": "theodisi",
-    "text": "Once per action, after you win a combat, the active system gains PRODUCTION 3 until the end of the action."
+    "text": "Once per action, after you win a combat: The active system gains PRODUCTION 3 until the end of the action."
   },
   {
     "alias": "thscrapyardff",
@@ -387,7 +387,7 @@
     "requirements": "BG",
     "faction": "scrapyard",
     "source": "theodisi",
-    "text": "After you activate a system, destroy any number of your fighters to apply +1 to the move value of 1 of your ships during this action for every 2 fighters you destroy. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+    "text": "After you activate a system: Destroy any number of your fighters to apply +1 to the move value of 1 of your ships during this action for every 2 fighters you destroy. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
   },
   {
     "alias": "thscrapyardr",
@@ -398,7 +398,7 @@
     "requirements": "RRR",
     "faction": "scrapyard",
     "source": "theodisi",
-    "text": "When you activate a system, or a system containing your units is activated, you may treat 1 unit type you control as if you owned the Unit Upgrade technology for it until the end of that tactical action."
+    "text": "When you activate a system or a system containing your units is activated: You may treat 1 unit type you control as if you owned its corresponding unit upgrade technology until the end of that tactical action."
   },
   {
     "alias": "thstoneborng",
@@ -409,7 +409,7 @@
     "requirements": "G",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "**UNLEASH**: Return 2 Green fragmentum tokens from your faction sheet.\nWhen you would draw an exploration card, you may exhaust this card to instead reveal cards from that exploration deck until you reveal a relic fragment. Resolve that relic fragment as if it were the drawn card, then shuffle the remaining revealed cards into that exploration deck."
+    "text": "**UNLEASH**: Return 2 green Fragmentum tokens from your faction sheet.\nWhen you would draw an exploration card: You may exhaust this card to instead reveal cards from that exploration deck until you reveal a relic fragment. Resolve that relic fragment as if it were the drawn card, then shuffle the remaining revealed cards into that exploration deck."
   },
   {
     "alias": "thstoneborngu",
@@ -420,7 +420,7 @@
     "requirements": "null",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "After you draw an exploration card, you may exhaust this card to reveal cards from that exploration deck until you reveal a relic fragment. Gain that relic fragment, then shuffle the remaining revealed cards into that exploration deck."
+    "text": "After you draw an exploration card: You may exhaust this card to reveal cards from that exploration deck until you reveal a relic fragment. Gain that relic fragment, then shuffle the remaining revealed cards into that exploration deck."
   },
   {
     "alias": "thstoneborndn",
@@ -432,7 +432,7 @@
     "requirements": "BBY",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "**UNLEASH**: Return 2 Blue fragmentum tokens from your faction sheet.\nDEPLOY: Once per turn, at the end of your turn, you may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+    "text": "**UNLEASH**: Return 2 blue Fragmentum tokens from your faction sheet.\nDEPLOY: Once per turn, at the end of your turn: You may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" action cards."
   },
   {
     "alias": "thstoneborndnu",
@@ -444,7 +444,7 @@
     "requirements": "null",
     "faction": "stoneborn",
     "source": "theodisi",
-    "text": "DEPLOY: Once per turn, at the end of your turn, you may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" Action Cards."
+    "text": "DEPLOY: Once per turn, at the end of your turn: You may purge 1 of your relic fragments to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships. This unit cannot be destroyed by \"Direct Hit\" action cards."
   },
   {
     "alias": "thmorphag",
@@ -455,7 +455,7 @@
     "requirements": "GG",
     "faction": "morpha",
     "source": "theodisi",
-    "text": "ACTION: Exhaust this card and discard 1 action card to draw 1 action card and 1 random hydromorphic card."
+    "text": "ACTION: Exhaust this card and discard 1 action card to draw 1 action card and 1 random Hydromorphic card."
   },
   {
     "alias": "thmorphacv",
@@ -467,7 +467,7 @@
     "requirements": "BB",
     "faction": "morpha",
     "source": "theodisi",
-    "text": "Once per action, when you discard 1 or more action cards, you may either produce 1 carrier in a system containing your ships, or move 1 carrier you control to a system that contains 1 of your space docks (it may transport units)."
+    "text": "Once per action, when you discard 1 or more action cards: You may either produce 1 carrier in a system containing your ships or move 1 carrier you control to your home system if it contains no other player's ships. That carrier may transport units."
   },
   {
     "alias": "ththurvialig",
@@ -478,7 +478,7 @@
     "requirements": "G",
     "faction": "thurviali",
     "source": "theodisi",
-    "text": "ACTION: Exhaust this card and remove up to 3 of your structures from the game board and place them on 1 or more planets you control."
+    "text": "ACTION: Exhaust this card to remove up to 3 of your structures from the game board and place them on 1 or more planets you control."
   },
   {
     "alias": "ththurvialib",
@@ -489,6 +489,7 @@
     "requirements": "BB",
     "faction": "thurviali",
     "source": "theodisi",
-    "text": "You may use the PRODUCTION, SPACE CANNON or PLANETARY SHIELD of structures you are coexisting with.\nACTION: Exhaust this card and select 1 other player. They may place a structure in coexistence from their reinforcements on a planet you control. If they do, they gain 1 command token."
-  }
+    "text": "You may use the PRODUCTION, SPACE CANNON, or PLANETARY SHIELD abilities of structures with which your units are coexisting.\nACTION: Exhaust this card and choose 1 other player. That player may place 1 structure from their reinforcements into coexistence on a planet you control. If they do, they gain 1 command token.",
+    "notes": "It wont show you as able to use space cannon, production it will calculate when it is usable."
+}
 ]

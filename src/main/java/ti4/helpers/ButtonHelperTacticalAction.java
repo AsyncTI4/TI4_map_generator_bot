@@ -133,6 +133,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -431,6 +432,10 @@ public final class ButtonHelperTacticalAction {
         String message3 = "You have "
                 + Helper.getProductionValue(player, game, game.getTileByPosition(pos), false)
                 + " PRODUCTION value in this system.\n";
+        String fleetSummary = ButtonHelper.fleetAndCapacitySummary(player, game, game.getTileByPosition(pos));
+        if (!fleetSummary.isEmpty()) {
+            message3 += fleetSummary + "\n";
+        }
         if (player.hasUnit("myrr_dreadnought") || player.hasUnit("myrr_dreadnought2")) {
             message3 += MyrrUnitsHandler.getReplicatorProductionReminder(player, game.getTileByPosition(pos));
         }
@@ -937,7 +942,14 @@ public final class ButtonHelperTacticalAction {
         MigoHarvestHandler.offerBlueHarvest(game, player);
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
+        FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        if (ButtonHelper.isLawInPlay(game, "lightspeedregulations")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", _Light Speed Regulations_ is in play. Technologies that increase move values have no effect.");
+        }
         BloomLeadersHandler.offerCommander(game, player, tile);
         DeepUnitHandler.offerDrown(game, player, tile);
         DeepBreakthroughHandler.offerEventHorizon(game, player);
@@ -1434,10 +1446,13 @@ public final class ButtonHelperTacticalAction {
         if (!game.isFowMode()) {
             MessageHelper.sendEphemeralFileInResponseToButtonPressComplete(file, event);
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
-                systemButtons);
+        String moveFromMessage =
+                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.";
+        String activeSystemFleetSummary = ButtonHelper.fleetAndCapacitySummary(player, game, tile);
+        if (!activeSystemFleetSummary.isEmpty()) {
+            moveFromMessage += "\n-# Active system: " + activeSystemFleetSummary;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), moveFromMessage, systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {

@@ -160,10 +160,12 @@ final class HexTileStats {
         Point point;
         List<String> soToPoList = game.getSoToPoList();
         int unscoredSOs = player.getSecrets().size();
-        int scoredSOs = (int) player.getSecretsScored().keySet().stream()
-                .filter(so -> !soToPoList.contains(so))
-                .count();
-        int secretsEmpty = player.getMaxSOCount() - unscoredSOs - scoredSOs;
+        int scoredSOs = game.isSecretsOnlyMode()
+                ? 0
+                : (int) player.getSecretsScored().keySet().stream()
+                        .filter(so -> !soToPoList.contains(so))
+                        .count();
+        int secretsEmpty = Math.max(0, player.getMaxSOCount() - unscoredSOs - scoredSOs);
         int soOffset = (15 + 35 * player.getMaxSOCount()) / 2 - 50;
 
         String soHand = "pa_so-icon_hand.png";

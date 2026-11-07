@@ -577,7 +577,7 @@ public class PlayerSetupService {
             player.addRelic("waxing_moonphase");
             player.addRelic("waning_moonphase");
             player.addRelic("new_moonphase");
-            player.addRelic("lunar_eclipse_moonphase");
+            player.addRelic("half_moonphase");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");

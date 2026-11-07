@@ -81,12 +81,19 @@ class MapJsonIOServiceTest extends BaseTi4Test {
                 }
                 """;
 
-        MapJsonIOService.importMapFromJson(game, json, null);
+        assertTrue(MapJsonIOService.importMapFromJson(game, json, null));
 
         LoreEntry stored = LoreService.getGameLore(game).get("000");
         assertNotNull(stored);
         assertEquals("An old beacon flickers.", stored.loreText);
         assertEquals(LoreService.TRIGGER.CONTROLLED, stored.trigger);
+    }
+
+    // The FoW setup panel shows its success notice from this result, so a parse failure must report false.
+    @Test
+    void malformedJsonReportsFailureAndKeepsTheMap() {
+        assertFalse(MapJsonIOService.importMapFromJson(game, "{ not json", null));
+        assertNotNull(game.getTileByPosition("000"));
     }
 
     // Lore is validated against the map, so it must be imported after every tile is placed: a target on a tile
@@ -183,6 +190,41 @@ class MapJsonIOServiceTest extends BaseTi4Test {
                 .orElse(null);
         assertNotNull(taggedKey, "second entry must be auto-tagged instead of overwriting the first");
         assertEquals("Second entry", lore.get(taggedKey).loreText);
+    }
+
+    // Lore whose text lives only in the footer (effect lines, no story text) is valid via the lore-file
+    // import and gets exported that way, so the map import must keep it too. Only fully empty entries are skipped.
+    @Test
+    void footerOnlyEntriesImportAndFullyEmptyOnesAreSkipped() {
+        String json = """
+                {
+                  "mapInfo": [
+                    {
+                      "position": "000",
+                      "tileID": "18",
+                      "systemLoreEntries": [
+                        {"loreText":"","footerText":"!token nebula","receiver":"CURRENT","trigger":"MOVED","ping":"NO","persistance":"ALWAYS"},
+                        {"loreText":"","footerText":"!token gravityrift","receiver":"CURRENT","trigger":"MOVED","ping":"NO","persistance":"ONCE"},
+                        {"loreText":"","footerText":"","receiver":"CURRENT","trigger":"MOVED","ping":"NO","persistance":"ONCE"}
+                      ]
+                    }
+                  ]
+                }
+                """;
+
+        MapJsonIOService.importMapFromJson(game, json, null);
+
+        Map<String, LoreEntry> lore = LoreService.getGameLore(game);
+        assertEquals(2, lore.size(), "both footer-only entries kept, the empty one skipped");
+        LoreEntry first = lore.get("000");
+        assertEquals("", first.loreText);
+        assertEquals("!token nebula", first.footerText);
+        assertEquals(LoreService.PERSISTANCE.ALWAYS, first.persistance);
+        assertTrue(
+                lore.entrySet().stream()
+                        .anyMatch(e ->
+                                e.getKey().startsWith("000#") && "!token gravityrift".equals(e.getValue().footerText)),
+                "second footer-only entry must be auto-tagged, not overwrite the first");
     }
 
     @Test

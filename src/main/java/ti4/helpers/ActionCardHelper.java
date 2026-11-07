@@ -40,6 +40,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StasisT
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenFilesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.secretsonly.CovertExchangeActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
@@ -64,6 +65,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.CorruptionTimingService;
 import ti4.service.actioncard.OracleDrawService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -846,6 +848,9 @@ public class ActionCardHelper {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
                     + " You may fix this with `/player turn_start`. Until then, you are #denied.";
         }
+        if (CorruptionTimingService.isBlocked(game, player, acID)) {
+            return CorruptionTimingService.blockedMessage(player);
+        }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentationUnfogged()
                     + " The bot thinks you are over the limit and thus will not allow you to play action cards at this time."
@@ -1161,6 +1166,9 @@ public class ActionCardHelper {
             }
             if ("stolen_files".equals(automationID)) {
                 StolenFilesBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if (CovertExchangeActionCardHandler.AUTOMATION_ID.equals(automationID)) {
+                CovertExchangeActionCardHandler.offerResolution(player, introMsg);
             }
             if ("unconventional_diplomacy".equals(automationID)) {
                 UnconventionalDiplomacyBrActionCardHandler.offerResolution(game, player, introMsg);

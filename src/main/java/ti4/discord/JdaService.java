@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -71,6 +72,7 @@ import ti4.game.persistence.GameManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
@@ -621,36 +623,75 @@ public class JdaService {
     }
 
     public static void shutdown() {
-        try {
-            AsyncTI4DiscordBot.markShuttingDown();
+        runShutdownSteps(List.of(
+                new ShutdownStep("mark shutting down", AsyncTI4DiscordBot::markShuttingDown),
+                new ShutdownStep("set shutdown presence", JdaService::setShutdownPresence),
+                new ShutdownStep("stop accepting commands", JdaService::stopAcceptingCommands),
+                executorStep(JDA_EVENT_POOL_NAME, JdaService::shutdownEventExecutor),
+                executorStep(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager::shutdown),
+                executorStep(CronManager.class.getSimpleName(), CronManager::shutdown),
+                new ShutdownStep("flush user active hours", JdaService::flushUserActiveHours),
+                executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
+                executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
+                executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown),
+                executorStep(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline::shutdown),
+                executorStep(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown),
+                new ShutdownStep("release active lease", JdaService::releaseActiveLease),
+                new ShutdownStep("send buffered logs", JdaService::sendBufferedLogsBeforeJdaShutdown),
+                new ShutdownStep("shut down JDA", JdaService::shutdownJda)));
+    }
 
-            jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-            BotLogger.info("SHUTDOWN PROCESS STARTED");
+    record ShutdownStep(String name, Runnable action) {}
 
-            ActiveLeaseService.setCurrentProcessReady(false);
-            BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-
-            logShutdownResult(JDA_EVENT_POOL_NAME, shutdownEventExecutor());
-            logShutdownResult(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager.shutdown());
-            logShutdownResult(CronManager.class.getSimpleName(), CronManager.shutdown());
-            UserActiveHourRecorder.flush();
-            logShutdownResult(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline.shutdown());
-            logShutdownResult(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline.shutdown());
-            logShutdownResult(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline.shutdown());
-            logShutdownResult(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline.shutdown());
-            logShutdownResult(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline.shutdown());
-
-            SpringContext.getBean(ActiveLeaseService.class).releaseLease();
-            BotLogger.info("RELEASED ACTIVE LEASE");
-
-            BotLogger.info("SHUTTING DOWN JDA.");
-
-            BotLogger.sendBufferedLogsToDiscord();
-
-            shutdownJda();
-        } catch (Exception e) {
-            BotLogger.error("Error encountered within shutdown process:\n> ", e);
+    static void runShutdownSteps(List<ShutdownStep> steps) {
+        for (ShutdownStep step : steps) {
+            try {
+                step.action().run();
+            } catch (Exception e) {
+                reportFailedShutdownStep(step.name(), e);
+            }
         }
+    }
+
+    private static void reportFailedShutdownStep(String stepName, Exception failure) {
+        try {
+            BotLogger.error("Shutdown step failed: " + stepName, failure);
+        } catch (Exception loggingFailure) {
+            System.err.println("Shutdown step failed: " + stepName);
+            failure.printStackTrace();
+        }
+    }
+
+    private static ShutdownStep executorStep(String executorName, Supplier<ShutdownResult> shutdown) {
+        return new ShutdownStep(executorName, () -> logShutdownResult(executorName, shutdown.get()));
+    }
+
+    private static void setShutdownPresence() {
+        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
+        BotLogger.info("SHUTDOWN PROCESS STARTED");
+    }
+
+    private static void stopAcceptingCommands() {
+        ActiveLeaseService.setCurrentProcessReady(false);
+        BotLogger.info("NO LONGER ACCEPTING COMMANDS");
+    }
+
+    private static void flushUserActiveHours() {
+        long startedAt = System.currentTimeMillis();
+        int flushedUsers = UserActiveHourRecorder.flush();
+        BotLogger.info(String.format(
+                "FLUSHED ACTIVE HOURS FOR %s IN %,d MS",
+                StringHelper.pluralize(flushedUsers, "USER", "USERS"), System.currentTimeMillis() - startedAt));
+    }
+
+    private static void releaseActiveLease() {
+        SpringContext.getBean(ActiveLeaseService.class).releaseLease();
+        BotLogger.info("RELEASED ACTIVE LEASE");
+    }
+
+    private static void sendBufferedLogsBeforeJdaShutdown() {
+        BotLogger.info("SHUTTING DOWN JDA.");
+        BotLogger.sendBufferedLogsToDiscord();
     }
 
     private static ShutdownResult shutdownEventExecutor() {

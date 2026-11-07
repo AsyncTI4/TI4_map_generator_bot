@@ -149,14 +149,22 @@ are retained for diagnostics and deduplication.
 ```mermaid
 stateDiagram-v2
     [*] --> Closed
-    Closed --> Counting: First accepted signal; schedule threshold reset in 1 minute
-    Counting --> Counting: Accept further signals with new reasons
-    Counting --> Closed: Scheduled threshold reset clears count and reasons
-    Counting --> Open: Count reaches 15; schedule reset in 3 minutes
+
+    state Closed {
+        [*] --> Idle
+        Idle --> Counting: first signal
+        Counting --> Counting: signal with a new reason
+        Counting --> Idle: 1-minute count reset
+    }
+
+    Counting --> Open: 15th signal
     Closed --> Open: openForSeconds(seconds)
-    Counting --> Open: openForSeconds(seconds)
-    Open --> Open: Submission checks refuse new work
-    Open --> Closed: Scheduled reset clears open flag, count, and reasons
+    Open --> Closed: scheduled reset
+
+    note right of Open
+        Submissions are refused.
+        Running tasks continue.
+    end note
 ```
 
 The one-minute count reset is scheduled from the first accepted signal; this is

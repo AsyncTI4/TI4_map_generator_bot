@@ -5,9 +5,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +20,7 @@ import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.spring.context.RequestContext;
 import ti4.spring.context.SetupRequestContext;
+import ti4.spring.security.FogGameAccess;
 
 @RequiredArgsConstructor
 @RestController
@@ -54,45 +52,18 @@ public class GameImageController {
             return getFullMapUrl(managedGame);
         }
 
-        // FoW game: check for authentication
-        String userId = getOptionalUserId();
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authentication required to view Fog of War maps");
-        }
-
         Game game = managedGame.getGame();
-        // FoW game: GM (owner) gets full map
-        if (userId.equals(game.getOwnerID())) {
-            return getFullMapUrl(managedGame);
-        }
-
-        // FoW game: Check if user is a GM via Discord role
-        boolean isGm = game.getPlayersWithGMRole().stream().anyMatch(p -> userId.equals(p.getUserID()));
-        if (isGm) {
-            return getFullMapUrl(managedGame);
-        }
-
-        // FoW game: Player gets their FoW map
-        if (managedGame.hasPlayer(userId)) {
-            return getPlayerFowMapUrl(gameName, userId);
-        }
-
-        // FoW game: Not a participant
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(
-                        "To see this Fog of War map, please make sure you are logged in and are participating in this game");
-    }
-
-    /**
-     * Get the user ID if authenticated, null otherwise.
-     */
-    private static String getOptionalUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return auth.getName();
-        }
-        return null;
+        FogGameAccess access = FogGameAccess.forCurrentUser(game);
+        return switch (access.role()) {
+            case ANONYMOUS ->
+                ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication required to view Fog of War maps");
+            case PLAYER -> getPlayerFowMapUrl(gameName, access.seat().getUserID());
+            case GAME_MASTER -> getFullMapUrl(managedGame);
+            case OUTSIDER ->
+                ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(
+                                "To see this Fog of War map, please make sure you are logged in and are participating in this game");
+        };
     }
 
     /**

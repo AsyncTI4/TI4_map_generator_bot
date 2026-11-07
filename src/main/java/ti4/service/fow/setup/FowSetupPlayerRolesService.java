@@ -20,7 +20,7 @@ final class FowSetupPlayerRolesService {
     private FowSetupPlayerRolesService() {}
 
     /** Seeded once from {@link Player#isGM()} so the common case (GM doesn't play) needs zero clicks. */
-    private static void ensureInitialized(Game game, FowSetupWizardState state) {
+    static void ensureInitialized(Game game, FowSetupWizardState state) {
         if (state.isPlayerRolesInitialized()) return;
         for (Player player : game.getPlayers().values()) {
             if (!player.isDummy() && player.isGM()) {

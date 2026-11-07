@@ -38,6 +38,11 @@ public abstract class PostgresDatabaseTest {
         registry.add("spring.datasource.url", () -> url);
         registry.add("spring.datasource.username", () -> username);
         registry.add("spring.datasource.password", () -> password);
+        // Spring caches one context per test configuration and each keeps its Hikari pool open for the whole run.
+        // At Hikari's default of 10 connections, ten cached contexts fill postgres:16's 100 slots in CI and
+        // later connections (e.g. the lease listener's) are refused. Keep each context's footprint small.
+        registry.add("spring.datasource.hikari.maximum-pool-size", () -> "4");
+        registry.add("spring.datasource.hikari.minimum-idle", () -> "1");
     }
 
     static void validateSettings(String url, String username) {

@@ -108,6 +108,9 @@ public class StatusCleanupService {
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
 
+            game.removeStoredValue("theodisiMinisterRelationsExhausted_" + player.getFaction());
+            game.removeStoredValue("theodisiSeatOfPowerExhausted_" + player.getFaction());
+
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {

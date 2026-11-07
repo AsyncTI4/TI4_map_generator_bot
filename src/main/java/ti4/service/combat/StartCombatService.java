@@ -1665,6 +1665,7 @@ public class StartCombatService {
     }
 
     private static boolean hasCendos(Player player, Tile tile) {
+        if (!player.hasUnit("tk-cendos")) return false;
         int nonFighterShips = 0;
         boolean hasDestroyer = false;
         for (UnitKey unit : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
@@ -1672,11 +1673,11 @@ public class StartCombatService {
             if (unit.unitType() == UnitType.Destroyer) {
                 hasDestroyer = true;
             }
-            if (model.isNonFighterShip()) {
+            if (model != null && model.isNonFighterShip()) {
                 nonFighterShips += tile.getSpaceUnitHolder().getUnitCount(unit);
             }
         }
-        return player.hasUnit("tk-cendos") && hasDestroyer && nonFighterShips >= 3;
+        return hasDestroyer && nonFighterShips >= 3;
     }
 
     private static List<Button> getStartOfSpaceCombatButtons(Game game, Player p1, Player p2, Tile tile) {
