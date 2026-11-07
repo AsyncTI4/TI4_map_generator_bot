@@ -98,6 +98,20 @@ class CronManagerTest {
     }
 
     @Test
+    void schedulingOnAShutDownSchedulerIsRefusedWithoutThrowing() {
+        // Worker tasks still draining during shutdown can trip the circuit breaker, which schedules a reset here.
+        // A throw at that point escaped the button handler and skipped the game save.
+        ScheduledThreadPoolExecutor scheduler = CronManager.newScheduler();
+        assertThat(CronManager.scheduleUnlessShutDown(scheduler, () -> {}, 1, TimeUnit.MINUTES))
+                .isTrue();
+
+        scheduler.shutdown();
+
+        assertThat(CronManager.scheduleUnlessShutDown(scheduler, () -> {}, 1, TimeUnit.MINUTES))
+                .isFalse();
+    }
+
+    @Test
     void shutdownStillWaitsForACronThatIsAlreadyRunning() throws InterruptedException {
         ScheduledThreadPoolExecutor scheduler = CronManager.newScheduler();
         CountDownLatch started = new CountDownLatch(1);

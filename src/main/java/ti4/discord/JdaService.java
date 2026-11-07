@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -92,6 +93,8 @@ import ti4.spring.websocket.GameWebStatePipeline;
 public class JdaService {
 
     private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
+    static final String FLUSH_USER_ACTIVE_HOURS = "flush user active hours";
+    static final String RELEASE_ACTIVE_LEASE = "release active lease";
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
     private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
     public static final int DISCORD_REQUEST_TIMEOUT_SECONDS = 60;
@@ -623,64 +626,80 @@ public class JdaService {
     }
 
     public static void shutdown() {
-        runShutdownSteps(List.of(
-                new ShutdownStep("mark shutting down", AsyncTI4DiscordBot::markShuttingDown),
-                new ShutdownStep("set shutdown presence", JdaService::setShutdownPresence),
-                new ShutdownStep("stop accepting commands", JdaService::stopAcceptingCommands),
-                executorStep(JDA_EVENT_POOL_NAME, JdaService::shutdownEventExecutor),
-                parallel(
-                        "drain workers and crons",
+        runShutdownPhases(shutdownPhases(), JdaService::reportFailedShutdownStep);
+    }
+
+    static List<List<ShutdownStep>> shutdownPhases() {
+        return List.of(
+                List.of(new ShutdownStep("mark shutting down", AsyncTI4DiscordBot::markShuttingDown)),
+                List.of(new ShutdownStep("set shutdown presence", JdaService::setShutdownPresence)),
+                List.of(new ShutdownStep("stop accepting commands", JdaService::stopAcceptingCommands)),
+                List.of(executorStep(JDA_EVENT_POOL_NAME, JdaService::shutdownEventExecutor)),
+                List.of(
                         executorStep(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager::shutdown),
-                        executorStep(CronManager.class.getSimpleName(), CronManager::shutdown),
-                        new ShutdownStep("flush user active hours", JdaService::flushUserActiveHours)),
-                parallel(
-                        "drain work pipelines",
+                        executorStep(CronManager.class.getSimpleName(), CronManager::shutdown)),
+                List.of(
                         executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
                         executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
-                        executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown)),
-                parallel(
-                        "drain persistence pipelines",
+                        executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown),
+                        new ShutdownStep(FLUSH_USER_ACTIVE_HOURS, JdaService::flushUserActiveHours)),
+                List.of(
                         executorStep(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline::shutdown),
                         executorStep(
                                 GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown)),
-                new ShutdownStep("release active lease", JdaService::releaseActiveLease),
-                new ShutdownStep("send buffered logs", JdaService::sendBufferedLogsBeforeJdaShutdown),
-                new ShutdownStep("shut down JDA", JdaService::shutdownJda)));
+                List.of(new ShutdownStep(RELEASE_ACTIVE_LEASE, JdaService::releaseActiveLease)),
+                List.of(new ShutdownStep("send buffered logs", JdaService::sendBufferedLogsBeforeJdaShutdown)),
+                List.of(new ShutdownStep("shut down JDA", JdaService::shutdownJda)));
     }
 
     record ShutdownStep(String name, Runnable action) {}
 
-    static void runShutdownSteps(List<ShutdownStep> steps) {
-        steps.forEach(JdaService::runShutdownStep);
+    static void runShutdownPhases(List<List<ShutdownStep>> phases, BiConsumer<String, Throwable> onFailure) {
+        for (List<ShutdownStep> phase : phases) {
+            if (phase.size() == 1) {
+                runShutdownStep(phase.getFirst(), onFailure);
+            } else {
+                runTogether(phase, onFailure);
+            }
+        }
     }
 
-    private static void runShutdownStep(ShutdownStep step) {
+    private static void runShutdownStep(ShutdownStep step, BiConsumer<String, Throwable> onFailure) {
         try {
             step.action().run();
-        } catch (Exception e) {
-            reportFailedShutdownStep(step.name(), e);
+        } catch (Throwable t) {
+            onFailure.accept(step.name(), t);
         }
     }
 
-    static ShutdownStep parallel(String name, ShutdownStep... steps) {
-        return new ShutdownStep(name, () -> runInParallel(name, List.of(steps)));
-    }
-
-    private static void runInParallel(String name, List<ShutdownStep> steps) {
+    private static void runTogether(List<ShutdownStep> steps, BiConsumer<String, Throwable> onFailure) {
         List<Thread> threads = steps.stream()
-                .map(step -> Thread.ofVirtual().name("shutdown-" + step.name()).start(() -> runShutdownStep(step)))
+                .map(step -> Thread.ofVirtual()
+                        .name("shutdown-" + step.name())
+                        .start(() -> runShutdownStep(step, onFailure)))
                 .toList();
-        try {
-            for (Thread thread : threads) {
-                thread.join();
-            }
-        } catch (InterruptedException e) {
+        boolean interrupted = false;
+        for (Thread thread : threads) {
+            interrupted |= joinUninterruptibly(thread);
+        }
+        if (interrupted) {
             Thread.currentThread().interrupt();
-            reportFailedShutdownStep(name, e);
         }
     }
 
-    private static void reportFailedShutdownStep(String stepName, Exception failure) {
+    private static boolean joinUninterruptibly(Thread thread) {
+        boolean interrupted = false;
+        while (true) {
+            try {
+                thread.join();
+                return interrupted;
+            } catch (InterruptedException e) {
+                interrupted = true;
+            }
+        }
+    }
+
+    private static void reportFailedShutdownStep(String stepName, Throwable failure) {
         try {
             BotLogger.error("Shutdown step failed: " + stepName, failure);
         } catch (Exception loggingFailure) {
