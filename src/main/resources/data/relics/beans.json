@@ -40,5 +40,47 @@
         "text": "During the Anti-Fighter Barrage step of a space combat in a system adjacent to this unit's system, you may use the ANTI-FIGHTER BARRAGE ability of 1 of your units of this type in this system.\n\nHeat Seekers: After you roll for this unit's ANTI-FIGHTER BARRAGE ability, you may discard this card to reroll all misses.\n\nCombat +1",
         "isFakeRelic": true,
         "source": "beans"
+    },
+    {
+        "alias": "ashenhourglass",
+        "name": "The Ashen Hourglass",
+        "text": "At the start of a round of space combat, you may exhaust this card and select a unit type controlled by your opponent participating in this combat. That unit type does not roll combat dice during this round of combat.",
+        "source": "beans"
+    },
+    {
+        "alias": "handoftheemperor",
+        "name": "Hand of the Emperor",
+        "text": "After an agenda is revealed, you may purge this card to immediately resolve that agenda as if you had placed 1 vote on the outcome of your choice.",
+        "source": "beans"
+    },
+    {
+        "alias": "thesilence",
+        "name": "The Silence",
+        "text": "At the start of the strategy phase, you may purge this card and choose 1 strategy card. That strategy card must be chosen last.",
+        "source": "beans"
+    },
+    {
+        "alias": "hamitstreasure",
+        "name": "Hamit's Treasure",
+        "text": "When you gain this card, place 5 trade goods from the supply on it; trade goods on this card can be spent as either resources or influence. At the start of a strategy phase, place 2 trade goods from the supply on this card.\n\nAction: Purge this card to gain all trade goods on this card and the same amount from the supply.",
+        "source": "beans"
+    },
+    {
+        "alias": "wellspring",
+        "name": "The Wellspring",
+        "text": "When you gain this card, place the Libertalia planet token in a system that contains your ships and gain its planet card and legendary ability card.\n\nLibertalia 2/2, Legendary, Cultural.\n\nRiver of Paradise: You may exhaust this card at the end of your turn to choose 1 planet you control. Ready that planet and either repair each of your damaged mechs, or place 2 infantry on that planet.",
+        "source": "beans"
+    },
+    {
+        "alias": "ouroboros",
+        "name": "The Ouroboros",
+        "text": "When you purge another relic, gain 1 purged relic fragment. ACTION: Purge this card to ready up to 4 exhausted non-strategy card components.",
+        "source": "beans"
+    },
+    {
+        "alias": "temporaldissidence",
+        "name": "Temporal Dissidence",
+        "text": "When you would resolve the primary ability of one of your strategy cards, you may purge this card to resolve the primary ability of a readied or unchosen strategy card instead.",
+        "source": "beans"
     }
 ]

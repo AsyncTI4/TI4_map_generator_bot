@@ -680,6 +680,7 @@ public class CombatRollService {
         }
 
         KryxosBreakthroughHandler.refreshPrototypeInnovators(game, player, tile, playerUnitsByQuantity, rollType);
+        playerUnitsByQuantity = splitChoirBreakthroughDamagedShips(player, playerUnitsByQuantity);
 
         if (playerUnitsByQuantity.isEmpty()) {
             String fightingOnUnitHolderName = unitHolderName;
@@ -3546,6 +3547,34 @@ public class CombatRollService {
         Map<UnitModel, Integer> result = new HashMap<>();
         map.forEach((k, v) -> result.merge(k.getLeft(), v, Integer::sum));
         return result;
+    }
+
+    private static Map<Pair<UnitModel, UnitHolder>, Integer> splitChoirBreakthroughDamagedShips(
+            Player player, Map<Pair<UnitModel, UnitHolder>, Integer> units) {
+        if (!player.hasUnlockedBreakthrough("choirbt")) {
+            return units;
+        }
+        Map<Pair<UnitModel, UnitHolder>, Integer> splitUnits = new HashMap<>();
+        for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : units.entrySet()) {
+            UnitModel unit = entry.getKey().getLeft();
+            UnitHolder holder = entry.getKey().getRight();
+            UnitKey unitKey = Units.getUnitKey(unit.getUnitType(), player.getColorID());
+            int damagedCount = unit.getIsShip() ? Math.min(entry.getValue(), holder.getDamagedUnitCount(unitKey)) : 0;
+            if (damagedCount == 0) {
+                splitUnits.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                continue;
+            }
+            int undamagedCount = entry.getValue() - damagedCount;
+            if (undamagedCount > 0) {
+                splitUnits.merge(entry.getKey(), undamagedCount, Integer::sum);
+            }
+            UnitModel damagedUnit = UnitModelValueInjectionService.injectValues(
+                    unit, UnitModelValueInjectionService.IntegerValueInjection.create());
+            String notes = damagedUnit.getNotes() == null ? "" : damagedUnit.getNotes();
+            damagedUnit.setNotes(notes + " choirbt_damaged_ship");
+            splitUnits.merge(new ImmutablePair<>(damagedUnit, holder), damagedCount, Integer::sum);
+        }
+        return splitUnits;
     }
 
     record MergeResult(Map<Pair<UnitModel, UnitHolder>, Integer> units, Set<String> divergingModels) {}

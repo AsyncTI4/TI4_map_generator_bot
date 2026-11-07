@@ -33,6 +33,9 @@ import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExp
 import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -1885,9 +1888,13 @@ public class StartCombatService {
         if (isSpaceCombat) {
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p2, p1, tile);
+            ChoirTechHandler.addOblivionsEchoCombatButton(buttons, game, p1, p2, tile);
+            ChoirTechHandler.addOblivionsEchoCombatButton(buttons, game, p2, p1, tile);
         }
 
         if (isGroundCombat) {
+            ChoirUnitHandler.addElegyCombatButton(buttons, game, p1, tile);
+            ChoirUnitHandler.addElegyCombatButton(buttons, game, p2, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
             if (combatHolder instanceof Planet planet) {
@@ -1962,6 +1969,8 @@ public class StartCombatService {
         OblivionTechHandler.addOblivionCannonButton(buttons, game, p2, p1, tile, isSpaceCombat);
         RevenantLeadersHandler.addRevKryxosHeroButton(buttons, game, p1, p2, tile, isSpaceCombat);
         RevenantLeadersHandler.addRevKryxosHeroButton(buttons, game, p2, p1, tile, isSpaceCombat);
+        ChoirLeadersHandler.addFuneralProcessionButton(buttons, game, p1, p2, tile, isSpaceCombat);
+        ChoirLeadersHandler.addFuneralProcessionButton(buttons, game, p2, p1, tile, isSpaceCombat);
         checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {

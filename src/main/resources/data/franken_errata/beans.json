@@ -284,5 +284,67 @@
         "itemId": "bloom_flagship",
         "undraftable": true,
         "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "deaths_refrain",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "morbid_harmony",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "choircommander",
+        "undraftable": true,
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "bechoirylament",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain",
+            "ABILITY:morbid_harmony"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:choircommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "bechoirrlament",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain",
+            "ABILITY:morbid_harmony"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:choircommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "choir_mechlament",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain",
+            "ABILITY:morbid_harmony"
+        ],
+        "optionalSwaps": [
+            "COMMANDER:choircommander"
+        ],
+        "source": "beans"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "choir_flagship",
+        "additionalComponents": [
+            "ABILITY:deaths_refrain"
+        ],
+        "source": "beans"
     }
 ]

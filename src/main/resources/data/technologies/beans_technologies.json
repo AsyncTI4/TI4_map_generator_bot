@@ -211,7 +211,7 @@
         "requirements": "YY",
         "faction": "deep",
         "source": "beans",
-        "text": "Systems that contain no planets and your ships gain PRODUCTION 2 as if they were 1 of your units.\n\nACTION: Exhaust this card to produce up to 2 units in a system containing your ships and no other player’s ships."
+        "text": "Systems that contain no planets and your ships gain PRODUCTION 2 as if they were 1 of your units.\n\nACTION: Exhaust this card to produce up to 2 units in a system containing your ships."
     },
     {
         "alias": "bedeepg",
@@ -246,5 +246,71 @@
         "faction": "bloom",
         "source": "beans",
         "text": "If the active system contains 1 or more of your coexisting units, this unit can move through systems that contain other players' ships. "
+    },
+    {
+        "alias": "bechoiry",
+        "name": "Tomb Resonance",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "choir",
+        "source": "beans",
+        "text": "**Lament**: When 1 or more of your units use their PRODUCTION ability, you may damage up to 2 ships in that system. Reduce the combined cost of the produced units by 1 for each ship damaged this way.\n**Requiem**: When 1 or more of your units use their PRODUCTION ability, you may repair up to 2 damaged ships in that system. Reduce the combined cost of the produced units by 1 for each ship repaired this way."
+    },
+    {
+        "alias": "bechoirylament",
+        "name": "Tomb Resonance",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "choir",
+        "source": "beans",
+        "text": "When 1 or more of your units use their PRODUCTION ability, you may damage up to 2 ships in that system. Reduce the combined cost of the produced units by 1 for each ship damaged this way."
+    },
+    {
+        "alias": "bechoiryrequiem",
+        "name": "Tomb Resonance",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "choir",
+        "source": "beans",
+        "text": "When 1 or more of your units use their PRODUCTION ability, you may repair up to 2 damaged ships in that system. Reduce the combined cost of the produced units by 1 for each ship repaired this way."
+    },
+    {
+        "alias": "bechoirr",
+        "name": "Oblivion's Echo",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "choir",
+        "source": "beans",
+        "text": "**Lament**: After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and choose 1 of your opponent's ships that is not damaged in the active system that has SUSTAIN DAMAGE and damage that ship.\n**Requiem**: After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and repair 1 of your other damaged ships in the active system. If you do, produce 1 hit against your opponent’s ships."
+    },
+    {
+        "alias": "bechoirrlament",
+        "name": "Oblivion's Echo",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "choir",
+        "source": "beans",
+        "text": "After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and choose 1 of your opponent's ships that is not damaged in the active system that has SUSTAIN DAMAGE and damage that ship."
+    },
+    {
+        "alias": "bechoirrrequiem",
+        "name": "Oblivion's Echo",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "choir",
+        "source": "beans",
+        "text": "After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and repair 1 of your other damaged ships in the active system. If you do, produce 1 hit against your opponent’s ships."
     }
 ]

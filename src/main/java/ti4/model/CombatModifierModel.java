@@ -113,6 +113,9 @@ public class CombatModifierModel implements ModelInterface {
                     }
                 }
             }
+            if ("_choir_damaged_ship_".equals(scope)) {
+                isInScope = unit.getIsShip() && StringUtils.contains(unit.getNotes(), "choirbt_damaged_ship");
+            }
             if ("_ship_no_ff".equals(scope)) {
                 isInScope = unit.getIsShip() && !"fighter".equalsIgnoreCase(unit.getBaseType());
             }

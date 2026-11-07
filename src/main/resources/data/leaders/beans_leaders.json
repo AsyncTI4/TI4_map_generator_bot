@@ -199,7 +199,7 @@
     "title": "The Technocrat",
     "abilityName": "Power Surge - Network Overload",
     "abilityWindow": "ACTION:",
-    "abilityText": "For each player that has a token on your faction sheet, you may remove it to either gain 1 of that player’s technologies, or force that player to return 1 technology of your choice to their technology deck.",
+    "abilityText": "For each player that has a token on your faction sheet, you may remove it to either gain 1 of that player’s non-faction technologies, or force that player to return 1 technology of your choice to their technology deck.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -381,6 +381,43 @@
     "abilityName": "Fungal Bloom - Rapid Dispersal",
     "abilityWindow": "ACTION:",
     "abilityText": "Place 1 infantry from your reinforcements on each planet your units are coexisting on. Then, for each of those planets that contains 2 or more of your ground forces, you may place 1 infantry from your reinforcements into coexistence on a non-home planet in or adjacent to that system. Then, purge this card.",
+    "unlockCondition": "Have 3 scored objectives.",
+    "source": "beans",
+    "flavorText": "Bloom."
+  },
+  {
+    "id": "choiragent",
+    "faction": "choir",
+    "type": "agent",
+    "name": "Lyra of the Crypt",
+    "title": "The Keeper in Silence",
+    "abilityWindow": "At the start of a player's turn:",
+    "abilityText": "You may exhaust this card to allow that player to repair 1 of their damaged ships on the game board. If that player was another player, you may ready 1 exhausted planet you control with a resource value less than that ship's cost.",
+    "unlockCondition": "Always Unlocked",
+    "source": "beans",
+    "flavorText": "Be still, O’ living one. The pain shall pass, but its song shall remain."
+  },
+  {
+    "id": "choircommander",
+    "faction": "choir",
+    "type": "commander",
+    "name": "Keyn of the Hollow",
+    "title": "The Watcher in Silence",
+    "abilityWindow": "After an agenda is revealed:",
+    "abilityText": "You may predict aloud an outcome of that agenda. If your prediction is correct, you may damage or repair one of your units.",
+    "unlockCondition": "There are 3 damaged ships on the game board.",
+    "source": "beans",
+    "flavorText": "I have heard ten thousand final breaths. Not one was truly silent."
+  },
+  {
+    "id": "choirhero",
+    "faction": "choir",
+    "type": "hero",
+    "name": "Mortua of the Tributary",
+    "title": "The Conductor",
+    "abilityName": "Funeral Procession - Last Communion",
+    "abilityWindow": "At the start of a space combat you are participating in:",
+    "abilityText": "Place this card near the game board. Then, damage all of your opponent's ships in this system. Your damaged units, and units they transport, may move out of systems that contain your command tokens. At the end of this game round, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Bloom."

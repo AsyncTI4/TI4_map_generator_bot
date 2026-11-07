@@ -38,19 +38,14 @@ class TransientGameInfoUpdater {
             MonumentsService.syncZelianAsteroidFieldToken(game);
             TeHelperGeneral.checkTransientInfo(game);
             BlueReverieTechHelper.syncEcologicalEngineeringAttachments(game);
-            for (Player player : game.getRealPlayers()) {
-                CommanderUnlockCheckService.checkPlayer(player, "ta");
-            }
             MigoUnitHandler.syncNevermen(game);
-            for (Player player : game.getRealPlayers()) {
-                CommanderUnlockCheckService.checkPlayer(player, "migo");
-            }
             MigoLeadersHandler.syncMigoCommanderBonus(game);
             for (Player player : game.getRealPlayers()) {
                 BloomAbilityHandler.syncCoexistingAbilities(game, player);
                 MigoAbilityHandler.syncHarvestCards(game, player);
                 MonumentsBRButtonHandler.checkMonumentHonorDishonorFlip(game, player);
                 MonumentsBRButtonHandler.checkDishonorMonumentCondition(game, player);
+                CommanderUnlockCheckService.checkPlayer(player, "migo", "ta", "choir");
             }
         } catch (Exception e) {
             BotLogger.error(

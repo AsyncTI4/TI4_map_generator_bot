@@ -47,6 +47,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedReso
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
@@ -1758,6 +1759,14 @@ public final class Helper {
                         .append(blacktfInfantry)
                         .append(" captured infantry with **The Flesh Cathedral**\n");
             }
+            int tombResonanceDiscount = ChoirTechHandler.getTombResonanceProductionDiscount(game, player);
+            if (tombResonanceDiscount > 0) {
+                msg.append("> Used ")
+                        .append(TechEmojis.CyberneticTech)
+                        .append("_Tomb Resonance_ for a ")
+                        .append(tombResonanceDiscount)
+                        .append(" resource discount.\n");
+            }
             msg.append("for a total spend of ").append(res).append(" resource").append(res == 1 ? "" : "s");
 
             if (!game.getStoredValue("producedUnitCostFor" + player.getFaction())
@@ -3289,7 +3298,6 @@ public final class Helper {
 
         MigoHarvestHandler.addYellowHarvestButton(unitButtons, game, player, tile);
         BloomBreakthroughHandler.addMycelialBridgesProductionButtons(event, unitButtons, game, player, tile);
-
         return unitButtons;
     }
 

@@ -15,6 +15,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnPromissoryHandler;
@@ -60,6 +61,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.planet.JotunheimLegendaryService;
 import ti4.service.tactical.postmovement.AtokeraHeroButton;
+import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -95,6 +97,7 @@ public class EndTurnService {
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
         DeepBreakthroughHandler.clearEventHorizon(game, player);
+        ChoirAbilityHandler.syncMorbidHarmony(player);
         ValhavnAgent.offerAtEndOfTurn(game, player);
         WarGamesBrActionCardHandler.clear(game);
         DisableService.clear(game);
@@ -104,6 +107,13 @@ public class EndTurnService {
                 && game.getStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED)
                         .isEmpty()) {
             ButtonHelperTacticalAction.logTacticalAction(game, player);
+        }
+        if (player.getPromissoryNotesInPlayArea().contains("bepnchoir") && !player.ownsPromissoryNote("bepnchoir")) {
+            Player choirPlayer = game.getPNOwner("bepnchoir");
+            if (choirPlayer != null && choirPlayer != player) {
+                SendPromissoryService.returnPromissoryFromPlayAreaToOwner(
+                        event, game, player, choirPlayer, "bepnchoir");
+            }
         }
         game.removeStoredValue(ButtonHelperTacticalAction.TACTICAL_ACTION_LOGGED);
         LostLegciesExploreHandler.resolveBattleworldEndOfTurn(event, game, player);

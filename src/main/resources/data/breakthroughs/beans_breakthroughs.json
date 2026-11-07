@@ -130,5 +130,17 @@
         ],
         "text": "After you produce 1 or more infantry, you may place up to 2  of the produced infantry into coexistence on different planets containing your coexisting units.",
         "source": "beans"
+    },
+    {
+        "alias": "choirbt",
+        "name": "Cenotaph Circuit",
+        "shortName": "Cenotaph\nCircuit",
+        "faction": "choir",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "Your ships with a printed capacity value gain SUSTAIN DAMAGE. Apply +1 to your damaged ships combat rolls.\n\nAt any time, you may exhaust this card to either repair 1 of your damaged units, or damage one of your units that has SUSTAIN DAMAGE.",
+        "source": "beans"
     }
 ]

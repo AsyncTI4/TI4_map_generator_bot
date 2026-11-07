@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
@@ -52,6 +53,7 @@ public class PassService {
         }
         UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
 
+        ChoirAbilityHandler.syncMorbidHarmony(player);
         player.setPassed(true);
         MigoAbilityHandler.offerCerebralArchiveResearch(game, player);
         ThirtyKSecretHooks.onPassed(game, player);

@@ -24,6 +24,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.adjacency.Adjacency;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -387,6 +388,19 @@ public class CommanderUnlockCheckService {
                                         .anyMatch(planet ->
                                                 planet.getPlanetTypes().contains("hazardous"))));
             }
+            case "choir" ->
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                                .flatMap(tile -> tile.getUnitHolders().values().stream())
+                                .flatMap(unitHolder -> unitHolder.getUnitKeys().stream()
+                                        .filter(unitKey -> {
+                                            UnitModel unitModel = game.getUnitFromUnitKey(unitKey);
+                                            return unitModel != null && unitModel.getIsShip();
+                                        })
+                                        .mapToInt(unitHolder::getDamagedUnitCount)
+                                        .boxed())
+                                .mapToInt(Integer::intValue)
+                                .sum()
+                        >= 3;
 
             // theodisi
             case "ardentia",

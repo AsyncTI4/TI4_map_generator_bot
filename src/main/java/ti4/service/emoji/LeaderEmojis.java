@@ -276,6 +276,9 @@ public enum LeaderEmojis implements TI4Emoji {
     BloomAgent,
     BloomCommander,
     BloomHero,
+    ChoirAgent,
+    ChoirCommander,
+    ChoirHero,
 
     // Lost Legacies (Theodisi)
     ArdentiaAgent,

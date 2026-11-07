@@ -210,6 +210,7 @@ public class NetrunnersLeadersHandler {
                 .map(Mapper::getTech)
                 .filter(java.util.Objects::nonNull)
                 .filter(technology -> !player.hasTech(technology.getAlias()))
+                .filter(technology -> !technology.isFactionTech())
                 .sorted(Comparator.comparing(TechnologyModel::getName))
                 .toList();
     }

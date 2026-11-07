@@ -512,5 +512,55 @@
         "complexity": "Medium",
         "preferredColours": ["blk", "red"],
         "source": "beans"
+    },
+    {
+        "alias": "choir",
+        "factionName": "The Choir of Ossyra",
+        "homeSystem": "be12",
+        "startingFleet": "1 cv, 1 dn, 2 ff, 1 inf o, 1 inf v, 1 inf c, 1 sd o",
+        "commodities": 3,
+        "factionTech": [
+            "bechoiry",
+            "bechoirr"
+        ],
+        "startingTechOptions": [
+            "ps",
+            "aida",
+            "md",
+            "sar"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "ossyra",
+            "vigil",
+            "cineris"
+        ],
+        "abilities": [
+            "deaths_refrain",
+            "morbid_harmony"
+        ],
+        "leaders": [
+            "choiragent",
+            "choircommander",
+            "choirhero"
+        ],
+        "promissoryNotes": [
+            "bepnchoir"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "choir_flagship",
+            "infantry",
+            "choir_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "preferredColours": ["nvy", "blk", "gray"],
+        "source": "beans"
     }
 ]

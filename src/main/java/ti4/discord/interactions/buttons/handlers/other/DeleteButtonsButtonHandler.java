@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyA
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
@@ -405,6 +406,7 @@ class DeleteButtonsButtonHandler {
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(RohDhnaAgent.button(player));
                 }
+                ChoirTechHandler.addTombResonancePaymentButtons(buttons, game, player, tile);
                 if (player.hasLeaderUnlocked("hacanhero")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
@@ -507,6 +509,7 @@ class DeleteButtonsButtonHandler {
             ArcanumBreakthroughHandler.clearPowerWordWishProductionContext(game, player, buttonID);
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
+            ChoirTechHandler.clearTombResonanceProductionContext(game, player);
             if (player.hasAbility("amalgamation")) {
                 game.removeStoredValue("amalgAmount");
             }
