@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
@@ -110,6 +112,13 @@ public class CardsInfoService {
         if (playerCardsInfoThread == null) return;
 
         List<Button> buttons = new ArrayList<>();
+        if (player.hasReadyBreakthrough("choirbt")) {
+            buttons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
+        }
+        Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptCardsInfoButton(player);
+        if (lyraOfTheCryptButton != null) {
+            buttons.add(lyraOfTheCryptButton);
+        }
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
         }

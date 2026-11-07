@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
@@ -591,6 +592,10 @@ public class CombatModHelper {
             case "bloom_flagship_in_combat" ->
                 meetsCondition = unitsByQuantity != null
                         && unitsByQuantity.keySet().stream().anyMatch(unit -> "bloom_flagship".equals(unit.getAlias()));
+            case "sepulchre_more_damaged_than_undamaged", "choir_more_damaged_than_undamaged_in_system" ->
+                meetsCondition = ChoirAbilityHandler.hasMoreDamagedShipsThanUndamagedShipsInSystem(game, tile);
+            case "sepulchre_more_undamaged_than_damaged", "choir_more_undamaged_than_damaged_in_system" ->
+                meetsCondition = ChoirAbilityHandler.hasMoreUndamagedShipsThanDamagedShipsInSystem(game, tile);
             case "vaylerianhero" -> {
                 if (player == game.getActivePlayer()
                         && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {

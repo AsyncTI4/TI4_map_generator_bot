@@ -55,6 +55,8 @@ import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
@@ -2627,6 +2629,11 @@ public class ButtonHelper {
     }
 
     public static boolean canMoveOutOfLockedSystems(Player player, Game game, Tile tile) {
+        return ChoirLeadersHandler.canMoveDamagedShipsOutOfLockedSystem(player, tile)
+                || canMoveOutOfLockedSystemsOtherThanFuneralProcession(player, game, tile);
+    }
+
+    public static boolean canMoveOutOfLockedSystemsOtherThanFuneralProcession(Player player, Game game, Tile tile) {
         return (DeepBreakthroughHandler.hasEventHorizonAllowance(game, player)
                         && tile.getPlanetUnitHolders().isEmpty())
                 || canMoveOutOfLockedSystems(player, game)
@@ -5144,6 +5151,10 @@ public class ButtonHelper {
 
     public static List<Button> getEndOfTurnAbilities(Player player, Game game) {
         List<Button> endButtons = new ArrayList<>();
+
+        if (player.hasReadyBreakthrough("choirbt")) {
+            endButtons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
+        }
 
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));

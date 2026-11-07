@@ -140,7 +140,7 @@
             "WARFARE",
             "BIOTIC"
         ],
-        "text": "Your ships with a printed capacity value gain SUSTAIN DAMAGE.\n\nAt any time, you may exhaust this card to either repair 1 of your damaged units, or damage one of your units that has SUSTAIN DAMAGE.",
+        "text": "Your ships with a printed capacity value gain SUSTAIN DAMAGE. Apply +1 to your damaged ships combat rolls.\n\nAt any time, you may exhaust this card to either repair 1 of your damaged units, or damage one of your units that has SUSTAIN DAMAGE.",
         "source": "beans"
     }
 ]

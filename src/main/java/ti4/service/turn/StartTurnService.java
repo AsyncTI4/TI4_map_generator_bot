@@ -20,6 +20,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGame
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.BorrowedTimeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
@@ -575,6 +577,14 @@ public class StartTurnService {
         String factionChecker = player.factionButtonChecker();
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
+        Button cenotaphCircuitButton = ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player);
+        if (cenotaphCircuitButton != null) {
+            startButtons.add(cenotaphCircuitButton);
+        }
+        Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptStartTurnButton(game, player);
+        if (lyraOfTheCryptButton != null) {
+            startButtons.add(lyraOfTheCryptButton);
+        }
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);
         if (!doneActionThisTurn) {

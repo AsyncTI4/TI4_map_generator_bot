@@ -522,6 +522,10 @@ public class UnitModelValueInjectionService {
                     Math.max(1, 10 - ButtonHelper.getNumberOfUnitsOnTheBoard(player.getGame(), player, "pds", false)));
         }
 
+        if (player.hasUnlockedBreakthrough("choirbt") && unit.getCapacityValue() > 0 && unit.getIsShip()) {
+            booleans.sustainDamage(true);
+        }
+
         return UnitValueInjection.of(integers, floats, booleans);
     }
 

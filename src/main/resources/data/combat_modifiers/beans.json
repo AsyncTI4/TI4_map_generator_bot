@@ -126,5 +126,49 @@
                 "alias": "bloom_mech"
             }
         ]
+    },
+    {
+        "alias": "sepulchre_bonus",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "sepulchre_more_damaged_than_undamaged",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "choir_flagship"
+            }
+        ]
+    },
+    {
+        "alias": "sepulchre_dice_bonus",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "sepulchre_more_undamaged_than_damaged",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "choir_flagship"
+            }
+        ]
+    },
+    {
+        "alias": "cenotaph_circuit_damaged_ship_bonus",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "scope": "_choir_damaged_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "breakthrough",
+                "alias": "choirbt"
+            }
+        ]
     }
 ]

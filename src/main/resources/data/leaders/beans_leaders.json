@@ -199,7 +199,7 @@
     "title": "The Technocrat",
     "abilityName": "Power Surge - Network Overload",
     "abilityWindow": "ACTION:",
-    "abilityText": "For each player that has a token on your faction sheet, you may remove it to either gain 1 of that player’s technologies, or force that player to return 1 technology of your choice to their technology deck.",
+    "abilityText": "For each player that has a token on your faction sheet, you may remove it to either gain 1 of that player’s non-faction technologies, or force that player to return 1 technology of your choice to their technology deck.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -404,7 +404,7 @@
     "name": "Keyn of the Hollow",
     "title": "The Watcher in Silence",
     "abilityWindow": "After an agenda is revealed:",
-    "abilityText": "You may predict aloud an outcome of that agenda. If your prediction is correct, repair one of your units. If the outcome you voted for was not resolved, damage one of your units instead.",
+    "abilityText": "You may predict aloud an outcome of that agenda. If your prediction is correct, you may damage or repair one of your units.",
     "unlockCondition": "There are 3 damaged ships on the game board.",
     "source": "beans",
     "flavorText": "I have heard ten thousand final breaths. Not one was truly silent."
@@ -417,7 +417,7 @@
     "title": "The Conductor",
     "abilityName": "Funeral Procession - Last Communion",
     "abilityWindow": "At the start of a space combat you are participating in:",
-    "abilityText": "Place this card near the game board. Then, damage any number of ships in this system. Your damaged units may move out of systems that contain your command tokens. At the end of this game round, purge this card.",
+    "abilityText": "Place this card near the game board. Then, damage all of your opponent's ships in this system. Your damaged units, and units they transport, may move out of systems that contain your command tokens. At the end of this game round, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Bloom."

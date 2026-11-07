@@ -390,7 +390,9 @@ public final class AgendaWhensAftersHelper {
         if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
             names.add("Atokera Commander Ability");
         }
-
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "choircommander")) {
+            names.add("Keyn of the Hollow Commander");
+        }
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");
         }
@@ -450,7 +452,9 @@ public final class AgendaWhensAftersHelper {
         if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
             buttons.add(Buttons.red("queueAfter_leader_Atokera Commander", "Atokera Commander Ability"));
         }
-
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "choircommander")) {
+            buttons.add(Buttons.red("queueAfter_leader_Keyn of the Hollow Commander", "Use Keyn of the Hollow"));
+        }
         if (player.hasLeaderUnlocked("keleresheroodlynn")) {
             buttons.add(Buttons.red("queueAfter_leader_Keleres Xxcha Hero", "Keleres Hero"));
         }
@@ -723,6 +727,9 @@ public final class AgendaWhensAftersHelper {
                                     }
                                     riderButtons = AgendaRiderHelper.getAgendaButtons(
                                             "Keleres Xxcha Hero", game, player.factionButtonChecker());
+                                } else if (after.toLowerCase().contains("keyn of the hollow")) {
+                                    riderButtons = AgendaRiderHelper.getAgendaButtons(
+                                            "Keyn of the Hollow Commander", game, player.factionButtonChecker());
                                 } else if (after.toLowerCase().contains("envoy")) {
                                     riderButtons = AgendaRiderHelper.getAgendaButtons(
                                             after, game, player.factionButtonChecker());

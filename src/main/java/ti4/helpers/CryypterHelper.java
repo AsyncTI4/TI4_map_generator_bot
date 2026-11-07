@@ -288,6 +288,7 @@ public final class CryypterHelper {
             LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
             if (leaderModel != null
                     && !leader.isLocked()
+                    && !"choircommander".equals(leaderModel.getAlias())
                     && "After an agenda is revealed:".equals(leaderModel.getAbilityWindow())) {
                 FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
                 if (factionModel == null) {

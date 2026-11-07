@@ -831,6 +831,12 @@ public class PromissoryNoteHelper {
         if ("bepndeep".equalsIgnoreCase(id)) {
             DeepPromissoryHandler.resolveDarkMatter(game, player);
         }
+        if ("bepnchoir".equalsIgnoreCase(id)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + ", _Dearly Departed_ is not automated. Please either cancel the hit or manually assign it, then ignore 1 destruction of your non-fighter ship.");
+        }
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");
         if (pn.getText().toLowerCase().contains("action:") && !actionTextPNsNotOwnAction.contains(id)) {

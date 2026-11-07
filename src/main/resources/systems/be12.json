@@ -1,12 +1,12 @@
 {
     "tileBack": "green",
     "id": "be12",
-    "name": "Ossyra/Vigilum/Cineris - Choir",
+    "name": "Ossyra/Vigil/Cineris - Choir",
     "aliases": [
         "be12",
         "choir",
         "ossyra",
-        "vigilumbe",
+        "vigil",
         "cineris"
     ],
     "imagePath": "be12_choirhs.png",
@@ -32,7 +32,7 @@
     "wormholes": [],
     "planets": [
         "ossyra",
-        "vigilumbe",
+        "vigil",
         "cineris"
     ],
     "source": "beans"

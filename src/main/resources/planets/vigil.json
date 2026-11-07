@@ -1,9 +1,9 @@
 {
-    "id": "vigilumbe",
+    "id": "vigil",
     "tileId": "be12",
-    "name": "Vigilum",
+    "name": "Vigil",
     "aliases": [
-        "vigilumbe",
+        "vigil",
         "choir"
     ],
     "positionInTile": {
@@ -19,7 +19,7 @@
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "vigilumbe",
+        "unitHolderName": "vigil",
         "coordinateMap": {
             "control": [
                 {

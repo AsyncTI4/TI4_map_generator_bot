@@ -33,6 +33,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExplorationRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
@@ -988,6 +989,7 @@ public final class AgendaHelper {
                                     || winningR.hasTech("dsatokcr")
                                     || winningR.hasUnit("kaltrim_mech")
                                     || specificVote.contains("Radiance")
+                                    || specificVote.contains("Keyn of the Hollow Commander")
                                     || specificVote.contains("Tarrock Ability"))) {
 
                         MessageChannel channel = winningR.getCorrectChannel();
@@ -1241,6 +1243,9 @@ public final class AgendaHelper {
                                                 + ", please resolve Ordagka, the Atokera commander, by using the button to gain 1 command token.");
                                 MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                             }
+                        }
+                        if (specificVote.contains("Keyn of the Hollow Commander")) {
+                            ChoirLeadersHandler.offerKeynOfTheHollow(game, winningR);
                         }
                         if (specificVote.contains("Tarrock Ability")) {
                             String message = winningR.getFactionEmoji() + " drew a secret objective.";

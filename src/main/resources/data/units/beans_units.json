@@ -631,7 +631,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "If there are more damaged units than not damaged units in this system, apply +1 to this unit's combat rolls. Otherwise, this unit rolls 1 additional combat die."
+        "ability": "If there are more damaged non-fighter ships than not damaged non-fighter ships in this system, apply +1 to this unit's combat rolls. Otherwise, this unit rolls 1 additional combat die."
     },
     {
         "id": "choir_mech",

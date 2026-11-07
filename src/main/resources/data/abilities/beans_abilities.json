@@ -314,7 +314,7 @@
         "id": "morbid_harmony",
         "name": "Morbid Harmony",
         "faction": "choir",
-        "permanentEffect": "At any time, if you have more damaged units on the board than not damaged, flip your faction technologies and mech to their requiem side, otherwise, flip them to their lament side; the other side has no effect.",
+        "permanentEffect": "At the end of your turn, if you have more damaged units with SUSTAIN DAMAGE on the board than not damaged, flip your faction technologies and mech to their requiem side, otherwise, flip them to their lament side; the other side has no effect.",
         "source": "beans"
     }
 ]
