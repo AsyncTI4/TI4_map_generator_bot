@@ -130,12 +130,15 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     void aSyncWhoseRevisionTheGameFileHasMovedPastIsSkipped() {
         // During a rollover the old process can still be draining a sync for a state the new process has already
         // saved over. That stale write must not replace the newer rows.
-        assertThat(persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-stale", "newer"), fileAt("newer")))
+        assertThat(persistenceService.replaceIfMatchesGameFile(
+                        snapshotAtRevision("pbd-stale", "newer"), fileAt("newer")))
                 .isTrue();
 
-        assertThat(persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-stale", "older"), fileAt("newer")))
+        assertThat(persistenceService.replaceIfMatchesGameFile(
+                        snapshotAtRevision("pbd-stale", "older"), fileAt("newer")))
                 .isFalse();
-        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-stale", "older"), fileAt("newer")))
+        assertThat(persistenceService.restoreIfMatchesGameFile(
+                        snapshotAtRevision("pbd-stale", "older"), fileAt("newer")))
                 .isFalse();
 
         assertThat(revisionOf("pbd-stale")).contains("newer");
@@ -143,7 +146,8 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
     @Test
     void aRestoreWhoseRevisionMatchesTheGameFileIsWritten() {
-        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-restore", "current"), fileAt("current")))
+        assertThat(persistenceService.restoreIfMatchesGameFile(
+                        snapshotAtRevision("pbd-restore", "current"), fileAt("current")))
                 .isTrue();
 
         assertThat(revisionOf("pbd-restore")).contains("current");
@@ -153,7 +157,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     void aGameFileWithoutARevisionKeyStillSyncsWhileTheFileExists() {
         // Games not saved since revision keys were introduced have none in their file. Their rows must still be
         // written, or warmup and reconciliation could never repair them.
-        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-legacy", null), fileAt(null)))
+        assertThat(persistenceService.restoreIfMatchesGameFile(snapshotAtRevision("pbd-legacy", null), fileAt(null)))
                 .isTrue();
 
         assertThat(gameRepository.existsById("pbd-legacy")).isTrue();
@@ -162,9 +166,10 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
     @Test
     void aSyncForAGameWhoseFileIsGoneIsSkipped() {
         // A stale sync landing after the other process deleted the game must not bring its rows back.
-        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-gone", null), GameFileRevision::missing))
+        assertThat(persistenceService.restoreIfMatchesGameFile(
+                        snapshotAtRevision("pbd-gone", null), GameFileRevision::missing))
                 .isFalse();
-        assertThat(persistenceService.replaceIfCurrent(
+        assertThat(persistenceService.replaceIfMatchesGameFile(
                         snapshotAtRevision("pbd-gone", "key"), GameFileRevision::missing))
                 .isFalse();
 
@@ -173,7 +178,7 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
     @Test
     void aSnapshotWithoutARevisionKeyDoesNotReplaceAKeyedGameFile() {
-        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-keyed", null), fileAt("key")))
+        assertThat(persistenceService.restoreIfMatchesGameFile(snapshotAtRevision("pbd-keyed", null), fileAt("key")))
                 .isFalse();
     }
 
@@ -183,12 +188,12 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         // sync for the same save. The older format must not win.
         GameEntitySnapshot newer = snapshotAtRevision("pbd-mapping", "same-save");
         newer.game().setMappingVersion(3);
-        assertThat(persistenceService.restoreIfCurrent(newer, fileAt("same-save")))
+        assertThat(persistenceService.restoreIfMatchesGameFile(newer, fileAt("same-save")))
                 .isTrue();
 
         GameEntitySnapshot older = snapshotAtRevision("pbd-mapping", "same-save");
         older.game().setMappingVersion(2);
-        assertThat(persistenceService.replaceIfCurrent(older, fileAt("same-save")))
+        assertThat(persistenceService.replaceIfMatchesGameFile(older, fileAt("same-save")))
                 .isFalse();
 
         assertThat(gameRepository.findById("pbd-mapping").map(GameEntity::getMappingVersion))
@@ -215,16 +220,17 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
         CountDownLatch firstHoldsTheLock = new CountDownLatch(1);
         CountDownLatch releaseFirst = new CountDownLatch(1);
         Thread first = Thread.ofVirtual()
-                .start(() -> persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-locked", "first"), () -> {
-                    firstHoldsTheLock.countDown();
-                    awaitQuietly(releaseFirst);
-                    return GameFileRevision.of("first");
-                }));
+                .start(() ->
+                        persistenceService.replaceIfMatchesGameFile(snapshotAtRevision("pbd-locked", "first"), () -> {
+                            firstHoldsTheLock.countDown();
+                            awaitQuietly(releaseFirst);
+                            return GameFileRevision.of("first");
+                        }));
         assertThat(firstHoldsTheLock.await(10, TimeUnit.SECONDS)).isTrue();
 
         CountDownLatch secondFinished = new CountDownLatch(1);
         Thread second = Thread.ofVirtual().start(() -> {
-            persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-locked", "second"), fileAt("second"));
+            persistenceService.replaceIfMatchesGameFile(snapshotAtRevision("pbd-locked", "second"), fileAt("second"));
             secondFinished.countDown();
         });
 

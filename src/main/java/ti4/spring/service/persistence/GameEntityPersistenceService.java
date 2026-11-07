@@ -44,15 +44,17 @@ public class GameEntityPersistenceService {
     }
 
     @Transactional
-    public boolean replaceIfCurrent(GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
-        if (!lockAndCheckCurrent(snapshot, currentFileRevision)) return false;
+    public boolean replaceIfMatchesGameFile(
+            GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
+        if (!lockAndCheckMatchesGameFile(snapshot, currentFileRevision)) return false;
         replace(snapshot);
         return true;
     }
 
     @Transactional
-    public boolean restoreIfCurrent(GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
-        if (!lockAndCheckCurrent(snapshot, currentFileRevision)) return false;
+    public boolean restoreIfMatchesGameFile(
+            GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
+        if (!lockAndCheckMatchesGameFile(snapshot, currentFileRevision)) return false;
         restore(snapshot);
         return true;
     }
@@ -70,7 +72,8 @@ public class GameEntityPersistenceService {
         return true;
     }
 
-    private boolean lockAndCheckCurrent(GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
+    private boolean lockAndCheckMatchesGameFile(
+            GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
         GameEntity game = snapshot.game();
         lockGame(game.getGameName());
         return currentFileRevision.get().matches(game.getRevisionKey()) && !rowHasNewerMapping(game);

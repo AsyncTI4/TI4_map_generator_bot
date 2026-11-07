@@ -207,7 +207,7 @@ work inside one process. So these finish before the lease is released:
 
 **What drains after the lease:**
 - Statistics and web state only read.
-- Database writes go through `replaceIfCurrent`, `restoreIfCurrent` and
+- Database writes go through `replaceIfMatchesGameFile`, `restoreIfMatchesGameFile` and
   `deleteIfGameFileMissing`, from both the sync pipeline and the reconciler. Each write takes a
   per-game Postgres advisory lock, then checks the game file:
   - A write is skipped if the snapshot's revision key no longer matches the file's. A newer save

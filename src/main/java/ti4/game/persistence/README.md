@@ -52,7 +52,7 @@ The database snapshot includes the saved revision and
 write. Every game gets a row. Games with fewer than 3 real or eliminated players
 are stored the same way but marked `statistics_ignored`, and every statistics
 query on player or title rows leaves them out. Live writes use
-`GameEntityPersistenceService.replaceIfCurrent`, which also updates user names.
+`GameEntityPersistenceService.replaceIfMatchesGameFile`, which also updates user names.
 
 Rows are unique per game and seat holder, `(game_name, playing_user_id)`. Stats
 users can repeat: a replaced player who stays seated has their own row, and their
@@ -73,7 +73,7 @@ File writes and database writes are not one transaction. Database submission
 happens after releasing the file lock, so concurrent saves can enqueue their
 database updates out of file-write order, and during a rollover the old process
 can still be draining syncs after the new one has saved. So the sync pipeline and
-the reconciler write through `replaceIfCurrent`, `restoreIfCurrent` and
+the reconciler write through `replaceIfMatchesGameFile`, `restoreIfMatchesGameFile` and
 `deleteIfGameFileMissing`. Each takes a per-game Postgres advisory lock and reads
 the game file's current state (`GameRevisionKeyFile.current`). A write is skipped
 when the snapshot's revision key no longer matches the file, when the file is gone,

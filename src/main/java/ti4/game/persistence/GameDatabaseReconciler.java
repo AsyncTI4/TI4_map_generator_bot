@@ -94,7 +94,7 @@ public class GameDatabaseReconciler {
                 return Optional.of(repair(
                         gameName,
                         "missing from the database",
-                        () -> persistenceService.restoreIfCurrent(
+                        () -> persistenceService.restoreIfMatchesGameFile(
                                 snapshot, () -> GameRevisionKeyFile.current(gameName)),
                         failures));
             }
@@ -110,7 +110,8 @@ public class GameDatabaseReconciler {
             return Optional.of(repair(
                     gameName,
                     description,
-                    () -> persistenceService.restoreIfCurrent(snapshot, () -> GameRevisionKeyFile.current(gameName)),
+                    () -> persistenceService.restoreIfMatchesGameFile(
+                            snapshot, () -> GameRevisionKeyFile.current(gameName)),
                     failures));
         }
 
