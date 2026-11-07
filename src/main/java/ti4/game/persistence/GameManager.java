@@ -1,8 +1,10 @@
 package ti4.game.persistence;
 
 import java.io.UncheckedIOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +15,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -42,9 +47,41 @@ public class GameManager {
     private static final AtomicBoolean warmupStarted = new AtomicBoolean(false);
     private static final CountDownLatch warmupFinishedLatch = new CountDownLatch(1);
     private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 40;
+    private static final int MAX_CHANGED_ROWS_TO_READ_BY_NAME = 1000;
+    private static final ReadWriteLock prebuildLock = new ReentrantReadWriteLock();
+    private static final Map<String, ManagedGame> prebuiltManagedGames = new ConcurrentHashMap<>();
+    private static boolean prebuildClosed;
 
     public static void preloadManagedGames() {
         ManagedGamePreload.start();
+    }
+
+    public static void buildPreloadedManagedGames() {
+        ManagedGamePreload.buildManagedGames();
+    }
+
+    static void prebuildManagedGame(ManagedGameState preloadedGame) {
+        prebuildLock.readLock().lock();
+        try {
+            if (prebuildClosed) return;
+            ManagedGame managedGame =
+                    gameNameToManagedGame.computeIfAbsent(preloadedGame.name(), _ -> new ManagedGame(preloadedGame));
+            prebuiltManagedGames.put(preloadedGame.name(), managedGame);
+        } finally {
+            prebuildLock.readLock().unlock();
+        }
+    }
+
+    private static Map<String, ManagedGame> closePrebuild() {
+        prebuildLock.writeLock().lock();
+        try {
+            prebuildClosed = true;
+            Map<String, ManagedGame> prebuilt = Map.copyOf(prebuiltManagedGames);
+            prebuiltManagedGames.clear();
+            return prebuilt;
+        } finally {
+            prebuildLock.writeLock().unlock();
+        }
     }
 
     public static void warmup() {
@@ -69,6 +106,9 @@ public class GameManager {
             try {
                 BotLogger.info("STARTED BUILDING MANAGED GAMES");
                 WarmupSources sources = warmupSources();
+                int keptFromStandby =
+                        discardOutdatedPrebuiltManagedGames(sources.prebuiltManagedGames(), sources.preloadedNames());
+                long buildStartedAt = System.currentTimeMillis();
                 Map<String, Exception> failedGames = new ConcurrentHashMap<>();
                 AtomicInteger builtFromPreload = new AtomicInteger();
                 AtomicInteger builtFromDatabase = new AtomicInteger();
@@ -90,13 +130,22 @@ public class GameManager {
                         }
                     }));
                 }
+                long buildMillis = System.currentTimeMillis() - buildStartedAt;
                 reportGamesThatFailedWarmup(failedGames);
                 warmupFinishedLatch.countDown();
                 BotLogger.info(String.format(
-                        "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD): %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE, %,d FROM GAME FILES",
+                        "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD,"
+                                + " %,d MS READING REVISION KEYS, %,d MS READING %,d CHANGED ROWS, %,d MS BUILDING):"
+                                + " %,d BUILT ON THE STANDBY, %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE,"
+                                + " %,d FROM GAME FILES",
                         System.currentTimeMillis() - warmupStartedAt,
                         sources.preloadWaitMillis(),
-                        builtFromPreload.get(),
+                        sources.revisionKeysMillis(),
+                        sources.changedRowsMillis(),
+                        sources.changedRowCount(),
+                        buildMillis,
+                        keptFromStandby,
+                        builtFromPreload.get() - keptFromStandby,
                         builtFromDatabase.get(),
                         builtFromGameFiles.get()));
                 if (JdaService.jda != null) {
@@ -112,16 +161,79 @@ public class GameManager {
     private record WarmupSources(
             @Nullable Map<String, ManagedGameState> persistedGames,
             Set<String> preloadedNames,
-            long preloadWaitMillis) {}
+            Map<String, ManagedGame> prebuiltManagedGames,
+            long preloadWaitMillis,
+            long revisionKeysMillis,
+            long changedRowsMillis,
+            int changedRowCount) {}
 
     private static WarmupSources warmupSources() {
         long waitStartedAt = System.currentTimeMillis();
         ManagedGamePreload.Snapshot preload = ManagedGamePreload.take();
         long preloadWaitMillis = System.currentTimeMillis() - waitStartedAt;
+        Map<String, ManagedGame> prebuiltManagedGames = closePrebuild();
         if (preload == null) {
-            return new WarmupSources(loadPersistedManagedGames(), Set.of(), preloadWaitMillis);
+            return new WarmupSources(
+                    loadPersistedManagedGames(), Set.of(), prebuiltManagedGames, preloadWaitMillis, 0, 0, 0);
         }
-        return new WarmupSources(preload.rows(), preload.stillCurrent(loadCurrentRevisionKeys()), preloadWaitMillis);
+
+        long revisionKeysStartedAt = System.currentTimeMillis();
+        Map<String, String> currentRevisionKeys = loadCurrentRevisionKeys();
+        Set<String> stillCurrent = preload.stillCurrent(currentRevisionKeys);
+        long revisionKeysMillis = System.currentTimeMillis() - revisionKeysStartedAt;
+
+        long changedRowsStartedAt = System.currentTimeMillis();
+        Set<String> changedNames = currentRevisionKeys.keySet().stream()
+                .filter(name -> !stillCurrent.contains(name))
+                .collect(Collectors.toUnmodifiableSet());
+        Map<String, ManagedGameState> persistedGames = withCurrentRows(preload.rows(), changedNames);
+        long changedRowsMillis = System.currentTimeMillis() - changedRowsStartedAt;
+
+        return new WarmupSources(
+                persistedGames,
+                stillCurrent,
+                prebuiltManagedGames,
+                preloadWaitMillis,
+                revisionKeysMillis,
+                changedRowsMillis,
+                changedNames.size());
+    }
+
+    private static Map<String, ManagedGameState> withCurrentRows(
+            Map<String, ManagedGameState> preloadedRows, Set<String> changedNames) {
+        if (changedNames.isEmpty()) return preloadedRows;
+        if (changedNames.size() > MAX_CHANGED_ROWS_TO_READ_BY_NAME) {
+            return Objects.requireNonNullElse(loadPersistedManagedGames(), preloadedRows);
+        }
+        try {
+            Map<String, ManagedGameState> rows = new HashMap<>(preloadedRows);
+            rows.putAll(PersistedManagedGameService.getBean().loadAll(changedNames));
+            return rows;
+        } catch (Exception e) {
+            BotLogger.error("Could not read the changed managed game rows, so they will be built from game files.", e);
+            return preloadedRows;
+        }
+    }
+
+    static int discardOutdatedPrebuiltManagedGames(
+            Map<String, ManagedGame> prebuiltManagedGames, Set<String> stillCurrent) {
+        int kept = 0;
+        for (Map.Entry<String, ManagedGame> prebuilt : prebuiltManagedGames.entrySet()) {
+            String gameName = prebuilt.getKey();
+            if (stillCurrent.contains(gameName) && gameNames.contains(gameName)) {
+                kept++;
+                continue;
+            }
+            discardPrebuiltManagedGame(gameName, prebuilt.getValue());
+        }
+        return kept;
+    }
+
+    private static void discardPrebuiltManagedGame(String gameName, ManagedGame prebuilt) {
+        ManagedGame remaining =
+                gameNameToManagedGame.computeIfPresent(gameName, (_, current) -> current == prebuilt ? null : current);
+        if (remaining != null) return;
+        prebuilt.getPlayers().forEach(player -> player.removeGame(gameName, prebuilt));
     }
 
     private static Map<String, String> loadCurrentRevisionKeys() {

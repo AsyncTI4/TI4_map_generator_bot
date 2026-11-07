@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -146,6 +147,21 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         ManagedGameState persisted = persistedManagedGameService.loadAll().get(game.getName());
         assertThat(persisted).isEqualTo(ManagedGameState.of(game));
+    }
+
+    @Test
+    void loadingByNameReturnsOnlyTheNamedGamesWithTheirSeats() {
+        Game changed = gameWithRealPlayers("pbd-db-by-name-changed", 3);
+        Game untouched = gameWithRealPlayers("pbd-db-by-name-untouched", 3);
+        persistenceService.replace(GameEntityMapper.toSnapshot(changed));
+        persistenceService.replace(GameEntityMapper.toSnapshot(untouched));
+
+        // Takeover reads only the games saved since the standby preload, plus a name with no row.
+        Map<String, ManagedGameState> rows =
+                persistedManagedGameService.loadAll(List.of(changed.getName(), "pbd-db-by-name-missing"));
+
+        assertThat(rows).containsOnlyKeys(changed.getName());
+        assertThat(rows.get(changed.getName())).isEqualTo(ManagedGameState.of(changed));
     }
 
     @Test

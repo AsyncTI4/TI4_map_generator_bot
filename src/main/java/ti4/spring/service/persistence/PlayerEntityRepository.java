@@ -1,5 +1,6 @@
 package ti4.spring.service.persistence;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,8 +23,21 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
             + " p.eliminated, p.npc) FROM PlayerEntity p LEFT JOIN p.playingUser pu")
     List<ParticipantRow> findAllParticipantRows();
 
+    @Query("SELECT new ti4.spring.service.persistence.ParticipantRow(p.game.gameName, pu.id, pu.name, p.playing,"
+            + " p.eliminated, p.npc) FROM PlayerEntity p LEFT JOIN p.playingUser pu"
+            + " WHERE p.game.gameName IN (:gameNames)")
+    List<ParticipantRow> findParticipantRowsByGameNameIn(@Param("gameNames") Collection<String> gameNames);
+
     default Map<String, List<ManagedGameState.Participant>> findAllParticipantsByGameName() {
-        return findAllParticipantRows().stream()
+        return groupByGameName(findAllParticipantRows());
+    }
+
+    default Map<String, List<ManagedGameState.Participant>> findParticipantsByGameName(Collection<String> gameNames) {
+        return groupByGameName(findParticipantRowsByGameNameIn(gameNames));
+    }
+
+    private static Map<String, List<ManagedGameState.Participant>> groupByGameName(List<ParticipantRow> rows) {
+        return rows.stream()
                 .collect(Collectors.groupingBy(
                         ParticipantRow::gameName,
                         Collectors.mapping(ParticipantRow::toParticipant, Collectors.toList())));
