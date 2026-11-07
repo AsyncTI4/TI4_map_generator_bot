@@ -175,15 +175,18 @@ public class JdaService {
         ListenerManager.registerListeners(jda);
     }
 
-    public static boolean waitForJdaReadyAndInitializeGuilds(String[] args) {
+    public static boolean awaitJdaReady() {
         BotLogger.info("AWAITING JDA READY");
         try {
             jda.awaitReady();
+            return true;
         } catch (Throwable t) {
             BotLogger.critical("Error waiting for bot to get ready", t);
             return false;
         }
+    }
 
+    public static boolean initializeGuilds(String[] args) {
         jda.getPresence()
                 .setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
