@@ -20,19 +20,12 @@ class ManagedGamePreloadTest {
             0L);
 
     @Test
-    void reusesOnlyVerifiedGamesWhoseDatabaseRevisionIsUnchangedSinceThePreload() {
-        Map<String, String> currentRevisionKeys = Map.of(
-                "unchanged", "rev-1",
-                "saved-since", "rev-2",
-                "row-behind-file", "rev-1",
-                "created-since", "rev-1");
+    void reusesOnlyVerifiedGamesWhoseFilesAreUnchangedSinceThePreloadAndStillExist() {
+        // deleted-since has no game file at takeover, and created-since was never preloaded.
+        Set<String> gameNames = Set.of("unchanged", "saved-since", "row-behind-file", "created-since");
 
-        assertThat(PRELOAD.stillCurrent(currentRevisionKeys)).containsExactly("unchanged");
-    }
-
-    @Test
-    void reusesNothingWhenTheCurrentRevisionKeysAreUnavailable() {
-        assertThat(PRELOAD.stillCurrent(Map.of())).isEmpty();
+        assertThat(ManagedGameWarmup.stillCurrent(PRELOAD, Set.of("saved-since"), gameNames))
+                .containsExactly("unchanged");
     }
 
     @Test

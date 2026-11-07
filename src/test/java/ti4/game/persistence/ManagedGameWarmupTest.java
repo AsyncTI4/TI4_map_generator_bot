@@ -27,9 +27,7 @@ class ManagedGameWarmupTest extends BaseTi4Test {
         ManagedGame standbyBuilt = saveAndGetManagedGame(newGame("prebuilt-kept", userId));
 
         int kept = ManagedGameWarmup.discardOutdatedStandbyBuilds(
-                Map.of(standbyBuilt.getName(), standbyBuilt),
-                Set.of(standbyBuilt.getName()),
-                Set.of(standbyBuilt.getName()));
+                Map.of(standbyBuilt.getName(), standbyBuilt), Set.of(standbyBuilt.getName()));
 
         assertThat(kept).isEqualTo(1);
         assertThat(GameManager.peekManagedGame(standbyBuilt.getName())).isSameAs(standbyBuilt);
@@ -41,9 +39,9 @@ class ManagedGameWarmupTest extends BaseTi4Test {
         String userId = uniqueName("discarded-user");
         ManagedGame standbyBuilt = saveAndGetManagedGame(newGame("prebuilt-discarded", userId));
 
-        // An empty still-current set means the game's database revision moved on after the standby preload.
-        int kept = ManagedGameWarmup.discardOutdatedStandbyBuilds(
-                Map.of(standbyBuilt.getName(), standbyBuilt), Set.of(), Set.of(standbyBuilt.getName()));
+        // An empty still-current set means the game file was saved after the standby preload.
+        int kept =
+                ManagedGameWarmup.discardOutdatedStandbyBuilds(Map.of(standbyBuilt.getName(), standbyBuilt), Set.of());
 
         assertThat(kept).isZero();
         assertThat(GameManager.peekManagedGame(standbyBuilt.getName())).isNull();
@@ -58,12 +56,14 @@ class ManagedGameWarmupTest extends BaseTi4Test {
         game.setLastModifiedDate(1);
         ManagedGame savedDuringTakeover = saveAndGetManagedGame(game);
 
-        ManagedGameWarmup.discardOutdatedStandbyBuilds(
-                Map.of(game.getName(), standbyBuilt), Set.of(), Set.of(game.getName()));
+        ManagedGameWarmup.discardOutdatedStandbyBuilds(Map.of(game.getName(), standbyBuilt), Set.of());
 
         // The save already replaced the standby-built instance, so the newer one and its player link survive.
         assertThat(GameManager.peekManagedGame(game.getName())).isSameAs(savedDuringTakeover);
-        assertThat(GameManager.getManagedPlayer(userId).getGames()).contains(savedDuringTakeover);
+        // ManagedGame equality is by name, so check the instance the player holds.
+        assertThat(GameManager.getManagedPlayer(userId).getGames())
+                .singleElement()
+                .isSameAs(savedDuringTakeover);
     }
 
     @Test
@@ -77,7 +77,7 @@ class ManagedGameWarmupTest extends BaseTi4Test {
 
         player.removeGame(game.getName(), older);
 
-        assertThat(player.getGames()).containsExactly(newer);
+        assertThat(player.getGames()).singleElement().isSameAs(newer);
     }
 
     @Test
@@ -88,9 +88,8 @@ class ManagedGameWarmupTest extends BaseTi4Test {
                 Map.of("saved-late", preloadedState("saved-late"), "untouched", preloadedState("untouched")),
                 Set.of("saved-late", "untouched"),
                 0L);
-        Map<String, String> currentRevisionKeys = Map.of("saved-late", "rev-1", "untouched", "rev-1");
-
-        assertThat(ManagedGameWarmup.stillCurrent(preload, currentRevisionKeys, Set.of("saved-late")))
+        // Only the game file's modified time decides: the lagging row is never consulted.
+        assertThat(ManagedGameWarmup.stillCurrent(preload, Set.of("saved-late"), Set.of("saved-late", "untouched")))
                 .containsExactly("untouched");
     }
 

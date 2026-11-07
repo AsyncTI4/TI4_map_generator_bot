@@ -1,7 +1,6 @@
 package ti4.game.persistence;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,10 +8,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.logging.BotLogger;
@@ -29,15 +28,7 @@ class ManagedGamePreload {
     private static final Executor MANAGED_GAME_BUILDER =
             task -> Thread.ofPlatform().name("managed-game-prebuild").daemon().start(task);
 
-    record Snapshot(Map<String, ManagedGameState> rows, Set<String> verifiedNames, long startedAtMillis) {
-
-        Set<String> stillCurrent(Map<String, String> currentRevisionKeys) {
-            return verifiedNames.stream()
-                    .filter(name -> Objects.equals(
-                            currentRevisionKeys.get(name), rows.get(name).revisionKey()))
-                    .collect(Collectors.toUnmodifiableSet());
-        }
-    }
+    record Snapshot(Map<String, ManagedGameState> rows, Set<String> verifiedNames, long startedAtMillis) {}
 
     static void start() {
         CompletableFuture<Snapshot> future = new CompletableFuture<>();
@@ -101,9 +92,12 @@ class ManagedGamePreload {
         standbyBuildLock.readLock().lock();
         try {
             if (standbyBuildClosed) return;
-            ManagedGame managedGame =
-                    GameManager.buildManagedGameIfAbsent(preloadedGame.name(), () -> new ManagedGame(preloadedGame));
-            standbyBuiltGames.put(preloadedGame.name(), managedGame);
+            AtomicBoolean builtHere = new AtomicBoolean();
+            ManagedGame managedGame = GameManager.buildManagedGameIfAbsent(preloadedGame.name(), () -> {
+                builtHere.set(true);
+                return new ManagedGame(preloadedGame);
+            });
+            if (builtHere.get()) standbyBuiltGames.put(preloadedGame.name(), managedGame);
         } finally {
             standbyBuildLock.readLock().unlock();
         }
