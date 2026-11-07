@@ -47,7 +47,7 @@ public class GameManager {
     private static final AtomicBoolean warmupStarted = new AtomicBoolean(false);
     private static final CountDownLatch warmupFinishedLatch = new CountDownLatch(1);
     private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 40;
-    private static final int MAX_CHANGED_ROWS_TO_READ_BY_NAME = 1000;
+    private static final int MAX_CHANGED_ROWS_TO_READ_BY_NAME = 100;
     private static final ReadWriteLock prebuildLock = new ReentrantReadWriteLock();
     private static final Map<String, ManagedGame> prebuiltManagedGames = new ConcurrentHashMap<>();
     private static boolean prebuildClosed;
