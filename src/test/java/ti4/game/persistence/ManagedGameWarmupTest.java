@@ -14,15 +14,17 @@ import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.testUtils.BaseTi4Test;
 
-class GameManagerPrebuildTest extends BaseTi4Test {
+class ManagedGameWarmupTest extends BaseTi4Test {
 
     @Test
     void aStandbyBuiltGameThatIsStillCurrentIsKept() {
         String userId = uniqueName("kept-user");
         ManagedGame standbyBuilt = saveAndGetManagedGame(newGame("prebuilt-kept", userId));
 
-        int kept = GameManager.discardOutdatedPrebuiltManagedGames(
-                Map.of(standbyBuilt.getName(), standbyBuilt), Set.of(standbyBuilt.getName()));
+        int kept = ManagedGameWarmup.discardOutdatedStandbyBuilds(
+                Map.of(standbyBuilt.getName(), standbyBuilt),
+                Set.of(standbyBuilt.getName()),
+                Set.of(standbyBuilt.getName()));
 
         assertThat(kept).isEqualTo(1);
         assertThat(GameManager.peekManagedGame(standbyBuilt.getName())).isSameAs(standbyBuilt);
@@ -35,8 +37,8 @@ class GameManagerPrebuildTest extends BaseTi4Test {
         ManagedGame standbyBuilt = saveAndGetManagedGame(newGame("prebuilt-discarded", userId));
 
         // An empty still-current set means the game's database revision moved on after the standby preload.
-        int kept =
-                GameManager.discardOutdatedPrebuiltManagedGames(Map.of(standbyBuilt.getName(), standbyBuilt), Set.of());
+        int kept = ManagedGameWarmup.discardOutdatedStandbyBuilds(
+                Map.of(standbyBuilt.getName(), standbyBuilt), Set.of(), Set.of(standbyBuilt.getName()));
 
         assertThat(kept).isZero();
         assertThat(GameManager.peekManagedGame(standbyBuilt.getName())).isNull();
@@ -51,7 +53,8 @@ class GameManagerPrebuildTest extends BaseTi4Test {
         game.setLastModifiedDate(1);
         ManagedGame savedDuringTakeover = saveAndGetManagedGame(game);
 
-        GameManager.discardOutdatedPrebuiltManagedGames(Map.of(game.getName(), standbyBuilt), Set.of());
+        ManagedGameWarmup.discardOutdatedStandbyBuilds(
+                Map.of(game.getName(), standbyBuilt), Set.of(), Set.of(game.getName()));
 
         // The save already replaced the standby-built instance, so the newer one and its player link survive.
         assertThat(GameManager.peekManagedGame(game.getName())).isSameAs(savedDuringTakeover);

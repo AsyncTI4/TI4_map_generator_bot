@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -21,6 +23,9 @@ class ManagedGamePreload {
 
     private static final int TAKE_TIMEOUT_SECONDS = 120;
     private static final AtomicReference<CompletableFuture<Snapshot>> preload = new AtomicReference<>();
+    private static final ReadWriteLock standbyBuildLock = new ReentrantReadWriteLock();
+    private static final Map<String, ManagedGame> standbyBuiltGames = new ConcurrentHashMap<>();
+    private static boolean standbyBuildClosed;
     private static final Executor MANAGED_GAME_BUILDER =
             task -> Thread.ofPlatform().name("managed-game-prebuild").daemon().start(task);
 
@@ -77,7 +82,7 @@ class ManagedGamePreload {
             snapshot.verifiedNames()
                     .forEach(name -> executorService.submit(() -> {
                         try {
-                            GameManager.prebuildManagedGame(snapshot.rows().get(name));
+                            buildOnStandby(snapshot.rows().get(name));
                         } catch (Exception e) {
                             failedNames.add(name);
                         }
@@ -89,6 +94,30 @@ class ManagedGamePreload {
                     + String.join(", ", failedNames.stream().sorted().limit(20).toList()));
         }
         return snapshot;
+    }
+
+    private static void buildOnStandby(ManagedGameState preloadedGame) {
+        standbyBuildLock.readLock().lock();
+        try {
+            if (standbyBuildClosed) return;
+            ManagedGame managedGame =
+                    GameManager.buildManagedGameIfAbsent(preloadedGame.name(), () -> new ManagedGame(preloadedGame));
+            standbyBuiltGames.put(preloadedGame.name(), managedGame);
+        } finally {
+            standbyBuildLock.readLock().unlock();
+        }
+    }
+
+    static Map<String, ManagedGame> closeStandbyBuild() {
+        standbyBuildLock.writeLock().lock();
+        try {
+            standbyBuildClosed = true;
+            Map<String, ManagedGame> built = Map.copyOf(standbyBuiltGames);
+            standbyBuiltGames.clear();
+            return built;
+        } finally {
+            standbyBuildLock.writeLock().unlock();
+        }
     }
 
     private static ExecutorService newBuildPool() {
