@@ -128,8 +128,6 @@ public class GameManager {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
-        // TODO: Queued after the file write lock is released, so two concurrent saves of one game can reach the
-        // database out of order and leave the older state until the next save or the nightly reconciliation.
         ManagedGameState managedGameState = ManagedGameState.of(game);
         GameDatabaseSyncPipeline.queueSync(game, managedGameState);
 

@@ -108,6 +108,8 @@ class ActiveLeaseServiceTest {
 
         assertThat(service.isActive()).isFalse();
         assertThat(service.isReady()).isFalse();
+        // The pipelines still drain after the release, and their logs must read as draining, not standby.
+        assertThat(service.isDraining()).isTrue();
         assertThat(acquisitions).hasValue(1);
         verify(listener).stop();
         verify(activeLeaseTransactionService, times(1)).tryAcquireLease(any());

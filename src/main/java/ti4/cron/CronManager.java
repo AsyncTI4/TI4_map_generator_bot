@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -38,9 +40,19 @@ public class CronManager {
         return SCHEDULER.scheduleAtFixedRate(cronTask, initialDelay, period, unit);
     }
 
-    public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
+    public static boolean scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
         Runnable cronTask = nonThrowingCronTask(clazz.getSimpleName(), runnable);
-        SCHEDULER.schedule(cronTask, initialDelay, unit);
+        return scheduleUnlessShutDown(SCHEDULER, cronTask, initialDelay, unit);
+    }
+
+    static boolean scheduleUnlessShutDown(
+            ScheduledExecutorService scheduler, Runnable task, long initialDelay, TimeUnit unit) {
+        try {
+            scheduler.schedule(task, initialDelay, unit);
+            return true;
+        } catch (RejectedExecutionException e) {
+            return false;
+        }
     }
 
     public static void registerManualOnly(Class<?> clazz, Runnable runnable) {
