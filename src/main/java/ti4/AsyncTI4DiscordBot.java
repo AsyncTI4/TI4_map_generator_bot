@@ -1,8 +1,10 @@
 package ti4;
 
+import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.springframework.boot.SpringApplication;
@@ -34,7 +36,7 @@ public class AsyncTI4DiscordBot {
     private static volatile boolean shuttingDown;
 
     static void main(String[] args) {
-        StartupTimeline startup = StartupTimeline.sinceJvmStart();
+        StartupTimeline startup = new StartupTimeline();
         startup.mark("STARTING THE JVM");
         GlobalSettings.loadSettings();
         BotLogger.info("\n# __BOT IS STARTING UP__");
@@ -112,5 +114,25 @@ public class AsyncTI4DiscordBot {
 
     private static boolean isWithinStartupDuration() {
         return System.currentTimeMillis() - START_TIME_MILLISECONDS <= WARMUP_DURATION.toMillis();
+    }
+
+    private static final class StartupTimeline {
+
+        private final long startedAtMillis =
+                ManagementFactory.getRuntimeMXBean().getStartTime();
+        private final List<String> stages = new ArrayList<>();
+        private long lastMarkMillis = startedAtMillis;
+
+        private void mark(String stage) {
+            long now = System.currentTimeMillis();
+            stages.add(String.format("%,d MS %s", now - lastMarkMillis, stage));
+            lastMarkMillis = now;
+        }
+
+        private String summary() {
+            return String.format(
+                    "STARTUP TOOK %,d MS AFTER THE JVM STARTED: %s",
+                    lastMarkMillis - startedAtMillis, String.join(", ", stages));
+        }
     }
 }
