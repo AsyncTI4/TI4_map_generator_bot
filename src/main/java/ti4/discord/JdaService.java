@@ -628,14 +628,21 @@ public class JdaService {
                 new ShutdownStep("set shutdown presence", JdaService::setShutdownPresence),
                 new ShutdownStep("stop accepting commands", JdaService::stopAcceptingCommands),
                 executorStep(JDA_EVENT_POOL_NAME, JdaService::shutdownEventExecutor),
-                executorStep(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager::shutdown),
-                executorStep(CronManager.class.getSimpleName(), CronManager::shutdown),
-                new ShutdownStep("flush user active hours", JdaService::flushUserActiveHours),
-                executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
-                executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
-                executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown),
-                executorStep(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline::shutdown),
-                executorStep(GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown),
+                parallel(
+                        "drain workers and crons",
+                        executorStep(ExecutorServiceManager.class.getSimpleName(), ExecutorServiceManager::shutdown),
+                        executorStep(CronManager.class.getSimpleName(), CronManager::shutdown),
+                        new ShutdownStep("flush user active hours", JdaService::flushUserActiveHours)),
+                parallel(
+                        "drain work pipelines",
+                        executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
+                        executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
+                        executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown)),
+                parallel(
+                        "drain persistence pipelines",
+                        executorStep(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline::shutdown),
+                        executorStep(
+                                GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown)),
                 new ShutdownStep("release active lease", JdaService::releaseActiveLease),
                 new ShutdownStep("send buffered logs", JdaService::sendBufferedLogsBeforeJdaShutdown),
                 new ShutdownStep("shut down JDA", JdaService::shutdownJda)));
@@ -644,12 +651,32 @@ public class JdaService {
     record ShutdownStep(String name, Runnable action) {}
 
     static void runShutdownSteps(List<ShutdownStep> steps) {
-        for (ShutdownStep step : steps) {
-            try {
-                step.action().run();
-            } catch (Exception e) {
-                reportFailedShutdownStep(step.name(), e);
+        steps.forEach(JdaService::runShutdownStep);
+    }
+
+    private static void runShutdownStep(ShutdownStep step) {
+        try {
+            step.action().run();
+        } catch (Exception e) {
+            reportFailedShutdownStep(step.name(), e);
+        }
+    }
+
+    static ShutdownStep parallel(String name, ShutdownStep... steps) {
+        return new ShutdownStep(name, () -> runInParallel(name, List.of(steps)));
+    }
+
+    private static void runInParallel(String name, List<ShutdownStep> steps) {
+        List<Thread> threads = steps.stream()
+                .map(step -> Thread.ofVirtual().name("shutdown-" + step.name()).start(() -> runShutdownStep(step)))
+                .toList();
+        try {
+            for (Thread thread : threads) {
+                thread.join();
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            reportFailedShutdownStep(name, e);
         }
     }
 
