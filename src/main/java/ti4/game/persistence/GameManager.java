@@ -306,7 +306,7 @@ public class GameManager {
         }
     }
 
-    private static void replaceManagedGame(ManagedGameState managedGameState) {
+    static void replaceManagedGame(ManagedGameState managedGameState) {
         gameNameToManagedGame.compute(managedGameState.name(), (_, previousManagedGame) -> {
             ManagedGame managedGame = new ManagedGame(managedGameState);
             if (previousManagedGame != null) {
@@ -380,6 +380,11 @@ public class GameManager {
             }
             return new ManagedGame(game);
         });
+    }
+
+    @Nullable
+    static ManagedGame peekManagedGame(String gameName) {
+        return gameNameToManagedGame.get(gameName);
     }
 
     public static boolean isWarmupFinished() {
