@@ -45,7 +45,6 @@ class ManagedGameWarmup {
             List<String> gameNames = GameLoadService.loadGameNames();
             standbyCheck = checkStandbyBuild(Set.copyOf(gameNames));
             GameManager.registerGameNames(gameNames);
-            BotLogger.info("LOADED " + GameManager.getGameCount() + " GAME NAMES");
         } catch (Exception e) {
             BotLogger.critical("Failed to warmup due to error while loading game names. Shutting down.", e);
             JdaService.shutdown();
@@ -109,7 +108,6 @@ class ManagedGameWarmup {
     }
 
     private static void buildManagedGames(long warmupStartedAt, StandbyCheck standbyCheck) {
-        BotLogger.info("STARTED BUILDING MANAGED GAMES");
         long changedRowsStartedAt = System.currentTimeMillis();
         Map<String, ManagedGameState> persistedGames = standbyCheck.preload() == null
                 ? loadPersistedManagedGames()
@@ -118,10 +116,11 @@ class ManagedGameWarmup {
         BuildCounts built = buildMissing(standbyCheck.stillCurrent(), persistedGames);
         GameManager.finishWarmup();
         BotLogger.info(String.format(
-                "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD,"
+                "UNBLOCKED %,d MANAGED GAMES %,d MS AFTER TAKING THE LEASE: %,d MS WAITING FOR THE STANDBY PRELOAD,"
                         + " %,d MS FINDING %,d GAME FILES SAVED SINCE THE PRELOAD, %,d MS READING CHANGED ROWS,"
-                        + " %,d MS BUILDING): %,d BUILT ON THE STANDBY, %,d FROM THE STANDBY PRELOAD,"
+                        + " %,d MS BUILDING. %,d BUILT ON THE STANDBY, %,d FROM THE STANDBY PRELOAD,"
                         + " %,d FROM THE DATABASE, %,d FROM GAME FILES",
+                GameManager.getGameCount(),
                 System.currentTimeMillis() - warmupStartedAt,
                 standbyCheck.preloadWaitMillis(),
                 standbyCheck.savedGameFilesMillis(),

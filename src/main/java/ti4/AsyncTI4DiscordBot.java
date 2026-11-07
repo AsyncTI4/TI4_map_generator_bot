@@ -60,22 +60,19 @@ public class AsyncTI4DiscordBot {
         GameManager.buildPreloadedManagedGames();
         JdaService.loadStaticDataAndResources();
         startup.mark("LOADING DATA");
-        BotLogger.info("WARMING INTERACTION HANDLERS");
         ButtonProcessor.checkButtonHandlersSetup();
         SelectionMenuProcessor.checkSelectionMenuHandlersSetup();
         ModalListener.checkModalHandlersSetup();
-        BotLogger.info("FINISHED WARMING INTERACTION HANDLERS");
         startup.mark("WARMING INTERACTION HANDLERS");
         activeLeaseService.beginLeaseParticipation(AsyncTI4DiscordBot::runLeaseOwnedStartupWork);
         JdaService.registerAndStartCronJobs();
         startup.mark("JOINING THE LEASE AND REGISTERING CRONS");
         JdaService.markProcessReady();
-        BotLogger.info(startup.summary());
+        BotLogger.info(startup.summary(JdaService.describeServers()));
     }
 
     private static void runLeaseOwnedStartupWork() {
         CronManager.runLeaseStartJobs();
-        BotLogger.info("STARTED BACKGROUND MANAGED GAME WARMUP");
         GameManager.warmup();
         DataMigrationManager.runMigrations();
     }
@@ -130,10 +127,10 @@ public class AsyncTI4DiscordBot {
             lastMarkMillis = now;
         }
 
-        private String summary() {
+        private String summary(String servers) {
             return String.format(
-                    "STARTUP TOOK %,d MS AFTER THE JVM STARTED: %s",
-                    lastMarkMillis - startedAtMillis, String.join(", ", stages));
+                    "STARTED UP ON %s IN %,d MS AFTER THE JVM STARTED: %s",
+                    servers, lastMarkMillis - startedAtMillis, String.join(", ", stages));
         }
     }
 }

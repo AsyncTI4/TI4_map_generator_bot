@@ -114,7 +114,7 @@ sequenceDiagram
 
     Note over Old,DB: Old renews the lease every 5 s
     Script->>New: compose up --scale (start new container)
-    New->>New: Spring up, start managed game preload,<br/>JDA login, guilds, static data, warm handlers
+    New->>New: Spring up, start managed game preload,<br/>JDA login, guilds, build ManagedGames from the preload,<br/>static data, warm handlers
     New->>DB: tryAcquireLease
     DB-->>New: refused (Old holds an unexpired lease)
     New->>DB: LISTEN active_lease_released
@@ -130,7 +130,7 @@ sequenceDiagram
     DB-->>New: NOTIFY active_lease_released
     New->>DB: tryAcquireLease
     DB-->>New: granted
-    New->>New: active = true: lease start jobs,<br/>GameManager.warmup, data migrations, ready = true
+    New->>New: active = true: lease start jobs,<br/>GameManager.warmup (keep current standby builds,<br/>rebuild games saved since the preload),<br/>data migrations, ready = true
     Traefik->>New: GET /api/public/ready
     New-->>Traefik: 200 (Traefik routes to New)
     Old->>Old: drain render, stats, web state, DB sync,<br/>send logs, shut down JDA, exit
@@ -179,9 +179,14 @@ the lease, until it exits.
 
 Some startup work must only run on the process that will own the games, so it runs from the
 lease-acquired callback rather than in `main`: `CronManager.runLeaseStartJobs()`,
-`GameManager.warmup()` and `DataMigrationManager.runMigrations()`. The managed game
-preload, by contrast, starts right away on the standby, so the warmup after takeover can build
-most games from the preload instead of from scratch.
+`GameManager.warmup()` and `DataMigrationManager.runMigrations()`.
+
+The managed games, by contrast, are built on the standby. The preload loads the database rows
+right after the Spring context starts, and the ManagedGames are built from them once JDA is
+ready. Takeover then keeps the standby builds whose game files haven't changed since the
+preload, and rebuilds only the rest. Commands that need ManagedGames wait for that, so it is
+the part of the handover window the new process adds. See the
+[persistence README](src/main/java/ti4/game/persistence/README.md#warmup) for the rules.
 
 ### Shutdown steps
 
@@ -268,6 +273,27 @@ Each bar is that executor's timeout (JDA gets 20 s, then 20 s more after `shutdo
 active-hours flush, the lease release and sending buffered logs have no timeout. They are
 usually quick, so they are drawn as points or left out. Real shutdowns are usually much faster,
 because most executors are idle.
+
+### Deployment log lines
+
+A rollout posts these lines to the bot log, in this order. The instance prefixes are described
+in [Process states](#process-states).
+
+| Process | Line | Meaning |
+| --- | --- | --- |
+| New | `[STANDBY x] STARTED UP ON N SERVERS (N FOR NEW GAMES, N FOG OF WAR) IN N MS AFTER THE JVM STARTED: …` | Startup finished and the process is waiting for the lease. The list is the time each startup step took. When no process holds the lease, the new process takes it on startup instead: `TOOK THE ACTIVE LEASE (on startup)` comes first, and this line has no prefix. |
+| Old | `[DRAINING x] STOPPED ACCEPTING COMMANDS` | The drain started. From here until the unblock line, interactions go unanswered. |
+| Old | `[DRAINING x] RELEASED THE ACTIVE LEASE N MS AFTER STOPPING COMMANDS: …` | The steps that must finish before the handover, and how long each took. |
+| New | `[WARMING x] TOOK THE ACTIVE LEASE (release notification)` | The new process holds the lease. The source is `on startup`, `release notification`, `poll` or `listener connect catch-up`. |
+| New | `UNBLOCKED N MANAGED GAMES N MS AFTER TAKING THE LEASE: …` | Commands work again. The line breaks the takeover into steps and says where each ManagedGame came from. |
+| Old | `[DRAINING x] FINISHED DRAINING N MS AFTER STOPPING COMMANDS: …` | The pipelines that drain after the handover, and how long each took. JDA shuts down next. |
+
+The handover window is the time from `STOPPED ACCEPTING COMMANDS` to `UNBLOCKED`. Lines from
+the two processes can arrive slightly out of order, because each posts through its own webhook
+queue, so compare their timestamps rather than their order in the channel.
+
+An executor that doesn't drain cleanly is marked in the summary, for example
+`map rendering (timed out)`, and gets its own warning line.
 
 ## Known gaps
 

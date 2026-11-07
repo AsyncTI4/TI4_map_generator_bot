@@ -31,9 +31,7 @@ public final class TileHelper {
     private static final Map<String, List<PlanetModel>> tileIdsToPlanetModels = new HashMap<>();
 
     public static void init() {
-        BotLogger.info("Initiating Planets");
         initPlanetsFromJson();
-        BotLogger.info("Initiating Tiles");
         initTilesFromJson();
     }
 

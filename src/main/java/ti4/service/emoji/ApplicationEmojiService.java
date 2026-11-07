@@ -21,6 +21,7 @@ import org.apache.commons.collections4.SetUtils;
 import ti4.discord.JdaService;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
@@ -44,7 +45,8 @@ public final class ApplicationEmojiService {
         List<EmojiFileData> newEmojis = emojiFiles.values().stream()
                 .filter(data -> !emojis.containsKey(data.getName()))
                 .toList();
-        BotLogger.info("Uploading " + newEmojis.size() + " new emojis...");
+        if (!newEmojis.isEmpty())
+            BotLogger.info("Uploading " + StringHelper.pluralize(newEmojis.size(), "new emoji") + ".");
         boolean success = createAppEmojis(newEmojis);
         pushEmojiListToCache(success);
     }
@@ -56,7 +58,8 @@ public final class ApplicationEmojiService {
                 .filter(data -> emojis.get(data.getName()).getTimeCreated()
                         < data.getFile().lastModified())
                 .toList();
-        BotLogger.info("Re-uploading " + staleEmojis.size() + " stale emojis...");
+        if (!staleEmojis.isEmpty())
+            BotLogger.info("Re-uploading " + StringHelper.pluralize(staleEmojis.size(), "stale emoji") + ".");
         boolean success = reuploadAppEmojis(staleEmojis);
         pushEmojiListToCache(success);
     }
@@ -66,7 +69,8 @@ public final class ApplicationEmojiService {
         List<CachedEmoji> hangingEmojis = emojis.values().stream()
                 .filter(emoji -> !emojiFiles.containsKey(emoji.getName()))
                 .toList();
-        BotLogger.info("Deleting " + hangingEmojis.size() + " hanging emojis...");
+        if (!hangingEmojis.isEmpty())
+            BotLogger.info("Deleting " + StringHelper.pluralize(hangingEmojis.size(), "hanging emoji") + ".");
         boolean success = deleteAppEmojis(hangingEmojis);
         pushEmojiListToCache(success);
     }
