@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -42,7 +43,8 @@ public final class AgendaWhensAftersHelper {
     static void offerEveryonePrepassOnShenanigans(Game game) {
         if (game.islandMode()) return;
         for (Player player : game.getRealPlayers()) {
-            if (playerDoesNotHaveShenanigans(player)) {
+            int result = ThreadLocalRandom.current().nextInt(0, 6);
+            if (playerDoesNotHaveShenanigans(player) && result != 5) {
                 String part2 = player.getFaction();
                 if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {
                     part2 = game.getStoredValue("Pass On Shenanigans") + "_" + player.getFaction();
@@ -972,14 +974,16 @@ public final class AgendaWhensAftersHelper {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         offerPreVote(player);
         resolveAfterQueue(event, game);
-        String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
-                + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
-                + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
-        buttons = new ArrayList<>();
+        if (!game.getStoredValue("Pass On Shenanigans").contains(player.getFaction())) {
+            String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
+                    + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
+                    + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
+            buttons = new ArrayList<>();
 
-        buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+            buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
     }
 
     private static boolean playerDoesNotHaveShenanigans(Player player) {
