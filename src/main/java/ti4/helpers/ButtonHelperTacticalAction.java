@@ -22,7 +22,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomLeadersHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
@@ -93,7 +92,6 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
-import ti4.game.Space;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
@@ -1523,9 +1521,6 @@ public final class ButtonHelperTacticalAction {
         }
 
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
-        boolean moveOnlyDamagedShips = !remove
-                && ChoirLeadersHandler.mayOnlyMoveDamagedShipsOutOfLockedSystem(game, player, tile)
-                && !ButtonHelper.canMoveOutOfLockedSystemsOtherThanFuneralProcession(player, game, tile);
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();
@@ -1564,15 +1559,6 @@ public final class ButtonHelperTacticalAction {
 
                 List<Integer> states = unitHolder.getUnitsByState().get(unitKey);
                 for (UnitState state : UnitState.values()) {
-                    boolean isTransportableUnit =
-                            unitKey.unitType() == UnitType.Fighter || unitKey.unitType() == UnitType.Infantry;
-                    if (moveOnlyDamagedShips
-                            && (!(unitHolder instanceof Space)
-                                    || unitModel == null
-                                    || (!unitModel.getIsShip() && !unitModel.getIsGroundForce())
-                                    || (!state.isDamaged() && !isTransportableUnit))) {
-                        continue;
-                    }
                     int amt = states.get(state.ordinal());
                     for (int x = 1; x <= Math.min(2, amt); x++) {
                         Button move = ButtonHelper.buildMoveUnitButton(
@@ -1599,7 +1585,7 @@ public final class ButtonHelperTacticalAction {
                         "Use Tnelis Commander",
                         FactionEmojis.tnelis));
 
-            if (!PirateHordeBrActionCardHandler.isActive(game, player) && !moveOnlyDamagedShips) {
+            if (!PirateHordeBrActionCardHandler.isActive(game, player)) {
                 buttons.add(Buttons.gray(
                         factionChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
             }

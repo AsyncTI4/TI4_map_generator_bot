@@ -14,7 +14,6 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
@@ -53,19 +52,8 @@ public class ChoirLeadersHandler {
                 FactionEmojis.choir));
     }
 
-    public static boolean canMoveDamagedShipsOutOfLockedSystem(Player player, Tile tile) {
-        return player.getLeader(HERO).map(Leader::isActive).orElse(false)
-                && tile.getSpaceUnitHolder().getUnitKeys().stream().anyMatch(unitKey -> {
-                    UnitModel unit = player.getUnitFromUnitKey(unitKey);
-                    return player.unitBelongsToPlayer(unitKey)
-                            && unit != null
-                            && (unit.getIsShip() || unit.getIsGroundForce())
-                            && tile.getSpaceUnitHolder().getDamagedUnitCount(unitKey) > 0;
-                });
-    }
-
-    public static boolean mayOnlyMoveDamagedShipsOutOfLockedSystem(Game game, Player player, Tile tile) {
-        return CommandCounterHelper.hasCC(player, tile) && canMoveDamagedShipsOutOfLockedSystem(player, tile);
+    public static boolean hasActiveFuneralProcession(Player player) {
+        return player.getLeader(HERO).map(Leader::isActive).orElse(false);
     }
 
     @ButtonHandler(USE_HERO)

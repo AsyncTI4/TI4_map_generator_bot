@@ -2629,12 +2629,8 @@ public class ButtonHelper {
     }
 
     public static boolean canMoveOutOfLockedSystems(Player player, Game game, Tile tile) {
-        return ChoirLeadersHandler.canMoveDamagedShipsOutOfLockedSystem(player, tile)
-                || canMoveOutOfLockedSystemsOtherThanFuneralProcession(player, game, tile);
-    }
-
-    public static boolean canMoveOutOfLockedSystemsOtherThanFuneralProcession(Player player, Game game, Tile tile) {
-        return (DeepBreakthroughHandler.hasEventHorizonAllowance(game, player)
+        return ChoirLeadersHandler.hasActiveFuneralProcession(player)
+                || (DeepBreakthroughHandler.hasEventHorizonAllowance(game, player)
                         && tile.getPlanetUnitHolders().isEmpty())
                 || canMoveOutOfLockedSystems(player, game)
                 || NatauLeadersHandler.canMoveOutOfLockedAnomaly(game, player, tile);
