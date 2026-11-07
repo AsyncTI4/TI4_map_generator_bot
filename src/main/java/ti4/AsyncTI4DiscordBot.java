@@ -34,6 +34,8 @@ public class AsyncTI4DiscordBot {
     private static volatile boolean shuttingDown;
 
     static void main(String[] args) {
+        StartupTimeline startup = StartupTimeline.sinceJvmStart();
+        startup.mark("STARTING THE JVM");
         GlobalSettings.loadSettings();
         BotLogger.info("\n# __BOT IS STARTING UP__");
 
@@ -41,22 +43,31 @@ public class AsyncTI4DiscordBot {
         applicationContext.getBean(JdaLifecycleService.class);
         ActiveLeaseService activeLeaseService = applicationContext.getBean(ActiveLeaseService.class);
         GameManager.preloadManagedGames();
+        startup.mark("STARTING SPRING");
 
         String[] resolvedArgs = resolveSourceArgs(args);
         JdaService.startJdaAndRegisterListeners(resolvedArgs);
-        if (!JdaService.waitForJdaReadyAndInitializeGuilds(resolvedArgs)) {
+        startup.mark("BUILDING JDA");
+        boolean jdaReady = JdaService.awaitJdaReady();
+        startup.mark("CONNECTING TO DISCORD");
+        if (!jdaReady || !JdaService.initializeGuilds(resolvedArgs)) {
             applicationContext.close();
             throw new IllegalStateException("Failed to initialize JDA and guilds");
         }
+        startup.mark("SETTING UP SERVERS");
         JdaService.loadStaticDataAndResources();
+        startup.mark("LOADING DATA");
         BotLogger.info("WARMING INTERACTION HANDLERS");
         ButtonProcessor.checkButtonHandlersSetup();
         SelectionMenuProcessor.checkSelectionMenuHandlersSetup();
         ModalListener.checkModalHandlersSetup();
         BotLogger.info("FINISHED WARMING INTERACTION HANDLERS");
+        startup.mark("WARMING INTERACTION HANDLERS");
         activeLeaseService.beginLeaseParticipation(AsyncTI4DiscordBot::runLeaseOwnedStartupWork);
         JdaService.registerAndStartCronJobs();
+        startup.mark("JOINING THE LEASE AND REGISTERING CRONS");
         JdaService.markProcessReady();
+        BotLogger.info(startup.summary());
     }
 
     private static void runLeaseOwnedStartupWork() {
