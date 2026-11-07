@@ -72,13 +72,16 @@ ended.
 File writes and database writes are not one transaction. Database submission
 happens after releasing the file lock, so concurrent saves can enqueue their
 database updates out of file-write order, and during a rollover the old process
-can still be draining syncs after the new one has saved. Pipeline writes therefore
-go through `replaceIfCurrent` / `restoreIfCurrent`: under a per-game Postgres
-advisory lock, the write only happens if the snapshot's revision key still matches
-the game file. An older snapshot is skipped, because the newer save queued its own
-sync. Warmup still only trusts a row whose revision key matches the file, and
-reconciliation compares the database revision with the revision on disk to catch
-any remaining drift.
+can still be draining syncs after the new one has saved. So the sync pipeline and
+the reconciler write through `replaceIfCurrent`, `restoreIfCurrent` and
+`deleteIfGameFileMissing`. Each takes a per-game Postgres advisory lock and reads
+the game file's current state (`GameRevisionKeyFile.current`). A write is skipped
+when the snapshot's revision key no longer matches the file, when the file is gone,
+or when the stored row has a newer mapping version. A delete is skipped while the
+file exists. A file with no revision key (saved before keys existed) still syncs
+while it exists. Warmup still only trusts a row whose revision key matches the
+file, and reconciliation compares the database revision with the revision on disk
+to catch any remaining drift.
 
 ## Loading, missing files, and corrupt files
 

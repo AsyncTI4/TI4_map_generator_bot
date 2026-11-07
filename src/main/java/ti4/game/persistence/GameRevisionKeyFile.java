@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.spring.service.persistence.GameFileRevision;
 
 @UtilityClass
 class GameRevisionKeyFile {
@@ -22,6 +23,14 @@ class GameRevisionKeyFile {
     @Nullable
     static String read(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> readFrom(gamePath(gameName)));
+    }
+
+    static GameFileRevision current(String gameName) {
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            Path gamePath = gamePath(gameName);
+            if (!Files.exists(gamePath)) return GameFileRevision.missing();
+            return GameFileRevision.of(readFrom(gamePath));
+        });
     }
 
     @Nullable

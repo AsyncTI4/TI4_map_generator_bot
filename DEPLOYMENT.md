@@ -172,7 +172,8 @@ stateDiagram-v2
 
 Log lines carry the state as a prefix: `[STANDBY xxxxxxxx]`, `[WARMING xxxxxxxx]` (active but
 not ready) and `[DRAINING xxxxxxxx]`, where `xxxxxxxx` is the short instance id. The active,
-ready process has no prefix.
+ready process has no prefix. A draining process keeps the `[DRAINING]` prefix after it releases
+the lease, until it exits.
 
 ### Startup work that waits for the lease
 
@@ -206,11 +207,18 @@ work inside one process. So these finish before the lease is released:
 
 **What drains after the lease:**
 - Statistics and web state only read.
-- Database sync writes go through `replaceIfCurrent` / `restoreIfCurrent`. Each write takes a
-  per-game Postgres advisory lock, then compares the snapshot's revision key with the one in
-  the game file. If the file has moved on, a newer save has already queued its own sync, so the
-  stale write is skipped. This also keeps two quick saves of one game from reaching the database
-  out of order.
+- Database writes go through `replaceIfCurrent`, `restoreIfCurrent` and
+  `deleteIfGameFileMissing`, from both the sync pipeline and the reconciler. Each write takes a
+  per-game Postgres advisory lock, then checks the game file:
+  - A write is skipped if the snapshot's revision key no longer matches the file's. A newer save
+    has already queued its own sync. This also keeps two quick saves of one game from reaching
+    the database out of order.
+  - A write is skipped if the game file is gone, so a stale sync can't bring a deleted game
+    back. A delete is skipped if the file exists.
+  - A write is skipped if the stored row has a newer `GameEntityMapper.MAPPING_VERSION`, so an
+    old process can't overwrite a row the new code already rebuilt.
+  - Game files saved before revision keys existed have none. They still sync while the file
+    exists, but without the ordering protection.
 - Map renders post to Discord, and also write website data, map overlays and the "latest map
   message" ids, without a lease check (see Known gaps).
 
@@ -283,13 +291,8 @@ because most executors are idle.
   "latest map message" ids, from a snapshot taken before the handover. If the new process
   renders the same game in that window, the older render can land last. Game files are not
   affected, and the next render fixes it.
-- **Some database writes skip the revision check.** The nightly reconciler (`restore`) and game
-  deletes (`delete`) write without the advisory lock or revision check. A reconciliation step
-  still draining after the handover can leave a row one save behind until the next save or
-  reconcile. The revision check also doesn't compare `GameEntityMapper.MAPPING_VERSION`: if a
-  deploy changes the mapping, a sync the old process is still draining can write a row in the old
-  format, which the next save, warmup or reconcile rebuilds.
-- **The old process logs as `[STANDBY]` after it releases the lease.** `releaseLease` clears the
-  draining flag, so phase 5 log lines carry the standby prefix instead of `[DRAINING]`.
+- **A game file read error drops that game's database write.** The guarded writes read the game
+  file inside the transaction. If that read fails, the write rolls back and is logged, and the
+  row stays behind until the next save or reconcile.
 - **A container that fails to become healthy in 540 s is rolled back**, even if it would
   have finished starting later. The old container keeps running, and the deploy job fails.
