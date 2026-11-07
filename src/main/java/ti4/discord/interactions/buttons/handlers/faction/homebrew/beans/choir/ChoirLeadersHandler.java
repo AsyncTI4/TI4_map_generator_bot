@@ -23,7 +23,7 @@ import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.agent.AgentLifecycle;
 
 @UtilityClass
 public class ChoirLeadersHandler {
@@ -210,20 +210,13 @@ public class ChoirLeadersHandler {
     @ButtonHandler(USE_AGENT)
     public static void useLyraOfTheCrypt(ButtonInteractionEvent event, Game game, Player choirPlayer, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.substring(USE_AGENT.length()));
-        if (!choirPlayer.hasUnexhaustedLeader(AGENT)
-                || target == null
-                || getDamagedShips(game, target).isEmpty()) {
+        if (!choirPlayer.hasUnexhaustedLeader(AGENT) || target == null || !hasDamagedShips(game, target)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        Leader agent = choirPlayer.getLeader(AGENT).orElse(null);
-        if (agent == null) {
-            ButtonHelper.deleteMessage(event);
-            return;
+        if (AgentLifecycle.use(game, choirPlayer, AGENT, target.getFaction(), event)) {
+            ButtonHelper.deleteTheOneButton(event);
         }
-        ExhaustLeaderService.exhaustLeader(game, choirPlayer, agent);
-        sendDamagedShipButtons(game, choirPlayer, target);
-        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler(SELECT_AGENT_TARGET)
@@ -315,7 +308,7 @@ public class ChoirLeadersHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void sendDamagedShipButtons(Game game, Player choirPlayer, Player target) {
+    public static void offerLyraDamagedShipSelection(Game game, Player choirPlayer, Player target) {
         String message =
                 target.getRepresentationNoPing() + ", choose 1 damaged ship to repair with **Lyra of the Crypt**.";
         List<Button> buttons = getDamagedShipButtons(game, target, choirPlayer, getDamagedShips(game, target));
@@ -400,6 +393,10 @@ public class ChoirLeadersHandler {
                         choirPlayer.factionButtonChecker() + READY_PLANET + shipCost + "|",
                         25,
                         0));
+    }
+
+    public static boolean hasDamagedShips(Game game, Player player) {
+        return !getDamagedShips(game, player).isEmpty();
     }
 
     private static List<ShipTarget> getDamagedShips(Game game, Player player) {
