@@ -52,7 +52,7 @@ The database snapshot includes the saved revision and
 write. Every game gets a row. Games with fewer than 3 real or eliminated players
 are stored the same way but marked `statistics_ignored`, and every statistics
 query on player or title rows leaves them out. Live writes use
-`GameEntityPersistenceService.replace`, which also updates user names.
+`GameEntityPersistenceService.replaceIfCurrent`, which also updates user names.
 
 Rows are unique per game and seat holder, `(game_name, playing_user_id)`. Stats
 users can repeat: a replaced player who stays seated has their own row, and their
@@ -69,11 +69,19 @@ statistics query on player rows leaves them out. `ManagedGame` derives a seat's
 status from `is_playing`, `is_eliminated`, `is_npc` and whether the game has
 ended.
 
-File writes and database writes are not one transaction. In particular, database
-submission happens after releasing the file lock, so concurrent saves can enqueue
-their database updates out of file-write order. Warmup only trusts a row whose
-revision key matches the file, so such a row is rebuilt from its file. Reconciliation compares the
-database revision with the revision on disk to detect this drift.
+File writes and database writes are not one transaction. Database submission
+happens after releasing the file lock, so concurrent saves can enqueue their
+database updates out of file-write order, and during a rollover the old process
+can still be draining syncs after the new one has saved. So the sync pipeline and
+the reconciler write through `replaceIfCurrent`, `restoreIfCurrent` and
+`deleteIfGameFileMissing`. Each takes a per-game Postgres advisory lock and reads
+the game file's current state (`GameRevisionKeyFile.current`). A write is skipped
+when the snapshot's revision key no longer matches the file, when the file is gone,
+or when the stored row has a newer mapping version. A delete is skipped while the
+file exists. A file with no revision key (saved before keys existed) still syncs
+while it exists. Warmup still only trusts a row whose revision key matches the
+file, and reconciliation compares the database revision with the revision on disk
+to catch any remaining drift.
 
 ## Loading, missing files, and corrupt files
 

@@ -5,7 +5,9 @@ import jakarta.persistence.PersistenceContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +44,54 @@ public class GameEntityPersistenceService {
     }
 
     @Transactional
+    public boolean replaceIfCurrent(GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
+        if (!lockAndCheckCurrent(snapshot, currentFileRevision)) return false;
+        replace(snapshot);
+        return true;
+    }
+
+    @Transactional
+    public boolean restoreIfCurrent(GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
+        if (!lockAndCheckCurrent(snapshot, currentFileRevision)) return false;
+        restore(snapshot);
+        return true;
+    }
+
+    @Transactional
     public void delete(String gameName) {
         deleteGameRows(gameName);
+    }
+
+    @Transactional
+    public boolean deleteIfGameFileMissing(String gameName, Supplier<GameFileRevision> currentFileRevision) {
+        lockGame(gameName);
+        if (currentFileRevision.get().exists()) return false;
+        deleteGameRows(gameName);
+        return true;
+    }
+
+    private boolean lockAndCheckCurrent(GameEntitySnapshot snapshot, Supplier<GameFileRevision> currentFileRevision) {
+        GameEntity game = snapshot.game();
+        lockGame(game.getGameName());
+        return currentFileRevision.get().matches(game.getRevisionKey()) && !rowHasNewerMapping(game);
+    }
+
+    private void lockGame(String gameName) {
+        entityManager
+                .createNativeQuery("select 1 from pg_advisory_xact_lock(hashtext(?1))")
+                .setParameter(1, gameName)
+                .getSingleResult();
+    }
+
+    private boolean rowHasNewerMapping(GameEntity incoming) {
+        List<?> storedVersions = entityManager
+                .createNativeQuery("select mapping_version from game where game_name = ?1")
+                .setParameter(1, incoming.getGameName())
+                .getResultList();
+        if (storedVersions.isEmpty() || storedVersions.getFirst() == null) return false;
+        int storedVersion = ((Number) storedVersions.getFirst()).intValue();
+        int incomingVersion = Objects.requireNonNullElse(incoming.getMappingVersion(), 0);
+        return storedVersion > incomingVersion;
     }
 
     private Map<String, UserEntity> saveUsers(

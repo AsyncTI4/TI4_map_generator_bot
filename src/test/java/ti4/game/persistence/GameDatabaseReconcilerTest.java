@@ -60,7 +60,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).restore(current);
+            verify(fixture.persistence).restoreIfCurrent(eq(current), any());
             verify(fixture.persistence, never()).replace(any());
             fixture.logs.verify(() -> BotLogger.error(contains("legacy: has an outdated revision key")));
         }
@@ -76,7 +76,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).restore(current);
+            verify(fixture.persistence).restoreIfCurrent(eq(current), any());
             verify(fixture.persistence, never()).replace(any());
             // Only real content differences are listed; the stale revision columns are not.
             fixture.logs.verify(() -> BotLogger.error(argThat(message -> message.contains("round (expected 5, found 1)")
@@ -102,7 +102,7 @@ class GameDatabaseReconcilerTest {
             fixture.persisted.put("deleted-3", mock(PersistedGameState.class));
             doThrow(new IllegalStateException("database down"))
                     .when(fixture.persistence)
-                    .delete(anyString());
+                    .deleteIfGameFileMissing(anyString(), any());
 
             fixture.run();
 
@@ -126,7 +126,7 @@ class GameDatabaseReconcilerTest {
             fixture.run();
 
             // The run still reaches finish(): the orphaned row is deleted and the failure is reported once.
-            verify(fixture.persistence).delete("deleted");
+            verify(fixture.persistence).deleteIfGameFileMissing(eq("deleted"), any());
             fixture.logs.verify(
                     () -> BotLogger.error(contains("hit errors on 1 game"), any(Throwable.class)), times(1));
         }
@@ -154,7 +154,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).delete("deleted");
+            verify(fixture.persistence).deleteIfGameFileMissing(eq("deleted"), any());
         }
     }
 
@@ -261,7 +261,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).restore(current);
+            verify(fixture.persistence).restoreIfCurrent(eq(current), any());
             fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
         }
     }

@@ -5,6 +5,10 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,6 +124,139 @@ class GameEntityPersistenceDatabaseTest extends PostgresDatabaseTest {
 
         assertThat(userNames("1", "2", "3", "4"))
                 .containsExactly("alice", "bob", GameEntityMapper.UNKNOWN_USER_PREFIX + "3", "carol");
+    }
+
+    @Test
+    void aSyncWhoseRevisionTheGameFileHasMovedPastIsSkipped() {
+        // During a rollover the old process can still be draining a sync for a state the new process has already
+        // saved over. That stale write must not replace the newer rows.
+        assertThat(persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-stale", "newer"), fileAt("newer")))
+                .isTrue();
+
+        assertThat(persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-stale", "older"), fileAt("newer")))
+                .isFalse();
+        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-stale", "older"), fileAt("newer")))
+                .isFalse();
+
+        assertThat(revisionOf("pbd-stale")).contains("newer");
+    }
+
+    @Test
+    void aRestoreWhoseRevisionMatchesTheGameFileIsWritten() {
+        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-restore", "current"), fileAt("current")))
+                .isTrue();
+
+        assertThat(revisionOf("pbd-restore")).contains("current");
+    }
+
+    @Test
+    void aGameFileWithoutARevisionKeyStillSyncsWhileTheFileExists() {
+        // Games not saved since revision keys were introduced have none in their file. Their rows must still be
+        // written, or warmup and reconciliation could never repair them.
+        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-legacy", null), fileAt(null)))
+                .isTrue();
+
+        assertThat(gameRepository.existsById("pbd-legacy")).isTrue();
+    }
+
+    @Test
+    void aSyncForAGameWhoseFileIsGoneIsSkipped() {
+        // A stale sync landing after the other process deleted the game must not bring its rows back.
+        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-gone", null), GameFileRevision::missing))
+                .isFalse();
+        assertThat(persistenceService.replaceIfCurrent(
+                        snapshotAtRevision("pbd-gone", "key"), GameFileRevision::missing))
+                .isFalse();
+
+        assertThat(gameRepository.existsById("pbd-gone")).isFalse();
+    }
+
+    @Test
+    void aSnapshotWithoutARevisionKeyDoesNotReplaceAKeyedGameFile() {
+        assertThat(persistenceService.restoreIfCurrent(snapshotAtRevision("pbd-keyed", null), fileAt("key")))
+                .isFalse();
+    }
+
+    @Test
+    void aSyncMappedByOlderCodeDoesNotReplaceARowMappedByNewerCode() {
+        // A deploy that bumps the mapping version: the new process rebuilds the row, then the old process drains a
+        // sync for the same save. The older format must not win.
+        GameEntitySnapshot newer = snapshotAtRevision("pbd-mapping", "same-save");
+        newer.game().setMappingVersion(3);
+        assertThat(persistenceService.restoreIfCurrent(newer, fileAt("same-save")))
+                .isTrue();
+
+        GameEntitySnapshot older = snapshotAtRevision("pbd-mapping", "same-save");
+        older.game().setMappingVersion(2);
+        assertThat(persistenceService.replaceIfCurrent(older, fileAt("same-save")))
+                .isFalse();
+
+        assertThat(gameRepository.findById("pbd-mapping").map(GameEntity::getMappingVersion))
+                .contains(3);
+    }
+
+    @Test
+    void aDeleteIsSkippedWhileTheGameFileExists() {
+        persistenceService.replace(snapshotAtRevision("pbd-delete", "key"));
+
+        assertThat(persistenceService.deleteIfGameFileMissing("pbd-delete", fileAt("key")))
+                .isFalse();
+        assertThat(gameRepository.existsById("pbd-delete")).isTrue();
+
+        assertThat(persistenceService.deleteIfGameFileMissing("pbd-delete", GameFileRevision::missing))
+                .isTrue();
+        assertThat(gameRepository.existsById("pbd-delete")).isFalse();
+    }
+
+    @Test
+    void guardedWritesOfOneGameWaitForEachOther() throws Exception {
+        // The revision check and the write happen under one per-game lock, so a write that checks after another
+        // process saved the game file cannot land after that process's own sync.
+        CountDownLatch firstHoldsTheLock = new CountDownLatch(1);
+        CountDownLatch releaseFirst = new CountDownLatch(1);
+        Thread first = Thread.ofVirtual()
+                .start(() -> persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-locked", "first"), () -> {
+                    firstHoldsTheLock.countDown();
+                    awaitQuietly(releaseFirst);
+                    return GameFileRevision.of("first");
+                }));
+        assertThat(firstHoldsTheLock.await(10, TimeUnit.SECONDS)).isTrue();
+
+        CountDownLatch secondFinished = new CountDownLatch(1);
+        Thread second = Thread.ofVirtual().start(() -> {
+            persistenceService.replaceIfCurrent(snapshotAtRevision("pbd-locked", "second"), fileAt("second"));
+            secondFinished.countDown();
+        });
+
+        assertThat(secondFinished.await(500, TimeUnit.MILLISECONDS))
+                .as("second write waits while the first holds the game's lock")
+                .isFalse();
+        releaseFirst.countDown();
+        first.join(10_000);
+        second.join(10_000);
+        assertThat(revisionOf("pbd-locked")).contains("second");
+    }
+
+    private static GameEntitySnapshot snapshotAtRevision(String gameName, String revisionKey) {
+        GameEntitySnapshot snapshot = snapshotWithUsers(gameName);
+        snapshot.game().setRevisionKey(revisionKey);
+        return snapshot;
+    }
+
+    private static Supplier<GameFileRevision> fileAt(String revisionKey) {
+        return () -> GameFileRevision.of(revisionKey);
+    }
+
+    private Optional<String> revisionOf(String gameName) {
+        return gameRepository.findById(gameName).map(GameEntity::getRevisionKey);
+    }
+
+    private static void awaitQuietly(CountDownLatch latch) {
+        try {
+            latch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static GameEntitySnapshot snapshotWithUsers(String gameName, UserEntity... users) {
