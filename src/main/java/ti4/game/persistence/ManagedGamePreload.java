@@ -29,7 +29,7 @@ class ManagedGamePreload {
     private static final Executor MANAGED_GAME_BUILDER =
             task -> Thread.ofPlatform().name("managed-game-prebuild").daemon().start(task);
 
-    record Snapshot(Map<String, ManagedGameState> rows, Set<String> verifiedNames) {
+    record Snapshot(Map<String, ManagedGameState> rows, Set<String> verifiedNames, long startedAtMillis) {
 
         Set<String> stillCurrent(Map<String, String> currentRevisionKeys) {
             return verifiedNames.stream()
@@ -63,6 +63,7 @@ class ManagedGamePreload {
     @Nullable
     private static Snapshot build() {
         if (DatabasePersistenceGate.isDisabled()) return null;
+        long startedAtMillis = System.currentTimeMillis();
         Map<String, ManagedGameState> rows =
                 PersistedManagedGameService.getBean().loadAll();
         Set<String> verifiedNames = ConcurrentHashMap.newKeySet();
@@ -71,7 +72,7 @@ class ManagedGamePreload {
                 if (row.matchesRevision(readRevisionKeyOrNull(name))) verifiedNames.add(name);
             }));
         }
-        return new Snapshot(rows, Set.copyOf(verifiedNames));
+        return new Snapshot(rows, Set.copyOf(verifiedNames), startedAtMillis);
     }
 
     @Nullable

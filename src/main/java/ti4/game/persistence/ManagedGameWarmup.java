@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -27,6 +28,7 @@ import ti4.spring.service.persistence.PersistedManagedGameService;
 class ManagedGameWarmup {
 
     private static final int MAX_CHANGED_ROWS_TO_READ_BY_NAME = 100;
+    private static final long SAVED_SINCE_PRELOAD_MARGIN_MILLIS = 1000;
 
     private record Sources(
             @Nullable Map<String, ManagedGameState> persistedGames,
@@ -34,6 +36,8 @@ class ManagedGameWarmup {
             Map<String, ManagedGame> standbyBuiltGames,
             long preloadWaitMillis,
             long revisionKeysMillis,
+            long savedGameFilesMillis,
+            int savedGameFileCount,
             long changedRowsMillis,
             int changedRowCount) {}
 
@@ -74,12 +78,15 @@ class ManagedGameWarmup {
         GameManager.finishWarmup();
         BotLogger.info(String.format(
                 "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD,"
-                        + " %,d MS CHECKING REVISION KEYS, %,d MS READING %,d CHANGED ROWS, %,d MS BUILDING):"
+                        + " %,d MS CHECKING REVISION KEYS, %,d MS FINDING %,d GAME FILES SAVED SINCE THE PRELOAD,"
+                        + " %,d MS READING %,d CHANGED ROWS, %,d MS BUILDING):"
                         + " %,d BUILT ON THE STANDBY, %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE,"
                         + " %,d FROM GAME FILES",
                 System.currentTimeMillis() - warmupStartedAt,
                 sources.preloadWaitMillis(),
                 sources.revisionKeysMillis(),
+                sources.savedGameFilesMillis(),
+                sources.savedGameFileCount(),
                 sources.changedRowsMillis(),
                 sources.changedRowCount(),
                 built.millis(),
@@ -134,16 +141,33 @@ class ManagedGameWarmup {
         long preloadWaitMillis = System.currentTimeMillis() - waitStartedAt;
         Map<String, ManagedGame> standbyBuiltGames = ManagedGamePreload.closeStandbyBuild();
         if (preload == null) {
-            return new Sources(loadPersistedManagedGames(), Set.of(), standbyBuiltGames, preloadWaitMillis, 0, 0, 0);
+            return new Sources(
+                    loadPersistedManagedGames(), Set.of(), standbyBuiltGames, preloadWaitMillis, 0, 0, 0, 0, 0);
         }
 
         long revisionKeysStartedAt = System.currentTimeMillis();
         Map<String, String> currentRevisionKeys = currentRevisionKeysRead.join();
-        Set<String> stillCurrent = preload.stillCurrent(currentRevisionKeys);
         long revisionKeysMillis = System.currentTimeMillis() - revisionKeysStartedAt;
 
+        long savedGameFilesStartedAt = System.currentTimeMillis();
+        Set<String> savedSincePreload = gameFilesSavedSince(preload.startedAtMillis());
+        long savedGameFilesMillis = System.currentTimeMillis() - savedGameFilesStartedAt;
+        if (savedSincePreload == null) {
+            return new Sources(
+                    preload.rows(),
+                    Set.of(),
+                    standbyBuiltGames,
+                    preloadWaitMillis,
+                    revisionKeysMillis,
+                    savedGameFilesMillis,
+                    0,
+                    0,
+                    0);
+        }
+        Set<String> stillCurrent = stillCurrent(preload, currentRevisionKeys, savedSincePreload);
+
         long changedRowsStartedAt = System.currentTimeMillis();
-        Set<String> changedNames = currentRevisionKeys.keySet().stream()
+        Set<String> changedNames = Stream.concat(currentRevisionKeys.keySet().stream(), savedSincePreload.stream())
                 .filter(name -> !stillCurrent.contains(name))
                 .collect(Collectors.toUnmodifiableSet());
         Map<String, ManagedGameState> persistedGames = withCurrentRows(preload.rows(), changedNames);
@@ -155,8 +179,31 @@ class ManagedGameWarmup {
                 standbyBuiltGames,
                 preloadWaitMillis,
                 revisionKeysMillis,
+                savedGameFilesMillis,
+                savedSincePreload.size(),
                 changedRowsMillis,
                 changedNames.size());
+    }
+
+    static Set<String> stillCurrent(
+            ManagedGamePreload.Snapshot preload,
+            Map<String, String> currentRevisionKeys,
+            Set<String> savedSincePreload) {
+        return preload.stillCurrent(currentRevisionKeys).stream()
+                .filter(name -> !savedSincePreload.contains(name))
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Nullable
+    private static Set<String> gameFilesSavedSince(long preloadStartedAtMillis) {
+        try {
+            return GameLoadService.gameNamesSavedSince(preloadStartedAtMillis - SAVED_SINCE_PRELOAD_MARGIN_MILLIS);
+        } catch (Exception e) {
+            BotLogger.error(
+                    "Could not list the game files saved since the standby preload, so every game will be checked against its file.",
+                    e);
+            return null;
+        }
     }
 
     private static Map<String, ManagedGameState> withCurrentRows(

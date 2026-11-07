@@ -16,7 +16,8 @@ class ManagedGamePreloadTest {
                     "deleted-since", state("deleted-since", "rev-1"),
                     "row-behind-file", state("row-behind-file", "rev-1")),
             // row-behind-file's row didn't match its game file during the preload, so it was never verified.
-            Set.of("unchanged", "saved-since", "deleted-since"));
+            Set.of("unchanged", "saved-since", "deleted-since"),
+            0L);
 
     @Test
     void reusesOnlyVerifiedGamesWhoseDatabaseRevisionIsUnchangedSinceThePreload() {

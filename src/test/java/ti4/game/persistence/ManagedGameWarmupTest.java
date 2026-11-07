@@ -5,6 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockStatic;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +15,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import ti4.game.Game;
+import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.testUtils.BaseTi4Test;
 
 class ManagedGameWarmupTest extends BaseTi4Test {
@@ -73,6 +78,42 @@ class ManagedGameWarmupTest extends BaseTi4Test {
         player.removeGame(game.getName(), older);
 
         assertThat(player.getGames()).containsExactly(newer);
+    }
+
+    @Test
+    void aGameSavedSinceThePreloadIsNotCurrentEvenWhileItsDatabaseRowStillLags() {
+        // The old instance releases the lease before its database sync drains, so a game saved just before the
+        // drain can still show its preload revision in the database at takeover.
+        ManagedGamePreload.Snapshot preload = new ManagedGamePreload.Snapshot(
+                Map.of("saved-late", preloadedState("saved-late"), "untouched", preloadedState("untouched")),
+                Set.of("saved-late", "untouched"),
+                0L);
+        Map<String, String> currentRevisionKeys = Map.of("saved-late", "rev-1", "untouched", "rev-1");
+
+        assertThat(ManagedGameWarmup.stillCurrent(preload, currentRevisionKeys, Set.of("saved-late")))
+                .containsExactly("untouched");
+    }
+
+    @Test
+    void gameFilesSavedSinceThePreloadAreFoundByTheirModifiedTime() throws Exception {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            String gameName = harness.getGameName();
+            Path gameFile = Storage.getGamePath(gameName + Constants.TXT);
+            long preloadStartedAt = System.currentTimeMillis();
+            Files.setLastModifiedTime(gameFile, FileTime.fromMillis(preloadStartedAt - 60_000));
+
+            assertThat(GameLoadService.gameNamesSavedSince(preloadStartedAt)).doesNotContain(gameName);
+
+            Files.setLastModifiedTime(gameFile, FileTime.fromMillis(preloadStartedAt + 1000));
+
+            assertThat(GameLoadService.gameNamesSavedSince(preloadStartedAt)).contains(gameName);
+        }
+    }
+
+    private static ManagedGameState preloadedState(String gameName) {
+        return new ManagedGameState(
+                gameName, "rev-1", false, false, false, false, false, false, false, false, false, false, false, false,
+                true, false, 0, 0, null, 0, 0, 1, null, null, null, null, List.of(), Map.of());
     }
 
     private static ManagedGame saveAndGetManagedGame(Game game) {
