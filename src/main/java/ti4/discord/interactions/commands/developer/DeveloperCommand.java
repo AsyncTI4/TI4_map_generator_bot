@@ -27,6 +27,7 @@ public class DeveloperCommand implements ParentCommand {
                     new ProduceNucleusGenStats(),
                     new AnnounceActiveGames(),
                     new DatabasePersistence(),
+                    new CheckPersistenceDrift(),
                     new DeleteUserMessages(),
                     new PostMatchmakingButtons(),
                     new ModifyMatchmakingQueue(),
