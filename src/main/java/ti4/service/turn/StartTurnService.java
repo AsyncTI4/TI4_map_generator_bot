@@ -117,7 +117,6 @@ public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         WarGamesBrActionCardHandler.clear(game);
-        MorphaBreakthroughHandler.clearMetamorphicDrawCount(game, player);
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         VanguardPromissoryHandler.returnGuildCallAtOwnerTurnStart(event, game, player);
         PoliticalMarriageLLButtonHandler.clearExpiredRestriction(game, player);
