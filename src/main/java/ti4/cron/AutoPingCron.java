@@ -25,6 +25,8 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.model.metadata.AutoPingMetadataManager.AutoPing;
 import ti4.service.button.ReactionService;
 import ti4.service.fow.GMService;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameStrategyPhaseService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -161,6 +163,10 @@ public class AutoPingCron {
         }
         if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             statusHomeworkPing(game, milliSinceLastPing);
+            return;
+        }
+        if ("strategy".equalsIgnoreCase(game.getPhaseOfGame()) && MegagameGroupService.isActive(game)) {
+            groupPickersPing(game, latestAutoPing, milliSinceLastPing, activePlayerSettings);
             return;
         }
 
@@ -355,6 +361,34 @@ public class AutoPingCron {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw ACs.");
         }
+    }
+
+    private static void groupPickersPing(
+            Game game,
+            AutoPing latestAutoPing,
+            long milliSinceLastPing,
+            Map<String, UserSettings> activePlayerSettings) {
+        int pingNumber = latestAutoPing.pingCount() + 1;
+        if (pingNumber > PING_NUMBER_TO_GIVE_UP_ON) {
+            return;
+        }
+        List<Player> pickers = MegagameStrategyPhaseService.currentPickers(game).stream()
+                .filter(picker -> !picker.isAFK())
+                .filter(picker -> getPingIntervalInHours(game, settingsFor(picker, activePlayerSettings)) > 0)
+                .toList();
+        int spacer = pickers.stream()
+                .mapToInt(picker -> getPingIntervalInHours(game, settingsFor(picker, activePlayerSettings)))
+                .min()
+                .orElse(0);
+        if (spacer == 0 || !hoursHavePassed(milliSinceLastPing, spacer)) {
+            return;
+        }
+        if (pingNumber == PING_NUMBER_TO_GIVE_UP_ON) {
+            pingPlayer(game, pickers.getFirst(), pingNumber, milliSinceLastPing, false);
+        } else {
+            pickers.forEach(picker -> pingPlayer(game, picker, pingNumber, milliSinceLastPing, false));
+        }
+        AutoPingMetadataManager.addPing(game.getName());
     }
 
     private static UserSettings settingsFor(Player player, Map<String, UserSettings> activePlayerSettings) {

@@ -35,7 +35,7 @@ final class AnomalyHighlights implements OffBoardHighlights {
         if (unitNum > 0) {
             int x = miscTile.x + (TileGeometry.TILE_WIDTH - 95) / 2;
             x += (unitNum == 3 ? 40 : 0) + (unitNum == 2 ? 30 : 0);
-            int y = miscTile.y + (TileGeometry.TILE_HEIGHT - 95) / 2 + (player.isSpeaker() ? 30 : 0);
+            int y = miscTile.y + (TileGeometry.TILE_HEIGHT - 95) / 2 + SpeakerOffset.of(player);
             String tokenFile = ImageResources.tokenOrAttachment("token_gravityrift.png");
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             for (int i = 0; i < unitNum; i++) {

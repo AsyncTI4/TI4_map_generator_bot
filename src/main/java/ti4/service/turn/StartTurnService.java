@@ -105,6 +105,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent
 import ti4.service.leader.genome.homebrew.tknova.DeploymentGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.PlayerAreaWarningService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -210,6 +211,8 @@ public class StartTurnService {
         if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
             buttonText +=
                     "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
+        } else if (MegagameGroupService.isActive(game) && !player.getSCs().isEmpty()) {
+            buttonText += "Your strategy card initiative number is " + player.getLowestSC() + ".";
         }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel =
@@ -420,6 +423,11 @@ public class StartTurnService {
                         player.addFollowedSC(sc);
                     }
                 }
+            }
+            if (MegagameGroupService.isActive(game)
+                    && !MegagameGroupService.sameGroup(game, player, sc)
+                    && !player.hasFollowedSC(sc)) {
+                player.addFollowedSC(sc);
             }
 
             if (!player.hasFollowedSC(sc)) {
@@ -750,7 +758,7 @@ public class StartTurnService {
                 if (!game.getPlayedSCs().contains(SC)) {
                     hadAnyUnplayedSCs = true;
                     String name = Helper.getSCName(SC, game);
-                    if ("pbd1000".equalsIgnoreCase(game.getName())) {
+                    if ("pbd1000".equalsIgnoreCase(game.getName()) || MegagameGroupService.isActive(game)) {
                         name += "(" + SC + ")";
                     }
                     Button strategicAction = Buttons.green(

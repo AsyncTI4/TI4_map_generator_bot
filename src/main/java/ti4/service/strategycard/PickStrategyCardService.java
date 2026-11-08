@@ -16,6 +16,8 @@ import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.message.MessageHelper;
 import ti4.service.game.StartPhaseService;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameStrategyPhaseService;
 import ti4.service.player.PlayerStatsService;
 
 @UtilityClass
@@ -34,6 +36,10 @@ public class PickStrategyCardService {
         }
         if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
             game.setSCPlayed(scPicked, Boolean.TRUE);
+        }
+        if (MegagameGroupService.isActive(game)) {
+            MegagameStrategyPhaseService.afterPick(event, game, player);
+            return;
         }
 
         boolean nextCorrectPing = false;

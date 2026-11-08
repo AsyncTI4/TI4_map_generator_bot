@@ -191,6 +191,9 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
 import ti4.service.map.SystemPickerService;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameScThreads;
+import ti4.service.megagame.MegagameWarnings;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.PlanetService;
@@ -1071,6 +1074,12 @@ public class ButtonHelper {
             }
             player.setEliminated(true);
             player.setDummy(true);
+            if (MegagameGroupService.isActive(game)) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        player.getFaction() + " was eliminated; the strategy card groups need a GM.\n"
+                                + MegagameWarnings.asText(game));
+            }
             if (!game.isFowMode()) {
                 Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
             }
@@ -9141,7 +9150,8 @@ public class ButtonHelper {
         String sc = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
-                game.getPing() + ", the active player has elected to move the game along after everyone has resolved **"
+                MegagameGroupService.pingForSc(game, Integer.parseInt(sc))
+                        + ", the active player has elected to move the game along after everyone has resolved **"
                         + Helper.getSCName(Integer.parseInt(sc), game)
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
@@ -9186,7 +9196,8 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
-                game.getPing() + " the active player has elected to move the game along after everyone has resolved **"
+                MegagameGroupService.pingForSc(game, Integer.parseInt(sc))
+                        + " the active player has elected to move the game along after everyone has resolved **"
                         + Helper.getSCName(Integer.parseInt(sc), game)
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
@@ -9338,7 +9349,7 @@ public class ButtonHelper {
                     + ", additionally, you may set _Public Disgrace_ to only trigger on a particular player. Choose to do so if you wish, or decline, or ignore this.";
             List<Button> buttons2 = new ArrayList<>();
             for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
+                if (p2 == player || !MegagameGroupService.allowsTargetInStrategyPhase(game, player, p2)) {
                     continue;
                 }
                 if (!game.isFowMode()) {
@@ -9663,7 +9674,9 @@ public class ButtonHelper {
             String stratName,
             @Nullable List<Button> buttons,
             @Nullable Consumer<Message> sentMessageConsumer) {
-        ThreadChannel threadChannel_ = getRightStratThread(game, stratName);
+        ThreadChannel threadChannel_ = MegagameGroupService.isActive(game) && player != null
+                ? MegagameScThreads.forPlayer(game, player, stratName)
+                : getRightStratThread(game, stratName);
         if (threadChannel_ != null) {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     threadChannel_, message, null, buttons, sentMessageConsumer);

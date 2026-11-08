@@ -55,19 +55,19 @@ final class AttachmentHighlights implements OffBoardHighlights {
                         miscTile.y
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 - 30
-                                + (player.isSpeaker() ? 30 : 0),
+                                + SpeakerOffset.of(player),
                         null);
                 if (attachCount.get(planet) > 1) {
                     g2.setColor(Color.WHITE);
                     g2.fillOval(
                             miscTile.x + (345 - 80) / 2 - 30,
-                            miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0),
+                            miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 - 30 + SpeakerOffset.of(player),
                             80,
                             80);
                     g2.setColor(Color.BLACK);
                     g2.fillOval(
                             miscTile.x + (345 - 72) / 2 - 30,
-                            miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 - 30 + (player.isSpeaker() ? 30 : 0) + 4,
+                            miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 - 30 + SpeakerOffset.of(player) + 4,
                             72,
                             72);
                     g2.setColor(Color.WHITE);
@@ -76,10 +76,7 @@ final class AttachmentHighlights implements OffBoardHighlights {
                             "" + attachCount.get(planet),
                             new Rectangle(
                                     miscTile.x + (345 - 80) / 2 - 30,
-                                    miscTile.y
-                                            + (TileGeometry.TILE_HEIGHT - 16) / 2
-                                            - 30
-                                            + (player.isSpeaker() ? 30 : 0),
+                                    miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 - 30 + SpeakerOffset.of(player),
                                     80,
                                     80),
                             Fonts.ti(48));
@@ -94,21 +91,19 @@ final class AttachmentHighlights implements OffBoardHighlights {
             g2.drawImage(
                     bufferedImage,
                     miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                    miscTile.y
-                            + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                            + (player.isSpeaker() ? 30 : 0),
+                    miscTile.y + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2 + SpeakerOffset.of(player),
                     null);
             if (attachCount.get(planet) > 1) {
                 g2.setColor(Color.WHITE);
                 g2.fillOval(
                         miscTile.x + (345 - 80) / 2,
-                        miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 + (player.isSpeaker() ? 30 : 0),
+                        miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 + SpeakerOffset.of(player),
                         80,
                         80);
                 g2.setColor(Color.BLACK);
                 g2.fillOval(
                         miscTile.x + (345 - 72) / 2,
-                        miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 + (player.isSpeaker() ? 30 : 0) + 4,
+                        miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 + SpeakerOffset.of(player) + 4,
                         72,
                         72);
                 g2.setColor(Color.WHITE);
@@ -117,7 +112,7 @@ final class AttachmentHighlights implements OffBoardHighlights {
                         "" + attachCount.get(planet),
                         new Rectangle(
                                 miscTile.x + (345 - 80) / 2,
-                                miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 + (player.isSpeaker() ? 30 : 0),
+                                miscTile.y + (TileGeometry.TILE_HEIGHT - 16) / 2 + SpeakerOffset.of(player),
                                 80,
                                 80),
                         Fonts.ti(48));

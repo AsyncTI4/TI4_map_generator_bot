@@ -91,6 +91,7 @@ import ti4.service.leader.agent.modules.homebrew.VeldyrAgent;
 import ti4.service.leader.agent.modules.homebrew.ZealotsAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -1111,6 +1112,8 @@ public class PlayerTechService {
             if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
                 buttonText += "Your strategy card initiative number is "
                         + player.getSCs().toArray()[0] + ".";
+            } else if (MegagameGroupService.isActive(game) && !player.getSCs().isEmpty()) {
+                buttonText += "Your strategy card initiative number is " + player.getLowestSC() + ".";
             }
             List<Button> buttons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);

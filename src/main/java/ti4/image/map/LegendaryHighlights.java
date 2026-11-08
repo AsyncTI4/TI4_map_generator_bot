@@ -43,7 +43,7 @@ final class LegendaryHighlights implements OffBoardHighlights {
                                     + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                     - 30
                                     + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1)
-                                    + (player.isSpeaker() ? 30 : 0),
+                                    + SpeakerOffset.of(player),
                             null);
                 }
             } else {
@@ -52,7 +52,7 @@ final class LegendaryHighlights implements OffBoardHighlights {
                         miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
                         miscTile.y
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                + (player.isSpeaker() ? 30 : 0),
+                                + SpeakerOffset.of(player),
                         null);
             }
         }
@@ -68,7 +68,7 @@ final class LegendaryHighlights implements OffBoardHighlights {
                         miscTile.y
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 + 30
-                                + (player.isSpeaker() ? 30 : 0),
+                                + SpeakerOffset.of(player),
                         null);
             } else {
                 g2.drawImage(
@@ -76,7 +76,7 @@ final class LegendaryHighlights implements OffBoardHighlights {
                         miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
                         miscTile.y
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                + (player.isSpeaker() ? 30 : 0),
+                                + SpeakerOffset.of(player),
                         null);
             }
             offBoardHighlighting++;

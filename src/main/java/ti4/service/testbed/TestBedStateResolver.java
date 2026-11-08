@@ -21,6 +21,7 @@ import ti4.service.fow.FogGameSummaryService;
 import ti4.service.fow.FogPreset;
 import ti4.service.fow.FogPresetService;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -55,7 +56,8 @@ public class TestBedStateResolver {
             "customHyperlanes",
             "fowOptions",
             "fogPreset",
-            "sectors");
+            "sectors",
+            "megagameSpeakers");
     public static final List<String> SEAT_FIELDS = List.of(
             "tg",
             "commodities",
@@ -87,7 +89,9 @@ public class TestBedStateResolver {
             "purgedTechs",
             "exhaustedRelics",
             "commodityValue",
-            "exhaustedPlanetAbilities");
+            "exhaustedPlanetAbilities",
+            "followedAll",
+            "megagameGroup");
 
     @Nullable
     public static String validatePath(String path) {
@@ -135,6 +139,10 @@ public class TestBedStateResolver {
             case "round" -> String.valueOf(game.getRound());
             case "activePlayer" -> factionOf(game.getActivePlayer());
             case "speaker" -> factionOf(game.getSpeaker());
+            case "megagameSpeakers" ->
+                joinSorted(MegagameGroupService.groups(game).stream()
+                        .map(group -> group + "=" + factionOf(MegagameGroupService.groupSpeaker(game, group)))
+                        .toList());
             case "playedScs" ->
                 joinSorted(game.getPlayedSCs().stream().map(String::valueOf).toList());
             case "acDiscard" -> joinSorted(game.getDiscardActionCards().keySet());
@@ -207,6 +215,12 @@ public class TestBedStateResolver {
             case "exhaustedPlanetAbilities" -> joinSorted(seat.getExhaustedPlanetsAbilities());
             case "techs" -> joinSorted(seat.getTechs());
             case "passed" -> String.valueOf(seat.isPassed());
+            case "followedAll" ->
+                joinSorted(seat.getFollowedSCs().stream().map(String::valueOf).toList());
+            case "megagameGroup" -> {
+                String group = MegagameGroupService.groupOf(seat.getGame(), seat);
+                yield group == null ? "" : group;
+            }
             case "followed" ->
                 joinSorted(IntStream.rangeClosed(1, 8)
                         .filter(seat::hasFollowedSC)

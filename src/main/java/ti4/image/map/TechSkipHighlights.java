@@ -46,7 +46,7 @@ final class TechSkipHighlights implements OffBoardHighlights {
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 - 30
                                 + i * 60 / (offBoardHighlighting - 1)
-                                + (player.isSpeaker() ? 30 : 0),
+                                + SpeakerOffset.of(player),
                         null);
             }
         } else if (offBoardHighlighting == 1) {
@@ -56,9 +56,7 @@ final class TechSkipHighlights implements OffBoardHighlights {
             g2.drawImage(
                     bufferedImage,
                     miscTile.x + (345 - bufferedImage.getWidth()) / 2,
-                    miscTile.y
-                            + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                            + (player.isSpeaker() ? 30 : 0),
+                    miscTile.y + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2 + SpeakerOffset.of(player),
                     null);
         }
         return offBoardHighlighting;

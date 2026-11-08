@@ -33,6 +33,8 @@ public class TestBedPreset {
     private Map<String, String> stored = new LinkedHashMap<>();
     private Map<String, String> gameOptions = new LinkedHashMap<>();
     private Map<String, String> decks = new LinkedHashMap<>();
+    private String strategyCardSet;
+    private List<String> tags = new ArrayList<>();
     private List<TestBedScript.Shortcut> shortcuts = new ArrayList<>();
 
     public List<Seat> allSeats() {

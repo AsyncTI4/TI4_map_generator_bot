@@ -763,7 +763,7 @@ public class PlayHeroService {
             }
             case "naazhero" -> {
                 RelicHelper.drawRelicAndNotify(player, event, game);
-                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
+                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)

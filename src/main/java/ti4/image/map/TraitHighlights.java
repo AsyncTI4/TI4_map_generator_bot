@@ -72,7 +72,7 @@ final class TraitHighlights implements OffBoardHighlights {
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 - 30
                                 + i * 60 / (offBoardHighlighting - 1)
-                                + (player.isSpeaker() ? 30 : 0),
+                                + SpeakerOffset.of(player),
                         null);
             }
         } else if (offBoardHighlighting == 1) {
@@ -85,7 +85,7 @@ final class TraitHighlights implements OffBoardHighlights {
                         miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
                         miscTile.y
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                + (player.isSpeaker() ? 30 : 0),
+                                + SpeakerOffset.of(player),
                         null);
             }
         }
