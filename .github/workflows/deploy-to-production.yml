@@ -48,7 +48,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.IMAGE_REPOSITORY }}:${{ steps.image.outputs.image_tag }}
+          tags: |
+            ${{ env.IMAGE_REPOSITORY }}:${{ steps.image.outputs.image_tag }}
+            ${{ env.IMAGE_REPOSITORY }}:master
           cache-from: type=gha
           cache-to: type=gha,mode=max
   build:
