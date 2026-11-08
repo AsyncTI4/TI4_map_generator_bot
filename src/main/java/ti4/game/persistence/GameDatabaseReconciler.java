@@ -92,7 +92,11 @@ public class GameDatabaseReconciler {
             GameEntitySnapshot snapshot = GameEntityMapper.toSnapshot(game);
             if (persistedState == null) {
                 return Optional.of(repair(
-                        gameName, "missing from the database", () -> persistenceService.restore(snapshot), failures));
+                        gameName,
+                        "missing from the database",
+                        () -> persistenceService.restoreIfMatchesGameFile(
+                                snapshot, () -> GameRevisionKeyFile.current(gameName)),
+                        failures));
             }
 
             PersistedGameState expectedState = PersistedGameState.of(snapshot);
@@ -103,7 +107,12 @@ public class GameDatabaseReconciler {
             String description = differences.isEmpty()
                     ? "has an outdated revision key"
                     : "differs in " + String.join("; ", differences);
-            return Optional.of(repair(gameName, description, () -> persistenceService.restore(snapshot), failures));
+            return Optional.of(repair(
+                    gameName,
+                    description,
+                    () -> persistenceService.restoreIfMatchesGameFile(
+                            snapshot, () -> GameRevisionKeyFile.current(gameName)),
+                    failures));
         }
 
         @Override
@@ -117,7 +126,8 @@ public class GameDatabaseReconciler {
                 discrepancies.add(repair(
                         persistedGameName,
                         "in the database but has no game file",
-                        () -> persistenceService.delete(persistedGameName),
+                        () -> persistenceService.deleteIfGameFileMissing(
+                                persistedGameName, () -> GameRevisionKeyFile.current(persistedGameName)),
                         failures));
             }
 

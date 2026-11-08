@@ -19,6 +19,7 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.spring.service.persistence.GameEntityPersistenceService;
+import ti4.spring.service.persistence.GameFileRevision;
 import ti4.spring.service.persistence.PersistedGameStateService;
 import ti4.spring.service.persistence.UnreferencedUserService;
 import ti4.testUtils.BaseTi4Test;
@@ -37,6 +38,19 @@ class GameRevisionKeyFileTest extends BaseTi4Test {
             assertThat(Files.readAllLines(gamePath(harness), StandardCharsets.UTF_8))
                     .isEqualTo(linesBefore);
             assertThat(GameRevisionKeyFile.read(gameName)).isNull();
+        }
+    }
+
+    @Test
+    void currentRevisionTellsAKeylessFileApartFromAMissingOne() throws IOException {
+        // A keyless file still syncs, but a missing one must not: a stale sync would bring a deleted game back.
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            String gameName = harness.getGameName();
+            assertThat(GameRevisionKeyFile.current(gameName)).isEqualTo(GameFileRevision.of(null));
+
+            Files.delete(gamePath(harness));
+
+            assertThat(GameRevisionKeyFile.current(gameName)).isEqualTo(GameFileRevision.missing());
         }
     }
 

@@ -156,7 +156,7 @@ public class ListTechService {
                     msg += " Spent 1 token from their strategy pool (" + player.getStrategicCC();
                     player.setStrategicCC(player.getStrategicCC() - 1);
                     msg += "->" + player.getStrategicCC() + ").";
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "used the Entropic Scar.");
                 }
                 player.addTech(tech);
                 NetrunnersAbilityHandler.resolveNeuralInstrumentsDebt(player, game, event);

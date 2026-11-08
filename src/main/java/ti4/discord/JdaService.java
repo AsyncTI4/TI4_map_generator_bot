@@ -1,6 +1,7 @@
 package ti4.discord;
 
 import jakarta.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -95,6 +95,7 @@ public class JdaService {
     private static final String JDA_EVENT_POOL_NAME = "JDA Event Pool";
     static final String FLUSH_USER_ACTIVE_HOURS = "flush user active hours";
     static final String RELEASE_ACTIVE_LEASE = "release active lease";
+    private static final ShutdownReport SHUTDOWN_REPORT = new ShutdownReport();
     private static final int EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS = 5;
     private static final int JDA_SHUTDOWN_TIMEOUT_SECONDS = 20;
     public static final int DISCORD_REQUEST_TIMEOUT_SECONDS = 60;
@@ -296,12 +297,6 @@ public class JdaService {
             guildQuadrodenary = tryToInitGuild(args[20], true);
         }
 
-        BotLogger.info("FINISHED INITIALIZING SERVERS\n> "
-                + guilds.size() + " total servers connected\n> "
-                + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
-                + fowServers.size() + " Fog of War servers"
-                + "\n> Guilds: " + jda.getGuilds().stream().map(Guild::getName).collect(Collectors.toSet()));
-
         if (isProduction()) leaveNonWhitelistedGuilds();
 
         // Check for and report a missing bot-log webhook
@@ -314,7 +309,6 @@ public class JdaService {
     }
 
     public static void loadStaticDataAndResources() {
-        BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
         // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
@@ -368,7 +362,12 @@ public class JdaService {
 
     public static void markProcessReady() {
         ActiveLeaseService.setCurrentProcessReady(true);
-        BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
+    }
+
+    public static String describeServers() {
+        return String.format(
+                "%,d SERVERS (%,d FOR NEW GAMES, %,d FOG OF WAR)",
+                guilds.size(), serversToCreateNewGamesOn.size(), fowServers.size());
     }
 
     private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {
@@ -416,7 +415,6 @@ public class JdaService {
             SlashCommandManager.getCommands().forEach(command -> command.register(commands));
             ContextCommandManager.getCommands().forEach(cmd -> cmd.register(commands));
             commands.queue(Consumers.nop(), BotLogger::catchRestError);
-            BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
             BotLogger.error("\n# FAILED TO START BOT ", e);
@@ -643,14 +641,14 @@ public class JdaService {
                         executorStep(CronManager.class.getSimpleName(), CronManager::shutdown)),
                 List.of(
                         executorStep(SliceGenerationPipeline.class.getSimpleName(), SliceGenerationPipeline::shutdown),
+                        new ShutdownStep(FLUSH_USER_ACTIVE_HOURS, JdaService::flushUserActiveHours)),
+                List.of(new ShutdownStep(RELEASE_ACTIVE_LEASE, JdaService::releaseActiveLease)),
+                List.of(
                         executorStep(MapRenderPipeline.class.getSimpleName(), MapRenderPipeline::shutdown),
                         executorStep(StatisticsPipeline.class.getSimpleName(), StatisticsPipeline::shutdown),
-                        new ShutdownStep(FLUSH_USER_ACTIVE_HOURS, JdaService::flushUserActiveHours)),
-                List.of(
                         executorStep(GameWebStatePipeline.class.getSimpleName(), GameWebStatePipeline::shutdown),
                         executorStep(
                                 GameDatabaseSyncPipeline.class.getSimpleName(), GameDatabaseSyncPipeline::shutdown)),
-                List.of(new ShutdownStep(RELEASE_ACTIVE_LEASE, JdaService::releaseActiveLease)),
                 List.of(new ShutdownStep("send buffered logs", JdaService::sendBufferedLogsBeforeJdaShutdown)),
                 List.of(new ShutdownStep("shut down JDA", JdaService::shutdownJda)));
     }
@@ -712,49 +710,87 @@ public class JdaService {
     }
 
     private static ShutdownStep executorStep(String executorName, Supplier<ShutdownResult> shutdown) {
-        return new ShutdownStep(executorName, () -> logShutdownResult(executorName, shutdown.get()));
+        return new ShutdownStep(executorName, () -> {
+            long startedAt = System.currentTimeMillis();
+            ShutdownResult result = shutdown.get();
+            SHUTDOWN_REPORT.record(
+                    System.currentTimeMillis() - startedAt, executorName + describeIfNotGraceful(result));
+            warnIfNotGraceful(executorName, result);
+        });
     }
 
     private static void setShutdownPresence() {
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-        BotLogger.info("SHUTDOWN PROCESS STARTED");
     }
 
     private static void stopAcceptingCommands() {
         ActiveLeaseService.setCurrentProcessReady(false);
-        BotLogger.info("NO LONGER ACCEPTING COMMANDS");
+        SHUTDOWN_REPORT.start();
+        BotLogger.info("STOPPED ACCEPTING COMMANDS");
     }
 
     private static void flushUserActiveHours() {
         long startedAt = System.currentTimeMillis();
         int flushedUsers = UserActiveHourRecorder.flush();
-        BotLogger.info(String.format(
-                "FLUSHED ACTIVE HOURS FOR %s IN %,d MS",
-                StringHelper.pluralize(flushedUsers, "USER", "USERS"), System.currentTimeMillis() - startedAt));
+        SHUTDOWN_REPORT.record(
+                System.currentTimeMillis() - startedAt,
+                "active hours for " + StringHelper.pluralize(flushedUsers, "user"));
     }
 
     private static void releaseActiveLease() {
         SpringContext.getBean(ActiveLeaseService.class).releaseLease();
-        BotLogger.info("RELEASED ACTIVE LEASE");
+        BotLogger.info(SHUTDOWN_REPORT.summarize("RELEASED THE ACTIVE LEASE"));
     }
 
     private static void sendBufferedLogsBeforeJdaShutdown() {
-        BotLogger.info("SHUTTING DOWN JDA.");
+        BotLogger.info(SHUTDOWN_REPORT.summarize("FINISHED DRAINING"));
         BotLogger.sendBufferedLogsToDiscord();
+    }
+
+    private static String describeIfNotGraceful(ShutdownResult result) {
+        return switch (result) {
+            case GRACEFUL_TERMINATION -> "";
+            case FORCED_TERMINATION -> " (interrupted)";
+            case TIMED_OUT -> " (timed out)";
+            case INTERRUPTED -> " (shutdown interrupted)";
+        };
+    }
+
+    private static void warnIfNotGraceful(String executorName, ShutdownResult result) {
+        switch (result) {
+            case GRACEFUL_TERMINATION -> {}
+            case FORCED_TERMINATION -> BotLogger.warning(executorName + " terminated after interrupt request.");
+            case TIMED_OUT -> BotLogger.warning(executorName + " did not terminate before the shutdown timeout.");
+            case INTERRUPTED -> BotLogger.warning(executorName + " shutdown was interrupted.");
+        }
+    }
+
+    private static final class ShutdownReport {
+
+        private final List<String> steps = new ArrayList<>();
+        private long stoppedAcceptingCommandsAt = System.currentTimeMillis();
+
+        private synchronized void start() {
+            stoppedAcceptingCommandsAt = System.currentTimeMillis();
+            steps.clear();
+        }
+
+        private synchronized void record(long millis, String step) {
+            steps.add(String.format("%,d MS %s", millis, step));
+        }
+
+        private synchronized String summarize(String milestone) {
+            String summary = String.format(
+                    "%s %,d MS AFTER STOPPING COMMANDS: %s",
+                    milestone, System.currentTimeMillis() - stoppedAcceptingCommandsAt, String.join(", ", steps));
+            steps.clear();
+            return summary;
+        }
     }
 
     private static ShutdownResult shutdownEventExecutor() {
         return ExecutorUtility.shutdownAndAwaitTermination(
                 EVENT_EXECUTOR, EVENT_POOL_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    }
-
-    private static void logShutdownResult(String executorName, ShutdownResult result) {
-        switch (result) {
-            case GRACEFUL_TERMINATION -> BotLogger.info(executorName + " terminated gracefully.");
-            case FORCED_TERMINATION -> BotLogger.info(executorName + " terminated after interrupt request.");
-            case TIMED_OUT -> BotLogger.info(executorName + " did not terminate before the shutdown timeout.");
-            case INTERRUPTED -> BotLogger.info(executorName + " shutdown was interrupted.");
-        }
     }
 
     private static void shutdownJda() {

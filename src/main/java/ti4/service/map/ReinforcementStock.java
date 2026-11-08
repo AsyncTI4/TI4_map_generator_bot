@@ -39,7 +39,7 @@ public record ReinforcementStock(
             return null;
         }
         int unitCap = player.getUnitCap(unitID);
-        if (unitCap == 0 && !"fs".equals(unitID)) {
+        if (unitCap == -1) {
             unitCap = position.getPositionCount(unitID);
         }
         unitCap -= ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) ? 1 : 0;

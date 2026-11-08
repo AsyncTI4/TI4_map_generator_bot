@@ -1499,6 +1499,7 @@
         "window": "Action",
         "text": "Explore a frontier token that is in or adjacent to a system that contains 1 or more of your ships.",
         "automationID": "probe",
+        "notes": "You must explore a frontier token. This card is not usable if there are no more available frontier tokens.",
         "flavorText": "With a dull thud, the probe shot from the cruiser and accelerated into the writhing maelstrom of the gravity rift. Admiral DeLouis paced on the bridge. Hopefully, this time the probe would return.",
         "source": "pok"
     },

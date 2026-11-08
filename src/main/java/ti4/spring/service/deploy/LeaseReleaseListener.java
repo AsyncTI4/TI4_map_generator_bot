@@ -12,6 +12,7 @@ import org.postgresql.PGConnection;
 import org.postgresql.PGNotification;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 
 @Component
@@ -92,8 +93,10 @@ public class LeaseReleaseListener {
                 statement.execute("LISTEN " + CHANNEL);
             }
             int priorFailures = failures.getAndSet(0);
-            BotLogger.info("Lease release listener is LISTENing on " + CHANNEL
-                    + (priorFailures > 0 ? " after " + priorFailures + " failed attempts" : ""));
+            if (priorFailures > 0) {
+                BotLogger.info("Lease release listener reconnected after "
+                        + StringHelper.pluralize(priorFailures, "failed attempt") + ".");
+            }
             runSafely(onLeaseReleased, SOURCE_CATCH_UP, stop);
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
             while (!stop.get()) {

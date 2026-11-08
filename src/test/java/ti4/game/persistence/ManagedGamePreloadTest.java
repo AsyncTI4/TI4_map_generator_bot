@@ -16,22 +16,21 @@ class ManagedGamePreloadTest {
                     "deleted-since", state("deleted-since", "rev-1"),
                     "row-behind-file", state("row-behind-file", "rev-1")),
             // row-behind-file's row didn't match its game file during the preload, so it was never verified.
-            Set.of("unchanged", "saved-since", "deleted-since"));
+            Set.of("unchanged", "saved-since", "deleted-since"),
+            0L);
 
     @Test
-    void reusesOnlyVerifiedGamesWhoseDatabaseRevisionIsUnchangedSinceThePreload() {
-        Map<String, String> currentRevisionKeys = Map.of(
-                "unchanged", "rev-1",
-                "saved-since", "rev-2",
-                "row-behind-file", "rev-1",
-                "created-since", "rev-1");
+    void reusesOnlyVerifiedGamesWhoseFilesAreUnchangedSinceThePreloadAndStillExist() {
+        // deleted-since has no game file at takeover, and created-since was never preloaded.
+        Set<String> gameNames = Set.of("unchanged", "saved-since", "row-behind-file", "created-since");
 
-        assertThat(PRELOAD.stillCurrent(currentRevisionKeys)).containsExactly("unchanged");
+        assertThat(ManagedGameWarmup.stillCurrent(PRELOAD, Set.of("saved-since"), gameNames))
+                .containsExactly("unchanged");
     }
 
     @Test
-    void reusesNothingWhenTheCurrentRevisionKeysAreUnavailable() {
-        assertThat(PRELOAD.stillCurrent(Map.of())).isEmpty();
+    void countsAsFinishedWhenNoPreloadIsPendingSoTheHealthCheckDoesNotWaitForever() {
+        assertThat(ManagedGamePreload.isFinished()).isTrue();
     }
 
     @Test

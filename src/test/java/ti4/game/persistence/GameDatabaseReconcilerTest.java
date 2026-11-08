@@ -2,7 +2,19 @@ package ti4.game.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.contains;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +72,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).restore(current);
+            verify(fixture.persistence).restoreIfMatchesGameFile(eq(current), any());
             verify(fixture.persistence, never()).replace(any());
             fixture.logs.verify(() -> BotLogger.error(contains("legacy: has an outdated revision key")));
         }
@@ -76,7 +88,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).restore(current);
+            verify(fixture.persistence).restoreIfMatchesGameFile(eq(current), any());
             verify(fixture.persistence, never()).replace(any());
             // Only real content differences are listed; the stale revision columns are not.
             fixture.logs.verify(() -> BotLogger.error(argThat(message -> message.contains("round (expected 5, found 1)")
@@ -102,7 +114,7 @@ class GameDatabaseReconcilerTest {
             fixture.persisted.put("deleted-3", mock(PersistedGameState.class));
             doThrow(new IllegalStateException("database down"))
                     .when(fixture.persistence)
-                    .delete(anyString());
+                    .deleteIfGameFileMissing(anyString(), any());
 
             fixture.run();
 
@@ -126,7 +138,7 @@ class GameDatabaseReconcilerTest {
             fixture.run();
 
             // The run still reaches finish(): the orphaned row is deleted and the failure is reported once.
-            verify(fixture.persistence).delete("deleted");
+            verify(fixture.persistence).deleteIfGameFileMissing(eq("deleted"), any());
             fixture.logs.verify(
                     () -> BotLogger.error(contains("hit errors on 1 game"), any(Throwable.class)), times(1));
         }
@@ -154,7 +166,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).delete("deleted");
+            verify(fixture.persistence).deleteIfGameFileMissing(eq("deleted"), any());
         }
     }
 
@@ -261,7 +273,7 @@ class GameDatabaseReconcilerTest {
 
             fixture.run();
 
-            verify(fixture.persistence).restore(current);
+            verify(fixture.persistence).restoreIfMatchesGameFile(eq(current), any());
             fixture.logs.verify(() -> BotLogger.error(contains("hit errors on 1 game"), same(failure)), times(1));
         }
     }

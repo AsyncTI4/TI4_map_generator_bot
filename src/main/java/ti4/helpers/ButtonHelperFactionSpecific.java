@@ -4174,7 +4174,7 @@ public final class ButtonHelperFactionSpecific {
             default -> 0; // everything else that can't be captured
         };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
-                .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
+                .filter(p -> p.getUnitCap(unitKey.asyncID()) != -1)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
                 .orElse(baseUnitCap);
         return (ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey) < unitCap
@@ -4193,7 +4193,7 @@ public final class ButtonHelperFactionSpecific {
             default -> 0; // everything else that can't be captured
         };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
-                .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
+                .filter(p -> p.getUnitCap(unitKey.asyncID()) != -1)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
                 .orElse(baseUnitCap);
         return unitCap - ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey);

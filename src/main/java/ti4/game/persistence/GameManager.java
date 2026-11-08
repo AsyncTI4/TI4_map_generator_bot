@@ -1,32 +1,25 @@
 package ti4.game.persistence;
 
-import java.io.UncheckedIOException;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
-import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
-import ti4.spring.service.persistence.PersistedManagedGameService;
 import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
@@ -47,157 +40,38 @@ public class GameManager {
         ManagedGamePreload.start();
     }
 
+    public static void buildPreloadedManagedGames() {
+        ManagedGamePreload.buildManagedGames();
+    }
+
+    public static boolean isPreloadFinished() {
+        return ManagedGamePreload.isFinished();
+    }
+
     public static void warmup() {
-        if (!warmupStarted.compareAndSet(false, true)) {
-            return;
-        }
-        long warmupStartedAt = System.currentTimeMillis();
-
-        try {
-            gameNames.addAll(GameLoadService.loadGameNames());
-            resetLatestPbdNumberFrom(0);
-            gameNamesLoadedLatch.countDown();
-            BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
-        } catch (Exception e) {
-            BotLogger.critical("Failed to warmup due to error while loading game names. Shutting down.", e);
-            JdaService.shutdown();
-        }
-
-        JdaService.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Ready to play"));
-
-        ExecutorServiceManager.runAsync("GameManager warmup", () -> {
-            try {
-                BotLogger.info("STARTED BUILDING MANAGED GAMES");
-                WarmupSources sources = warmupSources();
-                Map<String, Exception> failedGames = new ConcurrentHashMap<>();
-                AtomicInteger builtFromPreload = new AtomicInteger();
-                AtomicInteger builtFromDatabase = new AtomicInteger();
-                AtomicInteger builtFromGameFiles = new AtomicInteger();
-                try (ExecutorService executorService =
-                        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
-                    gameNames.forEach(name -> executorService.submit(() -> {
-                        try {
-                            if (sources.preloadedNames().contains(name)) {
-                                buildManagedGameFromPreload(
-                                        sources.persistedGames().get(name));
-                                builtFromPreload.incrementAndGet();
-                                return;
-                            }
-                            boolean fromDatabase = warmupManagedGame(name, sources.persistedGames());
-                            (fromDatabase ? builtFromDatabase : builtFromGameFiles).incrementAndGet();
-                        } catch (Exception e) {
-                            failedGames.put(name, e);
-                        }
-                    }));
-                }
-                reportGamesThatFailedWarmup(failedGames);
-                warmupFinishedLatch.countDown();
-                BotLogger.info(String.format(
-                        "MANAGED GAMES UNBLOCKED %,d MS AFTER WARMUP STARTED (%,d MS WAITING FOR THE STANDBY PRELOAD): %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE, %,d FROM GAME FILES",
-                        System.currentTimeMillis() - warmupStartedAt,
-                        sources.preloadWaitMillis(),
-                        builtFromPreload.get(),
-                        builtFromDatabase.get(),
-                        builtFromGameFiles.get()));
-                if (JdaService.jda != null) {
-                    JdaService.updatePresence();
-                }
-            } catch (Exception e) {
-                BotLogger.critical("Failed during GameManager warmup. Shutting down.", e);
-                JdaService.shutdown();
-            }
-        });
+        if (!warmupStarted.compareAndSet(false, true)) return;
+        ManagedGameWarmup.start();
     }
 
-    private record WarmupSources(
-            @Nullable Map<String, ManagedGameState> persistedGames,
-            Set<String> preloadedNames,
-            long preloadWaitMillis) {}
-
-    private static WarmupSources warmupSources() {
-        long waitStartedAt = System.currentTimeMillis();
-        ManagedGamePreload.Snapshot preload = ManagedGamePreload.take();
-        long preloadWaitMillis = System.currentTimeMillis() - waitStartedAt;
-        if (preload == null) {
-            return new WarmupSources(loadPersistedManagedGames(), Set.of(), preloadWaitMillis);
-        }
-        return new WarmupSources(preload.rows(), preload.stillCurrent(loadCurrentRevisionKeys()), preloadWaitMillis);
+    static void registerGameNames(Collection<String> loadedGameNames) {
+        gameNames.addAll(loadedGameNames);
+        resetLatestPbdNumberFrom(0);
+        gameNamesLoadedLatch.countDown();
     }
 
-    private static Map<String, String> loadCurrentRevisionKeys() {
-        try {
-            return PersistedManagedGameService.getBean().loadRevisionKeys();
-        } catch (Exception e) {
-            BotLogger.error("Could not read current revision keys, so the standby preload will be rechecked.", e);
-            return Map.of();
-        }
+    static void finishWarmup() {
+        warmupFinishedLatch.countDown();
     }
 
-    private static void buildManagedGameFromPreload(ManagedGameState preloadedGame) {
-        gameNameToManagedGame.computeIfAbsent(preloadedGame.name(), _ -> new ManagedGame(preloadedGame));
+    static ManagedGame buildManagedGameIfAbsent(String gameName, Supplier<ManagedGame> newManagedGame) {
+        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> newManagedGame.get());
     }
 
-    @Nullable
-    private static Map<String, ManagedGameState> loadPersistedManagedGames() {
-        if (DatabasePersistenceGate.isDisabled()) {
-            BotLogger.info("Database maintenance mode is on, so every managed game will be built from its game file.");
-            return null;
-        }
-        try {
-            return PersistedManagedGameService.getBean().loadAll();
-        } catch (Exception e) {
-            BotLogger.error(
-                    "Failed to load managed games from the database, so they will be built from game files.", e);
-            return null;
-        }
-    }
-
-    static boolean warmupManagedGame(String gameName, @Nullable Map<String, ManagedGameState> persistedGames) {
-        ManagedGameState persistedGame = persistedGames == null ? null : persistedGames.get(gameName);
-        if (persistedGame != null && buildManagedGameFromCurrentRow(gameName, persistedGame)) {
-            return true;
-        }
-        Game game = buildManagedGameFromGameFile(gameName);
-        if (game != null && persistedGames != null) {
-            GameDatabaseSyncPipeline.queueSyncFromGameFile(gameName);
-        }
-        return false;
-    }
-
-    private static boolean buildManagedGameFromCurrentRow(String gameName, ManagedGameState persistedGame) {
-        if (!persistedGame.matchesRevision(readRevisionKeyOrNull(gameName))) return false;
-        gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(persistedGame));
-        return true;
-    }
-
-    @Nullable
-    private static String readRevisionKeyOrNull(String gameName) {
-        try {
-            return GameRevisionKeyFile.read(gameName);
-        } catch (UncheckedIOException e) {
-            return null;
-        }
-    }
-
-    @Nullable
-    private static Game buildManagedGameFromGameFile(String gameName) {
-        Game game = GameLoadService.load(gameName);
-        if (game != null) {
-            gameNameToManagedGame.computeIfAbsent(gameName, _ -> new ManagedGame(game));
-        }
-        return game;
-    }
-
-    private static void reportGamesThatFailedWarmup(Map<String, Exception> failedGames) {
-        if (failedGames.isEmpty()) return;
-        List<String> failedGameNames = failedGames.keySet().stream().sorted().toList();
-        String firstFailedGameName = failedGameNames.getFirst();
-        BotLogger.error(
-                "Could not build " + StringHelper.pluralize(failedGameNames.size(), "managed game")
-                        + " at startup: " + String.join(", ", failedGameNames)
-                        + ". They stay unloaded until they are next accessed. The stack trace is from "
-                        + firstFailedGameName + ".",
-                failedGames.get(firstFailedGameName));
+    static void discardManagedGame(String gameName, ManagedGame managedGame) {
+        ManagedGame remaining = gameNameToManagedGame.computeIfPresent(
+                gameName, (_, current) -> current == managedGame ? null : current);
+        if (remaining != null) return;
+        managedGame.getPlayers().forEach(player -> player.removeGame(gameName, managedGame));
     }
 
     @Nullable
@@ -258,8 +132,6 @@ public class GameManager {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
-        // TODO: Queued after the file write lock is released, so two concurrent saves of one game can reach the
-        // database out of order and leave the older state until the next save or the nightly reconciliation.
         ManagedGameState managedGameState = ManagedGameState.of(game);
         GameDatabaseSyncPipeline.queueSync(game, managedGameState);
 

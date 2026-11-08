@@ -24,8 +24,9 @@ deploy that is still running (`cancel-in-progress`).
 ```mermaid
 flowchart TD
     push([Push to master / manual dispatch]) --> backup1[saveGamesBeforeDeploy<br/>commit and push save files on the host]
-    backup1 --> build["buildImage<br/>docker build, push to GHCR<br/>tags sha-COMMIT and master"]
-    build --> ssh[Wait for the host SSH port<br/>up to ~15 min]
+    push --> build["buildImage<br/>sparse checkout of the Dockerfile inputs<br/>docker build, push to GHCR<br/>tags sha-COMMIT and master"]
+    backup1 --> ssh[Wait for the host SSH port<br/>up to ~15 min]
+    build --> ssh
     ssh --> remote
 
     subgraph remote [On the Hostinger host, over SSH]
@@ -41,8 +42,20 @@ flowchart TD
         verify2 -->|No| fail([Job fails])
     end
 
+    prune --> tag["tagDeployedImage<br/>point deployed at sha-COMMIT"]
     prune --> backup2[saveGamesAfterDeploy<br/>commit and push save files again]
 ```
+
+The backup and the image build run at the same time; the deploy waits for both, so the saves
+are still backed up before the new container starts. The image build checks out only what the
+Dockerfile reads (the `Dockerfile`, `.dockerignore`, `pom.xml`, `src/main/java` and the
+classpath config), because the runtime resources come from the host checkout.
+
+The build pushes `sha-COMMIT` and `master`, so `master` is the image of the latest commit on
+the master branch, whether or not it has been deployed. The `deployed` tag moves to the image
+after the deploy succeeds, so it always names the image that is running. `RestartBot`, `StartBot` and
+the compose file's default run `deployed`, so a run whose backup or deploy failed can't slip
+undeployed code into a later restart.
 
 Each remote step also posts a timestamped line to the deploy Discord webhook.
 
@@ -80,9 +93,12 @@ flowchart TD
 ```
 
 "Healthy" is the compose healthcheck on `GET /api/public/ping`. Ping returns `200` only once
-the process has reached lease participation, near the end of startup (see section 3). A new
-process that is healthy is therefore fully started and waiting on standby; it is not yet
-the active bot.
+the process has reached lease participation, near the end of startup (see section 3), and its
+managed game preload, including the ManagedGames built from it, has finished. A new process
+that is healthy is therefore fully started, has its games ready and is waiting on standby; it
+is not yet the active bot. Waiting for the preload keeps a slow standby build out of the
+handover window: the old process keeps serving commands until the new one can take over with
+its games already built.
 
 The drain endpoint only accepts loopback callers, which is why the script calls it with
 `docker exec` inside the old container.
@@ -114,26 +130,26 @@ sequenceDiagram
 
     Note over Old,DB: Old renews the lease every 5 s
     Script->>New: compose up --scale (start new container)
-    New->>New: Spring up, start managed game preload,<br/>JDA login, guilds, static data, warm handlers
+    New->>New: Spring up, start managed game preload,<br/>JDA login, guilds, build ManagedGames from the preload,<br/>static data, warm handlers
     New->>DB: tryAcquireLease
     DB-->>New: refused (Old holds an unexpired lease)
     New->>DB: LISTEN active_lease_released
     New->>New: lease participation on, register crons,<br/>markProcessReady
     Script->>New: Docker healthcheck GET /api/public/ping
-    New-->>Script: 200 pong (healthy)
+    New-->>Script: 503 until the preload and standby build finish, then 200 pong (healthy)
     Script->>Old: POST /api/public/deploy/drain
     Old->>Old: draining = true, ready = false,<br/>stop participating, close Spring context
     Traefik->>Old: GET /api/public/ready
     Old-->>Traefik: 503 (Traefik stops routing to Old)
-    Old->>Old: Shutdown steps: executors, crons, pipelines,<br/>flush active hours
+    Old->>Old: Drain workers, crons, slice generation,<br/>flush active hours
     Old->>DB: releaseLease (expire it, pg_notify)
     DB-->>New: NOTIFY active_lease_released
     New->>DB: tryAcquireLease
     DB-->>New: granted
-    New->>New: active = true: lease start jobs,<br/>GameManager.warmup, data migrations, ready = true
+    New->>New: active = true: lease start jobs,<br/>GameManager.warmup (keep current standby builds,<br/>rebuild games saved since the preload),<br/>data migrations, ready = true
     Traefik->>New: GET /api/public/ready
     New-->>Traefik: 200 (Traefik routes to New)
-    Old->>Old: send buffered logs, shut down JDA, exit
+    Old->>Old: drain render, stats, web state, DB sync,<br/>send logs, shut down JDA, exit
     Script->>Old: docker stop --time 600, docker rm
 ```
 
@@ -166,21 +182,27 @@ stateDiagram-v2
     Standby --> Active: release notification or 5 s poll<br/>claims the lease
     Active --> Standby: renew failed (lease lost)
     Active --> Draining: POST /deploy/drain<br/>or /admin disable_bot
-    Draining --> Released: shutdown steps finish,<br/>lease expired + pg_notify
+    Draining --> Released: game writers and flush drained,<br/>lease expired + pg_notify
     Released --> [*]: JDA shut down, JVM exits
 ```
 
 Log lines carry the state as a prefix: `[STANDBY xxxxxxxx]`, `[WARMING xxxxxxxx]` (active but
 not ready) and `[DRAINING xxxxxxxx]`, where `xxxxxxxx` is the short instance id. The active,
-ready process has no prefix.
+ready process has no prefix. A draining process keeps the `[DRAINING]` prefix after it releases
+the lease, until it exits.
 
 ### Startup work that waits for the lease
 
 Some startup work must only run on the process that will own the games, so it runs from the
 lease-acquired callback rather than in `main`: `CronManager.runLeaseStartJobs()`,
-`GameManager.warmup()` and `DataMigrationManager.runMigrations()`. The managed game
-preload, by contrast, starts right away on the standby, so the warmup after takeover can build
-most games from the preload instead of from scratch.
+`GameManager.warmup()` and `DataMigrationManager.runMigrations()`.
+
+The managed games, by contrast, are built on the standby. The preload loads the database rows
+right after the Spring context starts, and the ManagedGames are built from them once JDA is
+ready. Takeover then keeps the standby builds whose game files haven't changed since the
+preload, and rebuilds only the rest. Commands that need ManagedGames wait for that, so it is
+the part of the handover window the new process adds. See the
+[persistence README](src/main/java/ti4/game/persistence/README.md#warmup) for the rules.
 
 ### Shutdown steps
 
@@ -191,30 +213,55 @@ thread is interrupted:
 1. Mark the process as shutting down, set the shutdown presence, stop accepting commands,
    then close the JDA event pool.
 2. **In parallel:** `ExecutorServiceManager` and `CronManager`.
-3. **In parallel:** `SliceGenerationPipeline`, `MapRenderPipeline`, `StatisticsPipeline` and the
-   user active-hours flush.
-4. **In parallel:** `GameWebStatePipeline` and `GameDatabaseSyncPipeline`.
-5. **One after another:** release the active lease, send buffered logs, shut down JDA.
+3. **In parallel:** `SliceGenerationPipeline` and the user active-hours flush.
+4. Release the active lease.
+5. **In parallel:** `MapRenderPipeline`, `StatisticsPipeline`, `GameWebStatePipeline` and
+   `GameDatabaseSyncPipeline`.
+6. **One after another:** send buffered logs, shut down JDA.
 
-The phases follow who hands work to whom:
+**What has to finish before the lease.** Once the new process holds the lease, it loads games
+from the shared game files and starts writing. Game file locks and the user settings lock only
+work inside one process. So these finish before the lease is released:
+- Every step that can save a game: workers, crons and slice generation.
+- The active-hours flush. It rewrites whole `user_settings` rows, so after the handover it
+  could overwrite a setting the new process had just saved.
+
+**What drains after the lease:**
+- Statistics and web state only read.
+- Database writes go through `replaceIfMatchesGameFile`, `restoreIfMatchesGameFile` and
+  `deleteIfGameFileMissing`, from both the sync pipeline and the reconciler. Each write takes a
+  per-game Postgres advisory lock, then checks the game file:
+  - A write is skipped if the snapshot's revision key no longer matches the file's. A newer save
+    has already queued its own sync. This also keeps two quick saves of one game from reaching
+    the database out of order.
+  - A write is skipped if the game file is gone, so a stale sync can't bring a deleted game
+    back. A delete is skipped if the file exists.
+  - A write is skipped if the stored row has a newer `GameEntityMapper.MAPPING_VERSION`, so an
+    old process can't overwrite a row the new code already rebuilt.
+  - Game files saved before revision keys existed have none. They still sync while the file
+    exists, but without the ordering protection.
+- Map renders post to Discord, and also write website data, map overlays and the "latest map
+  message" ids, without a lease check (see Known gaps).
+
+The phases also follow who hands work to whom:
 - Event handlers queue work onto the workers and pipelines.
 - Worker tasks start renders, slice generation and statistics jobs, and record user active
-  hours, so the flush waits for them.
+  hours, so those wait for the workers.
 - Workers and crons can drain together. Workers do schedule on the cron scheduler (circuit
   breaker resets, rate-limited log messages), but `CronManager.scheduleOnce` returns `false`
   instead of throwing once the scheduler is shut down. Anything scheduled after that point would
   never run anyway.
 - Anything that saves a game (`GameManager.save`) queues onto the web-state and database-sync
-  pipelines, so they close last.
-- The lease is released after the database sync phase.
+  pipelines, so they close after every game writer.
 
 This ordering is best effort, bounded by each executor's timeout (see Known gaps). When you add
-an executor, put it in the phase after everything that submits to it.
-`JdaServiceShutdownStepsTest` checks the order.
+an executor, put it in the phase after everything that submits to it. Put it before the lease if
+it writes shared state that the new process also writes, unless that write is guarded the way
+database sync is. `JdaServiceShutdownStepsTest` checks the order.
 
-The new process can't take over until the lease is released, so phases 1–4 also set how long
-interactions go unanswered during a rollover. In the worst case, where every executor runs to
-its timeout, the old sequential order took about 235 s and the phased order takes about 165 s:
+Interactions go unanswered from the start of the drain until the new process holds the lease.
+In the worst case, where every executor runs to its timeout, the lease is released after about
+95 s and the whole shutdown takes about 165 s:
 
 ```mermaid
 gantt
@@ -222,26 +269,17 @@ gantt
     dateFormat X
     axisFormat %s
 
-    section Before (sequential)
-    JDA event pool            :b1, 0, 5s
-    ExecutorServiceManager    :b2, after b1, 60s
-    CronManager               :b3, after b2, 30s
-    Active-hours flush        :milestone, b4, after b3, 0s
-    SliceGenerationPipeline   :b5, after b3, 30s
-    MapRenderPipeline         :b6, after b5, 20s
-    StatisticsPipeline        :b7, after b6, 10s
-    GameWebStatePipeline      :b8, after b7, 10s
-    GameDatabaseSyncPipeline  :b9, after b8, 30s
-    JDA shutdown              :crit, b10, after b9, 40s
-
-    section After (phased)
+    section Before the lease
     JDA event pool            :a1, 0, 5s
     ExecutorServiceManager    :a2, after a1, 60s
     CronManager               :a3, after a1, 30s
     SliceGenerationPipeline   :a5, after a2, 30s
-    MapRenderPipeline         :a6, after a2, 20s
-    StatisticsPipeline        :a7, after a2, 10s
     Active-hours flush        :milestone, a4, after a2, 0s
+    Lease released            :milestone, a11, after a5, 0s
+
+    section After the lease
+    MapRenderPipeline         :a6, after a5, 20s
+    StatisticsPipeline        :a7, after a5, 10s
     GameWebStatePipeline      :a8, after a5, 10s
     GameDatabaseSyncPipeline  :a9, after a5, 30s
     JDA shutdown              :crit, a10, after a9, 40s
@@ -249,25 +287,55 @@ gantt
 
 Each bar is that executor's timeout (JDA gets 20 s, then 20 s more after `shutdownNow`). The
 active-hours flush, the lease release and sending buffered logs have no timeout. They are
-usually quick, so they are drawn as a point or left out. Real shutdowns are usually much faster,
+usually quick, so they are drawn as points or left out. Real shutdowns are usually much faster,
 because most executors are idle.
+
+### Deployment log lines
+
+A rollout posts these lines to the bot log, in this order. The instance prefixes are described
+in [Process states](#process-states).
+
+| Process | Line | Meaning |
+| --- | --- | --- |
+| New | `[STANDBY x] STARTED UP ON N SERVERS (N FOR NEW GAMES, N FOG OF WAR) IN N MS AFTER THE JVM STARTED: …` | Startup finished and the process is waiting for the lease. The list is the time each startup step took. When no process holds the lease, the new process takes it on startup instead: `TOOK THE ACTIVE LEASE (on startup)` comes first, and this line has no prefix. |
+| New | `[STANDBY x] BUILT N MANAGED GAMES ON THE STANDBY N MS AFTER THE PRELOAD STARTED` | The standby build finished. Ping reports healthy from here, so the drain follows within a few seconds. It can come before or after the startup line. |
+| Old | `[DRAINING x] STOPPED ACCEPTING COMMANDS` | The drain started. From here until the unblock line, interactions go unanswered. |
+| Old | `[DRAINING x] RELEASED THE ACTIVE LEASE N MS AFTER STOPPING COMMANDS: …` | The steps that must finish before the handover, and how long each took. |
+| New | `[WARMING x] TOOK THE ACTIVE LEASE (release notification)` | The new process holds the lease. The source is `on startup`, `release notification`, `poll` or `listener connect catch-up`. |
+| New | `UNBLOCKED N MANAGED GAMES N MS AFTER TAKING THE LEASE: …` | Commands work again. The line breaks the takeover into steps and says where each ManagedGame came from. |
+| Old | `[DRAINING x] FINISHED DRAINING N MS AFTER STOPPING COMMANDS: …` | The pipelines that drain after the handover, and how long each took. JDA shuts down next. |
+
+The handover window is the time from `STOPPED ACCEPTING COMMANDS` to `UNBLOCKED`. Lines from
+the two processes can arrive slightly out of order, because each posts through its own webhook
+queue, so compare their timestamps rather than their order in the channel.
+
+An executor that doesn't drain cleanly is marked in the summary, for example
+`map rendering (timed out)`, and gets its own warning line.
 
 ## Known gaps
 
 - **Interactions in the handover window go unanswered.** The old process stops handling
   Discord events the moment it starts draining, and the new one only starts once it holds the
-  lease, after the old one's shutdown steps finish. Interactions in between get no reply.
+  lease, after the old one has drained the steps that must finish first (see Shutdown steps).
+  Interactions in between get no reply.
 - **A crashed active process blocks takeover for up to an hour.** Only a clean shutdown
   releases the lease. If the active JVM dies without running its shutdown steps, the lease
   stays valid until it expires (up to 3600 s after the last renewal). A restarted container
   gets a new `INSTANCE_ID`, so it cannot reclaim the old lease either.
 - **Shutdown ordering is bounded by timeouts.** An executor that hits its timeout may still be
-  running when the next phase starts. If `GameDatabaseSyncPipeline` times out, the lease is
-  released anyway, and the old process may still be finishing a write after the new one takes
-  over.
+  running when the next phase starts. A worker or cron that runs past its timeout can still save
+  a game after the lease is released, overwriting the new process's change to that game file.
 - **JDA callbacks outlive the executors.** REST callbacks (`queue(success, failure)`) run on
   JDA's own threads until JDA shuts down in the last phase. One that saves a game, queues a render
   or schedules a cron after its executor has closed has that work refused. The persistence
   pipelines log or drop the refused task.
+- **Map renders after the handover can overwrite newer website data.** A render that drains
+  after the lease is released still uploads website data, saves map overlays and records the
+  "latest map message" ids, from a snapshot taken before the handover. If the new process
+  renders the same game in that window, the older render can land last. Game files are not
+  affected, and the next render fixes it.
+- **A game file read error drops that game's database write.** The guarded writes read the game
+  file inside the transaction. If that read fails, the write rolls back and is logged, and the
+  row stays behind until the next save or reconcile.
 - **A container that fails to become healthy in 540 s is rolled back**, even if it would
   have finished starting later. The old container keeps running, and the deploy job fails.
