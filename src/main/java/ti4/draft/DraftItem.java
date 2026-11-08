@@ -190,15 +190,8 @@ public abstract class DraftItem {
 
     @JsonIgnore
     public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr, boolean useAlternateText) {
-        List<TextDisplay> textFields = new ArrayList<>();
-
-        String details = getTitle(game);
-        if (showDescr || DraftCategory.showDescrByDefault()) {
-            String descr = getDisplayDescription(game, getLongDescriptionImpl(game), useAlternateText);
-            descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
-            details += System.lineSeparator() + "> " + descr;
-        }
-        textFields.add(TextDisplay.of(details));
+        List<TextDisplay> textFields =
+                getTextDisplaysWithoutLinkedComponents(game, player, showDescr, useAlternateText);
 
         if (hasAdditionalComponents() && (game == null || !game.isTwilightsFallMode())) {
             List<String> adds = new ArrayList<>();
@@ -221,6 +214,18 @@ public abstract class DraftItem {
             textFields.add(TextDisplay.of(String.join(System.lineSeparator(), swaps)));
         }
         return textFields;
+    }
+
+    @JsonIgnore
+    public List<TextDisplay> getTextDisplaysWithoutLinkedComponents(
+            Game game, Player player, boolean showDescr, boolean useAlternateText) {
+        String details = getTitle(game);
+        if (showDescr || DraftCategory.showDescrByDefault()) {
+            String descr = getDisplayDescription(game, getLongDescriptionImpl(game), useAlternateText);
+            descr = descr.trim().replace("\n> ", "\n").replace("\n", "\n> ");
+            details += System.lineSeparator() + "> " + descr;
+        }
+        return List.of(TextDisplay.of(details));
     }
 
     @JsonIgnore
@@ -280,7 +285,7 @@ public abstract class DraftItem {
         return sb.toString();
     }
 
-    private List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
+    public List<DraftErrataModel> getAvailableOptionalSwaps(Game game) {
         return Errata.getOptionalSwaps().stream()
                 .filter(item -> item.getItemCategory() != DraftCategory.MONUMENT
                         || game == null
