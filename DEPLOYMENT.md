@@ -80,9 +80,12 @@ flowchart TD
 ```
 
 "Healthy" is the compose healthcheck on `GET /api/public/ping`. Ping returns `200` only once
-the process has reached lease participation, near the end of startup (see section 3). A new
-process that is healthy is therefore fully started and waiting on standby; it is not yet
-the active bot.
+the process has reached lease participation, near the end of startup (see section 3), and its
+managed game preload, including the ManagedGames built from it, has finished. A new process
+that is healthy is therefore fully started, has its games ready and is waiting on standby; it
+is not yet the active bot. Waiting for the preload keeps a slow standby build out of the
+handover window: the old process keeps serving commands until the new one can take over with
+its games already built.
 
 The drain endpoint only accepts loopback callers, which is why the script calls it with
 `docker exec` inside the old container.
@@ -120,7 +123,7 @@ sequenceDiagram
     New->>DB: LISTEN active_lease_released
     New->>New: lease participation on, register crons,<br/>markProcessReady
     Script->>New: Docker healthcheck GET /api/public/ping
-    New-->>Script: 200 pong (healthy)
+    New-->>Script: 503 until the preload and standby build finish, then 200 pong (healthy)
     Script->>Old: POST /api/public/deploy/drain
     Old->>Old: draining = true, ready = false,<br/>stop participating, close Spring context
     Traefik->>Old: GET /api/public/ready
@@ -282,6 +285,7 @@ in [Process states](#process-states).
 | Process | Line | Meaning |
 | --- | --- | --- |
 | New | `[STANDBY x] STARTED UP ON N SERVERS (N FOR NEW GAMES, N FOG OF WAR) IN N MS AFTER THE JVM STARTED: …` | Startup finished and the process is waiting for the lease. The list is the time each startup step took. When no process holds the lease, the new process takes it on startup instead: `TOOK THE ACTIVE LEASE (on startup)` comes first, and this line has no prefix. |
+| New | `[STANDBY x] BUILT N MANAGED GAMES ON THE STANDBY N MS AFTER THE PRELOAD STARTED` | The standby build finished. Ping reports healthy from here, so the drain follows within a few seconds. It can come before or after the startup line. |
 | Old | `[DRAINING x] STOPPED ACCEPTING COMMANDS` | The drain started. From here until the unblock line, interactions go unanswered. |
 | Old | `[DRAINING x] RELEASED THE ACTIVE LEASE N MS AFTER STOPPING COMMANDS: …` | The steps that must finish before the handover, and how long each took. |
 | New | `[WARMING x] TOOK THE ACTIVE LEASE (release notification)` | The new process holds the lease. The source is `on startup`, `release notification`, `poll` or `listener connect catch-up`. |

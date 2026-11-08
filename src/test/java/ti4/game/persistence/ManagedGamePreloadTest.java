@@ -29,6 +29,11 @@ class ManagedGamePreloadTest {
     }
 
     @Test
+    void countsAsFinishedWhenNoPreloadIsPendingSoTheHealthCheckDoesNotWaitForever() {
+        assertThat(ManagedGamePreload.isFinished()).isTrue();
+    }
+
+    @Test
     void takeWithoutAPreloadReturnsNothingSoWarmupBuildsFromScratch() {
         assertThat(ManagedGamePreload.take()).isNull();
     }

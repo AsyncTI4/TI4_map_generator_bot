@@ -44,6 +44,10 @@ public class GameManager {
         ManagedGamePreload.buildManagedGames();
     }
 
+    public static boolean isPreloadFinished() {
+        return ManagedGamePreload.isFinished();
+    }
+
     public static void warmup() {
         if (!warmupStarted.compareAndSet(false, true)) return;
         ManagedGameWarmup.start();

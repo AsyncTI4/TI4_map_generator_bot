@@ -42,6 +42,11 @@ class ManagedGamePreload {
                 : future.thenApplyAsync(ManagedGamePreload::withManagedGames, MANAGED_GAME_BUILDER));
     }
 
+    static boolean isFinished() {
+        CompletableFuture<Snapshot> future = preload.get();
+        return future == null || future.isDone();
+    }
+
     private static void complete(CompletableFuture<Snapshot> future) {
         try {
             future.complete(build());
@@ -80,6 +85,9 @@ class ManagedGamePreload {
                         }
                     }));
         }
+        BotLogger.info(String.format(
+                "BUILT %,d MANAGED GAMES ON THE STANDBY %,d MS AFTER THE PRELOAD STARTED",
+                standbyBuiltGames.size(), System.currentTimeMillis() - snapshot.startedAtMillis()));
         if (!failedNames.isEmpty()) {
             BotLogger.warning("Could not build " + failedNames.size()
                     + " managed games on the standby, so takeover will build them: "
