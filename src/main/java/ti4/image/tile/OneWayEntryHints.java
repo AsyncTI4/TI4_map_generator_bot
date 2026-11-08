@@ -14,7 +14,8 @@ final class OneWayEntryHints {
     private OneWayEntryHints() {}
 
     static void draw(TileScene scene, TileLayer layer) {
-        List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(layer.tile().getPosition());
+        List<String> neighbours =
+                MapPositionMapper.getAdjacentTilePositions(layer.tile().getPosition());
         if (neighbours == null || neighbours.size() != 6) {
             return;
         }
