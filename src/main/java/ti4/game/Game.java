@@ -3486,6 +3486,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 MorphaUnitHandler.recordCytoplasmicTransportDiscards(this, player, 1);
             }
             CommanderUnlockCheckService.checkAllPlayersInGame(this, "morpha");
+            CommanderUnlockCheckService.checkPlayer(player, "xyrix");
             return true;
         }
         return false;
@@ -3525,6 +3526,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             }
             setPurgedActionCard(acID, played);
+            if (played) {
+                CommanderUnlockCheckService.checkPlayer(player, "xyrix");
+            }
             return true;
         }
         return false;

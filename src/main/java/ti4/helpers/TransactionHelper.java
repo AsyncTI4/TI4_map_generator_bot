@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -2608,6 +2609,8 @@ public class TransactionHelper {
                 || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
                 || player.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
                 || player2.getPromissoryNotesInPlayArea().contains("viability_trade_convoys")
+                || XyrixTomeHandler.mayTransactWithNonNeighbor(game, player)
+                || XyrixTomeHandler.mayTransactWithNonNeighbor(game, player2)
                 || player2.getNeighbouringPlayers(false).contains(player)
                 || player.getNeighbouringPlayers(false).contains(player2)
                 || ThirtyKTransactions.mayTransact(game, player, player2);

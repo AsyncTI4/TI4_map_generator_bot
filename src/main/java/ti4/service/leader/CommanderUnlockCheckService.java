@@ -425,6 +425,8 @@ public class CommanderUnlockCheckService {
                     "thurviali" ->
                 shouldBeUnlocked =
                         LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
+
+            case "xyrix" -> shouldBeUnlocked = true;
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

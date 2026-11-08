@@ -11,6 +11,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -107,6 +110,10 @@ public class StatusCleanupService {
         }
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+
+            XyrixBreakthroughHandler.clearRoundState(player);
+            XyrixPromissoryHandler.clearPendingFrontierExplore(game, player);
+            XyrixTechHandler.clearRoundState(game, player);
 
             game.removeStoredValue("theodisiMinisterRelationsExhausted_" + player.getFaction());
             game.removeStoredValue("theodisiSeatOfPowerExhausted_" + player.getFaction());

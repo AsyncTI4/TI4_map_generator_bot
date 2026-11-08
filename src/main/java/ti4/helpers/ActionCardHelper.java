@@ -43,6 +43,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGame
 import ti4.discord.interactions.buttons.handlers.actioncards.secretsonly.CovertExchangeActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -818,6 +819,9 @@ public class ActionCardHelper {
             MessageChannel channel) {
         if (player.hasAbility("hydromorphic")) {
             return "You cannot use Action Card effects while you have Hydromorphic.";
+        }
+        if (XyrixLeadersHandler.preventsOpponentActionCards(game, player)) {
+            return "You cannot play action cards during the active player's turn due to _Intillectual Immunity_.";
         }
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);

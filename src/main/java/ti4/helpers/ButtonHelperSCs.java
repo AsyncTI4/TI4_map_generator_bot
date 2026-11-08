@@ -1670,6 +1670,131 @@ public final class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("alexandria_follow_")
+    public static void offerAlexandriaFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        int scNum = parseStrategyCardNumber(buttonID);
+        if (!player.hasPlanet("alexandria")
+                || player.getExhaustedPlanetsAbilities().contains("alexandria")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Iterative Indexing is not ready to use.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        player.exhaustPlanetAbility("alexandria");
+        String pendingKey = "alexandriaFollowPending_" + player.getFaction();
+        String promptId = event.getMessageId();
+        game.setStoredValue(pendingKey, promptId + "_" + scNum);
+        List<Button> buttons = new ArrayList<>();
+        if (player.getTacticalCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_tactic",
+                    "Spend from Tactic Pool"));
+        }
+        if (player.getFleetCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_fleet",
+                    "Spend from Fleet Pool"));
+        }
+        if (player.getStrategicCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_strategy",
+                    "Spend from Strategy Pool"));
+        }
+        if (buttons.isEmpty()) {
+            game.removeStoredValue(pendingKey);
+            player.refreshPlanet("alexandria");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have a command token to spend.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose the pool from which to spend a command token to follow **"
+                        + Helper.getSCName(scNum, game) + "**.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("alexandriaFollowSpend_")
+    public static void resolveAlexandriaFollow(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("alexandriaFollowSpend_", "").split("_", 3);
+        if (parts.length != 3) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        int scNum = parseStrategyCardNumber(parts[1]);
+        String pendingKey = "alexandriaFollowPending_" + player.getFaction();
+        if (!(parts[0] + "_" + scNum).equals(game.getStoredValue(pendingKey))
+                || !player.hasPlanet("alexandria")
+                || !player.getExhaustedPlanetsAbilities().contains("alexandria")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "That Iterative Indexing follow is no longer available.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!spendAlexandriaCommandToken(player, parts[2])) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You do not have a command token in that pool to spend.");
+            return;
+        }
+        game.removeStoredValue(pendingKey);
+        if (!player.getFollowedSCs().contains(scNum)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+        }
+        player.addFollowedSC(scNum, event);
+        if ("strategy".equals(parts[2])) {
+            VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
+            TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
+            if (player.hasAbility("strategic_fluidity")) {
+                OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
+            }
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                    player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");
+        }
+        MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scNum);
+        MessageHelper.sendMessageToChannel(
+                channel,
+                player.getRepresentationUnfogged()
+                        + " exhausted _Iterative Indexing_ and spent 1 command token from their " + parts[2]
+                        + " pool to follow " + Helper.getSCName(scNum, game) + ".");
+        if (game.isFowMode()) {
+            reactToStrategyCardMessage(game, player, scNum, null);
+        } else {
+            reactToFollowedStrategyCard(game, player, channel);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static int parseStrategyCardNumber(String value) {
+        try {
+            return Integer.parseInt(StringUtils.substringAfterLast(value, "_"));
+        } catch (NumberFormatException e) {
+            return Integer.parseInt(value);
+        }
+    }
+
+    private static boolean spendAlexandriaCommandToken(Player player, String pool) {
+        return switch (pool) {
+            case "tactic" -> {
+                if (player.getTacticalCC() < 1) yield false;
+                player.setTacticalCC(player.getTacticalCC() - 1);
+                yield true;
+            }
+            case "fleet" -> {
+                if (player.getFleetCC() < 1) yield false;
+                player.setFleetCC(player.getFleetCC() - 1);
+                yield true;
+            }
+            case "strategy" -> {
+                if (player.getStrategicCC() < 1) yield false;
+                player.setStrategicCC(player.getStrategicCC() - 1);
+                yield true;
+            }
+            default -> false;
+        };
+    }
+
     public static void reactToFollowedStrategyCard(Game game, Player player, MessageChannel channel) {
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 

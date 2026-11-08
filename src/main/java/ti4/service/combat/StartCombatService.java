@@ -52,6 +52,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Uy
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -1908,6 +1909,8 @@ public class StartCombatService {
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p1, tile);
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p2, tile);
         }
+        XyrixUnitHandler.addScholarsCombatButton(buttons, game, p1, tile);
+        XyrixUnitHandler.addScholarsCombatButton(buttons, game, p2, tile);
         if (isGroundCombat) {
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p2);

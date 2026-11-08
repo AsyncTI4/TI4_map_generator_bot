@@ -1004,6 +1004,17 @@ class GameLoadService {
                                 hydromorphicCardInfo.nextToken(), Integer.parseInt(hydromorphicCardInfo.nextToken()));
                     }
                 }
+                case Constants.TOME_CARDS -> {
+                    StringTokenizer tomeCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (tomeCardToken.hasMoreTokens()) {
+                        StringTokenizer tomeCardInfo = new StringTokenizer(tomeCardToken.nextToken(), ",");
+                        player.setTomeCard(tomeCardInfo.nextToken(), Integer.parseInt(tomeCardInfo.nextToken()));
+                    }
+                }
+                case Constants.TOME_CARD_IN_PLAY ->
+                    player.setTomeCardInPlay(tokenizer.hasMoreTokens() ? tokenizer.nextToken() : "");
+                case Constants.TOME_CARDS_INITIALIZED ->
+                    player.setTomeCardsInitialized(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.EVENTS -> {
                     StringTokenizer eventToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (eventToken.hasMoreTokens()) {

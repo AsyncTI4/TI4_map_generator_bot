@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.Bl
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
@@ -1265,6 +1266,9 @@ public class StartPhaseService {
         playPreassignedGiftOfPrescience(event, game);
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        for (Player player : game.getRealPlayers()) {
+            XyrixTomeHandler.offerEndOfStrategyTome(game, player);
+        }
         TurnActionLog.drain(game);
         for (Player player : game.getRealPlayers()) {
             MonumentsBRButtonHandler.offerArmageddonProject(game, player);

@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.Ch
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
@@ -55,6 +56,7 @@ public class PassService {
 
         ChoirAbilityHandler.syncMorbidHarmony(player);
         player.setPassed(true);
+        XyrixPromissoryHandler.placeFrontierTokenOnPass(game, player);
         MigoAbilityHandler.offerCerebralArchiveResearch(game, player);
         ThirtyKSecretHooks.onPassed(game, player);
         GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, true));
