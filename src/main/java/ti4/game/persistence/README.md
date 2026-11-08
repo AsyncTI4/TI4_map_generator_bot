@@ -8,7 +8,8 @@ database rows are a derived view that reconciliation can repair.
 
 | Entry point | Responsibility |
 | --- | --- |
-| [GameManager](GameManager.java) | Warmup, game lookup, save, delete, reload, undo, and managed-game/player indexes. |
+| [GameManager](GameManager.java) | Game lookup, save, delete, reload, undo, and managed-game/player indexes. `warmup()` delegates to `ManagedGameWarmup`. |
+| [ManagedGamePreload](ManagedGamePreload.java), [ManagedGameWarmup](ManagedGameWarmup.java) | The standby's preload and ManagedGame build, and the takeover that keeps the current ones and rebuilds the rest. |
 | [ManagedGame](ManagedGame.java), [ManagedPlayer](ManagedPlayer.java) | Lightweight metadata and player-to-game relationships. `ManagedGame.getGame()` loads the full game. |
 | [ConsumeGameUtility](ConsumeGameUtility.java) | Bulk game processing with execution locks and handling for games that cannot be loaded. |
 | [GameSnapshots](GameSnapshots.java) | Make an independent game copy through the save/load format for consumers such as map rendering. |
@@ -115,16 +116,37 @@ the file deletion operation succeeds.
 
 ## Warmup
 
-At startup `GameManager.warmup` loads every database row whose mapping version is
-current, then builds each `ManagedGame`:
+Warmup is split between the standby and the takeover, so the managed-game build
+happens before the process holds the lease.
 
-- A row whose revision key matches the game file header builds the `ManagedGame`
-  without parsing the file.
-- Otherwise the file is parsed, and a missing or outdated row queues a resync from
-  the file.
+**On the standby**, `ManagedGamePreload`:
+1. Right after the Spring context starts, loads every database row whose mapping
+   version is current, and verifies each against its game file's revision key.
+2. Right after JDA is ready, builds a `ManagedGame` from every verified row,
+   straight into the live `GameManager` maps. Nothing reads them yet: every reader
+   waits on a warmup latch that opens only at takeover. It records which games it
+   built, behind a read/write lock.
+
+**At takeover**, `ManagedGameWarmup` runs these steps before the game-names latch
+opens:
+1. Lists the game names, waits for the preload, and closes the standby build.
+2. Lists the game files modified since the preload started (with a one-second
+   margin).
+3. Keeps a standby build only if its row matched the file at preload time, the file
+   hasn't been modified since, and the game still exists. It doesn't consult the
+   database: the old process releases the lease before its database sync drains, so
+   rows can lag. The rest are discarded and taken off their players, checking
+   instance identity, because `ManagedGame` equality is by name.
+
+Then, after the names latch opens:
+- It reads fresh rows for the saved games in one query (every row past 100 games).
+- It builds every game still missing. A row whose revision key matches the game
+  file header builds the `ManagedGame` without parsing the file. Otherwise the file
+  is parsed, and a missing or outdated row queues a resync from the file.
 
 With maintenance mode on, or if the database read fails, every game is built from
-its file and no resync is queued.
+its file and no resync is queued. If the preload is missing or the file listing
+fails, every game is checked against its file.
 
 ## Reconciliation scheduling
 

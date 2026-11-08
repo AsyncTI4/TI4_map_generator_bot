@@ -5,8 +5,10 @@ import static ti4.game.persistence.GamePersistenceKeys.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,6 +80,31 @@ class GameLoadService {
             .build();
     private static final Pattern EM_DASH_PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
+
+    static Set<String> gameNamesSavedSince(long sinceMillis) {
+        try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
+            return pathStream
+                    .filter(path -> path.toString().toLowerCase().endsWith(GAME_FILE_EXTENSION))
+                    .filter(path -> lastModifiedMillis(path) >= sinceMillis)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .map(GameLoadService::stripGameFileExtension)
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toUnmodifiableSet());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static long lastModifiedMillis(Path path) {
+        try {
+            return Files.getLastModifiedTime(path).toMillis();
+        } catch (NoSuchFileException e) {
+            return Long.MIN_VALUE;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
     static List<String> loadGameNames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
