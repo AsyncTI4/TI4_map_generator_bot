@@ -164,10 +164,9 @@ jobs:
               docker builder prune --force --filter until=48h
               
               echo "DONE!"
-  # RestartBot and StartBot run :master, so it only moves once the image is actually deployed.
   tagDeployedImage:
     needs: [buildImage, build]
-    name: Tag Deployed Image as master
+    name: Tag Deployed Image
     runs-on: ubuntu-latest
     steps:
       - name: Log in to GitHub Container Registry
@@ -176,8 +175,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Point master at the deployed image
-        run: docker buildx imagetools create --tag "${IMAGE_REPOSITORY}:master" "${IMAGE_REPOSITORY}:${{ needs.buildImage.outputs.image_tag }}"
+      - name: Point deployed at the deployed image
+        run: docker buildx imagetools create --tag "${IMAGE_REPOSITORY}:deployed" "${IMAGE_REPOSITORY}:${{ needs.buildImage.outputs.image_tag }}"
   saveGamesAfterDeploy:
     needs: [build, saveGamesBeforeDeploy]
     uses: ./.github/workflows/force-backup-of-savefiles.yml

@@ -42,7 +42,7 @@ flowchart TD
         verify2 -->|No| fail([Job fails])
     end
 
-    prune --> tag["tagDeployedImage<br/>point master at sha-COMMIT"]
+    prune --> tag["tagDeployedImage<br/>point deployed at sha-COMMIT"]
     prune --> backup2[saveGamesAfterDeploy<br/>commit and push save files again]
 ```
 
@@ -51,10 +51,10 @@ are still backed up before the new container starts. The image build checks out 
 Dockerfile reads (the `Dockerfile`, `.dockerignore`, `pom.xml`, `src/main/java` and the
 classpath config), because the runtime resources come from the host checkout.
 
-The build pushes only the `sha-COMMIT` tag. `master` moves to that image after the deploy
-succeeds, so it always names the image that is running. `RestartBot` and `StartBot` run
-`master`, so a run whose backup or deploy failed can't slip undeployed code into a later
-restart.
+The build pushes only the `sha-COMMIT` tag. The `deployed` tag moves to that image after the
+deploy succeeds, so it always names the image that is running. `RestartBot`, `StartBot` and
+the compose file's default run `deployed`, so a run whose backup or deploy failed can't slip
+undeployed code into a later restart. There is no `master` image tag.
 
 Each remote step also posts a timestamped line to the deploy Discord webhook.
 
