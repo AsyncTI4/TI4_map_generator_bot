@@ -191,7 +191,7 @@ public abstract class DraftItem {
     @JsonIgnore
     public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr, boolean useAlternateText) {
         List<TextDisplay> textFields =
-                getTextDisplaysWithoutLinkedComponents(game, player, showDescr, useAlternateText);
+                new ArrayList<>(getTextDisplaysWithoutLinkedComponents(game, player, showDescr, useAlternateText));
 
         if (hasAdditionalComponents() && (game == null || !game.isTwilightsFallMode())) {
             List<String> adds = new ArrayList<>();
