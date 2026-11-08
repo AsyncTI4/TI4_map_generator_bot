@@ -24,7 +24,7 @@ deploy that is still running (`cancel-in-progress`).
 ```mermaid
 flowchart TD
     push([Push to master / manual dispatch]) --> backup1[saveGamesBeforeDeploy<br/>commit and push save files on the host]
-    push --> build["buildImage<br/>sparse checkout of the Dockerfile inputs<br/>docker build, push to GHCR<br/>tags sha-COMMIT and master"]
+    push --> build["buildImage<br/>sparse checkout of the Dockerfile inputs<br/>docker build, push to GHCR<br/>tag sha-COMMIT"]
     backup1 --> ssh[Wait for the host SSH port<br/>up to ~15 min]
     build --> ssh
     ssh --> remote
@@ -42,13 +42,19 @@ flowchart TD
         verify2 -->|No| fail([Job fails])
     end
 
+    prune --> tag["tagDeployedImage<br/>point master at sha-COMMIT"]
     prune --> backup2[saveGamesAfterDeploy<br/>commit and push save files again]
 ```
 
 The backup and the image build run at the same time; the deploy waits for both, so the saves
 are still backed up before the new container starts. The image build checks out only what the
-Dockerfile copies (`pom.xml`, `src/main/java` and the classpath config), because the runtime
-resources come from the host checkout.
+Dockerfile reads (the `Dockerfile`, `.dockerignore`, `pom.xml`, `src/main/java` and the
+classpath config), because the runtime resources come from the host checkout.
+
+The build pushes only the `sha-COMMIT` tag. `master` moves to that image after the deploy
+succeeds, so it always names the image that is running. `RestartBot` and `StartBot` run
+`master`, so a run whose backup or deploy failed can't slip undeployed code into a later
+restart.
 
 Each remote step also posts a timestamped line to the deploy Discord webhook.
 
