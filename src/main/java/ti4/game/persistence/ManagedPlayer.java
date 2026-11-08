@@ -28,6 +28,10 @@ public class ManagedPlayer {
         games.remove(gameName);
     }
 
+    void removeGame(String gameName, ManagedGame game) {
+        games.computeIfPresent(gameName, (_, current) -> current == game ? null : current);
+    }
+
     void addOrReplaceGame(ManagedGame game, String userId) {
         if (!userId.equals(id)) {
             throw new IllegalArgumentException("Player " + userId + " attempted merge with " + id);

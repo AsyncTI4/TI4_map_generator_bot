@@ -277,7 +277,6 @@ public class AnnotationHandler {
 
             var handlerRegistry = new HandlerRegistry<C>();
             registerHandlers(contextClass, handlerClass, handlerRegistry);
-            BotLogger.info("Registered " + handlerRegistry.getSize() + " handlers of type " + handlerClass.getName());
             return handlerRegistry;
         } catch (SecurityException e) {
             BotLogger.error(Constants.jazzPing() + " bot cannot read methods in the file.", e);
