@@ -1,6 +1,5 @@
 package ti4.service.megagame;
 
-import ti4.model.metadata.AutoPingMetadataManager;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +12,7 @@ import ti4.helpers.Helper;
 import ti4.image.io.ImageUploads;
 import ti4.image.map.MegagameGroupsImage;
 import ti4.message.MessageHelper;
+import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.game.StartPhaseService;
 
 @UtilityClass
