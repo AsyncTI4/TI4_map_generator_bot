@@ -94,6 +94,16 @@ class ManagedGameWarmupTest extends BaseTi4Test {
     }
 
     @Test
+    void oneScanOfTheGameFolderListsTheSameGamesAsTheNameListing() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            GameLoadService.GameFolder gameFolder = GameLoadService.scanGameFolder();
+
+            assertThat(gameFolder.gameNames()).containsExactlyElementsOf(GameLoadService.loadGameNames());
+            assertThat(gameFolder.lastModifiedMillis()).containsKey(harness.getGameName());
+        }
+    }
+
+    @Test
     void gameFilesSavedSinceThePreloadAreFoundByTheirModifiedTime() throws Exception {
         try (var harness = TestGameHarness.forDefaultMap()) {
             String gameName = harness.getGameName();
@@ -101,11 +111,13 @@ class ManagedGameWarmupTest extends BaseTi4Test {
             long preloadStartedAt = System.currentTimeMillis();
             Files.setLastModifiedTime(gameFile, FileTime.fromMillis(preloadStartedAt - 60_000));
 
-            assertThat(GameLoadService.gameNamesSavedSince(preloadStartedAt)).doesNotContain(gameName);
+            assertThat(GameLoadService.scanGameFolder().savedSince(preloadStartedAt))
+                    .doesNotContain(gameName);
 
             Files.setLastModifiedTime(gameFile, FileTime.fromMillis(preloadStartedAt + 1000));
 
-            assertThat(GameLoadService.gameNamesSavedSince(preloadStartedAt)).contains(gameName);
+            assertThat(GameLoadService.scanGameFolder().savedSince(preloadStartedAt))
+                    .contains(gameName);
         }
     }
 
