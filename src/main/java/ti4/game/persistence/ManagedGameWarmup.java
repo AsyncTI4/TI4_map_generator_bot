@@ -33,8 +33,8 @@ class ManagedGameWarmup {
             Set<String> stillCurrent,
             Set<String> savedSincePreload,
             int keptFromStandby,
-            long preloadWaitMillis,
-            long savedGameFilesMillis) {}
+            long gameFolderMillis,
+            long preloadWaitMillis) {}
 
     private record BuildCounts(int fromPreload, int fromDatabase, int fromGameFiles, long millis) {}
 
@@ -42,9 +42,10 @@ class ManagedGameWarmup {
         long warmupStartedAt = System.currentTimeMillis();
         StandbyCheck standbyCheck;
         try {
-            List<String> gameNames = GameLoadService.loadGameNames();
-            standbyCheck = checkStandbyBuild(Set.copyOf(gameNames));
-            GameManager.registerGameNames(gameNames);
+            GameLoadService.GameFolder gameFolder = GameLoadService.scanGameFolder();
+            long gameFolderMillis = System.currentTimeMillis() - warmupStartedAt;
+            standbyCheck = checkStandbyBuild(gameFolder, gameFolderMillis);
+            GameManager.registerGameNames(gameFolder.gameNames());
         } catch (Exception e) {
             BotLogger.critical("Failed to warmup due to error while loading game names. Shutting down.", e);
             JdaService.shutdown();
@@ -63,27 +64,20 @@ class ManagedGameWarmup {
         });
     }
 
-    private static StandbyCheck checkStandbyBuild(Set<String> gameNames) {
+    private static StandbyCheck checkStandbyBuild(GameLoadService.GameFolder gameFolder, long gameFolderMillis) {
         long waitStartedAt = System.currentTimeMillis();
         ManagedGamePreload.Snapshot preload = ManagedGamePreload.take();
         long preloadWaitMillis = System.currentTimeMillis() - waitStartedAt;
         Map<String, ManagedGame> standbyBuiltGames = ManagedGamePreload.closeStandbyBuild();
 
-        long savedGameFilesStartedAt = System.currentTimeMillis();
-        Set<String> savedSincePreload = preload == null ? null : gameFilesSavedSince(preload.startedAtMillis());
-        long savedGameFilesMillis = System.currentTimeMillis() - savedGameFilesStartedAt;
-
-        Set<String> stillCurrent = preload == null || savedSincePreload == null
+        Set<String> savedSincePreload = preload == null
                 ? Set.of()
-                : stillCurrent(preload, savedSincePreload, gameNames);
+                : gameFolder.savedSince(preload.startedAtMillis() - SAVED_SINCE_PRELOAD_MARGIN_MILLIS);
+        Set<String> stillCurrent = preload == null
+                ? Set.of()
+                : stillCurrent(preload, savedSincePreload, Set.copyOf(gameFolder.gameNames()));
         int kept = discardOutdatedStandbyBuilds(standbyBuiltGames, stillCurrent);
-        return new StandbyCheck(
-                preload,
-                stillCurrent,
-                Objects.requireNonNullElse(savedSincePreload, Set.of()),
-                kept,
-                preloadWaitMillis,
-                savedGameFilesMillis);
+        return new StandbyCheck(preload, stillCurrent, savedSincePreload, kept, gameFolderMillis, preloadWaitMillis);
     }
 
     static Set<String> stillCurrent(
@@ -116,19 +110,19 @@ class ManagedGameWarmup {
         BuildCounts built = buildMissing(standbyCheck.stillCurrent(), persistedGames);
         GameManager.finishWarmup();
         BotLogger.info(String.format(
-                "UNBLOCKED %,d MANAGED GAMES %,d MS AFTER TAKING THE LEASE: %,d MS WAITING FOR THE STANDBY PRELOAD,"
-                        + " %,d MS FINDING %,d GAME FILES SAVED SINCE THE PRELOAD, %,d MS READING CHANGED ROWS,"
-                        + " %,d MS BUILDING. %,d BUILT ON THE STANDBY, %,d FROM THE STANDBY PRELOAD,"
-                        + " %,d FROM THE DATABASE, %,d FROM GAME FILES",
+                "UNBLOCKED %,d MANAGED GAMES %,d MS AFTER TAKING THE LEASE: %,d MS LISTING GAME FILES"
+                        + " (%,d SAVED SINCE THE PRELOAD), %,d MS WAITING FOR THE STANDBY PRELOAD,"
+                        + " %,d MS READING CHANGED ROWS, %,d MS BUILDING. %,d BUILT ON THE STANDBY,"
+                        + " %,d FROM THE STANDBY PRELOAD, %,d FROM THE DATABASE, %,d FROM GAME FILES",
                 GameManager.getGameCount(),
                 System.currentTimeMillis() - warmupStartedAt,
-                standbyCheck.preloadWaitMillis(),
-                standbyCheck.savedGameFilesMillis(),
+                standbyCheck.gameFolderMillis(),
                 standbyCheck.savedSincePreload().size(),
+                standbyCheck.preloadWaitMillis(),
                 changedRowsMillis,
                 built.millis(),
                 standbyCheck.keptFromStandby(),
-                built.fromPreload() - standbyCheck.keptFromStandby(),
+                built.fromPreload(),
                 built.fromDatabase(),
                 built.fromGameFiles()));
         if (JdaService.jda != null) {
@@ -145,7 +139,8 @@ class ManagedGameWarmup {
         AtomicInteger fromGameFiles = new AtomicInteger();
         try (ExecutorService executorService =
                 Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
-            GameManager.getGameNames()
+            GameManager.getGameNames().stream()
+                    .filter(name -> GameManager.peekManagedGame(name) == null)
                     .forEach(name -> executorService.submit(() -> {
                         try {
                             if (!GameManager.isValid(name)) return;
@@ -165,18 +160,6 @@ class ManagedGameWarmup {
         reportGamesThatFailedWarmup(failedGames);
         return new BuildCounts(
                 fromPreload.get(), fromDatabase.get(), fromGameFiles.get(), System.currentTimeMillis() - startedAt);
-    }
-
-    @Nullable
-    private static Set<String> gameFilesSavedSince(long preloadStartedAtMillis) {
-        try {
-            return GameLoadService.gameNamesSavedSince(preloadStartedAtMillis - SAVED_SINCE_PRELOAD_MARGIN_MILLIS);
-        } catch (Exception e) {
-            BotLogger.error(
-                    "Could not list the game files saved since the standby preload, so every game will be checked against its file.",
-                    e);
-            return null;
-        }
     }
 
     private static Map<String, ManagedGameState> withCurrentRows(

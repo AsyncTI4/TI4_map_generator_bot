@@ -129,9 +129,9 @@ happens before the process holds the lease.
 
 **At takeover**, `ManagedGameWarmup` runs these steps before the game-names latch
 opens:
-1. Lists the game names, waits for the preload, and closes the standby build.
-2. Lists the game files modified since the preload started (with a one-second
-   margin).
+1. Scans the game folder once, reading every game file's name and modified time.
+2. Waits for the preload, closes the standby build, and picks out the game files
+   modified since the preload started (with a one-second margin).
 3. Keeps a standby build only if its row matched the file at preload time, the file
    hasn't been modified since, and the game still exists. It doesn't consult the
    database: the old process releases the lease before its database sync drains, so

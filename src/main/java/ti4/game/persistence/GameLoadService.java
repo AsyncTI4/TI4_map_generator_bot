@@ -81,19 +81,36 @@ class GameLoadService {
     private static final Pattern EM_DASH_PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
 
-    static Set<String> gameNamesSavedSince(long sinceMillis) {
-        try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
-            return pathStream
-                    .filter(path -> path.toString().toLowerCase().endsWith(GAME_FILE_EXTENSION))
-                    .filter(path -> lastModifiedMillis(path) >= sinceMillis)
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .map(GameLoadService::stripGameFileExtension)
-                    .map(String::toLowerCase)
+    record GameFolder(List<String> gameNames, Map<String, Long> lastModifiedMillis) {
+
+        Set<String> savedSince(long sinceMillis) {
+            return lastModifiedMillis.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= sinceMillis)
+                    .map(Map.Entry::getKey)
                     .collect(Collectors.toUnmodifiableSet());
+        }
+    }
+
+    static GameFolder scanGameFolder() {
+        List<Path> gameFiles;
+        try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
+            gameFiles = pathStream
+                    .filter(path -> path.toString().toLowerCase().endsWith(GAME_FILE_EXTENSION))
+                    .toList();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+        Map<String, Long> lastModifiedMillis = gameFiles.parallelStream()
+                .collect(Collectors.toConcurrentMap(
+                        GameLoadService::gameNameOf, GameLoadService::lastModifiedMillis, Math::max));
+        List<String> gameNames = lastModifiedMillis.keySet().stream()
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        return new GameFolder(gameNames, Map.copyOf(lastModifiedMillis));
+    }
+
+    private static String gameNameOf(Path gameFile) {
+        return stripGameFileExtension(gameFile.getFileName().toString()).toLowerCase();
     }
 
     private static long lastModifiedMillis(Path path) {
@@ -102,7 +119,7 @@ class GameLoadService {
         } catch (NoSuchFileException e) {
             return Long.MIN_VALUE;
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            return Long.MAX_VALUE;
         }
     }
 
