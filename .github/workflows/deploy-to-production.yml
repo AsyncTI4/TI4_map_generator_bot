@@ -16,13 +16,22 @@ jobs:
     uses: ./.github/workflows/force-backup-of-savefiles.yml
     secrets: inherit
   buildImage:
-    needs: saveGamesBeforeDeploy
     name: Build & Publish Bot Image
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.image.outputs.image_tag }}
     steps:
+      # Only the Dockerfile inputs; the runtime resources are mounted from the host checkout.
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            Dockerfile
+            .dockerignore
+            pom.xml
+            src/main/java
+            src/main/resources/config
+            src/main/resources/logback.xml
+          sparse-checkout-cone-mode: false
       - name: Compute image tag
         id: image
         run: echo "image_tag=sha-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"

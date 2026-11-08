@@ -24,8 +24,9 @@ deploy that is still running (`cancel-in-progress`).
 ```mermaid
 flowchart TD
     push([Push to master / manual dispatch]) --> backup1[saveGamesBeforeDeploy<br/>commit and push save files on the host]
-    backup1 --> build["buildImage<br/>docker build, push to GHCR<br/>tags sha-COMMIT and master"]
-    build --> ssh[Wait for the host SSH port<br/>up to ~15 min]
+    push --> build["buildImage<br/>sparse checkout of the Dockerfile inputs<br/>docker build, push to GHCR<br/>tags sha-COMMIT and master"]
+    backup1 --> ssh[Wait for the host SSH port<br/>up to ~15 min]
+    build --> ssh
     ssh --> remote
 
     subgraph remote [On the Hostinger host, over SSH]
@@ -43,6 +44,11 @@ flowchart TD
 
     prune --> backup2[saveGamesAfterDeploy<br/>commit and push save files again]
 ```
+
+The backup and the image build run at the same time; the deploy waits for both, so the saves
+are still backed up before the new container starts. The image build checks out only what the
+Dockerfile copies (`pom.xml`, `src/main/java` and the classpath config), because the runtime
+resources come from the host checkout.
 
 Each remote step also posts a timestamped line to the deploy Discord webhook.
 
