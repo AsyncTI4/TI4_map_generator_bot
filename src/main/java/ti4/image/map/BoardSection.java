@@ -18,6 +18,7 @@ import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.service.map.FractureService;
 
 final class BoardSection {
@@ -73,6 +74,7 @@ final class BoardSection {
         tilesWithExtra.addAll(game.getBorderAnomalies().stream()
                 .map(BorderAnomalyHolder::getTile)
                 .collect(Collectors.toSet()));
+        tilesWithExtra.addAll(neighboursOfOneWayHyperlanes());
 
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         GhostHexes.draw(ctx, g2, tileMap.keySet());
@@ -86,6 +88,15 @@ final class BoardSection {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), displayTypeStep));
         }
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
+    }
+
+    private Set<String> neighboursOfOneWayHyperlanes() {
+        Set<String> neighbours = new HashSet<>();
+        game.getCustomHyperlaneData().forEach((position, matrix) -> {
+            List<String> adjacent = MapPositionMapper.getAdjacentTilePositions(position);
+            if (adjacent != null && CustomHyperlaneService.hasOneWayLanes(matrix)) neighbours.addAll(adjacent);
+        });
+        return neighbours;
     }
 
     private void drawSetupTiles(Map<String, Tile> tileMap) {

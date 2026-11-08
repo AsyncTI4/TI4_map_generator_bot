@@ -4,6 +4,7 @@ import static ti4.image.tile.TileGeometry.TILE_PADDING;
 
 import java.awt.image.BufferedImage;
 import java.util.Set;
+import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.io.ImageHelper;
@@ -50,22 +51,31 @@ final class TileArtwork {
     static BufferedImage hyperlaneImage(TileScene scene, Tile tile) {
         HyperlaneView view = scene.hyperlanes();
         String matrix = scene.game().getCustomHyperlaneData().get(tile.getPosition());
-        String drawn = matrix;
+        String drawn = drawnLanes(scene, tile);
         String backgroundSeed = matrix;
         boolean lanesHidden = false;
         if (view.hidesUnseenLanes()) {
             backgroundSeed = tile.getPosition();
-            if (scene.hidesFogged(tile)) {
-                drawn = CustomHyperlaneService.formatMatrix(new int[6][6]);
-                lanesHidden = true;
-            } else if (matrix != null) {
-                drawn = lanesThePlayerSees(view, tile, matrix);
-                lanesHidden = !CustomHyperlaneService.formatMatrix(CustomHyperlaneService.parseMatrix(matrix))
-                        .equals(drawn);
-            }
+            lanesHidden = scene.hidesFogged(tile)
+                    || (matrix != null
+                            && !CustomHyperlaneService.formatMatrix(CustomHyperlaneService.parseMatrix(matrix))
+                                    .equals(drawn));
         }
         HyperlaneStyle style = CustomHyperlaneService.hasOneWayLanes(drawn) ? view.style() : HyperlaneStyle.DASHED;
         return HyperlaneTileGenerator.generateHyperlaneTile(tile, backgroundSeed, drawn, lanesHidden, style);
+    }
+
+    @Nullable
+    static String drawnLanes(TileScene scene, Tile tile) {
+        HyperlaneView view = scene.hyperlanes();
+        String matrix = scene.game().getCustomHyperlaneData().get(tile.getPosition());
+        if (!view.hidesUnseenLanes()) {
+            return matrix;
+        }
+        if (scene.hidesFogged(tile)) {
+            return CustomHyperlaneService.formatMatrix(new int[6][6]);
+        }
+        return matrix == null ? null : lanesThePlayerSees(view, tile, matrix);
     }
 
     private static String lanesThePlayerSees(HyperlaneView view, Tile tile, String matrix) {

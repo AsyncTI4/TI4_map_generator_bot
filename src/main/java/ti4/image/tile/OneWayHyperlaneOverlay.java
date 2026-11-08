@@ -32,6 +32,12 @@ final class OneWayHyperlaneOverlay {
     private static final double MARKER_DEPTH = 32;
     private static final double STRAIGHT_HANDLE = 100;
     private static final double ROUNDABOUT_RADIUS = 60;
+    private static final float NODE_RADIUS = 20;
+    private static final int NODE_CORE_ALPHA = 235;
+    private static final int NODE_HALO_ALPHA = 170;
+    private static final float HINT_RADIUS = 15;
+    private static final int HINT_CORE_ALPHA = 130;
+    private static final int HINT_HALO_ALPHA = 80;
 
     private static final Color BLUE_GLOW = new Color(0, 180, 255);
     private static final Color BLUE_CORE = new Color(180, 200, 240);
@@ -385,9 +391,20 @@ final class OneWayHyperlaneOverlay {
     }
 
     private static void drawNode(Graphics2D g, Point2D at) {
-        float radius = 20;
+        drawNode(g, at, NODE_RADIUS, NODE_CORE_ALPHA, NODE_HALO_ALPHA);
+    }
+
+    static void drawEntryHint(Graphics2D target, int side) {
+        Graphics2D g = (Graphics2D) target.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.clip(hexOutline());
+        drawNode(g, EDGE_MIDPOINTS.get(side), HINT_RADIUS, HINT_CORE_ALPHA, HINT_HALO_ALPHA);
+        g.dispose();
+    }
+
+    private static void drawNode(Graphics2D g, Point2D at, float radius, int coreAlpha, int haloAlpha) {
         g.setPaint(new RadialGradientPaint(at, radius, new float[] {0f, 0.35f, 1f}, new Color[] {
-            new Color(255, 255, 255, 235), new Color(150, 220, 255, 170), new Color(0, 160, 255, 0)
+            new Color(255, 255, 255, coreAlpha), new Color(150, 220, 255, haloAlpha), new Color(0, 160, 255, 0)
         }));
         g.fill(new Ellipse2D.Double(at.getX() - radius, at.getY() - radius, 2 * radius, 2 * radius));
     }
