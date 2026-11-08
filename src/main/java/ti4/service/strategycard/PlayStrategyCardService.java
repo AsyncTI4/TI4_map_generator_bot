@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -60,6 +61,9 @@ import ti4.service.fow.FowAutoDeclineService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.SpeakerService;
 import ti4.service.leader.agent.modules.MahactAgent;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameImperialQueue;
+import ti4.service.megagame.MegagameScThreads;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -110,6 +114,7 @@ public class PlayStrategyCardService {
             boolean isOverrule,
             String playVerb) {
         String stratCardName = Helper.getSCName(scToPlay, game);
+        boolean scGroups = MegagameGroupService.isActive(game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "**" + stratCardName + "** has already been played previously.");
@@ -181,6 +186,12 @@ public class PlayStrategyCardService {
                 }
             }
 
+            if (scGroups) {
+                playersToFollow = MegagameGroupService.groupMembersForSc(game, scToPlay);
+                gamePing = new StringBuilder(
+                        playersToFollow.stream().map(Player::getRepresentation).collect(Collectors.joining(", ")));
+            }
+
             if (!winnuHero && !gamePing.isEmpty()) {
                 message.append(gamePing).append(", please indicate your choice with these buttons.");
             } else {
@@ -191,6 +202,11 @@ public class PlayStrategyCardService {
                 for (Player player2 : playersToFollow) {
                     player2.removeFollowedSC(scToPlay);
                     player2.getCardsInfoThread(); // force thread to open if closed
+                }
+                if (scGroups) {
+                    for (Player outsider : MegagameGroupService.outsidersOfScGroup(game, scToPlay)) {
+                        outsider.addFollowedSC(scToPlay);
+                    }
                 }
 
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
@@ -352,7 +368,8 @@ public class PlayStrategyCardService {
             String assignSpeakerMessage2 = player.getRepresentation()
                     + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
                     + " This is not required, and not advised if you are offering them a conditional replenishment. If you're offering them a conditional replenishment, it is advised to let them press replenish (or replenish and wash) themselves, since them pressing that can act as their acceptance of the deal. The bot will not auto-deduct a strategy command token.";
-            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
+            List<Player> replenishTargets = scGroups ? game.getRealPlayers() : playersToFollow;
+            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, replenishTargets);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
 
@@ -391,7 +408,9 @@ public class PlayStrategyCardService {
         }
 
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
-        if (obsidian != null && obsidian.getPuppetedFactionsForPlot("enervate").contains(player.getFaction())) {
+        if (obsidian != null
+                && obsidian.getPuppetedFactionsForPlot("enervate").contains(player.getFaction())
+                && MegagameGroupService.allowsTarget(game, obsidian, player)) {
             if (scModel.usesAutomationForSCID("pok1leadership")) {
                 String enervateMsg = obsidian.getRepresentation()
                         + ", your _Enervate_ puppet has played **Leadership**, so you can resolve the primary instead of the secondary. ";
@@ -629,7 +648,10 @@ public class PlayStrategyCardService {
         if (scHolder == null) {
             scHolder = game.getRealPlayers().getFirst();
         }
-        for (Player p : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game)) {
+        List<Player> summaryOrder = MegagameGroupService.isActive(game)
+                ? MegagameGroupService.followOrderForSc(game, scID, scHolder)
+                : Helper.getSpeakerOrFullPriorityOrderFromPlayer(scHolder, game);
+        for (Player p : summaryOrder) {
             String representation = ping ? p.getRepresentation() : p.getRepresentationNoPing();
             var userSettings = UserSettingsManager.get(p.getUserID());
             if (!userSettings.isPrefersStrategyThreadJoining()) {
@@ -763,6 +785,7 @@ public class PlayStrategyCardService {
             List<Button> scButtons,
             List<Player> playersToReact,
             boolean isDetachmentCard) {
+        boolean scGroups = MegagameGroupService.isActive(game);
         long messageCreationTime = message.getTimeCreated().toInstant().toEpochMilli();
         StrategyCardMessageService.replaceStrategyCardMessage(
                 game.getName(), message.getId(), playRound, scToPlay, messageCreationTime);
@@ -774,6 +797,11 @@ public class PlayStrategyCardService {
             message.addReaction(reactionEmoji).queue(Consumers.nop(), BotLogger::catchRestError);
             GameMessageManager.addReaction(game.getName(), reactingPlayer.getFaction(), message.getId());
         }
+        if (scGroups) {
+            for (Player outsider : MegagameGroupService.outsidersOfScGroup(game, scToPlay)) {
+                GameMessageManager.addReaction(game.getName(), outsider.getFaction(), message.getId());
+            }
+        }
         if (game.isFowMode()) {
             Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
             MessageHelper.sendPrivateMessageToPlayer(
@@ -782,6 +810,9 @@ public class PlayStrategyCardService {
         }
 
         String threadName = getStrategyCardThreadName(game.getName(), playRound, scModel.getName());
+        if (scGroups) {
+            threadName = MegagameScThreads.threadName(threadName, scToPlay);
+        }
         ThreadChannelAction threadChannel = game.getMainGameChannel().createThreadChannel(threadName, message.getId());
         threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         threadChannel.queue(m5 -> {
@@ -994,7 +1025,11 @@ public class PlayStrategyCardService {
         }
 
         if (!isOverrule && "pok8imperial".equals(scModel.getBotSCAutomationID())) {
-            handleSOQueueing(game, winnuHero);
+            if (MegagameGroupService.isActive(game) && !winnuHero) {
+                MegagameImperialQueue.prepare(game, sc);
+            } else {
+                handleSOQueueing(game, winnuHero);
+            }
         }
         return getStrategyCardButtons(sc, game, player);
     }
@@ -1113,7 +1148,11 @@ public class PlayStrategyCardService {
 
     public static List<Player> getPlayersInFollowOrder(Game game, Player player) {
         List<Player> players;
-        if (!game.hasFullPriorityTrackMode()) {
+        if (MegagameGroupService.isActive(game)
+                && !game.getPhaseOfGame().contains("agenda")
+                && MegagameGroupService.groupOf(game, player) != null) {
+            players = MegagameGroupService.followOrderFromPlayer(game, player);
+        } else if (!game.hasFullPriorityTrackMode()) {
             players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         } else {
             if (game.getPhaseOfGame().contains("agenda")) {
@@ -1255,8 +1294,15 @@ public class PlayStrategyCardService {
         if (game.isFowMode()) {
             Collections.shuffle(players);
         }
+        String politicsGroup =
+                MegagameGroupService.isActive(game) ? MegagameGroupService.groupOf(game, politicsHolder) : null;
+        boolean scGroups = politicsGroup != null;
+        if (scGroups) {
+            players = new ArrayList<>(MegagameGroupService.members(game, politicsGroup));
+            players.remove(MegagameGroupService.groupSpeaker(game, politicsGroup));
+        }
         for (Player player : players) {
-            if (!player.isSpeaker() || game.isFowMode()) {
+            if (scGroups || !player.isSpeaker() || game.isFowMode()) {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
                     Button button = Buttons.gray(

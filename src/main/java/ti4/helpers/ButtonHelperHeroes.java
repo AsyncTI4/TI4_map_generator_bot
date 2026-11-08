@@ -48,6 +48,7 @@ import ti4.service.fow.RiftSetModeService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
@@ -1975,37 +1976,42 @@ public class ButtonHelperHeroes {
         return scButtons;
     }
 
-    public static List<Button> getNRAHeroButtons(Game game) {
+    public static List<Button> getNRAHeroButtons(Game game, Player naaz) {
         List<Button> scButtons = new ArrayList<>();
-        if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
+        if (isUnplayedForNaazHero(game, naaz, 1)) {
             scButtons.add(Buttons.SPEND_AND_GAIN_COMMAND_TOKENS);
             // scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
         }
-        if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
+        if (isUnplayedForNaazHero(game, naaz, 2)) {
             scButtons.add(Buttons.DIPLO_READY_2_PLANETS);
         }
-        if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
+        if (isUnplayedForNaazHero(game, naaz, 3)) {
             scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
-        if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
+        if (isUnplayedForNaazHero(game, naaz, 4)) {
             scButtons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
             scButtons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
-        if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
+        if (isUnplayedForNaazHero(game, naaz, 5)) {
             scButtons.add(Buttons.REPLENISH_COMMODITIES);
         }
-        if (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6)) {
+        if (isUnplayedForNaazHero(game, naaz, 6)) {
             scButtons.add(Buttons.WARFARE_BUILD_AT_HOME);
         }
-        if (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7)) {
+        if (isUnplayedForNaazHero(game, naaz, 7)) {
             scButtons.add(Buttons.GET_A_TECH);
         }
-        if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
+        if (isUnplayedForNaazHero(game, naaz, 8)) {
             scButtons.add(Buttons.NON_SC_DRAW_SECRET_OBJECTIVE);
         }
         scButtons.add(Buttons.DONE_RED_DELETE_BUTTONS);
 
         return scButtons;
+    }
+
+    private static boolean isUnplayedForNaazHero(Game game, Player naaz, int cardNumber) {
+        int sc = MegagameGroupService.groupCardFor(game, naaz, cardNumber);
+        return game.getScPlayed().get(sc) == null || !game.getScPlayed().get(sc);
     }
 
     public static List<Button> getSecondaryButtons(Game game) {

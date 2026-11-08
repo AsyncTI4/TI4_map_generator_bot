@@ -316,6 +316,13 @@ _Avoid_: Fog Plus Mode, fowplus
 **Fog preset**:
 A named set of fog option values (Standard, Fog+, Normal, Beginner) that the GM applies in one click. Applying one gives the same result whatever was set before; GM tools, map layout and rules options are only changed by a preset that turns them on.
 
+**SC group (megagame)**:
+In a megagame, one of several columns (Alpha, Beta, Gamma, …) that Players are split into. Each group picks, plays and follows only its own Strategy cards, whose initiative ends in the group's digit (12 is Leadership of group Beta). Groups shift one column at the start of each Strategy phase. Turned on per game with the tag `megagame_sc_groups` and managed with `/megagame`.
+_Avoid_: team, galaxy (both mean other things)
+
+**Group speaker**:
+The Speaker token of one SC group. It sets that group's pick order and secondary order, and is what Politics and the _Book of Latvinia_ hand out. The last group's speaker is the game's Speaker for agendas and Speaker-order effects.
+
 **Absol**:
 A homebrew content mode that substitutes revised cards, technologies and leaders.
 

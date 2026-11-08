@@ -264,7 +264,7 @@ copy-paste templates.
 | `fog` | `true`/`false` makes `apply` refuse the other kind of game; leave out for either. |
 | `mapString` | Optional; default is a standard 6-player map with homes at 301/304/307/310/313/316. |
 | `you` | Your own seat; leave out to only watch. |
-| `seats` | Virtual seats (`TestSeat1`, …); `{}` is a random base/PoK faction. At most 8 seats in total. |
+| `seats` | Virtual seats (`TestSeat1`, …); `{}` is a random base/PoK faction. At most 12 seats in total; past the 6 default homes every seat needs a `home` on the preset's own `mapString`. |
 | `defaults` | Seat fields for every seat that does not set them. |
 | `start` | `setup` (default), `strategy` or `action` (seats without `sc` get the lowest free card). |
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
@@ -272,7 +272,9 @@ copy-paste templates.
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
-| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens) `one_way_adjacency` (`true` or `false`) and `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
+| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens), `sc_count_for_map` (strategy cards per player, `1`-`9`), `one_way_adjacency` (`true` or `false`) and `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
+| `strategyCardSet` | Strategy card set alias applied before the start phase, e.g. `pbd30k`. Seats then need `sc` from that set when `start` is `action`. |
+| `tags` | Game tags added at apply, e.g. `megagame_sc_groups`. |
 | `decks` | Deck ids switched on before seats get cards, so `acs`, `sos` and `relics` can give cards from homebrew decks. Slots: `ac`, `so`, `relic`, `explore`, `agenda`. |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
@@ -322,11 +324,13 @@ Every step may also have a `label` for the report.
   or not, otherwise the main channel), `<seat>:private`, `<seat>:cards-info`, `<seat>:combat` (its newest combat
   thread), `<seat>:comms-inbox` (its anonymous comms inbox thread, once it exists).
 - **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `tacticalCcs`, `fleetCcs`, `strategyCcs`, `vp`,
-  `debt`, `scs`, `passed`, `followed`, `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
+  `debt`, `scs`, `passed`, `followed` (cards 1-8), `followedAll` (every followed card, e.g. `11,21`),
+  `megagameGroup` (the seat's SC group letter), `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
   `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`, `techs`, `exhaustedTechs`, `purgedTechs`,
   `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`, `exhaustedPlanetAbilities`, `commodityValue`
   (commodity value, not the commodities held);
-  `game.` + `activeSystem`, `phase`, `round`, `activePlayer`, `speaker`, `playedScs`, `acDiscard`, `agendaDiscard`,
+  `game.` + `activeSystem`, `phase`, `round`, `activePlayer`, `speaker`, `megagameSpeakers` (`A=sol,B=xxcha`),
+  `playedScs`, `acDiscard`, `agendaDiscard`,
   `laws`, `revealedPos`, `purgedPns`, `exploreDiscard`, `exploreDeck`, `relicDeck`, `soDeck` (secret objectives
   still in the deck), `soDeckSize`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),

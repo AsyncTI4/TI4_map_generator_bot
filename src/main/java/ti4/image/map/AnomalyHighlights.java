@@ -18,6 +18,7 @@ final class AnomalyHighlights implements OffBoardHighlights {
 
     @Override
     public int draw(Graphics2D g2, Game game, Player player, Point miscTile) {
+        int speakerOffset = SpeakerOffset.of(player);
         if (!(player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
             return 0;
         }
@@ -35,7 +36,7 @@ final class AnomalyHighlights implements OffBoardHighlights {
         if (unitNum > 0) {
             int x = miscTile.x + (TileGeometry.TILE_WIDTH - 95) / 2;
             x += (unitNum == 3 ? 40 : 0) + (unitNum == 2 ? 30 : 0);
-            int y = miscTile.y + (TileGeometry.TILE_HEIGHT - 95) / 2 + (player.isSpeaker() ? 30 : 0);
+            int y = miscTile.y + (TileGeometry.TILE_HEIGHT - 95) / 2 + speakerOffset;
             String tokenFile = ImageResources.tokenOrAttachment("token_gravityrift.png");
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             for (int i = 0; i < unitNum; i++) {

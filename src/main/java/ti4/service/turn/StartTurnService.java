@@ -104,6 +104,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent
 import ti4.service.leader.genome.homebrew.tknova.DeploymentGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.PlayerAreaWarningService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -418,6 +419,11 @@ public class StartTurnService {
                         player.addFollowedSC(sc);
                     }
                 }
+            }
+            if (MegagameGroupService.isActive(game)
+                    && !MegagameGroupService.sameGroup(game, player, sc)
+                    && !player.hasFollowedSC(sc)) {
+                player.addFollowedSC(sc);
             }
 
             if (!player.hasFollowedSC(sc)) {

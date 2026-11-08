@@ -54,6 +54,7 @@ import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.fow.PlanetTargetService.UnitHolderTargetSpec;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
@@ -1474,6 +1475,7 @@ public final class ButtonHelperActionCards {
         game.setStoredValue("politicalStabilityFaction", player.getFaction());
         for (Integer sc : game.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+            if (!MegagameGroupService.allowsCard(game, player, sc)) continue;
             Button button;
             String label = Helper.getSCName(sc, game);
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -2188,6 +2190,7 @@ public final class ButtonHelperActionCards {
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                if (!MegagameGroupService.allowsCardInStrategyPhase(game, player, sc)) continue;
                 Button button;
                 String label = "Coup " + Helper.getSCName(sc, game);
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -2216,7 +2219,7 @@ public final class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                if (!p2.hasUnplayedSCs()) {
+                if (!p2.hasUnplayedSCs() || !MegagameGroupService.allowsTargetInStrategyPhase(game, player, p2)) {
                     continue;
                 }
                 String label = "Extreme Duress " + p2.getFactionNameOrColor();
@@ -2241,6 +2244,7 @@ public final class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
             for (Player p2 : game.getRealPlayers()) {
+                if (!MegagameGroupService.allowsTargetInStrategyPhase(game, player, p2)) continue;
                 String label = "Crisis On " + p2.getFactionNameOrColor();
                 String scEmoji = p2.getFactionEmojiOrColor();
                 scButtons.add(Buttons.gray("resolvePreassignment_Crisis Target_" + p2.getColor(), label, scEmoji));
@@ -2447,6 +2451,7 @@ public final class ButtonHelperActionCards {
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                if (!MegagameGroupService.allowsCardInStrategyPhase(game, player, sc)) continue;
                 Button button;
                 String label = Helper.getSCName(sc, game);
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);

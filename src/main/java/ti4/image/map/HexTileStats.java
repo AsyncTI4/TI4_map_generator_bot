@@ -306,10 +306,11 @@ final class HexTileStats {
 
     private void drawSpeaker(Player player, Point miscTile, int offBoardHighlighting) {
         Point point;
-        if (player.isSpeaker()) {
-            String speakerID = Mapper.getTokenID(Constants.SPEAKER);
-            String speakerFile = ImageResources.token(speakerID);
-            BufferedImage img = ImageHelper.read(speakerFile);
+        BufferedImage groupSpeakerToken = SpeakerOffset.groupSpeakerToken(player);
+        if (player.isSpeaker() || groupSpeakerToken != null) {
+            BufferedImage img = groupSpeakerToken != null
+                    ? groupSpeakerToken
+                    : ImageHelper.read(ImageResources.token(Mapper.getTokenID(Constants.SPEAKER)));
             if (img != null) {
                 point = MapPositionMapper.getPlayerStats("newspeaker");
                 point.translate(miscTile.x - (img.getWidth() / 2), miscTile.y - (img.getHeight() / 2));

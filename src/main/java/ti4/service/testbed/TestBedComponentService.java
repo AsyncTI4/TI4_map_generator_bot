@@ -30,8 +30,11 @@ import ti4.service.option.FOWOptionService.FOWOption;
 @UtilityClass
 public class TestBedComponentService {
 
-    static final Map<String, BiConsumer<Game, Integer>> NUMBER_GAME_OPTIONS =
-            Map.of(Constants.WORMHOLE_TOKEN_MERGE, Game::setWormholeTokenMergeFrom);
+    static final Map<String, BiConsumer<Game, Integer>> NUMBER_GAME_OPTIONS = Map.of(
+            Constants.WORMHOLE_TOKEN_MERGE,
+            Game::setWormholeTokenMergeFrom,
+            Constants.SC_COUNT_FOR_MAP,
+            Game::setStrategyCardsPerPlayer);
     static final Map<String, BiConsumer<Game, Boolean>> SWITCH_GAME_OPTIONS = Map.of(
             Constants.ONE_WAY_ADJACENCY,
             Game::setOneWayAdjacency,
@@ -71,6 +74,10 @@ public class TestBedComponentService {
                 game.setFowOption(fowOption, true);
             }
         }
+        if (preset.getStrategyCardSet() != null) {
+            game.setStrategyCardSet(preset.getStrategyCardSet());
+        }
+        preset.getTags().stream().filter(tag -> !game.getTags().contains(tag)).forEach(game::addTag);
         preset.getStored().forEach(game::setStoredValue);
         preset.getGameOptions().forEach((key, value) -> setGameOption(game, key, value));
         for (String objective : preset.getRevealedObjectives()) {

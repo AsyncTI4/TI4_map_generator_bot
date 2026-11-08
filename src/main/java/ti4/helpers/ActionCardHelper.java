@@ -82,6 +82,8 @@ import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
+import ti4.service.megagame.MegagameActionCardRules;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -824,6 +826,10 @@ public class ActionCardHelper {
         String actionCardTitle = actionCard.getName();
         String actionCardWindow = actionCard.getWindow();
         boolean twinned = (acIndex == -99);
+        String megagameRefusal = MegagameActionCardRules.presetOnlyRefusal(event, game, acID, actionCardTitle);
+        if (megagameRefusal != null) {
+            return megagameRefusal;
+        }
 
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
@@ -2528,6 +2534,7 @@ public class ActionCardHelper {
     public static void serveManipulateInvestmentButtons(Game game, Player player) {
         List<Button> scButtons = new ArrayList<>();
         for (int sc : game.getSCList()) {
+            if (!MegagameGroupService.allowsCardInStrategyPhase(game, player, sc)) continue;
             Button button;
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
 

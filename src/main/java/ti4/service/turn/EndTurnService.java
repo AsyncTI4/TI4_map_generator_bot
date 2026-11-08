@@ -56,6 +56,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.agent.modules.homebrew.EdynAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.ValhavnAgent;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.planet.AsgardLegendaryService;
@@ -293,6 +294,9 @@ public class EndTurnService {
             }
         }
 
+        if (justPassed && MegagameGroupService.isLastToPassInGroup(game, mainPlayer)) {
+            CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
+        }
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (nextPlayer == null) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
