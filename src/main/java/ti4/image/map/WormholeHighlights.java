@@ -43,7 +43,7 @@ final class WormholeHighlights implements OffBoardHighlights {
         boolean travelBan =
                 ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban");
 
-        if (!gammaOnMap) {
+        if (!gammaOnMap)  {
             String tokenFile = ImageResources.tokenOrAttachment(gammaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             g2.drawImage(bufferedImage, x, y, null);

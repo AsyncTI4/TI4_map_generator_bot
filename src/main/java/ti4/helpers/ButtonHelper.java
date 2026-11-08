@@ -9646,6 +9646,13 @@ public class ButtonHelper {
         };
     }
 
+    public static ThreadChannel getStratThreadForSc(Game game, int sc) {
+        if (MegagameGroupService.isActive(game)) {
+            return MegagameScThreads.forSc(game, sc);
+        }
+        return getRightStratThread(game, getStratName(getStratName(sc), game));
+    }
+
     public static ThreadChannel getRightStratThread(Game game, String stratName) {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName.toLowerCase();

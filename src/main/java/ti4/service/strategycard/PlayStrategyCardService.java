@@ -403,7 +403,7 @@ public class PlayStrategyCardService {
         if (scModel.usesAutomationForSCID("tf6")) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "## " + MegagameGroupService.pingForSc(game, scToPlay)
+                    "## " + game.getPing()
                             + " Dane has said that if you are using the secondary to produce at home, you do not need to spend the 4 resources.");
         }
 

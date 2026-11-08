@@ -60,7 +60,6 @@ import ti4.service.leader.RefreshLeaderService;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.megagame.MegagameFollowGuard;
 import ti4.service.megagame.MegagameGroupService;
-import ti4.service.megagame.MegagameScThreads;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -1784,10 +1783,7 @@ public final class ButtonHelperSCs {
                         game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + scNum2)
                 .orElse(null);
         if (gameMessage != null) {
-            ThreadChannel chan = MegagameGroupService.isActive(game)
-                    ? MegagameScThreads.forSc(game, scNum2)
-                    : ButtonHelper.getRightStratThread(
-                            game, ButtonHelper.getStratName(ButtonHelper.getStratName(scNum2), game));
+            ThreadChannel chan = ButtonHelper.getStratThreadForSc(game, scNum2);
             if (chan != null) {
                 String followSummary = PlayStrategyCardService.getSCFollowSummary(game, scNum2, true);
                 chan.retrieveMessageById(gameMessage.messageId())

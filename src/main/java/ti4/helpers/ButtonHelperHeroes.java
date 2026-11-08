@@ -2010,9 +2010,7 @@ public class ButtonHelperHeroes {
     }
 
     private static boolean isUnplayedForNaazHero(Game game, Player naaz, int cardNumber) {
-        int sc = naaz != null && MegagameGroupService.isActive(game)
-                ? MegagameGroupService.groupCardFor(game, naaz, cardNumber)
-                : cardNumber;
+        int sc = MegagameGroupService.groupCardFor(game, naaz, cardNumber);
         return game.getScPlayed().get(sc) == null || !game.getScPlayed().get(sc);
     }
 

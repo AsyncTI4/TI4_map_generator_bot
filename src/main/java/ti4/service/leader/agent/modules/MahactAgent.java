@@ -100,7 +100,7 @@ public final class MahactAgent extends AgentModule<Integer> {
         Player mahact = use.user();
         MessageChannel channel = ButtonHelper.getSCFollowChannel(game, mahact, strategyCard);
         for (Player holder : game.getPlayers().values()) {
-            if (!holder.getSCs().contains(strategyCard) || !MegagameGroupService.allowsTarget(game, mahact, holder)) {
+            if (!holder.getSCs().contains(strategyCard)) {
                 continue;
             }
             List<Button> buttons = new ArrayList<>();
@@ -130,9 +130,7 @@ public final class MahactAgent extends AgentModule<Integer> {
             return;
         }
         Player constructionPlayer = player;
-        int construction = MegagameGroupService.isActive(game)
-                ? MegagameGroupService.groupCardFor(game, player, CONSTRUCTION)
-                : CONSTRUCTION;
+        int construction = MegagameGroupService.groupCardFor(game, player, CONSTRUCTION);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(construction)) {
                 constructionPlayer = p2;

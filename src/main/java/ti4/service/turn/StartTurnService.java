@@ -211,8 +211,6 @@ public class StartTurnService {
         if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
             buttonText +=
                     "Your strategy card initiative number is " + player.getSCs().toArray()[0] + ".";
-        } else if (MegagameGroupService.isActive(game) && !player.getSCs().isEmpty()) {
-            buttonText += "Your strategy card initiative number is " + player.getLowestSC() + ".";
         }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel =
@@ -758,7 +756,7 @@ public class StartTurnService {
                 if (!game.getPlayedSCs().contains(SC)) {
                     hadAnyUnplayedSCs = true;
                     String name = Helper.getSCName(SC, game);
-                    if ("pbd1000".equalsIgnoreCase(game.getName()) || MegagameGroupService.isActive(game)) {
+                    if ("pbd1000".equalsIgnoreCase(game.getName())) {
                         name += "(" + SC + ")";
                     }
                     Button strategicAction = Buttons.green(

@@ -126,7 +126,7 @@ public class MegagameGroupService {
     }
 
     public static int groupCardFor(Game game, Player player, int cardNumber) {
-        String group = groupOf(game, player);
+        String group = isActive(game) ? groupOf(game, player) : null;
         return group == null ? cardNumber : cardNumber * 10 + groupDigit(group);
     }
 

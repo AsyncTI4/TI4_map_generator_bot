@@ -508,9 +508,7 @@ public class TeHelperActionCards {
     }
 
     private static boolean isReadiedForStrategize(Game game, Player player, int cardNumber) {
-        int sc = MegagameGroupService.isActive(game)
-                ? MegagameGroupService.groupCardFor(game, player, cardNumber)
-                : cardNumber;
+        int sc = MegagameGroupService.groupCardFor(game, player, cardNumber);
         return game.getScPlayed().get(sc) == null || !game.getScPlayed().get(sc);
     }
 

@@ -131,8 +131,6 @@ import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantAgent;
 import ti4.service.map.FractureService;
-import ti4.service.megagame.MegagameGroupService;
-import ti4.service.megagame.MegagameScThreads;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -2478,10 +2476,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                             game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + sc)
                     .orElse(null);
             if (gameMessage != null) {
-                ThreadChannel chan = MegagameGroupService.isActive(game)
-                        ? MegagameScThreads.forSc(game, sc)
-                        : ButtonHelper.getRightStratThread(
-                                game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
+                ThreadChannel chan = ButtonHelper.getStratThreadForSc(game, sc);
                 if (chan != null) {
                     String followSummary = PlayStrategyCardService.getSCFollowSummary(game, sc, true);
                     chan.retrieveMessageById(gameMessage.messageId())
