@@ -166,7 +166,7 @@ public class AutoPingCron {
             return;
         }
         if ("strategy".equalsIgnoreCase(game.getPhaseOfGame()) && MegagameGroupService.isActive(game)) {
-            groupPickersPing(game, latestAutoPing, milliSinceLastPing, activePlayerSettings);
+            groupPickersPing(game, latestAutoPing, milliSinceLastPing);
             return;
         }
 
@@ -218,6 +218,16 @@ public class AutoPingCron {
 
     private static void pingPlayer(
             Game game, Player player, int pingNumber, long milliSinceLastPing, boolean quickPing) {
+        pingPlayer(game, player, pingNumber, milliSinceLastPing, quickPing, true);
+    }
+
+    private static void pingPlayer(
+            Game game,
+            Player player,
+            int pingNumber,
+            long milliSinceLastPing,
+            boolean quickPing,
+            boolean offerPingDisable) {
         if (pingNumber == PING_NUMBER_TO_GIVE_UP_ON) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
@@ -240,7 +250,7 @@ public class AutoPingCron {
             return;
         }
         MessageHelper.sendMessageToChannel(gameChannel, pingMessage);
-        if (pingNumber == 2) {
+        if (pingNumber == 2 && offerPingDisable) {
             offerTemporaryPingDisable(player, gameChannel);
         }
     }
@@ -363,30 +373,22 @@ public class AutoPingCron {
         }
     }
 
-    private static void groupPickersPing(
-            Game game,
-            AutoPing latestAutoPing,
-            long milliSinceLastPing,
-            Map<String, UserSettings> activePlayerSettings) {
+    private static void groupPickersPing(Game game, AutoPing latestAutoPing, long milliSinceLastPing) {
         int pingNumber = latestAutoPing.pingCount() + 1;
         if (pingNumber > PING_NUMBER_TO_GIVE_UP_ON) {
             return;
         }
         List<Player> pickers = MegagameStrategyPhaseService.currentPickers(game).stream()
                 .filter(picker -> !picker.isAFK())
-                .filter(picker -> getPingIntervalInHours(game, settingsFor(picker, activePlayerSettings)) > 0)
                 .toList();
-        int spacer = pickers.stream()
-                .mapToInt(picker -> getPingIntervalInHours(game, settingsFor(picker, activePlayerSettings)))
-                .min()
-                .orElse(0);
-        if (spacer == 0 || !hoursHavePassed(milliSinceLastPing, spacer)) {
+        int spacer = game.getAutoPingSpacer() > 0 ? game.getAutoPingSpacer() : DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS;
+        if (pickers.isEmpty() || !hoursHavePassed(milliSinceLastPing, spacer)) {
             return;
         }
         if (pingNumber == PING_NUMBER_TO_GIVE_UP_ON) {
-            pingPlayer(game, pickers.getFirst(), pingNumber, milliSinceLastPing, false);
+            pingPlayer(game, pickers.getFirst(), pingNumber, milliSinceLastPing, false, false);
         } else {
-            pickers.forEach(picker -> pingPlayer(game, picker, pingNumber, milliSinceLastPing, false));
+            pickers.forEach(picker -> pingPlayer(game, picker, pingNumber, milliSinceLastPing, false, false));
         }
         AutoPingMetadataManager.addPing(game.getName());
     }

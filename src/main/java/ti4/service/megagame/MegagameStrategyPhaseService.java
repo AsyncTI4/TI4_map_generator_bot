@@ -1,5 +1,6 @@
 package ti4.service.megagame;
 
+import ti4.model.metadata.AutoPingMetadataManager;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,7 @@ public class MegagameStrategyPhaseService {
             return;
         }
         game.setPhaseOfGame("strategy");
+        AutoPingMetadataManager.setupAutoPing(game.getName());
         if (!stillPicking.contains(game.getActivePlayer())) {
             game.updateActivePlayer(stillPicking.getFirst());
         }
