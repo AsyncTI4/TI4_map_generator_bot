@@ -368,8 +368,7 @@ public class PlayStrategyCardService {
             String assignSpeakerMessage2 = player.getRepresentation()
                     + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
                     + " This is not required, and not advised if you are offering them a conditional replenishment. If you're offering them a conditional replenishment, it is advised to let them press replenish (or replenish and wash) themselves, since them pressing that can act as their acceptance of the deal. The bot will not auto-deduct a strategy command token.";
-            List<Player> replenishTargets = scGroups ? game.getRealPlayers() : playersToFollow;
-            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, replenishTargets);
+            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
 
