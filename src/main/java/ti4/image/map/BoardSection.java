@@ -20,6 +20,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.map.FractureService;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 final class BoardSection {
 
@@ -92,6 +93,9 @@ final class BoardSection {
 
     private Set<String> neighboursOfOneWayHyperlanes() {
         Set<String> neighbours = new HashSet<>();
+        if (!game.getFowOption(FOWOption.ONE_WAY_LANE_HINTS)) {
+            return neighbours;
+        }
         game.getCustomHyperlaneData().forEach((position, matrix) -> {
             List<String> adjacent = MapPositionMapper.getAdjacentTilePositions(position);
             if (adjacent != null && CustomHyperlaneService.hasOneWayLanes(matrix)) neighbours.addAll(adjacent);
