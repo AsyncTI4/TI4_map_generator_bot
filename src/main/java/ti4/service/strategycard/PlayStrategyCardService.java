@@ -114,6 +114,7 @@ public class PlayStrategyCardService {
             boolean isOverrule,
             String playVerb) {
         String stratCardName = Helper.getSCName(scToPlay, game);
+        boolean scGroups = MegagameGroupService.isActive(game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "**" + stratCardName + "** has already been played previously.");
@@ -185,7 +186,7 @@ public class PlayStrategyCardService {
                 }
             }
 
-            if (MegagameGroupService.isActive(game)) {
+            if (scGroups) {
                 playersToFollow = MegagameGroupService.groupMembersForSc(game, scToPlay);
                 gamePing = new StringBuilder(
                         playersToFollow.stream().map(Player::getRepresentation).collect(Collectors.joining(", ")));
@@ -202,7 +203,7 @@ public class PlayStrategyCardService {
                     player2.removeFollowedSC(scToPlay);
                     player2.getCardsInfoThread(); // force thread to open if closed
                 }
-                if (MegagameGroupService.isActive(game)) {
+                if (scGroups) {
                     for (Player outsider : MegagameGroupService.outsidersOfScGroup(game, scToPlay)) {
                         outsider.addFollowedSC(scToPlay);
                     }
@@ -367,8 +368,7 @@ public class PlayStrategyCardService {
             String assignSpeakerMessage2 = player.getRepresentation()
                     + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
                     + " This is not required, and not advised if you are offering them a conditional replenishment. If you're offering them a conditional replenishment, it is advised to let them press replenish (or replenish and wash) themselves, since them pressing that can act as their acceptance of the deal. The bot will not auto-deduct a strategy command token.";
-            List<Player> replenishTargets =
-                    MegagameGroupService.isActive(game) ? game.getRealPlayers() : playersToFollow;
+            List<Player> replenishTargets = scGroups ? game.getRealPlayers() : playersToFollow;
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, replenishTargets);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
@@ -785,6 +785,7 @@ public class PlayStrategyCardService {
             List<Button> scButtons,
             List<Player> playersToReact,
             boolean isDetachmentCard) {
+        boolean scGroups = MegagameGroupService.isActive(game);
         long messageCreationTime = message.getTimeCreated().toInstant().toEpochMilli();
         StrategyCardMessageService.replaceStrategyCardMessage(
                 game.getName(), message.getId(), playRound, scToPlay, messageCreationTime);
@@ -796,7 +797,7 @@ public class PlayStrategyCardService {
             message.addReaction(reactionEmoji).queue(Consumers.nop(), BotLogger::catchRestError);
             GameMessageManager.addReaction(game.getName(), reactingPlayer.getFaction(), message.getId());
         }
-        if (MegagameGroupService.isActive(game)) {
+        if (scGroups) {
             for (Player outsider : MegagameGroupService.outsidersOfScGroup(game, scToPlay)) {
                 GameMessageManager.addReaction(game.getName(), outsider.getFaction(), message.getId());
             }
@@ -809,7 +810,7 @@ public class PlayStrategyCardService {
         }
 
         String threadName = getStrategyCardThreadName(game.getName(), playRound, scModel.getName());
-        if (MegagameGroupService.isActive(game)) {
+        if (scGroups) {
             threadName = MegagameScThreads.threadName(threadName, scToPlay);
         }
         ThreadChannelAction threadChannel = game.getMainGameChannel().createThreadChannel(threadName, message.getId());

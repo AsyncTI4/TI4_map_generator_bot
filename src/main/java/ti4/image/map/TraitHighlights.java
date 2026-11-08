@@ -19,6 +19,7 @@ final class TraitHighlights implements OffBoardHighlights {
 
     @Override
     public int draw(Graphics2D g2, Game game, Player player, Point miscTile) {
+        int speakerOffset = SpeakerOffset.of(player);
         int offBoardHighlighting = 0;
         List<String> traitFiles = new ArrayList<>();
         for (String planet : player.getPlanets()) {
@@ -72,7 +73,7 @@ final class TraitHighlights implements OffBoardHighlights {
                                 + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                 - 30
                                 + i * 60 / (offBoardHighlighting - 1)
-                                + SpeakerOffset.of(player),
+                                + speakerOffset,
                         null);
             }
         } else if (offBoardHighlighting == 1) {
@@ -83,9 +84,7 @@ final class TraitHighlights implements OffBoardHighlights {
                 g2.drawImage(
                         bufferedImage,
                         miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                        miscTile.y
-                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                + SpeakerOffset.of(player),
+                        miscTile.y + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2 + speakerOffset,
                         null);
             }
         }
