@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.fallback.FallbackLog;
+import ti4.ai.tactical.AttackLedger;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -45,7 +46,7 @@ class AiProgress {
 
     private static Map<String, String> withoutFallbackLog(Map<String, String> storedValues) {
         Map<String, String> kept = new HashMap<>(storedValues);
-        kept.keySet().removeIf(FallbackLog::isLogKey);
+        kept.keySet().removeIf(key -> FallbackLog.isLogKey(key) || AttackLedger.isLedgerKey(key));
         return kept;
     }
 

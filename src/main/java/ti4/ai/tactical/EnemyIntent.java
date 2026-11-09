@@ -8,6 +8,7 @@ import java.util.OptionalDouble;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner.Candidate;
@@ -32,20 +33,28 @@ class EnemyIntent {
     static Optional<List<TacticalPlan>> ranked(Game game, Player enemy) {
         if (ImaginedTurn.underway()) return Optional.empty();
         return Optional.of(remembered(
-                game, enemy.getFaction(), () -> ImaginedTurn.of(enemy, () -> TacticalPlanner.ranked(game, enemy))));
+                game,
+                enemy,
+                enemy.getFaction(),
+                () -> ImaginedTurn.of(enemy, () -> TacticalPlanner.ranked(game, enemy))));
     }
 
     static OptionalDouble attackWorth(Game game, Player enemy, Tile tile, Player defender) {
         if (ImaginedTurn.underway()) return OptionalDouble.empty();
         return remembered(
                 game,
+                enemy,
                 enemy.getFaction() + "|" + tile.getPosition() + "|" + defender.getFaction(),
                 () -> ImaginedTurn.of(enemy, () -> bestAttack(game, enemy, tile, defender)));
     }
 
+    private static String memoryMark(Game game, Player enemy) {
+        return AttackLedger.remembers(game, enemy) ? "|" + AiExperiments.Experiment.ATTACK_MEMORY : "";
+    }
+
     @SuppressWarnings("unchecked")
-    private static <T> T remembered(Game game, String key, Supplier<T> compute) {
-        String fullKey = game.getName() + "|" + key;
+    private static <T> T remembered(Game game, Player enemy, String key, Supplier<T> compute) {
+        String fullKey = game.getName() + "|" + key + memoryMark(game, enemy);
         Cached cached = CACHE.get(fullKey);
         if (cached != null && cached.isFor(game)) return (T) cached.value();
         T value = compute.get();

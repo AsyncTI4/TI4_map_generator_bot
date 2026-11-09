@@ -13,6 +13,7 @@ import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.ShardPrize;
 import ti4.ai.eval.Territory;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.SpendCost;
@@ -158,7 +159,7 @@ final class OffenseOutlook {
         double cancel = 0;
         double extraOrigins = EXTRA_ORIGIN_COST * Math.max(0, strike.origins().size() - 1);
         if (full && value - losses - extraOrigins >= floor) {
-            double plastic = estimate.theirExpectedLoss() + heldPlanetValue;
+            double plastic = plastic(estimate, heldPlanetValue);
             anger = anger(strike, estimate, plastic, denial.harmPoints(), ownObjective);
             counter = w * counterstrike(strike, estimate, after, planetsAfter, landed, terms.seatStake());
             nekroFeed = nekroFeed(opponent, estimate);
@@ -486,7 +487,27 @@ final class OffenseOutlook {
         double grievance = plastic * angerSensitivity(strike.target(), opponent)
                 + scoringDenial * Grievance.scoringDenial(standings.leadOverField(opponent));
         double relief = Grievance.relief(standings.winThreat(opponent), standings.winThreat(seat), ownObjective / VP);
-        return ANGER_SHARE * grievance * retaliation(strike, estimate) * relief;
+        double nearTerm = ANGER_SHARE * grievance * retaliation(strike, estimate) * relief;
+        if (!remembersAttacks()) return nearTerm;
+        return Math.max(nearTerm, relief * lastingAnger(strike, estimate, grievance));
+    }
+
+    private double plastic(StrikeEstimate estimate, double heldPlanetValue) {
+        double kills =
+                remembersAttacks() ? ValueScale.RESOURCE * estimate.theirExpectedLoss() : estimate.theirExpectedLoss();
+        return kills + heldPlanetValue;
+    }
+
+    private boolean remembersAttacks() {
+        return AttackLedger.remembers(game, seat);
+    }
+
+    private double lastingAnger(Strike strike, StrikeEstimate estimate, double grievance) {
+        Player opponent = strike.opponent();
+        double held = AttackLedger.grudge(game, opponent, seat);
+        double before = Standings.angerRatio(game, seat, held);
+        double after = Standings.angerRatio(game, seat, held + grievance);
+        return world(strike, estimate).hostility(opponent, strike.target()) * (after / before - 1);
     }
 
     private double retaliation(Strike strike, StrikeEstimate estimate) {

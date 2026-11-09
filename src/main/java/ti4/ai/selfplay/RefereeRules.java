@@ -1,6 +1,7 @@
 package ti4.ai.selfplay;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -11,6 +12,7 @@ import ti4.ai.AiSettings;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.tactical.AttackLedger;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.game.EndGameService;
@@ -79,7 +81,13 @@ public class RefereeRules {
                 game.getRealPlayers().stream()
                         .map(player -> player.getSecretsUnscored().size())
                         .toList(),
-                new TreeMap<>(game.getStoredValueMap()));
+                withoutAttackLedger(game.getStoredValueMap()));
+    }
+
+    private static Map<String, String> withoutAttackLedger(Map<String, String> storedValues) {
+        Map<String, String> kept = new TreeMap<>(storedValues);
+        kept.keySet().removeIf(AttackLedger::isLedgerKey);
+        return kept;
     }
 
     public static Predicate<PromptButton> anyStep() {

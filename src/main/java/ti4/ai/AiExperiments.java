@@ -22,7 +22,8 @@ public class AiExperiments {
         CANNON_COVER_RISK,
         BLOCKADE_GROUND,
         EXPLOIT_GUARDS,
-        SPEAKER_SALE
+        SPEAKER_SALE,
+        ATTACK_MEMORY
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

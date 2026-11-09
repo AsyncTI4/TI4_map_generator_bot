@@ -69,6 +69,7 @@ import ti4.ai.strategy.SpeakerSale;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
+import ti4.ai.tactical.AttackLedger;
 import ti4.ai.tactical.CombatMoment;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.tactical.FleetSupplyRules;
@@ -173,6 +174,7 @@ public class NekroBrain implements FactionBrain {
     private static final long SAME_TURN_TOLERANCE_MILLIS = TimeUnit.SECONDS.toMillis(5);
 
     private final List<Function<AiTurnContext, Optional<AiDecision>>> rules = List.of(
+            AttackLedger::observe,
             ActionSecretRules::observe,
             PromissoryRules::observe,
             TradeRules::observe,
