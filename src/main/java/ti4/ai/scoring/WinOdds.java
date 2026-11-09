@@ -2,8 +2,11 @@ package ti4.ai.scoring;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.CustodiansRace;
@@ -12,10 +15,10 @@ import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.StyxTake;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.helpers.Helper;
 import ti4.service.info.ListPlayerInfoService;
-import ti4.website.model.WebScoreBreakdown.EntryType;
 
 @UtilityClass
 public class WinOdds {
@@ -25,6 +28,10 @@ public class WinOdds {
     private static final int STATUS_PUBLIC_SCORES = 1;
     private static final int IMPERIAL_PUBLIC_SCORES = 1;
     private static final int STATUS_SECRET_SCORES = 1;
+    private static final int TECH_SPECIALTY_COLORS = 4;
+    private static final String BOOK_OF_LATVINIA = "bookoflatvinia";
+    private static final String CROWN_OF_EMPHIDIA = "emphidia";
+    private static final String TOMB_OF_EMPHIDIA = "attachment_tombofemphidia.png";
 
     public record Odds(double duringAction, double byStatusScoring, double byStatusEnd) {
 
@@ -32,22 +39,36 @@ public class WinOdds {
     }
 
     public static Odds of(Game game, Player viewer, Player rival) {
+        return of(game, viewer, rival, 0);
+    }
+
+    public static Odds of(Game game, Player viewer, Player rival, int immediatePoints) {
         return DecisionMemo.remember(
-                () -> compute(game, viewer, rival),
+                () -> compute(game, viewer, rival, immediatePoints),
                 "win.odds",
                 viewer,
                 rival,
+                immediatePoints,
                 DecidingSeat.knowsHandOf(viewer),
                 game.getRound());
     }
 
     public static double reachesGoal(Game game, Player viewer, Player rival) {
+        return reachesGoal(game, viewer, rival, 0);
+    }
+
+    public static double reachesGoal(Game game, Player viewer, Player rival, int immediatePoints) {
         if (rival.isNeutral() || rival.isEliminated() || game.getVp() <= 0) return 0;
-        return of(game, viewer, rival).byStatusEnd();
+        return of(game, viewer, rival, immediatePoints).byStatusEnd();
     }
 
     public static double finishesBefore(Game game, Player viewer, Player rival, OptionalInt mine) {
-        Odds odds = of(game, viewer, rival);
+        return finishesBefore(game, viewer, rival, mine, 0);
+    }
+
+    public static double finishesBefore(Game game, Player viewer, Player rival, OptionalInt mine, int immediatePoints) {
+        if (rival.isNeutral() || rival.isEliminated() || game.getVp() <= 0) return 0;
+        Odds odds = of(game, viewer, rival, immediatePoints);
         if (mine.isEmpty()) return odds.byStatusEnd();
         int myFinish = mine.getAsInt();
         if (myFinish <= WinRace.DURING_ACTION_PHASE) return 0;
@@ -55,21 +76,48 @@ public class WinOdds {
         return odds.duringAction() + (scoresEarlier ? odds.byStatusScoring() - odds.duringAction() : 0);
     }
 
-    private static Odds compute(Game game, Player viewer, Player rival) {
-        int missing = game.getVp() - rival.getTotalVictoryPoints();
+    public static boolean outrunsEveryRival(Game game, Player seat, OptionalInt mine, Map<Player, Integer> given) {
+        if (mine.isEmpty()) return false;
+        return game.getRealPlayers().stream()
+                .filter(other -> other != seat && !other.isEliminated())
+                .allMatch(other -> finishesBefore(game, seat, other, mine, given.getOrDefault(other, 0)) < MAJORITY);
+    }
+
+    private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints) {
+        int missing = game.getVp() - rival.getTotalVictoryPoints() - immediatePoints;
         if (missing <= 0) return Odds.CERTAIN;
+        boolean acts = !rival.isPassed();
         boolean imperial = ScoringStakes.holdsUnplayedImperial(game, rival);
         boolean mecatol = rival.controlsMecatol(true);
         Grid grid = Grid.start(missing);
         grid = grid.with(publics(game, rival, imperial, missing));
-        grid = grid.with(secrets(game, viewer, rival, missing));
+        grid = grid.with(secrets(game, viewer, rival, missing, acts));
         if (imperial && mecatol) grid = grid.with(Grid.certain(missing, ONE_POINT, 0));
-        grid = grid.with(Grid.chance(missing, custodiansPoints(imperial, mecatol), 0, custodians(game, viewer, rival)));
-        grid = grid.with(Grid.chance(missing, ONE_POINT, 0, StyxTake.thisRound(game, rival)));
-        int latvinia = ScoringPaths.readyPoints(game, rival, EntryType.LATVINIA);
-        if (latvinia > 0) grid = grid.with(Grid.certain(missing, latvinia, 0));
-        int crown = ScoringPaths.readyPoints(game, rival, EntryType.CROWN);
+        if (acts) {
+            grid = grid.with(
+                    Grid.chance(missing, custodiansPoints(imperial, mecatol), 0, custodians(game, viewer, rival)));
+            grid = grid.with(Grid.chance(missing, ONE_POINT, 0, StyxTake.thisRound(game, rival)));
+        }
+        if (acts && latviniaReady(game, rival)) grid = grid.with(Grid.certain(missing, ONE_POINT, 0));
+        int crown = crownReady(game, rival) ? ONE_POINT : 0;
         return new Odds(grid.actionAtLeast(missing), grid.totalAtLeast(missing, 0), grid.totalAtLeast(missing, crown));
+    }
+
+    private static boolean latviniaReady(Game game, Player rival) {
+        if (!rival.hasRelic(BOOK_OF_LATVINIA)) return false;
+        Set<String> specialties = new HashSet<>();
+        for (String name : rival.getPlanets()) {
+            Planet planet = game.getUnitHolderFromPlanet(name);
+            if (planet != null) specialties.addAll(planet.getTechSpecialities());
+        }
+        return specialties.size() >= TECH_SPECIALTY_COLORS;
+    }
+
+    private static boolean crownReady(Game game, Player rival) {
+        if (!rival.hasRelic(CROWN_OF_EMPHIDIA)) return false;
+        return rival.getPlanets().stream()
+                .map(game::getUnitHolderFromPlanet)
+                .anyMatch(planet -> planet != null && planet.getTokenList().contains(TOMB_OF_EMPHIDIA));
     }
 
     private static int custodiansPoints(boolean imperial, boolean mecatol) {
@@ -148,18 +196,19 @@ public class WinOdds {
         return candidates;
     }
 
-    private static Grid secrets(Game game, Player viewer, Player rival, int missing) {
+    private static Grid secrets(Game game, Player viewer, Player rival, int missing, boolean acts) {
         double[][] byStatusTaken = new double[STATUS_SECRET_SCORES + 1][missing + 1];
         byStatusTaken[0][0] = 1;
         for (CardChance card : SecretOdds.readyByCard(game, viewer, rival)) {
             double[][] next = new double[STATUS_SECRET_SCORES + 1][missing + 1];
-            double none = 1 - card.status() - card.action();
+            double actionChance = acts ? card.action() : 0;
+            double none = 1 - card.status() - actionChance;
             for (int taken = 0; taken <= STATUS_SECRET_SCORES; taken++) {
                 for (int action = 0; action <= missing; action++) {
                     double p = byStatusTaken[taken][action];
                     if (p == 0) continue;
                     next[taken][action] += p * none;
-                    next[taken][cap(action + ONE_POINT, missing)] += p * card.action();
+                    next[taken][cap(action + ONE_POINT, missing)] += p * actionChance;
                     next[Math.min(STATUS_SECRET_SCORES, taken + 1)][action] += p * card.status();
                 }
             }

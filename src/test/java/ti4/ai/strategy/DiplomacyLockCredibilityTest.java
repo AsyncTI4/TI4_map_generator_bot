@@ -143,10 +143,11 @@ class DiplomacyLockCredibilityTest extends BaseTi4Test {
     }
 
     // A landing party much smaller than the big fleet still matters when taking home would stop the seat scoring the
-    // public that would bring it within a point of winning.
+    // public that would win it the game. (Under WIN_THREAT_FEASIBLE a seat is near winning only when it can feasibly
+    // reach the goal, so the seat sits on 9 and Erect a Monument is its tenth point.)
     @Test
     void locksHomeAgainstALandingPartyAtTheDoorOfASeatNearWinning() {
-        test.points(letnev, 8);
+        test.points(letnev, 9);
         test.place("26", "319");
         letnev.addPlanet("lodor");
         test.game.getRevealedPublicObjectives().put("monument", 1);

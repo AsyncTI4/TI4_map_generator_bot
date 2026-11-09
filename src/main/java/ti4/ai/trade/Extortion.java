@@ -3,6 +3,7 @@ package ti4.ai.trade;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
@@ -21,6 +22,7 @@ import ti4.ai.promissory.NoteGiving;
 import ti4.ai.scoring.ScoringPaths;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.scoring.WinOdds;
 import ti4.ai.scoring.WinRace;
 import ti4.ai.scoring.WinRace.Boost;
 import ti4.ai.tactical.ExtortionPlans;
@@ -197,10 +199,12 @@ class Extortion {
                     .filter(item -> worth(game, seat, victim, item) <= MAX_DEMAND)
                     .forEach(items::add);
         }
-        List<OptionalInt> rivals = game.getRealPlayers().stream()
-                .filter(other -> other != seat)
-                .map(other -> WinRace.finish(game, other, WinRace.feared(game, seat, other, 0)))
-                .toList();
+        List<OptionalInt> rivals = WinRace.weighsFeasibility(seat)
+                ? List.of()
+                : game.getRealPlayers().stream()
+                        .filter(other -> other != seat)
+                        .map(other -> WinRace.finish(game, other, WinRace.feared(game, seat, other, 0)))
+                        .toList();
         return items.stream()
                 .filter(item -> winsFirstWith(game, seat, item, rivals))
                 .filter(item -> !AiSeats.isAiSeat(victim) || pays(game, seat, victim, item, threat))
@@ -236,6 +240,7 @@ class Extortion {
                 ? Math.max(0, SpendUnlock.pointDelta(game, seat, item.amount()))
                 : 0;
         OptionalInt mine = WinRace.finish(game, seat, new Boost(throne ? 1 : 0, 0, unlocked, false));
+        if (WinRace.weighsFeasibility(seat)) return WinOdds.outrunsEveryRival(game, seat, mine, Map.of());
         return rivals.stream().allMatch(theirs -> WinRace.finishesBefore(mine, theirs));
     }
 

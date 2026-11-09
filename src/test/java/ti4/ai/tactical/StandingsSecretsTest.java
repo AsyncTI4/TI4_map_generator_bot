@@ -11,6 +11,7 @@ import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.game.Player;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // The audit found the leader threat ramped over a fixed distance from the goal (1.5 points, then 3 under the
@@ -79,6 +80,28 @@ class StandingsSecretsTest extends BaseTi4Test {
         sardakkOnSevenWithThreeSurePoints();
 
         assertThat(standings().winThreat(sardakk)).isCloseTo(1.0, within(1e-9));
+    }
+
+    // The user's example: six of ten, but with three feasible sources worth four points. Imperial on Mecatol Rex (one
+    // point, LRR 45.2) and Imperial's extra public, Galvanize the People (two points), in the action phase, then
+    // Raise a Fleet (five non-fighter ships in one system, one point) in the status phase (LRR 61.6). A sure threat,
+    // while a rival on eight of ten with nothing to score is none.
+    @Test
+    void aRivalOnSixWithFeasiblePointsIsAThreatAndOneOnEightWithoutIsNot() {
+        score(sardakk, 6);
+        board.reveal("galvanize");
+        board.reveal("raise_fleet");
+        sardakk.setTacticalCC(3);
+        sardakk.setStrategicCC(3);
+        sardakk.addSC(IMPERIAL);
+        sardakk.addPlanet("mr");
+        board.test.units(board.home, "space", sardakk, UnitType.Dreadnought, 5);
+
+        assertThat(standings().winThreat(sardakk)).isCloseTo(1.0, within(1e-9));
+
+        Player sol = board.test.sol;
+        score(sol, 8);
+        assertThat(standings().winThreat(sol)).isZero();
     }
 
     // Without Mecatol Rex the Imperial point is gone (no way onto it this round) and Galvanize alone leaves Sardakk

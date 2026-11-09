@@ -73,6 +73,25 @@ class WinOddsTest extends BaseTi4Test {
         assertThat(WinRace.winnersBefore(test.game, test.nekro)).isEmpty();
     }
 
+    // A rival that has passed takes no more actions (LRR 3.3), so landing on Mecatol Rex is no longer open to it.
+    @Test
+    void aPassedRivalCannotLandForTheCustodians() {
+        points(test.sol, 9);
+        solCanLandOnMecatol();
+        test.sol.setPassed(true);
+
+        assertThat(WinOdds.reachesGoal(test.game, test.nekro, test.sol)).isZero();
+    }
+
+    // Holding the Throne as an immediate point is enough for a rival on nine.
+    @Test
+    void immediatePointsCountTowardTheGoal() {
+        points(test.sol, 9);
+
+        assertThat(WinOdds.reachesGoal(test.game, test.nekro, test.sol)).isZero();
+        assertThat(WinOdds.reachesGoal(test.game, test.nekro, test.sol, 1)).isCloseTo(1.0, within(1e-9));
+    }
+
     // Without the influence the landing scores nothing.
     @Test
     void aLandingItCannotPayForIsNoPoint() {

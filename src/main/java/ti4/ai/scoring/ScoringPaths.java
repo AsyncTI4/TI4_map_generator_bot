@@ -24,13 +24,6 @@ public class ScoringPaths {
                 .sum();
     }
 
-    public static int readyPoints(Game game, Player player, EntryType type) {
-        return entries(game, player).stream()
-                .filter(entry -> entry.getType() == type && entry.getState() == EntryState.QUALIFIES)
-                .mapToInt(ScoringPaths::points)
-                .sum();
-    }
-
     public static boolean imperialAwaitsMecatol(Game game, Player player) {
         return entries(game, player).stream()
                 .anyMatch(entry -> entry.getType() == EntryType.IMPERIAL && entry.getState() == EntryState.POTENTIAL);

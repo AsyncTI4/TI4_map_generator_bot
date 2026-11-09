@@ -83,9 +83,9 @@ class ExtortionPlansTest extends BaseTi4Test {
         assertThat(ExtortionPlans.fearOf(test.game, test.nekro, test.sol, tile)).isEqualTo(1.0);
     }
 
-    // Sol paid on 0 points, so the deal held. Once Sol (now on 9 with Imperial and Mecatol to take) could win this
-    // round, all deals are off: the spared system may be attacked, the attack is worth its full value, and Sol fears
-    // it again.
+    // Sol paid on 0 points, so the deal held. Once Sol (now on 9 with Imperial, holding Mecatol Rex, LRR 45.2) could
+    // win this round, all deals are off: the spared system may be attacked, the attack is worth its full value, and
+    // Sol fears it again. Sol holds Mecatol Rex so the point is feasible under WIN_THREAT_FEASIBLE as well.
     @Test
     void allDealsAreOffOnceThePayerCanWin() {
         double before = attackOnLodor().orElseThrow().score();
@@ -95,6 +95,7 @@ class ExtortionPlansTest extends BaseTi4Test {
 
         for (int card = 1; card <= 8; card++) test.game.setScTradeGood(card, 0);
         test.sol.addSC(8);
+        test.sol.addPlanet("mr");
         test.points(test.sol, 9);
 
         assertThat(ExtortionPlans.dealOff(test.game, test.nekro, test.sol)).isTrue();

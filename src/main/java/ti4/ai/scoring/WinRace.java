@@ -12,6 +12,7 @@ import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretValue;
+import ti4.ai.tactical.StyxTake;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -41,10 +42,6 @@ public class WinRace {
                 .filter(other ->
                         feasible ? likelyFirst(game, seat, other, mine) : finishesFirst(finish(game, other), mine))
                 .toList();
-    }
-
-    private static boolean weighsFeasibility(Player seat) {
-        return AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_THREAT_FEASIBLE);
     }
 
     private static boolean likelyFirst(Game game, Player seat, Player rival, OptionalInt mine) {
@@ -107,12 +104,22 @@ public class WinRace {
     }
 
     public static Boost feared(Game game, Player viewer, Player rival, int immediatePoints) {
-        int actionPoints = (int) Math.round(SecretOdds.chanceReady(game, viewer, rival)) + styxPoint(game, rival);
+        int actionPoints = weighsFeasibility(viewer)
+                ? styxTakePoint(game, rival)
+                : (int) Math.round(SecretOdds.chanceReady(game, viewer, rival)) + styxPoint(game, rival);
         return new Boost(immediatePoints, actionPoints, 0, ScoringPaths.imperialAwaitsMecatol(game, rival));
     }
 
     private static int styxPoint(Game game, Player rival) {
         return FractureCampaign.dock(game, rival).isPresent() ? STYX_POINT : 0;
+    }
+
+    public static int styxTakePoint(Game game, Player player) {
+        return StyxTake.thisRound(game, player) >= WinOdds.MAJORITY ? STYX_POINT : 0;
+    }
+
+    public static boolean weighsFeasibility(Player seat) {
+        return AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_THREAT_FEASIBLE);
     }
 
     public static boolean canWinThisRound(Game game, Player viewer, Player player) {
