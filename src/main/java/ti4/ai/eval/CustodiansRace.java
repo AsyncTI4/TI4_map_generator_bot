@@ -9,6 +9,8 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
@@ -22,6 +24,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 public final class CustodiansRace {
 
@@ -86,11 +89,14 @@ public final class CustodiansRace {
         private final Map<String, OptionalInt> idleArrivals = new HashMap<>();
         private final Map<String, Boolean> payable = new HashMap<>();
         private final Map<String, Boolean> covered = new HashMap<>();
+        private final Map<String, Double> survivals = new HashMap<>();
         private final Map<String, Integer> projections = new HashMap<>();
+        private final boolean coverOn;
 
         private Snapshot(Game game, Player seat) {
             this.game = game;
             this.seat = seat;
+            this.coverOn = seat != null && AiExperiments.enabled(seat, Experiment.CUSTODIANS_COVER);
             this.mecatol = custodiansTile(game);
         }
 
@@ -112,7 +118,7 @@ public final class CustodiansRace {
         }
 
         public OptionalInt arrivalFrom(Player player, Tile tile) {
-            if (mecatol == null || coveredByOthers(player)) return OptionalInt.empty();
+            if (mecatol == null || blockedByCover(player)) return OptionalInt.empty();
             int needed = hopsFrom(player, tile, bestTransportMove(player), Mode.LIKELY);
             if (needed == UNREACHABLE) return OptionalInt.empty();
             return OptionalInt.of(adjusted(player, baseRound() + Math.max(1, needed)));
@@ -125,21 +131,57 @@ public final class CustodiansRace {
         }
 
         public boolean canLandThisRound(Player player) {
-            if (mecatol == null || coveredByOthers(player)) return false;
+            if (mecatol == null || blockedByCover(player)) return false;
             return transportsOf(player).stream()
                     .anyMatch(transport -> actsNow(player, transport.tile())
                             && hopsFrom(player, transport.tile(), transport.baseMove(), Mode.OWNED) <= 1);
         }
 
         public double winChance(Player seatOfInterest, int arrival, Order order) {
-            double chance = 1.0;
+            double chance = coverSurvival(seatOfInterest);
             for (Player rival : game.getRealPlayers()) {
                 if (rival == seatOfInterest) continue;
                 OptionalInt theirs = arrival(rival);
                 if (theirs.isEmpty() || theirs.getAsInt() > arrival) continue;
-                chance *= theirs.getAsInt() < arrival ? BEATEN : sameRound(seatOfInterest, rival, order);
+                double kept = theirs.getAsInt() < arrival ? BEATEN : sameRound(seatOfInterest, rival, order);
+                chance *= 1 - coverSurvival(rival) * (1 - kept);
             }
             return chance;
+        }
+
+        public double coverSurvival(Player player) {
+            if (mecatol == null || !coverOn) return 1.0;
+            return survivals.computeIfAbsent(player.getFaction(), faction -> survivalUnderCover(player));
+        }
+
+        private double survivalUnderCover(Player player) {
+            List<Double> chances = CannonDice.againstShipsOf(game, player, mecatol);
+            if (chances.isEmpty()) return 1.0;
+            int hitPoints = transportsOf(player).stream()
+                    .mapToInt(transport -> hitPoints(player, transport.tile()))
+                    .max()
+                    .orElse(1);
+            return 1 - DiceOdds.atLeast(chances, hitPoints);
+        }
+
+        private static int hitPoints(Player player, Tile tile) {
+            UnitHolder space = BoardView.space(tile);
+            int hitPoints = 0;
+            for (Map.Entry<UnitType, Integer> ship :
+                    BoardView.ships(space, player).entrySet()) {
+                if (!BoardView.MOVING_SHIPS.contains(ship.getKey())) continue;
+                hitPoints += ship.getValue();
+                boolean sustains = BoardView.model(player, ship.getKey())
+                        .filter(UnitModel::getSustainDamage)
+                        .isPresent();
+                if (sustains) hitPoints += BoardView.undamaged(space, player, ship.getKey());
+            }
+            return Math.max(1, hitPoints);
+        }
+
+        private boolean blockedByCover(Player player) {
+            if (!coverOn) return coveredByOthers(player);
+            return coverSurvival(player) <= 0;
         }
 
         public double raceValue(Player seatOfInterest, OptionalInt arrival, Order order) {
@@ -208,7 +250,7 @@ public final class CustodiansRace {
         }
 
         private OptionalInt earliest(Player player, ToIntFunction<Transport> arrivalOf) {
-            if (mecatol == null || coveredByOthers(player)) return OptionalInt.empty();
+            if (mecatol == null || blockedByCover(player)) return OptionalInt.empty();
             int best = UNREACHABLE;
             for (Transport transport : transportsOf(player)) {
                 best = Math.min(best, arrivalOf.applyAsInt(transport));

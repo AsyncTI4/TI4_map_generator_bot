@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FlagshipRating;
 import ti4.ai.eval.FleetLimit;
@@ -328,7 +329,9 @@ public class ProductionPlanner {
             int extraProduction,
             @Nullable ProductionTrigger trigger,
             boolean seedFirst) {
-        if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
+        if (BoardView.hasEnemyShips(game, seat, tile)) {
+            return blockadedPlan(game, seat, tile, extraResources, defense, extraProduction);
+        }
         int fleetRoomBonus = trigger == null ? 0 : trigger.fleetRoomGained();
         Budget budget;
         try (Thinking.Span ignored = Thinking.enter("production.budget")) {
@@ -351,6 +354,18 @@ public class ProductionPlanner {
         phase("production.fractureFighters", () -> planFractureFighters(builder));
         if (trigger != null) phase("production.triggerTopUp", () -> topUpTrigger(builder, trigger));
         phase("production.fill", () -> fillProduction(builder));
+        return new BuildPlan(builder.orders);
+    }
+
+    private static BuildPlan blockadedPlan(
+            Game game, Player seat, Tile tile, int extraResources, DefenseOutlook defense, int extraProduction) {
+        if (!AiExperiments.enabled(seat, AiExperiments.Experiment.BLOCKADE_GROUND)) return new BuildPlan(List.of());
+        Budget budget = new Budget(
+                Helper.getProductionValue(seat, game, tile, false) + extraProduction,
+                spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
+                0);
+        Builder builder = new Builder(game, seat, tile, budget, null, defense, true);
+        phase("production.blockadedGround", () -> planDefensiveUnits(builder));
         return new BuildPlan(builder.orders);
     }
 
@@ -894,6 +909,7 @@ public class ProductionPlanner {
         private final List<BuildOrder> orders = new ArrayList<>();
         private final String groundPlanet;
         private final DefenseOutlook defense;
+        private final boolean groundOnly;
 
         Builder(Game game, Player seat, Tile tile, Budget budget) {
             this(game, seat, tile, budget, null, new DefenseOutlook(game, seat));
@@ -914,12 +930,24 @@ public class ProductionPlanner {
                 Budget budget,
                 @Nullable String groundPlanet,
                 DefenseOutlook defense) {
+            this(game, seat, tile, budget, groundPlanet, defense, false);
+        }
+
+        Builder(
+                Game game,
+                Player seat,
+                Tile tile,
+                Budget budget,
+                @Nullable String groundPlanet,
+                DefenseOutlook defense,
+                boolean groundOnly) {
             this.game = game;
             this.seat = seat;
             this.tile = tile;
             this.budget = budget;
             this.groundPlanet = groundPlanet;
             this.defense = defense;
+            this.groundOnly = groundOnly;
         }
 
         GroundCampaign campaign() {
@@ -932,7 +960,7 @@ public class ProductionPlanner {
 
         boolean ship(UnitType type, double value, boolean scoring, boolean forDefense) {
             UnitModel model = seat.getUnitByType(type);
-            if (model == null || !underCap(model.getAsyncId(), planned(type) + 1)) return false;
+            if (groundOnly || model == null || !underCap(model.getAsyncId(), planned(type) + 1)) return false;
             double cost = model.getCost();
             if (!budget.allows(1, cost, true)) return false;
             budget.spend(1, cost, true);
@@ -1053,7 +1081,10 @@ public class ProductionPlanner {
 
         private boolean addFighters(int count, double valueEach, boolean forDefense) {
             UnitModel model = seat.getUnitByType(UnitType.Fighter);
-            if (count <= 0 || model == null || !underCap(model.getAsyncId(), planned(UnitType.Fighter) + count)) {
+            if (groundOnly
+                    || count <= 0
+                    || model == null
+                    || !underCap(model.getAsyncId(), planned(UnitType.Fighter) + count)) {
                 return false;
             }
             double cost = model.getCost() * count;
@@ -1131,6 +1162,7 @@ public class ProductionPlanner {
         private boolean canAdd(UnitType type, int count) {
             UnitModel model = seat.getUnitByType(type);
             if (model == null || !underCap(model.getAsyncId(), planned(type) + count)) return false;
+            if (groundOnly && !BoardView.GROUND_FORCES.contains(type)) return false;
             double cost = model.getCost() * count;
             if (BoardView.GROUND_FORCES.contains(type)) {
                 boolean mechAllowed = type != UnitType.Mech || !game.isBaseGameMode();

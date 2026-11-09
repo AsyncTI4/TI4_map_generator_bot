@@ -6,6 +6,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CannonDice;
+import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -77,7 +79,7 @@ public class CannonWipeRules {
     public static double chanceToKillOneShip(Game game, Player seat, Tile tile) {
         if (tile.isScar(game)) return 0;
         List<Double> chances = new ArrayList<>();
-        for (BattleMath.CannonDice stack : BattleMath.cannonDice(game, tile, seat, List.of())) {
+        for (CannonDice stack : BattleMath.cannonDice(game, tile, seat, List.of())) {
             addDice(chances, stack.dice(), stack.hitsOn());
         }
         return chances.isEmpty() ? 0 : DiceOdds.atLeast(chances, 1);
@@ -108,7 +110,7 @@ public class CannonWipeRules {
         boolean covered = ButtonHelper.getPlayersWithPds2Cover(seat, game, tile.getPosition())
                 .contains(seat);
         if (covered) {
-            for (BattleMath.CannonDice stack : BattleMath.cannonDice(game, tile, seat, List.of())) {
+            for (CannonDice stack : BattleMath.cannonDice(game, tile, seat, List.of())) {
                 addDice(chances, stack.dice(), stack.hitsOn() + penalty);
             }
         }

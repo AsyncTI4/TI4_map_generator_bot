@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.actuation.AiActuator;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
@@ -34,6 +36,11 @@ public class AiConfusionService {
             List.of("decline", "pass", "no_", "not follow", "deletebuttons", "done", "skip", "cancel");
     private static final List<String> HIT_CANCEL_HANDLERS =
             List.of("cancelSpaceHits_", "cancelPdsOffenseHits_", "cancelGroundHits_", "cancelAFBHits_");
+    private static final String PASS_FOR_ROUND = "passForRound";
+    private static final String TURN_END = "turnEnd";
+    private static final List<String> VOTE_PREFIXES =
+            List.of("outcome_", "planetOutcomes_", "exhaustForVotes_", "resolveAgendaVote_", "proceedToFinalizingVote");
+    private static final String VOTE = "vote";
     private static final Set<String> CLAIMED_DELEGATIONS = ConcurrentHashMap.newKeySet();
 
     public static boolean claim(String delegationMessageId) {
@@ -78,15 +85,50 @@ public class AiConfusionService {
 
     private static String delegationText(Player seat, Message original, String reason) {
         String excerpt = StringUtils.abbreviate(original.getContentRaw().replace("\n", " "), EXCERPT_LENGTH);
-        return "🤖 " + seat.getRepresentationNoPing() + " isn't sure what to do here (" + reason + ")."
-                + " **Any player** may choose for it. [Original prompt](" + original.getJumpUrl() + ")"
+        String chooser = AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS)
+                ? " **The game owner or a bot developer** may choose for it."
+                : " **Any player** may choose for it.";
+        return "🤖 " + seat.getRepresentationNoPing() + " isn't sure what to do here (" + reason + ")." + chooser
+                + " [Original prompt](" + original.getJumpUrl() + ")"
                 + (excerpt.isBlank() ? "" : "\n> " + excerpt);
     }
 
-    public static Optional<PromptButton> safeDefault(AiPrompt prompt) {
+    public static boolean mayChooseFor(Player seat, String userId, String ownerId, boolean developer) {
+        if (!AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS)) return true;
+        return developer || (userId != null && userId.equals(ownerId));
+    }
+
+    public static boolean passesEarly(Game game, Player seat, PromptButton button) {
+        if (!AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS) || !passesRound(button)) return false;
+        return seat.getTacticalCC() > 0 || hasUnplayedStrategyCard(game, seat);
+    }
+
+    public static boolean neverDelegated(Game game, Player seat, PromptButton button) {
+        if (!AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS)) return false;
+        return passesEarly(game, seat, button) || endsTurn(button) || isVote(button);
+    }
+
+    private static boolean passesRound(PromptButton button) {
+        return button.handlerId().startsWith(PASS_FOR_ROUND);
+    }
+
+    private static boolean endsTurn(PromptButton button) {
+        return button.handlerId().startsWith(TURN_END);
+    }
+
+    private static boolean isVote(PromptButton button) {
+        return VOTE.equals(button.handlerId()) || VOTE_PREFIXES.stream().anyMatch(button.handlerId()::startsWith);
+    }
+
+    private static boolean hasUnplayedStrategyCard(Game game, Player seat) {
+        return seat.getSCs().stream().anyMatch(card -> !game.getPlayedSCs().contains(card));
+    }
+
+    public static Optional<PromptButton> safeDefault(Game game, Player seat, AiPrompt prompt) {
         List<PromptButton> enabled = prompt.enabledButtons().stream()
                 .filter(button -> !AiActuator.opensModal(button.customId()))
                 .filter(button -> !cancelsHits(button))
+                .filter(button -> !passesEarly(game, seat, button))
                 .toList();
         for (String hint : DECLINE_HINTS) {
             Optional<PromptButton> declining = enabled.stream()
@@ -99,12 +141,13 @@ public class AiConfusionService {
         return Optional.empty();
     }
 
-    public static Optional<PromptButton> selfPlayChoice(AiPrompt prompt) {
-        return safeDefault(prompt)
+    public static Optional<PromptButton> selfPlayChoice(Game game, Player seat, AiPrompt prompt) {
+        return safeDefault(game, seat, prompt)
                 .or(() -> prompt.enabledButtons().stream()
                         .filter(button -> !AiActuator.opensModal(button.customId()))
                         .filter(button -> !button.handlerId().startsWith("ultimateUndo"))
                         .filter(button -> !cancelsHits(button))
+                        .filter(button -> !passesEarly(game, seat, button))
                         .findFirst());
     }
 

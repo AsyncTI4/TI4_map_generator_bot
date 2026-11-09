@@ -8,6 +8,8 @@ import java.util.OptionalInt;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -46,22 +48,32 @@ class Extortion {
             int pointsAtRisk,
             String item,
             int stock,
-            boolean resolved) {
+            boolean resolved,
+            double needed) {
 
         Threat(String position, double demandValue, double loss, int pointsAtRisk) {
-            this(position, demandValue, loss, pointsAtRisk, "", 0, false);
+            this(position, demandValue, loss, pointsAtRisk, "", 0, false, 0);
         }
 
         Threat worth(double value) {
-            return new Threat(position, value, loss, pointsAtRisk, item, stock, resolved);
+            return new Threat(position, value, loss, pointsAtRisk, item, stock, resolved, needed);
         }
 
         Threat asking(DealItem asked, int victimStock) {
-            return new Threat(position, demandValue, loss, pointsAtRisk, asked.engineString(), victimStock, resolved);
+            return new Threat(
+                    position, demandValue, loss, pointsAtRisk, asked.engineString(), victimStock, resolved, needed);
+        }
+
+        Threat needing(double value) {
+            return new Threat(position, demandValue, loss, pointsAtRisk, item, stock, resolved, value);
         }
 
         Threat settled() {
-            return new Threat(position, demandValue, loss, pointsAtRisk, item, stock, true);
+            return new Threat(position, demandValue, loss, pointsAtRisk, item, stock, true, needed);
+        }
+
+        double paymentFloor() {
+            return Math.max(needed, MIN_PAYMENT_SHARE * demandValue);
         }
     }
 
@@ -70,6 +82,7 @@ class Extortion {
     static final int MAX_DEMAND = 5;
     static final int MAX_PER_ROUND = 2;
     static final double REPEAT_PENALTY = 2.0;
+    static final double MIN_PAYMENT_SHARE = 0.6;
     static final long AI_REPLY_MILLIS = 5 * 60_000L;
     static final long HUMAN_REPLY_MILLIS = 15 * 60_000L;
     private static final long POLL_MILLIS = 15_000L;
@@ -80,7 +93,8 @@ class Extortion {
     private static final String COUNT_KEY = "aiExtortionCount";
     private static final String ROUND = "@";
     private static final String FIELD = "~";
-    private static final int FIELDS = 7;
+    private static final int LEGACY_FIELDS = 7;
+    private static final int FIELDS = 8;
     private static final String DETAIL_SPACE = "fin777";
     private static final String DETAILS_MARK = "_details_";
     private static final String SAVE_REASON = "AI extortion";
@@ -164,7 +178,7 @@ class Extortion {
                 .filter(item -> pays(game, seat, victim, item, threat))
                 .max(Comparator.comparingDouble((DealItem item) -> worth(game, seat, victim, item))
                         .thenComparingDouble(item -> -cost(game, seat, victim, item)))
-                .map(item -> demandFor(game, seat, victim, target, threat, item));
+                .map(item -> demandFor(game, seat, victim, target, threat, item, needed));
     }
 
     static Optional<Demand> winningDemand(Game game, Player seat, Player victim, Tile target) {
@@ -191,7 +205,7 @@ class Extortion {
                 .filter(item -> winsFirstWith(game, seat, item, rivals))
                 .filter(item -> !AiSeats.isAiSeat(victim) || pays(game, seat, victim, item, threat))
                 .findFirst()
-                .map(item -> demandFor(game, seat, victim, target, threat, item));
+                .map(item -> demandFor(game, seat, victim, target, threat, item, worth(game, seat, victim, item)));
     }
 
     private static Threat threatAt(Game game, Player victim, Tile target) {
@@ -199,8 +213,11 @@ class Extortion {
         return new Threat(target.getPosition(), 0, loss(game, victim, target, points), points);
     }
 
-    private static Demand demandFor(Game game, Player seat, Player victim, Tile target, Threat threat, DealItem item) {
-        Threat asked = threat.worth(worth(game, seat, victim, item)).asking(item, stockOf(game, victim, item));
+    private static Demand demandFor(
+            Game game, Player seat, Player victim, Tile target, Threat threat, DealItem item, double needed) {
+        Threat asked = threat.worth(worth(game, seat, victim, item))
+                .asking(item, stockOf(game, victim, item))
+                .needing(Math.max(0, needed));
         return new Demand(victim, target, asked, Deal.EMPTY.with(item));
     }
 
@@ -235,7 +252,7 @@ class Extortion {
                 .map(alias -> noteFrom(victim, seat, alias))
                 .filter(item -> worth(game, seat, victim, item) > needed)
                 .filter(item -> pays(game, seat, victim, item, threat))
-                .map(item -> demandFor(game, seat, victim, target, threat, item));
+                .map(item -> demandFor(game, seat, victim, target, threat, item, needed));
     }
 
     private static DealItem noteFrom(Player victim, Player seat, String alias) {
@@ -355,7 +372,7 @@ class Extortion {
             return Optional.empty();
         }
         String[] fields = StringUtils.splitPreserveAllTokens(StringUtils.substringAfter(stored, ROUND), FIELD);
-        if (fields == null || fields.length != FIELDS) return Optional.empty();
+        if (fields == null || (fields.length != FIELDS && fields.length != LEGACY_FIELDS)) return Optional.empty();
         try {
             return Optional.of(new Threat(
                     fields[0],
@@ -364,26 +381,24 @@ class Extortion {
                     Integer.parseInt(fields[3]),
                     fields[4],
                     Integer.parseInt(fields[5]),
-                    Boolean.parseBoolean(fields[6])));
+                    Boolean.parseBoolean(fields[6]),
+                    fields.length == FIELDS ? Double.parseDouble(fields[7]) : 0));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
     }
 
     static void record(Game game, Player extorter, Player victim, Threat threat) {
-        extorter.setStoredValue(
-                THREAT_KEY + victim.getFaction(),
-                game.getRound()
-                        + ROUND
-                        + String.join(
-                                FIELD,
-                                threat.position(),
-                                String.valueOf(threat.demandValue()),
-                                String.valueOf(threat.loss()),
-                                String.valueOf(threat.pointsAtRisk()),
-                                threat.item(),
-                                String.valueOf(threat.stock()),
-                                String.valueOf(threat.resolved())));
+        List<String> fields = new ArrayList<>(List.of(
+                threat.position(),
+                String.valueOf(threat.demandValue()),
+                String.valueOf(threat.loss()),
+                String.valueOf(threat.pointsAtRisk()),
+                threat.item(),
+                String.valueOf(threat.stock()),
+                String.valueOf(threat.resolved())));
+        if (AiExperiments.enabled(extorter, Experiment.EXPLOIT_GUARDS)) fields.add(String.valueOf(threat.needed()));
+        extorter.setStoredValue(THREAT_KEY + victim.getFaction(), game.getRound() + ROUND + String.join(FIELD, fields));
     }
 
     private static Optional<Threat> open(Game game, Player extorter, Player victim) {
@@ -436,6 +451,21 @@ class Extortion {
 
     static boolean isCounter(Game game, Player extorter, Player victim, Deal deal) {
         return open(game, extorter, victim).isPresent() && isTribute(extorter, victim, deal);
+    }
+
+    static boolean paysEnough(Game game, Player extorter, Player victim, Deal deal) {
+        return open(game, extorter, victim)
+                .filter(threat -> matches(game, threat, extorter, victim, deal)
+                        || offered(game, extorter, victim, deal) >= threat.paymentFloor())
+                .isPresent();
+    }
+
+    private static double offered(Game game, Player extorter, Player victim, Deal deal) {
+        return deal.items().stream()
+                .filter(item -> item.type() != ItemType.DETAILS)
+                .filter(item -> item.isFrom(victim.getFaction()) && item.isTo(extorter.getFaction()))
+                .mapToDouble(item -> worth(game, extorter, victim, item))
+                .sum();
     }
 
     static void addDetails(Game game, Player extorter, Player victim) {

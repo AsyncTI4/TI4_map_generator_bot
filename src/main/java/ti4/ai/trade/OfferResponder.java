@@ -3,6 +3,8 @@ package ti4.ai.trade;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
 import ti4.ai.brain.AiDecision;
@@ -115,8 +117,7 @@ class OfferResponder {
             return Verdict.accepted();
         }
         if (Extortion.isCounter(game, seat, offerer, deal) && !deal.hasDetails()) {
-            Extortion.settle(context, offerer);
-            return Verdict.accepted();
+            return settleCounter(context, offerer, deal);
         }
         if (Extortion.isDemand(game, seat, offerer, deal)) {
             return TradeValue.of(game, seat, offerer, deal, Trust.of(context, offerer))
@@ -142,6 +143,16 @@ class OfferResponder {
             return Verdict.accepted();
         }
         return nearest(context, offerer, deal);
+    }
+
+    private static Verdict settleCounter(AiTurnContext context, Player victim, Deal deal) {
+        if (AiExperiments.enabled(context.seat(), Experiment.EXPLOIT_GUARDS)
+                && !Extortion.paysEnough(context.game(), context.seat(), victim, deal)) {
+            Extortion.refused(context, victim);
+            return Verdict.rejected();
+        }
+        Extortion.settle(context, victim);
+        return Verdict.accepted();
     }
 
     private static boolean acceptsAgentOrFacilitation(AiTurnContext context, Player offerer, Deal deal) {

@@ -1,12 +1,12 @@
-package ti4.ai.tactical;
+package ti4.ai.eval;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-class DiceOdds {
+public class DiceOdds {
 
-    static double atLeast(List<Double> hitChances, int needed) {
+    public static double atLeast(List<Double> hitChances, int needed) {
         double[] hits = {1.0};
         for (double chance : hitChances) {
             double[] next = new double[hits.length + 1];

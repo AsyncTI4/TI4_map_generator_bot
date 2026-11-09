@@ -14,6 +14,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.testbed.TestBedService;
 
 @UtilityClass
 class AiSeatPickButtonHandler {
@@ -23,6 +24,17 @@ class AiSeatPickButtonHandler {
         Optional<DelegationChoice> choice = DelegationChoice.parse(buttonID);
         if (game == null || player == null || choice.isEmpty()) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "This choice is no longer valid.");
+            return;
+        }
+        Player seat = game.getPlayer(choice.get().seatId());
+        if (seat != null
+                && !AiConfusionService.mayChooseFor(
+                        seat,
+                        event.getUser().getId(),
+                        game.getOwnerID(),
+                        TestBedService.isDeveloper(event.getMember()))) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Only the game owner or a bot developer may choose for the AI.");
             return;
         }
         if (!AiConfusionService.claim(event.getMessageId())) {

@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CannonDice;
+import ti4.ai.eval.DiceOdds;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,8 +20,6 @@ class CannonExposure {
 
     static final double MIN_DELIVERY = 0.5;
     private static final double DAMAGE_SHARE = 0.25;
-    private static final String ANTIMASS_DEFLECTORS = "amd";
-    private static final String ABSOL_ANTIMASS_DEFLECTORS = "absol_amd";
 
     record Outcome(double expectedLoss, double delivery) {
         static final Outcome UNTOUCHED = new Outcome(0, 1);
@@ -34,17 +34,7 @@ class CannonExposure {
     private record State(int capacity, int ships, double lost) {}
 
     static List<Double> dieChances(Game game, Player seat, Tile tile) {
-        List<Double> chances = new ArrayList<>();
-        if (tile.isScar(game)) return chances;
-        int penalty = seat.hasTech(ANTIMASS_DEFLECTORS) || seat.hasTech(ABSOL_ANTIMASS_DEFLECTORS) ? 1 : 0;
-        for (Player shooter : game.getRealPlayers()) {
-            if (shooter == seat) continue;
-            for (BattleMath.CannonDice stack : BattleMath.cannonDice(game, tile, shooter, List.of())) {
-                double chance = BattleMath.hitChance(stack.hitsOn() + penalty);
-                for (int die = 0; die < stack.dice(); die++) chances.add(chance);
-            }
-        }
-        return chances;
+        return CannonDice.againstShipsOf(game, seat, tile);
     }
 
     static double expectedHits(Game game, Player seat, Tile tile) {

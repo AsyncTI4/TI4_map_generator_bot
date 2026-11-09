@@ -13,6 +13,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.DiceOdds;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.secrets.ActionSecretRules;
 import ti4.game.Game;
