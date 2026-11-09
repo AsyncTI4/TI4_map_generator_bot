@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiGameWrites;
 import ti4.game.Game;
+import ti4.game.Player;
 
 record SpeakerPromise(
         String seller,
@@ -69,8 +70,21 @@ record SpeakerPromise(
 
     boolean bindsThisStrategyPhase(Game game) {
         return status == Status.ACCEPTED
-                && game.getRound() == saleRound + 1
+                && game.getRound() == pickRound()
                 && STRATEGY.equalsIgnoreCase(game.getPhaseOfGame());
+    }
+
+    int pickRound() {
+        return saleRound + 1;
+    }
+
+    boolean brokenBy(Game game, Player promisee, Player promiser) {
+        return status == Status.ACCEPTED
+                && declared()
+                && seller.equals(promisee.getFaction())
+                && buyer.equals(promiser.getFaction())
+                && game.getRound() == pickRound()
+                && promiser.getSCs().contains(wanted);
     }
 
     boolean declared() {

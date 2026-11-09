@@ -21,6 +21,9 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.ValueScale;
+import ti4.ai.promise.Promise;
+import ti4.ai.promise.PromiseBook;
+import ti4.ai.strategy.SpeakerSale;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -78,6 +81,10 @@ public class AttackLedger {
 
     public static double grudge(Game game, Player holder, Player attacker) {
         if (holder == null || attacker == null || holder == attacker) return 0;
+        return boardGrudge(game, holder, attacker) + betrayalGrudge(game, holder, attacker);
+    }
+
+    private static double boardGrudge(Game game, Player holder, Player attacker) {
         double total = 0;
         for (Attack attack : attacks(game)) {
             if (attack.attacker().equals(attacker.getFaction())
@@ -86,6 +93,17 @@ public class AttackLedger {
             }
         }
         return total;
+    }
+
+    static double betrayalGrudge(Game game, Player holder, Player attacker) {
+        double total = 0;
+        for (Promise promise : PromiseBook.brokenAgainst(game, holder)) {
+            if (promise.isPromiser(attacker)) total += promise.price() * decay(game.getRound() - promise.round());
+        }
+        return total
+                + SpeakerSale.brokenPick(game, holder, attacker)
+                        .map(pick -> pick.grievance() * decay(game.getRound() - pick.round()))
+                        .orElse(0.0);
     }
 
     static double decay(int roundsAgo) {

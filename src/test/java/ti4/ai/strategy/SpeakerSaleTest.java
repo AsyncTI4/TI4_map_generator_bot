@@ -292,6 +292,36 @@ class SpeakerSaleTest extends BaseTi4Test {
                 .containsExactly("scPick_1");
     }
 
+    // The first-pick promise is non-binding (LRR 28.4), so a human buyer can take the card nekro named. Holding it in
+    // the round after the sale breaks the promise: nekro lost the one pick place the deal promised it, worth the
+    // speaker's value spread over the average places from first.
+    @Test
+    void theBuyerTakingTheNamedCardBreaksThePromise() {
+        test.game.setRound(3);
+        storePromise(SpeakerPromise.Status.ACCEPTED, 2, 8);
+        assertThat(SpeakerSale.brokenPick(test.game, test.nekro, jolnar)).isEmpty();
+
+        jolnar.addSC(8);
+
+        assertThat(SpeakerSale.brokenPick(test.game, test.nekro, jolnar))
+                .contains(new SpeakerSale.BrokenPick(3, SpeakerSale.pickPositionValue(6)));
+        assertThat(SpeakerSale.brokenPick(test.game, jolnar, test.nekro)).isEmpty();
+    }
+
+    @Test
+    void takingAnotherCardOrAnUndeclaredOneKeepsThePromise() {
+        test.game.setRound(3);
+        jolnar.addSC(1);
+        storePromise(SpeakerPromise.Status.ACCEPTED, 2, 8);
+        assertThat(SpeakerSale.brokenPick(test.game, test.nekro, jolnar)).isEmpty();
+
+        jolnar.addSC(8);
+        storePromise(SpeakerPromise.Status.ACCEPTED, 2, SpeakerPromise.NOT_DECLARED);
+        assertThat(SpeakerSale.brokenPick(test.game, test.nekro, jolnar)).isEmpty();
+        storePromise(SpeakerPromise.Status.DECLINED, 2, 8);
+        assertThat(SpeakerSale.brokenPick(test.game, test.nekro, jolnar)).isEmpty();
+    }
+
     // The promise binds only the strategy phase right after the sale.
     @Test
     void anOldPromiseNoLongerBinds() {

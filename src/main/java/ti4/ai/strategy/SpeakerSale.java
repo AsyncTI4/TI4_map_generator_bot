@@ -30,6 +30,8 @@ public class SpeakerSale {
 
     public record Offer(Player buyer, int price) {}
 
+    public record BrokenPick(int round, double grievance) {}
+
     public static final String BUY_PREFIX = "speakerBuy_";
     public static final String DECLINE_PREFIX = "speakerNo_";
     static final int BASE_PRICE = 2;
@@ -57,6 +59,15 @@ public class SpeakerSale {
         if (buyer.getTg() < price || gain < price) return Optional.empty();
         if (!isSpeaker(game, seller) && price * CardValueScale.TRADE_GOOD <= agendaPerks(game)) return Optional.empty();
         return Optional.of(new Offer(buyer, price));
+    }
+
+    public static Optional<BrokenPick> brokenPick(Game game, Player seller, Player buyer) {
+        return SpeakerPromise.read(game)
+                .filter(promise -> promise.brokenBy(game, seller, buyer))
+                .map(promise -> new BrokenPick(
+                        promise.pickRound(),
+                        PROMISED_PICK_POSITION
+                                * pickPositionValue(game.getRealPlayers().size())));
     }
 
     public static boolean buyerAccepts(Game game, Player buyer, Player seller, int price) {
