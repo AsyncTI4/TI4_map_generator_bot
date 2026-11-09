@@ -19,12 +19,10 @@ public class AiExperiments {
         WIN_AWARE_POINTS,
         AGENDA_SABOTAGE,
         IMPERIAL_POINTS,
-        STALL_TIMING,
-        TOKEN_PRICE,
         CUSTODIANS_COVER,
         BLOCKADE_GROUND,
         EXPLOIT_GUARDS,
-        SPEAKER_AND_TECH
+        SPEAKER_SALE
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

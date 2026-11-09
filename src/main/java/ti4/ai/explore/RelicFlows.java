@@ -31,10 +31,7 @@ class RelicFlows {
         if (ComponentFlow.taken(context)) return Optional.empty();
         Optional<Candidate> best = best(context);
         if (best.isEmpty()
-                || ComponentFlow.tacticalActionBeats(
-                        context,
-                        best.get().net()
-                                + Stall.insteadOfTacticalAction(context.game(), context.seat(), Stall.ACTION_VALUE))) {
+                || ComponentFlow.tacticalActionBeats(context, best.get().net() + Stall.ACTION_VALUE)) {
             return Optional.empty();
         }
         return open(

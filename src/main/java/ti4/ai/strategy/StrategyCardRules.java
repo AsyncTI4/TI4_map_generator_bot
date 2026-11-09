@@ -1164,7 +1164,7 @@ public class StrategyCardRules {
                 .findFirst();
         if (self.isPresent()) return self;
         Game game = context.game();
-        if (AiExperiments.enabled(context.seat(), AiExperiments.Experiment.SPEAKER_AND_TECH)
+        if (AiExperiments.enabled(context.seat(), AiExperiments.Experiment.SPEAKER_SALE)
                 && !game.hasFullPriorityTrackMode()) {
             return speakerByPickPosition(game, context.seat(), choices);
         }

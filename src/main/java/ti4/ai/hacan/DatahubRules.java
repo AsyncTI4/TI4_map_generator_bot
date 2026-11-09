@@ -134,20 +134,19 @@ public class DatahubRules {
     }
 
     private static double gain(Game game, Player seat, Player other, int theirs, int mine) {
-        double ours = value(game, seat, seat, theirs) - value(game, seat, seat, mine);
-        double rival =
-                value(game, seat, other, mine) - value(game, seat, other, theirs) + TRADE_GOODS * TRADE_GOOD_VALUE;
+        double ours = value(game, seat, theirs) - value(game, seat, mine);
+        double rival = value(game, other, mine) - value(game, other, theirs) + TRADE_GOODS * TRADE_GOOD_VALUE;
         return ours - RIVAL_SHARE * rival;
     }
 
     static boolean helpsLeaderScore(Game game, Player seat, Player other, int theirs, int mine) {
         if (!Beneficiary.isPointsLeader(game, seat, other)) return false;
         return StrategyCard.of(game, mine) == StrategyCard.IMPERIAL
-                || value(game, seat, other, mine) > value(game, seat, other, theirs);
+                || value(game, other, mine) > value(game, other, theirs);
     }
 
-    private static double value(Game game, Player viewer, Player player, int initiative) {
-        return StrategyCardRanking.baseValueAsSeenBy(game, viewer, player, initiative);
+    private static double value(Game game, Player player, int initiative) {
+        return StrategyCardRanking.baseValue(game, player, initiative);
     }
 
     private static boolean affordable(Game game, Player seat) {

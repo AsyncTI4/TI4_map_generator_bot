@@ -40,8 +40,7 @@ class FragmentRules {
         if (ComponentFlow.tacticalActionBeats(
                 context,
                 RelicValue.draw(context.game(), context.seat()) * EARLY_USE_SHARE
-                        + Stall.insteadOfTacticalAction(
-                                context.game(), context.seat(), Stall.value(context.game(), context.seat())))) {
+                        + Stall.value(context.game(), context.seat()))) {
             return Optional.empty();
         }
         return open(context, thisTurn, "purge relic fragments instead of a weak tactical action");

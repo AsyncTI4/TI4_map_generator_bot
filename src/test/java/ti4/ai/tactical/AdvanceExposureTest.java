@@ -38,9 +38,7 @@ class AdvanceExposureTest extends BaseTi4Test {
     void setUp() {
         test = new AiTestGame();
         test.game.setRound(1);
-        // More than the standard 3 tactic tokens, so an advance spends a surplus token (TokenPrice) and these cases
-        // test only its exposure.
-        test.nekro.setTacticalCC(4);
+        test.nekro.setTacticalCC(3);
         home = test.nekroHome();
         neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
         test.place("47", neighbour);

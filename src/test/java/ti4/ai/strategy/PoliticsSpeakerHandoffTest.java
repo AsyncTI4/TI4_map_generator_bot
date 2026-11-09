@@ -94,7 +94,7 @@ class PoliticsSpeakerHandoffTest extends BaseTi4Test {
     // The control seat keeps the old rule: the seat with the fewest points.
     @Test
     void controlSeatNamesTheLowestScorer() {
-        AiExperiments.disable(test.nekro, EnumSet.of(AiExperiments.Experiment.SPEAKER_AND_TECH));
+        AiExperiments.disable(test.nekro, EnumSet.of(AiExperiments.Experiment.SPEAKER_SALE));
         changed();
 
         assertThat(chooseSpeaker()).isEqualTo(PREFIX + "sol");

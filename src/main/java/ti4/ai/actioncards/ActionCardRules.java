@@ -18,7 +18,6 @@ import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.secrets.SpyNetwork;
-import ti4.ai.tactical.Stall;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
@@ -68,16 +67,10 @@ public class ActionCardRules {
         Optional<ActionCardValue.Candidate> best = ActionCardValue.bestNewComponentPlay(game, seat);
         if (best.isEmpty()
                 || (!best.get().urgent()
-                        && tacticalActionBeats(
-                                context,
-                                withoutStallCredit(game, seat, best.get().value())))) {
+                        && tacticalActionBeats(context, best.get().value()))) {
             return Optional.empty();
         }
         return startPlay(context, key, best.get().alias(), PlayMoment.IN_TURN);
-    }
-
-    private static double withoutStallCredit(Game game, Player seat, double value) {
-        return Stall.withoutStallCredit(seat, value, Stall.cardActionValue(game, seat));
     }
 
     private static boolean tacticalActionBeats(AiTurnContext context, double actionValue) {

@@ -91,14 +91,8 @@ public class OrbitalDropRules {
         Optional<TacticalPlan> tactical = tacticalPlan(context);
         Optional<Plan> plan = plan(context, tactical);
         if (plan.isEmpty()) return Optional.empty();
-        if (tactical.isPresent() && tactical.get().score() >= insteadOfTacticalNet(context, plan.get())) {
-            return Optional.empty();
-        }
+        if (tactical.isPresent() && tactical.get().score() >= plan.get().net()) return Optional.empty();
         return open(context, thisTurn, plan.get(), "instead of a weaker tactical action");
-    }
-
-    private static double insteadOfTacticalNet(AiTurnContext context, Plan plan) {
-        return Stall.withoutStallCredit(context.seat(), plan.net(), Stall.actionValue(context.game(), context.seat()));
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
