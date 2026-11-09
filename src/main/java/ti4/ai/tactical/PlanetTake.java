@@ -52,6 +52,7 @@ public class PlanetTake {
     static double chance(Game game, Player taker, Target target, IncomingForces incoming, Player decider) {
         IncomingForce force = incoming.of(taker, target.tile(), Horizon.IMMEDIATE);
         if (force.isEmpty() || !force.carriesGround()) return 0.0;
+        if (target.holder() == null) return 1.0;
         Strike strike = new Strike(
                 target.tile(),
                 target.holder(),
@@ -80,9 +81,13 @@ public class PlanetTake {
         for (Planet planet : tile.getPlanetUnitHolders()) {
             if (!game.mecatols().contains(planet.getName()) || BoardView.hasCustodians(planet)) continue;
             Player controller = BoardView.controller(game, planet.getName());
-            return Optional.of(new Target(tile, planet.getName(), controller == null ? game.getNeutral() : controller));
+            return Optional.of(new Target(tile, planet.getName(), controller == null ? undefended(game) : controller));
         }
         return Optional.empty();
+    }
+
+    private static Player undefended(Game game) {
+        return game.findNeutral().orElse(null);
     }
 
     private static boolean cannonRisk(Player decider) {
