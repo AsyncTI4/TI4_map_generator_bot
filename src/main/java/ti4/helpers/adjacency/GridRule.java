@@ -37,13 +37,33 @@ public final class GridRule implements AdjacencyRule {
         Player player = context.getPlayer();
         Set<String> explored = new HashSet<>();
         boolean bothWays = lanesCountBothWays(context);
-        Set<Integer> passThroughSides = HyperlaneBridgeEnds.passThroughSides(game, player, position);
+        Set<Integer> passThroughSides = HyperlaneBridgeEnds.passThroughSides(game, position);
         for (int side = 0; side < 6; side++) {
             if (passThroughSides.contains(side)) continue;
             if (canBeEnteredFrom(game, position, side, bothWays)) {
                 collectSources(game, player, position, side, explored, sources, bothWays);
             }
         }
+        sources.addAll(bridgedSystemsTouching(game, player, position));
+    }
+
+    private static Set<String> bridgedSystemsTouching(Game game, Player player, String hyperlane) {
+        Set<String> systems = new HashSet<>();
+        Tile tile = game.getTileByPosition(hyperlane);
+        List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(hyperlane);
+        if (tile == null || !CustomHyperlaneService.isCustomHyperlaneTile(tile) || neighbours.size() != 6) {
+            return systems;
+        }
+        for (int side = 0; side < 6; side++) {
+            String system = neighbours.get(side);
+            int systemSide = (side + 3) % 6;
+            if (!HyperlaneBridgeEnds.passThroughSides(game, system).contains(systemSide)) continue;
+            List<String> systemNeighbours = MapPositionMapper.getAdjacentTilePositions(system);
+            if (hyperlane.equals(step(game, player, false, system, systemSide, null, systemNeighbours))) {
+                systems.add(system);
+            }
+        }
+        return systems;
     }
 
     private static boolean lanesCountBothWays(AdjacencyContext context) {
@@ -118,21 +138,23 @@ public final class GridRule implements AdjacencyRule {
         }
 
         Set<Integer> closedSides = sourceDirection == START && !naturalMapOnly
-                ? HyperlaneBridgeEnds.passThroughSides(game, player, position)
+                ? HyperlaneBridgeEnds.passThroughSides(game, position)
                 : Set.of();
         boolean onCustomLane =
                 hyperlaneData != null && !naturalMapOnly && CustomHyperlaneService.isCustomHyperlaneTile(currentTile);
         for (int direction = 0; direction < 6; direction++) {
-            if (closedSides.contains(direction)) continue;
             String next = step(game, player, naturalMapOnly, position, direction, hyperlaneData, directlyAdjacentTiles);
             if (next == null) continue;
+            if (closedSides.contains(direction)) {
+                tiles.add(next);
+                continue;
+            }
             if (lanes != null && hyperlaneData != null && sourceDirection >= 0) {
                 lanes.add(lane(position, sourceDirection, direction));
             }
             int enteredFrom = naturalMapOnly ? NATURAL_MAP_ONLY : (direction + 3) % 6;
-            Set<Integer> passThroughExits = onCustomLane
-                    ? HyperlaneBridgeEnds.passThroughExits(game, player, next, enteredFrom, bothWays)
-                    : null;
+            Set<Integer> passThroughExits =
+                    onCustomLane ? HyperlaneBridgeEnds.passThroughExits(game, next, enteredFrom, bothWays) : null;
             if (passThroughExits != null) {
                 tiles.addAll(passThrough(game, player, next, passThroughExits, explored, lanes, bothWays));
                 continue;
@@ -153,10 +175,18 @@ public final class GridRule implements AdjacencyRule {
         Set<String> tiles = new HashSet<>();
         List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(system);
         for (int exit : exits) {
-            tiles.addAll(
-                    traverse(game, player, false, neighbours.get(exit), (exit + 3) % 6, explored, lanes, bothWays));
+            String hyperlane = neighbours.get(exit);
+            int enteredFrom = (exit + 3) % 6;
+            if (FOWPlusService.shouldTraverseAdjacency(game, hyperlane, enteredFrom)) {
+                tiles.addAll(traverse(game, player, false, hyperlane, enteredFrom, explored, lanes, bothWays));
+            }
         }
         return tiles;
+    }
+
+    private static boolean entersBridge(Game game, @Nullable String override, String next, int dirFrom) {
+        return override == null
+                && HyperlaneBridgeEnds.passThroughSides(game, next).contains(dirFrom);
     }
 
     public static String lane(String position, int side, int otherSide) {
@@ -173,11 +203,13 @@ public final class GridRule implements AdjacencyRule {
             List<String> directlyAdjacentTiles) {
         int dirFrom = (direction + 3) % 6;
         String next = directlyAdjacentTiles.get(direction);
-        if (!naturalMapOnly && isBorderBlocked(game, player, position, direction, next, dirFrom)) {
+        String override = game.getAdjacentTileOverride(position, direction);
+        if (!naturalMapOnly
+                && isBorderBlocked(game, player, position, direction, next, dirFrom)
+                && !entersBridge(game, override, next, dirFrom)) {
             return null;
         }
 
-        String override = game.getAdjacentTileOverride(position, direction);
         if (override != null) {
             if (naturalMapOnly) return null;
             next = override;
@@ -233,13 +265,13 @@ public final class GridRule implements AdjacencyRule {
             if (previousTile == null || previousNeighbours == null || previousNeighbours.size() != 6) continue;
 
             List<Boolean> startData = previousTile.getHyperlaneData(START, game);
-            if (startData == null
-                    && HyperlaneBridgeEnds.passThroughSides(game, player, previous)
-                            .contains(direction)) {
-                for (int entry :
-                        HyperlaneBridgeEnds.passThroughEntriesLeadingTo(game, player, previous, direction, bothWays)) {
+            if (startData == null && FOWPlusService.shouldTraverseAdjacency(game, position, enteredFrom)) {
+                for (int entry : HyperlaneBridgeEnds.passThroughEntriesLeadingTo(game, previous, direction, bothWays)) {
                     collectSources(game, player, previous, entry, explored, sources, bothWays);
                 }
+            }
+            if (startData == null
+                    && HyperlaneBridgeEnds.passThroughSides(game, previous).contains(direction)) {
                 continue;
             }
             if (startData == null

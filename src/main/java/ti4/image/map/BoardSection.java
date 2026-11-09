@@ -31,7 +31,7 @@ final class BoardSection {
         this.g2 = g2;
         this.game = ctx.game();
         this.board = ctx.board();
-        this.tileLayers = TileLayers.forPreparedViewer(game, ctx.fog().fogViewer(), ctx.displayType());
+        this.tileLayers = ctx.fog().tileLayers(ctx.displayType());
     }
 
     static void draw(RenderContext ctx, Graphics2D g2) {

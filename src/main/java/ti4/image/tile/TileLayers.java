@@ -52,6 +52,15 @@ public final class TileLayers {
         return new TileLayers(new TileScene(game, displayType, viewer, new RenderWarnings()));
     }
 
+    public TileLayers withDisplayType(@Nullable DisplayType displayType) {
+        return new TileLayers(
+                new TileScene(scene.game(), displayType, scene.viewer(), new RenderWarnings(), scene.hyperlanes()));
+    }
+
+    TileScene scene() {
+        return scene;
+    }
+
     private static Map<TileStep, TileStepPainter> painters() {
         Map<TileStep, TileStepPainter> painters = new EnumMap<>(TileStep.class);
         painters.put(TileStep.Tile, new TileFaceStep(true));

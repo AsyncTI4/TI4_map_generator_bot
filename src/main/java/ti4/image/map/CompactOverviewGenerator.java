@@ -138,13 +138,14 @@ public final class CompactOverviewGenerator {
 
     public static BufferedImage playerImage(Game game, Player player, @Nullable DisplayType overlay) {
         FogMemoryService.refreshForPlayerOverview(game, player);
-        Map<String, Tile> tiles = knownTiles(game, player);
-        FogViewer viewer = new FogViewer(game, true, player);
+        TileLayers layers =
+                TileLayers.forPreparedViewer(game, new FogViewer(game, true, player), displayTypeFor(overlay));
+        Map<String, Tile> tiles = knownTiles(game, player, layers);
         return render(
                 game,
                 playerPanels(game, player, tiles.keySet()),
                 tiles,
-                TileLayers.forPreparedViewer(game, viewer, displayTypeFor(overlay)),
+                layers,
                 withOverlay(withDistances(game, PLAYER_STEPS), overlay),
                 MAX_SIZE,
                 header(game, player.getFaction() + " overview", overlay));
@@ -189,9 +190,9 @@ public final class CompactOverviewGenerator {
         return panels(game, MapSegment.visibleTo(game, player), MapSegment.mainMapVisibleTo(game, player), known);
     }
 
-    static Map<String, Tile> knownTiles(Game game, Player player) {
+    static Map<String, Tile> knownTiles(Game game, Player player, TileLayers layers) {
         Set<String> visible = FoWHelper.visibleSystems(game, player);
-        UnexploredBridges unexploredBridges = new UnexploredBridges(new FogViewer(game, true, player));
+        UnexploredBridges unexploredBridges = new UnexploredBridges(layers);
         Map<String, Tile> tiles = new HashMap<>();
         game.getTileMap().forEach((position, tile) -> {
             if (visible.contains(position)) {
@@ -207,7 +208,8 @@ public final class CompactOverviewGenerator {
     }
 
     private static boolean isUnknownBlank(Tile tile, Player player) {
-        return "0b".equals(tile.getTileID()) && StringUtils.isBlank(tile.getFogLabel(player));
+        return UnexploredBridges.UNEXPLORED_TILE_ID.equals(tile.getTileID())
+                && StringUtils.isBlank(tile.getFogLabel(player));
     }
 
     private static List<Panel> panels(Game game, List<MapSegment> segments, boolean withMain, Set<String> allowed) {

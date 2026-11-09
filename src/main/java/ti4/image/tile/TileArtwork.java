@@ -19,7 +19,6 @@ import ti4.service.map.HyperlaneStyleService;
 final class TileArtwork {
 
     private static final Set<String> OFFSET_ANOMALY_BORDER_LAYOUTS = Set.of("TYPE09", "TYPE12", "TYPE15");
-    private static final String UNEXPLORED_TILE_ID = "0b";
 
     private TileArtwork() {}
 
@@ -53,9 +52,16 @@ final class TileArtwork {
         }
         HyperlaneStyle style = scene.hyperlanes().style();
         if (isUnexplored(scene, tile)) {
-            return HyperlaneBridgeOverlay.onUnexplored(tile.getPosition(), unexploredBackground(tile), ends, style);
+            return HyperlaneBridgeOverlay.onUnexplored(
+                    tile.getPosition(), () -> unexploredBackground(tile), ends, style);
         }
-        return HyperlaneBridgeOverlay.onSystem(artPath, art, PlanetOcclusion.of(tile.getTileModel()), ends, style);
+        return HyperlaneBridgeOverlay.onSystem(
+                artPath,
+                art,
+                PlanetOcclusion.of(tile.getTileModel()),
+                ends,
+                BridgeEndsLookup.crossings(scene, tile, ends),
+                style);
     }
 
     private static String systemArtPath(Game game, Tile tile) {
@@ -69,7 +75,7 @@ final class TileArtwork {
     }
 
     private static boolean isUnexplored(TileScene scene, Tile tile) {
-        return UNEXPLORED_TILE_ID.equals(tile.getTileID()) && scene.hidesFogged(tile);
+        return UnexploredBridges.UNEXPLORED_TILE_ID.equals(tile.getTileID()) && scene.hidesFogged(tile);
     }
 
     static boolean showsUnexploredBridge(TileScene scene, Tile tile) {

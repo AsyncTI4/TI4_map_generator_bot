@@ -53,6 +53,19 @@ class HyperlaneBridgeOverlayTest extends BaseTi4Test {
                 .isTrue();
     }
 
+    // Sides 1, 2, 4 and 5 face systems the bridged system still borders, so the rim trail must not read as a wall.
+    @Test
+    void trailTunnelsUnderEdgesFacingANeighbouringSystem() {
+        HyperlaneStyleService.setShowsBridges(game, true);
+        BufferedImage walled = render();
+        for (int side : List.of(1, 2, 4, 5)) game.setTile(new Tile("20", AROUND.get(side)));
+        BufferedImage tunnelled = render();
+        assertThat(changedPixels(walled, tunnelled)).isBetween(100, 3000);
+
+        for (int side : List.of(1, 2, 4, 5)) game.addBorderAnomaly("000", side, "spatial_tear");
+        assertThat(pixels(render())).isEqualTo(pixels(walled));
+    }
+
     // A never-seen system is drawn from what the viewer knows: the two lanes leading to it, not its own art.
     @Test
     void neverSeenSystemShowsTheBridgeOnlyWhenBothLanesAreVisible() {
@@ -63,14 +76,20 @@ class HyperlaneBridgeOverlayTest extends BaseTi4Test {
         game.getTileByPosition(AROUND.get(0)).setTileFog(viewer, false);
         game.getTileByPosition(AROUND.get(3)).setTileFog(viewer, false);
         Tile unexplored = viewer.buildFogTile("000", viewer);
-        TileLayers layers = TileLayers.forPreparedViewer(game, new FogViewer(game, true, viewer), null);
 
-        BufferedImage plain = layers.draw(unexplored, TileStep.Tile);
+        BufferedImage plain = privateLayers(viewer).draw(unexplored, TileStep.Tile);
         HyperlaneStyleService.setShowsBridges(game, true);
-        assertThat(changedPixels(plain, layers.draw(unexplored, TileStep.Tile))).isGreaterThan(2000);
+        assertThat(changedPixels(plain, privateLayers(viewer).draw(unexplored, TileStep.Tile)))
+                .isGreaterThan(2000);
 
         game.getTileByPosition(AROUND.get(3)).setTileFog(viewer, true);
-        assertThat(pixels(layers.draw(unexplored, TileStep.Tile))).isEqualTo(pixels(plain));
+        assertThat(pixels(privateLayers(viewer).draw(unexplored, TileStep.Tile)))
+                .isEqualTo(pixels(plain));
+    }
+
+    // A scene belongs to one render, so each game state gets its own.
+    private TileLayers privateLayers(Player viewer) {
+        return TileLayers.forPreparedViewer(game, new FogViewer(game, true, viewer), null);
     }
 
     @Test

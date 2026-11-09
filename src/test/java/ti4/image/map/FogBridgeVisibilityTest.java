@@ -2,6 +2,7 @@ package ti4.image.map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -11,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.image.tile.TileLayers;
 import ti4.service.fow.FogViewer;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.map.HyperlaneStyleService;
@@ -76,9 +78,7 @@ class FogBridgeVisibilityTest extends BaseTi4Test {
             tile.setTileFog(
                     empyrean, !FoWHelper.getTilePositionsToShow(game, empyrean).contains(tile.getPosition()));
         }
-        assertThat(CompactOverviewGenerator.knownTiles(game, empyrean))
-                .containsKeys("102", "201", "203", "000")
-                .doesNotContainKey("101");
+        assertThat(knownTiles()).containsKeys("102", "201", "203", "000").doesNotContainKey("101");
     }
 
     // Hide unexplored map removes never-seen systems, but a bridged one stays: visible lanes must not lead into
@@ -93,7 +93,12 @@ class FogBridgeVisibilityTest extends BaseTi4Test {
         FogView fog = FogView.of(game, new FogViewer(game, true, empyrean));
         assertThat(fog.tiles()).containsKey("102");
         assertThat(fog.seenPositions()).contains("102");
-        assertThat(CompactOverviewGenerator.knownTiles(game, empyrean)).containsKey("102");
+        assertThat(knownTiles()).containsKey("102");
+    }
+
+    private Map<String, Tile> knownTiles() {
+        return CompactOverviewGenerator.knownTiles(
+                game, empyrean, TileLayers.forPreparedViewer(game, new FogViewer(game, true, empyrean), null));
     }
 
     private void lane(String position, int from, int to, boolean add) {

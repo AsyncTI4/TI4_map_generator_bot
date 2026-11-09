@@ -81,6 +81,35 @@ class BridgeEndsLookupTest extends BaseTi4Test {
                 .isEmpty();
     }
 
+    // Two lanes that only lead in carry no traffic, so the rules keep the system a normal stop: draw no bridge either.
+    @Test
+    void lanesThatOnlyLeadInMakeNoBridge() {
+        customHyperlane(0, 0, 3);
+        customHyperlane(3, 3, 0);
+        assertThat(ends()).isEmpty();
+    }
+
+    // Border anomalies only count where a hyperlane starts or ends; a bridge carries the lane on, so a tear on its edge
+    // changes nothing, for a hidden system (fog safe) as for a visible one.
+    @Test
+    void borderAnomalyOnABridgeEdgeDoesNotCutIt() {
+        game.setFowMode(true);
+        Player viewer = game.addPlayer("111", "sol");
+        viewer.setFaction(game, "sol");
+        viewer.setColor("blue");
+        customHyperlane(0, 0, 3);
+        customHyperlane(3, 0, 3);
+        game.getTileByPosition(AROUND.get(0)).setTileFog(viewer, false);
+        game.getTileByPosition(AROUND.get(3)).setTileFog(viewer, false);
+        game.getTileByPosition("000").setTileFog(viewer, true);
+        game.addBorderAnomaly("000", 3, "spatial_tear");
+        TileScene scene = new TileScene(game, null, new FogViewer(game, true, viewer), new RenderWarnings());
+
+        assertThat(BridgeEndsLookup.forSystem(scene, game.getTileByPosition("000")))
+                .containsExactly(new BridgeEnd(0, true, false), new BridgeEnd(3, false, true));
+        assertThat(ends()).containsExactly(new BridgeEnd(0, true, false), new BridgeEnd(3, false, true));
+    }
+
     private List<BridgeEnd> ends() {
         TileScene scene = new TileScene(game, null, FogViewer.unfogged(game), new RenderWarnings());
         return BridgeEndsLookup.forSystem(scene, game.getTileByPosition("000"));

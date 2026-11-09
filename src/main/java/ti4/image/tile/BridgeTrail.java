@@ -6,6 +6,7 @@ import static ti4.image.tile.TileGeometry.TILE_WIDTH;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +24,7 @@ final class BridgeTrail {
     private static final double EDGE_DISTANCE = TILE_HEIGHT / 2.0;
     private static final double OCCLUDED_COST = 30;
 
-    private static final List<Point2D> RING = ring();
+    private static final List<Point2D> RING = ringWithSideNAfterCornerN();
 
     private BridgeTrail() {}
 
@@ -43,7 +44,23 @@ final class BridgeTrail {
 
     record Arrow(double x, double y, double angle) {}
 
-    record Trail(List<Piece> ring, List<Piece> stubs, List<Arrow> cornerArrows) {}
+    record Tunnel(Point2D at, double edgeAngle, boolean oneWay) {}
+
+    record Trail(List<Piece> ring, List<Piece> stubs, List<Arrow> cornerArrows) {
+
+        List<Tunnel> tunnelsAt(Collection<Integer> crossingSides) {
+            List<Tunnel> tunnels = new ArrayList<>();
+            for (int side : crossingSides) {
+                Point2D midpoint = RING.get(ringIndex(side));
+                ring.stream()
+                        .filter(piece -> piece.points().contains(midpoint))
+                        .findFirst()
+                        .ifPresent(piece ->
+                                tunnels.add(new Tunnel(midpoint, Math.toRadians(side * 60), piece.isOneWay())));
+            }
+            return List.copyOf(tunnels);
+        }
+    }
 
     static Trail of(List<BridgeEnd> ends, Shape occluders) {
         List<BridgeEnd> byRing = new ArrayList<>(ends);
@@ -144,11 +161,10 @@ final class BridgeTrail {
                 CENTER_X + EDGE_DISTANCE * Math.sin(angle), CENTER_Y - EDGE_DISTANCE * Math.cos(angle));
     }
 
-    // Hex corners from the top-left one clockwise; side n is the edge after corner n.
-    private static List<Point2D> ring() {
+    private static List<Point2D> ringWithSideNAfterCornerN() {
         double scale = (EDGE_DISTANCE - INSET) / EDGE_DISTANCE;
         List<Point2D> corners = new ArrayList<>();
-        for (double[] corner : hexCorners()) {
+        for (double[] corner : hexCornersClockwiseFromTopLeft()) {
             corners.add(new Point2D.Double(
                     CENTER_X + (corner[0] - CENTER_X) * scale, CENTER_Y + (corner[1] - CENTER_Y) * scale));
         }
@@ -172,7 +188,7 @@ final class BridgeTrail {
         return List.copyOf(points);
     }
 
-    private static List<double[]> hexCorners() {
+    private static List<double[]> hexCornersClockwiseFromTopLeft() {
         return List.of(
                 new double[] {TILE_WIDTH / 4.0, 0},
                 new double[] {TILE_WIDTH * 3 / 4.0, 0},

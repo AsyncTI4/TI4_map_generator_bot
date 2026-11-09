@@ -396,8 +396,7 @@ public class TestBedPresetService {
             if (Boolean.FALSE.equals(preset.getFog())) {
                 errors.add("preset: `fogPreset` needs a fog game; drop `\"fog\": false`.");
             }
-            if (Arrays.stream(FogPreset.values())
-                    .noneMatch(known -> known.getId().equals(preset.getFogPreset()))) {
+            if (!isKnownFogPreset(preset.getFogPreset())) {
                 errors.add("preset: unknown `fogPreset` `" + preset.getFogPreset() + "`; use "
                         + Arrays.stream(FogPreset.values())
                                 .map(FogPreset::getId)
@@ -435,6 +434,15 @@ public class TestBedPresetService {
                     errors.add("Objective `" + objective + "` is scored but not in `revealedObjectives`.");
                 }
             }
+        }
+    }
+
+    private static boolean isKnownFogPreset(String id) {
+        try {
+            FogPreset.fromId(id);
+            return true;
+        } catch (IllegalArgumentException unknown) {
+            return false;
         }
     }
 

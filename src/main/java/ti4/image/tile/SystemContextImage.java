@@ -111,7 +111,7 @@ public final class SystemContextImage {
             Player fowPlayer = viewer.player();
             Set<String> hidden = new HashSet<>(tilesToDisplay.keySet());
             hidden.removeAll(viewer.visibleSystems());
-            UnexploredBridges bridges = new UnexploredBridges(viewer);
+            UnexploredBridges bridges = new UnexploredBridges(layers);
             for (String position : hidden) {
                 tilesToDisplay.remove(position);
                 if (fowPlayer != null) {

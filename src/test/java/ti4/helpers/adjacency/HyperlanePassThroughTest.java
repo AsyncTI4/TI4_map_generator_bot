@@ -14,6 +14,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.map.HyperlaneStyleService;
 import ti4.service.map.MapStringMapper;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedPresetService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -86,6 +87,68 @@ class HyperlanePassThroughTest extends BaseTi4Test {
         game.setFowMode(true);
         assertThat(Adjacency.of(game).forVision().from("301")).contains("104").doesNotContain("101");
         assertThat(GridRule.hyperlaneLanesFrom(game, null, "301")).contains(GridRule.lane("000", 0, 3));
+    }
+
+    // 000 becomes two-way: a lane arriving from 104 has nowhere to go on (201 only leads in), so it stops at Wellon as
+    // before (LRR 44.1) and Wellon may use it; traffic from 301 still passes through Wellon to 104.
+    @Test
+    void laneWithNoOnwardExitStopsAtTheBridgedSystem() {
+        HyperlaneStyleService.setShowsBridges(game, true);
+        game.getCustomHyperlaneData()
+                .put("000", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        assertThat(movement().from("104")).contains("101").doesNotContain("301");
+        assertThat(movement().from("101")).contains("104").doesNotContain("301");
+        assertThat(movement().from("301")).contains("104").doesNotContain("101");
+        assertThat(movement().into("104")).contains("301", "101");
+        assertThat(movement().into("101")).contains("104").doesNotContain("301");
+    }
+
+    // Wellon sees the hyperlane tiles on its edges, so asking the other way round must agree.
+    @Test
+    void hyperlaneTileOnABridgeEdgeHasWellonAsNeighbourBothWays() {
+        HyperlaneStyleService.setShowsBridges(game, true);
+        assertThat(movement().from("101")).contains("201");
+        assertThat(movement().into("201")).contains("101");
+    }
+
+    // Border anomalies only count where a hyperlane starts or ends: a tear on Wellon's bridged edge does not stop the
+    // lane running through; with bridges off it cuts the lane at Wellon as usual. Wellon's own link to the hyperlane
+    // tile 000 behind the tear stays cut both ways.
+    @Test
+    void borderAnomalyOnABridgeEdgeIsIgnored() {
+        game.addBorderAnomaly("101", 3, "spatial_tear");
+        assertThat(movement().from("301")).contains("101").doesNotContain("104");
+
+        HyperlaneStyleService.setShowsBridges(game, true);
+        assertThat(movement().from("301")).contains("104");
+        assertThat(movement().into("104")).contains("301");
+        assertThat(movement().from("101")).contains("201").doesNotContain("000");
+        assertThat(movement().into("000")).doesNotContain("101");
+    }
+
+    // Units in Wellon still see the hyperlane tiles on its edges, they just cannot follow the lanes through them.
+    @Test
+    void wellonStillSeesTheHyperlanesOnItsEdges() {
+        HyperlaneStyleService.setShowsBridges(game, true);
+        game.setFowMode(true);
+        assertThat(Adjacency.of(game).forVision().from("101"))
+                .contains("201", "000")
+                .doesNotContain("301", "104");
+    }
+
+    // FoW+ / Hide unexplored map: a hop never enters a hyperlane from a side without a lane, the hop out of a bridged
+    // system included. A third lane 211 -> 212 -> Wellon leads in; with lanes counting both ways (effects, one-way
+    // adjacency off) the walk from 211 could leave Wellon backwards along the 201 lane to 301, but not under the
+    // option.
+    @Test
+    void hideUnexploredMapAlsoGatesTheHopOutOfABridge() {
+        HyperlaneStyleService.setShowsBridges(game, true);
+        game.setTile(new Tile("21", "211"));
+        customLane("212", 4, 2);
+        assertThat(Adjacency.of(game).forEffects().from("211")).contains("104", "301");
+
+        game.setFowOption(FOWOption.HIDE_MAP, true);
+        assertThat(Adjacency.of(game).forEffects().from("211")).contains("104").doesNotContain("301");
     }
 
     // Space Cannon (PDS II) follows the same walk: from 301 it reaches 104 through Wellon, from Wellon it reaches

@@ -17,6 +17,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.service.fow.FogViewer;
+import ti4.service.map.HyperlaneStyleService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
@@ -86,6 +87,40 @@ class BorderDecorationsStepTest extends BaseTi4Test {
         game.getCustomHyperlaneData().put("000", "broken");
         assertThat(ExtrasStepTiles.positions(game)).containsExactly("000");
         assertThat(painted(extras(game, "104"))).isZero();
+    }
+
+    // With bridges on and a lane leaving 104 to the south (207), 104 is bridged: the lane does not end there, so no
+    // "a one-way lane leads in here" glow on its north edge.
+    @Test
+    void noHintWhereABridgeCarriesTheLaneOn() {
+        Game game = gameWithOneWayLaneIntoTile104(true);
+        game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
+        game.setTile(new Tile("hl", "207"));
+        game.getCustomHyperlaneData()
+                .put("207", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        assertThat(glowsAtNorthEdge(extras(game, "104"))).isTrue();
+
+        HyperlaneStyleService.setShowsBridges(game, true);
+        assertThat(painted(extras(game, "104"))).isZero();
+    }
+
+    // 104 is bridged, but only the lane arriving from 207 (south) carries on, out along 000's lane 3 -> 1. The 000
+    // lane arriving from the north has no onward exit, so it still ends in 104 and keeps its glow; 207's does not.
+    @Test
+    void hintStaysWhereALaneEndsInABridgedSystem() {
+        Game game = gameWithOneWayLaneIntoTile104(true);
+        game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
+        game.getCustomHyperlaneData()
+                .put("000", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,1,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        game.setTile(new Tile("hl", "207"));
+        game.getCustomHyperlaneData()
+                .put("207", "0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        HyperlaneStyleService.setShowsBridges(game, true);
+
+        BufferedImage layer = extras(game, "104");
+        assertThat(glowsAtNorthEdge(layer)).isTrue();
+        assertThat(layer.getRGB(TILE_PADDING + TILE_WIDTH / 2, TILE_PADDING + TILE_HEIGHT - 4) >>> 24)
+                .isZero();
     }
 
     // Systems 101 (north) and 104 (south) around custom hyperlane 000, whose one lane runs N -> S.

@@ -28,6 +28,10 @@ final class LaneInk {
     static final Color ARROW = new Color(70, 230, 110);
     static final Color OUTLINE = new Color(5, 10, 25);
 
+    private static final float NODE_RADIUS = 20;
+    private static final int NODE_CORE_ALPHA = 235;
+    private static final int NODE_HALO_ALPHA = 170;
+
     private LaneInk() {}
 
     static void stroke(Graphics2D g, Shape shape, float width, float alpha, Color color, float[] dash) {
@@ -67,9 +71,12 @@ final class LaneInk {
     }
 
     static void drawNode(Graphics2D g, Point2D at) {
-        float radius = 20;
+        drawNode(g, at, NODE_RADIUS, NODE_CORE_ALPHA, NODE_HALO_ALPHA);
+    }
+
+    static void drawNode(Graphics2D g, Point2D at, float radius, int coreAlpha, int haloAlpha) {
         g.setPaint(new RadialGradientPaint(at, radius, new float[] {0f, 0.35f, 1f}, new Color[] {
-            new Color(255, 255, 255, 235), new Color(150, 220, 255, 170), new Color(0, 160, 255, 0)
+            new Color(255, 255, 255, coreAlpha), new Color(150, 220, 255, haloAlpha), new Color(0, 160, 255, 0)
         }));
         g.fill(new Ellipse2D.Double(at.getX() - radius, at.getY() - radius, 2 * radius, 2 * radius));
     }
