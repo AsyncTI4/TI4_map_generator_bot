@@ -12,10 +12,12 @@ import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.testUtils.BaseTi4Test;
 
-// Six seats in table order nekro, sol, hacan, xxcha, letnev, jolnar. Nekro plays Politics and must name a new
-// speaker. Next round's picks start at the speaker and go round the table, so naming jolnar (the seat before nekro)
+// Six seats in table order nekro, sol, hacan, xxcha, letnev, jolnar. Nekro, the current speaker, plays Politics and
+// must name another player (LRR 80.6), so it is not among the choices. Next round's picks start at the speaker and go
+// round the table, so naming jolnar (the seat before nekro)
 // lets nekro pick second, while naming sol (the seat after nekro) leaves it picking last.
 class PoliticsSpeakerHandoffTest extends BaseTi4Test {
 
@@ -37,7 +39,7 @@ class PoliticsSpeakerHandoffTest extends BaseTi4Test {
         letnev = test.addSeat("200000000000000004", "letnev", "red");
         jolnar = test.addSeat("200000000000000005", "jolnar", "purple");
         test.game.setVp(10);
-        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setSpeakerUserID(test.nekro.getUserID());
         test.aiIsActive("action");
         for (Player rival : new Player[] {hacan, xxcha, letnev, jolnar}) test.points(rival, 3);
         changed();
@@ -77,6 +79,16 @@ class PoliticsSpeakerHandoffTest extends BaseTi4Test {
         changed();
 
         assertThat(chooseSpeaker()).isEqualTo(PREFIX + "letnev");
+    }
+
+    // With the full priority track, next round's pick order follows the track, not the speaker, so the pick position
+    // the speaker gives means nothing and the AI keeps the old rule.
+    @Test
+    void fullPriorityTrackKeepsTheLowestScorerRule() {
+        test.game.setPriorityTrackMode(PriorityTrackMode.FULL);
+        changed();
+
+        assertThat(chooseSpeaker()).isEqualTo(PREFIX + "sol");
     }
 
     // The control seat keeps the old rule: the seat with the fewest points.

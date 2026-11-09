@@ -1164,7 +1164,8 @@ public class StrategyCardRules {
                 .findFirst();
         if (self.isPresent()) return self;
         Game game = context.game();
-        if (AiExperiments.enabled(context.seat(), AiExperiments.Experiment.SPEAKER_AND_TECH)) {
+        if (AiExperiments.enabled(context.seat(), AiExperiments.Experiment.SPEAKER_AND_TECH)
+                && !game.hasFullPriorityTrackMode()) {
             return speakerByPickPosition(game, context.seat(), choices);
         }
         return choices.stream().min(Comparator.comparingInt(button -> victoryPointsOf(game, button)));
@@ -1172,7 +1173,7 @@ public class StrategyCardRules {
 
     private static Optional<PromptButton> speakerByPickPosition(Game game, Player seat, List<PromptButton> choices) {
         List<PromptButton> safe = choices.stream()
-                .filter(button -> !nearGoal(game, speakerOf(game, button)))
+                .filter(button -> !nearGoal(game, seat, speakerOf(game, button)))
                 .toList();
         List<PromptButton> candidates = safe.isEmpty() ? choices : safe;
         return candidates.stream()
@@ -1180,11 +1181,8 @@ public class StrategyCardRules {
                         .thenComparingInt(button -> victoryPointsOf(game, button)));
     }
 
-    private static boolean nearGoal(Game game, Player candidate) {
-        int goal = game.getVp();
-        return candidate != null
-                && goal > 0
-                && goal - candidate.getTotalVictoryPoints() <= ScoringStakes.CONTENDER_FROM_GOAL;
+    private static boolean nearGoal(Game game, Player seat, Player candidate) {
+        return candidate != null && ScoringStakes.contender(game, seat, candidate);
     }
 
     private static int pickPositionAfter(Game game, Player seat, PromptButton speakerButton) {

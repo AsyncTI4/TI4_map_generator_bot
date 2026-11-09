@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+import ti4.ai.AiExperiments;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.Threats;
 import ti4.ai.tactical.DefenseOutlook;
@@ -29,7 +30,8 @@ record PlanInputs(
         Map<Integer, CardPlan> plans,
         Map<String, Double> lockExposures,
         CustodiansRace.Snapshot race,
-        boolean planless) {
+        boolean planless,
+        boolean techInTradeGoods) {
 
     private static final int MAX_CACHED = 32;
     private static final ThreadLocal<Set<String>> COMPUTING = ThreadLocal.withInitial(HashSet::new);
@@ -48,15 +50,20 @@ record PlanInputs(
     }
 
     static PlanInputs of(Game game, Player seat, PlanMoment moment) {
-        String key = game.getName() + "|" + seat.getUserID() + "|" + moment;
+        return of(game, seat, moment, seat);
+    }
+
+    static PlanInputs of(Game game, Player seat, PlanMoment moment, Player viewer) {
+        boolean techInTradeGoods = AiExperiments.enabled(viewer, AiExperiments.Experiment.SPEAKER_AND_TECH);
+        String key = game.getName() + "|" + seat.getUserID() + "|" + moment + "|" + techInTradeGoods;
         synchronized (CACHE) {
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
         }
-        if (!COMPUTING.get().add(key)) return withoutPlans(game, seat, moment);
+        if (!COMPUTING.get().add(key)) return withoutPlans(game, seat, moment, techInTradeGoods);
         PlanInputs inputs;
         try {
-            inputs = compute(game, seat, moment);
+            inputs = compute(game, seat, moment, techInTradeGoods);
         } finally {
             COMPUTING.get().remove(key);
         }
@@ -66,20 +73,25 @@ record PlanInputs(
         return inputs;
     }
 
-    private static PlanInputs compute(Game game, Player seat, PlanMoment moment) {
+    private static PlanInputs compute(Game game, Player seat, PlanMoment moment, boolean techInTradeGoods) {
         try (Thinking.Span ignored = Thinking.enter("strategy.planInputs", () -> seat.getFaction() + " " + moment)) {
-            return assemble(game, seat, moment, TacticalPlanner.ranked(game, seat), false);
+            return assemble(game, seat, moment, TacticalPlanner.ranked(game, seat), false, techInTradeGoods);
         }
     }
 
-    private static PlanInputs withoutPlans(Game game, Player seat, PlanMoment moment) {
+    private static PlanInputs withoutPlans(Game game, Player seat, PlanMoment moment, boolean techInTradeGoods) {
         try (Thinking.Span ignored = Thinking.enter("strategy.planInputs.reentered")) {
-            return assemble(game, seat, moment, List.of(), true);
+            return assemble(game, seat, moment, List.of(), true, techInTradeGoods);
         }
     }
 
     private static PlanInputs assemble(
-            Game game, Player seat, PlanMoment moment, List<TacticalPlan> ranked, boolean planless) {
+            Game game,
+            Player seat,
+            PlanMoment moment,
+            List<TacticalPlan> ranked,
+            boolean planless,
+            boolean techInTradeGoods) {
         return new PlanInputs(
                 game,
                 seat,
@@ -91,7 +103,8 @@ record PlanInputs(
                 new ConcurrentHashMap<>(),
                 new ConcurrentHashMap<>(),
                 CustodiansRace.of(game, seat),
-                planless);
+                planless,
+                techInTradeGoods);
     }
 
     int round() {

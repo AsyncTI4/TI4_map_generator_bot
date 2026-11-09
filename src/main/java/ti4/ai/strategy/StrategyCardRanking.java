@@ -52,6 +52,11 @@ public class StrategyCardRanking {
         return baseValue(game, seat, plan(game, seat, initiative));
     }
 
+    public static double baseValueAsSeenBy(Game game, Player viewer, Player seat, int initiative) {
+        CardPlan plan = StrategyCardPlanner.plan(PlanInputs.of(game, seat, PlanMoment.PICK, viewer), initiative);
+        return baseValue(game, seat, plan);
+    }
+
     public static CardPlan pickPlan(Game game, Player seat, int initiative) {
         return plan(game, seat, initiative);
     }

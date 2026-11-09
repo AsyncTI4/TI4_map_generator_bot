@@ -63,6 +63,7 @@ final class OffenseOutlook {
     private final Player seat;
     private final DefenseOutlook defense;
     private final Standings standings;
+    private final double copiedTechTempo;
     private final Map<String, ObjectiveValue> publicViews = new HashMap<>();
     private final Map<String, Double> readyDenials = new HashMap<>();
     private final Map<String, Double> progressLosses = new HashMap<>();
@@ -74,6 +75,8 @@ final class OffenseOutlook {
         this.seat = seat;
         this.defense = defense;
         this.standings = defense.standings();
+        this.copiedTechTempo =
+                AiExperiments.enabled(seat, AiExperiments.Experiment.SPEAKER_AND_TECH) ? ResearchPolicy.TECH_TEMPO : 1;
     }
 
     StrikeValue evaluate(Strike strike, StrikeEstimate estimate, ContextTerms terms, boolean full) {
@@ -438,10 +441,8 @@ final class OffenseOutlook {
         if (!seat.hasAbility(SINGULARITY) || strike.opponent().isNeutral()) return 0;
         List<Double> values = new ArrayList<>(copyableValues(seat, strike.opponent()));
         values.sort(java.util.Comparator.reverseOrder());
-        double tempo =
-                AiExperiments.enabled(seat, AiExperiments.Experiment.SPEAKER_AND_TECH) ? ResearchPolicy.TECH_TEMPO : 1;
-        double best = values.isEmpty() ? 0 : tempo * values.get(0);
-        double second = values.size() < 2 ? 0 : tempo * values.get(1);
+        double best = values.isEmpty() ? 0 : copiedTechTempo * values.get(0);
+        double second = values.size() < 2 ? 0 : copiedTechTempo * values.get(1);
         if (estimate.spaceCombat()) return best * estimate.spaceKillChance() + second * estimate.groundKillChance();
         return best * estimate.groundKillChance();
     }

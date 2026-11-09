@@ -3,7 +3,6 @@ package ti4.ai.strategy;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
-import ti4.ai.AiExperiments;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.CardPlan.Benefit;
@@ -29,7 +28,7 @@ class TechnologyUses {
                         .orElse(0.0);
         boolean paysForSecond = StrategyCardRules.worthPayingForResearch(
                 game, seat, StrategyCardRules.SECOND_TECH_COST, ResearchPolicy.WORTH_PAYING_FOR, Wallet.of(game, seat));
-        double value = AiExperiments.enabled(seat, AiExperiments.Experiment.SPEAKER_AND_TECH)
+        double value = in.techInTradeGoods()
                 ? tradeGoodValue(in, research, paysForSecond)
                 : researchUnitValue(research, paysForSecond);
         return List.of(new Benefit(CardUse.TECHNOLOGY_RESEARCH, value));

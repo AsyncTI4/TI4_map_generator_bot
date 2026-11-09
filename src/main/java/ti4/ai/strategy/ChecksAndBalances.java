@@ -29,7 +29,7 @@ public class ChecksAndBalances {
         if (rival != picker && isAheadOf(game, rival, picker)) {
             return pickButtons.stream()
                     .min(Comparator.comparingDouble(
-                            card -> recipientValue(game, rival, card) - pickerTradeGoods(game, card)))
+                            card -> recipientValue(game, picker, rival, card) - pickerTradeGoods(game, card)))
                     .map(card -> new Plan(
                             card,
                             rival.getFaction(),
@@ -41,7 +41,7 @@ public class ChecksAndBalances {
                 .orElseThrow();
         return pickButtons.stream()
                 .max(Comparator.comparingDouble(
-                        card -> recipientValue(game, trailer, card) + pickerTradeGoods(game, card)))
+                        card -> recipientValue(game, picker, trailer, card) + pickerTradeGoods(game, card)))
                 .map(card -> new Plan(
                         card,
                         trailer.getFaction(),
@@ -91,8 +91,8 @@ public class ChecksAndBalances {
         return points > picker.getTotalVictoryPoints() || points == leaderPoints;
     }
 
-    private static double recipientValue(Game game, Player recipient, PromptButton card) {
-        return StrategyCardRanking.baseValue(game, recipient, StrategyCardRanking.initiative(card));
+    private static double recipientValue(Game game, Player picker, Player recipient, PromptButton card) {
+        return StrategyCardRanking.baseValueAsSeenBy(game, picker, recipient, StrategyCardRanking.initiative(card));
     }
 
     private static double pickerTradeGoods(Game game, PromptButton card) {
