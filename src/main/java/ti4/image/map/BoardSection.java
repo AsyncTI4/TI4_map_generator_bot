@@ -4,23 +4,19 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.image.tile.ExtrasStepTiles;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
-import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
-import ti4.service.map.CustomHyperlaneService;
 import ti4.service.map.FractureService;
-import ti4.service.option.FOWOptionService.FOWOption;
 
 final class BoardSection {
 
@@ -70,12 +66,7 @@ final class BoardSection {
 
         tileMap.remove(null);
         List<String> sortedTiles = tileMap.keySet().stream().sorted().toList();
-        Set<String> tilesWithExtra =
-                new HashSet<>(game.getAdjacentTileOverrides().values());
-        tilesWithExtra.addAll(game.getBorderAnomalies().stream()
-                .map(BorderAnomalyHolder::getTile)
-                .collect(Collectors.toSet()));
-        tilesWithExtra.addAll(neighboursOfOneWayHyperlanes());
+        Set<String> tilesWithExtra = ExtrasStepTiles.positions(game);
 
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         GhostHexes.draw(ctx, g2, tileMap.keySet());
@@ -89,18 +80,6 @@ final class BoardSection {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), displayTypeStep));
         }
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
-    }
-
-    private Set<String> neighboursOfOneWayHyperlanes() {
-        Set<String> neighbours = new HashSet<>();
-        if (!game.getFowOption(FOWOption.ONE_WAY_LANE_HINTS)) {
-            return neighbours;
-        }
-        game.getCustomHyperlaneData().forEach((position, matrix) -> {
-            List<String> adjacent = MapPositionMapper.getAdjacentTilePositions(position);
-            if (adjacent != null && CustomHyperlaneService.hasOneWayLanes(matrix)) neighbours.addAll(adjacent);
-        });
-        return neighbours;
     }
 
     private void drawSetupTiles(Map<String, Tile> tileMap) {

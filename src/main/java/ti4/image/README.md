@@ -167,7 +167,7 @@ flowchart TD
     Setup -- no --> P1
     Gray --> P1
     P1[Pass 1: TileStep.Tile<br/>every tile, sorted by position] --> Ghost[GhostHexes]
-    Ghost --> P2[Pass 2: TileStep.Extras<br/>tiles with border anomalies<br/>or adjacency overrides]
+    Ghost --> P2[Pass 2: TileStep.Extras<br/>ExtrasStepTiles.positions: border anomalies,<br/>adjacency overrides, one-way lane hints]
     P2 --> P3[Pass 3: TileStep.Units]
     P3 --> D{tile distances set?}
     D -- yes --> P4[Pass 4: TileStep.Distance]

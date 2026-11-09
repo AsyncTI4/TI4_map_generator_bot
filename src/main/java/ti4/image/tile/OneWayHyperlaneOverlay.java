@@ -394,7 +394,7 @@ final class OneWayHyperlaneOverlay {
         drawNode(g, at, NODE_RADIUS, NODE_CORE_ALPHA, NODE_HALO_ALPHA);
     }
 
-    static void drawEntryHint(Graphics2D target, int side) {
+    static void drawLaneHint(Graphics2D target, int side) {
         Graphics2D g = (Graphics2D) target.create();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.clip(hexOutline());

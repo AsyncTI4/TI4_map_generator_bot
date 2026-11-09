@@ -25,7 +25,6 @@ import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.MapPositionMapper;
-import ti4.service.option.FOWOptionService.FOWOption;
 
 final class BorderDecorationsStep implements TileStepPainter {
 
@@ -39,10 +38,7 @@ final class BorderDecorationsStep implements TileStepPainter {
         if (!scene.hidesFogged(tile)) {
             drawAdjacencyArrows(game, layer);
         }
-        if (game.getFowOption(FOWOption.ONE_WAY_LANE_HINTS)
-                && !game.getCustomHyperlaneData().isEmpty()) {
-            OneWayEntryHints.draw(scene, layer);
-        }
+        OneWayLaneHints.drawOn(scene, layer);
         if (!game.getBorderAnomalies().isEmpty()) {
             drawBorderAnomalies(scene, layer);
         }
