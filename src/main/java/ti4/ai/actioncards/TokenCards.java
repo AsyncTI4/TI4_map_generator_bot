@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.CardChains.Source;
 import ti4.ai.eval.BoardView;
+import ti4.ai.scoring.DenialMap;
 import ti4.ai.strategy.CardFacade;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -103,8 +104,12 @@ class TokenCards {
 
     private static Jam jam(Game game, Player seat, Player other, JamSystem system) {
         double interest = interest(game, other, game.getTileByPosition(system.system()));
-        return new Jam(
-                other.getFaction(), system.origin(), system.system(), interest * TableStanding.of(game, seat, other));
+        double value = interest * TableStanding.of(game, seat, other) + lockDenial(game, seat, other, system.system());
+        return new Jam(other.getFaction(), system.origin(), system.system(), value);
+    }
+
+    private static double lockDenial(Game game, Player seat, Player other, String system) {
+        return DenialMap.of(game, seat).locked(other, system);
     }
 
     private static List<JamSystem> jamSystems(Game game, Player seat) {
@@ -155,7 +160,7 @@ class TokenCards {
         Player other = game.getPlayerFromColorOrFaction(before(suffix));
         Tile tile = game.getTileByPosition(after(suffix));
         if (other == null || other == seat || tile == null || tile.isHomeSystem(game)) return Double.NEGATIVE_INFINITY;
-        return interest(game, other, tile);
+        return interest(game, other, tile) + lockDenial(game, seat, other, tile.getPosition());
     }
 
     private static String before(String suffix) {

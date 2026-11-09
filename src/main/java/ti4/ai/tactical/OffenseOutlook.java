@@ -13,10 +13,12 @@ import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
 import ti4.ai.eval.ShardPrize;
 import ti4.ai.eval.Territory;
+import ti4.ai.scoring.DenialMap;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.scoring.WinOdds;
 import ti4.ai.strategy.CopiedTechPolicy;
 import ti4.ai.strategy.MecatolCash;
 import ti4.ai.tactical.IncomingForces.Exclusion;
@@ -66,6 +68,7 @@ final class OffenseOutlook {
     private final Map<String, Double> progressLosses = new HashMap<>();
     private final Map<String, Boolean> reachesGuarded = new HashMap<>();
     private final Map<String, Territory> territories = new HashMap<>();
+    private DenialMap winMap;
 
     OffenseOutlook(Game game, Player seat, DefenseOutlook defense) {
         this.game = game;
@@ -91,6 +94,7 @@ final class OffenseOutlook {
         double mecatolDenial = 0;
         double fractureDenial = 0;
         double heldPlanetValue = 0;
+        double pointWeight = pointDenialWeight(opponent);
         for (Planet planet : landed) {
             double g = estimate.groundWins().get(planet.getName());
             double base = BoardView.planetValue(planet);
@@ -108,13 +112,13 @@ final class OffenseOutlook {
             if (isMecatol(planet)) {
                 mecatolHold += w * g * MecatolStake.ownHoldValue(game, seat);
                 if (BoardView.controller(game, planet.getName()) == opponent) {
-                    mecatolDenial += w * g * standings.denialWeight(opponent) * MecatolStake.holdValue(game, opponent);
+                    mecatolDenial += w * g * pointWeight * MecatolStake.holdValue(game, opponent);
                 }
             }
             if (BoardView.controller(game, planet.getName()) == opponent) {
                 heldPlanetValue += w * g * base;
                 if (FracturePrize.isStyx(planet)) {
-                    fractureDenial += w * g * standings.denialWeight(opponent) * FracturePrize.point(planet);
+                    fractureDenial += w * g * pointWeight * FracturePrize.point(planet);
                 }
                 fractureDenial += w * g * standings.denialWeight(opponent) * ShardPrize.gain(game, seat, planet);
             }
@@ -141,11 +145,13 @@ final class OffenseOutlook {
                 + fractureDenial;
         double cappedHarm = Math.min(harmTerms, harmCap);
         double imperial = imperial(strike, estimate, landed, after, planetsAfter);
+        double winBreak = winBreak(strike, estimate, landed, after, planetsAfter);
         double value = ownObjective
                 + (planets - heldPlanetValue)
                 + territory
                 + mecatolHold
                 + cappedHarm
+                + winBreak
                 + imperial
                 + nekroGain
                 + defenseTerm
@@ -179,6 +185,7 @@ final class OffenseOutlook {
                 mecatolHold,
                 mecatolDenial,
                 fractureDenial,
+                winBreak,
                 kills,
                 blockade,
                 nekroGain,
@@ -266,7 +273,8 @@ final class OffenseOutlook {
                         .take();
         double standingShare = holder.controlsMecatol(false) ? 1 : UNCONTROLLED_MECATOL_SHARE;
         double afterTaking = m * standingShare * takeVsUs + (1 - m) * before;
-        double lost = VP * standings.denialWeight(holder) * Math.max(0, before - afterTaking);
+        double weight = holder == struck ? pointDenialWeight(holder) : standings.denialWeight(holder);
+        double lost = VP * weight * Math.max(0, before - afterTaking);
         double cap = VP * (HARM_CAP_BASE + HARM_CAP_PER_THREAT * standings.winThreat(holder));
         return Math.min(lost, cap);
     }
@@ -290,7 +298,8 @@ final class OffenseOutlook {
         Tile target = strike.target();
         double w = estimate.spaceWin();
         double denialWeight = standings.denialWeight(opponent);
-        double homeBlock = homeBlock(strike, estimate, landed, after, planetsAfter, denialWeight);
+        double pointWeight = pointDenialWeight(opponent);
+        double homeBlock = homeBlock(strike, estimate, landed, after, planetsAfter, pointWeight);
         double publicPoints = standings.publicPoints(opponent);
         double ready = 0;
         double progress = 0;
@@ -305,9 +314,48 @@ final class OffenseOutlook {
             progress += progressLossOfShips(opponent, target);
         }
         double readyPoints = Math.min(publicPoints, ready);
-        double objective = homeBlock > 0 ? 0 : denialWeight * w * (VP * readyPoints + PROGRESS_DENIAL_SHARE * progress);
-        double harmPoints = homeBlock > 0 ? homeBlockPoints(strike, estimate, landed) : VP * w * readyPoints;
+        boolean blocks = homeBlock > 0 || winMap().covers(opponent) && homeBlockPoints(strike, estimate, landed) > 0;
+        double objective = blocks ? 0 : objectiveTerm(opponent, denialWeight, pointWeight, w, readyPoints, progress);
+        double harmPoints = blocks ? homeBlockPoints(strike, estimate, landed) : VP * w * readyPoints;
         return new Denial(objective, homeBlock, harmPoints);
+    }
+
+    private double objectiveTerm(
+            Player opponent, double denialWeight, double pointWeight, double w, double readyPoints, double progress) {
+        if (!winMap().covers(opponent)) {
+            return denialWeight * w * (VP * readyPoints + PROGRESS_DENIAL_SHARE * progress);
+        }
+        return w * (pointWeight * VP * readyPoints + denialWeight * PROGRESS_DENIAL_SHARE * progress);
+    }
+
+    private DenialMap winMap() {
+        if (winMap == null) winMap = DenialMap.of(game, seat);
+        return winMap;
+    }
+
+    private double pointDenialWeight(Player opponent) {
+        if (opponent.isNeutral() || !winMap().covers(opponent)) return standings.denialWeight(opponent);
+        return standings.denialWeightBeyondThisRound(opponent);
+    }
+
+    private double winBreak(
+            Strike strike, StrikeEstimate estimate, List<Planet> landed, Defenders after, List<Planet> planetsAfter) {
+        Player opponent = strike.opponent();
+        if (opponent.isNeutral() || !winMap().covers(opponent)) return 0;
+        Tile target = strike.target();
+        List<Planet> taken = landed.stream()
+                .filter(planet -> BoardView.controller(game, planet.getName()) == opponent)
+                .toList();
+        boolean shipsLost = !BoardView.ships(BoardView.space(target), opponent).isEmpty() && !estimate.escaped();
+        String system = shipsLost ? target.getPosition() : "";
+        if (taken.isEmpty() && system.isEmpty()) return 0;
+        double ships = system.isEmpty() ? 0 : winMap().ships(opponent, system);
+        if (taken.isEmpty()) return estimate.spaceWin() * ships;
+        List<String> names = taken.stream().map(Planet::getName).toList();
+        double all = winMap().value(opponent, WinOdds.Loss.holdings(names, system));
+        double hold = opponent.isPassed() ? 1 : 1 - retake(strike, estimate, after, planetsAfter);
+        double planetShare = meanGroundWin(taken, estimate) * hold * Math.max(0, all - ships);
+        return estimate.spaceWin() * (ships + planetShare);
     }
 
     private double homeBlock(

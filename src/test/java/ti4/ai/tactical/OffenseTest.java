@@ -165,11 +165,15 @@ class OffenseTest extends BaseTi4Test {
         board.reveal("sway_council");
         sardakk().setTg(8);
         score(sardakk(), 9);
-        assertThat(breakdown(DefenseScenario.SARDAKK_HOME_POSITION).homeBlock()).isPositive();
+        // Sardakk wins for certain, so with WIN_BREAK_DENIAL the block is priced as a broken win instead.
+        StrikeValue fixedHome = breakdown(DefenseScenario.SARDAKK_HOME_POSITION);
+        assertThat(fixedHome.homeBlock() + fixedHome.winBreak()).isPositive();
 
         sardakk().addAbility("nomadic");
 
-        assertThat(breakdown(DefenseScenario.SARDAKK_HOME_POSITION).homeBlock()).isZero();
+        StrikeValue nomad = breakdown(DefenseScenario.SARDAKK_HOME_POSITION);
+        assertThat(nomad.homeBlock()).isZero();
+        assertThat(nomad.winBreak()).isZero();
     }
 
     // Test 18: an average neighbour two points up in round three with a thinly held home: the gate stays shut, so

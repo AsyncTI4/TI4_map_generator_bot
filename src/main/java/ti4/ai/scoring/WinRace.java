@@ -34,9 +34,13 @@ public class WinRace {
         return DecisionMemo.remember(() -> computeWinnersBefore(game, seat), "win.race", seat, game.getRound());
     }
 
+    public static OptionalInt seatFinish(Game game, Player seat) {
+        return weighsFeasibility(seat) ? finish(game, seat, ownSecret(game, seat)) : finish(game, seat);
+    }
+
     private static List<Player> computeWinnersBefore(Game game, Player seat) {
         boolean feasible = weighsFeasibility(seat);
-        OptionalInt mine = feasible ? finish(game, seat, ownSecret(game, seat)) : finish(game, seat);
+        OptionalInt mine = seatFinish(game, seat);
         return game.getRealPlayers().stream()
                 .filter(other -> other != seat && !other.isEliminated())
                 .filter(other ->

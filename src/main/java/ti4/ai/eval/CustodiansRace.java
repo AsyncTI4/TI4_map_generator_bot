@@ -136,6 +136,14 @@ public final class CustodiansRace {
                             && hopsFrom(player, transport.tile(), transport.baseMove(), Mode.OWNED) <= 1);
         }
 
+        public boolean canLandThisRoundWithout(Player player, String stoppedPosition) {
+            if (mecatol == null || blockedByCover(player)) return false;
+            return transportsOf(player).stream()
+                    .filter(transport -> !transport.tile().getPosition().equals(stoppedPosition))
+                    .anyMatch(transport -> actsNow(player, transport.tile())
+                            && hopsFrom(player, transport.tile(), transport.baseMove(), Mode.OWNED) <= 1);
+        }
+
         public double winChance(Player seatOfInterest, int arrival, Order order) {
             return winChance(seatOfInterest, arrival, order, coverSurvival(seatOfInterest));
         }
