@@ -15,7 +15,16 @@ public class AiExperiments {
     public static final String DISABLED_KEY = "aiExperimentsOff";
 
     public enum Experiment {
-        PLACEHOLDER
+        WIN_RACE_SECRETS,
+        WIN_AWARE_POINTS,
+        AGENDA_SABOTAGE,
+        IMPERIAL_POINTS,
+        STALL_TIMING,
+        TOKEN_PRICE,
+        CUSTODIANS_COVER,
+        BLOCKADE_GROUND,
+        EXPLOIT_GUARDS,
+        SPEAKER_AND_TECH
     }
 
     public static boolean enabled(Player seat, Experiment experiment) {
