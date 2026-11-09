@@ -3,9 +3,11 @@ package ti4.ai.trade;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
 import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
@@ -13,6 +15,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.scoring.PaymentRules;
+import ti4.ai.tactical.ExtortionPlans;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -89,6 +92,67 @@ class OfferResponderTest extends BaseTi4Test {
                                 "sendingnekro_receivingsol_TGs_3",
                                 "sendingsol_receivingnekro_details_Iffin777refuse"))))
                 .isEqualTo("acceptOffer_blue_1");
+    }
+
+    // Nekro threatens Sol (a human) with an attack unless Sol pays 3 trade goods (worth 3 to Nekro).
+    private static TradeTable extortedSol() {
+        TradeTable table = table(false);
+        table.stock(table.sol, 3, 5);
+        Extortion.record(
+                table.game,
+                table.nekro,
+                table.sol,
+                new Extortion.Threat("305", 3, 8, 0)
+                        .asking(new DealItem("sol", "nekro", ItemType.TRADE_GOODS, "3"), table.sol.getTg()));
+        return table;
+    }
+
+    private static AiPrompt counterOf(TradeTable table, int tradeGoods) {
+        return offer(table, "counter" + tradeGoods, 1, "sendingsol_receivingnekro_TGs_" + tradeGoods);
+    }
+
+    // A lowball counter of 1 trade good is below 0.6 of the 3 demanded: Nekro refuses it and commits to the attack.
+    @Test
+    void refusesALowballExtortionCounterAndCommitsToTheAttack() {
+        TradeTable table = extortedSol();
+
+        assertThat(pressed(answer(table, counterOf(table, 1)))).isEqualTo("rejectOffer_blue");
+        assertThat(ExtortionPlans.spared(table.game, table.nekro, "305")).isFalse();
+        assertThat(ExtortionPlans.credibility(table.game, table.nekro, "305")).isPositive();
+    }
+
+    // 2 trade goods clear 0.6 x 3 = 1.8: Nekro takes the counter and spares the system.
+    @Test
+    void acceptsAnExtortionCounterWorthMostOfTheDemand() {
+        TradeTable table = extortedSol();
+
+        assertThat(pressed(answer(table, counterOf(table, 2)))).isEqualTo("acceptOffer_blue_1");
+        assertThat(ExtortionPlans.spared(table.game, table.nekro, "305")).isTrue();
+    }
+
+    // When the attack gave up 2.5 for the demand, 2 trade goods is not enough even though it clears 0.6 x 3.
+    @Test
+    void refusesACounterBelowWhatTheAttackWasWorth() {
+        TradeTable table = extortedSol();
+        Extortion.record(
+                table.game,
+                table.nekro,
+                table.sol,
+                Extortion.threat(table.game, table.nekro, table.sol)
+                        .orElseThrow()
+                        .needing(2.5));
+
+        assertThat(pressed(answer(table, counterOf(table, 2)))).isEqualTo("rejectOffer_blue");
+    }
+
+    // With the experiment off, any token payment settles the demand, as before.
+    @Test
+    void withoutTheGuardAnyCounterSettlesTheDemand() {
+        TradeTable table = extortedSol();
+        AiExperiments.disable(table.nekro, EnumSet.of(AiExperiments.Experiment.EXPLOIT_GUARDS));
+
+        assertThat(pressed(answer(table, counterOf(table, 1)))).isEqualTo("acceptOffer_blue_1");
+        assertThat(ExtortionPlans.spared(table.game, table.nekro, "305")).isTrue();
     }
 
     // C4.4 row 1 against a human: 3.0 - 1.8 = 1.2 for Nekro, minus 0.1 of Sol's 1.5 is 1.05, above the 0.5 margin.

@@ -470,7 +470,7 @@ class AiTickRunner {
         if (tick.selfPlay() && !tick.profile().isPaused()) return chooseWithoutHumans(tick, prompt, cause);
         if (!prompt.isHidden()) {
             boolean posted = AiConfusionService.delegate(
-                    tick.game(), tick.seat(), prompt, cause.reason(), offerable(tick, prompt));
+                    tick.game(), tick.seat(), prompt, cause.reason(), delegable(tick, prompt));
             if (!posted) AiConfusionService.announceStuck(tick.game(), tick.seat(), cause.reason());
             return recorded(
                     tick,
@@ -479,7 +479,7 @@ class AiTickRunner {
                     posted ? "asked the table to choose" : "stuck: could not post the choices",
                     SeatResult.act());
         }
-        Optional<PromptButton> safeChoice = AiConfusionService.safeDefault(prompt);
+        Optional<PromptButton> safeChoice = AiConfusionService.safeDefault(tick.game(), tick.seat(), prompt);
         if (safeChoice.isEmpty() || tick.profile().isPaused() || !mayActOnItsOwn(tick)) {
             AiConfusionService.announceStuck(tick.game(), tick.seat(), "a private choice");
             return recorded(tick, prompt, cause, "stuck: private choice with no safe option", SeatResult.act());
@@ -540,6 +540,13 @@ class AiTickRunner {
         return prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(seat.getFaction()));
     }
 
+    private static Predicate<String> delegable(SeatTick tick, AiPrompt prompt) {
+        Predicate<String> guarded = customId -> prompt.buttons().stream()
+                .filter(button -> button.customId().equals(customId))
+                .noneMatch(button -> AiConfusionService.neverDelegated(tick.seat(), button));
+        return offerable(tick, prompt).and(guarded);
+    }
+
     private static Predicate<String> offerable(SeatTick tick, AiPrompt prompt) {
         return customId -> prompt.buttons().stream()
                 .filter(button -> button.customId().equals(customId))
@@ -552,7 +559,7 @@ class AiTickRunner {
     }
 
     private static SeatResult chooseWithoutHumans(SeatTick tick, AiPrompt prompt, Cause cause) {
-        Optional<PromptButton> choice = AiConfusionService.selfPlayChoice(prompt)
+        Optional<PromptButton> choice = AiConfusionService.selfPlayChoice(tick.game(), tick.seat(), prompt)
                 .filter(button -> offerable(tick, prompt).test(button.customId()));
         if (choice.isEmpty() || !mayActOnItsOwn(tick)) {
             AiConfusionService.announceStuck(tick.game(), tick.seat(), cause.reason());
