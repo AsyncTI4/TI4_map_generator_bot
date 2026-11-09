@@ -10,11 +10,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.promise.Promise;
+import ti4.ai.promise.PromiseBook;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.game.Player;
@@ -114,6 +118,33 @@ class OwnTurnDealsTest extends BaseTi4Test {
         washOnly.game.getRevealedPublicObjectives().remove("trade_routes");
         start(washOnly);
         assertThat(draft(washOnly).purpose()).isEqualTo(Purpose.WASH);
+    }
+
+    // A promise offer is a transaction (LRR 94.1: one per neighbour per turn). While Nekro's offer to Sol stands, it
+    // drafts no wash with Sol; without the experiment the offer is not seen and the wash goes ahead.
+    @Test
+    void anOpenPromiseOfferTakesTheTurnsTransaction() {
+        TradeTable table = washTable(true);
+        PromiseBook.save(
+                table.game,
+                Promise.offer(
+                        table.game,
+                        Promise.Term.NO_ATTACK,
+                        table.nekro,
+                        table.sol,
+                        table.nekro,
+                        "",
+                        "",
+                        0,
+                        1,
+                        NOW,
+                        NOW + 60_000));
+
+        assertThat(start(table)).isEmpty();
+
+        AiExperiments.disable(table.nekro, Set.of(Experiment.PROMISE_DEALS));
+        start(table);
+        assertThat(draft(table).purpose()).isEqualTo(Purpose.WASH);
     }
 
     // Sol has 2 commodities to wash, Letnev 3: Letnev gives the bigger wash (3 x 0.9 against 2 x 0.9). Two points

@@ -7,9 +7,12 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSeats;
 import ti4.ai.brain.AiMemory;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.promise.PromiseBook;
 import ti4.game.Player;
 
 @UtilityClass
@@ -21,6 +24,7 @@ class Trust {
     static final double LOWER_FEE = 0.8;
     static final double LENDING = 0.6;
     static final double UNSOLICITED = 0.5;
+    static final double BROKEN_PROMISE = -Event.FREE_FOLLOW_UNPAID.delta();
     static final String KEY = "tradeTrust";
     static final String ROUND_KEY = "tradeTrustRound";
     private static final double MIN = 0;
@@ -49,7 +53,13 @@ class Trust {
 
     static double of(AiTurnContext context, Player player) {
         if (AiSeats.isAiSeat(player)) return AI;
-        return read(context.memory()).getOrDefault(player.getFaction(), HUMAN_START);
+        double remembered = read(context.memory()).getOrDefault(player.getFaction(), HUMAN_START);
+        return Math.clamp(remembered - brokenPromisePenalty(context, player), MIN, MAX);
+    }
+
+    private static double brokenPromisePenalty(AiTurnContext context, Player player) {
+        if (!AiExperiments.enabled(context.seat(), Experiment.PROMISE_DEALS)) return 0;
+        return BROKEN_PROMISE * PromiseBook.brokenBy(context.game(), player, context.seat());
     }
 
     static void record(AiTurnContext context, Player player, Event event) {

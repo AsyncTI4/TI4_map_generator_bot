@@ -57,7 +57,7 @@ public class GalacticThreatRules {
         if (holdsQueuedPrediction(game, seat) && QUEUE_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
             return pressHidden(context, "lockAftersIn", "keep its prediction queued");
         }
-        if (!worthPredicting(game, seat)) return Optional.empty();
+        if (PromisedVotes.forbidsRider(game, seat) || !worthPredicting(game, seat)) return Optional.empty();
         return pressHidden(context, QUEUE_ABILITY, "queue Galactic Threat")
                 .or(() -> pressHidden(context, "queueAnAfter", "look at its \"after\" options"));
     }

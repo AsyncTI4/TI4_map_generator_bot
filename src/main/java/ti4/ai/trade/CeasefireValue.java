@@ -13,7 +13,7 @@ import ti4.game.Tile;
 @UtilityClass
 class CeasefireValue {
 
-    private static final double DURESS_SHARE = 0.75;
+    static final double DURESS_SHARE = 0.75;
     private static final double HOME_BONUS = 2.0;
     private static final double MECATOL_SHARE = 0.5;
     private static final double AVOID_FIGHT_NEIGHBOUR = 0.5;
@@ -74,7 +74,7 @@ class CeasefireValue {
         return MECATOL_SHARE * Desperation.vpWorth(game, defender);
     }
 
-    private static boolean outgunned(Game game, Player defender, Player attacker, Tile tile) {
+    static boolean outgunned(Game game, Player defender, Player attacker, Tile tile) {
         double incoming = Threats.incomingFleetCost(game, attacker, tile);
         double defence = BoardView.shipCost(BoardView.space(tile), defender);
         return incoming >= Math.max(MIN_THREAT, DURESS_RATIO * defence);

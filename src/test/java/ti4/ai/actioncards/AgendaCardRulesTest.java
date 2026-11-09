@@ -8,12 +8,17 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.promise.Promise;
+import ti4.ai.promise.PromiseBook;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -142,6 +147,34 @@ class AgendaCardRulesTest extends BaseTi4Test {
         AiPrompt window = hidden("after", "queueAnAfter", "declineToQueueAnAfter");
 
         assertThat(AgendaCardRules.queueRider(context(nekro, window))).isEmpty();
+    }
+
+    // A rider card says its player cannot vote on the agenda, so a seat that sold its votes on this agenda (or offered
+    // to) would break its word by riding. It plays no rider while that promise stands; without the experiment it rides.
+    @Test
+    void aSeatBoundToVoteQueuesNoRider() {
+        holds(nekro, IMPERIAL);
+        AiPrompt window = hidden("after", "queueAnAfter", "declineToQueueAnAfter");
+        Promise sold = Promise.offer(
+                        test.game,
+                        Promise.Term.VOTE_FOR,
+                        nekro,
+                        sol,
+                        sol,
+                        PromisedVotes.agendaKey(test.game),
+                        "for",
+                        3,
+                        2,
+                        NOW,
+                        NOW + 60_000)
+                .accepted(test.game);
+        PromiseBook.save(test.game, sold);
+
+        assertThat(PromisedVotes.forbidsRider(test.game, nekro)).isTrue();
+        assertThat(AgendaCardRules.queueRider(context(nekro, window))).isEmpty();
+
+        AiExperiments.disable(nekro, Set.of(Experiment.PROMISE_DEALS));
+        assertThat(pressed(AgendaCardRules.queueRider(context(nekro, window)))).isEqualTo("queueAnAfter");
     }
 
     @Test

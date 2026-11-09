@@ -14,9 +14,9 @@ class TradeValue {
 
     private static final double AI_MARGIN = 0.3;
     private static final double HUMAN_MARGIN = 0.5;
-    private static final double PROPOSE_MIN = 0.5;
-    private static final double PREDICTED_MIN = 0.3;
-    private static final double HUMAN_GAIN_MIN = 0.5;
+    static final double PROPOSE_MIN = 0.5;
+    static final double PREDICTED_MIN = 0.3;
+    static final double HUMAN_GAIN_MIN = 0.5;
     private static final double PARTNER_TRUST_IN_AI = 1.0;
 
     record Valuation(

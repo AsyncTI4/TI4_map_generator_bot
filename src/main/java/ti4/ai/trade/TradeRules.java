@@ -21,6 +21,7 @@ public class TradeRules {
             PendingOffers.observe(context);
             TradeCardRules.observe(context);
             HumanDealWatch.observe(context);
+            PromiseDeals.observe(context);
             return Optional.empty();
         }
     }
@@ -32,6 +33,11 @@ public class TradeRules {
 
     public static Optional<AiDecision> answerOffers(AiTurnContext context) {
         return OfferResponder.answer(context);
+    }
+
+    public static Optional<AiDecision> answerPromises(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return PromiseDeals.answer(context);
     }
 
     public static Optional<AiDecision> askWhatTheyWant(AiTurnContext context) {

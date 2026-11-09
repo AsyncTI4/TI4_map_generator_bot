@@ -12,6 +12,7 @@ import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.RiderPayoff;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -142,7 +143,7 @@ public class AgendaCardRules {
         if (!waiting || entry(context).isPresent() || AgendaQueue.holdsQueuedAfter(game, seat)) {
             return Optional.empty();
         }
-        if (!ActionCardRules.mayPlayNow(game, seat)) return Optional.empty();
+        if (!ActionCardRules.mayPlayNow(game, seat) || PromisedVotes.forbidsRider(game, seat)) return Optional.empty();
         Optional<Choice> best = bestRider(context);
         if (best.isEmpty()) return Optional.empty();
         Optional<AiDecision> queue = pressHidden(

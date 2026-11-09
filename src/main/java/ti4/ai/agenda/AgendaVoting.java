@@ -70,7 +70,8 @@ public class AgendaVoting {
             context.memory().put(VOTED_AT_KEY + game.getCurrentAgendaInfo(), String.valueOf(context.now()));
             return Optional.of(vote.get().press("vote for " + ballot.get().outcome()));
         }
-        Optional<Ballot> ballot = context.memory().get(key).flatMap(Ballot::decode);
+        Optional<Ballot> ballot =
+                context.memory().get(key).flatMap(Ballot::decode).map(planned -> keepingPromise(context, key, planned));
         if (ballot.isEmpty()) {
             Optional<AiPrompt> offered =
                     outcomePrompts(turn, faction, 0).stream().findFirst();
@@ -94,6 +95,17 @@ public class AgendaVoting {
         Optional<AiDecision> planets = spendPlanets(context, turn, ballot.get());
         if (planets.isPresent()) return planets;
         return chooseOutcome(context, turn, ballot.get());
+    }
+
+    static Ballot keepingPromise(AiTurnContext context, String key, Ballot planned) {
+        Game game = context.game();
+        boolean breaksPromise = PromisedVotes.binding(game, context.seat())
+                .filter(promise -> !promise.target().equalsIgnoreCase(planned.outcome()))
+                .isPresent();
+        if (!breaksPromise) return planned;
+        Ballot kept = plan(game, context.seat()).orElse(planned);
+        context.memory().put(key, kept.encode());
+        return kept;
     }
 
     private static boolean confirmsVotes(String handlerId) {
@@ -257,11 +269,29 @@ public class AgendaVoting {
         String agenda = AgendaPolicy.currentAgenda(game);
         AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
         if (model == null || model.getTarget() == null) return Optional.empty();
-        List<Integer> planetVotes = seat.getReadiedPlanets().stream()
-                .map(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
-                .toList();
+        List<Integer> planetVotes = readiedPlanetVotes(game, seat);
+        Optional<Ballot> promised = PromisedVotes.binding(game, seat)
+                .filter(promise -> castable(game, planetVotes) > 0)
+                .flatMap(promise -> ballotFor(game, promise.target(), castable(game, planetVotes)));
+        if (promised.isPresent()) return promised;
         return BallotPlanner.choose(game, seat, agenda, planetVotes)
                 .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes()));
+    }
+
+    public static int castableVotes(Game game, Player seat) {
+        if (cannotVote(game, seat) || sitsOutThisAgenda(game, seat)) return 0;
+        return castable(game, readiedPlanetVotes(game, seat));
+    }
+
+    private static int castable(Game game, List<Integer> planetVotes) {
+        int available = planetVotes.stream().mapToInt(Integer::intValue).sum();
+        return AgendaRound.keepsAVoteBack(game) ? available - BallotPlanner.reserve(planetVotes) : available;
+    }
+
+    private static List<Integer> readiedPlanetVotes(Game game, Player seat) {
+        return seat.getReadiedPlanets().stream()
+                .map(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
+                .toList();
     }
 
     private static Optional<Ballot> ballotFor(Game game, String outcome, int votes) {
