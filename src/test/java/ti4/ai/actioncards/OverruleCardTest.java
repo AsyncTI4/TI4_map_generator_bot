@@ -27,6 +27,7 @@ import ti4.ai.strategy.OverruleChoice;
 import ti4.ai.strategy.SecondaryQueue;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
+import ti4.ai.tactical.Stall;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.game.Tile;
 import ti4.helpers.Helper;
@@ -388,6 +389,21 @@ class OverruleCardTest extends BaseTi4Test {
 
         assertThat(ActionCardValue.keepValue(table.game, table.nekro, "overrule"))
                 .isEqualTo(OverruleReserve.VALUE);
+    }
+
+    // ActionCardRules takes Stall.cardActionValue back out of a non-urgent component card's value under STALL_TIMING,
+    // so the component wrapper must add exactly that credit on top of the evaluator's own value.
+    @Test
+    void aComponentCardValueHoldsExactlyTheCardStallCredit() {
+        lateGame();
+        qualifyForTwoPublics();
+        holdsOverrule();
+
+        assertThat(plan().orElseThrow().value())
+                .isEqualTo(OverruleChoice.option(table.game, table.nekro, imperial())
+                                .orElseThrow()
+                                .value()
+                        + Stall.cardActionValue(table.game, table.nekro));
     }
 
     // Players save Overrule for the late game: early on even an extra public objective and a secret are not worth it,

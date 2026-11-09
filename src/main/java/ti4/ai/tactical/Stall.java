@@ -1,5 +1,6 @@
 package ti4.ai.tactical;
 
+import java.util.function.BooleanSupplier;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
@@ -26,13 +27,12 @@ public class Stall {
     }
 
     public static double insteadOfTacticalAction(Game game, Player seat, double legacyStall) {
-        return insteadOfTacticalAction(game, seat, legacyStall, false);
+        return insteadOfTacticalAction(game, seat, legacyStall, () -> false);
     }
 
-    public static double insteadOfTacticalAction(
-            Game game, Player seat, double legacyStall, boolean urgentOrFundsThisTurn) {
+    public static double insteadOfTacticalAction(Game game, Player seat, double legacyStall, BooleanSupplier urgent) {
         if (!AiExperiments.enabled(seat, Experiment.STALL_TIMING)) return legacyStall;
-        return urgentOrFundsThisTurn ? actionValue(game, seat) : 0;
+        return urgent.getAsBoolean() ? actionValue(game, seat) : 0;
     }
 
     public static double withoutStallCredit(Player seat, double valueWithStall, double stallCredit) {

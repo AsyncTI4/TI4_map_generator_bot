@@ -30,7 +30,7 @@ class StallTimingTest extends BaseTi4Test {
 
     @Test
     void keepsTheStallCreditForAnUrgentComponent() {
-        assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, 99, true))
+        assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, 99, () -> true))
                 .isEqualTo(Stall.actionValue(test.game, test.nekro))
                 .isPositive();
     }
@@ -40,8 +40,19 @@ class StallTimingTest extends BaseTi4Test {
     void anUrgentComponentEarnsNoStallOnceEveryoneElsePassed() {
         test.sol.setPassed(true);
 
-        assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, Stall.ACTION_VALUE, true))
+        assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, Stall.ACTION_VALUE, () -> true))
                 .isZero();
+    }
+
+    // The disabled path does no extra work: the urgency check is never run.
+    @Test
+    void theDisabledExperimentNeverAsksWhetherTheComponentIsUrgent() {
+        AiExperiments.disable(test.nekro, EnumSet.of(Experiment.STALL_TIMING));
+
+        assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, 2.0, () -> {
+                    throw new AssertionError("urgency evaluated with the experiment off");
+                }))
+                .isEqualTo(2.0);
     }
 
     @Test
@@ -55,7 +66,7 @@ class StallTimingTest extends BaseTi4Test {
 
         assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, Stall.ACTION_VALUE))
                 .isEqualTo(Stall.ACTION_VALUE);
-        assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, 7.0, true))
+        assertThat(Stall.insteadOfTacticalAction(test.game, test.nekro, 7.0, () -> true))
                 .isEqualTo(7.0);
         assertThat(Stall.withoutStallCredit(test.nekro, 4.0, 1.5)).isEqualTo(4.0);
     }

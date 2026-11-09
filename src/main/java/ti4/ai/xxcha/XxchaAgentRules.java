@@ -90,9 +90,7 @@ public class XxchaAgentRules {
         Optional<ReadyingValue.Pick> beforeASpend = pickBeforeASpend(game, seat, picks);
         if (beforeASpend.isEmpty()
                 || plan.get().score()
-                        >= beforeASpend.get().value()
-                                + Stall.insteadOfTacticalAction(
-                                        game, seat, stall, beforeASpend.get().unlocksScore())) {
+                        >= beforeASpend.get().value() + Stall.insteadOfTacticalAction(game, seat, stall)) {
             return Optional.empty();
         }
         return open(context, thisTurn, beforeASpend.get(), "before the spend it pays for");
