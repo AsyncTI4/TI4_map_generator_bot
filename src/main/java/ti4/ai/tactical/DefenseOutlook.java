@@ -679,15 +679,17 @@ public final class DefenseOutlook {
     }
 
     double hostility(Player enemy, Tile excluded) {
-        double total = 0;
+        double worst = 0;
         for (Tile tile : guardedTiles()) {
             if (tile == excluded) continue;
             Defenders defenders = defendersAt(tile);
-            total += Math.max(
-                    threat(enemy, tile, Horizon.IMMEDIATE, defenders),
-                    threat(enemy, tile, Horizon.NEXT_ROUND, defenders));
+            worst = Math.max(
+                    worst,
+                    Math.max(
+                            threat(enemy, tile, Horizon.IMMEDIATE, defenders),
+                            threat(enemy, tile, Horizon.NEXT_ROUND, defenders)));
         }
-        return total;
+        return worst;
     }
 
     private double roundFactor(Horizon horizon) {

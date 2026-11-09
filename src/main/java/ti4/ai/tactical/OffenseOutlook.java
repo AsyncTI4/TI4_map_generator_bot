@@ -159,8 +159,7 @@ final class OffenseOutlook {
         double cancel = 0;
         double extraOrigins = EXTRA_ORIGIN_COST * Math.max(0, strike.origins().size() - 1);
         if (full && value - losses - extraOrigins >= floor) {
-            double plastic = plastic(estimate, heldPlanetValue);
-            anger = anger(strike, estimate, plastic, denial.harmPoints(), ownObjective);
+            anger = anger(strike, estimate, heldPlanetValue, denial.harmPoints(), ownObjective);
             counter = w * counterstrike(strike, estimate, after, planetsAfter, landed, terms.seatStake());
             nekroFeed = nekroFeed(opponent, estimate);
             capture = VUIL_RAITH.equals(opponent.getFaction()) ? CAPTURE_VALUE * estimate.ourLossChance() * hurt : 0;
@@ -481,21 +480,18 @@ final class OffenseOutlook {
     }
 
     private double anger(
-            Strike strike, StrikeEstimate estimate, double plastic, double scoringDenial, double ownObjective) {
+            Strike strike, StrikeEstimate estimate, double heldPlanetValue, double scoringDenial, double ownObjective) {
         Player opponent = strike.opponent();
         if (opponent.isNeutral()) return 0;
-        double grievance = plastic * angerSensitivity(strike.target(), opponent)
-                + scoringDenial * Grievance.scoringDenial(standings.leadOverField(opponent));
+        double sensitivity = angerSensitivity(strike.target(), opponent);
+        double denialGrievance = scoringDenial * Grievance.scoringDenial(standings.leadOverField(opponent));
+        double grievance = (estimate.theirExpectedLoss() + heldPlanetValue) * sensitivity + denialGrievance;
         double relief = Grievance.relief(standings.winThreat(opponent), standings.winThreat(seat), ownObjective / VP);
         double nearTerm = ANGER_SHARE * grievance * retaliation(strike, estimate) * relief;
         if (!remembersAttacks()) return nearTerm;
-        return Math.max(nearTerm, relief * lastingAnger(strike, estimate, grievance));
-    }
-
-    private double plastic(StrikeEstimate estimate, double heldPlanetValue) {
-        double kills =
-                remembersAttacks() ? ValueScale.RESOURCE * estimate.theirExpectedLoss() : estimate.theirExpectedLoss();
-        return kills + heldPlanetValue;
+        double ledgerGrievance =
+                (ValueScale.RESOURCE * estimate.theirExpectedLoss() + heldPlanetValue) * sensitivity + denialGrievance;
+        return Math.max(nearTerm, relief * lastingAnger(strike, estimate, ledgerGrievance));
     }
 
     private boolean remembersAttacks() {

@@ -8,12 +8,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.AiGameWrites;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
@@ -34,8 +36,7 @@ public class AttackLedger {
     static final int REMEMBERED_ROUNDS = 3;
     private static final String KEY_PREFIX = "aiAttack";
     static final String LEDGER_KEY = KEY_PREFIX + "Ledger";
-    static final String UNITS_KEY = KEY_PREFIX + "Units";
-    static final String PLANETS_KEY = KEY_PREFIX + "Planets";
+    private static final String SAVE_REASON = "AI attack ledger";
     private static final String ENTRIES = ";";
     private static final String FIELDS = "/";
     private static final String VALUE = "=";
@@ -51,13 +52,24 @@ public class AttackLedger {
 
     private record Board(Map<String, Map<String, Double>> units, Map<String, String> planets) {}
 
+    private record Picture(Board board, String ledger) {}
+
+    private record GameKey(String name, long created) {
+
+        static GameKey of(Game game) {
+            return new GameKey(game.getName(), game.getCreationDateTime());
+        }
+    }
+
+    private static final Map<GameKey, Picture> PICTURES = new ConcurrentHashMap<>();
+
     public static Optional<AiDecision> observe(AiTurnContext context) {
         if (AiExperiments.enabled(context.seat(), Experiment.ATTACK_MEMORY)) record(context.game());
         return Optional.empty();
     }
 
-    public static boolean isLedgerKey(String key) {
-        return key.startsWith(KEY_PREFIX);
+    public static void forget(String gameName) {
+        PICTURES.keySet().removeIf(key -> key.name().equals(gameName));
     }
 
     public static boolean remembers(Game game, Player seat) {
@@ -83,16 +95,26 @@ public class AttackLedger {
 
     static void record(Game game) {
         Board now = board(game);
-        boolean seen = !game.getStoredValue(UNITS_KEY).isEmpty();
+        String stored = storedLedger(game);
+        GameKey key = GameKey.of(game);
+        Picture last = PICTURES.get(key);
         Map<String, Attack> ledger = new LinkedHashMap<>();
         for (Attack attack : attacks(game)) {
             if (decay(game.getRound() - attack.round()) > 0) ledger.put(attack.key(), attack);
         }
-        if (seen)
-            diff(game, readBoard(game), now).forEach(attack -> ledger.merge(attack.key(), attack, AttackLedger::sum));
-        game.setStoredValue(LEDGER_KEY, encodeLedger(ledger.values()));
-        game.setStoredValue(UNITS_KEY, encodeUnits(now.units()));
-        game.setStoredValue(PLANETS_KEY, encodePlanets(now.planets()));
+        if (last != null && last.ledger().equals(stored)) {
+            diff(game, last.board(), now).forEach(attack -> ledger.merge(attack.key(), attack, AttackLedger::sum));
+        }
+        String updated = encodeLedger(ledger.values());
+        PICTURES.put(key, new Picture(now, updated));
+        if (!updated.equals(stored)) {
+            AiGameWrites.persist(game, SAVE_REASON, latest -> latest.setStoredValue(LEDGER_KEY, updated));
+        }
+    }
+
+    private static String storedLedger(Game game) {
+        String stored = game.getStoredValue(LEDGER_KEY);
+        return stored.isEmpty() ? NONE : stored;
     }
 
     static List<Attack> attacks(Game game) {
@@ -110,6 +132,9 @@ public class AttackLedger {
         return new Attack(first.round(), first.attacker(), first.victim(), first.damage() + second.damage());
     }
 
+    // TODO: losses outside combat (agendas, fleet supply, off-turn Direct Hit/Plague) and planets changing hands
+    // without an invasion count as attacks; production in the same window hides losses (died is board-wide net), and an
+    // active player's combat losses can be charged to a player sharing a tile it moved out of.
     private static List<Attack> diff(Game game, Board before, Board after) {
         List<Attack> found = new ArrayList<>();
         Player active = game.getActivePlayer();
@@ -132,15 +157,18 @@ public class AttackLedger {
 
     private static List<Attack> unitLosses(
             Game game, Player victim, @Nullable Player active, Board before, Board after) {
-        if (victim == active) return List.of();
         String faction = victim.getFaction();
-        double died = Math.max(0, total(before, faction) - total(after, faction));
-        if (died <= 0) return List.of();
         Map<String, Double> drops = new HashMap<>();
-        before.units().forEach((position, costs) -> {
-            double drop = costs.getOrDefault(faction, 0.0) - unitsAt(after, position, faction);
-            if (drop > 0) drops.put(position, drop);
-        });
+        double ownLosses = 0;
+        for (Map.Entry<String, Map<String, Double>> entry : before.units().entrySet()) {
+            String position = entry.getKey();
+            double drop = entry.getValue().getOrDefault(faction, 0.0) - unitsAt(after, position, faction);
+            if (drop <= 0) continue;
+            if (ownAttack(game, victim, active, position)) ownLosses += drop;
+            else drops.put(position, drop);
+        }
+        double died = total(before, faction) - total(after, faction) - ownLosses;
+        if (died <= 0) return List.of();
         double dropped =
                 drops.values().stream().mapToDouble(Double::doubleValue).sum();
         double share = Math.min(1, died / dropped);
@@ -153,6 +181,10 @@ public class AttackLedger {
             found.add(new Attack(game.getRound(), attacker.getFaction(), faction, damage));
         });
         return found;
+    }
+
+    private static boolean ownAttack(Game game, Player victim, @Nullable Player active, String position) {
+        return victim == active && position.equals(game.getActiveSystem());
     }
 
     @Nullable
@@ -205,41 +237,11 @@ public class AttackLedger {
         return cost;
     }
 
-    private static Board readBoard(Game game) {
-        Map<String, Map<String, Double>> units = new TreeMap<>();
-        for (String entry : StringUtils.split(game.getStoredValue(UNITS_KEY), ENTRIES)) {
-            String[] fields = StringUtils.split(StringUtils.substringBefore(entry, VALUE), FIELDS);
-            String cost = StringUtils.substringAfter(entry, VALUE);
-            if (fields.length != 2 || !NumberUtils.isCreatable(cost)) continue;
-            units.computeIfAbsent(fields[0], position -> new TreeMap<>()).put(fields[1], Double.parseDouble(cost));
-        }
-        Map<String, String> planets = new TreeMap<>();
-        for (String entry : StringUtils.split(game.getStoredValue(PLANETS_KEY), ENTRIES)) {
-            String planet = StringUtils.substringBefore(entry, VALUE);
-            String owner = StringUtils.substringAfter(entry, VALUE);
-            if (!planet.isEmpty() && !owner.isEmpty()) planets.put(planet, owner);
-        }
-        return new Board(units, planets);
-    }
-
     private static String encodeLedger(Iterable<Attack> attacks) {
         List<String> entries = new ArrayList<>();
         for (Attack attack : attacks) {
             entries.add(attack.key() + VALUE + String.format(Locale.ROOT, FORMAT, attack.damage()));
         }
-        return entries.isEmpty() ? NONE : String.join(ENTRIES, entries);
-    }
-
-    private static String encodeUnits(Map<String, Map<String, Double>> units) {
-        List<String> entries = new ArrayList<>();
-        units.forEach((position, costs) -> costs.forEach((faction, cost) ->
-                entries.add(position + FIELDS + faction + VALUE + String.format(Locale.ROOT, FORMAT, cost))));
-        return entries.isEmpty() ? NONE : String.join(ENTRIES, entries);
-    }
-
-    private static String encodePlanets(Map<String, String> planets) {
-        List<String> entries = new ArrayList<>();
-        planets.forEach((planet, owner) -> entries.add(planet + VALUE + owner));
         return entries.isEmpty() ? NONE : String.join(ENTRIES, entries);
     }
 }

@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
@@ -18,12 +16,14 @@ import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.GameSnapshots;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // ATTACK_MEMORY: a public ledger of who attacked whom (ships destroyed in combat, LRR 18; planets taken by invasion,
-// LRR 49), diffed from the board between AI ticks and kept in the game's stored values so /game undo rolls it back.
+// LRR 49), diffed from the board between AI ticks. The ledger is a game stored value saved only when it changes, so
+// /game undo rolls it back; the board picture it diffs against lives in memory per game and is retaken after an undo.
 // Each round halves what an attack weighs and the ledger forgets after three rounds. A seat hits back at a recent
 // attacker more readily, prices the lasting anger of the players it conquers from, and expects the players it angered
 // to come for it.
@@ -59,16 +59,25 @@ class AttackMemoryTest extends BaseTi4Test {
         final Tile wellon = board.test.place("19", AiTestGame.neighbourOf(DefenseScenario.SARDAKK_HOME_POSITION));
 
         Invasion() {
+            game.newGameSetup();
             sardakk.addPlanet("wellon");
             board.test.units(wellon, "wellon", sardakk, UnitType.Infantry, 1);
         }
 
         void nekroTakesWellon() {
-            board.test.isActive(nekro, "action");
+            takeWellon(game);
+        }
+
+        static void takeWellon(Game game) {
+            Player nekro = game.getPlayerFromColorOrFaction("nekro");
+            Player sardakk = game.getPlayerFromColorOrFaction("sardakk");
+            Tile wellon = game.getTileFromPlanet("wellon");
+            game.setPhaseOfGame("action");
+            game.setActivePlayerID(nekro.getUserID());
             remove(wellon, "wellon", sardakk, UnitType.Infantry, 1);
             sardakk.removePlanet("wellon");
             nekro.addPlanet("wellon");
-            board.test.units(wellon, "wellon", nekro, UnitType.Infantry, 2);
+            wellon.addUnit("wellon", Units.getUnitKey(UnitType.Infantry, nekro.getColor()), 2);
         }
 
         double expectedDamage() {
@@ -131,6 +140,7 @@ class AttackMemoryTest extends BaseTi4Test {
         Tile refuge = board.test.place("47", board.beyondStaging());
         AttackLedger.record(board.test.game);
         board.test.isActive(board.test.nekro, "action");
+        board.test.game.setActiveSystem(board.stagingPosition);
         remove(board.staging, "space", board.sardakk, UnitType.Cruiser, 2);
         board.test.units(refuge, "space", board.sardakk, UnitType.Cruiser, 2);
         remove(board.staging, "space", board.test.nekro, UnitType.Destroyer, 1);
@@ -143,29 +153,85 @@ class AttackMemoryTest extends BaseTi4Test {
                 .isZero();
     }
 
-    // The ledger and the board picture it diffs against are game stored values, which the save file carries, so
-    // /game undo puts both back together: rolling back past the invasion forgets it, and replaying it records it once.
+    // The bot reloads the game from its save file on every tick, so two ticks never share a Game instance: the second
+    // tick must still diff against the picture the first one took.
+    @Test
+    void aFreshlyLoadedGameSeesTheLastTicksPicture() {
+        Invasion invasion = new Invasion();
+        AttackLedger.record(GameSnapshots.copy(invasion.game));
+        invasion.nekroTakesWellon();
+        Game nextTick = GameSnapshots.copy(invasion.game);
+
+        AttackLedger.record(nextTick);
+
+        assertThat(AttackLedger.grudge(nextTick, sardakkOf(nextTick), nekroOf(nextTick)))
+                .isCloseTo(invasion.expectedDamage(), within(0.01));
+        Game reloaded = GameSnapshots.copy(nextTick);
+        assertThat(AttackLedger.grudge(reloaded, sardakkOf(reloaded), nekroOf(reloaded)))
+                .isCloseTo(invasion.expectedDamage(), within(0.01));
+    }
+
+    // /game undo restores an older save file. Its ledger no longer matches the picture, so the AI retakes the picture
+    // instead of reading the undone invasion backwards, and replaying the invasion records it once.
     @Test
     void theLedgerRollsBackWithUndo() {
         Invasion invasion = new Invasion();
         AttackLedger.record(invasion.game);
-        Map<String, String> saved = new HashMap<>(invasion.game.getStoredValueMap());
+        Game undoFile = GameSnapshots.copy(invasion.game);
         invasion.nekroTakesWellon();
-        AttackLedger.record(invasion.game);
-        double recorded = AttackLedger.grudge(invasion.game, invasion.sardakk, invasion.nekro);
+        Game attacked = GameSnapshots.copy(invasion.game);
+        AttackLedger.record(attacked);
+        double recorded = AttackLedger.grudge(attacked, sardakkOf(attacked), nekroOf(attacked));
 
-        Invasion undone = new Invasion();
-        undone.game.getStoredValueMap().putAll(saved);
-        AttackLedger.record(undone.game);
-        double afterUndo = AttackLedger.grudge(undone.game, undone.sardakk, undone.nekro);
-        undone.nekroTakesWellon();
-        AttackLedger.record(undone.game);
-        AttackLedger.record(undone.game);
+        Game undone = GameSnapshots.copy(undoFile);
+        AttackLedger.record(undone);
+        double afterUndo = AttackLedger.grudge(undone, sardakkOf(undone), nekroOf(undone));
+        double reverse = AttackLedger.grudge(undone, nekroOf(undone), sardakkOf(undone));
+        Invasion.takeWellon(undone);
+        AttackLedger.record(undone);
+        AttackLedger.record(undone);
 
         assertThat(recorded).isPositive();
         assertThat(afterUndo).isZero();
-        assertThat(AttackLedger.grudge(undone.game, undone.sardakk, undone.nekro))
+        assertThat(reverse).isZero();
+        assertThat(AttackLedger.grudge(undone, sardakkOf(undone), nekroOf(undone)))
                 .isCloseTo(recorded, within(EXACT));
+    }
+
+    // A tick that sees nothing new writes nothing, so the bot does not save and add an undo step after every action.
+    @Test
+    void aQuietTickLeavesTheSaveAlone() {
+        Invasion invasion = new Invasion();
+        AttackLedger.record(invasion.game);
+        AttackLedger.record(invasion.game);
+
+        assertThat(invasion.game.getStoredValue(AttackLedger.LEDGER_KEY)).isEmpty();
+    }
+
+    // The AI may only tick once the victim's own turn has started (end of turn clears the active system), and the
+    // victim's losses from the attack still count.
+    @Test
+    void theVictimsLossesCountAfterItsTurnStarts() {
+        DefenseScenario board = new DefenseScenario();
+        board.raidingFleet(0, 2, 0);
+        AttackLedger.record(board.test.game);
+        board.test.units(board.staging, "space", board.test.nekro, UnitType.Dreadnought, 2);
+        remove(board.staging, "space", board.sardakk, UnitType.Cruiser, 2);
+        board.test.isActive(board.sardakk, "action");
+        board.test.game.setActiveSystem("");
+
+        AttackLedger.record(board.test.game);
+
+        assertThat(AttackLedger.grudge(board.test.game, board.sardakk, board.test.nekro))
+                .isPositive();
+    }
+
+    private static Player nekroOf(Game game) {
+        return game.getPlayerFromColorOrFaction("nekro");
+    }
+
+    private static Player sardakkOf(Game game) {
+        return game.getPlayerFromColorOrFaction("sardakk");
     }
 
     @Test
@@ -289,7 +355,21 @@ class AttackMemoryTest extends BaseTi4Test {
         double treatment = new RexRaid().strongNeighbour().anger();
 
         assertThat(remembered).isEqualTo(plain);
-        assertThat(treatment).isNotEqualTo(plain);
+        assertThat(treatment).isGreaterThanOrEqualTo(plain);
+    }
+
+    // Remembering attacks only ever adds the victim's lasting anger on top of the near-term term: conquest never gets
+    // cheaper with the flag on.
+    @Test
+    void conquestAngerWithTheFlagOnIsAtLeastTheOldValue() {
+        assertThat(new RexRaid().strongNeighbour().anger())
+                .isGreaterThanOrEqualTo(
+                        new RexRaid().strongNeighbour().control().anger());
+        assertThat(new RexRaid().weakAndFar().anger())
+                .isGreaterThanOrEqualTo(new RexRaid().weakAndFar().control().anger());
+        assertThat(new RexRaid().strongNeighbour().grudge(8).anger())
+                .isGreaterThanOrEqualTo(
+                        new RexRaid().strongNeighbour().grudge(8).control().anger());
     }
 
     // Sardakk's fleet waits beside Nekro's home. After Nekro took a VP's worth from Sardakk, Nekro expects Sardakk to
