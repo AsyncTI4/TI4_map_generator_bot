@@ -28,9 +28,10 @@ class ImperialUses {
         Game game = in.game();
         Player seat = in.seat();
         boolean holdsMecatol = seat.controlsMecatol(true);
+        PointsSplit points = pointsSplit(in);
         return List.of(
-                new Benefit(CardUse.IMPERIAL_SCORE, scoreValue(in)),
-                new Benefit(CardUse.IMPERIAL_MECATOL, mecatolBenefit(in), mecatolPosition(game)),
+                new Benefit(CardUse.IMPERIAL_SCORE, points.score()),
+                new Benefit(CardUse.IMPERIAL_MECATOL, points.mecatol(), mecatolPosition(game)),
                 new Benefit(
                         CardUse.IMPERIAL_SECRET,
                         !holdsMecatol && SecretDraws.worthDrawing(game, seat) ? secretOverFollowing(in) : 0));
@@ -99,32 +100,25 @@ class ImperialUses {
         return mecatol == null ? "" : mecatol.getPosition();
     }
 
-    private static double scoreValue(PlanInputs in) {
+    private record PointsSplit(double score, double mecatol) {}
+
+    private static PointsSplit pointsSplit(PlanInputs in) {
         Game game = in.game();
         Player seat = in.seat();
-        if (!pointsAware(seat)) return CardValueScale.VICTORY_POINT * ObjectiveOdds.extraScoreWithImperial(game, seat);
         double mecatol = mecatolValue(in);
-        if (mecatol > 0 && ObjectiveOdds.extraPointsWithImperial(game, seat) <= 0) return 0;
-        return pointsWorth(in) - mecatol;
-    }
-
-    private static double mecatolBenefit(PlanInputs in) {
-        double mecatol = mecatolValue(in);
-        if (!pointsAware(in.seat()) || mecatol <= 0) return mecatol;
-        if (ObjectiveOdds.extraPointsWithImperial(in.game(), in.seat()) > 0) return mecatol;
-        return pointsWorth(in);
-    }
-
-    private static double pointsWorth(PlanInputs in) {
-        Game game = in.game();
-        Player seat = in.seat();
-        double extraPoints = ObjectiveOdds.extraPointsWithImperial(game, seat);
-        double mecatol = mecatolValue(in);
-        double flat = mecatol + CardValueScale.VICTORY_POINT * extraPoints;
-        double stake = ScoringStakes.scoreValue(game, seat, mecatol / CardValueScale.VICTORY_POINT + extraPoints);
+        if (!pointsAware(seat)) {
+            return new PointsSplit(
+                    CardValueScale.VICTORY_POINT * ObjectiveOdds.extraScoreWithImperial(game, seat), mecatol);
+        }
         int heldMecatol = seat.controlsMecatol(true) ? 1 : 0;
-        double swing = ScoringStakes.WIN_VALUE * ObjectiveOdds.imperialWinSwing(game, seat, heldMecatol);
-        return Math.max(flat, Math.max(stake, swing));
+        ObjectiveOdds.ImperialOdds odds = ObjectiveOdds.imperial(game, seat, heldMecatol);
+        double flat = mecatol + CardValueScale.VICTORY_POINT * odds.extraPoints();
+        double stake =
+                ScoringStakes.scoreValue(game, seat, mecatol / CardValueScale.VICTORY_POINT + odds.extraPoints());
+        double swing = ScoringStakes.WIN_VALUE * odds.winSwing();
+        double worth = Math.max(flat, Math.max(stake, swing));
+        boolean premiumOnMecatol = holdsThreatenedMecatol(in) || (mecatol > 0 && odds.extraPoints() <= 0);
+        return premiumOnMecatol ? new PointsSplit(0, worth) : new PointsSplit(worth - mecatol, mecatol);
     }
 
     private static boolean pointsAware(Player seat) {

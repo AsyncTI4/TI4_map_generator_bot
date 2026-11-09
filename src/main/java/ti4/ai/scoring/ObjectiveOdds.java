@@ -20,46 +20,82 @@ public class ObjectiveOdds {
     private static final double[] SPEND_SHORT_BY = {0.6, 0.6, 0.45};
     private static final int FARTHEST_COUNTED = 3;
 
-    private record Chance(double byStatus, boolean metNow, int points) {
+    private record Chance(double byStatus, boolean metNow, int points) {}
 
-        Chance lockedIn() {
-            return new Chance(1, true, points);
-        }
+    private record LockIn(int lockedPoints, List<Chance> rest) {}
+
+    public record ImperialOdds(double extraPoints, double winSwing) {}
+
+    public static ImperialOdds imperial(Game game, Player player, int mecatolPoints) {
+        List<Chance> chances = chances(game, player);
+        return new ImperialOdds(extraPoints(chances), winSwing(game, player, chances, mecatolPoints));
     }
 
     public static double extraPointsWithImperial(Game game, Player seat) {
-        return lockInOptions(chances(game, seat)).stream()
-                .mapToDouble(ObjectiveOdds::expectedSecondBest)
-                .max()
-                .orElse(0);
+        return extraPoints(chances(game, seat));
     }
 
     public static double imperialWinSwing(Game game, Player player, int mecatolPoints) {
+        return winSwing(game, player, chances(game, player), mecatolPoints);
+    }
+
+    private static double extraPoints(List<Chance> chances) {
+        List<LockIn> locks = lockInOptions(chances);
+        if (locks.isEmpty()) return expectedSecondBest(chances);
+        return locks.stream()
+                .mapToDouble(lock -> expectedBest(lock.rest()))
+                .max()
+                .orElse(0);
+    }
+
+    private static double winSwing(Game game, Player player, List<Chance> chances, int mecatolPoints) {
         int goal = game.getVp();
         if (goal <= 0) return 0;
         int needed = goal - player.getTotalVictoryPoints();
-        List<Chance> chances = chances(game, player);
-        double without = reachChance(chances, needed, false);
-        double with = lockInOptions(chances).stream()
-                .mapToDouble(locked -> reachChance(locked, needed - mecatolPoints, true))
-                .max()
-                .orElse(0);
+        double without = reachesWithBest(chances, needed);
+        List<LockIn> locks = lockInOptions(chances);
+        double with = locks.isEmpty()
+                ? reachesWithBestTwo(chances, needed - mecatolPoints)
+                : locks.stream()
+                        .mapToDouble(lock -> reachesWithBest(lock.rest(), needed - mecatolPoints - lock.lockedPoints()))
+                        .max()
+                        .orElse(0);
         return Math.max(0, with - without);
     }
 
-    private static List<List<Chance>> lockInOptions(List<Chance> chances) {
-        if (chances.stream().noneMatch(Chance::metNow)) return List.of(chances);
-        List<List<Chance>> options = new ArrayList<>();
+    private static List<LockIn> lockInOptions(List<Chance> chances) {
+        List<LockIn> options = new ArrayList<>();
         for (int index = 0; index < chances.size(); index++) {
             if (!chances.get(index).metNow()) continue;
-            List<Chance> locked = new ArrayList<>(chances);
-            locked.set(index, chances.get(index).lockedIn());
-            options.add(locked);
+            List<Chance> rest = new ArrayList<>(chances);
+            Chance locked = rest.remove(index);
+            options.add(new LockIn(locked.points(), rest));
         }
         return options;
     }
 
-    private static double reachChance(List<Chance> chances, int needed, boolean scoresTwo) {
+    private static double reachesWithBest(List<Chance> chances, int needed) {
+        if (needed <= 0) return 1;
+        return atLeastOne(chances.stream()
+                .filter(chance -> chance.points() >= needed)
+                .map(Chance::byStatus)
+                .toList());
+    }
+
+    private static double expectedBest(List<Chance> chances) {
+        int most = chances.stream().mapToInt(Chance::points).max().orElse(0);
+        double expected = 0;
+        for (int points = 1; points <= most; points++) {
+            int atLeast = points;
+            expected += atLeastOne(chances.stream()
+                    .filter(chance -> chance.points() >= atLeast)
+                    .map(Chance::byStatus)
+                    .toList());
+        }
+        return expected;
+    }
+
+    private static double reachesWithBestTwo(List<Chance> chances, int needed) {
         if (needed <= 0) return 1;
         int most = chances.stream().mapToInt(Chance::points).max().orElse(0);
         double[][] odds = new double[most + 1][most + 1];
@@ -82,8 +118,7 @@ public class ObjectiveOdds {
         double reach = 0;
         for (int best = 0; best <= most; best++) {
             for (int second = 0; second <= best; second++) {
-                int scored = best + (scoresTwo ? second : 0);
-                if (scored >= needed) reach += odds[best][second];
+                if (best + second >= needed) reach += odds[best][second];
             }
         }
         return reach;

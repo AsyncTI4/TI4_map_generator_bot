@@ -100,6 +100,21 @@ class ObjectiveOddsTest extends BaseTi4Test {
         assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro)).isCloseTo(1.8, within(1e-9));
     }
 
+    // Raise a Fleet (1 VP, met now) is the only thing Imperial can lock in; the two stage II publics still pending
+    // can only add the better one of them by status. Command an Armada is three ships short (0.12) and Centralize
+    // Galactic Trade is two trade goods short (0.6), so the extra is 2 x (1 - 0.88 x 0.4), not their sum.
+    @Test
+    void aLockedStageOneAddsOnlyTheBestPendingStageTwo() {
+        test.nekro.setTg(8);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Dreadnought, 5);
+        reveal("raise_fleet");
+        reveal("centralize_trade");
+        reveal("command_armada");
+
+        assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro))
+                .isCloseTo(2 * (1 - 0.88 * 0.4), within(1e-9));
+    }
+
     // At 8 of 10 VP with two 1 VP publics met, the status phase alone reaches 9; Imperial reaches 10 whenever Raise a
     // Fleet still holds (0.9). Holding Mecatol Rex as well, the Imperial point plus Monument scored with the primary
     // reach 10 for certain, while without Imperial there is no Mecatol Rex point at all.

@@ -109,8 +109,9 @@ public class StrategyCardRanking {
 
     private static double rivalImperialStake(Game game, Player rival) {
         int mecatol = rival.controlsMecatol(true) ? 1 : 0;
-        double points = mecatol + ObjectiveOdds.extraPointsWithImperial(game, rival);
-        double swing = ScoringStakes.WIN_VALUE * ObjectiveOdds.imperialWinSwing(game, rival, mecatol);
+        ObjectiveOdds.ImperialOdds odds = ObjectiveOdds.imperial(game, rival, mecatol);
+        double points = mecatol + odds.extraPoints();
+        double swing = ScoringStakes.WIN_VALUE * odds.winSwing();
         return Math.max(ScoringStakes.rivalPointStake(game, rival, points), swing);
     }
 

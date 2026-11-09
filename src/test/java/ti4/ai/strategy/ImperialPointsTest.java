@@ -114,6 +114,39 @@ class ImperialPointsTest extends BaseTi4Test {
                         value -> assertThat(value).isCloseTo(0.9 * CardValueScale.VICTORY_POINT, within(1e-9)));
     }
 
+    // At 8 VP holding a threatened Mecatol Rex with Monument met now and Raise a Fleet one ship short: Imperial played
+    // now wins at once (8 + Mecatol + Monument). The win premium must stay on the Mecatol point, whose play-now rule
+    // covers a threatened Mecatol Rex; on the extra public it would wait for a second scorable public and risk the
+    // planet. The old values kept the Mecatol point as the main benefit too.
+    @Test
+    void playsAWinningImperialAtOnceWhileMecatolIsThreatened() {
+        test.place("18", "000");
+        test.nekro.addPlanet("mr");
+        Tile next = test.place("26", AiTestGame.neighbourOf("000"));
+        test.units(next, "space", test.sol, UnitType.Dreadnought, 1);
+        test.points(test.nekro, 8);
+        reveal("raise_fleet");
+        reveal("monument");
+        test.units(nekroHome, "space", test.nekro, UnitType.Dreadnought, 4);
+        test.nekro.setTg(8);
+        changed();
+
+        PlanInputs in = PlanInputs.of(test.game, test.nekro, PlanMoment.ACTION);
+        assertThat(ImperialUses.holdsThreatenedMecatol(in)).isTrue();
+        CardPlan imperial = StrategyCardPlanner.plan(in, IMPERIAL);
+        assertThat(imperial.main()).map(CardPlan.Benefit::use).contains(CardUse.IMPERIAL_MECATOL);
+        assertThat(imperial.benefit(CardUse.IMPERIAL_MECATOL))
+                .map(CardPlan.Benefit::value)
+                .contains(ScoringStakes.WIN_VALUE);
+        assertThat(CardTiming.of(in, imperial)).isEqualTo(CardTiming.Timing.NOW);
+
+        disableExperiment();
+        PlanInputs old = PlanInputs.of(test.game, test.nekro, PlanMoment.ACTION);
+        CardPlan oldImperial = StrategyCardPlanner.plan(old, IMPERIAL);
+        assertThat(oldImperial.main()).map(CardPlan.Benefit::use).contains(CardUse.IMPERIAL_MECATOL);
+        assertThat(CardTiming.of(old, oldImperial)).isEqualTo(CardTiming.Timing.NOW);
+    }
+
     // Holding Mecatol Rex at 9 VP: the Imperial point is the win, with nothing to score.
     @Test
     void valuesAWinningMecatolPointAsTheWin() {
