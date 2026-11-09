@@ -19,8 +19,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // Space cannon covering Mecatol Rex no longer switches the custodians race off: each seat's chance of landing is
-// scaled by the chance its loaded fleet survives the cover's dice. Seats with CUSTODIANS_COVER disabled keep the old
-// rule, where any rival cover empties their arrival.
+// scaled by the chance its loaded fleet survives the cover's dice. A deciding seat with CUSTODIANS_COVER disabled keeps
+// the old rule for every player, where any rival cover empties that player's arrival.
 class CustodiansCoverTest extends BaseTi4Test {
 
     private static final String MECATOL = "000";
@@ -108,8 +108,8 @@ class CustodiansCoverTest extends BaseTi4Test {
     }
 
     // A rival racing through the seat's own cover only beats it when its landing survives. Sol has Antimass
-    // Deflectors, so the seat's PDS II hits it on 6. With Sol's experiment disabled, Sol's arrival is empty again
-    // under the old rule and poses no threat.
+    // Deflectors, so the seat's PDS II hits it on 6. With the deciding seat's experiment disabled, Sol's arrival is
+    // empty again under the old rule and poses no threat.
     @Test
     void aRivalUnderTheSeatsCoverThreatensOnlyByItsSurvivalChance() {
         loadedCarrier(SOL_START, test.sol, 0);
@@ -122,10 +122,43 @@ class CustodiansCoverTest extends BaseTi4Test {
         assertThat(race.winChance(test.nekro, solArrival + 1, Order.UNKNOWN))
                 .isCloseTo(1 - solSurvival * CustodiansRace.TAKE_FIRST, within(1e-9));
 
-        disableCover(test.sol);
+        disableCover(test.nekro);
         Snapshot oldRule = race();
 
         assertThat(oldRule.arrival(test.sol)).isEmpty();
+        assertThat(oldRule.coverSurvival(test.sol)).isEqualTo(1.0);
         assertThat(oldRule.winChance(test.nekro, solArrival + 1, Order.UNKNOWN)).isEqualTo(1.0);
+    }
+
+    // Mixed A/B tables: a control seat (experiment off) must run the old brain even when the covered rival has the
+    // experiment on. The flag is read from the deciding seat only, so the rival's own flag changes nothing.
+    @Test
+    void aControlSeatIgnoresTheRivalsFlagAndKeepsTheOldRule() {
+        loadedCarrier(SOL_START, test.sol, 0);
+        pdsTwoBesideMecatol(test.nekro, NEKRO_CANNON);
+        disableCover(test.nekro);
+        int solUncoveredArrival =
+                CustodiansRace.of(test.game, test.sol).arrival(test.sol).orElseThrow();
+
+        Snapshot control = race();
+
+        assertThat(control.arrival(test.sol)).isEmpty();
+        assertThat(control.canLandThisRound(test.sol)).isFalse();
+        assertThat(control.winChance(test.nekro, solUncoveredArrival + 1, Order.UNKNOWN))
+                .isEqualTo(1.0);
+    }
+
+    // The reverse: a treatment seat judges a control rival by the treatment rule, so the rival's covered arrival
+    // still exists and is weighed by its survival.
+    @Test
+    void aTreatmentSeatJudgesAControlRivalByTheNewRule() {
+        loadedCarrier(NEKRO_START, test.nekro, 0);
+        pdsTwoBesideMecatol(test.sol, SOL_CANNON);
+        disableCover(test.nekro);
+
+        Snapshot treatment = CustodiansRace.of(test.game, test.sol);
+
+        assertThat(treatment.arrival(test.nekro)).isPresent();
+        assertThat(treatment.coverSurvival(test.nekro)).isCloseTo(0.4, within(1e-9));
     }
 }

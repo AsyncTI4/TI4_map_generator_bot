@@ -91,10 +91,12 @@ public final class CustodiansRace {
         private final Map<String, Boolean> covered = new HashMap<>();
         private final Map<String, Double> survivals = new HashMap<>();
         private final Map<String, Integer> projections = new HashMap<>();
+        private final boolean coverOn;
 
         private Snapshot(Game game, Player seat) {
             this.game = game;
             this.seat = seat;
+            this.coverOn = seat != null && AiExperiments.enabled(seat, Experiment.CUSTODIANS_COVER);
             this.mecatol = custodiansTile(game);
         }
 
@@ -148,7 +150,7 @@ public final class CustodiansRace {
         }
 
         public double coverSurvival(Player player) {
-            if (mecatol == null || !AiExperiments.enabled(player, Experiment.CUSTODIANS_COVER)) return 1.0;
+            if (mecatol == null || !coverOn) return 1.0;
             return survivals.computeIfAbsent(player.getFaction(), faction -> survivalUnderCover(player));
         }
 
@@ -178,7 +180,7 @@ public final class CustodiansRace {
         }
 
         private boolean blockedByCover(Player player) {
-            if (!AiExperiments.enabled(player, Experiment.CUSTODIANS_COVER)) return coveredByOthers(player);
+            if (!coverOn) return coveredByOthers(player);
             return coverSurvival(player) <= 0;
         }
 
