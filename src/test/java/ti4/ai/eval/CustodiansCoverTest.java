@@ -12,6 +12,8 @@ import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.CustodiansRace.Order;
 import ti4.ai.eval.CustodiansRace.Snapshot;
+import ti4.ai.scoring.ScoringReserve;
+import ti4.ai.scoring.SpendCost;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
@@ -19,7 +21,8 @@ import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // Space cannon covering Mecatol Rex no longer switches the custodians race off: each seat's chance of landing is
-// scaled by the chance its loaded fleet survives the cover's dice. A deciding seat with CUSTODIANS_COVER disabled keeps
+// scaled by the chance its loaded fleet survives the cover's dice. A deciding seat with CANNON_COVER_RISK disabled
+// keeps
 // the old rule for every player, where any rival cover empties that player's arrival.
 class CustodiansCoverTest extends BaseTi4Test {
 
@@ -62,7 +65,7 @@ class CustodiansCoverTest extends BaseTi4Test {
     }
 
     private void disableCover(Player seat) {
-        AiExperiments.disable(seat, EnumSet.of(Experiment.CUSTODIANS_COVER));
+        AiExperiments.disable(seat, EnumSet.of(Experiment.CANNON_COVER_RISK));
     }
 
     private Snapshot race() {
@@ -105,6 +108,80 @@ class CustodiansCoverTest extends BaseTi4Test {
         pdsTwoBesideMecatol(test.sol, SOL_CANNON);
 
         assertThat(race().coverSurvival(test.nekro)).isEqualTo(1.0);
+    }
+
+    // The owner assigns space cannon hits (LRR 77.3c), so a fighter the carrier has room for takes the single die and
+    // the
+    // carrier still lands its infantry.
+    @Test
+    void aCarriedFighterSoaksTheSingleDie() {
+        loadedCarrier(NEKRO_START, test.nekro, 0);
+        test.units(test.game.getTileByPosition(NEKRO_START), "space", test.nekro, UnitType.Fighter, 1);
+        pdsTwoBesideMecatol(test.sol, SOL_CANNON);
+
+        assertThat(race().coverSurvival(test.nekro)).isEqualTo(1.0);
+    }
+
+    // A carrier full of infantry has no room for the fighter, so the fighter stays behind and soaks nothing.
+    @Test
+    void aFighterWithoutRoomStaysBehind() {
+        loadedCarrier(NEKRO_START, test.nekro, 0);
+        Tile start = test.game.getTileByPosition(NEKRO_START);
+        test.units(start, "space", test.nekro, UnitType.Infantry, 3);
+        test.units(start, "space", test.nekro, UnitType.Fighter, 1);
+        pdsTwoBesideMecatol(test.sol, SOL_CANNON);
+
+        assertThat(race().coverSurvival(test.nekro)).isCloseTo(0.4, within(1e-9));
+    }
+
+    // A specific moving stack is priced by its own hit points: two hit points shrug off the one die.
+    @Test
+    void aMovingStackIsPricedByItsOwnHitPoints() {
+        loadedCarrier(NEKRO_START, test.nekro, 0);
+        pdsTwoBesideMecatol(test.sol, SOL_CANNON);
+        Snapshot race = race();
+        OptionalInt arrival = race.arrival(test.nekro);
+
+        assertThat(race.coverSurvival(test.nekro, 1)).isCloseTo(0.4, within(1e-9));
+        assertThat(race.coverSurvival(test.nekro, 2)).isEqualTo(1.0);
+        assertThat(race.raceValue(test.nekro, arrival, Order.UNKNOWN, 1.0))
+                .isCloseTo(race.raceValue(test.nekro, arrival, Order.UNKNOWN) / 0.4, within(1e-9));
+    }
+
+    // The custodians reserve follows the landing's survival. One PDS II die at 5+ leaves a lone carrier 40%, short of
+    // the even chance the race check asks for, so nothing is held. With Antimass Deflectors the die needs a 6 and the
+    // landing survives half the time: half the 6 influence is held.
+    @Test
+    void holdsCustodiansInfluenceInProportionToSurvival() {
+        loadedCarrier(NEKRO_START, test.nekro, 0);
+        pdsTwoBesideMecatol(test.sol, SOL_CANNON);
+
+        assertThat(ScoringReserve.custodiansInfluenceHeld(race(), test.nekro)).isZero();
+        assertThat(ScoringReserve.custodiansReserve(test.game, test.nekro)).isEqualTo(SpendCost.NONE);
+
+        test.nekro.addTech("amd");
+
+        assertThat(ScoringReserve.custodiansInfluenceHeld(race(), test.nekro)).isEqualTo(3);
+        assertThat(ScoringReserve.custodiansReserve(test.game, test.nekro)).isEqualTo(SpendCost.influence(3));
+    }
+
+    @Test
+    void holdsTheFullCustodiansCostWhenUncovered() {
+        loadedCarrier(NEKRO_START, test.nekro, 0);
+
+        assertThat(ScoringReserve.custodiansInfluenceHeld(race(), test.nekro)).isEqualTo(CustodiansRace.COST);
+    }
+
+    // The old rule never reserved for a covered landing: the landing was impossible.
+    @Test
+    void aControlSeatHoldsNothingForACoveredLanding() {
+        loadedCarrier(NEKRO_START, test.nekro, 0);
+        pdsTwoBesideMecatol(test.sol, SOL_CANNON);
+        test.nekro.addTech("amd");
+        disableCover(test.nekro);
+
+        assertThat(ScoringReserve.custodiansInfluenceHeld(race(), test.nekro)).isEqualTo(CustodiansRace.COST);
+        assertThat(ScoringReserve.custodiansReserve(test.game, test.nekro)).isEqualTo(SpendCost.NONE);
     }
 
     // A rival racing through the seat's own cover only beats it when its landing survives. Sol has Antimass

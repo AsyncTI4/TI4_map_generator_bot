@@ -2,10 +2,13 @@ package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -122,14 +125,28 @@ class SeatOfTheEmpireTest extends BaseTi4Test {
         assertThat(plan.moves()).anyMatch(move -> move.type() == UnitType.Carrier);
     }
 
+    // Old rule, kept for control seats: the rounded hit is taken off the ship count. With CANNON_COVER_RISK the
+    // dreadnought's sustain damage absorbs it and the seat is priced by its odds (CannonCoverRiskTest).
     @Test
     void staysOutOfSpaceCannonCoverWhenTheExpectedHitBreaksTheSeat() {
+        AiExperiments.disable(test.nekro, EnumSet.of(Experiment.CANNON_COVER_RISK));
         test.nekro.setSecret("ose");
         dreadnoughtHoldsMecatol();
         carrierWithFightersNextDoor(1);
         solPdsTwoCoversMecatol();
 
         assertThat(positioning()).isEmpty();
+    }
+
+    // CANNON_COVER_RISK: the owner puts the one hit on the dreadnought's sustain damage (LRR 80), so three ships stay.
+    @Test
+    void goesIntoCoverWhenTheDreadnoughtSustainsTheHit() {
+        test.nekro.setSecret("ose");
+        dreadnoughtHoldsMecatol();
+        carrierWithFightersNextDoor(1);
+        solPdsTwoCoversMecatol();
+
+        assertThat(positioning()).isPresent();
     }
 
     @Test

@@ -24,6 +24,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CannonDice;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FleetLimit;
@@ -1016,7 +1017,7 @@ public class TacticalPlanner {
         }
         double value = landingValue(context, tile, targets, forces);
         int spareForces = unitCount(cargo) - landed;
-        double approach = approaching && spareForces > 0 ? APPROACH_SHARE * context.approachGain(tile) : 0;
+        double approach = approaching && spareForces > 0 ? APPROACH_SHARE * context.approachGain(tile, legal.get()) : 0;
         if (approach > 0) spareForces--;
         value += approach;
         value += context.offense()
@@ -1854,7 +1855,7 @@ public class TacticalPlanner {
         if (!canStageAt(context, origin, destination, group.getFirst().type())) return Optional.empty();
         OptionalInt hopsThere = context.race().hopsToMecatol(seat, destination);
         if (hopsThere.isEmpty() || hopsThere.getAsInt() >= hopsHere) return Optional.empty();
-        double gain = context.approachGain(destination);
+        double gain = context.approachGain(destination, group);
         if (gain <= 0) return Optional.empty();
         return stagingPlan(context, origin, destination, group, APPROACH_SHARE * gain);
     }
@@ -2964,6 +2965,7 @@ public class TacticalPlanner {
     private static Optional<TacticalPlan> afterCannon(Context context, Tile tile, TacticalPlan plan) {
         List<Double> chances = context.cannonChances(tile);
         if (chances.isEmpty()) return Optional.of(plan);
+        if (context.cannonRisk()) return Optional.of(riskedUnderCannon(context, tile, plan, chances));
         TacticalPlan current = plan;
         Optional<TacticalPlan> priced = priced(context, tile, current, chances);
         for (int added = 0; priced.isEmpty() && added < MAX_ESCORTS; added++) {
@@ -2987,6 +2989,43 @@ public class TacticalPlanner {
         if (!outcome.viable()) return Optional.empty();
         double realised = plan.score() > 0 ? plan.score() * outcome.delivery() : plan.score();
         return Optional.of(plan.withScore(realised - outcome.expectedLoss()));
+    }
+
+    private static TacticalPlan riskedUnderCannon(Context context, Tile tile, TacticalPlan plan, List<Double> chances) {
+        TacticalPlan current = plan;
+        TacticalPlan best = risked(context, tile, plan, chances);
+        for (int added = 0; added < MAX_ESCORTS; added++) {
+            Optional<TacticalPlan> escorted = withCheapestEscort(context, tile, current);
+            if (escorted.isEmpty()) break;
+            TacticalPlan charged =
+                    escorted.get().withScore(current.score() - escortCost(context, current, escorted.get()));
+            TacticalPlan candidate = risked(context, tile, charged, chances);
+            if (candidate.score() <= best.score()) break;
+            current = charged;
+            best = candidate;
+        }
+        return best;
+    }
+
+    private static TacticalPlan risked(Context context, Tile tile, TacticalPlan plan, List<Double> chances) {
+        CannonExposure.Outcome outcome =
+                CannonExposure.of(context.seat, tile, plan.moves(), cargoDelivered(context, tile, plan), chances);
+        double realised = plan.score() > 0 ? plan.score() * outcome.delivery() : plan.score();
+        return plan.withScore(realised - outcome.expectedLoss());
+    }
+
+    private static double escortCost(Context context, TacticalPlan before, TacticalPlan after) {
+        double cost =
+                SHIP_COST_WEIGHT * (fleetCost(context.seat, after.moves()) - fleetCost(context.seat, before.moves()));
+        Set<String> origins = new HashSet<>();
+        after.moves().forEach(move -> origins.add(move.origin()));
+        for (String position : origins) {
+            Tile origin = context.game.getTileByPosition(position);
+            if (origin == null) continue;
+            cost += context.defense().leaveCost(origin, movesFrom(origin, after.moves()))
+                    - context.defense().leaveCost(origin, movesFrom(origin, before.moves()));
+        }
+        return cost;
     }
 
     private static Optional<TacticalPlan> withCheapestEscort(Context context, Tile tile, TacticalPlan plan) {
@@ -3018,12 +3057,16 @@ public class TacticalPlanner {
         Footprint after =
                 context.footprintAfter(tile, plan.moves(), plan.landings().keySet());
         boolean chasing = SeatCover.chases(context.game, context.seat, tile, context.objectives());
-        if (chasing
-                && !SeatCover.completesThroughCannon(
-                        context.game, context.seat, tile, context.objectives(), after, plan.moves(), fire)) {
-            return Optional.empty();
-        }
+        boolean completes = context.cannonRisk()
+                ? SeatCover.completesAtRisk(context.game, context.seat, tile, plan.moves())
+                : SeatCover.completesThroughCannon(
+                        context.game, context.seat, tile, context.objectives(), after, plan.moves(), fire);
+        if (chasing && !completes) return Optional.empty();
         double shortfall = SeatCover.shortfall(context.game, context.seat, tile, context.objectives(), plan.moves());
+        if (context.cannonRisk() && chasing) {
+            shortfall += SeatCover.seatShortfall(
+                    context.game, context.seat, tile, context.objectives(), after, plan.moves());
+        }
         TacticalPlan shortened = plan.withScore(plan.score() - shortfall);
         Optional<TacticalPlan> priced = chasing
                 ? Optional.of(chargedForCannon(context, tile, shortened))
@@ -3629,6 +3672,7 @@ public class TacticalPlanner {
         private Boolean expectsGravityDrive;
         private Double mecatolCash;
         private Boolean winAwarePoints;
+        private Boolean cannonRisk;
         private Double custodiansPrice;
         private final Map<String, Integer> pointsReturned = new HashMap<>();
         private DefenseOutlook defense;
@@ -3723,6 +3767,32 @@ public class TacticalPlanner {
             });
         }
 
+        double approachGain(Tile destination, List<UnitMove> moves) {
+            if (!cannonRisk()) return approachGain(destination);
+            int hitPoints = stagedHitPoints(destination, moves);
+            return approachGains.computeIfAbsent(destination.getPosition() + "|" + hitPoints, key -> {
+                OptionalInt idle = race().idleArrival(seat);
+                OptionalInt moved = race().arrivalFrom(seat, destination);
+                if (moved.isEmpty() || idle.isPresent() && idle.getAsInt() <= moved.getAsInt()) return 0.0;
+                double staged = race().coverSurvival(seat, hitPoints);
+                return race().raceValue(seat, moved, CustodiansRace.Order.UNKNOWN, staged)
+                        - race().raceValue(seat, idle, CustodiansRace.Order.UNKNOWN);
+            });
+        }
+
+        private int stagedHitPoints(Tile destination, List<UnitMove> moves) {
+            UnitHolder space = BoardView.space(destination);
+            Map<UnitType, Integer> ships = new EnumMap<>(BoardView.ships(space, seat));
+            Map<UnitType, Integer> damaged = new EnumMap<>(UnitType.class);
+            ships.keySet().forEach(type -> damaged.put(type, BoardView.damaged(space, seat, type)));
+            int groundForces = BoardView.groundForces(space, seat);
+            for (UnitMove move : moves) {
+                if (BoardView.GROUND_FORCES.contains(move.type())) groundForces += move.count();
+                else ships.merge(move.type(), move.count(), Integer::sum);
+            }
+            return CannonDice.landingHitPoints(seat, ships, damaged, groundForces);
+        }
+
         private static OptionalInt earlier(OptionalInt first, OptionalInt second) {
             if (second.isEmpty()) return first;
             return OptionalInt.of(Math.min(first.getAsInt(), second.getAsInt()));
@@ -3804,6 +3874,12 @@ public class TacticalPlanner {
             if (winAwarePoints == null)
                 winAwarePoints = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_AWARE_POINTS);
             return winAwarePoints;
+        }
+
+        boolean cannonRisk() {
+            if (cannonRisk == null)
+                cannonRisk = AiExperiments.enabled(seat, AiExperiments.Experiment.CANNON_COVER_RISK);
+            return cannonRisk;
         }
 
         int pointsReturned(Tile target) {

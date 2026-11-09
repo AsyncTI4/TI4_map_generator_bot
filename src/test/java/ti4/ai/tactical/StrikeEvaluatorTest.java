@@ -3,9 +3,12 @@ package ti4.ai.tactical;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Planet;
@@ -44,6 +47,11 @@ class StrikeEvaluatorTest extends BaseTi4Test {
 
     private void owns(Player player, Tile tile, String holder, UnitType type, int count) {
         board.test.units(tile, holder, player, type, count);
+    }
+
+    // The rounded-hits wipe-out is the old rule, kept for control seats; CannonCoverRiskTest has the risk rule.
+    private void controlSeat() {
+        AiExperiments.disable(nekro(), EnumSet.of(Experiment.CANNON_COVER_RISK));
     }
 
     private static StrikeRules rules(boolean homeLandings, boolean custodians) {
@@ -131,6 +139,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     // The same planet, but the space cannon is enough to wipe out a small fleet: the loss is the space cannon's doing.
     @Test
     void aSmallFleetIsKeptOffAPdsPlanetBySpaceCannonLosses() {
+        controlSeat();
         sardakk().removeOwnedUnitByID("pds");
         sardakk().addOwnedUnitByID("pds2");
         owns(sardakk(), target, "lodor", UnitType.Pds, 4);
@@ -259,6 +268,7 @@ class StrikeEvaluatorTest extends BaseTi4Test {
     // Four PDS II cover the system: the expected hits are enough to destroy the whole small fleet before it fights.
     @Test
     void enoughSpaceCannonDestroysTheFleetAndTheCargo() {
+        controlSeat();
         sardakk().removeOwnedUnitByID("pds");
         sardakk().addOwnedUnitByID("pds2");
         owns(sardakk(), target, "lodor", UnitType.Pds, 4);

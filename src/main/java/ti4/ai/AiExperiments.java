@@ -19,7 +19,7 @@ public class AiExperiments {
         WIN_AWARE_POINTS,
         AGENDA_SABOTAGE,
         IMPERIAL_POINTS,
-        CUSTODIANS_COVER,
+        CANNON_COVER_RISK,
         BLOCKADE_GROUND,
         EXPLOIT_GUARDS,
         SPEAKER_SALE

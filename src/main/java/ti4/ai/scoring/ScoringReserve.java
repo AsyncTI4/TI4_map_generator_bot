@@ -71,13 +71,21 @@ public class ScoringReserve {
     }
 
     public static SpendCost custodiansReserve(Game game, Player seat) {
-        return custodiansClaim(game, seat).isPresent() ? SpendCost.influence(CustodiansRace.COST) : SpendCost.NONE;
+        if (custodiansClaim(game, seat).isEmpty()) return SpendCost.NONE;
+        return SpendCost.influence(custodiansInfluenceHeld(CustodiansRace.of(game, seat), seat));
+    }
+
+    public static int custodiansInfluenceHeld(CustodiansRace.Snapshot race, Player seat) {
+        double survival = race.coverSurvival(seat);
+        if (survival >= 1) return CustodiansRace.COST;
+        if (survival < CUSTODIANS_RACE_CHANCE) return 0;
+        return (int) Math.ceil(CustodiansRace.COST * survival);
     }
 
     public static Optional<Wallet.Payment> custodiansClaim(Game game, Player seat) {
         if (!isActionPhase(game) || !CustodiansRace.open(game)) return Optional.empty();
         CustodiansRace.Snapshot race = CustodiansRace.of(game, seat);
-        if (!race.canLandThisRound(seat)) return Optional.empty();
+        if (!race.canLandThisRound(seat) || custodiansInfluenceHeld(race, seat) == 0) return Optional.empty();
         if (!holdsUnplayedImperial(game, seat) && !winsTheCustodiansRace(race, seat)) return Optional.empty();
         return planForCustodians(game, seat);
     }

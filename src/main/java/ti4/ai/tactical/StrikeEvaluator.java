@@ -8,13 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CannonDice;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Detailed;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.CombatOdds.Outcome;
+import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.IconStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.PlanetStake;
@@ -56,23 +59,72 @@ class StrikeEvaluator {
 
     // TODO: Mentak Ambush, L4 Disruptors and Titans' planetary PDS are not in the odds
     static StrikeEstimate estimate(Game game, Player seat, Strike strike) {
-        return estimate(game, seat, strike, true);
+        return estimate(game, seat, strike, seat);
+    }
+
+    static StrikeEstimate estimate(Game game, Player seat, Strike strike, Player decider) {
+        return estimate(
+                game, seat, strike, true, AiExperiments.enabled(decider, AiExperiments.Experiment.CANNON_COVER_RISK));
     }
 
     static StrikeEstimate laterSpaceCombat(Game game, Player seat, Strike strike) {
-        return estimate(game, seat, strike, false);
+        return estimate(game, seat, strike, false, false);
     }
 
-    private static StrikeEstimate estimate(Game game, Player seat, Strike strike, boolean openingFire) {
+    private static StrikeEstimate estimate(
+            Game game, Player seat, Strike strike, boolean openingFire, boolean cannonRisk) {
+        Tile target = strike.target();
+        Player opponent = strike.opponent();
+        UnitHolder space = BoardView.space(target);
+        Side attacking = new Side(seat, strike.ships());
+        boolean spaceCombat = !merged(BoardView.ships(space, opponent), strike.extraDefenderShips())
+                .isEmpty();
+        int theirCannon = openingFire ? BattleMath.expectedCannonHits(game, seat, target) : 0;
+        List<Combatant> arriving =
+                CombatForces.combatants(game, target, space, attacking, new Side(opponent, Map.of()), strike.damaged());
+        if (cannonRisk && openingFire && !arriving.isEmpty()) {
+            int hitPoints = hitPoints(arriving);
+            double wiped = DiceOdds.atLeast(CannonDice.againstShipsOf(game, seat, target), hitPoints);
+            if (wiped > 0) {
+                StrikeEstimate survived = afterOpeningFire(
+                        game, seat, strike, openingFire, Math.min(theirCannon, hitPoints - 1), arriving);
+                return blended(survived, wipedOut(seat, strike, spaceCombat), 1 - wiped);
+            }
+        }
+        return afterOpeningFire(game, seat, strike, openingFire, theirCannon, arriving);
+    }
+
+    private static int hitPoints(List<Combatant> ships) {
+        return ships.size() + (int) ships.stream().filter(Combatant::sustain).count();
+    }
+
+    private static StrikeEstimate blended(StrikeEstimate survived, StrikeEstimate wiped, double survival) {
+        double wipe = 1 - survival;
+        return new StrikeEstimate(
+                survival * survived.spaceWin(),
+                survived.escaped(),
+                survived.spaceCombat(),
+                survived.groundCombat(),
+                survived.landings(),
+                survived.groundWins(),
+                survived.groundSent(),
+                survival * survived.ourExpectedLoss() + wipe * wiped.ourExpectedLoss(),
+                survived.ourLossIfWin(),
+                survival * survived.theirExpectedLoss(),
+                survival * survived.spaceKillChance(),
+                survival * survived.groundKillChance(),
+                survival * survived.ourLossChance() + wipe * wiped.ourLossChance(),
+                survived.survivors());
+    }
+
+    private static StrikeEstimate afterOpeningFire(
+            Game game, Player seat, Strike strike, boolean openingFire, int theirCannon, List<Combatant> arriving) {
         Tile target = strike.target();
         Player opponent = strike.opponent();
         UnitHolder space = BoardView.space(target);
         Side attacking = new Side(seat, strike.ships());
         Map<UnitType, Integer> defenderShips = merged(BoardView.ships(space, opponent), strike.extraDefenderShips());
         boolean spaceCombat = !defenderShips.isEmpty();
-        int theirCannon = openingFire ? BattleMath.expectedCannonHits(game, seat, target) : 0;
-        List<Combatant> arriving =
-                CombatForces.combatants(game, target, space, attacking, new Side(opponent, Map.of()), strike.damaged());
         List<Combatant> survivingCannon = BattleMath.afterCannonFire(arriving, theirCannon);
         if (theirCannon > 0 && survivingCannon.isEmpty() && !arriving.isEmpty()) {
             return wipedOut(seat, strike, spaceCombat);
