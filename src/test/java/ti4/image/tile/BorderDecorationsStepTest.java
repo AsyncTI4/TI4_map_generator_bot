@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 class BorderDecorationsStepTest extends BaseTi4Test {
@@ -27,6 +28,31 @@ class BorderDecorationsStepTest extends BaseTi4Test {
         assertThat(pixels(allSides)).isEqualTo(pixels(centredImage(allSides)));
         assertThat(painted(oneSide)).isPositive().isLessThan(painted(allSides));
         assertThat(painted(renderRatNest(List.of()))).isZero();
+    }
+
+    // One-way hyperlane 000 runs N -> S: with "One-way lane hints" on, 104 (where it leads) glows at its north edge,
+    // 101 (where it starts) does not, and nothing glows with the option off.
+    @Test
+    void oneWayLaneHintGlowsOnlyOnTheSystemTheLaneLeadsInto() {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("one-way-hint-test");
+        game.setTile(new Tile("19", "101"));
+        game.setTile(new Tile("20", "104"));
+        game.setTile(new Tile("hl", "000"));
+        game.getCustomHyperlaneData()
+                .put("000", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+
+        assertThat(painted(extras(game, "104"))).isZero();
+        game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
+        BufferedImage target = extras(game, "104");
+        assertThat(target.getRGB(TILE_PADDING + TILE_WIDTH / 2, TILE_PADDING + 3) >>> 24)
+                .isPositive();
+        assertThat(painted(extras(game, "101"))).isZero();
+    }
+
+    private static BufferedImage extras(Game game, String position) {
+        return TileLayers.of(game, null, DisplayType.all).draw(game.getTileByPosition(position), TileStep.Extras);
     }
 
     private static BufferedImage renderRatNest(List<Integer> directions) {
