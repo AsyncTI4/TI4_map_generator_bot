@@ -9,11 +9,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CannonDice;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Force;
+import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
@@ -116,6 +119,7 @@ public final class DefenseOutlook {
     private final Map<String, Optional<List<TacticalPlan>>> intents;
     private final Map<String, Double> spaceChances;
     private Double homeDefenseLevel;
+    private Boolean cannonRisk;
     private Planet anchor;
     private GroundCampaign campaign;
     private boolean anchorKnown;
@@ -920,7 +924,16 @@ public final class DefenseOutlook {
                 new Side(enemy, force.ships()),
                 new Side(seat, Map.of()),
                 force.damaged());
-        return BattleMath.afterCannonFire(arriving, ourCannon).isEmpty() ? 0 : 1;
+        if (arriving.isEmpty() || !cannonRisk())
+            return BattleMath.afterCannonFire(arriving, ourCannon).isEmpty() ? 0 : 1;
+        int hitPoints = arriving.size()
+                + (int) arriving.stream().filter(Combatant::sustain).count();
+        return 1 - DiceOdds.atLeast(CannonDice.fromShooter(game, tile, seat, enemy), hitPoints);
+    }
+
+    private boolean cannonRisk() {
+        if (cannonRisk == null) cannonRisk = AiExperiments.enabled(seat, AiExperiments.Experiment.CANNON_COVER_RISK);
+        return cannonRisk;
     }
 
     private Optional<SpaceFight> spaceFight(Tile tile, IncomingForce force, Defenders defenders) {

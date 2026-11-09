@@ -3,10 +3,13 @@ package ti4.ai.tactical;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -70,11 +73,13 @@ class CannonExposureTest extends BaseTi4Test {
         assertThat(covered.get().score()).isLessThan(open);
     }
 
+    // Old rule, kept for control seats: below half delivery the plan is vetoed. CannonCoverRiskTest has the risk rule.
     @Test
     void rejectsALoneCarrierIntoHeavyCover() {
         test.nekro.setSecret("mp");
         fleet(0);
         solCoversTheTarget(3);
+        AiExperiments.disable(test.nekro, EnumSet.of(Experiment.CANNON_COVER_RISK));
 
         assertThat(expansion()).isEmpty();
     }

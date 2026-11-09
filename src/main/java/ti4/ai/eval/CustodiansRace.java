@@ -24,7 +24,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 
 public final class CustodiansRace {
 
@@ -96,7 +95,7 @@ public final class CustodiansRace {
         private Snapshot(Game game, Player seat) {
             this.game = game;
             this.seat = seat;
-            this.coverOn = seat != null && AiExperiments.enabled(seat, Experiment.CUSTODIANS_COVER);
+            this.coverOn = seat != null && AiExperiments.enabled(seat, Experiment.CANNON_COVER_RISK);
             this.mecatol = custodiansTile(game);
         }
 
@@ -138,7 +137,11 @@ public final class CustodiansRace {
         }
 
         public double winChance(Player seatOfInterest, int arrival, Order order) {
-            double chance = coverSurvival(seatOfInterest);
+            return winChance(seatOfInterest, arrival, order, coverSurvival(seatOfInterest));
+        }
+
+        private double winChance(Player seatOfInterest, int arrival, Order order, double seatSurvival) {
+            double chance = seatSurvival;
             for (Player rival : game.getRealPlayers()) {
                 if (rival == seatOfInterest) continue;
                 OptionalInt theirs = arrival(rival);
@@ -154,29 +157,27 @@ public final class CustodiansRace {
             return survivals.computeIfAbsent(player.getFaction(), faction -> survivalUnderCover(player));
         }
 
-        private double survivalUnderCover(Player player) {
+        public double coverSurvival(Player player, int hitPoints) {
+            if (mecatol == null || !coverOn) return 1.0;
             List<Double> chances = CannonDice.againstShipsOf(game, player, mecatol);
             if (chances.isEmpty()) return 1.0;
+            return 1 - DiceOdds.atLeast(chances, Math.max(1, hitPoints));
+        }
+
+        private double survivalUnderCover(Player player) {
             int hitPoints = transportsOf(player).stream()
                     .mapToInt(transport -> hitPoints(player, transport.tile()))
                     .max()
                     .orElse(1);
-            return 1 - DiceOdds.atLeast(chances, hitPoints);
+            return coverSurvival(player, hitPoints);
         }
 
         private static int hitPoints(Player player, Tile tile) {
             UnitHolder space = BoardView.space(tile);
-            int hitPoints = 0;
-            for (Map.Entry<UnitType, Integer> ship :
-                    BoardView.ships(space, player).entrySet()) {
-                if (!BoardView.MOVING_SHIPS.contains(ship.getKey())) continue;
-                hitPoints += ship.getValue();
-                boolean sustains = BoardView.model(player, ship.getKey())
-                        .filter(UnitModel::getSustainDamage)
-                        .isPresent();
-                if (sustains) hitPoints += BoardView.undamaged(space, player, ship.getKey());
-            }
-            return Math.max(1, hitPoints);
+            Map<UnitType, Integer> ships = BoardView.ships(space, player);
+            Map<UnitType, Integer> damaged = new HashMap<>();
+            ships.keySet().forEach(type -> damaged.put(type, BoardView.damaged(space, player, type)));
+            return CannonDice.landingHitPoints(player, ships, damaged, BoardView.groundForces(space, player));
         }
 
         private boolean blockedByCover(Player player) {
@@ -185,12 +186,16 @@ public final class CustodiansRace {
         }
 
         public double raceValue(Player seatOfInterest, OptionalInt arrival, Order order) {
+            return raceValue(seatOfInterest, arrival, order, coverSurvival(seatOfInterest));
+        }
+
+        public double raceValue(Player seatOfInterest, OptionalInt arrival, Order order, double seatSurvival) {
             if (mecatol == null || arrival.isEmpty()) return 0;
             double prize = ObjectiveValue.VICTORY_POINT_VALUE
                     + MecatolStake.holdValue(game, seatOfInterest)
                     + mecatolPlanetValue()
                     + IconStake.freeValue(game, seatOfInterest, mecatol);
-            return prize * winChance(seatOfInterest, arrival.getAsInt(), order);
+            return prize * winChance(seatOfInterest, arrival.getAsInt(), order, seatSurvival);
         }
 
         private double sameRound(Player seatOfInterest, Player rival, Order order) {

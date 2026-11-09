@@ -109,7 +109,7 @@ final class FractureScreen {
                     Map.of(),
                     StyxTake.RULES,
                     Map.of());
-            StrikeEstimate estimate = StrikeEvaluator.estimate(game, rival, strike);
+            StrikeEstimate estimate = StrikeEvaluator.estimate(game, rival, strike, seat);
             return estimate.spaceWin() * estimate.groundWins().getOrDefault(FracturePrize.STYX, 0.0);
         }
     }

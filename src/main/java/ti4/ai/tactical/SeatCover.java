@@ -2,6 +2,8 @@ package ti4.ai.tactical;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.eval.BoardView;
+import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
@@ -9,6 +11,9 @@ import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 import ti4.service.info.ListPlayerInfoService;
 
 @UtilityClass
@@ -34,6 +39,38 @@ class SeatCover {
             double cannonFire) {
         if (isSeat(game, seat, tile)) return seatSurvives(game, objectives, after, cannonFire);
         return SupplyLines.survival(game, seat, tile, arriving) > 0;
+    }
+
+    static boolean completesAtRisk(Game game, Player seat, Tile tile, List<UnitMove> arriving) {
+        return isSeat(game, seat, tile) || SupplyLines.survival(game, seat, tile, arriving) > 0;
+    }
+
+    static double seatShortfall(
+            Game game, Player seat, Tile tile, ObjectiveValue objectives, Footprint after, List<UnitMove> arriving) {
+        if (!isSeat(game, seat, tile)) return 0;
+        int needed = ListPlayerInfoService.getObjectiveThreshold(OCCUPY_THE_SEAT, game);
+        int reached = objectives.progress(OCCUPY_THE_SEAT, after);
+        if (reached < needed) return 0;
+        int spareHits = reached - needed + freshSustains(seat, tile, arriving);
+        double held = 1 - DiceOdds.atLeast(CannonExposure.dieChances(game, seat, tile), spareHits + 1);
+        return ObjectiveValue.VICTORY_POINT_VALUE * (1 - held);
+    }
+
+    private static int freshSustains(Player seat, Tile tile, List<UnitMove> arriving) {
+        UnitHolder space = BoardView.space(tile);
+        int sustains = 0;
+        for (UnitType type : BoardView.MOVING_SHIPS) {
+            if (!sustains(seat, type)) continue;
+            sustains += BoardView.undamaged(space, seat, type);
+            for (UnitMove move : arriving) {
+                if (move.type() == type) sustains += move.count();
+            }
+        }
+        return sustains;
+    }
+
+    private static boolean sustains(Player seat, UnitType type) {
+        return BoardView.model(seat, type).filter(UnitModel::getSustainDamage).isPresent();
     }
 
     static double shortfall(Game game, Player seat, Tile tile, ObjectiveValue objectives, List<UnitMove> arriving) {
