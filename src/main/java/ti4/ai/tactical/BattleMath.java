@@ -9,15 +9,14 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import ti4.ai.eval.Adjacency;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CannonDice;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
@@ -25,8 +24,6 @@ import ti4.model.UnitModel;
 @UtilityClass
 class BattleMath {
 
-    private static final String XXCHA_MECH = "xxcha_mech";
-    private static final String ARTICLES_OF_WAR = "articles_war";
     private static final String ASSAULT_CANNON = "asc";
     private static final int ASSAULT_CANNON_SHIPS = 3;
 
@@ -55,26 +52,8 @@ class BattleMath {
         return expected;
     }
 
-    record CannonDice(int dice, int hitsOn) {}
-
     static List<CannonDice> cannonDice(Game game, Tile tile, Player shooter, Collection<UnitHolder> leaving) {
-        List<CannonDice> stacks = new ArrayList<>();
-        for (String position : Adjacency.withSystem(game, shooter, tile.getPosition())) {
-            Tile nearby = game.getTileByPosition(position);
-            if (nearby == null) continue;
-            boolean inSystem = nearby == tile;
-            for (UnitHolder holder : nearby.getUnitHolders().values()) {
-                if (leaving.contains(holder)) continue;
-                for (UnitKey key : holder.getUnitKeysForPlayer(shooter)) {
-                    UnitModel model = shooter.getUnitFromUnitKey(key);
-                    if (model == null || (!inSystem && !model.getDeepSpaceCannon(shooter))) continue;
-                    if (XXCHA_MECH.equals(model.getId()) && ButtonHelper.isLawInPlay(game, ARTICLES_OF_WAR)) continue;
-                    int dice = model.getSpaceCannonDieCount(shooter) * holder.getUnitCount(key);
-                    stacks.add(new CannonDice(dice, model.getSpaceCannonHitsOn(shooter)));
-                }
-            }
-        }
-        return stacks;
+        return CannonDice.of(game, tile, shooter, leaving);
     }
 
     static double spaceCannonHits(Player owner, UnitHolder holder) {
@@ -130,7 +109,7 @@ class BattleMath {
     }
 
     static double hitChance(int hitsOn) {
-        return Math.max(0, 11 - hitsOn) / 10.0;
+        return CannonDice.hitChance(hitsOn);
     }
 
     static Map<UnitType, Integer> damagedAmong(UnitHolder holder, Player player, Map<UnitType, Integer> units) {
