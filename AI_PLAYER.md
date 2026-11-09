@@ -925,6 +925,27 @@ to build one by hand:
     - An AI victim pays when the attack would cost more: its planets there, half its ships, every ground force and
       structure on those planets, and the points it would really lose. Details a human writes into an offer are still
       dropped before the AI answers.
+  - **Promise deals** (experiment `PROMISE_DEALS`; `ti4.ai.promise`, `PromiseDeals`, `PromiseDealButtons`). The
+    promisee pays the promiser trade goods for a promise the engine cannot enforce: `VOTE_FOR` (all its votes for one
+    outcome on this agenda), `NO_ATTACK` (no activation of a system holding the promisee's units or planets this round)
+    or `STAY_OUT` (no ships into one system this round). The offer is a public message with Accept/Decline buttons
+    owned by the partner; accepting moves the trade goods with the normal transaction. The record lives in the game
+    stored value `aiPromises` (rolls back with `/game undo`; broken promises stay for later rounds,
+    `PromiseBook.brokenAgainst`).
+    - Values: a vote promise is worth what it shifts the `AgendaForecast` expected utility of each side; a territorial
+      promise is worth 3/4 (the Ceasefire duress share) of the most the promisee could lose (the extortion loss) in a
+      system where the promiser's fleet outguns it, and costs the promiser its best tactical plan minus its best plan
+      the promise still allows. A promise from a human is worth their trust times that.
+    - Prices: the seller asks what the buyer still gains after the buyer's margin, the buyer offers the seller's cost
+      plus the seller's margin (at least 1 trade good, at most 5 for territorial promises); the proposer must keep 0.5.
+      At most 2 offers a round (territorial) and 2 an agenda (votes), one per partner, never with a contender. A seat
+      the Extortion code is already threatening is not also sold peace.
+    - Keeping: tactical plans into a protected system are dropped (also while its own offer stands); a seat that
+      promised its votes casts them all for that outcome. A seat that was promised peace by an AI no longer fears it
+      there, and fears a human promiser half as much.
+    - Breaches: a promiser's command token in a protected system with its units there (or the promisee still there),
+      or its votes on another outcome, marks the promise broken; each broken promise lowers trust by 0.3. The promisee
+      activating the promiser's systems calls a territorial promise off.
   - **Trade holder first.** A seat holding an unplayed _Trade_ starts no note deals or _Military Support_ sales at the
     start of its turn: it plays _Trade_ and settles with its followers first.
   - **Military Support** (`MilitarySupportDeals`). Sol sells it for 1 trade good at the start of any of its own turns

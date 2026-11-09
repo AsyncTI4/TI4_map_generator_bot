@@ -67,7 +67,7 @@ public class AgendaSwing {
                 .orElse(OptionalDouble.empty());
     }
 
-    private static Optional<String> votedFor(Game game, Player player) {
+    public static Optional<String> votedFor(Game game, Player player) {
         for (Map.Entry<String, String> entry : game.getCurrentAgendaVotes().entrySet()) {
             for (String piece : entry.getValue().split(PIECES)) {
                 if (ownedBy(game, piece, player) && NumberUtils.isDigits(afterOwner(piece))) {

@@ -41,6 +41,7 @@ import ti4.ai.explore.ExploreOutlook;
 import ti4.ai.explore.ExploreSite;
 import ti4.ai.explore.ExploreValues;
 import ti4.ai.letnev.GravleashPlan;
+import ti4.ai.promise.PromiseBook;
 import ti4.ai.promissory.PlayAreaNotes;
 import ti4.ai.sardakk.CommanderReach;
 import ti4.ai.scoring.Footprint;
@@ -402,7 +403,7 @@ public class TacticalPlanner {
             plans.addAll(flankSpeedPlans(context, activatable));
         }
         List<TacticalPlan> adjusted = plans.stream()
-                .filter(plan -> !ExtortionPlans.honoured(context.game, context.seat, plan))
+                .filter(plan -> !offLimits(context.game, context.seat, plan))
                 .map(plan -> plan.withScore(plan.score() - marchForfeit(context, plan)))
                 .map(plan -> plan.withScore(plan.score() + heroRoomBonus(context, plan)))
                 .map(plan -> ExtortionPlans.adjust(context.game, context.seat, plan))
@@ -430,7 +431,7 @@ public class TacticalPlanner {
                                 .flatMap(Optional::stream),
                         marches)
                 .filter(plan -> plan.score() >= 0)
-                .filter(plan -> !ExtortionPlans.honoured(game, seat, plan))
+                .filter(plan -> !offLimits(game, seat, plan))
                 .max(Comparator.comparingDouble(TacticalPlan::score))
                 .or(() -> freeStep(context));
     }
@@ -445,7 +446,12 @@ public class TacticalPlanner {
     public static Optional<TacticalPlan> forWarfareTarget(Game game, Player seat, String target) {
         Tile tile = game.getTileByPosition(target);
         if (tile == null) return Optional.empty();
-        return bestFor(Context.tokenFree(game, seat), tile).filter(plan -> !ExtortionPlans.honoured(game, seat, plan));
+        return bestFor(Context.tokenFree(game, seat), tile).filter(plan -> !offLimits(game, seat, plan));
+    }
+
+    static boolean offLimits(Game game, Player seat, TacticalPlan plan) {
+        return ExtortionPlans.honoured(game, seat, plan)
+                || PromiseBook.forbidsActivating(game, seat, game.getTileByPosition(plan.target()));
     }
 
     static double ownAreaBonus(Territory.Zone zone) {
@@ -681,7 +687,7 @@ public class TacticalPlanner {
         try (Thinking.Span ignored = Thinking.enter("tactical.target")) {
             Tile tile = game.getTileByPosition(target);
             if (tile == null) return Optional.empty();
-            return bestFor(new Context(game, seat), tile).filter(plan -> !ExtortionPlans.honoured(game, seat, plan));
+            return bestFor(new Context(game, seat), tile).filter(plan -> !offLimits(game, seat, plan));
         }
     }
 

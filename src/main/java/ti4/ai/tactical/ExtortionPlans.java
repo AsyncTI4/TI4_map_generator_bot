@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiSeats;
+import ti4.ai.promise.PromiseBook;
 import ti4.ai.scoring.WinRace;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -65,8 +67,19 @@ public class ExtortionPlans {
     }
 
     public static double fearOf(Game game, Player enemy, Player seat, Tile tile) {
+        return Math.min(extortionFear(game, enemy, seat, tile), promisedFear(game, enemy, seat, tile));
+    }
+
+    private static double extortionFear(Game game, Player enemy, Player seat, Tile tile) {
         if (!paid(game, enemy, seat) || dealOff(game, enemy, seat)) return 1.0;
         return spared(game, enemy, tile.getPosition()) ? 0.0 : PAID_FEAR;
+    }
+
+    static double promisedFear(Game game, Player enemy, Player seat, Tile tile) {
+        boolean promised = PromiseBook.bindingFor(game, seat).stream()
+                .anyMatch(promise -> promise.isPromiser(enemy) && promise.forbidsActivating(game, tile));
+        if (!promised) return 1.0;
+        return AiSeats.isAiSeat(enemy) ? 0.0 : PAID_FEAR;
     }
 
     static TacticalPlan adjust(Game game, Player seat, TacticalPlan plan) {

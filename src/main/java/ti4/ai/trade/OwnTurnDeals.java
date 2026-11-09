@@ -79,6 +79,7 @@ class OwnTurnDeals {
         Optional<AiDecision> started = timed("trade.techRequest", () -> TechnologyRequest.start(context, partners))
                 .or(() -> timed("trade.desperation", () -> desperation(context, partners)))
                 .or(() -> timed("trade.extortion", () -> Extortion.propose(context, partners)))
+                .or(() -> timed("trade.promises", () -> PromiseDeals.proposeOwnTurn(context, partners)))
                 .or(() -> timed("trade.wash", () -> wash(context, partners, partner -> true)))
                 .or(() -> timed(
                         "trade.noteProposals",
@@ -109,6 +110,7 @@ class OwnTurnDeals {
                 .toList();
         return payDebt(context, creditors)
                 .or(() -> collect(context, partners))
+                .or(() -> timed("trade.votePromises", () -> PromiseDeals.proposeVotes(context, partners)))
                 .or(() -> wash(
                         context,
                         partners,

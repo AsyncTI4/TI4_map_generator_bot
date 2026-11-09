@@ -73,7 +73,11 @@ public final class AgendaForecast {
                 draws(game, viewer, voters.size()),
                 speakerIndex(game, voters),
                 keepsVotesWithRider(game, voters));
-        return new AgendaForecast(frame, remainingVotes(game, frame, placed), placed.castByOutcome(), placed.riders());
+        return PromisedVotes.placeAccepted(
+                game,
+                viewer,
+                new AgendaForecast(
+                        frame, remainingVotes(game, frame, placed), placed.castByOutcome(), placed.riders()));
     }
 
     public boolean isEmpty() {
@@ -125,6 +129,11 @@ public final class AgendaForecast {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
         int index = isEmpty() ? -1 : frame.outcomes().indexOf(outcome);
         return voter < 0 || index < 0 ? 0 : utilities()[voter][index];
+    }
+
+    public int votesLeft(Player player) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        return voter < 0 ? 0 : votes[voter];
     }
 
     public double expectedUtility(Player player) {

@@ -472,6 +472,10 @@ A Player's removal from the Game when they control no Planets, have no ground fo
 To attack a Player who will otherwise win before you get to score, typically by taking a planet in their home System so they cannot score public objectives. AI seats announce it as "We must slay X, Y, Z." and other AI seats read the declared targets.
 _Avoid_: Kingmaking, gank
 
+**Promise deal**:
+Trade goods paid now for a promise the engine cannot enforce: "my votes go to outcome X on this agenda", "I won't attack you this round" (no combat or invasion against your units or planets, no activation of a system holding them) or "I won't move ships into system S this round". Breaking one costs the breaker trust. AI seats always keep theirs.
+_Avoid_: Pact, treaty
+
 **Pop**:
 To play a Strategy card's primary ability, as in "popping Trade".
 _Avoid_: Cast, fire

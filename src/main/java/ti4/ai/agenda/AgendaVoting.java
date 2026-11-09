@@ -257,11 +257,29 @@ public class AgendaVoting {
         String agenda = AgendaPolicy.currentAgenda(game);
         AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
         if (model == null || model.getTarget() == null) return Optional.empty();
-        List<Integer> planetVotes = seat.getReadiedPlanets().stream()
-                .map(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
-                .toList();
+        List<Integer> planetVotes = readiedPlanetVotes(game, seat);
+        Optional<Ballot> promised = PromisedVotes.binding(game, seat)
+                .filter(promise -> castable(game, planetVotes) > 0)
+                .flatMap(promise -> ballotFor(game, promise.target(), castable(game, planetVotes)));
+        if (promised.isPresent()) return promised;
         return BallotPlanner.choose(game, seat, agenda, planetVotes)
                 .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes()));
+    }
+
+    public static int castableVotes(Game game, Player seat) {
+        if (cannotVote(game, seat) || sitsOutThisAgenda(game, seat)) return 0;
+        return castable(game, readiedPlanetVotes(game, seat));
+    }
+
+    private static int castable(Game game, List<Integer> planetVotes) {
+        int available = planetVotes.stream().mapToInt(Integer::intValue).sum();
+        return AgendaRound.keepsAVoteBack(game) ? available - BallotPlanner.reserve(planetVotes) : available;
+    }
+
+    private static List<Integer> readiedPlanetVotes(Game game, Player seat) {
+        return seat.getReadiedPlanets().stream()
+                .map(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
+                .toList();
     }
 
     private static Optional<Ballot> ballotFor(Game game, String outcome, int votes) {

@@ -256,6 +256,7 @@ public class NekroBrain implements FactionBrain {
             SolCommanderRules::next,
             ViscountUnlennSale::answer,
             SpeakerSale::answer,
+            TradeRules::answerPromises,
             ViscountUnlennSale::holdRoll,
             ViscountUnlennSale::offer,
             context -> CombatRules.next(context, NekroBrain::atRoundStart),
