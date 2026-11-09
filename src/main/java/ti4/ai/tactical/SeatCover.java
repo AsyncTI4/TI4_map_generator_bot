@@ -50,7 +50,7 @@ class SeatCover {
         if (!isSeat(game, seat, tile)) return 0;
         int needed = ListPlayerInfoService.getObjectiveThreshold(OCCUPY_THE_SEAT, game);
         int reached = objectives.progress(OCCUPY_THE_SEAT, after);
-        if (objectives.progress(OCCUPY_THE_SEAT, objectives.before()) >= needed || reached < needed) return 0;
+        if (reached < needed) return 0;
         int spareHits = reached - needed + freshSustains(seat, tile, arriving);
         double held = 1 - DiceOdds.atLeast(CannonExposure.dieChances(game, seat, tile), spareHits + 1);
         return ObjectiveValue.VICTORY_POINT_VALUE * (1 - held);

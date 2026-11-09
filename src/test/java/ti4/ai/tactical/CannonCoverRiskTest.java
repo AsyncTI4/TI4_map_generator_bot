@@ -192,6 +192,10 @@ class CannonCoverRiskTest extends BaseTi4Test {
         final Tile launch;
 
         Seat(UnitType holder) {
+            this(holder, 1, 1);
+        }
+
+        Seat(UnitType holder, int holders, int cannons) {
             test.game.setPhaseOfGame("action");
             test.nekroHome();
             test.nekro.setTacticalCC(3);
@@ -202,7 +206,7 @@ class CannonCoverRiskTest extends BaseTi4Test {
             ring = MapPositionMapper.getAdjacentTilePositions("000").stream()
                     .filter(position -> !"x".equals(position))
                     .toList();
-            test.units(rex, "space", test.nekro, holder, 1);
+            test.units(rex, "space", test.nekro, holder, holders);
             launch = test.place("26", ring.get(0));
             test.units(launch, "space", test.nekro, UnitType.Carrier, 1);
             test.units(launch, "space", test.nekro, UnitType.Fighter, 1);
@@ -210,14 +214,17 @@ class CannonCoverRiskTest extends BaseTi4Test {
             test.sol.addPlanet("jord");
             test.sol.removeOwnedUnitByID("pds");
             test.sol.addOwnedUnitByID("pds2");
-            test.units(test.game.getTileByPosition(ring.get(3)), "jord", test.sol, UnitType.Pds, 1);
+            test.units(test.game.getTileByPosition(ring.get(3)), "jord", test.sol, UnitType.Pds, cannons);
         }
 
         double shortfall() {
-            TacticalPlanner.Context context = new TacticalPlanner.Context(test.game, test.nekro);
-            List<UnitMove> moves = List.of(
+            return shortfall(List.of(
                     new UnitMove(launch.getPosition(), "space", UnitType.Carrier, 1),
-                    new UnitMove(launch.getPosition(), "space", UnitType.Fighter, 1));
+                    new UnitMove(launch.getPosition(), "space", UnitType.Fighter, 1)));
+        }
+
+        double shortfall(List<UnitMove> moves) {
+            TacticalPlanner.Context context = new TacticalPlanner.Context(test.game, test.nekro);
             return SeatCover.seatShortfall(
                     test.game,
                     test.nekro,
@@ -242,5 +249,18 @@ class CannonCoverRiskTest extends BaseTi4Test {
         Seat seat = new Seat(UnitType.Dreadnought);
 
         assertThat(seat.shortfall()).isZero();
+    }
+
+    // The objective is already met before the move: three cruisers hold Mecatol Rex. Space cannon offense fires at
+    // every ship of the active player in the active system (LRR 77.2-77.5), not just the arrivals, so moving a
+    // fourth ship in under two PDS II dice (5+, 0.6 each) still risks the point: 2 hits leave 2 ships, P = 0.36.
+    @Test
+    void movingIntoAnAlreadyHeldSeatStillRisksThePoint() {
+        Seat seat = new Seat(UnitType.Cruiser, 3, 2);
+
+        double charge = seat.shortfall(List.of(new UnitMove(seat.launch.getPosition(), "space", UnitType.Carrier, 1)));
+
+        assertThat(charge).isGreaterThan(0);
+        assertThat(charge).isCloseTo(0.36 * VP, within(EXACT));
     }
 }

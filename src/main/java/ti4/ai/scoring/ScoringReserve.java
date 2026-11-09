@@ -76,10 +76,7 @@ public class ScoringReserve {
     }
 
     public static int custodiansInfluenceHeld(CustodiansRace.Snapshot race, Player seat) {
-        double survival = race.coverSurvival(seat);
-        if (survival >= 1) return CustodiansRace.COST;
-        if (survival < CUSTODIANS_RACE_CHANCE) return 0;
-        return (int) Math.ceil(CustodiansRace.COST * survival);
+        return race.coverSurvival(seat) < CUSTODIANS_RACE_CHANCE ? 0 : CustodiansRace.COST;
     }
 
     public static Optional<Wallet.Payment> custodiansClaim(Game game, Player seat) {

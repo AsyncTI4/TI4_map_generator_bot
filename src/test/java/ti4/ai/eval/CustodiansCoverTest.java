@@ -148,11 +148,11 @@ class CustodiansCoverTest extends BaseTi4Test {
                 .isCloseTo(race.raceValue(test.nekro, arrival, Order.UNKNOWN) / 0.4, within(1e-9));
     }
 
-    // The custodians reserve follows the landing's survival. One PDS II die at 5+ leaves a lone carrier 40%, short of
-    // the even chance the race check asks for, so nothing is held. With Antimass Deflectors the die needs a 6 and the
-    // landing survives half the time: half the 6 influence is held.
+    // The custodians reserve is all or nothing: a partial hold cannot pay the 6 influence. One PDS II die at 5+ leaves
+    // a lone carrier 40%, short of the even chance the race check asks for, so nothing is held. With Antimass
+    // Deflectors the die needs a 6 and the landing survives half the time: the full 6 influence is held.
     @Test
-    void holdsCustodiansInfluenceInProportionToSurvival() {
+    void holdsTheFullCustodiansCostOnlyWhenTheLandingLikelySurvives() {
         loadedCarrier(NEKRO_START, test.nekro, 0);
         pdsTwoBesideMecatol(test.sol, SOL_CANNON);
 
@@ -161,8 +161,9 @@ class CustodiansCoverTest extends BaseTi4Test {
 
         test.nekro.addTech("amd");
 
-        assertThat(ScoringReserve.custodiansInfluenceHeld(race(), test.nekro)).isEqualTo(3);
-        assertThat(ScoringReserve.custodiansReserve(test.game, test.nekro)).isEqualTo(SpendCost.influence(3));
+        assertThat(ScoringReserve.custodiansInfluenceHeld(race(), test.nekro)).isEqualTo(CustodiansRace.COST);
+        assertThat(ScoringReserve.custodiansReserve(test.game, test.nekro))
+                .isEqualTo(SpendCost.influence(CustodiansRace.COST));
     }
 
     @Test
