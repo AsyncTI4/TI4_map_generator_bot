@@ -123,11 +123,14 @@ class ShenanigansPlayTest extends BaseTi4Test {
         assertThat(answers(legalText(), hand())).containsExactlyInAnyOrder("generic_button_id_3", "genericReact4");
     }
 
-    // Deadly Plot exhausts all of the player's planets, so the AI only plays it on the last agenda of the phase,
-    // when the planets ready anyway.
+    // Deadly Plot exhausts all of the player's planets, so on the first agenda it costs the seat its votes on the
+    // second one; here Mecatol Rex (6 influence) is still ready, which outweighs Shard's swing. On the last agenda of
+    // the phase the planets ready anyway. EarlyDeadlyPlotTest covers the first-agenda cases.
     @Test
     void keepsDeadlyPlotForTheFinalAgenda() {
         test.nekro.setActionCard("deadly_plot", DEADLY_PLOT_INDEX);
+        test.place("18", "000");
+        test.nekro.addPlanet("mr");
 
         assertThat(answers(plots(), hand())).containsExactlyInAnyOrder("generic_button_id_1", "generic_button_id_2");
 
