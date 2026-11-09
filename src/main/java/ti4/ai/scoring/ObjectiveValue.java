@@ -2,12 +2,15 @@ package ti4.ai.scoring;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
+import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.game.Game;
@@ -37,13 +40,20 @@ public final class ObjectiveValue {
     private static final Set<String> ATTACHMENT_OBJECTIVES = Set.of("lost_outposts", "ancient_monuments");
     private static final Set<String> SPECIALTY_OBJECTIVES = Set.of("research_outposts", "brain_trust");
 
-    private record Target(String id, int threshold, int points, int before) {}
+    private record Target(String id, int threshold, int points, int before, boolean secret) {}
+
+    private record PriceKey(int points, int returned) {}
 
     private final Game game;
     private final Player seat;
     private final Footprint before;
     private final List<Target> targets = new ArrayList<>();
     private final Map<String, Set<String>> systemSets = new HashMap<>();
+    private final Map<PriceKey, Double> completionPrices = new HashMap<>();
+    private final Map<Integer, Double> breakPrices = new HashMap<>();
+    private Boolean winAware;
+    private Integer readyPublicPoints;
+    private Integer freePublicSlots;
 
     public ObjectiveValue(Game game, Player seat) {
         this(game, seat, true);
@@ -56,11 +66,11 @@ public final class ObjectiveValue {
         boolean canScorePublics = Helper.canPlayerScorePOs(game, seat);
         for (String id : game.getRevealedPublicObjectives().keySet()) {
             if (canScorePublics && !ObjectivePolicy.hasScored(game, seat, id)) {
-                addTarget(id, Math.max(1, ObjectivePolicy.victoryPoints(id)));
+                addTarget(id, Math.max(1, ObjectivePolicy.victoryPoints(id)), false);
             }
         }
         if (includeSecrets) {
-            for (String id : ImaginedTurn.unscoredSecrets(seat).keySet()) addTarget(id, 1);
+            for (String id : ImaginedTurn.unscoredSecrets(seat).keySet()) addTarget(id, 1, true);
         }
     }
 
@@ -68,12 +78,12 @@ public final class ObjectiveValue {
         return new ObjectiveValue(game, player, false);
     }
 
-    private void addTarget(String id, int points) {
+    private void addTarget(String id, int points, boolean secret) {
         int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
         if (threshold <= 0) return;
         int progress = progress(id, before);
         if (progress == NOT_MODELLED) return;
-        targets.add(new Target(id, threshold, points, progress));
+        targets.add(new Target(id, threshold, points, progress, secret));
     }
 
     public Footprint before() {
@@ -85,12 +95,23 @@ public final class ObjectiveValue {
     }
 
     public double gain(Footprint after) {
+        return gain(after, 0);
+    }
+
+    public double gain(Footprint after, int pointsReturned) {
+        if (winAware()) return winAwareGain(targets, target -> progress(target.id(), after), pointsReturned);
         double total = 0;
         for (Target target : targets) total += gainOf(target, after);
         return total;
     }
 
     public double traitSecretGain(Footprint after) {
+        if (winAware()) {
+            List<Target> traits = targets.stream()
+                    .filter(target -> TRAIT_SECRETS.containsKey(target.id()))
+                    .toList();
+            return winAwareGain(traits, target -> progress(target.id(), after), 0);
+        }
         double total = 0;
         for (Target target : targets) {
             if (TRAIT_SECRETS.containsKey(target.id())) total += gainOf(target, after);
@@ -109,11 +130,97 @@ public final class ObjectiveValue {
 
     public double gainAt(String id, int progress) {
         if (progress == NOT_MODELLED) return 0;
+        if (winAware()) {
+            List<Target> matching =
+                    targets.stream().filter(target -> target.id().equals(id)).toList();
+            return winAwareGain(matching, target -> progress, 0);
+        }
         double total = 0;
         for (Target target : targets) {
             if (target.id().equals(id)) total += targetGain(target, progress);
         }
         return total;
+    }
+
+    private boolean winAware() {
+        if (winAware == null) winAware = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_AWARE_POINTS);
+        return winAware;
+    }
+
+    private double winAwareGain(List<Target> chosen, ToIntFunction<Target> progressAfter, int pointsReturned) {
+        double total = 0;
+        int secretPoints = 0;
+        int brokenPoints = 0;
+        List<Integer> publicPoints = new ArrayList<>();
+        for (Target target : chosen) {
+            int now = target.before();
+            int then = progressAfter.applyAsInt(target);
+            if (then == NOT_MODELLED || then == now) continue;
+            boolean wasComplete = now >= target.threshold();
+            boolean isComplete = then >= target.threshold();
+            if (wasComplete) {
+                if (!isComplete) brokenPoints += target.points();
+            } else if (!isComplete) {
+                total += partialGain(target, now, then);
+            } else if (target.secret()) {
+                secretPoints += target.points();
+            } else {
+                publicPoints.add(target.points());
+            }
+        }
+        publicPoints.sort(Comparator.reverseOrder());
+        int slots = freePublicSlots();
+        int scoredPoints = secretPoints;
+        for (int index = 0; index < publicPoints.size(); index++) {
+            int points = publicPoints.get(index);
+            if (index < slots) scoredPoints += points;
+            else total += VICTORY_POINT_VALUE * points * PARTIAL_SHARE;
+        }
+        return total + completionPrice(scoredPoints, pointsReturned) - breakPrice(brokenPoints);
+    }
+
+    private double completionPrice(int points, int pointsReturned) {
+        if (points <= pointsReturned) return 0;
+        return completionPrices.computeIfAbsent(new PriceKey(points, pointsReturned), key -> {
+            int base = readyPoints() - key.returned();
+            double stake = ScoringStakes.scoreValue(game, seat, base + key.points())
+                    - ScoringStakes.scoreValue(game, seat, Math.max(0, base));
+            return Math.max(VICTORY_POINT_VALUE * key.points(), stake);
+        });
+    }
+
+    private double breakPrice(int points) {
+        if (points <= 0) return 0;
+        return breakPrices.computeIfAbsent(points, lost -> {
+            int base = readyPoints();
+            double stake =
+                    ScoringStakes.scoreValue(game, seat, base) - ScoringStakes.scoreValue(game, seat, base - lost);
+            return Math.max(VICTORY_POINT_VALUE * lost, stake);
+        });
+    }
+
+    private int readyPoints() {
+        if (readyPublicPoints == null) countReadyPublics();
+        int readySecrets = (int) targets.stream()
+                .filter(target -> target.secret() && target.before() >= target.threshold())
+                .count();
+        return readyPublicPoints + Math.min(1, readySecrets);
+    }
+
+    private int freePublicSlots() {
+        if (freePublicSlots == null) countReadyPublics();
+        return freePublicSlots;
+    }
+
+    private void countReadyPublics() {
+        List<Integer> ready = ObjectivePolicy.scorablePublics(game, seat).stream()
+                .map(ObjectivePolicy::victoryPoints)
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        int chances = ScoringReserve.scoringChances(game, seat);
+        freePublicSlots = Math.max(0, chances - ready.size());
+        readyPublicPoints =
+                ready.stream().limit(chances).mapToInt(Integer::intValue).sum();
     }
 
     private static double targetGain(Target target, int then) {
@@ -158,6 +265,12 @@ public final class ObjectiveValue {
     }
 
     private double oneMoreGain(Set<String> objectives) {
+        if (winAware()) {
+            List<Target> open = targets.stream()
+                    .filter(target -> objectives.contains(target.id()) && target.before() < target.threshold())
+                    .toList();
+            return winAwareGain(open, target -> target.before() + 1, 0);
+        }
         double total = 0;
         for (Target target : targets) {
             int now = target.before();
