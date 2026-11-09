@@ -65,6 +65,7 @@ import ti4.ai.strategy.CardPlanMemory;
 import ti4.ai.strategy.ChecksAndBalances;
 import ti4.ai.strategy.OverruleChoice;
 import ti4.ai.strategy.SecondaryQueue;
+import ti4.ai.strategy.SpeakerSale;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
@@ -254,6 +255,7 @@ public class NekroBrain implements FactionBrain {
             CombatCardRules::cancelHits,
             SolCommanderRules::next,
             ViscountUnlennSale::answer,
+            SpeakerSale::answer,
             ViscountUnlennSale::holdRoll,
             ViscountUnlennSale::offer,
             context -> CombatRules.next(context, NekroBrain::atRoundStart),
@@ -269,6 +271,7 @@ public class NekroBrain implements FactionBrain {
             this::breakAgendaTie,
             ShenanigansRules::react,
             TradeRules::payDebtInAgenda,
+            SpeakerSale::declare,
             this::pickStrategyCard,
             NekroLeaderRules::startAgent,
             CarthAgentRules::start,
@@ -484,12 +487,15 @@ public class NekroBrain implements FactionBrain {
         }
         Optional<AiDecision> giveAway = giveAwayStrategyCard(context);
         if (giveAway.isPresent()) return giveAway;
+        Optional<AiDecision> promised = SpeakerSale.awaitSellerPick(context);
+        if (promised.isPresent()) return promised;
         for (AiPrompt prompt : promptsThisTurn(context)) {
             List<PromptButton> picks = prompt.enabledButtons().stream()
                     .filter(button -> button.handlerId().startsWith("scPick_"))
                     .filter(button -> button.isOwnedBy(context.faction()))
                     .filter(button -> !context.alreadyPressed(prompt, button))
                     .toList();
+            picks = SpeakerSale.withoutPromisedCard(context, picks);
             if (ChecksAndBalances.inPlay(context.game())) {
                 Optional<ChecksAndBalances.Plan> plan = ChecksAndBalances.plan(context.game(), context.seat(), picks);
                 if (plan.isPresent()) {

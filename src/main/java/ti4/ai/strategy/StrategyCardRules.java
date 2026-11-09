@@ -26,7 +26,6 @@ import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.ScoringRules;
-import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
@@ -1063,6 +1062,14 @@ public class StrategyCardRules {
                             .isPresent())
                     .findFirst();
             if (speakerPrompt.isPresent()) {
+                Optional<AiDecision> sale = SpeakerSale.sell(
+                        context,
+                        speakerPrompt.get(),
+                        speakerButtons(context.game(), speakerChoices(context, speakerPrompt.get())));
+                if (sale.isPresent()) {
+                    if (sale.get() instanceof AiDecision.Press) CardMessages.markDone(context, "speaker");
+                    return sale;
+                }
                 CardMessages.markDone(context, "speaker");
                 Optional<PromptButton> choice = speakerChoice(context, speakerPrompt.get());
                 if (choice.isPresent()) {
@@ -1154,11 +1161,24 @@ public class StrategyCardRules {
         return button.handlerId().startsWith(SPEAKER_PREFIX);
     }
 
+    private static Map<Player, PromptButton> speakerButtons(Game game, List<PromptButton> choices) {
+        Map<Player, PromptButton> buttons = new LinkedHashMap<>();
+        for (PromptButton button : choices) {
+            Player player = speakerOf(game, button);
+            if (player != null) buttons.putIfAbsent(player, button);
+        }
+        return buttons;
+    }
+
+    private static List<PromptButton> speakerChoices(AiTurnContext context, AiPrompt prompt) {
+        return prompt.enabledButtons().stream()
+                .filter(button -> button.isOwnedBy(context.faction()) && isSpeakerChoice(button))
+                .toList();
+    }
+
     private static Optional<PromptButton> speakerChoice(AiTurnContext context, AiPrompt prompt) {
         String faction = context.faction();
-        List<PromptButton> choices = prompt.enabledButtons().stream()
-                .filter(button -> button.isOwnedBy(faction) && isSpeakerChoice(button))
-                .toList();
+        List<PromptButton> choices = speakerChoices(context, prompt);
         Optional<PromptButton> self = choices.stream()
                 .filter(button -> button.handlerId().equals(SPEAKER_PREFIX + faction))
                 .findFirst();
@@ -1172,24 +1192,10 @@ public class StrategyCardRules {
     }
 
     private static Optional<PromptButton> speakerByPickPosition(Game game, Player seat, List<PromptButton> choices) {
-        List<PromptButton> safe = choices.stream()
-                .filter(button -> !nearGoal(game, seat, speakerOf(game, button)))
-                .toList();
-        List<PromptButton> candidates = safe.isEmpty() ? choices : safe;
-        return candidates.stream()
-                .min(Comparator.comparingInt((PromptButton button) -> pickPositionAfter(game, seat, button))
-                        .thenComparingInt(button -> victoryPointsOf(game, button)));
-    }
-
-    private static boolean nearGoal(Game game, Player seat, Player candidate) {
-        return candidate != null && ScoringStakes.contender(game, seat, candidate);
-    }
-
-    private static int pickPositionAfter(Game game, Player seat, PromptButton speakerButton) {
-        Player speaker = speakerOf(game, speakerButton);
-        if (speaker == null) return Integer.MAX_VALUE;
-        int position = Helper.getSpeakerOrderFromThisPlayer(speaker, game).indexOf(seat);
-        return position < 0 ? Integer.MAX_VALUE : position;
+        Map<Player, PromptButton> buttons = speakerButtons(game, choices);
+        return SpeakerSale.speakerByPickPosition(game, seat, List.copyOf(buttons.keySet()))
+                .map(buttons::get)
+                .or(() -> choices.stream().findFirst());
     }
 
     private static Player speakerOf(Game game, PromptButton speakerButton) {
