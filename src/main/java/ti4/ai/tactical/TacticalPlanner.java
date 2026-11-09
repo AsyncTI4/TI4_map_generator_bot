@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
@@ -192,7 +193,7 @@ public class TacticalPlanner {
         Optional<TacticalPlan> hold = holdForWarfareBuild(context, all).or(() -> holdForGravityDrive(context, all));
         if (hold.isPresent()) return hold;
         if (stallsWithAStrategyCard(context, all)) return Optional.empty();
-        List<TacticalPlan> plans = withinTokenBudget(all, seat.getTacticalCC() - reservedTokens);
+        List<TacticalPlan> plans = affordable(game, seat, all, seat.getTacticalCC() - reservedTokens);
         if (plans.isEmpty()) return Optional.empty();
         TacticalPlan top = plans.getFirst();
         boolean anotherActionAfter =
@@ -209,6 +210,12 @@ public class TacticalPlanner {
     private static List<TacticalPlan> outweighingTheReserve(Game game, Player seat, List<TacticalPlan> plans) {
         double worth = ScoringReserve.reservedWorth(game, seat);
         return plans.stream().filter(plan -> plan.score() > worth).toList();
+    }
+
+    static List<TacticalPlan> affordable(Game game, Player seat, List<TacticalPlan> plans, int spareTokens) {
+        if (!AiExperiments.enabled(seat, Experiment.TOKEN_PRICE)) return withinTokenBudget(plans, spareTokens);
+        if (plans.isEmpty()) return plans;
+        return TokenPrice.worthTheirToken(plans, spareTokens, TokenPrice.of(game, seat));
     }
 
     static List<TacticalPlan> withinTokenBudget(List<TacticalPlan> plans, int spareTokens) {
