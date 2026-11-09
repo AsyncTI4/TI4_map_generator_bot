@@ -36,6 +36,7 @@ public final class ObjectiveValue {
     public static final Map<String, String> TRAIT_SECRETS =
             Map.of("mp", "industrial", "faa", "cultural", "mrm", "hazardous");
     private static final int STAGE_TWO_POINTS = 2;
+    private static final int SECRETS_PER_STATUS_PHASE = 1;
     public static final int NOT_MODELLED = -1;
     private static final Set<String> ATTACHMENT_OBJECTIVES = Set.of("lost_outposts", "ancient_monuments");
     private static final Set<String> SPECIALTY_OBJECTIVES = Set.of("research_outposts", "brain_trust");
@@ -45,6 +46,8 @@ public final class ObjectiveValue {
     private record StakeKey(int base, int delta) {}
 
     private record ReadyPublic(String id, int points, boolean spend, boolean fresh) {}
+
+    private record SecretScoring(int scoredDelta, int leftoverDelta) {}
 
     private record PhaseScoring(int boardPoints, int scoredPoints, int freshPoints, int leftoverPoints) {}
 
@@ -186,17 +189,28 @@ public final class ObjectiveValue {
         }
         PhaseScoring before = phaseScoring(List.of(), Set.of());
         PhaseScoring after = phaseScoring(completed, broken);
-        int gained = after.freshPoints() + newSecretPoints;
+        int readySecretsBefore = readySecretCount();
+        SecretScoring secrets = secretScoring(readySecretsBefore, newSecretPoints, brokenSecretPoints);
+        int gained = after.freshPoints() + Math.max(0, secrets.scoredDelta());
         if (gained > 0 && gained <= pointsReturned) {
             after = phaseScoring(List.of(), broken);
-            newSecretPoints = 0;
+            secrets = secretScoring(readySecretsBefore, 0, brokenSecretPoints);
             pointsReturned = 0;
         }
-        int flatPoints = after.boardPoints() - before.boardPoints() + newSecretPoints - brokenSecretPoints;
-        int scoredDelta = after.scoredPoints() - before.scoredPoints() + newSecretPoints - brokenSecretPoints;
+        int flatPoints = after.boardPoints() - before.boardPoints() + secrets.scoredDelta();
+        int scoredDelta = after.scoredPoints() - before.scoredPoints() + secrets.scoredDelta();
         int base = before.scoredPoints() + readySecretPoints() - pointsReturned;
-        double leftover = VICTORY_POINT_VALUE * PARTIAL_SHARE * (after.leftoverPoints() - before.leftoverPoints());
+        int leftoverPoints = after.leftoverPoints() - before.leftoverPoints() + secrets.leftoverDelta();
+        double leftover = VICTORY_POINT_VALUE * PARTIAL_SHARE * leftoverPoints;
         return total + leftover + pointPrice(base, scoredDelta, flatPoints);
+    }
+
+    private static SecretScoring secretScoring(int readyBefore, int newSecretPoints, int brokenSecretPoints) {
+        int readyAfter = readyBefore + newSecretPoints - brokenSecretPoints;
+        int scoredBefore = Math.min(SECRETS_PER_STATUS_PHASE, readyBefore);
+        int scoredAfter = Math.min(SECRETS_PER_STATUS_PHASE, readyAfter);
+        int leftoverDelta = (readyAfter - scoredAfter) - (readyBefore - scoredBefore);
+        return new SecretScoring(scoredAfter - scoredBefore, leftoverDelta);
     }
 
     private double pointPrice(int base, int scoredDelta, int flatPoints) {
@@ -212,10 +226,13 @@ public final class ObjectiveValue {
     }
 
     private int readySecretPoints() {
-        long ready = targets.stream()
+        return Math.min(SECRETS_PER_STATUS_PHASE, readySecretCount());
+    }
+
+    private int readySecretCount() {
+        return (int) targets.stream()
                 .filter(target -> target.secret() && target.before() >= target.threshold())
                 .count();
-        return (int) Math.min(1, ready);
     }
 
     private PhaseScoring phaseScoring(List<Target> completed, Set<String> broken) {

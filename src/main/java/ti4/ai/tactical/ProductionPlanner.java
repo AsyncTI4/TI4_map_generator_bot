@@ -20,6 +20,7 @@ import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Threats;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -97,6 +98,7 @@ public class ProductionPlanner {
     private static final int MAX_DEFENSE_BUNDLE_SIZE = 3;
     private static final int MAX_DEFENSE_MECHS = 2;
     private static final double DEFENSE_MIN_VALUE_PER_RESOURCE = 0.5;
+    private static final double BLOCKADED_MIN_VALUE_PER_RESOURCE = ValueScale.RESOURCE;
     private static final double DEFENSE_FOCUS_BIAS = 1.2;
     private static final List<UnitType> DEFENSE_SHIPS =
             List.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
@@ -629,6 +631,7 @@ public class ProductionPlanner {
             DefenseBundle best = null;
             double bestGain = 0;
             double bestPerResource = 0;
+            double bestPaidPerResource = 0;
             for (DefenseBundle bundle : builder.defenseBundles()) {
                 double gain = now - defense.cost(tile, builder.grown(planned, bundle));
                 double bundleCost = Math.max(CHEAPEST_UNIT_COST, builder.cost(bundle.type()) * bundle.count());
@@ -637,9 +640,10 @@ public class ProductionPlanner {
                     best = bundle;
                     bestGain = gain;
                     bestPerResource = perResource;
+                    bestPaidPerResource = gain / bundleCost;
                 }
             }
-            if (best == null || bestPerResource < DEFENSE_MIN_VALUE_PER_RESOURCE) return;
+            if (best == null || !builder.defensePaysFor(bestPerResource, bestPaidPerResource)) return;
             builder.addDefense(best, bestGain);
         }
     }
@@ -1178,6 +1182,11 @@ public class ProductionPlanner {
                     .count();
             boolean focused = bundle.ground() ? planets == 1 : planets >= 2;
             return focused ? DEFENSE_FOCUS_BIAS : 1.0;
+        }
+
+        boolean defensePaysFor(double biasedPerResource, double paidPerResource) {
+            if (groundOnly) return paidPerResource >= BLOCKADED_MIN_VALUE_PER_RESOURCE;
+            return biasedPerResource >= DEFENSE_MIN_VALUE_PER_RESOURCE;
         }
 
         void addDefense(DefenseBundle bundle, double gain) {
