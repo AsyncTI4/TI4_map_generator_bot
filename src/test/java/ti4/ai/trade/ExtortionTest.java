@@ -3,8 +3,10 @@ package ti4.ai.trade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
 import ti4.ai.tactical.ExtortionPlans;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -371,5 +373,38 @@ class ExtortionTest extends BaseTi4Test {
 
         table.points(nekro, 9);
         assertThat(ThroneSale.allowed(table.game, sol, nekro, throne)).isFalse();
+    }
+
+    // A threat saved before the needed field existed (7 fields) still reads back, with nothing needed.
+    @Test
+    void aLegacySevenFieldThreatStillParses() {
+        nekro.setStoredValue("aiExtortionThreat|sol", "3@305~3.0~8.0~0~~0~false");
+
+        Extortion.Threat threat = Extortion.threat(table.game, nekro, sol).orElseThrow();
+        assertThat(threat.demandValue()).isCloseTo(3, within(1e-9));
+        assertThat(threat.needed()).isZero();
+        assertThat(threat.paymentFloor()).isCloseTo(1.8, within(1e-9));
+    }
+
+    // With the guard on, what the AI needed is saved; with it off, the record keeps the old 7-field format.
+    @Test
+    void theNeededFieldIsSavedOnlyWithTheGuard() {
+        Extortion.record(table.game, nekro, sol, new Extortion.Threat(TARGET, 3, 8, 0).needing(2.5));
+        assertThat(Extortion.threat(table.game, nekro, sol).orElseThrow().needed())
+                .isCloseTo(2.5, within(1e-9));
+
+        AiExperiments.disable(nekro, EnumSet.of(AiExperiments.Experiment.EXPLOIT_GUARDS));
+        Extortion.record(table.game, nekro, sol, new Extortion.Threat(TARGET, 3, 8, 0).needing(2.5));
+        assertThat(nekro.getStoredValue("aiExtortionThreat|sol")).isEqualTo("3@305~3.0~8.0~0~~0~false");
+    }
+
+    // The trade-goods demand records the gap it had to beat, so a counter must cover at least that much.
+    @Test
+    void aTradeGoodDemandRecordsWhatTheAttackNeeded() {
+        Extortion.Demand demand =
+                Extortion.demandOf(table.game, nekro, sol, lodor(), 0.5).orElseThrow();
+
+        assertThat(demand.threat().needed()).isCloseTo(0.5, within(1e-9));
+        assertThat(demand.threat().paymentFloor()).isGreaterThanOrEqualTo(0.5);
     }
 }

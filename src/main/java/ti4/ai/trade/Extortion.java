@@ -8,6 +8,8 @@ import java.util.OptionalInt;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -387,20 +389,16 @@ class Extortion {
     }
 
     static void record(Game game, Player extorter, Player victim, Threat threat) {
-        extorter.setStoredValue(
-                THREAT_KEY + victim.getFaction(),
-                game.getRound()
-                        + ROUND
-                        + String.join(
-                                FIELD,
-                                threat.position(),
-                                String.valueOf(threat.demandValue()),
-                                String.valueOf(threat.loss()),
-                                String.valueOf(threat.pointsAtRisk()),
-                                threat.item(),
-                                String.valueOf(threat.stock()),
-                                String.valueOf(threat.resolved()),
-                                String.valueOf(threat.needed())));
+        List<String> fields = new ArrayList<>(List.of(
+                threat.position(),
+                String.valueOf(threat.demandValue()),
+                String.valueOf(threat.loss()),
+                String.valueOf(threat.pointsAtRisk()),
+                threat.item(),
+                String.valueOf(threat.stock()),
+                String.valueOf(threat.resolved())));
+        if (AiExperiments.enabled(extorter, Experiment.EXPLOIT_GUARDS)) fields.add(String.valueOf(threat.needed()));
+        extorter.setStoredValue(THREAT_KEY + victim.getFaction(), game.getRound() + ROUND + String.join(FIELD, fields));
     }
 
     private static Optional<Threat> open(Game game, Player extorter, Player victim) {
@@ -457,7 +455,8 @@ class Extortion {
 
     static boolean paysEnough(Game game, Player extorter, Player victim, Deal deal) {
         return open(game, extorter, victim)
-                .filter(threat -> offered(game, extorter, victim, deal) >= threat.paymentFloor())
+                .filter(threat -> matches(game, threat, extorter, victim, deal)
+                        || offered(game, extorter, victim, deal) >= threat.paymentFloor())
                 .isPresent();
     }
 

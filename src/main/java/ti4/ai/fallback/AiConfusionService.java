@@ -36,7 +36,8 @@ public class AiConfusionService {
             List.of("decline", "pass", "no_", "not follow", "deletebuttons", "done", "skip", "cancel");
     private static final List<String> HIT_CANCEL_HANDLERS =
             List.of("cancelSpaceHits_", "cancelPdsOffenseHits_", "cancelGroundHits_", "cancelAFBHits_");
-    private static final List<String> TURN_ENDERS = List.of("passForRound", "turnEnd");
+    private static final String PASS_FOR_ROUND = "passForRound";
+    private static final String TURN_END = "turnEnd";
     private static final List<String> VOTE_PREFIXES =
             List.of("outcome_", "planetOutcomes_", "exhaustForVotes_", "resolveAgendaVote_", "proceedToFinalizingVote");
     private static final String VOTE = "vote";
@@ -97,17 +98,22 @@ public class AiConfusionService {
         return developer || (userId != null && userId.equals(ownerId));
     }
 
-    public static boolean endsTurnEarly(Game game, Player seat, PromptButton button) {
-        if (!AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS) || !endsTurn(button)) return false;
+    public static boolean passesEarly(Game game, Player seat, PromptButton button) {
+        if (!AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS) || !passesRound(button)) return false;
         return seat.getTacticalCC() > 0 || hasUnplayedStrategyCard(game, seat);
     }
 
-    public static boolean neverDelegated(Player seat, PromptButton button) {
-        return AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS) && (endsTurn(button) || isVote(button));
+    public static boolean neverDelegated(Game game, Player seat, PromptButton button) {
+        if (!AiExperiments.enabled(seat, Experiment.EXPLOIT_GUARDS)) return false;
+        return passesEarly(game, seat, button) || endsTurn(button) || isVote(button);
+    }
+
+    private static boolean passesRound(PromptButton button) {
+        return button.handlerId().startsWith(PASS_FOR_ROUND);
     }
 
     private static boolean endsTurn(PromptButton button) {
-        return TURN_ENDERS.stream().anyMatch(button.handlerId()::startsWith);
+        return button.handlerId().startsWith(TURN_END);
     }
 
     private static boolean isVote(PromptButton button) {
@@ -122,7 +128,7 @@ public class AiConfusionService {
         List<PromptButton> enabled = prompt.enabledButtons().stream()
                 .filter(button -> !AiActuator.opensModal(button.customId()))
                 .filter(button -> !cancelsHits(button))
-                .filter(button -> !endsTurnEarly(game, seat, button))
+                .filter(button -> !passesEarly(game, seat, button))
                 .toList();
         for (String hint : DECLINE_HINTS) {
             Optional<PromptButton> declining = enabled.stream()
@@ -141,7 +147,7 @@ public class AiConfusionService {
                         .filter(button -> !AiActuator.opensModal(button.customId()))
                         .filter(button -> !button.handlerId().startsWith("ultimateUndo"))
                         .filter(button -> !cancelsHits(button))
-                        .filter(button -> !endsTurnEarly(game, seat, button))
+                        .filter(button -> !passesEarly(game, seat, button))
                         .findFirst());
     }
 

@@ -64,16 +64,14 @@ class AiConfusionServiceTest extends BaseTi4Test {
     // A seat with a tactic token or an unplayed strategy card left must not pass the round through the fallback,
     // even though "pass" is a declining hint; it waits for a better option instead.
     @Test
-    void neverPassesOrEndsTheTurnWhileItCanStillAct() {
+    void neverPassesTheRoundWhileItCanStillAct() {
         AiTestGame test = new AiTestGame();
         Player seat = test.nekro;
         seat.setTacticalCC(1);
         AiPrompt pass = prompt("FFCC_nekro_passForRound");
-        AiPrompt endTurn = prompt("FFCC_nekro_turnEnd");
 
         assertThat(AiConfusionService.safeDefault(test.game, seat, pass)).isEmpty();
         assertThat(AiConfusionService.selfPlayChoice(test.game, seat, pass)).isEmpty();
-        assertThat(AiConfusionService.selfPlayChoice(test.game, seat, endTurn)).isEmpty();
 
         seat.setTacticalCC(0);
         seat.addSC(3);
@@ -83,6 +81,20 @@ class AiConfusionServiceTest extends BaseTi4Test {
         assertThat(AiConfusionService.safeDefault(test.game, seat, pass))
                 .map(PromptButton::customId)
                 .contains("FFCC_nekro_passForRound");
+    }
+
+    // End Turn only appears once the turn's action is done, so tokens left over are no reason to hold it back. The
+    // end-of-turn abilities prompt puts End Turn first: the self-play fallback must end the turn, not fire an ability.
+    @Test
+    void endsAFinishedTurnRatherThanPressingAnEndOfTurnAbility() {
+        AiTestGame test = new AiTestGame();
+        Player seat = test.nekro;
+        seat.setTacticalCC(3);
+        AiPrompt endOfTurn = prompt("FFCC_nekro_turnEnd", "FFCC_nekro_exhaustAgent_nekroagent", "useRelic_nanoforge");
+
+        assertThat(AiConfusionService.selfPlayChoice(test.game, seat, endOfTurn))
+                .map(PromptButton::customId)
+                .contains("FFCC_nekro_turnEnd");
     }
 
     // With the experiment off, the old fallback passes even with tactic tokens left.
@@ -98,10 +110,11 @@ class AiConfusionServiceTest extends BaseTi4Test {
                 .contains("FFCC_nekro_passForRound");
     }
 
-    // Passing, ending the turn and agenda votes are never handed to the table to choose.
+    // Passing early, ending the turn and agenda votes are never handed to the table to choose.
     @Test
     void passEndTurnAndVotesAreNeverDelegated() {
         AiTestGame test = new AiTestGame();
+        test.nekro.setTacticalCC(1);
         AiPrompt prompt = prompt(
                 "FFCC_nekro_passForRound",
                 "FFCC_nekro_turnEnd",
@@ -111,13 +124,25 @@ class AiConfusionServiceTest extends BaseTi4Test {
                 "FFCC_nekro_deleteButtons");
 
         assertThat(prompt.buttons().stream()
-                        .filter(button -> !AiConfusionService.neverDelegated(test.nekro, button))
+                        .filter(button -> !AiConfusionService.neverDelegated(test.game, test.nekro, button))
                         .map(PromptButton::customId))
                 .containsExactly("FFCC_nekro_deleteButtons");
 
         AiExperiments.disable(test.nekro, EnumSet.of(Experiment.EXPLOIT_GUARDS));
-        assertThat(prompt.buttons().stream().noneMatch(button -> AiConfusionService.neverDelegated(test.nekro, button)))
+        assertThat(prompt.buttons().stream()
+                        .noneMatch(button -> AiConfusionService.neverDelegated(test.game, test.nekro, button)))
                 .isTrue();
+    }
+
+    // With no tactic token and every strategy card played, passing is the only legal move, so the table may press it.
+    @Test
+    void aForcedPassMayStillBeDelegated() {
+        AiTestGame test = new AiTestGame();
+        test.nekro.setTacticalCC(0);
+        PromptButton pass = prompt("FFCC_nekro_passForRound").buttons().getFirst();
+
+        assertThat(AiConfusionService.neverDelegated(test.game, test.nekro, pass))
+                .isFalse();
     }
 
     // Only the game owner or a bot developer may choose for the AI; with the guard off, anyone may.

@@ -145,6 +145,22 @@ class OfferResponderTest extends BaseTi4Test {
         assertThat(pressed(answer(table, counterOf(table, 2)))).isEqualTo("rejectOffer_blue");
     }
 
+    // Paying exactly what was demanded always settles it, even if the floor has drifted above the item's value.
+    @Test
+    void acceptsTheExactDemandEvenAboveTheFloor() {
+        TradeTable table = extortedSol();
+        Extortion.record(
+                table.game,
+                table.nekro,
+                table.sol,
+                Extortion.threat(table.game, table.nekro, table.sol)
+                        .orElseThrow()
+                        .needing(5));
+
+        assertThat(pressed(answer(table, counterOf(table, 3)))).isEqualTo("acceptOffer_blue_1");
+        assertThat(ExtortionPlans.spared(table.game, table.nekro, "305")).isTrue();
+    }
+
     // With the experiment off, any token payment settles the demand, as before.
     @Test
     void withoutTheGuardAnyCounterSettlesTheDemand() {

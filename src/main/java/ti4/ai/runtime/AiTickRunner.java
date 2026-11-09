@@ -543,7 +543,7 @@ class AiTickRunner {
     private static Predicate<String> delegable(SeatTick tick, AiPrompt prompt) {
         Predicate<String> guarded = customId -> prompt.buttons().stream()
                 .filter(button -> button.customId().equals(customId))
-                .noneMatch(button -> AiConfusionService.neverDelegated(tick.seat(), button));
+                .noneMatch(button -> AiConfusionService.neverDelegated(tick.game(), tick.seat(), button));
         return offerable(tick, prompt).and(guarded);
     }
 
