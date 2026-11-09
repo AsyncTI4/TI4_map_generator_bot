@@ -23,6 +23,7 @@ import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
+import ti4.logging.BotLogger;
 
 @UtilityClass
 public class SpeakerSale {
@@ -62,16 +63,58 @@ public class SpeakerSale {
         return AiExperiments.enabled(buyer, AiExperiments.Experiment.SPEAKER_SALE)
                 && buyer.getTg() >= price
                 && !ScoringStakes.contender(game, buyer, seller)
+                && !aheadLate(game, buyer, seller)
                 && buyerGain(game, buyer, seller) >= price;
     }
 
     static double buyerGain(Game game, Player buyer, Player seller) {
         int seats = game.getRealPlayers().size();
-        int position = Helper.getSpeakerOrderFromThisPlayer(seller, game).indexOf(buyer);
-        if (seats < 2 || position < 0) return 0;
-        int positionsGained = Math.max(0, position - PROMISED_PICK_POSITION);
+        Optional<Player> speakerIfDeclined = speakerIfDeclined(game, buyer, seller);
+        if (seats < 2 || speakerIfDeclined.isEmpty()) return 0;
+        int position = Helper.getSpeakerOrderFromThisPlayer(speakerIfDeclined.get(), game)
+                .indexOf(buyer);
+        if (position < 0) return 0;
+        int positionsGained = position - PROMISED_PICK_POSITION;
         double perks = Math.max(0, SpeakerTokenValue.of(game, buyer) - CardValueScale.SPEAKER);
         return positionsGained * pickPositionValue(seats) + perks;
+    }
+
+    static Optional<Player> speakerIfDeclined(Game game, Player buyer, Player seller) {
+        if (!isSpeaker(game, seller)) return Optional.of(seller);
+        List<Player> others = game.getRealPlayers().stream()
+                .filter(player -> player != seller && player != buyer)
+                .toList();
+        return speakerByPickPosition(game, seller, others);
+    }
+
+    static Optional<Player> speakerByPickPosition(Game game, Player seat, List<Player> candidates) {
+        List<Player> safe = candidates.stream()
+                .filter(candidate -> !ScoringStakes.contender(game, seat, candidate))
+                .filter(candidate -> !refusedBuyer(game, seat, candidate))
+                .toList();
+        List<Player> pool = safe.isEmpty() ? candidates : safe;
+        return pool.stream()
+                .min(Comparator.comparingInt((Player candidate) -> pickPositionAfter(game, seat, candidate))
+                        .thenComparingInt(Player::getTotalVictoryPoints));
+    }
+
+    private static boolean refusedBuyer(Game game, Player seat, Player candidate) {
+        boolean aheadLateNeighbour = candidate == rightNeighbour(game, seat) && aheadLate(game, seat, candidate);
+        return aheadLateNeighbour || turnedDownThisRound(game, seat, candidate);
+    }
+
+    private static boolean turnedDownThisRound(Game game, Player seller, Player candidate) {
+        return SpeakerPromise.read(game)
+                .filter(promise -> promise.soldThisRound(game, seller.getFaction()))
+                .filter(promise -> promise.buyer().equals(candidate.getFaction()))
+                .filter(promise -> promise.status() == SpeakerPromise.Status.DECLINED
+                        || promise.status() == SpeakerPromise.Status.EXPIRED)
+                .isPresent();
+    }
+
+    private static int pickPositionAfter(Game game, Player seat, Player speaker) {
+        int position = Helper.getSpeakerOrderFromThisPlayer(speaker, game).indexOf(seat);
+        return position < 0 ? Integer.MAX_VALUE : position;
     }
 
     static double pickPositionValue(int seats) {
@@ -180,13 +223,19 @@ public class SpeakerSale {
         Game game = context.game();
         Player buyer = game.getPlayerFromColorOrFaction(promise.buyer());
         return switch (promise.status()) {
-            case ACCEPTED ->
-                Optional.ofNullable(buyer == null ? null : choices.get(buyer))
-                        .map(button -> AiDecision.press(
-                                prompt,
-                                button,
-                                "give the speaker token to " + promise.buyer() + ", who paid " + promise.price()
-                                        + " trade goods and lets me pick first"));
+            case ACCEPTED -> {
+                PromptButton button = buyer == null ? null : choices.get(buyer);
+                if (button == null) {
+                    BotLogger.error("AI speaker sale in " + game.getName() + ": " + promise.buyer() + " paid "
+                            + promise.price() + " trade goods but has no speaker button; refund it by hand.");
+                    yield Optional.empty();
+                }
+                yield Optional.of(AiDecision.press(
+                        prompt,
+                        button,
+                        "give the speaker token to " + promise.buyer() + ", who paid " + promise.price()
+                                + " trade goods and lets me pick first"));
+            }
             case OFFERED -> {
                 if (context.now() < promise.expiresAt()) {
                     yield Optional.of(new AiDecision.Wait(promise.expiresAt(), "an answer to the speaker sale"));
@@ -220,16 +269,23 @@ public class SpeakerSale {
                 .persist(game);
         return Optional.of(new AiDecision.Post(
                 prompt.channelId(),
-                offerText(seat, buyer, offer.get().price()),
+                offerText(game, seat, buyer, offer.get().price()),
                 offerButtons(game, seat, buyer, offer.get().price())));
     }
 
-    private static String offerText(Player seller, Player buyer, int price) {
+    private static String offerText(Game game, Player seller, Player buyer, int price) {
         String sellerName = seller.getFactionEmojiOrColor();
-        return buyer.getRepresentationUnfogged() + " " + sellerName + " is resolving Politics and offers you the"
-                + " speaker token for " + price + " trade goods. The deal: you become the speaker now. In the next"
-                + " strategy phase you pick first, but " + sellerName + " names the strategy card it wants when the"
-                + " phase starts and you leave that card for it.";
+        String deal = buyer.getRepresentationUnfogged() + " " + sellerName + " is resolving Politics and offers you"
+                + " the speaker token for " + price + " trade goods. The deal: you become the speaker now. In the"
+                + " next strategy phase you pick first, but " + sellerName + " names the strategy card it wants when"
+                + " the phase starts and you leave that card for it.";
+        String ifDeclined = speakerIfDeclined(game, buyer, seller)
+                .map(other -> other == seller
+                        ? " If you say no, " + sellerName + " takes the token itself."
+                        : " If you say no, " + sellerName + " gives the token to " + other.getFactionEmojiOrColor()
+                                + " instead.")
+                .orElse("");
+        return deal + ifDeclined;
     }
 
     private static List<Button> offerButtons(Game game, Player seller, Player buyer, int price) {

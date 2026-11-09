@@ -81,10 +81,18 @@ class SpeakerSaleTest extends BaseTi4Test {
         changed();
     }
 
-    // Nekro already holds the token, so it cannot keep it; it offers it to jolnar, its right-hand neighbour, for the
-    // user's baseline of 2 trade goods with the first-pick promise.
+    // Nekro already holds the token, so it cannot keep it (LRR 80.6). If jolnar declines, nekro gives the token to
+    // letnev instead, so jolnar would pick second anyway: the deal gains it no pick place, only the speaker's perks.
+    // Holding Mecatol Rex makes those perks 0.5 agenda + 1.5 Imperial = 2, so nekro offers at the 2 trade good
+    // baseline with the first-pick promise.
+    private void jolnarWantsImperial() {
+        jolnar.addPlanet("mr");
+        changed();
+    }
+
     @Test
     void offersTheTokenToTheRightNeighbourWhenItIsSpeaker() {
+        jolnarWantsImperial();
         AiDecision decision = chooseSpeakerAsSpeaker(NOW);
 
         assertThat(decision).isInstanceOf(AiDecision.Post.class);
@@ -92,13 +100,14 @@ class SpeakerSaleTest extends BaseTi4Test {
         assertThat(post.buttons())
                 .extracting(Button::getCustomId)
                 .containsExactly("FFCC_jolnar_speakerBuy_2_nekro", "FFCC_jolnar_speakerNo_2_nekro");
-        assertThat(post.text()).contains("2 trade goods");
+        assertThat(post.text()).contains("2 trade goods").contains("gives the token to");
         assertThat(promise().status()).isEqualTo(SpeakerPromise.Status.OFFERED);
         assertThat(promise().price()).isEqualTo(2);
     }
 
     @Test
     void waitsForTheAnswerWhileTheOfferStands() {
+        jolnarWantsImperial();
         chooseSpeakerAsSpeaker(NOW);
 
         assertThat(chooseSpeakerAsSpeaker(NOW + 1000)).isInstanceOf(AiDecision.Wait.class);
@@ -111,14 +120,16 @@ class SpeakerSaleTest extends BaseTi4Test {
         assertThat(AiTestGame.pressedId(chooseSpeakerAsSpeaker(NOW))).isEqualTo(PREFIX + "jolnar");
     }
 
-    // No answer in time: the offer lapses and nekro falls back to the seat that lets it pick earliest.
+    // No answer in time: the offer lapses. Nekro keeps its word and does not hand jolnar the token for free; it picks
+    // the next seat that lets it pick earliest, letnev, exactly the fallback jolnar priced the offer against.
     @Test
     void anUnansweredOfferLapsesAndFallsBack() {
         storePromise(SpeakerPromise.Status.OFFERED, 2, SpeakerPromise.NOT_DECLARED);
 
         AiDecision decision = chooseSpeakerAsSpeaker(NOW + 120_000);
 
-        assertThat(AiTestGame.pressedId(decision)).isEqualTo(PREFIX + "jolnar");
+        assertThat(AiTestGame.pressedId(decision)).isEqualTo(PREFIX + "letnev");
+        assertThat(SpeakerSale.speakerIfDeclined(test.game, jolnar, test.nekro)).contains(letnev);
         assertThat(promise().status()).isEqualTo(SpeakerPromise.Status.EXPIRED);
     }
 
@@ -158,32 +169,72 @@ class SpeakerSaleTest extends BaseTi4Test {
         assertThat(SpeakerPromise.read(test.game)).isEmpty();
     }
 
-    // Holding Mecatol Rex makes jolnar want first pick for Imperial, worth another 1.5 trade goods to it, so nekro
-    // charges the leader its full valuation, rounded down: 4 positions x 0.6 + 0.5 agenda + 1.5 = 4.4, so 4.
+    // Sol holds the token, so a decline leaves jolnar last. Holding Mecatol Rex makes jolnar want first pick for
+    // Imperial, worth another 1.5 trade goods to it, so nekro charges the leader its full valuation, rounded down:
+    // 4 positions x 0.6 + 0.5 agenda + 1.5 = 4.4, so 4.
     @Test
     void chargesALeaderMoreWhenTheTokenIsWorthMoreToIt() {
+        test.game.setSpeakerUserID(test.sol.getUserID());
         test.points(jolnar, 3);
         jolnar.addPlanet("mr");
         jolnar.setTg(5);
         changed();
 
-        AiDecision decision = chooseSpeakerAsSpeaker(NOW);
+        AiDecision decision = chooseSpeaker(NOW, "nekro", "hacan", "xxcha", "letnev", "jolnar");
 
         assertThat(decision).isInstanceOf(AiDecision.Post.class);
         assertThat(promise().price()).isEqualTo(4);
     }
 
-    // In six seats one pick position is worth 1.5 / 2.5 = 0.6 trade goods; jolnar climbs from last (index 5) to the
-    // promised second choice (index 1), 2.4 trade goods, plus the speaker's agenda perks (0.5: the test table counts
-    // custodians as taken), so it pays 2 but not 3. In three seats it only climbs one place.
+    // Sol holds the token, so if jolnar declines nekro takes it itself and jolnar picks last. In six seats one pick
+    // position is worth 1.5 / 2.5 = 0.6 trade goods; jolnar climbs from last (index 5) to the promised second choice
+    // (index 1), 2.4 trade goods, plus the speaker's agenda perks (0.5: the test table counts custodians as taken), so
+    // it pays 2 but not 3. In three seats it only climbs one place.
     @Test
     void aiBuyerPaysWhenThePickGainCoversThePrice() {
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        assertThat(SpeakerSale.speakerIfDeclined(test.game, jolnar, test.nekro)).contains(test.nekro);
         assertThat(SpeakerSale.buyerGain(test.game, jolnar, test.nekro))
                 .isEqualTo(2.9, org.assertj.core.data.Offset.offset(1e-9));
         assertThat(SpeakerSale.buyerAccepts(test.game, jolnar, test.nekro, 2)).isTrue();
         assertThat(SpeakerSale.buyerAccepts(test.game, jolnar, test.nekro, 3)).isFalse();
 
         jolnar.setTg(1);
+        assertThat(SpeakerSale.buyerAccepts(test.game, jolnar, test.nekro, 2)).isFalse();
+    }
+
+    // Nekro holds the token (LRR 80.6: it cannot keep it). Declining does not leave jolnar last: nekro would then give
+    // the token to letnev, the next seat that lets it pick early, and jolnar picks second. The deal makes jolnar
+    // speaker but still second to pick, so it gains no place and only the 0.5 agenda perk: not worth 2.
+    @Test
+    void aiBuyerPricesTheDealAgainstTheSpeakersRealFallback() {
+        assertThat(SpeakerSale.speakerIfDeclined(test.game, jolnar, test.nekro)).contains(letnev);
+        assertThat(SpeakerSale.buyerGain(test.game, jolnar, test.nekro))
+                .isEqualTo(0.5, org.assertj.core.data.Offset.offset(1e-9));
+        assertThat(SpeakerSale.buyerAccepts(test.game, jolnar, test.nekro, 2)).isFalse();
+
+        // So nekro makes no offer and gives jolnar the token for free, as without the experiment's sale.
+        assertThat(AiTestGame.pressedId(chooseSpeakerAsSpeaker(NOW))).isEqualTo(PREFIX + "jolnar");
+        assertThat(SpeakerPromise.read(test.game)).isEmpty();
+    }
+
+    // Once jolnar has turned the offer down, nekro does not give it the token for free: the fallback matches the
+    // alternative jolnar priced.
+    @Test
+    void aDeclinedBuyerIsNotHandedTheTokenForFree() {
+        storePromise(SpeakerPromise.Status.DECLINED, 2, SpeakerPromise.NOT_DECLARED);
+
+        assertThat(AiTestGame.pressedId(chooseSpeakerAsSpeaker(NOW))).isEqualTo(PREFIX + "letnev");
+    }
+
+    // Late in the game a buyer will not hand first pick to a seller that is ahead of it.
+    @Test
+    void aiBuyerRefusesASellerAheadLate() {
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.points(test.nekro, 3);
+        changed();
+
+        assertThat(SpeakerSale.buyerGain(test.game, jolnar, test.nekro)).isGreaterThan(2);
         assertThat(SpeakerSale.buyerAccepts(test.game, jolnar, test.nekro, 2)).isFalse();
     }
 
@@ -199,6 +250,7 @@ class SpeakerSaleTest extends BaseTi4Test {
 
     @Test
     void aiBuyerPressesBuyOrDecline() {
+        test.game.setSpeakerUserID(test.sol.getUserID());
         storePromise(SpeakerPromise.Status.OFFERED, 2, SpeakerPromise.NOT_DECLARED);
         AiPrompt offer = prompt(
                 "offer", PromptSource.PUBLIC, NOW, "FFCC_jolnar_speakerBuy_2_nekro", "FFCC_jolnar_speakerNo_2_nekro");
