@@ -3,9 +3,11 @@ package ti4.ai.strategy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.secrets.SecretDrawValue;
@@ -164,9 +166,10 @@ class StrategyCardPlannerTest extends BaseTi4Test {
                 .contains(CardValueScale.MECATOL_THREATENED_SHARE * CardValueScale.VICTORY_POINT);
     }
 
-    // Taking Imperial keeps the point away from a Mecatol Rex holder who has not picked yet.
+    // Without IMPERIAL_POINTS, taking Imperial keeps the point away from a Mecatol Rex holder who has not picked yet.
     @Test
     void deniesImperialToAMecatolHolderStillToPick() {
+        AiExperiments.disable(test.nekro, Set.of(AiExperiments.Experiment.IMPERIAL_POINTS));
         placeMecatol();
         test.sol.addPlanet("mr");
         test.game.setSpeaker(test.nekro);
@@ -175,6 +178,17 @@ class StrategyCardPlannerTest extends BaseTi4Test {
         assertThat(StrategyCardRanking.imperialDenial(test.game, test.nekro)).isPositive();
 
         test.sol.addSC(TRADE);
+        assertThat(StrategyCardRanking.imperialDenial(test.game, test.nekro)).isZero();
+    }
+
+    // With IMPERIAL_POINTS, a Nekro that would score nothing extra with Imperial does not take it just to block.
+    @Test
+    void doesNotTakeImperialOnlyToBlockWithoutOwnPointGain() {
+        placeMecatol();
+        test.sol.addPlanet("mr");
+        test.game.setSpeaker(test.nekro);
+        changed();
+
         assertThat(StrategyCardRanking.imperialDenial(test.game, test.nekro)).isZero();
     }
 

@@ -35,6 +35,7 @@ class CardTiming {
         if (claimsWithPeaceAccords(in, plan)) return Timing.NOW;
         if (plan.card() == StrategyCard.LEADERSHIP && LeadershipUses.fundsWantedFollows(in)) return Timing.NOW;
         if (plan.card() == StrategyCard.WARFARE) return warfare(in, plan);
+        if (plan.card() == StrategyCard.IMPERIAL && winsWithImperialNow(in)) return Timing.NOW;
         if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
         Optional<Benefit> main = plan.main();
         if (main.isEmpty()) return Timing.FALLBACK;
@@ -112,6 +113,10 @@ class CardTiming {
         return plan.benefit(CardUse.DIPLOMACY_PROTECT)
                 .filter(benefit -> benefit.hasTarget() && in.isThreatened(tileAt(in.game(), benefit.target())))
                 .isPresent();
+    }
+
+    private static boolean winsWithImperialNow(PlanInputs in) {
+        return ImperialUses.pointsAware(in.game(), in.seat()) && ImperialUses.winsAtOnce(in);
     }
 
     private static boolean yieldsToOverrule(PlanInputs in) {

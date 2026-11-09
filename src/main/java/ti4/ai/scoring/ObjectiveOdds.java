@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.IntToDoubleFunction;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -19,48 +20,66 @@ public class ObjectiveOdds {
     private static final double SPEND_MET = 0.72;
     private static final double[] SPEND_SHORT_BY = {0.6, 0.6, 0.45};
     private static final int FARTHEST_COUNTED = 3;
+    private static final int WITHIN_REACH_STEPS = 1;
+    private static final int PUBLICS_FOR_AN_EXTRA_SCORE = 2;
+    private static final int SECRET_POINTS = 1;
 
-    private record Chance(double byStatus, boolean metNow, int points) {}
+    private record Chance(double byStatus, boolean metNow, int points, boolean withinReach) {}
 
     private record LockIn(int lockedPoints, List<Chance> rest) {}
 
     public record ImperialOdds(double extraPoints, double winSwing) {}
 
-    public static ImperialOdds imperial(Game game, Player player, int mecatolPoints) {
+    public static ImperialOdds imperial(Game game, Player player, int mecatolPoints, double secretChance) {
         List<Chance> chances = chances(game, player);
-        return new ImperialOdds(extraPoints(chances), winSwing(game, player, chances, mecatolPoints));
+        return new ImperialOdds(extraPoints(chances), winSwing(game, player, chances, mecatolPoints, secretChance));
+    }
+
+    public static boolean imperialScoresAnExtraPublic(Game game, Player player) {
+        return chances(game, player).stream().filter(Chance::withinReach).count() >= PUBLICS_FOR_AN_EXTRA_SCORE;
     }
 
     public static double extraPointsWithImperial(Game game, Player seat) {
         return extraPoints(chances(game, seat));
     }
 
-    public static double imperialWinSwing(Game game, Player player, int mecatolPoints) {
-        return winSwing(game, player, chances(game, player), mecatolPoints);
+    public static double imperialWinSwing(Game game, Player player, int mecatolPoints, double secretChance) {
+        return winSwing(game, player, chances(game, player), mecatolPoints, secretChance);
     }
 
     private static double extraPoints(List<Chance> chances) {
         List<LockIn> locks = lockInOptions(chances);
         if (locks.isEmpty()) return expectedSecondBest(chances);
-        return locks.stream()
-                .mapToDouble(lock -> expectedBest(lock.rest()))
+        double withoutImperial = expectedBest(chances);
+        double withImperial = locks.stream()
+                .mapToDouble(lock -> lock.lockedPoints() + expectedBest(lock.rest()))
                 .max()
                 .orElse(0);
+        return Math.max(0, withImperial - withoutImperial);
     }
 
-    private static double winSwing(Game game, Player player, List<Chance> chances, int mecatolPoints) {
+    private static double winSwing(
+            Game game, Player player, List<Chance> chances, int mecatolPoints, double secretChance) {
         int goal = game.getVp();
         if (goal <= 0) return 0;
         int needed = goal - player.getTotalVictoryPoints();
-        double without = reachesWithBest(chances, needed);
+        double without = withSecret(secretChance, needed, left -> reachesWithBest(chances, left));
         List<LockIn> locks = lockInOptions(chances);
         double with = locks.isEmpty()
-                ? reachesWithBestTwo(chances, needed - mecatolPoints)
+                ? withSecret(secretChance, needed - mecatolPoints, left -> reachesWithBestTwo(chances, left))
                 : locks.stream()
-                        .mapToDouble(lock -> reachesWithBest(lock.rest(), needed - mecatolPoints - lock.lockedPoints()))
+                        .mapToDouble(lock -> withSecret(
+                                secretChance,
+                                needed - mecatolPoints - lock.lockedPoints(),
+                                left -> reachesWithBest(lock.rest(), left)))
                         .max()
                         .orElse(0);
         return Math.max(0, with - without);
+    }
+
+    private static double withSecret(double secretChance, int needed, IntToDoubleFunction reaches) {
+        return secretChance * reaches.applyAsDouble(needed - SECRET_POINTS)
+                + (1 - secretChance) * reaches.applyAsDouble(needed);
     }
 
     private static List<LockIn> lockInOptions(List<Chance> chances) {
@@ -158,6 +177,7 @@ public class ObjectiveOdds {
         double bestSpend = 0;
         int spendPoints = 0;
         boolean spendMetNow = false;
+        boolean spendWithinReach = false;
         for (String objective : game.getRevealedPublicObjectives().keySet()) {
             if (Mapper.getPublicObjective(objective) == null || ObjectivePolicy.hasScored(game, seat, objective)) {
                 continue;
@@ -167,15 +187,20 @@ public class ObjectiveOdds {
             Optional<SpendCost> cost = ObjectiveCatalog.spendCost(objective);
             if (cost.isPresent()) {
                 double chance = spendChance(wallet, cost.get());
+                spendWithinReach |= wallet.shortfall(cost.get(), FARTHEST_COUNTED) <= WITHIN_REACH_STEPS;
                 if (chance > bestSpend) spendPoints = points;
                 if (chance == bestSpend) spendPoints = Math.max(spendPoints, points);
                 bestSpend = Math.max(bestSpend, chance);
                 spendMetNow |= metNow;
             } else {
-                chances.add(new Chance(boardChance(game, seat, objective), metNow, points));
+                chances.add(new Chance(
+                        boardChance(game, seat, objective),
+                        metNow,
+                        points,
+                        boardShortBy(game, seat, objective) <= WITHIN_REACH_STEPS));
             }
         }
-        if (bestSpend > 0) chances.add(new Chance(bestSpend, spendMetNow, spendPoints));
+        if (bestSpend > 0) chances.add(new Chance(bestSpend, spendMetNow, spendPoints, spendWithinReach));
         return chances;
     }
 
@@ -197,9 +222,14 @@ public class ObjectiveOdds {
     static double boardChance(Game game, Player seat, String objective) {
         int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
         if (threshold <= 0) return 0;
-        int shortBy =
-                Math.max(0, threshold - ListPlayerInfoService.getPlayerProgressOnObjective(objective, game, seat));
+        int shortBy = boardShortBy(game, seat, objective);
         return shortBy == 0 ? BOARD_MET : BOARD_SHORT_BY[Math.min(FARTHEST_COUNTED, shortBy) - 1];
+    }
+
+    private static int boardShortBy(Game game, Player seat, String objective) {
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
+        if (threshold <= 0) return Integer.MAX_VALUE;
+        return Math.max(0, threshold - ListPlayerInfoService.getPlayerProgressOnObjective(objective, game, seat));
     }
 
     static double atLeastTwo(List<Double> chances) {
