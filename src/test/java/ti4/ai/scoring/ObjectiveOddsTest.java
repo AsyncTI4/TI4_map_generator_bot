@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 // The chance of meeting two public objectives by the status phase, which is what Imperial turns into an extra point.
@@ -73,5 +74,59 @@ class ObjectiveOddsTest extends BaseTi4Test {
 
         test.nekro.setTg(0);
         assertThat(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro)).isCloseTo(0.45 * 0.12, within(1e-9));
+    }
+
+    // With every objective worth 1 VP the expected extra points match the old extra-score chance.
+    @Test
+    void extraPointsMatchTheOldChanceForOnePointObjectives() {
+        reveal("monument");
+        reveal("expand_borders");
+
+        assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro))
+                .isCloseTo(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro), within(1e-9));
+    }
+
+    // Two stage II objectives met: Centralize Galactic Trade (10 trade goods, scored now with Imperial) and Command an
+    // Armada (eight ships in one system, 0.9 by status). The extra public is worth 2 VP, so 1.8 expected points where
+    // the old odds counted 0.9.
+    @Test
+    void stageTwoObjectivesCountTwoPoints() {
+        test.nekro.setTg(10);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Dreadnought, 8);
+        reveal("centralize_trade");
+        reveal("command_armada");
+
+        assertThat(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro)).isCloseTo(0.9, within(1e-9));
+        assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro)).isCloseTo(1.8, within(1e-9));
+    }
+
+    // Raise a Fleet (1 VP, met now) is the only thing Imperial can lock in; the two stage II publics still pending
+    // can only add the better one of them by status. Command an Armada is three ships short (0.12) and Centralize
+    // Galactic Trade is two trade goods short (0.6), so the extra is 2 x (1 - 0.88 x 0.4), not their sum.
+    @Test
+    void aLockedStageOneAddsOnlyTheBestPendingStageTwo() {
+        test.nekro.setTg(8);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Dreadnought, 5);
+        reveal("raise_fleet");
+        reveal("centralize_trade");
+        reveal("command_armada");
+
+        assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro))
+                .isCloseTo(2 * (1 - 0.88 * 0.4), within(1e-9));
+    }
+
+    // At 8 of 10 VP with two 1 VP publics met, the status phase alone reaches 9; Imperial reaches 10 whenever Raise a
+    // Fleet still holds (0.9). Holding Mecatol Rex as well, the Imperial point plus Monument scored with the primary
+    // reach 10 for certain, while without Imperial there is no Mecatol Rex point at all.
+    @Test
+    void winSwingIsTheChanceImperialAloneReachesTheGoal() {
+        test.game.setVp(10);
+        test.points(test.nekro, 8);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Dreadnought, 5);
+        reveal("raise_fleet");
+        reveal("monument");
+
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 0)).isCloseTo(0.9, within(1e-9));
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 1)).isCloseTo(1.0, within(1e-9));
     }
 }

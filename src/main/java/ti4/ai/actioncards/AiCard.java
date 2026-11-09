@@ -67,7 +67,8 @@ record AiCard(
     }
 
     boolean readyToResolve(AiTurnContext context) {
-        return window != Window.AGENDA_WHEN || AgendaCards.revealSettled(context);
+        if (window == Window.AGENDA_WHEN) return AgendaCards.revealSettled(context);
+        return !ShenaniganCards.isShenanigan(this) || ShenaniganCards.othersAnswered(context);
     }
 
     boolean hasTarget() {

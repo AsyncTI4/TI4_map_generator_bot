@@ -67,6 +67,17 @@ public class PlayAreaNotes {
         return cost;
     }
 
+    public static int pointsReturnedOnActivating(Game game, Player seat, Tile tile) {
+        int points = 0;
+        for (String note : seat.getPromissoryNotesInPlayArea()) {
+            if (!note.endsWith(SUPPORT_FOR_THE_THRONE) || !returnsOnActivation(note)) continue;
+            Player owner = game.getPNOwner(note);
+            if (owner == null || owner == seat || !FoWHelper.playerHasUnitsInSystem(owner, tile)) continue;
+            points++;
+        }
+        return points;
+    }
+
     static double lossOf(Game game, Player seat, Player owner, String note) {
         if (note.endsWith(SUPPORT_FOR_THE_THRONE)) return ThronePoint.kept(game, seat, owner);
         if (note.endsWith(NoteGiving.ALLIANCE)) return AllianceValue.lost(game, seat, owner);

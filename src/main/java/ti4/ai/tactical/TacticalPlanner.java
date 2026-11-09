@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
@@ -118,6 +119,7 @@ public class TacticalPlanner {
     private static final int LAST_EARLY_ROUND = 4;
     private static final double EARLY_GAME_FADE_PER_ROUND = 0.25;
     private static final double CUSTODIANS_VALUE = ObjectiveValue.VICTORY_POINT_VALUE;
+    private static final int CUSTODIANS_POINTS = 1;
     private static final double MECATOL_CASH_SHARE = 0.75;
     private static final String DARKEN_THE_SKIES = "dts";
     private static final String BRAVE_THE_VOID = "btv";
@@ -964,7 +966,7 @@ public class TacticalPlanner {
             value += BoardView.planetValue(planet)
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, split[INFANTRY], split[MECH]);
-            if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            if (BoardView.hasCustodians(planet)) value += context.custodiansValue(tile);
             if (isMecatol(context.game, planet)) {
                 value += context.mecatolTakeValue() + context.mecatolCash();
             }
@@ -1041,7 +1043,7 @@ public class TacticalPlanner {
             value += BoardView.planetValue(planet)
                     + planetTempo(context.game)
                     + context.exploreValue(tile, planet, landing[INFANTRY], landing[MECH]);
-            if (BoardView.hasCustodians(planet)) value += CUSTODIANS_VALUE;
+            if (BoardView.hasCustodians(planet)) value += context.custodiansValue(tile);
             if (isMecatol(context.game, planet)) value += context.mecatolTakeValue();
             value += context.expansionZoneBonus(tile);
         }
@@ -3626,6 +3628,9 @@ public class TacticalPlanner {
         private Boolean canPayCustodians;
         private Boolean expectsGravityDrive;
         private Double mecatolCash;
+        private Boolean winAwarePoints;
+        private Double custodiansPrice;
+        private final Map<String, Integer> pointsReturned = new HashMap<>();
         private DefenseOutlook defense;
         private OffenseOutlook offense;
         private Exposure exposure;
@@ -3792,7 +3797,28 @@ public class TacticalPlanner {
         }
 
         double objectiveGain(Tile target, List<UnitMove> moves, Collection<String> gainedPlanets) {
-            return objectives().gain(footprintAfter(target, moves, gainedPlanets));
+            return objectives().gain(footprintAfter(target, moves, gainedPlanets), pointsReturned(target));
+        }
+
+        boolean winAwarePoints() {
+            if (winAwarePoints == null)
+                winAwarePoints = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_AWARE_POINTS);
+            return winAwarePoints;
+        }
+
+        int pointsReturned(Tile target) {
+            if (!winAwarePoints()) return 0;
+            return pointsReturned.computeIfAbsent(
+                    target.getPosition(), position -> PlayAreaNotes.pointsReturnedOnActivating(game, seat, target));
+        }
+
+        double custodiansValue(Tile target) {
+            if (!winAwarePoints()) return CUSTODIANS_VALUE;
+            if (pointsReturned(target) >= CUSTODIANS_POINTS) return 0;
+            if (custodiansPrice == null) {
+                custodiansPrice = Math.max(CUSTODIANS_VALUE, ScoringStakes.scoreValue(game, seat, CUSTODIANS_POINTS));
+            }
+            return custodiansPrice;
         }
 
         double departureLoss(Tile target, List<UnitMove> base, List<UnitMove> extra, Collection<String> landings) {
@@ -3829,7 +3855,7 @@ public class TacticalPlanner {
             for (ProductionPlanner.BuildOrder order : build.orders())
                 built.merge(order.type(), order.units(), Integer::sum);
             ObjectiveValue value = objectives();
-            return value.gain(value.before().withBuilt(tile.getPosition(), built));
+            return value.gain(value.before().withBuilt(tile.getPosition(), built), pointsReturned(tile));
         }
 
         boolean expectsGravityDrive() {

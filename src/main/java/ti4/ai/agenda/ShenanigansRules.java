@@ -3,10 +3,14 @@ package ti4.ai.agenda;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.actioncards.ShenaniganCards;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
@@ -21,6 +25,11 @@ public class ShenanigansRules {
             Set.of("generic_button_id_1", "generic_button_id_2", "generic_button_id_3", "genericReact4");
     private static final List<String> LABELS =
             List.of("No Deadly Plot", "No Bribery", "Refuse Confounding Legal Text", "Refuse Confusing Legal Text");
+    private static final Map<String, String> CARD_OF_LABEL = Map.of(
+            "No Deadly Plot",
+            AgendaSwing.DEADLY_PLOT,
+            "Refuse Confounding Legal Text",
+            AgendaSwing.CONFOUNDING_LEGAL_TEXT);
     private static final long MIN_DELAY_SECONDS = 5;
     private static final int DELAY_SPREAD_SECONDS = 20;
 
@@ -34,11 +43,28 @@ public class ShenanigansRules {
         if (context.now() < next.get().readyAt()) {
             return Optional.of(new AiDecision.Wait(next.get().readyAt(), "the agenda shenanigans"));
         }
+        Optional<AiDecision> play = playInstead(context, next.get().button());
+        if (play.isPresent()) return play;
         return Optional.of(AiDecision.press(
                 next.get().prompt(),
                 next.get().button(),
                 "confirm it plays none of the agenda shenanigans: "
                         + next.get().button().label()));
+    }
+
+    private static boolean experimenting(AiTurnContext context) {
+        return AiExperiments.enabled(context.seat(), Experiment.AGENDA_SABOTAGE);
+    }
+
+    private static Optional<AiDecision> playInstead(AiTurnContext context, PromptButton button) {
+        String title = CARD_OF_LABEL.get(button.label());
+        if (title == null || !experimenting(context)) return Optional.empty();
+        return ShenaniganCards.playIfWorthIt(context, title);
+    }
+
+    private static boolean playingInstead(AiTurnContext context, PromptButton button) {
+        String title = CARD_OF_LABEL.get(button.label());
+        return title != null && experimenting(context) && ShenaniganCards.playing(context, title);
     }
 
     public static boolean isShenanigansButton(PromptButton button) {
@@ -51,6 +77,7 @@ public class ShenanigansRules {
             if (prompt.isHidden() || !AgendaClock.isInThisAgenda(context, prompt)) continue;
             for (PromptButton button : prompt.enabledButtons()) {
                 if (!isShenanigansButton(button) || context.alreadyPressed(prompt, button)) continue;
+                if (playingInstead(context, button)) continue;
                 pending.add(
                         new Pending(prompt, button, prompt.createdAtMillis() + delayMillis(context, prompt, button)));
             }

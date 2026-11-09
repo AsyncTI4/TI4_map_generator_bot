@@ -233,8 +233,14 @@ public class TechRules {
 
     public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
         if (!mayUseProductionBiomes(context)) return Optional.empty();
-        double value = productionBiomesValue(context.game(), context.seat())
-                + Stall.actionValue(context.game(), context.seat());
+        Game game = context.game();
+        Player seat = context.seat();
+        double value = productionBiomesValue(game, seat)
+                + Stall.insteadOfTacticalAction(
+                        game,
+                        seat,
+                        Stall.actionValue(game, seat),
+                        () -> SpendUnlock.pointDelta(game, seat, BIOMES_TRADE_GOODS) > 0);
         if (tacticalActionBeats(context, value)) return Optional.empty();
         return openProductionBiomes(
                 context, thisTurn, "take 4 trade goods with Production Biomes instead of a weak tactical action");

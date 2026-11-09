@@ -2,8 +2,10 @@ package ti4.ai.strategy;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.scoring.ObjectiveOdds;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
@@ -26,9 +28,10 @@ class ImperialUses {
         Game game = in.game();
         Player seat = in.seat();
         boolean holdsMecatol = seat.controlsMecatol(true);
+        PointsSplit points = pointsSplit(in);
         return List.of(
-                new Benefit(CardUse.IMPERIAL_SCORE, CardValueScale.VICTORY_POINT * extraPublicScore(game, seat)),
-                new Benefit(CardUse.IMPERIAL_MECATOL, mecatolValue(in), mecatolPosition(game)),
+                new Benefit(CardUse.IMPERIAL_SCORE, points.score()),
+                new Benefit(CardUse.IMPERIAL_MECATOL, points.mecatol(), mecatolPosition(game)),
                 new Benefit(
                         CardUse.IMPERIAL_SECRET,
                         !holdsMecatol && SecretDraws.worthDrawing(game, seat) ? secretOverFollowing(in) : 0));
@@ -97,8 +100,29 @@ class ImperialUses {
         return mecatol == null ? "" : mecatol.getPosition();
     }
 
-    private static double extraPublicScore(Game game, Player seat) {
-        return ObjectiveOdds.extraScoreWithImperial(game, seat);
+    private record PointsSplit(double score, double mecatol) {}
+
+    private static PointsSplit pointsSplit(PlanInputs in) {
+        Game game = in.game();
+        Player seat = in.seat();
+        double mecatol = mecatolValue(in);
+        if (!pointsAware(seat)) {
+            return new PointsSplit(
+                    CardValueScale.VICTORY_POINT * ObjectiveOdds.extraScoreWithImperial(game, seat), mecatol);
+        }
+        int heldMecatol = seat.controlsMecatol(true) ? 1 : 0;
+        ObjectiveOdds.ImperialOdds odds = ObjectiveOdds.imperial(game, seat, heldMecatol);
+        double flat = mecatol + CardValueScale.VICTORY_POINT * odds.extraPoints();
+        double stake =
+                ScoringStakes.scoreValue(game, seat, mecatol / CardValueScale.VICTORY_POINT + odds.extraPoints());
+        double swing = ScoringStakes.WIN_VALUE * odds.winSwing();
+        double worth = Math.max(flat, Math.max(stake, swing));
+        boolean premiumOnMecatol = holdsThreatenedMecatol(in) || (mecatol > 0 && odds.extraPoints() <= 0);
+        return premiumOnMecatol ? new PointsSplit(0, worth) : new PointsSplit(worth - mecatol, mecatol);
+    }
+
+    private static boolean pointsAware(Player seat) {
+        return AiExperiments.enabled(seat, AiExperiments.Experiment.IMPERIAL_POINTS);
     }
 
     private static boolean takesCustodiansThisRound(Game game, Player seat) {

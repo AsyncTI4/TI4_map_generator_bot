@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.ObjectiveOdds;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -86,14 +89,30 @@ public class StrategyCardRanking {
         List<Player> order = PickStrategyCardService.getSCPickOrder(game);
         int seatIndex = order.indexOf(seat);
         if (seatIndex < 0) return 0;
-        return order.subList(seatIndex + 1, order.size()).stream()
+        List<Player> laterPickers = order.subList(seatIndex + 1, order.size()).stream()
                 .filter(other -> other.getSCs().size() < game.getStrategyCardsPerPlayer())
+                .toList();
+        if (AiExperiments.enabled(seat, AiExperiments.Experiment.IMPERIAL_POINTS)) {
+            return laterPickers.stream()
+                    .mapToDouble(rival -> rivalImperialStake(game, rival))
+                    .max()
+                    .orElse(0);
+        }
+        return laterPickers.stream()
                 .filter(other -> other.controlsMecatol(true))
                 .mapToDouble(other -> CardValueScale.DENIAL_SHARE
                         * CardValueScale.VICTORY_POINT
                         * (closeToWinning(game, other) ? 1 : CardValueScale.DISTANT_DENIAL_SHARE))
                 .max()
                 .orElse(0);
+    }
+
+    private static double rivalImperialStake(Game game, Player rival) {
+        int mecatol = rival.controlsMecatol(true) ? 1 : 0;
+        ObjectiveOdds.ImperialOdds odds = ObjectiveOdds.imperial(game, rival, mecatol);
+        double points = mecatol + odds.extraPoints();
+        double swing = ScoringStakes.WIN_VALUE * odds.winSwing();
+        return Math.max(ScoringStakes.rivalPointStake(game, rival, points), swing);
     }
 
     private static boolean closeToWinning(Game game, Player player) {

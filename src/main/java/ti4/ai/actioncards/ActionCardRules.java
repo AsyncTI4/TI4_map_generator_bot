@@ -18,6 +18,7 @@ import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.secrets.SpyNetwork;
+import ti4.ai.tactical.Stall;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
 import ti4.ai.tactical.TacticalRules;
@@ -67,10 +68,16 @@ public class ActionCardRules {
         Optional<ActionCardValue.Candidate> best = ActionCardValue.bestNewComponentPlay(game, seat);
         if (best.isEmpty()
                 || (!best.get().urgent()
-                        && tacticalActionBeats(context, best.get().value()))) {
+                        && tacticalActionBeats(
+                                context,
+                                withoutStallCredit(game, seat, best.get().value())))) {
             return Optional.empty();
         }
         return startPlay(context, key, best.get().alias(), PlayMoment.IN_TURN);
+    }
+
+    private static double withoutStallCredit(Game game, Player seat, double value) {
+        return Stall.withoutStallCredit(seat, value, Stall.cardActionValue(game, seat));
     }
 
     private static boolean tacticalActionBeats(AiTurnContext context, double actionValue) {
@@ -243,7 +250,7 @@ public class ActionCardRules {
 
     static Optional<AiDecision> startPlay(AiTurnContext context, String key, String alias, Plan plan) {
         Integer index = context.seat().getActionCards().get(alias);
-        Optional<AiCard> card = AiActionCards.of(alias);
+        Optional<AiCard> card = AiActionCards.forPlay(alias);
         if (index == null || card.isEmpty()) return Optional.empty();
         String title = SabotageWindow.title(alias);
         Optional<Match> play = ActionCardHand.playButton(
@@ -374,7 +381,7 @@ public class ActionCardRules {
     }
 
     private static Optional<AiDecision> resolve(AiTurnContext context, String key, CardPlay play) {
-        Optional<AiCard> card = AiActionCards.of(play.alias());
+        Optional<AiCard> card = AiActionCards.forPlay(play.alias());
         Game game = context.game();
         Player seat = context.seat();
         if (card.isEmpty() || censured(game, seat)) return stop(context, key, play, Stage.DONE);
@@ -402,7 +409,7 @@ public class ActionCardRules {
 
     private static void rememberResolveButton(AiTurnContext context, String key, CardPlay play) {
         String handler =
-                AiActionCards.of(play.alias()).map(AiCard::resolveHandler).orElse(null);
+                AiActionCards.forPlay(play.alias()).map(AiCard::resolveHandler).orElse(null);
         if (handler == null || context.memory().has(REF_KEY + key)) return;
         CardPrompts.ownedPublic(
                         context,
@@ -431,7 +438,7 @@ public class ActionCardRules {
     }
 
     private static Optional<AiDecision> target(AiTurnContext context, String key, CardPlay play) {
-        Optional<AiDecision> choice = AiActionCards.of(play.alias())
+        Optional<AiDecision> choice = AiActionCards.forPlay(play.alias())
                 .filter(AiCard::hasTarget)
                 .flatMap(card -> card.target().next(context, key, play));
         if (choice.isPresent()) return choice;
