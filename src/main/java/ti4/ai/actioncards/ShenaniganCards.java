@@ -56,7 +56,7 @@ public class ShenaniganCards {
         boolean holds =
                 seat.getActionCards().keySet().stream().anyMatch(alias -> title.equals(SabotageWindow.title(alias)));
         if (!holds) return Optional.empty();
-        double gain = AgendaSwing.forViewer(game, seat, title, seat);
+        double gain = gainOf(game, seat, title);
         return worthPlaying(game, seat, title, gain)
                 .flatMap(alias -> ActionCardRules.startPlay(context, key, alias, Plan.of(gain)));
     }
@@ -70,6 +70,12 @@ public class ShenaniganCards {
                 .filter(alias -> gain >= ActionCardPrior.keepPrior(alias));
     }
 
+    private static double gainOf(Game game, Player seat, String title) {
+        double swing = AgendaSwing.forViewer(game, seat, title, seat);
+        if (!EarlyDeadlyPlot.applies(game, seat, title)) return swing;
+        return swing - EarlyDeadlyPlot.lostSecondAgendaVotes(game, seat);
+    }
+
     static Optional<AiCard> of(String alias) {
         return CARDS.stream().filter(card -> card.matches().test(alias)).findFirst();
     }
@@ -81,9 +87,16 @@ public class ShenaniganCards {
             case AgendaSwing.CONFOUNDING_LEGAL_TEXT ->
                 AgendaSwing.isElectable(game, seat) && !winner.get().equals(seat.getFaction());
             case AgendaSwing.DEADLY_PLOT ->
-                AgendaRound.isFinalAgenda(game) && AgendaSwing.backedAnotherOutcome(game, seat, winner.get());
+                AgendaSwing.backedAnotherOutcome(game, seat, winner.get())
+                        && mayDeadlyPlotNow(game, seat, winner.get());
             default -> false;
         };
+    }
+
+    private static boolean mayDeadlyPlotNow(Game game, Player seat, String winner) {
+        if (AgendaRound.isFinalAgenda(game)) return true;
+        return EarlyDeadlyPlot.applies(game, seat, AgendaSwing.DEADLY_PLOT)
+                && EarlyDeadlyPlot.worthDiscarding(game, seat, winner);
     }
 
     private static AiCard card(String title, TargetStep target) {

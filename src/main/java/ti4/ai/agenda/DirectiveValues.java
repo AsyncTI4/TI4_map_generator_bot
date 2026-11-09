@@ -189,7 +189,7 @@ class DirectiveValues {
         return 0;
     }
 
-    private static List<Player> seedRecipients(Game game, boolean most) {
+    static List<Player> seedRecipients(Game game, boolean most) {
         List<Player> players = livePlayers(game);
         int target = most
                 ? players.stream().mapToInt(Player::getTotalVictoryPoints).max().orElse(0)
