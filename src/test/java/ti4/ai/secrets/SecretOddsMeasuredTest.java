@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.DecidingSeat;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -45,7 +46,8 @@ class SecretOddsMeasuredTest extends BaseTi4Test {
         test.nekro.setSecret(FORM_A_SPY_NETWORK);
         fiveActionCards(test.nekro);
 
-        assertThat(SecretOdds.chanceReady(test.game, test.nekro, test.nekro)).isCloseTo(1, within(1e-9));
+        assertThat(DecidingSeat.of(test.nekro, () -> SecretOdds.chanceReady(test.game, test.nekro, test.nekro)))
+                .isCloseTo(1, within(1e-9));
     }
 
     @Test

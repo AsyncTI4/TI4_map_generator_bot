@@ -223,7 +223,11 @@ public final class ObjectiveValue {
         for (ReadyPublic ready : readyPublics()) {
             if (!ready.spend() && !broken.contains(ready.id())) board.add(ready);
         }
-        for (Target target : completed) board.add(new ReadyPublic(target.id(), target.points(), false, true));
+        Set<String> alreadyReady = board.stream().map(ReadyPublic::id).collect(java.util.stream.Collectors.toSet());
+        for (Target target : completed) {
+            if (alreadyReady.contains(target.id())) continue;
+            board.add(new ReadyPublic(target.id(), target.points(), false, true));
+        }
         board.sort(Comparator.comparingInt(ReadyPublic::points).reversed().thenComparing(ReadyPublic::fresh));
         int chances = ScoringReserve.scoringChances(game, seat);
         int boardPoints = 0;
@@ -253,6 +257,7 @@ public final class ObjectiveValue {
         if (readyPublics != null) return readyPublics;
         Map<String, ReadyPublic> ready = new HashMap<>();
         for (String id : ObjectivePolicy.scorablePublics(game, seat)) {
+            if (ObjectivePolicy.victoryPoints(id) <= 0 || modelledAsIncomplete(id)) continue;
             boolean spend = ObjectiveCatalog.spendCost(id).isPresent();
             ready.put(id, new ReadyPublic(id, Math.max(1, ObjectivePolicy.victoryPoints(id)), spend, false));
         }
@@ -262,6 +267,14 @@ public final class ObjectiveValue {
         }
         readyPublics = List.copyOf(ready.values());
         return readyPublics;
+    }
+
+    private boolean modelledAsIncomplete(String id) {
+        return targets.stream()
+                .anyMatch(target -> !target.secret()
+                        && target.id().equals(id)
+                        && target.before() != NOT_MODELLED
+                        && target.before() < target.threshold());
     }
 
     private static double targetGain(Target target, int then) {

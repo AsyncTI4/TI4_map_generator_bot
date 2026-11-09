@@ -8,8 +8,8 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FractureCampaign;
-import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
@@ -51,7 +51,7 @@ public class WinRace {
     }
 
     private static Boost ownSecret(Game game, Player seat) {
-        boolean knowsHand = !ImaginedTurn.imagines(seat);
+        boolean knowsHand = DecidingSeat.knowsHandOf(seat);
         int secret =
                 knowsHand && SecretValue.bestScorableStatusSecret(game, seat).isPresent() ? 1 : 0;
         return new Boost(0, 0, 0, false, secret);

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.FracturePrize;
@@ -20,7 +19,6 @@ import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.CopiedTechPolicy;
 import ti4.ai.strategy.MecatolCash;
-import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.game.Game;
@@ -63,7 +61,6 @@ final class OffenseOutlook {
     private final Player seat;
     private final DefenseOutlook defense;
     private final Standings standings;
-    private final double copiedTechTempo;
     private final Map<String, ObjectiveValue> publicViews = new HashMap<>();
     private final Map<String, Double> readyDenials = new HashMap<>();
     private final Map<String, Double> progressLosses = new HashMap<>();
@@ -75,8 +72,6 @@ final class OffenseOutlook {
         this.seat = seat;
         this.defense = defense;
         this.standings = defense.standings();
-        this.copiedTechTempo =
-                AiExperiments.enabled(seat, AiExperiments.Experiment.SPEAKER_AND_TECH) ? ResearchPolicy.TECH_TEMPO : 1;
     }
 
     StrikeValue evaluate(Strike strike, StrikeEstimate estimate, ContextTerms terms, boolean full) {
@@ -441,8 +436,8 @@ final class OffenseOutlook {
         if (!seat.hasAbility(SINGULARITY) || strike.opponent().isNeutral()) return 0;
         List<Double> values = new ArrayList<>(copyableValues(seat, strike.opponent()));
         values.sort(java.util.Comparator.reverseOrder());
-        double best = values.isEmpty() ? 0 : copiedTechTempo * values.get(0);
-        double second = values.size() < 2 ? 0 : copiedTechTempo * values.get(1);
+        double best = values.isEmpty() ? 0 : values.get(0);
+        double second = values.size() < 2 ? 0 : values.get(1);
         if (estimate.spaceCombat()) return best * estimate.spaceKillChance() + second * estimate.groundKillChance();
         return best * estimate.groundKillChance();
     }
@@ -623,7 +618,6 @@ final class OffenseOutlook {
     }
 
     private ObjectiveValue publicView(Player player) {
-        return publicViews.computeIfAbsent(
-                player.getFaction(), faction -> ObjectiveValue.publicOnly(game, player, seat));
+        return publicViews.computeIfAbsent(player.getFaction(), faction -> ObjectiveValue.publicOnly(game, player));
     }
 }

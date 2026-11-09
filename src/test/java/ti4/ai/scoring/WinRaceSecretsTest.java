@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.DecidingSeat;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -73,7 +74,17 @@ class WinRaceSecretsTest extends BaseTi4Test {
     void theSeatsOwnReadyStatusSecretWinsTheRace() {
         nekroOnNineWithAReadySecretAheadOfSol();
 
-        assertThat(WinRace.winnersBefore(test.game, test.nekro)).isEmpty();
+        // Nekro only knows its hand while it is the seat deciding.
+        assertThat(DecidingSeat.of(test.nekro, () -> WinRace.winnersBefore(test.game, test.nekro)))
+                .isEmpty();
+    }
+
+    // Judged by anyone else, Nekro's hand stays hidden, so Sol still looks like it wins first.
+    @Test
+    void anotherSeatJudgingNekroDoesNotSeeItsSecret() {
+        nekroOnNineWithAReadySecretAheadOfSol();
+
+        assertThat(WinRace.winnersBefore(test.game, test.nekro)).containsExactly(test.sol);
     }
 
     @Test

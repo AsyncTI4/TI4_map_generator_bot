@@ -24,6 +24,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.expedition.ExpeditionRules;
 import ti4.ai.explore.CrownOfEmphidiaRules;
 import ti4.ai.explore.ExplorationRules;
@@ -301,6 +302,10 @@ public class NekroBrain implements FactionBrain {
 
     @Override
     public AiDecision decide(AiTurnContext context) {
+        return DecidingSeat.of(context.seat(), () -> firstRuleDecision(context));
+    }
+
+    private AiDecision firstRuleDecision(AiTurnContext context) {
         for (Function<AiTurnContext, Optional<AiDecision>> rule : rules) {
             Optional<AiDecision> decision = rule.apply(context);
             if (decision.isPresent()) return decision.get();

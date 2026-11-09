@@ -27,7 +27,12 @@ public class AiExperiments {
         SPEAKER_AND_TECH
     }
 
+    public static final String OFF_PROPERTY = "ai.experiments.off";
+    private static final Set<Experiment> OFF_EVERYWHERE =
+            parse(System.getProperty(OFF_PROPERTY)).orElse(EnumSet.noneOf(Experiment.class));
+
     public static boolean enabled(Player seat, Experiment experiment) {
+        if (OFF_EVERYWHERE.contains(experiment)) return false;
         String disabled = seat.getStoredValue(DISABLED_KEY);
         if (disabled.isEmpty()) return true;
         return !Arrays.asList(disabled.split(",")).contains(experiment.name());
@@ -47,7 +52,10 @@ public class AiExperiments {
     }
 
     public static Optional<Set<Experiment>> abExperiments() {
-        String value = System.getProperty(AB_PROPERTY);
+        return parse(System.getProperty(AB_PROPERTY));
+    }
+
+    private static Optional<Set<Experiment>> parse(String value) {
         if (value == null || value.isBlank()) return Optional.empty();
         if ("all".equalsIgnoreCase(value.trim())) return Optional.of(EnumSet.allOf(Experiment.class));
         if ("none".equalsIgnoreCase(value.trim())) return Optional.of(EnumSet.noneOf(Experiment.class));

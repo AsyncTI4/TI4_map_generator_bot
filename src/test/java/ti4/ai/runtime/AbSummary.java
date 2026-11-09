@@ -98,7 +98,7 @@ final class AbSummary {
                 results.size(),
                 pairDifferences.size(),
                 meanAndError(pairDifferences),
-                meanAndError(pairWinShares),
+                meanAndError(pairWinShares, 0.5),
                 results.stream()
                         .mapToDouble(GameResult::treatmentPoints)
                         .average()
@@ -110,6 +110,11 @@ final class AbSummary {
     }
 
     static String meanAndError(List<Double> values) {
+        return meanAndError(values, 0);
+    }
+
+    // t is measured against the null hypothesis: 0 for the point difference, 0.5 for the win share.
+    static String meanAndError(List<Double> values, double nullValue) {
         int n = values.size();
         if (n == 0) return "n/a";
         double mean = values.stream().mapToDouble(Double::doubleValue).average().orElse(0);
@@ -119,6 +124,6 @@ final class AbSummary {
                         .sum()
                 / (n - 1);
         double error = Math.sqrt(variance / n);
-        return String.format("%.3f ± %.3f (t %.2f)", mean, error, error == 0 ? 0 : mean / error);
+        return String.format("%.3f ± %.3f (t %.2f)", mean, error, error == 0 ? 0 : (mean - nullValue) / error);
     }
 }

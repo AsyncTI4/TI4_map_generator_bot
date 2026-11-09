@@ -1,19 +1,15 @@
 package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import ti4.ai.AiExperiments;
 import ti4.ai.AiTestGame;
 import ti4.ai.scoring.ObjectiveValue;
-import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -395,25 +391,6 @@ class OffenseTest extends BaseTi4Test {
 
         assertThat(with).isPositive();
         assertThat(without).isZero();
-    }
-
-    // A copied technology is a free research, so the experiment seat counts it at TECH_TEMPO trade goods per research
-    // unit, like the Technology card's free research; a control seat keeps the raw research units.
-    @Test
-    void nekroCountsTheCopiedTechnologyAtTechTempo() {
-        fleetAtHome(1, 2, 0);
-        String target = board.otherNeighbourOfHome();
-        Tile system = board.test.place("47", target);
-        board.test.units(system, "space", board.test.sol, UnitType.Cruiser, 1);
-        board.test.sol.addTech("ff2");
-        board.test.sol.addTech("dd2");
-
-        double experiment = breakdown(target).nekroGain();
-        AiExperiments.disable(nekro(), EnumSet.of(AiExperiments.Experiment.SPEAKER_AND_TECH));
-        double control = breakdown(target).nekroGain();
-
-        assertThat(control).isPositive();
-        assertThat(experiment).isCloseTo(ResearchPolicy.TECH_TEMPO * control, within(1e-9));
     }
 
     @Test

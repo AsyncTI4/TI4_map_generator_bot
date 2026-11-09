@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
-import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -56,11 +56,11 @@ public class SecretOdds {
     }
 
     private static double measuredChanceReady(Game game, Player viewer, Player player) {
-        boolean knowsHand = !ImaginedTurn.imagines(viewer);
+        boolean knowsHand = DecidingSeat.knowsHandOf(viewer);
         if (player == viewer && knowsHand) return measuredOwnReady(game, viewer);
         int held = player.getSo();
         List<String> pool =
-                poolWithout(game, ImaginedTurn.unscoredSecrets(viewer).keySet());
+                poolWithout(game, knowsHand ? viewer.getSecretsUnscored().keySet() : Set.of());
         if (held <= 0 || pool.isEmpty()) return 0;
         ObjectiveValue board = ObjectiveValue.publicOnly(game, player);
         double mean = pool.stream()

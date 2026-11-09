@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.DecidingSeat;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -109,7 +110,8 @@ class SecretOddsTest extends BaseTi4Test {
         fleet(test.nekro, "302");
         test.nekro.setSecret(GATHER_A_MIGHTY_FLEET);
 
-        assertThat(SecretOdds.chanceReady(test.game, test.nekro, test.nekro)).isCloseTo(1, within(1e-9));
+        assertThat(DecidingSeat.of(test.nekro, () -> SecretOdds.chanceReady(test.game, test.nekro, test.nekro)))
+                .isCloseTo(1, within(1e-9));
     }
 
     @Test
