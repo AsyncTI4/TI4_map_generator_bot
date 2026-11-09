@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
 import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
 import ti4.ai.actioncards.DrawnCardValue;
@@ -25,6 +26,7 @@ import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.ScoringRules;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretDrawValue;
@@ -1162,12 +1164,42 @@ public class StrategyCardRules {
                 .findFirst();
         if (self.isPresent()) return self;
         Game game = context.game();
+        if (AiExperiments.enabled(context.seat(), AiExperiments.Experiment.SPEAKER_AND_TECH)) {
+            return speakerByPickPosition(game, context.seat(), choices);
+        }
         return choices.stream().min(Comparator.comparingInt(button -> victoryPointsOf(game, button)));
     }
 
+    private static Optional<PromptButton> speakerByPickPosition(Game game, Player seat, List<PromptButton> choices) {
+        List<PromptButton> safe = choices.stream()
+                .filter(button -> !nearGoal(game, speakerOf(game, button)))
+                .toList();
+        List<PromptButton> candidates = safe.isEmpty() ? choices : safe;
+        return candidates.stream()
+                .min(Comparator.comparingInt((PromptButton button) -> pickPositionAfter(game, seat, button))
+                        .thenComparingInt(button -> victoryPointsOf(game, button)));
+    }
+
+    private static boolean nearGoal(Game game, Player candidate) {
+        int goal = game.getVp();
+        return candidate != null
+                && goal > 0
+                && goal - candidate.getTotalVictoryPoints() <= ScoringStakes.CONTENDER_FROM_GOAL;
+    }
+
+    private static int pickPositionAfter(Game game, Player seat, PromptButton speakerButton) {
+        Player speaker = speakerOf(game, speakerButton);
+        if (speaker == null) return Integer.MAX_VALUE;
+        int position = Helper.getSpeakerOrderFromThisPlayer(speaker, game).indexOf(seat);
+        return position < 0 ? Integer.MAX_VALUE : position;
+    }
+
+    private static Player speakerOf(Game game, PromptButton speakerButton) {
+        return game.getPlayerFromColorOrFaction(StringUtils.removeStart(speakerButton.handlerId(), SPEAKER_PREFIX));
+    }
+
     private static int victoryPointsOf(Game game, PromptButton speakerButton) {
-        Player player =
-                game.getPlayerFromColorOrFaction(StringUtils.removeStart(speakerButton.handlerId(), SPEAKER_PREFIX));
+        Player player = speakerOf(game, speakerButton);
         return player == null ? Integer.MAX_VALUE : player.getTotalVictoryPoints();
     }
 

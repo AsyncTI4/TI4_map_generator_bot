@@ -206,6 +206,17 @@ public class ResearchPolicy {
     }
 
     private static Optional<String> pickBestResearchable(Game game, Player seat) {
+        return best(game, seat, researchable(game, seat));
+    }
+
+    static Optional<String> bestResearchableExcept(Game game, Player seat, String excluded) {
+        List<String> others = researchable(game, seat).stream()
+                .filter(alias -> !alias.equals(excluded))
+                .toList();
+        return best(game, seat, others);
+    }
+
+    private static List<String> researchable(Game game, Player seat) {
         List<String> researchable = new ArrayList<>();
         for (TechnologyType type : TechnologyType.values()) {
             for (TechnologyModel tech :
@@ -213,7 +224,7 @@ public class ResearchPolicy {
                 researchable.add(tech.getAlias());
             }
         }
-        return best(game, seat, researchable);
+        return researchable;
     }
 
     public static double value(Game game, Player seat, String alias) {
@@ -292,6 +303,13 @@ public class ResearchPolicy {
         if (holderReach <= openingReachValue(game, seat, GRAVITY_DRIVE)) return best;
         double drive = value(game, seat, GRAVITY_DRIVE) - openingReachValue(game, seat, GRAVITY_DRIVE) + holderReach;
         return Math.max(best, drive);
+    }
+
+    static Optional<String> firstResearchAsTechnologyHolder(Game game, Player seat) {
+        Optional<String> best = bestResearchable(game, seat);
+        double bestValue = best.map(alias -> value(game, seat, alias)).orElse(0.0);
+        if (bestValueAsTechnologyHolder(game, seat) > bestValue) return Optional.of(GRAVITY_DRIVE);
+        return best;
     }
 
     static double openingReachValue(Game game, Player seat, String alias) {
