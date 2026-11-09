@@ -23,10 +23,23 @@ public class StyxTake {
         return DecisionMemo.remember(() -> compute(game, player), "styx.take", player, game.getRound());
     }
 
+    public static double thisRoundWithout(Game game, Player player, Tile stopped) {
+        return DecisionMemo.remember(
+                () -> compute(game, player, new IncomingForces(game, new IncomingForces.Exclusion(player, stopped))),
+                "styx.take.without",
+                player,
+                stopped.getPosition(),
+                game.getRound());
+    }
+
     private static double compute(Game game, Player player) {
+        return compute(game, player, new IncomingForces(game));
+    }
+
+    private static double compute(Game game, Player player, IncomingForces incoming) {
         Optional<Tile> styx = styxTile(game);
         if (styx.isEmpty() || FracturePrize.holdsStyx(styx.get(), player)) return 0.0;
-        IncomingForce force = new IncomingForces(game).of(player, styx.get(), Horizon.IMMEDIATE);
+        IncomingForce force = incoming.of(player, styx.get(), Horizon.IMMEDIATE);
         if (force.isEmpty() || !force.carriesGround()) return 0.0;
         Strike strike = new Strike(
                 styx.get(),

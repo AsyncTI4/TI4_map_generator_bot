@@ -165,7 +165,15 @@ final class Standings {
 
     double denialWeight(Player target) {
         double threat = winThreat(target);
-        return CALM_DENIAL * hurtWeight(target) * (1 - threat) + WINNING_DENIAL * threat;
+        return calmDenialWeight(target, threat) + WINNING_DENIAL * threat;
+    }
+
+    double calmDenialWeight(Player target) {
+        return calmDenialWeight(target, winThreat(target));
+    }
+
+    private double calmDenialWeight(Player target, double threat) {
+        return CALM_DENIAL * hurtWeight(target) * (1 - threat);
     }
 
     private static double clamp(double value, double low, double high) {

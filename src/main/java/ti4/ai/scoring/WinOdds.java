@@ -1,6 +1,7 @@
 package ti4.ai.scoring;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -11,12 +12,14 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
+import ti4.ai.eval.FracturePrize;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.StyxTake;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.Helper;
 import ti4.service.info.ListPlayerInfoService;
 
@@ -38,19 +41,73 @@ public class WinOdds {
         static final Odds CERTAIN = new Odds(1, 1, 1);
     }
 
+    public record Loss(Set<String> planets, String system, boolean shipsStay) {
+
+        public static final Loss NONE = new Loss(Set.of(), "", false);
+
+        public Loss {
+            planets = Set.copyOf(planets);
+        }
+
+        public static Loss planet(String planet) {
+            return new Loss(Set.of(planet), "", false);
+        }
+
+        public static Loss ships(String position) {
+            return new Loss(Set.of(), position, false);
+        }
+
+        public static Loss locked(String position) {
+            return new Loss(Set.of(), position, true);
+        }
+
+        public static Loss holdings(Collection<String> planets, String shipsLostIn) {
+            return new Loss(new HashSet<>(planets), shipsLostIn, false);
+        }
+
+        public boolean isNone() {
+            return planets.isEmpty() && system.isEmpty();
+        }
+
+        boolean losesShips() {
+            return !system.isEmpty() && !shipsStay;
+        }
+
+        boolean stopsShips() {
+            return !system.isEmpty();
+        }
+    }
+
     public static Odds of(Game game, Player viewer, Player rival) {
         return of(game, viewer, rival, 0);
     }
 
     public static Odds of(Game game, Player viewer, Player rival, int immediatePoints) {
         return DecisionMemo.remember(
-                () -> compute(game, viewer, rival, immediatePoints),
+                () -> compute(game, viewer, rival, immediatePoints, Loss.NONE),
                 "win.odds",
                 viewer,
                 rival,
                 immediatePoints,
                 DecidingSeat.knowsHandOf(viewer),
                 game.getRound());
+    }
+
+    public static Odds without(Game game, Player viewer, Player rival, Loss loss) {
+        if (loss.isNone()) return of(game, viewer, rival);
+        return DecisionMemo.remember(
+                () -> compute(game, viewer, rival, 0, loss),
+                "win.odds.without",
+                viewer,
+                rival,
+                loss,
+                DecidingSeat.knowsHandOf(viewer),
+                game.getRound());
+    }
+
+    public static double finishesBeforeWithout(Game game, Player viewer, Player rival, OptionalInt mine, Loss loss) {
+        if (rival.isNeutral() || rival.isEliminated() || game.getVp() <= 0) return 0;
+        return finishesBefore(without(game, viewer, rival, loss), rival, mine);
     }
 
     public static double reachesGoal(Game game, Player viewer, Player rival) {
@@ -68,7 +125,10 @@ public class WinOdds {
 
     public static double finishesBefore(Game game, Player viewer, Player rival, OptionalInt mine, int immediatePoints) {
         if (rival.isNeutral() || rival.isEliminated() || game.getVp() <= 0) return 0;
-        Odds odds = of(game, viewer, rival, immediatePoints);
+        return finishesBefore(of(game, viewer, rival, immediatePoints), rival, mine);
+    }
+
+    private static double finishesBefore(Odds odds, Player rival, OptionalInt mine) {
         if (mine.isEmpty()) return odds.byStatusEnd();
         int myFinish = mine.getAsInt();
         if (myFinish <= WinRace.DURING_ACTION_PHASE) return 0;
@@ -83,39 +143,59 @@ public class WinOdds {
                 .allMatch(other -> finishesBefore(game, seat, other, mine, given.getOrDefault(other, 0)) < MAJORITY);
     }
 
-    private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints) {
-        int missing = game.getVp() - rival.getTotalVictoryPoints() - immediatePoints;
+    private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
+        int missing = game.getVp() - rival.getTotalVictoryPoints() - immediatePoints + heldPointsLost(rival, loss);
         if (missing <= 0) return Odds.CERTAIN;
+        Board board = Board.of(game, rival, loss);
         boolean acts = !rival.isPassed();
         boolean imperial = ScoringStakes.holdsUnplayedImperial(game, rival);
-        boolean mecatol = rival.controlsMecatol(true);
+        boolean mecatol = rival.controlsMecatol(true) && !losesMecatol(game, loss);
         Grid grid = Grid.start(missing);
-        grid = grid.with(publics(game, rival, imperial, missing));
-        grid = grid.with(secrets(game, viewer, rival, missing, acts));
+        grid = grid.with(publics(game, rival, imperial, missing, board));
+        grid = grid.with(secrets(game, viewer, rival, missing, acts, board));
         if (imperial && mecatol) grid = grid.with(Grid.certain(missing, ONE_POINT, 0));
         if (acts) {
-            grid = grid.with(
-                    Grid.chance(missing, custodiansPoints(imperial, mecatol), 0, custodians(game, viewer, rival)));
-            grid = grid.with(Grid.chance(missing, ONE_POINT, 0, StyxTake.thisRound(game, rival)));
+            grid = grid.with(Grid.chance(
+                    missing, custodiansPoints(imperial, mecatol), 0, custodians(game, viewer, rival, loss)));
+            grid = grid.with(Grid.chance(missing, ONE_POINT, 0, styxTake(game, rival, loss)));
         }
-        if (acts && latviniaReady(game, rival)) grid = grid.with(Grid.certain(missing, ONE_POINT, 0));
-        int crown = crownReady(game, rival) ? ONE_POINT : 0;
+        if (acts && latviniaReady(game, rival, loss)) grid = grid.with(Grid.certain(missing, ONE_POINT, 0));
+        int crown = crownReady(game, rival, loss) ? ONE_POINT : 0;
         return new Odds(grid.actionAtLeast(missing), grid.totalAtLeast(missing, 0), grid.totalAtLeast(missing, crown));
     }
 
-    private static boolean latviniaReady(Game game, Player rival) {
+    private static int heldPointsLost(Player rival, Loss loss) {
+        boolean losesStyx = loss.planets().contains(FracturePrize.STYX)
+                && rival.getPlanets().contains(FracturePrize.STYX);
+        return losesStyx ? ONE_POINT : 0;
+    }
+
+    private static boolean losesMecatol(Game game, Loss loss) {
+        return loss.planets().stream().anyMatch(game.mecatols()::contains);
+    }
+
+    private static double styxTake(Game game, Player rival, Loss loss) {
+        double now = StyxTake.thisRound(game, rival);
+        if (now <= 0 || !loss.stopsShips()) return now;
+        Tile stopped = game.getTileByPosition(loss.system());
+        return stopped == null ? now : StyxTake.thisRoundWithout(game, rival, stopped);
+    }
+
+    private static boolean latviniaReady(Game game, Player rival, Loss loss) {
         if (!rival.hasRelic(BOOK_OF_LATVINIA)) return false;
         Set<String> specialties = new HashSet<>();
         for (String name : rival.getPlanets()) {
+            if (loss.planets().contains(name)) continue;
             Planet planet = game.getUnitHolderFromPlanet(name);
             if (planet != null) specialties.addAll(planet.getTechSpecialities());
         }
         return specialties.size() >= TECH_SPECIALTY_COLORS;
     }
 
-    private static boolean crownReady(Game game, Player rival) {
+    private static boolean crownReady(Game game, Player rival, Loss loss) {
         if (!rival.hasRelic(CROWN_OF_EMPHIDIA)) return false;
         return rival.getPlanets().stream()
+                .filter(name -> !loss.planets().contains(name))
                 .map(game::getUnitHolderFromPlanet)
                 .anyMatch(planet -> planet != null && planet.getTokenList().contains(TOMB_OF_EMPHIDIA));
     }
@@ -124,19 +204,76 @@ public class WinOdds {
         return ONE_POINT + (imperial && !mecatol ? ONE_POINT : 0);
     }
 
-    private static double custodians(Game game, Player viewer, Player rival) {
+    private static double custodians(Game game, Player viewer, Player rival, Loss loss) {
         if (!CustodiansRace.open(game)) return 0;
         CustodiansRace.Snapshot race = CustodiansRace.of(game, viewer);
         if (!race.canLandThisRound(rival)) return 0;
+        if (loss.stopsShips() && !race.canLandThisRoundWithout(rival, loss.system())) return 0;
         OptionalInt arrival = race.arrival(rival);
         if (arrival.isEmpty() || arrival.getAsInt() != game.getRound()) return 0;
         return race.winChance(rival, arrival.getAsInt(), CustodiansRace.Order.KNOWN);
     }
 
+    private static final class Board {
+
+        private static final Board UNCHANGED = new Board(Loss.NONE, null, null, false);
+        private static final Set<String> NOMADIC_ABILITIES = Set.of("nomadic", "mobile_command");
+        private static final String NOMADIC_TECH = "tf-nomadic";
+
+        private final Loss loss;
+        private final ObjectiveValue view;
+        private final Footprint after;
+        private final boolean homeLost;
+
+        private Board(Loss loss, ObjectiveValue view, Footprint after, boolean homeLost) {
+            this.loss = loss;
+            this.view = view;
+            this.after = after;
+            this.homeLost = homeLost;
+        }
+
+        static Board of(Game game, Player rival, Loss loss) {
+            if (loss.isNone()) return UNCHANGED;
+            ObjectiveValue view =
+                    DecisionMemo.remember(() -> ObjectiveValue.publicOnly(game, rival), "win.odds.board", rival);
+            Footprint after = view.before();
+            for (String planet : loss.planets()) after = after.withoutPlanet(planet);
+            if (loss.losesShips()) after = after.withoutShipsIn(loss.system());
+            return new Board(loss, view, after, losesHomePlanet(rival, loss));
+        }
+
+        private static boolean losesHomePlanet(Player rival, Loss loss) {
+            if (NOMADIC_ABILITIES.stream().anyMatch(rival::hasAbility) || rival.hasTech(NOMADIC_TECH)) return false;
+            Tile home = rival.getHomeSystemTile();
+            if (home == null) return false;
+            return home.getPlanetUnitHolders().stream()
+                    .anyMatch(planet -> !planet.isSpaceStation()
+                            && rival.getPlanets().contains(planet.getName())
+                            && loss.planets().contains(planet.getName()));
+        }
+
+        boolean changed() {
+            return view != null;
+        }
+
+        int drop(String id) {
+            if (view == null) return 0;
+            int now = view.progress(id, view.before());
+            int then = view.progress(id, after);
+            if (now == ObjectiveValue.NOT_MODELLED || then == ObjectiveValue.NOT_MODELLED) return 0;
+            return Math.max(0, now - then);
+        }
+
+        Wallet wallet(Wallet wallet) {
+            if (loss.planets().isEmpty()) return wallet;
+            return wallet.without(new Wallet.Payment(List.copyOf(loss.planets()), List.of(), 0, 0));
+        }
+    }
+
     private record Candidate(int points, double chance) {}
 
-    private static Grid publics(Game game, Player rival, boolean imperial, int missing) {
-        List<Candidate> candidates = publicCandidates(game, rival);
+    private static Grid publics(Game game, Player rival, boolean imperial, int missing, Board board) {
+        List<Candidate> candidates = board.homeLost ? List.of() : publicCandidates(game, rival, board);
         int picks = STATUS_PUBLIC_SCORES + (imperial ? IMPERIAL_PUBLIC_SCORES : 0);
         double[][][] byPicks = new double[picks + 1][missing + 1][missing + 1];
         byPicks[0][0][0] = 1;
@@ -166,10 +303,10 @@ public class WinOdds {
         return grid;
     }
 
-    private static List<Candidate> publicCandidates(Game game, Player rival) {
+    private static List<Candidate> publicCandidates(Game game, Player rival, Board board) {
         if (!Helper.canPlayerScorePOs(game, rival)) return List.of();
         List<Candidate> candidates = new ArrayList<>();
-        Wallet wallet = WinRace.projectedWallet(game, rival);
+        Wallet wallet = board.wallet(WinRace.projectedWallet(game, rival));
         int bestSpend = 0;
         for (String id : game.getRevealedPublicObjectives().keySet()) {
             if (ObjectivePolicy.hasScored(game, rival, id)) continue;
@@ -178,14 +315,18 @@ public class WinOdds {
                 if (ready) bestSpend = Math.max(bestSpend, ObjectivePolicy.victoryPoints(id));
                 continue;
             }
-            if (ready) {
+            int drop = board.drop(id);
+            if (ready && drop == 0) {
                 candidates.add(new Candidate(ObjectivePolicy.victoryPoints(id), 1));
                 continue;
             }
             int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
             if (threshold <= 0) continue;
-            int progress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, rival);
-            if (progress >= threshold) continue;
+            int progress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, rival) - drop;
+            if (progress >= threshold) {
+                if (ready) candidates.add(new Candidate(ObjectivePolicy.victoryPoints(id), 1));
+                continue;
+            }
             double chance = SecretOdds.readinessAt(progress, threshold);
             if (chance > 0) candidates.add(new Candidate(ObjectivePolicy.victoryPoints(id), chance));
         }
@@ -196,10 +337,13 @@ public class WinOdds {
         return candidates;
     }
 
-    private static Grid secrets(Game game, Player viewer, Player rival, int missing, boolean acts) {
+    private static Grid secrets(Game game, Player viewer, Player rival, int missing, boolean acts, Board board) {
         double[][] byStatusTaken = new double[STATUS_SECRET_SCORES + 1][missing + 1];
         byStatusTaken[0][0] = 1;
-        for (CardChance card : SecretOdds.readyByCard(game, viewer, rival)) {
+        List<CardChance> cards = board.changed()
+                ? SecretOdds.readyByCard(game, viewer, rival, board.view, board.after)
+                : SecretOdds.readyByCard(game, viewer, rival);
+        for (CardChance card : cards) {
             double[][] next = new double[STATUS_SECRET_SCORES + 1][missing + 1];
             double actionChance = acts ? card.action() : 0;
             double none = 1 - card.status() - actionChance;

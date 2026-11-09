@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.eval.DecidingSeat;
+import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -82,10 +83,26 @@ public class SecretOdds {
                 poolWithout(game, knowsHand ? viewer.getSecretsUnscored().keySet() : Set.of());
         if (held <= 0 || pool.isEmpty()) return List.of();
         ObjectiveValue board = ObjectiveValue.publicOnly(game, player);
+        return unseenReadyByCard(game, board, player, board.before(), pool, held);
+    }
+
+    public static List<CardChance> readyByCard(
+            Game game, Player viewer, Player player, ObjectiveValue board, Footprint footprint) {
+        boolean knowsHand = DecidingSeat.knowsHandOf(viewer);
+        if (player == viewer && knowsHand) return ownReadyByCard(game, viewer);
+        int held = player.getSo();
+        List<String> pool =
+                poolWithout(game, knowsHand ? viewer.getSecretsUnscored().keySet() : Set.of());
+        if (held <= 0 || pool.isEmpty()) return List.of();
+        return unseenReadyByCard(game, board, player, footprint, pool, held);
+    }
+
+    private static List<CardChance> unseenReadyByCard(
+            Game game, ObjectiveValue board, Player player, Footprint footprint, List<String> pool, int held) {
         double status = 0;
         double action = 0;
         for (String id : pool) {
-            double readiness = measuredReadiness(game, board, player, id);
+            double readiness = measuredReadiness(game, board, player, id, footprint);
             SecretPhase phase = SecretPhase.of(id);
             if (phase == SecretPhase.ACTION) action += readiness;
             else if (phase != SecretPhase.AGENDA) status += readiness;
@@ -126,9 +143,14 @@ public class SecretOdds {
     }
 
     private static double measuredReadiness(Game game, ObjectiveValue board, Player player, String id) {
+        return measuredReadiness(game, board, player, id, board.before());
+    }
+
+    private static double measuredReadiness(
+            Game game, ObjectiveValue board, Player player, String id, Footprint footprint) {
         int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
         if (threshold <= 0) return BASE_RATE;
-        int progress = board.progress(id, board.before());
+        int progress = board.progress(id, footprint);
         if (progress == ObjectiveValue.NOT_MODELLED) {
             progress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player);
         }
