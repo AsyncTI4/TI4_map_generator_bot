@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -21,7 +20,6 @@ import ti4.helpers.FoWHelper;
 import ti4.image.io.Fonts;
 import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
-import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
 import ti4.service.fow.FogMemoryService;
 import ti4.service.fow.FogViewer;
@@ -82,11 +80,7 @@ public final class SystemContextImage {
             tileMap.remove(null);
 
             Set<String> tiles = tileMap.keySet();
-            Set<String> tilesWithExtra =
-                    new HashSet<>(game.getAdjacentTileOverrides().values());
-            tilesWithExtra.addAll(game.getBorderAnomalies().stream()
-                    .map(BorderAnomalyHolder::getTile)
-                    .collect(Collectors.toSet()));
+            Set<String> tilesWithExtra = ExtrasStepTiles.positions(game);
 
             tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
             tilesWithExtra.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
