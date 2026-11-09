@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.GameHorizon;
+import ti4.ai.scoring.WinRace;
 import ti4.ai.strategy.CardValueScale;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TokenPrice.Prices;
@@ -17,11 +19,14 @@ import ti4.testUtils.BaseTi4Test;
 
 // A tactical action spends a command token that would otherwise carry into next round, worth 3 influence
 // (CardValueScale.HELD_TOKEN, 2.4 TG). A plan is taken only when its score plus what passing now would forgo (the
-// stall while a rival still acts) covers that price. Tokens beyond the round's worthwhile plans are priced at the
-// TOKEN_FLOOR, and tokens are free in the last round or when a rival is set to win first.
+// stall while a rival still acts) covers that price. For a non-build plan, a token spent while the seat holds more than
+// the standard 3 tactic tokens is priced at the TOKEN_FLOOR, and tokens are free in the last round or when a rival is
+// set to win first.
 class TokenPriceTest extends BaseTi4Test {
 
     private static final double STALL = Stall.ACTION_VALUE;
+    private static final int STANDARD = TokenPrice.STANDARD_TACTIC;
+    private static final int IMPERIAL = 8;
     private static final Prices WHILE_RIVALS_ACT =
             new Prices(CardValueScale.HELD_TOKEN, CardValueScale.TOKEN_FLOOR, STALL);
     private static final Prices AFTER_RIVALS_PASSED =
@@ -78,19 +83,37 @@ class TokenPriceTest extends BaseTi4Test {
     }
 
     @Test
-    void spareTokensStillBuyAUsefulSetupMoveAfterEveryRivalHasPassed() {
+    void anAbundantTokenStillBuysAUsefulSetupMoveAfterEveryRivalHasPassed() {
         TacticalPlan advance = plan(Kind.POSITION, "203", CardValueScale.TOKEN_FLOOR);
 
         assertThat(TokenPrice.worthTheirToken(List.of(advance), 3, AFTER_RIVALS_PASSED))
+                .isEmpty();
+        assertThat(TokenPrice.worthTheirToken(List.of(advance), 4, AFTER_RIVALS_PASSED))
                 .containsExactly(advance);
     }
 
-    // Conservative case: tokens to spare and a rival still acting, so a cheap positional move beats passing early.
+    // The audit case: 4 tokens and 2 worthwhile targets. Those two rank first and are taken, which leaves 2 tokens,
+    // within the standard count, so a rival still acting no longer makes a 0.3 move worth one of them: 0.3 plus the
+    // 1.5 stall is short of the 2.4 a carried token is worth.
     @Test
-    void spareTokensStillBuyACheapMoveWhileARivalStillActs() {
+    void aCheapMoveIsNotWorthAStandardTokenWhileARivalStillActs() {
         TacticalPlan advance = plan(Kind.POSITION, "203", 0.3);
 
-        assertThat(TokenPrice.worthTheirToken(List.of(advance), 3, WHILE_RIVALS_ACT))
+        assertThat(TacticalPlanner.withinTokenBudget(List.of(advance), 2)).containsExactly(advance);
+        assertThat(TokenPrice.worthTheirToken(List.of(advance), 2, WHILE_RIVALS_ACT))
+                .isEmpty();
+        assertThat(TokenPrice.worthTheirToken(List.of(advance), STANDARD, WHILE_RIVALS_ACT))
+                .isEmpty();
+    }
+
+    // Conservative case: with more tactic tokens than the standard 3, spending one still leaves the standard count
+    // to carry over (plus the status-phase gain), so the spent token is priced at the TOKEN_FLOOR. While a rival
+    // still acts, passing would forgo the stall, so a cheap positional move beats passing early.
+    @Test
+    void anAbundantTokenStillBuysACheapMoveWhileARivalStillActs() {
+        TacticalPlan advance = plan(Kind.POSITION, "203", 0.3);
+
+        assertThat(TokenPrice.worthTheirToken(List.of(advance), STANDARD + 1, WHILE_RIVALS_ACT))
                 .containsExactly(advance);
     }
 
@@ -98,8 +121,18 @@ class TokenPriceTest extends BaseTi4Test {
     void aMinorBuildIsNeverWorthASpareToken() {
         TacticalPlan build = plan(Kind.PRODUCE, "304", 0.5);
 
-        assertThat(TokenPrice.worthTheirToken(List.of(build), 3, WHILE_RIVALS_ACT))
+        assertThat(TokenPrice.worthTheirToken(List.of(build), STANDARD + 3, WHILE_RIVALS_ACT))
                 .isEmpty();
+    }
+
+    // The spare-token test no longer depends on how many targets the round offers.
+    @Test
+    void abundanceIsAboutTokensHeldNotTargetsOnOffer() {
+        TacticalPlan advance = plan(Kind.POSITION, "203", 0.3);
+        TacticalPlan worthwhile = plan(Kind.EXPAND, "204", CardValueScale.HELD_TOKEN);
+
+        assertThat(TokenPrice.worthTheirToken(List.of(worthwhile, advance), 2, WHILE_RIVALS_ACT))
+                .containsExactly(worthwhile);
     }
 
     @Test
@@ -129,6 +162,45 @@ class TokenPriceTest extends BaseTi4Test {
         test.points(test.sol, 8);
 
         assertThat(TokenPrice.of(test.game, test.nekro).held()).isZero();
+    }
+
+    // Sol on 7 of 10 holds an unplayed Imperial and Mecatol Rex, with the 6 tokens for Galvanize the People ready: the
+    // Imperial primary scores it (2) plus the Mecatol point in this action phase. The leader is 3 points short, so the
+    // round horizon alone (roundsLeft 2) would keep the token price; the projected winner makes tokens free.
+    @Test
+    void aTokenIsFreeWhenARivalIsProjectedToWinFirst() {
+        test.game.setVp(10);
+        test.game.setRound(5);
+        test.solHomeBeside(AiTestGame.neighbourOf(AiTestGame.HOME));
+        for (int card = 1; card <= IMPERIAL; card++) test.game.setScTradeGood(card, 0);
+        test.game.getRevealedPublicObjectives().put("galvanize", 1);
+        test.points(test.sol, 7);
+
+        assertThat(TokenPrice.of(test.game, test.nekro).held()).isEqualTo(CardValueScale.HELD_TOKEN);
+
+        test.place("18", "000");
+        test.sol.addPlanet("mr");
+        test.sol.addSC(IMPERIAL);
+        test.sol.setTacticalCC(3);
+        test.sol.setStrategicCC(3);
+
+        assertThat(GameHorizon.roundsLeft(test.game)).isEqualTo(2);
+        assertThat(WinRace.winnersBefore(test.game, test.nekro)).containsExactly(test.sol);
+        assertThat(TokenPrice.of(test.game, test.nekro).held()).isZero();
+        assertThat(TokenPrice.of(test.game, test.nekro).surplus()).isZero();
+    }
+
+    // A seat racing for Prove Endurance values the stall above the plain 1.5 (Endurance.stallBonus), so passing
+    // forgoes more and a cheaper plan clears the token price.
+    @Test
+    void aBiggerStallLowersTheBar() {
+        TacticalPlan build = plan(Kind.PRODUCE, "304", 0.5);
+        Prices racingForEndurance = new Prices(CardValueScale.HELD_TOKEN, CardValueScale.TOKEN_FLOOR, STALL + 0.5);
+
+        assertThat(TokenPrice.worthTheirToken(List.of(build), 1, WHILE_RIVALS_ACT))
+                .isEmpty();
+        assertThat(TokenPrice.worthTheirToken(List.of(build), 1, racingForEndurance))
+                .containsExactly(build);
     }
 
     @Test

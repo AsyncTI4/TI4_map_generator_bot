@@ -213,6 +213,7 @@ public class TacticalPlanner {
 
     static List<TacticalPlan> affordable(Game game, Player seat, List<TacticalPlan> plans, int spareTokens) {
         if (!AiExperiments.enabled(seat, Experiment.TOKEN_PRICE)) return withinTokenBudget(plans, spareTokens);
+        if (plans.isEmpty()) return plans;
         return TokenPrice.worthTheirToken(plans, spareTokens, TokenPrice.of(game, seat));
     }
 

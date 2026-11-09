@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.MecatolStake;
@@ -214,14 +217,37 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.landings()).containsOnlyKeys("newalbion", "starpoint");
     }
 
-    // Nothing claimable is in reach this turn; the free planets are two systems out. With tokens to spare the carrier
-    // and
-    // its infantry move to the empty system between, to take them next time, rather than wait at home. The move is too
-    // small to count as a planned activation.
+    private void carrierTwoSystemsShortOfFreePlanets(int tacticTokens) {
+        test.game.setRound(1);
+        test.nekro.setTacticalCC(tacticTokens);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
+        test.place("47", neighbour);
+        test.place("27", twoSystemsFromHome());
+    }
+
+    // With only the standard 3 tactic tokens, each carries into next round at the held price (2.4 TG under
+    // TOKEN_PRICE), and the small setup move plus the stall does not cover it. Without the experiment the old
+    // spare-token escape still lets the move through.
+    @Test
+    void aSmallSetupMoveIsNotWorthOneOfTheStandardTokens() {
+        carrierTwoSystemsShortOfFreePlanets(3);
+
+        assertThat(TacticalPlanner.best(test.game, test.nekro)).isEmpty();
+
+        AiExperiments.disable(test.nekro, EnumSet.of(Experiment.TOKEN_PRICE));
+
+        assertThat(TacticalPlanner.best(test.game, test.nekro))
+                .hasValueSatisfying(plan -> assertThat(plan.kind()).isEqualTo(Kind.POSITION));
+    }
+
+    // Nothing claimable is in reach this turn; the free planets are two systems out. With tokens to spare (more than
+    // the standard 3) the carrier and its infantry move to the empty system between, to take them next time, rather
+    // than wait at home. The move is too small to count as a planned activation.
     @Test
     void advancesACarrierTowardPlanetsOutOfReachWhenTokensAreSpare() {
         test.game.setRound(1);
-        test.nekro.setTacticalCC(3);
+        test.nekro.setTacticalCC(4);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         test.place("47", neighbour);
