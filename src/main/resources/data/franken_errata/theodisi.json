@@ -369,5 +369,11 @@
             "ABILITY:fluid_transfer"
         ],
         "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "fluid_transfer",
+        "undraftable": true,
+        "source": "theodisi"
     }
 ]
