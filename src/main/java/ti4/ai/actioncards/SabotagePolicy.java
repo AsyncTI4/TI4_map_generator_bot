@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSettings;
+import ti4.ai.agenda.AgendaSwing;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
@@ -88,7 +91,12 @@ public class SabotagePolicy {
         double denied = Involvement.aimedAtSeat(context, title, cardPlayer)
                 ? ScoringStakes.scoreValue(game, seat, CardScoring.pointsDenied(title, game, seat))
                 : 0;
-        return baseline + rival + denied;
+        return baseline + rival + denied + agendaKept(game, seat, title, cardPlayer);
+    }
+
+    static double agendaKept(Game game, Player seat, String title, Player cardPlayer) {
+        if (!AiExperiments.enabled(seat, Experiment.AGENDA_SABOTAGE) || !AgendaSwing.changesTheAgenda(title)) return 0;
+        return -AgendaSwing.forViewer(game, seat, title, cardPlayer);
     }
 
     static boolean overruleUnseen(Game game, Player seat) {

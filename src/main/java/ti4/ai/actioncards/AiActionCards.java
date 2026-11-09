@@ -121,11 +121,18 @@ public class AiActionCards {
     }
 
     public static Set<String> targetPrefixes() {
-        return CARDS.stream().flatMap(card -> card.targetPrefixes().stream()).collect(Collectors.toUnmodifiableSet());
+        return Stream.concat(
+                        CARDS.stream().flatMap(card -> card.targetPrefixes().stream()),
+                        ShenaniganCards.targetPrefixes().stream())
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     static Optional<AiCard> of(String alias) {
         return CARDS.stream().filter(card -> card.matches().test(alias)).findFirst();
+    }
+
+    static Optional<AiCard> forPlay(String alias) {
+        return of(alias).or(() -> ShenaniganCards.of(alias));
     }
 
     static List<AiCard> inWindow(Window window) {
