@@ -129,7 +129,7 @@ public class SardakkHeroRules {
     private static double denial(Game game, Player seat, Planet planet) {
         Player holder = BoardView.controller(game, planet.getName());
         if (holder == null || holder == seat) return 0;
-        ObjectiveValue theirs = ObjectiveValue.publicOnly(game, holder);
+        ObjectiveValue theirs = ObjectiveValue.publicOnly(game, holder, seat);
         double loss = -theirs.gain(theirs.before().withoutPlanet(planet.getName()));
         return Math.clamp(loss, 0, VP);
     }

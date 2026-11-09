@@ -12,6 +12,7 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiTestGame;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.model.MapPositionMapper;
 import ti4.testUtils.BaseTi4Test;
 
 class WinAwareObjectiveValueTest extends BaseTi4Test {
@@ -111,25 +112,106 @@ class WinAwareObjectiveValueTest extends BaseTi4Test {
                 .isEqualTo(2 * ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
-    // Nekro already qualifies for Negotiate Trade Routes and has one public scoring slot this status phase, so a
-    // second ready public waits a round: it counts at the partial share, not a full point.
+    // An affordable spend objective (Negotiate Trade Routes) does not fill the scoring slot: completing a board
+    // public lets Nekro score it instead and keep the trade goods, so it keeps its full price.
     @Test
-    void aPublicBeyondTheScoringSlotsIsDiscounted() {
+    void anAffordableSpendObjectiveDoesNotFillTheSlot() {
         reveal("trade_routes");
         test.nekro.setTg(5);
-        ObjectiveValue value = raiseFleetValue();
-
-        assertThat(value.gain(cruiserJoins(value))).isCloseTo(0.6 * ObjectiveValue.VICTORY_POINT_VALUE, within(1e-9));
-    }
-
-    @Test
-    void withTheExperimentOffAPublicBeyondTheSlotsCountsInFull() {
-        reveal("trade_routes");
-        test.nekro.setTg(5);
-        disableExperiment();
         ObjectiveValue value = raiseFleetValue();
 
         assertThat(value.gain(cruiserJoins(value))).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
+    // Five destroyers at home already qualify for Raise a Fleet.
+    private ObjectiveValue withRaiseFleetReady() {
+        reveal("raise_fleet");
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 5);
+        return new ObjectiveValue(test.game, test.nekro);
+    }
+
+    // Raise a Fleet already fills the one public slot this status phase, so a second ready board public waits a round:
+    // it counts at the partial share, not a full point.
+    @Test
+    void aBoardPublicBeyondTheScoringSlotIsDiscounted() {
+        reveal("deep_space");
+        ObjectiveValue value = withRaiseFleetReady();
+
+        assertThat(value.gainAt("deep_space", 3)).isCloseTo(0.6 * ObjectiveValue.VICTORY_POINT_VALUE, within(1e-9));
+    }
+
+    // The unplayed Imperial gives a second public slot, so the second ready public is a full point.
+    @Test
+    void imperialOpensASecondSlot() {
+        reveal("deep_space");
+        test.nekro.addSC(8);
+        ObjectiveValue value = withRaiseFleetReady();
+
+        assertThat(value.gainAt("deep_space", 3)).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
+    // A completed 2-point stage II takes the slot from the ready 1-point public: one more point now, and Raise a Fleet
+    // waits a round at the partial share.
+    @Test
+    void aStageTwoUpgradesTheReadyPublic() {
+        reveal("command_armada");
+        ObjectiveValue value = withRaiseFleetReady();
+
+        assertThat(value.gainAt("command_armada", 8))
+                .isCloseTo(ObjectiveValue.VICTORY_POINT_VALUE + 0.6 * ObjectiveValue.VICTORY_POINT_VALUE, within(1e-9));
+    }
+
+    // At 9 of 10 with Raise a Fleet ready, moving a destroyer out of home breaks it but completes Explore Deep Space
+    // (third planetless system). The seat still scores one public for the win, so the swap is worth nothing.
+    @Test
+    void breakingOneReadyPublicWhileCompletingAnotherKeepsTheWin() {
+        test.points(test.nekro, 9);
+        reveal("deep_space");
+        List<String> around = adjacentEmptyPositions(3);
+        for (String position : around) test.place(EMPTY_SYSTEM, position);
+        test.units(test.game.getTileByPosition(around.get(1)), "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(test.game.getTileByPosition(around.get(2)), "space", test.nekro, UnitType.Destroyer, 1);
+        ObjectiveValue value = withRaiseFleetReady();
+        Footprint swap = value.before()
+                .after(around.get(0), List.of(new Footprint.Move(AiTestGame.HOME, UnitType.Destroyer, 1)), List.of());
+
+        assertThat(value.brokenReady(swap)).containsExactly("raise_fleet");
+        assertThat(value.completedPoints(swap)).isEqualTo(1);
+        assertThat(value.gain(swap)).isZero();
+    }
+
+    private List<String> adjacentEmptyPositions(int count) {
+        return MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(position -> !"x".equals(position) && test.game.getTileByPosition(position) == null)
+                .limit(count)
+                .toList();
+    }
+
+    // Sol decides and sees Nekro, a rival at 9 of 10, through a public view. The price follows the deciding seat:
+    // a control Sol keeps the flat 8 although Nekro is in the treatment arm, and a treatment Sol sees the win
+    // although Nekro is a control seat.
+    @Test
+    void aRivalViewFollowsTheDecidingSeatsFlag() {
+        test.points(test.nekro, 9);
+        raiseFleetValue();
+        AiExperiments.disable(test.sol, EnumSet.of(AiExperiments.Experiment.WIN_AWARE_POINTS));
+
+        ObjectiveValue seenByControl = ObjectiveValue.publicOnly(test.game, test.nekro, test.sol);
+        assertThat(seenByControl.gain(cruiserJoins(seenByControl))).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+
+        AiExperiments.disable(test.sol, EnumSet.noneOf(AiExperiments.Experiment.class));
+        disableExperiment();
+        ObjectiveValue seenByTreatment = ObjectiveValue.publicOnly(test.game, test.nekro, test.sol);
+        assertThat(seenByTreatment.gain(cruiserJoins(seenByTreatment))).isEqualTo(ScoringStakes.WIN_VALUE);
+    }
+
+    @Test
+    void withTheExperimentOffAPublicBeyondTheSlotCountsInFull() {
+        reveal("deep_space");
+        disableExperiment();
+        ObjectiveValue value = withRaiseFleetReady();
+
+        assertThat(value.gainAt("deep_space", 3)).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
     // A secret ignores the public slot: it is scored on its own.

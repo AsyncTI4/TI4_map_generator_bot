@@ -1117,7 +1117,7 @@ public final class DefenseOutlook {
     private ObjectiveValue publicView(Player player) {
         ObjectiveValue view = publicViews.get(player.getFaction());
         if (view == null) {
-            view = ObjectiveValue.publicOnly(game, player);
+            view = ObjectiveValue.publicOnly(game, player, seat);
             publicViews.put(player.getFaction(), view);
         }
         return view;

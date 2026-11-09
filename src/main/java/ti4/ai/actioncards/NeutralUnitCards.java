@@ -235,7 +235,7 @@ class NeutralUnitCards {
                 .findFirst()
                 .orElse(null);
         if (owner == null || !ScoringStakes.contender(game, seat, owner)) return Double.NEGATIVE_INFINITY;
-        ObjectiveValue objectives = ObjectiveValue.publicOnly(game, owner);
+        ObjectiveValue objectives = ObjectiveValue.publicOnly(game, owner, seat);
         double lost = Math.max(0, -objectives.gain(Footprint.of(game, owner).withoutPlanet(planet)));
         double points = lost / ObjectiveValue.VICTORY_POINT_VALUE;
         Planet info = game.getPlanetsInfo().get(planet);

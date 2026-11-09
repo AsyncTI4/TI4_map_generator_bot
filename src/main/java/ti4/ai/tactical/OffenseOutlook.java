@@ -618,6 +618,7 @@ final class OffenseOutlook {
     }
 
     private ObjectiveValue publicView(Player player) {
-        return publicViews.computeIfAbsent(player.getFaction(), faction -> ObjectiveValue.publicOnly(game, player));
+        return publicViews.computeIfAbsent(
+                player.getFaction(), faction -> ObjectiveValue.publicOnly(game, player, seat));
     }
 }

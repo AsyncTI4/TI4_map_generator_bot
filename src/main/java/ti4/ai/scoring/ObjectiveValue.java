@@ -42,26 +42,30 @@ public final class ObjectiveValue {
 
     private record Target(String id, int threshold, int points, int before, boolean secret) {}
 
-    private record PriceKey(int points, int returned) {}
+    private record StakeKey(int base, int delta) {}
+
+    private record ReadyPublic(String id, int points, boolean spend, boolean fresh) {}
+
+    private record PhaseScoring(int boardPoints, int scoredPoints, int freshPoints, int leftoverPoints) {}
 
     private final Game game;
     private final Player seat;
+    private final Player decider;
     private final Footprint before;
     private final List<Target> targets = new ArrayList<>();
     private final Map<String, Set<String>> systemSets = new HashMap<>();
-    private final Map<PriceKey, Double> completionPrices = new HashMap<>();
-    private final Map<Integer, Double> breakPrices = new HashMap<>();
+    private final Map<StakeKey, Double> stakes = new HashMap<>();
     private Boolean winAware;
-    private Integer readyPublicPoints;
-    private Integer freePublicSlots;
+    private List<ReadyPublic> readyPublics;
 
     public ObjectiveValue(Game game, Player seat) {
-        this(game, seat, true);
+        this(game, seat, seat, true);
     }
 
-    private ObjectiveValue(Game game, Player seat, boolean includeSecrets) {
+    private ObjectiveValue(Game game, Player seat, Player decider, boolean includeSecrets) {
         this.game = game;
         this.seat = seat;
+        this.decider = decider;
         this.before = Footprint.of(game, seat);
         boolean canScorePublics = Helper.canPlayerScorePOs(game, seat);
         for (String id : game.getRevealedPublicObjectives().keySet()) {
@@ -75,7 +79,11 @@ public final class ObjectiveValue {
     }
 
     public static ObjectiveValue publicOnly(Game game, Player player) {
-        return new ObjectiveValue(game, player, false);
+        return new ObjectiveValue(game, player, player, false);
+    }
+
+    public static ObjectiveValue publicOnly(Game game, Player player, Player decider) {
+        return new ObjectiveValue(game, player, decider, false);
     }
 
     private void addTarget(String id, int points, boolean secret) {
@@ -143,15 +151,18 @@ public final class ObjectiveValue {
     }
 
     private boolean winAware() {
-        if (winAware == null) winAware = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_AWARE_POINTS);
+        if (winAware == null) {
+            winAware = game.getVp() > 0 && AiExperiments.enabled(decider, AiExperiments.Experiment.WIN_AWARE_POINTS);
+        }
         return winAware;
     }
 
     private double winAwareGain(List<Target> chosen, ToIntFunction<Target> progressAfter, int pointsReturned) {
         double total = 0;
-        int secretPoints = 0;
-        int brokenPoints = 0;
-        List<Integer> publicPoints = new ArrayList<>();
+        int newSecretPoints = 0;
+        int brokenSecretPoints = 0;
+        List<Target> completed = new ArrayList<>();
+        Set<String> broken = new HashSet<>();
         for (Target target : chosen) {
             int now = target.before();
             int then = progressAfter.applyAsInt(target);
@@ -159,68 +170,98 @@ public final class ObjectiveValue {
             boolean wasComplete = now >= target.threshold();
             boolean isComplete = then >= target.threshold();
             if (wasComplete) {
-                if (!isComplete) brokenPoints += target.points();
+                if (isComplete) continue;
+                if (target.secret()) brokenSecretPoints += target.points();
+                else broken.add(target.id());
             } else if (!isComplete) {
                 total += partialGain(target, now, then);
             } else if (target.secret()) {
-                secretPoints += target.points();
+                newSecretPoints += target.points();
             } else {
-                publicPoints.add(target.points());
+                completed.add(target);
             }
         }
-        publicPoints.sort(Comparator.reverseOrder());
-        int slots = freePublicSlots();
-        int scoredPoints = secretPoints;
-        for (int index = 0; index < publicPoints.size(); index++) {
-            int points = publicPoints.get(index);
-            if (index < slots) scoredPoints += points;
-            else total += VICTORY_POINT_VALUE * points * PARTIAL_SHARE;
+        if (completed.isEmpty() && broken.isEmpty() && newSecretPoints == 0 && brokenSecretPoints == 0) {
+            return total;
         }
-        return total + completionPrice(scoredPoints, pointsReturned) - breakPrice(brokenPoints);
+        PhaseScoring before = phaseScoring(List.of(), Set.of());
+        PhaseScoring after = phaseScoring(completed, broken);
+        int gained = after.freshPoints() + newSecretPoints;
+        if (gained > 0 && gained <= pointsReturned) {
+            after = phaseScoring(List.of(), broken);
+            newSecretPoints = 0;
+            pointsReturned = 0;
+        }
+        int flatPoints = after.boardPoints() - before.boardPoints() + newSecretPoints - brokenSecretPoints;
+        int scoredDelta = after.scoredPoints() - before.scoredPoints() + newSecretPoints - brokenSecretPoints;
+        int base = before.scoredPoints() + readySecretPoints() - pointsReturned;
+        double leftover = VICTORY_POINT_VALUE * PARTIAL_SHARE * (after.leftoverPoints() - before.leftoverPoints());
+        return total + leftover + pointPrice(base, scoredDelta, flatPoints);
     }
 
-    private double completionPrice(int points, int pointsReturned) {
-        if (points <= pointsReturned) return 0;
-        return completionPrices.computeIfAbsent(new PriceKey(points, pointsReturned), key -> {
-            int base = readyPoints() - key.returned();
-            double stake = ScoringStakes.scoreValue(game, seat, base + key.points())
-                    - ScoringStakes.scoreValue(game, seat, Math.max(0, base));
-            return Math.max(VICTORY_POINT_VALUE * key.points(), stake);
-        });
+    private double pointPrice(int base, int scoredDelta, int flatPoints) {
+        if (scoredDelta == 0 && flatPoints == 0) return 0;
+        double stake = stakes.computeIfAbsent(
+                new StakeKey(base, scoredDelta),
+                key -> ScoringStakes.scoreValue(game, seat, key.base() + key.delta())
+                        - ScoringStakes.scoreValue(game, seat, Math.max(0, key.base())));
+        double flat = VICTORY_POINT_VALUE * flatPoints;
+        if (flatPoints > 0) return Math.max(flat, stake);
+        if (flatPoints < 0) return Math.min(flat, stake);
+        return stake;
     }
 
-    private double breakPrice(int points) {
-        if (points <= 0) return 0;
-        return breakPrices.computeIfAbsent(points, lost -> {
-            int base = readyPoints();
-            double stake =
-                    ScoringStakes.scoreValue(game, seat, base) - ScoringStakes.scoreValue(game, seat, base - lost);
-            return Math.max(VICTORY_POINT_VALUE * lost, stake);
-        });
-    }
-
-    private int readyPoints() {
-        if (readyPublicPoints == null) countReadyPublics();
-        int readySecrets = (int) targets.stream()
+    private int readySecretPoints() {
+        long ready = targets.stream()
                 .filter(target -> target.secret() && target.before() >= target.threshold())
                 .count();
-        return readyPublicPoints + Math.min(1, readySecrets);
+        return (int) Math.min(1, ready);
     }
 
-    private int freePublicSlots() {
-        if (freePublicSlots == null) countReadyPublics();
-        return freePublicSlots;
-    }
-
-    private void countReadyPublics() {
-        List<Integer> ready = ObjectivePolicy.scorablePublics(game, seat).stream()
-                .map(ObjectivePolicy::victoryPoints)
-                .sorted(Comparator.reverseOrder())
-                .toList();
+    private PhaseScoring phaseScoring(List<Target> completed, Set<String> broken) {
+        List<ReadyPublic> board = new ArrayList<>();
+        for (ReadyPublic ready : readyPublics()) {
+            if (!ready.spend() && !broken.contains(ready.id())) board.add(ready);
+        }
+        for (Target target : completed) board.add(new ReadyPublic(target.id(), target.points(), false, true));
+        board.sort(Comparator.comparingInt(ReadyPublic::points).reversed().thenComparing(ReadyPublic::fresh));
         int chances = ScoringReserve.scoringChances(game, seat);
-        freePublicSlots = Math.max(0, chances - ready.size());
-        readyPublicPoints =
-                ready.stream().limit(chances).mapToInt(Integer::intValue).sum();
+        int boardPoints = 0;
+        int freshPoints = 0;
+        int leftoverPoints = 0;
+        for (int index = 0; index < board.size(); index++) {
+            ReadyPublic ready = board.get(index);
+            if (index >= chances) {
+                leftoverPoints += ready.points();
+                continue;
+            }
+            boardPoints += ready.points();
+            if (ready.fresh()) freshPoints += ready.points();
+        }
+        int openSlots = Math.max(0, chances - board.size());
+        int spendPoints = readyPublics().stream()
+                .filter(ready -> ready.spend() && !broken.contains(ready.id()))
+                .map(ReadyPublic::points)
+                .sorted(Comparator.reverseOrder())
+                .limit(openSlots)
+                .mapToInt(Integer::intValue)
+                .sum();
+        return new PhaseScoring(boardPoints, boardPoints + spendPoints, freshPoints, leftoverPoints);
+    }
+
+    private List<ReadyPublic> readyPublics() {
+        if (readyPublics != null) return readyPublics;
+        Map<String, ReadyPublic> ready = new HashMap<>();
+        for (String id : ObjectivePolicy.scorablePublics(game, seat)) {
+            boolean spend = ObjectiveCatalog.spendCost(id).isPresent();
+            ready.put(id, new ReadyPublic(id, Math.max(1, ObjectivePolicy.victoryPoints(id)), spend, false));
+        }
+        for (Target target : targets) {
+            if (target.secret() || target.before() < target.threshold()) continue;
+            ready.putIfAbsent(target.id(), new ReadyPublic(target.id(), target.points(), false, false));
+        }
+        readyPublics = List.copyOf(ready.values());
+        return readyPublics;
     }
 
     private static double targetGain(Target target, int then) {
