@@ -76,19 +76,21 @@ class ObjectiveOddsTest extends BaseTi4Test {
         assertThat(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro)).isCloseTo(0.45 * 0.12, within(1e-9));
     }
 
-    // With every objective worth 1 VP the expected extra points match the old extra-score chance.
+    // The extra points are the gain over the status phase alone (LRR 61.6: one public per status phase). Imperial
+    // scores Monument now (1 VP for certain) and Expand Borders may follow at status (0.12): 1.12 expected points.
+    // Without Imperial the status phase scores the better of the two: 1 - 0.28 x 0.88 = 0.7536.
     @Test
-    void extraPointsMatchTheOldChanceForOnePointObjectives() {
+    void extraPointsAreTheGainOverTheStatusPhaseAlone() {
         reveal("monument");
         reveal("expand_borders");
 
         assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro))
-                .isCloseTo(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro), within(1e-9));
+                .isCloseTo(1.12 - (1 - 0.28 * 0.88), within(1e-9));
     }
 
-    // Two stage II objectives met: Centralize Galactic Trade (10 trade goods, scored now with Imperial) and Command an
-    // Armada (eight ships in one system, 0.9 by status). The extra public is worth 2 VP, so 1.8 expected points where
-    // the old odds counted 0.9.
+    // Two stage II objectives met: Centralize Galactic Trade (10 trade goods, 0.72 by status) and Command an Armada
+    // (eight ships in one system, 0.9 by status). Imperial scores Centralize now and Armada by status: 2 + 1.8. The
+    // status phase alone scores one 2 VP public with chance 1 - 0.28 x 0.1, so the gain is 3.8 - 1.944 = 1.856.
     @Test
     void stageTwoObjectivesCountTwoPoints() {
         test.nekro.setTg(10);
@@ -97,22 +99,42 @@ class ObjectiveOddsTest extends BaseTi4Test {
         reveal("command_armada");
 
         assertThat(ObjectiveOdds.extraScoreWithImperial(test.game, test.nekro)).isCloseTo(0.9, within(1e-9));
-        assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro)).isCloseTo(1.8, within(1e-9));
+        assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro))
+                .isCloseTo(3.8 - 2 * (1 - 0.28 * 0.1), within(1e-9));
     }
 
-    // Raise a Fleet (1 VP, met now) is the only thing Imperial can lock in; the two stage II publics still pending
-    // can only add the better one of them by status. Command an Armada is three ships short (0.12) and Centralize
-    // Galactic Trade is two trade goods short (0.6), so the extra is 2 x (1 - 0.88 x 0.4), not their sum.
+    // The audit's mixed-points overcount. Raise a Fleet (1 VP, met now, 0.9) is the only thing Imperial can lock in;
+    // Command an Armada is three ships short (0.12) and Centralize Galactic Trade two trade goods short (0.6), both
+    // 2 VP. With Imperial: 1 + 2 x (1 - 0.88 x 0.4) = 2.296. Without it the status phase scores the best one public:
+    // P(at least 1 VP) + P(at least 2 VP) = (1 - 0.1 x 0.88 x 0.4) + (1 - 0.88 x 0.4) = 1.6128. The old figure, 1.296,
+    // treated Raise a Fleet as already banked and so counted the 2 VP public as extra.
     @Test
-    void aLockedStageOneAddsOnlyTheBestPendingStageTwo() {
+    void aLockedStageOneGainsOnlyOverTheBestStatusScore() {
         test.nekro.setTg(8);
         test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Dreadnought, 5);
         reveal("raise_fleet");
         reveal("centralize_trade");
         reveal("command_armada");
 
+        double with = 1 + 2 * (1 - 0.88 * 0.4);
+        double without = (1 - 0.1 * 0.88 * 0.4) + (1 - 0.88 * 0.4);
         assertThat(ObjectiveOdds.extraPointsWithImperial(test.game, test.nekro))
-                .isCloseTo(2 * (1 - 0.88 * 0.4), within(1e-9));
+                .isCloseTo(with - without, within(1e-9));
+    }
+
+    // An extra public needs two publics met now or one step short (one scored with the primary, LRR 45.2, and one at
+    // status, LRR 61.6). Monument affordable plus Expand Borders six planets short is not an extra public.
+    @Test
+    void anExtraPublicNeedsTwoPublicsWithinReach() {
+        reveal("monument");
+        reveal("expand_borders");
+        assertThat(ObjectiveOdds.imperialScoresAnExtraPublic(test.game, test.nekro))
+                .isFalse();
+
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Dreadnought, 4);
+        reveal("raise_fleet");
+        assertThat(ObjectiveOdds.imperialScoresAnExtraPublic(test.game, test.nekro))
+                .isTrue();
     }
 
     // At 8 of 10 VP with two 1 VP publics met, the status phase alone reaches 9; Imperial reaches 10 whenever Raise a
@@ -126,7 +148,26 @@ class ObjectiveOddsTest extends BaseTi4Test {
         reveal("raise_fleet");
         reveal("monument");
 
-        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 0)).isCloseTo(0.9, within(1e-9));
-        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 1)).isCloseTo(1.0, within(1e-9));
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 0, 0)).isCloseTo(0.9, within(1e-9));
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 1, 0)).isCloseTo(1.0, within(1e-9));
+    }
+
+    // A secret scored in the same status phase (LRR 61.6: one public and one secret) can reach the goal without
+    // Imperial. At 8 of 10 VP holding Mecatol Rex with only Raise a Fleet met (0.9): with Imperial the goal is reached
+    // for certain; without it only Raise a Fleet plus a ready secret reach 10. A 50% secret leaves a swing of
+    // 1 - 0.5 x 0.9; with no Mecatol Rex the primary adds only the certainty of Raise a Fleet, 0.5 x (1 - 0.9).
+    @Test
+    void winSwingCountsTheSecretThatReachesTheGoalAnyway() {
+        test.game.setVp(10);
+        test.points(test.nekro, 8);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Dreadnought, 5);
+        reveal("raise_fleet");
+
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 1, 0)).isCloseTo(1.0, within(1e-9));
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 1, 0.5))
+                .isCloseTo(1 - 0.5 * 0.9, within(1e-9));
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 0, 0)).isZero();
+        assertThat(ObjectiveOdds.imperialWinSwing(test.game, test.nekro, 0, 0.5))
+                .isCloseTo(0.5 * (1 - 0.9), within(1e-9));
     }
 }

@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.game.Game;
 import ti4.game.Player;
 
 @UtilityClass
@@ -13,6 +14,13 @@ public class DecidingSeat {
 
     public static boolean knowsHandOf(Player seat) {
         return Objects.equals(DECIDING.get(), seat.getUserID()) && !ImaginedTurn.imagines(seat);
+    }
+
+    public static Player orSelf(Game game, Player seat) {
+        @Nullable String deciding = DECIDING.get();
+        if (deciding == null) return seat;
+        @Nullable Player decider = game.getPlayer(deciding);
+        return decider == null ? seat : decider;
     }
 
     public static <T> T of(Player seat, Supplier<T> decision) {

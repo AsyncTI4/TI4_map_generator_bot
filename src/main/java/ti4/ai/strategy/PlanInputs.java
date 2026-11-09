@@ -48,7 +48,7 @@ record PlanInputs(
     }
 
     static PlanInputs of(Game game, Player seat, PlanMoment moment) {
-        String key = game.getName() + "|" + seat.getUserID() + "|" + moment;
+        String key = game.getName() + "|" + seat.getUserID() + "|" + moment + viewerKey(game, seat);
         synchronized (CACHE) {
             Cached cached = CACHE.get(key);
             if (cached != null && cached.isFor(game)) return cached.inputs();
@@ -64,6 +64,12 @@ record PlanInputs(
             CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), inputs));
         }
         return inputs;
+    }
+
+    private static String viewerKey(Game game, Player seat) {
+        return ImperialUses.pointsAware(game, seat)
+                ? "|" + ImperialUses.viewer(game, seat).getUserID()
+                : "";
     }
 
     private static PlanInputs compute(Game game, Player seat, PlanMoment moment) {

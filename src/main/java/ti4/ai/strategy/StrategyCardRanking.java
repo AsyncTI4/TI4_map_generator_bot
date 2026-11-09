@@ -5,13 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ai.AiExperiments;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.perception.PromptButton;
-import ti4.ai.scoring.ObjectiveOdds;
 import ti4.ai.scoring.ObjectivePolicy;
-import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -92,9 +89,12 @@ public class StrategyCardRanking {
         List<Player> laterPickers = order.subList(seatIndex + 1, order.size()).stream()
                 .filter(other -> other.getSCs().size() < game.getStrategyCardsPerPlayer())
                 .toList();
-        if (AiExperiments.enabled(seat, AiExperiments.Experiment.IMPERIAL_POINTS)) {
+        if (ImperialUses.pointsAware(game, seat)) {
+            if (laterPickers.isEmpty() || !ImperialUses.gainsPointTempo(PlanInputs.of(game, seat, PlanMoment.PICK)))
+                return 0;
+            Player viewer = ImperialUses.viewer(game, seat);
             return laterPickers.stream()
-                    .mapToDouble(rival -> rivalImperialStake(game, rival))
+                    .mapToDouble(rival -> ImperialDenial.rivalStake(game, viewer, rival))
                     .max()
                     .orElse(0);
         }
@@ -107,15 +107,7 @@ public class StrategyCardRanking {
                 .orElse(0);
     }
 
-    private static double rivalImperialStake(Game game, Player rival) {
-        int mecatol = rival.controlsMecatol(true) ? 1 : 0;
-        ObjectiveOdds.ImperialOdds odds = ObjectiveOdds.imperial(game, rival, mecatol);
-        double points = mecatol + odds.extraPoints();
-        double swing = ScoringStakes.WIN_VALUE * odds.winSwing();
-        return Math.max(ScoringStakes.rivalPointStake(game, rival, points), swing);
-    }
-
-    private static boolean closeToWinning(Game game, Player player) {
+    static boolean closeToWinning(Game game, Player player) {
         return player.getTotalVictoryPoints() >= game.getVp() - CardValueScale.DENIAL_CLOSE_GAP;
     }
 }
