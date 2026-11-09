@@ -55,6 +55,7 @@ public class CustomHyperlaneService {
             Buttons.gray("customHyperlaneExport", "Export", "⬆️"),
             Buttons.gray("customHyperlaneTransform~MDL", "Transform", "↔️"),
             Buttons.gray("customHyperlaneStyle", "One-Way Style", "🎨"),
+            Buttons.gray("customHyperlaneBridges", "Bridges On/Off", "🌉"),
             Buttons.DONE_DELETE_BUTTONS);
 
     public static boolean isCustomHyperlaneTile(Tile tile) {
@@ -156,6 +157,19 @@ public class CustomHyperlaneService {
                             event.getChannel(), "One-way hyperlanes now use **" + style.getLabel() + "**.");
                 });
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("customHyperlaneBridges")
+    public static void toggleBridges(ButtonInteractionEvent event, Game game) {
+        boolean shown = !HyperlaneStyleService.showsBridges(game);
+        HyperlaneStyleService.setShowsBridges(game, shown);
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                shown
+                        ? "Hyperlane bridges are **on**: a custom hyperlane carries on through a system between"
+                                + " lanes, so it connects the systems at its far ends, and the system shows the lane"
+                                + " running along its rim."
+                        : "Hyperlane bridges are **off**.");
     }
 
     @ButtonHandler(value = "customHyperlaneExport", save = false)

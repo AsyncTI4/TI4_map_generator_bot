@@ -11,6 +11,19 @@ import ti4.settings.users.UserSettingsManager;
 public class HyperlaneStyleService {
 
     static final String GAME_STYLE_KEY = "customHyperlaneStyle";
+    static final String BRIDGES_KEY = "customHyperlaneBridges";
+
+    public static boolean showsBridges(Game game) {
+        return Boolean.parseBoolean(game.getStoredValue(BRIDGES_KEY));
+    }
+
+    public static void setShowsBridges(Game game, boolean shown) {
+        if (shown) {
+            game.setStoredValue(BRIDGES_KEY, "true");
+        } else {
+            game.removeStoredValue(BRIDGES_KEY);
+        }
+    }
 
     public static HyperlaneStyle gameDefault(Game game) {
         return HyperlaneStyle.fromName(game.getStoredValue(GAME_STYLE_KEY)).orElse(HyperlaneStyle.DASHED);

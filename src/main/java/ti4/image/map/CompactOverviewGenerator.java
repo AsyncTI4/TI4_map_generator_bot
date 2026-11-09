@@ -31,6 +31,7 @@ import ti4.image.io.ImageUploads;
 import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
+import ti4.image.tile.UnexploredBridges;
 import ti4.logging.BotLogger;
 import ti4.service.fow.FogMemoryService;
 import ti4.service.fow.FogViewer;
@@ -190,14 +191,15 @@ public final class CompactOverviewGenerator {
 
     static Map<String, Tile> knownTiles(Game game, Player player) {
         Set<String> visible = FoWHelper.visibleSystems(game, player);
+        UnexploredBridges unexploredBridges = new UnexploredBridges(new FogViewer(game, true, player));
         Map<String, Tile> tiles = new HashMap<>();
         game.getTileMap().forEach((position, tile) -> {
             if (visible.contains(position)) {
                 tiles.put(position, tile);
                 return;
             }
-            Tile remembered = player.buildFogTile(position, player);
-            if (remembered != null && !isUnknownBlank(remembered, player)) {
+            Tile remembered = unexploredBridges.fogTile(player, position);
+            if (remembered != null && (!isUnknownBlank(remembered, player) || unexploredBridges.shows(remembered))) {
                 tiles.put(position, remembered);
             }
         });

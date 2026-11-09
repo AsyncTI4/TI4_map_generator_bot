@@ -3,7 +3,9 @@ package ti4.image.tile;
 import static ti4.image.tile.TileGeometry.TILE_PADDING;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.io.ImageHelper;
@@ -11,10 +13,13 @@ import ti4.image.io.ImageResources;
 import ti4.model.HyperlaneStyle;
 import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.map.HyperlaneBridgeEnds.BridgeEnd;
+import ti4.service.map.HyperlaneStyleService;
 
 final class TileArtwork {
 
     private static final Set<String> OFFSET_ANOMALY_BORDER_LAYOUTS = Set.of("TYPE09", "TYPE12", "TYPE15");
+    private static final String UNEXPLORED_TILE_ID = "0b";
 
     private TileArtwork() {}
 
@@ -34,38 +39,79 @@ final class TileArtwork {
     }
 
     private static BufferedImage baseImage(TileScene scene, Tile tile) {
-        Game game = scene.game();
         if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
             return hyperlaneImage(scene, tile);
         }
+        String artPath = systemArtPath(scene.game(), tile);
+        BufferedImage art = ImageHelper.read(artPath);
+        if (art == null || !HyperlaneStyleService.showsBridges(scene.game())) {
+            return art;
+        }
+        List<BridgeEnd> ends = BridgeEndsLookup.forSystem(scene, tile);
+        if (ends.isEmpty()) {
+            return art;
+        }
+        HyperlaneStyle style = scene.hyperlanes().style();
+        if (isUnexplored(scene, tile)) {
+            return HyperlaneBridgeOverlay.onUnexplored(tile.getPosition(), unexploredBackground(tile), ends, style);
+        }
+        return HyperlaneBridgeOverlay.onSystem(artPath, art, PlanetOcclusion.of(tile.getTileModel()), ends, style);
+    }
+
+    private static String systemArtPath(Game game, Tile tile) {
         if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
-            return ImageHelper.read(ImageResources.tile("51r_Creuss.png"));
+            return ImageResources.tile("51r_Creuss.png");
         }
         if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
-            return ImageHelper.read(ImageResources.tile("17r_DeltaWH.png"));
+            return ImageResources.tile("17r_DeltaWH.png");
         }
-        return ImageHelper.read(ImageResources.tilePath(tile));
+        return ImageResources.tilePath(tile);
+    }
+
+    private static boolean isUnexplored(TileScene scene, Tile tile) {
+        return UNEXPLORED_TILE_ID.equals(tile.getTileID()) && scene.hidesFogged(tile);
+    }
+
+    static boolean showsUnexploredBridge(TileScene scene, Tile tile) {
+        return isUnexplored(scene, tile)
+                && HyperlaneStyleService.showsBridges(scene.game())
+                && !BridgeEndsLookup.forSystem(scene, tile).isEmpty();
+    }
+
+    private static BufferedImage unexploredBackground(Tile tile) {
+        String noLanes = CustomHyperlaneService.formatMatrix(new int[6][6]);
+        return HyperlaneTileGenerator.generateHyperlaneTile(
+                tile, tile.getPosition(), noLanes, false, HyperlaneStyle.DASHED);
     }
 
     static BufferedImage hyperlaneImage(TileScene scene, Tile tile) {
         HyperlaneView view = scene.hyperlanes();
         String matrix = scene.game().getCustomHyperlaneData().get(tile.getPosition());
-        String drawn = matrix;
+        String drawn = drawnLanes(scene, tile);
         String backgroundSeed = matrix;
         boolean lanesHidden = false;
         if (view.hidesUnseenLanes()) {
             backgroundSeed = tile.getPosition();
-            if (scene.hidesFogged(tile)) {
-                drawn = CustomHyperlaneService.formatMatrix(new int[6][6]);
-                lanesHidden = true;
-            } else if (matrix != null) {
-                drawn = lanesThePlayerSees(view, tile, matrix);
-                lanesHidden = !CustomHyperlaneService.formatMatrix(CustomHyperlaneService.parseMatrix(matrix))
-                        .equals(drawn);
-            }
+            lanesHidden = scene.hidesFogged(tile)
+                    || (matrix != null
+                            && !CustomHyperlaneService.formatMatrix(CustomHyperlaneService.parseMatrix(matrix))
+                                    .equals(drawn));
         }
         HyperlaneStyle style = CustomHyperlaneService.hasOneWayLanes(drawn) ? view.style() : HyperlaneStyle.DASHED;
         return HyperlaneTileGenerator.generateHyperlaneTile(tile, backgroundSeed, drawn, lanesHidden, style);
+    }
+
+    @Nullable
+    static String drawnLanes(TileScene scene, Tile tile) {
+        HyperlaneView view = scene.hyperlanes();
+        String matrix = scene.game().getCustomHyperlaneData().get(tile.getPosition());
+        if (!view.hidesUnseenLanes()) {
+            return matrix;
+        }
+        if (scene.hidesFogged(tile)) {
+            return CustomHyperlaneService.formatMatrix(new int[6][6]);
+        }
+        return matrix == null ? null : lanesThePlayerSees(view, tile, matrix);
     }
 
     private static String lanesThePlayerSees(HyperlaneView view, Tile tile, String matrix) {

@@ -1,20 +1,29 @@
 package ti4.image.tile;
 
+import static ti4.image.tile.LaneInk.AMBER_CORE;
+import static ti4.image.tile.LaneInk.AMBER_GLOW;
+import static ti4.image.tile.LaneInk.ARROW;
+import static ti4.image.tile.LaneInk.BLUE_CORE;
+import static ti4.image.tile.LaneInk.BLUE_GLOW;
+import static ti4.image.tile.LaneInk.ENTRY_GATE;
+import static ti4.image.tile.LaneInk.EXIT_GATE;
+import static ti4.image.tile.LaneInk.arrowHead;
+import static ti4.image.tile.LaneInk.clear;
+import static ti4.image.tile.LaneInk.drawNode;
+import static ti4.image.tile.LaneInk.hexOutline;
+import static ti4.image.tile.LaneInk.path;
+import static ti4.image.tile.LaneInk.rampStroke;
+import static ti4.image.tile.LaneInk.stroke;
 import static ti4.image.tile.TileGeometry.TILE_HEIGHT;
 import static ti4.image.tile.TileGeometry.TILE_WIDTH;
 
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -32,15 +41,6 @@ final class OneWayHyperlaneOverlay {
     private static final double MARKER_DEPTH = 32;
     private static final double STRAIGHT_HANDLE = 100;
     private static final double ROUNDABOUT_RADIUS = 60;
-
-    private static final Color BLUE_GLOW = new Color(0, 180, 255);
-    private static final Color BLUE_CORE = new Color(180, 200, 240);
-    private static final Color AMBER_GLOW = new Color(255, 200, 40);
-    private static final Color AMBER_CORE = new Color(240, 220, 170);
-    private static final Color ENTRY_GATE = new Color(225, 60, 55);
-    private static final Color EXIT_GATE = new Color(70, 230, 110);
-    private static final Color ARROW = new Color(70, 230, 110);
-    private static final Color OUTLINE = new Color(5, 10, 25);
 
     private static final List<Point2D> EDGE_MIDPOINTS = edgeMidpoints();
 
@@ -248,18 +248,6 @@ final class OneWayHyperlaneOverlay {
         return new Point2D.Double(edge.getX() + inward.getX() * distance, edge.getY() + inward.getY() * distance);
     }
 
-    private static Shape hexOutline() {
-        Path2D hex = new Path2D.Double();
-        hex.moveTo(TILE_WIDTH / 4.0, 0);
-        hex.lineTo(TILE_WIDTH * 3 / 4.0, 0);
-        hex.lineTo(TILE_WIDTH, CENTER_Y);
-        hex.lineTo(TILE_WIDTH * 3 / 4.0, TILE_HEIGHT);
-        hex.lineTo(TILE_WIDTH / 4.0, TILE_HEIGHT);
-        hex.lineTo(0, CENTER_Y);
-        hex.closePath();
-        return hex;
-    }
-
     private static List<Point2D> flatten(Shape shape) {
         List<Point2D> corners = new ArrayList<>();
         PathIterator iterator = shape.getPathIterator(null, 0.5);
@@ -287,14 +275,6 @@ final class OneWayHyperlaneOverlay {
         List<Point2D> copy = new ArrayList<>(points);
         Collections.reverse(copy);
         return copy;
-    }
-
-    private static Path2D path(List<Point2D> points) {
-        Path2D path = new Path2D.Double();
-        path.moveTo(points.getFirst().getX(), points.getFirst().getY());
-        for (int i = 1; i < points.size(); i++)
-            path.lineTo(points.get(i).getX(), points.get(i).getY());
-        return path;
     }
 
     private static double length(List<Point2D> points) {
@@ -346,68 +326,5 @@ final class OneWayHyperlaneOverlay {
             }
         }
         return pointAt(points, 13);
-    }
-
-    private static void stroke(Graphics2D g, Shape shape, float width, float alpha, Color color, float[] dash) {
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-        g.setStroke(
-                dash == null
-                        ? new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND)
-                        : new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1f, dash, 0));
-        g.setColor(color);
-        g.draw(shape);
-    }
-
-    private static void rampStroke(
-            Graphics2D g,
-            List<Point2D> points,
-            float startWidth,
-            float endWidth,
-            float startAlpha,
-            float endAlpha,
-            Color color) {
-        g.setColor(color);
-        int segments = points.size() - 1;
-        for (int i = 0; i < segments; i++) {
-            float t = (float) i / segments;
-            g.setComposite(
-                    AlphaComposite.getInstance(AlphaComposite.SRC_OVER, startAlpha + (endAlpha - startAlpha) * t));
-            g.setStroke(new BasicStroke(
-                    startWidth + (endWidth - startWidth) * t, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
-            g.draw(new Line2D.Double(points.get(i), points.get(i + 1)));
-        }
-    }
-
-    private static void clear(Graphics2D g, Shape shape) {
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 0f));
-        g.setStroke(new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
-        g.draw(shape);
-    }
-
-    private static void drawNode(Graphics2D g, Point2D at) {
-        float radius = 20;
-        g.setPaint(new RadialGradientPaint(at, radius, new float[] {0f, 0.35f, 1f}, new Color[] {
-            new Color(255, 255, 255, 235), new Color(150, 220, 255, 170), new Color(0, 160, 255, 0)
-        }));
-        g.fill(new Ellipse2D.Double(at.getX() - radius, at.getY() - radius, 2 * radius, 2 * radius));
-    }
-
-    private static void arrowHead(Graphics2D g, double[] at, Color color) {
-        AffineTransform original = g.getTransform();
-        g.translate(at[0], at[1]);
-        g.rotate(at[2]);
-        g.scale(0.7, 0.7);
-        Path2D head = new Path2D.Double();
-        head.moveTo(14, 0);
-        head.lineTo(-10, -12);
-        head.lineTo(-4, 0);
-        head.lineTo(-10, 12);
-        head.closePath();
-        g.setColor(OUTLINE);
-        g.setStroke(new BasicStroke(3.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g.draw(head);
-        g.setColor(color);
-        g.fill(head);
-        g.setTransform(original);
     }
 }

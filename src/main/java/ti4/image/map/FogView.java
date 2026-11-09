@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.image.tile.UnexploredBridges;
 import ti4.service.fow.FogViewer;
 
 final class FogView {
@@ -17,6 +18,7 @@ final class FogView {
     private final FogViewer viewer;
     private final Set<String> visibleSystems;
     private final Map<String, Tile> tiles;
+    private UnexploredBridges unexploredBridges;
 
     private FogView(FogViewer viewer, Set<String> visibleSystems, Map<String, Tile> tiles) {
         this.viewer = viewer;
@@ -37,16 +39,19 @@ final class FogView {
         Map<String, Tile> tiles = new HashMap<>(game.getTileMap());
         Set<String> hiddenPositions = new HashSet<>(tiles.keySet());
         hiddenPositions.removeAll(visibleSystems);
+        UnexploredBridges bridges = new UnexploredBridges(viewer);
         for (String position : hiddenPositions) {
             tiles.remove(position);
             if (player != null) {
-                Tile fogTile = player.buildFogTile(position, player);
+                Tile fogTile = bridges.fogTile(player, position);
                 if (fogTile != null) {
                     tiles.put(position, fogTile);
                 }
             }
         }
-        return new FogView(viewer, visibleSystems, tiles);
+        FogView view = new FogView(viewer, visibleSystems, tiles);
+        view.unexploredBridges = bridges;
+        return view;
     }
 
     static FogView unfogged(Game game) {
@@ -97,7 +102,17 @@ final class FogView {
     }
 
     boolean isUnseenBlankFogTile(Tile tile) {
-        return viewer.privateView() && "0b".equals(tile.getTileID()) && StringUtils.isBlank(tile.getFogLabel(viewer()));
+        return viewer.privateView()
+                && "0b".equals(tile.getTileID())
+                && StringUtils.isBlank(tile.getFogLabel(viewer()))
+                && !unexploredBridges().shows(tile);
+    }
+
+    private UnexploredBridges unexploredBridges() {
+        if (unexploredBridges == null) {
+            unexploredBridges = new UnexploredBridges(viewer);
+        }
+        return unexploredBridges;
     }
 
     @Nullable
