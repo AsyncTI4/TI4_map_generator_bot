@@ -2,8 +2,11 @@ package ti4.ai.trade;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -11,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSeats;
+import ti4.ai.actioncards.AgendaCardRules;
+import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
@@ -22,6 +27,8 @@ import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.ai.promise.PromiseChecks;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.tactical.TacticalPlan;
+import ti4.ai.tactical.TacticalPlanner;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
@@ -51,10 +58,11 @@ class PromiseDeals {
         Player seat = context.seat();
         if (!active(seat) || !TradeLegality.isActionPhase(game)) return Optional.empty();
         if (proposedThisScope(game, seat, false) >= MAX_PER_SCOPE) return Optional.empty();
+        Function<Player, List<TacticalPlan>> plans = rankedOnce(game);
         return partners.stream()
                 .filter(partner -> approachable(context, partner))
                 .filter(partner -> noTerritorialDealYet(game, seat, partner))
-                .flatMap(partner -> territorial(context, partner).stream())
+                .flatMap(partner -> territorial(context, plans, partner).stream())
                 .max(BEST)
                 .flatMap(proposal -> post(context, proposal));
     }
@@ -65,10 +73,15 @@ class PromiseDeals {
         if (!active(seat) || !TradeLegality.isAgendaPhase(game)) return Optional.empty();
         if (PromisedVotes.agendaKey(game).isBlank()) return Optional.empty();
         if (proposedThisScope(game, seat, true) >= MAX_PER_SCOPE) return Optional.empty();
-        return partners.stream()
+        List<Player> open = partners.stream()
                 .filter(partner -> approachable(context, partner))
                 .filter(partner -> noVoteDealYet(game, seat, partner))
-                .flatMap(partner -> votes(context, partner).stream())
+                .toList();
+        if (open.isEmpty()) return Optional.empty();
+        VoteDeals.Outlook outlook = VoteDeals.outlook(game, seat);
+        boolean mayPromiseVotes = !votesCommittedElsewhere(context);
+        return open.stream()
+                .flatMap(partner -> votes(context, outlook, mayPromiseVotes, partner).stream())
                 .max(Comparator.comparingDouble(Proposal::gain))
                 .flatMap(proposal -> post(context, proposal));
     }
@@ -88,6 +101,7 @@ class PromiseDeals {
                 Optional<Promise> promise = openFor(game, seat, id);
                 if (promise.isEmpty()) continue;
                 if (accepts(context, promise.get())) {
+                    proposerOf(game, promise.get()).ifPresent(proposer -> TradeLegality.useWindow(context, proposer));
                     return Optional.of(AiDecision.press(prompt, button, "accept the promise deal"));
                 }
                 Optional<PromptButton> decline = prompt.firstEnabled(candidate -> candidate.isOwnedBy(context.faction())
@@ -105,7 +119,12 @@ class PromiseDeals {
         if (!active(seat)) return;
         Game game = context.game();
         for (Promise promise : PromiseBook.all(game)) {
-            settled(context, promise).ifPresent(status -> PromiseBook.persist(game, promise.with(status)));
+            Optional<Promise.Status> status = settled(context, promise);
+            if (status.isPresent()) {
+                PromiseBook.persist(game, promise.with(status.get()));
+            } else if (promise.isPromisee(seat)) {
+                PromiseChecks.withoutLeftSystems(game, promise).ifPresent(pruned -> PromiseBook.persist(game, pruned));
+            }
         }
     }
 
@@ -131,6 +150,14 @@ class PromiseDeals {
                 .filter(promise -> stillOpen(game, promise));
     }
 
+    static boolean offerOpenWith(Game game, Player seat, Player partner) {
+        if (!active(seat)) return false;
+        return PromiseBook.all(game).stream()
+                .filter(Promise::open)
+                .filter(promise -> PromiseBook.between(promise, seat, partner))
+                .anyMatch(promise -> stillOpen(game, promise));
+    }
+
     static boolean stillOpen(Game game, Promise promise) {
         if (!promise.thisRound(game)) return false;
         Optional<Player> promiser = promise.promiserIn(game);
@@ -152,10 +179,48 @@ class PromiseDeals {
         if (promiser == null || promisee == null) return false;
         Player proposer = promise.isPromiser(seat) ? promisee : promiser;
         if (ScoringStakes.contender(game, seat, proposer)) return false;
+        if (!TradeLegality.canTransact(game, seat, proposer) || TradeLegality.windowUsed(context, proposer)) {
+            return false;
+        }
         double margin = TradeValue.margin(proposer);
-        if (promise.isPromiser(seat)) return promise.price() - restraint(game, seat, promise) >= margin;
+        if (promise.isPromiser(seat)) return sells(context, promise, promisee, margin);
         double gain = Trust.of(context, promiser) * protection(game, seat, promiser, promise);
         return seat.getTg() >= promise.price() && gain - promise.price() >= margin;
+    }
+
+    private static boolean sells(AiTurnContext context, Promise promise, Player buyer, double margin) {
+        Game game = context.game();
+        Player seat = context.seat();
+        boolean votes = promise.term() == Promise.Term.VOTE_FOR;
+        if (votes && votesCommittedElsewhere(context)) return false;
+        double cost = restraint(game, seat, promise);
+        double worth = votes
+                ? VoteDeals.valued(game, seat, seat, buyer, promise.target())
+                        .map(VoteDeals.Terms::buyerGain)
+                        .orElse(0.0)
+                : PromiseValue.protection(game, buyer, seat, promise.term(), promise.target());
+        int ask = sellerPrice(worth, cost, buyer, buyer.getTg(), votes ? 0 : MAX_TERRITORY_PRICE)
+                .orElse(0);
+        return promise.price() >= ask && promise.price() - cost >= margin;
+    }
+
+    private static boolean votesCommittedElsewhere(AiTurnContext context) {
+        return AgendaQueue.holdsQueuedAfter(context.game(), context.seat())
+                || AgendaCardRules.holdsUnplacedRider(context);
+    }
+
+    private static Optional<Player> proposerOf(Game game, Promise promise) {
+        return Optional.ofNullable(game.getPlayerFromColorOrFaction(promise.proposer()));
+    }
+
+    private static Function<Player, List<TacticalPlan>> rankedOnce(Game game) {
+        Map<String, List<TacticalPlan>> ranked = new HashMap<>();
+        return player -> ranked.computeIfAbsent(player.getFaction(), faction -> TacticalPlanner.ranked(game, player));
+    }
+
+    private static double restraintCost(
+            Game game, Function<Player, List<TacticalPlan>> plans, Player promiser, Promise promise) {
+        return PromiseValue.restraintCost(game, plans.apply(promiser), promiser.getTacticalCC(), promise);
     }
 
     private static double restraint(Game game, Player promiser, Promise promise) {
@@ -175,49 +240,63 @@ class PromiseDeals {
                 .orElse(0.0);
     }
 
-    private static List<Proposal> territorial(AiTurnContext context, Player partner) {
+    private static List<Proposal> territorial(
+            AiTurnContext context, Function<Player, List<TacticalPlan>> plans, Player partner) {
         Game game = context.game();
         Player seat = context.seat();
         List<Proposal> proposals = new ArrayList<>();
         if (Extortion.threat(game, seat, partner).isEmpty()) {
-            sale(context, partner, Promise.Term.NO_ATTACK, "").ifPresent(proposals::add);
+            sale(context, plans, partner, Promise.Term.NO_ATTACK, "").ifPresent(proposals::add);
             PromiseValue.mostExposed(game, partner, seat)
-                    .flatMap(tile -> sale(context, partner, Promise.Term.STAY_OUT, tile.getPosition()))
+                    .flatMap(tile -> sale(context, plans, partner, Promise.Term.STAY_OUT, tile.getPosition()))
                     .ifPresent(proposals::add);
         }
-        purchase(context, partner, Promise.Term.NO_ATTACK, "").ifPresent(proposals::add);
+        purchase(context, plans, partner, Promise.Term.NO_ATTACK, "").ifPresent(proposals::add);
         PromiseValue.mostExposed(game, seat, partner)
-                .flatMap(tile -> purchase(context, partner, Promise.Term.STAY_OUT, tile.getPosition()))
+                .flatMap(tile -> purchase(context, plans, partner, Promise.Term.STAY_OUT, tile.getPosition()))
                 .ifPresent(proposals::add);
         return proposals;
     }
 
-    private static Optional<Proposal> sale(AiTurnContext context, Player buyer, Promise.Term term, String target) {
+    private static Optional<Proposal> sale(
+            AiTurnContext context,
+            Function<Player, List<TacticalPlan>> plans,
+            Player buyer,
+            Promise.Term term,
+            String target) {
         Game game = context.game();
         Player seat = context.seat();
         double value = PromiseValue.protection(game, buyer, seat, term, target);
         if (value <= 0) return Optional.empty();
-        double cost = PromiseValue.restraintCost(game, seat, hypothetical(game, term, seat, buyer, target));
+        double cost = restraintCost(game, plans, seat, hypothetical(game, term, seat, buyer, target));
         return sellerPrice(value, cost, buyer, buyer.getTg(), MAX_TERRITORY_PRICE)
                 .map(price -> new Proposal(term, seat, buyer, target, 0, price, price - cost));
     }
 
-    private static Optional<Proposal> purchase(AiTurnContext context, Player seller, Promise.Term term, String target) {
+    private static Optional<Proposal> purchase(
+            AiTurnContext context,
+            Function<Player, List<TacticalPlan>> plans,
+            Player seller,
+            Promise.Term term,
+            String target) {
         Game game = context.game();
         Player seat = context.seat();
-        double value = Trust.of(context, seller) * PromiseValue.protection(game, seat, seller, term, target);
+        double worth = PromiseValue.protection(game, seat, seller, term, target);
+        double value = Trust.of(context, seller) * worth;
         if (value <= 0) return Optional.empty();
-        double cost = PromiseValue.restraintCost(game, seller, hypothetical(game, term, seller, seat, target));
-        return buyerPrice(value, cost, seller, seat.getTg(), MAX_TERRITORY_PRICE)
+        double cost = restraintCost(game, plans, seller, hypothetical(game, term, seller, seat, target));
+        int ask = askOf(seller, worth, cost, seat, MAX_TERRITORY_PRICE);
+        return buyerPrice(value, cost, seller, seat.getTg(), MAX_TERRITORY_PRICE, ask)
                 .map(price -> new Proposal(term, seller, seat, target, 0, price, value - price));
     }
 
-    private static List<Proposal> votes(AiTurnContext context, Player partner) {
+    private static List<Proposal> votes(
+            AiTurnContext context, VoteDeals.Outlook outlook, boolean mayPromiseVotes, Player partner) {
         Game game = context.game();
         Player seat = context.seat();
         List<Proposal> proposals = new ArrayList<>();
-        if (!sellingVotes(game, seat)) {
-            VoteDeals.bestSale(game, seat, seat, partner)
+        if (mayPromiseVotes && !sellingVotes(game, seat)) {
+            VoteDeals.bestSale(outlook, seat, partner)
                     .flatMap(terms -> sellerPrice(terms.buyerGain(), terms.sellerCost(), partner, partner.getTg(), 0)
                             .map(price -> new Proposal(
                                     Promise.Term.VOTE_FOR,
@@ -231,9 +310,14 @@ class PromiseDeals {
         }
         if (!sellingVotes(game, partner)) {
             double trust = Trust.of(context, partner);
-            VoteDeals.bestPurchase(game, seat, seat, partner)
+            VoteDeals.bestPurchase(outlook, seat, partner)
                     .flatMap(terms -> buyerPrice(
-                                    trust * terms.buyerGain(), terms.sellerCost(), partner, seat.getTg(), 0)
+                                    trust * terms.buyerGain(),
+                                    terms.sellerCost(),
+                                    partner,
+                                    seat.getTg(),
+                                    0,
+                                    askOf(partner, terms.buyerGain(), terms.sellerCost(), seat, 0))
                             .map(price -> new Proposal(
                                     Promise.Term.VOTE_FOR,
                                     partner,
@@ -256,10 +340,20 @@ class PromiseDeals {
     }
 
     static Optional<Integer> buyerPrice(double value, double cost, Player seller, int ownTradeGoods, int cap) {
-        int price = Math.max(MIN_PRICE, (int) Math.ceil(cost + partnerMinimum(seller)));
+        return buyerPrice(value, cost, seller, ownTradeGoods, cap, 0);
+    }
+
+    static Optional<Integer> buyerPrice(
+            double value, double cost, Player seller, int ownTradeGoods, int cap, int sellerAsk) {
+        int price = Math.max(sellerAsk, Math.max(MIN_PRICE, (int) Math.ceil(cost + partnerMinimum(seller))));
         if (price > ownTradeGoods || (cap > 0 && price > cap)) return Optional.empty();
         if (value - price < TradeValue.PROPOSE_MIN) return Optional.empty();
         return Optional.of(price);
+    }
+
+    private static int askOf(Player seller, double worth, double cost, Player buyer, int cap) {
+        if (!AiSeats.isAiSeat(seller)) return 0;
+        return sellerPrice(worth, cost, buyer, buyer.getTg(), cap).orElse(0);
     }
 
     private static double partnerMinimum(Player partner) {
@@ -322,6 +416,7 @@ class PromiseDeals {
                 context.now(),
                 context.now() + TradeRules.ownTurnReplyMillis(partner));
         PromiseBook.persist(game, promise);
+        TradeLegality.useWindow(context, partner);
         return Optional.of(new AiDecision.Post(
                 channel.get(), offerText(game, seat, partner, promise), offerButtons(partner, promise)));
     }

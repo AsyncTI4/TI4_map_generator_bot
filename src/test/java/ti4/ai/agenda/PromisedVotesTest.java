@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.brain.AiTurnContext;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.game.Player;
@@ -67,6 +68,40 @@ class PromisedVotesTest extends BaseTi4Test {
         AgendaVoting.Ballot ballot = AgendaVoting.plan(test.game, sol).orElseThrow();
         assertThat(ballot.outcome()).isEqualTo("nekro");
         assertThat(ballot.votes()).isEqualTo(AgendaVoting.castableVotes(test.game, sol));
+    }
+
+    // Sol planned its ballot (for itself) before the buyer accepted its offer. The planned ballot is rebuilt for the
+    // promised outcome before any vote is cast, so the promise is kept.
+    @Test
+    void aBallotPlannedBeforeThePromiseIsRebuilt() {
+        AiTurnContext context = test.contextFor(sol, Set.of(), AiTestGame.NOW);
+        String key = "agendaBallot|test";
+        AgendaVoting.Ballot planned = AgendaVoting.plan(test.game, sol).orElseThrow();
+        context.memory().put(key, planned.encode());
+        assertThat(AgendaVoting.keepingPromise(context, key, planned)).isEqualTo(planned);
+
+        PromiseBook.save(test.game, votesFor(sol, test.nekro, "nekro").accepted(test.game));
+
+        AgendaVoting.Ballot kept = AgendaVoting.keepingPromise(context, key, planned);
+        assertThat(kept.outcome()).isEqualTo("nekro");
+        assertThat(context.memory().get(key).flatMap(AgendaVoting.Ballot::decode))
+                .contains(kept);
+    }
+
+    // A seat that sold its votes, or offered them for sale, plays no rider on this agenda, since a rider would stop it
+    // voting; a seat that was only asked to sell is free.
+    @Test
+    void aVotePromiseForbidsRiders() {
+        Promise asked = votesFor(sol, test.nekro, "nekro");
+        PromiseBook.save(test.game, asked);
+        assertThat(PromisedVotes.forbidsRider(test.game, sol)).isFalse();
+
+        PromiseBook.save(test.game, asked.accepted(test.game));
+        assertThat(PromisedVotes.forbidsRider(test.game, sol)).isTrue();
+        assertThat(PromisedVotes.forbidsRider(test.game, test.nekro)).isFalse();
+
+        AiExperiments.disable(sol, Set.of(Experiment.PROMISE_DEALS));
+        assertThat(PromisedVotes.forbidsRider(test.game, sol)).isFalse();
     }
 
     // An offer that is not yet accepted does not bind a vote: the seat votes as it likes if the buyer is silent.

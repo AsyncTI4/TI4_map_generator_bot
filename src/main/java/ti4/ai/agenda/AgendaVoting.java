@@ -70,7 +70,8 @@ public class AgendaVoting {
             context.memory().put(VOTED_AT_KEY + game.getCurrentAgendaInfo(), String.valueOf(context.now()));
             return Optional.of(vote.get().press("vote for " + ballot.get().outcome()));
         }
-        Optional<Ballot> ballot = context.memory().get(key).flatMap(Ballot::decode);
+        Optional<Ballot> ballot =
+                context.memory().get(key).flatMap(Ballot::decode).map(planned -> keepingPromise(context, key, planned));
         if (ballot.isEmpty()) {
             Optional<AiPrompt> offered =
                     outcomePrompts(turn, faction, 0).stream().findFirst();
@@ -94,6 +95,17 @@ public class AgendaVoting {
         Optional<AiDecision> planets = spendPlanets(context, turn, ballot.get());
         if (planets.isPresent()) return planets;
         return chooseOutcome(context, turn, ballot.get());
+    }
+
+    static Ballot keepingPromise(AiTurnContext context, String key, Ballot planned) {
+        Game game = context.game();
+        boolean breaksPromise = PromisedVotes.binding(game, context.seat())
+                .filter(promise -> !promise.target().equalsIgnoreCase(planned.outcome()))
+                .isPresent();
+        if (!breaksPromise) return planned;
+        Ballot kept = plan(game, context.seat()).orElse(planned);
+        context.memory().put(key, kept.encode());
+        return kept;
     }
 
     private static boolean confirmsVotes(String handlerId) {

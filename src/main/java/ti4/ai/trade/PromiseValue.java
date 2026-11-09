@@ -3,6 +3,7 @@ package ti4.ai.trade;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.promise.Presence;
 import ti4.ai.promise.Promise;
@@ -40,14 +41,32 @@ class PromiseValue {
     }
 
     static double restraintCost(Game game, Player promiser, Promise promise) {
-        List<TacticalPlan> plans = TacticalPlanner.ranked(game, promiser);
-        double best = plans.stream().mapToDouble(TacticalPlan::score).max().orElse(0);
-        double allowed = plans.stream()
-                .filter(plan -> !promise.forbidsActivating(game, game.getTileByPosition(plan.target())))
-                .mapToDouble(TacticalPlan::score)
-                .max()
-                .orElse(0);
-        return Math.max(0, best) - Math.max(0, allowed);
+        return restraintCost(game, TacticalPlanner.ranked(game, promiser), promiser.getTacticalCC(), promise);
+    }
+
+    static double restraintCost(Game game, List<TacticalPlan> plans, int tacticalTokens, Promise promise) {
+        Predicate<TacticalPlan> forbidden =
+                plan -> promise.forbidsActivating(game, game.getTileByPosition(plan.target()));
+        double forbiddenBest = bestScore(plans, forbidden);
+        double allowed = bestScore(plans, forbidden.negate());
+        long preferred = plans.stream()
+                .filter(forbidden.negate())
+                .filter(plan -> plan.score() > forbiddenBest)
+                .map(TacticalPlan::target)
+                .distinct()
+                .count();
+        if (tacticalTokens > preferred) return forbiddenBest;
+        return Math.max(0, Math.max(forbiddenBest, allowed) - allowed);
+    }
+
+    private static double bestScore(List<TacticalPlan> plans, Predicate<TacticalPlan> filter) {
+        return Math.max(
+                0,
+                plans.stream()
+                        .filter(filter)
+                        .mapToDouble(TacticalPlan::score)
+                        .max()
+                        .orElse(0));
     }
 
     private static List<Tile> threatened(Game game, Player buyer, Player seller) {
@@ -57,7 +76,10 @@ class PromiseValue {
     }
 
     private static boolean exposed(Game game, Player buyer, Player seller, Tile tile) {
-        return Presence.at(buyer, tile) && CeasefireValue.outgunned(game, buyer, seller, tile);
+        return Presence.at(buyer, tile)
+                && seller.getTacticalCC() > 0
+                && !tile.hasPlayerCC(seller)
+                && CeasefireValue.outgunned(game, buyer, seller, tile);
     }
 
     private static double loss(Game game, Player buyer, Tile tile) {

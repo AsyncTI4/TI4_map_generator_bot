@@ -126,6 +126,59 @@ class PromiseBookTest extends BaseTi4Test {
         assertThat(PromiseChecks.territorial(test.game, promise)).contains(Promise.Status.BROKEN);
     }
 
+    // A system the promisee has left before the promiser activated it is no longer protected: moving in later breaks
+    // nothing. A system it still holds stays protected.
+    @Test
+    void aSystemThePromiseeLeftIsNoLongerGuarded() {
+        Promise promise = offer(Promise.Term.NO_ATTACK, "", 1).accepted(test.game);
+        assertThat(PromiseChecks.withoutLeftSystems(test.game, promise)).isEmpty();
+
+        lodor.removeAllUnits(test.sol.getColor());
+        Promise pruned = PromiseChecks.withoutLeftSystems(test.game, promise).orElseThrow();
+        assertThat(pruned.guarded()).isEmpty();
+
+        lodor.addCC(Mapper.getCCID(test.nekro.getColor()));
+        test.units(lodor, "space", test.nekro, UnitType.Dreadnought, 1);
+        assertThat(PromiseChecks.territorial(test.game, pruned)).isEmpty();
+        assertThat(PromiseChecks.territorial(test.game, promise)).contains(Promise.Status.BROKEN);
+    }
+
+    // Producing ships at a space dock already in the system is not moving ships into it.
+    @Test
+    void producingInsideAStayOutSystemIsNotABreach() {
+        Tile empty = test.place("19", "310");
+        Promise promise = offer(Promise.Term.STAY_OUT, empty.getPosition(), 1).accepted(test.game);
+        test.nekro.addPlanet("wellon");
+        test.units(empty, "wellon", test.nekro, UnitType.Spacedock, 1);
+
+        empty.addCC(Mapper.getCCID(test.nekro.getColor()));
+        test.units(empty, "space", test.nekro, UnitType.Destroyer, 1);
+
+        assertThat(PromiseChecks.territorial(test.game, promise)).isEmpty();
+    }
+
+    // The action phase ends before the status phase removes command tokens (LRR 81.4), so a promise still unbroken when
+    // the status phase starts was kept, while a breach seen then still counts.
+    @Test
+    void aPromiseUnbrokenWhenTheActionPhaseEndsWasKept() {
+        Promise promise = offer(Promise.Term.NO_ATTACK, "", 1).accepted(test.game);
+        test.game.setPhaseOfGame("statusScoring");
+        assertThat(PromiseChecks.territorial(test.game, promise)).contains(Promise.Status.KEPT);
+
+        lodor.addCC(Mapper.getCCID(test.nekro.getColor()));
+        test.units(lodor, "space", test.nekro, UnitType.Dreadnought, 1);
+        assertThat(PromiseChecks.territorial(test.game, promise)).contains(Promise.Status.BROKEN);
+    }
+
+    // A target with a save delimiter in it is never stored.
+    @Test
+    void anUnsafeTargetIsNotStored() {
+        PromiseBook.save(test.game, offer(Promise.Term.STAY_OUT, "a:b", 1));
+        PromiseBook.save(test.game, offer(Promise.Term.STAY_OUT, "a,b", 2));
+
+        assertThat(PromiseBook.all(test.game)).isEmpty();
+    }
+
     @Test
     void aPromiseThatLastedTheRoundWasKept() {
         Promise promise = offer(Promise.Term.NO_ATTACK, "", 1).accepted(test.game);

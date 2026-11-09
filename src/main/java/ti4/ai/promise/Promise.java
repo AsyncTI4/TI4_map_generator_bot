@@ -44,6 +44,8 @@ public record Promise(
     private static final String FIELD = "|";
     private static final String POSITIONS = "+";
     private static final int FIELDS = 15;
+    private static final String UNSAFE = FIELD + POSITIONS + PromiseBook.RECORDS;
+    private static final String SAVE_DELIMITERS = ":,";
 
     public Promise {
         guarded = List.copyOf(guarded);
@@ -84,6 +86,16 @@ public record Promise(
         return new Promise(
                 id, term, promiser, promisee, proposer, round, agenda, target, votes, price, next, offeredAt, expiresAt,
                 guarded, held);
+    }
+
+    public Promise withGuarded(List<String> positions) {
+        return new Promise(
+                id, term, promiser, promisee, proposer, round, agenda, target, votes, price, status, offeredAt,
+                expiresAt, positions, held);
+    }
+
+    public boolean storable() {
+        return StringUtils.containsNone(target + agenda, UNSAFE) && StringUtils.containsNone(encode(), SAVE_DELIMITERS);
     }
 
     public Promise accepted(Game game) {

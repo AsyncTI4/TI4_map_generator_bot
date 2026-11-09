@@ -28,6 +28,14 @@ public class PromisedVotes {
                 .findFirst();
     }
 
+    public static boolean forbidsRider(Game game, Player seat) {
+        if (!PromiseBook.active(game, seat)) return false;
+        return PromiseBook.all(game).stream()
+                .filter(promise -> promise.isPromiser(seat) && onThisAgenda(game, promise))
+                .anyMatch(promise -> promise.status() == Promise.Status.ACCEPTED
+                        || (promise.open() && promise.proposer().equals(promise.promiser())));
+    }
+
     public static boolean hasVoted(Game game, Player player) {
         return AgendaSwing.votedFor(game, player).isPresent();
     }

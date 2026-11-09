@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiGameWrites;
+import ti4.ai.AiSeats;
 import ti4.ai.eval.DecidingSeat;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -20,7 +21,7 @@ public class PromiseBook {
 
     static final String KEY = "aiPromises";
     static final int MAX_RECORDS = 48;
-    private static final String RECORDS = ";";
+    static final String RECORDS = ";";
     private static final String SAVE_REASON = "AI promise";
 
     public static List<Promise> all(Game game) {
@@ -36,6 +37,7 @@ public class PromiseBook {
     }
 
     public static void save(Game game, Promise promise) {
+        if (!promise.storable()) return;
         List<Promise> kept = new ArrayList<>(all(game).stream()
                 .filter(other -> !other.id().equals(promise.id()))
                 .filter(other -> worthKeeping(game, other))
@@ -59,7 +61,7 @@ public class PromiseBook {
     }
 
     public static List<Promise> bindingOn(Game game, Player promiser) {
-        if (!active(game, promiser)) return List.of();
+        if (!AiSeats.isAiSeat(promiser) || !active(game, promiser)) return List.of();
         return all(game).stream()
                 .filter(promise -> promise.thisRound(game))
                 .filter(Promise::binds)

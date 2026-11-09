@@ -17,6 +17,7 @@ import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.TransactionHelper;
 import ti4.helpers.Units.UnitType;
@@ -37,6 +38,7 @@ class PromiseDealButtonsTest extends BaseTi4Test {
     private MockedStatic<ButtonHelper> buttons;
     private MockedStatic<TransactionHelper> transactions;
     private ButtonInteractionEvent event;
+    private Tile lodor;
 
     @BeforeEach
     void setUp() {
@@ -45,6 +47,8 @@ class PromiseDealButtonsTest extends BaseTi4Test {
         sol = test.sol;
         test.nekroHome();
         test.units(test.solHomeBeside(AiTestGame.neighbourOf(AiTestGame.HOME)), "space", sol, UnitType.Carrier, 1);
+        lodor = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        sol.addPlanet("lodor");
         test.aiIsActive("action");
         sol.setTg(3);
         test.nekro.setTg(0);
@@ -105,6 +109,20 @@ class PromiseDealButtonsTest extends BaseTi4Test {
     @Test
     void aBuyerShortOfTradeGoodsChangesNothing() {
         sol.setTg(1);
+
+        PromiseDealButtons.accept(event, game, sol, PromiseDeals.ACCEPT_PREFIX + promise.id());
+
+        assertThat(transfers).isEmpty();
+        assertThat(stored().status()).isEqualTo(Promise.Status.OFFERED);
+    }
+
+    // Without Lodor, Sol's home sits two systems from Nekro's: they are not neighbours, so the trade goods cannot
+    // change hands in the action phase (LRR 94.1) and accepting changes nothing.
+    @Test
+    void strangersCannotPayForAPromise() {
+        sol.removePlanet("lodor");
+        game.removeTile(lodor.getPosition());
+        game.setLastModifiedDate(game.getLastModifiedDate() + 1);
 
         PromiseDealButtons.accept(event, game, sol, PromiseDeals.ACCEPT_PREFIX + promise.id());
 

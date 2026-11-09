@@ -27,6 +27,13 @@ class PromiseDealButtons {
         }
         Player promiser = promise.get().promiserIn(game).orElseThrow();
         Player promisee = promise.get().promiseeIn(game).orElseThrow();
+        if (!TradeLegality.canTransact(game, promiser, promisee)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event,
+                    "The deal is off: " + promiser.getFactionEmojiOrColor() + " and "
+                            + promisee.getFactionEmojiOrColor() + " cannot transact right now.");
+            return;
+        }
         if (promisee.getTg() < promise.get().price()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event,

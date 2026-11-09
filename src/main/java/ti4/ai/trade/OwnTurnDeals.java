@@ -130,6 +130,7 @@ class OwnTurnDeals {
         return TradeLegality.legalPartners(context.game(), context.seat()).stream()
                 .filter(partner -> !TradeLegality.windowUsed(context, partner))
                 .filter(partner -> !PendingOffers.with(context, partner))
+                .filter(partner -> !PromiseDeals.offerOpenWith(context.game(), context.seat(), partner))
                 .filter(partner -> !IncomingOffer.liveFrom(context, partner))
                 .filter(partner -> !TradeCardRules.holdsFor(context, partner))
                 .toList();

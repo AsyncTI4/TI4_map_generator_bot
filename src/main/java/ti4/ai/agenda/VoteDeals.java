@@ -16,32 +16,55 @@ public class VoteDeals {
         }
     }
 
-    public static Optional<Terms> bestSale(Game game, Player viewer, Player seller, Player buyer) {
-        return best(game, viewer, seller, buyer, Comparator.comparingDouble(Terms::surplus));
+    public static final class Outlook {
+
+        private final Game game;
+        private final Player viewer;
+        private final AgendaForecast forecast;
+        private AgendaForecast withItsBallot;
+
+        private Outlook(Game game, Player viewer) {
+            this.game = game;
+            this.viewer = viewer;
+            forecast = AgendaForecast.of(game, viewer);
+        }
+
+        private AgendaForecast withoutDeal(Player seller) {
+            if (viewer != seller) return forecast;
+            if (withItsBallot == null) withItsBallot = AgendaVoting.forecastWithItsBallot(game, seller);
+            return withItsBallot;
+        }
     }
 
-    public static Optional<Terms> bestPurchase(Game game, Player viewer, Player buyer, Player seller) {
-        return best(game, viewer, seller, buyer, Comparator.comparingDouble(Terms::buyerGain));
+    public static Outlook outlook(Game game, Player viewer) {
+        return new Outlook(game, viewer);
+    }
+
+    public static Optional<Terms> bestSale(Outlook outlook, Player seller, Player buyer) {
+        return best(outlook, seller, buyer, Comparator.comparingDouble(Terms::surplus));
+    }
+
+    public static Optional<Terms> bestPurchase(Outlook outlook, Player buyer, Player seller) {
+        return best(outlook, seller, buyer, Comparator.comparingDouble(Terms::buyerGain));
     }
 
     public static Optional<Terms> valued(Game game, Player viewer, Player seller, Player buyer, String outcome) {
-        AgendaForecast forecast = AgendaForecast.of(game, viewer);
-        if (!votesForSale(game, forecast, seller) || !forecast.outcomes().contains(outcome)) return Optional.empty();
-        return Optional.of(valued(game, forecast, withoutDeal(game, viewer, forecast, seller), seller, buyer, outcome));
+        Outlook outlook = outlook(game, viewer);
+        if (!votesForSale(game, outlook.forecast, seller)
+                || !outlook.forecast.outcomes().contains(outcome)) {
+            return Optional.empty();
+        }
+        return Optional.of(valued(game, outlook.forecast, outlook.withoutDeal(seller), seller, buyer, outcome));
     }
 
-    private static Optional<Terms> best(
-            Game game, Player viewer, Player seller, Player buyer, Comparator<Terms> preference) {
-        AgendaForecast forecast = AgendaForecast.of(game, viewer);
+    private static Optional<Terms> best(Outlook outlook, Player seller, Player buyer, Comparator<Terms> preference) {
+        Game game = outlook.game;
+        AgendaForecast forecast = outlook.forecast;
         if (!votesForSale(game, forecast, seller)) return Optional.empty();
-        AgendaForecast withoutDeal = withoutDeal(game, viewer, forecast, seller);
+        AgendaForecast withoutDeal = outlook.withoutDeal(seller);
         return forecast.outcomes().stream()
                 .map(outcome -> valued(game, forecast, withoutDeal, seller, buyer, outcome))
                 .max(preference);
-    }
-
-    private static AgendaForecast withoutDeal(Game game, Player viewer, AgendaForecast forecast, Player seller) {
-        return viewer == seller ? AgendaVoting.forecastWithItsBallot(game, seller) : forecast;
     }
 
     private static boolean votesForSale(Game game, AgendaForecast forecast, Player seller) {
