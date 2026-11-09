@@ -265,6 +265,7 @@ class AiTickRunner {
         if (thinkingHeld(tick)) return AiDecision.idle();
         AiDecision decision = AiDecision.idle();
         ThinkingAborted aborted = null;
+        boolean failed = false;
         Thinking.Decision thinking = Thinking.open(AiSettings.thinkingLimits());
         DecisionMemo.Open memo = DecisionMemo.open();
         try {
@@ -274,6 +275,7 @@ class AiTickRunner {
         } catch (StackOverflowError e) {
             aborted = ThinkingAborted.stackOverflow(e);
         } catch (RuntimeException e) {
+            failed = true;
             BotLogger.error(
                     "AI brain failed for " + context.faction() + " in "
                             + context.game().getName(),
@@ -283,7 +285,13 @@ class AiTickRunner {
             thinking.close();
         }
         noteThinking(tick, thinking.profile(), decision, aborted);
+        if (aborted == null && !failed) decidedNormally(tick);
         return decision;
+    }
+
+    private static void decidedNormally(SeatTick tick) {
+        tick.state().recordDecided();
+        tick.lane().clearAbortStorm();
     }
 
     private static boolean thinkingHeld(SeatTick tick) {
@@ -315,14 +323,24 @@ class AiTickRunner {
     private static void cutShort(SeatTick tick, ThinkingProfile profile, ThinkingAborted aborted) {
         tick.state().holdThinking(tick.now(), progressOf(tick));
         String summary = AbortReport.line(tick.game(), tick.seat(), profile, aborted);
-        tick.lane().noteAbort(summary);
+        tick.lane().noteAbort(summary, tick.now());
+        tick.state().recordAbort();
         if (tick.state().firstAbortInRound(tick.game().getRound())) BotLogger.warning(summary);
+        reportAbortStorm(tick);
         recorded(
                 tick,
                 null,
                 new Cause(THINKING_ABORTED, aborted.reason(), aborted.innermost(TRAIL_SPANS_RECORDED)),
                 "gave up thinking until the game changes",
                 SeatResult.act());
+    }
+
+    private static void reportAbortStorm(SeatTick tick) {
+        AiLane lane = tick.lane();
+        if (!lane.everySeatAborting(AiSeats.activeAiSeats(tick.game()), AiSettings.ABORT_STORM_LIMIT)) return;
+        if (!lane.markAbortStormLogged()) return;
+        BotLogger.error("AI thinking was cut short " + AiSettings.ABORT_STORM_LIMIT
+                + " times in a row for every AI seat in " + tick.game().getName() + "; " + lane.lastAbort());
     }
 
     private static String outcomeName(AiDecision decision, ThinkingAborted aborted) {
@@ -423,9 +441,14 @@ class AiTickRunner {
         if (forced || state.markStuckAnnounced()) {
             AiConfusionService.announceStuck(
                     tick.game(), tick.seat(), reasons.isEmpty() ? "nothing it can hand over" : described);
-            return recorded(tick, null, cause, "stuck: no prompt it can hand over", SeatResult.act());
+            return recorded(tick, null, cause, stuckOutcome(tick), SeatResult.act());
         }
         return SeatResult.wakeAt(tick.now() + threshold);
+    }
+
+    private static String stuckOutcome(SeatTick tick) {
+        String abort = tick.lane().recentAbort(tick.now(), AiSettings.RECENT_ABORT.toMillis());
+        return "stuck: no prompt it can hand over" + (abort.isEmpty() ? "" : " after thinking was cut short: " + abort);
     }
 
     private static SeatResult fallBack(SeatTick tick, AiPrompt prompt, Cause cause, boolean requested) {
@@ -559,7 +582,7 @@ class AiTickRunner {
     }
 
     private static SeatResult chooseWithoutHumans(SeatTick tick, AiPrompt prompt, Cause cause) {
-        Optional<PromptButton> choice = AiConfusionService.selfPlayChoice(tick.game(), tick.seat(), prompt)
+        Optional<PromptButton> choice = forcedChoice(tick, prompt, cause)
                 .filter(button -> offerable(tick, prompt).test(button.customId()));
         if (choice.isEmpty() || !mayActOnItsOwn(tick)) {
             AiConfusionService.announceStuck(tick.game(), tick.seat(), cause.reason());
@@ -573,6 +596,13 @@ class AiTickRunner {
             AiConfusionService.announceStuck(tick.game(), tick.seat(), "it could not put its command tokens back");
         }
         return recorded(tick, prompt, cause, outcomeOf(choice.get(), finish), SeatResult.act());
+    }
+
+    private static Optional<PromptButton> forcedChoice(SeatTick tick, AiPrompt prompt, Cause cause) {
+        boolean stalled = TIMEOUT.equals(cause.kind()) || REQUESTED.equals(cause.kind());
+        return stalled
+                ? AiConfusionService.stalledChoice(tick.game(), tick.seat(), prompt)
+                : AiConfusionService.selfPlayChoice(tick.game(), tick.seat(), prompt);
     }
 
     private static boolean referee(

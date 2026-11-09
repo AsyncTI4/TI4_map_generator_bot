@@ -13,6 +13,8 @@ import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 class AiConfusionServiceTest extends BaseTi4Test {
@@ -162,6 +164,42 @@ class AiConfusionServiceTest extends BaseTi4Test {
         AiExperiments.disable(test.nekro, EnumSet.of(Experiment.EXPLOIT_GUARDS));
         assertThat(AiConfusionService.mayChooseFor(test.nekro, "rival", "owner", false))
                 .isTrue();
+    }
+
+    // A stalled seat on its own system picker activates a system it already holds alone, a harmless activation,
+    // instead of pressing "Get Tiles N Spaces Away" and wandering between picker pages.
+    @Test
+    void aStalledSystemPickerActivatesASystemHoldingOnlyItsOwnUnits() {
+        AiTestGame test = new AiTestGame();
+        test.nekroHome();
+        String contested = AiTestGame.neighbourOf(AiTestGame.HOME);
+        Tile front = test.place("19", contested);
+        test.units(front, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(front, "space", test.sol, UnitType.Carrier, 1);
+        AiPrompt picker = prompt(
+                "getTilesThisFarAway_0", "ringTile_" + contested, "ringTile_" + AiTestGame.HOME, "ultimateUndo_4");
+
+        assertThat(AiConfusionService.stalledChoice(test.game, test.nekro, picker))
+                .map(PromptButton::customId)
+                .contains("ringTile_" + AiTestGame.HOME);
+        assertThat(AiConfusionService.selfPlayChoice(test.game, test.nekro, picker))
+                .map(PromptButton::customId)
+                .contains("getTilesThisFarAway_0");
+    }
+
+    // Without such a system, or outside a system picker, the stalled choice is the ordinary self-play choice.
+    @Test
+    void aStalledChoiceFallsBackToTheSelfPlayChoice() {
+        AiTestGame test = new AiTestGame();
+        AiPrompt picker = prompt("getTilesThisFarAway_1", "ringTile_" + AiTestGame.HOME);
+        AiPrompt endOfTurn = prompt("FFCC_nekro_turnEnd", "FFCC_nekro_exhaustAgent_nekroagent");
+
+        assertThat(AiConfusionService.stalledChoice(test.game, test.nekro, picker))
+                .map(PromptButton::customId)
+                .contains("getTilesThisFarAway_1");
+        assertThat(AiConfusionService.stalledChoice(test.game, test.nekro, endOfTurn))
+                .map(PromptButton::customId)
+                .contains("FFCC_nekro_turnEnd");
     }
 
     @Test

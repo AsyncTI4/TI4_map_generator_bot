@@ -192,7 +192,7 @@ public class TacticalRules {
     private static List<AiPrompt> pickers(AiTurnContext context, List<AiPrompt> turn) {
         long since = secondActionSince(context);
         return turn.stream()
-                .filter(TacticalRules::isPicker)
+                .filter(TacticalRules::isSystemPicker)
                 .filter(prompt -> prompt.createdAtMillis() >= since)
                 .toList();
     }
@@ -323,8 +323,8 @@ public class TacticalRules {
         return Optional.of(offered.get(best.get().target()).press("activate " + describe(best.get()) + " instead"));
     }
 
-    private static boolean isPicker(AiPrompt prompt) {
-        return prompt.hasHandlerPrefix("ringTile_")
+    public static boolean isSystemPicker(AiPrompt prompt) {
+        return prompt.hasHandlerPrefix(RING_TILE_PREFIX)
                 || prompt.hasHandlerPrefix("getTilesThisFarAway_")
                 || prompt.hasHandlerPrefix("ring_");
     }

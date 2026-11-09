@@ -45,6 +45,8 @@ final class AiLane {
     private long lastSlowWarning = Long.MIN_VALUE;
     private int thinkingAborts;
     private String lastAbort = "";
+    private long lastAbortAt;
+    private boolean abortStormLogged;
 
     AiLane(String gameName) {
         this.gameName = gameName;
@@ -72,12 +74,37 @@ final class AiLane {
         copy.lastSlowWarning = lastSlowWarning;
         copy.thinkingAborts = thinkingAborts;
         copy.lastAbort = lastAbort;
+        copy.lastAbortAt = lastAbortAt;
+        copy.abortStormLogged = abortStormLogged;
         return copy;
     }
 
-    synchronized void noteAbort(String summary) {
+    synchronized void noteAbort(String summary, long now) {
         thinkingAborts++;
         lastAbort = summary;
+        lastAbortAt = now;
+    }
+
+    synchronized String recentAbort(long now, long windowMillis) {
+        return thinkingAborts == 0 || now - lastAbortAt > windowMillis ? "" : lastAbort;
+    }
+
+    boolean everySeatAborting(List<Player> active, int limit) {
+        return !active.isEmpty()
+                && active.stream().allMatch(player -> {
+                    AiSeatState state = seats.get(player.getUserID());
+                    return state != null && state.consecutiveAborts() >= limit;
+                });
+    }
+
+    synchronized boolean markAbortStormLogged() {
+        if (abortStormLogged) return false;
+        abortStormLogged = true;
+        return true;
+    }
+
+    synchronized void clearAbortStorm() {
+        abortStormLogged = false;
     }
 
     synchronized String lastAbort() {
