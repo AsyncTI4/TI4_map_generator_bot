@@ -5,10 +5,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.FractureCampaign;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.secrets.SecretOdds;
+import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -31,20 +34,52 @@ public class WinRace {
     }
 
     private static List<Player> computeWinnersBefore(Game game, Player seat) {
-        OptionalInt mine = finish(game, seat);
+        boolean secrets = countsSecrets(seat);
+        OptionalInt mine = secrets ? finish(game, seat, ownSecret(game, seat)) : finish(game, seat);
         return game.getRealPlayers().stream()
                 .filter(other -> other != seat && !other.isEliminated())
-                .filter(other -> finishesFirst(finish(game, other), mine))
+                .filter(other -> finishesFirst(rivalFinish(game, seat, other, secrets), mine))
                 .toList();
+    }
+
+    private static boolean countsSecrets(Player seat) {
+        return AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_RACE_SECRETS);
+    }
+
+    private static OptionalInt rivalFinish(Game game, Player seat, Player rival, boolean secrets) {
+        return secrets ? finish(game, rival, fearedAtStatus(game, seat, rival)) : finish(game, rival);
+    }
+
+    private static Boost ownSecret(Game game, Player seat) {
+        boolean knowsHand = !ImaginedTurn.imagines(seat);
+        int secret =
+                knowsHand && SecretValue.bestScorableStatusSecret(game, seat).isPresent() ? 1 : 0;
+        return new Boost(0, 0, 0, false, secret);
+    }
+
+    private static Boost fearedAtStatus(Game game, Player viewer, Player rival) {
+        int secret = (int) Math.round(SecretOdds.chanceReady(game, viewer, rival));
+        return new Boost(0, styxPoint(game, rival), 0, ScoringPaths.imperialAwaitsMecatol(game, rival), secret);
+    }
+
+    public static boolean winsWithReserve(Game game, Player seat, String reservedId) {
+        OptionalInt mine = finish(game, seat, ownSecret(game, seat), readyPublics(game, seat, reservedId));
+        return winnersBefore(game, seat).stream()
+                .allMatch(rival -> finishesBefore(mine, rivalFinish(game, seat, rival, true)));
     }
 
     private static boolean finishesFirst(OptionalInt theirs, OptionalInt mine) {
         return theirs.isPresent() && (mine.isEmpty() || theirs.getAsInt() < mine.getAsInt());
     }
 
-    public record Boost(int immediatePoints, int actionPoints, int extraPublic, boolean takesMecatol) {
+    public record Boost(
+            int immediatePoints, int actionPoints, int extraPublic, boolean takesMecatol, int statusSecret) {
 
-        public static final Boost NONE = new Boost(0, 0, 0, false);
+        public static final Boost NONE = new Boost(0, 0, 0, false, 0);
+
+        public Boost(int immediatePoints, int actionPoints, int extraPublic, boolean takesMecatol) {
+            this(immediatePoints, actionPoints, extraPublic, takesMecatol, 0);
+        }
     }
 
     static OptionalInt finish(Game game, Player player) {
@@ -52,9 +87,13 @@ public class WinRace {
     }
 
     public static OptionalInt finish(Game game, Player player, Boost boost) {
+        return finish(game, player, boost, null);
+    }
+
+    private static OptionalInt finish(Game game, Player player, Boost boost, List<Integer> ready) {
         int missing = game.getVp() - player.getTotalVictoryPoints() - boost.immediatePoints();
         if (missing <= 0) return OptionalInt.of(boost.immediatePoints() > 0 ? IMMEDIATELY : DURING_ACTION_PHASE);
-        List<Integer> publics = new ArrayList<>(readyPublics(game, player));
+        List<Integer> publics = new ArrayList<>(ready != null ? ready : readyPublics(game, player));
         if (boost.extraPublic() > 0) {
             publics.add(boost.extraPublic());
             publics.sort(Comparator.reverseOrder());
@@ -64,14 +103,17 @@ public class WinRace {
         int duringAction = boost.actionPoints();
         if (imperial) duringAction += best(publics, 0) + (mecatol ? MECATOL_POINT : 0);
         if (duringAction >= missing) return OptionalInt.of(DURING_ACTION_PHASE);
-        int byStatus = duringAction + best(publics, imperial ? 1 : 0);
+        int byStatus = duringAction + best(publics, imperial ? 1 : 0) + Math.min(1, boost.statusSecret());
         return byStatus >= missing ? OptionalInt.of(1 + player.getInitiative()) : OptionalInt.empty();
     }
 
     public static Boost feared(Game game, Player viewer, Player rival, int immediatePoints) {
-        int actionPoints = (int) Math.round(SecretOdds.chanceReady(game, viewer, rival))
-                + (FractureCampaign.dock(game, rival).isPresent() ? STYX_POINT : 0);
+        int actionPoints = (int) Math.round(SecretOdds.chanceReady(game, viewer, rival)) + styxPoint(game, rival);
         return new Boost(immediatePoints, actionPoints, 0, ScoringPaths.imperialAwaitsMecatol(game, rival));
+    }
+
+    private static int styxPoint(Game game, Player rival) {
+        return FractureCampaign.dock(game, rival).isPresent() ? STYX_POINT : 0;
     }
 
     public static boolean canWinThisRound(Game game, Player viewer, Player player) {
@@ -92,14 +134,24 @@ public class WinRace {
     }
 
     static List<Integer> readyPublics(Game game, Player player) {
+        return readyPublics(game, player, null);
+    }
+
+    private static List<Integer> readyPublics(Game game, Player player, String reservedId) {
         if (!Helper.canPlayerScorePOs(game, player)) return List.of();
         Wallet wallet = projectedWallet(game, player);
         List<Integer> points = new ArrayList<>();
         int bestSpend = 0;
         for (String id : game.getRevealedPublicObjectives().keySet()) {
-            if (ObjectivePolicy.hasScored(game, player, id) || !qualifies(game, player, wallet, id)) continue;
+            if (ObjectivePolicy.hasScored(game, player, id)) continue;
             int value = ObjectivePolicy.victoryPoints(id);
-            if (ObjectiveCatalog.isSpend(id)) bestSpend = Math.max(bestSpend, value);
+            boolean spend = ObjectiveCatalog.isSpend(id);
+            if (reservedId != null && spend) {
+                if (id.equals(reservedId)) bestSpend = value;
+                continue;
+            }
+            if (!qualifies(game, player, wallet, id)) continue;
+            if (spend) bestSpend = Math.max(bestSpend, value);
             else points.add(value);
         }
         if (bestSpend > 0) points.add(bestSpend);

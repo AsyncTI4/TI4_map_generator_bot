@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.trace.Thinking;
@@ -46,7 +47,10 @@ public class ScoringReserve {
         if (!isActionPhase(game) || !Helper.canPlayerScorePOs(game, seat)) {
             return Optional.empty();
         }
-        if (!timed("scoring.winRace", () -> WinRace.winnersBefore(game, seat)).isEmpty()) return Optional.empty();
+        boolean outrun = !timed("scoring.winRace", () -> WinRace.winnersBefore(game, seat))
+                .isEmpty();
+        boolean racesWithReserve = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_RACE_SECRETS);
+        if (outrun && !racesWithReserve) return Optional.empty();
         Wallet wallet = timed(
                 "scoring.wallet",
                 () -> custodiansClaim(game, seat)
@@ -55,6 +59,7 @@ public class ScoringReserve {
         Optional<Reserved> spend = timed("scoring.affordable", () -> bestAffordableSpend(game, seat, wallet))
                 .or(() -> timed("scoring.projected", () -> bestProjectedSpend(game, seat, wallet)));
         if (spend.isEmpty()) return Optional.empty();
+        if (outrun && !WinRace.winsWithReserve(game, seat, spend.get().objectiveId())) return Optional.empty();
         int spendPoints = ObjectivePolicy.victoryPoints(spend.get().objectiveId());
         long freeScoresWorthAsMuch = timed(
                 "scoring.scorable",

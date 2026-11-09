@@ -2,8 +2,10 @@ package ti4.ai.trade;
 
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.AiSeats;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -30,7 +32,9 @@ class TradeValue {
     }
 
     static double predictedFor(Game game, Player partner, Player seat, Deal deal) {
-        Valuation theirs = evaluate(game, partner, seat, deal, PARTNER_TRUST_IN_AI, true);
+        Valuation theirs = AiExperiments.enabled(partner, AiExperiments.Experiment.WIN_RACE_SECRETS)
+                ? ImaginedTurn.of(partner, () -> evaluate(game, partner, seat, deal, PARTNER_TRUST_IN_AI, true))
+                : evaluate(game, partner, seat, deal, PARTNER_TRUST_IN_AI, true);
         return theirs.veto().isPresent() ? Double.NEGATIVE_INFINITY : theirs.utility();
     }
 

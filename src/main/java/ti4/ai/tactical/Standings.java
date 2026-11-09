@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.scoring.WinRace;
+import ti4.ai.secrets.SecretOdds;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
 import ti4.game.Game;
@@ -21,6 +23,7 @@ final class Standings {
 
     static final double SECRET_CHANCE = 0.35;
     private static final double WIN_WINDOW = 1.5;
+    private static final double SECRET_WIN_WINDOW = 3;
     private static final double HURT_PER_LEAD_POINT = 0.25;
     private static final double SOLE_LEADER_HURT = 0.25;
     private static final double MIN_HURT = 0.5;
@@ -107,7 +110,16 @@ final class Standings {
     }
 
     double secretPoint(Player player) {
+        if (countsSecretOdds()) return SecretOdds.chanceReady(game, seat, player);
         return player.getSo() > 0 ? SECRET_CHANCE : 0;
+    }
+
+    private boolean countsSecretOdds() {
+        return seat != null && AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_RACE_SECRETS);
+    }
+
+    private double winWindow() {
+        return countsSecretOdds() ? SECRET_WIN_WINDOW : WIN_WINDOW;
     }
 
     double projected(Player player) {
@@ -125,7 +137,8 @@ final class Standings {
 
     double winThreat(Player player) {
         if (winsBeforeTheSeat(player)) return 1;
-        return clamp((projected(player) - (goal() - WIN_WINDOW)) / WIN_WINDOW, 0, 1);
+        double window = winWindow();
+        return clamp((projected(player) - (goal() - window)) / window, 0, 1);
     }
 
     boolean winsBeforeTheSeat(Player player) {
