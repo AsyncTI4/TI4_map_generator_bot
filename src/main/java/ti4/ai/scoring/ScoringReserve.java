@@ -49,7 +49,7 @@ public class ScoringReserve {
         }
         boolean outrun = !timed("scoring.winRace", () -> WinRace.winnersBefore(game, seat))
                 .isEmpty();
-        boolean racesWithReserve = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_RACE_SECRETS);
+        boolean racesWithReserve = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_THREAT_FEASIBLE);
         if (outrun && !racesWithReserve) return Optional.empty();
         Wallet wallet = timed(
                 "scoring.wallet",

@@ -1,5 +1,6 @@
 package ti4.ai.trade;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
@@ -9,6 +10,7 @@ import ti4.ai.promissory.NoteGiving;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ScoringPaths;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.scoring.WinOdds;
 import ti4.ai.scoring.WinRace;
 import ti4.ai.scoring.WinRace.Boost;
 import ti4.ai.secrets.ActionSecretOdds;
@@ -49,6 +51,9 @@ class ThroneSale {
     }
 
     static boolean hiddenPathToWin(Game game, Player seat, Player receiver) {
+        if (WinRace.weighsFeasibility(seat)) {
+            return WinOdds.reachesGoal(game, seat, receiver, THRONE_POINT) >= WinOdds.MAJORITY;
+        }
         double reach = ScoringPaths.readyPoints(game, receiver)
                 + (ScoringPaths.imperialAwaitsMecatol(game, receiver) ? MECATOL_POINT : 0)
                 + SecretOdds.chanceReady(game, seat, receiver)
@@ -59,6 +64,9 @@ class ThroneSale {
     static boolean winsFirst(Game game, Player seat, Player partner, boolean swap, int savedPoints) {
         Boost own = new Boost(swap ? THRONE_POINT : 0, ownActionPoints(game, seat), savedPoints, false);
         OptionalInt mine = WinRace.finish(game, seat, own);
+        if (WinRace.weighsFeasibility(seat)) {
+            return WinOdds.outrunsEveryRival(game, seat, mine, Map.of(partner, THRONE_POINT));
+        }
         if (!WinRace.finishesBefore(
                 mine, WinRace.finish(game, partner, WinRace.feared(game, seat, partner, THRONE_POINT)))) {
             return false;
@@ -74,7 +82,8 @@ class ThroneSale {
                 .filter(id -> SecretPhase.of(id) == SecretPhase.ACTION)
                 .mapToDouble(id -> ActionSecretOdds.perRound(game, seat, id))
                 .sum();
-        return (int) Math.floor(secrets) + styx(game, seat);
+        int styx = WinRace.weighsFeasibility(seat) ? WinRace.styxTakePoint(game, seat) : styx(game, seat);
+        return (int) Math.floor(secrets) + styx;
     }
 
     private static int styx(Game game, Player player) {

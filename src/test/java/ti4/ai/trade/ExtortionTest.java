@@ -152,11 +152,15 @@ class ExtortionTest extends BaseTi4Test {
     // Sol on 9, holding Imperial with Mecatol to take, can win this round. The only demand worth making is one that
     // lets Nekro win first. On 5 nothing Sol could pay gets Nekro there first. On 9 Sol's Support for the Throne would,
     // but no player hands over the point that wins the game, so it is never asked for either. Sol is human here.
+    // This is the old win model (Imperial always reads as a Mecatol point); with WIN_THREAT_FEASIBLE Sol has no ships
+    // to
+    // land on Mecatol Rex, so it cannot win this round at all.
     @Test
     void againstAPlayerWhoCanWinOnlyADemandThatWinsFirst() {
         table = TradeTable.withHumanSol();
         nekro = table.nekro;
         sol = table.sol;
+        AiExperiments.disable(nekro, EnumSet.of(AiExperiments.Experiment.WIN_THREAT_FEASIBLE));
         table.game.setRound(3);
         table.stock(sol, 0, 6);
         table.nekroAndSolNeighbour();
@@ -176,6 +180,19 @@ class ExtortionTest extends BaseTi4Test {
         assertThat(Extortion.demandOf(table.game, nekro, sol, table.game.getTileByPosition(TradeTable.BESIDE_NEKRO), 0))
                 .map(demand -> demand.deal().notes("sol"))
                 .hasValueSatisfying(notes -> assertThat(notes).doesNotContain(NotesForTrade.detailOf("blue_sftt")));
+    }
+
+    // WIN_THREAT_FEASIBLE: Imperial with no way onto Mecatol Rex is no point (LRR 45.2 needs control of Mecatol Rex),
+    // so Sol on 9 cannot win this round and Nekro's demand is an ordinary one.
+    @Test
+    void imperialWithNoWayOntoMecatolIsNoWinThisRound() {
+        for (int card = 1; card <= 8; card++) table.game.setScTradeGood(card, 0);
+        sol.addSC(8);
+        table.points(sol, 9);
+        table.points(nekro, 5);
+
+        assertThat(ti4.ai.scoring.WinRace.canWinThisRound(table.game, nekro, sol))
+                .isFalse();
     }
 
     // The same position against an AI Sol: it would never hand Nekro the winning point, so no demand is made.

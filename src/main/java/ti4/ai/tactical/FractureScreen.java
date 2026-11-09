@@ -13,7 +13,6 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 
@@ -22,7 +21,6 @@ final class FractureScreen {
     private static final double SCREEN_SHARE = 0.5;
     private static final double PARTNER_SHARE = 0.5;
     private static final double MIN_THREAT = 0.3;
-    private static final StrikeRules RULES = new StrikeRules(false, 0.5, true, true);
 
     private final Game game;
     private final Player seat;
@@ -45,7 +43,7 @@ final class FractureScreen {
         Map<String, Double> computed = new HashMap<>();
         Optional<Tile> styx = contestedStyx();
         if (styx.isEmpty()) return computed;
-        Player holder = holderOf(styx.get());
+        Player holder = StyxTake.holderOf(game, styx.get());
         List<Tile> candidates = screenTiles(styx.get());
         Set<String> own = candidates.stream()
                 .filter(tile -> BoardView.hasOwnShips(seat, tile))
@@ -109,7 +107,7 @@ final class FractureScreen {
                     force.ground(),
                     Map.of(),
                     Map.of(),
-                    RULES,
+                    StyxTake.RULES,
                     Map.of());
             StrikeEstimate estimate = StrikeEvaluator.estimate(game, rival, strike);
             return estimate.spaceWin() * estimate.groundWins().getOrDefault(FracturePrize.STYX, 0.0);
@@ -127,14 +125,6 @@ final class FractureScreen {
                 .filter(tile -> tile.getPlanetUnitHolders().stream().anyMatch(FracturePrize::isStyx))
                 .filter(tile -> !FracturePrize.holdsStyx(tile, seat))
                 .findFirst();
-    }
-
-    private Player holderOf(Tile styx) {
-        for (Planet planet : styx.getPlanetUnitHolders()) {
-            Player controller = BoardView.controller(game, planet.getName());
-            if (FracturePrize.isStyx(planet) && controller != null) return controller;
-        }
-        return game.getNeutral();
     }
 
     // TODO: ingress systems on a rival's path are not screened, and a screen is planned one ship, one system per action

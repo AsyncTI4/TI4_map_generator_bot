@@ -1,5 +1,7 @@
 package ti4.ai.secrets;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +35,7 @@ public class SecretOdds {
     }
 
     public static double chanceReady(Game game, Player viewer, Player player) {
-        if (AiExperiments.enabled(viewer, AiExperiments.Experiment.WIN_RACE_SECRETS)) {
+        if (AiExperiments.enabled(viewer, AiExperiments.Experiment.WIN_THREAT_FEASIBLE)) {
             return measuredChanceReady(game, viewer, player);
         }
         if (player == viewer) return chanceOwnReady(game, viewer);
@@ -70,6 +72,41 @@ public class SecretOdds {
         return 1 - Math.pow(1 - mean, held);
     }
 
+    public record CardChance(double status, double action) {}
+
+    public static List<CardChance> readyByCard(Game game, Player viewer, Player player) {
+        boolean knowsHand = DecidingSeat.knowsHandOf(viewer);
+        if (player == viewer && knowsHand) return ownReadyByCard(game, viewer);
+        int held = player.getSo();
+        List<String> pool =
+                poolWithout(game, knowsHand ? viewer.getSecretsUnscored().keySet() : Set.of());
+        if (held <= 0 || pool.isEmpty()) return List.of();
+        ObjectiveValue board = ObjectiveValue.publicOnly(game, player);
+        double status = 0;
+        double action = 0;
+        for (String id : pool) {
+            double readiness = measuredReadiness(game, board, player, id);
+            SecretPhase phase = SecretPhase.of(id);
+            if (phase == SecretPhase.ACTION) action += readiness;
+            else if (phase != SecretPhase.AGENDA) status += readiness;
+        }
+        CardChance unseen = new CardChance(status / pool.size(), action / pool.size());
+        return Collections.nCopies(held, unseen);
+    }
+
+    private static List<CardChance> ownReadyByCard(Game game, Player viewer) {
+        ObjectiveValue board = ObjectiveValue.publicOnly(game, viewer);
+        List<CardChance> cards = new ArrayList<>();
+        for (String id : viewer.getSecretsUnscored().keySet()) {
+            double readiness = ownReadiness(game, board, viewer, id);
+            SecretPhase phase = SecretPhase.of(id);
+            if (phase == SecretPhase.AGENDA) continue;
+            boolean action = phase == SecretPhase.ACTION;
+            cards.add(new CardChance(action ? 0 : readiness, action ? readiness : 0));
+        }
+        return cards;
+    }
+
     private static double measuredOwnReady(Game game, Player viewer) {
         ObjectiveValue board = ObjectiveValue.publicOnly(game, viewer);
         double noneReady = 1;
@@ -98,7 +135,7 @@ public class SecretOdds {
         return readinessAt(progress, threshold);
     }
 
-    private static double readinessAt(int progress, int threshold) {
+    public static double readinessAt(int progress, int threshold) {
         if (progress >= threshold) return 1;
         return progress + 1 >= threshold ? ONE_STEP_SHORT : 0;
     }

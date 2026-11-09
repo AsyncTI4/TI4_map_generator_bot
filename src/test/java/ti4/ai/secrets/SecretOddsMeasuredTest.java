@@ -14,7 +14,7 @@ import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
 // Form a Spy Network (five action cards) is a secret the footprint model does not measure, so it used to count at
-// the flat base rate for everyone, even for the seat holding it with five cards in hand. With WIN_RACE_SECRETS the
+// the flat base rate for everyone, even for the seat holding it with five cards in hand. With WIN_THREAT_FEASIBLE the
 // seat checks its own secrets against their real thresholds and measures rivals on the public progress the bot
 // already tracks (the action card count is public).
 class SecretOddsMeasuredTest extends BaseTi4Test {
@@ -38,7 +38,7 @@ class SecretOddsMeasuredTest extends BaseTi4Test {
     }
 
     private void disableForNekro() {
-        AiExperiments.disable(test.nekro, Set.of(Experiment.WIN_RACE_SECRETS));
+        AiExperiments.disable(test.nekro, Set.of(Experiment.WIN_THREAT_FEASIBLE));
     }
 
     @Test
