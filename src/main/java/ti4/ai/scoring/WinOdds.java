@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -15,6 +16,7 @@ import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
+import ti4.ai.tactical.PlanetTake;
 import ti4.ai.tactical.StyxTake;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -144,12 +146,36 @@ public class WinOdds {
     }
 
     private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
+        Odds held = compute(game, viewer, rival, immediatePoints, loss, Optional.empty());
+        if (held == Odds.CERTAIN || !WinRace.weighsFeasibility(viewer)) return held;
+        Optional<String> contested = PlanetTake.contestedMecatol(game, rival);
+        if (contested.isEmpty()) return held;
+        double take = mecatolTake(game, viewer, rival, loss);
+        if (take <= 0) return held;
+        return blend(compute(game, viewer, rival, immediatePoints, loss, contested), held, take);
+    }
+
+    private static double mecatolTake(Game game, Player viewer, Player rival, Loss loss) {
+        Tile stopped = loss.stopsShips() ? game.getTileByPosition(loss.system()) : null;
+        if (stopped == null) return PlanetTake.mecatolThisRound(game, viewer, rival);
+        return PlanetTake.mecatolThisRoundWithout(game, viewer, rival, stopped);
+    }
+
+    private static Odds blend(Odds taken, Odds held, double take) {
+        return new Odds(
+                take * taken.duringAction() + (1 - take) * held.duringAction(),
+                take * taken.byStatusScoring() + (1 - take) * held.byStatusScoring(),
+                take * taken.byStatusEnd() + (1 - take) * held.byStatusEnd());
+    }
+
+    private static Odds compute(
+            Game game, Player viewer, Player rival, int immediatePoints, Loss loss, Optional<String> takes) {
         int missing = game.getVp() - rival.getTotalVictoryPoints() - immediatePoints + heldPointsLost(rival, loss);
         if (missing <= 0) return Odds.CERTAIN;
-        Board board = Board.of(game, rival, loss);
+        Board board = Board.of(game, rival, loss, takes);
         boolean acts = !rival.isPassed();
         boolean imperial = ScoringStakes.holdsUnplayedImperial(game, rival);
-        boolean mecatol = rival.controlsMecatol(true) && !losesMecatol(game, loss);
+        boolean mecatol = takes.isPresent() || (rival.controlsMecatol(true) && !losesMecatol(game, loss));
         Grid grid = Grid.start(missing);
         grid = grid.with(publics(game, rival, imperial, missing, board));
         grid = grid.with(secrets(game, viewer, rival, missing, acts, board));
@@ -216,7 +242,7 @@ public class WinOdds {
 
     private static final class Board {
 
-        private static final Board UNCHANGED = new Board(Loss.NONE, null, null, false);
+        private static final Board UNCHANGED = new Board(Loss.NONE, null, null, false, false);
         private static final Set<String> NOMADIC_ABILITIES = Set.of("nomadic", "mobile_command");
         private static final String NOMADIC_TECH = "tf-nomadic";
 
@@ -224,22 +250,24 @@ public class WinOdds {
         private final ObjectiveValue view;
         private final Footprint after;
         private final boolean homeLost;
+        private final boolean gains;
 
-        private Board(Loss loss, ObjectiveValue view, Footprint after, boolean homeLost) {
+        private Board(Loss loss, ObjectiveValue view, Footprint after, boolean homeLost, boolean gains) {
             this.loss = loss;
             this.view = view;
             this.after = after;
             this.homeLost = homeLost;
+            this.gains = gains;
         }
 
-        static Board of(Game game, Player rival, Loss loss) {
-            if (loss.isNone()) return UNCHANGED;
+        static Board of(Game game, Player rival, Loss loss, Optional<String> gained) {
+            if (loss.isNone() && gained.isEmpty()) return UNCHANGED;
             ObjectiveValue view =
                     DecisionMemo.remember(() -> ObjectiveValue.publicOnly(game, rival), "win.odds.board", rival);
-            Footprint after = view.before();
+            Footprint after = gained.map(view.before()::withPlanet).orElse(view.before());
             for (String planet : loss.planets()) after = after.withoutPlanet(planet);
             if (loss.losesShips()) after = after.withoutShipsIn(loss.system());
-            return new Board(loss, view, after, losesHomePlanet(rival, loss));
+            return new Board(loss, view, after, losesHomePlanet(rival, loss), gained.isPresent());
         }
 
         private static boolean losesHomePlanet(Player rival, Loss loss) {
@@ -257,11 +285,19 @@ public class WinOdds {
         }
 
         int drop(String id) {
+            return Math.max(0, -change(id));
+        }
+
+        int rise(String id) {
+            return gains ? Math.max(0, change(id)) : 0;
+        }
+
+        private int change(String id) {
             if (view == null) return 0;
             int now = view.progress(id, view.before());
             int then = view.progress(id, after);
             if (now == ObjectiveValue.NOT_MODELLED || then == ObjectiveValue.NOT_MODELLED) return 0;
-            return Math.max(0, now - then);
+            return then - now;
         }
 
         Wallet wallet(Wallet wallet) {
@@ -322,9 +358,11 @@ public class WinOdds {
             }
             int threshold = ListPlayerInfoService.getObjectiveThreshold(id, game);
             if (threshold <= 0) continue;
-            int progress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, rival) - drop;
+            int rise = board.rise(id);
+            int progress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, rival) - drop + rise;
             if (progress >= threshold) {
-                if (ready) candidates.add(new Candidate(ObjectivePolicy.victoryPoints(id), 1));
+                if (ready || progress - rise < threshold)
+                    candidates.add(new Candidate(ObjectivePolicy.victoryPoints(id), 1));
                 continue;
             }
             double chance = SecretOdds.readinessAt(progress, threshold);
