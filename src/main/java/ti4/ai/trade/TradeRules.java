@@ -89,6 +89,14 @@ public class TradeRules {
         return NotesForTrade.giveCost(game, giver, receiver, alias);
     }
 
+    public static boolean canTransact(Game game, Player first, Player second) {
+        return TradeLegality.canTransact(game, first, second);
+    }
+
+    public static long ownTurnReplyMillis(Player partner) {
+        return Extortion.replyTimeout(partner);
+    }
+
     public static boolean carthAccepts(Game game, Player hacan, Player target, int gain) {
         return CarthDeals.acceptable(game, target, hacan, gain);
     }
