@@ -335,7 +335,7 @@ final class OffenseOutlook {
 
     private double pointDenialWeight(Player opponent) {
         if (opponent.isNeutral() || !winMap().covers(opponent)) return standings.denialWeight(opponent);
-        return standings.calmDenialWeight(opponent);
+        return standings.denialWeightBeyondThisRound(opponent);
     }
 
     private double winBreak(
@@ -353,9 +353,7 @@ final class OffenseOutlook {
         if (taken.isEmpty()) return estimate.spaceWin() * ships;
         List<String> names = taken.stream().map(Planet::getName).toList();
         double all = winMap().value(opponent, WinOdds.Loss.holdings(names, system));
-        double hold = target == opponent.getHomeSystemTile() && !opponent.isPassed()
-                ? 1 - retake(strike, estimate, after, planetsAfter)
-                : 1;
+        double hold = opponent.isPassed() ? 1 : 1 - retake(strike, estimate, after, planetsAfter);
         double planetShare = meanGroundWin(taken, estimate) * hold * Math.max(0, all - ships);
         return estimate.spaceWin() * (ships + planetShare);
     }

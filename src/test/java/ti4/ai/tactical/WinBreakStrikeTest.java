@@ -68,6 +68,26 @@ class WinBreakStrikeTest extends BaseTi4Test {
     }
 
     @Test
+    void aRetakeByTheContendersNextFleetCutsTheWinBreak() {
+        double alone = breakdown().winBreak();
+        String spot = MapPositionMapper.getAdjacentTilePositions("000").stream()
+                .filter(candidate -> !"x".equals(candidate) && board.test.game.getTileByPosition(candidate) == null)
+                .findFirst()
+                .orElseThrow();
+        // Sardakk can move straight back onto Mecatol Rex with its next tactical action, before Imperial resolves,
+        // so taking the planet now only holds if that retake fails.
+        Tile reserve = board.test.place("48", spot);
+        board.test.units(reserve, "space", sardakk(), UnitType.Dreadnought, 3);
+        board.test.units(reserve, "space", sardakk(), UnitType.Carrier, 2);
+        board.test.units(reserve, "space", sardakk(), UnitType.Infantry, 6);
+
+        double retaken = breakdown().winBreak();
+
+        assertThat(alone).isGreaterThan(ScoringStakes.WIN_VALUE / 2);
+        assertThat(retaken).isLessThan(alone / 2);
+    }
+
+    @Test
     void withTheExperimentOffNoWinBreakIsAdded() {
         StrikeValue on = breakdown();
         AiExperiments.disable(nekro(), Set.of(Experiment.WIN_BREAK_DENIAL));

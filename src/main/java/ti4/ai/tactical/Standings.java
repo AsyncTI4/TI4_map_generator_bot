@@ -168,8 +168,10 @@ final class Standings {
         return calmDenialWeight(target, threat) + WINNING_DENIAL * threat;
     }
 
-    double calmDenialWeight(Player target) {
-        return calmDenialWeight(target, winThreat(target));
+    double denialWeightBeyondThisRound(Player target) {
+        double threat = winThreat(target);
+        double thisRound = winsBeforeTheSeat(target) ? 1 : WinOdds.reachesGoal(game, seat, target);
+        return calmDenialWeight(target, threat) + WINNING_DENIAL * Math.max(0, threat - thisRound);
     }
 
     private double calmDenialWeight(Player target, double threat) {
