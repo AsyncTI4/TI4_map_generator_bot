@@ -89,6 +89,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                         .map(SelfPlayGame.Outcome::leaderPointsAfterRound)
                         .toList()));
         printTempo(outcomes);
+        if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get());
 
         String reports = String.join(
                 System.lineSeparator() + System.lineSeparator(),
@@ -1174,7 +1175,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         long clockStart = SEEDED_BATCH ? SEEDED_CLOCK_START : System.currentTimeMillis();
         if (threads == 1) {
             List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
-            for (int i = 0; i < games; i++) outcomes.add(playFullGame(clockStart + i, i, games));
+            for (int i = 0; i < games; i++)
+                outcomes.add(playFullGame(clockStart + (SelfPlayGame.AB.isPresent() ? i / 2 : i), i, games));
             return outcomes;
         }
         java.util.concurrent.atomic.AtomicInteger names = new java.util.concurrent.atomic.AtomicInteger();
@@ -1184,7 +1186,8 @@ class AiSelfPlayTest extends BaseTi4Test {
             List<java.util.concurrent.Future<SelfPlayGame.Outcome>> futures = new ArrayList<>();
             for (int i = 0; i < games; i++) {
                 int slot = i;
-                futures.add(pool.submit(() -> playFullGame(clockStart + slot, slot, games)));
+                long clock = clockStart + (SelfPlayGame.AB.isPresent() ? slot / 2 : slot);
+                futures.add(pool.submit(() -> playFullGame(clock, slot, games)));
             }
             List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
             for (java.util.concurrent.Future<SelfPlayGame.Outcome> future : futures) outcomes.add(future.get());
@@ -1215,9 +1218,11 @@ class AiSelfPlayTest extends BaseTi4Test {
     private static SelfPlayGame.Outcome play(
             Predicate<Game> stopWhen, long maxVirtualMillis, int maxTicks, long clockStart, int slot) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
-            String name = SEEDED_BATCH
-                    ? "aiseed" + Math.floorMod(SelfPlayGame.BASE_SEED + slot, 1_000_000L)
-                    : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
+            String name = SelfPlayGame.AB.isPresent()
+                    ? "aiab" + Math.floorMod(SelfPlayGame.seedFor(slot), 1_000_000L) + (slot % 2 == 0 ? "a" : "b")
+                    : SEEDED_BATCH
+                            ? "aiseed" + Math.floorMod(SelfPlayGame.BASE_SEED + slot, 1_000_000L)
+                            : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
             SelfPlayGame game = new SelfPlayGame(env, name, slot);
             try {
                 game.setUp(factions());

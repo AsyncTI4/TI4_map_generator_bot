@@ -79,7 +79,9 @@ final class SelfPlayGame {
             FractureTracker.Summary fracture,
             RelicTracker.Summary relics,
             String report,
-            long wallSeconds) {
+            long wallSeconds,
+            int slot,
+            java.util.Set<String> controlSeats) {
 
         // Per seat, for each round the game reached: how many presses of this kind the AI made.
         List<Double> perSeat(java.util.function.Predicate<String> kinds) {
@@ -219,8 +221,17 @@ final class SelfPlayGame {
         this(env, name, 0);
     }
 
+    // -Dai.selfplay.ab=EXPERIMENT,...|all|none: games run in pairs that share a seed (slots 2k and 2k+1), and half of
+    // the seats play with those experiments switched off, the other half in the paired game.
+    static final java.util.Optional<java.util.Set<ti4.ai.AiExperiments.Experiment>> AB =
+            ti4.ai.AiExperiments.abExperiments();
+
+    static long seedFor(int slot) {
+        return BASE_SEED + (AB.isPresent() ? slot / 2 : slot);
+    }
+
     SelfPlayGame(SelfPlayEnvironment env, String name, int slot) {
-        this(env, name, slot, BASE_SEED + slot);
+        this(env, name, slot, seedFor(slot));
     }
 
     SelfPlayGame(SelfPlayEnvironment env, String name, int slot, long seed) {
@@ -255,6 +266,7 @@ final class SelfPlayGame {
         };
         game.setShowBanners(false);
         markLegacySeats(game);
+        markControlSeats(game);
         // -Dai.selfplay.give=summit,mining_initiative deals those action cards to every seat, to exercise a card flow.
         for (String alias : System.getProperty("ai.selfplay.give", "").split(",")) {
             if (alias.isBlank()) continue;
@@ -347,6 +359,19 @@ final class SelfPlayGame {
             legacySeats.add(seats.get(index).getFaction());
         }
     }
+
+    // The control half of an A/B pair: seats 0, 2, 4 in the even game of the pair and 1, 3, 5 in the odd one.
+    private void markControlSeats(Game game) {
+        if (AB.isEmpty()) return;
+        List<Player> seats = game.getRealPlayers();
+        for (int index = 0; index < seats.size(); index++) {
+            if ((index + slot) % 2 != 0) continue;
+            ti4.ai.AiExperiments.disable(seats.get(index), AB.get());
+            controlSeats.add(seats.get(index).getFaction());
+        }
+    }
+
+    private final java.util.Set<String> controlSeats = new java.util.LinkedHashSet<>();
 
     private AiLane lane;
 
@@ -746,7 +771,9 @@ final class SelfPlayGame {
                 fracture.summary(),
                 relics.summary(game),
                 report(ending, game, ticks),
-                (System.nanoTime() - wallStart) / 1_000_000_000L);
+                (System.nanoTime() - wallStart) / 1_000_000_000L,
+                slot,
+                java.util.Set.copyOf(controlSeats));
     }
 
     // A play is stamped with the round the game was in when it was first seen, which is within one tick of the play.
