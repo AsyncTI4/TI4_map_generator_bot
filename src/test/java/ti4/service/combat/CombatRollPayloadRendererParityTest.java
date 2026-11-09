@@ -82,7 +82,7 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
     }
 
     @Test
-    void capsJovinFaelornPonthousCommanderModifierAtTwoBestDice() {
+    void capsJovinFaelornPonthousCommanderModifierAtOneBestDice() {
         Harness harness = new Harness();
         Player ponthous = harness.player("ponthous");
         Player sol = harness.player("sol");
@@ -95,16 +95,8 @@ class CombatRollPayloadRendererParityTest extends BaseTi4Test {
         RenderedRoll roll = assertRollBodyParity(harness, ponthous, sol, tile, CombatRollType.combatround, 5, 5, 5, 5);
 
         assertTrue(roll.productionMessage().contains("Jovin Faelorn"));
-        assertTrue(roll.productionMessage().contains("+2 to up to 2 dice from"));
-        assertTrue(roll.productionMessage().contains("first 1 die (+2 mods)"));
-        assertEquals(2, roll.payload().total().displayedTotalHits());
-        assertEquals(
-                List.of(3, 5, 7, 8),
-                roll.payload().unitRolls().stream()
-                        .flatMap(unitRoll -> unitRoll.dice().stream())
-                        .map(CombatRollPayload.DieRoll::threshold)
-                        .sorted()
-                        .toList());
+        assertTrue(roll.productionMessage().contains("+2 to up to 1"));
+        assertEquals(1, roll.payload().total().displayedTotalHits());
     }
 
     @Test

@@ -1896,7 +1896,7 @@ public final class ButtonHelperSCs {
 
         strategicCC--;
         player.setStrategicCC(strategicCC);
-        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
+        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player, scNum);
         TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
         if (scNum != -1 && player.hasAbility("strategic_fluidity")) {
             OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
