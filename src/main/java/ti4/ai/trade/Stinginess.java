@@ -7,7 +7,9 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
 import ti4.ai.brain.SearchMemo;
+import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.tactical.AttackLedger;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
@@ -79,12 +81,20 @@ class Stinginess {
     private static double computeRivalry(Game game, Player self, Player other) {
         if (nearWin(game, other)) return NEAR_WIN_RIVALRY;
         int gap = Standings.vp(other) - Standings.vp(self);
-        if (gap <= -HARMLESS_GAP) return 0;
-        int tenths = BASE_RIVALRY_TENTHS
+        int grudge = grudgeTenths(game, self, other);
+        if (gap <= -HARMLESS_GAP) return Math.min(MAX_RIVALRY_TENTHS, grudge) / TENTHS;
+        int tenths = grudge
+                + BASE_RIVALRY_TENTHS
                 + RIVALRY_TENTHS_PER_POINT * Math.max(0, gap)
                 + (strictLeader(game, other) ? LEADER_RIVALRY_TENTHS : 0)
                 + (Standings.vp(other) >= Standings.goal(game) - CONTENDER_FROM_GOAL ? CONTENDER_RIVALRY_TENTHS : 0);
         return Math.min(MAX_RIVALRY_TENTHS, tenths) / TENTHS;
+    }
+
+    static int grudgeTenths(Game game, Player self, Player other) {
+        if (!AttackLedger.remembers(game, self)) return 0;
+        double points = AttackLedger.grudge(game, self, other) / ObjectiveValue.VICTORY_POINT_VALUE;
+        return (int) Math.round(RIVALRY_TENTHS_PER_POINT * points);
     }
 
     static boolean leads(Game game, Player player) {

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import ti4.ai.fallback.DelegatedPress;
 import ti4.ai.strategy.SecondaryQueue;
+import ti4.ai.tactical.AttackLedger;
 import ti4.ai.trace.ThinkingStats;
 import ti4.game.Player;
 
@@ -113,6 +114,7 @@ final class AiLane {
     void forgetAfterUndo() {
         seats.values().forEach(AiSeatState::forgetAfterUndo);
         SecondaryQueue.forget(gameName);
+        AttackLedger.forget(gameName);
         refereeAttempts.clear();
     }
 

@@ -23,7 +23,8 @@ public class AiExperiments {
         BLOCKADE_GROUND,
         EXPLOIT_GUARDS,
         SPEAKER_SALE,
-        WIN_BREAK_DENIAL
+        WIN_BREAK_DENIAL,
+        ATTACK_MEMORY
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

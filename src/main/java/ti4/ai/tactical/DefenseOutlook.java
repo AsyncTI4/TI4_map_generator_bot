@@ -129,6 +129,7 @@ public final class DefenseOutlook {
     private final Map<String, Double> costs = new HashMap<>();
     private final Map<String, Double> threats = new HashMap<>();
     private final Map<String, Double> postures = new HashMap<>();
+    private final Map<String, Double> angers = new HashMap<>();
 
     public DefenseOutlook(Game game, Player seat) {
         this(game, seat, new IncomingForces(game), null, null);
@@ -665,8 +666,30 @@ public final class DefenseOutlook {
                 * motiveFactor(enemy, tile, force, planets)
                 * appetiteShare
                 * ceasefire(enemy)
-                * boughtOff(enemy, tile, horizon);
+                * boughtOff(enemy, tile, horizon)
+                * anger(enemy);
         return clamp(raw, 0, 1);
+    }
+
+    private double anger(Player enemy) {
+        return cached(angers, enemy.getFaction(), () -> {
+            if (!AttackLedger.remembers(game, seat)) return 1.0;
+            return Standings.angerRatio(game, seat, AttackLedger.grudge(game, enemy, seat));
+        });
+    }
+
+    double hostility(Player enemy, Tile excluded) {
+        double worst = 0;
+        for (Tile tile : guardedTiles()) {
+            if (tile == excluded) continue;
+            Defenders defenders = defendersAt(tile);
+            worst = Math.max(
+                    worst,
+                    Math.max(
+                            threat(enemy, tile, Horizon.IMMEDIATE, defenders),
+                            threat(enemy, tile, Horizon.NEXT_ROUND, defenders)));
+        }
+        return worst;
     }
 
     private double roundFactor(Horizon horizon) {
@@ -790,7 +813,12 @@ public final class DefenseOutlook {
         double alternative = Math.max(alternative(enemy, tile), APPETITE_SCALE);
         double share = attackShare(netGain - actionCost(enemy), alternative);
         return clamp(
-                roundFactor(horizon) * aggression(enemy) * share * ceasefire(enemy) * boughtOff(enemy, tile, horizon),
+                roundFactor(horizon)
+                        * aggression(enemy)
+                        * share
+                        * ceasefire(enemy)
+                        * boughtOff(enemy, tile, horizon)
+                        * anger(enemy),
                 0,
                 1);
     }

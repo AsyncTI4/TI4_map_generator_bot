@@ -9,7 +9,9 @@ import java.util.Optional;
 import ti4.ai.AiExperiments;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.scoring.WinOdds;
 import ti4.ai.scoring.WinRace;
@@ -144,13 +146,37 @@ final class Standings {
 
     double hurtWeight(Player target) {
         if (target.isNeutral()) return 0;
+        return hurtWeight(game, target, ownGrudge(target));
+    }
+
+    private double ownGrudge(Player target) {
+        if (seat == null || ImaginedTurn.underway() || !AttackLedger.remembers(game, seat)) return 0;
+        return AttackLedger.grudge(game, seat, target);
+    }
+
+    static double hurtWeight(Game game, Player target, double grudge) {
+        if (target.isNeutral()) return 0;
         List<Player> others = game.getRealPlayers().stream()
                 .filter(player -> player != target)
                 .toList();
-        double mean = others.stream().mapToInt(this::vp).average().orElse(vp(target));
-        boolean soleLeader = vp(target) >= 1 && others.stream().allMatch(player -> vp(player) < vp(target));
-        double weight = 1 + HURT_PER_LEAD_POINT * (vp(target) - mean) + (soleLeader ? SOLE_LEADER_HURT : 0);
+        int points = target.getTotalVictoryPoints();
+        double mean = others.stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .average()
+                .orElse(points);
+        boolean soleLeader = points >= 1 && others.stream().allMatch(player -> player.getTotalVictoryPoints() < points);
+        double weight =
+                1 + HURT_PER_LEAD_POINT * (points - mean) + (soleLeader ? SOLE_LEADER_HURT : 0) + grudgeHurt(grudge);
         return clamp(weight, MIN_HURT, MAX_HURT);
+    }
+
+    static double grudgeHurt(double grudge) {
+        return HURT_PER_LEAD_POINT * grudge / ObjectiveValue.VICTORY_POINT_VALUE;
+    }
+
+    static double angerRatio(Game game, Player target, double grudge) {
+        double calm = hurtWeight(game, target, 0);
+        return calm <= 0 ? 1 : hurtWeight(game, target, grudge) / calm;
     }
 
     double leadOverField(Player target) {
