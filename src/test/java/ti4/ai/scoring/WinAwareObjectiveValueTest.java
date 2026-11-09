@@ -226,6 +226,52 @@ class WinAwareObjectiveValueTest extends BaseTi4Test {
                 .isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
+    // Destroyers in six systems (home and five around it) already qualify for Control the Region, and Gather a
+    // Mighty Fleet is held too.
+    private ObjectiveValue withControlTheRegionReady() {
+        test.nekro.setSecret("ctr");
+        test.nekro.setSecret("gamf");
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 1);
+        for (String position : adjacentEmptyPositions(5)) {
+            test.place(EMPTY_SYSTEM, position);
+            test.units(test.game.getTileByPosition(position), "space", test.nekro, UnitType.Destroyer, 1);
+        }
+        return new ObjectiveValue(test.game, test.nekro);
+    }
+
+    private static Footprint fiveDreadnoughts(ObjectiveValue value) {
+        return value.before().withBuilt(AiTestGame.HOME, Map.of(UnitType.Dreadnought, 5));
+    }
+
+    // LRR 61.6: one secret objective per status phase. Control the Region already takes the secret slot, so
+    // completing Gather a Mighty Fleet waits a round and counts at the partial share (0.6 x 8 = 4.8), like a public
+    // past the public slot.
+    @Test
+    void aSecondReadySecretWaitsARound() {
+        ObjectiveValue value = withControlTheRegionReady();
+
+        assertThat(value.gain(fiveDreadnoughts(value)))
+                .isCloseTo(0.6 * ObjectiveValue.VICTORY_POINT_VALUE, within(1e-9));
+    }
+
+    // At 9 of 10 the ready Control the Region is already the winning point, so a second secret is not a second win.
+    @Test
+    void aSecondReadySecretIsNotTheWinWhenTheFirstAlreadyWins() {
+        test.points(test.nekro, 9);
+        ObjectiveValue value = withControlTheRegionReady();
+
+        assertThat(value.gain(fiveDreadnoughts(value)))
+                .isCloseTo(0.6 * ObjectiveValue.VICTORY_POINT_VALUE, within(1e-9));
+    }
+
+    @Test
+    void withTheExperimentOffASecondReadySecretCountsInFull() {
+        disableExperiment();
+        ObjectiveValue value = withControlTheRegionReady();
+
+        assertThat(value.gain(fiveDreadnoughts(value))).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
     // The move hands back a Support for the Throne: one point back for one point gained nets nothing, so the
     // completion is worth nothing, even at 9 of 10.
     @Test
