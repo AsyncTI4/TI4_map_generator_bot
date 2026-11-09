@@ -1,23 +1,32 @@
 package ti4.ai.actioncards;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.agenda.AgendaClock;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Player;
+import ti4.message.GameMessage;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.testUtils.BaseTi4Test;
 
 class AgendaSabotageTest extends BaseTi4Test {
@@ -116,26 +125,120 @@ class AgendaSabotageTest extends BaseTi4Test {
                 .isZero();
     }
 
+    // The resolution prompt posted at the end of voting, still naming the old winner.
+    private static AiPrompt currentWinner(long created) {
+        return prompt(
+                "current-winner",
+                PromptSource.PUBLIC,
+                created,
+                List.of("agendaResolution_nekro", "autoresolve_manual"),
+                List.of("Resolve with Current Winner", "Resolve it Manually"));
+    }
+
+    // The message Confounding Legal Text posts itself, newer than the resolution prompt.
+    private static AiPrompt cardMessage() {
+        return prompt(
+                "card-message",
+                PromptSource.PUBLIC,
+                NOW + 500L,
+                List.of("autoresolve_manual"),
+                List.of("Resolve Confounding Legal Text"));
+    }
+
+    private static AiPrompt plots() {
+        return prompt(
+                "plots",
+                PromptSource.PUBLIC,
+                NOW - 1_000L,
+                List.of("generic_button_id_2", "generic_button_id_1"),
+                List.of("No Bribery", "No Deadly Plot"));
+    }
+
+    private void storePlay(CardPlay.Stage stage) {
+        PlayMemory.store(
+                test.context(),
+                PlayMemory.agendaKey(test.context()),
+                new CardPlay(stage, NOW - 600_000L, NOW, "confounding", "", false, 0, ""));
+    }
+
+    private CardPlay.Stage stage() {
+        return test.context()
+                .memory()
+                .get(PlayMemory.agendaKey(test.context()))
+                .flatMap(CardPlay::decode)
+                .orElseThrow()
+                .stage();
+    }
+
     // After playing Confounding Legal Text and surviving the Sabotage window, the seat resolves the agenda by hand
-    // and elects itself.
+    // and elects itself. "Resolve it Manually" is pressed on the original resolution prompt, so the stale "Resolve
+    // with Current Winner" button is deleted with it, not on the newer message the card posted.
     @Test
     void resolvesAPlayedConfoundingByElectingItself() {
-        String key = PlayMemory.agendaKey(test.context());
-        PlayMemory.store(
-                test.context(), key, new CardPlay(CardPlay.Stage.TARGET, NOW, NOW, "confounding", "", false, 0, ""));
-        AiPrompt resolve = prompt("resolve", PromptSource.PUBLIC, NOW, "autoresolve_manual");
+        AgendaClock.seenAt(test.contextAt(NOW - 60_000L));
+        storePlay(CardPlay.Stage.TARGET);
+        AiPrompt original = currentWinner(NOW - 2_000L);
+        AiPrompt card = cardMessage();
 
-        Optional<AiDecision> manual = ActionCardRules.continuePlay(test.context(resolve));
-        assertThat(AiTestGame.pressedId(manual.orElseThrow())).isEqualTo("autoresolve_manual");
+        Optional<AiDecision> manual = ActionCardRules.continuePlay(test.context(original, card));
+        AiDecision.Press press = (AiDecision.Press) manual.orElseThrow();
+        assertThat(press.button().customId()).isEqualTo("autoresolve_manual");
+        assertThat(press.prompt().messageId()).isEqualTo("current-winner");
 
         AiPrompt choose =
                 prompt("choose", PromptSource.PUBLIC, NOW + 1_000L, "agendaResolution_sol", "agendaResolution_nekro");
         Set<String> pressed =
-                Set.of(AiTurnContext.pressKey(resolve, resolve.buttons().getFirst()));
+                Set.of(AiTurnContext.pressKey(original, original.buttons().get(1)));
         Optional<AiDecision> elect =
-                ActionCardRules.continuePlay(test.contextFor(nekro, pressed, NOW + 2_000L, resolve, choose));
+                ActionCardRules.continuePlay(test.contextFor(nekro, pressed, NOW + 2_000L, card, choose));
         assertThat(AiTestGame.pressedId(elect.orElseThrow())).isEqualTo("agendaResolution_nekro");
         assertThat(ShenaniganCards.playing(test.context(), CONFOUNDING)).isTrue();
+    }
+
+    // Once someone else has resolved the agenda, the original prompt is gone. The card's own message must not be
+    // used to resolve the agenda a second time.
+    @Test
+    void doesNotResolveAgainOnceTheResolutionPromptIsGone() {
+        AgendaClock.seenAt(test.contextAt(NOW - 60_000L));
+        storePlay(CardPlay.Stage.TARGET);
+
+        assertThat(ActionCardRules.continuePlay(test.context(cardMessage()))).isEmpty();
+    }
+
+    // A "choose the winner" prompt the seat did not open itself is left to whoever opened it.
+    @Test
+    void doesNotElectItselfFromAPromptItDidNotOpen() {
+        AgendaClock.seenAt(test.contextAt(NOW - 60_000L));
+        storePlay(CardPlay.Stage.TARGET);
+        AiPrompt choose =
+                prompt("choose", PromptSource.PUBLIC, NOW + 1_000L, "agendaResolution_sol", "agendaResolution_nekro");
+
+        assertThat(ActionCardRules.continuePlay(test.contextAt(NOW + 2_000L, choose)))
+                .isEmpty();
+    }
+
+    // Sol has not yet answered the Deadly Plot window, so the seat holds the resolution for the whole table until
+    // every other player has, however long that takes. Then it resolves.
+    @Test
+    void waitsForEveryOtherPlayerToAnswerTheShenanigansBeforeResolving() {
+        AgendaClock.seenAt(test.contextAt(NOW - 60_000L));
+        storePlay(CardPlay.Stage.RESOLVE);
+        AiPrompt original = currentWinner(NOW - 2_000L);
+        LinkedHashSet<String> reacted = new LinkedHashSet<>(List.of("xxcha"));
+        try (MockedStatic<GameMessageManager> messages = Mockito.mockStatic(GameMessageManager.class)) {
+            messages.when(() -> GameMessageManager.getOne(anyString(), eq("plots")))
+                    .thenAnswer(invocation ->
+                            Optional.of(new GameMessage("plots", GameMessageType.AGENDA_DEADLY_PLOT, reacted, 0L)));
+
+            assertThat(ActionCardRules.continuePlay(test.contextAt(NOW + 600_000L, original, plots())))
+                    .isEmpty();
+            assertThat(stage()).isEqualTo(CardPlay.Stage.RESOLVE);
+
+            reacted.add("sol");
+            Optional<AiDecision> manual =
+                    ActionCardRules.continuePlay(test.contextAt(NOW + 610_000L, original, plots()));
+            assertThat(AiTestGame.pressedId(manual.orElseThrow())).isEqualTo("autoresolve_manual");
+        }
     }
 
     @Test

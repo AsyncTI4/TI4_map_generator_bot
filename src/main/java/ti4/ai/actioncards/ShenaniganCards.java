@@ -10,6 +10,7 @@ import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.agenda.AgendaClock;
 import ti4.ai.agenda.AgendaRound;
 import ti4.ai.agenda.AgendaSwing;
+import ti4.ai.agenda.ShenanigansRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -18,6 +19,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.message.GameMessageManager;
 
 @UtilityClass
 public class ShenaniganCards {
@@ -26,6 +28,7 @@ public class ShenaniganCards {
     private static final String ELECT = "agendaResolution_";
     private static final String NO_EFFECT = "resolveWithNoEffect";
     private static final String MANUAL_PRESSED = "manual";
+    private static final String CURRENT_WINNER_LABEL = "Resolve with Current Winner";
     private static final KeepFloor PRIOR = (game, seat, alias) -> ActionCardPrior.keepPrior(alias);
     private static final List<AiCard> CARDS = List.of(
             card(AgendaSwing.CONFOUNDING_LEGAL_TEXT, ShenaniganCards::electItself),
@@ -50,6 +53,9 @@ public class ShenaniganCards {
         if (context.memory().has(key)) return Optional.empty();
         Game game = context.game();
         Player seat = context.seat();
+        boolean holds =
+                seat.getActionCards().keySet().stream().anyMatch(alias -> title.equals(SabotageWindow.title(alias)));
+        if (!holds) return Optional.empty();
         double gain = AgendaSwing.forViewer(game, seat, title, seat);
         return worthPlaying(game, seat, title, gain)
                 .flatMap(alias -> ActionCardRules.startPlay(context, key, alias, Plan.of(gain)));
@@ -100,7 +106,38 @@ public class ShenaniganCards {
         return finish(context, key, play, NO_EFFECT, "discard the agenda with Deadly Plot");
     }
 
+    static boolean isShenanigan(AiCard card) {
+        return CARDS.stream().anyMatch(shenanigan -> shenanigan.key().equals(card.key()));
+    }
+
+    static boolean othersAnswered(AiTurnContext context) {
+        Game game = context.game();
+        List<String> others = game.getRealPlayers().stream()
+                .filter(player -> player != context.seat())
+                .map(Player::getFaction)
+                .toList();
+        return context.prompts().stream()
+                .filter(prompt -> !prompt.isHidden() && AgendaClock.isInThisAgenda(context, prompt))
+                .filter(prompt -> prompt.enabledButtons().stream().anyMatch(ShenanigansRules::isShenanigansButton))
+                .allMatch(prompt -> GameMessageManager.getOne(game.getName(), prompt.messageId())
+                        .map(entry -> entry.factionsThatReacted().containsAll(others))
+                        .orElse(true));
+    }
+
     private static Optional<AiDecision> finish(
+            AiTurnContext context, String key, CardPlay play, String handler, String reason) {
+        if (MANUAL_PRESSED.equals(play.extra())) return chooseOutcome(context, key, play, handler, reason);
+        Optional<Match> manual = Prompts.newestFirst(context.prompts()).stream()
+                .filter(prompt -> !prompt.isHidden() && AgendaClock.isInThisAgenda(context, prompt))
+                .filter(ShenaniganCards::offersTheCurrentWinner)
+                .map(prompt -> unpressed(context, prompt, MANUAL))
+                .flatMap(Optional::stream)
+                .findFirst();
+        manual.ifPresent(ignored -> PlayMemory.store(context, key, play.withExtra(MANUAL_PRESSED)));
+        return manual.map(match -> match.press("resolve the agenda by hand to " + reason));
+    }
+
+    private static Optional<AiDecision> chooseOutcome(
             AiTurnContext context, String key, CardPlay play, String handler, String reason) {
         Optional<Match> outcome = Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> !prompt.isHidden()
@@ -108,18 +145,15 @@ public class ShenaniganCards {
                 .map(prompt -> unpressed(context, prompt, handler))
                 .flatMap(Optional::stream)
                 .findFirst();
-        if (outcome.isPresent()) {
-            PlayMemory.moveTo(context, key, play, Stage.DONE);
-            return Optional.of(outcome.get().press(reason));
-        }
-        if (MANUAL_PRESSED.equals(play.extra())) return Optional.empty();
-        Optional<Match> manual = Prompts.newestFirst(context.prompts()).stream()
-                .filter(prompt -> !prompt.isHidden() && AgendaClock.isInThisAgenda(context, prompt))
-                .map(prompt -> unpressed(context, prompt, MANUAL))
-                .flatMap(Optional::stream)
-                .findFirst();
-        manual.ifPresent(ignored -> PlayMemory.store(context, key, play.withExtra(MANUAL_PRESSED)));
-        return manual.map(match -> match.press("resolve the agenda by hand to " + reason));
+        outcome.ifPresent(ignored -> PlayMemory.moveTo(context, key, play, Stage.DONE));
+        return outcome.map(match -> match.press(reason));
+    }
+
+    private static boolean offersTheCurrentWinner(AiPrompt prompt) {
+        return prompt.firstEnabled(button -> button.isUnowned()
+                        && button.handlerId().startsWith(ELECT)
+                        && CURRENT_WINNER_LABEL.equals(button.label()))
+                .isPresent();
     }
 
     private static Optional<Match> unpressed(AiTurnContext context, AiPrompt prompt, String handler) {
