@@ -14,7 +14,7 @@ import ti4.testUtils.BaseTi4Test;
 
 // The audit's case: the win race only counted public objectives, so a seat holding a ready status secret thought a
 // rival would win first and dropped the reserve for the spend objective that would have won it the game. With
-// WIN_RACE_SECRETS the seat counts its own ready status secret (it knows its hand) and keeps a reserve whenever
+// WIN_THREAT_FEASIBLE the seat counts its own ready status secret (it knows its hand) and keeps a reserve whenever
 // keeping it still wins the race.
 class WinRaceSecretsTest extends BaseTi4Test {
 
@@ -50,7 +50,7 @@ class WinRaceSecretsTest extends BaseTi4Test {
     }
 
     private void disableForNekro() {
-        AiExperiments.disable(test.nekro, Set.of(Experiment.WIN_RACE_SECRETS));
+        AiExperiments.disable(test.nekro, Set.of(Experiment.WIN_THREAT_FEASIBLE));
     }
 
     // Form a Spy Network needs five action cards, which Nekro holds: its secret is ready for the status phase.

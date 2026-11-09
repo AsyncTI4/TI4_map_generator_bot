@@ -32,7 +32,7 @@ class TradeValue {
     }
 
     static double predictedFor(Game game, Player partner, Player seat, Deal deal) {
-        Valuation theirs = AiExperiments.enabled(partner, AiExperiments.Experiment.WIN_RACE_SECRETS)
+        Valuation theirs = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_THREAT_FEASIBLE)
                 ? ImaginedTurn.of(partner, () -> evaluate(game, partner, seat, deal, PARTNER_TRUST_IN_AI, true))
                 : evaluate(game, partner, seat, deal, PARTNER_TRUST_IN_AI, true);
         return theirs.veto().isPresent() ? Double.NEGATIVE_INFINITY : theirs.utility();

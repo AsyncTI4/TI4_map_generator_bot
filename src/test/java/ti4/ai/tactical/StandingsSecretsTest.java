@@ -9,13 +9,18 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.secrets.SecretOdds;
+import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
-// The audit found every AI kept expanding while a rival sat three points from the goal: the leader threat only
-// started 1.5 points out, and any held secret counted as a flat 0.35. With WIN_RACE_SECRETS the threat ramps from
-// three points out and a rival's secret counts at its card-counting odds.
+// The audit found the leader threat ramped over a fixed distance from the goal (1.5 points, then 3 under the
+// experiment), so several rivals looked like threats from 7/10 whatever they could actually score. With
+// WIN_THREAT_FEASIBLE the threat is the rival's chance to reach the goal by the end of the coming status phase, built
+// from the points it can feasibly get: one public per status phase (LRR 61.6, 81.1), Imperial's extra public and
+// Mecatol point (LRR 45.2), secrets at their card-counting odds, the custodians and Styx when it can take them.
 class StandingsSecretsTest extends BaseTi4Test {
+
+    private static final int IMPERIAL = 8;
 
     private DefenseScenario board;
     private Player sardakk;
@@ -36,33 +41,70 @@ class StandingsSecretsTest extends BaseTi4Test {
     }
 
     private void disableForNekro() {
-        AiExperiments.disable(board.test.nekro, Set.of(Experiment.WIN_RACE_SECRETS));
+        AiExperiments.disable(board.test.nekro, Set.of(Experiment.WIN_THREAT_FEASIBLE));
     }
 
-    // Eight of ten with nothing ready: one third of the way into the three-point window.
+    // Nine of ten with nothing it can score this round: not a threat, however close it sits.
     @Test
-    void aRivalTwoPointsFromTheGoalIsAlreadyAThreat() {
-        score(sardakk, 8);
+    void aRivalOnePointOutWithNothingFeasibleIsNoThreat() {
+        score(sardakk, 9);
 
-        assertThat(standings().winThreat(sardakk)).isCloseTo(1.0 / 3, within(1e-9));
+        assertThat(standings().winThreat(sardakk)).isZero();
         assertThat(standings().denialWeight(sardakk))
-                .isGreaterThan(0.4 * standings().hurtWeight(sardakk));
+                .isCloseTo(0.4 * standings().hurtWeight(sardakk), within(1e-9));
     }
 
+    // The old ramp: nine of ten is a third of the way into the 1.5-point window.
     @Test
-    void withTheExperimentDisabledTheThreatStartsOnlyOnePointAndAHalfOut() {
-        score(sardakk, 8);
+    void withTheExperimentDisabledTheThreatRampsOverTheOldWindow() {
+        score(sardakk, 9);
         disableForNekro();
 
+        assertThat(standings().winThreat(sardakk)).isCloseTo(1.0 / 3, within(1e-9));
+    }
+
+    // Seven of ten, but Sardakk holds the unplayed Imperial with Mecatol Rex (one point, LRR 45.2) and six command
+    // tokens for Galvanize the People (two points): three sure points, so it is a certain threat.
+    private void sardakkOnSevenWithThreeSurePoints() {
+        score(sardakk, 7);
+        board.reveal("galvanize");
+        sardakk.setTacticalCC(3);
+        sardakk.setStrategicCC(3);
+        sardakk.addSC(IMPERIAL);
+        sardakk.addPlanet("mr");
+    }
+
+    @Test
+    void aRivalFurtherOutWithFeasiblePointsIsAThreat() {
+        sardakkOnSevenWithThreeSurePoints();
+
+        assertThat(standings().winThreat(sardakk)).isCloseTo(1.0, within(1e-9));
+    }
+
+    // Without Mecatol Rex the Imperial point is gone (no way onto it this round) and Galvanize alone leaves Sardakk
+    // one short.
+    @Test
+    void imperialWithoutMecatolGivesNoPoint() {
+        sardakkOnSevenWithThreeSurePoints();
+        sardakk.removePlanet("mr");
+
         assertThat(standings().winThreat(sardakk)).isZero();
     }
 
-    // Seven of ten is three points out: still calm.
+    // Two unseen secrets on nine of ten: the threat is the exact chance that either card is ready, not a rounded
+    // sure point.
     @Test
-    void aRivalThreePointsBehindTheGoalStaysCalm() {
-        score(sardakk, 7);
+    void aRivalsSecretsCountAtTheirExactOdds() {
+        score(sardakk, 9);
+        sardakk.setSecret("dhw");
+        sardakk.setSecret("lsc");
 
-        assertThat(standings().winThreat(sardakk)).isZero();
+        double noneReady = 1;
+        for (CardChance card : SecretOdds.readyByCard(board.test.game, board.test.nekro, sardakk)) {
+            noneReady *= 1 - card.status() - card.action();
+        }
+        assertThat(standings().winThreat(sardakk)).isCloseTo(1 - noneReady, within(1e-9));
+        assertThat(standings().winThreat(sardakk)).isBetween(0.0, 0.5);
     }
 
     @Test

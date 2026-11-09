@@ -21,7 +21,7 @@ public class WinRace {
 
     private static final String ACTION_PHASE = "action";
     private static final int IMMEDIATELY = -1;
-    private static final int DURING_ACTION_PHASE = 0;
+    static final int DURING_ACTION_PHASE = 0;
     private static final int LEADERSHIP_TOKENS = 3;
     private static final int MECATOL_POINT = 1;
     private static final int STYX_POINT = 1;
@@ -34,20 +34,25 @@ public class WinRace {
     }
 
     private static List<Player> computeWinnersBefore(Game game, Player seat) {
-        boolean secrets = countsSecrets(seat);
-        OptionalInt mine = secrets ? finish(game, seat, ownSecret(game, seat)) : finish(game, seat);
+        boolean feasible = weighsFeasibility(seat);
+        OptionalInt mine = feasible ? finish(game, seat, ownSecret(game, seat)) : finish(game, seat);
         return game.getRealPlayers().stream()
                 .filter(other -> other != seat && !other.isEliminated())
-                .filter(other -> finishesFirst(rivalFinish(game, seat, other, secrets), mine))
+                .filter(other ->
+                        feasible ? likelyFirst(game, seat, other, mine) : finishesFirst(finish(game, other), mine))
                 .toList();
     }
 
-    private static boolean countsSecrets(Player seat) {
-        return AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_RACE_SECRETS);
+    private static boolean weighsFeasibility(Player seat) {
+        return AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_THREAT_FEASIBLE);
     }
 
-    private static OptionalInt rivalFinish(Game game, Player seat, Player rival, boolean secrets) {
-        return secrets ? finish(game, rival, fearedAtStatus(game, seat, rival)) : finish(game, rival);
+    private static boolean likelyFirst(Game game, Player seat, Player rival, OptionalInt mine) {
+        return WinOdds.finishesBefore(game, seat, rival, mine) >= WinOdds.MAJORITY;
+    }
+
+    static int statusFinish(Player player) {
+        return 1 + player.getInitiative();
     }
 
     private static Boost ownSecret(Game game, Player seat) {
@@ -57,15 +62,9 @@ public class WinRace {
         return new Boost(0, 0, 0, false, secret);
     }
 
-    private static Boost fearedAtStatus(Game game, Player viewer, Player rival) {
-        int secret = (int) Math.round(SecretOdds.chanceReady(game, viewer, rival));
-        return new Boost(0, styxPoint(game, rival), 0, ScoringPaths.imperialAwaitsMecatol(game, rival), secret);
-    }
-
     public static boolean winsWithReserve(Game game, Player seat, String reservedId) {
         OptionalInt mine = finish(game, seat, ownSecret(game, seat), readyPublics(game, seat, reservedId));
-        return winnersBefore(game, seat).stream()
-                .allMatch(rival -> finishesBefore(mine, rivalFinish(game, seat, rival, true)));
+        return winnersBefore(game, seat).stream().noneMatch(rival -> likelyFirst(game, seat, rival, mine));
     }
 
     private static boolean finishesFirst(OptionalInt theirs, OptionalInt mine) {
@@ -104,7 +103,7 @@ public class WinRace {
         if (imperial) duringAction += best(publics, 0) + (mecatol ? MECATOL_POINT : 0);
         if (duringAction >= missing) return OptionalInt.of(DURING_ACTION_PHASE);
         int byStatus = duringAction + best(publics, imperial ? 1 : 0) + Math.min(1, boost.statusSecret());
-        return byStatus >= missing ? OptionalInt.of(1 + player.getInitiative()) : OptionalInt.empty();
+        return byStatus >= missing ? OptionalInt.of(statusFinish(player)) : OptionalInt.empty();
     }
 
     public static Boost feared(Game game, Player viewer, Player rival, int immediatePoints) {
@@ -118,7 +117,9 @@ public class WinRace {
 
     public static boolean canWinThisRound(Game game, Player viewer, Player player) {
         return DecisionMemo.remember(
-                () -> finish(game, player, feared(game, viewer, player, 0)).isPresent(),
+                () -> weighsFeasibility(viewer)
+                        ? WinOdds.reachesGoal(game, viewer, player) >= WinOdds.MAJORITY
+                        : finish(game, player, feared(game, viewer, player, 0)).isPresent(),
                 "win.canWinThisRound",
                 viewer,
                 player,
@@ -159,7 +160,7 @@ public class WinRace {
         return points;
     }
 
-    private static boolean qualifies(Game game, Player player, Wallet wallet, String id) {
+    static boolean qualifies(Game game, Player player, Wallet wallet, String id) {
         SpendCost cost = ObjectiveCatalog.spendCost(id).orElse(SpendCost.NONE);
         if (isTokenSpend(cost)) return wallet.tokens() >= cost.tokens();
         return ObjectivePolicy.qualifies(game, player, wallet, id);
@@ -169,7 +170,7 @@ public class WinRace {
         return cost.tokens() > 0 && cost.resources() == 0 && cost.influence() == 0 && cost.tradeGoods() == 0;
     }
 
-    private static Wallet projectedWallet(Game game, Player player) {
+    static Wallet projectedWallet(Game game, Player player) {
         Wallet now = Wallet.of(game, player);
         int gained = holdsUnplayedLeadership(game, player) ? LEADERSHIP_TOKENS : 0;
         return new Wallet(
