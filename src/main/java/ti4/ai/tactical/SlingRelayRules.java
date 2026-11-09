@@ -65,7 +65,8 @@ public class SlingRelayRules {
             computed.ifPresent(found -> TacticalRules.remember(context, found));
             return computed;
         });
-        if (plan.isPresent() && plan.get().score() >= sling) return Optional.empty();
+        double insteadOfTactical = Stall.withoutStallCredit(seat, sling, stall);
+        if (plan.isPresent() && plan.get().score() >= insteadOfTactical) return Optional.empty();
         String reason = choice.get().ship().scoring() ? "for an objective, without locking it" : "and wait and see";
         return open(context, thisTurn, choice.get(), reason);
     }

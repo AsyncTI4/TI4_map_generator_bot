@@ -88,7 +88,11 @@ public class XxchaAgentRules {
             return open(context, thisTurn, picks.getFirst(), "as the stalling action");
         }
         Optional<ReadyingValue.Pick> beforeASpend = pickBeforeASpend(game, seat, picks);
-        if (beforeASpend.isEmpty() || plan.get().score() >= beforeASpend.get().value() + stall) {
+        if (beforeASpend.isEmpty()
+                || plan.get().score()
+                        >= beforeASpend.get().value()
+                                + Stall.insteadOfTacticalAction(
+                                        game, seat, stall, beforeASpend.get().unlocksScore())) {
             return Optional.empty();
         }
         return open(context, thisTurn, beforeASpend.get(), "before the spend it pays for");
