@@ -150,6 +150,21 @@ class CustomHyperlaneServiceTest {
         assertEquals(List.of(), CustomHyperlaneService.describeContradictions(matrixWithOneConnection(0, 3)));
     }
 
+    // The one-way lane hint glows on the system a one-way lane leads into: the exit side of the lane, never its entry.
+    @Test
+    void oneWayExitSidesAreWhereOneWayLanesLeave() {
+        assertEquals(Set.of(3), CustomHyperlaneService.oneWayExitSides(matrixWithOneConnection(0, 3)));
+        String twoWay = "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        assertEquals(Set.of(), CustomHyperlaneService.oneWayExitSides(twoWay));
+    }
+
+    // On a roundabout only exit-only connectors count; a side that can also be entered is two-way.
+    @Test
+    void roundaboutExitSidesAreExitOnlyConnectors() {
+        String roundabout = "1,0,1,0,1,0;0,0,0,0,0,0;0,0,1,0,1,0;0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0";
+        assertEquals(Set.of(4), CustomHyperlaneService.oneWayExitSides(roundabout));
+    }
+
     private static String oneWay(String matrix) {
         return PATTERN.matcher(matrix).replaceFirst("2");
     }

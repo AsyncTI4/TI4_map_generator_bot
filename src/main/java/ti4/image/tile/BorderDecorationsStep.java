@@ -38,6 +38,7 @@ final class BorderDecorationsStep implements TileStepPainter {
         if (!scene.hidesFogged(tile)) {
             drawAdjacencyArrows(game, layer);
         }
+        OneWayLaneHints.drawOn(scene, layer);
         if (!game.getBorderAnomalies().isEmpty()) {
             drawBorderAnomalies(scene, layer);
         }

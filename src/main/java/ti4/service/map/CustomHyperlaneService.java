@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -537,6 +538,33 @@ public class CustomHyperlaneService {
 
     public static boolean hasOneWayLanes(String stored) {
         return stored != null && toTypedMatrix(stored).contains(ONE_WAY);
+    }
+
+    public static Set<Integer> oneWayExitSides(String stored) {
+        int[][] grid = parseMatrix(stored);
+        boolean roundabout = hasSelfConnection(stored);
+        Set<Integer> exits = new TreeSet<>();
+        for (int side = 0; side < 6; side++) {
+            if (roundabout ? isExitOnlyRoundaboutSide(grid, side) : hasOneWayLaneInto(grid, side)) exits.add(side);
+        }
+        return exits;
+    }
+
+    private static boolean hasOneWayLaneInto(int[][] grid, int side) {
+        for (int from = 0; from < 6; from++) {
+            if (from != side && grid[from][side] == 1 && grid[side][from] == 0) return true;
+        }
+        return false;
+    }
+
+    private static boolean isExitOnlyRoundaboutSide(int[][] grid, int side) {
+        boolean entered = false, left = false;
+        for (int other = 0; other < 6; other++) {
+            if (other == side) continue;
+            entered |= grid[other][side] == 1;
+            left |= grid[side][other] == 1;
+        }
+        return grid[side][side] == 1 && entered && !left;
     }
 
     public static List<String> describeOneWayLanes(String stored) {

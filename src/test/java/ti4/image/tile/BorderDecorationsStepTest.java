@@ -11,10 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
+import ti4.service.fow.FogViewer;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 class BorderDecorationsStepTest extends BaseTi4Test {
@@ -27,6 +30,84 @@ class BorderDecorationsStepTest extends BaseTi4Test {
         assertThat(pixels(allSides)).isEqualTo(pixels(centredImage(allSides)));
         assertThat(painted(oneSide)).isPositive().isLessThan(painted(allSides));
         assertThat(painted(renderRatNest(List.of()))).isZero();
+    }
+
+    // One-way hyperlane 000 runs N -> S: with "One-way lane hints" on, 104 (where it leads) glows at its north edge,
+    // 101 (where it starts) does not, and nothing glows with the option off.
+    @Test
+    void oneWayLaneHintGlowsOnlyOnTheSystemTheLaneLeadsInto() {
+        Game game = gameWithOneWayLaneIntoTile104(true);
+
+        assertThat(painted(extras(game, "104"))).isZero();
+        game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
+        assertThat(glowsAtNorthEdge(extras(game, "104"))).isTrue();
+        assertThat(painted(extras(game, "101"))).isZero();
+    }
+
+    // The option is a fog option: a normal game that has it stored (e.g. converted from fog) draws nothing extra.
+    @Test
+    void normalGamesNeverGlowAndKeepTheirExtrasTiles() {
+        Game game = gameWithOneWayLaneIntoTile104(false);
+        game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
+
+        assertThat(painted(extras(game, "104"))).isZero();
+        assertThat(ExtrasStepTiles.positions(game)).isEmpty();
+    }
+
+    // Fog safety: a player only gets the hint from a hyperlane they currently see.
+    @Test
+    void privateViewGlowsOnlyFromASeenHyperlane() {
+        Game game = gameWithOneWayLaneIntoTile104(true);
+        game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
+        Player viewer = game.addPlayer("111", "sol");
+        viewer.setFaction(game, "sol");
+        viewer.setColor("blue");
+        game.getTileByPosition("104").setTileFog(viewer, false);
+        TileLayers privateLayers =
+                TileLayers.forPreparedViewer(game, new FogViewer(game, true, viewer), DisplayType.all);
+
+        game.getTileByPosition("000").setTileFog(viewer, true);
+        assertThat(painted(privateLayers.draw(game.getTileByPosition("104"), TileStep.Extras)))
+                .isZero();
+        game.getTileByPosition("000").setTileFog(viewer, false);
+        assertThat(glowsAtNorthEdge(privateLayers.draw(game.getTileByPosition("104"), TileStep.Extras)))
+                .isTrue();
+    }
+
+    // A spatial tear on the lane's exit edge blocks the route, so the system behind it must not glow; a malformed
+    // hyperlane entry must not break the render either.
+    @Test
+    void noHintAcrossABlockedEdgeOrFromBrokenData() {
+        Game game = gameWithOneWayLaneIntoTile104(true);
+        game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
+        game.addBorderAnomaly("000", 3, "spatial_tear");
+        assertThat(painted(extras(game, "104"))).isZero();
+
+        game.getCustomHyperlaneData().put("000", "broken");
+        assertThat(ExtrasStepTiles.positions(game)).containsExactly("000");
+        assertThat(painted(extras(game, "104"))).isZero();
+    }
+
+    // Systems 101 (north) and 104 (south) around custom hyperlane 000, whose one lane runs N -> S.
+    private static Game gameWithOneWayLaneIntoTile104(boolean fog) {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("one-way-hint-test");
+        game.setFowMode(fog);
+        game.setTile(new Tile("19", "101"));
+        game.setTile(new Tile("20", "104"));
+        game.setTile(new Tile("hl", "000"));
+        game.getCustomHyperlaneData()
+                .put("000", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        return game;
+    }
+
+    private static boolean glowsAtNorthEdge(BufferedImage layer) {
+        return (layer.getRGB(TILE_PADDING + TILE_WIDTH / 2, TILE_PADDING + 3) >>> 24) > 0;
+    }
+
+    private static BufferedImage extras(Game game, String position) {
+        return TileLayers.of(game, null, DisplayType.all).draw(game.getTileByPosition(position), TileStep.Extras);
     }
 
     private static BufferedImage renderRatNest(List<Integer> directions) {

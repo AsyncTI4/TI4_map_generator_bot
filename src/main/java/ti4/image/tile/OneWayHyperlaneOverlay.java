@@ -41,6 +41,9 @@ final class OneWayHyperlaneOverlay {
     private static final double MARKER_DEPTH = 32;
     private static final double STRAIGHT_HANDLE = 100;
     private static final double ROUNDABOUT_RADIUS = 60;
+    private static final float HINT_RADIUS = 15;
+    private static final int HINT_CORE_ALPHA = 130;
+    private static final int HINT_HALO_ALPHA = 80;
 
     private static final List<Point2D> EDGE_MIDPOINTS = edgeMidpoints();
 
@@ -326,5 +329,13 @@ final class OneWayHyperlaneOverlay {
             }
         }
         return pointAt(points, 13);
+    }
+
+    static void drawLaneHint(Graphics2D target, int side) {
+        Graphics2D g = (Graphics2D) target.create();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.clip(hexOutline());
+        drawNode(g, EDGE_MIDPOINTS.get(side), HINT_RADIUS, HINT_CORE_ALPHA, HINT_HALO_ALPHA);
+        g.dispose();
     }
 }
