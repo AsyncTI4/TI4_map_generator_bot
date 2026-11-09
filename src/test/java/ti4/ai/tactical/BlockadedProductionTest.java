@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ValueScale;
 import ti4.ai.tactical.ProductionPlanner.BuildOrder;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
@@ -65,6 +67,50 @@ class BlockadedProductionTest extends BaseTi4Test {
         AiExperiments.disable(board.test.nekro, EnumSet.of(Experiment.BLOCKADE_GROUND));
 
         assertThat(plan().isEmpty()).isTrue();
+    }
+
+    // A blockading carrier with two infantry against one defending infantry is a small threat: the planner buys only
+    // the ground forces whose defence gain pays for their resources, which here is a single infantry, although the
+    // dock could produce several more and Nekro has 20 trade goods.
+    @Test
+    void aSmallThreatBuysASmallGarrison() {
+        DefenseScenario small = new DefenseScenario();
+        small.test.nekro.setTg(20);
+        small.test.units(small.home, "space", small.sardakk, UnitType.Carrier, 1);
+        small.test.units(small.home, "space", small.sardakk, UnitType.Infantry, 2);
+        small.test.units(small.home, HOME_PLANET, small.test.nekro, UnitType.Infantry, 1);
+
+        BuildPlan plan = ProductionPlanner.plan(small.test.game, small.test.nekro, small.home);
+        int capacity = Helper.getProductionValue(small.test.nekro, small.test.game, small.home, false);
+
+        assertThat(plan.units()).isEqualTo(1);
+        assertThat(plan.units()).isLessThan(capacity);
+    }
+
+    // The bigger landing in setUp (four infantry) earns a bigger garrison, but still not a full dock: every order must
+    // be worth at least its resources (0.8 trade goods each, ValueScale.RESOURCE) in reduced defence cost.
+    @Test
+    void everyBlockadedOrderPaysForItsResources() {
+        BuildPlan plan = plan();
+        int capacity = Helper.getProductionValue(board.test.nekro, board.test.game, board.home, false);
+
+        assertThat(plan.units()).isBetween(2, capacity - 1);
+        assertThat(plan.orders())
+                .allSatisfy(
+                        order -> assertThat(order.value()).isGreaterThanOrEqualTo(ValueScale.RESOURCE * order.cost()));
+    }
+
+    // A lone blockading destroyer carries no ground forces, so nothing threatens the planet and nothing is built.
+    @Test
+    void noThreatBuildsNothing() {
+        DefenseScenario calm = new DefenseScenario();
+        calm.test.nekro.setTg(20);
+        calm.test.units(calm.home, "space", calm.sardakk, UnitType.Destroyer, 1);
+        calm.test.units(calm.home, HOME_PLANET, calm.test.nekro, UnitType.Infantry, 1);
+
+        assertThat(ProductionPlanner.plan(calm.test.game, calm.test.nekro, calm.home)
+                        .isEmpty())
+                .isTrue();
     }
 
     // A lone destroyer cannot land troops; whatever the blockaded dock buys is still ground forces only.
