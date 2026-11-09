@@ -74,7 +74,7 @@ class WarfareUses {
         return plan.isEmpty() ? Optional.empty() : Optional.of(plan);
     }
 
-    private static double doubleBuild(PlanInputs in, Tile home, Optional<BuildPlan> firstBuild) {
+    static double doubleBuild(PlanInputs in, Tile home, Optional<BuildPlan> firstBuild) {
         if (firstBuild.isEmpty()) return 0;
         Game game = in.game();
         Player seat = in.seat();

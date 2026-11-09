@@ -41,10 +41,12 @@ class FreelancersRulesTest extends BaseTi4Test {
         test.aiIsActive("action");
     }
 
-    // With money to spare, the best ship for the system is a carrier (the AI wants two), and the extra system it
-    // saves a trip to makes it worth building. It builds the carrier and pays for it.
+    // With money to spare, the flagship already out and infantry waiting on Tequran with no ship to lift them, the best
+    // ship for the system is a carrier, and the extra system it saves a trip to makes it worth building. It builds the
+    // carrier and pays for it.
     @Test
     void buildsAShipInAForwardSystem() {
+        infantryWaitingForward();
         assertThat(pressedId(ExplorationRules.next(test.context(offer())).orElseThrow()))
                 .isEqualTo("freelancersBuild_tequran");
 
@@ -58,6 +60,7 @@ class FreelancersRulesTest extends BaseTi4Test {
     // planet: that is the planet the AI exhausts.
     @Test
     void paysWithTheSparestInfluencePlanet() {
+        infantryWaitingForward();
         ExplorationRules.next(test.context(offer()));
         ExplorationRules.next(test.context(units()));
 
@@ -73,6 +76,11 @@ class FreelancersRulesTest extends BaseTi4Test {
                 List.of("Tequran", "Torkan", "Mordai II", "Done Exhausting Planets"));
         assertThat(pressedId(PaymentRules.pay(test.context(payment)).orElseThrow()))
                 .isEqualTo("spend_torkan_freelancers");
+    }
+
+    private void infantryWaitingForward() {
+        test.units(forward, "tequran", test.nekro, UnitType.Infantry, 5);
+        test.units(test.game.getTileByPosition(AiTestGame.HOME), "space", test.nekro, UnitType.Flagship, 1);
     }
 
     // With every planet spent and no trade goods there is nothing to pay with, so the offer is declined.

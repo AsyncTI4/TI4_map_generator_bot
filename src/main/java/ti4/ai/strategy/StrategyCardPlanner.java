@@ -13,7 +13,11 @@ import ti4.game.Player;
 public class StrategyCardPlanner {
 
     static CardPlan plan(PlanInputs in, int initiative) {
-        return in.plans().computeIfAbsent(initiative, card -> evaluate(in, card));
+        CardPlan cached = in.plans().get(initiative);
+        if (cached != null) return cached;
+        CardPlan evaluated = evaluate(in, initiative);
+        CardPlan raced = in.plans().putIfAbsent(initiative, evaluated);
+        return raced == null ? evaluated : raced;
     }
 
     private static CardPlan evaluate(PlanInputs in, int initiative) {

@@ -28,6 +28,7 @@ import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.combat.SpaceCannonOffenceWindow;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.spring.context.SpringContext;
 
@@ -72,6 +73,7 @@ public class CombatButtonHandler {
     @ButtonHandler("declinePDS_")
     public static void declinePDS(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTile(buttonID.split("_")[1]);
+        if (tile != null) SpaceCannonOffenceWindow.resolve(game, player, tile.getPosition());
         String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON"
                 + (tile != null ? " at " + tile.getRepresentation() : "") + ".";
         if (game.isFowMode()) {

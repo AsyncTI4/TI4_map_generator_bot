@@ -15,9 +15,11 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.explore.ExplorationRules;
 import ti4.ai.legendary.TempestaRules;
+import ti4.ai.naalu.MatriarchRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
@@ -33,6 +35,8 @@ import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.ai.tech.TechRules;
+import ti4.ai.winnu.BloodTies;
+import ti4.ai.winnu.WinnuProduction;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -79,7 +83,6 @@ public class TacticalRules {
     private static final long WAR_MACHINE_WAIT_MILLIS = 10_000L;
     private static final String AIDA_EXHAUST = "exhaustTech_aida";
     private static final String AIDA_DISCOUNT = "aida_";
-    private static final int CUSTODIANS_COST = 6;
     static final String FREE_BUILD_KEY = "hacanHeroBuild|";
     private static final String FREE_BUILD_PLANNED = "planned";
     private static final String FREE_BUILD_PURGED = "purged";
@@ -253,6 +256,8 @@ public class TacticalRules {
 
         Optional<AiDecision> movement = movement(context, turn, target, plan);
         if (movement.isPresent()) return movement;
+        Optional<AiDecision> spaceCannon = SpaceCannonWait.next(context, turn, tile);
+        if (spaceCannon.isPresent()) return spaceCannon;
         if (BoardView.hasOwnShips(seat, tile) && BoardView.hasEnemyShips(game, seat, tile)) {
             return waitForCombat(context, turn);
         }
@@ -489,6 +494,9 @@ public class TacticalRules {
                         "land on " + landing.get().planet()));
             }
         }
+        Optional<AiDecision> matriarch =
+                MatriarchRules.commitFighters(context, done.get().prompt(), tile);
+        if (matriarch.isPresent()) return matriarch;
         return Optional.of(done.get().press("done landing"));
     }
 
@@ -522,6 +530,7 @@ public class TacticalRules {
 
     private static void expectCustodiansPayment(AiTurnContext context, Tile tile, String planetName) {
         if (!needsCustodiansPayment(tile, planetName)) return;
+        if (BloodTies.waivesCustodiansInfluence(context.seat())) return;
         custodiansPayment(context)
                 .ifPresent(payment ->
                         PaymentRules.expect(context, "the custodians token", payment, PaymentRules.OBJECTIVE_DONE));
@@ -532,7 +541,7 @@ public class TacticalRules {
     }
 
     private static Optional<Wallet.Payment> custodiansPayment(AiTurnContext context) {
-        SpendCost cost = SpendCost.influence(CUSTODIANS_COST);
+        SpendCost cost = SpendCost.influence(CustodiansRace.cost(context.seat()));
         return ScoringReserve.planForCustodians(context.game(), context.seat())
                 .or(() -> Wallet.of(context.game(), context.seat()).plan(cost));
     }
@@ -712,6 +721,7 @@ public class TacticalRules {
         if (reserve.isNone()) return false;
         int discounts = (seat.hasTech("st") ? 1 : 0)
                 + ProductionPlanner.aidaDiscount(seat)
+                + WinnuProduction.plannedDiscount(seat)
                 + (seat.getSpentThingsThisWindow().contains(WAR_MACHINE_SPENT) ? 1 : 0);
         int owed = (int) Math.ceil(producedCost(seat) + addedCost - discounts);
         if (owed <= 0) return false;
@@ -768,6 +778,8 @@ public class TacticalRules {
         }
         if (owed > 0) {
             SpendCost reserve = ProductionPlanner.reserve(game, seat);
+            Optional<AiDecision> winnu = WinnuProduction.discount(context, payment, owed, reserve);
+            if (winnu.isPresent()) return winnu;
             Optional<PromptButton> planet = PaymentPlanner.keepingReserve(game, seat, payment, owed, reserve)
                     .or(() -> PaymentPlanner.choosePlanet(game, seat, payment, owed));
             if (planet.isPresent()) {
@@ -812,6 +824,8 @@ public class TacticalRules {
                 spent += 1;
             } else if (AIDA_DISCOUNT.equals(thing)) {
                 spent += ButtonHelper.getNumberOfUnitUpgrades(seat);
+            } else if (WinnuProduction.AGENT.equals(thing)) {
+                spent += WinnuProduction.AGENT_DISCOUNT;
             } else if (thing.startsWith("tg_")) {
                 spent += parseDouble(StringUtils.substringAfter(thing, "tg_")) * Wallet.tradeGoodValue(seat);
             } else if (seat.getPlanets().contains(thing)
@@ -819,7 +833,7 @@ public class TacticalRules {
                 spent += pooling.resourcesOf(game.getPlanetsInfo().get(thing));
             }
         }
-        return spent;
+        return spent + WinnuProduction.swappedGain(game, seat);
     }
 
     private static double parseDouble(String value) {

@@ -94,8 +94,10 @@ class ArmadaFleetSupplyTest extends BaseTi4Test {
         assertThat(dreadnoughtsSent()).isEqualTo(3);
     }
 
+    // The flagship is already out next door, so it does not take the build's resources.
     @Test
     void buildsUpToTheArmadaLimitInAHomeSystemHoldingOneShip() {
+        test.units(test.place("22", neighbour), "space", test.nekro, UnitType.Flagship, 1);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         test.nekro.setTg(10);

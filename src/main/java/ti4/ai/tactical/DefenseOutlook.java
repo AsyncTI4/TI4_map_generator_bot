@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import ti4.ai.eval.BoardView;
@@ -125,6 +126,8 @@ public final class DefenseOutlook {
     private final Map<String, Double> costs = new HashMap<>();
     private final Map<String, Double> threats = new HashMap<>();
     private final Map<String, Double> postures = new HashMap<>();
+    private final Map<String, PresenceReach> presenceReaches = new HashMap<>();
+    private final Map<String, Integer> dockCounts = new HashMap<>();
 
     public DefenseOutlook(Game game, Player seat) {
         this(game, seat, new IncomingForces(game), null, null);
@@ -152,6 +155,21 @@ public final class DefenseOutlook {
         this.intents = root == null ? new HashMap<>() : root.intents;
         this.spaceChances = root == null ? new HashMap<>() : root.spaceChances;
         this.groundChances = root == null ? new HashMap<>() : root.groundChances;
+    }
+
+    PresenceReach presenceReach(Game game, Player seat, Tile dock) {
+        if (game != this.game || seat != this.seat)
+            return PresenceReach.of(game, seat, dock, new DefenseOutlook(game, seat));
+        PresenceReach cached = presenceReaches.get(dock.getPosition());
+        if (cached != null) return cached;
+        PresenceReach reach = PresenceReach.of(game, seat, dock, this);
+        presenceReaches.put(dock.getPosition(), reach);
+        return reach;
+    }
+
+    int dockCount(String measure, Game game, Player seat, Tile dock, IntSupplier count) {
+        if (game != this.game || seat != this.seat) return count.getAsInt();
+        return dockCounts.computeIfAbsent(measure + "@" + dock.getPosition(), ignored -> count.getAsInt());
     }
 
     GroundCampaign campaign() {

@@ -38,6 +38,11 @@ import ti4.ai.letnev.DarktalonTreillaRules;
 import ti4.ai.letnev.LetnevCombatRules;
 import ti4.ai.letnev.RearAdmiralFarranRules;
 import ti4.ai.letnev.ViscountUnlennSale;
+import ti4.ai.naalu.ForesightRules;
+import ti4.ai.naalu.IconoclastRules;
+import ti4.ai.naalu.MatriarchRules;
+import ti4.ai.naalu.OracleRules;
+import ti4.ai.naalu.ZeuAgentRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.ConvoysRules;
@@ -64,6 +69,7 @@ import ti4.ai.strategy.CardPlanMemory;
 import ti4.ai.strategy.ChecksAndBalances;
 import ti4.ai.strategy.OverruleChoice;
 import ti4.ai.strategy.SecondaryQueue;
+import ti4.ai.strategy.StrategyCardPickLog;
 import ti4.ai.strategy.StrategyCardRanking;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.StrategyCardTurn;
@@ -81,9 +87,19 @@ import ti4.ai.tactical.TransitDiodesRules;
 import ti4.ai.tech.EntropicScarRules;
 import ti4.ai.tech.TechRules;
 import ti4.ai.trade.TradeRules;
+import ti4.ai.winnu.LazaxGateFolding;
+import ti4.ai.winnu.MathisMathinusRules;
+import ti4.ai.winnu.ReclaimerRules;
+import ti4.ai.winnu.StartingTechRules;
 import ti4.ai.xxcha.PeaceAccordsRules;
 import ti4.ai.xxcha.QuashRules;
 import ti4.ai.xxcha.XxchaAgentRules;
+import ti4.ai.yin.BrotherMilorRules;
+import ti4.ai.yin.BrotherOmarRules;
+import ti4.ai.yin.DannelRules;
+import ti4.ai.yin.DevotionRules;
+import ti4.ai.yin.IndoctrinationRules;
+import ti4.ai.yin.YinSpinnerRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -127,6 +143,11 @@ public class NekroBrain implements FactionBrain {
             XxchaAgentRules.USER_PREFIX,
             XxchaAgentRules.READY_PREFIX,
             PromissoryRules.GREYFIRE_TARGET,
+            DannelRules.TARGET_PREFIX,
+            DannelRules.COMBAT_PREFIX,
+            BrotherOmarRules.STEP_ONE,
+            BrotherOmarRules.REMOVAL_PREFIX,
+            YinSpinnerRules.START,
             TIED_PLANETS,
             "sendTGTo_",
             "deleteButtons_construction",
@@ -157,6 +178,8 @@ public class NekroBrain implements FactionBrain {
             DatahubRules.SELECT_PREFIX,
             DatahubRules.SWAP_PREFIX,
             WrathOfKenaraRules.FINISH_PREFIX,
+            ReclaimerRules.PREFIX,
+            MathisMathinusRules.IMPERIAL_POINT,
             RearAdmiralFarranRules.GAIN,
             OrbitalDropRules.MECH_PREFIX,
             OrbitalDropRules.FINISH,
@@ -177,12 +200,14 @@ public class NekroBrain implements FactionBrain {
             this::finishCommandTokenGain,
             StrategyCardRules::exhaustAiDevelopmentForResearch,
             StrategyCardRules::exhaustProphetsTearsForResearch,
+            BrotherOmarRules::returnInfantry,
             PaymentRules::pay,
             SecretCostRules::pay,
             NekroLeaderRules::payAgentCost,
             RelicActionRules::next,
             CrownOfEmphidiaRules::scorePoint,
             MawOfWorldsRules::purge,
+            OracleRules::play,
             LegendaryRules::next,
             AvernusRules::next,
             ExpeditionRules::next,
@@ -195,8 +220,11 @@ public class NekroBrain implements FactionBrain {
             TechRules::reviveInfantry,
             EntropicScarRules::next,
             TechRules::placeSpinnerInfantry,
+            YinSpinnerRules::afterOtherProduction,
             TechRules::placeSelfAssemblyMech,
+            IconoclastRules::deploy,
             TechRules::placeMagenInfantry,
+            MatriarchRules::returnFighters,
             TechRules::continueProductionBiomes,
             DatahubRules::next,
             SlingRelayRules::next,
@@ -207,6 +235,7 @@ public class NekroBrain implements FactionBrain {
             IntegratedEconomyRules::next,
             ExplorationRules::next,
             StrategyCardRules::chooseTechnology,
+            StartingTechRules::choose,
             StrategyCardRules::gainTokens,
             StrategyCardRules::placeStructure,
             StrategyCardRules::readyPlanets,
@@ -217,13 +246,18 @@ public class NekroBrain implements FactionBrain {
             BellumGloriosumRules::next,
             XxchaAgentRules::next,
             NorrSupremacyRules::next,
+            ReclaimerRules::next,
             DarktalonTreillaRules::next,
             RearAdmiralFarranRules::gainTradeGood,
+            MathisMathinusRules::next,
+            LazaxGateFolding::next,
             OrbitalDropRules::next,
             SolHeroRules::next,
+            DannelRules::next,
             NekroLeaderRules::chooseAgentTarget,
             CarthAgentRules::chooseTarget,
             SolAgentRules::chooseTarget,
+            ZeuAgentRules::next,
             NekroLeaderRules::continueHero,
             ActionCardRules::continuePlay,
             ActionCardRules::afterActivation,
@@ -248,13 +282,18 @@ public class NekroBrain implements FactionBrain {
             WrathOfKenaraRules::next,
             SardakkHeroRules::next,
             SardakkCommanderRules::next,
+            ForesightRules::next,
             CombatCardRules::hold,
             CombatCardRules::afterSpaceCannon,
             CombatCardRules::cancelHits,
             SolCommanderRules::next,
+            BrotherMilorRules::next,
+            IndoctrinationRules::next,
+            DevotionRules::next,
             ViscountUnlennSale::answer,
             ViscountUnlennSale::holdRoll,
             ViscountUnlennSale::offer,
+            MatriarchRules::continueHits,
             context -> CombatRules.next(context, NekroBrain::atRoundStart),
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,
@@ -280,6 +319,7 @@ public class NekroBrain implements FactionBrain {
             TradeRules::carthPreWash,
             TradeRules::startDeals,
             TradeRules::awaitExtortion,
+            DannelRules::holdTurn,
             this::takeTurn,
             StrategyCardRules::follow,
             this::declineStrategyCardFollow,
@@ -494,12 +534,13 @@ public class NekroBrain implements FactionBrain {
                             prompt, plan.get().card(), plan.get().reason()));
                 }
             }
-            Optional<StrategyCardRanking.Pick> best =
-                    StrategyCardRanking.bestPick(context.game(), context.seat(), picks);
-            if (best.isPresent()) {
-                CardPlanMemory.write(context, best.get().plan());
+            List<StrategyCardRanking.Pick> ranked = StrategyCardRanking.ranked(context.game(), context.seat(), picks);
+            if (!ranked.isEmpty()) {
+                StrategyCardRanking.Pick best = ranked.getFirst();
+                CardPlanMemory.write(context, best.plan());
+                StrategyCardPickLog.record(context.game(), context.seat(), ranked);
                 return Optional.of(AiDecision.press(
-                        prompt, best.get().button(), "pick " + best.get().plan().describe()));
+                        prompt, best.button(), "pick " + best.plan().describe()));
             }
         }
         return Optional.empty();
@@ -573,10 +614,16 @@ public class NekroBrain implements FactionBrain {
         if (cardAction.isPresent()) return cardAction;
         Optional<AiDecision> techAction = TechRules.insteadOfTacticalAction(context, thisTurn);
         if (techAction.isPresent()) return techAction;
+        Optional<AiDecision> winnuHero = MathisMathinusRules.insteadOfTacticalAction(context, thisTurn);
+        if (winnuHero.isPresent()) return winnuHero;
+        Optional<AiDecision> gateFolding = LazaxGateFolding.insteadOfTacticalAction(context, thisTurn);
+        if (gateFolding.isPresent()) return gateFolding;
         Optional<AiDecision> xxchaStall = XxchaAgentRules.insteadOfTacticalAction(context, thisTurn);
         if (xxchaStall.isPresent()) return xxchaStall;
         Optional<AiDecision> solHero = SolHeroRules.insteadOfTacticalAction(context, thisTurn);
         if (solHero.isPresent()) return solHero;
+        Optional<AiDecision> yinHero = DannelRules.insteadOfTacticalAction(context, thisTurn);
+        if (yinHero.isPresent()) return yinHero;
         Optional<AiDecision> orbitalDrop = OrbitalDropRules.insteadOfTacticalAction(context, thisTurn);
         if (orbitalDrop.isPresent()) return orbitalDrop;
         Optional<AiDecision> tactical = TacticalRules.start(context);
@@ -593,6 +640,10 @@ public class NekroBrain implements FactionBrain {
         }
         Optional<AiDecision> card = ActionCardRules.playBeforePassing(context);
         if (card.isPresent()) return card;
+        Optional<AiDecision> winnuHeroBeforePassing = MathisMathinusRules.beforePassing(context, thisTurn);
+        if (winnuHeroBeforePassing.isPresent()) return winnuHeroBeforePassing;
+        Optional<AiDecision> gateFoldingBeforePassing = LazaxGateFolding.beforePassing(context, thisTurn);
+        if (gateFoldingBeforePassing.isPresent()) return gateFoldingBeforePassing;
         Optional<AiDecision> relicBeforePassing = RelicActionRules.beforePassing(context, thisTurn);
         if (relicBeforePassing.isPresent()) return relicBeforePassing;
         Optional<AiDecision> expeditionBeforePassing = ExpeditionRules.beforePassing(context, thisTurn);
@@ -601,6 +652,8 @@ public class NekroBrain implements FactionBrain {
         if (xxchaAgent.isPresent()) return xxchaAgent;
         Optional<AiDecision> solHeroBeforePassing = SolHeroRules.beforePassing(context, thisTurn);
         if (solHeroBeforePassing.isPresent()) return solHeroBeforePassing;
+        Optional<AiDecision> yinHeroBeforePassing = DannelRules.beforePassing(context, thisTurn);
+        if (yinHeroBeforePassing.isPresent()) return yinHeroBeforePassing;
         Optional<AiDecision> orbitalDropBeforePassing = OrbitalDropRules.beforePassing(context, thisTurn);
         if (orbitalDropBeforePassing.isPresent()) return orbitalDropBeforePassing;
         Optional<AiDecision> convoysBeforePassing = ConvoysRules.beforePassing(context, thisTurn);

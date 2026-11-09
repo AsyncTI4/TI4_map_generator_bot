@@ -1,5 +1,6 @@
 package ti4.ai.strategy;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
@@ -14,6 +15,7 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.model.Mapper;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.strategycard.PickStrategyCardService;
 
 @UtilityClass
 class PoliticsUses {
@@ -24,6 +26,7 @@ class PoliticsUses {
     static List<Benefit> benefits(PlanInputs in, int initiative) {
         return List.of(
                 new Benefit(CardUse.POLITICS_SPEAKER, speakerValue(in)),
+                new Benefit(CardUse.POLITICS_FIRST_PICK, firstPickValue(in, initiative)),
                 new Benefit(CardUse.POLITICS_ACTION_CARDS, actionCardValue(in)),
                 new Benefit(CardUse.POLITICS_EXPEDITION, expeditionValue(in)),
                 new Benefit(CardUse.POLITICS_AGENDA, in.agendaPhaseActive() ? CardValueScale.AGENDA_PEEK : 0));
@@ -44,6 +47,38 @@ class PoliticsUses {
         if (wantsImperialNextRound(game, seat)) value += CardValueScale.SPEAKER_FOR_IMPERIAL;
         if (game.isCustodiansScored()) value += CardValueScale.AGENDA_PEEK;
         return value;
+    }
+
+    private static double firstPickValue(PlanInputs in, int politics) {
+        Game game = in.game();
+        Player seat = in.seat();
+        if (in.moment() != PlanMoment.PICK || isSpeaker(game, seat)) return 0;
+        int earlierPickers = PickStrategyCardService.getSCPickOrder(game).indexOf(seat);
+        if (earlierPickers <= 0) return 0;
+        List<Double> cardValues = game.getSCList().stream()
+                .filter(initiative -> initiative != politics)
+                .map(initiative ->
+                        Math.max(0, StrategyCardPlanner.plan(in, initiative).value()))
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        if (cardValues.isEmpty()) return 0;
+        double best = cardValues.getFirst();
+        return CardValueScale.FIRST_PICK_SHARE * (best - expectedBestLeft(cardValues, earlierPickers));
+    }
+
+    static double expectedBestLeft(List<Double> valuesBestFirst, int taken) {
+        int cards = valuesBestFirst.size();
+        if (taken >= cards) return 0;
+        double expected = 0;
+        double allTakenSoFar = 1;
+        for (int rank = 0; rank <= taken; rank++) {
+            int remaining = cards - rank;
+            int stillToTake = taken - rank;
+            double survives = 1 - (double) stillToTake / remaining;
+            expected += allTakenSoFar * survives * valuesBestFirst.get(rank);
+            allTakenSoFar *= (double) stillToTake / remaining;
+        }
+        return expected;
     }
 
     private static boolean isSpeaker(Game game, Player seat) {

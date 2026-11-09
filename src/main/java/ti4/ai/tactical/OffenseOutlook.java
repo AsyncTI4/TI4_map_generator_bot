@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FactionAggression;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
@@ -49,7 +50,6 @@ final class OffenseOutlook {
     private static final double ONE_STEP_SHORT_BLOCK = 0.25;
     private static final double OWN_IMPERIAL_SHARE = 0.8;
     private static final double UNCONTROLLED_MECATOL_SHARE = 0.5;
-    private static final int CUSTODIANS_INFLUENCE = 6;
     private static final String NULLIFICATION_FIELD = "nf";
     private static final String ABSOL_NULLIFICATION_FIELD = "absol_nf";
     private static final String SINGULARITY = "technological_singularity";
@@ -275,7 +275,7 @@ final class OffenseOutlook {
         IncomingForces.IncomingForce force = defense.force(holder, mecatolTile, Horizon.IMMEDIATE);
         if (force.isEmpty() || !force.carriesGround()) return 0;
         boolean custodians = mecatolTile.getPlanetUnitHolders().stream().anyMatch(BoardView::hasCustodians);
-        return !custodians || Wallet.of(game, holder).influence() >= CUSTODIANS_INFLUENCE ? 1 : 0;
+        return !custodians || Wallet.of(game, holder).influence() >= CustodiansRace.cost(holder) ? 1 : 0;
     }
 
     private Denial objectiveDenial(

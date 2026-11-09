@@ -174,13 +174,14 @@ class StrategyCardTurnTest extends BaseTi4Test {
 
     // Thunder's Edge Warfare's tactical action places no token, so the fleet it moves can move again. Rather than spend
     // a token on the first worthwhile tactical action of the round and waste the card later (Xxcha played it on its 6th
-    // turn to move nothing), the AI uses Warfare for that action, in round 1 and after.
+    // turn to move nothing), the AI uses Warfare for that action, in round 1 and after. Two free systems lie next door,
+    // so the home build is a second carrier rather than a stack of infantry worth a second Warfare build.
     @Test
     void usesThundersEdgeWarfareForTheFirstWorthwhileTacticalAction() {
         test.nekro.addSC(WARFARE);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.units(home, "space", test.nekro, UnitType.Infantry, 2);
-        test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.claimableSystemsBeside(AiTestGame.HOME, 2);
         changed();
 
         assertThat(StrategyCardTurn.dueNow(test.context(turnStart(WARFARE)), WARFARE))

@@ -30,10 +30,12 @@ class SlingRelayRulesTest extends BaseTi4Test {
         test.aiIsActive("action");
     }
 
-    // With no carrier yet, the ship worth most is a carrier at the home dock. It opens the component actions,
+    // With no carrier yet and a free system next door, the ship worth most is a carrier at the home dock. It opens the
+    // component actions,
     // exhausts Sling Relay, picks the home system, produces the carrier and expects to pay its 3 resources.
     @Test
     void producesACarrierInsteadOfPassing() {
+        test.claimableSystemsBeside(AiTestGame.HOME, 1);
         AiPrompt turn =
                 prompt("turn", PromptSource.PUBLIC, NOW, "FFCC_nekro_componentAction", "FFCC_nekro_passForRound");
         assertThat(pressedId(

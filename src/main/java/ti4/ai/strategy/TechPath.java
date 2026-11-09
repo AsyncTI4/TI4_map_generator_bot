@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.secrets.SecretValue;
+import ti4.ai.yin.BrotherOmar;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -166,6 +167,7 @@ public class TechPath {
                 if (matches) skips.merge(colour, 1, Integer::sum);
             }
         }
+        BrotherOmar.skips(seat).forEach((colour, count) -> skips.merge(colour, count, Integer::sum));
         return skips;
     }
 }

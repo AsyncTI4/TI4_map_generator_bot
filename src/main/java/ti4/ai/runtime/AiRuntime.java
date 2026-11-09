@@ -14,6 +14,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
 import ti4.ai.fallback.DelegatedPress;
+import ti4.ai.trace.AiLogStore;
 import ti4.ai.trace.ThinkingStats;
 import ti4.cron.CronManager;
 import ti4.discord.JdaService;
@@ -151,6 +152,7 @@ public class AiRuntime {
             for (ManagedGame managed : GameManager.getManagedGames()) {
                 if (!managed.isHasEnded() && AiSeats.hasAiSeat(managed)) register(managed.getName());
             }
+            AiLogStore.deleteLogsOfMissingGames(GameManager::isValid);
             DISCOVERED.set(true);
         } catch (RuntimeException e) {
             BotLogger.info("AI players could not look for AI games yet and will retry: " + e.getMessage());

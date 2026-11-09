@@ -12,6 +12,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
+import ti4.ai.naalu.MatriarchRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
@@ -40,6 +41,7 @@ public class CombatRules {
     private static final String AFB_HIT_PREFIX = "autoAssignAFBHits_";
     private static final String SPACE_CANNON_OFFENCE_SUFFIX = "_spacecannonoffence";
     private static final String SPACE_CANNON_DEFENCE_SUFFIX = "_spacecannondefence";
+    private static final String DECLINE_SPACE_CANNON = "declinePDS_";
     private static final String ASSAULT_CANNON = "asc";
     private static final String ASSAULT_CANNON_PREFIX = "assCannonNDihmohn_asc_";
     private static final int ASSAULT_CANNON_SHIPS = 3;
@@ -124,6 +126,8 @@ public class CombatRules {
                                 && behind(context.game(), context.seat(), button));
                 if (ownRoll.isPresent()) return Optional.of(ownRoll.get().press("roll its dice before taking hits"));
             }
+            Optional<AiDecision> matriarch = MatriarchRules.assignHitsByHand(context, prompt, assign.get());
+            if (matriarch.isPresent()) return matriarch;
             return Optional.of(AiDecision.press(prompt, assign.get(), "assign hits"));
         }
         return Optional.empty();
@@ -174,6 +178,14 @@ public class CombatRules {
                 if (attacking && !position.equals(game.getActiveSystem())) continue;
                 if (!ButtonHelper.getPlayersWithPds2Cover(active, game, position)
                         .contains(context.seat())) continue;
+                if (!attacking && !BoardView.hasOwnShips(active, game.getTileByPosition(position))) {
+                    context.memory().put(key, "declined");
+                    Optional<PromptButton> decline =
+                            prompt.firstEnabled(button -> button.handlerId().startsWith(DECLINE_SPACE_CANNON));
+                    if (decline.isEmpty()) continue;
+                    return Optional.of(
+                            AiDecision.press(prompt, decline.get(), "decline space cannon: no ships to hit"));
+                }
                 Optional<PromptButton> graviton = graviton(context, prompt, game.getTileByPosition(position));
                 if (graviton.isPresent()) {
                     return Optional.of(AiDecision.press(prompt, graviton.get(), "exhaust Graviton Laser System"));

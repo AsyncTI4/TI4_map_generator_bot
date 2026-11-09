@@ -8,8 +8,10 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.brain.SearchMemo;
+import ti4.ai.naalu.GiftOfPrescience;
 import ti4.ai.promissory.NoteGiving;
 import ti4.ai.strategy.CardFacade;
+import ti4.ai.winnu.Acquiescence;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.model.Mapper;
@@ -42,13 +44,23 @@ class NotesForTrade {
     private static final int AGREEMENT_DISCOUNT = 1;
     private static final double OWN_FACTION_NOTE_COST = 1.5;
     private static final double RETURN_DISCOUNT = 0.3;
+    private static final String GREYFIRE = "greyfire";
+    private static final double GREYFIRE_GIVE_COST = 0.5;
     private static final Map<String, Double> NOTES_IT_PLAYS = Map.of(
-            "ra", 1.5,
-            "gift", 1.0,
-            "tekklar", 1.0,
-            "antivirus", 0.5,
-            "greyfire", 0.5,
-            "favor", 0.5);
+            "ra",
+            1.5,
+            "gift",
+            1.0,
+            "tekklar",
+            1.0,
+            "antivirus",
+            0.5,
+            "greyfire",
+            0.5,
+            "favor",
+            0.5,
+            Acquiescence.NOTE,
+            Acquiescence.HELD_VALUE);
 
     static Optional<String> aliasOf(Player sender, String detail) {
         if (!StringUtils.isNumeric(detail)) return Optional.of(detail.replace(DealItem.ALIAS_UNDERSCORE, "_"));
@@ -131,6 +143,9 @@ class NotesForTrade {
         if (POLITICAL_FAVOR.equals(alias)) return politicalFavorCost(game);
         if (MilitarySupport.ALIAS.equals(alias)) return MilitarySupport.givenCost(game, seat, receiver);
         if (ConvoysValue.isConvoys(alias)) return ConvoysValue.GIVE_COST;
+        if (GiftOfPrescience.ALIAS.equals(alias)) return GiftOfPrescience.giveCost();
+        if (Acquiescence.NOTE.equals(alias)) return Acquiescence.GIVE_COST;
+        if (GREYFIRE.equals(alias)) return GREYFIRE_GIVE_COST;
         return OWN_FACTION_NOTE_COST;
     }
 

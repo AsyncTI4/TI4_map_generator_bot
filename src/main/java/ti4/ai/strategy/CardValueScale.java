@@ -17,6 +17,7 @@ public class CardValueScale {
     static final double STRATEGY_TOKEN = 1.0;
     static final double ACTION_CARD = ActionCardPrior.AVERAGE_CARD;
     static final double SPEAKER = 1.5;
+    static final double FIRST_PICK_SHARE = 1.0;
     static final double SPEAKER_FOR_IMPERIAL = 1.5;
     static final double AGENDA_PEEK = 0.5;
     static final double DOCK_EARLY = 4.0;
@@ -44,11 +45,9 @@ public class CardValueScale {
     static final double MECATOL_TAKE_SHARE = 0.5;
     static final double SPEAKER_RACE_SHARE = 0.2;
     static final double SPEAKER_RACE_RIVAL_NOW = 0.2;
-    static final double LEADERSHIP_RACE_CAP = 0.5;
     static final double DENIAL_SHARE = 0.5;
     static final int DENIAL_CLOSE_GAP = 2;
     static final double DISTANT_DENIAL_SHARE = 0.5;
-    static final double TRADE_LEVERAGE = 0.5;
     static final double PRIOR_WEIGHT = 1.0;
     static final double WARFARE_PLAY_MIN_GAIN = 2.0;
     static final double REPLAN_DELTA = 1.0;

@@ -375,6 +375,78 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         assertThat(CommandTokenPolicy.midRoundSurplus(test.game, test.nekro)).isEmpty();
     }
 
+    // aiplay1: Nekro sat on 30 trade goods with one fleet token from round two on, because the fleet pool followed its
+    // largest stack (one ship) and a small fleet kept the stacks small. A seat that can pay for ships at a dock grows
+    // its fleet toward the ships it can build there, once three tactic tokens and the usual strategy tokens are kept.
+    @Test
+    void aRichSeatGrowsItsFleetTowardTheShipsItCanBuild() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(2);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).isEqualTo(split(5, 2, 2));
+
+        test.nekro.setTg(30);
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).isEqualTo(split(3, 4, 2));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 10)).isEqualTo(split(3, 5, 2));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 11)).isEqualTo(split(4, 5, 2));
+    }
+
+    // A rival that could out-stall it still gets its four tactic tokens first; the fleet takes what is left.
+    @Test
+    void aRichSeatFearingAStallKeepsFourTacticsBeforeGrowingTheFleet() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(2);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+        test.nekro.setTg(30);
+        rivalTactics(2);
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 6)).isEqualTo(split(4, 1, 1));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).isEqualTo(split(4, 3, 2));
+    }
+
+    // The round-two redistribution in aiplay1 (6/1/2 after gaining) now moves tactic tokens into the fleet pool.
+    @Test
+    void aRichSeatRedistributesTacticTokensIntoItsFleet() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(2);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+        test.nekro.setTg(30);
+        rivalTactics(2);
+        tokens(6, 1, 2);
+
+        assertThat(CommandTokenPolicy.poolToRedistributeFrom(test.game, test.nekro))
+                .contains("decrease_tactic_cc");
+        test.nekro.setTacticalCC(5);
+        assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_fleet_cc");
+    }
+
+    // Trade goods count, and so do planets that are exhausted now but ready again next round.
+    @Test
+    void exhaustedPlanetsCountTowardNextRoundsBuild() {
+        test.game.setPhaseOfGame("statusHomework");
+        test.game.setRound(2);
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+        test.nekro.setTg(2);
+        test.nekro.exhaustPlanet("mordaiii");
+
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).containsEntry(CommandTokenPolicy.Pool.FLEET, 3);
+    }
+
+    // Paying for Nekro Malleon mid-round takes a spare tactic or strategy token, not a fleet token the seat can still
+    // build into; in aiplay1 the second fleet token went this way in round three.
+    @Test
+    void spendsTacticTokensBeforeTheFleetItCanBuildInto() {
+        test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
+        test.aiIsActive("action");
+        tokens(8, 2, 0);
+        assertThat(CommandTokenPolicy.poolsToShrink(test.game, test.nekro).getFirst())
+                .isEqualTo("decrease_fleet_cc");
+
+        test.nekro.setTg(30);
+        assertThat(CommandTokenPolicy.poolsToShrink(test.game, test.nekro).getLast())
+                .isEqualTo("decrease_fleet_cc");
+    }
+
     private static final int IMPERIAL = 8;
 
     private void tokens(int tactic, int fleet, int strategy) {

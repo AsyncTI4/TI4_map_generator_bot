@@ -3,6 +3,7 @@ package ti4.ai.expedition;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.yin.YinAscendant;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.map.FractureService;
@@ -33,7 +34,9 @@ public class BreakthroughValue {
         if (!isLocked(seat)) return 0;
         double lift = ExpeditionStats.breakthroughLiftPoints(seat.getFaction());
         double floor = PRIORITY_FLOORS.getOrDefault(seat.getFaction(), 0.0);
-        return Math.max(floor, Math.max(LEAST, BASE + PER_WIN_POINT * lift)) * timing(game);
+        return Math.max(
+                YinAscendant.value(game, seat),
+                Math.max(floor, Math.max(LEAST, BASE + PER_WIN_POINT * lift)) * timing(game));
     }
 
     public static double fractureRoll(Game game, Player seat) {

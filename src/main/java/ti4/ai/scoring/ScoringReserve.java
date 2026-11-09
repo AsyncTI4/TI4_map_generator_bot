@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.trace.Thinking;
@@ -66,20 +67,45 @@ public class ScoringReserve {
     }
 
     public static SpendCost custodiansReserve(Game game, Player seat) {
-        return custodiansClaim(game, seat).isPresent() ? SpendCost.influence(CustodiansRace.COST) : SpendCost.NONE;
+        return custodiansClaim(game, seat).isPresent()
+                ? SpendCost.influence(CustodiansRace.cost(seat))
+                : SpendCost.NONE;
     }
 
     public static Optional<Wallet.Payment> custodiansClaim(Game game, Player seat) {
-        if (!isActionPhase(game) || !CustodiansRace.open(game)) return Optional.empty();
+        if (!isActionPhase(game)) return Optional.empty();
+        return DecisionMemo.remember(
+                () -> contendsForCustodians(game, seat) ? planForCustodians(game, seat) : Optional.empty(),
+                "custodians.claim",
+                game,
+                seat,
+                spendState(seat));
+    }
+
+    public static boolean contendsForCustodians(Game game, Player seat) {
+        return DecisionMemo.remember(
+                () -> computeContendsForCustodians(game, seat), "custodians.contends", game, seat, spendState(seat));
+    }
+
+    private static List<Object> spendState(Player seat) {
+        return List.of(
+                seat.getTg(),
+                seat.getTacticalCC(),
+                seat.isPassed(),
+                List.copyOf(seat.getPlanets()),
+                List.copyOf(seat.getExhaustedPlanets()));
+    }
+
+    private static boolean computeContendsForCustodians(Game game, Player seat) {
+        if (!CustodiansRace.open(game)) return false;
         CustodiansRace.Snapshot race = CustodiansRace.of(game, seat);
-        if (!race.canLandThisRound(seat)) return Optional.empty();
-        if (!holdsUnplayedImperial(game, seat) && !winsTheCustodiansRace(race, seat)) return Optional.empty();
-        return planForCustodians(game, seat);
+        if (!race.canLandThisRound(seat)) return false;
+        return holdsUnplayedImperial(game, seat) || winsTheCustodiansRace(race, seat);
     }
 
     public static Optional<Wallet.Payment> planForCustodians(Game game, Player seat) {
         SpendCost promised = SpendCost.tradeGoods(PromisedTradeGoods.of(seat));
-        return planAfterReserve(Wallet.of(game, seat), promised, SpendCost.influence(CustodiansRace.COST));
+        return planAfterReserve(Wallet.of(game, seat), promised, SpendCost.influence(CustodiansRace.cost(seat)));
     }
 
     private static boolean winsTheCustodiansRace(CustodiansRace.Snapshot race, Player seat) {

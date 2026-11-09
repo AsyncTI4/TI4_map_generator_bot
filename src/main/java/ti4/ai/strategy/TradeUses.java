@@ -26,7 +26,7 @@ class TradeUses {
                 new Benefit(
                         CardUse.TRADE_SPEND_OBJECTIVE,
                         Math.max(0, unlockedPoints) * CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT),
-                new Benefit(CardUse.TRADE_LEVERAGE, hasTradePartner(game, seat) ? CardValueScale.TRADE_LEVERAGE : 0),
+                new Benefit(CardUse.TRADE_WASHES, washPartners(game, seat) * CardValueScale.TRADE_GOOD),
                 new Benefit(
                         CardUse.TRADE_EXPEDITION,
                         expeditionValue(game, seat, unlockedPoints, in.moment() == PlanMoment.PICK)),
@@ -46,7 +46,12 @@ class TradeUses {
         return Math.max(0, holding - following);
     }
 
-    private static boolean hasTradePartner(Game game, Player seat) {
-        return AiSettings.isTradingEnabled() && game.getRealPlayers().stream().anyMatch(other -> other != seat);
+    static long washPartners(Game game, Player seat) {
+        if (!AiSettings.isTradingEnabled()) return 0;
+        return game.getRealPlayers().stream()
+                .filter(other -> other != seat)
+                .filter(other -> !other.hasAbility(ExpectedTradeGoods.MASTERS_OF_TRADE))
+                .filter(other -> other.getCommoditiesTotal() > 0)
+                .count();
     }
 }

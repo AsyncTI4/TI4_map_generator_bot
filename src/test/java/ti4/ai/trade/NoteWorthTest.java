@@ -63,6 +63,28 @@ class NoteWorthTest extends BaseTi4Test {
         assertThat(ThronePoint.kept(table.game, nekro, sol)).isCloseTo(0.15 * 8, within(EXACT));
     }
 
+    // Trading the note away is priced by the race, but handing it back by activating the giver's system loses a
+    // point Nekro already holds for certain: tied for the lead on 4 of 10, the trade price is half a point (6 x 0.5)
+    // while the return costs the whole point.
+    @Test
+    void returningTheThroneCostsAFullPoint() {
+        table.points(nekro, 4);
+        table.points(sol, 4);
+        table.points(letnev, 3);
+
+        assertThat(ThronePoint.kept(table.game, nekro, sol)).isCloseTo(6 * 0.5, within(EXACT));
+        assertThat(ThronePoint.lost(table.game, nekro)).isCloseTo(6, within(EXACT));
+    }
+
+    // Nekro on 9 of 10, with the point deciding the game: the return costs the endgame rate (capped at 12).
+    @Test
+    void returningTheThroneNearTheGoalCostsTheEndgameRate() {
+        table.points(nekro, 9);
+        table.points(sol, 5);
+
+        assertThat(ThronePoint.lost(table.game, nekro)).isCloseTo(12, within(EXACT));
+    }
+
     // Receiving the point that reaches the goal is a win.
     @Test
     void theWinningThroneIsWorthTheGame() {

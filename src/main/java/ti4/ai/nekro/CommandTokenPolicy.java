@@ -14,6 +14,7 @@ import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.TechPath;
 import ti4.ai.strategy.TokenPlan;
 import ti4.ai.tactical.ProductionPlanner;
@@ -38,6 +39,8 @@ public class CommandTokenPolicy {
     private static final int STACKING_FLEET_CAP = 5;
     private static final int BUILD_FLEET_MIN_CAPACITY = 4;
     private static final int BUILD_FLEET_MIN_RESOURCES = 6;
+    private static final int AVERAGE_SHIP_COST = 3;
+    private static final int TACTIC_BEFORE_BUILDING = 3;
     private static final String RAISE_A_FLEET = "raise_fleet";
     private static final int RAISE_A_FLEET_SHIPS = 5;
     private static final String COMMAND_AN_ARMADA = "command_armada";
@@ -134,7 +137,9 @@ public class CommandTokenPolicy {
 
     public static List<String> poolsToShrink(Game game, Player seat) {
         Map<Pool, Integer> ideal = ideal(game, seat, Math.max(0, totalTokens(seat) - 1));
-        int fleetFloor = Math.max(0, largestStack(game, seat) - fleetBonus(seat));
+        int fleetFloor = Math.max(
+                Math.max(0, largestStack(game, seat) - fleetBonus(seat)),
+                fleetKeptForBuilding(game, seat, fleetCap(game, seat)));
         List<Pool> order = new ArrayList<>(List.of(Pool.FLEET, Pool.STRATEGY, Pool.TACTIC));
         order.removeIf(pool -> pool.count(seat) <= 0);
         order.sort(Comparator.comparing((Pool pool) -> pool == Pool.FLEET && seat.getFleetCC() <= fleetFloor)
@@ -197,6 +202,7 @@ public class CommandTokenPolicy {
             return List.of(
                     new Level(Pool.FLEET, Math.min(cap, largest) - bonus),
                     new Level(Pool.TACTIC, 1),
+                    new Level(Pool.FLEET, fleetKeptForBuilding(game, seat, cap)),
                     new Level(Pool.FLEET, Math.min(cap, heroFleet) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
@@ -212,11 +218,15 @@ public class CommandTokenPolicy {
                 new Level(Pool.FLEET, Math.min(cap, heroFleet) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus)));
         levels.addAll(fearsAStall(game, seat) ? TWO_TACTICS_PER_STRATEGY : FOLLOWS_FIRST);
+        levels.add(new Level(Pool.FLEET, Math.min(cap, SPARE_FLEET)));
+        int toBuild = fleetToBuild(game, seat, true);
+        if (toBuild > 0) {
+            levels.add(new Level(Pool.TACTIC, TACTIC_BEFORE_BUILDING));
+            levels.add(new Level(Pool.FLEET, Math.min(growth, toBuild) - bonus));
+        }
         levels.addAll(List.of(
-                new Level(Pool.FLEET, Math.min(cap, SPARE_FLEET)),
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.STRATEGY, strategyTarget(game, seat)),
-                new Level(Pool.FLEET, Math.min(growth, buildFleet(game, seat, largest)) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
                 new Level(Pool.FLEET, Math.min(growth, stackingFleet(game, seat, largest)) - bonus),
                 new Level(Pool.TACTIC, TACTIC_PLENTY),
@@ -281,14 +291,31 @@ public class CommandTokenPolicy {
                 : 0;
     }
 
-    private static int buildFleet(Game game, Player seat, int largest) {
-        Tile home = seat.getHomeSystemTile();
-        if (home == null) return 0;
-        Integer resources = Helper.getPlayerResourcesAvailable(seat, game);
-        boolean canBuildBig = Helper.getProductionValue(seat, game, home, false) >= BUILD_FLEET_MIN_CAPACITY
-                && resources != null
-                && resources >= BUILD_FLEET_MIN_RESOURCES;
-        return canBuildBig ? largest + 1 : 0;
+    private static int fleetKeptForBuilding(Game game, Player seat, int cap) {
+        return Math.min(seat.getFleetCC(), Math.min(cap, fleetToBuild(game, seat, false)) - fleetBonus(seat));
+    }
+
+    private static int fleetToBuild(Game game, Player seat, boolean nextRound) {
+        Tile dock = null;
+        int production = 0;
+        for (Tile tile : game.getTileMap().values()) {
+            if (!tile.containsPlayersUnits(seat)) continue;
+            int here = Helper.getProductionValue(seat, game, tile, false);
+            if (here > production) {
+                dock = tile;
+                production = here;
+            }
+        }
+        int budget = buildBudget(game, seat, nextRound);
+        if (dock == null || production < BUILD_FLEET_MIN_CAPACITY || budget < BUILD_FLEET_MIN_RESOURCES) return 0;
+        int affordableShips = Math.min(production, budget / AVERAGE_SHIP_COST);
+        return BoardView.nonFighterShips(BoardView.space(dock), seat) + affordableShips;
+    }
+
+    private static int buildBudget(Game game, Player seat, boolean nextRound) {
+        Integer planets =
+                nextRound ? Helper.getPlayerResourcesTotal(seat, game) : Helper.getPlayerResourcesAvailable(seat, game);
+        return (planets == null ? 0 : planets) + seat.getTg() * Wallet.tradeGoodValue(seat);
     }
 
     private static int stackingFleet(Game game, Player seat, int largest) {

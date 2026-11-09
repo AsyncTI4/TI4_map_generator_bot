@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.scoring.Pooling;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
@@ -209,7 +210,7 @@ class DiplomacyUse {
             this.tokensNow = leadership ? tokensBought(wallet) : 0;
             this.custodians = active
                     && hasTacticToken
-                    && !affords(wallet, SpendCost.influence(TokenPurchase.CUSTODIANS_COST))
+                    && !affords(wallet, SpendCost.influence(CustodiansRace.cost(seat)))
                     && TokenPurchase.custodiansWithinReach(game, seat);
         }
 

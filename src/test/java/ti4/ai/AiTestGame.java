@@ -17,6 +17,7 @@ import ti4.ai.perception.PromptButton;
 import ti4.ai.profile.AggressionLevel;
 import ti4.ai.profile.AiProfile;
 import ti4.ai.strategy.SecondaryQueue;
+import ti4.ai.trace.AiLogStore;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -50,6 +51,7 @@ public final class AiTestGame {
         game = new Game();
         game.setName("ai-test-game");
         SecondaryQueue.forget(game.getName());
+        AiLogStore.keepInMemory();
         ti4.ai.tactical.SlayIntent.forget(game.getName());
         game.setRound(2);
         game.setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
@@ -113,6 +115,20 @@ public final class AiTestGame {
         Tile tile = new Tile(tileId, position);
         game.setTile(tile);
         return tile;
+    }
+
+    /**
+     * Places {@code count} systems with planets nobody holds (Lodor, New Albion, Tequ'ran, Wellon) on the empty
+     * positions next to {@code position}, so carriers built there have something to claim.
+     */
+    public List<Tile> claimableSystemsBeside(String position, int count) {
+        List<String> tileIds = List.of("26", "27", "28", "19");
+        List<String> free = MapPositionMapper.getAdjacentTilePositions(position).stream()
+                .filter(candidate -> !"x".equals(candidate) && game.getTileByPosition(candidate) == null)
+                .toList();
+        List<Tile> placed = new ArrayList<>();
+        for (int index = 0; index < count; index++) placed.add(place(tileIds.get(index), free.get(index)));
+        return placed;
     }
 
     public void units(Tile tile, String holder, Player player, UnitType type, int count) {

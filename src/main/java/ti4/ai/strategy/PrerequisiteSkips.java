@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.tactical.ProductionPlanner;
+import ti4.ai.yin.BrotherOmar;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -23,22 +24,35 @@ public class PrerequisiteSkips {
     private static final String AI_DEVELOPMENT = "aida";
     private static final String PROPHETS_TEARS = "prophetstears";
 
-    public record Plan(List<String> planets, boolean aiDevelopment, double resourcesLost, boolean prophetsTears) {
+    public record Plan(
+            List<String> planets,
+            boolean aiDevelopment,
+            double resourcesLost,
+            boolean prophetsTears,
+            boolean returnsInfantry) {
 
         static final Plan NONE = new Plan(List.of(), false, 0, false);
+        static final Plan RETURNING_INFANTRY = new Plan(List.of(), false, 0, false, true);
 
         Plan(List<String> planets, boolean aiDevelopment, double resourcesLost) {
             this(planets, aiDevelopment, resourcesLost, false);
         }
 
+        Plan(List<String> planets, boolean aiDevelopment, double resourcesLost, boolean prophetsTears) {
+            this(planets, aiDevelopment, resourcesLost, prophetsTears, false);
+        }
+
         public double valueLost() {
-            return VALUE_PER_RESOURCE * resourcesLost;
+            return VALUE_PER_RESOURCE * resourcesLost + (returnsInfantry ? BrotherOmar.INFANTRY_VALUE : 0);
         }
     }
 
     public static Plan of(Game game, Player seat, TechnologyModel tech) {
         Plan plan = withoutProphetsTears(game, seat, tech);
-        if (!seat.hasRelicReady(PROPHETS_TEARS) || missing(seat, tech).isEmpty() || seat.hasTech(PSYCHOARCHAEOLOGY)) {
+        if (!seat.hasRelicReady(PROPHETS_TEARS)
+                || missing(seat, tech).isEmpty()
+                || seat.hasTech(PSYCHOARCHAEOLOGY)
+                || plan.returnsInfantry()) {
             return plan;
         }
         return withProphetsTears(game, plan);
@@ -57,6 +71,7 @@ public class PrerequisiteSkips {
     private static Plan withoutProphetsTears(Game game, Player seat, TechnologyModel tech) {
         Map<TechnologyType, Integer> missing = missing(seat, tech);
         if (missing.isEmpty() || seat.hasTech(PSYCHOARCHAEOLOGY)) return Plan.NONE;
+        if (BrotherOmar.ignoresPrerequisites(seat, tech)) return Plan.RETURNING_INFANTRY;
         List<String> planets = new ArrayList<>();
         double lost = 0;
         int shortfall = 0;
@@ -86,7 +101,8 @@ public class PrerequisiteSkips {
     }
 
     static Map<TechnologyType, Integer> missing(Player seat, TechnologyModel tech) {
-        return TechColours.missing(seat, tech.getRequirements().orElse(""), TechColours.owned(seat, null), Map.of());
+        return TechColours.missing(
+                seat, tech.getRequirements().orElse(""), TechColours.owned(seat, null), BrotherOmar.skips(seat));
     }
 
     private static boolean hasSpecialty(Game game, Player seat, String planet, TechnologyType colour) {

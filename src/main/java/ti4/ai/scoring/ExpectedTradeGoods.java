@@ -12,7 +12,7 @@ import ti4.game.Player;
 public class ExpectedTradeGoods {
 
     public static final int TRADE_PRIMARY = 3;
-    private static final String MASTERS_OF_TRADE = "master_of_trade";
+    public static final String MASTERS_OF_TRADE = "master_of_trade";
 
     public static int beforeStatus(Game game, Player seat) {
         int primary = holdsUnplayedTrade(game, seat) ? TRADE_PRIMARY : 0;

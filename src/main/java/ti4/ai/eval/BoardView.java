@@ -103,8 +103,12 @@ public class BoardView {
     }
 
     public static int moveValueWithBoosts(Player player, UnitType type) {
+        return moveValue(player, type) + singleShipBoosts(player);
+    }
+
+    public static int singleShipBoosts(Player player) {
         boolean tempesta = LegendaryPlanets.abilityReady(player, LegendaryPlanets.TEMPESTA);
-        return moveValueWithGravityDrive(player, type) + (tempesta ? 1 : 0);
+        return (player.hasTech(GRAVITY_DRIVE) ? 1 : 0) + (tempesta ? 1 : 0);
     }
 
     public static int capacity(Player player, UnitType type) {

@@ -147,6 +147,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatStatsService;
 import ti4.service.combat.CombatUnitSelectionHelper;
+import ti4.service.combat.SpaceCannonOffenceWindow;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
@@ -6842,6 +6843,9 @@ public class ButtonHelper {
     @ButtonHandler("combatRoll_")
     public static void resolveCombatRoll(
             Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
+        if (buttonID.contains("_spacecannonoffence")) {
+            SpaceCannonOffenceWindow.resolve(game, player, buttonID.split("_")[1]);
+        }
         resolveCombatRoll(player, game, event, buttonID, true);
     }
 

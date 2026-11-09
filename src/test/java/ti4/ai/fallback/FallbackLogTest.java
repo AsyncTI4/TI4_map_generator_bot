@@ -2,15 +2,18 @@ package ti4.ai.fallback;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.trace.AiLogStore;
 import ti4.testUtils.BaseTi4Test;
 
 class FallbackLogTest extends BaseTi4Test {
@@ -79,6 +82,26 @@ class FallbackLogTest extends BaseTi4Test {
                 .contains("recent=[a]", "pending=\"unsure (no rule)\"", "outcome=\"asked\"");
     }
 
+    // Live game aiplay1: a seat that stayed stuck all night logged the same stall every 5 minutes, and each record
+    // saved the game, so the undo history filled with fallback saves. A repeat of a recent stall is only logged.
+    @Test
+    void aRepeatOfARecentStallIsNotRecordedAgain() {
+        FallbackRecord first = FallbackLog.capture(
+                test.game, test.nekro, null, "THINKING_ABORTED", "it thought too long", List.of(), "", "", 1L);
+        FallbackRecord again = FallbackLog.capture(
+                test.game, test.nekro, null, "THINKING_ABORTED", "it thought too long", List.of(), "", "", 2L);
+        FallbackRecord other =
+                FallbackLog.capture(test.game, test.nekro, null, "TIMEOUT", "waiting", List.of(), "", "", 3L);
+
+        FallbackLog.record(test.game, first);
+        FallbackLog.record(test.game, again);
+        FallbackLog.record(test.game, other);
+
+        assertThat(FallbackLog.recent(test.game))
+                .extracting(FallbackRecord::atMillis)
+                .containsExactly(3L, 1L);
+    }
+
     // Private prompts name cards and secrets, so only their button handlers are kept, never their text.
     @Test
     void aPrivatePromptKeepsNoTextAndOnlyHandlerNames() {
@@ -104,24 +127,31 @@ class FallbackLogTest extends BaseTi4Test {
     }
 
     @Test
-    void recordsSurviveTheSaveFormatThatSplitsStoredValuesOnCommasAndColons() {
-        FallbackRecord record = FallbackLog.capture(
-                test.game,
-                test.nekro,
-                prompt(PromptSource.PUBLIC, "a, b: c; d\ne", "FFCC_nekro_x"),
-                "UNSURE",
-                "r, s: t",
-                List.of("p, q: r"),
-                "",
-                "o",
-                9L);
+    void recordsLiveInTheirOwnFileAndNotInTheGameSave(@TempDir Path directory) {
+        AiLogStore.useDirectory(directory);
+        try {
+            FallbackRecord record = FallbackLog.capture(
+                    test.game,
+                    test.nekro,
+                    prompt(PromptSource.PUBLIC, "a, b: c; d\ne", "FFCC_nekro_x"),
+                    "UNSURE",
+                    "r, s: t",
+                    List.of("p, q: r"),
+                    "",
+                    "o",
+                    9L);
 
-        FallbackLog.record(test.game, record);
+            FallbackLog.record(test.game, record);
+            AiLogStore.forget(test.game.getName());
 
-        test.game.getStoredValueMap().forEach((key, value) -> {
-            if (FallbackLog.isLogKey(key)) assertThat(value).doesNotContain(",", ":", ";", "\n");
-        });
-        assertThat(FallbackLog.recent(test.game).getFirst().promptText()).isEqualTo("a, b: c; d e");
+            assertThat(directory.resolve(test.game.getName() + ".properties")).exists();
+            assertThat(test.game.getStoredValueMap()).isEmpty();
+            assertThat(FallbackLog.recent(test.game).getFirst().promptText()).isEqualTo("a, b: c; d e");
+            assertThat(FallbackLog.recent(test.game).getFirst().recentDecisions())
+                    .containsExactly("p, q: r");
+        } finally {
+            AiLogStore.keepInMemory();
+        }
     }
 
     @Test

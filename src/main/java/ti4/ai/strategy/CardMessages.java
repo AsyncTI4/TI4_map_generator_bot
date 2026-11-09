@@ -17,10 +17,22 @@ class CardMessages {
 
     private static final String STEP_KEY = "scStep|";
     private static final String OVERRULED = " overruled";
+    private static final String PLAYED = " played";
 
     static Optional<AiPrompt> playedThisTurn(AiTurnContext context, int initiative) {
         long turnStart = Prompts.turnStart(context);
-        return cardMessage(context, initiative).filter(prompt -> prompt.createdAtMillis() >= turnStart);
+        return cardMessage(context, initiative)
+                .filter(prompt -> prompt.createdAtMillis() >= turnStart)
+                .or(() -> playedWithoutFollowers(context, initiative, turnStart));
+    }
+
+    private static Optional<AiPrompt> playedWithoutFollowers(AiTurnContext context, int initiative, long turnStart) {
+        String played = context.game().getSCEmojiWordRepresentation(initiative) + PLAYED;
+        return Prompts.newestFirst(context.prompts()).stream()
+                .filter(prompt -> !prompt.isHidden() && prompt.createdAtMillis() >= turnStart)
+                .filter(prompt -> prompt.content().contains(played))
+                .filter(prompt -> prompt.buttons().stream().anyMatch(PromptButton::isUnowned))
+                .findFirst();
     }
 
     static Optional<AiPrompt> cardMessage(AiTurnContext context, int initiative) {

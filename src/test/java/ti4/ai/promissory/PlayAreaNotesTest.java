@@ -7,7 +7,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
-import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.ThronePoint;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -42,15 +42,16 @@ class PlayAreaNotesTest extends BaseTi4Test {
         test.nekro.addPromissoryNoteToPlayArea(note);
     }
 
-    // Activating a system with Sol's units would hand Sol's Support for the Throne back: a victory point lost, priced
-    // by what it is worth to Nekro now. Early on, with nobody near the goal, that is well under a full point.
+    // Activating a system with Sol's units would hand Sol's Support for the Throne back: a victory point Nekro
+    // already holds is lost for certain, so it costs a full point, not the discounted trade price of the note.
     @Test
-    void chargesWhatTheThronePointIsWorthForReturningSupportForTheThrone() {
+    void chargesAFullPointForReturningSupportForTheThrone() {
         aiHoldsInPlayArea("blue_sftt");
         test.units(tile, "space", test.sol, UnitType.Destroyer, 1);
-        double point = ThronePoint.kept(test.game, test.nekro, test.sol);
+        double point = ThronePoint.lost(test.game, test.nekro);
 
-        assertThat(point).isPositive().isLessThan(ObjectiveValue.VICTORY_POINT_VALUE);
+        assertThat(point).isEqualTo(ScoringStakes.vpWorth(test.game, test.nekro));
+        assertThat(point).isGreaterThan(ThronePoint.kept(test.game, test.nekro, test.sol));
         assertThat(PlayAreaNotes.adjustedScore(test.game, test.nekro, tile, plan(false, 10.0)))
                 .isEqualTo(10.0 - point);
     }

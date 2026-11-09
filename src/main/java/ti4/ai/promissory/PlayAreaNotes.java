@@ -57,18 +57,35 @@ public class PlayAreaNotes {
     }
 
     static double returnCost(Game game, Player seat, Tile tile) {
-        double cost = 0;
-        for (String note : seat.getPromissoryNotesInPlayArea()) {
-            Player owner = game.getPNOwner(note);
-            if (owner == null || owner == seat || !returnsOnActivation(note)) continue;
-            if (!FoWHelper.playerHasUnitsInSystem(owner, tile)) continue;
-            cost += lossOf(game, seat, owner, note);
-        }
-        return cost;
+        return returnedOnActivating(game, seat, tile).stream()
+                .mapToDouble(note -> lossOf(game, seat, game.getPNOwner(note), note))
+                .sum();
+    }
+
+    public static boolean returnsAnyOnActivating(Game game, Player seat, Tile tile) {
+        return !returnedOnActivating(game, seat, tile).isEmpty();
+    }
+
+    public static int pointsReturnedOnActivating(Game game, Player seat, Tile tile) {
+        return (int) returnedOnActivating(game, seat, tile).stream()
+                .filter(note -> note.endsWith(SUPPORT_FOR_THE_THRONE))
+                .count();
+    }
+
+    private static List<String> returnedOnActivating(Game game, Player seat, Tile tile) {
+        return seat.getPromissoryNotesInPlayArea().stream()
+                .filter(note -> {
+                    Player owner = game.getPNOwner(note);
+                    return owner != null
+                            && owner != seat
+                            && returnsOnActivation(note)
+                            && FoWHelper.playerHasUnitsInSystem(owner, tile);
+                })
+                .toList();
     }
 
     static double lossOf(Game game, Player seat, Player owner, String note) {
-        if (note.endsWith(SUPPORT_FOR_THE_THRONE)) return ThronePoint.kept(game, seat, owner);
+        if (note.endsWith(SUPPORT_FOR_THE_THRONE)) return ThronePoint.lost(game, seat);
         if (note.endsWith(NoteGiving.ALLIANCE)) return AllianceValue.lost(game, seat, owner);
         return OTHER_NOTE_VALUE;
     }

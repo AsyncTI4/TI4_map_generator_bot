@@ -61,10 +61,22 @@ class ConstructionUses {
     }
 
     private static Benefit productionAt(PlanInputs in, Tile tile) {
-        double built = ProductionPlanner.plan(in.game(), in.seat(), tile).value();
+        ProductionPlanner.BuildPlan build = ProductionPlanner.plan(in.game(), in.seat(), tile);
+        double built = CardValueScale.PRODUCTION_SHARE * build.value();
+        if (built <= 0) return new Benefit(CardUse.CONSTRUCTION_PRODUCE, 0, tile.getPosition());
         double moveOut = TacticalPlanner.bestScore(movingOutOf(in.ranked(), tile.getPosition()));
-        double value = CardValueScale.PRODUCTION_SHARE * built + CardValueScale.BUILD_THEN_MOVE_SHARE * moveOut;
-        return new Benefit(CardUse.CONSTRUCTION_PRODUCE, built > 0 ? value : 0, tile.getPosition());
+        double movesTheBuildOut = CardValueScale.BUILD_THEN_MOVE_SHARE * Math.min(built, moveOut);
+        if (!tacticalBuildPossible(in, tile)) {
+            return new Benefit(CardUse.CONSTRUCTION_PRODUCE, built + movesTheBuildOut, tile.getPosition());
+        }
+        double token = TokenValue.savedTacticToken(in);
+        double secondBuild = Math.max(0, WarfareUses.doubleBuild(in, tile, Optional.of(build)) - token);
+        double value = Math.min(built, token) + Math.max(movesTheBuildOut, secondBuild);
+        return new Benefit(CardUse.CONSTRUCTION_PRODUCE, value, tile.getPosition());
+    }
+
+    private static boolean tacticalBuildPossible(PlanInputs in, Tile tile) {
+        return in.seat().getTacticalCC() > 0 && !tile.hasPlayerCC(in.seat());
     }
 
     static List<TacticalPlan> movingOutOf(List<TacticalPlan> ranked, String position) {

@@ -50,10 +50,14 @@ class RiderPayoutsTest extends BaseTi4Test {
     }
 
     private AiPrompt gainPrompt(String content) {
+        return gainPrompt(content, NOW);
+    }
+
+    private AiPrompt gainPrompt(String content, long created) {
         List<String> ids = new ArrayList<>(GAIN_BUTTONS);
         ids.add("FFCC_nekro_deleteButtons");
         List<String> labels = List.of("Gain Tactic", "Gain Fleet", "Gain Strategy", "Done Gaining Command Tokens");
-        return AiTestGame.withContent(AiTestGame.prompt("gain", PromptSource.PUBLIC, NOW, ids, labels), content);
+        return AiTestGame.withContent(AiTestGame.prompt("gain", PromptSource.PUBLIC, created, ids, labels), content);
     }
 
     private static String pressed(Optional<AiDecision> decision) {
@@ -138,47 +142,84 @@ class RiderPayoutsTest extends BaseTi4Test {
 
     // ---- Leadership Rider ----------------------------------------------------------------------------------------
 
-    private void leadershipRiderWon() {
-        test.game.setStoredValue("resolvedAgendaOutcome", "for");
-        test.game.setCurrentAgendaVote("for", "nekro_Leadership Rider");
+    // AgendaHelper posts this line, then the gain buttons, to the winner's channel when a Leadership Rider pays out.
+    private AiPrompt announcement(Player winner, long created) {
+        return AiTestGame.withContent(
+                AiTestGame.prompt("announce", PromptSource.PUBLIC, created),
+                winner.getRepresentationUnfogged()
+                        + " resolve _Leadership Rider_ by using the button to gain 3 command tokens.");
     }
 
-    private String gain(AiPrompt prompt) {
-        return pressed(RiderPayouts.leadership(context(nekro, NOW, Set.of(), prompt)));
+    private String announcedGainPrompt() {
+        return nekro.getRepresentation()
+                + ", your current command tokens are 3/3/2. Use buttons to gain command tokens.";
+    }
+
+    private String gain(AiPrompt... prompts) {
+        return pressed(RiderPayouts.leadership(context(nekro, NOW, Set.of(), prompts)));
     }
 
     // The bot rewrites the prompt's text after each token, so the AI has to remember the prompt to collect all three
     // and then press Done.
     @Test
     void gainsThreeTokensWithAWinningLeadershipRider() {
-        leadershipRiderWon();
-        String announced = nekro.getRepresentation()
-                + ", your current command tokens are 3/3/2. Use buttons to gain command tokens.";
-        assertThat(gain(gainPrompt(announced))).startsWith("FFCC_nekro_increase_");
+        AiPrompt announced = announcement(nekro, NOW);
+        assertThat(gain(announced, gainPrompt(announcedGainPrompt()))).startsWith("FFCC_nekro_increase_");
 
         nekro.setStrategicCC(3);
         AiPrompt rewritten = gainPrompt(nekro.getRepresentation() + " command tokens have gone from 3/3/2 -> 3/3/3.");
-        assertThat(gain(rewritten)).startsWith("FFCC_nekro_increase_");
+        assertThat(gain(announced, rewritten)).startsWith("FFCC_nekro_increase_");
 
         nekro.setTacticalCC(4);
         nekro.setStrategicCC(4);
-        assertThat(gain(rewritten)).isEqualTo("FFCC_nekro_deleteButtons");
+        assertThat(gain(announced, rewritten)).isEqualTo("FFCC_nekro_deleteButtons");
+    }
+
+    // Live game aiplay1: Miscount Disclosed reveals the revote agenda in the same press that pays the riders, which
+    // clears the resolved outcome and the votes before the AI looks. The payout line alone proves the win.
+    @Test
+    void gainsAfterMiscountDisclosedClearedTheResolvedOutcome() {
+        test.game.setStoredValue("resolvedAgendaOutcome", "");
+
+        assertThat(gain(announcement(nekro, NOW), gainPrompt(announcedGainPrompt())))
+                .startsWith("FFCC_nekro_increase_");
+    }
+
+    // Another prompt (here Leadership's secondary, resolved later in aiplay1) overwrote the stored starting tokens with
+    // a lower count, so the bot's net gain already reads 3. The AI counts from the tokens it held when it first saw
+    // the rider buttons instead.
+    @Test
+    void countsFromItsOwnStartWhenTheStoredStartingTokensAreStale() {
+        test.game.setStoredValue("originalCCsFornekro", "2/2/1");
+        AiPrompt announced = announcement(nekro, NOW);
+        AiPrompt buttons = gainPrompt(announcedGainPrompt());
+
+        assertThat(gain(announced, buttons)).startsWith("FFCC_nekro_increase_");
+        nekro.setTacticalCC(5);
+        nekro.setStrategicCC(3);
+        assertThat(gain(announced, buttons)).isEqualTo("FFCC_nekro_deleteButtons");
+    }
+
+    // An unresolved rider stays owed: the AI resolves it even when it gets to the buttons long after the agenda.
+    @Test
+    void resolvesARiderWhoseButtonsAreOld() {
+        long old = NOW - 2 * 60 * 60_000L;
+
+        assertThat(gain(announcement(nekro, old), gainPrompt(announcedGainPrompt(), old)))
+                .startsWith("FFCC_nekro_increase_");
     }
 
     @Test
-    void gainsNothingWithoutAWinningLeadershipRider() {
-        String announced = nekro.getRepresentation()
-                + ", your current command tokens are 3/3/2. Use buttons to gain command tokens.";
-        assertThat(gain(gainPrompt(announced))).isEmpty();
-
-        test.game.setStoredValue("resolvedAgendaOutcome", "for");
-        test.game.setCurrentAgendaVote("against", "nekro_Leadership Rider");
-        assertThat(gain(gainPrompt(announced))).isEmpty();
+    void gainsNothingWithoutAPayoutLineForItself() {
+        assertThat(gain(gainPrompt(announcedGainPrompt()))).isEmpty();
+        assertThat(gain(announcement(sol, NOW), gainPrompt(announcedGainPrompt())))
+                .isEmpty();
+        assertThat(gain(announcement(nekro, NOW + 1_000L), gainPrompt(announcedGainPrompt())))
+                .isEmpty();
     }
 
     @Test
     void stopsGainingAtTheCommandTokenLimit() {
-        leadershipRiderWon();
         nekro.setTacticalCC(8);
         nekro.setFleetCC(5);
         nekro.setStrategicCC(3);
@@ -186,14 +227,14 @@ class RiderPayoutsTest extends BaseTi4Test {
         String announced = nekro.getRepresentation()
                 + ", your current command tokens are 8/5/3. Use buttons to gain command tokens.";
 
-        assertThat(gain(gainPrompt(announced))).isEqualTo("FFCC_nekro_deleteButtons");
+        assertThat(gain(announcement(nekro, NOW), gainPrompt(announced))).isEqualTo("FFCC_nekro_deleteButtons");
     }
 
     @Test
     void leavesTheGainButtonsOfOtherMessagesAlone() {
-        leadershipRiderWon();
-
-        assertThat(gain(gainPrompt(nekro.getRepresentation() + " you have been hit by a mech.")))
+        assertThat(gain(
+                        announcement(nekro, NOW),
+                        gainPrompt(nekro.getRepresentation() + " you have been hit by a mech.")))
                 .isEmpty();
     }
 }

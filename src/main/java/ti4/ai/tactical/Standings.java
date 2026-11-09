@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.scoring.WinRace;
@@ -28,7 +29,6 @@ final class Standings {
     private static final double CALM_DENIAL = 0.4;
     private static final double WINNING_DENIAL = 2.0;
     private static final double CUSTODIANS_CHANCE = 0.5;
-    private static final int CUSTODIANS_INFLUENCE = 6;
 
     private final Game game;
     private final Player seat;
@@ -102,7 +102,7 @@ final class Standings {
         if (mecatol == null || mecatol.getPlanetUnitHolders().stream().noneMatch(BoardView::hasCustodians)) return 0;
         IncomingForce force = incoming.of(player, mecatol, Horizon.IMMEDIATE);
         boolean landsGroundForces = !force.isEmpty() && force.carriesGround();
-        boolean canPay = Wallet.of(game, player).influence() >= CUSTODIANS_INFLUENCE;
+        boolean canPay = Wallet.of(game, player).influence() >= CustodiansRace.cost(player);
         return landsGroundForces && canPay ? CUSTODIANS_CHANCE : 0;
     }
 

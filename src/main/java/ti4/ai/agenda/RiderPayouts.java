@@ -1,19 +1,20 @@
 package ti4.ai.agenda;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
-import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.nekro.NekroRules;
+import ti4.ai.perception.AiPerception;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.strategy.StrategyCardRules;
-import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.Helper;
 
 @UtilityClass
 public class RiderPayouts {
@@ -21,9 +22,10 @@ public class RiderPayouts {
     private static final String GET_A_TECHNOLOGY = "acquireATech";
     private static final String GAIN_TOKENS_TEXT = "Use buttons to gain command tokens";
     private static final String LEADERSHIP_KEY = "leadershipRiderGain|";
-    private static final String RESOLVED_OUTCOME = "resolvedAgendaOutcome";
     private static final int LEADERSHIP_TOKENS = 3;
     private static final long RECENT_MILLIS = 30 * 60_000L;
+    private static final long ANNOUNCEMENT_TOLERANCE_MILLIS = 10_000L;
+    private static final String SEPARATOR = "|";
 
     public static Optional<AiDecision> technology(AiTurnContext context) {
         Player seat = context.seat();
@@ -40,30 +42,68 @@ public class RiderPayouts {
     }
 
     public static Optional<AiDecision> leadership(AiTurnContext context) {
-        if (!wonRider(context.game(), context.seat(), RiderPayoff.LEADERSHIP)) return Optional.empty();
-        for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
-            if (prompt.isHidden() || context.now() - prompt.createdAtMillis() > RECENT_MILLIS) continue;
-            Optional<Integer> target = leadershipTarget(context, prompt);
-            if (target.isEmpty()) continue;
-            Optional<AiDecision> gain = NekroRules.gainTokens(
-                    context, prompt, target.get(), LEADERSHIP_KEY + prompt.messageId(), "its Leadership Rider");
-            if (gain.isPresent()) return gain;
+        List<AiPrompt> prompts = Prompts.newestFirst(context.prompts());
+        for (AiPrompt prompt : prompts) {
+            if (prompt.isHidden() || !Prompts.mentions(prompt, context.seat())) continue;
+            Optional<LeadershipGain> gain = leadershipGain(context, prompt, prompts);
+            if (gain.isEmpty()) continue;
+            Optional<AiDecision> press = NekroRules.gainTokens(
+                    context,
+                    prompt,
+                    gain.get().gained(context.seat()),
+                    gain.get().target(),
+                    LEADERSHIP_KEY + prompt.messageId(),
+                    "its Leadership Rider");
+            if (press.isPresent()) return press;
         }
         return Optional.empty();
     }
 
-    private static Optional<Integer> leadershipTarget(AiTurnContext context, AiPrompt prompt) {
+    private record LeadershipGain(int target, int baseline) {
+
+        int gained(Player seat) {
+            return totalTokens(seat) - baseline;
+        }
+
+        String encode() {
+            return target + SEPARATOR + baseline;
+        }
+
+        static Optional<LeadershipGain> decode(String stored) {
+            String[] parts = stored.split(Pattern.quote(SEPARATOR));
+            if (parts.length != 2 || !StringUtils.isNumeric(parts[0]) || !StringUtils.isNumeric(parts[1])) {
+                return Optional.empty();
+            }
+            return Optional.of(new LeadershipGain(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])));
+        }
+    }
+
+    private static Optional<LeadershipGain> leadershipGain(
+            AiTurnContext context, AiPrompt prompt, List<AiPrompt> prompts) {
         String key = LEADERSHIP_KEY + prompt.messageId();
-        Optional<Integer> remembered =
-                context.memory().get(key).filter(StringUtils::isNumeric).map(Integer::parseInt);
+        Optional<LeadershipGain> remembered = context.memory().get(key).flatMap(LeadershipGain::decode);
         if (remembered.isPresent()) return remembered;
-        if (!prompt.content().contains(GAIN_TOKENS_TEXT) || !Prompts.mentions(prompt, context.seat())) {
+        if (!prompt.content().contains(GAIN_TOKENS_TEXT) || !announcedBefore(context, prompt, prompts)) {
             return Optional.empty();
         }
-        int target = Math.min(
-                LEADERSHIP_TOKENS, CommandTokenPolicy.gainWithinReinforcements(context.game(), context.seat()));
-        context.memory().put(key, String.valueOf(target));
-        return Optional.of(target);
+        Player seat = context.seat();
+        int room = Math.max(0, seat.getCommandTokenLimit() - Helper.getCCCount(context.game(), seat.getColor()));
+        LeadershipGain gain = new LeadershipGain(Math.min(LEADERSHIP_TOKENS, room), totalTokens(seat));
+        context.memory().put(key, gain.encode());
+        return Optional.of(gain);
+    }
+
+    private static boolean announcedBefore(AiTurnContext context, AiPrompt gainPrompt, List<AiPrompt> prompts) {
+        return prompts.stream()
+                .filter(prompt -> !prompt.isHidden())
+                .filter(prompt -> prompt.content().contains(AiPerception.LEADERSHIP_RIDER_PAYOUT))
+                .filter(prompt -> Prompts.mentions(prompt, context.seat()))
+                .anyMatch(prompt -> gainPrompt.createdAtMillis() >= prompt.createdAtMillis()
+                        && gainPrompt.createdAtMillis() - prompt.createdAtMillis() <= ANNOUNCEMENT_TOLERANCE_MILLIS);
+    }
+
+    private static int totalTokens(Player seat) {
+        return seat.getTacticalCC() + seat.getFleetCC() + seat.getStrategicCC();
     }
 
     private static boolean isRecentPublicMessageNaming(AiTurnContext context, AiPrompt prompt, String rider) {
@@ -71,17 +111,5 @@ public class RiderPayouts {
                 && context.now() - prompt.createdAtMillis() <= RECENT_MILLIS
                 && prompt.content().contains(rider)
                 && Prompts.mentions(prompt, context.seat());
-    }
-
-    static boolean wonRider(Game game, Player seat, String rider) {
-        String outcome = game.getStoredValue(RESOLVED_OUTCOME);
-        if (outcome.isEmpty()) return false;
-        for (Map.Entry<String, String> votes : game.getCurrentAgendaVotes().entrySet()) {
-            if (!votes.getKey().equalsIgnoreCase(outcome)) continue;
-            for (String piece : votes.getValue().split(";")) {
-                if (piece.equalsIgnoreCase(seat.getFaction() + "_" + rider)) return true;
-            }
-        }
-        return false;
     }
 }

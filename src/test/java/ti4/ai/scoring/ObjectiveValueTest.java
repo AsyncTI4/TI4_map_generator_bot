@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
+import ti4.ai.eval.BoardView;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlan.Kind;
@@ -259,10 +260,11 @@ class ObjectiveValueTest extends BaseTi4Test {
         assertThat(value.gain(after)).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
-    // Raise a Fleet needs five non-fighter ships in one system: with five fleet tokens, the home dock builds cheap
-    // destroyers next to the ships already there before spending production on anything else.
+    // Raise a Fleet needs five non-fighter ships in one system: with five fleet tokens, the home dock fills the three
+    // missing slots before spending production on anything else. Any ship counts, so the slots start as destroyers and
+    // go to whatever ship is worth more (here the expansion carriers the seat lacks), still all scored for the fleet.
     @Test
-    void buildsDestroyersAtADockToRaiseAFleet() {
+    void buildsTheMissingShipsAtADockToRaiseAFleet() {
         reveal("raise_fleet");
         test.nekro.setFleetCC(5);
         test.nekro.setTg(10);
@@ -270,7 +272,9 @@ class ObjectiveValueTest extends BaseTi4Test {
 
         ProductionPlanner.BuildPlan plan = ProductionPlanner.plan(test.game, test.nekro, home);
 
-        assertThat(plan.units(UnitType.Destroyer)).isEqualTo(3);
+        assertThat(plan.orders().subList(0, 3))
+                .allMatch(order -> BoardView.MOVING_SHIPS.contains(order.type()))
+                .allMatch(ProductionPlanner.BuildOrder::scoring);
     }
 
     // Patrol Vast Territories is worth two points and needs units in five systems without planets. Holding two

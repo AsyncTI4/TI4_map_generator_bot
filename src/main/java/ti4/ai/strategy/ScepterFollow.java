@@ -7,6 +7,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.winnu.Acquiescence;
 import ti4.game.Game;
 
 @UtilityClass
@@ -26,7 +27,8 @@ class ScepterFollow {
         Game game = context.game();
         return game.getPlayedSCs().stream()
                 .filter(initiative -> StrategyCard.of(game, initiative) == card)
-                .anyMatch(initiative -> pending(context, initiative));
+                .anyMatch(initiative -> pending(context, initiative)
+                        || Acquiescence.playButton(context, initiative).isPresent());
     }
 
     static void remember(AiTurnContext context, int initiative) {
@@ -34,11 +36,13 @@ class ScepterFollow {
     }
 
     static Optional<AiDecision> exhaustFirst(AiTurnContext context, int initiative, AiDecision decision) {
-        if (!(decision instanceof AiDecision.Press)
-                || !context.seat().hasRelicReady(RELIC)
-                || pending(context, initiative)) {
-            return Optional.empty();
+        if (!(decision instanceof AiDecision.Press) || pending(context, initiative)) return Optional.empty();
+        Optional<Match> acquiescence = Acquiescence.playButton(context, initiative);
+        if (acquiescence.isPresent()) {
+            remember(context, initiative);
+            return acquiescence.map(match -> match.press("follow with Acquiescence instead of a strategy token"));
         }
+        if (!context.seat().hasRelicReady(RELIC)) return Optional.empty();
         String handler = BUTTON + initiative;
         Optional<Match> scepter = Prompts.unowned(Prompts.newestFirst(context.prompts()), handler::equals)
                 .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));

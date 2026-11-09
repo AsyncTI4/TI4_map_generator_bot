@@ -27,6 +27,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.tactical.GroundCampaign;
 import ti4.ai.tactical.PrecisionRules;
+import ti4.ai.yin.BrotherOmar;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -373,7 +374,11 @@ public class ResearchPolicy {
     }
 
     static int missingPrerequisites(Player seat, TechnologyModel next, TechnologyModel adding) {
-        return TechColours.missing(seat, next.getRequirements().orElse(""), TechColours.owned(seat, adding), Map.of())
+        return TechColours.missing(
+                        seat,
+                        next.getRequirements().orElse(""),
+                        TechColours.owned(seat, adding),
+                        BrotherOmar.skips(seat))
                 .values()
                 .stream()
                 .mapToInt(Integer::intValue)
