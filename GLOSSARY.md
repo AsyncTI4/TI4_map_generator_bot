@@ -186,16 +186,20 @@ An Anomaly that adds +1 to the move of ships leaving or passing through it, each
 An anomaly attached to a System's edge rather than its interior.
 
 **Void Tether**:
-The Empyrean breakthrough's Border anomaly token. Enforced only with One-way adjacency on (always in fog); otherwise it is drawn but blocks nothing. When enforced, it blocks the shared edge between its two Systems, in either direction and for every purpose, for everyone except the Player holding the breakthrough (`exemptHolderOf` in `border_anomalies.json`) and the colours that Player allows through that token ("unless you allow it", stored on the token, cleared when it is moved or removed). Only the edge is blocked: other links between the same two Systems (matching wormholes, custom links, ingress/egress, …) still connect them. Across it, a Player counts as a Neighbor only from the exempt side.
+The Empyrean breakthrough's Border anomaly token. Enforced only with One-way adjacency on (always in fog): it blocks the shared edge between its two Systems for everyone except the breakthrough's holder and the colours they allow through. Other links between the two Systems (wormholes, custom links, …) still connect them.
 
 **Hyperlane**:
 A Tile that is not a System, whose drawn lanes make the Systems at their ends adjacent.
 
 **One-way hyperlane**:
-A lane on a custom Hyperlane (`hl` tile) that units can only follow from one side to the other. In the 6×6 matrix (row = side entered, column = side left, sides N, NE, SE, S, SW, NW) a GM types `2` for it; `1` stays two-way and is mirrored. Stored as an asymmetric 0/1 matrix. Drawn amber in the game's or the viewer's style (Dashed lanes, Arrows, Fading lanes, Entry/exit gates); on a roundabout every side that can be entered reaches every side that can be left (a one-way loop is two-way), so it marks only its entry-only and exit-only connectors. With the fog option "Hide unseen hyperlanes", a Player's own map shows only the lanes their vision runs along, and a remembered hyperlane shows no lanes. With the fog option "One-way lane hints", the System a visible one-way lane leads into gets a faint glow on that edge (not across a blocked edge).
+A lane on a custom Hyperlane (`hl` tile) that units can follow in one direction only; a GM types `2` for it in the 6×6 matrix (`1` = two-way). Drawn amber in the game's or the viewer's hyperlane style. Fog options: "Hide unseen hyperlanes" shows only lanes a Player's vision runs along; "One-way lane hints" adds a faint glow where a visible one-way lane leads into a System.
 
 **Hyperlane bridge**:
-A lane matrix that a GM gives a System in the custom hyperlane manager (`/map custom_hyperlanes`, Add Bridge), in the hyperlane format: row = side a lane comes in from, column = side it leaves through, `1` two-way, `2` one-way, no roundabouts; each side carries one lane and the lanes must fit on the rim without crossing or overlapping. A lane arriving at a side the matrix lists continues only to the sides the matrix pairs it with, so it passes straight through the System and connects the tiles at its far ends (LRR 44.1): a Hyperlane carries it on, another bridged System passes it on again, and a plain System is where it ends. The sides in the matrix are lane-only edges: the bridged System does not border the tiles across them and its units cannot use those lanes. A lane arriving at a side the matrix does not list ends in the System as usual. Border anomalies only count where a lane starts or ends. On the map a lane trails just inside the System's edge for each pair, blue when two-way and amber in the hyperlane style when one-way, with a red bar where a one-way lane enters, a green bar where it leaves and green arrows in the corners; it passes behind planets, their values and names, and tunnels under edges that still border a neighbouring System (with a white glow where a lane ends in the System under the trail). In Fog of War only bridge lanes the Player can see are drawn; a never-seen bridged System with visible lanes on both ends is drawn as an empty hyperlane tile with a ping; and where a hidden bridge lane takes the edge between two Systems the Player sees, that edge shows a Spatial Tear (drawn only, not a border anomaly).
+A lane matrix a GM gives a System (`/map custom_hyperlanes` → More → Add Bridge, hyperlane format, no roundabouts, one lane per side, no crossing). Its lanes pass straight through the System to the tiles at their far ends (LRR 44.1); the System does not border the tiles across those edges and its units cannot use those lanes. Lanes arriving at other sides end in the System as usual. Drawn as a trail along the System's rim. In Fog of War a hidden bridge lane between two seen Systems shows as a Spatial Tear (drawn only).
+
+**Hyperlane portal**:
+A lettered token (A–Z) a GM puts on a roundabout or empty custom Hyperlane (`/map custom_hyperlanes` → More → Portals, up to 7 per tile, the first in the centre). Units on the ring can jump to every other Hyperlane with the same letter and carry on along its spokes; it costs no movement, like any Hyperlane. A portal can be two-way, entry-only (`>`) or exit-only (`<`). An empty Hyperlane with two letters links their networks.
+_Avoid_: Wormhole gate
 
 **Frontier token**:
 A marker placed in each System without planets that can be explored for a reward.
@@ -342,11 +346,11 @@ Prophecy of Kings, the first Twilight Imperium 4th Edition expansion, whose cont
 Thunder's Edge, the Twilight Imperium 4th Edition expansion that follows PoK and adds Breakthroughs, Expeditions and the Fracture; statistics filters name it `te`.
 
 **Fog secret objectives**:
-A set of 32 homebrew secret objectives for Fog of War games, played by choosing the `secret_objectives_pok_fog` secret objective deck (the PoK deck plus the 32). They reward scouting (systems a Player has found, meaning in their fog memory or current vision), hiding (nothing in another Player's view) and watching (another Player's units in your view). Status ones are checked by the bot; action and agenda ones are offered with a score button when the bot sees the moment happen.
+32 homebrew secret objectives for Fog of War, played with the `secret_objectives_pok_fog` deck (PoK plus the 32). They reward scouting, hiding and watching; the bot checks status ones and offers a score button for action and agenda ones.
 _Avoid_: FoW SOs, vision secrets
 
 **Secrets Only**:
-A Fog of War homebrew mode, set through weird game setup, where no public objectives are revealed and Players race to 10 victory points with secret objectives. Each Player holds up to 4 unscored secret objectives, keeps 2 of 4 at setup and 1 of 2 each status phase, and a scored secret objective is shuffled back into the deck for others to draw. No Player may score the same one twice.
+A Fog of War homebrew mode (weird game setup) with no public objectives: Players race to 10 victory points with secret objectives. Each holds up to 4 unscored, keeps 2 of 4 at setup and 1 of 2 each status phase; scored ones go back into the deck, and no one scores the same one twice.
 _Avoid_: SO-only, secret race
 
 **Secret objective offer**:

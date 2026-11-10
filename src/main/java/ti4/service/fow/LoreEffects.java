@@ -35,7 +35,10 @@ import ti4.service.fow.LoreService.LoreEntry;
 import ti4.service.fow.LoreService.RECEIVER;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.AddTileService;
+import ti4.service.map.BridgeMatrix;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.HyperlanePortals;
 import ti4.service.tech.ListTechService;
 
 /**
@@ -103,7 +106,11 @@ final class LoreEffects {
             "clearunits",
             "settile",
             "rotatehyperlane",
-            "sethyperlane");
+            "sethyperlane",
+            "setportals",
+            "removeportals",
+            "setbridge",
+            "removebridge");
 
     static EffectResults applyLoreEffects(Player player, Game game, LoreEntry lore, boolean isSystemLore) {
         return applyLoreEffects(player, game, lore, isSystemLore, null);
@@ -235,9 +242,9 @@ final class LoreEffects {
         if (lore.isChoiceGated() || lore.isRollGated()) {
             String marker = lore.isChoiceGated() ? "!choice" : "!roll";
             if (lore.receiver == RECEIVER.WINNER || lore.receiver == RECEIVER.LOSER) {
-                problems.add(
-                        "`" + marker
-                                + "` has no effect when the receiver is Battle winner/loser — that receiver already gates on the player's win/loss self-report");
+                problems.add("`" + marker
+                        + "` has no effect when the receiver is Battle winner/loser — that receiver already"
+                        + " gates on the player's win/loss self-report");
             } else if (lore.receiver == RECEIVER.GM) {
                 problems.add("`" + marker
                         + "` has no effect when the receiver is GM — GMs are never offered the choice or its reward");
@@ -256,9 +263,9 @@ final class LoreEffects {
                 String stripped = line.strip();
                 Matcher m = BIN_BRANCH.matcher(stripped);
                 if (m.matches() && m.group(2).contains("!")) {
-                    problems.add(
-                            "`" + stripped
-                                    + "` looks like a roll bin but the footer has no `!roll NdM` marker — its effect will fire every time");
+                    problems.add("`" + stripped
+                            + "` looks like a roll bin but the footer has no `!roll NdM` marker — its effect"
+                            + " will fire every time");
                 }
             }
         }
@@ -435,7 +442,11 @@ final class LoreEffects {
             Map.entry("rfog", "removefogtile"),
             Map.entry("stl", "settile"),
             Map.entry("rhl", "rotatehyperlane"),
-            Map.entry("shl", "sethyperlane"));
+            Map.entry("shl", "sethyperlane"),
+            Map.entry("spor", "setportals"),
+            Map.entry("rpor", "removeportals"),
+            Map.entry("sbr", "setbridge"),
+            Map.entry("rbr", "removebridge"));
 
     private record ParsedEffect(
             String verb, List<String> args, String targetRef, String branch, List<String> conditions) {}
@@ -621,6 +632,10 @@ final class LoreEffects {
         register(LoreEffects::effectSetTile, "settile");
         register(LoreEffects::effectRotateHyperlane, "rotatehyperlane");
         register(LoreEffects::effectSetHyperlane, "sethyperlane");
+        register(LoreEffects::effectSetPortals, "setportals");
+        register(LoreEffects::effectRemovePortals, "removeportals");
+        register(LoreEffects::effectSetBridge, "setbridge");
+        register(LoreEffects::effectRemoveBridge, "removebridge");
     }
 
     /** FoW-aware player name for effect descriptions: color emoji + name in FoW so identity stays hidden. */
@@ -1121,6 +1136,7 @@ final class LoreEffects {
             matrix = CustomHyperlaneService.rotateMatrix60(matrix);
         }
         CustomHyperlaneService.insertStoredData(ctx.game, position, matrix);
+        HyperlanePortals.rotate(ctx.game, position, normalized);
         return new EffectDescription(
                 "The hyperlane at " + position + " rotated by " + (normalized * 60) + "°.", true, position);
     }
@@ -1137,6 +1153,46 @@ final class LoreEffects {
 
         CustomHyperlaneService.insertStoredData(ctx.game, position, matrix);
         return new EffectDescription("The hyperlane at " + position + " reconfigured.", true, position);
+    }
+
+    private static EffectDescription effectSetPortals(EffectContext ctx) {
+        if (ctx.args.length < 2) return null;
+        String position = ctx.arg(0);
+        if (HyperlanePortals.trySet(ctx.game, position, portalSlotsArg(ctx.arg(1)))
+                .isPresent()) return null;
+        return new EffectDescription("Portals opened at " + position + ".", true, position);
+    }
+
+    private static EffectDescription effectRemovePortals(EffectContext ctx) {
+        if (ctx.args.length < 1) return null;
+        String position = ctx.arg(0);
+        if (HyperlanePortals.slotsOf(ctx.game, position).isEmpty()) return null;
+        HyperlanePortals.remove(ctx.game, position);
+        return new EffectDescription("Portals at " + position + " closed.", true, position);
+    }
+
+    private static EffectDescription effectSetBridge(EffectContext ctx) {
+        if (ctx.args.length < 2) return null;
+        String position = ctx.arg(0);
+        String stored = decodeHyperlaneMatrixArg(ctx.arg(1));
+        if (stored == null) return null;
+        String typed = CustomHyperlaneService.toTypedMatrix(stored);
+        if (HyperlaneBridges.problemWith(ctx.game, position, typed).isPresent()) return null;
+        HyperlaneBridges.set(ctx.game, position, typed);
+        return new EffectDescription("A hyperlane bridge now runs through " + position + ".", true, position);
+    }
+
+    private static EffectDescription effectRemoveBridge(EffectContext ctx) {
+        if (ctx.args.length < 1) return null;
+        String position = ctx.arg(0);
+        if (HyperlaneBridges.matrixOf(ctx.game, position) == null) return null;
+        HyperlaneBridges.remove(ctx.game, position);
+        return new EffectDescription("The hyperlane bridge through " + position + " is gone.", true, position);
+    }
+
+    private static String portalSlotsArg(String arg) {
+        String trimmed = arg.trim();
+        return trimmed.matches("([0-6][A-Za-z][<>]?)+") ? HyperlanePortals.typedFromCompact(trimmed) : trimmed;
     }
 
     /** Decodes a footer-safe encoded hyperlane matrix (9 hex chars or legacy 36-bit binary); null if invalid. */
@@ -1189,9 +1245,9 @@ final class LoreEffects {
             case "removeunit" -> {
                 int idx = (!a.isEmpty() && !isSignedInt(a, 0)) ? 1 : 0;
                 if (a.size() < idx + 2) {
-                    problems.add(
-                            "`removeunit` needs `[neutral|<color>] <count> <unit> [planet]`, e.g. `!removeunit 2 infantry` or `!removeunit 2 infantry mr`"
-                                    + where);
+                    problems.add("`removeunit` needs `[neutral|<color>] <count> <unit> [planet]`, e.g. `!removeunit 2"
+                            + " infantry` or `!removeunit 2 infantry mr`"
+                            + where);
                 } else {
                     if (!isSignedInt(a, idx)) {
                         problems.add("`removeunit` count `" + a.get(idx) + "` isn't a number" + where);
@@ -1211,14 +1267,16 @@ final class LoreEffects {
             case "clearunits" -> {
                 if (a.isEmpty()) {
                     problems.add(
-                            "`clearunits` needs `<neutral|color> [planet]`, e.g. `!clearunits neutral` or `!clearunits red mr`"
+                            "`clearunits` needs `<neutral|color> [planet]`, e.g. `!clearunits neutral` or `!clearunits"
+                                    + " red mr`"
                                     + where);
                 }
             }
             case "tech" -> {
                 if (a.isEmpty()) {
                     problems.add(
-                            "`tech` needs a tech id, `random`, or `choose`, e.g. `!tech gd`, `!tech random blue`, or `!tech choose blue`"
+                            "`tech` needs a tech id, `random`, or `choose`, e.g. `!tech gd`, `!tech random blue`, or"
+                                    + " `!tech choose blue`"
                                     + where);
                 } else if ("random".equalsIgnoreCase(a.get(0))
                         || "choose".equalsIgnoreCase(a.get(0))
@@ -1250,9 +1308,9 @@ final class LoreEffects {
             }
             case "settile" -> {
                 if (a.size() < 2) {
-                    problems.add(
-                            "`settile` needs `<position> <tileId|random> [filters]`, e.g. `!settile 305 41` or `!settile 305 random red wormhole`"
-                                    + where);
+                    problems.add("`settile` needs `<position> <tileId|random> [filters]`, e.g. `!settile 305 41` or"
+                            + " `!settile 305 random red wormhole`"
+                            + where);
                 } else {
                     if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
                         problems.add("invalid position `" + a.getFirst() + "`" + where);
@@ -1270,6 +1328,52 @@ final class LoreEffects {
                     }
                 }
             }
+            case "setportals" -> {
+                if (a.size() < 2) {
+                    problems.add("`setportals` needs `<position> <slots>`, e.g. `!setportals 205 0A3B>`" + where);
+                } else {
+                    if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
+                        problems.add("invalid position `" + a.getFirst() + "`" + where);
+                    }
+                    HyperlanePortals.parseTyped(portalSlotsArg(a.get(1)))
+                            .problem()
+                            .ifPresent(problem -> problems.add("`setportals` " + problem + where));
+                }
+            }
+            case "setbridge" -> {
+                if (a.size() < 2) {
+                    problems.add("`setbridge` needs `<position> <encodedMatrix>` — use the 9-hex-char form from the"
+                            + " hyperlane manager's Export button (`bridge:` rows)" + where);
+                } else {
+                    if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
+                        problems.add("invalid position `" + a.getFirst() + "`" + where);
+                    }
+                    String stored = decodeHyperlaneMatrixArg(a.get(1));
+                    if (stored == null) {
+                        problems.add("invalid encoded matrix `" + a.get(1)
+                                + "` — use the 9-hex-char form from the hyperlane manager's Export button" + where);
+                    } else {
+                        BridgeMatrix matrix = BridgeMatrix.parse(stored);
+                        if (matrix != null) {
+                            matrix.layoutProblem().ifPresent(problem -> problems.add("`setbridge` " + problem + where));
+                        }
+                    }
+                }
+            }
+            case "removebridge" -> {
+                if (a.isEmpty()) {
+                    problems.add("`removebridge` needs a position, e.g. `!removebridge 205`" + where);
+                } else if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
+                    problems.add("invalid position `" + a.getFirst() + "`" + where);
+                }
+            }
+            case "removeportals" -> {
+                if (a.isEmpty()) {
+                    problems.add("`removeportals` needs a position, e.g. `!removeportals 205`" + where);
+                } else if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
+                    problems.add("invalid position `" + a.getFirst() + "`" + where);
+                }
+            }
             case "rotatehyperlane" -> {
                 if (a.isEmpty()) {
                     problems.add("`rotatehyperlane` needs a position, e.g. `!rotatehyperlane 305 2`" + where);
@@ -1284,9 +1388,9 @@ final class LoreEffects {
             }
             case "sethyperlane" -> {
                 if (a.size() < 2) {
-                    problems.add(
-                            "`sethyperlane` needs `<position> <encodedMatrix>` — use the 9-hex-char form from the hyperlane manager's Export button"
-                                    + where);
+                    problems.add("`sethyperlane` needs `<position> <encodedMatrix>` — use the 9-hex-char form from the"
+                            + " hyperlane manager's Export button"
+                            + where);
                 } else {
                     if (!MapPositionMapper.isTilePositionValid(a.get(0))) {
                         problems.add("invalid position `" + a.getFirst() + "`" + where);

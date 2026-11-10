@@ -13,7 +13,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
-import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.TileBoundData;
 
 @UtilityClass
 class CreussButtonHandler {
@@ -29,7 +29,7 @@ class CreussButtonHandler {
         tile2.setPosition(position);
         game.setTile(tile);
         game.setTile(tile2);
-        HyperlaneBridges.move(game, position, position2, true);
+        TileBoundData.move(game, position, position2, true);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getHomeSystemPosition().equals(tile2.getPosition())) {
                 p2.setHomeSystemPosition(tile.getPosition());

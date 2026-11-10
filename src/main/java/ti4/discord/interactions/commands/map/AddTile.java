@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
 import ti4.service.map.AddTileService;
-import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.TileBoundData;
 
 class AddTile extends GameStateSubcommand {
 
@@ -59,7 +59,7 @@ class AddTile extends GameStateSubcommand {
                 AddTileService.addCustodianToken(tile, game);
             }
 
-            HyperlaneBridges.remove(game, position);
+            TileBoundData.clear(game, position);
             AddTileService.addTile(getGame(), tile);
         }
 

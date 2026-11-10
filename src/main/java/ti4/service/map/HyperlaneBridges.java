@@ -133,13 +133,6 @@ public class HyperlaneBridges {
         game.removeStoredValue(KEY);
     }
 
-    public static void move(Game game, String from, String to, boolean swap) {
-        if (from.equals(to)) {
-            return;
-        }
-        moveAll(game, swap ? Map.of(from, to, to, from) : Map.of(from, to));
-    }
-
     public static void moveAll(Game game, Map<String, String> fromTo) {
         Map<String, BridgeMatrix> bridges = stored(game);
         if (bridges.isEmpty()) {

@@ -2,6 +2,7 @@ package ti4.discord.interactions.commands.map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.GameStateSubcommand;
+import ti4.helpers.FoWHelper;
 import ti4.service.map.CustomHyperlaneService;
 
 class CustomHyperlanes extends GameStateSubcommand {
@@ -12,6 +13,7 @@ class CustomHyperlanes extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        if (FoWHelper.refusesNonGmInFog(getGame(), event)) return;
         CustomHyperlaneService.offerManageHyperlaneButtons(getGame(), event);
     }
 }

@@ -3,16 +3,20 @@ package ti4.image.tile;
 import static ti4.image.tile.TileGeometry.TILE_PADDING;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
+import ti4.helpers.adjacency.GridRule;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.HyperlaneStyle;
 import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.service.map.BridgeMatrix;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.map.HyperlanePortals;
+import ti4.service.map.PortalSlot;
 
 final class TileArtwork {
 
@@ -101,7 +105,32 @@ final class TileArtwork {
                                     .equals(drawn));
         }
         HyperlaneStyle style = CustomHyperlaneService.hasOneWayLanes(drawn) ? view.style() : HyperlaneStyle.DASHED;
-        return HyperlaneTileGenerator.generateHyperlaneTile(tile, backgroundSeed, drawn, lanesHidden, style);
+        BufferedImage image =
+                HyperlaneTileGenerator.generateHyperlaneTile(tile, backgroundSeed, drawn, lanesHidden, style);
+        List<PortalSlot> portals = visiblePortals(scene, tile);
+        if (portals.isEmpty()) {
+            return image;
+        }
+        boolean ringMissing = drawn != null && !CustomHyperlaneService.hasSelfConnection(drawn);
+        return PortalTokens.drawnOn(image, portals, ringMissing);
+    }
+
+    private static List<PortalSlot> visiblePortals(TileScene scene, Tile tile) {
+        String position = tile.getPosition();
+        List<PortalSlot> slots = HyperlanePortals.slotsOf(scene.game(), position);
+        HyperlaneView view = scene.hyperlanes();
+        if (slots.isEmpty()
+                || !view.hidesUnseenLanes()
+                || view.revealedPositions().contains(position)) {
+            return slots;
+        }
+        if (scene.hidesFogged(tile)) {
+            return List.of();
+        }
+        Set<String> visible = view.visibleLanes();
+        return slots.stream()
+                .filter(slot -> visible.contains(GridRule.portalLane(position, slot.letter())))
+                .toList();
     }
 
     @Nullable

@@ -337,7 +337,8 @@ Every step may also have a `label` for the report.
   still in the deck), `soDeckSize`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),
   `customAdjacencies` (`<primary>><listed>`), `customHyperlanes` (`<position>:<matrix>`, one-way lanes as `2`),
-  `hyperlaneBridges` (bridged systems as `<position>:<matrix>`, same format),
+  `hyperlaneBridges` (bridged systems as `<position>:<matrix>`, same format), `hyperlanePortals` (portal hyperlanes as
+  `<position>:<slots>`, e.g. `000:0=A, 3=B>`),
   `fowOptions` (enabled fog options, e.g. `fow_plus,ghost_hexes`; includes `disable_fracture`), `fogPreset`
   (`standard`, `plus`, `normal`, `beginner` or `custom`), `sectors` (every map sector as
   `<name>:<kind>:<positions with a system>`, e.g. `rim:shape:a101 a102`; kinds `circle`, `cluster`, `shape`,
