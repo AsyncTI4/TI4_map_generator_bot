@@ -286,7 +286,7 @@
         "itemCategory": "ABILITY",
         "itemId": "trovantous",
         "optionalSwaps": [
-            "MECH:stoneborn_mech"
+            "MECH:stoneborn_mechdormant"
         ],
         "source": "theodisi"
     },

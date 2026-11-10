@@ -233,6 +233,7 @@ public class FrankenSettings extends SettingsMenu {
         game.removeStoredValue(FrankenDrazDraft.DISCORDANT_STARS_FACTION_LIMITS_KEY);
         game.removeStoredValue(FrankenDrazDraft.BLUE_REVERIE_FACTION_LIMITS_KEY);
         game.removeStoredValue(FrankenDrazDraft.LOST_LEGACIES_FACTION_LIMITS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.WFTV_FACTION_LIMITS_KEY);
         if (isFrankendrazMode()
                 && !factionPrioritySettings.getPrioritizedFactions().getKeys().isEmpty()) {
             game.setStoredValue(
@@ -264,6 +265,12 @@ public class FrankenSettings extends SettingsMenu {
                             + factionPrioritySettings
                                     .getLostLegaciesFactionLimits()
                                     .getValHigh());
+        }
+        if (isFrankendrazMode() && isWftvEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.WFTV_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getWftvFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings.getWftvFactionLimits().getValHigh());
         }
     }
 
