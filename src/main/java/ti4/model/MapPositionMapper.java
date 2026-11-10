@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,10 @@ public final class MapPositionMapper {
     private static final int HORIZONTAL_TILE_SPACING = 260;
     private static final int EXTRA_BOARD_STRIDE = boardWidth(BoardPosition.MAX_RING);
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
+    private static final int TILE_WIDTH = 345;
+    private static final int REFRACTURE_SIDE_TILE_GAP = 175;
+    private static final int TOP_REFRACTURE_NORTH_OFFSET = 125;
+    private static final int LOWER_REFRACTURE_SOUTH_OFFSET = 150;
 
     private static final Properties tileImageCoordinates = new Properties();
     private static final Properties playerInfo = new Properties();
@@ -141,6 +146,154 @@ public final class MapPositionMapper {
     }
 
     public static Point getScaledTilePosition(Game game, String position, int x, int y, int fractureYbump) {
+        Point scaled = projectedTilePosition(game, position, x, y, fractureYbump);
+        scaled.translate(
+                refractureHorizontalOffset(game, fractureYbump), refractureVerticalOffset(game, fractureYbump));
+        if (isTopRefractureTile(game, position)) scaled.translate(0, -TOP_REFRACTURE_NORTH_OFFSET);
+        if (isLowerRefractureTile(game, position)) scaled.translate(0, LOWER_REFRACTURE_SOUTH_OFFSET);
+        return scaled;
+    }
+
+    private static Point projectedTilePosition(Game game, String position, int x, int y, int fractureYbump) {
+        Point scaled;
+        if (isRefractureTile(game, position)) {
+            scaled = dynamicallyPlaceRefractureTile(game, position, x, y, fractureYbump);
+        } else {
+            scaled = scaleTilePosition(game, position, x, y, fractureYbump, false);
+        }
+        return scaled;
+    }
+
+    private static int refractureVerticalOffset(Game game, int fractureYbump) {
+        if (!game.isRefractureMode()
+                || game.getTileMap().keySet().stream().noneMatch(position -> position.startsWith("frac"))) {
+            return 0;
+        }
+        int top = game.getTileMap().keySet().stream()
+                .map(position -> new PositionedPoint(position, getTilePosition(position)))
+                .filter(position -> position.point() != null)
+                .mapToInt(position -> projectedTilePosition(
+                                game, position.position(), position.point().x, position.point().y, fractureYbump)
+                        .y)
+                .min()
+                .orElse(0);
+        return Math.max(0, 100 - top);
+    }
+
+    private static int refractureHorizontalOffset(Game game, int fractureYbump) {
+        if (!game.isRefractureMode()
+                || game.getTileMap().keySet().stream().noneMatch(position -> position.startsWith("frac"))) {
+            return 0;
+        }
+        int left = game.getTileMap().keySet().stream()
+                .map(position -> new PositionedPoint(position, getTilePosition(position)))
+                .filter(position -> position.point() != null)
+                .mapToInt(position -> projectedTilePosition(
+                                game, position.position(), position.point().x, position.point().y, fractureYbump)
+                        .x)
+                .min()
+                .orElse(0);
+        return Math.max(0, 50 - left);
+    }
+
+    @Nullable
+    public static Rectangle getRenderedTileBounds(Game game, int fractureYbump) {
+        Rectangle bounds = null;
+        for (String position : game.getTileMap().keySet()) {
+            Point raw = getTilePosition(position);
+            if (raw == null) continue;
+            Point scaled = getScaledTilePosition(game, position, raw.x, raw.y, fractureYbump);
+            Rectangle tileBounds = new Rectangle(scaled.x, scaled.y, TILE_WIDTH, SPACE_FOR_TILE_HEIGHT);
+            bounds = bounds == null ? tileBounds : bounds.union(tileBounds);
+        }
+        return bounds;
+    }
+
+    private static Point dynamicallyPlaceRefractureTile(Game game, String position, int x, int y, int fractureYbump) {
+        Point tilePosition = scaleTilePosition(game, position, x, y, fractureYbump, true);
+        List<Point> refractureTiles = game.getTileMap().keySet().stream()
+                .filter(candidate -> isRefractureTile(game, candidate))
+                .map(candidate -> new PositionedPoint(candidate, getTilePosition(candidate)))
+                .filter(candidate -> candidate.point() != null)
+                .map(candidate -> scaleTilePosition(
+                        game, candidate.position(), candidate.point().x, candidate.point().y, fractureYbump, true))
+                .toList();
+        List<Point> mapTiles = game.getTileMap().keySet().stream()
+                .filter(candidate -> !candidate.startsWith("frac"))
+                .map(candidate -> new PositionedPoint(candidate, getTilePosition(candidate)))
+                .filter(candidate -> candidate.point() != null)
+                .map(candidate -> scaleTilePosition(
+                        game, candidate.position(), candidate.point().x, candidate.point().y, fractureYbump, false))
+                .toList();
+        if (refractureTiles.isEmpty() || mapTiles.isEmpty() || !tilesOverlap(refractureTiles, mapTiles)) {
+            return tilePosition;
+        }
+        Point translation = minimumRefractureTranslation(game, refractureTiles, mapTiles);
+        tilePosition.translate(translation.x, translation.y);
+        return tilePosition;
+    }
+
+    private static Point minimumRefractureTranslation(Game game, List<Point> refractureTiles, List<Point> mapTiles) {
+        List<Point> candidates = new ArrayList<>(List.of(new Point()));
+        for (Point refractureTile : refractureTiles) {
+            for (Point mapTile : mapTiles) {
+                addRefractureTranslationCandidates(game, candidates, refractureTile, mapTile, REFRACTURE_SIDE_TILE_GAP);
+            }
+        }
+        return candidates.stream()
+                .filter(candidate -> isLayoutDirection(game, candidate))
+                .filter(candidate -> !tilesOverlap(refractureTiles, mapTiles, candidate))
+                .min(java.util.Comparator.comparingInt(candidate -> Math.abs(candidate.x) + Math.abs(candidate.y)))
+                .orElseGet(Point::new);
+    }
+
+    private static boolean isLayoutDirection(Game game, Point candidate) {
+        return switch (game.getStoredValue("refractureLayoutEdge")) {
+            case "UPPER_RIGHT", "LOWER_RIGHT" -> candidate.x >= 0 && candidate.y == 0;
+            case "BOTTOM" -> candidate.x == 0 && candidate.y >= 0;
+            case "LOWER_LEFT", "UPPER_LEFT" -> candidate.x <= 0 && candidate.y == 0;
+            default -> candidate.x == 0 && candidate.y <= 0;
+        };
+    }
+
+    private static void addRefractureTranslationCandidates(
+            Game game, List<Point> candidates, Point refractureTile, Point mapTile, int gap) {
+        switch (game.getStoredValue("refractureLayoutEdge")) {
+            case "UPPER_RIGHT", "LOWER_RIGHT" ->
+                candidates.add(new Point(mapTile.x + TILE_WIDTH + gap - refractureTile.x, 0));
+            case "BOTTOM" -> candidates.add(new Point(0, mapTile.y + SPACE_FOR_TILE_HEIGHT + gap - refractureTile.y));
+            case "LOWER_LEFT", "UPPER_LEFT" ->
+                candidates.add(new Point(mapTile.x - gap - TILE_WIDTH - refractureTile.x, 0));
+            default -> candidates.add(new Point(0, mapTile.y - gap - SPACE_FOR_TILE_HEIGHT - refractureTile.y));
+        }
+    }
+
+    private static boolean tilesOverlap(List<Point> first, List<Point> second) {
+        return tilesOverlap(first, second, new Point());
+    }
+
+    private static boolean tilesOverlap(List<Point> first, List<Point> second, Point translation) {
+        return first.stream()
+                .anyMatch(firstPoint -> second.stream()
+                        .anyMatch(secondPoint -> tileBoundsOverlap(
+                                new Point(firstPoint.x + translation.x, firstPoint.y + translation.y), secondPoint)));
+    }
+
+    private static boolean tileBoundsOverlap(Point first, Point second) {
+        return first.x < second.x + TILE_WIDTH
+                && first.x + TILE_WIDTH > second.x
+                && first.y < second.y + SPACE_FOR_TILE_HEIGHT
+                && first.y + SPACE_FOR_TILE_HEIGHT > second.y;
+    }
+
+    private static Point scaleTilePosition(
+            Game game, String position, int x, int y, int fractureYbump, boolean orientRefracture) {
+        boolean rotatedRefracture = orientRefracture && isRotatedRefractureTile(game, position);
+        if (orientRefracture) {
+            Point refracturePosition = orientRefractureTile(game, position, x, y);
+            x = refracturePosition.x;
+            y = refracturePosition.y;
+        }
         int layoutRings = layoutRingCount(game);
         int ringCount = Math.clamp(layoutRings, RING_MIN_COUNT, RING_MAX_COUNT);
         Optional<BoardPosition> board = BoardPosition.parse(position);
@@ -165,7 +318,7 @@ public final class MapPositionMapper {
                 x -= lower * HORIZONTAL_TILE_SPACING * 2;
                 y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
                 y += fractureYbump;
-            } else if (position.startsWith("frac")) {
+            } else if (position.startsWith("frac") && !rotatedRefracture) {
                 x -= lower * HORIZONTAL_TILE_SPACING;
                 if (fractureYbump == 400) {
                     y -= (400 - 300) / 2; // always 50
@@ -181,6 +334,55 @@ public final class MapPositionMapper {
         }
         return new Point(x, y);
     }
+
+    private static boolean isRefractureTile(Game game, String position) {
+        return game.isRefractureMode() && position != null && position.startsWith("frac");
+    }
+
+    private static boolean isTopRefractureTile(Game game, String position) {
+        return isRefractureTile(game, position) && "TOP".equals(game.getStoredValue("refractureLayoutEdge"));
+    }
+
+    private static boolean isLowerRefractureTile(Game game, String position) {
+        return isRefractureTile(game, position)
+                && switch (game.getStoredValue("refractureLayoutEdge")) {
+                    case "LOWER_RIGHT", "LOWER_LEFT" -> true;
+                    default -> false;
+                };
+    }
+
+    private static Point orientRefractureTile(Game game, String position, int x, int y) {
+        if (!game.isRefractureMode() || position == null || !position.startsWith("frac")) return new Point(x, y);
+        int rotations = refractureLayoutRotations(game);
+        int q = Math.floorDiv(x - 2080, HORIZONTAL_TILE_SPACING);
+        int r = Math.floorDiv(y + 1350 - 2550 - 150 * q, SPACE_FOR_TILE_HEIGHT);
+        for (int index = 0; index < rotations; index++) {
+            int previousQ = q;
+            q = -r;
+            r += previousQ;
+        }
+        return new Point(2080 + HORIZONTAL_TILE_SPACING * q, 2550 + 150 * q + SPACE_FOR_TILE_HEIGHT * r);
+    }
+
+    private static boolean isRotatedRefractureTile(Game game, String position) {
+        return game.isRefractureMode()
+                && position != null
+                && position.startsWith("frac")
+                && refractureLayoutRotations(game) != 0;
+    }
+
+    private static int refractureLayoutRotations(Game game) {
+        return switch (game.getStoredValue("refractureLayoutEdge")) {
+            case "UPPER_RIGHT" -> 1;
+            case "LOWER_RIGHT" -> 2;
+            case "BOTTOM" -> 3;
+            case "LOWER_LEFT" -> 4;
+            case "UPPER_LEFT" -> 5;
+            default -> 0;
+        };
+    }
+
+    private record PositionedPoint(String position, Point point) {}
 
     @Nullable
     public static Point getTilePosition(String position) {

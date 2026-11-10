@@ -64,6 +64,7 @@ import ti4.service.leader.agent.modules.MahactAgent;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.megagame.MegagameImperialQueue;
 import ti4.service.megagame.MegagameScThreads;
+import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -215,6 +216,7 @@ public class PlayStrategyCardService {
                 }
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
+                scoreMaterCalyxaSovereignCrown(event, game, player, scModel);
                 // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
                 if (scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
@@ -632,6 +634,20 @@ public class PlayStrategyCardService {
         if (player.isNpc()) {
             EndTurnService.endTurnAndUpdateMap(event, game, player);
         }
+    }
+
+    private static void scoreMaterCalyxaSovereignCrown(
+            GenericInteractionCreateEvent event, Game game, Player player, StrategyCardModel scModel) {
+        if (!game.isRefractureMode()
+                || !player.getPlanets().contains("matercalyxa")
+                || !(scModel.usesAutomationForSCID("pok8imperial") || scModel.usesAutomationForSCID("tf8"))) {
+            return;
+        }
+        Integer objectiveId = game.getRevealedPublicObjectives().get(Constants.SOVEREIGN_CROWN);
+        if (objectiveId == null) {
+            objectiveId = game.addCustomPO(Constants.SOVEREIGN_CROWN, 1);
+        }
+        ScorePublicObjectiveService.scorePO(event, game, player, objectiveId);
     }
 
     public static String getSCFollowSummary(Game game, int scID, boolean ping) {

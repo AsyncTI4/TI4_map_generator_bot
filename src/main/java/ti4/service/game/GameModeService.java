@@ -28,6 +28,7 @@ public class GameModeService {
                         Map.entry("Discordant Stars", game::isDiscordantStarsMode),
                         Map.entry("Blue Reverie", game::isBlueReverieMode),
                         Map.entry("Uncharted Space", game::isUnchartedSpaceStuff),
+                        Map.entry("Refracture", game::isRefractureMode),
                         Map.entry("Milty Mod", game::isMiltyModMode),
                         Map.entry("Promises, Promises", game::isPromisesPromisesMode),
                         Map.entry("Flagshipping", game::isFlagshippingMode),

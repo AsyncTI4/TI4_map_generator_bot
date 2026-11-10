@@ -543,6 +543,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.LOST_LEGACIES_TILES + " " + game.isLostLegaciesTiles());
         writer.write(System.lineSeparator());
+        writer.write(Constants.REFRACTURE_MODE + " " + game.isRefractureMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.VERBOSITY + " " + game.getOutputVerbosity());
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + game.isTestBetaFeaturesMode());

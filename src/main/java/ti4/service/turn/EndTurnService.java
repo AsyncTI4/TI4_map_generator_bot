@@ -56,6 +56,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.agent.modules.homebrew.EdynAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.ValhavnAgent;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -167,6 +168,8 @@ public class EndTurnService {
         game.removeStoredValue("possiblyUsedRift");
         AsgardLegendaryService.clearBifrostBridge(game, player);
         JotunheimLegendaryService.clear(game, player);
+        RefractureRulesService.clearDemeterCapacity(game, player);
+        RefractureRulesService.clearPendingMaahes(game, player);
         game.removeStoredValue("safeHarborUsed");
         game.removeStoredValue("heartWarnedThisTurn");
         ThirtyKTurnState.clearEndOfTurn(game);

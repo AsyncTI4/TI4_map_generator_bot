@@ -8,6 +8,9 @@
         "frac15"
     ],
     "imagePath": "fracture15.png",
+    "planets": [
+        "charon"
+    ],
     "shipPositionsType": "TYPE04",
     "tileBack": "fracture",
     "isFracture": true,

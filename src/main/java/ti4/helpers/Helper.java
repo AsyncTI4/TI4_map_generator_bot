@@ -2699,6 +2699,9 @@ public final class Helper {
                 && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
             productionValueTotal *= 2;
         }
+        if (game.isRefractureMode() && player.getPlanets().contains("demeterii")) {
+            productionValueTotal *= 2;
+        }
         if (player.hasTech("bedeepy")
                 && tile.getPlanetUnitHolders().isEmpty()
                 && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)

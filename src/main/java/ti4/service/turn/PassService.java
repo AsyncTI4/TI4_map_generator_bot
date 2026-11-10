@@ -15,6 +15,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Uy
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.RefractureLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
@@ -61,6 +62,7 @@ public class PassService {
         ButtonHelperFactionSpecific.offerDeathBinding(game, player);
         SarcosaHeroHandler.offerPassAbility(game, player);
         NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
+        RefractureLegendaryButtonHandler.offerLekythoi(game, player);
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
         RevenantArcanumAgent.offerAfterPass(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {

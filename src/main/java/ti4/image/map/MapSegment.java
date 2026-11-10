@@ -56,7 +56,7 @@ public record MapSegment(
     private static final String INVALID_NAME =
             "Segment names use lowercase letters, digits and `-`, up to 20 characters.";
     private static final List<String> FRACTURE_POSITIONS =
-            IntStream.rangeClosed(1, 25).mapToObj(i -> "frac" + i).toList();
+            IntStream.rangeClosed(1, 49).mapToObj(i -> "frac" + i).toList();
 
     public MapSegment(String name, String centre, int radius) {
         this(name, centre, radius, Kind.CIRCLE, null);

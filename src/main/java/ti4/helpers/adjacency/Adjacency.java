@@ -27,6 +27,7 @@ public final class Adjacency {
             new GhotiCommanderRule(),
             new ObsidianMirrorRule(),
             new UydaiHeroRule(),
+            new RefractureFenrirRule(),
             new TreatedAsAdjacentRule());
 
     private final AdjacencyContext context;

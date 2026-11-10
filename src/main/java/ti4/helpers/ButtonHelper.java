@@ -190,6 +190,7 @@ import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.map.SystemPickerService;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.megagame.MegagameScThreads;
@@ -5183,6 +5184,13 @@ public class ButtonHelper {
             endButtons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
         }
 
+        if (RefractureRulesService.canUseExperiment(game, player)) {
+            endButtons.add(Buttons.gray(
+                    player.factionButtonChecker() + "refractureExperimentStart",
+                    "Use Experiment",
+                    PlanetEmojis.getPlanetEmojiOrNull("experiment")));
+        }
+
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
         }
@@ -5912,10 +5920,11 @@ public class ButtonHelper {
         String ringNum = buttonID.replace("ring_", "");
 
         if ("corners".equalsIgnoreCase(ringNum)) {
-            List<String> cornerPositions = List.of(
-                    "tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7", "frac8",
-                    "frac9", "frac10", "frac11", "frac12", "frac13", "frac14", "frac15", "frac16", "frac17", "frac18",
-                    "frac19", "frac20", "frac21", "frac22", "frac23", "frac24", "frac25");
+            List<String> cornerPositions = new ArrayList<>(List.of("tl", "tr", "bl", "br"));
+            game.getTileMap().keySet().stream()
+                    .filter(position -> position.startsWith("frac"))
+                    .sorted()
+                    .forEach(cornerPositions::add);
             for (String pos : cornerPositions) {
                 Tile t = game.getTileByPosition(pos);
                 if (canActivateTile(game, player, t, visiblePositions)) {
@@ -7505,6 +7514,12 @@ public class ButtonHelper {
                     }
                 }
             }
+        }
+        if ("spacecombat".equalsIgnoreCase(type)
+                && RefractureRulesService.charonCanParticipateInCombat(game, player, tile)) {
+            buttons.add(Buttons.red(
+                    player.factionButtonChecker() + "refractureCharonAssignHit_" + tile.getPosition(),
+                    "Exhaust Charon to Assign 1 Hit"));
         }
         buttons.add(Buttons.gray(
                 player.factionButtonChecker() + "assignHits_" + tile.getPosition() + "_AllShips", "Remove All Ships"));
