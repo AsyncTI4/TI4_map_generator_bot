@@ -2324,7 +2324,7 @@ public final class Helper {
                 }
             }
             if (token.contains("factoryleasei")) {
-                productionValueTotal += tile.getPlanetUnitHolders().size();
+                productionValueTotal += tile.getPlanetUnitHolders().size() + 1;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
