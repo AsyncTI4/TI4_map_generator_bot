@@ -52,6 +52,7 @@ final class AiSeatState {
     private long thinkingHeldAt;
     private int thinkingHeldFingerprint;
     private int abortLoggedRound = -1;
+    private int consecutiveAborts;
 
     synchronized AiSeatState copy() {
         AiSeatState copy = new AiSeatState();
@@ -74,6 +75,7 @@ final class AiSeatState {
         copy.thinkingHeldAt = thinkingHeldAt;
         copy.thinkingHeldFingerprint = thinkingHeldFingerprint;
         copy.abortLoggedRound = abortLoggedRound;
+        copy.consecutiveAborts = consecutiveAborts;
         return copy;
     }
 
@@ -211,6 +213,18 @@ final class AiSeatState {
         repeatedFallbacks = Math.min(repeatedFallbacks + 1, limit + 2);
         if (repeatedFallbacks <= limit) return FallbackVerdict.CHOOSE;
         return repeatedFallbacks == limit + 1 ? FallbackVerdict.STOP_AND_ANNOUNCE : FallbackVerdict.STOPPED;
+    }
+
+    void recordAbort() {
+        consecutiveAborts++;
+    }
+
+    void recordDecided() {
+        consecutiveAborts = 0;
+    }
+
+    int consecutiveAborts() {
+        return consecutiveAborts;
     }
 
     boolean firstAbortInRound(int round) {

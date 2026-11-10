@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +24,7 @@ import ti4.ai.fallback.FallbackRecord;
 import ti4.ai.profile.AiProfile;
 import ti4.ai.runtime.AiTickRunner.SeatTick;
 import ti4.ai.trace.Thinking;
+import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.testUtils.BaseTi4Test;
 
@@ -100,6 +102,80 @@ class AiTickRunnerThinkingTest extends BaseTi4Test {
         assertThat(lane.lastAbort())
                 .startsWith("3 aborts, last: AI thinking aborted")
                 .contains("round=3");
+    }
+
+    // When every AI seat keeps cutting its thinking short, nobody can move the game on and the per-round warning is
+    // easy to miss. One error is logged for the storm, and again only after some seat has decided normally.
+    @Test
+    void anAbortStormAcrossEverySeatIsLoggedOnceAsAnError() {
+        AiTestGame table = AiTestGame.withSolAi();
+        table.game.setPhaseOfGame("action");
+        AiLane stormLane = new AiLane(table.game.getName());
+        FactionBrain stuck = brain(ctx -> recurse(new AtomicInteger(), 0));
+        FactionBrain fine = brain(ctx -> AiDecision.idle());
+        List<String> errors = new ArrayList<>();
+        try (MockedStatic<BotLogger> logger = Mockito.mockStatic(BotLogger.class)) {
+            logger.when(() -> BotLogger.error(anyString())).thenAnswer(call -> errors.add(call.getArgument(0)));
+
+            for (int i = 0; i < AiSettings.ABORT_STORM_LIMIT; i++) {
+                decideFor(stormLane, table, table.nekro, stuck);
+                assertThat(errors).isEmpty();
+                decideFor(stormLane, table, table.sol, stuck);
+            }
+            assertThat(errors).hasSize(1);
+            assertThat(errors.getFirst())
+                    .contains("every AI seat in " + table.game.getName())
+                    .contains("last: AI thinking aborted");
+
+            decideFor(stormLane, table, table.nekro, stuck);
+            decideFor(stormLane, table, table.sol, stuck);
+            assertThat(errors).hasSize(1);
+
+            decideFor(stormLane, table, table.nekro, fine);
+            decideFor(stormLane, table, table.sol, stuck);
+            assertThat(errors).hasSize(1);
+            for (int i = 0; i < AiSettings.ABORT_STORM_LIMIT; i++) {
+                decideFor(stormLane, table, table.nekro, stuck);
+            }
+            assertThat(errors).hasSize(2);
+        }
+    }
+
+    // A seat stuck with no prompt to hand over says in the fallback log that its thinking was cut short just before.
+    @Test
+    void theStuckRecordNamesARecentAbort() {
+        test.game.setActivePlayerID(test.nekro.getUserID());
+        test.game.setLastActivePlayerChange(new Date(NOW - 1000));
+        lane.noteAbort("AI thinking aborted game=x seat=nekro", NOW);
+        lane.requestDelegation(test.nekro.getUserID(), false);
+
+        try (MockedStatic<BotLogger> logger = Mockito.mockStatic(BotLogger.class)) {
+            AiTickRunner.handleIdle(tick);
+        }
+
+        assertThat(FallbackLog.recent(test.game))
+                .extracting(FallbackRecord::outcome)
+                .containsExactly("stuck: no prompt it can hand over after thinking was cut short:"
+                        + " AI thinking aborted game=x seat=nekro");
+    }
+
+    private static void decideFor(AiLane lane, AiTestGame table, Player seat, FactionBrain brain) {
+        seat.setTg(seat.getTg() + 1);
+        AiProfile profile = AiProfile.of(seat);
+        SeatTick seatTick = new SeatTick(
+                lane,
+                lane.seat(seat.getUserID()),
+                table.game,
+                seat,
+                new SeatIdentity(seat.getUserID(), seat.getFaction(), seat.getUserName(), ""),
+                profile,
+                List.of(),
+                true,
+                NOW);
+        AiTickRunner.decide(
+                seatTick,
+                brain,
+                new AiTurnContext(table.game, seat, profile, List.of(), Set.of(), table.memoryOf(seat), NOW));
     }
 
     @Test

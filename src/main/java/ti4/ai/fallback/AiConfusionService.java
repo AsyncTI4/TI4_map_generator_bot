@@ -16,11 +16,14 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.actuation.AiActuator;
+import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.tactical.TacticalRules;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -36,6 +39,7 @@ public class AiConfusionService {
             List.of("decline", "pass", "no_", "not follow", "deletebuttons", "done", "skip", "cancel");
     private static final List<String> HIT_CANCEL_HANDLERS =
             List.of("cancelSpaceHits_", "cancelPdsOffenseHits_", "cancelGroundHits_", "cancelAFBHits_");
+    private static final String RING_TILE = "ringTile_";
     private static final String PASS_FOR_ROUND = "passForRound";
     private static final String TURN_END = "turnEnd";
     private static final List<String> VOTE_PREFIXES =
@@ -149,6 +153,20 @@ public class AiConfusionService {
                         .filter(button -> !cancelsHits(button))
                         .filter(button -> !passesEarly(game, seat, button))
                         .findFirst());
+    }
+
+    public static Optional<PromptButton> stalledChoice(Game game, Player seat, AiPrompt prompt) {
+        if (!TacticalRules.isSystemPicker(prompt)) return selfPlayChoice(game, seat, prompt);
+        return prompt.enabledButtons().stream()
+                .filter(button -> button.handlerId().startsWith(RING_TILE))
+                .filter(button -> holdsOnlyOwnUnits(game, seat, StringUtils.removeStart(button.handlerId(), RING_TILE)))
+                .findFirst()
+                .or(() -> selfPlayChoice(game, seat, prompt));
+    }
+
+    private static boolean holdsOnlyOwnUnits(Game game, Player seat, String position) {
+        Tile tile = game.getTileByPosition(position);
+        return tile != null && tile.containsPlayersUnits(seat) && !BoardView.hasEnemyUnits(game, seat, tile);
     }
 
     private static boolean cancelsHits(PromptButton button) {

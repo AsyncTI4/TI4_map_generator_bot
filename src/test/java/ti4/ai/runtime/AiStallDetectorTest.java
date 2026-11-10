@@ -51,6 +51,33 @@ class AiStallDetectorTest extends BaseTi4Test {
         assertThat(relatedTo(reasons, current, older, hand, someoneElse)).containsExactly("current");
     }
 
+    // AI seats prefer distance-based tactical actions, so the system picker carries no owner. A seat whose thinking
+    // aborted while that picker was up used to find nothing to hand over and stalled silently.
+    @Test
+    void turnReasonCoversAnUnownedSystemPickerPostedThisTurn() {
+        game.setActivePlayerID(AI_ID);
+        game.setLastActivePlayerChange(new Date(NOW - 1000));
+        AiPrompt picker =
+                prompt("picker", PromptSource.PUBLIC, NOW, "ringTile_301", "getTilesThisFarAway_1", "ultimateUndo_3");
+        AiPrompt farther = prompt("farther", PromptSource.PUBLIC, NOW, "getTilesThisFarAway_0", "ringTile_202");
+        AiPrompt older = prompt("older", PromptSource.PUBLIC, NOW - 3_600_000L, "ringTile_301");
+
+        List<WaitReason> reasons = AiStallDetector.waitReasons(game, nekro, List.of(picker, farther, older));
+
+        assertThat(relatedTo(reasons, picker, farther, older)).containsExactly("picker", "farther");
+    }
+
+    @Test
+    void anUnownedSystemPickerIsNotRelatedWhenItIsNotTheSeatsTurn() {
+        game.setActivePlayerID("someone-else");
+        game.setLastActivePlayerChange(new Date(NOW - 1000));
+        AiPrompt picker = prompt("picker", PromptSource.PUBLIC, NOW, "ringTile_301", "getTilesThisFarAway_1");
+
+        List<WaitReason> reasons = AiStallDetector.waitReasons(game, nekro, List.of(picker));
+
+        assertThat(relatedTo(reasons, picker)).isEmpty();
+    }
+
     @Test
     void scoringReasonsLastUntilBothChoicesAreRecorded() {
         game.setPhaseOfGame("statusScoring");

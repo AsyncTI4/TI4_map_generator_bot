@@ -33,6 +33,8 @@ public class AiSettings {
     public static final Duration SLOW_WARNING_GAP = Duration.ofMinutes(1);
     public static final Duration THINKING_RETRY = Duration.ofMinutes(5);
     public static final int THINKING_REENTRY_LIMIT = 8;
+    public static final int ABORT_STORM_LIMIT = 3;
+    public static final Duration RECENT_ABORT = Duration.ofMinutes(10);
     public static final int THINKING_DEPTH_LIMIT = 60;
     public static final int THINKING_CALL_CAP = 200_000;
     public static final String THINKING_BUDGET_PROPERTY = "ai.thinking.budget.seconds";

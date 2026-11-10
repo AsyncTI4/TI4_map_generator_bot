@@ -9,6 +9,7 @@ import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.CombatRules;
+import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
@@ -31,7 +32,8 @@ class AiStallDetector {
                     "its turn",
                     prompt -> !prompt.isHidden()
                             && prompt.createdAtMillis() >= turnStart
-                            && prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(faction))));
+                            && (TacticalRules.isSystemPicker(prompt)
+                                    || prompt.buttons().stream().anyMatch(button -> button.isOwnedBy(faction)))));
         }
         if ("statusScoring".equalsIgnoreCase(phase)) {
             if (game.getStoredValue(faction + "round" + round + "PO").isEmpty()) {
