@@ -1177,7 +1177,8 @@ to build one by hand:
        one half (3 in 10 against a player about to win).
     2. **Standings.** From public information only (scores, objectives revealed and ready, techs, planets, the Imperial
        card): what each player can still score this round, how close each is to winning (_win threat_, full when the
-       projected total reaches the goal), how much hurting each is worth (more for the sole leader, less for a player
+       projected total reaches the goal; with `WIN_THREAT_FEASIBLE` a rival that can take Mecatol Rex from its holder
+       this round counts the points that control would score, at the chance it wins the invasion), how much hurting each is worth (more for the sole leader, less for a player
        behind) and how much denying a point to each is worth (little until the player is close to winning, then more than
        a point of its own).
     3. **Value.** In the planner's currency (a victory point is 8): the seat's own objective progress; the planets taken
@@ -1580,6 +1581,27 @@ Seven small generic changes don't reference `ti4.ai`:
     starts with only its own faction note and the five generic notes; the scoreboard lists the notes each seat holds,
     received and has in its play area.
   - `-Dai.trading=false` plays without trading, for an A/B comparison of the batch summary.
+  - Experiments (`AiExperiments`): newer rules are behind named experiments, all on by default.
+    `-Dai.experiments.off=A,B` turns them off for every seat. `-Dai.selfplay.ab=A,B` (or `all`) plays half of the
+    seats with those experiments off (control) and half with everything on (treatment). Games run in pairs: both games
+    of a pair share a seed and swap the two halves (`seedFor(slot) = seed + slot / 2`). The summary prints the
+    treatment-minus-control points and win share over complete pairs, with standard errors. With one experiment
+    named this is a leave-one-out test. A/A noise is about ±0.26 points at 12 pairs. Leave-one-out results from
+    2026-11-10, 24 pairs each, seed 7000:
+    | Experiment | Points, treatment minus control | Treatment win share |
+    | --- | --- | --- |
+    | `PROMISE_DEALS` | +0.47 ± 0.20 | 0.68 ± 0.05 |
+    | `WIN_BREAK_DENIAL` | +0.29 ± 0.20 | 0.66 ± 0.08 |
+    | `ATTACK_MEMORY` | +0.29 ± 0.22 | 0.50 ± 0.07 |
+    | `WIN_THREAT_FEASIBLE` | −0.09 ± 0.16 | 0.50 ± 0.07 |
+    `WIN_THREAT_FEASIBLE` stays on: it reads rivals' real paths to points (including taking Mecatol Rex from its
+    holder) and costs nothing measurable. The first three runs each lost one to three games to a stack overflow in
+    the Mecatol take, since fixed; those games still count in their pairs.
+  - A stack overflow inside a decision is caught (`AiTickRunner`), and the abort log line names the repeating cycle
+    of AI frames (`keys=[cycle]`, cycle in `path`). Three such aborts in 10 minutes log an abort storm error. Pricing
+    paths that can call themselves again break the cycle with a per-thread guard: a hand's per-card keep values
+    (`KindPricing.keepValues`, falls back to the prior) and a Mecatol take priced inside another take (`WinOdds`,
+    counts as none).
   - `SabotageSelfPlayTest` plays a contender's _Overrule_ in a six-seat game and checks that an AI seat cancels it with the bot's real buttons.
   - `-Dai.selfplay.give=<alias,...>` deals those action cards to every seat, to watch a card's flow end to end.
   - `-Dai.selfplay.fracture=true` brings the Fracture into play at the start of round 2 of every game (`FractureTracker`): the

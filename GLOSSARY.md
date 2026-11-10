@@ -476,6 +476,10 @@ _Avoid_: Kingmaking, gank
 Trade goods paid now for a promise the engine cannot enforce: "my votes go to outcome X on this agenda", "I won't attack you this round" (no combat or invasion against your units or planets, no activation of a system holding them) or "I won't move ships into system S this round". Breaking one costs the breaker trust. AI seats always keep theirs.
 _Avoid_: Pact, treaty
 
+**Win threat**:
+How close a Player is to winning as an AI seat reads it from public information: the chance the points the Player can still score this round (objectives it can complete, Imperial, taking Mecatol Rex from its holder) reach the goal. Denying points to a Player matters more as their win threat rises.
+_Avoid_: Kingmaker risk
+
 **Pop**:
 To play a Strategy card's primary ability, as in "popping Trade".
 _Avoid_: Cast, fire
