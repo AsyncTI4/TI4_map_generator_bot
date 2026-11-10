@@ -2284,6 +2284,7 @@ public final class AgendaHelper {
         int voteCount = getVoteCountFromPlanets(game, player);
         Map<String, Integer> additionalVotes = getAdditionalVotesFromOtherSources(game, player);
         String additionalVotesText = getAdditionalVotesFromOtherSourcesText(additionalVotes);
+        boolean cannotVoteExplained = false;
 
         if (game.isFowMode()) {
             sb.append(" vote count: **???**");
@@ -2300,7 +2301,7 @@ public final class AgendaHelper {
                                         .get("Stellar Atomics")
                                         .contains(player.getUserID())))) {
             sb.append(" __cannot__ vote due to having used _Stellar Atomics_.**");
-
+            cannotVoteExplained = true;
         } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
         } else if (player.hasAbility("lithoids")) { // Vote with planet resources, not influence
@@ -2332,7 +2333,14 @@ public final class AgendaHelper {
                     .append(voteCount)
                     .append("**");
         }
+        if (!cannotVoteExplained && cannotVote(game, player)) {
+            return " ~~" + sb.toString().trim() + "~~ (can't vote)";
+        }
         return sb.toString();
+    }
+
+    private static boolean cannotVote(Game game, Player player) {
+        return getVoteTotal(player, game)[0] < 1 && getTotalVoteCount(game, player) > 0;
     }
 
     private static int getTotalVoteCount(Game game, Player player) {
@@ -3138,7 +3146,9 @@ public final class AgendaHelper {
         List<Player> orderList = getVotingOrder(game);
         int votes = 0;
         for (Player player : orderList) {
-            votes += getTotalVoteCount(game, player);
+            if (!cannotVote(game, player)) {
+                votes += getTotalVoteCount(game, player);
+            }
         }
         boolean hideTotalVotes =
                 game.getFowOption(FOWOption.HIDE_TOTAL_VOTES) || isRepresentativeGovernmentInEffect(game);
