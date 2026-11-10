@@ -83,6 +83,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Relic fragment | seat `fragments` | `"fragments": ["crf1"]` |
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
+| Fog preset (reset a reused fog game's options, e.g. FoW+ off) | game `fogPreset`: `standard`, `plus`, `normal` or `beginner`; applied before `fowOptions` | `"fogPreset": "normal"` |
 | Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
 | Game option (`/custom` setting or game mode; currently `wormhole_token_merge`, `one_way_adjacency`, `secrets_only_mode`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
 | Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
@@ -270,6 +271,7 @@ copy-paste templates.
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
 | `revealedObjectives`, `laws`, `tokens`, `borderAnomalies`, `customAdjacencies` | Game state; see [Set up any component](#set-up-any-component). |
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
+| `fogPreset` | Fog preset applied before `fowOptions`, like choosing one in the fog settings: `standard`, `plus`, `normal` (classic fog, FoW+ off) or `beginner`. Use it when a reused fog game must not keep FoW+ or other options. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
 | `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens), `sc_count_for_map` (strategy cards per player, `1`-`9`), `one_way_adjacency` (`true` or `false`) and `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
@@ -335,6 +337,7 @@ Every step may also have a `label` for the report.
   still in the deck), `soDeckSize`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),
   `customAdjacencies` (`<primary>><listed>`), `customHyperlanes` (`<position>:<matrix>`, one-way lanes as `2`),
+  `hyperlaneBridges` (bridged systems as `<position>:<matrix>`, same format),
   `fowOptions` (enabled fog options, e.g. `fow_plus,ghost_hexes`; includes `disable_fracture`), `fogPreset`
   (`standard`, `plus`, `normal`, `beginner` or `custom`), `sectors` (every map sector as
   `<name>:<kind>:<positions with a system>`, e.g. `rim:shape:a101 a102`; kinds `circle`, `cluster`, `shape`,

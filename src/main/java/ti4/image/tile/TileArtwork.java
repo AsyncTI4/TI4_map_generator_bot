@@ -11,6 +11,7 @@ import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.HyperlaneStyle;
 import ti4.model.ShipPositionModel.ShipPosition;
+import ti4.service.map.BridgeMatrix;
 import ti4.service.map.CustomHyperlaneService;
 
 final class TileArtwork {
@@ -35,17 +36,55 @@ final class TileArtwork {
     }
 
     private static BufferedImage baseImage(TileScene scene, Tile tile) {
-        Game game = scene.game();
         if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
             return hyperlaneImage(scene, tile);
         }
+        String artPath = systemArtPath(scene.game(), tile);
+        BufferedImage art = ImageHelper.read(artPath);
+        if (art == null) {
+            return art;
+        }
+        BridgeMatrix lanes = BridgeEndsLookup.drawnMatrix(scene, tile);
+        if (lanes.isEmpty()) {
+            return art;
+        }
+        HyperlaneStyle style = scene.hyperlanes().style();
+        if (isUnexplored(scene, tile)) {
+            return HyperlaneBridgeOverlay.onUnexplored(
+                    tile.getPosition(), () -> unexploredBackground(tile), lanes, style);
+        }
+        return HyperlaneBridgeOverlay.onSystem(
+                artPath,
+                art,
+                PlanetOcclusion.of(tile.getTileModel()),
+                lanes,
+                BridgeEndsLookup.marks(scene, tile),
+                style);
+    }
+
+    private static String systemArtPath(Game game, Tile tile) {
         if (game.isLiberationC4Mode() && "51".equals(tile.getTileID())) {
-            return ImageHelper.read(ImageResources.tile("51r_Creuss.png"));
+            return ImageResources.tile("51r_Creuss.png");
         }
         if (game.isLiberationC4Mode() && "17".equals(tile.getTileID())) {
-            return ImageHelper.read(ImageResources.tile("17r_DeltaWH.png"));
+            return ImageResources.tile("17r_DeltaWH.png");
         }
-        return ImageHelper.read(ImageResources.tilePath(tile));
+        return ImageResources.tilePath(tile);
+    }
+
+    private static boolean isUnexplored(TileScene scene, Tile tile) {
+        return UnexploredBridges.UNEXPLORED_TILE_ID.equals(tile.getTileID()) && scene.hidesFogged(tile);
+    }
+
+    static boolean showsUnexploredBridge(TileScene scene, Tile tile) {
+        return isUnexplored(scene, tile)
+                && !BridgeEndsLookup.drawnMatrix(scene, tile).isEmpty();
+    }
+
+    private static BufferedImage unexploredBackground(Tile tile) {
+        String noLanes = CustomHyperlaneService.formatMatrix(new int[6][6]);
+        return HyperlaneTileGenerator.generateHyperlaneTile(
+                tile, tile.getPosition(), noLanes, false, HyperlaneStyle.DASHED);
     }
 
     static BufferedImage hyperlaneImage(TileScene scene, Tile tile) {
