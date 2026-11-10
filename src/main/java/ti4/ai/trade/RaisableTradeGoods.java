@@ -12,8 +12,10 @@ public class RaisableTradeGoods {
 
     public static int byWashing(Game game, Player seat) {
         if (!AiSettings.isTradingEnabled() || seat.getCommodities() < 1) return 0;
-        return TradeLegality.legalPartners(game, seat).stream()
+        return Standings.others(game, seat).stream()
                 .filter(AiSeats::isAiSeat)
+                .filter(partner -> DealItem.tradable(partner.getFaction()))
+                .filter(partner -> TradeLegality.canTransactInActionPhase(game, seat, partner))
                 .mapToInt(partner -> Math.min(TradeBudget.spareCommodities(seat, partner), partner.getCommodities()))
                 .max()
                 .orElse(0);
