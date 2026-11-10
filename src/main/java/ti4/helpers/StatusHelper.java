@@ -18,6 +18,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.obliv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1167,6 +1168,7 @@ public final class StatusHelper {
         if (!isStatusScoring(game)) {
             return;
         }
+        KaloraAbilityHandler.resolveStatusPhaseScoring(game);
         List<GameSubEvent> subEvents = GameEventDraft.drain(game);
         if (subEvents.isEmpty()) {
             return;

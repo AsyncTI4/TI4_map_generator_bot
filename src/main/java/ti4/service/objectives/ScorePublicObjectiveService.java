@@ -75,12 +75,7 @@ public class ScorePublicObjectiveService {
             int tgBefore = player.getTg();
             informAboutScoring(event, channel, game, player, poID);
             ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id, tgBefore);
-            if (player.hasAbility("primordial")) {
-                KaloraAbilityHandler.primordial(player, game);
-            }
-            if (player.getPromissoryNotesInPlayArea().contains("bapnkalo")) {
-                KaloraAbilityHandler.sharedTreasure(player, game);
-            }
+            KaloraAbilityHandler.onPublicObjectiveScored(game, player, id);
             for (Player p2 : player.getNeighbouringPlayers(true)) {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);
