@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -45,6 +47,10 @@ public class CustomHyperlaneService {
     private static final String HYPERLANE_TILEID = "hl";
     private static final String ONE_WAY = "2";
     private static final List<String> SIDE_NAMES = List.of("N", "NE", "SE", "S", "SW", "NW");
+    private static final String EMPTY_TYPED_MATRIX =
+            "0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0";
+    private static final String BRIDGE_PREFIX = "bridge:";
+    private static final String BRIDGE_POSITION = "bridgePosition";
 
     private static final List<Button> HYPERLANE_BUTTONS = Arrays.asList(
             Buttons.gray("customHyperlaneRefresh", "Refresh"),
@@ -56,7 +62,7 @@ public class CustomHyperlaneService {
             Buttons.gray("customHyperlaneExport", "Export", "⬆️"),
             Buttons.gray("customHyperlaneTransform~MDL", "Transform", "↔️"),
             Buttons.gray("customHyperlaneStyle", "One-Way Style", "🎨"),
-            Buttons.gray("customHyperlaneBridges", "Bridges On/Off", "🌉"),
+            Buttons.gray("hlBridgeAdd~MDL", "Add Bridge", "🌉"),
             Buttons.DONE_DELETE_BUTTONS);
 
     public static boolean isCustomHyperlaneTile(Tile tile) {
@@ -118,6 +124,9 @@ public class CustomHyperlaneService {
                 hyperlaneTileButtons.add(Buttons.blue("customHyperlaneEdit_" + position + "~MDL", position));
             }
         }
+        for (String position : HyperlaneBridges.all(game).keySet()) {
+            hyperlaneTileButtons.add(Buttons.gray("hlBridgeEdit_" + position + "~MDL", position, "🌉"));
+        }
         SortHelper.sortButtonsByTitle(hyperlaneTileButtons);
         return hyperlaneTileButtons;
     }
@@ -160,17 +169,84 @@ public class CustomHyperlaneService {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("customHyperlaneBridges")
-    public static void toggleBridges(ButtonInteractionEvent event, Game game) {
-        boolean shown = !HyperlaneStyleService.showsBridges(game);
-        HyperlaneStyleService.setShowsBridges(game, shown);
+    @ButtonHandler(value = "hlBridgeAdd~MDL", save = false)
+    public static void addBridge(ButtonInteractionEvent event) {
+        TextInput position = TextInput.create(BRIDGE_POSITION, TextInputStyle.SHORT)
+                .setPlaceholder("000")
+                .setMaxLength(8)
+                .build();
+        Modal modal = Modal.create("hlBridgeSaveNew", "Add Bridge")
+                .addComponents(
+                        Label.of("System position", position),
+                        Label.of("Lanes: 1 two-way, 2 one-way", bridgeLanesInput(EMPTY_TYPED_MATRIX)))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("hlBridgeEdit_")
+    public static void editBridge(ButtonInteractionEvent event, String buttonID, Game game) {
+        String position = StringUtils.substringBetween(buttonID, "hlBridgeEdit_", "~MDL");
+        BridgeMatrix matrix = HyperlaneBridges.all(game).get(position);
+        String typed = matrix == null
+                ? EMPTY_TYPED_MATRIX
+                : toTypedMatrix(matrix.stored()).replace(";", ";\n");
+        Modal modal = Modal.create("hlBridgeSave_" + position, position + " Bridge")
+                .addComponents(Label.of("Lanes: 1 two-way, 2 one-way, clear removes", bridgeLanesInput(typed)))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static TextInput bridgeLanesInput(String value) {
+        return TextInput.create(Constants.SETTING_VALUE, TextInputStyle.PARAGRAPH)
+                .setValue(value)
+                .setRequired(false)
+                .setMaxLength(76)
+                .build();
+    }
+
+    @ModalHandler("hlBridgeSave")
+    public static void saveBridge(ModalInteractionEvent event, Game game) {
+        String position = StringUtils.substringAfter(event.getModalId(), "hlBridgeSave_");
+        if (position.isEmpty() && event.getValue(BRIDGE_POSITION) != null) {
+            position = event.getValue(BRIDGE_POSITION).getAsString().trim().toLowerCase();
+        }
+        String typed = event.getValue(Constants.SETTING_VALUE)
+                .getAsString()
+                .replace("\n", "")
+                .replace(" ", "");
+        if (StringUtils.isBlank(typed) || !typed.matches(".*[12].*")) {
+            HyperlaneBridges.remove(game, position);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Bridge removed from " + position + ".");
+            return;
+        }
+        Optional<String> problem = HyperlaneBridges.problemWith(game, position, typed);
+        if (problem.isPresent()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), problem.get());
+            return;
+        }
+        HyperlaneBridges.set(game, position, typed);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                shown
-                        ? "Hyperlane bridges are **on**: a custom hyperlane carries on through a system between"
-                                + " lanes, so it connects the systems at its far ends, and the system shows the lane"
-                                + " running along its rim."
-                        : "Hyperlane bridges are **off**.");
+                "Bridge on " + position + ": "
+                        + describeBridge(HyperlaneBridges.all(game).get(position)) + "."
+                        + "\n-# Lanes pass straight through " + position + "; the edges they use are lane-only, so "
+                        + position + " doesn't border the tiles across them." + contradictionsLine(typed));
+    }
+
+    public static String describeBridge(@Nullable BridgeMatrix matrix) {
+        if (matrix == null) {
+            return "no lanes";
+        }
+        List<String> lanes = new ArrayList<>();
+        for (int a = 0; a < 6; a++) {
+            for (int b = a + 1; b < 6; b++) {
+                boolean ab = matrix.leads(a, b), ba = matrix.leads(b, a);
+                if (ab && ba) lanes.add(SIDE_NAMES.get(a) + " ↔ " + SIDE_NAMES.get(b));
+                else if (ab) lanes.add(SIDE_NAMES.get(a) + " → " + SIDE_NAMES.get(b));
+                else if (ba) lanes.add(SIDE_NAMES.get(b) + " → " + SIDE_NAMES.get(a));
+            }
+        }
+        return String.join(", ", lanes);
     }
 
     @ButtonHandler(value = "customHyperlaneExport", save = false)
@@ -180,6 +256,13 @@ public class CustomHyperlaneService {
             sb.append(entry.getKey())
                     .append(",")
                     .append(encodeMatrix(entry.getValue()))
+                    .append(' ');
+        }
+        for (Map.Entry<String, BridgeMatrix> bridge : HyperlaneBridges.all(game).entrySet()) {
+            sb.append(BRIDGE_PREFIX)
+                    .append(bridge.getKey())
+                    .append(",")
+                    .append(encodeMatrix(bridge.getValue().stored()))
                     .append(' ');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
@@ -202,14 +285,17 @@ public class CustomHyperlaneService {
                 event.getValue(Constants.SETTING_VALUE).getAsString().replace("\n", " ");
 
         Map<String, String> customHyperlaneData = new HashMap<>();
+        Map<String, String> bridges = new HashMap<>();
         for (String dataRow : importData.split(" ")) {
+            if (dataRow.isBlank()) continue;
             String[] data = dataRow.split(",");
             if (data.length != 2) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid data: `" + dataRow + "`");
                 return;
             }
 
-            String position = data[0];
+            boolean bridge = data[0].startsWith(BRIDGE_PREFIX);
+            String position = bridge ? data[0].substring(BRIDGE_PREFIX.length()) : data[0];
             if (!MapPositionMapper.isTilePositionValid(game, position)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: `" + position + "`");
                 return;
@@ -221,15 +307,33 @@ public class CustomHyperlaneService {
                 return;
             }
 
-            customHyperlaneData.put(position, matrix);
+            (bridge ? bridges : customHyperlaneData).put(position, matrix);
         }
 
-        if (!customHyperlaneData.isEmpty()) {
-            game.setCustomHyperlaneData(customHyperlaneData);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data imported.");
-        } else {
+        if (customHyperlaneData.isEmpty() && bridges.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Found nothing to import.");
+            return;
         }
+        game.setCustomHyperlaneData(customHyperlaneData);
+        int previousBridges = HyperlaneBridges.all(game).size();
+        HyperlaneBridges.clear(game);
+        StringBuilder problems = new StringBuilder();
+        bridges.forEach((position, stored) -> {
+            String typed = toTypedMatrix(stored);
+            HyperlaneBridges.problemWith(game, position, typed)
+                    .ifPresentOrElse(
+                            problem -> problems.append("\nBridge ")
+                                    .append(position)
+                                    .append(" skipped: ")
+                                    .append(problem),
+                            () -> HyperlaneBridges.set(game, position, typed));
+        });
+        int importedBridges = HyperlaneBridges.all(game).size();
+        String bridgeLine = importedBridges + previousBridges == 0
+                ? ""
+                : "\nBridges: " + importedBridges + " imported"
+                        + (previousBridges > 0 ? ", " + previousBridges + " previous removed" : "") + ".";
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data imported." + bridgeLine + problems);
     }
 
     @ButtonHandler("customHyperlaneEdit")

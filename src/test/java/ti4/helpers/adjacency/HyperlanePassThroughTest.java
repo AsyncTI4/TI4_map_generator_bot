@@ -2,6 +2,7 @@ package ti4.helpers.adjacency;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -11,17 +12,19 @@ import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.PdsCoverageHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.model.MapPositionMapper;
 import ti4.service.map.CustomHyperlaneService;
-import ti4.service.map.HyperlaneStyleService;
+import ti4.service.map.HyperlaneBridges;
 import ti4.service.map.MapStringMapper;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedPresetService;
 import ti4.testUtils.BaseTi4Test;
 
-// One-way chain 301 -> custom hyperlane 201 -> Wellon 101 -> custom hyperlane 000 -> 104 (all lanes N -> S).
-// With bridges on the drawn line continues through Wellon, so by LRR 44.1 it connects 301 and 104; Wellon is not
-// linked to it.
+// A north-south column: 301 -> custom hyperlane 201 (N -> S) -> Wellon 101 -> custom hyperlane 000 (N -> S) -> 104.
+// Without a bridge matrix the lanes stop at Wellon (LRR 44.1). Wellon's matrix decides which lanes pass through it.
 class HyperlanePassThroughTest extends BaseTi4Test {
+
+    private static final int N = 0, NE = 1, SE = 2, S = 3, SW = 4;
 
     private Game game;
 
@@ -32,151 +35,169 @@ class HyperlanePassThroughTest extends BaseTi4Test {
         game.setTile(new Tile("20", "301"));
         game.setTile(new Tile("19", "101"));
         game.setTile(new Tile("22", "104"));
-        customLane("201", 0, 3);
-        customLane("000", 0, 3);
+        customLane("201", N, S);
+        customLane("000", N, S);
     }
 
     @Test
-    void bridgesOffFollowTheOfficialRule() {
+    void withoutAMatrixTheLanesStopAtTheSystem() {
         assertThat(movement().from("301")).contains("101").doesNotContain("104");
     }
 
     @Test
-    void bridgesOnPassThroughWellon() {
-        HyperlaneStyleService.setShowsBridges(game, true);
+    void theMatrixCarriesTheLaneThroughWellon() {
+        bridge("101", N, S, false);
         assertThat(movement().from("301")).contains("104").doesNotContain("101");
         assertThat(movement().into("104")).contains("301");
         assertThat(movement().into("101")).doesNotContain("301");
+        assertThat(movement().from("104")).doesNotContain("301");
     }
 
-    // The bridged system keeps its natural neighbours but cannot use the lanes that pass through it.
+    // Ships in Wellon can't join its bridge lanes, and the edges those lanes use are lane-only.
     @Test
-    void wellonCannotUseTheLanesThroughIt() {
-        HyperlaneStyleService.setShowsBridges(game, true);
+    void wellonCannotUseItsOwnLanes() {
+        bridge("101", N, S, false);
         assertThat(movement().from("101")).doesNotContain("104", "301");
         assertThat(movement().into("101")).doesNotContain("301", "104");
     }
 
+    // A lane that arrives at a side the matrix doesn't list ends in Wellon, while N -> S still passes through.
     @Test
-    void oneWayPassThroughOnlyFollowsTheLanes() {
-        HyperlaneStyleService.setShowsBridges(game, true);
-        assertThat(movement().from("104")).doesNotContain("301");
-        assertThat(movement().into("301")).doesNotContain("104");
+    void aLaneOutsideTheMatrixEndsInTheSystem() {
+        bridge("101", N, S, false);
+        String northEast = neighbour("101", NE);
+        customLane(northEast, NE, SW);
+        game.setTile(new Tile("21", neighbour(northEast, NE)));
+        assertThat(movement().from(neighbour(northEast, NE))).contains("101").doesNotContain("104");
+        assertThat(movement().from("301")).contains("104").doesNotContain("101");
     }
 
-    // Outside movement, with one-way adjacency off, lanes count both ways; so does the pass-through.
+    // With four ends only the listed pairs connect: N -> S and NE -> SE.
     @Test
-    void effectsCountThePassThroughBothWays() {
-        HyperlaneStyleService.setShowsBridges(game, true);
+    void onlyTheListedPairsConnect() {
+        String northEast = neighbour("101", NE);
+        String southEast = neighbour("101", SE);
+        customLane(northEast, NE, SW);
+        game.setTile(new Tile("21", neighbour(northEast, NE)));
+        game.setTile(new Tile("23", southEast));
+        HyperlaneBridges.set(game, "101", typed(new int[][] {{N, S, 2}, {NE, SE, 2}}));
+        assertThat(movement().from("301")).contains("104").doesNotContain(southEast, "101");
+        assertThat(movement().from(neighbour(northEast, NE)))
+                .contains(southEast)
+                .doesNotContain("104", "101");
+    }
+
+    // 301 -> 201 -> Wellon (N -> S) -> system 000 (N -> S) -> 104: two bridges in a row, and the two bridged systems
+    // don't border each other across the edge their lane uses.
+    @Test
+    void twoBridgesInARow() {
+        game.getCustomHyperlaneData().remove("000");
+        game.setTile(new Tile("24", "000"));
+        bridge("101", N, S, false);
+        bridge("000", N, S, false);
+        assertThat(movement().from("301")).contains("104").doesNotContain("101", "000");
+        assertThat(movement().from("101")).doesNotContain("000");
+        assertThat(movement().from("000")).doesNotContain("101");
+        assertThat(movement().into("104")).contains("301");
+    }
+
+    // Plain systems at both ends of a two-way bridge: 201 and 000 reach each other through Wellon, Wellon reaches
+    // neither, and a tear where the lane ends (Wellon | 000) cuts it.
+    @Test
+    void aBridgeLinksTwoPlainSystems() {
+        game.getCustomHyperlaneData().clear();
+        game.setTile(new Tile("24", "201"));
+        game.setTile(new Tile("25", "000"));
+        bridge("101", N, S, true);
+        assertThat(movement().from("201")).contains("000").doesNotContain("101");
+        assertThat(movement().from("000")).contains("201");
+        assertThat(movement().into("000")).contains("201");
+        assertThat(movement().from("101")).doesNotContain("201", "000");
+
+        game.addBorderAnomaly("101", S, "spatial_tear");
+        assertThat(movement().from("201")).doesNotContain("000");
+        assertThat(movement().into("000")).doesNotContain("201");
+    }
+
+    // A tear on an edge where the lane carries on into a hyperlane doesn't cut it: border anomalies only count where
+    // a lane starts or ends.
+    @Test
+    void aTearWhereTheLaneCarriesOnIsIgnored() {
+        bridge("101", N, S, false);
+        game.addBorderAnomaly("101", S, "spatial_tear");
+        assertThat(movement().from("301")).contains("104");
+        assertThat(movement().into("104")).contains("301");
+    }
+
+    // Standard fog: Wellon still sees the hyperlane tiles on its lane sides. FoW+ only lets vision into a hyperlane
+    // along a lane, and Wellon can't use its own lanes, so there it sees neither, asked from either side.
+    @Test
+    void fowPlusHidesTheHyperlanesAcrossWellonsLaneSides() {
+        bridge("101", N, S, false);
+        game.setFowMode(true);
+        assertThat(Adjacency.of(game).forVision().from("101")).contains("201", "000");
+
+        game.setFowOption(FOWOption.FOW_PLUS, true);
+        assertThat(Adjacency.of(game).forVision().from("101")).doesNotContain("201", "000");
+        assertThat(Adjacency.of(game).forVision().into("201")).doesNotContain("101");
+        assertThat(Adjacency.of(game).forVision().from("301")).contains("104");
+    }
+
+    @Test
+    void effectsCountTheBridgeBothWays() {
+        bridge("101", N, S, false);
         assertThat(Adjacency.of(game).forEffects().from("104")).contains("301").doesNotContain("101");
     }
 
-    // Official hyperlane tiles keep LRR 44.1: a static lane next to Wellon leaves only one custom end, so no bridge.
     @Test
-    void staticHyperlaneTilesDoNotPassThrough() {
-        HyperlaneStyleService.setShowsBridges(game, true);
-        game.getCustomHyperlaneData().remove("000");
-        game.setTile(new Tile("83a120", "000"));
-        assertThat(movement().from("301")).contains("101").doesNotContain("104");
-    }
-
-    // Fog vision passes through without reaching Wellon, and the lane beyond counts as seen.
-    @Test
-    void visionPassesThroughAndSeesTheLaneBeyond() {
-        HyperlaneStyleService.setShowsBridges(game, true);
+    void visionPassesThroughAndRecordsTheBridgeLane() {
+        bridge("101", N, S, false);
         game.setFowMode(true);
         assertThat(Adjacency.of(game).forVision().from("301")).contains("104").doesNotContain("101");
-        assertThat(GridRule.hyperlaneLanesFrom(game, null, "301")).contains(GridRule.lane("000", 0, 3));
+        assertThat(GridRule.hyperlaneLanesFrom(game, null, "301"))
+                .contains(GridRule.lane("101", N, S), GridRule.lane("000", N, S));
     }
 
-    // 000 becomes two-way: a lane arriving from 104 has nowhere to go on (201 only leads in), so it stops at Wellon as
-    // before (LRR 44.1) and Wellon may use it; traffic from 301 still passes through Wellon to 104.
     @Test
-    void laneWithNoOnwardExitStopsAtTheBridgedSystem() {
-        HyperlaneStyleService.setShowsBridges(game, true);
-        game.getCustomHyperlaneData()
-                .put("000", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
-        assertThat(movement().from("104")).contains("101").doesNotContain("301");
-        assertThat(movement().from("101")).contains("104").doesNotContain("301");
-        assertThat(movement().from("301")).contains("104").doesNotContain("101");
-        assertThat(movement().into("104")).contains("301", "101");
-        assertThat(movement().into("101")).contains("104").doesNotContain("301");
-    }
-
-    // Wellon sees the hyperlane tiles on its edges, so asking the other way round must agree.
-    @Test
-    void hyperlaneTileOnABridgeEdgeHasWellonAsNeighbourBothWays() {
-        HyperlaneStyleService.setShowsBridges(game, true);
-        assertThat(movement().from("101")).contains("201");
-        assertThat(movement().into("201")).contains("101");
-    }
-
-    // Border anomalies only count where a hyperlane starts or ends: a tear on Wellon's bridged edge does not stop the
-    // lane running through; with bridges off it cuts the lane at Wellon as usual. Wellon's own link to the hyperlane
-    // tile 000 behind the tear stays cut both ways.
-    @Test
-    void borderAnomalyOnABridgeEdgeIsIgnored() {
-        game.addBorderAnomaly("101", 3, "spatial_tear");
-        assertThat(movement().from("301")).contains("101").doesNotContain("104");
-
-        HyperlaneStyleService.setShowsBridges(game, true);
-        assertThat(movement().from("301")).contains("104");
-        assertThat(movement().into("104")).contains("301");
-        assertThat(movement().from("101")).contains("201").doesNotContain("000");
-        assertThat(movement().into("000")).doesNotContain("101");
-    }
-
-    // Units in Wellon still see the hyperlane tiles on its edges, they just cannot follow the lanes through them.
-    @Test
-    void wellonStillSeesTheHyperlanesOnItsEdges() {
-        HyperlaneStyleService.setShowsBridges(game, true);
-        game.setFowMode(true);
-        assertThat(Adjacency.of(game).forVision().from("101"))
-                .contains("201", "000")
-                .doesNotContain("301", "104");
-    }
-
-    // FoW+ / Hide unexplored map: a hop never enters a hyperlane from a side without a lane, the hop out of a bridged
-    // system included. A third lane 211 -> 212 -> Wellon leads in; with lanes counting both ways (effects, one-way
-    // adjacency off) the walk from 211 could leave Wellon backwards along the 201 lane to 301, but not under the
-    // option.
-    @Test
-    void hideUnexploredMapAlsoGatesTheHopOutOfABridge() {
-        HyperlaneStyleService.setShowsBridges(game, true);
-        game.setTile(new Tile("21", "211"));
-        customLane("212", 4, 2);
-        assertThat(Adjacency.of(game).forEffects().from("211")).contains("104", "301");
-
-        game.setFowOption(FOWOption.HIDE_MAP, true);
-        assertThat(Adjacency.of(game).forEffects().from("211")).contains("104").doesNotContain("301");
-    }
-
-    // Space Cannon (PDS II) follows the same walk: from 301 it reaches 104 through Wellon, from Wellon it reaches
-    // neither end of the lanes that pass through it.
-    @Test
-    void spaceCannonFollowsThePassThrough() {
+    void spaceCannonFollowsTheBridge() {
         Player shooter = pds2Shooter();
         game.getTileByPosition("301").addUnit("vefutii", Units.getUnitKey(UnitType.Pds, "blue"), 1);
         assertThat(PdsCoverageHelper.calculatePdsCoverage(game, game.getTileByPosition("104")))
                 .isNull();
-
-        HyperlaneStyleService.setShowsBridges(game, true);
+        bridge("101", N, S, false);
         assertThat(PdsCoverageHelper.calculatePdsCoverage(game, game.getTileByPosition("104")))
                 .containsKey(shooter.getFaction());
     }
 
     @Test
-    void spaceCannonInTheBridgedSystemDoesNotUseTheLanes() {
-        Player shooter = pds2Shooter();
+    void spaceCannonInTheBridgedSystemDoesNotUseItsLanes() {
+        pds2Shooter();
         game.getTileByPosition("101").addUnit("wellon", Units.getUnitKey(UnitType.Pds, "blue"), 1);
-        assertThat(PdsCoverageHelper.calculatePdsCoverage(game, game.getTileByPosition("104")))
-                .containsKey(shooter.getFaction());
-
-        HyperlaneStyleService.setShowsBridges(game, true);
+        bridge("101", N, S, false);
         assertThat(PdsCoverageHelper.calculatePdsCoverage(game, game.getTileByPosition("104")))
                 .isNull();
         assertThat(PdsCoverageHelper.calculatePdsCoverage(game, game.getTileByPosition("301")))
                 .isNull();
+    }
+
+    // The hyperlane-bridges-2p testbed map: Empyrean home 301, Wellon 101 bridged N -> S.
+    @Test
+    void tacticalDistanceOnTheTestbedMapIsOneStep() {
+        Game full = new Game();
+        full.newGameSetup();
+        MapStringMapper.getMappedTilesToPosition(TestBedPresetService.DEFAULT_MAP_STRING, full)
+                .forEach((position, tileId) -> full.setTile(new Tile(tileId, position)));
+        String oneWay = "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        for (String position : List.of("201", "000")) {
+            full.setTile(new Tile("hl", position));
+            full.getCustomHyperlaneData().put(position, oneWay);
+        }
+        HyperlaneBridges.set(full, "101", typed(new int[][] {{N, S, 2}}));
+        Player empyrean = full.addPlayer("111", "empyrean");
+        empyrean.setFaction(full, "empyrean");
+        empyrean.setColor("blue");
+        assertThat(CheckDistanceHelper.getTileDistances(full, empyrean, "301", 15, true))
+                .containsEntry("104", 1);
     }
 
     private Player pds2Shooter() {
@@ -187,31 +208,22 @@ class HyperlanePassThroughTest extends BaseTi4Test {
         return shooter;
     }
 
-    // The hyperlane-bridges-2p testbed map: default map, hyperlanes at 201/000/203/206/208, Empyrean home 301.
-    @Test
-    void tacticalDistanceOnTheTestbedMapIsOneStep() {
-        Game full = new Game();
-        full.newGameSetup();
-        MapStringMapper.getMappedTilesToPosition(TestBedPresetService.DEFAULT_MAP_STRING, full)
-                .forEach((position, tileId) -> full.setTile(new Tile(tileId, position)));
-        String oneWay = "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
-        for (String position : new String[] {"201", "000"}) {
-            full.setTile(new Tile("hl", position));
-            full.getCustomHyperlaneData().put(position, oneWay);
-        }
-        full.getCustomHyperlaneData()
-                .put("000", "0,0,0,1,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,1,0,0,0,0;0,0,0,0,0,0");
-        Player empyrean = full.addPlayer("111", "empyrean");
-        empyrean.setFaction(full, "empyrean");
-        empyrean.setColor("blue");
-        HyperlaneStyleService.setShowsBridges(full, true);
-
-        assertThat(CheckDistanceHelper.getTileDistances(full, empyrean, "301", 15, true))
-                .containsEntry("104", 1);
-    }
-
     private Adjacency movement() {
         return Adjacency.of(game).forMovement();
+    }
+
+    private void bridge(String position, int from, int to, boolean twoWay) {
+        HyperlaneBridges.set(game, position, typed(new int[][] {{from, to, twoWay ? 1 : 2}}));
+    }
+
+    private static String typed(int[][] lanes) {
+        int[][] grid = new int[6][6];
+        for (int[] lane : lanes) grid[lane[0]][lane[1]] = lane[2];
+        return CustomHyperlaneService.formatMatrix(grid);
+    }
+
+    private static String neighbour(String position, int side) {
+        return MapPositionMapper.getAdjacentTilePositions(position).get(side);
     }
 
     private void customLane(String position, int from, int to) {

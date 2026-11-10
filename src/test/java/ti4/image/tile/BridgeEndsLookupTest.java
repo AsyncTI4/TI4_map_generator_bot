@@ -8,16 +8,23 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.model.MapPositionMapper;
 import ti4.service.fow.FogViewer;
+import ti4.service.map.BridgeEnd;
 import ti4.service.map.CustomHyperlaneService;
-import ti4.service.map.HyperlaneBridgeEnds.BridgeEnd;
+import ti4.service.map.HyperlaneBridges;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
-// System 19 in the centre; hyperlanes placed on its sides by direction (0 = north, clockwise).
+// System 19 in the centre bridged N -> S; neighbours placed by side (0 = north, clockwise).
 class BridgeEndsLookupTest extends BaseTi4Test {
 
     private static final List<String> AROUND = MapPositionMapper.getAdjacentTilePositions("000");
+    private static final String NORTH_TO_SOUTH =
+            "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
 
     private Game game;
 
@@ -26,93 +33,90 @@ class BridgeEndsLookupTest extends BaseTi4Test {
         game = new Game();
         game.newGameSetup();
         game.setTile(new Tile("19", "000"));
+        HyperlaneBridges.set(game, "000", NORTH_TO_SOUTH);
     }
 
     @Test
-    void oneWayLaneInFromTheNorthAndOutToTheSouth() {
-        customHyperlane(0, 0, 3);
-        customHyperlane(3, 0, 3);
-        assertThat(ends()).containsExactly(new BridgeEnd(0, true, false), new BridgeEnd(3, false, true));
-    }
-
-    // Bridges are the pass-through rule, which is for custom hyperlanes only: official tiles keep LRR 44.1.
-    @Test
-    void staticHyperlaneTilesDoNotCount() {
-        customHyperlane(0, 0, 3);
-        game.setTile(new Tile("83a", AROUND.get(1)));
-        assertThat(ends()).isEmpty();
+    void theMatrixIsDrawnInFullForAnUnfoggedView() {
+        assertThat(BridgeEndsLookup.drawnMatrix(unfogged(), system()).ends())
+                .containsExactly(new BridgeEnd(0, true, false), new BridgeEnd(3, false, true));
     }
 
     @Test
-    void aSingleLaneEndMakesNoBridge() {
-        customHyperlane(0, 0, 3);
-        assertThat(ends()).isEmpty();
+    void noMatrixDrawsNothing() {
+        HyperlaneBridges.remove(game, "000");
+        assertThat(BridgeEndsLookup.drawnMatrix(unfogged(), system()).isEmpty()).isTrue();
     }
 
-    // An adjacency override on the hyperlane's shared edge sends its lane elsewhere.
+    // A fogged system shows only lanes whose both ends the viewer can see.
     @Test
-    void overriddenEdgeIsSkipped() {
-        customHyperlane(0, 0, 3);
-        customHyperlane(3, 0, 3);
-        game.addAdjacentTileOverride(AROUND.get(0), 3, "201");
-        assertThat(ends()).isEmpty();
-    }
-
-    @Test
-    void hyperlaneSystemsGetNoBridge() {
-        customHyperlane(0, 0, 3);
-        customHyperlane(3, 0, 3);
-        game.setTile(new Tile("83a", "000"));
-        assertThat(ends()).isEmpty();
-    }
-
-    @Test
-    void privateViewIgnoresHyperlanesInFog() {
-        game.setFowMode(true);
-        Player viewer = game.addPlayer("111", "sol");
-        viewer.setFaction(game, "sol");
-        viewer.setColor("blue");
-        customHyperlane(0, 0, 3);
-        customHyperlane(3, 0, 3);
+    void foggedSystemShowsOnlyLanesBetweenVisibleNeighbours() {
+        for (String position : AROUND) game.setTile(new Tile("20", position));
+        Player viewer = fogViewer();
+        system().setTileFog(viewer, true);
         game.getTileByPosition(AROUND.get(0)).setTileFog(viewer, false);
         game.getTileByPosition(AROUND.get(3)).setTileFog(viewer, true);
-        TileScene scene = new TileScene(game, null, new FogViewer(game, true, viewer), new RenderWarnings());
-        assertThat(BridgeEndsLookup.forSystem(scene, game.getTileByPosition("000")))
-                .isEmpty();
+        assertThat(BridgeEndsLookup.drawnMatrix(privateScene(viewer), system()).isEmpty())
+                .isTrue();
+
+        game.getTileByPosition(AROUND.get(3)).setTileFog(viewer, false);
+        assertThat(BridgeEndsLookup.drawnMatrix(privateScene(viewer), system()).isEmpty())
+                .isFalse();
     }
 
-    // Two lanes that only lead in carry no traffic, so the rules keep the system a normal stop: draw no bridge either.
+    // Hide unseen hyperlanes: no vision runs along the bridge lane, but a player with ships in the bridged system
+    // still sees that system's own lanes. Under FoW+ only lanes whose far tiles they see stay drawn.
     @Test
-    void lanesThatOnlyLeadInMakeNoBridge() {
-        customHyperlane(0, 0, 3);
-        customHyperlane(3, 3, 0);
-        assertThat(ends()).isEmpty();
+    void aPlayerInsideTheBridgedSystemSeesItsLanes() {
+        for (String position : AROUND) game.setTile(new Tile("20", position));
+        Player viewer = fogViewer();
+        game.setFowOption(FOWOption.HIDE_UNSEEN_HYPERLANES, true);
+        for (Tile tile : game.getTileMap().values()) tile.setTileFog(viewer, false);
+        assertThat(BridgeEndsLookup.drawnMatrix(privateScene(viewer), system()).isEmpty())
+                .isTrue();
+
+        system().addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, viewer.getColorID()), 1);
+        assertThat(BridgeEndsLookup.drawnMatrix(privateScene(viewer), system()).isEmpty())
+                .isFalse();
+
+        game.setFowOption(FOWOption.FOW_PLUS, true);
+        game.getTileByPosition(AROUND.get(3)).setTileFog(viewer, true);
+        assertThat(BridgeEndsLookup.drawnMatrix(privateScene(viewer), system()).isEmpty())
+                .isTrue();
     }
 
-    // Border anomalies only count where a hyperlane starts or ends; a bridge carries the lane on, so a tear on its edge
-    // changes nothing, for a hidden system (fog safe) as for a visible one.
+    // Tunnels go toward neighbouring systems on sides without lanes; a lane ending in the system on such a side gets
+    // the glow; lane sides, hyperlanes and border anomalies get neither.
     @Test
-    void borderAnomalyOnABridgeEdgeDoesNotCutIt() {
+    void tunnelsAndLaneEnds() {
+        game.setTile(new Tile("20", AROUND.get(1)));
+        game.setTile(new Tile("21", AROUND.get(2)));
+        game.setTile(new Tile("22", AROUND.get(3)));
+        customHyperlane(5, 5, 2);
+        game.addBorderAnomaly("000", 2, "spatial_tear");
+        HyperlaneBridgeOverlay.Marks marks = BridgeEndsLookup.marks(unfogged(), system());
+        assertThat(marks.tunnels()).containsExactly(1);
+        assertThat(marks.laneEnds()).containsExactly(5);
+    }
+
+    private Tile system() {
+        return game.getTileByPosition("000");
+    }
+
+    private Player fogViewer() {
         game.setFowMode(true);
         Player viewer = game.addPlayer("111", "sol");
         viewer.setFaction(game, "sol");
         viewer.setColor("blue");
-        customHyperlane(0, 0, 3);
-        customHyperlane(3, 0, 3);
-        game.getTileByPosition(AROUND.get(0)).setTileFog(viewer, false);
-        game.getTileByPosition(AROUND.get(3)).setTileFog(viewer, false);
-        game.getTileByPosition("000").setTileFog(viewer, true);
-        game.addBorderAnomaly("000", 3, "spatial_tear");
-        TileScene scene = new TileScene(game, null, new FogViewer(game, true, viewer), new RenderWarnings());
-
-        assertThat(BridgeEndsLookup.forSystem(scene, game.getTileByPosition("000")))
-                .containsExactly(new BridgeEnd(0, true, false), new BridgeEnd(3, false, true));
-        assertThat(ends()).containsExactly(new BridgeEnd(0, true, false), new BridgeEnd(3, false, true));
+        return viewer;
     }
 
-    private List<BridgeEnd> ends() {
-        TileScene scene = new TileScene(game, null, FogViewer.unfogged(game), new RenderWarnings());
-        return BridgeEndsLookup.forSystem(scene, game.getTileByPosition("000"));
+    private TileScene unfogged() {
+        return new TileScene(game, null, FogViewer.unfogged(game), new RenderWarnings());
+    }
+
+    private TileScene privateScene(Player viewer) {
+        return new TileScene(game, null, new FogViewer(game, true, viewer), new RenderWarnings());
     }
 
     private void customHyperlane(int systemSide, int from, int to) {

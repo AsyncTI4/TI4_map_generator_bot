@@ -32,9 +32,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 import ti4.model.HyperlaneStyle;
-import ti4.service.map.HyperlaneBridgeEnds.BridgeEnd;
+import ti4.service.map.BridgeEnd;
+import ti4.service.map.BridgeMatrix;
 
 final class HyperlaneBridgeOverlay {
 
@@ -42,6 +44,9 @@ final class HyperlaneBridgeOverlay {
     private static final double TUNNEL_HALF_LENGTH = 11;
     private static final double TUNNEL_HALF_WIDTH = 14;
     private static final double TUNNEL_MOUTH_OFFSET = 12;
+    private static final float LANE_END_GLOW_RADIUS = 24;
+    private static final int LANE_END_GLOW_CORE = 210;
+    private static final int LANE_END_GLOW_HALO = 140;
     private static final double CENTER_X = TILE_WIDTH / 2.0;
     private static final double CENTER_Y = TILE_HEIGHT / 2.0;
 
@@ -56,23 +61,29 @@ final class HyperlaneBridgeOverlay {
 
     private HyperlaneBridgeOverlay() {}
 
+    record Marks(Set<Integer> tunnels, Set<Integer> laneEnds) {
+
+        static final Marks NONE = new Marks(Set.of(), Set.of());
+
+        Set<Integer> tunnelSides() {
+            Set<Integer> sides = new TreeSet<>(tunnels);
+            sides.addAll(laneEnds);
+            return sides;
+        }
+    }
+
     static BufferedImage onSystem(
-            String artKey,
-            BufferedImage art,
-            Shape occluders,
-            List<BridgeEnd> ends,
-            Set<Integer> crossings,
-            HyperlaneStyle style) {
+            String artKey, BufferedImage art, Shape occluders, BridgeMatrix lanes, Marks marks, HyperlaneStyle style) {
         return cached(
-                key(artKey, ends, style) + "|x" + crossings,
-                () -> compose(art, occluders, ends, crossings, style, false));
+                key(artKey, lanes, style) + "|x" + marks.tunnels() + "|g" + marks.laneEnds(),
+                () -> compose(art, occluders, lanes, marks, style, false));
     }
 
     static BufferedImage onUnexplored(
-            String artKey, Supplier<BufferedImage> background, List<BridgeEnd> ends, HyperlaneStyle style) {
+            String artKey, Supplier<BufferedImage> background, BridgeMatrix lanes, HyperlaneStyle style) {
         return cached(
-                key("unexplored:" + artKey, ends, style),
-                () -> compose(background.get(), new Path2D.Double(), ends, Set.of(), style, true));
+                key("unexplored:" + artKey, lanes, style),
+                () -> compose(background.get(), new Path2D.Double(), lanes, Marks.NONE, style, true));
     }
 
     private static BufferedImage cached(String key, Supplier<BufferedImage> compose) {
@@ -85,25 +96,21 @@ final class HyperlaneBridgeOverlay {
         return raced == null ? composed : raced;
     }
 
-    private static String key(String artKey, List<BridgeEnd> ends, HyperlaneStyle style) {
-        StringBuilder key = new StringBuilder(artKey).append('|').append(style.name());
-        for (BridgeEnd end : ends) {
-            key.append('|').append(end.side()).append(end.entry() ? 'i' : '-').append(end.exit() ? 'o' : '-');
-        }
-        return key.toString();
+    private static String key(String artKey, BridgeMatrix lanes, HyperlaneStyle style) {
+        return artKey + '|' + style.name() + '|' + lanes.stored();
     }
 
     private static BufferedImage compose(
             BufferedImage art,
             Shape occluders,
-            List<BridgeEnd> ends,
-            Set<Integer> crossings,
+            BridgeMatrix lanes,
+            Marks marks,
             HyperlaneStyle style,
             boolean unexplored) {
-        BridgeTrail.Trail trail = BridgeTrail.of(ends, occluders);
+        BridgeTrail.Trail trail = BridgeTrail.of(lanes, occluders);
         List<BridgeTrail.Piece> pieces = new ArrayList<>(trail.ring());
         pieces.addAll(trail.stubs());
-        List<BridgeTrail.Tunnel> tunnels = trail.tunnelsAt(crossings);
+        List<BridgeTrail.Tunnel> tunnels = trail.tunnelsAt(marks.tunnelSides());
         BufferedImage image = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -116,7 +123,7 @@ final class HyperlaneBridgeOverlay {
         } else {
             unexploredPing(g);
         }
-        g.drawImage(markers(ends, trail, tunnels), 0, 0, null);
+        g.drawImage(markers(lanes.ends(), trail, tunnels, marks.laneEnds()), 0, 0, null);
         g.dispose();
         return image;
     }
@@ -185,7 +192,7 @@ final class HyperlaneBridgeOverlay {
     }
 
     private static BufferedImage markers(
-            List<BridgeEnd> ends, BridgeTrail.Trail trail, List<BridgeTrail.Tunnel> tunnels) {
+            List<BridgeEnd> ends, BridgeTrail.Trail trail, List<BridgeTrail.Tunnel> tunnels, Set<Integer> laneEnds) {
         BufferedImage image = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -194,7 +201,17 @@ final class HyperlaneBridgeOverlay {
         for (BridgeTrail.Arrow arrow : trail.cornerArrows()) {
             LaneInk.arrowHead(g, new double[] {arrow.x(), arrow.y(), arrow.angle()}, ARROW);
         }
-        for (BridgeTrail.Tunnel tunnel : tunnels) tunnelMouths(g, tunnel);
+        for (BridgeTrail.Tunnel tunnel : tunnels) {
+            tunnelMouths(g, tunnel);
+            if (laneEnds.contains(tunnel.side())) {
+                LaneInk.drawNode(
+                        g,
+                        BridgeTrail.edgeMidpoint(tunnel.side()),
+                        LANE_END_GLOW_RADIUS,
+                        LANE_END_GLOW_CORE,
+                        LANE_END_GLOW_HALO);
+            }
+        }
         for (BridgeEnd end : ends) LaneInk.drawNode(g, BridgeTrail.edgeMidpoint(end.side()));
         for (BridgeEnd end : ends) {
             if (!end.isOneWay()) continue;

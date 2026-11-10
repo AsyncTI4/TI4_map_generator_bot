@@ -3,7 +3,6 @@ package ti4.image.tile;
 import static ti4.image.tile.TileGeometry.TILE_PADDING;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.game.Game;
@@ -12,9 +11,8 @@ import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.model.HyperlaneStyle;
 import ti4.model.ShipPositionModel.ShipPosition;
+import ti4.service.map.BridgeMatrix;
 import ti4.service.map.CustomHyperlaneService;
-import ti4.service.map.HyperlaneBridgeEnds.BridgeEnd;
-import ti4.service.map.HyperlaneStyleService;
 
 final class TileArtwork {
 
@@ -43,24 +41,24 @@ final class TileArtwork {
         }
         String artPath = systemArtPath(scene.game(), tile);
         BufferedImage art = ImageHelper.read(artPath);
-        if (art == null || !HyperlaneStyleService.showsBridges(scene.game())) {
+        if (art == null) {
             return art;
         }
-        List<BridgeEnd> ends = BridgeEndsLookup.forSystem(scene, tile);
-        if (ends.isEmpty()) {
+        BridgeMatrix lanes = BridgeEndsLookup.drawnMatrix(scene, tile);
+        if (lanes.isEmpty()) {
             return art;
         }
         HyperlaneStyle style = scene.hyperlanes().style();
         if (isUnexplored(scene, tile)) {
             return HyperlaneBridgeOverlay.onUnexplored(
-                    tile.getPosition(), () -> unexploredBackground(tile), ends, style);
+                    tile.getPosition(), () -> unexploredBackground(tile), lanes, style);
         }
         return HyperlaneBridgeOverlay.onSystem(
                 artPath,
                 art,
                 PlanetOcclusion.of(tile.getTileModel()),
-                ends,
-                BridgeEndsLookup.crossings(scene, tile, ends),
+                lanes,
+                BridgeEndsLookup.marks(scene, tile),
                 style);
     }
 
@@ -80,8 +78,7 @@ final class TileArtwork {
 
     static boolean showsUnexploredBridge(TileScene scene, Tile tile) {
         return isUnexplored(scene, tile)
-                && HyperlaneStyleService.showsBridges(scene.game())
-                && !BridgeEndsLookup.forSystem(scene, tile).isEmpty();
+                && !BridgeEndsLookup.drawnMatrix(scene, tile).isEmpty();
     }
 
     private static BufferedImage unexploredBackground(Tile tile) {

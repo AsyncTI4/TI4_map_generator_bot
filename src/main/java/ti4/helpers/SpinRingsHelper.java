@@ -16,6 +16,7 @@ import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
+import ti4.service.map.HyperlaneBridges;
 import ti4.service.map.SpinService;
 import ti4.service.map.SpinService.Direction;
 import ti4.service.map.SpinService.SpinSetting;
@@ -105,6 +106,7 @@ public class SpinRingsHelper {
 
         List<Tile> tilesToSet = new ArrayList<>();
         List<Map<String, String>> customHyperlanesToMove = new ArrayList<>();
+        Map<String, String> bridgesToMove = new HashMap<>();
         Map<Player, Set<String>> systemsPlayersSee = new HashMap<>();
         Map<Player, Set<String>> systemsPlayersSawMoving = new HashMap<>();
         if (game.isFowMode()) {
@@ -143,6 +145,7 @@ public class SpinRingsHelper {
                 if (game.getCustomHyperlaneData().get(fromPosition) != null) {
                     customHyperlanesToMove.add(Map.of(fromPosition, toPosition));
                 }
+                bridgesToMove.put(fromPosition, toPosition);
                 tilesToSet.add(tile);
                 if (game.isFowMode()) {
                     updateSystemsPlayerSawMoving(fromPosition, toPosition, systemsPlayersSawMoving, systemsPlayersSee);
@@ -158,6 +161,7 @@ public class SpinRingsHelper {
         for (Tile tile : tilesToSet) {
             game.setTile(tile);
         }
+        HyperlaneBridges.moveAll(game, bridgesToMove);
         if (!customHyperlanesToMove.isEmpty()) {
             Map<String, String> currentData = new HashMap<>(game.getCustomHyperlaneData());
             Map<String, String> newData = new HashMap<>();

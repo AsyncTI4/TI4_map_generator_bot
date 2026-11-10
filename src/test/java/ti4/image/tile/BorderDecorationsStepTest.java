@@ -17,7 +17,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.service.fow.FogViewer;
-import ti4.service.map.HyperlaneStyleService;
+import ti4.service.map.HyperlaneBridges;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
@@ -100,27 +100,57 @@ class BorderDecorationsStepTest extends BaseTi4Test {
                 .put("207", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
         assertThat(glowsAtNorthEdge(extras(game, "104"))).isTrue();
 
-        HyperlaneStyleService.setShowsBridges(game, true);
+        HyperlaneBridges.set(game, "104", "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
         assertThat(painted(extras(game, "104"))).isZero();
     }
 
-    // 104 is bridged, but only the lane arriving from 207 (south) carries on, out along 000's lane 3 -> 1. The 000
-    // lane arriving from the north has no onward exit, so it still ends in 104 and keeps its glow; 207's does not.
+    // 104 is bridged S -> SW, so the lane arriving from 207 (south) carries on. The 000 lane arriving from the north
+    // isn't in the matrix, so it still ends in 104 and keeps its glow; 207's does not.
     @Test
     void hintStaysWhereALaneEndsInABridgedSystem() {
         Game game = gameWithOneWayLaneIntoTile104(true);
         game.setFowOption(FOWOption.ONE_WAY_LANE_HINTS, true);
-        game.getCustomHyperlaneData()
-                .put("000", "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,1,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
         game.setTile(new Tile("hl", "207"));
         game.getCustomHyperlaneData()
                 .put("207", "0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
-        HyperlaneStyleService.setShowsBridges(game, true);
+        HyperlaneBridges.set(game, "104", "0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,2,0;0,0,0,0,0,0;0,0,0,0,0,0");
 
         BufferedImage layer = extras(game, "104");
         assertThat(glowsAtNorthEdge(layer)).isTrue();
         assertThat(layer.getRGB(TILE_PADDING + TILE_WIDTH / 2, TILE_PADDING + TILE_HEIGHT - 4) >>> 24)
                 .isZero();
+    }
+
+    // 000 is bridged N -> S straight into system 104, so their shared edge is lane-only. A fog player who can't see
+    // that lane (Hide unseen hyperlanes, no vision along it) gets a Spatial Tear on the edge; once the lanes are
+    // shown, or in a public view, the tear goes away.
+    @Test
+    void laneBlockedBorderShowsATearOnlyToPlayersWhoCantSeeTheLane() {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("lane-blocked-test");
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_UNSEEN_HYPERLANES, true);
+        game.setTile(new Tile("19", "000"));
+        game.setTile(new Tile("20", "104"));
+        HyperlaneBridges.set(game, "000", "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        Player viewer = game.addPlayer("111", "sol");
+        viewer.setFaction(game, "sol");
+        viewer.setColor("blue");
+        game.getTileByPosition("000").setTileFog(viewer, false);
+        game.getTileByPosition("104").setTileFog(viewer, false);
+
+        assertThat(painted(privateExtras(game, viewer, "000"))).isPositive();
+        assertThat(game.getBorderAnomalies()).isEmpty();
+        assertThat(painted(extras(game, "000"))).isZero();
+
+        game.setFowOption(FOWOption.HIDE_UNSEEN_HYPERLANES, false);
+        assertThat(painted(privateExtras(game, viewer, "000"))).isZero();
+    }
+
+    private static BufferedImage privateExtras(Game game, Player viewer, String position) {
+        return TileLayers.forPreparedViewer(game, new FogViewer(game, true, viewer), DisplayType.all)
+                .draw(game.getTileByPosition(position), TileStep.Extras);
     }
 
     // Systems 101 (north) and 104 (south) around custom hyperlane 000, whose one lane runs N -> S.

@@ -12,10 +12,11 @@ import ti4.game.Tile;
 import ti4.model.MapPositionMapper;
 import ti4.service.fow.FogViewer;
 import ti4.service.map.CustomHyperlaneService;
-import ti4.service.map.HyperlaneStyleService;
+import ti4.service.map.HyperlaneBridges;
 import ti4.testUtils.BaseTi4Test;
 
-// System 19 with a one-way hyperlane leading in from the north and one leading out to the south.
+// System 19 with a one-way hyperlane leading in from the north and one leading out to the south; bridged N -> S
+// where a test asks for it.
 class HyperlaneBridgeOverlayTest extends BaseTi4Test {
 
     private static final List<String> AROUND = MapPositionMapper.getAdjacentTilePositions("000");
@@ -42,7 +43,7 @@ class HyperlaneBridgeOverlayTest extends BaseTi4Test {
     @Test
     void trailRunsAlongTheRimWithGatesAtBothEnds() {
         BufferedImage before = render();
-        HyperlaneStyleService.setShowsBridges(game, true);
+        bridgeNorthToSouth();
         BufferedImage after = render();
 
         int cx = PAD + TileGeometry.TILE_WIDTH / 2, cy = PAD + TileGeometry.TILE_HEIGHT / 2;
@@ -56,7 +57,7 @@ class HyperlaneBridgeOverlayTest extends BaseTi4Test {
     // Sides 1, 2, 4 and 5 face systems the bridged system still borders, so the rim trail must not read as a wall.
     @Test
     void trailTunnelsUnderEdgesFacingANeighbouringSystem() {
-        HyperlaneStyleService.setShowsBridges(game, true);
+        bridgeNorthToSouth();
         BufferedImage walled = render();
         for (int side : List.of(1, 2, 4, 5)) game.setTile(new Tile("20", AROUND.get(side)));
         BufferedImage tunnelled = render();
@@ -78,7 +79,7 @@ class HyperlaneBridgeOverlayTest extends BaseTi4Test {
         Tile unexplored = viewer.buildFogTile("000", viewer);
 
         BufferedImage plain = privateLayers(viewer).draw(unexplored, TileStep.Tile);
-        HyperlaneStyleService.setShowsBridges(game, true);
+        bridgeNorthToSouth();
         assertThat(changedPixels(plain, privateLayers(viewer).draw(unexplored, TileStep.Tile)))
                 .isGreaterThan(2000);
 
@@ -93,11 +94,15 @@ class HyperlaneBridgeOverlayTest extends BaseTi4Test {
     }
 
     @Test
-    void turningBridgesOffForgetsTheSetting() {
-        HyperlaneStyleService.setShowsBridges(game, true);
-        HyperlaneStyleService.setShowsBridges(game, false);
-        assertThat(HyperlaneStyleService.showsBridges(game)).isFalse();
-        assertThat(game.getStoredValueMap()).doesNotContainKey("customHyperlaneBridges");
+    void removingTheBridgeRestoresTheArt() {
+        BufferedImage plain = render();
+        bridgeNorthToSouth();
+        HyperlaneBridges.remove(game, "000");
+        assertThat(pixels(render())).isEqualTo(pixels(plain));
+    }
+
+    private void bridgeNorthToSouth() {
+        HyperlaneBridges.set(game, "000", "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
     }
 
     private BufferedImage render() {

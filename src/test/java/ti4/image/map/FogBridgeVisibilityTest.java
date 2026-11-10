@@ -15,12 +15,13 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.tile.TileLayers;
 import ti4.service.fow.FogViewer;
 import ti4.service.map.CustomHyperlaneService;
-import ti4.service.map.HyperlaneStyleService;
+import ti4.service.map.HyperlaneBridges;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.testUtils.BaseTi4Test;
 
 // The hyperlane-bridges-fog testbed map: destroyers in 302, 304 and 105; one-way chain 201 -> Wellon 101 -> 000 -> 104;
-// two-way lane 203 <-> 102 <-> 000 <-> 105. Bridges on, so Wellon and 102 are passed through and never seen.
+// two-way lane 203 <-> 102 <-> 000 <-> 105. Wellon (N -> S), 102 (NE <-> SW) and 104 (N -> SW) are bridged, so Wellon
+// and 102 are passed through and never seen.
 class FogBridgeVisibilityTest extends BaseTi4Test {
 
     private Game game;
@@ -44,7 +45,9 @@ class FogBridgeVisibilityTest extends BaseTi4Test {
         twoWay("000", 1, 4);
         twoWay("203", 4, 1);
         lane("208", 1, 4, true);
-        HyperlaneStyleService.setShowsBridges(game, true);
+        HyperlaneBridges.set(game, "101", "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        HyperlaneBridges.set(game, "102", "0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        HyperlaneBridges.set(game, "104", "0,0,0,0,2,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
         for (String position : new String[] {"302", "304", "105"}) {
             game.getTileByPosition(position)
                     .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, empyrean.getColorID()), 1);

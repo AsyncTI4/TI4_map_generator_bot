@@ -40,9 +40,9 @@ final class OneWayLaneHints {
         if (neighbours.size() != 6) {
             return;
         }
-        Set<Integer> lanesPassOn = BridgeEndsLookup.sidesWhereArrivingLanesPassOn(scene, layer.tile());
+        Set<Integer> laneOnlySides = BridgeEndsLookup.laneOnlySides(scene, layer.tile());
         for (int side = 0; side < 6; side++) {
-            if (!lanesPassOn.contains(side) && oneWayLaneLeadsInto(scene, position, side, neighbours.get(side))) {
+            if (!laneOnlySides.contains(side) && oneWayLaneLeadsInto(scene, position, side, neighbours.get(side))) {
                 glowOnEdge(layer, side);
             }
         }

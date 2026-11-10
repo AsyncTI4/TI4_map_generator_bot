@@ -3,7 +3,7 @@ package ti4.image.tile;
 import javax.annotation.Nullable;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.service.map.HyperlaneStyleService;
+import ti4.service.map.HyperlaneBridges;
 
 public final class UnexploredBridges {
 
@@ -22,7 +22,7 @@ public final class UnexploredBridges {
     @Nullable
     public Tile fogTile(Player player, String position) {
         Tile remembered = player.buildFogTile(position, player);
-        if (remembered != null || !HyperlaneStyleService.showsBridges(scene.game())) {
+        if (remembered != null || HyperlaneBridges.all(scene.game()).isEmpty()) {
             return remembered;
         }
         Tile unexplored = new Tile(UNEXPLORED_TILE_ID, position, player, true, "");

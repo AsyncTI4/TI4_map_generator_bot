@@ -8,9 +8,9 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import ti4.service.map.HyperlaneBridgeEnds.BridgeEnd;
+import ti4.service.map.BridgeEnd;
+import ti4.service.map.BridgeMatrix;
 
 final class BridgeTrail {
 
@@ -23,6 +23,8 @@ final class BridgeTrail {
     private static final double CENTER_Y = TILE_HEIGHT / 2.0;
     private static final double EDGE_DISTANCE = TILE_HEIGHT / 2.0;
     private static final double OCCLUDED_COST = 30;
+    private static final double ARROW_CLEARANCE = 9;
+    private static final int ARROW_SEARCH_STEPS = 8;
 
     private static final List<Point2D> RING = ringWithSideNAfterCornerN();
 
@@ -44,7 +46,7 @@ final class BridgeTrail {
 
     record Arrow(double x, double y, double angle) {}
 
-    record Tunnel(Point2D at, double edgeAngle, boolean oneWay) {}
+    record Tunnel(int side, Point2D at, double edgeAngle, boolean oneWay) {}
 
     record Trail(List<Piece> ring, List<Piece> stubs, List<Arrow> cornerArrows) {
 
@@ -56,55 +58,107 @@ final class BridgeTrail {
                         .filter(piece -> piece.points().contains(midpoint))
                         .findFirst()
                         .ifPresent(piece ->
-                                tunnels.add(new Tunnel(midpoint, Math.toRadians(side * 60), piece.isOneWay())));
+                                tunnels.add(new Tunnel(side, midpoint, Math.toRadians(side * 60), piece.isOneWay())));
             }
             return List.copyOf(tunnels);
         }
     }
 
-    static Trail of(List<BridgeEnd> ends, Shape occluders) {
-        List<BridgeEnd> byRing = new ArrayList<>(ends);
-        byRing.sort(Comparator.comparingInt(end -> ringIndex(end.side())));
-        List<Piece> best = List.of();
-        double bestCost = Double.MAX_VALUE;
-        for (int dropped = 0; dropped < byRing.size(); dropped++) {
-            List<Piece> pieces = piecesWithoutGapAfter(byRing, dropped);
-            double cost = pieces.stream()
-                    .mapToDouble(piece -> cost(piece.points(), occluders))
-                    .sum();
-            if (cost < bestCost) {
-                bestCost = cost;
-                best = pieces;
-            }
+    static Trail of(BridgeMatrix lanes, Shape occluders) {
+        int segments = RING.size();
+        boolean[] clockwise = new boolean[segments];
+        boolean[] counterClockwise = new boolean[segments];
+        List<BridgeMatrix.Pair> pairs = lanes.pairs();
+        List<Boolean> layout = cheapestLayout(lanes, pairs, occluders);
+        for (int i = 0; i < pairs.size(); i++) {
+            route(lanes, pairs.get(i), layout.get(i), clockwise, counterClockwise);
         }
+        List<Piece> ring = runs(clockwise, counterClockwise);
         List<Piece> stubs = new ArrayList<>();
-        for (BridgeEnd end : ends) {
+        for (BridgeEnd end : lanes.ends()) {
             stubs.add(new Piece(
                     List.of(edgeMidpoint(end.side()), RING.get(ringIndex(end.side()))), end.entry(), end.exit()));
         }
-        return new Trail(best, List.copyOf(stubs), cornerArrows(best));
+        return new Trail(ring, List.copyOf(stubs), cornerArrows(ring, occluders));
     }
 
-    private static List<Piece> piecesWithoutGapAfter(List<BridgeEnd> byRing, int dropped) {
-        int count = byRing.size();
-        List<BridgeEnd> order = new ArrayList<>();
-        for (int k = 1; k <= count; k++) order.add(byRing.get((dropped + k) % count));
+    private static List<Boolean> cheapestLayout(BridgeMatrix lanes, List<BridgeMatrix.Pair> pairs, Shape occluders) {
+        List<List<Boolean>> layouts = lanes.rimLayoutsWithoutSharing();
+        if (layouts.isEmpty()) {
+            List<Boolean> eachOnItsOwn = new ArrayList<>();
+            for (BridgeMatrix.Pair pair : pairs)
+                eachOnItsOwn.add(arcCost(pair, true, occluders) <= arcCost(pair, false, occluders));
+            return eachOnItsOwn;
+        }
+        List<Boolean> best = layouts.getFirst();
+        double bestCost = Double.MAX_VALUE;
+        for (List<Boolean> layout : layouts) {
+            double total = 0;
+            for (int i = 0; i < pairs.size(); i++) total += arcCost(pairs.get(i), layout.get(i), occluders);
+            if (total < bestCost) {
+                bestCost = total;
+                best = layout;
+            }
+        }
+        return best;
+    }
+
+    private static double arcCost(BridgeMatrix.Pair pair, boolean clockwiseFromLow, Shape occluders) {
+        return clockwiseFromLow
+                ? cost(arc(pair.low(), pair.high()), occluders)
+                : cost(arc(pair.high(), pair.low()), occluders);
+    }
+
+    private static void route(
+            BridgeMatrix lanes,
+            BridgeMatrix.Pair pair,
+            boolean clockwiseFromLow,
+            boolean[] clockwise,
+            boolean[] counterClockwise) {
+        int from = clockwiseFromLow ? pair.low() : pair.high(), to = clockwiseFromLow ? pair.high() : pair.low();
+        boolean along = lanes.leads(from, to), against = lanes.leads(to, from);
+        for (int k = ringIndex(from); k != ringIndex(to); k = (k + 1) % RING.size()) {
+            clockwise[k] |= along;
+            counterClockwise[k] |= against;
+        }
+    }
+
+    private static List<Piece> runs(boolean[] clockwise, boolean[] counterClockwise) {
+        int segments = RING.size();
+        int start = -1;
+        for (int k = 0; k < segments; k++) {
+            int previous = (k + segments - 1) % segments;
+            if (clockwise[k] != clockwise[previous] || counterClockwise[k] != counterClockwise[previous]) {
+                start = k;
+                break;
+            }
+        }
         List<Piece> pieces = new ArrayList<>();
-        for (int k = 0; k < count - 1; k++) {
-            boolean forward = anyEntry(order, 0, k) && anyExit(order, k + 1, count - 1);
-            boolean backward = anyEntry(order, k + 1, count - 1) && anyExit(order, 0, k);
-            if (!forward && !backward) continue;
-            pieces.add(new Piece(arc(order.get(k).side(), order.get(k + 1).side()), forward, backward));
+        if (start < 0) {
+            if (clockwise[0] || counterClockwise[0]) pieces.add(piece(0, segments, clockwise[0], counterClockwise[0]));
+            return pieces;
+        }
+        int runStart = start;
+        for (int step = 1; step <= segments; step++) {
+            int k = (start + step) % segments;
+            int last = (k + segments - 1) % segments;
+            boolean changes = step == segments
+                    || clockwise[k] != clockwise[last]
+                    || counterClockwise[k] != counterClockwise[last];
+            if (!changes) continue;
+            if (clockwise[last] || counterClockwise[last]) {
+                int length = (k - runStart + segments) % segments;
+                pieces.add(piece(runStart, length == 0 ? segments : length, clockwise[last], counterClockwise[last]));
+            }
+            runStart = k;
         }
         return pieces;
     }
 
-    private static boolean anyEntry(List<BridgeEnd> order, int from, int to) {
-        return order.subList(from, to + 1).stream().anyMatch(BridgeEnd::entry);
-    }
-
-    private static boolean anyExit(List<BridgeEnd> order, int from, int to) {
-        return order.subList(from, to + 1).stream().anyMatch(BridgeEnd::exit);
+    private static Piece piece(int first, int segmentCount, boolean forward, boolean backward) {
+        List<Point2D> points = new ArrayList<>();
+        for (int k = 0; k <= segmentCount; k++) points.add(RING.get((first + k) % RING.size()));
+        return new Piece(List.copyOf(points), forward, backward);
     }
 
     private static List<Point2D> arc(int fromSide, int toSide) {
@@ -127,21 +181,42 @@ final class BridgeTrail {
         return total;
     }
 
-    private static List<Arrow> cornerArrows(List<Piece> pieces) {
+    private static List<Arrow> cornerArrows(List<Piece> pieces, Shape occluders) {
         List<Arrow> arrows = new ArrayList<>();
         for (Piece piece : pieces) {
             if (!piece.isOneWay()) continue;
             List<Point2D> points = piece.inTravelDirection();
             for (int k = 1; k < points.size() - 1; k++) {
                 if (!isCornerApex(points.get(k))) continue;
-                Point2D before = points.get(k - 1), after = points.get(k + 1);
+                int spot = clearSpotNear(points, k, occluders);
+                if (spot < 0) continue;
+                Point2D before = points.get(spot - 1), after = points.get(spot + 1);
                 arrows.add(new Arrow(
-                        points.get(k).getX(),
-                        points.get(k).getY(),
+                        points.get(spot).getX(),
+                        points.get(spot).getY(),
                         Math.atan2(after.getY() - before.getY(), after.getX() - before.getX())));
             }
         }
         return List.copyOf(arrows);
+    }
+
+    private static int clearSpotNear(List<Point2D> points, int apex, Shape occluders) {
+        for (int step = 0; step <= ARROW_SEARCH_STEPS; step++) {
+            for (int candidate : new int[] {apex + step, apex - step}) {
+                if (candidate > 0 && candidate < points.size() - 1 && isClear(points.get(candidate), occluders)) {
+                    return candidate;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static boolean isClear(Point2D point, Shape occluders) {
+        return !occluders.intersects(
+                point.getX() - ARROW_CLEARANCE,
+                point.getY() - ARROW_CLEARANCE,
+                2 * ARROW_CLEARANCE,
+                2 * ARROW_CLEARANCE);
     }
 
     private static boolean isCornerApex(Point2D point) {

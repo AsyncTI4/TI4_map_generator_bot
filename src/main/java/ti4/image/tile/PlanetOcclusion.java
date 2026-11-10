@@ -56,6 +56,7 @@ final class PlanetOcclusion {
         int dy = corner == ResInfLocation.TopLeft || corner == ResInfLocation.TopRight ? -1 : 1;
         addValueCircle(shapes, x + dx * r * 0.5, y + dy * r * 1.1);
         addValueCircle(shapes, x + dx * r * 0.84, y + dy * r * 0.78);
+        if (hasIcon(planet)) addValueCircle(shapes, x + dx * r * 1.18, y + dy * r * 0.45);
         int icons = layout.getExtraIcons() == null ? 0 : layout.getExtraIcons();
         double near = x + dx * BANNER_NEAR, far = x - dx * (BANNER_FAR + icons * ICON_WIDTH);
         double bannerY = y + dy * (r + BANNER_GAP);
@@ -63,6 +64,12 @@ final class PlanetOcclusion {
                 new RoundRectangle2D.Double(
                         Math.min(near, far), bannerY - BANNER_HEIGHT / 2, Math.abs(far - near), BANNER_HEIGHT, 10, 10),
                 false);
+    }
+
+    private static boolean hasIcon(PlanetModel planet) {
+        return planet.isLegendary()
+                || planet.getTechSpecialties() != null
+                        && !planet.getTechSpecialties().isEmpty();
     }
 
     private static void addValueCircle(Path2D shapes, double x, double y) {

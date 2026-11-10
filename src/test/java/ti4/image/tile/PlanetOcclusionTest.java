@@ -29,4 +29,15 @@ class PlanetOcclusionTest extends BaseTi4Test {
         assertThat(shape.contains(202 - 60, 207 + r + 8)).isTrue();
         assertThat(shape.contains(202 - 60, 207 - (r + 8))).isFalse();
     }
+
+    // Rigel III's tech skip sits beyond its values (bottom left), where a rim trail runs; Starpoint has no icon.
+    @Test
+    void techSkipIconSpotIsCoveredOnlyForPlanetsWithAnIcon() {
+        double r = Mapper.getPlanet("rigeliii").getRadius();
+        assertThat(PlanetOcclusion.build(List.of("rigeliii")).contains(83 - r * 1.18, 139 + r * 0.45))
+                .isTrue();
+        double s = Mapper.getPlanet("starpoint").getRadius();
+        assertThat(PlanetOcclusion.build(List.of("starpoint")).contains(202 + s * 1.18, 207 + s * 0.45))
+                .isFalse();
+    }
 }
