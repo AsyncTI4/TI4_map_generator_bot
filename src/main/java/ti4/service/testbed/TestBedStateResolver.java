@@ -22,6 +22,7 @@ import ti4.service.fow.FogPreset;
 import ti4.service.fow.FogPresetService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.HyperlanePortals;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -56,6 +57,7 @@ public class TestBedStateResolver {
             "customAdjacencies",
             "customHyperlanes",
             "hyperlaneBridges",
+            "hyperlanePortals",
             "fowOptions",
             "fogPreset",
             "sectors",
@@ -177,6 +179,10 @@ public class TestBedStateResolver {
                         .map(entry -> entry.getKey() + ":"
                                 + CustomHyperlaneService.toTypedMatrix(
                                         entry.getValue().stored()))
+                        .toList());
+            case "hyperlanePortals" ->
+                joinSorted(HyperlanePortals.all(game).entrySet().stream()
+                        .map(entry -> entry.getKey() + ":" + HyperlanePortals.describe(entry.getValue()))
                         .toList());
             case "fowOptions" ->
                 joinSorted(FogGameSummaryService.enabledOptions(game).stream()

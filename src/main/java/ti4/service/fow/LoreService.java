@@ -325,17 +325,20 @@ public final class LoreService {
 
     @ButtonHandler(value = "gmLoreRefresh", save = false)
     private static void refreshLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         showLoreButtons(event, buttonID, game);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = "gmLoreExportImportButtons", save = false)
     private static void gmLoreExportImportButtons(ButtonInteractionEvent event, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", LORE_EXPORT_IMPORT_BUTTONS);
     }
 
     @ButtonHandler(value = "gmLoreExport", save = false)
     private static void exportLore(ButtonInteractionEvent event, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         File exportFile = new File(game.getName() + LORE_EXPORT_FILENAME);
         try (FileWriter writer = new FileWriter(exportFile, StandardCharsets.UTF_8)) {
             writer.write(game.getStoredValue(SYSTEM_LORE_KEY));
@@ -352,6 +355,7 @@ public final class LoreService {
 
     @ButtonHandler(value = "gmLoreImport~MDL", save = false)
     public static void importLore(ButtonInteractionEvent event, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         TextInput url = TextInput.create("url", TextInputStyle.SHORT)
                 .setRequired(false)
                 .setPlaceholder("http://your.url/fow123_lore_export.txt")
@@ -369,6 +373,7 @@ public final class LoreService {
 
     @ModalHandler("gmLoreImportFromURL")
     public static void importLoreFromURL(ModalInteractionEvent event, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         String source = uploadedFileOrUrl(event);
         if (source.isEmpty()) {
             MessageHelper.sendMessageToChannel(
@@ -529,6 +534,7 @@ public final class LoreService {
 
     @ButtonHandler(value = "gmLore", save = false)
     public static void showLoreButtons(GenericInteractionCreateEvent event, String buttonID, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         String page = StringUtils.substringAfter(buttonID, "page");
         int pageNum = StringUtils.isBlank(page) ? 1 : Integer.parseInt(page);
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
@@ -682,6 +688,7 @@ public final class LoreService {
 
     @ButtonHandler("loreAdd0")
     public static void addLoreStep1(ButtonInteractionEvent event, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd1_").setPlaceholder("Notify...");
         for (RECEIVER value : RECEIVER.values()) {
@@ -694,7 +701,8 @@ public final class LoreService {
     }
 
     @SelectionHandler("loreAdd1")
-    public static void handleReceiverSelectionChange(StringSelectInteractionEvent event, String menuId) {
+    public static void handleReceiverSelectionChange(StringSelectInteractionEvent event, String menuId, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         RECEIVER selected = RECEIVER.valueOf(event.getValues().getFirst());
         StringSelectMenu.Builder selectMenu =
                 StringSelectMenu.create("loreAdd2_" + selected).setPlaceholder("When...");
@@ -707,6 +715,7 @@ public final class LoreService {
 
     @SelectionHandler("loreAdd2")
     public static void handleTriggerSelectionChange(StringSelectInteractionEvent event, String menuId, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         String selected =
                 menuId.replace("loreAdd2_", "") + ":" + event.getValues().getFirst();
         StringSelectMenu.Builder selectMenu =
@@ -720,7 +729,8 @@ public final class LoreService {
     }
 
     @SelectionHandler("loreAdd3")
-    public static void handlePingSelectionChange(StringSelectInteractionEvent event, String menuId) {
+    public static void handlePingSelectionChange(StringSelectInteractionEvent event, String menuId, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         String selected =
                 menuId.replace("loreAdd3_", "") + ":" + event.getValues().getFirst();
         StringSelectMenu.Builder selectMenu =
@@ -733,7 +743,8 @@ public final class LoreService {
     }
 
     @SelectionHandler("loreAdd4")
-    public static void handlePersistanceSelectionChange(StringSelectInteractionEvent event, String menuId) {
+    public static void handlePersistanceSelectionChange(StringSelectInteractionEvent event, String menuId, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         String selected =
                 menuId.replace("loreAdd4_", "") + ":" + event.getValues().getFirst();
         confirmAddLoreSettings(event.getChannel(), selected);
@@ -742,6 +753,7 @@ public final class LoreService {
 
     @ButtonHandler("gmLoreAdd")
     public static void addDefaultLore(ButtonInteractionEvent event, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         confirmAddLoreSettings(
                 event.getChannel(),
                 RECEIVER.CURRENT + ":" + TRIGGER.CONTROLLED + ":" + PING.NO + ":" + PERSISTANCE.ONCE);
@@ -758,6 +770,7 @@ public final class LoreService {
 
     @ButtonHandler("gmLoreEdit")
     public static void editLore(ButtonInteractionEvent event, String buttonID, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         String target = StringUtils.substringBetween(buttonID, "gmLoreEdit_", "~MDL");
 
         TextInput.Builder position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
@@ -861,6 +874,7 @@ public final class LoreService {
 
     @ModalHandler("gmLoreSave_")
     public static void saveLoreFromModal(ModalInteractionEvent event, Game game) {
+        if (FoWHelper.refusesNonGmInFog(game, event)) return;
         // KNOWN LATENT RISK (documented, not guarded): event.getValue(id) returns null if the submitted
         // modal lacks that component. All four fields (POSITION/MESSAGE/footer/rounds) are always present
         // in the modal editLore() builds, so the .getAsString() chains below are safe for any modal opened

@@ -19,7 +19,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
 import ti4.service.map.AddTileService.RandomOption;
-import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.TileBoundData;
 
 class AddTileRandom extends GameStateSubcommand {
 
@@ -75,7 +75,7 @@ class AddTileRandom extends GameStateSubcommand {
             TileModel randomTile = availableTiles.getFirst();
             drawnTiles.add(randomTile.getId());
             if (!drawOnly) {
-                HyperlaneBridges.remove(getGame(), position);
+                TileBoundData.clear(getGame(), position);
                 AddTileService.addTile(getGame(), new Tile(randomTile.getId(), position));
             }
 

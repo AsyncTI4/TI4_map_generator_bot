@@ -18,6 +18,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
@@ -1070,6 +1073,22 @@ public final class FoWHelper {
         if ("null".equals(viewer.getColor())) return false;
         initializeFog(game, viewer, false);
         return canSeeStatsOfPlayer(game, player, viewer);
+    }
+
+    public static boolean refusesNonGmInFog(Game game, GenericInteractionCreateEvent event) {
+        if (!game.isFowMode() || isGameMaster(event.getUser().getId(), game)) {
+            return false;
+        }
+        String message = "Only the GM can use this in Fog of War.";
+        if (event instanceof IReplyCallback reply && !reply.isAcknowledged()) {
+            reply.reply(message).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+        } else if (event instanceof IDeferrableCallback deferred) {
+            deferred.getHook()
+                    .setEphemeral(true)
+                    .sendMessage(message)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+        return true;
     }
 
     public static boolean isGameMaster(String userId, Game game) {

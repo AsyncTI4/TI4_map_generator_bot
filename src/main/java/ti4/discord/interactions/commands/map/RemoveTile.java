@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.MapPositionMapper;
-import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.TileBoundData;
 
 class RemoveTile extends GameStateSubcommand {
 
@@ -35,7 +35,7 @@ class RemoveTile extends GameStateSubcommand {
                 MessageHelper.replyToMessage(event, "Tile position `" + position + "` is not valid");
             }
             game.removeTile(position);
-            HyperlaneBridges.remove(game, position);
+            TileBoundData.clear(game, position);
         }
     }
 }

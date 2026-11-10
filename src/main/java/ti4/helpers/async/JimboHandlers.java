@@ -21,7 +21,7 @@ import ti4.model.MapPositionMapper;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
-import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.TileBoundData;
 
 // Jazz's Interactive Map Builder
 public final class JimboHandlers {
@@ -170,7 +170,7 @@ public final class JimboHandlers {
         } else if ((matcher = Pattern.compile(regexPt5).matcher(buttonID)).matches()) {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
             String pos = matcher.group("pos");
-            HyperlaneBridges.remove(game, pos);
+            TileBoundData.clear(game, pos);
             AddTileService.addTile(game, new Tile(model.getAlias(), pos));
 
             String msg = model.getName() + " (" + model.getAlias() + ") has been placed in location " + pos + ".";
@@ -236,7 +236,7 @@ public final class JimboHandlers {
                 t2.setPosition(pos1);
                 game.setTile(t2);
             }
-            HyperlaneBridges.move(game, pos1, pos2, true);
+            TileBoundData.move(game, pos1, pos2, true);
             String msg = "Successfully swapped the tiles at positions [] and []";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             postMainMenu(event, game);
@@ -273,7 +273,7 @@ public final class JimboHandlers {
             TileModel model = game.getTileByPosition(pos).getTileModel();
             String msg = "Removed tile " + model.getName() + " (" + model.getAlias() + ") from position " + pos + ":";
             game.removeTile(pos);
-            HyperlaneBridges.remove(game, pos);
+            TileBoundData.clear(game, pos);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
             // DONE
