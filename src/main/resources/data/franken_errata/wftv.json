@@ -75,7 +75,14 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "phantom_energy",
-        "optionalSwaps": ["FLAGSHIP:tyris_flagship"],
+        "additionalComponents": ["ABILITY:arrow_of_time"],
+        "optionalSwaps": ["FLAGSHIP:tyris_flagship", "AGENT:tyrisagent"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "arrow_of_time",
+        "undraftable": true,
         "source": "wftv"
     },
     {
