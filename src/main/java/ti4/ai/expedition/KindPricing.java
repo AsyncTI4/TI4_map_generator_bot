@@ -1,16 +1,20 @@
 package ti4.ai.expedition;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.actioncards.ActionCardValue;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
@@ -33,6 +37,8 @@ class KindPricing {
     static final double SECRET_CARD_SHARE = 0.5;
     private static final int MAX_CACHED = 64;
     private static final Map<String, CachedKeeps> KEEPS = new ConcurrentHashMap<>();
+    private static final ThreadLocal<Set<Player>> PRICING_EACH_CARD =
+            ThreadLocal.withInitial(() -> Collections.newSetFromMap(new IdentityHashMap<>()));
     private static final String BIO_STIMS = "bs";
     private static final Wallet.Payment NO_PAYMENT = new Wallet.Payment(List.of(), List.of(), 0, 0);
 
@@ -150,16 +156,32 @@ class KindPricing {
         }
     }
 
-    private static List<Double> keepValues(Game game, Player seat) {
+    static List<Double> keepValues(Game game, Player seat) {
         String key = game.getName() + "|" + seat.getUserID();
         CachedKeeps cached = KEEPS.get(key);
         if (cached != null && cached.isFor(game)) return cached.keeps();
-        List<Double> keeps = ActionCardValue.discardOrder(game, seat).stream()
-                .map(alias -> ActionCardValue.keepValue(game, seat, alias))
-                .toList();
+        Set<String> hand = ImaginedTurn.actionCards(seat).keySet();
+        if (!hand.isEmpty() && PRICING_EACH_CARD.get().contains(seat)) return keepPriors(hand);
+        List<Double> keeps = keepValuesInOrder(game, seat, ActionCardValue.discardOrder(game, seat));
         if (KEEPS.size() > MAX_CACHED) KEEPS.clear();
         KEEPS.put(key, new CachedKeeps(new WeakReference<>(game), game.getLastModifiedDate(), keeps));
         return keeps;
+    }
+
+    private static List<Double> keepValuesInOrder(Game game, Player seat, List<String> order) {
+        Set<Player> pricing = PRICING_EACH_CARD.get();
+        boolean outermost = pricing.add(seat);
+        try {
+            return order.stream()
+                    .map(alias -> ActionCardValue.keepValue(game, seat, alias))
+                    .toList();
+        } finally {
+            if (outermost) pricing.remove(seat);
+        }
+    }
+
+    private static List<Double> keepPriors(Set<String> hand) {
+        return hand.stream().map(ActionCardPrior::keepPrior).toList();
     }
 
     private static Optional<Price> actionCards(Game game, Player seat, Holdings holdings) {
