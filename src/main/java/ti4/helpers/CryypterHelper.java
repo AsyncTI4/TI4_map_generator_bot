@@ -25,6 +25,7 @@ import ti4.game.Player;
 import ti4.game.Space;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -287,6 +288,7 @@ public final class CryypterHelper {
             LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
             if (leaderModel != null
                     && !leader.isLocked()
+                    && !"choircommander".equals(leaderModel.getAlias())
                     && "After an agenda is revealed:".equals(leaderModel.getAbilityWindow())) {
                 FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
                 if (factionModel == null) {
@@ -357,6 +359,7 @@ public final class CryypterHelper {
                     List<Tile> arboTiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(
                             game, envoyPlayer, UnitType.Mech, UnitType.Infantry);
                     Map<Planet, Integer> eligiblePlanets = new HashMap<>();
+                    Adjacency adjacency = Adjacency.of(game, envoyPlayer);
 
                     for (Tile arbotile : arboTiles) {
                         Space space = arbotile.getSpaceUnitHolder();
@@ -371,8 +374,7 @@ public final class CryypterHelper {
                             }
                         }
 
-                        Set<String> adjTiles =
-                                FoWHelper.getAdjacentTiles(game, arbotile.getPosition(), null, false, false);
+                        Set<String> adjTiles = adjacency.from(arbotile.getPosition());
                         for (String adjTile : adjTiles) {
                             Tile tile = game.getTileByPosition(adjTile);
                             List<Planet> planets = tile.getPlanetUnitHolders();

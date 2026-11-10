@@ -43,6 +43,8 @@ public class GameProperties {
     @Deprecated // can be removed?
     private @ExportableField long startedDate;
 
+    private String revisionKey;
+
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
@@ -107,6 +109,7 @@ public class GameProperties {
     private boolean injectRulesLinks;
     private boolean newTransactionMethod = true;
     private boolean nomadCoin;
+    private boolean oneWayAdjacency;
     private boolean queueSO = true;
     private boolean showBanners = true;
     private boolean showBubbles = true;
@@ -151,6 +154,7 @@ public class GameProperties {
     private @ExportableField boolean monumentsMode;
     private @ExportableField boolean wildWildGalaxyMode;
     private @ExportableField boolean feastOrFamineMode;
+    private @ExportableField boolean secretsOnlyMode;
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean oplusplusRegularMode;

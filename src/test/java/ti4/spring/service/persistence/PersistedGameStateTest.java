@@ -33,6 +33,9 @@ class PersistedGameStateTest {
         GameEntity expected = game(5);
         GameEntity actual = game(4);
 
+        expected.setPlayerCount(6);
+        actual.setPlayerCount(5);
+
         PersistedGameState expectedState = PersistedGameState.of(
                 expected, List.of(player(expected, alice, "sol")), List.of(title(expected, alice, "Kingmaker")));
         PersistedGameState actualState =
@@ -40,9 +43,43 @@ class PersistedGameStateTest {
 
         assertThat(expectedState.describeDifferencesFrom(actualState))
                 .containsExactly(
-                        "game columns round (expected 5, found 4)",
+                        "game columns round (expected 5, found 4), playerCount (expected 6, found 5)",
                         "player rows (1 missing, 1 unexpected)",
                         "title rows (1 missing, 0 unexpected)");
+    }
+
+    @Test
+    void staleRevisionColumnsAreNotContentDifferences() {
+        GameEntity current = game(4);
+        current.setRevisionKey("revision");
+        current.setMappingVersion(GameEntityMapper.MAPPING_VERSION);
+        // A row written before revision keys existed has neither column set.
+        GameEntity legacy = game(4);
+
+        PersistedGameState currentState = PersistedGameState.of(current, List.of(), List.of());
+        PersistedGameState legacyState = PersistedGameState.of(legacy, List.of(), List.of());
+
+        assertThat(currentState.describeDifferencesFrom(legacyState)).isEmpty();
+        assertThat(currentState.hasSameRevisionColumnsAs(legacyState)).isFalse();
+        assertThat(currentState.hasSameRevisionColumnsAs(currentState)).isTrue();
+    }
+
+    @Test
+    void revisionMatchRequiresBothSourceAndMappingVersions() {
+        GameEntity entity = game(1);
+        entity.setRevisionKey("revision-a");
+        entity.setMappingVersion(GameEntityMapper.MAPPING_VERSION);
+        PersistedGameState state = PersistedGameState.of(entity, List.of(), List.of());
+        assertThat(state.matchesRevision("revision-a")).isTrue();
+        assertThat(state.matchesRevision("revision-b")).isFalse();
+        assertThat(state.matchesRevision(null)).isFalse();
+        assertThat(state.matchesRevision("")).isFalse();
+        entity.setMappingVersion(null);
+        assertThat(PersistedGameState.of(entity, List.of(), List.of()).matchesRevision("revision-a"))
+                .isFalse();
+        entity.setMappingVersion(GameEntityMapper.MAPPING_VERSION - 1);
+        assertThat(PersistedGameState.of(entity, List.of(), List.of()).matchesRevision("revision-a"))
+                .isFalse();
     }
 
     private static GameEntity game(int round) {
@@ -55,7 +92,7 @@ class PersistedGameStateTest {
     private static PlayerEntity player(GameEntity game, UserEntity user, String faction) {
         PlayerEntity player = new PlayerEntity();
         player.setGame(game);
-        player.setUser(user);
+        player.setStatsUser(user);
         player.setFactionName(faction);
         return player;
     }

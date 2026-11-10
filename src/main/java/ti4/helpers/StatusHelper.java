@@ -54,6 +54,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.EronousPlanetService;
+import ti4.service.tech.EntropicScarService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.gameevent.GameEventDraft;
@@ -332,16 +333,24 @@ public final class StatusHelper {
                 }
             }
 
+            boolean canScorePublicObjectives = Helper.canPlayerScorePOs(game, player);
+            boolean scarTechnologyCouldEnableScoring = scorables.isEmpty()
+                    && canScorePublicObjectives
+                    && EntropicScarService.couldScorePublicObjectiveAfterScar(game, player);
+
             if (!game.getStoredValue(keyV).isEmpty()
-                    && Helper.canPlayerScorePOs(game, player)
+                    && canScorePublicObjectives
                     && scorableInts.contains(Integer.parseInt(game.getStoredValue(keyV)))) {
                 poScoring(null, player, game.getStoredValue(keyV), game, player.getCorrectChannel());
             } else {
-                if (scorables.isEmpty()) {
+                if (scarTechnologyCouldEnableScoring) {
+                    messageText = player.getRepresentation()
+                            + ", you may become eligible to score a public objective after resolving Entropic Scar. Resolve that choice before choosing whether to score a public objective.";
+                } else if (scorables.isEmpty()) {
                     messageText = player.getRepresentation()
                             + ", the bot does not believe that you can score any public objectives.";
                 } else {
-                    if (Helper.canPlayerScorePOs(game, player)) {
+                    if (canScorePublicObjectives) {
                         messageText = player.getRepresentation()
                                 + ", as a reminder, the bot believes you are capable of scoring the following public objective"
                                 + (scorables.size() == 1 ? "" : "s") + ":\n";
@@ -354,7 +363,8 @@ public final class StatusHelper {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
             }
 
-            if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
+            if (shouldAutoMarkNoPublicObjective(
+                    !scorables.isEmpty(), canScorePublicObjectives, scarTechnologyCouldEnableScoring)) {
                 String message = player.getRepresentation()
                         + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -486,6 +496,11 @@ public final class StatusHelper {
         }
     }
 
+    static boolean shouldAutoMarkNoPublicObjective(
+            boolean hasScorableObjectives, boolean canScorePublicObjectives, boolean scarTechnologyCouldEnableScoring) {
+        return !canScorePublicObjectives || (!hasScorableObjectives && !scarTechnologyCouldEnableScoring);
+    }
+
     public static List<Player> getPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
             return PriorityTrackHelper.getPriorityTrack(game).stream()
@@ -500,7 +515,7 @@ public final class StatusHelper {
     public static void handleStatusPhaseMiddle(Game game) {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
-            for (Player p2 : vaden.getNeighbouringPlayers(true)) {
+            for (Player p2 : vaden.getAbilityNeighbours()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."
@@ -783,14 +798,7 @@ public final class StatusHelper {
         }
         for (Map.Entry<Player, Integer> entry : scars.entrySet()) {
             Player player = entry.getKey();
-            List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
-            if (game.isTwilightsFallMode()) {
-                factionTechs.add("antimatter");
-                factionTechs.add("wavelength");
-            }
-            factionTechs.remove("vax");
-            factionTechs.remove("vay");
-            player.getTechs().forEach(factionTechs::remove);
+            List<String> factionTechs = EntropicScarService.getAvailableTechnologies(game, player);
             List<Button> buttons = new ArrayList<>(factionTechs.stream()
                     .map(tech -> {
                         TechnologyModel model = Mapper.getTech(tech);

@@ -466,7 +466,7 @@ public class TkHelperActionCards {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             List<String> abilities = p2.getTechs();
             // If they have biosynthetic, then that is the only discardable ability
             if (p2.hasAbility("tf-biosyntheticsynergy")) abilities = List.of("tf-biosyntheticsynergy");

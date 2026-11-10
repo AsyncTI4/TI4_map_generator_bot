@@ -16,13 +16,22 @@ jobs:
     uses: ./.github/workflows/force-backup-of-savefiles.yml
     secrets: inherit
   buildImage:
-    needs: saveGamesBeforeDeploy
     name: Build & Publish Bot Image
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.image.outputs.image_tag }}
     steps:
+      # Only the Dockerfile inputs; the runtime resources are mounted from the host checkout.
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /Dockerfile
+            /.dockerignore
+            /pom.xml
+            /src/main/java/
+            /src/main/resources/config/
+            /src/main/resources/logback.xml
+          sparse-checkout-cone-mode: false
       - name: Compute image tag
         id: image
         run: echo "image_tag=sha-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
@@ -51,6 +60,24 @@ jobs:
     name: Pull & Deploy Bot
     runs-on: ubuntu-latest
     steps:
+      # The failures are TCP connect timeouts to the SSH port that can last 10+ minutes, so wait
+      # for the port to answer before connecting, giving up after about 15 minutes.
+      - name: Wait for the SSH port to answer
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_PORT: ${{ secrets.HOSTINGER_SSH_PORT }}
+        run: |
+          for attempt in $(seq 1 30); do
+            if timeout 5 bash -c "</dev/tcp/$SSH_HOST/$SSH_PORT" 2>/dev/null; then
+              echo "SSH port reachable on probe $attempt"
+              exit 0
+            fi
+            echo "SSH port unreachable on probe $attempt, waiting 25s"
+            sleep 25
+          done
+          echo "SSH port still unreachable after ~15 minutes"
+          exit 1
+
       - name: Execute remote ssh commands
         uses: appleboy/ssh-action@master
         env:
@@ -139,6 +166,19 @@ jobs:
               docker builder prune --force --filter until=48h
               
               echo "DONE!"
+  tagDeployedImage:
+    needs: [buildImage, build]
+    name: Tag Deployed Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Point deployed at the deployed image
+        run: docker buildx imagetools create --tag "${IMAGE_REPOSITORY}:deployed" "${IMAGE_REPOSITORY}:${{ needs.buildImage.outputs.image_tag }}"
   saveGamesAfterDeploy:
     needs: [build, saveGamesBeforeDeploy]
     uses: ./.github/workflows/force-backup-of-savefiles.yml

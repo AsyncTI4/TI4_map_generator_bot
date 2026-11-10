@@ -24,6 +24,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.objectives.RevealPublicObjectiveService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 
@@ -88,9 +89,16 @@ class GamePhaseButtonHandler {
 
     @ButtonHandler("startOfGameObjReveal")
     public static void startOfGameObjReveal(ButtonInteractionEvent event, Game game) {
+        if (game.isSecretsOnlyMode() && SecretsOnlyService.anyPlayerHasPendingOffer(game)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Please ensure everyone has chosen their starting secret objectives before hitting this button.");
+            return;
+        }
         for (Player p : game.getRealPlayers()) {
             if (p.getSecrets().size() > 1
                     && !game.isExtraSecretMode()
+                    && !game.isSecretsOnlyMode()
                     && (!game.isErwansGambitMode() || !"mentak".equalsIgnoreCase(p.getFaction()))) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
@@ -132,7 +140,10 @@ class GamePhaseButtonHandler {
             game.setStoredValue("revealedFlop" + game.getRound(), "Yes");
         }
 
-        if (game.isCivilizedSocietyMode()) {
+        if (game.isSecretsOnlyMode()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "No public objectives are revealed in a Secrets Only game.");
+        } else if (game.isCivilizedSocietyMode()) {
             RevealPublicObjectiveService.revealAllObjectives(game);
         } else {
             RevealPublicObjectiveService.revealTwoStage1(game);

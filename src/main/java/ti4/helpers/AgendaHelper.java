@@ -32,7 +32,9 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageA
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExplorationRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
@@ -87,6 +89,7 @@ import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedService;
 import ti4.service.unit.AddUnitService;
@@ -587,6 +590,7 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(),
                     "## The speaker has broken the tie for \"" + getAgendaOutcomeName(game, winner, true) + "\".");
+            FogSecretHooks.onSpeakerBrokeTie(game);
         }
         if (resolveTime) {
             resolveTime(game, winner);
@@ -988,6 +992,7 @@ public final class AgendaHelper {
                                     || winningR.hasTech("dsatokcr")
                                     || winningR.hasUnit("kaltrim_mech")
                                     || specificVote.contains("Radiance")
+                                    || specificVote.contains("Keyn of the Hollow Commander")
                                     || specificVote.contains("Tarrock Ability"))) {
 
                         MessageChannel channel = winningR.getCorrectChannel();
@@ -1241,6 +1246,9 @@ public final class AgendaHelper {
                                                 + ", please resolve Ordagka, the Atokera commander, by using the button to gain 1 command token.");
                                 MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                             }
+                        }
+                        if (specificVote.contains("Keyn of the Hollow Commander")) {
+                            ChoirLeadersHandler.offerKeynOfTheHollow(game, winningR);
                         }
                         if (specificVote.contains("Tarrock Ability")) {
                             String message = winningR.getFactionEmoji() + " drew a secret objective.";
@@ -2959,6 +2967,10 @@ public final class AgendaHelper {
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + ", an agenda has been revealed.";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
+        if (TheodisiAgendaResolver.onAgendaRevealed(game, event, agendaID)) {
+            revealAgenda(event, revealFromBottom, game, channel);
+            return;
+        }
         KaltrimUnitHandler.offerJewelOfTheRose(game, agendaID);
         if (!action && aCount == 1) {
             VeylorAbilitiesHandler.offerTightScheduling(game);

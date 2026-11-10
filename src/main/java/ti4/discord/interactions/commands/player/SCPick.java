@@ -18,6 +18,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.game.StartPhaseService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.player.PlayerStatsService;
 import ti4.service.strategycard.PickStrategyCardService;
 
@@ -26,7 +27,6 @@ class SCPick extends GameStateSubcommand {
     public SCPick() {
         super(Constants.SC_PICK, "Pick a strategy card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
-                .setRequiredRange(0, 99)
                 .setRequired(true));
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
@@ -68,6 +68,13 @@ class SCPick extends GameStateSubcommand {
         // ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
+            return;
+        }
+        if (MegagameGroupService.isActive(game)) {
+            if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
+                game.getRealPlayers().forEach(p2 -> p2.addFollowedSC(scPicked));
+            }
+            PickStrategyCardService.secondHalfOfSCPick(event, player, game, scPicked);
             return;
         }
         secondHalfOfSCPick(event, player, game, scPicked);

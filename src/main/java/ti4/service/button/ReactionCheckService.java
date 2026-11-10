@@ -25,6 +25,7 @@ import ti4.service.StatusCleanupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
+import ti4.service.objectives.SecretsOnlyService;
 
 @UtilityClass
 public class ReactionCheckService {
@@ -114,6 +115,15 @@ public class ReactionCheckService {
         Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
         boolean tfWarning = false;
         List<Button> buttons = new ArrayList<>();
+        if (game.isSecretsOnlyMode()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.getMainGameChannel(),
+                    "All players have indicated scoring. No public objective is revealed in a Secrets Only game."
+                            + " Press the button to run status cleanup and offer each player "
+                            + SecretsOnlyService.STATUS_PHASE_OFFER_SIZE + " secret objectives to keep 1 from.",
+                    List.of(Buttons.green("reveal_stage_none", "Run Cleanup and Offer Secret Objectives")));
+            return;
+        }
         if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
             message2 = "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";

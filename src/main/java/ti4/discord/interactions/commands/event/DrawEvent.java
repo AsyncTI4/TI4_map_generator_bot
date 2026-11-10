@@ -21,7 +21,7 @@ class DrawEvent extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        int count = Math.clamp(event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt), 1, 10);
+        int count = Math.max(1, event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt));
         for (int i = 0; i < count; i++) {
             game.drawEvent(player.getUserID());
         }

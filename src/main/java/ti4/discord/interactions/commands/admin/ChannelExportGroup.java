@@ -13,11 +13,14 @@ class ChannelExportGroup extends SubcommandGroup {
                     new StartChannelExport(),
                     new CancelChannelExport(),
                     new ResumeChannelExport(),
-                    new LogChannelExport())
+                    new LogChannelExport(),
+                    new InfoChannelExport())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     ChannelExportGroup() {
-        super(Constants.CHANNEL_EXPORT, "Export a channel's history to the bot server, then cancel or resume it");
+        super(
+                Constants.CHANNEL_EXPORT,
+                "Export a channel's history to the bot server; inspect, cancel or resume exports");
     }
 
     @Override

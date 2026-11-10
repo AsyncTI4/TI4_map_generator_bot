@@ -19,11 +19,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.attachmentupload.AttachmentUpload;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -32,6 +34,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IDeferrableCallback;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -349,20 +352,30 @@ public final class LoreService {
 
     @ButtonHandler(value = "gmLoreImport~MDL", save = false)
     public static void importLore(ButtonInteractionEvent event, Game game) {
-        TextInput.Builder url = TextInput.create("url", TextInputStyle.SHORT)
-                .setRequired(true)
-                .setPlaceholder("http://your.url/fow123_lore_export.txt");
+        TextInput url = TextInput.create("url", TextInputStyle.SHORT)
+                .setRequired(false)
+                .setPlaceholder("http://your.url/fow123_lore_export.txt")
+                .build();
+        AttachmentUpload file = AttachmentUpload.create("file")
+                .setRequiredRange(0, 1)
+                .setRequired(false)
+                .build();
 
-        Modal importLoreModal = Modal.create("gmLoreImportFromURL", "Import Lore from URL")
-                .addComponents(Label.of("URL", url.build()))
+        Modal importLoreModal = Modal.create("gmLoreImportFromURL", "Import Lore")
+                .addComponents(Label.of("URL", url), Label.of("Or upload the exported lore file", file))
                 .build();
         event.replyModal(importLoreModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("gmLoreImportFromURL")
     public static void importLoreFromURL(ModalInteractionEvent event, Game game) {
-        String url = event.getValue("url").getAsString();
-        String loreString = URLReaderHelper.readFromURL(url, event.getChannel());
+        String source = uploadedFileOrUrl(event);
+        if (source.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Give a URL or upload the exported lore file. Nothing was imported.");
+            return;
+        }
+        String loreString = URLReaderHelper.readFromURL(source, event.getChannel());
         if (loreString == null) {
             return;
         }
@@ -388,6 +401,16 @@ public final class LoreService {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
+
+    private static String uploadedFileOrUrl(ModalInteractionEvent event) {
+        ModalMapping file = event.getValue("file");
+        List<Message.Attachment> attachments = file == null ? List.of() : file.getAsAttachmentList();
+        if (!attachments.isEmpty()) {
+            return attachments.getFirst().getUrl();
+        }
+        ModalMapping url = event.getValue("url");
+        return url == null ? "" : url.getAsString().trim();
     }
 
     /** {@code entries} only contains entries that parsed and validated cleanly; {@code errors} entries were skipped. */
@@ -919,7 +942,9 @@ public final class LoreService {
             Map<String, LoreEntry> savedLoreMap,
             Game game) {
         String target = rawTarget.trim();
-        if (savedLoreMap.containsKey(target) && StringUtils.isBlank(loreEntry.loreText)) {
+        if (savedLoreMap.containsKey(target)
+                && StringUtils.isBlank(loreEntry.loreText)
+                && StringUtils.isBlank(loreEntry.footerText)) {
             return target; // Deleting existing lore (by its exact stored key) is always valid, even if stale
         }
 
@@ -1032,7 +1057,7 @@ public final class LoreService {
             return new LoreImportResult(null, List.of());
         }
         entry.target = validTarget;
-        setLore(entry, game, new StringBuilder());
+        loreMap.put(validTarget, entry);
         saveLore(game);
         return new LoreImportResult(validTarget, LoreEffects.validateEffects(entry, game));
     }
@@ -1443,13 +1468,12 @@ public final class LoreService {
      */
     static List<Player> computeChoiceAudience(
             Game game, LoreEntry loreEntry, Player triggeringPlayer, String position) {
-        List<Player> audience =
-                switch (loreEntry.receiver) {
-                    case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
-                    case ALL -> game.getRealPlayers();
-                    case GM -> List.of();
-                    default -> List.of(triggeringPlayer);
-                };
+        List<Player> audience = switch (loreEntry.receiver) {
+            case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
+            case ALL -> game.getRealPlayers();
+            case GM -> List.of();
+            default -> List.of(triggeringPlayer);
+        };
         // NPC-controlled seats don't get interactive buttons, so they're excluded from the audience
         // entirely rather than being left in it unresolved — otherwise they'd block round completion
         // in maybeCompleteChoiceRound forever.
@@ -1856,12 +1880,11 @@ public final class LoreService {
         // ADJACENT/ALL notify multiple players, but the call above only ever rewards the triggering
         // player. Give every other recipient their own copy of the player-stat effects (map-mutating
         // effects already applied exactly once above and must not repeat).
-        List<Player> extraRecipients =
-                switch (loreEntry.receiver) {
-                    case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
-                    case ALL -> game.getRealPlayers();
-                    default -> List.of();
-                };
+        List<Player> extraRecipients = switch (loreEntry.receiver) {
+            case ADJACENT -> FoWHelper.getAdjacentPlayers(game, position, false);
+            case ALL -> game.getRealPlayers();
+            default -> List.of();
+        };
         for (Player other : extraRecipients) {
             if (other.equals(player)) continue;
             LoreEffects.EffectResults otherResults =

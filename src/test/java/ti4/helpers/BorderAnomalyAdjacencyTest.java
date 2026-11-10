@@ -44,9 +44,9 @@ class BorderAnomalyAdjacencyTest extends BaseTi4Test {
         assertAdjacency("nebula", true, true);
     }
 
-    // The "not adjacent for other players" rule is not automated yet; a tether must stay neutral until it is.
+    // The tether only blocks with one-way adjacency on or in fog; VoidTetherAdjacencyTest covers those modes.
     @Test
-    void voidTetherBlocksNothing() {
+    void voidTetherBlocksNothingInNormalGames() {
         assertAdjacency("void_tether", true, true);
     }
 

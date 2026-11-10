@@ -2,6 +2,7 @@ package ti4.spring.api.webdata;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ti4.game.Game;
 import ti4.spring.context.RequestContext;
+import ti4.spring.security.FogGameAccess;
 import ti4.spring.service.gameevent.GameEventDto;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.website.model.WebGameState;
@@ -21,18 +23,34 @@ import ti4.website.model.WebGameState;
 public class GameWebDataController {
 
     private final GameWebDataService gameWebDataService;
+    private final FogWebDataService fogWebDataService;
     private final GameEventService gameEventService;
 
     @GetMapping(value = "/web-data", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> get(@PathVariable String gameName) {
+    public ResponseEntity<String> get(@PathVariable String gameName, @RequestParam(required = false) String viewAs) {
         Game game = RequestContext.getGame();
         if (game == null) {
             return ResponseEntity.notFound().build();
         }
         if (game.isFowMode()) {
-            return ResponseEntity.notFound().build();
+            return getFogWebData(game, viewAs);
         }
         return ResponseEntity.ok(gameWebDataService.getOrCompute(gameName));
+    }
+
+    private ResponseEntity<String> getFogWebData(Game game, String viewAs) {
+        FogGameAccess access = FogGameAccess.forCurrentUser(game);
+        return switch (access.role()) {
+            case ANONYMOUS -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            case OUTSIDER -> ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            case PLAYER ->
+                ResponseEntity.ok(fogWebDataService.forSeat(game, access.seat().getFaction()));
+            case GAME_MASTER ->
+                fogWebDataService
+                        .forGameMaster(game, viewAs)
+                        .map(ResponseEntity::ok)
+                        .orElseGet(() -> ResponseEntity.badRequest().build());
+        };
     }
 
     @GetMapping(value = "/game-state", produces = MediaType.APPLICATION_JSON_VALUE)

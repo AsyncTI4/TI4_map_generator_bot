@@ -202,6 +202,30 @@ public class UnitModelValueInjectionService {
                 injectedUnit = addLightrailOrdnanceAttributes(injectedUnit, pds);
             }
         }
+        UnitModel openSourceProfile = Mapper.getUnit(player.getGame().getStoredValue("theodisiOpenSourceRoboticsUnit"));
+        if (ButtonHelper.isLawInPlay(player.getGame(), "opensourcerobotics")
+                && openSourceProfile != null
+                && unit.getUnitType() == openSourceProfile.getUnitType()) {
+            if (injectedUnit == unit) injectedUnit = copyUnit(unit);
+            String openSourceAbility = openSourceProfile.getAbility().orElse("");
+            String openSourceLabel = "**Open Source Robotics — " + openSourceProfile.getName() + "**";
+            injectedUnit.setName(unit.getName() + " | " + openSourceProfile.getName());
+            injectedUnit.setAbility(
+                    openSourceAbility.isBlank() ? openSourceLabel : openSourceLabel + "\n" + openSourceAbility);
+            injectedUnit.setProductionValue(openSourceProfile.getProductionValue());
+            injectedUnit.setCapacityValue(openSourceProfile.getCapacityValue());
+            injectedUnit.setSustainDamage(openSourceProfile.getSustainDamage());
+            injectedUnit.setPlanetaryShield(openSourceProfile.getPlanetaryShield());
+            injectedUnit.setDeepSpaceCannon(openSourceProfile.getDeepSpaceCannon());
+            injectedUnit.setDisablesPlanetaryShield(openSourceProfile.getDisablesPlanetaryShield());
+            injectedUnit.setCanBeDirectHit(openSourceProfile.getCanBeDirectHit());
+            injectedUnit.setAfbDieCount(openSourceProfile.getAfbDieCount());
+            injectedUnit.setAfbHitsOn(openSourceProfile.getAfbHitsOn());
+            injectedUnit.setBombardDieCount(openSourceProfile.getBombardDieCount());
+            injectedUnit.setBombardHitsOn(openSourceProfile.getBombardHitsOn());
+            injectedUnit.setSpaceCannonDieCount(openSourceProfile.getSpaceCannonDieCount());
+            injectedUnit.setSpaceCannonHitsOn(openSourceProfile.getSpaceCannonHitsOn());
+        }
         return injectedUnit;
     }
 
@@ -409,7 +433,7 @@ public class UnitModelValueInjectionService {
         }
 
         if (player.hasAbility("destroyer_customrig") && "destroyer".equalsIgnoreCase(unit.getBaseType())) {
-            integers.combatHitsOn(-2);
+            integers.combatHitsOn(-1);
         }
 
         if (player.hasRelic("salvage_war_sun") && unit.getUnitType() == UnitType.Warsun) {
@@ -520,6 +544,10 @@ public class UnitModelValueInjectionService {
             integers.spaceCannonDieCount(2);
             integers.spaceCannonHitsOn(
                     Math.max(1, 10 - ButtonHelper.getNumberOfUnitsOnTheBoard(player.getGame(), player, "pds", false)));
+        }
+
+        if (player.hasUnlockedBreakthrough("choirbt") && unit.getCapacityValue() > 0 && unit.getIsShip()) {
+            booleans.sustainDamage(true);
         }
 
         return UnitValueInjection.of(integers, floats, booleans);

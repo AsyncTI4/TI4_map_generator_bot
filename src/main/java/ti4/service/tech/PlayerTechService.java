@@ -16,6 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
@@ -56,6 +59,7 @@ import ti4.helpers.PatternHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.helpers.thundersedge.DSHelperBreakthroughs;
@@ -104,6 +108,17 @@ import ti4.spring.service.gameevent.TurnActionLog;
 public class PlayerTechService {
 
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
+        String resolvedTechId = AliasHandler.resolveTech(techID);
+        if (player.hasAbility("forbidden_knowledge")
+                && !player.hasTech(resolvedTechId)
+                && ArcanumPrimordialTechHandler.isPrimordialTechnology(resolvedTechId)
+                && !ArcanumPrimordialTechHandler.canGainPrimordialTechnology(player, resolvedTechId)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    player.getRepresentationNoPing()
+                            + " cannot gain that primordial technology until they own 4 technologies of its color.");
+            return;
+        }
         boolean gainedTech = !player.hasTech(techID);
         player.addTech(techID);
         BlueReverieHelper.checkXinHarmony(game, player);
@@ -239,6 +254,7 @@ public class PlayerTechService {
     public static void exhaustTechAndResolve(
             GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         String pos = "";
+        String hyphalMigrationTarget = "";
         if (tech.contains("dskortg")) {
             String[] splitTech = tech.split("_");
             if (splitTech.length > 1) {
@@ -249,6 +265,10 @@ public class PlayerTechService {
         if (tech.startsWith("aws_")) {
             pos = tech.substring("aws_".length());
             tech = "aws";
+        }
+        if (tech.startsWith("bebloomg_")) {
+            hyphalMigrationTarget = tech.substring("bebloomg_".length());
+            tech = "bebloomg";
         }
         String inf = "";
         if (tech.contains("_inf") && tech.contains("absol_aida")) {
@@ -288,6 +308,13 @@ public class PlayerTechService {
                     event.getMessageChannel(), "No system without planets is available for _Power Word: Plane Shift_.");
             return;
         }
+        if ("bebloomg".equals(tech)
+                && !hyphalMigrationTarget.isEmpty()
+                && event instanceof ButtonInteractionEvent buttonEvent
+                && !canResolveHyphalMigration(game, player, hyphalMigrationTarget)) {
+            deleteIfButtonEvent(buttonEvent);
+            return;
+        }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology "
                 + techModel.getRepresentation(false) + ".";
         game.setStoredValue(
@@ -318,6 +345,13 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "bedeepg" -> DeepTechHandler.resolveItLooksBack(event, game, player);
+            case "bebloomg" -> {
+                if (event instanceof ButtonInteractionEvent buttonEvent && !hyphalMigrationTarget.isEmpty()) {
+                    BloomTechHandler.resolveHyphalMigration(buttonEvent, game, player, hyphalMigrationTarget);
+                    deleteIfButtonEvent(buttonEvent);
+                }
+            }
             case "ththurvialig" -> {
                 ThurvialiTechHandler.resolveRestructuring(game, player);
                 deleteTheOneButtonIfButtonEvent(event);
@@ -486,9 +520,10 @@ public class PlayerTechService {
             case "tf-singularitypoint" -> {
                 deleteTheOneButtonIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
+                Adjacency adjacency = Adjacency.of(game, player).withSelf();
                 for (Tile tile : game.getTileMap().values()) {
                     boolean adjToUnits = false;
-                    for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                    for (String pos2 : adjacency.into(tile.getPosition())) {
                         Tile tile2 = game.getTileByPosition(pos2);
                         if (tile2.containsPlayersUnits(player)) {
                             adjToUnits = true;
@@ -755,6 +790,9 @@ public class PlayerTechService {
                         pdsPlanets);
                 ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
             }
+            case "bedeepy" -> {
+                DeepTechHandler.startAbyssalGenesis(event, game, player);
+            }
             default ->
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(), "> This technology is not automated. Please resolve manually.");
@@ -821,6 +859,14 @@ public class PlayerTechService {
         if (event instanceof ButtonInteractionEvent) {
             ((ComponentInteraction) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    private static boolean canResolveHyphalMigration(Game game, Player player, String hyphalMigrationTarget) {
+        String[] payload = hyphalMigrationTarget.split("\\|", 3);
+        Player committer = payload.length == 3 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
+        Tile destination = payload.length == 3 ? game.getTileByPosition(payload[1]) : null;
+        String planetName = payload.length == 3 ? payload[2] : null;
+        return BloomTechHandler.canResolveHyphalMigration(game, player, committer, destination, planetName);
     }
 
     private static void sendNextActionButtonsIfButtonEvent(
@@ -901,6 +947,7 @@ public class PlayerTechService {
         if (isResearch) {
             MonumentsTEButtonHandler.offerEpiphanyResearchButtons(game, player, techM);
             VyserixLeaderHandler.resolveCommanderOnResearch(game, player, techM);
+            MigoAbilityHandler.offerCerebralArchive(game, player, techM);
         }
         if (player.hasTech("dxa_br") && !player.hasTechReady("dxa_br")) {
             player.refreshTech("dxa_br");

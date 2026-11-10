@@ -82,7 +82,7 @@ public class MapJsonIOService {
                 // custom hyperlane string if present
                 String custom = game.getCustomHyperlaneData().get(tile.getPosition());
                 if (custom != null) {
-                    t.setCustomHyperlaneString(custom);
+                    t.setCustomHyperlaneString(CustomHyperlaneService.toTypedMatrix(custom));
                 }
 
                 // border anomalies
@@ -181,10 +181,11 @@ public class MapJsonIOService {
         }
     }
 
-    // Package-private for tests — allows calling directly with a JSON string and an in-memory
-    // Game, without needing a fake ModalInteractionEvent/URL fetch.
-    static void importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
+    // Takes the JSON string directly, so tests can call it with an in-memory Game, without needing a
+    // fake ModalInteractionEvent/URL fetch.
+    public static boolean importMapFromJson(Game game, String jsonString, MessageChannel feedbackChannel) {
         StringBuilder errorSb = new StringBuilder();
+        boolean imported = false;
         try {
             MapDataIO mapData = mapper.readValue(jsonString, MapDataIO.class);
 
@@ -241,6 +242,7 @@ public class MapJsonIOService {
                         .append('\n');
             }
 
+            imported = true;
             MessageHelper.sendMessageToChannel(feedbackChannel, "Map imported from JSON.");
             MessageHelper.sendMessageToChannelWithButtons(
                     feedbackChannel,
@@ -257,6 +259,7 @@ public class MapJsonIOService {
             MessageHelper.sendMessageToChannel(
                     feedbackChannel, "Some parts of the map did not import cleanly:\n" + errorSb);
         }
+        return imported;
     }
 
     private static boolean handleTile(TileIO tileIO, Game game, StringBuilder sb) {
@@ -290,11 +293,9 @@ public class MapJsonIOService {
         for (String token : tileIO.getTokens()) {
             Tile tile = game.getTileByPosition(tileIO.getPosition());
             String tokenFileName = token;
-            String tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
-            if (tokenPath == null) {
+            if (!ImageResources.hasTokenImage(tokenFileName)) {
                 tokenFileName = Mapper.getTokenID(token);
-                tokenPath = ImageResources.tokenOrAttachment(tokenFileName);
-                if (tokenPath == null) {
+                if (!ImageResources.hasTokenImage(tokenFileName)) {
                     appendError(sb, tileIO, "Token not found: " + token);
                     continue;
                 }
@@ -411,7 +412,8 @@ public class MapJsonIOService {
         }
 
         for (LoreIO io : entries) {
-            if (io == null || StringUtils.isBlank(io.getLoreText())) continue;
+            if (io == null || (StringUtils.isBlank(io.getLoreText()) && StringUtils.isBlank(io.getFooterText())))
+                continue;
 
             // One entry's failure — expected (bad enum) or not (any other exception) — must not
             // stop the rest of this target's entries, or the target after it, from importing.
@@ -521,6 +523,17 @@ public class MapJsonIOService {
         private Map<String, List<LoreIO>> phaseLore;
         private Map<String, String> galaxies;
         private Integer sectorGap;
+        private List<SectorListIO> sectors;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SectorListIO {
+        private String name;
+        private List<String> positions;
+        private String type;
+        private String centre;
+        private Integer distance;
     }
 
     @Data

@@ -138,14 +138,13 @@ final class LeaderCards {
     }
 
     private static void drawPips(Graphics2D g2, Leader leader, boolean isExhaustedLocked, int x, int y) {
-        String pipID =
-                switch (leader.getType()) {
-                    case Constants.AGENT -> "i";
-                    case Constants.COMMANDER -> "ii";
-                    case Constants.HERO -> "iii";
-                    case Constants.ENVOY -> "agenda";
-                    default -> "";
-                };
+        String pipID = switch (leader.getType()) {
+            case Constants.AGENT -> "i";
+            case Constants.COMMANDER -> "ii";
+            case Constants.HERO -> "iii";
+            case Constants.ENVOY -> "agenda";
+            default -> "";
+        };
         if (pipID.isEmpty()) {
             return;
         }
@@ -171,7 +170,7 @@ final class LeaderCards {
             }
             Leader commander = other.unsafeGetLeader(Constants.COMMANDER);
             if (commander != null) {
-                drawBorrowedCommander(ctx, other, commander, "pa_leaders_imperia", x + deltaX, y);
+                drawBorrowedCommander(ctx, player, other, commander, "pa_leaders_imperia", x + deltaX, y);
                 deltaX += CARD_STEP;
             }
         }
@@ -186,7 +185,7 @@ final class LeaderCards {
             }
             Leader commander = game.getRevenantLichCommander(lichPoolOwner, other);
             if (commander != null) {
-                drawBorrowedCommander(ctx, other, commander, "pa_leaders_lich", x + deltaX, y);
+                drawBorrowedCommander(ctx, lichPoolOwner, other, commander, "pa_leaders_lich", x + deltaX, y);
                 deltaX += CARD_STEP;
             }
         }
@@ -194,10 +193,16 @@ final class LeaderCards {
     }
 
     private static void drawBorrowedCommander(
-            PlayerAreaContext ctx, Player owner, Leader commander, String overlayPrefix, int x, int y) {
+            PlayerAreaContext ctx,
+            Player areaOwner,
+            Player owner,
+            Leader commander,
+            String overlayPrefix,
+            int x,
+            int y) {
         Graphics2D g2 = ctx.g2();
         String status = commander.isLocked() ? "_exh" : "_rdy";
-        if (ctx.hidesStatsOf(owner)) {
+        if (ctx.hidesStatsInArea(areaOwner, owner)) {
             CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, "Commander", HIDDEN_COMMANDER_TEXT);
         } else {
             CardRect.draw(ctx, x - 2, y - 2, CardRect.WIDTH, CardRect.HEIGHT, Mapper.getLeader(commander.getId()));

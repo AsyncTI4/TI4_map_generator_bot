@@ -32,9 +32,11 @@ import ti4.discord.interactions.commands.homebrew.HomebrewCommand;
 import ti4.discord.interactions.commands.lazax.LazaxCommand;
 import ti4.discord.interactions.commands.leaders.LeaderCommand;
 import ti4.discord.interactions.commands.map.MapCommand;
+import ti4.discord.interactions.commands.megagame.MegagameCommand;
 import ti4.discord.interactions.commands.milty.MiltyCommand;
 import ti4.discord.interactions.commands.planet.PlanetCommand;
 import ti4.discord.interactions.commands.player.PlayerCommand;
+import ti4.discord.interactions.commands.player.PlayerCommand2;
 import ti4.discord.interactions.commands.plot.FrankenCommand2;
 import ti4.discord.interactions.commands.relic.RelicCommand;
 import ti4.discord.interactions.commands.rules.RulesCommand;
@@ -112,6 +114,7 @@ public class SlashCommandManager {
                     new BothelperCommand(),
                     new BothelperCommand2(),
                     new PlayerCommand(),
+                    new PlayerCommand2(),
                     new GameCommand(),
                     new ACCardsCommand(),
                     new PNCardsCommand(),
@@ -123,6 +126,7 @@ public class SlashCommandManager {
                     new Special2Command(),
                     new LeaderCommand(),
                     new HomebrewCommand(),
+                    new MegagameCommand(),
                     new CombatCommand(),
                     new CustomCommand(),
                     new FOWCommand(),

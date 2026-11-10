@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -34,6 +35,7 @@ import ti4.service.player.RefreshCardsService;
 public class StatusCleanupService {
 
     public void runStatusCleanup(Game game) {
+        ChoirAbilityHandler.snapshotDeathsRefrainDamagedUnits(game);
         game.removeStoredValue("deflectedSC");
         game.removeStoredValue("pharadnPNUsed");
         game.removeStoredValue("willParticipateInSplice");
@@ -105,6 +107,9 @@ public class StatusCleanupService {
         }
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+
+            game.removeStoredValue("theodisiMinisterRelationsExhausted_" + player.getFaction());
+            game.removeStoredValue("theodisiSeatOfPowerExhausted_" + player.getFaction());
 
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
@@ -192,6 +197,7 @@ public class StatusCleanupService {
             ListPlayerInfoService.displayerScoringProgression(game, true, tableTalkChannel, "both");
         }
         game.clearAllEmptyStoredValues();
+        ChoirAbilityHandler.offerDeathsRefrain(game);
         if (game.isErwansGambitMode()) {
             Player mentak = game.getPlayerFromColorOrFaction("mentak");
             if (mentak != null && mentak.isRealPlayer()) {

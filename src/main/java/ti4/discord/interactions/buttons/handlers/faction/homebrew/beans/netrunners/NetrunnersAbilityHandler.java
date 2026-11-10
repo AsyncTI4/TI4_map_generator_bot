@@ -128,7 +128,7 @@ public class NetrunnersAbilityHandler {
         }
         player.removeDebtTokens(tokenOwner.getColor(), 1, Constants.NETRUNNERS_DEBT_POOL);
         game.removeStoredValue(PROXY_NETWORK_TARGET + player.getFaction());
-        PlayerTechService.getTech(game, player, event, "getTech_" + techID);
+        PlayerTechService.getTech(game, player, event, "getTech_" + techID + "__res__comp");
     }
 
     @ButtonHandler(PROXY_NETWORK_TECH_NAV)

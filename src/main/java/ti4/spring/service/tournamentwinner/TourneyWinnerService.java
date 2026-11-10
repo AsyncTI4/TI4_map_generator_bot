@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Service;
 import ti4.discord.JdaService;
-import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.game.persistence.DatabasePersistenceGate;
 
 @AllArgsConstructor
 @Service

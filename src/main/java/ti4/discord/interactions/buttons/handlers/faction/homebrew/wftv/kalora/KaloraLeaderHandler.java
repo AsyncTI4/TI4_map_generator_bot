@@ -9,7 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.FoWHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
@@ -36,7 +36,7 @@ public class KaloraLeaderHandler {
         if (!game.getStoredValue(guardKey).isEmpty()) return;
         game.setStoredValue(guardKey, "true");
         try {
-            for (String adjacentPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
+            for (String adjacentPos : Adjacency.of(game, player).forEffects().into(tile.getPosition())) {
                 Tile adjacentTile = game.getTileByPosition(adjacentPos);
                 if (adjacentTile == null) continue;
                 Map<Pair<UnitModel, UnitHolder>, Integer> adjacentUnits =

@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -21,9 +22,9 @@ class ArmsDealAcd2ButtonHandler {
     @ButtonHandler("resolveArmsDeal")
     public static void resolveArmsDeal(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-
+        Set<Player> neighbours = player.getAbilityNeighbours();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player || !player.getNeighbouringPlayers(true).contains(p2)) {
+            if (p2 == player || !neighbours.contains(p2)) {
                 continue;
             }
             buttons.add(FoWHelper.fogSafeTargetButton("armsDealStep2_" + p2.getFaction(), "gray", p2));

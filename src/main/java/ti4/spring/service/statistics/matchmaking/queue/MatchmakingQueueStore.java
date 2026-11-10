@@ -14,7 +14,7 @@ import ti4.settings.users.UserSettingsManager;
 
 @Service
 @AllArgsConstructor
-public class MatchmakingQueueStore {
+class MatchmakingQueueStore {
 
     private final MatchmakingQueuePartyRepository partyRepository;
     private final MatchmakingQueueMemberRepository memberRepository;

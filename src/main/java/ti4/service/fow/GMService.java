@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -33,6 +34,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.helpers.adjacency.AdjacencyPurpose;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -93,12 +95,14 @@ public final class GMService {
     }
 
     public static TextChannel getGMChannel(Game game) {
-        List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
-        return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
+        TextChannel gmRoom = gmRoomOrNull(game);
+        return gmRoom == null ? game.getMainGameChannel() : gmRoom;
     }
 
     public static TextChannel gmRoomOrNull(Game game) {
-        List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
+        Guild guild = game.getGuild();
+        if (guild == null) return null;
+        List<TextChannel> channels = guild.getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? null : channels.getFirst();
     }
 
@@ -351,7 +355,7 @@ public final class GMService {
 
         StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
-        for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
+        for (Player player : FoWHelper.getAdjacentPlayers(game, position, false, AdjacencyPurpose.VISION)) {
             sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append('\n');
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

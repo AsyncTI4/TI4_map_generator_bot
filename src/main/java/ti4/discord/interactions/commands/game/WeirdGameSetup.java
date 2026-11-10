@@ -20,9 +20,11 @@ import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.FogPreset;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.game.MonumentsService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.TEOptionService;
 import ti4.service.tigl.TiglSetupService;
@@ -51,10 +53,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
                 Constants.NO_FRACTURE,
                 "True to stop The Fracture ever entering play in TE games."));
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.CC_LIMIT,
-                        "Command token limit each player should have, default 16.")
-                .setRequiredRange(0, 99));
+                OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(
@@ -79,12 +78,16 @@ public class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MONUMENTS_MODE, "True to enable Monuments+"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
+                Constants.SECRETS_ONLY_MODE,
+                "True to enable Secrets Only (Fog of War homebrew: no public objectives, recycled secrets, 10 VP)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
                 "True to enable RiftSet mode (only for Eronous)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.FOW_PLUS.toString(),
-                "True to enable FoW+ Mode (only in Fog of War games)"));
+                "True to enable FoW+ (fog games only; also in /fow fow_options)"));
     }
 
     @Override
@@ -95,7 +98,10 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (communityMode != null) game.setCommunityMode(communityMode);
 
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
-        if (fowMode != null) game.setFowMode(fowMode);
+        if (fowMode != null) {
+            game.setFowMode(fowMode);
+            if (fowMode) suggestFullFogSetup(event, game);
+        }
 
         Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
         if (tfMode != null) {
@@ -184,6 +190,14 @@ public class WeirdGameSetup extends GameStateSubcommand {
             }
         }
 
+        Boolean secretsOnlyMode = event.getOption(Constants.SECRETS_ONLY_MODE, null, OptionMapping::getAsBoolean);
+        if (Boolean.TRUE.equals(secretsOnlyMode) && !game.isFowMode()) {
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Secrets Only can only be used in Fog of War games. It was not enabled.");
+        } else if (secretsOnlyMode != null) {
+            SecretsOnlyService.setActive(event, game, secretsOnlyMode);
+        }
+
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
 
@@ -216,7 +230,7 @@ public class WeirdGameSetup extends GameStateSubcommand {
         }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
-        if (riftsetMode != null && game.isFowMode()) {
+        if (Boolean.TRUE.equals(riftsetMode) && game.isFowMode()) {
             RiftSetModeService.activate(event, game);
         }
 
@@ -224,6 +238,18 @@ public class WeirdGameSetup extends GameStateSubcommand {
         if (fowPlus != null && game.isFowMode()) {
             FOWPlusService.setActive(game, fowPlus);
         }
+    }
+
+    private static void suggestFullFogSetup(SlashCommandInteractionEvent event, Game game) {
+        if (game.getGuild() == null || GMService.gmRoomOrNull(game) != null) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Fog of War is on, but this game has no GM room and no fog preset yet. For a full fog setup"
+                        + " (GM room, Standard preset, setup wizard) use `/fow create_fow_game_button` instead."
+                        + " To keep this game, you can still apply a preset here.",
+                List.of(Buttons.blue("fowPresetPreview_" + FogPreset.STANDARD.getId(), "Preview Standard preset")));
     }
 
     /** Extracted so non-slash-command callers (e.g. the FoW setup wizard) can toggle Thunder's Edge mode. */

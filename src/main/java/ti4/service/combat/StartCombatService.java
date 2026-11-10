@@ -32,6 +32,10 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMora
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -98,6 +102,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
@@ -735,6 +740,18 @@ public class StartCombatService {
                             threadChannel,
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+                }
+                if (ButtonHelper.doesPlayerHaveFSHere("migo_flagship", player2, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
+                }
+                if (ButtonHelper.doesPlayerHaveFSHere("migo_flagship", player1, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
                 }
             }
         }
@@ -1648,6 +1665,7 @@ public class StartCombatService {
     }
 
     private static boolean hasCendos(Player player, Tile tile) {
+        if (!player.hasUnit("tk-cendos")) return false;
         int nonFighterShips = 0;
         boolean hasDestroyer = false;
         for (UnitKey unit : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
@@ -1655,11 +1673,11 @@ public class StartCombatService {
             if (unit.unitType() == UnitType.Destroyer) {
                 hasDestroyer = true;
             }
-            if (model.isNonFighterShip()) {
+            if (model != null && model.isNonFighterShip()) {
                 nonFighterShips += tile.getSpaceUnitHolder().getUnitCount(unit);
             }
         }
-        return player.hasUnit("tk-cendos") && hasDestroyer && nonFighterShips >= 3;
+        return hasDestroyer && nonFighterShips >= 3;
     }
 
     private static List<Button> getStartOfSpaceCombatButtons(Game game, Player p1, Player p2, Tile tile) {
@@ -1870,11 +1888,21 @@ public class StartCombatService {
         if (isSpaceCombat) {
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p2, p1, tile);
+            ChoirTechHandler.addOblivionsEchoCombatButton(buttons, game, p1, p2, tile);
+            ChoirTechHandler.addOblivionsEchoCombatButton(buttons, game, p2, p1, tile);
         }
 
         if (isGroundCombat) {
+            ChoirUnitHandler.addElegyCombatButton(buttons, game, p1, tile);
+            ChoirUnitHandler.addElegyCombatButton(buttons, game, p2, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
+            if (combatHolder instanceof Planet planet) {
+                BloomStrainHandler.addCarnivorousActiveButton(buttons, game, p1, planet, tile);
+                if (p2 != p1) {
+                    BloomStrainHandler.addCarnivorousActiveButton(buttons, game, p2, planet, tile);
+                }
+            }
             XinUnitHandler.addSentinelRepairButton(buttons, p1, tile, combatHolder);
             XinUnitHandler.addSentinelRepairButton(buttons, p2, tile, combatHolder);
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p1, tile);
@@ -1941,6 +1969,8 @@ public class StartCombatService {
         OblivionTechHandler.addOblivionCannonButton(buttons, game, p2, p1, tile, isSpaceCombat);
         RevenantLeadersHandler.addRevKryxosHeroButton(buttons, game, p1, p2, tile, isSpaceCombat);
         RevenantLeadersHandler.addRevKryxosHeroButton(buttons, game, p2, p1, tile, isSpaceCombat);
+        ChoirLeadersHandler.addFuneralProcessionButton(buttons, game, p1, p2, tile, isSpaceCombat);
+        ChoirLeadersHandler.addFuneralProcessionButton(buttons, game, p2, p1, tile, isSpaceCombat);
         checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
@@ -2083,12 +2113,14 @@ public class StartCombatService {
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
                 buttons.add(ExhaustOnlyAgents.THUNDARIAN.button(agentHolder));
             }
+            // TODO: Franken: with two flagships, should every flagship tile count here, not only getFirst()?
             List<Tile> flagshipTile =
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
-            if (agentHolder.hasUnit("empyrean_flagship")
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnit("empyrean_flagship")
                     && !flagshipTile.isEmpty()
-                    && FoWHelper.getAdjacentTiles(game, pos, agentHolder, false, true)
-                            .contains(flagshipTile.getFirst().getPosition())) {
+                    && Adjacency.of(game, agentHolder)
+                            .isAdjacent(flagshipTile.getFirst().getPosition(), pos)) {
                 buttons.add(Buttons.gray(
                         factionChecker + "empyreanFlagshipAbilityStep1_" + pos,
                         "Use Empyrean Flagship Ability",

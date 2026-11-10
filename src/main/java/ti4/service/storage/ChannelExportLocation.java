@@ -6,8 +6,11 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -18,6 +21,8 @@ public record ChannelExportLocation(Path exportsRoot, String channelId, String e
     private static final Pattern ANSI_ESCAPE = Pattern.compile("\u001B\\[[;?0-9]*[A-Za-z]");
     private static final Pattern STACK_FRAME = Pattern.compile("(?m)^[ \\t]+at .*(?:\\R|$)");
     private static final Pattern EXPORT_ID = Pattern.compile("[0-9A-Za-z_-]+");
+    private static final Pattern EXPORT_FILE =
+            Pattern.compile("([0-9A-Za-z_-]+)\\.(?:log|request|running|failed|cancelled|paused|done|tar\\.gz)");
 
     public static boolean isValidExportId(String exportId) {
         return exportId != null && EXPORT_ID.matcher(exportId).matches();
@@ -30,6 +35,34 @@ public record ChannelExportLocation(Path exportsRoot, String channelId, String e
                     .filter(Files::isDirectory)
                     .map(directory -> new ChannelExportLocation(
                             exportsRoot, directory.getFileName().toString(), exportId))
+                    .filter(ChannelExportLocation::exists)
+                    .toList();
+        }
+    }
+
+    public static List<ChannelExportLocation> findAll(Path exportsRoot) throws IOException {
+        if (!Files.isDirectory(exportsRoot)) return List.of();
+        List<ChannelExportLocation> found = new ArrayList<>();
+        try (Stream<Path> channelDirectories = Files.list(exportsRoot)) {
+            for (Path directory : channelDirectories.filter(Files::isDirectory).toList()) {
+                found.addAll(findInChannelDirectory(exportsRoot, directory));
+            }
+        }
+        found.sort(Comparator.comparing(ChannelExportLocation::exportId)
+                .thenComparing(ChannelExportLocation::channelId)
+                .reversed());
+        return found;
+    }
+
+    private static List<ChannelExportLocation> findInChannelDirectory(Path exportsRoot, Path directory)
+            throws IOException {
+        String channelId = directory.getFileName().toString();
+        try (Stream<Path> files = Files.list(directory)) {
+            return files.map(file -> EXPORT_FILE.matcher(file.getFileName().toString()))
+                    .filter(Matcher::matches)
+                    .map(matcher -> matcher.group(1))
+                    .distinct()
+                    .map(exportId -> new ChannelExportLocation(exportsRoot, channelId, exportId))
                     .filter(ChannelExportLocation::exists)
                     .toList();
         }

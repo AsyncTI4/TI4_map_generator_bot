@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.explore.bluereverie.BlueReverieExploreHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
@@ -824,6 +826,9 @@ public class ExploreService {
                         StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
                     }
                     game.purgeExplore(ogID);
+                    if (StringUtils.containsIgnoreCase(exploreModel.getText(), "purge this card")) {
+                        DeepAbilityHandler.offerEnergySiphon(player);
+                    }
                 }
             }
         }
@@ -899,9 +904,21 @@ public class ExploreService {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 5 action cards.");
                 }
             }
-            case "dv1", "dv2" -> {
-                message = new StringBuilder("Drew a secret objective.");
-                game.drawSecretObjective(player.getUserID());
+            case "dv1",
+                    "dv2",
+                    "sodossierc1",
+                    "sodossierc2",
+                    "sodossierh1",
+                    "sodossierh2",
+                    "sodossieri1",
+                    "sodossieri2",
+                    "sodossierf1",
+                    "sodossierf2" -> {
+                boolean drew = game.drawSecretObjective(player.getUserID()) != null;
+                message = new StringBuilder(
+                        drew
+                                ? "Drew a secret objective."
+                                : "Could not draw a secret objective: no drawable secret objective is left in the deck.");
                 if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, message.toString());
                 }
@@ -1543,6 +1560,7 @@ public class ExploreService {
                                         adjacentTile.getPlanetUnitHolders().size())
                                 .sum();
 
+                // TODO: the card says "in, or adjacent to"; should this be the sum rather than the max?
                 int highestPlanetCount = Math.max(planetsInSystem, planetsInAdjacentSystems);
 
                 player.gainCommodities(highestPlanetCount);
@@ -1626,6 +1644,7 @@ public class ExploreService {
             }
             case "localinstability" -> {
                 game.purgeExplore("localinstability");
+                DeepAbilityHandler.offerEnergySiphon(player);
                 List<Button> buttons = new ArrayList<>();
                 if (!tile.hasIngress()) {
                     buttons.add(Buttons.green(
@@ -1676,6 +1695,7 @@ public class ExploreService {
             }
             case "materialcache" -> {
                 game.purgeExplore("materialcache");
+                DeepAbilityHandler.offerEnergySiphon(player);
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "gainComms_3", "Gain 3 Commodities", MiscEmojis.comm));
@@ -1689,6 +1709,7 @@ public class ExploreService {
             }
             case "fallenempire" -> {
                 game.purgeExplore("fallenempire");
+                DeepAbilityHandler.offerEnergySiphon(player);
                 List<Button> buttons = new ArrayList<>();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetID, game);
 
@@ -1710,6 +1731,7 @@ public class ExploreService {
             }
             case "retiredadventurers" -> {
                 game.purgeExplore("retiredadventurers");
+                DeepAbilityHandler.offerEnergySiphon(player);
                 List<Button> buttons = BlueReverieExploreHandler.getRetiredAdventurersButtons(game, player);
                 if (buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannel(
@@ -1724,6 +1746,7 @@ public class ExploreService {
             }
             case "recoveredmemorycore" -> {
                 game.purgeExplore("recoveredmemorycore");
+                DeepAbilityHandler.offerEnergySiphon(player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation() + ", choose how to resolve _Recovered Memory Core_.",
@@ -1817,7 +1840,8 @@ public class ExploreService {
         boolean hasFrontierToken = space.getTokenList().contains(frontierFilename);
         boolean hasGhotiAnchorpointFrontier =
                 MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile);
-        if (hasFrontierToken || hasGhotiAnchorpointFrontier || force) {
+        boolean hasArbiterInSystem = DeepUnitHandler.hasArbiterInSystem(player, tile);
+        if (hasFrontierToken || hasGhotiAnchorpointFrontier || hasArbiterInSystem || force) {
             if (hasFrontierToken && !force) {
                 space.removeToken(frontierFilename);
             }
@@ -1833,6 +1857,10 @@ public class ExploreService {
                         player.getCorrectChannel(),
                         player.getRepresentationNoPing() + " put 1 commodity on _ATS Armaments_.");
             }
+            if (player.hasAbility("dark_matter_link")) {
+                DeepAbilityHandler.offerDarkMatterLink(player, tile);
+            }
+            DeepUnitHandler.offerNullDeploy(game, player);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No frontier token in given system.");
         }

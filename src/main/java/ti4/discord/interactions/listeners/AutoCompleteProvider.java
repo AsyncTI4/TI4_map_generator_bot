@@ -30,6 +30,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.search.FindService;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.discord.interactions.commands.uncategorized.ServerPromoteCommand;
+import ti4.discord.interactions.commands.user.SetFowFilter;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -393,8 +394,7 @@ class AutoCompleteProvider {
             }
             case Constants.FOG_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
+                List<Command.Choice> options = mapTo25ChoicesThatContain(SetFowFilter.filterLabels(), enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.PRIMARY_TILE_DIRECTION -> {
@@ -1006,7 +1006,10 @@ class AutoCompleteProvider {
                 try {
                     Player player = CommandHelper.getPlayerFromGame(
                             game, event.getMember(), event.getUser().getId());
-                    if (player != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
+                    if (player != null
+                            && (Constants.ABILITY_REMOVE.equals(subcommandName)
+                                    || Constants.ABILITY_READY.equals(subcommandName)
+                                    || Constants.ABILITY_EXHAUST.equals(subcommandName))) {
                         for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
                         }
@@ -1492,12 +1495,11 @@ class AutoCompleteProvider {
 
     private static void resolveFindAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
-        List<Command.Choice> options =
-                switch (optionName) {
-                    case Constants.SEARCH_TYPE -> FindService.autoCompleteType(event);
-                    case Constants.SOURCE -> FindService.autoCompleteSource(event);
-                    default -> Collections.emptyList();
-                };
+        List<Command.Choice> options = switch (optionName) {
+            case Constants.SEARCH_TYPE -> FindService.autoCompleteType(event);
+            case Constants.SOURCE -> FindService.autoCompleteSource(event);
+            default -> Collections.emptyList();
+        };
         event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

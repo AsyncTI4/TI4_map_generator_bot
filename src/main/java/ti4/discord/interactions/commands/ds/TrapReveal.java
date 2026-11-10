@@ -18,9 +18,7 @@ class TrapReveal extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID")
-                .setRequiredRange(0, 999)
-                .setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID").setRequired(true));
     }
 
     @Override

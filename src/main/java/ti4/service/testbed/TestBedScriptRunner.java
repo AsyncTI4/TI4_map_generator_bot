@@ -50,7 +50,7 @@ public final class TestBedScriptRunner {
     private static final int MAX_DETAIL = 160;
     private static final int SNAPSHOT_MESSAGES = 5;
     private static final Set<String> STATE_ONLY_ACTIONS =
-            Set.of("setStored", "removeStored", "actAs", "stackExplore", "removeToken", "setGameOption");
+            Set.of("setStored", "removeStored", "actAs", "stackExplore", "removeToken", "setGameOption", "placeTile");
 
     private enum Status {
         PASS,
@@ -497,6 +497,10 @@ public final class TestBedScriptRunner {
                 String problem = TestBedComponentService.removeToken(game, step.getKey(), step.getValue());
                 if (problem != null) problems.add(problem);
             }
+            case "placeTile" -> {
+                String problem = TestBedComponentService.placeTile(game, step.getKey(), step.getValue());
+                if (problem != null) problems.add(problem);
+            }
             case "setActivePlayer" -> {
                 Player seat = seat(game, step.getAs());
                 if (seat == null) {
@@ -561,12 +565,11 @@ public final class TestBedScriptRunner {
     private Status expect(int index, Step step) {
         Expect expect = step.getExpect();
         WaitMode mode = waitMode(expect);
-        Check check =
-                switch (mode) {
-                    case ONCE -> evaluate(expect);
-                    case UNTIL_PASS -> waitFor(() -> evaluate(expect), step);
-                    case UNTIL_QUIET -> waitForQuiet(() -> evaluate(expect), step);
-                };
+        Check check = switch (mode) {
+            case ONCE -> evaluate(expect);
+            case UNTIL_PASS -> waitFor(() -> evaluate(expect), step);
+            case UNTIL_QUIET -> waitForQuiet(() -> evaluate(expect), step);
+        };
         String actual = check.actual();
         if (!check.ok() && !check.hit() && mode != WaitMode.ONCE) {
             actual += "; game: " + TestBedWaitReasons.describe(current());

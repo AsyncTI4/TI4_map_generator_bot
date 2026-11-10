@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import ti4.game.Game;
-import ti4.game.SanityLimits;
 
 public enum MiscEmojis implements TI4Emoji {
     // Tokens
@@ -151,11 +150,11 @@ public enum MiscEmojis implements TI4Emoji {
     }
 
     public static String comm(int x) {
-        return comm.toString().repeat(SanityLimits.cap(x, SanityLimits.REPEATED_EMOJIS));
+        return comm.toString().repeat(x);
     }
 
     public static String tg(int x) {
-        return tg.toString().repeat(SanityLimits.cap(x, SanityLimits.REPEATED_EMOJIS));
+        return tg.toString().repeat(x);
     }
 
     @Override

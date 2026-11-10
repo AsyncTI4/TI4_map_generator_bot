@@ -7,13 +7,17 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesAbilityHandler;
 import ti4.draft.DraftCategory;
+import ti4.game.Planet;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -131,7 +135,7 @@ public class FrankenAbilityService {
                 player.addRelic("waxing_moonphase");
                 player.addRelic("waning_moonphase");
                 player.addRelic("full_moonphase");
-                player.addRelic("lunar_eclipse_moonphase");
+                player.addRelic("half_moonphase");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
@@ -160,6 +164,18 @@ public class FrankenAbilityService {
             }
             if ("custom_rigs".equalsIgnoreCase(abilityID)) {
                 ScrapyardAbilitiesHandler.getScrapyardRigsButtons(player.getGame(), player);
+            }
+            if ("harvest".equalsIgnoreCase(abilityID)) {
+                Tile tileHs = player.getHomeSystemTile();
+                for (Planet planet : tileHs.getPlanetUnitHolders()) {
+                    if (planet.getTechSpecialities().isEmpty()) {
+                        continue;
+                    }
+                    MigoAbilityHandler.onPlanetGained(player, planet.getName());
+                }
+            }
+            if ("origin_unknown".equalsIgnoreCase(abilityID)) {
+                DeepUnitHandler.offerFrankenSetup(player);
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());

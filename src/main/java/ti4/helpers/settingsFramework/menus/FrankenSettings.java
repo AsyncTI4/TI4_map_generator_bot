@@ -155,11 +155,10 @@ public class FrankenSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "startFranken" -> startDraft(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "startFranken" -> startDraft(event);
+            default -> null;
+        };
         return error == null ? "success" : error;
     }
 

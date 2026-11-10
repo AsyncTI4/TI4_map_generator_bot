@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import ti4.contest.replay.core.CombatCandidatePromotionStatus;
 import ti4.contest.replay.core.CombatCandidateStatus;
 import ti4.contest.replay.core.CombatContestReplayStatus;
@@ -51,6 +52,7 @@ public class CombatReplayPromotionService {
     private final CombatReplayLeaderboardService replayLeaderboardService;
     private final CombatReplayExecutionService replayExecutionService;
     private final CombatReplayDiscordPostService discordPostService;
+    private final TransactionTemplate transactionTemplate;
     private Clock clock = Clock.systemDefaultZone();
 
     public void promoteBestCandidateIfDue() {
@@ -242,7 +244,18 @@ public class CombatReplayPromotionService {
         }
     }
 
-    private CombatReplayContestEntity persistPromotedReplayContest(
+    CombatReplayContestEntity persistPromotedReplayContest(
+            CombatCandidateEntity winner,
+            LocalDateTime promotedAt,
+            TextChannel contestChannel,
+            Message posted,
+            ThreadChannel thread,
+            CombatReplayContestEntity existingContest) {
+        return transactionTemplate.execute(_ -> persistPromotedReplayContestInTransaction(
+                winner, promotedAt, contestChannel, posted, thread, existingContest));
+    }
+
+    private CombatReplayContestEntity persistPromotedReplayContestInTransaction(
             CombatCandidateEntity winner,
             LocalDateTime promotedAt,
             TextChannel contestChannel,

@@ -69,6 +69,7 @@ public class GameModeService {
                         Map.entry("Monuments+", game::isMonumentsMode),
                         Map.entry("Wild, Wild Galaxy", game::isWildWildGalaxyMode),
                         Map.entry("Feast or Famine", game::isFeastOrFamineMode),
+                        Map.entry("Secrets Only", game::isSecretsOnlyMode),
                         Map.entry("Zealous Orthodoxy", game::isZealousOrthodoxyMode),
                         Map.entry("Stellar Atomics", game::isStellarAtomicsMode),
                         Map.entry("No Support Swap", game::isNoSwapMode),

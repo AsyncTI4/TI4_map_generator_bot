@@ -172,11 +172,10 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "toggleAdvanced" -> toggleAdvanced(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "toggleAdvanced" -> toggleAdvanced(event);
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

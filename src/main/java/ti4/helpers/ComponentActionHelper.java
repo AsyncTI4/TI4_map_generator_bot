@@ -15,6 +15,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
@@ -173,28 +174,27 @@ public class ComponentActionHelper {
         for (BreakthroughModel bt : p1.getBreakthroughModels()) {
             if (bt != null && bt.getText().contains("ACTION:")) {
                 if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                    boolean validAction =
-                            switch (bt.getAlias()) {
-                                case "arborecbt" ->
-                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                                case "crimsonbt" -> true;
-                                case "mahactbt" -> !p1.getTechs().isEmpty();
-                                case "ardentiabt" ->
-                                    game.getRealPlayers().stream()
-                                            .anyMatch(otherPlayer -> otherPlayer != p1
-                                                    && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
-                                                            .isEmpty());
-                                case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
-                                case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
-                                case "stonebornbt", "stonebornbtunleashed" ->
-                                    !p1.getFragments().isEmpty();
-                                case "saarbt" ->
-                                    game.getTileMap().values().stream()
-                                            .filter(Tile::isAsteroidField)
-                                            .anyMatch(Tile.tileHasPlayerShips(p1));
-                                case "deepwroughtbt" -> true;
-                                default -> true;
-                            };
+                    boolean validAction = switch (bt.getAlias()) {
+                        case "arborecbt" ->
+                            game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                        case "crimsonbt" -> true;
+                        case "mahactbt" -> !p1.getTechs().isEmpty();
+                        case "ardentiabt" ->
+                            game.getRealPlayers().stream()
+                                    .anyMatch(otherPlayer -> otherPlayer != p1
+                                            && !ButtonHelper.getTilesWithYourCC(otherPlayer, game, event)
+                                                    .isEmpty());
+                        case "ashenbt" -> AshenBreakthroughHandler.hasEligibleTarget(game, p1);
+                        case "scrapyardbt" -> ScrapyardBreakthroughHandler.hasCapturedUnits(p1);
+                        case "stonebornbt", "stonebornbtunleashed" ->
+                            !p1.getFragments().isEmpty();
+                        case "saarbt" ->
+                            game.getTileMap().values().stream()
+                                    .filter(Tile::isAsteroidField)
+                                    .anyMatch(Tile.tileHasPlayerShips(p1));
+                        case "deepwroughtbt" -> true;
+                        default -> true;
+                    };
 
                     if (validAction) {
                         TI4Emoji btEmoji = bt.getFactionEmoji();
@@ -369,8 +369,8 @@ public class ComponentActionHelper {
         }
 
         // Relics
-        if (p1.hasRelicReady("new_moonphase")) {
-            compButtons.add(AeternaAbilityHandler.getNewMoonButton(p1));
+        if (p1.hasRelicReady("half_moonphase")) {
+            compButtons.add(AeternaAbilityHandler.getHalfMoonButton(p1));
         }
         boolean enigmaticSeen = false;
         for (String relic : p1.getRelics()) {
@@ -379,6 +379,7 @@ public class ComponentActionHelper {
                             "waxing_moonphase",
                             "waning_moonphase",
                             "new_moonphase",
+                            "half_moonphase",
                             "lunar_eclipse_moonphase")
                     .contains(relic)) {
                 continue;
@@ -448,6 +449,7 @@ public class ComponentActionHelper {
                                 Buttons.red(factionChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
                 }
+                // TODO: the relic id is stellarconverter; does this "no targets" check ever match?
                 if ("stellar_converter".equalsIgnoreCase(relic)
                         && ButtonHelper.getButtonsForStellar(p1, game).isEmpty()) {
                     continue;
@@ -706,7 +708,10 @@ public class ComponentActionHelper {
                             "sarcosaagent",
                             "stonebornagentdormant",
                             "stonebornagentunleashed",
-                            "ironagent");
+                            "ironagent",
+                            "bloomagent",
+                            "migoagent",
+                            "deepagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
@@ -1166,7 +1171,7 @@ public class ComponentActionHelper {
                                 + " has used to the _Total War_ ability to spend 10 commodities from their home planets to score 1 victory point."
                                 + " They have " + remaining + " commodit" + (remaining == 1 ? "y" : "ies")
                                 + " remaining.");
-                String customPOName = "Total War VPs (" + p1.getFaction() + ")";
+                String customPOName = game.customPONameFor(p1, "Total War VPs");
                 int vp = 1;
                 if (game.getCustomPublicVP().containsKey(customPOName)) {
                     vp = game.getCustomPublicVP().get(customPOName) + 1;
@@ -1228,7 +1233,7 @@ public class ComponentActionHelper {
         String reward = buttonID.split("_")[1];
         switch (reward) {
             case "vp" -> {
-                String customPOName = "Bounty VPs (" + p1.getFaction() + ")";
+                String customPOName = game.customPONameFor(p1, "Bounty VPs");
                 int vp = 1;
                 if (game.getCustomPublicVP().containsKey(customPOName)) {
                     vp = game.getCustomPublicVP().get(customPOName) + 1;
@@ -1486,6 +1491,7 @@ public class ComponentActionHelper {
                     }
                 } else {
                     ButtonHelperActionCards.resolveResearch(game, player, event);
+                    DeepAbilityHandler.offerEnergySiphon(player);
                 }
             }
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);

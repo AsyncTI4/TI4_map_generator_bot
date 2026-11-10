@@ -179,6 +179,9 @@ class ActionCardButtonHandler {
 
         if (sendReact) {
             recordCanceled(game, player, targetPlayer, acName, type);
+            if (targetPlayer != null) {
+                ActionCardPingButtonHandler.forgetPingedPlanet(game, targetPlayer);
+            }
             if (game.getGameStats().markLatestPlayCanceled(acName)) {
                 SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
                 if (acName.contains("Rider") || acName.contains("Sanction")) {

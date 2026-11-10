@@ -185,7 +185,7 @@ public class MatchmakingRatingEventService {
         return filterRatingsByUserIds(getCachedConservativePlayerRatings(), userIds);
     }
 
-    public Long getAverageDisplayRating(Collection<String> userIds) {
+    private Long getAverageDisplayRating(Collection<String> userIds) {
         if (userIds.isEmpty()) {
             return null;
         }

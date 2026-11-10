@@ -16,9 +16,12 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinHeroHandler;
@@ -237,6 +240,7 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "deephero" -> DeepLeadersHandler.resolveHero(event, game, player);
             case "stonebornherodormant" -> StonebornLeadersHandler.drawThreeRelicsAndOfferOne(game, player);
             case "stonebornherounleashed" -> {
                 MessageHelper.sendMessageToChannel(
@@ -320,6 +324,8 @@ public class PlayHeroService {
             case "ironhero" -> IronLeadersHandler.startAdmiralThalenHero(game, player);
             case "netrunnershero" -> NetrunnersLeadersHandler.startNetrunnersHero(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
+            case "migohero" -> MigoLeadersHandler.startMigoHero(event, game, player);
+            case "bloomhero" -> BloomLeadersHandler.startFungalBloom(event, game, player);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
             case "mirvedahero" -> {
@@ -757,7 +763,7 @@ public class PlayHeroService {
             }
             case "naazhero" -> {
                 RelicHelper.drawRelicAndNotify(player, event, game);
-                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
+                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)

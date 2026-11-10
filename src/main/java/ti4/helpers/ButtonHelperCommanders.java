@@ -27,6 +27,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -1081,7 +1082,8 @@ public class ButtonHelperCommanders {
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
 
-            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true, true)) {
+            for (String pos2 :
+                    Adjacency.of(game, player).forMovement().withSelf().into(tile.getPosition())) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 if (CommandCounterHelper.hasCC(event, player.getColor(), tile2)
                         && !game.isDominusOrb()

@@ -21,9 +21,7 @@ class SendTG extends GameStateSubcommand {
 
     public SendTG() {
         super(Constants.SEND_TG, "Send trade goods to player/faction", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count")
-                .setRequiredRange(1, 999)
-                .setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.TARGET_FACTION_OR_COLOR,

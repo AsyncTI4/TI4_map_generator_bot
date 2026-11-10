@@ -347,12 +347,12 @@ public class BotLogger {
 
         if (timeToNextMessage <= 0) {
             sendMessageToBotLogWebhook(message);
-        } else {
-            CronManager.scheduleOnce(
-                    BotLogger.class,
-                    () -> sendMessageToBotLogWebhook(message),
-                    timeToNextMessage,
-                    TimeUnit.MILLISECONDS);
+            return;
+        }
+        boolean scheduled = CronManager.scheduleOnce(
+                BotLogger.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
+        if (!scheduled) {
+            sendMessageToBotLogWebhook(message);
         }
     }
 
@@ -412,6 +412,10 @@ public class BotLogger {
 
     public static void logCron(String message) {
         LogBufferManager.addLogMessage(new CronEventLog(message));
+    }
+
+    public static void sendBufferedLogsToDiscord() {
+        LogBufferManager.sendBufferedLogsToDiscord();
     }
 
     public static void catchRestError(Throwable e) {

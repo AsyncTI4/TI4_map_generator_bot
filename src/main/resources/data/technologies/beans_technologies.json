@@ -178,7 +178,7 @@
         "requirements": "RY",
         "faction": "valhavn",
         "source": "beans",
-        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet or an adjacent planet.\nSPACE CANNON 4, PLANETARY SHIELD"
+        "text": "You may use this unit’s SPACE CANNON against ships in adjacent systems.\n\nDuring the “Commit Ground Forces” step of an invasion in this or an adjacent system, you may commit up to 1 ground force from this unit’s planet.\nSPACE CANNON 4, PLANETARY SHIELD"
     },
     {
         "alias": "bemigob",
@@ -201,5 +201,116 @@
         "faction": "migo",
         "source": "beans",
         "text": "After you exhaust a planet that has a technology specialty, you may exhaust this card to ready that planet."
+    },
+    {
+        "alias": "bedeepy",
+        "name": "Abyssal Genesis",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "deep",
+        "source": "beans",
+        "text": "Systems that contain no planets and your ships gain PRODUCTION 2 as if they were 1 of your units.\n\nACTION: Exhaust this card to produce up to 2 units in a system containing your ships."
+    },
+    {
+        "alias": "bedeepg",
+        "name": "It Looks Back",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "deep",
+        "source": "beans",
+        "text": "After 1 of your neighbors produces 1 or more units, you may exhaust this card to produce 1 unit of a type that player produced in 1 of your systems that contains a unit with PRODUCTION."
+    },
+    {
+        "alias": "bebloomg",
+        "name": "Hyphal Migration",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "bloom",
+        "source": "beans",
+        "text": "After another player commits units to a planet you do not control in or adjacent to a non-home system that contains one of your ground forces, you may exhaust this card to place 1 infantry from your reinforcements into coexistence on that planet."
+    },
+    {
+        "alias": "bebloomcr",
+        "name": "Zygomycete II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GYR",
+        "baseUpgrade": "cr2",
+        "faction": "bloom",
+        "source": "beans",
+        "text": "If the active system contains 1 or more of your coexisting units, this unit can move through systems that contain other players' ships. "
+    },
+    {
+        "alias": "bechoiry",
+        "name": "Tomb Resonance",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "choir",
+        "source": "beans",
+        "text": "**Lament**: When 1 or more of your units use their PRODUCTION ability, you may damage up to 2 ships in that system. Reduce the combined cost of the produced units by 1 for each ship damaged this way.\n**Requiem**: When 1 or more of your units use their PRODUCTION ability, you may repair up to 2 damaged ships in that system. Reduce the combined cost of the produced units by 1 for each ship repaired this way."
+    },
+    {
+        "alias": "bechoirylament",
+        "name": "Tomb Resonance",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "choir",
+        "source": "beans",
+        "text": "When 1 or more of your units use their PRODUCTION ability, you may damage up to 2 ships in that system. Reduce the combined cost of the produced units by 1 for each ship damaged this way."
+    },
+    {
+        "alias": "bechoiryrequiem",
+        "name": "Tomb Resonance",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "choir",
+        "source": "beans",
+        "text": "When 1 or more of your units use their PRODUCTION ability, you may repair up to 2 damaged ships in that system. Reduce the combined cost of the produced units by 1 for each ship repaired this way."
+    },
+    {
+        "alias": "bechoirr",
+        "name": "Oblivion's Echo",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "choir",
+        "source": "beans",
+        "text": "**Lament**: After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and choose 1 of your opponent's ships that is not damaged in the active system that has SUSTAIN DAMAGE and damage that ship.\n**Requiem**: After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and repair 1 of your other damaged ships in the active system. If you do, produce 1 hit against your opponent’s ships."
+    },
+    {
+        "alias": "bechoirrlament",
+        "name": "Oblivion's Echo",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "choir",
+        "source": "beans",
+        "text": "After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and choose 1 of your opponent's ships that is not damaged in the active system that has SUSTAIN DAMAGE and damage that ship."
+    },
+    {
+        "alias": "bechoirrrequiem",
+        "name": "Oblivion's Echo",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "choir",
+        "source": "beans",
+        "text": "After 1 of your ships uses its SUSTAIN DAMAGE ability, you may exhaust this card and repair 1 of your other damaged ships in the active system. If you do, produce 1 hit against your opponent’s ships."
     }
 ]

@@ -36,8 +36,7 @@ class LegacyAgentFallThroughGuardTest extends BaseTi4Test {
             "lumerisagent",
             "psmagent",
             "uchoiragent",
-            "zooidagent",
-            "migoagent");
+            "zooidagent");
 
     private static final Path SOURCES = Path.of("src", "main", "java");
     private static final Pattern AGENT_SELECTION = Pattern.compile("getAgentSelection_([a-z0-9]+)");

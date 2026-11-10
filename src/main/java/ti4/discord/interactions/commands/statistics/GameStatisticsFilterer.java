@@ -49,12 +49,9 @@ public class GameStatisticsFilterer {
 
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
-        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Player count e.g. 3-8")
-                .setRequiredRange(1, 30));
-        filters.add(new OptionData(OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8")
-                .setRequiredRange(1, 30));
-        filters.add(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14")
-                .setRequiredRange(1, 99));
+        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Player count e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14"));
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
@@ -105,9 +102,24 @@ public class GameStatisticsFilterer {
     // 6-player, 10-victory-point, non-homebrew, non-Galactic-Event, non-Scenario games with
     // winners. Homebrew covers fog, and scenario covers Alliance.
     public static Predicate<Game> getStandardCompetitiveGamesFilter() {
-        Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(6, game);
+        return getStandardCompetitiveGamesFilter(6, 6, Set.of(10));
+    }
+
+    public static Predicate<Game> getCompetitiveExportGamesFilter() {
+        return getStandardCompetitiveGamesFilter(3, 8, Set.of(10, 12, 14))
+                .and(Game::isThundersEdge)
+                .and(Game::isProphecyOfKings)
+                .and(game -> !game.isTwilightsFallMode());
+    }
+
+    private static Predicate<Game> getStandardCompetitiveGamesFilter(
+            int minPlayerCount, int maxPlayerCount, Set<Integer> victoryPointGoals) {
+        Predicate<Game> playerCountPredicate = game -> {
+            int playerCount = game.getRealAndEliminatedPlayers().size();
+            return playerCount >= minPlayerCount && playerCount <= maxPlayerCount;
+        };
         return playerCountPredicate
-                .and(game -> filterOnVictoryPointGoal(10, game))
+                .and(game -> victoryPointGoals.contains(game.getVp()))
                 .and(game -> filterOnFogType(Boolean.FALSE, game))
                 .and(game -> filterOnGalacticEvent(Boolean.FALSE, game))
                 .and(game -> filterOnScenario(Boolean.FALSE, game))

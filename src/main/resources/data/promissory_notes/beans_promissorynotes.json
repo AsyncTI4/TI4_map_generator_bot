@@ -83,5 +83,35 @@
         "playArea": false,
         "text": "When you research a technology\n\nYou may return this card to the Mi-Go player to treat 1 of your technology specialties as any color.",
         "source": "beans"
+    },
+    {
+        "alias": "bepndeep",
+        "name": "Dark Matter",
+        "faction": "deep",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "ACTION:\n\nPlace this card face up in your play area and place a frontier token in your home system.\n\nAt the start of the status phase, return this card to The Deep player.",
+        "source": "beans"
+    },
+    {
+        "alias": "bepnbloom",
+        "name": "Starter Culture",
+        "faction": "bloom",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "ACTION:\n\nPlace this card face up in your play area. You and the J'nahfa player may agree to place 1 infantry from each of your reinforcements into coexistence on a non-home planet the other player controls that contains their ground forces.\n\nAt the start of the status phase, return this card to the J'nahfa player.",
+        "source": "beans"
+    },
+    {
+        "alias": "bepnchoir",
+        "name": "Dearly Departed",
+        "faction": "choir",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "text": "When 1 of your non-fighter ships would be destroyed during combat:\n\nYou may place this card faceup in your play area instead.\n\nAt the end of your turn, return this card to the Ossyra player.",
+        "source": "beans"
     }
 ]

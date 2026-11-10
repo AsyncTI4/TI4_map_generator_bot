@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
@@ -64,11 +66,106 @@ class CustomHyperlaneServiceTest {
 
     @Test
     void connectionMatrixValidation() {
+        String oneWay = oneWay(matrixWithOneConnection(0, 3));
         assertTrue(CustomHyperlaneService.isValidConnectionMatrix(matrixWithOneConnection(1, 4)));
+        assertTrue(CustomHyperlaneService.isValidConnectionMatrix(oneWay), "typed form allows 2");
         assertFalse(CustomHyperlaneService.isValidConnectionMatrix("0,0,0;0,0,0"), "wrong dimensions");
-        assertFalse(
-                CustomHyperlaneService.isValidConnectionMatrix(
-                        PATTERN.matcher(matrixWithOneConnection(0, 0)).replaceFirst("2")),
-                "cells must be 0 or 1");
+        assertFalse(CustomHyperlaneService.isValidConnectionMatrix(
+                matrixWithOneConnection(0, 0).replace("1", "3")));
+        // a 2 reaching storage would make encodeMatrix throw on the next save
+        assertFalse(CustomHyperlaneService.isValidStoredMatrix(oneWay));
+        assertTrue(CustomHyperlaneService.isValidStoredMatrix(matrixWithOneConnection(0, 3)));
+    }
+
+    @Test
+    void typedOneMirrorsAndTypedTwoStaysOneWay() {
+        assertEquals(
+                CustomHyperlaneService.toStoredMatrix(matrixWithOneConnection(3, 0)),
+                CustomHyperlaneService.toStoredMatrix(matrixWithOneConnection(0, 3)));
+        assertEquals(
+                matrixWithOneConnection(0, 3),
+                CustomHyperlaneService.toStoredMatrix(oneWay(matrixWithOneConnection(0, 3))));
+    }
+
+    @Test
+    void typedFormRoundTripsThroughStorage() {
+        String typed = CustomHyperlaneService.toTypedMatrix(
+                CustomHyperlaneService.toStoredMatrix(oneWay(matrixWithOneConnection(5, 1))));
+        assertEquals(oneWay(matrixWithOneConnection(5, 1)), typed);
+
+        String twoWay = CustomHyperlaneService.toStoredMatrix(matrixWithOneConnection(1, 4));
+        assertEquals(twoWay, CustomHyperlaneService.toStoredMatrix(CustomHyperlaneService.toTypedMatrix(twoWay)));
+    }
+
+    @Test
+    void rotationKeepsTheDirectionOfAOneWayLane() {
+        assertEquals(
+                matrixWithOneConnection(1, 4), CustomHyperlaneService.rotateMatrix60(matrixWithOneConnection(0, 3)));
+        assertTrue(CustomHyperlaneService.hasOneWayLanes(
+                CustomHyperlaneService.rotateMatrix60(matrixWithOneConnection(0, 3))));
+    }
+
+    @Test
+    void describesOneWayLanesBySide() {
+        assertEquals(List.of("N → S"), CustomHyperlaneService.describeOneWayLanes(matrixWithOneConnection(0, 3)));
+        assertEquals(
+                List.of(),
+                CustomHyperlaneService.describeOneWayLanes(
+                        CustomHyperlaneService.toStoredMatrix(matrixWithOneConnection(0, 3))));
+    }
+
+    // A seen two-way lane keeps both cells, so it is never drawn as one-way; unseen lanes drop out.
+    @Test
+    void onlyLanesKeepsTheSeenLanesWithTheirDirection() {
+        String stored = CustomHyperlaneService.toStoredMatrix(
+                "0,0,0,1,0,0;0,0,0,0,2,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+        String seen = CustomHyperlaneService.onlyLanes(stored, "000", Set.of("000:0:3"));
+        assertEquals(CustomHyperlaneService.toStoredMatrix(matrixWithOneConnection(0, 3)), seen);
+        assertEquals(
+                matrixWithOneConnection(1, 4),
+                CustomHyperlaneService.onlyLanes(stored, "000", Set.of("000:1:4", "101:0:3")));
+        assertFalse(CustomHyperlaneService.onlyLanes(stored, "000", Set.of()).contains("1"));
+    }
+
+    // On a roundabout you can always drive on to the next exit, so every side you can enter reaches every side you
+    // can leave: a one-way loop ends up two-way, while "enter at N, leave at SE or SW" stays one-way.
+    @Test
+    void roundaboutsConnectEveryEntryToEveryExit() {
+        String loop = "1,0,2,0,0,0;0,0,0,0,0,0;0,0,1,0,2,0;0,0,0,0,0,0;2,0,0,0,1,0;0,0,0,0,0,0";
+        String allWays = "1,0,1,0,1,0;0,0,0,0,0,0;1,0,1,0,1,0;0,0,0,0,0,0;1,0,1,0,1,0;0,0,0,0,0,0";
+        assertEquals(allWays, CustomHyperlaneService.toStoredMatrix(loop));
+
+        String fromNorth = "1,0,2,0,2,0;0,0,0,0,0,0;0,0,1,0,0,0;0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0";
+        assertEquals(
+                List.of("N → SE", "N → SW"),
+                CustomHyperlaneService.describeOneWayLanes(CustomHyperlaneService.toStoredMatrix(fromNorth)));
+    }
+
+    // A 2 whose mirror cell is also set is saved as two-way; the save message warns about it.
+    @Test
+    void describesOneWayLanesTypedInBothDirections() {
+        String bothWays = "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        assertEquals(List.of("N ↔ S"), CustomHyperlaneService.describeContradictions(bothWays));
+        assertEquals(List.of(), CustomHyperlaneService.describeContradictions(oneWay(matrixWithOneConnection(0, 3))));
+        assertEquals(List.of(), CustomHyperlaneService.describeContradictions(matrixWithOneConnection(0, 3)));
+    }
+
+    // The one-way lane hint glows on the system a one-way lane leads into: the exit side of the lane, never its entry.
+    @Test
+    void oneWayExitSidesAreWhereOneWayLanesLeave() {
+        assertEquals(Set.of(3), CustomHyperlaneService.oneWayExitSides(matrixWithOneConnection(0, 3)));
+        String twoWay = "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        assertEquals(Set.of(), CustomHyperlaneService.oneWayExitSides(twoWay));
+    }
+
+    // On a roundabout only exit-only connectors count; a side that can also be entered is two-way.
+    @Test
+    void roundaboutExitSidesAreExitOnlyConnectors() {
+        String roundabout = "1,0,1,0,1,0;0,0,0,0,0,0;0,0,1,0,1,0;0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0";
+        assertEquals(Set.of(4), CustomHyperlaneService.oneWayExitSides(roundabout));
+    }
+
+    private static String oneWay(String matrix) {
+        return PATTERN.matcher(matrix).replaceFirst("2");
     }
 }

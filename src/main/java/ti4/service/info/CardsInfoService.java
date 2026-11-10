@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
@@ -40,6 +42,7 @@ import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -109,6 +112,13 @@ public class CardsInfoService {
         if (playerCardsInfoThread == null) return;
 
         List<Button> buttons = new ArrayList<>();
+        if (player.hasReadyBreakthrough("choirbt")) {
+            buttons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
+        }
+        Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptCardsInfoButton(player);
+        if (lyraOfTheCryptButton != null) {
+            buttons.add(lyraOfTheCryptButton);
+        }
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
         }
@@ -253,6 +263,9 @@ public class CardsInfoService {
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
         }
+        if (IsPlayerElectedService.isPlayerElected(game, player, "ministercontrol")) {
+            buttons.add(Buttons.gray("theodisiMinisterControl", "Discard Minister of Control", CardEmojis.Agenda));
+        }
         if (!game.isFowMode()
                         && game.getPlayers().values().stream()
                                 .anyMatch(p -> p.getAbilities().contains("galvanize"))
@@ -353,6 +366,9 @@ public class CardsInfoService {
         }
         if (player.hasUnlockedBreakthrough("yssarilbt")) {
             buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
+        }
+        if (player.hasUnlockedBreakthrough("empyreanbt") && VoidTetherService.hasEnforcedTether(game)) {
+            buttons.add(Buttons.gray("voidTetherAccessMenu", "Void Tether Access", FactionEmojis.Empyrean));
         }
         if (player.hasAbility("pillage") && !game.isTwilightsFallMode()) {
             if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
@@ -640,7 +656,7 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
-        if (KnownCardsService.isEnabled(game)) {
+        if (!KnownCardsService.getKnownCardHandEmbeds(game, player).isEmpty()) {
             buttons.add(Buttons.gray("showKnownCardHands", "Show Known Card Hands", CardEmojis.ActionCard));
         }
         RiftSetModeService.addCapturedUnitsButton(buttons, game);

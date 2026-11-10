@@ -22,6 +22,7 @@ import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionTargetingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.TnelisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
@@ -48,6 +49,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
@@ -76,6 +78,7 @@ import ti4.service.leader.agent.modules.homebrew.GhotiAgent;
 import ti4.service.leader.agent.modules.homebrew.MortheusAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
@@ -137,7 +140,7 @@ public final class ButtonHelperModifyUnits {
         if (space
                 && mentakFS != null
                 && mentakFS != player
-                && hasFlagshipInOrAdjacentToSystem(game, player, tile, unitHolder, mentakFS)) {
+                && hasFlagshipInOrAdjacentToSystem(game, tile, unitHolder, mentakFS)) {
             return 0;
         }
         int metali = 0;
@@ -175,7 +178,7 @@ public final class ButtonHelperModifyUnits {
     }
 
     private static boolean hasFlagshipInOrAdjacentToSystem(
-            Game game, Player player, Tile tile, UnitHolder unitHolder, Player flagshipOwner) {
+            Game game, Tile tile, UnitHolder unitHolder, Player flagshipOwner) {
         String color = flagshipOwner.getColor();
         if (unitHolder.getUnitCount(UnitType.Flagship, color) > 0) {
             return true;
@@ -183,7 +186,7 @@ public final class ButtonHelperModifyUnits {
         if (tile == null) {
             return false;
         }
-        for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+        for (String adjPos : Adjacency.of(game, flagshipOwner).into(tile.getPosition())) {
             Tile adjTile = game.getTileByPosition(adjPos);
             if (adjTile == null) continue;
             UnitHolder adjSpace = adjTile.getSpaceUnitHolder();
@@ -586,6 +589,7 @@ public final class ButtonHelperModifyUnits {
             }
         }
         ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
+        FogSecretHooks.afterCombatHits(game, player, tile, unitHolder, "groundcombat");
         LostLegaciesRelicHandler.finishNeutralReplacementBatch(event, game);
         event.getMessage();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -870,6 +874,7 @@ public final class ButtonHelperModifyUnits {
                 "carrier",
                 "dreadnought",
                 "flagship",
+                "thedeep",
                 "celagrom",
                 "aurelion",
                 "lady",
@@ -883,6 +888,7 @@ public final class ButtonHelperModifyUnits {
                     "carrier",
                     "dreadnought",
                     "flagship",
+                    "thedeep",
                     "celagrom",
                     "aurelion",
                     "lady",
@@ -899,6 +905,7 @@ public final class ButtonHelperModifyUnits {
                             "dreadnought",
                             "carrier",
                             "flagship",
+                            "thedeep",
                             "celagrom",
                             "aurelion",
                             "lady",
@@ -1123,6 +1130,7 @@ public final class ButtonHelperModifyUnits {
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
             ThirtyKSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
+            FogSecretHooks.afterCombatHits(game, player, tile, unitHolder, "spacecombat");
             ThirtyKExploreHooks.afterSpaceCombatHits(event, game, player, tile, "spacecombat");
             ThirtyKActionCardHooks.afterCombatHitsAssigned(game, tile, "spacecombat");
             if (sustainedFlagbearer) {
@@ -1193,9 +1201,10 @@ public final class ButtonHelperModifyUnits {
                     == UnitType.Fighter) {
                 for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                     if (p2.ownsUnit("tf-vortexer")) {
-                        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
+                        for (String pos : Adjacency.of(game, p2).withSelf().into(tile.getPosition())) {
                             if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2)
                                     > 0) {
+                                // TODO: break? Carriers in two systems in range capture one fighter twice.
                                 CaptureUnitService.executeCapture(event, game, p2, units.getFirst());
                             }
                         }
@@ -1354,7 +1363,7 @@ public final class ButtonHelperModifyUnits {
     public static List<Button> getRalnelCommanderButtons(Player player, Game game, String pos1) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
-        for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false, false)) {
+        for (String pos2 : Adjacency.of(game, player).forMovement().from(pos1)) {
             Tile targetTile = game.getTileByPosition(pos2);
             if (!canRetreatTo(game, player, targetTile, true, false)) {
                 continue; // skip invalid systems
@@ -1377,7 +1386,7 @@ public final class ButtonHelperModifyUnits {
         if (feint) {
             skilledS += "feint";
         }
-        Set<String> positions = FoWHelper.getAdjacentTiles(game, pos1, player, false);
+        Set<String> positions = Adjacency.of(game, player).forMovement().from(pos1);
         Tile helheimTile = game.getTileFromPlanet("helheim");
         if (player.hasPlanet("helheim")
                 && helheimTile != null
@@ -1388,7 +1397,7 @@ public final class ButtonHelperModifyUnits {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander") && player.getHomeSystemTile() != null) {
             positions.addAll(FoWHelper.getAdjacentTiles(game, player.getHomeSystemPosition(), player, false));
         }
-        if (player.hasUnlockedBreakthrough("ghotibt")) {
+        if (player.hasUnlockedBreakthrough("ghotibt") || player.hasUnlockedBreakthrough("deepbt")) {
             positions.addAll(FoWHelper.getEmptyTiles(game).stream()
                     .map(Tile::getPosition)
                     .collect(Collectors.toSet()));
@@ -1556,6 +1565,7 @@ public final class ButtonHelperModifyUnits {
                                 || MonumentsService.canUseNaaluMonumentCoexistence(game, player, unitHolder.getName())
                                 || XinUnitHandler.canUseStarSentinelCoexistence(player, unitHolder)
                                 || XinUnitHandler.canUseStarSentinelCoexistence(player2, unitHolder)
+                                || MigoBreakthroughHandler.canUseYthicSymbiosis(game, player2, unitHolder.getName())
                                 || player2.hasAbility("researchteam"))) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
@@ -1594,11 +1604,16 @@ public final class ButtonHelperModifyUnits {
                                             && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
                                     || XinUnitHandler.canUseStarSentinelCoexistence(player2, unitHolder)
                                     || TaBreakthroughHandler.canUseSafeHavensCoexistence(
+                                            game, player2, unitHolder.getName())
+                                    || MigoBreakthroughHandler.canUseYthicSymbiosis(
                                             game, player2, unitHolder.getName()))) {
                         buttons = new ArrayList<>();
                         if (TaBreakthroughHandler.canUseSafeHavensCoexistence(game, player2, unitHolder.getName())) {
                             buttons.add(TaBreakthroughHandler.getSafeHavensCoexistenceButton(
                                     player2, unitHolder.getName()));
+                        }
+                        if (MigoBreakthroughHandler.canUseYthicSymbiosis(game, player2, unitHolder.getName())) {
+                            buttons.add(MigoBreakthroughHandler.getYthicSymbiosisButton(player2, unitHolder.getName()));
                         }
                         buttons.add(Buttons.green(
                                 player2.factionButtonChecker() + "enterCoexistence_" + unitHolder.getName(),
@@ -1669,7 +1684,7 @@ public final class ButtonHelperModifyUnits {
                     && !player.getPlanets().contains(unitHolder.getName())) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("takeMonument_" + unitHolder.getName(), "Take Control Of Monument"));
-                b2s.add(Buttons.blue("destroyMonument_" + tile.getPosition(), "Destroy Monument"));
+                b2s.add(Buttons.blue("destroyMonument_" + unitHolder.getName(), "Destroy Monument"));
                 b2s.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),

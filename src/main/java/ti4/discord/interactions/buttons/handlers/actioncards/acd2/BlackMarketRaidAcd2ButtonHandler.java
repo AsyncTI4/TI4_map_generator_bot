@@ -72,13 +72,12 @@ class BlackMarketRaidAcd2ButtonHandler {
                 if (purged >= fragsToPurge) break;
                 player.removeFragment(fragId);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                String emoji =
-                        switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
-                            case "cultural" -> ExploreEmojis.CFrag.toString();
-                            case "industrial" -> ExploreEmojis.IFrag.toString();
-                            case "hazardous" -> ExploreEmojis.HFrag.toString();
-                            default -> ExploreEmojis.UFrag.toString();
-                        };
+                String emoji = switch (Mapper.getExplore(fragId).getType().toLowerCase()) {
+                    case "cultural" -> ExploreEmojis.CFrag.toString();
+                    case "industrial" -> ExploreEmojis.IFrag.toString();
+                    case "hazardous" -> ExploreEmojis.HFrag.toString();
+                    default -> ExploreEmojis.UFrag.toString();
+                };
                 fragMsg.append(emoji);
                 purged++;
             }

@@ -5,8 +5,10 @@ import static ti4.game.persistence.GamePersistenceKeys.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +21,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -77,6 +81,48 @@ class GameLoadService {
     private static final Pattern EM_DASH_PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
 
+    record GameFolder(List<String> gameNames, Map<String, Long> lastModifiedMillis) {
+
+        Set<String> savedSince(long sinceMillis) {
+            return lastModifiedMillis.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= sinceMillis)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toUnmodifiableSet());
+        }
+    }
+
+    static GameFolder scanGameFolder() {
+        List<Path> gameFiles;
+        try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
+            gameFiles = pathStream
+                    .filter(path -> path.toString().toLowerCase().endsWith(GAME_FILE_EXTENSION))
+                    .toList();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        Map<String, Long> lastModifiedMillis = gameFiles.parallelStream()
+                .collect(Collectors.toConcurrentMap(
+                        GameLoadService::gameNameOf, GameLoadService::lastModifiedMillis, Math::max));
+        List<String> gameNames = lastModifiedMillis.keySet().stream()
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        return new GameFolder(gameNames, Map.copyOf(lastModifiedMillis));
+    }
+
+    private static String gameNameOf(Path gameFile) {
+        return stripGameFileExtension(gameFile.getFileName().toString()).toLowerCase();
+    }
+
+    private static long lastModifiedMillis(Path path) {
+        try {
+            return Files.getLastModifiedTime(path).toMillis();
+        } catch (NoSuchFileException e) {
+            return Long.MIN_VALUE;
+        } catch (IOException e) {
+            return Long.MAX_VALUE;
+        }
+    }
+
     static List<String> loadGameNames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             return pathStream
@@ -93,12 +139,19 @@ class GameLoadService {
         }
     }
 
+    private static final Set<String> reportedUnreadableFiles = ConcurrentHashMap.newKeySet();
+
     @Nullable
-    public static Game load(String gameName) {
+    static Game load(String gameName) {
         return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);
         });
+    }
+
+    static boolean isKnownUnreadable(String gameName) {
+        File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
+        return gameFile.exists() && reportedUnreadableFiles.contains(gameFile.getName());
     }
 
     private static String stripGameFileExtension(String fileName) {
@@ -112,10 +165,16 @@ class GameLoadService {
             return null;
         }
         try {
-            return readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            Game game = readGame(Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()));
+            reportedUnreadableFiles.remove(gameFile.getName());
+            return game;
         } catch (Exception e) {
-            BotLogger.critical(
-                    "Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.", e);
+            if (reportedUnreadableFiles.add(gameFile.getName())) {
+                BotLogger.critical(
+                        "The game file " + gameFile.getName() + " could not be loaded and may be corrupt."
+                                + " A bothelper can run `/bothelper reload_game` to restore it from its latest undo.",
+                        e);
+            }
             return null;
         }
     }
@@ -524,6 +583,7 @@ class GameLoadService {
                         StringTokenizer dataInfoTokens = new StringTokenizer(fowOptions.nextToken(), ",");
                         String optionName = dataInfoTokens.nextToken();
                         String optionValue = dataInfoTokens.nextToken();
+                        if (!FOWOption.exists(optionName)) continue;
                         game.setFowOption(FOWOption.fromString(optionName), Boolean.parseBoolean(optionValue));
                     }
                 }
@@ -561,6 +621,7 @@ class GameLoadService {
                 // TODO: default false here vs true in GameProperties; a missing token reverts to legacy flow.
                 case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
+                case Constants.ONE_WAY_ADJACENCY -> game.setOneWayAdjacency(parseBooleanOrDefault(info, false));
                 case Constants.WORMHOLE_TOKEN_MERGE -> game.setWormholeTokenMergeFrom(wormholeTokenMergeFrom(info));
                 case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
@@ -638,6 +699,7 @@ class GameLoadService {
                     game.setRapidMobilizationMode(parseBooleanOrDefault(info, false));
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(parseBooleanOrDefault(info, false));
                 case Constants.FEAST_OR_FAMINE_MODE -> game.setFeastOrFamineMode(parseBooleanOrDefault(info, false));
+                case Constants.SECRETS_ONLY_MODE -> game.setSecretsOnlyMode(parseBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(parseBooleanOrDefault(info, false));
                 case Constants.COSMIC_CONVERGENCE_MODE ->
                     game.setCosmicConvergenceMode(parseBooleanOrDefault(info, false));
@@ -700,6 +762,7 @@ class GameLoadService {
                         game.setStartedDate(Long.parseLong(info));
                     }
                 }
+                case REVISION_KEY -> game.setRevisionKey(info);
                 case Constants.LAST_MODIFIED_DATE -> {
                     if (isNotBlank(info)) {
                         game.setLastModifiedDate(Long.parseLong(info));
@@ -826,14 +889,13 @@ class GameLoadService {
         while (actionCardToken.hasMoreTokens()) {
             StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
             String id = cardInfo.nextToken();
-            ACStatus status =
-                    switch (cardInfo.nextToken()) {
-                        case "garbozia" -> ACStatus.garbozia;
-                        case "ralnelbt" -> ACStatus.ralnelbt;
-                        case "morphabt" -> ACStatus.morphabt;
-                        case "purged" -> ACStatus.purged;
-                        default -> null;
-                    };
+            ACStatus status = switch (cardInfo.nextToken()) {
+                case "garbozia" -> ACStatus.garbozia;
+                case "ralnelbt" -> ACStatus.ralnelbt;
+                case "morphabt" -> ACStatus.morphabt;
+                case "purged" -> ACStatus.purged;
+                default -> null;
+            };
             cards.put(id, status);
         }
         return cards;
@@ -1246,7 +1308,7 @@ class GameLoadService {
                     "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, UnitHolder.capToHolderLimit(uk, counts));
+        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, counts);
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {

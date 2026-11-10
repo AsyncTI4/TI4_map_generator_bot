@@ -25,7 +25,7 @@ class SetupWizard extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "You are not GM in this game.");
             return;
         }
-        FowSetupWizardService.openOrRefresh(game);
+        FowSetupWizardService.openLegacy(game);
         MessageHelper.replyToMessage(event, "Setup wizard posted in the GM room.");
     }
 }

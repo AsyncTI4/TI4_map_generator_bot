@@ -1,0 +1,15 @@
+{
+    "id": "thedeep",
+    "name": "The Deep",
+    "aliases": [
+        "thedeep"
+    ],
+    "resources": 3,
+    "influence": 1,
+    "planetTypes": [
+        "FAKE",
+        "FACTION"
+    ],
+    "source": "beans",
+    "flavorText": "*I AM ETERNAL*"
+}

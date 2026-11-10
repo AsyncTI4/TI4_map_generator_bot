@@ -76,14 +76,17 @@ public class ScorePublicObjectiveService {
             informAboutScoring(event, channel, game, player, poID);
             ThirtyKExploreHooks.afterPublicObjectiveScored(game, player, id, tgBefore);
             KaloraAbilityHandler.onPublicObjectiveScored(game, player, id);
-            for (Player p2 : player.getNeighbouringPlayers(true)) {
-                if (p2.hasLeaderUnlocked("syndicatecommander")) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.hasLeaderUnlocked("syndicatecommander")
+                        && p2.getAbilityNeighbours().contains(player)) {
                     p2.setTg(p2.getTg() + 1);
+                    // TODO: message names the Tnelis commander (Fillipo Rois); should it be the Syndicate commander?
                     String msg = p2.getRepresentationUnfogged() + ", you gained 1 trade good"
                             + " due to your neighbor scoring a public objective while you have Fillipo Rois, the Tnelis commander."
                             + " Your trade goods went from " + (p2.getTg() - 1) + " -> " + p2.getTg() + ".";
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
                     ButtonHelperAbilities.pillageCheck(p2, game);
+                    // TODO: p2 gained the trade good; should this be resolveArtunoCheck(p2, 1)?
                     ButtonHelperAgents.resolveArtunoCheck(player, 1);
                 }
             }

@@ -59,7 +59,7 @@ final class PromissoryNotesInPlay {
         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
         if (promissoryNote == null) return false;
 
-        boolean hidden = ctx.hidesStatsOf(owner);
+        boolean hidden = ctx.hidesStatsInArea(player, owner);
         boolean revealsFaction =
                 pn.endsWith("_an") || promissoryNote.getFaction().isPresent();
         if (hidden && revealsFaction) {

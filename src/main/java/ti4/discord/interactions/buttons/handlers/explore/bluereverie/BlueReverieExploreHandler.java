@@ -494,13 +494,12 @@ public class BlueReverieExploreHandler {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
-        boolean spent =
-                switch (pool) {
-                    case "tactical" -> spendTacticalToken(player);
-                    case "fleet" -> spendFleetToken(player);
-                    case "strategy" -> spendStrategyToken(player);
-                    default -> false;
-                };
+        boolean spent = switch (pool) {
+            case "tactical" -> spendTacticalToken(player);
+            case "fleet" -> spendFleetToken(player);
+            case "strategy" -> spendStrategyToken(player);
+            default -> false;
+        };
         if (!spent) {
             ButtonHelper.deleteTheOneButton(event);
             return;
@@ -639,10 +638,15 @@ public class BlueReverieExploreHandler {
     }
 
     private static List<Button> getNeighborPlanetButtons(Game game, Player player, Player neighbor) {
+        if (!player.getAbilityNeighbours().contains(neighbor)) return new ArrayList<>();
+        return getPlanetButtons(game, player, neighbor);
+    }
+
+    private static List<Button> getPlanetButtons(Game game, Player player, Player neighbor) {
         List<Button> buttons = new ArrayList<>();
         Set<String> knownPlanets = PlanetTargetService.knownPlanetIds(game, player, Set.of());
         for (String planetName : knownPlanets.stream().sorted().toList()) {
-            if (!isNeighborPlanet(game, player, neighbor, planetName)) continue;
+            if (!isNonHomePlanetOf(game, neighbor, planetName)) continue;
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + PLACE_NEIGHBOR_UNIT + neighbor.getFaction() + "|" + planetName,
                     Helper.getPlanetRepresentation(planetName, game)));
@@ -651,13 +655,17 @@ public class BlueReverieExploreHandler {
     }
 
     private static List<Player> getEligibleNeighbors(Game game, Player player) {
-        return player.getNeighbouringPlayers(true).stream()
-                .filter(neighbor ->
-                        getNeighborPlanetButtons(game, player, neighbor).size() > 0)
+        return player.getAbilityNeighbours().stream()
+                .filter(neighbor -> getPlanetButtons(game, player, neighbor).size() > 0)
                 .toList();
     }
 
     private static boolean isNeighborPlanet(Game game, Player player, Player neighbor, String planetName) {
+        return isNonHomePlanetOf(game, neighbor, planetName)
+                && player.getAbilityNeighbours().contains(neighbor);
+    }
+
+    private static boolean isNonHomePlanetOf(Game game, Player neighbor, String planetName) {
         Planet planet = game.getUnitHolderFromPlanet(planetName);
         Tile tile = game.getTileFromPlanet(planetName);
         Player controller = game.getPlayerThatControlsPlanet(planetName, true);
@@ -666,8 +674,7 @@ public class BlueReverieExploreHandler {
                 && planet.getPlanetModel() != null
                 && !planet.isSpaceStation()
                 && !tile.isHomeSystem(game)
-                && controller == neighbor
-                && player.getNeighbouringPlayers(true).contains(neighbor);
+                && controller == neighbor;
     }
 
     private static int getAmount(String value) {

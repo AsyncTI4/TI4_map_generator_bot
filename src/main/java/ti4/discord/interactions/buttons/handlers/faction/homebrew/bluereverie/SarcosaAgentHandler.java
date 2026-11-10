@@ -72,13 +72,12 @@ public class SarcosaAgentHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "That system is no longer eligible.");
             return;
         }
-        String units =
-                switch (values[1]) {
-                    case "1dd" -> "1 dd";
-                    case "2dd" -> "2 dd";
-                    case "ca" -> "1 ca";
-                    default -> "";
-                };
+        String units = switch (values[1]) {
+            case "1dd" -> "1 dd";
+            case "2dd" -> "2 dd";
+            case "ca" -> "1 ca";
+            default -> "";
+        };
         if (units.isEmpty()) return;
         AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), units);
         MessageHelper.sendMessageToChannel(

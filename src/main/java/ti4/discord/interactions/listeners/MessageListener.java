@@ -68,8 +68,6 @@ class MessageListener extends ListenerAdapter {
             "this isn’t okay",
             "crossed a line",
             "personal attack",
-            "please dont",
-            "please don't",
             "you’re being rude",
             "you insulted me",
             "trying to cheat",

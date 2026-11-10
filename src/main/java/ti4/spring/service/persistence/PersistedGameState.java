@@ -6,11 +6,14 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public record PersistedGameState(GameColumns game, List<PlayerRow> players, List<TitleRow> titles) {
 
     public record GameColumns(
             String gameName,
+            String revisionKey,
+            Integer mappingVersion,
             long creationEpochMilliseconds,
             Long endedEpochMilliseconds,
             int round,
@@ -28,10 +31,35 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
             boolean twilightImperiumGlobalLeague,
             boolean twilightImperiumGlobalLeagueFractured,
             String twilightImperiumGlobalLeagueRank,
-            int playerCount) {}
+            int playerCount,
+            boolean statisticsIgnored,
+            boolean ended,
+            boolean winner,
+            boolean victoryPointGoalReached,
+            boolean fogOfWarMode,
+            boolean fogQol01,
+            boolean factionReactMode,
+            boolean colorReactMode,
+            boolean strategyCardReactMode,
+            boolean fastStrategyCardFollowMode,
+            boolean injectRulesLinks,
+            long lastModifiedEpochMilliseconds,
+            String activePlayerUserId,
+            long lastActivePlayerChangeEpochMilliseconds,
+            String guildId,
+            String mainGameChannelId,
+            String tableTalkChannelId,
+            String launchPostThreadId,
+            boolean competitiveExportEligible,
+            boolean autoPingEnabled,
+            boolean temporaryPingDisabled,
+            String teamMatePrimaryUserIds) {}
 
     public record PlayerRow(
-            String userId,
+            String statsUserId,
+            String playingUserId,
+            boolean playing,
+            boolean npc,
             String factionName,
             int score,
             int totalNumberOfTurns,
@@ -43,6 +71,15 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
             boolean replaced) {}
 
     public record TitleRow(String userId, String title) {}
+
+    private static final Set<String> REVISION_COLUMNS = Set.of("revisionKey", "mappingVersion");
+
+    public boolean matchesRevision(String revision) {
+        return revision != null
+                && !revision.isBlank()
+                && revision.equals(game.revisionKey())
+                && Objects.equals(game.mappingVersion(), GameEntityMapper.MAPPING_VERSION);
+    }
 
     public static PersistedGameState of(GameEntitySnapshot snapshot) {
         return of(snapshot.game(), snapshot.game().getPlayers(), snapshot.titles());
@@ -58,6 +95,11 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
                 .sorted(Comparator.comparing(TitleRow::toString))
                 .toList();
         return new PersistedGameState(toGameColumns(game), playerRows, titleRows);
+    }
+
+    public boolean hasSameRevisionColumnsAs(PersistedGameState actual) {
+        return Objects.equals(game.revisionKey(), actual.game.revisionKey())
+                && Objects.equals(game.mappingVersion(), actual.game.mappingVersion());
     }
 
     public List<String> describeDifferencesFrom(PersistedGameState actual) {
@@ -84,6 +126,7 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     private static List<String> differingComponents(Record expected, Record actual) {
         List<String> differing = new ArrayList<>();
         for (RecordComponent component : expected.getClass().getRecordComponents()) {
+            if (REVISION_COLUMNS.contains(component.getName())) continue;
             Object expectedValue = componentValue(component, expected);
             Object actualValue = componentValue(component, actual);
             if (!Objects.equals(expectedValue, actualValue)) {
@@ -104,6 +147,8 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
     private static GameColumns toGameColumns(GameEntity game) {
         return new GameColumns(
                 game.getGameName(),
+                game.getRevisionKey(),
+                game.getMappingVersion(),
                 game.getCreationEpochMilliseconds(),
                 game.getEndedEpochMilliseconds(),
                 game.getRound(),
@@ -121,12 +166,37 @@ public record PersistedGameState(GameColumns game, List<PlayerRow> players, List
                 game.isTwilightImperiumGlobalLeague(),
                 game.isTwilightImperiumGlobalLeagueFractured(),
                 game.getTwilightImperiumGlobalLeagueRank(),
-                game.getPlayerCount());
+                game.getPlayerCount(),
+                game.isStatisticsIgnored(),
+                game.isEnded(),
+                game.isWinner(),
+                game.isVictoryPointGoalReached(),
+                game.isFogOfWarMode(),
+                game.isFogQol01(),
+                game.isFactionReactMode(),
+                game.isColorReactMode(),
+                game.isStrategyCardReactMode(),
+                game.isFastStrategyCardFollowMode(),
+                game.isInjectRulesLinks(),
+                game.getLastModifiedEpochMilliseconds(),
+                game.getActivePlayerUserId(),
+                game.getLastActivePlayerChangeEpochMilliseconds(),
+                game.getGuildId(),
+                game.getMainGameChannelId(),
+                game.getTableTalkChannelId(),
+                game.getLaunchPostThreadId(),
+                game.isCompetitiveExportEligible(),
+                game.isAutoPingEnabled(),
+                game.isTemporaryPingDisabled(),
+                game.getTeamMatePrimaryUserIds());
     }
 
     private static PlayerRow toPlayerRow(PlayerEntity player) {
         return new PlayerRow(
-                player.getUser().getId(),
+                player.getStatsUser().getId(),
+                player.getPlayingUser() == null ? null : player.getPlayingUser().getId(),
+                player.isPlaying(),
+                player.isNpc(),
                 player.getFactionName(),
                 player.getScore(),
                 player.getTotalNumberOfTurns(),

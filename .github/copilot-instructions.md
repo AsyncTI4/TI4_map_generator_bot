@@ -149,7 +149,7 @@ public void handleMyButton(ButtonInteractionEvent event, Game game, Player playe
 
 - `PlayerEntity` (Spring Data / Hibernate entity) tracks per-player statistics. Has an `is_replaced` boolean column set when `statsTrackedUserID != userID`.
 - `GameDatabaseSyncPipeline` queues a database write (via `GameEntityPersistenceService`) every time a game file is saved, undone, reloaded, or deleted.
-- `GameDatabaseReconciliationCron` runs nightly on the same pipeline, diffs every ManagedGame against its database rows (game files are the source of truth), logs an error listing any discrepancies, and repairs them. It also deletes `discord_user` rows no player, title or standalone title references.
+- `GameDatabaseReconciliationCron` runs nightly on the same pipeline, checks cached ManagedGame revision keys and mapping versions, loading and diffing games whose versions do not match their database rows (game files are the source of truth), logs an error listing any discrepancies, and repairs them. It also deletes `discord_user` rows no player, title or standalone title references. `GameDatabaseReconciler` queues one task per game, each queuing the next, so syncs run between games; only one run happens at a time, and `/developer database_persistence mode:on` queues one to catch up after maintenance mode.
 - `ExpeditionWinRateStatisticsService` merges `obsidian` and `firmament` factions into a combined key `"obsidian & firmament"`.
 
 ### 9. Cron Jobs
@@ -195,12 +195,14 @@ Scheduled tasks live in `ti4.cron.*`. They are started by `JdaService` after bot
 - Tests extend `BaseTi4Test` which calls `globalBeforeAll()` once to initialize `Mapper`, `TileHelper`, `AliasHandler`, `MapPositionMapper`, `SelectionManager`, and spoof emojis.
 - JUnit 5; run with `mvn test`.
 - No Discord connection is made during tests (`JdaService.testingMode = true`).
+- `*DatabaseTest` classes run against a real PostgreSQL and are skipped unless `TI4_TEST_POSTGRES_URL` is set. CI sets it and provides a Postgres 16 service container. To run them locally, see "Database Tests" in `CONTRIBUTING.md` (use `docker-compose.test.yml` and extend `ti4.test.PostgresDatabaseTest`; only database/user `tibot_ci_test` are allowed: the tests drop and recreate their tables).
 
 ---
 
 ## Deployment Notes
 
-- The bot is deployed on a Hostinger server via SSH. Deployment workflows are in `.github/workflows/`.
-- The bot runs as a JAR: `java -jar <jar> <discordBotToken> <discordUserID> <discordServerID>`.
+- The bot is deployed on a Hostinger server via SSH as a Docker container behind Traefik. See [DEPLOYMENT.md](../DEPLOYMENT.md) for the deploy workflow and how the active lease hands over between the old and new process.
 - Spring Boot serves on port 8081 (internal metrics/API).
 - Images and data are uploaded to S3 via Python scripts in `scripts/`.
+
+- Bump GameEntityMapper.MAPPING_VERSION when changing the database snapshot mapping so reconciliation refreshes rows even when their saved revision key matches. Legacy files without a revision are fully reconciled until their next save.

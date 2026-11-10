@@ -26,7 +26,6 @@ class AddToSplice extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.POSITION,
                         "Player's position in the splice (1st, 2nd, etc). Default is last.")
-                .setRequiredRange(1, 30)
                 .setRequired(false));
     }
 

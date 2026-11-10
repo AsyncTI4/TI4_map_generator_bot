@@ -21,7 +21,6 @@ class ShowAC extends GameStateSubcommand {
         super(Constants.SHOW_AC, "Show an action card to one player", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
-                .setRequiredRange(0, 999)
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
                 .setRequired(true)

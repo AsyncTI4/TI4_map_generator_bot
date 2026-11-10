@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -60,7 +61,8 @@ public class FowAutoDeclineService {
         }
     }
 
-    public static boolean resolveDue(Game game, BiConsumer<Game, Player> onImperialDecline) {
+    public static boolean resolveDue(
+            Game game, BiConsumer<Game, Player> onImperialDecline, Consumer<Runnable> afterSave) {
         if (!FoWHelper.isFogQol01(game)) return false;
         List<String> keys = new ArrayList<>();
         for (String key : game.getStoredValueMap().keySet()) {
@@ -70,7 +72,7 @@ public class FowAutoDeclineService {
         long now = System.currentTimeMillis();
         for (String key : keys) {
             try {
-                changed |= resolveKey(game, key, now, onImperialDecline);
+                changed |= resolveKey(game, key, now, onImperialDecline, afterSave);
             } catch (Exception e) {
                 BotLogger.error(new LogOrigin(game), "Fog auto-decline failed for " + key, e);
                 game.removeStoredValue(key);
@@ -80,7 +82,8 @@ public class FowAutoDeclineService {
         return changed;
     }
 
-    private static boolean resolveKey(Game game, String key, long now, BiConsumer<Game, Player> onImperialDecline) {
+    private static boolean resolveKey(
+            Game game, String key, long now, BiConsumer<Game, Player> onImperialDecline, Consumer<Runnable> afterSave) {
         String[] scAndFaction = key.substring(KEY_PREFIX.length()).split("_", 2);
         String[] dueAndRound = game.getStoredValue(key).split("_", 2);
         if (scAndFaction.length < 2 || dueAndRound.length < 2) {
@@ -98,7 +101,7 @@ public class FowAutoDeclineService {
 
         game.removeStoredValue(key);
         if (stillCannotFollow(game, player, sc)) {
-            decline(game, player, sc, onImperialDecline);
+            decline(game, player, sc, onImperialDecline, afterSave);
         }
         return true;
     }
@@ -111,8 +114,23 @@ public class FowAutoDeclineService {
                 && PlayStrategyCardService.lacksStrategyTokensToFollow(game, primary, player, sc, scModel);
     }
 
-    private static void decline(Game game, Player player, int sc, BiConsumer<Game, Player> onImperialDecline) {
+    private static void decline(
+            Game game,
+            Player player,
+            int sc,
+            BiConsumer<Game, Player> onImperialDecline,
+            Consumer<Runnable> afterSave) {
         player.addFollowedSC(sc);
+        afterSave.accept(() -> announceDecline(game, player, sc));
+        boolean imperial = game.getStrategyCardModelByInitiative(sc)
+                .map(model -> model.usesAutomationForSCID("pok8imperial"))
+                .orElse(false);
+        if (imperial) {
+            onImperialDecline.accept(game, player);
+        }
+    }
+
+    private static void announceDecline(Game game, Player player, int sc) {
         StrategyCardMessageService.getStrategyCardMessage(game.getName(), game.getRound(), sc)
                 .ifPresent(scMessage ->
                         ReactionService.addReaction(player, false, null, null, scMessage.messageId(), game));
@@ -120,11 +138,5 @@ public class FowAutoDeclineService {
                 player.getCardsInfoThread(),
                 "You were automatically marked as not following **" + Helper.getSCName(sc, game)
                         + "**, because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
-        boolean imperial = game.getStrategyCardModelByInitiative(sc)
-                .map(model -> model.usesAutomationForSCID("pok8imperial"))
-                .orElse(false);
-        if (imperial) {
-            onImperialDecline.accept(game, player);
-        }
     }
 }

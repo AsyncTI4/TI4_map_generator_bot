@@ -139,12 +139,11 @@ public class GameSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "preset14pt" -> preset14vp();
-                    case "preset444" -> preset444();
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "preset14pt" -> preset14vp();
+            case "preset444" -> preset444();
+            default -> null;
+        };
         if (action.startsWith("changeTemplate_") && event instanceof StringSelectInteractionEvent sEvent) {
             afterChangeMapTemplateHandler(sEvent);
         }

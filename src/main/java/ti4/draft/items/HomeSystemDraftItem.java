@@ -64,6 +64,9 @@ public class HomeSystemDraftItem extends DraftItem {
         StringBuilder sb = new StringBuilder();
         appendSystemTraits(tile, sb);
         List<String> planetIds = tile.getPlanets();
+        if (planetIds.isEmpty()) {
+            return sb.append("No planets.").toString();
+        }
         for (int i = 0; i < planetIds.size() - 1; i++) {
             buildPlanetString(Mapper.getPlanet(planetIds.get(i)), sb);
             sb.append(", ");

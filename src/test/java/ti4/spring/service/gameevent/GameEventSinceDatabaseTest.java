@@ -17,19 +17,20 @@ import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfigu
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import ti4.game.Game;
+import ti4.test.PostgresDatabaseTest;
 
 // Runs against a real Postgres, e.g. a throwaway database in a local container:
-//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test
-// Skipped when the variable is unset (CI has no database).
+//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:55432/tibot_ci_test
+// Skipped when the variable is unset. CI provides a dedicated test database.
 @EnabledIfEnvironmentVariable(named = "TI4_TEST_POSTGRES_URL", matches = ".+")
 @SpringBootTest(
         classes = GameEventSinceDatabaseTest.TestConfig.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = "spring.jpa.hibernate.ddl-auto=create-drop")
-class GameEventSinceDatabaseTest {
+class GameEventSinceDatabaseTest extends PostgresDatabaseTest {
 
     @Autowired
     private GameEventService service;
@@ -37,12 +38,8 @@ class GameEventSinceDatabaseTest {
     @Autowired
     private GameEventRepository repository;
 
-    @DynamicPropertySource
-    static void datasource(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> System.getenv("TI4_TEST_POSTGRES_URL"));
-        registry.add("spring.datasource.username", () -> envOrDefault("TI4_TEST_POSTGRES_USER", "tibot"));
-        registry.add("spring.datasource.password", () -> envOrDefault("TI4_TEST_POSTGRES_PASSWORD", ""));
-    }
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @BeforeEach
     void clearTable() {
@@ -82,6 +79,24 @@ class GameEventSinceDatabaseTest {
         assertThat(repository.findGameNamesWithEventsAfter(100)).containsExactly("pbd1", "pbd2");
     }
 
+    @Test
+    void bulkDeleteRemovesOnlyLaterEventsOfThatGame() {
+        save("pbd1", 1, 100);
+        save("pbd1", 2, 200);
+        save("pbd1", 3, 300);
+        save("pbd2", 3, 300);
+
+        int deleted = new TransactionTemplate(transactionManager)
+                .execute(_ -> repository.deleteByGameNameAndSeqGreaterThan("pbd1", 1));
+
+        assertThat(deleted).isEqualTo(2);
+        assertThat(repository.findByGameNameAndSeqLessThanEqualOrderBySeqAsc("pbd1", 10))
+                .extracting(GameEventEntity::getSeq)
+                .containsExactly(1L);
+        assertThat(repository.findByGameNameAndSeqLessThanEqualOrderBySeqAsc("pbd2", 10))
+                .hasSize(1);
+    }
+
     private void save(String gameName, long seq, long timestamp) {
         repository.save(new GameEventEntity(
                 null, gameName, seq, "TURN", 1, "action", "sol", timestamp, "{}", null, null, null));
@@ -92,11 +107,6 @@ class GameEventSinceDatabaseTest {
         when(game.getName()).thenReturn(name);
         when(game.getEventSequenceCounter()).thenReturn(eventSequenceCounter);
         return game;
-    }
-
-    private static String envOrDefault(String name, String fallback) {
-        String value = System.getenv(name);
-        return value == null ? fallback : value;
     }
 
     @Configuration

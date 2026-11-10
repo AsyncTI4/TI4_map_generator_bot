@@ -19,6 +19,7 @@ import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -66,7 +67,7 @@ public class ThurvialiTechHandler {
             return false;
         }
         for (String position :
-                ti4.helpers.FoWHelper.getAdjacentTiles(game, targetTile.getPosition(), player, false, true)) {
+                Adjacency.of(game, player).forEffects().withSelf().into(targetTile.getPosition())) {
             Tile tile = game.getTileByPosition(position);
             if (tile == null || tile.isScar(game)) {
                 continue;
@@ -253,7 +254,7 @@ public class ThurvialiTechHandler {
                         + " with _Mutualism_ and gains 1 command token.",
                 ButtonHelper.getGainCCButtons(player));
         ButtonHelper.deleteMessage(event);
-        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, owner);
     }
 
     @ButtonHandler(SELECT_RESTRUCTURING_STRUCTURE)

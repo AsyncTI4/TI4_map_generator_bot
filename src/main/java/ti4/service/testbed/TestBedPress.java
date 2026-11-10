@@ -487,14 +487,13 @@ public class TestBedPress {
 
     private static boolean seed(Object action, Method method, @Nullable Object[] args) throws Throwable {
         if (args == null || args.length != 1) return false;
-        String setter =
-                switch (method.getName()) {
-                    case "sendMessage" -> args[0] instanceof MessageCreateData ? "applyData" : "setContent";
-                    case "sendMessageEmbeds" -> "setEmbeds";
-                    case "sendMessageComponents" -> "setComponents";
-                    case "sendFiles" -> "setFiles";
-                    default -> null;
-                };
+        String setter = switch (method.getName()) {
+            case "sendMessage" -> args[0] instanceof MessageCreateData ? "applyData" : "setContent";
+            case "sendMessageEmbeds" -> "setEmbeds";
+            case "sendMessageComponents" -> "setComponents";
+            case "sendFiles" -> "setFiles";
+            default -> null;
+        };
         if (setter == null) return false;
         Method target =
                 MethodUtils.getMatchingAccessibleMethod(MessageCreateRequest.class, setter, method.getParameterTypes());

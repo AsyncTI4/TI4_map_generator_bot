@@ -2,9 +2,13 @@ package ti4.cron;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,9 +21,17 @@ import ti4.logging.BotLogger;
 @UtilityClass
 public class CronManager {
 
-    private static final ScheduledThreadPoolExecutor SCHEDULER = new ScheduledThreadPoolExecutor(1);
+    private static final ScheduledThreadPoolExecutor SCHEDULER = newScheduler();
     private static final Map<String, Runnable> CRONS = new ConcurrentHashMap<>();
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 30;
+    private static final List<LeaseStartJob> LEASE_START_JOBS = new ArrayList<>();
+    private static boolean leaseAcquired;
+
+    static ScheduledThreadPoolExecutor newScheduler() {
+        ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(1);
+        scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        return scheduler;
+    }
 
     public static ScheduledFuture<?> schedulePeriodically(
             Class<?> clazz, Runnable runnable, long initialDelay, long period, TimeUnit unit) {
@@ -28,15 +40,42 @@ public class CronManager {
         return SCHEDULER.scheduleAtFixedRate(cronTask, initialDelay, period, unit);
     }
 
-    public static void scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
-        CRONS.put(clazz.getSimpleName(), runnable);
+    public static boolean scheduleOnce(Class<?> clazz, Runnable runnable, long initialDelay, TimeUnit unit) {
         Runnable cronTask = nonThrowingCronTask(clazz.getSimpleName(), runnable);
-        SCHEDULER.schedule(cronTask, initialDelay, unit);
+        return scheduleUnlessShutDown(SCHEDULER, cronTask, initialDelay, unit);
+    }
+
+    static boolean scheduleUnlessShutDown(
+            ScheduledExecutorService scheduler, Runnable task, long initialDelay, TimeUnit unit) {
+        try {
+            scheduler.schedule(task, initialDelay, unit);
+            return true;
+        } catch (RejectedExecutionException e) {
+            return false;
+        }
+    }
+
+    public static void registerManualOnly(Class<?> clazz, Runnable runnable) {
+        CRONS.put(clazz.getSimpleName(), runnable);
+    }
+
+    public static synchronized void scheduleOnceAfterLeaseAcquired(
+            Class<?> clazz, Runnable runnable, long delay, TimeUnit unit) {
+        CRONS.put(clazz.getSimpleName(), runnable);
+        LeaseStartJob job = new LeaseStartJob(clazz, runnable, delay, unit);
+        LEASE_START_JOBS.add(job);
+        if (leaseAcquired) {
+            job.schedule();
+        }
+    }
+
+    public static synchronized void runLeaseStartJobs() {
+        leaseAcquired = true;
+        LEASE_START_JOBS.forEach(LeaseStartJob::schedule);
     }
 
     public static void schedulePeriodicallyAtTime(
             Class<?> clazz, Runnable runnable, int hour, int minute, ZoneId zoneId) {
-        CRONS.put(clazz.getSimpleName(), runnable);
         long initialDelaySeconds = calculateInitialDelaySeconds(hour, minute, zoneId);
         long periodSeconds = TimeUnit.DAYS.toSeconds(1);
         schedulePeriodically(clazz, runnable, initialDelaySeconds, periodSeconds, TimeUnit.SECONDS);
@@ -78,5 +117,11 @@ public class CronManager {
                 BotLogger.error("Unhandled exception in cron: " + cronName, t);
             }
         };
+    }
+
+    private record LeaseStartJob(Class<?> clazz, Runnable runnable, long delay, TimeUnit unit) {
+        void schedule() {
+            scheduleOnce(clazz, runnable, delay, unit);
+        }
     }
 }

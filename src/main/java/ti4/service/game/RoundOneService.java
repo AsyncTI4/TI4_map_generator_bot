@@ -16,8 +16,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
@@ -25,6 +25,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.tigl.TiglSetupService;
 
 @UtilityClass
@@ -69,6 +70,9 @@ public class RoundOneService {
             game.removeRelicFromGame("quantumcore");
             game.removeRelicFromGame("thesilverflame");
             game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"));
+        }
+        if (game.isSecretsOnlyMode()) {
+            SecretsOnlyService.addModeCards(game);
         }
         game.removeOverruleIfPurged();
         game.setupNeutralPlayer();
@@ -149,30 +153,32 @@ public class RoundOneService {
                 for (int i = 0; i < others.size(); i++) {
                     Player target = others.get(i);
                     String shrine = (i == 0 ? "special" : "normal");
+                    // TODO: fog: planet names still show for tiles the target has not seen.
+                    Adjacency adjacency = Adjacency.of(game, target).forEffects();
                     buttons = new ArrayList<>();
                     if (rex != null) {
-                        for (String pos : FoWHelper.getAdjacentTiles(game, rex.getPosition(), target, false, false)) {
+                        for (String pos : adjacency.into(rex.getPosition())) {
                             Tile tile = game.getTileByPosition(pos);
                             if (tile != null) {
                                 for (Planet planet : tile.getPlanetUnitHolders()) {
                                     buttons.add(Buttons.green(
                                             "addShrine_" + planet.getName() + "_" + shrine,
                                             Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
-                                                    + tile.getRepresentationForButtons()));
+                                                    + tile.getRepresentationForButtons(game, target)));
                                 }
                             }
                         }
                     }
                     Tile hs = target.getHomeSystemTile();
                     if (hs != null) {
-                        for (String pos : FoWHelper.getAdjacentTiles(game, hs.getPosition(), target, false, false)) {
+                        for (String pos : adjacency.into(hs.getPosition())) {
                             Tile tile = game.getTileByPosition(pos);
                             if (tile != null) {
                                 for (Planet planet : tile.getPlanetUnitHolders()) {
                                     buttons.add(Buttons.green(
                                             "addShrine_" + planet.getName() + "_" + shrine,
                                             Helper.getPlanetRepresentation(planet.getName(), game) + " In Tile "
-                                                    + tile.getRepresentationForButtons()));
+                                                    + tile.getRepresentationForButtons(game, target)));
                                 }
                             }
                         }

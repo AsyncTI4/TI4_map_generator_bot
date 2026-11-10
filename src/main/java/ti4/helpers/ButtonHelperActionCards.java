@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.actioncards.ActionCardPingButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
@@ -29,6 +31,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -51,6 +54,7 @@ import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
 import ti4.service.fow.PlanetTargetService.UnitHolderTargetSpec;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
@@ -58,6 +62,12 @@ import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
 public final class ButtonHelperActionCards {
+
+    private static final String CRIPPLE_DEFENSES = "Cripple Defenses";
+    private static final String PLAGUE = "Plague";
+    private static final String REPARATIONS = "Reparations";
+    private static final String UNSTABLE_PLANET = "Unstable Planet";
+    private static final String UPRISING = "Uprising";
 
     private static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
         String factionChecker = player.factionButtonChecker();
@@ -664,8 +674,8 @@ public final class ButtonHelperActionCards {
                 continue;
             }
             if (p3.getPlayableActionCards().contains("lieinwait")) {
-                if (p3.getNeighbouringPlayers(false).contains(p1)
-                        && p3.getNeighbouringPlayers(false).contains(p2)) {
+                Set<Player> neighbours = p3.getAbilityNeighbours();
+                if (neighbours.contains(p1) && neighbours.contains(p2)) {
                     MessageHelper.sendMessageToChannel(
                             p3.getCardsInfoThread(),
                             p3.getRepresentation()
@@ -891,6 +901,11 @@ public final class ButtonHelperActionCards {
                     Helper.getPlanetRepresentation(planet, game)));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        Optional<String> pingedTarget = pingedTargetButtonId(game, player, REPARATIONS, reparationsSpec());
+        if (pingedTarget.isPresent()) {
+            resolveReparationsStep3(player, game, event, pingedTarget.get());
+            return;
+        }
         buttons = new ArrayList<>();
         String reparationsMsg = ", please tell the bot who took the planet from you.";
         if (game.isFowMode()) {
@@ -1063,6 +1078,11 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("resolveUprisingStep1")
     public static void resolveUprisingStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Optional<String> pingedTarget = pingedTargetButtonId(game, player, UPRISING, uprisingSpec());
+        if (pingedTarget.isPresent()) {
+            resolveUprisingStep3(player, game, event, pingedTarget.get());
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         if (!game.isFowMode()) {
             for (Player p2 : game.getRealPlayers()) {
@@ -1131,8 +1151,9 @@ public final class ButtonHelperActionCards {
     public static void resolveSeizeArtifactStep1(
             Player player, Game game, ButtonInteractionEvent event, String kolleccTech) {
         List<Button> buttons = new ArrayList<>();
+        Set<Player> neighbours = player.getAbilityNeighbours();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player || !player.getNeighbouringPlayers(true).contains(p2)) {
+            if (p2 == player || !neighbours.contains(p2)) {
                 continue;
             }
             if (game.isFowMode()) {
@@ -1162,6 +1183,11 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("resolvePlagueStep1")
     public static void resolvePlagueStep1(Player player, Game game, ButtonInteractionEvent event) {
+        Optional<String> pingedTarget = pingedTargetButtonId(game, player, PLAGUE, plagueSpec());
+        if (pingedTarget.isPresent()) {
+            resolvePlagueStep3(player, game, event, pingedTarget.get());
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         if (!game.isFowMode()) {
             for (Player p2 : game.getRealPlayers()) {
@@ -1295,7 +1321,7 @@ public final class ButtonHelperActionCards {
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
-        CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
+        CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti", "deep");
         if (tile.isFracture()) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
@@ -1326,6 +1352,11 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("resolveCrippleDefensesStep1")
     public static void resolveCrippleDefensesStep1(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Optional<String> pingedTarget = pingedTargetButtonId(game, player, CRIPPLE_DEFENSES, crippleSpec());
+        if (pingedTarget.isPresent()) {
+            resolveCrippleStep3(player, game, event, pingedTarget.get());
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         if (!game.isFowMode()) {
             for (Player p2 : game.getRealPlayers()) {
@@ -1444,6 +1475,7 @@ public final class ButtonHelperActionCards {
         game.setStoredValue("politicalStabilityFaction", player.getFaction());
         for (Integer sc : game.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+            if (!MegagameGroupService.allowsCard(game, player, sc)) continue;
             Button button;
             String label = Helper.getSCName(sc, game);
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -1522,6 +1554,11 @@ public final class ButtonHelperActionCards {
 
     @ButtonHandler("resolveUnstableStep1")
     public static void resolveUnstableStep1(Player player, Game game, ButtonInteractionEvent event) {
+        Optional<String> pingedTarget = pingedTargetButtonId(game, player, UNSTABLE_PLANET, unstableSpec(game));
+        if (pingedTarget.isPresent()) {
+            resolveUnstableStep3(player, game, event, pingedTarget.get());
+            return;
+        }
         List<Button> buttons = new ArrayList<>();
         if (!game.isFowMode()) {
             for (Player p2 : game.getRealPlayersNDummies()) {
@@ -2153,6 +2190,7 @@ public final class ButtonHelperActionCards {
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                if (!MegagameGroupService.allowsCardInStrategyPhase(game, player, sc)) continue;
                 Button button;
                 String label = "Coup " + Helper.getSCName(sc, game);
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -2181,7 +2219,7 @@ public final class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                if (!p2.hasUnplayedSCs()) {
+                if (!p2.hasUnplayedSCs() || !MegagameGroupService.allowsTargetInStrategyPhase(game, player, p2)) {
                     continue;
                 }
                 String label = "Extreme Duress " + p2.getFactionNameOrColor();
@@ -2206,6 +2244,7 @@ public final class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
             for (Player p2 : game.getRealPlayers()) {
+                if (!MegagameGroupService.allowsTargetInStrategyPhase(game, player, p2)) continue;
                 String label = "Crisis On " + p2.getFactionNameOrColor();
                 String scEmoji = p2.getFactionEmojiOrColor();
                 scButtons.add(Buttons.gray("resolvePreassignment_Crisis Target_" + p2.getColor(), label, scEmoji));
@@ -2412,6 +2451,7 @@ public final class ButtonHelperActionCards {
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                if (!MegagameGroupService.allowsCardInStrategyPhase(game, player, sc)) continue;
                 Button button;
                 String label = Helper.getSCName(sc, game);
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -2558,6 +2598,27 @@ public final class ButtonHelperActionCards {
         return PlanetTargetSpec.of("unstableStep3_" + BlindSelectionService.TBD_FACTION)
                 .excludingSelf()
                 .where(p -> ButtonHelper.getTypeOfPlanet(game, p.getName()).contains("hazardous"));
+    }
+
+    public static Optional<PlanetTargetSpec> singlePlanetTargetSpec(Game game, String cardTitle) {
+        if (cardTitle == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(
+                switch (cardTitle) {
+                    case CRIPPLE_DEFENSES -> crippleSpec();
+                    case PLAGUE -> plagueSpec();
+                    case REPARATIONS -> reparationsSpec();
+                    case UNSTABLE_PLANET -> unstableSpec(game);
+                    case UPRISING -> uprisingSpec();
+                    default -> null;
+                });
+    }
+
+    private static Optional<String> pingedTargetButtonId(
+            Game game, Player player, String cardTitle, PlanetTargetSpec spec) {
+        return ActionCardPingButtonHandler.consumePingedPlanet(game, player, cardTitle)
+                .map(spec::targetButtonId);
     }
 
     private static List<Button> getUnstableTargetsFor(Player p2, Game game) {
@@ -3024,7 +3085,7 @@ public final class ButtonHelperActionCards {
 
     public static List<Button> getPlagiarizeButtons(Game game, Player player) {
         List<String> techToGain = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers(true)) {
+        for (Player p2 : player.getAbilityNeighbours()) {
             techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, game);
         }
         List<Button> techs = new ArrayList<>();
@@ -3146,11 +3207,11 @@ public final class ButtonHelperActionCards {
 
     private static List<Button> getProbeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
+        Adjacency adjacency = Adjacency.of(game, player).forEffects();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
                 boolean hasShips = false;
-                for (String tile2pos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                for (String tile2pos : adjacency.into(tile.getPosition())) {
                     if (FoWHelper.playerHasShipsInSystem(player, game.getTileByPosition(tile2pos))) {
                         hasShips = true;
                     }

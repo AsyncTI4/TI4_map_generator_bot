@@ -20,6 +20,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGame
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.BorrowedTimeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PoliticalMarriageLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamBreakthroughHandler;
@@ -29,7 +31,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
@@ -103,6 +104,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent
 import ti4.service.leader.genome.homebrew.tknova.DeploymentGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.PlayerAreaWarningService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -115,7 +117,6 @@ public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         WarGamesBrActionCardHandler.clear(game);
-        MorphaBreakthroughHandler.clearMetamorphicDrawCount(game, player);
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
         VanguardPromissoryHandler.returnGuildCallAtOwnerTurnStart(event, game, player);
         PoliticalMarriageLLButtonHandler.clearExpiredRestriction(game, player);
@@ -419,6 +420,11 @@ public class StartTurnService {
                     }
                 }
             }
+            if (MegagameGroupService.isActive(game)
+                    && !MegagameGroupService.sameGroup(game, player, sc)
+                    && !player.hasFollowedSC(sc)) {
+                player.addFollowedSC(sc);
+            }
 
             if (!player.hasFollowedSC(sc)) {
                 String msg = "> " + game.getSCEmojiWordRepresentation(sc);
@@ -575,6 +581,14 @@ public class StartTurnService {
         String factionChecker = player.factionButtonChecker();
         game.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
+        Button cenotaphCircuitButton = ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player);
+        if (cenotaphCircuitButton != null) {
+            startButtons.add(cenotaphCircuitButton);
+        }
+        Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptStartTurnButton(game, player);
+        if (lyraOfTheCryptButton != null) {
+            startButtons.add(lyraOfTheCryptButton);
+        }
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);
         if (!doneActionThisTurn) {

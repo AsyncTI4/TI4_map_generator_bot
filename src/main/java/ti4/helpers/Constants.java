@@ -193,6 +193,7 @@ public final class Constants {
     public static final String SHOW_BUBBLES = "show_bubbles";
     public static final String TRANSACTION_METHOD = "transaction_method";
     public static final String SHOW_GEARS = "show_gears";
+    public static final String ONE_WAY_ADJACENCY = "one_way_adjacency";
     public static final String WORMHOLE_TOKEN_MERGE = "wormhole_token_merge";
     public static final String SHOW_BANNERS = "show_banners";
     public static final String SHOW_HEX_BORDERS = "show_hex_borders";
@@ -553,10 +554,13 @@ public final class Constants {
     public static final String SET_FOG_FILTER = "set_fog_filter";
     public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
-    public static final String PING_SYSTEM = "ping_system";
+    public static final String PING_SYSTEM = "system";
     public static final String TARGET_PLANET_PING = "target_planet";
     public static final String TARGET_SYSTEM_PING = "target_system";
-    public static final String TARGET_PLAYER_PING = "target_player_ping";
+    public static final String TARGET_PLAYER_PING = "target_player";
+    public static final String FOW_MAP_GROUP = "map";
+    public static final String FOW_MAP_SEGMENT = "segment";
+    public static final String FOW_MAP_OVERVIEW = "overview";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
     public static final String LAST_TIME_GAMES_CHECKED = "last_time_games_checked";
@@ -749,6 +753,7 @@ public final class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
+    public static final String SETUP_BETA = "setup_beta";
     public static final String SETUP_BOT_PLAYER = "setup_bot_player";
     public static final String SETUP_STARTING_FLEET = "setup_starting_fleet";
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
@@ -1143,7 +1148,7 @@ public final class Constants {
     public static final String BAG_INFO_THREAD_PREFIX = "Draft Bag-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
-    public static final String PING_ACTIVE_PLAYER = "ping_active_player";
+    public static final String PING_ACTIVE_PLAYER = "active_player";
     public static final String WHISPER = "whisper";
     public static final String MSG = "msg";
     public static final String OVERRIDE_FOW = "override_fow";
@@ -1161,7 +1166,6 @@ public final class Constants {
     public static final String FRANKEN = "franken";
     public static final String FRANKEN2 = "franken2";
     public static final String FRANKENDRAZ = "frankendraz";
-    public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
     public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
 
     // DRAFTS
@@ -1284,6 +1288,8 @@ public final class Constants {
     public static final String LATERPICK_LIMIT = "laterpick_limit";
 
     public static final String ABILITY = "ability";
+    public static final String ABILITY_EXHAUST = "exhaust_ability";
+    public static final String ABILITY_READY = "ready_ability";
     public static final String BAN = "ban";
     public static final String DRAFT_LIMITS = "draft_limits";
     public static final String BAN_ABILITY = "ban_ability";
@@ -1391,6 +1397,7 @@ public final class Constants {
     public static final String CALL_OF_THE_VOID_MODE = "call_of_the_void_mode";
     public static final String WILD_WILD_GALAXY_MODE = "wild_wild_galaxy_mode";
     public static final String FEAST_OR_FAMINE_MODE = "feast_or_famine_mode";
+    public static final String SECRETS_ONLY_MODE = "secrets_only_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String VEILED_HEART_MODE = "veiled_heart_mode";
@@ -1644,6 +1651,7 @@ public final class Constants {
     public static final String CANCEL_CHANNEL_EXPORT = "cancel";
     public static final String RESUME_CHANNEL_EXPORT = "resume";
     public static final String LOG_CHANNEL_EXPORT = "log";
+    public static final String INFO_CHANNEL_EXPORT = "info";
     public static final String EXPORT_ID = "export_id";
     public static final String EXPORT_MAX_SIZE_MB = "max_size_mb";
     public static final String CHANNEL = "channel";

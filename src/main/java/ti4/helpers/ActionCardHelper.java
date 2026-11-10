@@ -40,6 +40,8 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StasisT
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.StolenFilesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.UnconventionalDiplomacyBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.actioncards.secretsonly.CovertExchangeActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
@@ -63,6 +65,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.CorruptionTimingService;
 import ti4.service.actioncard.OracleDrawService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -79,6 +82,8 @@ import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
+import ti4.service.megagame.MegagameActionCardRules;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -133,6 +138,21 @@ public class ActionCardHelper {
      */
     public static boolean isDiscardVisible(Game game, boolean hideUnplayed, String acId) {
         return !hideUnplayed || game.getPlayedActionCards().contains(acId);
+    }
+
+    public static void sendAmendmentReminder(Player player) {
+        if (!player.getPlayableActionCards().contains("amendment")) {
+            return;
+        }
+        List<Button> amendmentButtons = new ArrayList<>();
+        amendmentButtons.add(Buttons.green(
+                player.factionButtonChecker() + "resolveAmendmentStep1", "Resolve Amendment", CardEmojis.ActionCard));
+        amendmentButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", a reminder that this is the window to play _Amendment_."
+                        + " Use the buttons to start the process.",
+                amendmentButtons);
     }
 
     public static void sendActionCardInfo(Game game, Player player) {
@@ -782,6 +802,7 @@ public class ActionCardHelper {
             sendSchemingDiscardButtons(player);
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+        BloomAbilityHandler.offerNeurotropicActive(game, player);
 
         if (!silent) {
             String message = player.getRepresentation() + " drew " + StringHelper.pluralize(count, "action card")
@@ -805,6 +826,10 @@ public class ActionCardHelper {
         String actionCardTitle = actionCard.getName();
         String actionCardWindow = actionCard.getWindow();
         boolean twinned = (acIndex == -99);
+        String megagameRefusal = MegagameActionCardRules.presetOnlyRefusal(event, game, acID, actionCardTitle);
+        if (megagameRefusal != null) {
+            return megagameRefusal;
+        }
 
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
@@ -828,6 +853,9 @@ public class ActionCardHelper {
                 && !game.isTwilightsFallMode()) {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
                     + " You may fix this with `/player turn_start`. Until then, you are #denied.";
+        }
+        if (CorruptionTimingService.isBlocked(game, player, acID)) {
+            return CorruptionTimingService.blockedMessage(player);
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentationUnfogged()
@@ -1144,6 +1172,9 @@ public class ActionCardHelper {
             }
             if ("stolen_files".equals(automationID)) {
                 StolenFilesBrActionCardHandler.offerResolution(game, player, introMsg);
+            }
+            if (CovertExchangeActionCardHandler.AUTOMATION_ID.equals(automationID)) {
+                CovertExchangeActionCardHandler.offerResolution(player, introMsg);
             }
             if ("unconventional_diplomacy".equals(automationID)) {
                 UnconventionalDiplomacyBrActionCardHandler.offerResolution(game, player, introMsg);
@@ -1510,11 +1541,6 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
-            if ("oracle".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOracle", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
             if ("intrigue".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveIntrigue", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1626,11 +1652,6 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
-            if ("hijacked_signal".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHijackedSignal", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
             if ("misallocated_funding".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.factionButtonChecker() + "resolveMisallocatedFunding", buttonLabel));
@@ -1654,6 +1675,16 @@ public class ActionCardHelper {
 
             if ("sacrifice".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSacrifice", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("brokered_alliance".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveBrokeredAlliance", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("fractured_reality".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveFracturedReality", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -2503,6 +2534,7 @@ public class ActionCardHelper {
     public static void serveManipulateInvestmentButtons(Game game, Player player) {
         List<Button> scButtons = new ArrayList<>();
         for (int sc : game.getSCList()) {
+            if (!MegagameGroupService.allowsCardInStrategyPhase(game, player, sc)) continue;
             Button button;
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
 

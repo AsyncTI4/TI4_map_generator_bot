@@ -13,7 +13,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
@@ -337,6 +339,9 @@ public class PromissoryNoteHelper {
         if ("bepncryst".equalsIgnoreCase(id)) {
             CrystellumPromissoryHandler.resolveFracture(game, player, event);
         }
+        if ("bepnbloom".equalsIgnoreCase(id)) {
+            BloomPromissoryHandler.offerStarterCulture(game, player);
+        }
         if ("bepnnatau".equalsIgnoreCase(id)) {
             NatauPromissoryHandler.offerRuptureSystems(game, player);
         }
@@ -510,7 +515,7 @@ public class PromissoryNoteHelper {
                     player.getCorrectChannel(), "Please spend 1 influence.", buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             buttons = new ArrayList<>();
-            for (Player p2 : player.getNeighbouringPlayers(true)) {
+            for (Player p2 : player.getAbilityNeighbours()) {
                 buttons.add(Buttons.green(
                         player.factionButtonChecker() + "passMalevolencyTo_" + p2.getFaction(),
                         p2.getFactionNameOrColor()));
@@ -822,6 +827,15 @@ public class PromissoryNoteHelper {
         }
         if ("thpnstoneborn".equalsIgnoreCase(id)) {
             StonebornPromissoryHandler.offerPotentialChoices(player, game);
+        }
+        if ("bepndeep".equalsIgnoreCase(id)) {
+            DeepPromissoryHandler.resolveDarkMatter(game, player);
+        }
+        if ("bepnchoir".equalsIgnoreCase(id)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing()
+                            + ", _Dearly Departed_ is not automated. Please either cancel the hit or manually assign it, then ignore 1 destruction of your non-fighter ship.");
         }
         // These PNs' text contains "action:" but describe a trigger on another player's action
         List<String> actionTextPNsNotOwnAction = List.of("acq", "bapnconc");

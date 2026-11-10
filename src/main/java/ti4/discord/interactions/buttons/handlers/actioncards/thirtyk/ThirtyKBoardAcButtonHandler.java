@@ -261,7 +261,7 @@ public class ThirtyKBoardAcButtonHandler {
     private static Map<String, Integer> homeDistances(Game game, Player player) {
         Tile home = player.getHomeSystemTile();
         if (home == null) return Map.of();
-        return CheckDistanceHelper.getTileDistances(game, null, home.getPosition(), 4, true);
+        return CheckDistanceHelper.getBoardDistances(game, home.getPosition(), 4);
     }
 
     @ButtonHandler(CUMULATIVE_PLACE)

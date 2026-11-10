@@ -51,6 +51,10 @@ import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TheodisiOutpostActionCardHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -876,7 +880,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
             if ("monument".equals(unit)) return 1;
-            if (MapPositionMapper.getReinforcementsPosition(unit) == null) return 0;
+            if (MapPositionMapper.getReinforcementsPosition(unit) == null) return -1;
             return MapPositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
             // return 0;
         }
@@ -1407,6 +1411,11 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         return maxSOCount + Math.max(bonus, getBonusScoredSecrets());
     }
 
+    public int getSecretsCountedTowardLimit() {
+        int inHand = getSecretsUnscored().size();
+        return game.isSecretsOnlyMode() ? inHand : inHand + secretsScored.size();
+    }
+
     public void setSecret(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
@@ -1636,6 +1645,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (hasTech("tf-corporateimperialism")) {
             bonus += 4;
         }
+        if (ButtonHelper.isLawInPlay(game, "privateequity")) {
+            try {
+                bonus += Integer.parseInt(game.getStoredValue("theodisiPrivateEquity"));
+            } catch (NumberFormatException ignored) {
+            }
+        }
 
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
@@ -1697,6 +1712,12 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (MonumentsDSButtonHandler.hasVaylerianMonumentCommodityBonus(game, this)) {
             bonus++;
+        }
+        if (hasAbility("rhizomatic_dormant")) {
+            bonus++;
+        }
+        if (hasAbility("rhizomatic_active")) {
+            bonus += 2;
         }
         bonus += ThirtyKRelicHooks.commodityBonus(game, this);
 
@@ -2311,22 +2332,22 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public void setTacticalCC(int tacticalCC) {
-        if (tacticalCC >= 0) super.setTacticalCC(Math.min(tacticalCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
+        if (tacticalCC >= 0) super.setTacticalCC(SanityLimits.cap(tacticalCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     @Override
     public void setFleetCC(int fleetCC) {
-        if (fleetCC >= 0) super.setFleetCC(Math.min(fleetCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
+        if (fleetCC >= 0) super.setFleetCC(SanityLimits.cap(fleetCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     @Override
     public void setStasisInfantry(int stasisInfantry) {
-        super.setStasisInfantry(Math.min(stasisInfantry, SanityLimits.STASIS_UNITS));
+        super.setStasisInfantry(SanityLimits.cap(stasisInfantry, SanityLimits.STASIS_UNITS));
     }
 
     @Override
     public void setStasisFighters(int stasisFighters) {
-        super.setStasisFighters(Math.min(stasisFighters, SanityLimits.STASIS_UNITS));
+        super.setStasisFighters(SanityLimits.cap(stasisFighters, SanityLimits.STASIS_UNITS));
     }
 
     public String gainFleetCC(int amt) {
@@ -2345,7 +2366,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     @Override
     public void setStrategicCC(int strategicCC) {
-        if (strategicCC >= 0) super.setStrategicCC(Math.min(strategicCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
+        if (strategicCC >= 0) super.setStrategicCC(SanityLimits.cap(strategicCC, SanityLimits.COMMAND_TOKENS_PER_POOL));
     }
 
     public double getExpectedHits() {
@@ -2444,6 +2465,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
         getFollowedSCs().add(sc);
         if (game != null) {
+            BloomAbilityHandler.offerSporefall(game, this, sc);
             ThurvialiAbilityHandler.offerCelestialEnvoys(game, this, sc);
         }
         if (editSCFollow) {
@@ -2454,8 +2476,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                             game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + sc)
                     .orElse(null);
             if (gameMessage != null) {
-                ThreadChannel chan = ButtonHelper.getRightStratThread(
-                        game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
+                ThreadChannel chan = ButtonHelper.getStratThreadForSc(game, sc);
                 if (chan != null) {
                     String followSummary = PlayStrategyCardService.getSCFollowSummary(game, sc, true);
                     chan.retrieveMessageById(gameMessage.messageId())
@@ -3111,6 +3132,17 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                 StonebornUnitHandler.damageMobileMountain(game, this);
             }
             IxthLegendaryButtonHandler.onPlanetExhausted(game, this, planet);
+            if (getPlanets().contains(planet) && hasTech("bemigog") && hasTechReady("bemigog")) {
+                MigoTechHandler.offerSynapticFeedbackLoop(this, game, planet);
+            }
+            Planet planetM = this.game.getPlanetsInfo().get(planet);
+            if (getPlanets().contains(planet)
+                    && hasAbility("harvest_green")
+                    && !getExhaustedAbilities().contains("harvest_green")
+                    && planetM != null
+                    && !planetM.getTechSpecialities().isEmpty()) {
+                MigoHarvestHandler.offerGreenHarvest(this);
+            }
         }
         Game game = this.game;
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
@@ -3291,7 +3323,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public void setDebtTokens(Map<String, Integer> debtTokens, String pool) {
         Map<String, Integer> capped = new LinkedHashMap<>();
         debtTokens.forEach((color, count) ->
-                capped.put(color, count == null ? null : Math.min(count, SanityLimits.DEBT_TOKENS_PER_COLOR)));
+                capped.put(color, count == null ? null : SanityLimits.cap(count, SanityLimits.DEBT_TOKENS_PER_COLOR)));
         this.debtTokens.put(pool.toLowerCase(), capped);
     }
 
@@ -3306,8 +3338,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
 
         int current = debtTokens.get(pool).getOrDefault(tokenColor, 0);
-        debtTokens.get(pool).put(tokenColor, (int)
-                Math.min((long) current + count, SanityLimits.DEBT_TOKENS_PER_COLOR));
+        debtTokens
+                .get(pool)
+                .put(tokenColor, SanityLimits.cappedSum(current, count, SanityLimits.DEBT_TOKENS_PER_COLOR));
     }
 
     public void removeDebtTokens(String tokenColor, int count) {
@@ -3395,6 +3428,10 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         PlayerNeighbourGraph graph = new PlayerNeighbourGraph(game);
         if (checkEquiv) return graph.neighboursOf(this);
         return new LinkedHashSet<>(graph.directNeighboursOf(this));
+    }
+
+    public Set<Player> getAbilityNeighbours() {
+        return getNeighbouringPlayers(!game.usesOneWayAdjacency());
     }
 
     public boolean isNeighboursWith(Player player) {
@@ -3727,6 +3764,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         }
         if (game.getStoredValue("silverFlamed").contains(getFaction())) {
             return null;
+        }
+        if (DeepUnitHandler.isDeepPlayer(this)) {
+            return DeepUnitHandler.getUnitTile(game, this);
         }
         if (getHomeSystemPosition() != null) {
             Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());
