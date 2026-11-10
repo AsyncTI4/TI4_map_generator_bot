@@ -49,6 +49,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     public static final String DISCORDANT_STARS_FACTION_LIMITS_KEY = "frankenDrazDiscordantStarsFactionLimits";
     public static final String BLUE_REVERIE_FACTION_LIMITS_KEY = "frankenDrazBlueReverieFactionLimits";
     public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
+    public static final String WFTV_FACTION_LIMITS_KEY = "frankenDrazWftvFactionLimits";
     private static final int DEFAULT_MONUMENT_LIMIT = 2;
     private static final int DEFAULT_FACTION_LIMIT = 6;
     private static final Set<String> EXCLUDED_FACTIONS =
@@ -148,7 +149,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         for (Map.Entry<ComponentSource, String> entry : Map.of(
                         ComponentSource.ds, DISCORDANT_STARS_FACTION_LIMITS_KEY,
                         ComponentSource.blue_reverie, BLUE_REVERIE_FACTION_LIMITS_KEY,
-                        ComponentSource.theodisi, LOST_LEGACIES_FACTION_LIMITS_KEY)
+                        ComponentSource.theodisi, LOST_LEGACIES_FACTION_LIMITS_KEY,
+                        ComponentSource.wftv, WFTV_FACTION_LIMITS_KEY)
                 .entrySet()) {
             String[] limits = game.getStoredValue(entry.getValue()).split("\\|", 2);
             if (limits.length == 2) {
