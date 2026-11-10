@@ -177,6 +177,16 @@ class MecatolTakeWinOddsTest extends BaseTi4Test {
         assertThat(WinOdds.reachesGoal(test.game, test.nekro, test.sol)).isZero();
     }
 
+    // Self-play overflow: the take's invasion estimate prices copied tech, explore and secret draws, whose
+    // feasibility asks win odds again, which priced another take. A take priced inside a take counts as none.
+    @Test
+    void aTakePricedWhilePricingATakeCountsAsNone() {
+        assertThat(WinOdds.outsideAnotherTake(() -> 0.7)).isEqualTo(0.7);
+        assertThat(WinOdds.outsideAnotherTake(() -> WinOdds.outsideAnotherTake(() -> 0.7)))
+                .isZero();
+        assertThat(WinOdds.outsideAnotherTake(() -> 0.4)).isEqualTo(0.4);
+    }
+
     // CPU: one invasion estimate per rival per tick; the memo makes repeat calls free.
     @Test
     void theTakeEstimateIsCheap() {

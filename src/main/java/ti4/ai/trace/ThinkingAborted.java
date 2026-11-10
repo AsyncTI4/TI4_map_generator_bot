@@ -27,12 +27,35 @@ public final class ThinkingAborted extends RuntimeException {
     }
 
     public static ThinkingAborted stackOverflow(StackOverflowError overflow) {
-        Set<String> frames = new LinkedHashSet<>();
+        List<String> innermostFirst = new ArrayList<>();
         for (StackTraceElement element : overflow.getStackTrace()) {
+            if (element.getClassName().startsWith(AI_PACKAGE)) innermostFirst.add(frameOf(element));
+        }
+        List<String> cycle = repeatingCycle(innermostFirst);
+        if (!cycle.isEmpty()) return new ThinkingAborted("it ran out of stack", cycle.reversed(), List.of("cycle"));
+        Set<String> frames = new LinkedHashSet<>();
+        for (String frame : innermostFirst) {
             if (frames.size() == OVERFLOW_FRAMES) break;
-            if (element.getClassName().startsWith(AI_PACKAGE)) frames.add(frameOf(element));
+            frames.add(frame);
         }
         return new ThinkingAborted("it ran out of stack", new ArrayList<>(frames).reversed());
+    }
+
+    static List<String> repeatingCycle(List<String> innermostFirst) {
+        int skip = innermostFirst.size() / 4;
+        List<String> body = innermostFirst.subList(skip, innermostFirst.size());
+        for (int period = 1; period <= body.size() / 3; period++) {
+            if (repeatsWithPeriod(body, period)) return body.subList(0, period);
+        }
+        return List.of();
+    }
+
+    private static boolean repeatsWithPeriod(List<String> frames, int period) {
+        int checked = Math.min(frames.size(), period * 3);
+        for (int index = period; index < checked; index++) {
+            if (!frames.get(index).equals(frames.get(index - period))) return false;
+        }
+        return true;
     }
 
     private static String frameOf(StackTraceElement element) {

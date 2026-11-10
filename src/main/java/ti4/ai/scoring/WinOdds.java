@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.CustodiansRace;
@@ -37,6 +38,7 @@ public class WinOdds {
     private static final String BOOK_OF_LATVINIA = "bookoflatvinia";
     private static final String CROWN_OF_EMPHIDIA = "emphidia";
     private static final String TOMB_OF_EMPHIDIA = "attachment_tombofemphidia.png";
+    private static final ThreadLocal<Boolean> PRICING_MECATOL_TAKE = ThreadLocal.withInitial(() -> false);
 
     public record Odds(double duringAction, double byStatusScoring, double byStatusEnd) {
 
@@ -157,8 +159,18 @@ public class WinOdds {
 
     private static double mecatolTake(Game game, Player viewer, Player rival, Loss loss) {
         Tile stopped = loss.stopsShips() ? game.getTileByPosition(loss.system()) : null;
-        if (stopped == null) return PlanetTake.mecatolThisRound(game, viewer, rival);
-        return PlanetTake.mecatolThisRoundWithout(game, viewer, rival, stopped);
+        if (stopped == null) return outsideAnotherTake(() -> PlanetTake.mecatolThisRound(game, viewer, rival));
+        return outsideAnotherTake(() -> PlanetTake.mecatolThisRoundWithout(game, viewer, rival, stopped));
+    }
+
+    static double outsideAnotherTake(DoubleSupplier take) {
+        if (PRICING_MECATOL_TAKE.get()) return 0;
+        PRICING_MECATOL_TAKE.set(true);
+        try {
+            return take.getAsDouble();
+        } finally {
+            PRICING_MECATOL_TAKE.set(false);
+        }
     }
 
     private static Odds blend(Odds taken, Odds held, double take) {
