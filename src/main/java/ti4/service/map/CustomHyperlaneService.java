@@ -206,47 +206,40 @@ public class CustomHyperlaneService {
 
     @ModalHandler("hlBridgeSave")
     public static void saveBridge(ModalInteractionEvent event, Game game) {
+        boolean adding = !event.getModalId().startsWith("hlBridgeSave_");
         String position = StringUtils.substringAfter(event.getModalId(), "hlBridgeSave_");
-        if (position.isEmpty() && event.getValue(BRIDGE_POSITION) != null) {
+        if (adding && event.getValue(BRIDGE_POSITION) != null) {
             position = event.getValue(BRIDGE_POSITION).getAsString().trim().toLowerCase();
         }
-        String typed = event.getValue(Constants.SETTING_VALUE)
-                .getAsString()
-                .replace("\n", "")
-                .replace(" ", "");
-        if (StringUtils.isBlank(typed) || !typed.matches(".*[12].*")) {
+        String typed = event.getValue(Constants.SETTING_VALUE).getAsString();
+        MessageHelper.sendMessageToChannel(event.getChannel(), saveBridgeInput(game, position, typed, adding));
+    }
+
+    public static String saveBridgeInput(Game game, String position, String input, boolean adding) {
+        String typed = input.replace("\n", "").replace(" ", "");
+        boolean clears = StringUtils.isBlank(typed) || isValidConnectionMatrix(typed) && !typed.matches(".*[12].*");
+        if (clears) {
             HyperlaneBridges.remove(game, position);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Bridge removed from " + position + ".");
-            return;
+            return "Bridge removed from " + position + ".";
         }
         Optional<String> problem = HyperlaneBridges.problemWith(game, position, typed);
         if (problem.isPresent()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), problem.get());
-            return;
+            return problem.get();
         }
+        boolean replaces = adding && HyperlaneBridges.matrixOf(game, position) != null;
         HyperlaneBridges.set(game, position, typed);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "Bridge on " + position + ": "
-                        + describeBridge(HyperlaneBridges.all(game).get(position)) + "."
-                        + "\n-# Lanes pass straight through " + position + "; the edges they use are lane-only, so "
-                        + position + " doesn't border the tiles across them." + contradictionsLine(typed));
+        return "Bridge on " + position + ": " + describeBridge(HyperlaneBridges.matrixOf(game, position)) + "."
+                + "\n-# Lanes pass straight through " + position + "; the edges they use are lane-only, so "
+                + position + " doesn't border the tiles across them."
+                + (replaces ? "\n-# This replaced the bridge that was already there." : "")
+                + contradictionsLine(typed);
     }
 
     public static String describeBridge(@Nullable BridgeMatrix matrix) {
-        if (matrix == null) {
+        if (matrix == null || matrix.isEmpty()) {
             return "no lanes";
         }
-        List<String> lanes = new ArrayList<>();
-        for (int a = 0; a < 6; a++) {
-            for (int b = a + 1; b < 6; b++) {
-                boolean ab = matrix.leads(a, b), ba = matrix.leads(b, a);
-                if (ab && ba) lanes.add(SIDE_NAMES.get(a) + " ↔ " + SIDE_NAMES.get(b));
-                else if (ab) lanes.add(SIDE_NAMES.get(a) + " → " + SIDE_NAMES.get(b));
-                else if (ba) lanes.add(SIDE_NAMES.get(b) + " → " + SIDE_NAMES.get(a));
-            }
-        }
-        return String.join(", ", lanes);
+        return matrix.pairs().stream().map(matrix::describe).collect(Collectors.joining(", "));
     }
 
     @ButtonHandler(value = "customHyperlaneExport", save = false)
@@ -281,41 +274,46 @@ public class CustomHyperlaneService {
 
     @ModalHandler("customHyperlaneImportSave")
     public static void saveImportedHyperlaneData(ModalInteractionEvent event, Game game) {
-        String importData =
-                event.getValue(Constants.SETTING_VALUE).getAsString().replace("\n", " ");
+        String importData = event.getValue(Constants.SETTING_VALUE).getAsString();
+        MessageHelper.sendMessageToChannel(event.getChannel(), importHyperlaneData(game, importData));
+    }
 
+    public static String importHyperlaneData(Game game, String input) {
         Map<String, String> customHyperlaneData = new HashMap<>();
         Map<String, String> bridges = new HashMap<>();
-        for (String dataRow : importData.split(" ")) {
+        for (String dataRow : input.replace("\n", " ").split(" ")) {
             if (dataRow.isBlank()) continue;
             String[] data = dataRow.split(",");
             if (data.length != 2) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid data: `" + dataRow + "`");
-                return;
+                return "Invalid data: `" + dataRow + "`";
             }
-
             boolean bridge = data[0].startsWith(BRIDGE_PREFIX);
             String position = bridge ? data[0].substring(BRIDGE_PREFIX.length()) : data[0];
             if (!MapPositionMapper.isTilePositionValid(game, position)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: `" + position + "`");
-                return;
+                return "Invalid position: `" + position + "`";
             }
-
             String matrix = decodeMatrix(data[1].trim());
             if (!isValidStoredMatrix(matrix)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid connection matrix: `" + matrix + "`");
-                return;
+                return "Invalid connection matrix: `" + matrix + "`";
             }
-
             (bridge ? bridges : customHyperlaneData).put(position, matrix);
         }
-
         if (customHyperlaneData.isEmpty() && bridges.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Found nothing to import.");
-            return;
+            return "Found nothing to import.";
         }
-        game.setCustomHyperlaneData(customHyperlaneData);
-        int previousBridges = HyperlaneBridges.all(game).size();
+        StringBuilder reply = new StringBuilder();
+        if (!customHyperlaneData.isEmpty()) {
+            game.setCustomHyperlaneData(customHyperlaneData);
+            reply.append("Hyperlane data imported.");
+        }
+        if (!bridges.isEmpty()) {
+            reply.append(reply.isEmpty() ? "" : "\n").append(importBridges(game, bridges));
+        }
+        return reply.toString();
+    }
+
+    private static String importBridges(Game game, Map<String, String> bridges) {
+        int previous = HyperlaneBridges.all(game).size();
         HyperlaneBridges.clear(game);
         StringBuilder problems = new StringBuilder();
         bridges.forEach((position, stored) -> {
@@ -328,12 +326,8 @@ public class CustomHyperlaneService {
                                     .append(problem),
                             () -> HyperlaneBridges.set(game, position, typed));
         });
-        int importedBridges = HyperlaneBridges.all(game).size();
-        String bridgeLine = importedBridges + previousBridges == 0
-                ? ""
-                : "\nBridges: " + importedBridges + " imported"
-                        + (previousBridges > 0 ? ", " + previousBridges + " previous removed" : "") + ".";
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data imported." + bridgeLine + problems);
+        return "Bridges: " + HyperlaneBridges.all(game).size() + " imported"
+                + (previous > 0 ? ", " + previous + " previous removed" : "") + "." + problems;
     }
 
     @ButtonHandler("customHyperlaneEdit")
@@ -738,6 +732,7 @@ public class CustomHyperlaneService {
     }
 
     public static void moveCustomHyperlaneData(String from, String to, Game game, boolean twoWays) {
+        HyperlaneBridges.move(game, from, to, twoWays);
         Map<String, String> data = game.getCustomHyperlaneData();
         String dataFrom = data.remove(from);
         String dataTo = data.remove(to);

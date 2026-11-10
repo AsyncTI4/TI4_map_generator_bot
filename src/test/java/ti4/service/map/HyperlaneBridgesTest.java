@@ -100,9 +100,60 @@ class HyperlaneBridgesTest extends BaseTi4Test {
                 .orElse("");
     }
 
+    // A bridge belongs to its tile: a different system placed on the position doesn't inherit it, and moving or
+    // swapping systems carries the bridge along (move_tile, swap_two_systems and the lore swap all use this).
+    @Test
+    void aBridgeStaysWithItsTile() {
+        HyperlaneBridges.set(game, "000", TYPED);
+        game.setTile(new Tile("20", "000"));
+        assertThat(HyperlaneBridges.matrixOf(game, "000")).isNull();
+
+        game.setTile(new Tile("19", "000"));
+        game.setTile(new Tile("21", "102"));
+        game.setTile(new Tile("21", "000"));
+        game.setTile(new Tile("19", "102"));
+        CustomHyperlaneService.moveCustomHyperlaneData("000", "102", game, true);
+        assertThat(HyperlaneBridges.matrixOf(game, "102")).isNotNull();
+        assertThat(HyperlaneBridges.matrixOf(game, "000")).isNull();
+    }
+
+    // Import replaces only what it contains: bridge rows alone keep the hyperlanes, hyperlane rows alone keep the
+    // bridges.
+    @Test
+    void importReplacesOnlyWhatItContains() {
+        String lane = "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        game.getCustomHyperlaneData().put("101", lane);
+        HyperlaneBridges.set(game, "000", TYPED);
+
+        String bridgeRow = "bridge:000," + CustomHyperlaneService.encodeMatrix(NORTH_TO_SOUTH.replace('2', '1'));
+        assertThat(CustomHyperlaneService.importHyperlaneData(game, bridgeRow)).contains("Bridges: 1 imported");
+        assertThat(game.getCustomHyperlaneData()).containsEntry("101", lane);
+
+        String laneRow = "101," + CustomHyperlaneService.encodeMatrix(lane);
+        CustomHyperlaneService.importHyperlaneData(game, laneRow);
+        assertThat(HyperlaneBridges.matrixOf(game, "000")).isNotNull();
+    }
+
+    // A typo is reported, not taken as "remove"; Add Bridge says when it replaces an existing bridge.
+    @Test
+    void theModalReportsTyposAndReplacements() {
+        HyperlaneBridges.set(game, "000", TYPED);
+        assertThat(CustomHyperlaneService.saveBridgeInput(game, "000", NORTH_TO_SOUTH.replace('2', '3'), false))
+                .contains("6 rows of 6 values");
+        assertThat(HyperlaneBridges.matrixOf(game, "000")).isNotNull();
+
+        assertThat(CustomHyperlaneService.saveBridgeInput(game, "000", NORTH_TO_SOUTH, true))
+                .contains("replaced the bridge");
+        assertThat(CustomHyperlaneService.saveBridgeInput(game, "000", EMPTY, false))
+                .isEqualTo("Bridge removed from 000.");
+        assertThat(HyperlaneBridges.hasAny(game)).isFalse();
+    }
+
     @Test
     void spinningRingsMovesTheBridgeWithItsTile() {
         HyperlaneBridges.set(game, "000", TYPED);
+        game.setTile(new Tile("20", "000"));
+        game.setTile(new Tile("19", "102"));
         HyperlaneBridges.moveAll(game, Map.of("000", "102", "102", "000"));
         assertThat(HyperlaneBridges.all(game)).containsOnlyKeys("102");
     }

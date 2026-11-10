@@ -83,9 +83,13 @@ final class BorderDecorationsStep implements TileStepPainter {
                 || game.hasBorderAnomalyOn(neighbourPosition, facing)) {
             return false;
         }
-        boolean neighbourDrawsIt =
-                HyperlaneBridges.laneSides(game, neighbourPosition).contains(facing)
-                        && neighbourPosition.compareTo(position) < 0;
+        if (!HyperlaneBridges.laneSides(game, neighbourPosition).contains(facing)) {
+            return true;
+        }
+        if (BridgeEndsLookup.drawnMatrix(scene, neighbour).sides().contains(facing)) {
+            return false;
+        }
+        boolean neighbourDrawsIt = neighbourPosition.compareTo(position) < 0 && scene.seesPosition(position);
         return !neighbourDrawsIt;
     }
 

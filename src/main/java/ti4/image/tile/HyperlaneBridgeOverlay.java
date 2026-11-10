@@ -50,7 +50,7 @@ final class HyperlaneBridgeOverlay {
     private static final double CENTER_X = TILE_WIDTH / 2.0;
     private static final double CENTER_Y = TILE_HEIGHT / 2.0;
 
-    private static final int CACHED_IMAGES = 256;
+    private static final int CACHED_IMAGES = 48;
     private static final Map<String, BufferedImage> CACHE =
             Collections.synchronizedMap(new LinkedHashMap<>(64, 0.75f, true) {
                 @Override

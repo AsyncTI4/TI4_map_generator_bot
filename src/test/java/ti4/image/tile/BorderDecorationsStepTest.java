@@ -13,7 +13,10 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.service.fow.FogViewer;
@@ -145,6 +148,31 @@ class BorderDecorationsStepTest extends BaseTi4Test {
         assertThat(painted(extras(game, "000"))).isZero();
 
         game.setFowOption(FOWOption.HIDE_UNSEEN_HYPERLANES, false);
+        assertThat(painted(privateExtras(game, viewer, "000"))).isZero();
+    }
+
+    // 000 and 104 are both bridged N -> S. The player sits in 104, so 104 shows the lane on the shared edge; 000's own
+    // lanes aren't seen. The edge carries a visible lane, so neither tile may draw a tear.
+    @Test
+    void noTearWhereTheOtherBridgeShowsTheLane() {
+        Game game = new Game();
+        game.newGameSetup();
+        game.setName("lane-blocked-chain-test");
+        game.setFowMode(true);
+        game.setFowOption(FOWOption.HIDE_UNSEEN_HYPERLANES, true);
+        game.setTile(new Tile("19", "000"));
+        game.setTile(new Tile("20", "104"));
+        String northToSouth = "0,0,0,2,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        HyperlaneBridges.set(game, "000", northToSouth);
+        HyperlaneBridges.set(game, "104", northToSouth);
+        Player viewer = game.addPlayer("111", "sol");
+        viewer.setFaction(game, "sol");
+        viewer.setColor("blue");
+        game.getTileByPosition("104")
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Destroyer, viewer.getColorID()), 1);
+        game.getTileByPosition("000").setTileFog(viewer, false);
+        game.getTileByPosition("104").setTileFog(viewer, false);
+
         assertThat(painted(privateExtras(game, viewer, "000"))).isZero();
     }
 

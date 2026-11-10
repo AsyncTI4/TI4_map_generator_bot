@@ -18,34 +18,35 @@ public class HyperlaneBridges {
 
     static final String KEY = "hyperlaneBridges";
     private static final int PARSED_STORES_KEPT = 64;
-    private static final Map<String, Map<String, BridgeMatrix>> PARSED = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, Stored>> PARSED = new ConcurrentHashMap<>();
+
+    record Stored(@Nullable String tileId, BridgeMatrix matrix) {
+
+        boolean belongsTo(@Nullable Tile tile) {
+            return tile != null && !isHyperlane(tile) && (tileId == null || tileId.equals(tile.getTileID()));
+        }
+    }
+
+    public static boolean hasAny(Game game) {
+        return !stored(game).isEmpty();
+    }
 
     public static Map<String, BridgeMatrix> all(Game game) {
-        String raw = game.getStoredValueMap().get(KEY);
-        if (raw == null || raw.isEmpty()) {
-            return Map.of();
-        }
-        Map<String, BridgeMatrix> parsed = PARSED.get(raw);
-        if (parsed == null) {
-            if (PARSED.size() >= PARSED_STORES_KEPT) PARSED.clear();
-            parsed = parse(StringHelper.unescape(raw));
-            PARSED.put(raw, parsed);
-        }
-        return parsed;
+        Map<String, BridgeMatrix> bridges = new TreeMap<>();
+        stored(game).forEach((position, stored) -> {
+            if (stored.belongsTo(game.getTileByPosition(position))) bridges.put(position, stored.matrix());
+        });
+        return bridges;
     }
 
     @Nullable
     public static BridgeMatrix matrixOf(Game game, String position) {
-        Map<String, BridgeMatrix> bridges = all(game);
+        Map<String, Stored> bridges = stored(game);
         if (bridges.isEmpty()) {
             return null;
         }
-        BridgeMatrix matrix = bridges.get(position);
-        if (matrix == null) {
-            return null;
-        }
-        Tile tile = game.getTileByPosition(position);
-        return tile == null || isHyperlane(tile) ? null : matrix;
+        Stored stored = bridges.get(position);
+        return stored != null && stored.belongsTo(game.getTileByPosition(position)) ? stored.matrix() : null;
     }
 
     public static Set<Integer> laneSides(Game game, String position) {
@@ -94,17 +95,18 @@ public class HyperlaneBridges {
 
     public static void set(Game game, String position, String typed) {
         BridgeMatrix matrix = BridgeMatrix.parse(CustomHyperlaneService.toStoredMatrix(typed));
-        Map<String, BridgeMatrix> bridges = new TreeMap<>(all(game));
-        if (matrix == null || matrix.isEmpty()) {
+        Map<String, Stored> bridges = new TreeMap<>(stored(game));
+        Tile tile = game.getTileByPosition(position);
+        if (matrix == null || matrix.isEmpty() || tile == null) {
             bridges.remove(position);
         } else {
-            bridges.put(position, matrix);
+            bridges.put(position, new Stored(tile.getTileID(), matrix));
         }
         write(game, bridges);
     }
 
     public static void remove(Game game, String position) {
-        Map<String, BridgeMatrix> bridges = new TreeMap<>(all(game));
+        Map<String, Stored> bridges = new TreeMap<>(stored(game));
         if (bridges.remove(position) != null) write(game, bridges);
     }
 
@@ -112,13 +114,25 @@ public class HyperlaneBridges {
         game.removeStoredValue(KEY);
     }
 
+    public static void move(Game game, String from, String to, boolean swap) {
+        if (from.equals(to)) {
+            return;
+        }
+        moveAll(game, swap ? Map.of(from, to, to, from) : Map.of(from, to));
+    }
+
     public static void moveAll(Game game, Map<String, String> fromTo) {
-        Map<String, BridgeMatrix> bridges = all(game);
+        Map<String, Stored> bridges = stored(game);
         if (bridges.isEmpty()) {
             return;
         }
-        Map<String, BridgeMatrix> moved = new TreeMap<>();
-        bridges.forEach((position, matrix) -> moved.put(fromTo.getOrDefault(position, position), matrix));
+        Map<String, Stored> moved = new TreeMap<>();
+        bridges.forEach((position, stored) -> {
+            if (!fromTo.containsKey(position)) moved.put(position, stored);
+        });
+        bridges.forEach((position, stored) -> {
+            if (fromTo.containsKey(position)) moved.put(fromTo.get(position), stored);
+        });
         write(game, moved);
     }
 
@@ -126,30 +140,45 @@ public class HyperlaneBridges {
         return CustomHyperlaneService.isCustomHyperlaneTile(tile) || Mapper.getHyperlaneData(tile.getTileID()) != null;
     }
 
-    public static String encode(Map<String, BridgeMatrix> bridges) {
-        StringBuilder encoded = new StringBuilder();
-        new TreeMap<>(bridges).forEach((position, matrix) -> {
-            if (!encoded.isEmpty()) encoded.append('|');
-            encoded.append(position).append('=').append(matrix.stored());
-        });
-        return encoded.toString();
+    private static Map<String, Stored> stored(Game game) {
+        String raw = game.getStoredValueMap().get(KEY);
+        if (raw == null || raw.isEmpty()) {
+            return Map.of();
+        }
+        Map<String, Stored> parsed = PARSED.get(raw);
+        if (parsed == null) {
+            if (PARSED.size() >= PARSED_STORES_KEPT) PARSED.clear();
+            parsed = parse(StringHelper.unescape(raw));
+            PARSED.put(raw, parsed);
+        }
+        return parsed;
     }
 
-    private static void write(Game game, Map<String, BridgeMatrix> bridges) {
+    private static void write(Game game, Map<String, Stored> bridges) {
         if (bridges.isEmpty()) {
             game.removeStoredValue(KEY);
-        } else {
-            game.setStoredValue(KEY, encode(bridges));
+            return;
         }
+        StringBuilder encoded = new StringBuilder();
+        new TreeMap<>(bridges).forEach((position, stored) -> {
+            if (!encoded.isEmpty()) encoded.append('|');
+            encoded.append(position).append('=');
+            if (stored.tileId() != null) encoded.append(stored.tileId()).append('@');
+            encoded.append(stored.matrix().stored());
+        });
+        game.setStoredValue(KEY, encoded.toString());
     }
 
-    static Map<String, BridgeMatrix> parse(String encoded) {
-        Map<String, BridgeMatrix> bridges = new LinkedHashMap<>();
+    static Map<String, Stored> parse(String encoded) {
+        Map<String, Stored> bridges = new LinkedHashMap<>();
         for (String entry : encoded.split("\\|")) {
             int split = entry.indexOf('=');
             if (split <= 0) continue;
-            BridgeMatrix matrix = BridgeMatrix.parse(entry.substring(split + 1));
-            if (matrix != null && !matrix.isEmpty()) bridges.put(entry.substring(0, split), matrix);
+            String value = entry.substring(split + 1);
+            int at = value.indexOf('@');
+            String tileId = at > 0 ? value.substring(0, at) : null;
+            BridgeMatrix matrix = BridgeMatrix.parse(at > 0 ? value.substring(at + 1) : value);
+            if (matrix != null && !matrix.isEmpty()) bridges.put(entry.substring(0, split), new Stored(tileId, matrix));
         }
         return Map.copyOf(bridges);
     }

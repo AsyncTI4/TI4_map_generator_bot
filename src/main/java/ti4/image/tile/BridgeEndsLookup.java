@@ -9,6 +9,7 @@ import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.adjacency.GridRule;
 import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.map.BridgeMatrix;
 import ti4.service.map.CustomHyperlaneService;
@@ -87,8 +88,10 @@ final class BridgeEndsLookup {
             return false;
         }
         int facing = (side + 3) % 6;
-        if (CustomHyperlaneService.isCustomHyperlaneTile(neighbour)) {
-            String lanes = TileArtwork.drawnLanes(scene, neighbour);
+        if (HyperlaneBridges.isHyperlane(neighbour)) {
+            String lanes = CustomHyperlaneService.isCustomHyperlaneTile(neighbour)
+                    ? TileArtwork.drawnLanes(scene, neighbour)
+                    : Mapper.getHyperlaneData(neighbour.getTileID());
             if (lanes == null || !CustomHyperlaneService.isValidStoredMatrix(lanes)) return false;
             int[][] grid = CustomHyperlaneService.parseMatrix(lanes);
             for (int other = 0; other < 6; other++) {

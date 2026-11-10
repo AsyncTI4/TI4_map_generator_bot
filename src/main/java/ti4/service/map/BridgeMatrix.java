@@ -1,6 +1,7 @@
 package ti4.service.map;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -30,9 +31,15 @@ public final class BridgeMatrix {
     }
 
     private final boolean[][] leads;
+    private final Set<Integer> sides;
 
     private BridgeMatrix(boolean[][] leads) {
         this.leads = leads;
+        Set<Integer> used = new TreeSet<>();
+        for (int side = 0; side < 6; side++) {
+            if (entersAt(side) || exitsAt(side)) used.add(side);
+        }
+        sides = Collections.unmodifiableSet(used);
     }
 
     @Nullable
@@ -69,10 +76,6 @@ public final class BridgeMatrix {
     }
 
     public Set<Integer> sides() {
-        Set<Integer> sides = new TreeSet<>();
-        for (int side = 0; side < 6; side++) {
-            if (entersAt(side) || exitsAt(side)) sides.add(side);
-        }
         return sides;
     }
 

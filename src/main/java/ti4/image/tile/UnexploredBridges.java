@@ -22,7 +22,7 @@ public final class UnexploredBridges {
     @Nullable
     public Tile fogTile(Player player, String position) {
         Tile remembered = player.buildFogTile(position, player);
-        if (remembered != null || HyperlaneBridges.all(scene.game()).isEmpty()) {
+        if (remembered != null || !HyperlaneBridges.hasAny(scene.game())) {
             return remembered;
         }
         Tile unexplored = new Tile(UNEXPLORED_TILE_ID, position, player, true, "");

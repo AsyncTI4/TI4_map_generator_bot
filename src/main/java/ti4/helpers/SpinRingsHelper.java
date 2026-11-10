@@ -234,6 +234,7 @@ public class SpinRingsHelper {
     // - ring 3 cw three steps (except 6p map HS positions)
     public static void spinRings(Game game) {
         List<Tile> tilesToSet = new ArrayList<>();
+        Map<String, String> bridgesToMove = new HashMap<>();
 
         for (int y = 1; y < 4; y++) {
             for (int x = 1; x < (y * 6 + 1); x++) {
@@ -249,6 +250,7 @@ public class SpinRingsHelper {
                 if (tile == null) {
                     continue;
                 }
+                String fromPosition = tile.getPosition();
 
                 if (y == 2) {
                     if ((x - 2) < 1) {
@@ -271,12 +273,14 @@ public class SpinRingsHelper {
                         }
                     }
                 }
+                bridgesToMove.put(fromPosition, tile.getPosition());
                 tilesToSet.add(tile);
             }
         }
         for (Tile tile : tilesToSet) {
             game.setTile(tile);
         }
+        HyperlaneBridges.moveAll(game, bridgesToMove);
         game.rebuildTilePositionAutoCompleteList();
 
         String sb = "# " + randomStatusMessage() + "\n-# " + spunMessage(1, Direction.CW, 1, null, game.isFowMode())

@@ -49,6 +49,9 @@ public final class GridRule implements AdjacencyRule {
 
     private static Set<String> bridgedSystemsTouching(Game game, Player player, String hyperlane) {
         Set<String> systems = new HashSet<>();
+        if (!HyperlaneBridges.hasAny(game)) {
+            return systems;
+        }
         Tile tile = game.getTileByPosition(hyperlane);
         List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(hyperlane);
         if (tile == null
