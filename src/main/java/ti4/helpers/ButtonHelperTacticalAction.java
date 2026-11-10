@@ -133,6 +133,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
@@ -787,6 +788,7 @@ public final class ButtonHelperTacticalAction {
         MorphaUnitHandler.clearCytoplasmicTransports(game);
         MorphaAbilityHandler.clearHydrosphericExtraction(game);
         HydromorphicCardHandler.clearTacticalActionEffects(game);
+        RefractureRulesService.clearTacticalState(game);
         GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
@@ -944,6 +946,15 @@ public final class ButtonHelperTacticalAction {
         ThirtyKSecretHooks.onSystemActivated(game, player);
         FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        if (RefractureRulesService.canUseFenrir(game, player)) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you may exhaust _Homotopic Engines_.",
+                    Buttons.green(
+                            player.factionButtonChecker() + "planetAbilityExhaust_fenrir",
+                            "Use Homotopic Engines",
+                            PlanetEmojis.getPlanetEmojiOrNull("fenrir")));
+        }
         if (ButtonHelper.isLawInPlay(game, "lightspeedregulations")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

@@ -61,8 +61,15 @@ public class FractureService {
     public static boolean isFractureExpandedRegionOnMap(Game game) {
         return Stream.of(
                         "frac8", "frac9", "frac10", "frac11", "frac12", "frac13", "frac14", "frac15", "frac16",
-                        "frac17", "frac18", "frac19", "frac20", "frac21", "frac22", "frac23", "frac24", "frac25")
+                        "frac17", "frac18", "frac19", "frac20", "frac21", "frac22", "frac23", "frac24", "frac25",
+                        "frac26", "frac27", "frac28", "frac29", "frac30", "frac31", "frac32", "frac33", "frac34",
+                        "frac35", "frac36", "frac37", "frac38", "frac39", "frac40", "frac41", "frac42", "frac43",
+                        "frac44", "frac45", "frac46", "frac47", "frac48", "frac49")
                 .anyMatch(pos -> game.getTileByPosition(pos) != null);
+    }
+
+    public static boolean isRefractureTopLayout(Game game) {
+        return game.isRefractureMode() && "TOP".equals(game.getStoredValue(RefractureLayoutRegistry.LAYOUT_EDGE_KEY));
     }
 
     public static boolean canFractureEnterPlay(Game game) {
@@ -142,13 +149,13 @@ public class FractureService {
                     player.getRepresentation(false, false)
                             + " has _Styx and Stones_ so The Fracture enters automatically!"
                             + " Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.");
-            if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
+            if (spawnFracture(event, game, false)) spawnIngressTokens(event, game, player, bt);
         } else if ("cabalbt".equals(bt)) {
             String msg = player.getRepresentation(false, false)
                     + " has _Al'Raith Ix Ianovar_ so The Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
+            if (spawnFracture(event, game, false)) spawnIngressTokens(event, game, player, bt);
             AlRaithService.serveBeginCabalBreakthroughButtons(event, game, player);
         } else {
             if (result == 1 || result == 10) { // success
@@ -241,10 +248,12 @@ public class FractureService {
                             buttons);
 
                 } else {
-                    String msg = player.getRepresentation(false, false) + " rolled a " + diceDisplay
-                            + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    if (spawnFracture(event, game)) spawnIngressTokens(event, game, player, bt);
+                    if (spawnFracture(event, game, game.isRefractureMode() && result == 10)) {
+                        String msg = player.getRepresentation(false, false) + " rolled a " + diceDisplay
+                                + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                        spawnIngressTokens(event, game, player, bt);
+                    }
                 }
             } else if (result == 6 && RandomHelper.isOneInX(10)) {
                 MessageHelper.sendMessageToChannel(
@@ -266,7 +275,7 @@ public class FractureService {
      */
     public static boolean enterPlayOrExplain(
             GenericInteractionCreateEvent event, Game game, @NotNull Player player, String breakthrough) {
-        if (!spawnFracture(event, game)) {
+        if (!spawnFracture(event, game, game.isRefractureMode())) {
             // Already in play is the normal case for a later effect, so stay quiet unless
             // it is actually disabled
             if (!isFractureInPlay(game)) {
@@ -283,12 +292,53 @@ public class FractureService {
      * were actually placed.
      */
     public static boolean spawnFracture(GenericInteractionCreateEvent event, Game game) {
+        return spawnFracture(event, game, game.isRefractureMode());
+    }
+
+    public static boolean spawnRefractureLayout(GenericInteractionCreateEvent event, Game game, int layout) {
+        return spawnRefractureLayout(event, game, layout, false);
+    }
+
+    public static boolean spawnRefractureLayout(
+            GenericInteractionCreateEvent event, Game game, int layout, boolean withDemeter) {
+        if (!game.isRefractureMode() || !canFractureEnterPlay(game)) return false;
+        if (!RefractureLayoutRegistry.isConfigured(layout)) return false;
+        if (withDemeter && !spawnDemeter(event, game, layout)) return false;
+        return layout == 1
+                ? spawnNormalFracture(event, game)
+                : RefractureLayoutRegistry.placeLayout(event, game, layout);
+    }
+
+    private static boolean spawnFracture(GenericInteractionCreateEvent event, Game game, boolean addDemeter) {
         if (!canFractureEnterPlay(game)) return false;
+        if (game.isRefractureMode()) {
+            if (addDemeter) spawnDemeter(event, game);
+            int layout = new Die(0).getResult();
+            MessageHelper.sendMessageToChannel(
+                    game.isFowMode() ? GMService.getGMChannel(game) : event.getMessageChannel(),
+                    "Refracture layout roll: " + DiceEmojis.getGrayDieEmoji(layout) + ".");
+            if (!RefractureLayoutRegistry.isConfigured(layout)) {
+                MessageHelper.sendMessageToChannel(
+                        game.isFowMode() ? GMService.getGMChannel(game) : event.getMessageChannel(),
+                        "Refracture layout " + layout
+                                + " was rolled, but that layout has not been configured. The Fracture does not enter play.");
+                return false;
+            }
+            boolean entered = layout == 1
+                    ? spawnNormalFracture(event, game)
+                    : RefractureLayoutRegistry.placeLayout(event, game, layout);
+            return entered;
+        }
+        return spawnNormalFracture(event, game);
+    }
+
+    private static boolean spawnNormalFracture(GenericInteractionCreateEvent event, Game game) {
         List<String> fracture = Arrays.asList(
                 "fracture1", "fracture2", "fracture3", "fracture4", "fracture5", "fracture6", "fracture7");
         List<String> positions = Arrays.asList("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
 
         Player neutral = game.getNeutral();
+        if (game.isRefractureMode()) game.setStoredValue(RefractureLayoutRegistry.LAYOUT_EDGE_KEY, "TOP");
         String neutralColorID = neutral.getColorID();
         List<String> units =
                 Arrays.asList("2 ca, 2 inf c", "", "", "2 dn, 1 dd, 3 inf s", "", "", "1 cv, 4 ff, 1 inf l, 1 inf p");
@@ -307,7 +357,90 @@ public class FractureService {
             // add units
             AddUnitService.addUnits(event, game.getTileByPosition(pos), game, neutralColorID, units.get(i));
         }
+        moveCornerHomeSystemsAwayFromRefracture(game);
+        moveMalliceAwayFromRefracture(game);
         return true;
+    }
+
+    public static void moveCornerHomeSystemsAwayFromRefracture(Game game) {
+        if (!game.isRefractureMode()) return;
+        List<String> affectedCorners = switch (game.getStoredValue(RefractureLayoutRegistry.LAYOUT_EDGE_KEY)) {
+            case "TOP" -> List.of("tl", "tr");
+            case "LOWER_LEFT" -> List.of("tl", "bl");
+            case "LOWER_RIGHT" -> List.of("tr", "br");
+            default -> List.of();
+        };
+        List<String> destinations = switch (game.getStoredValue(RefractureLayoutRegistry.LAYOUT_EDGE_KEY)) {
+            case "TOP" -> List.of("bl", "br");
+            case "LOWER_LEFT" -> List.of("tr", "br");
+            case "LOWER_RIGHT" -> List.of("tl", "bl");
+            default -> List.of();
+        };
+        List<Tile> homesToMove = game.getTileMap().values().stream()
+                .filter(tile -> Set.of("51", "118").contains(tile.getTileID()))
+                .filter(tile -> affectedCorners.contains(tile.getPosition()))
+                .sorted(java.util.Comparator.comparing(Tile::getTileID))
+                .toList();
+        for (Tile home : homesToMove) {
+            String destination = destinations.stream()
+                    .filter(corner -> game.getTileByPosition(corner) == null)
+                    .findFirst()
+                    .orElse(null);
+            if (destination == null) continue;
+            Player owner = game.getRealPlayers().stream()
+                    .filter(player -> home.getPosition().equals(player.getHomeSystemPosition()))
+                    .findFirst()
+                    .orElse(null);
+            relocateTileWithoutRemovingPlanets(game, home, destination);
+            if (owner != null) owner.setHomeSystemPosition(destination);
+        }
+    }
+
+    public static void moveMalliceAwayFromRefracture(Game game) {
+        if (!game.isRefractureMode() || game.getTileMap().values().stream().noneMatch(Tile::isFracture)) {
+            return;
+        }
+        Tile mallice = game.getTileMap().values().stream()
+                .filter(tile -> Set.of("82a", "82b", "82ah", "82bh").contains(tile.getTileID()))
+                .findFirst()
+                .orElse(null);
+        if (mallice == null) return;
+        boolean lowerLeftLayout = "LOWER_LEFT".equals(game.getStoredValue(RefractureLayoutRegistry.LAYOUT_EDGE_KEY));
+        if (!lowerLeftLayout && !"tl".equalsIgnoreCase(mallice.getPosition())) return;
+        Stream<String> destinations = lowerLeftLayout ? Stream.of("br", "tr", "tl") : Stream.of("bl", "br", "tr");
+        String destination = destinations
+                .filter(corner ->
+                        corner.equalsIgnoreCase(mallice.getPosition()) || game.getTileByPosition(corner) == null)
+                .findFirst()
+                .orElse(null);
+        if (destination == null || destination.equalsIgnoreCase(mallice.getPosition())) return;
+        relocateTileWithoutRemovingPlanets(game, mallice, destination);
+    }
+
+    private static void relocateTileWithoutRemovingPlanets(Game game, Tile tile, String destination) {
+        game.getTileMap().remove(tile.getPosition());
+        tile.setPosition(destination);
+        game.setTile(tile);
+    }
+
+    private static boolean spawnDemeter(GenericInteractionCreateEvent event, Game game) {
+        return spawnDemeter(event, game, 0);
+    }
+
+    private static boolean spawnDemeter(GenericInteractionCreateEvent event, Game game, int layout) {
+        if (game.getTileMap().values().stream().anyMatch(tile -> "fracture38".equals(tile.getTileID()))) return true;
+        Stream<String> corners = layout == 8 ? Stream.of("tl", "tr", "br", "bl") : Stream.of("tl", "tr", "bl", "br");
+        return corners.filter(corner -> game.getTileByPosition(corner) == null)
+                .findFirst()
+                .map(corner -> {
+                    Tile demeter = new Tile("fracture38", corner);
+                    demeter.addToken("token_relictoken.png", "demeterii");
+                    game.setTile(demeter);
+                    AddUnitService.addUnits(
+                            event, demeter, game, game.getNeutral().getColorID(), "1 ws, 2 ff space, 5 inf demeterii");
+                    return true;
+                })
+                .orElse(false);
     }
 
     public static void spawnIngressTokens(
@@ -408,7 +541,7 @@ public class FractureService {
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        if (tile == null) {
+        if (tile == null || tile.isFracture()) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -431,6 +564,7 @@ public class FractureService {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (alreadyCounted.contains(tile)) continue;
+            if (tile.isFracture()) continue;
             if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) continue;
             if (tile.getPlanetUnitHolders().stream().anyMatch(p -> p.hasTechSpecialty(type))) tiles.add(tile);
         }

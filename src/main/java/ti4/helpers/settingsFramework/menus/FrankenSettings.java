@@ -299,6 +299,7 @@ public class FrankenSettings extends SettingsMenu {
                 Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
                 Boolean.toString(homebrewSettings.getEchoesOfYggdrasil().isVal()));
         game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
+        game.setRefractureMode(homebrewSettings.getRefracture().isVal());
     }
 
     private FrankenDraftMode selectedDraftMode() {
