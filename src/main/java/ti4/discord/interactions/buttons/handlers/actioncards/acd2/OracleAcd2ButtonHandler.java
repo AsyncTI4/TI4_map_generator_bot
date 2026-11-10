@@ -23,6 +23,8 @@ import ti4.model.Mapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.info.SecretObjectiveInfoService;
 
+// TODO: Oracle left ACD2 in #6077; remove once no in-progress game still holds it in a deck or hand.
+@Deprecated(forRemoval = true)
 @UtilityClass
 class OracleAcd2ButtonHandler {
 

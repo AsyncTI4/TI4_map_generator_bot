@@ -13,6 +13,8 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.Mapper;
 
+// TODO: Oracle left ACD2 in #6077; remove with OracleAcd2ButtonHandler once no in-progress game holds it.
+@Deprecated(forRemoval = true)
 @UtilityClass
 public class OracleDrawService {
 
