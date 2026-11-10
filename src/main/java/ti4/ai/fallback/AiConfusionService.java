@@ -159,6 +159,7 @@ public class AiConfusionService {
         if (!TacticalRules.isSystemPicker(prompt)) return selfPlayChoice(game, seat, prompt);
         return prompt.enabledButtons().stream()
                 .filter(button -> button.handlerId().startsWith(RING_TILE))
+                .filter(button -> button.isUnowned() || button.isOwnedBy(seat.getFaction()))
                 .filter(button -> holdsOnlyOwnUnits(game, seat, StringUtils.removeStart(button.handlerId(), RING_TILE)))
                 .findFirst()
                 .or(() -> selfPlayChoice(game, seat, prompt));
