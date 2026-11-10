@@ -46,7 +46,8 @@ public class CustomHyperlaneService {
 
     private static final String HYPERLANE_TILEID = "hl";
     private static final String ONE_WAY = "2";
-    private static final List<String> SIDE_NAMES = List.of("N", "NE", "SE", "S", "SW", "NW");
+    private static final List<String> SIDE_NAMES = BridgeMatrix.SIDE_NAMES;
+    private static final Set<String> CLEAR_WORDS = Set.of("0", "clear", "none", "remove");
     private static final String EMPTY_TYPED_MATRIX =
             "0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0";
     private static final String BRIDGE_PREFIX = "bridge:";
@@ -186,7 +187,7 @@ public class CustomHyperlaneService {
     @ButtonHandler("hlBridgeEdit_")
     public static void editBridge(ButtonInteractionEvent event, String buttonID, Game game) {
         String position = StringUtils.substringBetween(buttonID, "hlBridgeEdit_", "~MDL");
-        BridgeMatrix matrix = HyperlaneBridges.all(game).get(position);
+        BridgeMatrix matrix = HyperlaneBridges.matrixOf(game, position);
         String typed = matrix == null
                 ? EMPTY_TYPED_MATRIX
                 : toTypedMatrix(matrix.stored()).replace(";", ";\n");
@@ -217,7 +218,9 @@ public class CustomHyperlaneService {
 
     public static String saveBridgeInput(Game game, String position, String input, boolean adding) {
         String typed = input.replace("\n", "").replace(" ", "");
-        boolean clears = StringUtils.isBlank(typed) || isValidConnectionMatrix(typed) && !typed.matches(".*[12].*");
+        boolean clears = StringUtils.isBlank(typed)
+                || CLEAR_WORDS.contains(typed.toLowerCase())
+                || isValidConnectionMatrix(typed) && !typed.matches(".*[12].*");
         if (clears) {
             HyperlaneBridges.remove(game, position);
             return "Bridge removed from " + position + ".";
@@ -265,7 +268,7 @@ public class CustomHyperlaneService {
     public static void importHyperlaneData(ButtonInteractionEvent event) {
         TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, TextInputStyle.PARAGRAPH);
 
-        Modal importDataModal = Modal.create("customHyperlaneImportSave", "Import Data (overwrites existing)")
+        Modal importDataModal = Modal.create("customHyperlaneImportSave", "Import (replaces only what you paste)")
                 .addComponents(Label.of("Hyperlane Data", data.build()))
                 .build();
 
@@ -308,26 +311,23 @@ public class CustomHyperlaneService {
         }
         if (!bridges.isEmpty()) {
             reply.append(reply.isEmpty() ? "" : "\n").append(importBridges(game, bridges));
+        } else if (HyperlaneBridges.hasAny(game)) {
+            reply.append("\nBridges unchanged (" + HyperlaneBridges.all(game).size() + ").");
         }
         return reply.toString();
     }
 
     private static String importBridges(Game game, Map<String, String> bridges) {
         int previous = HyperlaneBridges.all(game).size();
-        HyperlaneBridges.clear(game);
-        StringBuilder problems = new StringBuilder();
-        bridges.forEach((position, stored) -> {
-            String typed = toTypedMatrix(stored);
-            HyperlaneBridges.problemWith(game, position, typed)
-                    .ifPresentOrElse(
-                            problem -> problems.append("\nBridge ")
-                                    .append(position)
-                                    .append(" skipped: ")
-                                    .append(problem),
-                            () -> HyperlaneBridges.set(game, position, typed));
-        });
-        return "Bridges: " + HyperlaneBridges.all(game).size() + " imported"
-                + (previous > 0 ? ", " + previous + " previous removed" : "") + "." + problems;
+        Map<String, String> typed = new HashMap<>();
+        bridges.forEach((position, stored) -> typed.put(position, toTypedMatrix(stored)));
+        List<String> skipped = HyperlaneBridges.replaceAll(game, typed);
+        StringBuilder reply =
+                new StringBuilder("Bridges: " + HyperlaneBridges.all(game).size() + " imported");
+        if (previous > 0) reply.append(", ").append(previous).append(" previous removed");
+        reply.append('.');
+        skipped.forEach(problem -> reply.append("\nBridge ").append(problem));
+        return reply.toString();
     }
 
     @ButtonHandler("customHyperlaneEdit")

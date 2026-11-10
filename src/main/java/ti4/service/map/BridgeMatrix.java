@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public final class BridgeMatrix {
 
     public static final BridgeMatrix NONE = new BridgeMatrix(new boolean[6][6]);
-    private static final List<String> SIDE_NAMES = List.of("N", "NE", "SE", "S", "SW", "NW");
+    static final List<String> SIDE_NAMES = List.of("N", "NE", "SE", "S", "SW", "NW");
 
     public record Pair(int low, int high) {
 

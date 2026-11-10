@@ -100,18 +100,18 @@ class HyperlaneBridgesTest extends BaseTi4Test {
                 .orElse("");
     }
 
-    // A bridge belongs to its tile: a different system placed on the position doesn't inherit it, and moving or
-    // swapping systems carries the bridge along (move_tile, swap_two_systems and the lore swap all use this).
+    // A bridge stays on its position when the system there is replaced in place (Mallice flipping, a hero turning it
+    // into a supernova), and travels with the system when it is moved or swapped (move_tile, swap_two_systems, the
+    // lore swap, Spatial Collapse, the Creuss hero, the map builder).
     @Test
-    void aBridgeStaysWithItsTile() {
+    void aBridgeTravelsWithItsSystem() {
         HyperlaneBridges.set(game, "000", TYPED);
         game.setTile(new Tile("20", "000"));
-        assertThat(HyperlaneBridges.matrixOf(game, "000")).isNull();
+        assertThat(HyperlaneBridges.matrixOf(game, "000")).isNotNull();
 
-        game.setTile(new Tile("19", "000"));
         game.setTile(new Tile("21", "102"));
+        game.setTile(new Tile("20", "102"));
         game.setTile(new Tile("21", "000"));
-        game.setTile(new Tile("19", "102"));
         CustomHyperlaneService.moveCustomHyperlaneData("000", "102", game, true);
         assertThat(HyperlaneBridges.matrixOf(game, "102")).isNotNull();
         assertThat(HyperlaneBridges.matrixOf(game, "000")).isNull();
@@ -144,6 +144,9 @@ class HyperlaneBridgesTest extends BaseTi4Test {
 
         assertThat(CustomHyperlaneService.saveBridgeInput(game, "000", NORTH_TO_SOUTH, true))
                 .contains("replaced the bridge");
+        assertThat(CustomHyperlaneService.saveBridgeInput(game, "000", "clear", false))
+                .isEqualTo("Bridge removed from 000.");
+        HyperlaneBridges.set(game, "000", TYPED);
         assertThat(CustomHyperlaneService.saveBridgeInput(game, "000", EMPTY, false))
                 .isEqualTo("Bridge removed from 000.");
         assertThat(HyperlaneBridges.hasAny(game)).isFalse();

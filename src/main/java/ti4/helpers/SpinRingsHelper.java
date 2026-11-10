@@ -232,6 +232,17 @@ public class SpinRingsHelper {
     // - ring 1 cw one step
     // - ring 2 ccw two steps
     // - ring 3 cw three steps (except 6p map HS positions)
+    static Map<String, String> movedWithTheirTiles(Map<String, String> data, Map<String, String> fromTo) {
+        Map<String, String> moved = new HashMap<>();
+        data.forEach((position, value) -> {
+            if (!fromTo.containsKey(position)) moved.put(position, value);
+        });
+        data.forEach((position, value) -> {
+            if (fromTo.containsKey(position)) moved.put(fromTo.get(position), value);
+        });
+        return moved;
+    }
+
     public static void spinRings(Game game) {
         List<Tile> tilesToSet = new ArrayList<>();
         Map<String, String> bridgesToMove = new HashMap<>();
@@ -281,6 +292,7 @@ public class SpinRingsHelper {
             game.setTile(tile);
         }
         HyperlaneBridges.moveAll(game, bridgesToMove);
+        game.setCustomHyperlaneData(movedWithTheirTiles(game.getCustomHyperlaneData(), bridgesToMove));
         game.rebuildTilePositionAutoCompleteList();
 
         String sb = "# " + randomStatusMessage() + "\n-# " + spunMessage(1, Direction.CW, 1, null, game.isFowMode())
