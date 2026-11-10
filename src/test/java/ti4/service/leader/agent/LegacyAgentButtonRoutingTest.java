@@ -91,7 +91,6 @@ class LegacyAgentButtonRoutingTest extends BaseTi4Test {
             "arcanumVeylaUseOnOther",
             "arcanumVeylaTarget_",
             "arcanumVeylaReturnTech_",
-            "arcanumVeylaGainTech_",
             "useMyrixAgent",
             "myrixAgentShip_",
             "useOblivionAgent",
