@@ -60,6 +60,15 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
     - Idle decisions (no rule fired) are 65% of decisions and 28% of decision time (38 ms mean). Polls of an
       unchanged game re-run rules that find nothing to do. A cache keyed on the save's revision, not the `Game`
       instance (each tick reloads it), is the obvious first optimization.
+    - Idle-poll cache, checked and dropped 2026-11-11 (3 games, seed 9300, run alongside other work, so shares
+      only). The report now tags each decision with what changed since the seat's last decision ended (`saved`,
+      `same save`, `unchanged`) and whether a rule read `context.now()`. Idle decisions on an unchanged game are only
+      3.3% of decision time, and 99.5% of them read the clock, so a timer could change their answer and skipping them
+      is not safe. Idle decisions after a save are 13.8%. The seat's own turn on a fresh save (`press, saved`) is
+      66.6%, with `NekroBrain.takeTurn` alone at 46.5%; `TradeRules.startDeals` is 10.0% and
+      `StrategyCardRules.gainTokens` 7.8%. The earlier 28% idle share was inflated by idles that now cost less.
+      Next candidate: share seat-independent work (win odds, threats, incoming forces) across seats and decisions on
+      the same save.
     - Other heavy nested paths: `trade.votePromises` (8.2k calls, 3,856 s total), `agenda.forecast` (3,740 s total),
       `strategy.planInputs` (4,141 s total), `production.plan` (3,890 s total).
     - This run used the first build, in which timing frames still counted toward the depth limit; no decision was cut

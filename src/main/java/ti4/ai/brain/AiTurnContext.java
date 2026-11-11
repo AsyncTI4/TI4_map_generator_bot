@@ -17,6 +17,11 @@ public record AiTurnContext(
         AiMemory memory,
         long now) {
 
+    public long now() {
+        ClockReads.note();
+        return now;
+    }
+
     public String turnKey() {
         return game.getActivePlayerID() + "@" + game.getLastActivePlayerChange().getTime();
     }

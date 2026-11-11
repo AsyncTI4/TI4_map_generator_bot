@@ -53,6 +53,13 @@ final class AiSeatState {
     private int thinkingHeldFingerprint;
     private int abortLoggedRound = -1;
     private int consecutiveAborts;
+    private DecisionInputs lastInputs;
+
+    synchronized DecisionInputs replaceLastInputs(DecisionInputs latest) {
+        DecisionInputs previous = lastInputs;
+        lastInputs = latest;
+        return previous;
+    }
 
     synchronized AiSeatState copy() {
         AiSeatState copy = new AiSeatState();
@@ -76,6 +83,7 @@ final class AiSeatState {
         copy.thinkingHeldFingerprint = thinkingHeldFingerprint;
         copy.abortLoggedRound = abortLoggedRound;
         copy.consecutiveAborts = consecutiveAborts;
+        copy.lastInputs = lastInputs;
         return copy;
     }
 

@@ -19,6 +19,7 @@ import ti4.ai.actuation.AiActuator.PressTarget;
 import ti4.ai.actuation.AiActuator.SeatIdentity;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.ClockReads;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
@@ -284,6 +285,8 @@ class AiTickRunner {
         ThinkingAborted aborted = null;
         boolean failed = false;
         TimingReport.startDecision();
+        DecisionInputs before = TimingReport.enabled() ? DecisionInputs.of(context) : null;
+        ClockReads.reset();
         long cpuStart = TimingReport.cpuNow();
         Thinking.Decision thinking = Thinking.open(AiSettings.thinkingLimits());
         DecisionMemo.Open memo = DecisionMemo.open();
@@ -303,11 +306,18 @@ class AiTickRunner {
             memo.close();
             thinking.close();
         }
+        long cpu = TimingReport.cpuNow() - cpuStart;
         TimingReport.recordDecision(
-                thinking.profile(), TimingReport.cpuNow() - cpuStart, outcomeName(decision, aborted));
+                thinking.profile(), cpu, outcomeName(decision, aborted), inputChange(tick, context, before));
         noteThinking(tick, thinking.profile(), decision, aborted);
         if (aborted == null && !failed) decidedNormally(tick);
         return decision;
+    }
+
+    private static String inputChange(SeatTick tick, AiTurnContext context, DecisionInputs before) {
+        if (before == null) return "";
+        DecisionInputs previous = tick.state().replaceLastInputs(DecisionInputs.of(context));
+        return before.changeSince(previous) + (ClockReads.read() ? ", read the clock" : "");
     }
 
     private static void decidedNormally(SeatTick tick) {

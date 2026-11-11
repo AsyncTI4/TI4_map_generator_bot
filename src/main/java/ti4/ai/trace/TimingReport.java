@@ -44,6 +44,7 @@ public class TimingReport {
     private static final Map<String, Tally> OUTSIDE = new HashMap<>();
     private static final Map<String, Tally> OUTCOMES = new HashMap<>();
     private static final Map<String, Tally> DECIDING_RULES = new HashMap<>();
+    private static final Map<String, Tally> INPUT_CHANGES = new HashMap<>();
     private static final List<Long> WALL = new ArrayList<>();
     private static final List<Long> CPU = new ArrayList<>();
 
@@ -69,6 +70,10 @@ public class TimingReport {
     }
 
     public static void recordDecision(ThinkingProfile profile, long cpuNanos, String outcome) {
+        recordDecision(profile, cpuNanos, outcome, "");
+    }
+
+    public static void recordDecision(ThinkingProfile profile, long cpuNanos, String outcome, String inputChange) {
         String rule = DECIDED_BY.get();
         DECIDED_BY.remove();
         if (!enabled) return;
@@ -77,6 +82,11 @@ public class TimingReport {
             WALL.add(wall);
             CPU.add(cpuNanos);
             OUTCOMES.computeIfAbsent(outcome, key -> new Tally()).add(1, wall, cpuNanos, wall);
+            if (!inputChange.isEmpty()) {
+                INPUT_CHANGES
+                        .computeIfAbsent(outcome + ", " + inputChange, key -> new Tally())
+                        .add(1, wall, cpuNanos, wall);
+            }
             DECIDING_RULES
                     .computeIfAbsent(rule == null ? "(no rule)" : rule, key -> new Tally())
                     .add(1, wall, cpuNanos, wall);
@@ -99,6 +109,7 @@ public class TimingReport {
         OUTSIDE.clear();
         OUTCOMES.clear();
         DECIDING_RULES.clear();
+        INPUT_CHANGES.clear();
         WALL.clear();
         CPU.clear();
     }
@@ -128,6 +139,12 @@ public class TimingReport {
         lines.add("TIMING by outcome (count, wall total, wall mean, CPU total, wall max):");
         rows(OUTCOMES, Integer.MAX_VALUE, Comparator.comparingLong(tally -> -tally.totalNanos))
                 .forEach(row -> lines.add("TIMING   " + decisionRow(row.getKey(), row.getValue(), wallTotal)));
+        if (!INPUT_CHANGES.isEmpty()) {
+            lines.add("TIMING by outcome and what changed since the seat's last decision ended"
+                    + " (count, wall total and share, wall mean, CPU total, wall max):");
+            rows(INPUT_CHANGES, Integer.MAX_VALUE, Comparator.comparingLong(tally -> -tally.totalNanos))
+                    .forEach(row -> lines.add("TIMING   " + decisionRow(row.getKey(), row.getValue(), wallTotal)));
+        }
         lines.add("TIMING by deciding rule (count, wall total and share, wall mean, CPU total, wall max):");
         rows(DECIDING_RULES, RULE_ROWS, Comparator.comparingLong(tally -> -tally.totalNanos))
                 .forEach(row -> lines.add("TIMING   " + decisionRow(row.getKey(), row.getValue(), wallTotal)));

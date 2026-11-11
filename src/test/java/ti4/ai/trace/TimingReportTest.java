@@ -56,6 +56,19 @@ class TimingReportTest {
     }
 
     @Test
+    void decisionsAreSplitByWhatChangedSinceTheSeatLastDecided() {
+        TimingReport.recordDecision(profile(30 * MILLI), 30 * MILLI, "idle", "unchanged");
+        TimingReport.recordDecision(profile(10 * MILLI), 10 * MILLI, "idle", "saved");
+        TimingReport.recordDecision(profile(MILLI), MILLI, "press");
+
+        List<String> lines = TimingReport.lines();
+
+        assertThat(lines).anyMatch(line -> line.contains("idle, unchanged: 1, 30 ms (73.2%)"));
+        assertThat(indexOf(lines, "idle, unchanged")).isLessThan(indexOf(lines, "idle, saved"));
+        assertThat(lines).noneMatch(line -> line.contains("press, "));
+    }
+
+    @Test
     void nothingIsRecordedWhileDisabled() {
         TimingReport.enable(false);
         TimingReport.recordDecision(profile(MILLI), MILLI, "press");
