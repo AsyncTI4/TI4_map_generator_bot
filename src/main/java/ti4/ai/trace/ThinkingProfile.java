@@ -4,7 +4,7 @@ import java.util.List;
 
 public record ThinkingProfile(long totalNanos, List<SpanTotal> spans) {
 
-    public record SpanTotal(String name, long calls, long totalNanos, long selfNanos, int maxReentry) {}
+    public record SpanTotal(String name, long calls, long totalNanos, long selfNanos, int maxReentry, long maxNanos) {}
 
     public static ThinkingProfile empty() {
         return new ThinkingProfile(0, List.of());

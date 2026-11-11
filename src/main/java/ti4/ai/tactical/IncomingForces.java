@@ -16,6 +16,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.Footprint;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -140,10 +141,12 @@ final class IncomingForces {
     }
 
     IncomingForce of(Player enemy, Tile target, Horizon horizon) {
-        if (base != null && exclusion != null && enemy != exclusion.owner()) return base.of(enemy, target, horizon);
-        return forces.computeIfAbsent(
-                enemy.getFaction() + "#" + target.getPosition() + "#" + horizon,
-                key -> scan(enemy, target, horizon, ONE_MOVE));
+        try (Thinking.Span timing = Thinking.measure("incoming.force")) {
+            if (base != null && exclusion != null && enemy != exclusion.owner()) return base.of(enemy, target, horizon);
+            return forces.computeIfAbsent(
+                    enemy.getFaction() + "#" + target.getPosition() + "#" + horizon,
+                    key -> scan(enemy, target, horizon, ONE_MOVE));
+        }
     }
 
     IncomingForce approaching(Player enemy, Tile target) {

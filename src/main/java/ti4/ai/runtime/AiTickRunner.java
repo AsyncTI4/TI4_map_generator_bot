@@ -43,6 +43,7 @@ import ti4.ai.trace.Thinking;
 import ti4.ai.trace.ThinkingAborted;
 import ti4.ai.trace.ThinkingProfile;
 import ti4.ai.trace.ThinkingStats;
+import ti4.ai.trace.TimingReport;
 import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -70,6 +71,9 @@ class AiTickRunner {
     private static final String CUT_SHORT = "cut short";
     private static final String PERCEIVE_SPAN = "ai.perceive";
     private static final String ACTUATE_SPAN = "ai.actuate";
+    private static final String TICK_SPAN = "ai.tick";
+    private static final String LOAD_SPAN = "ai.load";
+    private static final String SEAT_SPAN = "ai.seat";
     private static final int TRAIL_SPANS_RECORDED = 4;
 
     private record Cause(String kind, String reason, String pending) {}
@@ -100,6 +104,15 @@ class AiTickRunner {
     }
 
     static void tick(AiLane lane, long now) {
+        long start = System.nanoTime();
+        try {
+            tickOnce(lane, now);
+        } finally {
+            TimingReport.recordOutside(TICK_SPAN, System.nanoTime() - start);
+        }
+    }
+
+    private static void tickOnce(AiLane lane, long now) {
         if (!AiRuntime.mayMutate()) {
             lane.markDirty(now + RETRY_DELAY_MILLIS);
             return;
@@ -109,7 +122,9 @@ class AiTickRunner {
             AiRuntime.forget(lane);
             return;
         }
+        long loadStart = System.nanoTime();
         Game game = managed.getGame();
+        TimingReport.recordOutside(LOAD_SPAN, System.nanoTime() - loadStart);
         List<Player> seats = AiSeats.activeAiSeats(game);
         if (seats.isEmpty()) {
             AiRuntime.forget(lane);
@@ -145,7 +160,9 @@ class AiTickRunner {
         }
         long wakeAt = Long.MAX_VALUE;
         for (Player seat : lane.rotation(seats)) {
+            long seatStart = System.nanoTime();
             SeatResult result = runSeat(lane, game, seat, snapshot, selfPlay, now);
+            TimingReport.recordOutside(SEAT_SPAN, System.nanoTime() - seatStart);
             if (result.acted()) {
                 lane.markDirty(now + AiSettings.DEBOUNCE.toMillis());
                 return;
@@ -266,6 +283,8 @@ class AiTickRunner {
         AiDecision decision = AiDecision.idle();
         ThinkingAborted aborted = null;
         boolean failed = false;
+        TimingReport.startDecision();
+        long cpuStart = TimingReport.cpuNow();
         Thinking.Decision thinking = Thinking.open(AiSettings.thinkingLimits());
         DecisionMemo.Open memo = DecisionMemo.open();
         try {
@@ -284,6 +303,8 @@ class AiTickRunner {
             memo.close();
             thinking.close();
         }
+        TimingReport.recordDecision(
+                thinking.profile(), TimingReport.cpuNow() - cpuStart, outcomeName(decision, aborted));
         noteThinking(tick, thinking.profile(), decision, aborted);
         if (aborted == null && !failed) decidedNormally(tick);
         return decision;

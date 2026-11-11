@@ -10,6 +10,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -131,16 +132,18 @@ public class SeatStrike {
     }
 
     public static double feasibility(Game game, Player seat) {
-        Tile mecatol = game.getMecatolTile();
-        if (mecatol == null || FleetLimit.ships(seat) <= 0) return OUT_OF_SHIPS_FEASIBILITY;
-        if (controls(game, seat)) return FREE_MECATOL_FEASIBILITY;
-        Player opponent = TacticalPlanner.singleOpponent(game, seat, mecatol);
-        if (opponent == null) {
-            boolean empty = !BoardView.hasEnemyUnits(game, seat, mecatol) && !heldByAnother(game, seat);
-            return empty ? FREE_MECATOL_FEASIBILITY : CROWDED_MECATOL_FEASIBILITY;
+        try (Thinking.Span timing = Thinking.measure("seatStrike.feasibility")) {
+            Tile mecatol = game.getMecatolTile();
+            if (mecatol == null || FleetLimit.ships(seat) <= 0) return OUT_OF_SHIPS_FEASIBILITY;
+            if (controls(game, seat)) return FREE_MECATOL_FEASIBILITY;
+            Player opponent = TacticalPlanner.singleOpponent(game, seat, mecatol);
+            if (opponent == null) {
+                boolean empty = !BoardView.hasEnemyUnits(game, seat, mecatol) && !heldByAnother(game, seat);
+                return empty ? FREE_MECATOL_FEASIBILITY : CROWDED_MECATOL_FEASIBILITY;
+            }
+            double reach = TacticalPlanner.stageFeasibility(new TacticalPlanner.Context(game, seat), mecatol, opponent);
+            return Math.max(CROWDED_MECATOL_FEASIBILITY, reach);
         }
-        double reach = TacticalPlanner.stageFeasibility(new TacticalPlanner.Context(game, seat), mecatol, opponent);
-        return Math.max(CROWDED_MECATOL_FEASIBILITY, reach);
     }
 
     private static boolean heldByAnother(Game game, Player seat) {

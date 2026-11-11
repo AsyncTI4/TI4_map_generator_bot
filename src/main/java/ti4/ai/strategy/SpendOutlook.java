@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -21,12 +22,14 @@ public class SpendOutlook {
     }
 
     public static boolean spendingAhead(Game game, Player seat) {
-        String key = game.getName() + "|" + seat.getUserID();
-        Cached cached = CACHE.get(key);
-        if (cached != null && cached.isFor(game)) return cached.ahead();
-        boolean ahead = DiplomacyUse.spendingAhead(game, seat, true);
-        if (CACHE.size() > MAX_CACHED) CACHE.clear();
-        CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), ahead));
-        return ahead;
+        try (Thinking.Span timing = Thinking.measure("spend.ahead")) {
+            String key = game.getName() + "|" + seat.getUserID();
+            Cached cached = CACHE.get(key);
+            if (cached != null && cached.isFor(game)) return cached.ahead();
+            boolean ahead = DiplomacyUse.spendingAhead(game, seat, true);
+            if (CACHE.size() > MAX_CACHED) CACHE.clear();
+            CACHE.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), ahead));
+            return ahead;
+        }
     }
 }

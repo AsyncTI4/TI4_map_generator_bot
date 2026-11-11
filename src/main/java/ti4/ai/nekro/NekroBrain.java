@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.ai.actioncards.ActionCardResponses;
@@ -22,6 +21,7 @@ import ti4.ai.agenda.RiderPayouts;
 import ti4.ai.agenda.ShenanigansRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.brain.BrainRule;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.DecidingSeat;
@@ -83,6 +83,8 @@ import ti4.ai.tactical.TacticalRules;
 import ti4.ai.tactical.TransitDiodesRules;
 import ti4.ai.tech.EntropicScarRules;
 import ti4.ai.tech.TechRules;
+import ti4.ai.trace.Thinking;
+import ti4.ai.trace.TimingReport;
 import ti4.ai.trade.TradeRules;
 import ti4.ai.xxcha.PeaceAccordsRules;
 import ti4.ai.xxcha.QuashRules;
@@ -173,7 +175,7 @@ public class NekroBrain implements FactionBrain {
             .collect(Collectors.toUnmodifiableSet());
     private static final long SAME_TURN_TOLERANCE_MILLIS = TimeUnit.SECONDS.toMillis(5);
 
-    private final List<Function<AiTurnContext, Optional<AiDecision>>> rules = List.of(
+    private final List<BrainRule> rules = List.of(
             AttackLedger::observe,
             ActionSecretRules::observe,
             PromissoryRules::observe,
@@ -296,6 +298,8 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::awaitSecondaries,
             StrategyCardRules::awaitFollowTurn);
 
+    private final List<BrainRule.Named> namedRules = BrainRule.named(rules);
+
     @Override
     public String id() {
         return "nekro";
@@ -312,9 +316,15 @@ public class NekroBrain implements FactionBrain {
     }
 
     private AiDecision firstRuleDecision(AiTurnContext context) {
-        for (Function<AiTurnContext, Optional<AiDecision>> rule : rules) {
-            Optional<AiDecision> decision = rule.apply(context);
-            if (decision.isPresent()) return decision.get();
+        for (BrainRule.Named rule : namedRules) {
+            Optional<AiDecision> decision;
+            try (Thinking.Span timing = Thinking.measure(rule.spanName())) {
+                decision = rule.rule().apply(context);
+            }
+            if (decision.isPresent()) {
+                TimingReport.decidedBy(rule.name());
+                return decision.get();
+            }
         }
         return AiDecision.idle();
     }

@@ -21,6 +21,7 @@ import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.secrets.SecretValue;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -43,15 +44,19 @@ class KindPricing {
     private static final Wallet.Payment NO_PAYMENT = new Wallet.Payment(List.of(), List.of(), 0, 0);
 
     static Optional<Price> of(Game game, Player seat, ExpeditionKind kind, Holdings holdings, SpendHorizon horizon) {
-        SpendCost reserve = ScoringReserve.of(game, seat);
-        return switch (kind) {
-            case TECH_SKIP -> techSkip(game, seat, holdings.wallet(), reserve, horizon);
-            case TRADE_GOODS -> tradeGoods(holdings.wallet(), reserve);
-            case FIVE_RES -> planetsFor(game, holdings.wallet(), reserve, SpendCost.resources(RESOURCES_COST), horizon);
-            case FIVE_INF -> planetsFor(game, holdings.wallet(), reserve, SpendCost.influence(INFLUENCE_COST), horizon);
-            case SECRET -> secret(game, seat);
-            case ACTION_CARDS -> actionCards(game, seat, holdings);
-        };
+        try (Thinking.Span timing = Thinking.measure("expedition.price")) {
+            SpendCost reserve = ScoringReserve.of(game, seat);
+            return switch (kind) {
+                case TECH_SKIP -> techSkip(game, seat, holdings.wallet(), reserve, horizon);
+                case TRADE_GOODS -> tradeGoods(holdings.wallet(), reserve);
+                case FIVE_RES ->
+                    planetsFor(game, holdings.wallet(), reserve, SpendCost.resources(RESOURCES_COST), horizon);
+                case FIVE_INF ->
+                    planetsFor(game, holdings.wallet(), reserve, SpendCost.influence(INFLUENCE_COST), horizon);
+                case SECRET -> secret(game, seat);
+                case ACTION_CARDS -> actionCards(game, seat, holdings);
+            };
+        }
     }
 
     private static Optional<Price> techSkip(
@@ -157,15 +162,17 @@ class KindPricing {
     }
 
     static List<Double> keepValues(Game game, Player seat) {
-        String key = game.getName() + "|" + seat.getUserID();
-        CachedKeeps cached = KEEPS.get(key);
-        if (cached != null && cached.isFor(game)) return cached.keeps();
-        Set<String> hand = ImaginedTurn.actionCards(seat).keySet();
-        if (!hand.isEmpty() && PRICING_EACH_CARD.get().contains(seat)) return keepPriors(hand);
-        List<Double> keeps = keepValuesInOrder(game, seat, ActionCardValue.discardOrder(game, seat));
-        if (KEEPS.size() > MAX_CACHED) KEEPS.clear();
-        KEEPS.put(key, new CachedKeeps(new WeakReference<>(game), game.getLastModifiedDate(), keeps));
-        return keeps;
+        try (Thinking.Span timing = Thinking.measure("expedition.keepValues")) {
+            String key = game.getName() + "|" + seat.getUserID();
+            CachedKeeps cached = KEEPS.get(key);
+            if (cached != null && cached.isFor(game)) return cached.keeps();
+            Set<String> hand = ImaginedTurn.actionCards(seat).keySet();
+            if (!hand.isEmpty() && PRICING_EACH_CARD.get().contains(seat)) return keepPriors(hand);
+            List<Double> keeps = keepValuesInOrder(game, seat, ActionCardValue.discardOrder(game, seat));
+            if (KEEPS.size() > MAX_CACHED) KEEPS.clear();
+            KEEPS.put(key, new CachedKeeps(new WeakReference<>(game), game.getLastModifiedDate(), keeps));
+            return keeps;
+        }
     }
 
     private static List<Double> keepValuesInOrder(Game game, Player seat, List<String> order) {

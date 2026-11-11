@@ -13,6 +13,7 @@ import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner.Candidate;
 import ti4.ai.tactical.TacticalPlanner.Context;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -31,12 +32,14 @@ class EnemyIntent {
     }
 
     static Optional<List<TacticalPlan>> ranked(Game game, Player enemy) {
-        if (ImaginedTurn.underway()) return Optional.empty();
-        return Optional.of(remembered(
-                game,
-                enemy,
-                enemy.getFaction(),
-                () -> ImaginedTurn.of(enemy, () -> TacticalPlanner.ranked(game, enemy))));
+        try (Thinking.Span timing = Thinking.measure("enemy.ranked")) {
+            if (ImaginedTurn.underway()) return Optional.empty();
+            return Optional.of(remembered(
+                    game,
+                    enemy,
+                    enemy.getFaction(),
+                    () -> ImaginedTurn.of(enemy, () -> TacticalPlanner.ranked(game, enemy))));
+        }
     }
 
     static OptionalDouble attackWorth(Game game, Player enemy, Tile tile, Player defender) {

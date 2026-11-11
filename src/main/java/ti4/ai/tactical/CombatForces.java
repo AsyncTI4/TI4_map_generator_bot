@@ -14,6 +14,7 @@ import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.letnev.LetnevSpaceCombat;
 import ti4.ai.strategy.CopiedTechPolicy;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -62,12 +63,14 @@ class CombatForces {
     }
 
     static Force force(Player player, List<Combatant> units, boolean ground) {
-        Force force = Force.of(units);
-        if (player.hasTech(DURANIUM_ARMOR)) force = force.repairing();
-        if (ground && player.hasTech(X89_DOUBLING)) force = force.doublingHits();
-        if (ground && player.hasTech(PARTICLE_WEAVE)) force = force.weaving();
-        if (!ground) force = LetnevSpaceCombat.applyTo(player, force);
-        return force;
+        try (Thinking.Span timing = Thinking.measure("combat.force")) {
+            Force force = Force.of(units);
+            if (player.hasTech(DURANIUM_ARMOR)) force = force.repairing();
+            if (ground && player.hasTech(X89_DOUBLING)) force = force.doublingHits();
+            if (ground && player.hasTech(PARTICLE_WEAVE)) force = force.weaving();
+            if (!ground) force = LetnevSpaceCombat.applyTo(player, force);
+            return force;
+        }
     }
 
     static Force withExpectedCopy(

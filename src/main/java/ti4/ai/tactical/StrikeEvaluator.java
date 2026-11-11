@@ -22,6 +22,7 @@ import ti4.ai.eval.IconStake;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.PlanetStake;
 import ti4.ai.letnev.L4Disruptors;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -63,8 +64,14 @@ class StrikeEvaluator {
     }
 
     static StrikeEstimate estimate(Game game, Player seat, Strike strike, Player decider) {
-        return estimate(
-                game, seat, strike, true, AiExperiments.enabled(decider, AiExperiments.Experiment.CANNON_COVER_RISK));
+        try (Thinking.Span timing = Thinking.measure("strike.estimate")) {
+            return estimate(
+                    game,
+                    seat,
+                    strike,
+                    true,
+                    AiExperiments.enabled(decider, AiExperiments.Experiment.CANNON_COVER_RISK));
+        }
     }
 
     static StrikeEstimate laterSpaceCombat(Game game, Player seat, Strike strike) {

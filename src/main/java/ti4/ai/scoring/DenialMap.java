@@ -14,6 +14,7 @@ import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.scoring.WinOdds.Loss;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -51,19 +52,21 @@ public final class DenialMap {
     }
 
     static DenialMap build(Game game, Player seat) {
-        OptionalInt mine = WinRace.seatFinish(game, seat);
-        Map<Player, Double> first = new LinkedHashMap<>();
-        Map<Player, Double> chances = new LinkedHashMap<>();
-        for (Player rival : game.getRealPlayers()) {
-            if (rival == seat || rival.isEliminated() || rival.isNeutral()) continue;
-            double before = WinOdds.finishesBefore(game, seat, rival, mine);
-            first.put(rival, before);
-            if (WinOdds.reachesGoal(game, seat, rival) >= MATERIAL_CHANCE && before > 0) chances.put(rival, before);
+        try (Thinking.Span timing = Thinking.measure("denial.build")) {
+            OptionalInt mine = WinRace.seatFinish(game, seat);
+            Map<Player, Double> first = new LinkedHashMap<>();
+            Map<Player, Double> chances = new LinkedHashMap<>();
+            for (Player rival : game.getRealPlayers()) {
+                if (rival == seat || rival.isEliminated() || rival.isNeutral()) continue;
+                double before = WinOdds.finishesBefore(game, seat, rival, mine);
+                first.put(rival, before);
+                if (WinOdds.reachesGoal(game, seat, rival) >= MATERIAL_CHANCE && before > 0) chances.put(rival, before);
+            }
+            Map<Player, Double> stakes = new LinkedHashMap<>();
+            for (Player rival : chances.keySet())
+                stakes.put(rival, ScoringStakes.WIN_VALUE * nobodyElseFirst(first, rival));
+            return new DenialMap(game, seat, mine, chances, stakes);
         }
-        Map<Player, Double> stakes = new LinkedHashMap<>();
-        for (Player rival : chances.keySet())
-            stakes.put(rival, ScoringStakes.WIN_VALUE * nobodyElseFirst(first, rival));
-        return new DenialMap(game, seat, mine, chances, stakes);
     }
 
     private static double nobodyElseFirst(Map<Player, Double> first, Player rival) {

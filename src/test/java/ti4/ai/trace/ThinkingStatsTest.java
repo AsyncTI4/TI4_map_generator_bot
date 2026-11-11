@@ -68,6 +68,6 @@ class ThinkingStatsTest {
     }
 
     private static SpanTotal span(String name, long calls, long totalMillis, long selfMillis, int reentry) {
-        return new SpanTotal(name, calls, totalMillis * MILLI, selfMillis * MILLI, reentry);
+        return new SpanTotal(name, calls, totalMillis * MILLI, selfMillis * MILLI, reentry, totalMillis * MILLI);
     }
 }

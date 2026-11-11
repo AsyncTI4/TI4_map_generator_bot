@@ -13,6 +13,7 @@ import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -265,17 +266,19 @@ public class AgendaVoting {
     }
 
     static Optional<Ballot> plan(Game game, Player seat) {
-        if (cannotVote(game, seat) || sitsOutThisAgenda(game, seat)) return Optional.empty();
-        String agenda = AgendaPolicy.currentAgenda(game);
-        AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
-        if (model == null || model.getTarget() == null) return Optional.empty();
-        List<Integer> planetVotes = readiedPlanetVotes(game, seat);
-        Optional<Ballot> promised = PromisedVotes.binding(game, seat)
-                .filter(promise -> castable(game, planetVotes) > 0)
-                .flatMap(promise -> ballotFor(game, promise.target(), castable(game, planetVotes)));
-        if (promised.isPresent()) return promised;
-        return BallotPlanner.choose(game, seat, agenda, planetVotes)
-                .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes()));
+        try (Thinking.Span timing = Thinking.measure("agenda.ballot")) {
+            if (cannotVote(game, seat) || sitsOutThisAgenda(game, seat)) return Optional.empty();
+            String agenda = AgendaPolicy.currentAgenda(game);
+            AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
+            if (model == null || model.getTarget() == null) return Optional.empty();
+            List<Integer> planetVotes = readiedPlanetVotes(game, seat);
+            Optional<Ballot> promised = PromisedVotes.binding(game, seat)
+                    .filter(promise -> castable(game, planetVotes) > 0)
+                    .flatMap(promise -> ballotFor(game, promise.target(), castable(game, planetVotes)));
+            if (promised.isPresent()) return promised;
+            return BallotPlanner.choose(game, seat, agenda, planetVotes)
+                    .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes()));
+        }
     }
 
     public static int castableVotes(Game game, Player seat) {

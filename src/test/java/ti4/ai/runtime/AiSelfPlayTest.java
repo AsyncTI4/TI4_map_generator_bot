@@ -50,6 +50,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         int games = Integer.getInteger("ai.selfplay.games", 1);
         int threads = Math.clamp(
                 Integer.getInteger("ai.selfplay.threads", Runtime.getRuntime().availableProcessors() / 2), 1, games);
+        ti4.ai.trace.TimingReport.reset();
         long batchStart = System.nanoTime();
         List<SelfPlayGame.Outcome> played = playAll(games, threads);
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
@@ -217,6 +218,10 @@ class AiSelfPlayTest extends BaseTi4Test {
         printObjectiveRates(summaries);
         printSecretMix(summaries);
         ProduceTracker.printBatch();
+        // -Dai.timing=true: where the AI spent its time, over every decision of the batch.
+        if (ti4.ai.trace.TimingReport.enabled()) {
+            ti4.ai.trace.TimingReport.lines().forEach(System.out::println);
+        }
     }
 
     // Every secret scored over the batch, most scored first, with its share of all scored secrets: the mix to hold

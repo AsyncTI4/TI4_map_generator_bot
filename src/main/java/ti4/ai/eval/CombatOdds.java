@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.trace.Thinking;
 import ti4.helpers.Units.UnitType;
 
 @UtilityClass
@@ -289,14 +290,16 @@ public class CombatOdds {
         }
 
         private double[] computeDistribution(List<Combatant> units, int absorbed, boolean rerollingMisses) {
-            int destroyed = Math.max(0, absorbed - sustains);
-            double[] distribution = {1.0};
-            for (Combatant unit : units.subList(Math.min(destroyed, units.size()), units.size())) {
-                double single = Math.clamp((11 - unit.hitsOn()) / 10.0, 0.0, 1.0);
-                double hitChance = rerollingMisses ? 1 - (1 - single) * (1 - single) : single;
-                for (int die = 0; die < unit.dice(); die++) distribution = addDie(distribution, hitChance);
+            try (Thinking.Span timing = Thinking.measure("combat.distribution")) {
+                int destroyed = Math.max(0, absorbed - sustains);
+                double[] distribution = {1.0};
+                for (Combatant unit : units.subList(Math.min(destroyed, units.size()), units.size())) {
+                    double single = Math.clamp((11 - unit.hitsOn()) / 10.0, 0.0, 1.0);
+                    double hitChance = rerollingMisses ? 1 - (1 - single) * (1 - single) : single;
+                    for (int die = 0; die < unit.dice(); die++) distribution = addDie(distribution, hitChance);
+                }
+                return distribution;
             }
-            return distribution;
         }
 
         private static double[] addDie(double[] distribution, double hitChance) {

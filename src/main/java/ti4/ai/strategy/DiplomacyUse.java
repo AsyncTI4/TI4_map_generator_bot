@@ -18,6 +18,7 @@ import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.tactical.PeaceAccords;
 import ti4.ai.tactical.ProductionPlanner;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -100,7 +101,9 @@ class DiplomacyUse {
     }
 
     static Optional<Choice> best(Game game, Player seat, Collection<String> candidates, int count) {
-        return best(game, seat, candidates, count, 0);
+        try (Thinking.Span timing = Thinking.measure("diplomacy.best")) {
+            return best(game, seat, candidates, count, 0);
+        }
     }
 
     private static Optional<Choice> best(

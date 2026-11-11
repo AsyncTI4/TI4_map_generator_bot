@@ -50,6 +50,12 @@ public class Thinking {
         return session == null ? NO_SPAN : session.enter(name, key);
     }
 
+    public static Span measure(String name) {
+        if (!TimingReport.enabled()) return NO_SPAN;
+        Session session = CURRENT.get();
+        return session == null || session.aborted != null ? NO_SPAN : session.track(name);
+    }
+
     private static final class Stat {
         private final String name;
         private long calls;
@@ -57,6 +63,7 @@ public class Thinking {
         private int maxActive;
         private long totalNanos;
         private long selfNanos;
+        private long maxNanos;
 
         private Stat(String name) {
             this.name = name;
@@ -72,6 +79,7 @@ public class Thinking {
         private final Map<String, Stat> stats = new HashMap<>();
         private ThinkingAborted aborted;
         private long end;
+        private int measuredOpen;
 
         private Session(ThinkingLimits limits, LongSupplier clock, Session previous) {
             this.limits = limits;
@@ -87,9 +95,20 @@ public class Thinking {
             stat.calls++;
             String reason = violation(stat, now);
             if (reason != null) throw abort(name, key, reason);
+            return push(stat, key, now, false);
+        }
+
+        private Span track(String name) {
+            Stat stat = stats.computeIfAbsent(name, Stat::new);
+            stat.calls++;
+            measuredOpen++;
+            return push(stat, null, clock.getAsLong(), true);
+        }
+
+        private Frame push(Stat stat, Supplier<String> key, long now, boolean measured) {
             stat.active++;
             stat.maxActive = Math.max(stat.maxActive, stat.active);
-            Frame frame = new Frame(this, stat, key, now);
+            Frame frame = new Frame(this, stat, key, now, measured);
             stack.add(frame);
             return frame;
         }
@@ -101,7 +120,8 @@ public class Thinking {
             if (stat.active >= limits.reentryLimit()) {
                 return stat.name + " re-entered itself " + stat.active + " deep";
             }
-            if (stack.size() >= limits.depthLimit()) return "it nested " + stack.size() + " spans deep";
+            int depth = stack.size() - measuredOpen;
+            if (depth >= limits.depthLimit()) return "it nested " + depth + " spans deep";
             if (limits.hasBudget() && now - start > limits.budgetNanos()) {
                 return "it thought for more than " + limits.budgetNanos() / 1_000_000L + " ms";
             }
@@ -112,6 +132,7 @@ public class Thinking {
             List<String> names = new ArrayList<>(stack.size() + 1);
             Set<String> keys = new LinkedHashSet<>();
             for (Frame frame : stack) {
+                if (frame.measured) continue;
                 names.add(frame.stat.name);
                 addKey(keys, frame.stat.name, frame.key);
             }
@@ -131,10 +152,14 @@ public class Thinking {
             if (index < 0) return;
             while (stack.size() > index + 1) stack.getLast().close();
             stack.remove(index);
+            if (frame.measured) measuredOpen--;
             Stat stat = frame.stat;
             stat.active--;
             stat.selfNanos += elapsed - frame.childNanos;
-            if (stat.active == 0) stat.totalNanos += elapsed;
+            if (stat.active == 0) {
+                stat.totalNanos += elapsed;
+                stat.maxNanos = Math.max(stat.maxNanos, elapsed);
+            }
             if (!stack.isEmpty()) stack.getLast().childNanos += elapsed;
         }
 
@@ -142,7 +167,8 @@ public class Thinking {
         public ThinkingProfile profile() {
             long finished = end == 0 ? clock.getAsLong() : end;
             List<SpanTotal> spans = stats.values().stream()
-                    .map(stat -> new SpanTotal(stat.name, stat.calls, stat.totalNanos, stat.selfNanos, stat.maxActive))
+                    .map(stat -> new SpanTotal(
+                            stat.name, stat.calls, stat.totalNanos, stat.selfNanos, stat.maxActive, stat.maxNanos))
                     .sorted(Comparator.comparingLong(SpanTotal::selfNanos).reversed())
                     .toList();
             return new ThinkingProfile(finished - start, spans);
@@ -161,13 +187,15 @@ public class Thinking {
         private final Stat stat;
         private final Supplier<String> key;
         private final long start;
+        private final boolean measured;
         private long childNanos;
 
-        private Frame(Session session, Stat stat, Supplier<String> key, long start) {
+        private Frame(Session session, Stat stat, Supplier<String> key, long start, boolean measured) {
             this.session = session;
             this.stat = stat;
             this.key = key;
             this.start = start;
+            this.measured = measured;
         }
 
         @Override

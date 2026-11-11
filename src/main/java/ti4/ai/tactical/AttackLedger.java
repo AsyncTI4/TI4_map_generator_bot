@@ -24,6 +24,7 @@ import ti4.ai.eval.ValueScale;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.ai.strategy.SpeakerSale;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -127,21 +128,23 @@ public class AttackLedger {
     }
 
     static void record(Game game) {
-        Board now = board(game);
-        String stored = storedLedger(game);
-        GameKey key = GameKey.of(game);
-        Picture last = PICTURES.get(key);
-        Map<String, Attack> ledger = new LinkedHashMap<>();
-        for (Attack attack : attacks(game)) {
-            if (decay(game.getRound() - attack.round()) > 0) ledger.put(attack.key(), attack);
-        }
-        if (last != null && last.ledger().equals(stored)) {
-            diff(game, last.board(), now).forEach(attack -> ledger.merge(attack.key(), attack, AttackLedger::sum));
-        }
-        String updated = encodeLedger(ledger.values());
-        PICTURES.put(key, new Picture(now, updated));
-        if (!updated.equals(stored)) {
-            AiGameWrites.persist(game, SAVE_REASON, latest -> latest.setStoredValue(LEDGER_KEY, updated));
+        try (Thinking.Span timing = Thinking.measure("attack.record")) {
+            Board now = board(game);
+            String stored = storedLedger(game);
+            GameKey key = GameKey.of(game);
+            Picture last = PICTURES.get(key);
+            Map<String, Attack> ledger = new LinkedHashMap<>();
+            for (Attack attack : attacks(game)) {
+                if (decay(game.getRound() - attack.round()) > 0) ledger.put(attack.key(), attack);
+            }
+            if (last != null && last.ledger().equals(stored)) {
+                diff(game, last.board(), now).forEach(attack -> ledger.merge(attack.key(), attack, AttackLedger::sum));
+            }
+            String updated = encodeLedger(ledger.values());
+            PICTURES.put(key, new Picture(now, updated));
+            if (!updated.equals(stored)) {
+                AiGameWrites.persist(game, SAVE_REASON, latest -> latest.setStoredValue(LEDGER_KEY, updated));
+            }
         }
     }
 

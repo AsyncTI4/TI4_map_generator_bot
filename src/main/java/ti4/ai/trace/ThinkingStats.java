@@ -47,6 +47,7 @@ public final class ThinkingStats {
     }
 
     public synchronized void recordOutside(String name, long nanos) {
+        TimingReport.recordOutside(name, nanos);
         Total total = spans.computeIfAbsent(name, key -> new Total());
         total.calls++;
         total.totalNanos += nanos;

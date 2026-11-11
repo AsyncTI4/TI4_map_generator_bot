@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.Threats;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -51,13 +52,15 @@ class CeasefireValue {
     }
 
     static double stakeAgainst(Game game, Player defender, Player attacker) {
-        String key = game.getName() + "|" + defender.getFaction() + "|" + attacker.getFaction();
-        Cached cached = STAKES.get(key);
-        if (cached != null && cached.isFor(game)) return cached.stake();
-        double stake = Math.max(homeStake(game, defender, attacker), mecatolStake(game, defender, attacker));
-        if (STAKES.size() > MAX_CACHED) STAKES.clear();
-        STAKES.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), stake));
-        return stake;
+        try (Thinking.Span timing = Thinking.measure("ceasefire.stake")) {
+            String key = game.getName() + "|" + defender.getFaction() + "|" + attacker.getFaction();
+            Cached cached = STAKES.get(key);
+            if (cached != null && cached.isFor(game)) return cached.stake();
+            double stake = Math.max(homeStake(game, defender, attacker), mecatolStake(game, defender, attacker));
+            if (STAKES.size() > MAX_CACHED) STAKES.clear();
+            STAKES.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), stake));
+            return stake;
+        }
     }
 
     private static double homeStake(Game game, Player defender, Player attacker) {

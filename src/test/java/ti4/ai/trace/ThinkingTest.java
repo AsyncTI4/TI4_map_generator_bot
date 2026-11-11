@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.concurrent.atomic.AtomicLong;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.trace.ThinkingProfile.SpanTotal;
 
@@ -13,6 +15,28 @@ class ThinkingTest {
     private static final ThinkingLimits LIMITS = new ThinkingLimits(0, 3, 10, 5);
 
     private final AtomicLong clock = new AtomicLong();
+
+    // Timing spans only record with -Dai.timing=true; these tests switch it on.
+    @BeforeEach
+    void timeSpans() {
+        TimingReport.enable(true);
+    }
+
+    @AfterEach
+    void restoreTiming() {
+        TimingReport.enable(Boolean.getBoolean(TimingReport.PROPERTY));
+    }
+
+    @Test
+    void aMeasuredSpanIsIgnoredWhileTimingIsOff() {
+        TimingReport.enable(false);
+        try (Thinking.Decision decision = Thinking.open(ThinkingLimits.unlimited(), clock::get)) {
+            try (Thinking.Span span = Thinking.measure("timing")) {
+                clock.addAndGet(20);
+            }
+            assertThat(decision.profile().spans()).isEmpty();
+        }
+    }
 
     // Outside a decision every span is a shared no-op, so planners can be called from tests and tools untouched.
     @Test
@@ -132,7 +156,8 @@ class ThinkingTest {
             ThinkingProfile profile = decision.profile();
             assertThat(profile.totalNanos()).isEqualTo(75);
             assertThat(profile.spans())
-                    .containsExactly(new SpanTotal("inner", 2, 60, 60, 1), new SpanTotal("outer", 1, 75, 15, 1));
+                    .containsExactly(
+                            new SpanTotal("inner", 2, 60, 60, 1, 30), new SpanTotal("outer", 1, 75, 15, 1, 75));
         }
     }
 
@@ -145,7 +170,57 @@ class ThinkingTest {
                     clock.addAndGet(20);
                 }
             }
-            assertThat(decision.profile().spans()).containsExactly(new SpanTotal("loop", 2, 30, 30, 2));
+            assertThat(decision.profile().spans()).containsExactly(new SpanTotal("loop", 2, 30, 30, 2, 30));
+        }
+    }
+
+    // Timing spans only measure: past the budget and the call cap they still never cut the decision short, so adding
+    // them cannot change what the AI decides.
+    @Test
+    void aMeasuredSpanNeverCutsADecisionShort() {
+        ThinkingLimits tight = new ThinkingLimits(10, 8, 60, 1);
+        try (Thinking.Decision decision = Thinking.open(tight, clock::get)) {
+            for (int i = 0; i < 3; i++) {
+                try (Thinking.Span span = Thinking.measure("timing")) {
+                    clock.addAndGet(20);
+                }
+            }
+            assertThat(decision.profile().spans()).containsExactly(new SpanTotal("timing", 3, 60, 60, 1, 20));
+        }
+    }
+
+    // A timing span between two limited spans does not count toward the depth limit, and stays out of the trail.
+    @Test
+    void measuredSpansDoNotCountTowardTheDepthLimit() {
+        ThinkingLimits twoDeep = new ThinkingLimits(0, 8, 2, Integer.MAX_VALUE);
+        try (Thinking.Decision decision = Thinking.open(twoDeep, clock::get)) {
+            try (Thinking.Span outer = Thinking.enter("outer");
+                    Thinking.Span timing = Thinking.measure("timing");
+                    Thinking.Span inner = Thinking.enter("inner")) {
+                assertThat(decision.profile().spans()).hasSize(3);
+            }
+            assertThatThrownBy(() -> {
+                        try (Thinking.Span outer = Thinking.enter("outer");
+                                Thinking.Span timing = Thinking.measure("timing");
+                                Thinking.Span inner = Thinking.enter("inner");
+                                Thinking.Span third = Thinking.enter("third")) {
+                            clock.addAndGet(1);
+                        }
+                    })
+                    .isInstanceOfSatisfying(ThinkingAborted.class, aborted -> {
+                        assertThat(aborted.reason()).isEqualTo("it nested 2 spans deep");
+                        assertThat(aborted.innermost(4)).doesNotContain("timing");
+                    });
+        }
+    }
+
+    @Test
+    void aMeasuredSpanOutsideADecisionDoesNothing() {
+        try (Thinking.Span span = Thinking.measure("timing")) {
+            clock.addAndGet(20);
+        }
+        try (Thinking.Decision decision = Thinking.open(ThinkingLimits.unlimited(), clock::get)) {
+            assertThat(decision.profile().spans()).isEmpty();
         }
     }
 

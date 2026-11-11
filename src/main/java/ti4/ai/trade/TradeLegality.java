@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -156,14 +157,16 @@ class TradeLegality {
     }
 
     private static Set<String> neighbourFactions(Game game, Player player) {
-        String key = game.getName() + SEPARATOR + player.getFaction();
-        Cached cached = NEIGHBOURS.get(key);
-        if (cached != null && cached.isFor(game)) return cached.factions();
-        Set<String> factions = player.getNeighbouringPlayers(false).stream()
-                .map(Player::getFaction)
-                .collect(Collectors.toUnmodifiableSet());
-        if (NEIGHBOURS.size() > MAX_CACHED) NEIGHBOURS.clear();
-        NEIGHBOURS.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), factions));
-        return factions;
+        try (Thinking.Span timing = Thinking.measure("trade.neighbours")) {
+            String key = game.getName() + SEPARATOR + player.getFaction();
+            Cached cached = NEIGHBOURS.get(key);
+            if (cached != null && cached.isFor(game)) return cached.factions();
+            Set<String> factions = player.getNeighbouringPlayers(false).stream()
+                    .map(Player::getFaction)
+                    .collect(Collectors.toUnmodifiableSet());
+            if (NEIGHBOURS.size() > MAX_CACHED) NEIGHBOURS.clear();
+            NEIGHBOURS.put(key, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), factions));
+            return factions;
+        }
     }
 }

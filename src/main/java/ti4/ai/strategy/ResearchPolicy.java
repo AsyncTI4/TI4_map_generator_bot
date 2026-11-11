@@ -27,6 +27,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.tactical.GroundCampaign;
 import ti4.ai.tactical.PrecisionRules;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -217,19 +218,21 @@ public class ResearchPolicy {
     }
 
     public static double value(Game game, Player seat, String alias) {
-        TechnologyModel tech = Mapper.getTech(alias);
-        if (tech == null || seat.hasTech(alias)) return 0;
-        return baseValue(tech) * statusPhaseShare(game, alias)
-                + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
-                + steppingStoneValue(game, seat, tech)
-                + custodiansRaceValue(game, seat, alias)
-                + openingReachValue(game, seat, alias)
-                + fractureMarchValue(game, seat, alias)
-                + frontierTapValue(game, seat, alias)
-                + groundSecretValue(game, seat, tech)
-                + barrageSecretValue(game, seat, tech)
-                + Endurance.researchValue(seat, alias)
-                + GravleashPlan.driveBonus(seat, alias);
+        try (Thinking.Span timing = Thinking.measure("research.value")) {
+            TechnologyModel tech = Mapper.getTech(alias);
+            if (tech == null || seat.hasTech(alias)) return 0;
+            return baseValue(tech) * statusPhaseShare(game, alias)
+                    + OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
+                    + steppingStoneValue(game, seat, tech)
+                    + custodiansRaceValue(game, seat, alias)
+                    + openingReachValue(game, seat, alias)
+                    + fractureMarchValue(game, seat, alias)
+                    + frontierTapValue(game, seat, alias)
+                    + groundSecretValue(game, seat, tech)
+                    + barrageSecretValue(game, seat, tech)
+                    + Endurance.researchValue(seat, alias)
+                    + GravleashPlan.driveBonus(seat, alias);
+        }
     }
 
     static double frontierTapValue(Game game, Player seat, String alias) {

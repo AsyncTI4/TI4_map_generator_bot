@@ -18,6 +18,7 @@ import ti4.ai.scoring.WinRace;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -134,9 +135,11 @@ final class Standings {
     }
 
     double winThreat(Player player) {
-        if (winsBeforeTheSeat(player)) return 1;
-        if (weighsFeasibility()) return WinOdds.reachesGoal(game, seat, player);
-        return clamp((projected(player) - (goal() - WIN_WINDOW)) / WIN_WINDOW, 0, 1);
+        try (Thinking.Span timing = Thinking.measure("standings.winThreat")) {
+            if (winsBeforeTheSeat(player)) return 1;
+            if (weighsFeasibility()) return WinOdds.reachesGoal(game, seat, player);
+            return clamp((projected(player) - (goal() - WIN_WINDOW)) / WIN_WINDOW, 0, 1);
+        }
     }
 
     boolean winsBeforeTheSeat(Player player) {

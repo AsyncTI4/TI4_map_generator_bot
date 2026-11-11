@@ -9,6 +9,7 @@ import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -50,23 +51,25 @@ public class PlanetTake {
     }
 
     static double chance(Game game, Player taker, Target target, IncomingForces incoming, Player decider) {
-        IncomingForce force = incoming.of(taker, target.tile(), Horizon.IMMEDIATE);
-        if (force.isEmpty() || !force.carriesGround()) return 0.0;
-        if (target.holder() == null) return 1.0;
-        Strike strike = new Strike(
-                target.tile(),
-                target.holder(),
-                List.of(),
-                List.of(),
-                force.ships(),
-                force.damaged(),
-                force.ground(),
-                Map.of(),
-                Map.of(),
-                RULES,
-                Map.of());
-        StrikeEstimate estimate = StrikeEvaluator.estimate(game, taker, strike, decider);
-        return estimate.spaceWin() * estimate.groundWins().getOrDefault(target.planet(), 0.0);
+        try (Thinking.Span timing = Thinking.measure("planetTake.chance")) {
+            IncomingForce force = incoming.of(taker, target.tile(), Horizon.IMMEDIATE);
+            if (force.isEmpty() || !force.carriesGround()) return 0.0;
+            if (target.holder() == null) return 1.0;
+            Strike strike = new Strike(
+                    target.tile(),
+                    target.holder(),
+                    List.of(),
+                    List.of(),
+                    force.ships(),
+                    force.damaged(),
+                    force.ground(),
+                    Map.of(),
+                    Map.of(),
+                    RULES,
+                    Map.of());
+            StrikeEstimate estimate = StrikeEvaluator.estimate(game, taker, strike, decider);
+            return estimate.spaceWin() * estimate.groundWins().getOrDefault(target.planet(), 0.0);
+        }
     }
 
     private static double mecatol(Game game, Player taker, IncomingForces incoming, Player decider) {

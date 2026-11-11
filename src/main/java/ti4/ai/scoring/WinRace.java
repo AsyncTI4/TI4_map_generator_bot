@@ -13,6 +13,7 @@ import ti4.ai.eval.FractureCampaign;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretValue;
 import ti4.ai.tactical.StyxTake;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
@@ -39,13 +40,15 @@ public class WinRace {
     }
 
     private static List<Player> computeWinnersBefore(Game game, Player seat) {
-        boolean feasible = weighsFeasibility(seat);
-        OptionalInt mine = seatFinish(game, seat);
-        return game.getRealPlayers().stream()
-                .filter(other -> other != seat && !other.isEliminated())
-                .filter(other ->
-                        feasible ? likelyFirst(game, seat, other, mine) : finishesFirst(finish(game, other), mine))
-                .toList();
+        try (Thinking.Span timing = Thinking.measure("winRace.winners")) {
+            boolean feasible = weighsFeasibility(seat);
+            OptionalInt mine = seatFinish(game, seat);
+            return game.getRealPlayers().stream()
+                    .filter(other -> other != seat && !other.isEliminated())
+                    .filter(other ->
+                            feasible ? likelyFirst(game, seat, other, mine) : finishesFirst(finish(game, other), mine))
+                    .toList();
+        }
     }
 
     private static boolean likelyFirst(Game game, Player seat, Player rival, OptionalInt mine) {

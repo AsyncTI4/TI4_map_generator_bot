@@ -1,6 +1,7 @@
 package ti4.ai.secrets;
 
 import lombok.experimental.UtilityClass;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -19,8 +20,10 @@ public class SecretDraws {
     }
 
     public static double redrawValue(Game game, Player seat) {
-        if (hasScoredAll(seat)) return 0;
-        return SecretDrawValue.pointValue(game, seat, redrawGainPoints(game, seat));
+        try (Thinking.Span timing = Thinking.measure("secrets.redrawValue")) {
+            if (hasScoredAll(seat)) return 0;
+            return SecretDrawValue.pointValue(game, seat, redrawGainPoints(game, seat));
+        }
     }
 
     static boolean weakHand(Game game, Player seat) {

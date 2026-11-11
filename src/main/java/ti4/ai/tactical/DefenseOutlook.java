@@ -27,6 +27,7 @@ import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -281,9 +282,11 @@ public final class DefenseOutlook {
     }
 
     private double computeHomeDefenseLevel() {
-        Tile tile = home();
-        if (tile == null) return 0;
-        return enemyReach(tile) * homePressure();
+        try (Thinking.Span timing = Thinking.measure("defense.home")) {
+            Tile tile = home();
+            if (tile == null) return 0;
+            return enemyReach(tile) * homePressure();
+        }
     }
 
     private double enemyReach(Tile tile) {
@@ -555,12 +558,14 @@ public final class DefenseOutlook {
     }
 
     private boolean computeGuarded(Tile tile) {
-        return isHome(tile)
-                || hasSeatDock(tile)
-                || controlsMecatol(tile)
-                || FracturePrize.holdsStyx(tile, seat)
-                || scoringLoss(tile) >= SCORING_CRITICAL
-                || contested(tile);
+        try (Thinking.Span timing = Thinking.measure("defense.guarded")) {
+            return isHome(tile)
+                    || hasSeatDock(tile)
+                    || controlsMecatol(tile)
+                    || FracturePrize.holdsStyx(tile, seat)
+                    || scoringLoss(tile) >= SCORING_CRITICAL
+                    || contested(tile);
+        }
     }
 
     private boolean hasSeatDock(Tile tile) {
@@ -603,14 +608,16 @@ public final class DefenseOutlook {
     }
 
     private double computeThreat(Player enemy, Tile tile, Horizon horizon, Defenders defenders) {
-        IncomingForce force = incoming.of(enemy, tile, horizon);
-        if (force.isEmpty() || fearCeiling(enemy, tile, horizon, force) < MIN_FEAR) return 0;
-        Chances chances = chances(tile, force, defenders);
-        double fear = fear(enemy, tile, horizon, force, defenders, chances);
-        double target = target(fear);
-        double exposed = Math.max(0, chances.take() - target) * stake(tile)
-                + Math.max(0, chances.space() - target) * spaceStake(tile, force);
-        return weight(enemy, horizon) * fear * exposed;
+        try (Thinking.Span timing = Thinking.measure("defense.threat")) {
+            IncomingForce force = incoming.of(enemy, tile, horizon);
+            if (force.isEmpty() || fearCeiling(enemy, tile, horizon, force) < MIN_FEAR) return 0;
+            Chances chances = chances(tile, force, defenders);
+            double fear = fear(enemy, tile, horizon, force, defenders, chances);
+            double target = target(fear);
+            double exposed = Math.max(0, chances.take() - target) * stake(tile)
+                    + Math.max(0, chances.space() - target) * spaceStake(tile, force);
+            return weight(enemy, horizon) * fear * exposed;
+        }
     }
 
     private double spaceStake(Tile tile, IncomingForce force) {
@@ -921,11 +928,13 @@ public final class DefenseOutlook {
     }
 
     private double computeSpace(Tile tile, IncomingForce force, Defenders defenders) {
-        Optional<SpaceFight> fight = spaceFight(tile, force, defenders);
-        if (fight.isPresent())
-            return CombatOdds.resolve(fight.get().attack(), fight.get().defence())
-                    .attackerWins();
-        return undefendedChance(tile, force);
+        try (Thinking.Span timing = Thinking.measure("defense.space")) {
+            Optional<SpaceFight> fight = spaceFight(tile, force, defenders);
+            if (fight.isPresent())
+                return CombatOdds.resolve(fight.get().attack(), fight.get().defence())
+                        .attackerWins();
+            return undefendedChance(tile, force);
+        }
     }
 
     double expectedShipLoss(Tile tile, IncomingForce force, Defenders defenders) {
@@ -997,13 +1006,16 @@ public final class DefenseOutlook {
     }
 
     private double computeGround(Tile tile, IncomingForce force, Planet planet, Defenders defenders) {
-        double[] cannonHits =
-                L4Disruptors.shieldsInvaders(force.enemy()) ? new double[] {1} : spaceCannonHitOdds(planet);
-        double chance = 0;
-        for (int hits = 0; hits < cannonHits.length; hits++) {
-            if (cannonHits[hits] > 0) chance += cannonHits[hits] * landedChance(tile, force, planet, defenders, hits);
+        try (Thinking.Span timing = Thinking.measure("defense.ground")) {
+            double[] cannonHits =
+                    L4Disruptors.shieldsInvaders(force.enemy()) ? new double[] {1} : spaceCannonHitOdds(planet);
+            double chance = 0;
+            for (int hits = 0; hits < cannonHits.length; hits++) {
+                if (cannonHits[hits] > 0)
+                    chance += cannonHits[hits] * landedChance(tile, force, planet, defenders, hits);
+            }
+            return chance;
         }
-        return chance;
     }
 
     private double landedChance(Tile tile, IncomingForce force, Planet planet, Defenders defenders, int cannonHits) {

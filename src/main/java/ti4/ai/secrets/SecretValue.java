@@ -12,6 +12,7 @@ import ti4.ai.strategy.TechPath;
 import ti4.ai.tactical.GroundCampaign;
 import ti4.ai.tactical.SeatStrike;
 import ti4.ai.tactical.SupplyLines;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -72,12 +73,15 @@ public class SecretValue {
     }
 
     public static double keepValue(Game game, Player seat, String secretId) {
-        boolean ready = isReady(game, seat, secretId);
-        boolean congested = isCongested(game, seat, secretId);
-        if (ready && !congested) return READY_VALUE;
-        double chance = ready ? 1.0 : completionChance(game, seat, secretId) * boardFeasibility(game, seat, secretId);
-        double value = chance * phaseValue(secretId) + openingTempo(game, seat, secretId);
-        return congested ? value * CONGESTION_FACTOR : value;
+        try (Thinking.Span timing = Thinking.measure("secrets.keepValue")) {
+            boolean ready = isReady(game, seat, secretId);
+            boolean congested = isCongested(game, seat, secretId);
+            if (ready && !congested) return READY_VALUE;
+            double chance =
+                    ready ? 1.0 : completionChance(game, seat, secretId) * boardFeasibility(game, seat, secretId);
+            double value = chance * phaseValue(secretId) + openingTempo(game, seat, secretId);
+            return congested ? value * CONGESTION_FACTOR : value;
+        }
     }
 
     private static double openingTempo(Game game, Player seat, String secretId) {

@@ -19,6 +19,7 @@ import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.PlanetTake;
 import ti4.ai.tactical.StyxTake;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -148,13 +149,15 @@ public class WinOdds {
     }
 
     private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
-        Odds held = compute(game, viewer, rival, immediatePoints, loss, Optional.empty());
-        if (held == Odds.CERTAIN || !WinRace.weighsFeasibility(viewer)) return held;
-        Optional<String> contested = PlanetTake.contestedMecatol(game, rival);
-        if (contested.isEmpty()) return held;
-        double take = mecatolTake(game, viewer, rival, loss);
-        if (take <= 0) return held;
-        return blend(compute(game, viewer, rival, immediatePoints, loss, contested), held, take);
+        try (Thinking.Span timing = Thinking.measure("winOdds.compute")) {
+            Odds held = compute(game, viewer, rival, immediatePoints, loss, Optional.empty());
+            if (held == Odds.CERTAIN || !WinRace.weighsFeasibility(viewer)) return held;
+            Optional<String> contested = PlanetTake.contestedMecatol(game, rival);
+            if (contested.isEmpty()) return held;
+            double take = mecatolTake(game, viewer, rival, loss);
+            if (take <= 0) return held;
+            return blend(compute(game, viewer, rival, immediatePoints, loss, contested), held, take);
+        }
     }
 
     private static double mecatolTake(Game game, Player viewer, Player rival, Loss loss) {

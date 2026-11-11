@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.SplittableRandom;
 import java.util.function.ToDoubleFunction;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
@@ -58,26 +59,28 @@ public final class AgendaForecast {
     }
 
     public static AgendaForecast of(Game game, Player viewer) {
-        if (!applies(game)) return NONE;
-        List<String> outcomes = AgendaOutcomes.of(game);
-        List<Player> voters = votingOrder(game);
-        if (outcomes.isEmpty() || voters.isEmpty()) return NONE;
-        String agenda = AgendaPolicy.currentAgenda(game);
-        Placed placed = readPlaced(game, viewer, voters, outcomes);
-        Frame frame = new Frame(
-                game,
-                viewer,
-                voters,
-                outcomes,
-                baseUtilities(game, viewer, voters, outcomes, agenda),
-                draws(game, viewer, voters.size()),
-                speakerIndex(game, voters),
-                keepsVotesWithRider(game, voters));
-        return PromisedVotes.placeAccepted(
-                game,
-                viewer,
-                new AgendaForecast(
-                        frame, remainingVotes(game, frame, placed), placed.castByOutcome(), placed.riders()));
+        try (Thinking.Span timing = Thinking.measure("agenda.forecast")) {
+            if (!applies(game)) return NONE;
+            List<String> outcomes = AgendaOutcomes.of(game);
+            List<Player> voters = votingOrder(game);
+            if (outcomes.isEmpty() || voters.isEmpty()) return NONE;
+            String agenda = AgendaPolicy.currentAgenda(game);
+            Placed placed = readPlaced(game, viewer, voters, outcomes);
+            Frame frame = new Frame(
+                    game,
+                    viewer,
+                    voters,
+                    outcomes,
+                    baseUtilities(game, viewer, voters, outcomes, agenda),
+                    draws(game, viewer, voters.size()),
+                    speakerIndex(game, voters),
+                    keepsVotesWithRider(game, voters));
+            return PromisedVotes.placeAccepted(
+                    game,
+                    viewer,
+                    new AgendaForecast(
+                            frame, remainingVotes(game, frame, placed), placed.castByOutcome(), placed.riders()));
+        }
     }
 
     public boolean isEmpty() {

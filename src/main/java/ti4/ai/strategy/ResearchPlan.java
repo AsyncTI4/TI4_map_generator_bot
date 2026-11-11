@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -161,19 +162,21 @@ public record ResearchPlan(
     }
 
     private static ResearchPlan build(Game game, Player seat, Map<String, String> parts) {
-        if (!canResearch(game, seat)) {
+        try (Thinking.Span timing = Thinking.measure("research.plan")) {
+            if (!canResearch(game, seat)) {
+                return new ResearchPlan(
+                        game.getName(), seat.getFaction(), game.getRound(), NOTHING, List.of(), List.of(), parts);
+            }
+            int left = TechPath.researchesLeft(game);
+            List<Goal> goals = new ArrayList<>();
+            List<Candidate> candidates = new ArrayList<>();
+            addObjectives(game, seat, left, goals, candidates);
+            addAntimassReach(game, seat, left, goals, candidates);
+            addReachReasons(game, seat, candidates);
+            List<Step> steps = sequence(candidates, Math.min(left, MAX_STEPS));
             return new ResearchPlan(
-                    game.getName(), seat.getFaction(), game.getRound(), NOTHING, List.of(), List.of(), parts);
+                    game.getName(), seat.getFaction(), game.getRound(), nextOf(seat, steps), steps, goals, parts);
         }
-        int left = TechPath.researchesLeft(game);
-        List<Goal> goals = new ArrayList<>();
-        List<Candidate> candidates = new ArrayList<>();
-        addObjectives(game, seat, left, goals, candidates);
-        addAntimassReach(game, seat, left, goals, candidates);
-        addReachReasons(game, seat, candidates);
-        List<Step> steps = sequence(candidates, Math.min(left, MAX_STEPS));
-        return new ResearchPlan(
-                game.getName(), seat.getFaction(), game.getRound(), nextOf(seat, steps), steps, goals, parts);
     }
 
     private static String nextOf(Player seat, List<Step> steps) {

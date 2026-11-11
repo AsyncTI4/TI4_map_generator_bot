@@ -433,6 +433,7 @@ final class SelfPlayGame {
             ManagedGame managed = GameManager.getManagedGame(name);
             Game game = observed(managed);
             if (game == null) return outcome(Ending.LOST_GAME, null, ticks);
+            long observeStart = System.nanoTime();
             recordVictoryPoints(game);
             recordPlayRounds(game);
             env.promissory.observe(game);
@@ -449,6 +450,7 @@ final class SelfPlayGame {
             logFleets(game);
             logResearchPlans(game);
             closeOverrulePicks(game, false);
+            ti4.ai.trace.TimingReport.recordOutside("harness.observe", System.nanoTime() - observeStart);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
             if (announcedGameOver()) return outcome(Ending.OBJECTIVES_EXHAUSTED, game, ticks);

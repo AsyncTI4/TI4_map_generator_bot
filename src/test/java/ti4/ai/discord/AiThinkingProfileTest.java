@@ -35,7 +35,7 @@ class AiThinkingProfileTest extends BaseTi4Test {
         ThinkingStats stats = new ThinkingStats();
         List<SpanTotal> spans = new java.util.ArrayList<>();
         for (int i = 0; i < 200; i++) {
-            spans.add(new SpanTotal("a.very.long.span.name.number." + i + "x".repeat(60), i, i, i, 1));
+            spans.add(new SpanTotal("a.very.long.span.name.number." + i + "x".repeat(60), i, i, i, 1, i));
         }
         for (int i = 0; i < 20; i++) {
             stats.record(new ThinkingProfile(5_000_000_000L, spans), "faction" + "y".repeat(30), "cut short", true);

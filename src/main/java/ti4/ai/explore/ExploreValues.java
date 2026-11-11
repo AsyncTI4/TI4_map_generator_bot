@@ -7,6 +7,7 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.secrets.SecretDraws;
 import ti4.ai.strategy.StrategyCardRules;
+import ti4.ai.trace.Thinking;
 import ti4.ai.trade.ComponentValues;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -36,7 +37,9 @@ public class ExploreValues {
     private static final String FRONTIER_DECK = "frontier";
 
     public static double frontierCard(Game game, Player seat) {
-        return FRONTIER_CARD + derelictVesselShare(game) * secretDraw(game, seat);
+        try (Thinking.Span timing = Thinking.measure("explore.frontierCard")) {
+            return FRONTIER_CARD + derelictVesselShare(game) * secretDraw(game, seat);
+        }
     }
 
     private static double derelictVesselShare(Game game) {
