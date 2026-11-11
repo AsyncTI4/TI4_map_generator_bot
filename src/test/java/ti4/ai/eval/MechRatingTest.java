@@ -129,6 +129,15 @@ class MechRatingTest extends BaseTi4Test {
                 .isGreaterThan(MechRating.abilityQuality(seat("ralnel")));
     }
 
+    // User ratings: Deepwrought's mech is very good (Production), Mahact's only strong, so Deepwrought ranks higher.
+    @Test
+    void deepwroughtMechRanksAboveMahact() {
+        assertThat(MechRating.ofUnit("deepwrought_mech").quality())
+                .isGreaterThan(MechRating.ofUnit("mahact_mech").quality());
+        assertThat(MechRating.abilityQuality(seat("deepwrought")))
+                .isGreaterThan(MechRating.abilityQuality(seat("mahact")));
+    }
+
     // Rearmament Agreement: a home mech with production or cannon (Arborec, Deepwrought, Xxcha) is worth more than
     // a home defender (Mahact, Keleres, Ral Nel, Jol-Nar), which beats a mech that belongs at the front (Creuss).
     @Test

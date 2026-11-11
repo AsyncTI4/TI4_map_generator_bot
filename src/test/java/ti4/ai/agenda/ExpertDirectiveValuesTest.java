@@ -285,6 +285,18 @@ class ExpertDirectiveValuesTest extends BaseTi4Test {
         assertThat(expert(nekro, "cladenstine", "for")).isPositive();
     }
 
+    // For with only fleet tokens left: both tokens come off the fleet pool (3 -> 1), so three cruisers at Lodor
+    // lose two of them, not one at limit 2 plus two more at limit 1.
+    @Test
+    void clandestineForCountsEachShipOnceWhenBothTokensComeOffTheFleetPool() {
+        nekro.setTacticalCC(0);
+        nekro.setStrategicCC(0);
+        test.units(lodorTile, "space", nekro, UnitType.Cruiser, 3);
+
+        assertThat(ExpertDirectiveValues.sheetTokenLoss(test.game, nekro))
+                .isCloseTo(2 * CardValueScale.HELD_TOKEN + 4 * ValueScale.RESOURCE, within(EPSILON));
+    }
+
     // Every outcome string other than For or Against is worth nothing.
     @Test
     void otherOutcomesAreWorthNothing() {

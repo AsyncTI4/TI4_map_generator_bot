@@ -1,5 +1,6 @@
 package ti4.ai.agenda;
 
+import static ti4.ai.agenda.AgendaValueMath.pointsTo;
 import static ti4.ai.agenda.AgendaValueMath.relativeToRivals;
 import static ti4.ai.agenda.AgendaValueMath.rivalGainCost;
 
@@ -7,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.Wallet;
 import ti4.game.Game;
@@ -27,6 +29,8 @@ class ExpertPlanetValues {
             "rt_warfare", 1.0,
             "senate_sanctuary", 1.0,
             "terraforming_initiative", 1.0);
+    private static final String HOLY_PLANET = "holy_planet_of_ixth";
+    private static final int HOLY_PLANET_POINT = 1;
     private static final String COMPENSATED_DISARMAMENT = "disarmament";
     private static final double INFANTRY_TG = 1.0;
     private static final double MECH_TG = 2.5;
@@ -46,8 +50,14 @@ class ExpertPlanetValues {
         if (planet == null || !AgendaPolicy.hasRequiredTrait(agenda, planet)) return 0;
         Player owner = BoardView.controller(game, outcome);
         if (owner == null || !game.getRealPlayers().contains(owner)) return 0;
+        if (HOLY_PLANET.equals(agenda) && winsWithPoint(game, owner))
+            return pointsTo(game, voter, owner, HOLY_PLANET_POINT);
         if (owner == voter) return worth;
         return -rivalGainCost(game, voter, owner, worth);
+    }
+
+    private static boolean winsWithPoint(Game game, Player owner) {
+        return owner.getTotalVictoryPoints() + HOLY_PLANET_POINT >= GameHorizon.goal(game);
     }
 
     private static double compensatedDisarmament(Game game, Player voter, String outcome) {

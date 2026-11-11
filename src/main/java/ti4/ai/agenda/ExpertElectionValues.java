@@ -76,6 +76,8 @@ class ExpertElectionValues {
     static Double valueOf(AgendaView view, String agenda, String outcome, String ownVote) {
         return switch (agenda) {
             case "secret" -> elected(view, outcome, holder -> archivedSecretWorth(view, holder));
+            // TODO: missing user's +2 TG when the holder knows a good Elect Player agenda is next; needs
+            // AgendaKnowledge (plan M6).
             case "committee" -> elected(view, outcome, holder -> roundTable(view.game(), 4, 2, 1));
             case "arbiter" -> elected(view, outcome, holder -> ARBITER);
             case "minister_commerce" -> elected(view, outcome, holder -> commerceWorth(view.game(), holder));

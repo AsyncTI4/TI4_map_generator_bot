@@ -9,6 +9,7 @@ import static ti4.ai.agenda.AgendaValueMath.relativeToRivals;
 import static ti4.ai.agenda.AgendaValueMath.threat;
 import static ti4.ai.agenda.AgendaValueMath.unitCost;
 import static ti4.ai.agenda.AgendaValueMath.unitsOnBoard;
+import static ti4.ai.agenda.AgendaValueMath.votedOn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.Set;
 import java.util.function.ToDoubleFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang3.math.NumberUtils;
 import ti4.ai.eval.Adjacency;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
@@ -72,7 +72,6 @@ class ExpertDirectiveValues {
     private static final int ONE_TOKEN = 1;
     private static final int CLANDESTINE_TOKENS = 2;
     private static final int SPARE_FLEET_POOL = 3;
-    private static final String VOTE_SEPARATOR = ";";
 
     @Nullable
     static Double valueOf(AgendaView view, String agenda, String outcome, String ownVote) {
@@ -260,21 +259,7 @@ class ExpertDirectiveValues {
 
     private static double againstVoterTokenLoss(Game game, Player voter, Player player, String ownVote) {
         if (player == voter) return isAgainst(ownVote) ? CommandTokenValue.tactic(game, voter, ONE_TOKEN) : 0;
-        return votedAgainst(game, player) ? CardValueScale.HELD_TOKEN : 0;
-    }
-
-    private static boolean votedAgainst(Game game, Player player) {
-        return game.getCurrentAgendaVotes().entrySet().stream()
-                .filter(entry -> isAgainst(entry.getKey()))
-                .flatMap(entry -> List.of(entry.getValue().split(VOTE_SEPARATOR)).stream())
-                .anyMatch(piece -> isVoteBy(game, player, piece));
-    }
-
-    private static boolean isVoteBy(Game game, Player player, String piece) {
-        int split = piece.indexOf('_');
-        if (split < 0) return false;
-        if (!NumberUtils.isDigits(piece.substring(split + 1))) return false;
-        return game.getPlayerFromColorOrFaction(piece.substring(0, split).toLowerCase()) == player;
+        return votedOn(game, player, AgendaValueMath::isAgainst) ? CardValueScale.HELD_TOKEN : 0;
     }
 
     private static double wormholeResearchGain(Game game, Player player) {
@@ -342,7 +327,7 @@ class ExpertDirectiveValues {
 
     private static double fleetRemovalCost(Game game, Player player, int fleet) {
         double token = fleet > SPARE_FLEET_POOL ? CardValueScale.TOKEN_FLOOR : CardValueScale.HELD_TOKEN;
-        return token + shipsOverLimitValue(game, player, fleet - 1);
+        return token + shipsOverLimitValue(game, player, fleet - 1) - shipsOverLimitValue(game, player, fleet);
     }
 
     static double shipsOverLimitValue(Game game, Player player, int fleetTokens) {

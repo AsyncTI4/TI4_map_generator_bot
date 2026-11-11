@@ -120,6 +120,22 @@ class ExpertMechAgendaValuesTest extends BaseTi4Test {
         assertThat(value(hacan, "articles_war", "against", "")).isZero();
     }
 
+    // A rival whose votes already sit on For also collects 3 TG when Against wins, which counts against the voter
+    // through the usual threat weighting.
+    @Test
+    void againstWeighsTheTradeGoodsRivalsOnForCollect() {
+        Player hacan = seat("hacan", "yellow");
+        Player arborec = seat("arborec", "green");
+        test.game.setCurrentAgendaVote("for", "green_2");
+
+        double rivalShare = 3.0
+                * AgendaValueMath.threat(test.game, arborec)
+                / AgendaValueMath.liveRivals(test.game, hacan).size();
+        assertThat(value(hacan, "articles_war", "against", "for")).isCloseTo(3.0 - rivalShare, within(1e-9));
+        assertThat(value(hacan, "articles_war", "against", "")).isCloseTo(-rivalShare, within(1e-9));
+        assertThat(value(hacan, "articles_war", "against", "")).isNegative();
+    }
+
     // Rearmament Against replaces every mech with an infantry: Arborec, Saar and Naaz with several out fight it.
     @ParameterizedTest
     @ValueSource(strings = {"arborec", "saar", "naaz"})

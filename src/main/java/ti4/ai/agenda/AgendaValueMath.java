@@ -2,9 +2,11 @@ package ti4.ai.agenda;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.actioncards.ActionCardValue;
 import ti4.ai.eval.BoardView;
@@ -26,6 +28,7 @@ class AgendaValueMath {
 
     static final String FOR = "for";
     static final String AGAINST = "against";
+    private static final String VOTE_SEPARATOR = ";";
     private static final double ORDINARY_RIVAL_STAKE = 4.5;
     private static final double MIN_THREAT = 0.5;
     private static final double MAX_THREAT = 3.0;
@@ -53,6 +56,20 @@ class AgendaValueMath {
 
     static double threat(Game game, Player rival) {
         return Math.clamp(ScoringStakes.rivalPointStake(game, rival, 1) / ORDINARY_RIVAL_STAKE, MIN_THREAT, MAX_THREAT);
+    }
+
+    static boolean votedOn(Game game, Player player, Predicate<String> outcome) {
+        return game.getCurrentAgendaVotes().entrySet().stream()
+                .filter(entry -> outcome.test(entry.getKey()))
+                .flatMap(entry -> List.of(entry.getValue().split(VOTE_SEPARATOR)).stream())
+                .anyMatch(piece -> isVoteBy(game, player, piece));
+    }
+
+    private static boolean isVoteBy(Game game, Player player, String piece) {
+        int split = piece.indexOf('_');
+        if (split < 0) return false;
+        if (!NumberUtils.isDigits(piece.substring(split + 1))) return false;
+        return game.getPlayerFromColorOrFaction(piece.substring(0, split).toLowerCase()) == player;
     }
 
     static double relativeToRivals(Game game, Player voter, ToDoubleFunction<Player> gain) {

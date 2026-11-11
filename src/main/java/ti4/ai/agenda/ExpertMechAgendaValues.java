@@ -7,6 +7,7 @@ import static ti4.ai.agenda.AgendaValueMath.liveRivals;
 import static ti4.ai.agenda.AgendaValueMath.relativeToRivals;
 import static ti4.ai.agenda.AgendaValueMath.threat;
 import static ti4.ai.agenda.AgendaValueMath.unitsOnBoard;
+import static ti4.ai.agenda.AgendaValueMath.votedOn;
 
 import java.util.List;
 import java.util.Set;
@@ -39,8 +40,14 @@ class ExpertMechAgendaValues {
 
     static double articlesOfWar(Game game, Player voter, String outcome, String ownVote) {
         if (isFor(outcome)) return rivalStakesLost(game, voter) - articlesStake(game, voter);
-        if (isAgainst(outcome) && isFor(ownVote)) return ARTICLES_TRADE_GOODS * ValueScale.TRADE_GOOD;
+        if (isAgainst(outcome))
+            return relativeToRivals(game, voter, seat -> articlesPayout(game, voter, seat, ownVote));
         return 0;
+    }
+
+    private static double articlesPayout(Game game, Player voter, Player seat, String ownVote) {
+        boolean votedFor = seat == voter ? isFor(ownVote) : votedOn(game, seat, AgendaValueMath::isFor);
+        return votedFor ? ARTICLES_TRADE_GOODS * ValueScale.TRADE_GOOD : 0;
     }
 
     static double articlesStake(Game game, Player seat) {

@@ -85,6 +85,20 @@ class ExpertPlanetValuesTest extends BaseTi4Test {
         assertThat(value(sol, "holy_planet_of_ixth", LODOR)).isNegative();
     }
 
+    // Holy Planet of Ixth gives its owner a point: when that point wins the game, the flat 3 TG gives way to the
+    // full stake of a rival's winning point, so the voter fights the election far harder.
+    @Test
+    void aHolyPlanetThatHandsARivalTheWinningPointCostsTheFullPointStake() {
+        nekro.addPlanet(LODOR);
+        test.points(nekro, ti4.ai.eval.GameHorizon.goal(test.game) - 1);
+
+        double value = value(sol, "holy_planet_of_ixth", LODOR);
+
+        assertThat(value).isCloseTo(AgendaValueMath.pointsTo(test.game, sol, nekro, 1), within(1e-9));
+        assertThat(value).isLessThan(-rivalCost(sol, nekro, 3) * 2);
+        assertThat(value(nekro, "holy_planet_of_ixth", LODOR)).isGreaterThan(3);
+    }
+
     // The trait requirement still applies: Lodor is cultural, so the hazardous and industrial laws can't elect it.
     @Test
     void aPlanetWithoutTheRequiredTraitIsWorthNothing() {
