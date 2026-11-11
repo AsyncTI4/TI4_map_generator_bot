@@ -86,6 +86,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.tech.ListTechService;
 import ti4.service.tech.PlayerTechService;
@@ -2531,7 +2532,7 @@ public final class ButtonHelperFactionSpecific {
     public static List<Button> getSwapSCButtons(Game game, String type, Player hacan) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == hacan) {
+            if (p2 == hacan || ("qdn".equals(type) && !MegagameGroupService.allowsTarget(game, hacan, p2))) {
                 continue;
             }
             if (p2.getSCs().size() > 1) {
@@ -4172,7 +4173,7 @@ public final class ButtonHelperFactionSpecific {
             default -> 0; // everything else that can't be captured
         };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
-                .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
+                .filter(p -> p.getUnitCap(unitKey.asyncID()) != -1)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
                 .orElse(baseUnitCap);
         return (ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey) < unitCap
@@ -4191,7 +4192,7 @@ public final class ButtonHelperFactionSpecific {
             default -> 0; // everything else that can't be captured
         };
         int unitCap = game.getPlayerByColorID(unitKey.colorID())
-                .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0)
+                .filter(p -> p.getUnitCap(unitKey.asyncID()) != -1)
                 .map(p -> p.getUnitCap(unitKey.asyncID()))
                 .orElse(baseUnitCap);
         return unitCap - ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey);

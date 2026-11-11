@@ -9,7 +9,6 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 public class InteractionLogCron {
 
     public static void register() {
-        BotLogger.info("Registering bot log cron");
         CronManager.schedulePeriodically(
                 InteractionLogCron.class, InteractionLogCron::sendBufferedLogsToDiscord, 2, 2, TimeUnit.MINUTES);
     }

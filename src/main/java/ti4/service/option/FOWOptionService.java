@@ -89,6 +89,10 @@ public class FOWOptionService {
                 FOWOptionCategory.VISIBILITY,
                 "Hide unseen hyperlanes",
                 "Custom hyperlanes show only the lanes a player's vision runs along; remembered ones show no lanes"),
+        ONE_WAY_LANE_HINTS(
+                FOWOptionCategory.VISIBILITY,
+                "One-way lane hints",
+                "A faint glow on the system edge a visible one-way hyperlane leads into"),
         HIDE_PLAYER_INFOS(
                 FOWOptionCategory.VISIBILITY,
                 "Hide player infos",

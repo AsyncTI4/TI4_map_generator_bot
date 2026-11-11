@@ -6,7 +6,9 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 import ti4.model.Mapper;
+import ti4.service.emoji.MiscEmojis;
 import ti4.testUtils.BaseTi4Test;
 
 class AgendaHelperTest extends BaseTi4Test {
@@ -105,6 +107,34 @@ class AgendaHelperTest extends BaseTi4Test {
         game.setStoredValue("executiveOrder", "active");
 
         assertThat(AgendaHelper.getVoteCountMessage(game)).contains("Total votes:");
+    }
+
+    @Test
+    void getVoteCountMessageStrikesPlayersWhoCannotVoteAndDropsThemFromTotal() {
+        Game game = voteCountGame();
+        game.setTile(new Tile("30", "301"));
+        // mellon has 2 influence, zohbat has 1
+        game.getPlayer("speaker").addPlanet("mellon");
+        game.getPlayer("player").addPlanet("zohbat");
+        game.setStoredValue("AssassinatedReps", "hacan");
+
+        String message = AgendaHelper.getVoteCountMessage(game);
+
+        assertThat(message)
+                .contains("Total votes: 2")
+                .contains("~~vote count: **" + MiscEmojis.influence + " 1**~~ (can't vote)");
+    }
+
+    @Test
+    void getVoteCountMessageCountsEveryoneWhenAllCanVote() {
+        Game game = voteCountGame();
+        game.setTile(new Tile("30", "301"));
+        game.getPlayer("speaker").addPlanet("mellon");
+        game.getPlayer("player").addPlanet("zohbat");
+
+        assertThat(AgendaHelper.getVoteCountMessage(game))
+                .contains("Total votes: 3")
+                .doesNotContain("can't vote");
     }
 
     private static Player censuredPlayer() {

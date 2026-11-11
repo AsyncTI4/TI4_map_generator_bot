@@ -4,7 +4,6 @@ import static ti4.discord.utility.DiscordErrorUtility.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -350,13 +349,9 @@ public class BotLogger {
             sendMessageToBotLogWebhook(message);
             return;
         }
-        try {
-            CronManager.scheduleOnce(
-                    BotLogger.class,
-                    () -> sendMessageToBotLogWebhook(message),
-                    timeToNextMessage,
-                    TimeUnit.MILLISECONDS);
-        } catch (RejectedExecutionException e) {
+        boolean scheduled = CronManager.scheduleOnce(
+                BotLogger.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
+        if (!scheduled) {
             sendMessageToBotLogWebhook(message);
         }
     }

@@ -1,0 +1,50 @@
+{
+  "name": "megagame-6p",
+  "description": "Six seats in three SC groups of two on the pbd30k cards (A sol+hacan, B jolnar+xxcha, C letnev+winnu); group speakers hacan, jolnar and letnev (game speaker); stops at the strategy phase.",
+  "fog": false,
+  "strategyCardSet": "pbd30k",
+  "tags": [
+    "megagame_sc_groups"
+  ],
+  "seats": [
+    {
+      "faction": "sol",
+      "color": "blue"
+    },
+    {
+      "faction": "hacan",
+      "color": "yellow"
+    },
+    {
+      "faction": "jolnar",
+      "color": "purple"
+    },
+    {
+      "faction": "xxcha",
+      "color": "green"
+    },
+    {
+      "faction": "letnev",
+      "speaker": true,
+      "color": "red"
+    },
+    {
+      "faction": "winnu",
+      "color": "orange"
+    }
+  ],
+  "stored": {
+    "megagameGroup_A": "sol_hacan",
+    "megagameGroup_B": "jolnar_xxcha",
+    "megagameGroup_C": "letnev_winnu",
+    "megagameSpeaker_A": "hacan",
+    "megagameSpeaker_B": "jolnar"
+  },
+  "gameOptions": {
+    "sc_count_for_map": "1"
+  },
+  "start": "strategy",
+  "decks": {
+    "ac": "action_cards_pok_te_30k_jmsc"
+  }
+}

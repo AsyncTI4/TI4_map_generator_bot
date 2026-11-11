@@ -5,8 +5,10 @@ import static ti4.game.persistence.GamePersistenceKeys.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,6 +80,48 @@ class GameLoadService {
             .build();
     private static final Pattern EM_DASH_PATTERN = Pattern.compile("—");
     private static final String GAME_FILE_EXTENSION = Constants.TXT;
+
+    record GameFolder(List<String> gameNames, Map<String, Long> lastModifiedMillis) {
+
+        Set<String> savedSince(long sinceMillis) {
+            return lastModifiedMillis.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= sinceMillis)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toUnmodifiableSet());
+        }
+    }
+
+    static GameFolder scanGameFolder() {
+        List<Path> gameFiles;
+        try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
+            gameFiles = pathStream
+                    .filter(path -> path.toString().toLowerCase().endsWith(GAME_FILE_EXTENSION))
+                    .toList();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        Map<String, Long> lastModifiedMillis = gameFiles.parallelStream()
+                .collect(Collectors.toConcurrentMap(
+                        GameLoadService::gameNameOf, GameLoadService::lastModifiedMillis, Math::max));
+        List<String> gameNames = lastModifiedMillis.keySet().stream()
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        return new GameFolder(gameNames, Map.copyOf(lastModifiedMillis));
+    }
+
+    private static String gameNameOf(Path gameFile) {
+        return stripGameFileExtension(gameFile.getFileName().toString()).toLowerCase();
+    }
+
+    private static long lastModifiedMillis(Path path) {
+        try {
+            return Files.getLastModifiedTime(path).toMillis();
+        } catch (NoSuchFileException e) {
+            return Long.MIN_VALUE;
+        } catch (IOException e) {
+            return Long.MAX_VALUE;
+        }
+    }
 
     static List<String> loadGameNames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
@@ -629,6 +673,7 @@ class GameLoadService {
                 case Constants.BLUE_REVERIE_MODE -> game.setBlueReverieMode(parseBooleanOrDefault(info, false));
                 case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(parseBooleanOrDefault(info, false));
                 case Constants.LOST_LEGACIES_TILES -> game.setLostLegaciesTiles(parseBooleanOrDefault(info, false));
+                case Constants.REFRACTURE_MODE -> game.setRefractureMode(parseBooleanOrDefault(info, false));
                 case Constants.VERBOSITY -> game.setOutputVerbosity(info);
                 case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(parseBooleanOrDefault(info, false));
                 case Constants.AGE_OF_EXPLORATION_MODE ->

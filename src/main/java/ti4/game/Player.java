@@ -881,7 +881,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
             if ("monument".equals(unit)) return 1;
-            if (MapPositionMapper.getReinforcementsPosition(unit) == null) return 0;
+            if (MapPositionMapper.getReinforcementsPosition(unit) == null) return -1;
             return MapPositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
             // return 0;
         }
@@ -2504,8 +2504,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
                             game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + sc)
                     .orElse(null);
             if (gameMessage != null) {
-                ThreadChannel chan = ButtonHelper.getRightStratThread(
-                        game, ButtonHelper.getStratName(ButtonHelper.getStratName(sc), game));
+                ThreadChannel chan = ButtonHelper.getStratThreadForSc(game, sc);
                 if (chan != null) {
                     String followSummary = PlayStrategyCardService.getSCFollowSummary(game, sc, true);
                     chan.retrieveMessageById(gameMessage.messageId())

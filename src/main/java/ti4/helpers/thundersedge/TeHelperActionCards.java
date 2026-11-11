@@ -41,6 +41,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.BlindSelectionService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
@@ -98,7 +99,8 @@ public class TeHelperActionCards {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
             if (sc <= 0
-                    || (game.getScPlayed().get(sc) != null && game.getScPlayed().get(sc))) continue;
+                    || (game.getScPlayed().get(sc) != null && game.getScPlayed().get(sc))
+                    || !MegagameGroupService.allowsCard(game, player, sc)) continue;
             Button button;
             String label = Helper.getSCName(sc, game);
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -472,37 +474,42 @@ public class TeHelperActionCards {
     public static List<Button> getReadiedStrategyCardSecondaryButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
 
-        if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
+        if (isReadiedForStrategize(game, player, 1)) {
             buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens", CardEmojis.SC1));
         }
-        if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
+        if (isReadiedForStrategize(game, player, 2)) {
             buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets", CardEmojis.SC2));
         }
-        if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
+        if (isReadiedForStrategize(game, player, 3)) {
             buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
-        if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
+        if (isReadiedForStrategize(game, player, 4)) {
             buttons.add(Buttons.CONSTRUCTION_PLACE_1_SPACE_DOCK);
             buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
-        if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
+        if (isReadiedForStrategize(game, player, 5)) {
             buttons.add(Buttons.green("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
-        if (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6)) {
+        if (isReadiedForStrategize(game, player, 6)) {
             buttons.add(Buttons.green("warfareBuild", "Build At Home", CardEmojis.SC6));
         }
-        if (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7)) {
+        if (isReadiedForStrategize(game, player, 7)) {
             if (player.hasAbility("propagation")) {
                 buttons.add(Buttons.green("leadershipGenerateCCButtons_", "Gain 3 Command Tokens (for Nekro)"));
             } else {
                 buttons.add(Buttons.GET_A_TECH.withEmoji(CardEmojis.SC7.asEmoji()));
             }
         }
-        if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
+        if (isReadiedForStrategize(game, player, 8)) {
             buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
 
         return buttons;
+    }
+
+    private static boolean isReadiedForStrategize(Game game, Player player, int cardNumber) {
+        int sc = MegagameGroupService.groupCardFor(game, player, cardNumber);
+        return game.getScPlayed().get(sc) == null || !game.getScPlayed().get(sc);
     }
 
     @ButtonHandler("strategize")

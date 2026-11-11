@@ -121,6 +121,30 @@ class MatchmakingButtonHandlerTiglRankTest extends BaseTi4Test {
     }
 
     @Test
+    void queueModalPreselectsOnlyTheHighestAllowedRank() {
+        giveUserRank(TIGLRank.COMMANDER);
+        List<String> allowed =
+                MatchmakingButtonHandler.allowedTiglRanks(List.of(user), MatchmakingOptions.TIGL_RANK_OPTIONS);
+
+        assertEquals(List.of("Commander"), MatchmakingButtonHandler.highestRankOnly(allowed));
+    }
+
+    @Test
+    void groupQueueModalPreselectsTheGroupCeilingNotTheLeadersRank() {
+        giveUserRank(TIGLRank.COMMANDER);
+        User ministerPartner = userWithRank("222", TIGLRank.MINISTER);
+        List<String> allowed = MatchmakingButtonHandler.allowedTiglRanks(
+                List.of(user, ministerPartner), MatchmakingOptions.TIGL_RANK_OPTIONS);
+
+        assertEquals(List.of("Minister"), MatchmakingButtonHandler.highestRankOnly(allowed));
+    }
+
+    @Test
+    void queueModalPreselectsUnrankedWhenNothingIsAllowed() {
+        assertEquals(List.of(MatchmakingOptions.UNRANKED_OPTION), MatchmakingButtonHandler.highestRankOnly(List.of()));
+    }
+
+    @Test
     void userWithoutAnyRankRoleOnlyGetsUnranked() {
         Member member = mock(Member.class);
         when(guild.getMemberById(USER_ID)).thenReturn(member);

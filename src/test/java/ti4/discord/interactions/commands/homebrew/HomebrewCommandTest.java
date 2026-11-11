@@ -29,7 +29,8 @@ class HomebrewCommandTest {
 
     @Test
     void everyOldTopLevelCommandIsNowAGroup() {
-        assertThat(command.getSubcommandGroups()).containsOnlyKeys("lost_legacies", "monument", "omegaphase");
+        assertThat(command.getSubcommandGroups())
+                .containsOnlyKeys("lost_legacies", "monument", "omegaphase", "refracture");
         assertThat(command.getSubcommandGroups().get("lost_legacies").getGroupSubcommands())
                 .containsOnlyKeys(
                         "add_fragmentum_token",

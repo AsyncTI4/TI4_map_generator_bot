@@ -286,7 +286,7 @@
         "itemCategory": "ABILITY",
         "itemId": "trovantous",
         "optionalSwaps": [
-            "MECH:stoneborn_mech"
+            "MECH:stoneborn_mechdormant"
         ],
         "source": "theodisi"
     },
@@ -368,6 +368,12 @@
         "additionalComponents": [
             "ABILITY:fluid_transfer"
         ],
+        "source": "theodisi"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "fluid_transfer",
+        "undraftable": true,
         "source": "theodisi"
     }
 ]

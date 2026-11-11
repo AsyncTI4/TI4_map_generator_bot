@@ -20,6 +20,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.regex.RegexService;
 import ti4.service.strategycard.StrategyCardMessageService;
 import ti4.service.transaction.SendPromissoryService;
@@ -37,11 +38,17 @@ public class MindsieveService {
         if (!naalu.hasUnlockedBreakthrough(id)) return false;
         for (String pn : naalu.getPromissoryNotes().keySet()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
-            if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
+            if (naalu.getPromissoryNotesInPlayArea().contains(pn) || !ownerInGroup(naalu, pn)) continue;
             if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) continue;
             return true;
         }
         return false;
+    }
+
+    private static boolean ownerInGroup(Player naalu, String pn) {
+        Game game = naalu.getGame();
+        return !MegagameGroupService.isActive(game)
+                || MegagameGroupService.allowsTarget(game, naalu, game.getPNOwner(pn));
     }
 
     public void serveMindsieveButtons(Game game, Player naalu, int sc) {
@@ -61,7 +68,7 @@ public class MindsieveService {
         List<Button> buttons = new ArrayList<>();
         for (String pn : naalu.getPromissoryNotes().keySet()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
-            if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
+            if (naalu.getPromissoryNotesInPlayArea().contains(pn) || !ownerInGroup(naalu, pn)) continue;
             if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) {
                 String fmt = "\n-# Since they %s, you cannot send them your _Alliance_ promissory note.";
                 String reason = game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact";

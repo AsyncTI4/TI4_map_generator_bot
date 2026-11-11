@@ -15,6 +15,7 @@ final class LegendaryHighlights implements OffBoardHighlights {
 
     @Override
     public int draw(Graphics2D g2, Game game, Player player, Point miscTile) {
+        int speakerOffset = SpeakerOffset.of(player);
         int offBoardHighlighting = 0;
         boolean hasNanoForge = player.hasRelic("nanoforge") || player.hasRelic("absol_nanoforge");
         for (String planet : player.getPlanets()) {
@@ -43,16 +44,14 @@ final class LegendaryHighlights implements OffBoardHighlights {
                                     + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
                                     - 30
                                     + i * 60 / (offBoardHighlighting + (hasNanoForge ? 1 : 0) - 1)
-                                    + (player.isSpeaker() ? 30 : 0),
+                                    + speakerOffset,
                             null);
                 }
             } else {
                 g2.drawImage(
                         bufferedImage,
                         miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                        miscTile.y
-                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                + (player.isSpeaker() ? 30 : 0),
+                        miscTile.y + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2 + speakerOffset,
                         null);
             }
         }
@@ -65,18 +64,13 @@ final class LegendaryHighlights implements OffBoardHighlights {
                 g2.drawImage(
                         bufferedImage,
                         miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
-                        miscTile.y
-                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                + 30
-                                + (player.isSpeaker() ? 30 : 0),
+                        miscTile.y + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2 + 30 + speakerOffset,
                         null);
             } else {
                 g2.drawImage(
                         bufferedImage,
                         miscTile.x + (TileGeometry.TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                        miscTile.y
-                                + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                + (player.isSpeaker() ? 30 : 0),
+                        miscTile.y + (TileGeometry.TILE_HEIGHT - bufferedImage.getHeight()) / 2 + speakerOffset,
                         null);
             }
             offBoardHighlighting++;

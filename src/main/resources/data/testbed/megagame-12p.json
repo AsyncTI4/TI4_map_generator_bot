@@ -1,0 +1,70 @@
+{
+  "name": "megagame-12p",
+  "description": "Twelve seats in two SC groups of six on the pbd30k cards. A: sol hacan jolnar xxcha letnev winnu (speaker jolnar); B: arborec mentak yssaril l1z1x muaat saar (speaker yssaril, the game speaker). One card each; stops at the strategy phase.",
+  "fog": false,
+  "mapString": "{18} 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 0 37 38 0 39 40 0 41 42 0 43 44 0 45 46 0 47 48 59 0 60 61 62 0 63 64 65 0 66 67 68 0 69 70 71 0 72 73 74 0 75 76",
+  "strategyCardSet": "pbd30k",
+  "tags": [
+    "megagame_sc_groups"
+  ],
+  "seats": [
+    {
+      "faction": "sol",
+      "home": "301"
+    },
+    {
+      "faction": "hacan",
+      "home": "304"
+    },
+    {
+      "faction": "jolnar",
+      "home": "307"
+    },
+    {
+      "faction": "xxcha",
+      "home": "310"
+    },
+    {
+      "faction": "letnev",
+      "home": "313"
+    },
+    {
+      "faction": "winnu",
+      "home": "316"
+    },
+    {
+      "faction": "arborec",
+      "home": "402"
+    },
+    {
+      "faction": "mentak",
+      "home": "406"
+    },
+    {
+      "faction": "yssaril",
+      "home": "410",
+      "speaker": true
+    },
+    {
+      "faction": "l1z1x",
+      "home": "414"
+    },
+    {
+      "faction": "muaat",
+      "home": "418"
+    },
+    {
+      "faction": "saar",
+      "home": "422"
+    }
+  ],
+  "stored": {
+    "megagameGroup_A": "sol_hacan_jolnar_xxcha_letnev_winnu",
+    "megagameGroup_B": "arborec_mentak_yssaril_l1z1x_muaat_saar",
+    "megagameSpeaker_A": "jolnar"
+  },
+  "gameOptions": {
+    "sc_count_for_map": "1"
+  },
+  "start": "strategy"
+}

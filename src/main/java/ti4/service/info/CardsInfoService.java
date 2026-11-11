@@ -85,6 +85,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
+import ti4.service.map.RefractureRulesService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -121,6 +122,12 @@ public class CardsInfoService {
         Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptCardsInfoButton(player);
         if (lyraOfTheCryptButton != null) {
             buttons.add(lyraOfTheCryptButton);
+        }
+        if (RefractureRulesService.canUseExperiment(game, player)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "refractureExperimentStart",
+                    "Use Experiment",
+                    MiscEmojis.LegendaryPlanet));
         }
         Button tomeCardsButton = XyrixTomeHandler.getTomeCardsInfoButton(game, player);
         if (tomeCardsButton != null) {

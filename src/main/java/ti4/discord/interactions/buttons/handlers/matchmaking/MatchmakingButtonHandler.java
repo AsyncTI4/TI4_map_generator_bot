@@ -309,12 +309,10 @@ class MatchmakingButtonHandler {
                 userSettings.getMatchmakingPaces(),
                 DEFAULT_PACE_OPTIONS,
                 REQUIRE_SELECTION);
+        List<String> rankOptions =
+                allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), MatchmakingOptions.TIGL_RANK_OPTIONS);
         LabelChildComponent ranks = buildMultiSelect(
-                TIGL_RANKS_ID,
-                allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), MatchmakingOptions.TIGL_RANK_OPTIONS),
-                userSettings.getMatchmakingTiglRanks(),
-                DEFAULT_TIGL_RANK_OPTIONS,
-                REQUIRE_SELECTION);
+                TIGL_RANKS_ID, rankOptions, List.of(), highestRankOnly(rankOptions), REQUIRE_SELECTION);
         Modal.Builder modal = Modal.create(modalId, title)
                 .addComponents(Label.of("Victory Point Goal", victoryPoints))
                 .addComponents(Label.of("Pace", paces))
@@ -516,6 +514,7 @@ class MatchmakingButtonHandler {
         saveTiglMatchmakingPreferences(event, userSettings);
 
         Optional<String> error = MatchmakerService.get().queue(userId, true);
+        logTiglQueueSubmission(event, userSettings, error);
         if (error.isPresent()) {
             replyEphemeral(event, error.get());
             return;
@@ -695,6 +694,27 @@ class MatchmakingButtonHandler {
         userSettings.setMatchmakingTiglRanks(
                 allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), getSelectedValues(event, TIGL_RANKS_ID)));
         UserSettingsManager.save(userSettings);
+    }
+
+    private static void logTiglQueueSubmission(
+            ModalInteractionEvent event, UserSettings userSettings, Optional<String> queueError) {
+        List<String> groupMemberIds =
+                MatchmakerService.get().partyMemberIds(event.getUser().getId());
+        List<String> ranksOpenToGroup =
+                allowedTiglRanks(groupUsers(event.getUser(), groupMemberIds), MatchmakingOptions.TIGL_RANK_OPTIONS);
+        TiglQueueSubmissionLog.post(new TiglQueueSubmissionLog.Submission(
+                event.getUser().getEffectiveName(),
+                event.getUser().getId(),
+                getSelectedValues(event, TIGL_RANKS_ID),
+                userSettings.getMatchmakingTiglRanks(),
+                ranksOpenToGroup,
+                groupMemberIds,
+                queueError));
+    }
+
+    static List<String> highestRankOnly(List<String> allowedRanks) {
+        if (allowedRanks.isEmpty()) return DEFAULT_TIGL_RANK_OPTIONS;
+        return List.of(allowedRanks.getLast());
     }
 
     static List<String> allowedTiglRanks(List<User> users, List<String> requestedRanks) {

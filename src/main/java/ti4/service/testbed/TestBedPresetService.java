@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -24,10 +25,12 @@ import ti4.logging.BotLogger;
 import ti4.model.BoardPosition;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
+import ti4.model.StrategyCardModel;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
 import ti4.model.TileHelper;
+import ti4.service.fow.FogPreset;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
@@ -44,7 +47,7 @@ public class TestBedPresetService {
     public static final String DEFAULT_MAP_STRING = "{18} 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36"
             + " 0 37 38 0 39 40 0 41 42 0 43 44 0 45 46 0 47 48";
 
-    private static final int MAX_SEATS = 8;
+    private static final int MAX_SEATS = 12;
     private static final Set<String> LEADER_TYPES = Set.of("agent", "commander", "hero", "envoy");
     public static final List<String> BREAKTHROUGH_STATES = List.of("unlocked", "exhausted");
     private static final Pattern CCS_PATTERN = Pattern.compile("\\d+/\\d+/\\d+");
@@ -192,7 +195,7 @@ public class TestBedPresetService {
         if (!preset.getCombat().isEmpty() && !"action".equals(preset.getStart())) {
             errors.add("`combat` needs `start` to be `action`.");
         }
-        validateSeatIdentities(seats, errors);
+        validateSeatIdentities(seats, allowedStrategyCards(preset), errors);
         validateTeamMateYou(preset, seats, errors);
         validateBotAccount(seats, errors);
         validateGameState(preset, errors);
@@ -220,7 +223,17 @@ public class TestBedPresetService {
         }
     }
 
-    private static void validateSeatIdentities(List<Seat> seats, List<String> errors) {
+    private static Set<Integer> allowedStrategyCards(TestBedPreset preset) {
+        String setId = preset.getStrategyCardSet();
+        if (setId == null || !Mapper.isValidStrategyCardSet(setId)) {
+            return Set.of(1, 2, 3, 4, 5, 6, 7, 8);
+        }
+        return Mapper.getStrategyCardSets().get(setId).getStrategyCardModels().stream()
+                .map(StrategyCardModel::getInitiative)
+                .collect(Collectors.toSet());
+    }
+
+    private static void validateSeatIdentities(List<Seat> seats, Set<Integer> allowedCards, List<String> errors) {
         Set<String> factions = new HashSet<>();
         Set<String> colors = new HashSet<>();
         Set<String> homes = new HashSet<>();
@@ -246,8 +259,11 @@ public class TestBedPresetService {
                 if (!homes.add(seat.getHome())) errors.add("Home position `" + seat.getHome() + "` is used twice.");
             }
             if (seat.getSc() != null) {
-                if (seat.getSc() < 1 || seat.getSc() > 8)
-                    errors.add("Strategy card `" + seat.getSc() + "` is not 1-8.");
+                if (!allowedCards.contains(seat.getSc()))
+                    errors.add("Strategy card `" + seat.getSc() + "` is not "
+                            + (allowedCards.size() == 8 && allowedCards.contains(1)
+                                    ? "1-8."
+                                    : "in the preset's strategy card set."));
                 if (!scs.add(seat.getSc())) errors.add("Strategy card `" + seat.getSc() + "` is picked twice.");
             }
             if (seat.isSpeaker()) speakers++;
@@ -376,9 +392,37 @@ public class TestBedPresetService {
         if (!preset.getFowOptions().isEmpty() && Boolean.FALSE.equals(preset.getFog())) {
             errors.add("preset: `fowOptions` need a fog game; drop `\"fog\": false`.");
         }
+        if (preset.getFogPreset() != null) {
+            if (Boolean.FALSE.equals(preset.getFog())) {
+                errors.add("preset: `fogPreset` needs a fog game; drop `\"fog\": false`.");
+            }
+            if (!isKnownFogPreset(preset.getFogPreset())) {
+                errors.add("preset: unknown `fogPreset` `" + preset.getFogPreset() + "`; use "
+                        + Arrays.stream(FogPreset.values())
+                                .map(FogPreset::getId)
+                                .toList() + ".");
+            }
+        }
         preset.getStored().forEach((key, value) -> {
             if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
         });
+        if (preset.getStrategyCardSet() != null && !Mapper.isValidStrategyCardSet(preset.getStrategyCardSet())) {
+            errors.add("preset: unknown `strategyCardSet` `" + preset.getStrategyCardSet() + "`.");
+        }
+        if (preset.getStrategyCardSet() == null
+                && "action".equals(preset.getStart())
+                && preset.allSeats().size() > 8
+                && preset.allSeats().stream().anyMatch(seat -> seat.getSc() == null)) {
+            errors.add("preset: more than 8 seats starting in the action phase need an `sc` on every seat.");
+        }
+        if (preset.getStrategyCardSet() != null
+                && "action".equals(preset.getStart())
+                && preset.allSeats().stream().anyMatch(seat -> seat.getSc() == null)) {
+            errors.add("preset: with `strategyCardSet`, every seat needs an `sc` when `start` is `action`.");
+        }
+        if (preset.getTags().stream().anyMatch(String::isBlank)) {
+            errors.add("preset: `tags` may not be blank.");
+        }
         preset.getGameOptions().forEach((key, value) -> {
             String problem = TestBedComponentService.gameOptionProblem(key, value);
             if (problem != null) errors.add("preset: " + problem);
@@ -390,6 +434,15 @@ public class TestBedPresetService {
                     errors.add("Objective `" + objective + "` is scored but not in `revealedObjectives`.");
                 }
             }
+        }
+    }
+
+    private static boolean isKnownFogPreset(String id) {
+        try {
+            FogPreset.fromId(id);
+            return true;
+        } catch (IllegalArgumentException unknown) {
+            return false;
         }
     }
 

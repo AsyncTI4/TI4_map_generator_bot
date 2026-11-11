@@ -201,7 +201,7 @@ public class AddPlanetService {
             if (ccPath != null) {
                 unitHolder.addControl(ccID);
             }
-            if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
+            if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG) && !player.isDummy()) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
                 GameEventService.commit(game, GameEventType.OBJECTIVE_SCORED, player, Map.of("category", "CUSTODIAN"));
@@ -736,6 +736,8 @@ public class AddPlanetService {
                         || game.getPhaseOfGame().contains("agenda"))
                 && player.hasUnit("saar_mech")
                 && !setup
+                && game.getTileFromPlanet(planet) != null
+                && !game.getTileFromPlanet(planet).isScar(game)
                 && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();

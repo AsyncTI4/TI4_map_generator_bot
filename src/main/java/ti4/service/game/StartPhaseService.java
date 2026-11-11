@@ -93,6 +93,8 @@ import ti4.service.info.ListTurnOrderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.map.SpinService;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameStrategyPhaseService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
@@ -295,6 +297,9 @@ public class StartPhaseService {
             round++;
             game.setRound(round);
             GameEventService.commit(game, GameEventType.ROUND_STARTED, null, Map.of("round", round));
+            if (MegagameGroupService.isActive(game)) {
+                MegagameStrategyPhaseService.startRound(game);
+            }
         }
         if (game.getRound() == 1 && !game.isFowMode()) {
             Helper.setOrder(game);
@@ -678,7 +683,9 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        if (firstSCPicker.isNpc()) {
+        if (MegagameGroupService.isActive(game)) {
+            MegagameStrategyPhaseService.pingFirstPickers(game, pickSCMsg);
+        } else if (firstSCPicker.isNpc()) {
             PickStrategyCardService.checkForQueuedSCPick(null, firstSCPicker, game, "");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
@@ -1394,7 +1401,8 @@ public class StartPhaseService {
                     if (sc <= 0
                             || p2.getSCs().contains(sc)
                             || game.getStrategyCardModelByInitiative(sc).get().usesAutomationForSCID("pok5trade")
-                            || (!game.isFowMode() && !scPickedList.contains(sc))) {
+                            || (!game.isFowMode() && !scPickedList.contains(sc))
+                            || !MegagameGroupService.allowsCard(game, p2, sc)) {
                         continue;
                     }
                     List<Button> scButtons = new ArrayList<>();

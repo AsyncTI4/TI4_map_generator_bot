@@ -1,16 +1,16 @@
 {
     "id": "fracture10",
-    "name": "Anibus/Sekhmet/Nile",
+    "name": "Anubis/Sekhmet/Nile",
     "aliases": [
         "fracture10",
-        "anubius",
+        "anubis",
         "sekhmet",
         "nile",
         "frac10"
     ],
     "imagePath": "fracture10.png",
     "planets": [
-        "anubius",
+        "anubis",
         "sekhmet",
         "nile"
     ],

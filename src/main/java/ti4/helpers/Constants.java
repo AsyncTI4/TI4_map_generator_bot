@@ -106,6 +106,7 @@ public final class Constants {
     public static final String BLUE_REVERIE_MODE = "blue_reverie_mode";
     public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String LOST_LEGACIES_TILES = "lost_legacies_tiles";
+    public static final String REFRACTURE_MODE = "refracture_mode";
     public static final String TWILIGHT_DS = "twilight_ds";
     public static final String TWILIGHT_KART = "twilight_kart";
     public static final String TK_DESTROYER_CUP = "tk_destroyer_cup";
@@ -467,6 +468,7 @@ public final class Constants {
     private static final String GYRAXIS = "gyraxis";
     private static final String LOST_STATION = "loststation";
     private static final String ILLUSTRION = "illustrion";
+    private static final String CHARON = "charon";
     public static final List<String> TOKEN_PLANETS = List.of(
             MIRAGE,
             OASIS,
@@ -479,6 +481,7 @@ public final class Constants {
             GYRAXIS,
             LOST_STATION,
             ILLUSTRION,
+            CHARON,
             AVERNUS,
             OCEANUS,
             THUNDERSEDGE,
@@ -952,6 +955,7 @@ public final class Constants {
     public static final String PO_VP_WORTH = "public_vp_worth";
     public static final String CUSTODIAN = "Custodian/Imperial";
     public static final String IMPERIAL_RIDER = "Imperial Rider";
+    public static final String SOVEREIGN_CROWN = "Sovereign Crown";
     public static final String REVEALED_PO = "revealedPublicObjectives";
     public static final String CUSTOM_PO_VP = "customPublicVP";
     public static final String SCORED_PO = "scoredPublicObjectives";

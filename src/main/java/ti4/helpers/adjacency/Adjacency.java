@@ -28,6 +28,7 @@ public final class Adjacency {
             new ObsidianMirrorRule(),
             new UydaiHeroRule(),
             new XyrixFlagshipRule(),
+            new RefractureFenrirRule(),
             new TreatedAsAdjacentRule());
 
     private final AdjacencyContext context;

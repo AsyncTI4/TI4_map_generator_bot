@@ -129,6 +129,8 @@ import ti4.service.leader.genome.homebrew.tknova.BrutalGenome;
 import ti4.service.leader.genome.homebrew.tknova.RavenousGenome;
 import ti4.service.leader.genome.homebrew.tknova.ScornfulGenome;
 import ti4.service.map.TokenPlanetService;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameImperialQueue;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -237,10 +239,28 @@ public final class Helper {
     }
 
     public static void resolveQueue(Game game) {
+        if (MegagameGroupService.isActive(game) && !game.getPhaseOfGame().contains("agenda")) {
+            for (Player groupImperialHolder : MegagameImperialQueue.imperialHolders(game)) {
+                resolveQueueFrom(game, groupImperialHolder);
+            }
+            return;
+        }
         Player imperialHolder = getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
+        resolveQueueFrom(game, imperialHolder);
+    }
+
+    private static boolean hasQueuedDrawsAmong(Game game, List<Player> players, String queueKey) {
+        String queue = game.getStoredValue(queueKey);
+        if (!MegagameGroupService.isActive(game)) {
+            return queue.length() > 2;
+        }
+        return players.stream().anyMatch(p -> queue.contains(p.getFaction() + "*"));
+    }
+
+    private static void resolveQueueFrom(Game game, Player imperialHolder) {
         // String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
@@ -274,7 +294,7 @@ public final class Helper {
                 }
             }
             if (game.getStoredValue(key3).contains(player.getFaction() + "*")
-                    && game.getStoredValue(key2).length() > 2) {
+                    && hasQueuedDrawsAmong(game, players, key2)) {
                 if (!game.isFowMode()) {
                     message = player.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
@@ -819,9 +839,11 @@ public final class Helper {
 
     public static List<Button> getRemainingSCButtons(Game game, Player playerPicker, boolean checkTart) {
         List<Button> scButtons = new ArrayList<>();
+        boolean scGroups = MegagameGroupService.isActive(game);
 
         for (Integer sc : game.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+            if (scGroups && !MegagameGroupService.sameGroup(game, playerPicker, sc)) continue;
             boolean held = false;
             for (Player player : game.getPlayers().values()) {
                 if (player == null || player.getFaction() == null) {
@@ -2302,7 +2324,7 @@ public final class Helper {
                 }
             }
             if (token.contains("factoryleasei")) {
-                productionValueTotal += tile.getPlanetUnitHolders().size();
+                productionValueTotal += tile.getPlanetUnitHolders().size() + 1;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
@@ -2675,6 +2697,9 @@ public final class Helper {
         if (game.isMonumentsMode()
                 && MonumentsService.isMonumentOnBoard(game, player, "letnev_monument")
                 && tile == MonumentsService.getMonumentTile(game, player, "letnev_monument")) {
+            productionValueTotal *= 2;
+        }
+        if (game.isRefractureMode() && player.getPlanets().contains("demeterii")) {
             productionValueTotal *= 2;
         }
         if (player.hasTech("bedeepy")

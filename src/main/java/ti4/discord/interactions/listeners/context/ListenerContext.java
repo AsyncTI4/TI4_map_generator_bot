@@ -26,6 +26,7 @@ import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
+import ti4.service.megagame.MegagameGmAccess;
 import ti4.service.testbed.TestBedService;
 import ti4.settings.users.UserSettingsManager;
 
@@ -64,7 +65,8 @@ public abstract class ListenerContext {
         String componentID = getComponentID();
         return "showGameAgain".equalsIgnoreCase(componentID)
                 || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
-                || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX);
+                || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX)
+                || MegagameGmAccess.allowsSeatlessGm(game, event.getMember(), componentID);
     }
 
     ListenerContext(GenericInteractionCreateEvent event, String compID) {

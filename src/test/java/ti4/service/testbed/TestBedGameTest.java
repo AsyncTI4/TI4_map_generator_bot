@@ -32,6 +32,7 @@ import ti4.image.map.MapSegment;
 import ti4.model.Mapper;
 import ti4.model.TestBedPreset;
 import ti4.model.TestBedScript.Shortcut;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.testbed.TestBedPanelService.PageRef;
 import ti4.service.testbed.TestBedResetService.ResetResult;
@@ -171,6 +172,22 @@ class TestBedGameTest extends BaseTi4Test {
         assertEquals(
                 List.of(new MapSegment("core", "000", 3), new MapSegment("outpost", "a000", 1)),
                 MapSegment.stored(game));
+    }
+
+    // A fog preset resets a reused fog game first (here FoW+ off), and the preset's own options still switch on after.
+    @Test
+    void presetFogPresetResetsFogOptionsBeforeTheExtraOnes() {
+        game.setFowMode(true);
+        FOWPlusService.setActive(game, true);
+        game.setFowOption(FOWOption.HIDE_MAP, true);
+        TestBedPreset preset = TestBedPresetService.parse("""
+                { "fogPreset": "normal", "fowOptions": ["ghost_hexes"] }""");
+
+        TestBedComponentService.applyGameState(game, preset, new ArrayList<>());
+
+        assertFalse(FOWPlusService.isActive(game));
+        assertFalse(game.getFowOption(FOWOption.HIDE_MAP));
+        assertTrue(game.getFowOption(FOWOption.GHOST_HEXES));
     }
 
     // A timed-out step says what the game is still waiting on, per seat.

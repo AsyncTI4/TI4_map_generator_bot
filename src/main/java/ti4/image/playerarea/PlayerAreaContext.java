@@ -18,6 +18,7 @@ public final class PlayerAreaContext {
     private final WebsiteOverlays overlays;
     private final NeighbourMap neighbours;
     private Map<UnitKey, Integer> unitsOnBoard;
+    private Player onlyPlayer;
 
     private PlayerAreaContext(
             Graphics2D g2, Game game, FogViewer fogViewer, WebsiteOverlays overlays, NeighbourMap neighbours) {
@@ -31,6 +32,19 @@ public final class PlayerAreaContext {
     public static PlayerAreaContext of(
             Graphics2D g2, Game game, FogViewer fogViewer, WebsiteOverlays overlays, NeighbourMap neighbours) {
         return new PlayerAreaContext(g2, game, fogViewer, overlays, neighbours);
+    }
+
+    public PlayerAreaContext onlyShowing(@Nullable Player player) {
+        onlyPlayer = player;
+        return this;
+    }
+
+    boolean showsOnePlayer() {
+        return onlyPlayer != null;
+    }
+
+    boolean excludes(Player player) {
+        return onlyPlayer != null && onlyPlayer != player;
     }
 
     public static PlayerAreaContext publicView(Graphics2D g2, Game game, WebsiteOverlays overlays) {

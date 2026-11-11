@@ -31,7 +31,7 @@ public class LunariumBreakthroughHandler {
 
     @ButtonHandler("lunariumDarkSideAC")
     public static void resolveDarkSideAC(Player player, ButtonInteractionEvent event) {
-        ActionCardHelper.drawActionCards(player, 1);
+        ActionCardHelper.drawActionCardsSilent(player, 1);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " drew 1 action card using _Dark Side Exploitation_.");

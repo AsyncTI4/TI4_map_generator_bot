@@ -77,6 +77,10 @@ final class BoardLayout {
             int scoreTokenSpacing) {
         int fractureYbump = fractureYbump(game);
         int mapHeight = getMapHeight(game) + fractureYbump;
+        Rectangle renderedTileBounds = MapPositionMapper.getRenderedTileBounds(game, fractureYbump);
+        if (renderedTileBounds != null) {
+            mapHeight = Math.max(mapHeight, renderedTileBounds.y + renderedTileBounds.height + EXTRA_Y);
+        }
 
         FrameResolver.Framing framing =
                 new FrameResolver(game, displayType, requestedSegment, fog, stats, fractureYbump).resolve();
@@ -87,6 +91,16 @@ final class BoardLayout {
                 frameBounds == null
                         ? getMapWidth(game) + extraBoardsWidth(game)
                         : layoutWidthFor(game, frameBounds.width));
+        if (frameBounds == null && renderedTileBounds != null) {
+            mapWidth = Math.max(
+                    mapWidth,
+                    renderedTileBounds.x
+                            + renderedTileBounds.width
+                            + EXTRA_X
+                            + TileGeometry.LAYER_SIZE
+                            - TileGeometry.TILE_WIDTH
+                            - TileGeometry.TILE_PADDING);
+        }
         MapFrame mapFrame = frameBounds == null
                 ? null
                 : MapFrame.fit(
@@ -98,6 +112,7 @@ final class BoardLayout {
         int connectionStripTop = 0;
         if (mapFrame != null) {
             mapHeight = mapFrame.height();
+            mapWidth = Math.max(mapWidth, mapFrame.width());
             framedWidth = mapFrame.width();
             connections = sectorConnections(game, fog, framing);
             connectionStripTop = mapHeight;

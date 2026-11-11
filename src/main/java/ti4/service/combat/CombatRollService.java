@@ -125,6 +125,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.HacanFlagshipService;
@@ -385,6 +386,18 @@ public class CombatRollService {
         return zelianFakeUnit;
     }
 
+    public static UnitModel getCharonCombatUnit(Player player) {
+        UnitModel charonUnit = new UnitModel();
+        charonUnit.setCombatDieCount(4);
+        charonUnit.setCombatHitsOn(6);
+        charonUnit.setName("Charon");
+        charonUnit.setAsyncId("charoncombat");
+        charonUnit.setId("charoncombat");
+        charonUnit.setBaseType("fs");
+        charonUnit.setFaction(player.getFaction());
+        return charonUnit;
+    }
+
     public static int secondHalfOfCombatRoll(
             Player player,
             Game game,
@@ -535,6 +548,11 @@ public class CombatRollService {
                             1);
                 }
             }
+        }
+        if (rollType == CombatRollType.combatround
+                && "space".equalsIgnoreCase(unitHolderName)
+                && RefractureRulesService.charonCanParticipateInCombat(game, player, tile)) {
+            playerUnitsByQuantity.put(new ImmutablePair<>(getCharonCombatUnit(player), combatOnHolder), 1);
         }
         playerUnitsByQuantity = MassHypnosisLLButtonHandler.splitHypnotizedShipForRoll(
                 game, player, tile, combatOnHolder, rollType, playerUnitsByQuantity);

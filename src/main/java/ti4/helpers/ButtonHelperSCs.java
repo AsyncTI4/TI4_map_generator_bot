@@ -58,6 +58,8 @@ import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
+import ti4.service.megagame.MegagameFollowGuard;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -194,6 +196,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("diploRefresh2")
     public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
@@ -203,7 +208,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("diplomacy").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "diplomacy");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("noctis").orElse(null);
@@ -280,6 +285,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("nekroFollowTech")
     public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -288,7 +296,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("technology").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "technology");
         }
 
         if (!used
@@ -388,6 +396,9 @@ public final class ButtonHelperSCs {
     @ButtonHandler("sc_trade_follow")
     @ButtonHandler("sc_follow_trade")
     public static void followTrade(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -396,7 +407,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "trade");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("amicus").orElse(null);
@@ -429,6 +440,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_draw_so")
     public static void scDrawSO(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
@@ -439,7 +453,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("imperial").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "imperial");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("aeterna").orElse(null);
@@ -516,6 +530,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_refresh")
     public static void refresh(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         resolveRefresh(game, player, event);
     }
 
@@ -530,7 +547,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "trade");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("amicus").orElse(null);
@@ -568,6 +585,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_refresh_and_wash")
     public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         resolveRefreshAndWash(game, player, event);
     }
 
@@ -608,7 +628,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "trade");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("amicus").orElse(null);
@@ -1040,6 +1060,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("warfareBuild")
     public static void warfareBuild(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         List<Button> buttons;
         boolean used = addUsedSCPlayer(messageID, game, player);
@@ -1050,7 +1073,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("warfare").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "warfare");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("calamitas").orElse(null);
@@ -1092,6 +1115,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("construction_")
     public static void construction(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
@@ -1120,7 +1146,7 @@ public final class ButtonHelperSCs {
                     .orElse(null);
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("construction").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "construction");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("civitas").orElse(null);
@@ -1537,6 +1563,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("leadershipGenerateCCButtons")
     public static void leadershipButtons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok1leadership")) {
@@ -1550,7 +1579,7 @@ public final class ButtonHelperSCs {
             game.setStoredValue("resetSpend", "yes");
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("leadership").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "leadership");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByInitiative(1).get();
@@ -1833,6 +1862,9 @@ public final class ButtonHelperSCs {
                 setStatus = false;
             }
         }
+        if (setStatus && MegagameFollowGuard.refusesCard(event, game, player, scNum)) {
+            return;
+        }
         if (setStatus) {
             player.addFollowedSC(scNum, event, false);
             suffix = " **" + Helper.getSCName(scNum, game) + "**";
@@ -1876,8 +1908,7 @@ public final class ButtonHelperSCs {
                         game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + scNum2)
                 .orElse(null);
         if (gameMessage != null) {
-            ThreadChannel chan = ButtonHelper.getRightStratThread(
-                    game, ButtonHelper.getStratName(ButtonHelper.getStratName(scNum2), game));
+            ThreadChannel chan = ButtonHelper.getStratThreadForSc(game, scNum2);
             if (chan != null) {
                 String followSummary = PlayStrategyCardService.getSCFollowSummary(game, scNum2, true);
                 chan.retrieveMessageById(gameMessage.messageId())
@@ -1901,6 +1932,9 @@ public final class ButtonHelperSCs {
             } catch (NumberFormatException e2) {
                 setStatus = false;
             }
+        }
+        if (setStatus && MegagameFollowGuard.refusesCard(event, game, player, scNum)) {
+            return;
         }
         if (player != null
                 && player.getSCs().contains(scNum)
@@ -1987,7 +2021,7 @@ public final class ButtonHelperSCs {
 
         strategicCC--;
         player.setStrategicCC(strategicCC);
-        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
+        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player, scNum);
         TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
         if (scNum != -1 && player.hasAbility("strategic_fluidity")) {
             OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
@@ -1997,6 +2031,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_ac_draw")
     public static void scACDraw(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used2 = addUsedSCPlayer(messageID + "ac", game, player);
         if (used2) {
@@ -2010,7 +2047,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("politics").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "politics");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("Tyrannus").orElse(null);

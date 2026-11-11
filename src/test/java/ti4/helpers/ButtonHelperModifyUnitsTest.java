@@ -3,14 +3,21 @@ package ti4.helpers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
@@ -574,6 +581,37 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
 
         // Homebrew war suns like Sentinel I have no SUSTAIN DAMAGE; the war sun base type alone must not grant it
         assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("archon_warsun")));
+    }
+
+    @Test
+    void testPlaceUnitAndDeleteButton_SpaceDockInThirdGravityRift_UnlocksCabalCommander() {
+        Game cabalGame = new Game();
+        Player cabal = cabalGame.addPlayer("cabalId", "cabalUser");
+        cabal.setColor("black");
+        cabal.setFaction(cabalGame, "cabal");
+        cabal.addOwnedUnitByID("cabal_spacedock");
+        cabal.addPlanet("wellon");
+
+        Tile emptyRift = new Tile("41", "101");
+        emptyRift.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, "black"), 1);
+        Tile cormund = new Tile("67", "102");
+        cormund.addUnit("cormund", Units.getUnitKey(UnitType.Infantry, "black"), 1);
+        Tile wellon = new Tile("19", "103");
+        cabalGame.setTile(emptyRift);
+        cabalGame.setTile(cormund);
+        cabalGame.setTile(wellon);
+        assertEquals(2, ButtonHelper.getNumberOfGravRiftsPlayerIsIn(cabal, cabalGame));
+
+        // The button JR-XS455-O offers for placing a space dock on Wellon.
+        String buttonID = "placeOneNDone_dontskip_sd_wellon";
+        ButtonInteractionEvent event = mock(ButtonInteractionEvent.class, RETURNS_DEEP_STUBS);
+        when(event.getComponentId()).thenReturn(buttonID);
+        try (MockedStatic<MessageHelper> ignored = mockStatic(MessageHelper.class)) {
+            ButtonHelperModifyUnits.placeUnitAndDeleteButton(buttonID, event, cabalGame, cabal);
+        }
+
+        assertEquals(1, wellon.getUnitHolders().get("wellon").getUnitCount(UnitType.Spacedock, cabal));
+        assertTrue(cabal.hasLeaderUnlocked("cabalcommander"));
     }
 
     private static Player createPlayerWithDuraniumArmor(Game game, String color) {

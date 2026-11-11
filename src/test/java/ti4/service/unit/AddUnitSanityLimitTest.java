@@ -1,6 +1,6 @@
 package ti4.service.unit;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -85,8 +85,8 @@ class AddUnitSanityLimitTest extends BaseTi4Test {
 
     @Test
     void unitsWithoutAReinforcementSlotCanBePlaced() {
-        // Plenary Orbital has no reinforcement position, so its unit cap reads as 0.
-        assertThat(letnev.getUnitCap("plenaryorbital")).isZero();
+        // Plenary Orbital has no reinforcement position, so its unit cap reads as -1.
+        assertThat(letnev.getUnitCap("plenaryorbital")).isNegative();
 
         AddUnitService.addUnits(null, tile, game, letnev.getColor(), "plenaryorbital mecatol");
 

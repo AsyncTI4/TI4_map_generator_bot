@@ -34,23 +34,19 @@ public class ActiveLeaseService {
     public void beginLeaseParticipation(Runnable onLeaseAcquired) {
         this.onLeaseAcquired = Objects.requireNonNull(onLeaseAcquired);
 
-        tryAcquireLease();
-        if (isActive()) {
-            BotLogger.info("Acquired active lease for instance " + AsyncTI4DiscordBot.INSTANCE_ID);
-        } else {
-            BotLogger.warning("Did not acquire active lease on startup for instance " + AsyncTI4DiscordBot.INSTANCE_ID);
-        }
+        tryAcquireLease("on startup");
         leaseParticipationEnabled.set(true);
         leaseReleaseListener.start(this::takeOverLeaseIfStandby);
     }
 
-    private synchronized boolean tryAcquireLease() {
+    private synchronized boolean tryAcquireLease(String source) {
         if (isActive() || !activeLeaseTransactionService.tryAcquireLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
             return false;
         }
 
         setActive(true);
         setDraining(false);
+        BotLogger.info("TOOK THE ACTIVE LEASE (" + source + ")");
         onLeaseAcquired.run();
         return true;
     }
@@ -60,10 +56,8 @@ public class ActiveLeaseService {
             return;
         }
 
-        if (tryAcquireLease()) {
+        if (tryAcquireLease(source)) {
             setReady(true);
-            BotLogger.info(
-                    "Inactive instance acquired active lease (" + source + "): " + AsyncTI4DiscordBot.INSTANCE_ID);
         }
     }
 
@@ -73,9 +67,9 @@ public class ActiveLeaseService {
         }
 
         if (!activeLeaseTransactionService.renewLease(AsyncTI4DiscordBot.INSTANCE_ID)) {
-            BotLogger.warning("Active instance lost lease ownership: " + AsyncTI4DiscordBot.INSTANCE_ID);
             setReady(false);
             setActive(false);
+            BotLogger.warning("LOST THE ACTIVE LEASE");
         }
     }
 
@@ -84,6 +78,7 @@ public class ActiveLeaseService {
         leaseReleaseListener.stop();
         activeLeaseTransactionService.releaseLease(AsyncTI4DiscordBot.INSTANCE_ID);
         setActive(false);
+        setDraining(true);
     }
 
     public boolean stillOwnsLease() {
@@ -147,7 +142,6 @@ public class ActiveLeaseService {
         leaseParticipationEnabled.set(false);
         setDraining(true);
         setReady(false);
-        BotLogger.info("Drain requested for active instance " + AsyncTI4DiscordBot.INSTANCE_ID);
         Thread.ofPlatform().name("bot-drain-shutdown").start(SpringContext::closeApplicationContext);
         return true;
     }

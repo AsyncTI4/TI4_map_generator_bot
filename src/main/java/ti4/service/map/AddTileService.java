@@ -27,6 +27,7 @@ public class AddTileService {
     public static void addTile(Game game, Tile tile) {
         game.removeTile(tile.getPosition()); // remove old tile first to clean up associated planet ownership
         game.setTile(tile);
+        if (!CustomHyperlaneService.isCustomHyperlaneTile(tile)) HyperlanePortals.remove(game, tile.getPosition());
         addCustodianToken(tile, game);
     }
 
