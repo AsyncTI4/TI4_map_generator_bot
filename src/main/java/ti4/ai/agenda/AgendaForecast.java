@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.SplittableRandom;
 import java.util.function.ToDoubleFunction;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -309,10 +311,21 @@ public final class AgendaForecast {
                 } else if (RiderPayoff.isImperial(rider.title())) {
                     merged[voter][rider.outcome()] -= rider.rivalStake();
                 }
+                merged[voter][rider.outcome()] -= threatDislike(voter, rider);
             }
         }
         utilities = merged;
         return merged;
+    }
+
+    private double threatDislike(int voter, Rider rider) {
+        if (!GalacticThreatCost.RIDER.equals(rider.title())) return 0;
+        Player player = frame.voters().get(voter);
+        if (player == frame.viewer() || !AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST)) {
+            return 0;
+        }
+        String outcome = frame.outcomes().get(rider.outcome());
+        return GalacticThreatCost.cost(frame.game(), player, frame.voters().get(rider.owner()), outcome, outcome);
     }
 
     private Map<String, Double> simulate() {

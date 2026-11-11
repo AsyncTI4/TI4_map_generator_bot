@@ -33,7 +33,8 @@ class BallotPlanner {
         AgendaForecast forecast = AgendaForecast.of(game, seat);
         if (forecast.isEmpty()) return withoutForecast(game, seat, agenda, outcomes, cap, finalAgenda);
         List<Integer> totals = reachableTotals(planetVotes, cap);
-        ToDoubleFunction<Option> worth = option -> expectedValue(game, seat, agenda, forecast, option);
+        ToDoubleFunction<Option> worth = option -> expectedValue(game, seat, agenda, forecast, option)
+                - GalacticThreatCost.ofBallot(game, seat, option.outcome(), option.votes());
         double abstain = expectedValue(game, seat, agenda, forecast, new Option(ABSTAIN, 0, 0));
         if (finalAgenda && !AgendaValues.dependsOnOwnVote(agenda)) {
             return allIn(forecast, seat, outcomes, cap, worth, abstain);
@@ -75,7 +76,8 @@ class BallotPlanner {
 
     private static Optional<Choice> withoutForecast(
             Game game, Player seat, String agenda, List<String> outcomes, int cap, boolean finalAgenda) {
-        ToDoubleFunction<String> value = outcome -> AgendaUtility.of(game, seat, true, agenda, outcome);
+        ToDoubleFunction<String> value = outcome -> AgendaUtility.of(game, seat, true, agenda, outcome)
+                - GalacticThreatCost.ofBallot(game, seat, outcome, cap);
         double least = outcomes.stream().mapToDouble(value).min().orElse(0);
         Optional<String> best = outcomes.stream().max(Comparator.comparingDouble(value));
         if (best.isEmpty()) return Optional.empty();
