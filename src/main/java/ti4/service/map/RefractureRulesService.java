@@ -113,6 +113,7 @@ public class RefractureRulesService {
     public static boolean charonCanParticipateInCombat(Game game, Player player, Tile tile) {
         Tile charonTile = game.getTileFromPlanet("charon");
         return game.isRefractureMode()
+                && !player.isNeutral()
                 && player.getPlanets().contains("charon")
                 && !player.getExhaustedPlanets().contains("charon")
                 && charonTile == tile
