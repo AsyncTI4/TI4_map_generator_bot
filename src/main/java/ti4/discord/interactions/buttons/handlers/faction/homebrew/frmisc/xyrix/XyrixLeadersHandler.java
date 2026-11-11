@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class XyrixLeadersHandler {
@@ -44,6 +45,22 @@ public class XyrixLeadersHandler {
                 buttons,
                 List.of(Buttons.DONE_DELETE_BUTTONS),
                 actionCardPrefix(player));
+    }
+
+    public static void offerHeroAtStrategyPhaseStart(Game game, Player player) {
+        if (game == null || player == null || !player.hasLeaderUnlocked(HERO) || hasActiveHero(player)) {
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing()
+                        + ", you may play _Archeron the Ascendant_ at the start of the Strategy Phase.",
+                List.of(
+                        Buttons.green(
+                                player.factionButtonChecker() + "componentActionRes_leader_" + HERO,
+                                "Play Archeron Hero",
+                                FactionEmojis.xyrix),
+                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     @ButtonHandler(TAKE_ACTION_CARD)

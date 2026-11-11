@@ -155,6 +155,9 @@ public class PlayStrategyCardService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " played "
                         + game.getSCEmojiWordRepresentation(scToPlay));
+        if (!winnuHero && !isOverrule) {
+            XyrixBreakthroughHandler.offerStrategicAction(game, player, scToPlay, false);
+        }
         ThurvialiAbilityHandler.clearCelestialEnvoysUsed(game);
 
         StringBuilder message = new StringBuilder();
@@ -223,7 +226,6 @@ public class PlayStrategyCardService {
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
                 scoreMaterCalyxaSovereignCrown(event, game, player, scModel);
-                XyrixBreakthroughHandler.offerStrategicAction(game, player, scToPlay, false);
                 // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
                 if (scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());

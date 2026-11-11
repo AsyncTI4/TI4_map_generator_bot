@@ -30,6 +30,7 @@ public final class XyrixAgent extends AgentModule<XyrixAgent.Gift> {
     private static final String OFFER_ACTION_CARD = "xyrixAgentOfferActionCard_";
     private static final String GIVE_ACTION_CARD = "xyrixAgentGiveActionCard_";
     private static final String DECLINE = "xyrixAgentDecline_";
+    private static final String PENDING = "xyrixAgentPending_";
     private static final String SEPARATOR = "|";
 
     public record Gift(Player target, String actionCard) {}
@@ -46,31 +47,13 @@ public final class XyrixAgent extends AgentModule<XyrixAgent.Gift> {
     }
 
     @ButtonHandler(SELECT_TARGET)
-    static void selectTarget(ButtonInteractionEvent event, Game game, Player holder) {
-        if (!holder.hasUnexhaustedLeader(ID)) {
-            return;
-        }
-        List<Button> buttons = game.getRealPlayersExcludingThis(holder).stream()
-                .map(target -> FoWHelper.fogSafeTargetButton(
-                        holder.factionButtonChecker() + OFFER_ACTION_CARD + target.getFaction(),
-                        "gray",
-                        target,
-                        holder))
-                .toList();
-        if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no other players to target.");
-            return;
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                holder.getCardsInfoThread(),
-                holder.getRepresentationNoPing() + ", choose a player for _Caerax the Curator_.",
-                buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    public static void selectTarget(ButtonInteractionEvent event, Game game, Player holder) {
+        AgentLifecycle.pressLegacyButton(event, game, holder, ID, "");
     }
 
     @ButtonHandler(OFFER_ACTION_CARD)
     static void offerActionCard(ButtonInteractionEvent event, Game game, Player holder, String buttonID) {
-        if (!holder.hasUnexhaustedLeader(ID)) {
+        if (!isPending(game, holder)) {
             return;
         }
         Player target = game.getPlayerFromColorOrFaction(buttonID.substring(OFFER_ACTION_CARD.length()));
@@ -80,7 +63,10 @@ public final class XyrixAgent extends AgentModule<XyrixAgent.Gift> {
         List<Button> cards = actionCardButtons(holder, target);
         if (cards.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), targetName(game, target) + " has no action cards to give.");
+                    target.getCardsInfoThread(),
+                    target.getRepresentationNoPing() + ", you have no action cards to give with " + agentName(game)
+                            + ".");
+            clearPendingState(game, holder);
             return;
         }
         NewStuffHelper.sendPaginated(
@@ -99,7 +85,7 @@ public final class XyrixAgent extends AgentModule<XyrixAgent.Gift> {
         }
         String[] payload = buttonID.substring(GIVE_ACTION_CARD.length()).split("\\|", 2);
         Player holder = payload.length == 2 ? game.getPlayerFromColorOrFaction(payload[0]) : null;
-        if (holder == null || !holder.hasUnexhaustedLeader(ID)) {
+        if (holder == null || !isPending(game, holder)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -114,47 +100,60 @@ public final class XyrixAgent extends AgentModule<XyrixAgent.Gift> {
                 buttonID)) {
             return;
         }
-        Integer cardIndex = parseCardIndex(payload[1]);
-        if (cardIndex == null) {
+        String actionCard = actionCardId(target, payload[1]);
+        if (actionCard == null) {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        AgentLifecycle.use(game, holder, ID, target.getFaction() + SEPARATOR + cardIndex, event);
+        ActionCardHelper.sendActionCard(event, game, target, holder, actionCard);
+        List<Button> buttons = TeHelperActionCards.getReadiedStrategyCardSecondaryButtons(game, target);
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(
+                target.getCorrectChannel(),
+                target.getRepresentationNoPing() + " gave an action card to " + targetName(game, holder) + " with "
+                        + agentName(game)
+                        + ". They may now resolve the secondary ability of a readied or unchosen strategy card without spending a command token.",
+                buttons);
+        clearPendingState(game, holder);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(DECLINE)
     static void decline(ButtonInteractionEvent event, Game game, Player target, String buttonID) {
         Player holder = game.getPlayerFromColorOrFaction(buttonID.substring(DECLINE.length()));
-        if (holder != null && holder.hasUnexhaustedLeader(ID)) {
+        if (holder != null && isPending(game, holder)) {
             MessageHelper.sendMessageToChannel(
                     target.getCorrectChannel(),
                     target.getRepresentationNoPing() + " declined " + agentName(game) + "'s offer.");
+            clearPendingState(game, holder);
         }
         ButtonHelper.deleteMessage(event);
     }
 
     @Override
     public Optional<Gift> decode(Game game, Player user, String payload) {
+        if (payload.isEmpty()) {
+            return Optional.of(new Gift(null, null));
+        }
         String[] values = payload.split("\\|", 2);
         if (values.length != 2) {
             return Optional.empty();
         }
         Player target = AgentTargets.player(game, values[0]).orElse(null);
-        Integer cardIndex = parseCardIndex(values[1]);
-        if (target == null || cardIndex == null) {
+        String actionCard = target == null ? null : actionCardId(target, values[1]);
+        if (actionCard == null) {
             return Optional.empty();
         }
-        String actionCard = target.getActionCards().entrySet().stream()
-                .filter(entry -> entry.getValue().equals(cardIndex))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
-        return Optional.ofNullable(actionCard).map(card -> new Gift(target, card));
+        return Optional.of(new Gift(target, actionCard));
     }
 
     @Override
     public Optional<String> unusableReason(Game game, Player user, Gift gift) {
+        if (gift.target() == null) {
+            return game.getRealPlayersExcludingThis(user).isEmpty()
+                    ? Optional.of("There are no other players to target")
+                    : Optional.empty();
+        }
         if (gift.target() == user) {
             return Optional.of("Caerax must target another player");
         }
@@ -168,22 +167,38 @@ public final class XyrixAgent extends AgentModule<XyrixAgent.Gift> {
     public AgentOutcome resolve(AgentUse<Gift> use) {
         Player holder = use.user();
         Player target = use.payload().target();
+        if (target == null) {
+            use.game()
+                    .setStoredValue(
+                            pendingKey(holder), Integer.toString(use.game().getRound()));
+            List<Button> buttons = use.game().getRealPlayersExcludingThis(holder).stream()
+                    .map(other -> FoWHelper.fogSafeTargetButton(
+                            holder.factionButtonChecker() + OFFER_ACTION_CARD + other.getFaction(),
+                            "gray",
+                            other,
+                            holder))
+                    .toList();
+            return AgentOutcome.of(
+                    Message.addressedTo(holder, ", choose a player for " + use.agentNameFor(holder) + ".", buttons)
+                            .inCorrectChannel());
+        }
         ActionCardHelper.sendActionCard(
                 use.event(), use.game(), target, holder, use.payload().actionCard());
         List<Button> buttons = TeHelperActionCards.getReadiedStrategyCardSecondaryButtons(use.game(), target);
         buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         return AgentOutcome.of(Message.addressedTo(
-                target,
-                ", gave an action card to " + targetName(use.game(), holder) + " with "
-                        + use.agentNameFor(target)
-                        + ". They may now resolve the secondary ability of a readied or unchosen strategy card without spending a command token.",
-                buttons));
+                        target,
+                        ", gave an action card to " + targetName(use.game(), holder) + " with "
+                                + use.agentNameFor(target)
+                                + ". They may now resolve the secondary ability of a readied or unchosen strategy card without spending a command token.",
+                        buttons)
+                .inCorrectChannel());
     }
 
     private static List<Button> actionCardButtons(Player holder, Player target) {
         return target.getActionCards().entrySet().stream()
                 .map(entry -> Buttons.green(
-                        actionCardPrefix(holder, target) + entry.getValue(),
+                        actionCardPrefix(holder, target) + entry.getKey(),
                         Mapper.getActionCard(entry.getKey()).getName()))
                 .toList();
     }
@@ -207,11 +222,40 @@ public final class XyrixAgent extends AgentModule<XyrixAgent.Gift> {
         return target.factionButtonChecker() + GIVE_ACTION_CARD + holder.getFaction() + SEPARATOR;
     }
 
+    private static String actionCardId(Player target, String selection) {
+        if (target.getActionCards().containsKey(selection)) {
+            return selection;
+        }
+        Integer cardIndex = parseCardIndex(selection);
+        if (cardIndex == null) {
+            return null;
+        }
+        return target.getActionCards().entrySet().stream()
+                .filter(entry -> entry.getValue().equals(cardIndex))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
     private static Integer parseCardIndex(String value) {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    private static boolean isPending(Game game, Player holder) {
+        return Integer.toString(game.getRound()).equals(game.getStoredValue(pendingKey(holder)))
+                && (holder.hasLeader(ID) || holder.hasExternalAccessToLeader(ID))
+                && !holder.hasUnexhaustedLeader(ID);
+    }
+
+    public static void clearPendingState(Game game, Player holder) {
+        game.removeStoredValue(pendingKey(holder));
+    }
+
+    private static String pendingKey(Player holder) {
+        return PENDING + holder.getFaction();
     }
 }

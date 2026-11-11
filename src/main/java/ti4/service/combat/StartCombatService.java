@@ -1909,9 +1909,9 @@ public class StartCombatService {
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p1, tile);
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p2, tile);
         }
-        XyrixUnitHandler.addScholarsCombatButton(buttons, game, p1, tile);
-        XyrixUnitHandler.addScholarsCombatButton(buttons, game, p2, tile);
         if (isGroundCombat) {
+            XyrixUnitHandler.addScholarsCombatButton(buttons, p1, tile);
+            XyrixUnitHandler.addScholarsCombatButton(buttons, p2, tile);
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p2);
         }

@@ -204,7 +204,6 @@ public class SilverFlameService {
         String planetTileName = AliasHandler.resolveTile("silver_flame");
         Tile tile = new Tile(planetTileName, homeSystem.getPosition());
         AddTileService.addTile(game, tile);
-        FractureService.enterPlayOrExplain(null, game, player, null);
         ButtonHelper.deleteAllButtons(event);
 
         if (controlsAPlanet && player.getSecretsUnscored().containsKey("bam")) {

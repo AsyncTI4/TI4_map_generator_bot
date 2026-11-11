@@ -18,6 +18,7 @@
     "techSpecialties": null,
     "legendaryAbilityName": "Iterative Indexing",
     "legendaryAbilityText": "When you would spend a command token, you may exhaust this card to spend that token from any pool instead.",
+    "legendaryNotes": "This is automated adjacent to Emelpar. Tactical activations won't trigger it. Resolve manually.",
     "unitPositions": {
         "unitHolderName": "alexandria",
         "coordinateMap": {

@@ -27,8 +27,8 @@ public class XyrixUnitHandler {
     private static final String USE_SCHOLARS = "xyrixUseScholars_";
     private static final String SUSTAIN_SCHOLARS = "xyrixSustainScholars_";
 
-    public static void addScholarsCombatButton(List<Button> buttons, Game game, Player player, Tile tile) {
-        if (!getEligibleScholars(player, tile).isEmpty()) {
+    public static void addScholarsCombatButton(List<Button> buttons, Player player, Tile tile) {
+        if (hasScholar(player, tile)) {
             buttons.add(Buttons.gray(
                     player.factionButtonChecker() + USE_SCHOLARS + tile.getPosition(),
                     "Use Scholars (On Win)",
@@ -39,16 +39,19 @@ public class XyrixUnitHandler {
     @ButtonHandler(USE_SCHOLARS)
     public static void offerScholarsToSustain(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.substring(USE_SCHOLARS.length()));
-        if (!isCurrentCombat(game, player, tile)) {
+        if (!isGroundCombat(game, tile)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder holder : getEligibleScholars(player, tile)) {
-            buttons.add(Buttons.green(
-                    player.factionButtonChecker() + SUSTAIN_SCHOLARS + tile.getPosition() + "|" + holder.getName(),
-                    "Sustain Scholar on " + holderName(game, holder),
-                    FactionEmojis.xyrix));
+            for (int scholar = 1; scholar <= undamagedScholars(player, holder); scholar++) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + SUSTAIN_SCHOLARS + tile.getPosition() + "|" + holder.getName()
+                                + "|" + scholar,
+                        "Sustain Scholar on " + holderName(game, holder) + " (" + scholar + ")",
+                        FactionEmojis.xyrix));
+            }
         }
         if (buttons.isEmpty()) {
             ButtonHelper.deleteMessage(event);
@@ -63,13 +66,13 @@ public class XyrixUnitHandler {
 
     @ButtonHandler(SUSTAIN_SCHOLARS)
     public static void sustainScholar(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String[] payload = buttonID.substring(SUSTAIN_SCHOLARS.length()).split("\\|", 2);
-        Tile tile = payload.length == 2 ? game.getTileByPosition(payload[0]) : null;
-        UnitHolder holder = tile == null || payload.length != 2
+        String[] payload = buttonID.substring(SUSTAIN_SCHOLARS.length()).split("\\|", 3);
+        Tile tile = payload.length == 3 ? game.getTileByPosition(payload[0]) : null;
+        UnitHolder holder = tile == null || payload.length != 3
                 ? null
                 : tile.getUnitHolders().get(payload[1]);
         UnitKey mech = Units.getUnitKey(UnitType.Mech, player.getColorID());
-        if (!isCurrentCombat(game, player, tile)
+        if (!isGroundCombat(game, tile)
                 || holder == null
                 || !player.hasUnit(SCHOLARS)
                 || holder.getUnitCount(mech) <= holder.getDamagedUnitCount(mech)) {
@@ -82,7 +85,7 @@ public class XyrixUnitHandler {
                 game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
                 player.getRepresentationNoPing() + " sustained 1 Scholar on " + holderName(game, holder)
                         + " and drew 1 action card.");
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     private static List<UnitHolder> getEligibleScholars(Player player, Tile tile) {
@@ -95,12 +98,25 @@ public class XyrixUnitHandler {
                 .toList();
     }
 
-    private static boolean isCurrentCombat(Game game, Player player, Tile tile) {
+    private static boolean hasScholar(Player player, Tile tile) {
+        if (tile == null || !player.hasUnit(SCHOLARS)) {
+            return false;
+        }
+        UnitKey mech = Units.getUnitKey(UnitType.Mech, player.getColorID());
+        return tile.getUnitHolders().values().stream().anyMatch(holder -> holder.getUnitCount(mech) > 0);
+    }
+
+    private static int undamagedScholars(Player player, UnitHolder holder) {
+        UnitKey mech = Units.getUnitKey(UnitType.Mech, player.getColorID());
+        return holder.getUnitCount(mech) - holder.getDamagedUnitCount(mech);
+    }
+
+    private static boolean isGroundCombat(Game game, Tile tile) {
         StartCombatService.CurrentCombat combat = StartCombatService.getCurrentCombat(game);
         return combat != null
                 && tile != null
                 && tile.getPosition().equals(combat.tilePosition())
-                && combat.factions().contains(player.getFaction());
+                && !"space".equals(combat.unitHolderName());
     }
 
     private static String holderName(Game game, UnitHolder holder) {

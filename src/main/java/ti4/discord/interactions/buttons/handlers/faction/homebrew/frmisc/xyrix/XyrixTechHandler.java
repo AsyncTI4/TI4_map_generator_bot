@@ -13,6 +13,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
@@ -39,13 +40,13 @@ public class XyrixTechHandler {
                 .toList();
         if (buttons.isEmpty() || player.getActionCards().isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(),
+                    player.getCorrectChannel(),
                     "_Intergalactic Library Loans_ requires another player and an action card.");
             return;
         }
         game.setStoredValue(libraryPendingKey(player), String.valueOf(game.getRound()));
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
+                player.getCorrectChannel(),
                 player.getRepresentationNoPing()
                         + ", choose a player to receive 1 action card for _Intergalactic Library Loans_.",
                 buttons);
@@ -59,7 +60,7 @@ public class XyrixTechHandler {
         if (target == null || target == player) return;
         List<Button> buttons = player.getActionCards().entrySet().stream()
                 .map(entry -> Buttons.green(
-                        player.factionButtonChecker() + LIBRARY_CARD + target.getFaction() + "_" + entry.getValue(),
+                        player.factionButtonChecker() + LIBRARY_CARD + target.getFaction() + "|" + entry.getValue(),
                         Mapper.getActionCard(entry.getKey()).getName()))
                 .toList();
         MessageHelper.sendMessageToChannelWithButtons(
@@ -74,7 +75,7 @@ public class XyrixTechHandler {
     public static void resolveIntergalacticLibraryLoans(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!hasPendingLibraryLoans(game, player)) return;
-        String[] payload = buttonID.replace(LIBRARY_CARD, "").split("_");
+        String[] payload = buttonID.replace(LIBRARY_CARD, "").split("\\|", 2);
         if (payload.length != 2) return;
         Player target = game.getPlayerFromColorOrFaction(payload[0]);
         int cardIndex;
@@ -97,6 +98,7 @@ public class XyrixTechHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " gave an action card to " + target.getRepresentationNoPing()
                         + " and drew 2 action cards with _Intergalactic Library Loans_.");
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -108,7 +110,7 @@ public class XyrixTechHandler {
             if (player != activatingPlayer && !activeSystem.containsPlayersUnits(player)) continue;
             game.setStoredValue(copyPromptKey(player), activeSystem.getPosition());
             MessageHelper.sendMessageToChannelWithButton(
-                    player.getCardsInfoThread(),
+                    player.getCorrectChannel(),
                     player.getRepresentationNoPing() + ", you may choose a technology for _Crepuscular Copy_.",
                     Buttons.green(player.factionButtonChecker() + COPY_PAGE + "0", "Choose Technology"));
         }
@@ -139,7 +141,7 @@ public class XyrixTechHandler {
             buttons.add(Buttons.blue(player.factionButtonChecker() + COPY_PAGE + (page + 1), "Next Page"));
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
+                player.getCorrectChannel(),
                 player.getRepresentationNoPing() + ", choose a technology for _Crepuscular Copy_.",
                 buttons);
         ButtonHelper.deleteMessage(event);
@@ -153,7 +155,7 @@ public class XyrixTechHandler {
         player.getTechs().add(technology.getAlias());
         game.setStoredValue(copySelectedKey(player), technology.getAlias());
         MessageHelper.sendMessageToChannelWithEmbed(
-                player.getCardsInfoThread(),
+                player.getCorrectChannel(),
                 player.getRepresentationNoPing()
                         + " is using _Crepuscular Copy_ to gain this technology's ability text until the end of the tactical action.",
                 technology.getRepresentationEmbed());
@@ -165,6 +167,10 @@ public class XyrixTechHandler {
             String copiedTechnology = game.getStoredValue(copySelectedKey(player));
             if (!copiedTechnology.isEmpty()) {
                 player.getTechs().remove(copiedTechnology);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing()
+                                + " removed their copied technology gained through _Crepuscular Copy_.");
             }
             game.removeStoredValue(copyPromptKey(player));
             game.removeStoredValue(copySelectedKey(player));

@@ -31,6 +31,7 @@ import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
 import ti4.service.map.SpinService;
 import ti4.service.player.RefreshCardsService;
 
@@ -114,6 +115,7 @@ public class StatusCleanupService {
             XyrixBreakthroughHandler.clearRoundState(player);
             XyrixPromissoryHandler.clearPendingFrontierExplore(game, player);
             XyrixTechHandler.clearRoundState(game, player);
+            XyrixAgent.clearPendingState(game, player);
 
             game.removeStoredValue("theodisiMinisterRelationsExhausted_" + player.getFaction());
             game.removeStoredValue("theodisiSeatOfPowerExhausted_" + player.getFaction());
