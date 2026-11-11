@@ -2,10 +2,12 @@ package ti4.ai.runtime;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Predicate;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -14,7 +16,8 @@ import ti4.game.Player;
  * every other seat's action cards and unscored secret objectives go back into their decks, the hidden decks (action
  * cards, secret objectives, unrevealed public objectives, agendas, explores, relics) are shuffled, and each other seat
  * is dealt the same number of cards it held, in the same hand slots. Counts are public, so they are kept. The deciding
- * seat's own hand and every revealed card stay as they are. Promissory notes are not resampled.
+ * seat's own hand, every revealed card and every unrevealed objective the seat peeked at stay as they are. Promissory
+ * notes are not resampled.
  */
 final class Determinizer {
 
@@ -25,7 +28,7 @@ final class Determinizer {
                 game.getRealPlayers().stream().filter(player -> player != seat).toList();
         Map<Player, List<Integer>> actionCardSlots = returnActionCards(game, others);
         Map<Player, List<Integer>> secretSlots = returnSecrets(game, others);
-        shuffleHiddenDecks(game, random);
+        shuffleHiddenDecks(game, seat, random);
         actionCardSlots.forEach((player, slots) -> {
             for (int slot : slots) {
                 if (game.getActionCards().isEmpty()) break;
@@ -70,10 +73,36 @@ final class Determinizer {
         return slots;
     }
 
-    private static void shuffleHiddenDecks(Game game, Random random) {
+    private static void shuffleHiddenDecks(Game game, Player seat, Random random) {
         game.shuffleDecks();
         game.shuffleAgendas();
-        if (game.getPublicObjectives1() != null) Collections.shuffle(game.getPublicObjectives1(), random);
-        if (game.getPublicObjectives2() != null) Collections.shuffle(game.getPublicObjectives2(), random);
+        shuffleUnseen(
+                game.getPublicObjectives1Peekable(),
+                game.getPublicObjectives1(),
+                game.getPublicObjectives1Peeked(),
+                seat,
+                random);
+        shuffleUnseen(
+                game.getPublicObjectives2Peekable(),
+                game.getPublicObjectives2(),
+                game.getPublicObjectives2Peeked(),
+                seat,
+                random);
+    }
+
+    // Reveals take the peekable list first and then the deck, so the two are one hidden order. An objective the seat
+    // peeked at keeps its place; the rest are dealt again into the remaining places.
+    private static void shuffleUnseen(
+            List<String> peekable, List<String> deck, Map<String, List<String>> peeked, Player seat, Random random) {
+        List<String> stack = deck == null ? new ArrayList<>() : deck;
+        Predicate<String> unseen =
+                objective -> !peeked.getOrDefault(objective, List.of()).contains(seat.getUserID());
+        List<String> order = new ArrayList<>(peekable);
+        order.addAll(stack);
+        order.removeIf(unseen.negate());
+        Collections.shuffle(order, random);
+        Iterator<String> next = order.iterator();
+        peekable.replaceAll(objective -> unseen.test(objective) ? next.next() : objective);
+        stack.replaceAll(objective -> unseen.test(objective) ? next.next() : objective);
     }
 }

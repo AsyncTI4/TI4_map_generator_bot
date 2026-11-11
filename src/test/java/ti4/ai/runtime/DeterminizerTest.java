@@ -87,6 +87,50 @@ class DeterminizerTest extends BaseTi4Test {
         assertThat(test.sol.getActionCards().keySet()).isEqualTo(first);
     }
 
+    // Status phases reveal from the peekable list first, so a rollout that leaves it alone knows the next objectives.
+    @Test
+    void theNextObjectivesToBeRevealedAreResampled() {
+        game.setPublicObjectives1(new ArrayList<>(List.of("a", "b", "c", "d", "e")));
+        game.setPublicObjectives1Peekable(new ArrayList<>(List.of("f", "g", "h", "i", "j")));
+        game.setPublicObjectives2(new ArrayList<>(List.of("k", "l", "m", "n", "o")));
+        game.setPublicObjectives2Peekable(new ArrayList<>(List.of("p", "q", "r", "s", "t")));
+        List<String> firstStageOne = List.copyOf(game.getPublicObjectives1Peekable());
+        List<String> firstStageTwo = List.copyOf(game.getPublicObjectives2Peekable());
+
+        resample(7);
+
+        assertThat(game.getPublicObjectives1Peekable()).hasSize(5).isNotEqualTo(firstStageOne);
+        assertThat(game.getPublicObjectives2Peekable()).hasSize(5).isNotEqualTo(firstStageTwo);
+        assertThat(unrevealed(game.getPublicObjectives1Peekable(), game.getPublicObjectives1()))
+                .containsExactlyInAnyOrder("a", "b", "c", "d", "e", "f", "g", "h", "i", "j");
+        assertThat(unrevealed(game.getPublicObjectives2Peekable(), game.getPublicObjectives2()))
+                .containsExactlyInAnyOrder("k", "l", "m", "n", "o", "p", "q", "r", "s", "t");
+    }
+
+    // Nekro looked at "g", so it may plan around it. Sol looked at "h", which Nekro does not know.
+    @Test
+    void onlyObjectivesTheDecidingSeatPeekedAtStayInPlace() {
+        game.setPublicObjectives1(new ArrayList<>(List.of("a", "b", "c", "d", "e")));
+        game.setPublicObjectives1Peekable(new ArrayList<>(List.of("f", "g", "h", "i", "j")));
+        game.getPublicObjectives1Peeked().put("g", new ArrayList<>(List.of(test.nekro.getUserID())));
+        game.getPublicObjectives1Peeked().put("h", new ArrayList<>(List.of(test.sol.getUserID())));
+
+        boolean solsMoved = false;
+        for (long seed = 1; seed <= 10; seed++) {
+            resample(seed);
+            assertThat(game.getPublicObjectives1Peekable().get(1)).isEqualTo("g");
+            solsMoved |= !"h".equals(game.getPublicObjectives1Peekable().get(2));
+        }
+
+        assertThat(solsMoved).isTrue();
+    }
+
+    private static List<String> unrevealed(List<String> peekable, List<String> deck) {
+        List<String> all = new ArrayList<>(peekable);
+        all.addAll(deck);
+        return all;
+    }
+
     private void resample(long seed) {
         Random random = new Random(seed);
         RandomHelper.useForThisThread(random);

@@ -133,7 +133,9 @@ final class TrajectoryReplay {
                         new FractureMarch(
                                 entry.getValue().get(0).asInt(),
                                 entry.getValue().get(1).asString())));
-        return new AiGameState.Snapshot(openFollows, slayIntents, marches);
+        // The attack ledger itself is in the save. Its picture only feeds the next record, never a decision.
+        return new AiGameState.Snapshot(
+                openFollows, slayIntents, marches, new ti4.ai.tactical.AttackLedger.Pictures(Map.of()));
     }
 
     private static List<GameMessage> gameMessages(JsonNode node) {

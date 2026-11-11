@@ -1657,7 +1657,8 @@ Seven small generic changes don't reference `ti4.ai`:
     round: from a snapshot, each of the seat's top options (by its own card values) is forced and played to the start
     of round R + 2 over several continuation seeds (12 by default). Before each continuation `Determinizer` resamples
     everything the seat cannot see: other seats' action cards and unscored secrets go back into their decks and are
-    dealt again in the same counts, and the hidden decks are shuffled, so the seat cannot plan around cards it could
+    dealt again in the same counts, and the hidden decks are shuffled (the objectives still to be revealed too, except
+    those the seat peeked at, which keep their place), so the seat cannot plan around cards it could
     not know about (promissory notes are not resampled yet). Options share continuation seeds. A rollout takes about
     80 seconds, which an async game can afford per decision. It prints
     each option's victory point margin and how often the AI's own pick was the best one. Switches:

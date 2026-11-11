@@ -10,6 +10,7 @@ import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.ValueScale;
+import ti4.ai.runtime.AiGameState;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.game.Game;
@@ -196,6 +197,41 @@ class AttackMemoryTest extends BaseTi4Test {
         assertThat(reverse).isZero();
         assertThat(AttackLedger.grudge(undone, sardakkOf(undone), nekroOf(undone)))
                 .isCloseTo(recorded, within(EXACT));
+    }
+
+    // A rollout plays a branch and puts a snapshot back. The picture must go back with it, or the attack played after
+    // the restore is compared with the branch's board and is not recorded.
+    @Test
+    void aRestoredSnapshotDiffsAgainstItsOwnPicture() {
+        Invasion invasion = new Invasion();
+        AttackLedger.record(invasion.game);
+        Game atSnapshot = GameSnapshots.copy(invasion.game);
+        AiGameState.Snapshot snapshot = AiGameState.snapshot(invasion.game.getName());
+        invasion.nekroTakesWellon();
+        Game branch = GameSnapshots.copy(invasion.game);
+        AttackLedger.record(branch);
+        double recorded = AttackLedger.grudge(branch, sardakkOf(branch), nekroOf(branch));
+
+        AiGameState.restore(atSnapshot.getName(), snapshot);
+        Invasion.takeWellon(atSnapshot);
+        AttackLedger.record(atSnapshot);
+
+        assertThat(recorded).isPositive();
+        assertThat(AttackLedger.grudge(atSnapshot, sardakkOf(atSnapshot), nekroOf(atSnapshot)))
+                .isCloseTo(recorded, within(EXACT));
+    }
+
+    @Test
+    void forgettingAGameDropsItsPicture() {
+        Invasion invasion = new Invasion();
+        AttackLedger.record(invasion.game);
+
+        AiGameState.forget(invasion.game.getName());
+        invasion.nekroTakesWellon();
+        AttackLedger.record(invasion.game);
+
+        assertThat(AttackLedger.grudge(invasion.game, sardakkOf(invasion.game), nekroOf(invasion.game)))
+                .isZero();
     }
 
     // A tick that sees nothing new writes nothing, so the bot does not save and add an undo step after every action.

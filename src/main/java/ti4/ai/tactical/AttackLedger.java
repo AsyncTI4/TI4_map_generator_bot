@@ -57,6 +57,8 @@ public class AttackLedger {
 
     private record Picture(Board board, String ledger) {}
 
+    public record Pictures(Map<GameKey, Picture> byGame) {}
+
     private record GameKey(String name, long created) {
 
         static GameKey of(Game game) {
@@ -73,6 +75,19 @@ public class AttackLedger {
 
     public static void forget(String gameName) {
         PICTURES.keySet().removeIf(key -> key.name().equals(gameName));
+    }
+
+    public static Pictures snapshot(String gameName) {
+        Map<GameKey, Picture> pictures = new HashMap<>();
+        PICTURES.forEach((key, picture) -> {
+            if (key.name().equals(gameName)) pictures.put(key, picture);
+        });
+        return new Pictures(pictures);
+    }
+
+    public static void restore(String gameName, Pictures pictures) {
+        forget(gameName);
+        PICTURES.putAll(pictures.byGame());
     }
 
     public static boolean remembers(Game game, Player seat) {
