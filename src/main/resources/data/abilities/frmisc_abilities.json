@@ -1,0 +1,9 @@
+[
+    {
+        "id": "tomebound_tutelage",
+        "name": "Tomebound Tutelage",
+        "faction": "xyrix",
+        "permanentEffect": "During setup, place the Tome Cards in your hand. At the end of the strategy phase, purge each Tome Card in your play area. Then place 1 Tome Card face up in your play area and resolve its effects",
+        "source": "frmisc"
+    }
+]

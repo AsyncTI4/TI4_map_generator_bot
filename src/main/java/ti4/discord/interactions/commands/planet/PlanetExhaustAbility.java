@@ -215,7 +215,6 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = player.getFactionEmoji() + " exhausted Conviction to gain 2 commodities. They now have "
                         + player.getCommodities() + " commodities.";
             }
-
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(

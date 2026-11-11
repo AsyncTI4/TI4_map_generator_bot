@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunne
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaFactionTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
@@ -315,6 +316,12 @@ public class PlayerTechService {
             deleteIfButtonEvent(buttonEvent);
             return;
         }
+        if ("frmiscxyrixg".equals(tech) && !player.hasTechReady(tech)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + " has already exhausted _Intergalactic Library Loans_.");
+            return;
+        }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology "
                 + techModel.getRepresentation(false) + ".";
         game.setStoredValue(
@@ -345,6 +352,7 @@ public class PlayerTechService {
         }
 
         switch (tech) {
+            case "frmiscxyrixg" -> XyrixTechHandler.offerIntergalacticLibraryLoans(game, player);
             case "bedeepg" -> DeepTechHandler.resolveItLooksBack(event, game, player);
             case "bebloomg" -> {
                 if (event instanceof ButtonInteractionEvent buttonEvent && !hyphalMigrationTarget.isEmpty()) {

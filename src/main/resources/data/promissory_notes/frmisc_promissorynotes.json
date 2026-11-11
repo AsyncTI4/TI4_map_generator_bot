@@ -1,0 +1,13 @@
+[
+    {
+        "alias": "frmiscpnxyrix",
+        "name": "Dark Matter Spawning Station",
+        "faction": "xyrix",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "dmss",
+        "text": " ACTION: Attach this card to a non-home planet you control other than Mecatol Rex. When you pass, place a frontier token in this planet’s system. When you explore the frontier deck in this planet’s system, draw one additional card and choose which to resolve. Return the rest to the frontier exploration deck and shuffle that deck.",
+        "source": "frmisc"
+    }
+]

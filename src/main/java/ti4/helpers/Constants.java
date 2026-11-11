@@ -812,6 +812,9 @@ public final class Constants {
     public static final String FACTION6 = "faction6";
     public static final String AC = "action_cards";
     public static final String HYDROMORPHIC_CARDS = "hydromorphic_cards";
+    public static final String TOME_CARDS = "tome_cards";
+    public static final String TOME_CARD_IN_PLAY = "tome_card_in_play";
+    public static final String TOME_CARDS_INITIALIZED = "tome_cards_initialized";
     public static final String HYDROMORPHIC_CARD_ID = "hydromorphic_card_id";
     public static final String HYDROMORPHIC_CARD = "hydromorphic_card";
     public static final String ACTION_CARD = "action_card";

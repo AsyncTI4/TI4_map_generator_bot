@@ -68,6 +68,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -2529,10 +2531,15 @@ public class ButtonHelper {
             return 999;
         }
         int limit = 7;
-        if (isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")
+                && !player.hasTech("frmiscxyrixg")
+                && isLawInPlay(game, "sanctions")
+                && !game.isAbsolMode()) {
             limit = 3;
         }
-        if (isLawInPlay(game, "absol_sanctions")) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")
+                && !player.hasTech("frmiscxyrixg")
+                && isLawInPlay(game, "absol_sanctions")) {
             limit = 3;
             if (game.getLawsInfo().get("absol_sanctions") != null
                     && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
@@ -2555,6 +2562,9 @@ public class ButtonHelper {
         }
         if (player.hasAbility("neurotropic_active")) {
             limit += 2;
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")) {
+            limit += 3;
         }
         return limit;
     }
@@ -5183,6 +5193,10 @@ public class ButtonHelper {
         if (player.hasReadyBreakthrough("choirbt")) {
             endButtons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
         }
+        Button tomeOfNegotiation = XyrixTomeHandler.getNegotiationEndTurnButton(game, player);
+        if (tomeOfNegotiation != null) {
+            endButtons.add(tomeOfNegotiation);
+        }
 
         if (RefractureRulesService.canUseExperiment(game, player)) {
             endButtons.add(Buttons.gray(
@@ -6321,7 +6335,9 @@ public class ButtonHelper {
 
     public static void resolveFullFrontierExplore(
             Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
-        if (player.hasUnlockedBreakthrough("oblivionbt")) {
+        if (XyrixPromissoryHandler.offerAdditionalFrontierExplore(event, game, player, tile)) {
+            return;
+        } else if (player.hasUnlockedBreakthrough("oblivionbt")) {
             OblivionBreakthroughHandler.offerFrontierExplores(
                     event, game, player, tile, player.hasAbility("voidsailors") ? 3 : 2);
         } else if (player.hasAbility("voidsailors")) {
@@ -6644,6 +6660,7 @@ public class ButtonHelper {
                         + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
                 StonebornTechHandler.addDormantXenolithExploreButton(buttons, player, planetId, trait);
+                XyrixTomeHandler.addIndustrializationExploreButton(buttons, game, player, planetId);
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.factionButtonChecker() + "movedNExplored_" + source + planetId + "_"
                             + trait + "kolleccbt";
