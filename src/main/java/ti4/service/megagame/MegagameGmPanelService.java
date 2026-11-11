@@ -29,7 +29,6 @@ public class MegagameGmPanelService {
     public static final String PREFIX = "megaGm";
     private static final String HANDS = PREFIX + "Hands_";
     private static final String CARDS_INFO = PREFIX + "CardsInfo_";
-    private static final String CHANNELS = PREFIX + "Channels_";
 
     private static final List<Button> HAND_CHECK_BUTTONS = List.of(
             Buttons.gray(HANDS + HandCheckService.SABOTAGE, "Sabotages", CardEmojis.ActionCard),
@@ -52,7 +51,6 @@ public class MegagameGmPanelService {
         buttons.add(Buttons.SHOW_DECKS);
         buttons.add(Buttons.green(HANDS, "Check Player Hands for..."));
         buttons.add(Buttons.green(CARDS_INFO, "Player Cards Info..."));
-        buttons.add(Buttons.green(CHANNELS, "Player Channels..."));
         String content = "Megagame GM Buttons (only you can see this)";
         if (member != null && game.getPlayer(member.getId()) != null) {
             buttons.add(Buttons.EDIT_SUMMARIES);
@@ -81,24 +79,6 @@ public class MegagameGmPanelService {
         }
         String text = joinedWith(List.of(cardsInfo(game, target)), "See another player's cards info:");
         sendEphemeral(event.getHook(), text, factionButtons(game, CARDS_INFO));
-    }
-
-    @ButtonHandler(value = CHANNELS, save = false)
-    public static void playerChannels(ButtonInteractionEvent event, String buttonID, Game game) {
-        if (!mayUse(event, game)) return;
-        String faction = buttonID.replace(CHANNELS, "");
-        Player target = faction.isEmpty() ? null : game.getPlayerFromColorOrFaction(faction);
-        if (target == null) {
-            sendEphemeral(event.getHook(), "Whose channels do you want to see?", factionButtons(game, CHANNELS));
-            return;
-        }
-        List<Button> again = factionButtons(game, CHANNELS);
-        MegagameChannelAccessService.channelReport(
-                game,
-                target,
-                event.getMember(),
-                report -> sendEphemeral(
-                        event.getHook(), joinedWith(List.of(report), "See another player's channels:"), again));
     }
 
     private static String joinedWith(List<String> reports, String prompt) {
