@@ -477,8 +477,10 @@ class PromiseDealsTest extends BaseTi4Test {
     }
 
     // Agenda phase: Xxcha (an AI, 4 points) holds the bigger bloc on Shard of the Throne. Sol (an AI) wants the point
-    // and offers to buy Xxcha's votes for itself, at the price Xxcha would ask; the offer uses up this agenda's
-    // transaction between them (LRR 94.6).
+    // and offers to buy Xxcha's votes for itself; the offer uses up this agenda's transaction between them (LRR 94.6).
+    // Sol holds 7 TG: on the expert value table the Shard is worth 6 TG to each holder, so with a 10 TG wallet Xxcha
+    // would ask 8 and leave Sol under the proposal minimum. With 7 TG Xxcha has no ask that clears its own minimum and
+    // Sol offers 7, the lowest price that covers Xxcha's cost.
     @Test
     void anAiOffersToBuyVotes() {
         AiTestGame test = AiTestGame.withSolAi();
@@ -494,7 +496,7 @@ class PromiseDealsTest extends BaseTi4Test {
         test.game.setSpeakerUserID(test.sol.getUserID());
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":2,\"red\":5,\"black\":0}");
         test.isActive(test.sol, "agendawaiting");
-        test.sol.setTg(10);
+        test.sol.setTg(7);
         AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, table());
 
         AiDecision.Post post = (AiDecision.Post)

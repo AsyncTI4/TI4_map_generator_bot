@@ -69,6 +69,20 @@ class AgendaValuesTest extends BaseTi4Test {
     // For/Against words, each seat, an owned and an unowned planet, a strategy card number and a law in play.
     @Test
     void everyOfficialAgendaHasAFiniteValue() {
+        assertEveryOfficialAgendaIsFinite(List.of(nekro));
+    }
+
+    // The same sweep with the expert value table switched back on (it is on by default in play), for every voter, so
+    // each group's values and the legacy fallbacks it leaves in place stay finite.
+    @Test
+    void everyOfficialAgendaHasAFiniteValueOnTheExpertTable() {
+        for (Player seat : List.of(nekro, sol, hacan)) seat.setStoredValue(AiExperiments.DISABLED_KEY, "");
+        assertThat(AiExperiments.enabled(nekro, Experiment.AGENDA_VALUE_TABLE)).isTrue();
+
+        assertEveryOfficialAgendaIsFinite(List.of(nekro, sol, hacan));
+    }
+
+    private void assertEveryOfficialAgendaIsFinite(List<Player> voters) {
         nekro.addPlanet(LODOR);
         test.game.getLaws().put("minister_war", 1);
         test.game.getLawsInfo().put("minister_war", sol.getFaction());
@@ -88,13 +102,15 @@ class AgendaValuesTest extends BaseTi4Test {
 
         List<String> agendas = officialAgendas();
         assertThat(agendas).hasSize(63);
-        for (String agenda : agendas) {
-            for (String outcome : outcomes) {
-                for (String ownVote : List.of("", "for", "against", outcome)) {
-                    assertThatCode(() -> assertThat(value(nekro, agenda, outcome, ownVote))
-                                    .isFinite())
-                            .as("%s / %s / %s", agenda, outcome, ownVote)
-                            .doesNotThrowAnyException();
+        for (Player voter : voters) {
+            for (String agenda : agendas) {
+                for (String outcome : outcomes) {
+                    for (String ownVote : List.of("", "for", "against", outcome)) {
+                        assertThatCode(() -> assertThat(value(voter, agenda, outcome, ownVote))
+                                        .isFinite())
+                                .as("%s: %s / %s / %s", voter.getFaction(), agenda, outcome, ownVote)
+                                .doesNotThrowAnyException();
+                    }
                 }
             }
         }

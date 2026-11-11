@@ -3,6 +3,8 @@ package ti4.ai.xxcha;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.brain.AiDecision;
@@ -20,6 +22,7 @@ public class QuashRules {
     private static final String ABILITY = "quash";
     private static final String QUEUE_QUASH = "queueWhen_ability_quash";
     private static final String OPEN_WHENS = "queueAWhen";
+    private static final double EXPERT_QUASH_MARGIN = 1.0;
 
     public static Optional<AiDecision> queue(AiTurnContext context) {
         Game game = context.game();
@@ -39,7 +42,11 @@ public class QuashRules {
     public static boolean worthQuashing(Game game, Player seat) {
         OptionalDouble loss = AgendaPolicy.expectedLoss(game, seat);
         if (loss.isEmpty()) return AgendaPolicy.worthDiscarding(game, seat);
-        return loss.getAsDouble() > CardFacade.strategyToken();
+        return loss.getAsDouble() > CardFacade.strategyToken() + quashMargin(seat);
+    }
+
+    private static double quashMargin(Player seat) {
+        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE) ? EXPERT_QUASH_MARGIN : 0;
     }
 
     private static Optional<AiDecision> pressHidden(AiTurnContext context, String handlerId, String reason) {

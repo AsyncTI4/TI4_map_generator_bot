@@ -111,8 +111,12 @@ class EarlyDeadlyPlotTest extends BaseTi4Test {
 
     // Minister of Sciences is worth 3 resources a round to the holder for the rest of the game, more than a VP's
     // worth to Sol, who leads the table alone. No points are at stake, but the ability is powerful enough.
+    // This pins the legacy per-round formula: on the expert value table no non-point election is worth a VP (Sciences
+    // is at most 4 TG), so the seats are put on the legacy formula to keep the "powerful ability" path covered.
     @Test
     void discardsAFirstAgendaThatGivesTheLeaderAPowerfulAbility() {
+        for (Player seat : test.game.getRealPlayers())
+            AiExperiments.disable(seat, Set.of(Experiment.AGENDA_VALUE_TABLE));
         agenda("minister_sciences");
         test.points(test.sol, 4);
         test.points(test.nekro, 2);

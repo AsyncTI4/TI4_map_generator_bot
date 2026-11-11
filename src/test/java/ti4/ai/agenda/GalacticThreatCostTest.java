@@ -128,10 +128,16 @@ class GalacticThreatCostTest extends BaseTi4Test {
     }
 
     // On Public Execution Sol wants a rival elected and Nekro and Xxcha are equal rivals, so the 1 trade good of
-    // Galactic Threat cost is enough to move Sol's ballot off whichever rival Nekro predicted.
+    // Galactic Threat cost is enough to move Sol's ballot off whichever rival Nekro predicted. Each rival holds three
+    // action cards, so on the expert value table executing either one (losing its hand) is worth Sol's votes.
     @Test
     void theBallotMovesOffThePredictionWhenTheRivalsAreEqual() {
         test.game.setCurrentAgendaInfo("Directive_Elect Player_7_execution");
+        int index = 1;
+        for (Player rival : List.of(test.nekro, xxcha)) {
+            for (String card : List.of("sabo1", "sabo2", "sabo3"))
+                rival.setActionCard(card + rival.getColor(), index++);
+        }
         String unpredicted = solsBallot().outcome();
         test.game.setCurrentAgendaVote(unpredicted, "black_" + GalacticThreatCost.RIDER);
 
