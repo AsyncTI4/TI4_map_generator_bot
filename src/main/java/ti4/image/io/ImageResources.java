@@ -86,6 +86,12 @@ public final class ImageResources {
     }
 
     @Nullable
+    public static String strategyCardIcon(int initiative) {
+        if (initiative < 1 || initiative > 8) return null;
+        return find("emojis/cards/", "SC" + initiative + ".png");
+    }
+
+    @Nullable
     public static String general(String name) {
         return find("general/", name);
     }
