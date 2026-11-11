@@ -1773,7 +1773,7 @@ public final class ButtonHelperSCs {
         }
         player.addFollowedSC(scNum, event);
         if ("strategy".equals(parts[2])) {
-            VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
+            VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player, scNum);
             TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
             if (player.hasAbility("strategic_fluidity")) {
                 OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
