@@ -33,7 +33,11 @@ class CardTiming {
         if (movesOutBeforeConstruction(in, plan)) return Timing.FALLBACK;
         if (opensTheRound(in, plan)) return Timing.NOW;
         if (claimsWithPeaceAccords(in, plan)) return Timing.NOW;
-        if (plan.card() == StrategyCard.LEADERSHIP && LeadershipUses.fundsWantedFollows(in)) return Timing.NOW;
+        if (plan.card() == StrategyCard.LEADERSHIP
+                && LeadershipUses.fundsWantedFollows(in)
+                && plan.value() + LeadershipUses.fundedFollowsValue(in) >= takeableBestScore(in, in.ranked())) {
+            return Timing.NOW;
+        }
         if (plan.card() == StrategyCard.WARFARE) return warfare(in, plan);
         if (plan.card() == StrategyCard.IMPERIAL && winsWithImperialNow(in)) return Timing.NOW;
         if (plan.card() == StrategyCard.IMPERIAL && yieldsToOverrule(in)) return Timing.FALLBACK;
@@ -88,9 +92,14 @@ class CardTiming {
         return switch (main.use()) {
             case LEADERSHIP_TOKENS, TECHNOLOGY_PROPAGATION ->
                 seat.getTacticalCC() == 0 && !in.ranked().isEmpty();
-            case DIPLOMACY_PROTECT -> main.hasTarget() && in.isThreatened(tileAt(in.game(), main.target()));
+            case DIPLOMACY_PROTECT ->
+                main.hasTarget()
+                        && in.isThreatened(tileAt(in.game(), main.target()))
+                        && beatsTheBestMoveElsewhere(in, plan, main.target());
             case DIPLOMACY_READY ->
-                main.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING && !readiesAfterSpending(in, plan);
+                main.value() >= CardValueScale.READY_SHARE * READY_USE_WORTH_PLAYING
+                        && !readiesAfterSpending(in, plan)
+                        && beatsTheBestMove(in, plan);
             case CONSTRUCTION_PRODUCE -> main.value() >= in.bestScore();
             case TECHNOLOGY_RESEARCH -> TechnologyTiming.playsNow(in);
             case CONSTRUCTION_PDS -> main.hasTarget() && in.round() >= FIRST_ROUND_FOR_EARLY_PDS;
@@ -99,6 +108,21 @@ class CardTiming {
             case IMPERIAL_SCORE -> imperialScoresNow(in);
             default -> false;
         };
+    }
+
+    private static boolean beatsTheBestMove(PlanInputs in, CardPlan plan) {
+        return plan.value() >= takeableBestScore(in, in.ranked());
+    }
+
+    private static double takeableBestScore(PlanInputs in, List<TacticalPlan> moves) {
+        return in.seat().getTacticalCC() == 0 ? 0 : TacticalPlanner.bestScore(moves);
+    }
+
+    private static boolean beatsTheBestMoveElsewhere(PlanInputs in, CardPlan plan, String locked) {
+        List<TacticalPlan> elsewhere = in.ranked().stream()
+                .filter(move -> !locked.equals(move.target()))
+                .toList();
+        return plan.value() >= takeableBestScore(in, elsewhere);
     }
 
     private static boolean readiesAfterSpending(PlanInputs in, CardPlan plan) {

@@ -19,6 +19,7 @@ import ti4.game.Tile;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.model.MapPositionMapper;
+import ti4.service.combat.SpaceCannonOffenceWindow;
 import ti4.testUtils.BaseTi4Test;
 
 // Bombardment comes before ground forces are committed: the bot offers "Roll BOMBARDMENT" next to the landing
@@ -79,6 +80,7 @@ class BombardmentRulesTest extends BaseTi4Test {
     @Test
     void leavesAShieldedPlanetAlone() {
         test.units(tile, "lodor", test.sol, UnitType.Pds, 1);
+        solDeclinesSpaceCannon();
         AiPrompt landing = landingPrompt("combatRoll_" + target + "_space_bombardment");
 
         assertThat(pressedId(TacticalRules.continueAction(test.context(landing)).orElseThrow()))
@@ -109,6 +111,7 @@ class BombardmentRulesTest extends BaseTi4Test {
     @Test
     void bombardsAShieldedPlanetWithArcSecundusInTheFleet() {
         test.units(tile, "lodor", test.sol, UnitType.Pds, 1);
+        solDeclinesSpaceCannon();
         test.nekro.removeOwnedUnitByID("nekro_flagship");
         test.nekro.addOwnedUnitByID("letnev_flagship");
         test.units(tile, "space", test.nekro, UnitType.Flagship, 1);
@@ -220,6 +223,12 @@ class BombardmentRulesTest extends BaseTi4Test {
         test.units(shared, "newalbion", sardakk, UnitType.Infantry, 1);
         test.units(shared, "space", test.nekro, UnitType.Dreadnought, 1);
         return shared;
+    }
+
+    // The PDS on Lodor also covers the active system with SPACE CANNON, so the AI waits for that window first; these
+    // tests are about bombardment, so Sol has already declined.
+    private void solDeclinesSpaceCannon() {
+        SpaceCannonOffenceWindow.resolve(test.game, test.sol, target);
     }
 
     private AiPrompt landingPrompt(String bombardButton) {

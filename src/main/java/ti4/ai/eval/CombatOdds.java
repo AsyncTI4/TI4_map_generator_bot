@@ -58,38 +58,43 @@ public class CombatOdds {
             boolean repairs,
             @Nullable Force afterOpponentLoss,
             boolean weaves,
-            int rerollRounds) {
+            int rerollRounds,
+            boolean detonates) {
 
         public Force(List<Combatant> units, int hitMultiplier, boolean repairs, @Nullable Force afterOpponentLoss) {
-            this(units, hitMultiplier, repairs, afterOpponentLoss, false, 0);
+            this(units, hitMultiplier, repairs, afterOpponentLoss, false, 0, false);
         }
 
         public static Force of(List<Combatant> units) {
-            return new Force(units, 1, false, null, false, 0);
+            return new Force(units, 1, false, null, false, 0, false);
         }
 
         public Force doublingHits() {
-            return new Force(units, 2, repairs, afterOpponentLoss, weaves, rerollRounds);
+            return new Force(units, 2, repairs, afterOpponentLoss, weaves, rerollRounds, detonates);
         }
 
         public Force repairing() {
-            return new Force(units, hitMultiplier, true, afterOpponentLoss, weaves, rerollRounds);
+            return new Force(units, hitMultiplier, true, afterOpponentLoss, weaves, rerollRounds, detonates);
         }
 
         public Force weaving() {
-            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, true, rerollRounds);
+            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, true, rerollRounds, detonates);
         }
 
         public Force improvingAfterOpponentLoss(Force improved) {
-            return new Force(units, hitMultiplier, repairs, improved, weaves, rerollRounds);
+            return new Force(units, hitMultiplier, repairs, improved, weaves, rerollRounds, detonates);
         }
 
         public Force withUnits(List<Combatant> replaced) {
-            return new Force(replaced, hitMultiplier, repairs, afterOpponentLoss, weaves, rerollRounds);
+            return new Force(replaced, hitMultiplier, repairs, afterOpponentLoss, weaves, rerollRounds, detonates);
         }
 
         public Force rerollingMissesInFirstRounds(int rounds) {
-            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, weaves, Math.max(0, rounds));
+            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, weaves, Math.max(0, rounds), detonates);
+        }
+
+        public Force detonating() {
+            return new Force(units, hitMultiplier, repairs, afterOpponentLoss, weaves, rerollRounds, true);
         }
     }
 
@@ -156,6 +161,10 @@ public class CombatOdds {
                         int newD = Math.min(d.hitPoints(), struckD + a.retaliation(absorbedByA, struckA));
                         boolean aDead = newA == a.hitPoints();
                         boolean dDead = newD == d.hitPoints();
+                        if (aDead && attacker.detonates()) newD = d.hitPoints();
+                        if (dDead && defender.detonates()) newA = a.hitPoints();
+                        aDead = newA == a.hitPoints();
+                        dDead = newD == d.hitPoints();
                         if (aDead && dDead) {
                             bothDestroyed += p;
                             addLosses(losses, p, a, newA, d, newD, false);

@@ -515,6 +515,10 @@ _Avoid_: Bonus points, extra VP
 Shorthand for the Sabotage action card, which cancels another action card.
 _Avoid_: Cancel card
 
+**Boat float**:
+Players cooperating on a vote or deal so that all of them come out ahead ("a rising tide floats all boats"). The classic case is Articles of War: every Player but one puts 1 vote on For, the last Player votes Against with enough votes to tie, the Speaker breaks the tie for Against, and each Player who voted For receives 3 Trade goods and gives the Against Player 1 of them.
+_Avoid_: Collusion, kingmaking
+
 **Gum**:
 To park a fighter or other small ship in a System to block opponents from moving through it.
 _Avoid_: Clog, blocker

@@ -30,6 +30,7 @@ class CustodiansStrategyTest extends BaseTi4Test {
         test.nekroHome();
         test.game.setRound(2);
         test.game.setPhaseOfGame("strategy");
+        test.game.setStrategyCardSet("pok");
         Tile rex = test.place("18", "000");
         rex.addToken(Constants.CUSTODIAN_TOKEN_PNG, "mr");
         test.place(EMPTY_SYSTEM, "101");
@@ -58,7 +59,7 @@ class CustodiansStrategyTest extends BaseTi4Test {
     }
 
     private double tempo(Player seat) {
-        return benefit(seat, LEADERSHIP, CardUse.LEADERSHIP_TEMPO);
+        return InitiativeRace.gain(test.game, seat, LEADERSHIP);
     }
 
     private double speaker(Player seat) {
@@ -99,6 +100,43 @@ class CustodiansStrategyTest extends BaseTi4Test {
         loadedCarrier(test.sol, "102");
 
         assertThat(tempo(naalu)).isZero();
+    }
+
+    // Any early card wins the race, not only Leadership: Diplomacy acts before Sol unless Sol takes Leadership, while
+    // Imperial acts last and gains nothing over the coin flip.
+    @Test
+    void anEarlyCardIsWorthActingBeforeARivalThatLandsThisRound() {
+        loadedCarrier(test.nekro, "101");
+        loadedCarrier(test.sol, "102");
+
+        double diplomacy = InitiativeRace.gain(test.game, test.nekro, 2);
+
+        assertThat(diplomacy).isPositive().isLessThanOrEqualTo(tempo(test.nekro));
+        assertThat(InitiativeRace.gain(test.game, test.nekro, 8)).isZero();
+    }
+
+    // Once the rival holds Leadership, the seat cannot act before it, so no card is worth anything in the race.
+    @Test
+    void noCardBeatsARivalThatAlreadyHoldsAnEarlierCard() {
+        loadedCarrier(test.nekro, "101");
+        loadedCarrier(test.sol, "102");
+        test.sol.addSC(LEADERSHIP);
+        changed();
+
+        assertThat(InitiativeRace.gain(test.game, test.nekro, 2)).isZero();
+    }
+
+    // A rival that can also land this round and picks later is expected to take the earliest card left. Only a card
+    // that
+    // still beats it once it has done so is worth anything, and with no cap: here Leadership is most of the race.
+    @Test
+    void aRivalThatCanLandThisRoundTakesTheEarliestCardLeft() {
+        test.game.setSpeakerUserID(test.nekro.getUserID());
+        loadedCarrier(test.nekro, "101");
+        loadedCarrier(test.sol, "102");
+
+        assertThat(tempo(test.nekro)).isGreaterThan(CardValueScale.VICTORY_POINT / 2);
+        assertThat(InitiativeRace.gain(test.game, test.nekro, POLITICS)).isZero();
     }
 
     private double speakerRace(boolean rivalOnTheSameRound, String rivalPosition) {

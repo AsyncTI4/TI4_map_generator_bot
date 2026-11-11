@@ -17,6 +17,13 @@ class TokenValue {
         return tokens(in, gained, CardValueScale.TOKEN_FLOOR);
     }
 
+    static double savedTacticToken(PlanInputs in) {
+        int index = Math.max(0, in.seat().getTacticalCC());
+        List<TacticalPlan> ranked = in.ranked();
+        double planValue = index < ranked.size() ? ranked.get(index).score() * CardValueScale.TOKEN_ACTION_SHARE : 0;
+        return Math.max(CardValueScale.TOKEN_FLOOR, planValue);
+    }
+
     static double carriedTokens(PlanInputs in, int gained) {
         return tokens(in, gained, CardValueScale.HELD_TOKEN);
     }

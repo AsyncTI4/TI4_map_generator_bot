@@ -12,6 +12,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiSeats;
 import ti4.ai.AiSettings;
 import ti4.ai.actuation.AiActuator;
@@ -40,6 +41,7 @@ import ti4.ai.seat.AiSeatService;
 import ti4.ai.selfplay.RefereeRules;
 import ti4.ai.selfplay.RefereeRules.RefereePress;
 import ti4.ai.tactical.CombatRules;
+import ti4.ai.trace.AiDebugLog;
 import ti4.ai.trace.Thinking;
 import ti4.ai.trace.ThinkingAborted;
 import ti4.ai.trace.ThinkingProfile;
@@ -59,6 +61,7 @@ import ti4.service.game.GameUndoNameService;
 class AiTickRunner {
 
     private static final long RETRY_DELAY_MILLIS = 30_000L;
+    private static final int DEBUG_PROMPT_LENGTH = 200;
     private static final long HEALTH_WINDOW_MILLIS = 600_000L;
     private static final int GAME_FAILURE_LIMIT = 3;
     private static final int GLOBAL_FAILURE_LIMIT = 10;
@@ -259,6 +262,26 @@ class AiTickRunner {
                 tick.state().recordDecision(unsure.prompt().key(), describe(unsure));
             default -> {}
         }
+        debugLog(tick, decision);
+    }
+
+    private static void debugLog(SeatTick tick, AiDecision decision) {
+        if (!AiDebugLog.isOn(tick.game())) return;
+        String text =
+                switch (decision) {
+                    case AiDecision.Press press -> describe(press) + " on \"" + promptText(press.prompt()) + "\"";
+                    case AiDecision.Unsure unsure -> describe(unsure) + " on \"" + promptText(unsure.prompt()) + "\"";
+                    case AiDecision.Wait wait -> "wait (" + wait.reason() + ")";
+                    case AiDecision.Announce announce -> "announce \"" + announce.text() + "\"";
+                    case AiDecision.Propose ignored -> "propose a deal";
+                    case AiDecision.Post post -> "post \"" + post.text() + "\"";
+                    case AiDecision.Idle ignored -> null;
+                };
+        if (text != null) AiDebugLog.log(tick.game(), tick.seat(), text);
+    }
+
+    private static String promptText(AiPrompt prompt) {
+        return StringUtils.abbreviate(StringUtils.normalizeSpace(prompt.content()), DEBUG_PROMPT_LENGTH);
     }
 
     private static String describe(AiDecision.Press press) {

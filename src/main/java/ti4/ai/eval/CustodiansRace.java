@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import ti4.ai.AiExperiments;
@@ -15,6 +17,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
+import ti4.ai.winnu.BloodTies;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -24,6 +27,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
+import ti4.service.strategycard.PickStrategyCardService;
 
 public final class CustodiansRace {
 
@@ -55,6 +59,10 @@ public final class CustodiansRace {
     private static final String ACTION_PHASE = "action";
 
     private CustodiansRace() {}
+
+    public static int cost(Player player) {
+        return BloodTies.waivesCustodiansInfluence(player) ? 0 : COST;
+    }
 
     public static boolean open(Game game) {
         return custodiansTile(game) != null;
@@ -145,16 +153,21 @@ public final class CustodiansRace {
         }
 
         public double winChance(Player seatOfInterest, int arrival, Order order) {
-            return winChance(seatOfInterest, arrival, order, coverSurvival(seatOfInterest));
+            return winChance(
+                    seatOfInterest,
+                    arrival,
+                    rival -> sameRound(seatOfInterest, rival, order),
+                    coverSurvival(seatOfInterest));
         }
 
-        private double winChance(Player seatOfInterest, int arrival, Order order, double seatSurvival) {
+        private double winChance(
+                Player seatOfInterest, int arrival, ToDoubleFunction<Player> sameRound, double seatSurvival) {
             double chance = seatSurvival;
             for (Player rival : game.getRealPlayers()) {
                 if (rival == seatOfInterest) continue;
                 OptionalInt theirs = arrival(rival);
                 if (theirs.isEmpty() || theirs.getAsInt() > arrival) continue;
-                double kept = theirs.getAsInt() < arrival ? BEATEN : sameRound(seatOfInterest, rival, order);
+                double kept = theirs.getAsInt() < arrival ? BEATEN : sameRound.applyAsDouble(rival);
                 chance *= 1 - coverSurvival(rival) * (1 - kept);
             }
             return chance;
@@ -199,11 +212,77 @@ public final class CustodiansRace {
 
         public double raceValue(Player seatOfInterest, OptionalInt arrival, Order order, double seatSurvival) {
             if (mecatol == null || arrival.isEmpty()) return 0;
-            double prize = ObjectiveValue.VICTORY_POINT_VALUE
+            return prize(seatOfInterest)
+                    * winChance(
+                            seatOfInterest,
+                            arrival.getAsInt(),
+                            rival -> sameRound(seatOfInterest, rival, order),
+                            seatSurvival);
+        }
+
+        public double raceValueActingAt(Player seatOfInterest, OptionalInt arrival, int initiative) {
+            if (mecatol == null || arrival.isEmpty()) return 0;
+            Map<String, Integer> racersCards = racersCards(seatOfInterest, arrival.getAsInt(), initiative);
+            return prize(seatOfInterest)
+                    * winChance(
+                            seatOfInterest,
+                            arrival.getAsInt(),
+                            rival -> sameRoundActingAt(seatOfInterest, rival, initiative, racersCards),
+                            coverSurvival(seatOfInterest));
+        }
+
+        private Map<String, Integer> racersCards(Player seatOfInterest, int arrival, int initiative) {
+            List<Integer> open = new ArrayList<>(openCards(initiative));
+            open.sort(Integer::compare);
+            Map<String, Integer> cards = new HashMap<>();
+            for (Player rival : PickStrategyCardService.getSCPickOrder(game)) {
+                if (open.isEmpty()) break;
+                if (rival == null || rival == seatOfInterest || rival.hasTheZeroToken() || !stillPicking(rival))
+                    continue;
+                OptionalInt theirs = arrival(rival);
+                if (theirs.isEmpty() || theirs.getAsInt() != arrival) continue;
+                boolean holdsAnEarlierCard = !rival.getSCs().isEmpty() && rival.getLowestSC() < open.getFirst();
+                cards.put(rival.getFaction(), holdsAnEarlierCard ? rival.getLowestSC() : open.removeFirst());
+            }
+            return cards;
+        }
+
+        private double prize(Player seatOfInterest) {
+            return ObjectiveValue.VICTORY_POINT_VALUE
                     + MecatolStake.holdValue(game, seatOfInterest)
                     + mecatolPlanetValue()
                     + IconStake.freeValue(game, seatOfInterest, mecatol);
-            return prize * winChance(seatOfInterest, arrival.getAsInt(), order, seatSurvival);
+        }
+
+        private double sameRoundActingAt(
+                Player seatOfInterest, Player rival, int initiative, Map<String, Integer> racersCards) {
+            if (seatOfInterest.hasTheZeroToken()) return LIKELY_FIRST;
+            if (rival.hasTheZeroToken()) return BEATEN;
+            Integer expected = racersCards.get(rival.getFaction());
+            if (expected != null) return expected < initiative ? BEATEN : LIKELY_FIRST;
+            if (!rival.getSCs().isEmpty()) return rival.getInitiative() < initiative ? BEATEN : LIKELY_FIRST;
+            OptionalDouble earlier = chanceOfAnEarlierCard(initiative);
+            if (earlier.isEmpty()) return COIN_FLIP;
+            return earlier.getAsDouble() * BEATEN + (1 - earlier.getAsDouble()) * LIKELY_FIRST;
+        }
+
+        public boolean stillPicking(Player player) {
+            return player.getSCs().size() < Math.max(1, game.getStrategyCardsPerPlayer());
+        }
+
+        public List<Integer> openCards(int initiative) {
+            Set<Integer> taken = new HashSet<>();
+            game.getRealPlayers().forEach(player -> taken.addAll(player.getSCs()));
+            return game.getSCList().stream()
+                    .filter(card -> card != initiative && !taken.contains(card))
+                    .toList();
+        }
+
+        private OptionalDouble chanceOfAnEarlierCard(int initiative) {
+            List<Integer> open = openCards(initiative);
+            if (open.isEmpty()) return OptionalDouble.empty();
+            return OptionalDouble.of(
+                    open.stream().filter(card -> card < initiative).count() / (double) open.size());
         }
 
         private double sameRound(Player seatOfInterest, Player rival, Order order) {
@@ -275,7 +354,7 @@ public final class CustodiansRace {
             int base = baseRound();
             int arrival = raw;
             if (arrival == base && !canPayNow(player)) arrival = base + 1;
-            if (arrival > base && projectedInfluence(player) < COST) arrival++;
+            if (arrival > base && projectedInfluence(player) < cost(player)) arrival++;
             return arrival;
         }
 
@@ -284,9 +363,9 @@ public final class CustodiansRace {
                 if (player == seat) {
                     return ScoringReserve.planForCustodians(game, seat).isPresent()
                             || IconStake.behindCustodians(game, seat)
-                                    && Wallet.of(game, seat).canPay(SpendCost.influence(COST));
+                                    && Wallet.of(game, seat).canPay(SpendCost.influence(cost(seat)));
                 }
-                return Wallet.of(game, player).canPay(SpendCost.influence(COST));
+                return Wallet.of(game, player).canPay(SpendCost.influence(cost(player)));
             });
         }
 

@@ -39,8 +39,10 @@ it, it applies to all of them (`remove` needs it when there are several).
 faction (setup refuses it, and home planets, button ownership and many game values are keyed by
 faction). AI seats can play the factions whose setup needs no choices and whose abilities the
 shared rules handle: Nekro Virus, Sardakk N'orr, Emirates of Hacan, Barony of Letnev,
-L1Z1X Mindnet, Naalu Collective, Federation of Sol, Universities of Jol-Nar, Xxcha Kingdom and
-Yin Brotherhood. They all use the same rules; the Nekro-only rules (Technological Singularity,
+L1Z1X Mindnet, Naalu Collective, Federation of Sol, Universities of Jol-Nar, Xxcha Kingdom,
+Yin Brotherhood and the Winnu (whose starting technology the seat picks itself at setup). Naalu, Winnu and Yin are
+work in progress (`AiSettings.WIP_FACTIONS`): their faction rules are written but not yet tested in play, so they are
+selectable by name only and never picked by default, `/ai watch` or `/ai play`. They all use the same rules; the Nekro-only rules (Technological Singularity,
 the tech-steal bonus when choosing attacks) switch on for Nekro only.
 
 **Federation of Sol.** The Sol rules key on the ability, leader, unit or breakthrough rather than the faction, so
@@ -65,6 +67,129 @@ Nekro and Franken copies work too (`ti4.ai.sol`):
   from what the reserve leaves.
 - Production wants one Advanced Carrier II (capacity 8, and it sustains damage) instead of two carriers.
 - Genesis' infantry in space is landed like any other ground force in the system, or carried with the fleet.
+
+**Naalu Collective (work in progress).** The Naalu rules key on the ability, leader, unit, note or breakthrough rather than the faction,
+so Nekro and Franken copies work too (`ti4.ai.naalu`):
+- _Telepathic_ and _Neuroglaive_ need no presses: the bot gives the seat the 0 token (`Player.hasTheZeroToken`, which
+  the strategy card ranking and the Custodians race already read) and takes the fleet token from whoever activates a
+  system with its ships.
+- _Foresight_ (`ForesightRules`): the bot offers it on the space combat's start message. The seat decides once, before
+  the first roll and only when another player moved in (never in its own action): it escapes when its win chance is
+  below 0.5 (the chance the attacker's `StrikeEvaluator` already assumes Foresight is used at) and the ships it expects
+  to lose, less the win chance times the stake in its planets there, beat the strategy token (`StrategyTokenCost`,
+  `UNSPARED` 2 when it cannot spare one) plus the cheapest destination's lock loss. It moves to the adjacent system the
+  Skilled Retreat rules rate best (home, own planets, no threat, least locked plans); the retreat rules carry the
+  ground forces. The decision is remembered per round, system and attacker, so a later attacker is judged afresh.
+- Z'eu (Thunder's Edge, `ZeuAgentRules`) is offered after every command token placed and answered at once (its window
+  is right after the placement). The seat declines every other player's token, every offer from an earlier turn and
+  every offer once it has no tactic token left. On its own activation it returns the token straight away, before any
+  ship moves, so the system can be activated again and the fleet that ends there can move on (the agent readies every
+  status phase and its other uses are rare). Any other token of its own (someone else's Diplomacy, a retreat
+  destination) is returned when freeing that system makes its best tactical plan at least 1 trade good better
+  (`CardFacade.tokenUnlockGain`, the value Warfare's unblock uses).
+- M'aban needs no presses (it only shows notes and agendas, which the AI does not forecast from).
+- The Oracle (`OracleRules`) has no other use, so it is played from the status phase reminder the first time it is
+  unlocked and another player has a promissory note in hand.
+- The Matriarch (`MatriarchRules`): at the landing step, once the ground forces are down, the fighters in its system are
+  committed two at a time to the invaded planet with the most enemy ground forces where the seat landed ground forces
+  (never to a planet without a ground combat, where they would stay). They go back to space with the bot's button once
+  no ground combat is left in that system. The bot's auto-assign destroys infantry before fighters, and committed
+  fighters cannot take control (Naalu ruling, Matriarch I), so with fighters on the planet the seat assigns ground hits
+  by hand (`assignHitsByHand`, hooked into `CombatRules`, then `continueHits`): Sustain Damage first, then fighters,
+  infantry and mechs (damaged ones first). A ground combat automation a human proposes still auto-assigns. The planner
+  does not yet count committed fighters when choosing invasions.
+- Iconoclast (Thunder's Edge, `IconoclastRules`): a free mech, so it is always deployed when another player gains a
+  relic, on the planet where a mech cuts the expected loss most (`GroundDrops`), else the one with most resources.
+- _Gift of Prescience_ (`GiftOfPrescience`): going first in the final round wins games, so holders keep it for that
+  round. Its owner never gives it for less than a victory point (`ObjectiveValue.VICTORY_POINT_VALUE`), and
+  _Mindsieve_ never picks it. Receivers pre-play it as before.
+- _Mindsieve_ (`MindsieveFollow`, hooked into following like the Scepter of Emelpar): before resolving a secondary
+  it would follow anyway, the seat gives the primary its cheapest giveable note (not a support, alliance, note in play
+  or withheld _Military Support_) when that note costs no more than the token (`StrategyTokenCost`, 2 when none can
+  be spared); with such a note it also follows without a spare token. Never for Trade, whose follow button spends a
+  token anyway.
+- Hybrid Crystal Fighters' combat and cost come from the unit models. Fighters still move only when carried and are
+  built within capacity (the half fleet pool count of excess Fighter IIs is not used).
+
+**The Winnu (work in progress).** The Winnu rules key on the ability, leader, technology, unit or note rather than the faction, so Nekro
+and Franken copies work too (`ti4.ai.winnu`):
+- _Starting technology_ (`StartingTechRules`): setup posts the faction's no-prerequisite options as free
+  `getTech_<alias>__noPay__comp` buttons owned by the seat; in round 1, while it holds none of them, the seat takes the
+  one `ResearchPolicy` ranks best. Any faction with starting technology options gets the same pick.
+- _Blood Ties_ (`BloodTies`, `CustodiansRace.cost`): the custodians cost no influence, so every custodians check
+  (`CustodiansRace`, `ScoringReserve`, `TokenPurchase`, `ImperialUses`, `DiplomacyUse`, `OffenseOutlook`, `Standings`,
+  `TacticalPlanner`) prices them at 0 for the seat, and a landing on Mecatol Rex expects no influence payment (the bot
+  posts none). Ground forces are still needed, as for everyone.
+- _Reclamation_ (`Reclamation`): the bot places the PDS and space dock itself; taking Mecatol Rex is worth 4 more for
+  the dock and 3 for the PDS (`PlanetStake`'s structure values) while they are in reinforcements.
+- Berekar Berekon (`WinnuProduction`): pressed from the seat's own production payment when at least 2 is still owed,
+  and counted as 2 in the production budget while ready. It is never offered to other players.
+- Rickar Rickani and _Imperator_'s +1 per _Support for the Throne_ come from the bot's combat modifier data, which the
+  odds model already reads. Imperator's extra move is not automated by the bot, so the AI does not plan with it.
+- Mathis Mathinus (`MathisMathinusRules`) is played for the primary of Imperial (picked from the bot's unowned
+  `winnuHero_<initiative>` buttons, even when Imperial was played already): in place of a tactical action when it scores
+  2 points or wins (Mecatol Rex held, a public objective beyond the status phase's chances), before passing when it
+  scores 1. It lets nobody else follow, and the primary is resolved from the follow-less card message
+  (`CardMessages`).
+- _Lazax Gate Folding_ (`LazaxGateFolding`): while the seat does not hold Mecatol Rex, every alpha or beta system leads
+  into the Mecatol system for its movement (`Adjacency.forMovement`; only that direction, which is the one the bot
+  allows). Holding it, the ACTION places 1 infantry there before passing, or in place of a tactical action worth less
+  than 1 plus the stall value.
+- _Hegemonic Trade Policy_ (`WinnuProduction`): the bot only exhausts it, so the AI counts the swap itself: when at
+  least 2 more than the planet's resources is owed, it exhausts the card and spends the ready planet whose influence
+  beats its resources by the most (2 or more, never one its scoring reserve needs), counted at its influence.
+- Salai Sai Corian (`SalaiSaiCorian`) rolls one die per non-fighter ship it faces in the odds model (the bot adds those
+  dice only when it rolls).
+- The Reclaimer (`ReclaimerRules`): from the bot's unowned `winnuStructure_` offer on its own planet, the seat places a
+  space dock where the system has none of its docks, otherwise a PDS (2 at most on a planet), one for each Reclaimer
+  on the planet (each button once), then closes the offer.
+- _Acquiescence_ (`Acquiescence`): a holder plays it right before a follow it has decided to make, like the Scepter
+  of Emelpar (`ScepterFollow`). In trades it is worth 1 to receive and costs the Winnu 0.5 to give, since it comes back.
+
+**Yin Brotherhood (work in progress).** The Yin rules key on the ability, leader, unit, technology or breakthrough rather than the
+faction, so Nekro copies and alliances work too (`ti4.ai.yin`). They run before the combat rules, so every ability is
+decided before the next die is rolled:
+- _Indoctrination_ (`IndoctrinationRules`): at the start of a ground combat it fights (also one Dannel of the Tenth
+  starts), before any roll, it indoctrinates when the conversion (`CombatForecast.conversionGain`: the swing in win
+  chance times the fight's and the planet's stake, the change in expected losses, and the infantry gained and taken)
+  beats 2 influence (1.6 trade goods). With Moyin's Ashes it also prices the mech for 3 influence and takes the better;
+  if the bot offers no mech it falls back to infantry. Influence comes from planets after the scoring reserve
+  (`PaymentRules`); it declines when it cannot pay. While Brother Omar is locked, either faction ability is worth 1
+  more for unlocking him.
+- _Devotion_ (`DevotionRules`): after each space combat round (both sides rolled and hits assigned) it destroys its
+  cheapest destroyer or cruiser for the enemy ship whose loss gains most (`CombatForecast.shipTradeGain`; a ship that
+  can sustain only cancels the hit), when that is worth 0.5 or more, and presses that ship's hit button itself. The bot
+  deletes the Devotion button once used, so in later rounds it presses the combat buttons' refresh to get it back.
+- Brother Milor (`BrotherMilorRules`): it notes its units when a combat's buttons first appear; after one of its own
+  ships or ground forces is destroyed, while the enemy is still there, it gives itself 2 fighters (space) or 2 infantry
+  on that planet when they are worth 1 trade good or more (`CombatForecast.reinforcementGain`; infantry count their
+  own value, fighters only the swing, since they may exceed capacity). Never for other players. Any AI seat a human Yin
+  gives Milor to places the units (infantry on a contested planet, otherwise fighters).
+- Brother Omar (`BrotherOmar`, `BrotherOmarRules`): research planning (`PrerequisiteSkips`, and the route planners through `TechPath.skips`) counts him as one green
+  prerequisite, and for a technology another player owns (not a faction technology) returns an infantry (0.4 trade
+  goods) instead of exhausting specialty planets. It then presses "Remove Infantry via Yin Commander" on the research
+  payment and returns the infantry from its largest garrison (planets before space, home slightly preferred).
+- Dannel of the Tenth (`DannelPlan`, `DannelRules`): up to 3 infantry spread over non-home planets (no space stations,
+  demilitarized zones, Mallice, or planets with enemy structures and no enemy ground forces; Mecatol Rex under the
+  custodians only when their 6 influence is payable, which it then pays), each planet worth its landing win chance
+  without space cannon times its value, objective progress, denial of a rival's objective, the Mecatol hold value and
+  a point for the custodians. It plays the hero as a component action when that spread, less half a point for keeping
+  the hero (nothing in the last round), beats the best tactical plan, or instead of passing. It walks the hero's buttons
+  once per planet, starts each ground combat the bot asks about, and holds its turn (up to 15 minutes) until those
+  combats end.
+- The Van Hauge (`VanHauge`, `CombatOdds.Force.detonating`): when the side holding it is wiped out the other side loses
+  every ship too, so in every plan and threat estimate no fleet wins a space combat against it; the best result is
+  both fleets gone. That makes the flagship a deterrent and a fleet killer for the Yin.
+- Yin Spinner (`TechRules.startYinSpinner`, `YinSpinnerRules`): after every build, and after Sling Relay, Freelancers or
+  Chaos Mapping, where the bot posts the spin on its own; that spin waits until the build's placement message is
+  gone, so nothing is spun when nothing was produced. Impulse Core is `CombatTechRules`.
+- _Greyfire Mutagen_ costs the Yin 0.5 to give (`NotesForTrade`): it cannot be played against the Yin and comes back
+  after use. Holders play it through `CombatNotes`.
+- _Yin Ascendant_ (`YinAscendant`, used by `BreakthroughValue`): 1.5 trade goods per alliance ability, one when gained
+  and about one per round left for the public objectives it scores. The commanders it brings need no choice; those
+  with AI rules (Sardakk, Sol, Xxcha, Letnev) are used through the usual leader checks.
+- Not handled: Milor for other players' losses (or selling him), and committing all of Dannel's infantry before any of
+  the ground combats (the bot resolves each landing in turn).
 
 **When an AI is confused**, it posts the choice in the main game channel and **any player**
 may pick for it. Choices involving hidden information (its hand, its secret objectives) are

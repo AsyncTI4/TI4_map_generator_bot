@@ -61,6 +61,7 @@ import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.ai.trace.Thinking;
+import ti4.ai.winnu.Reclamation;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -142,7 +143,6 @@ public class TacticalPlanner {
     private static final double FIGHTER_ESCORT_VALUE = 0.15;
     private static final double SHIP_COST_WEIGHT = 0.05;
     private static final double HOME_DEFENCE_VALUE = 6.0;
-    private static final int CUSTODIANS_COST = 6;
     private static final int REINFORCEMENT_BUNDLE = 3;
     private static final double CHEAPEST_UNIT_COST = 0.5;
     private static final int MECATOL_GARRISON = 1;
@@ -747,8 +747,12 @@ public class TacticalPlanner {
         for (Tile origin : context.origins()) {
             if (origin == target) continue;
             massFrom(context, origin, target, plan.moves(), reserved).ifPresent(legal -> {
-                moves.removeIf(move -> move.origin().equals(origin.getPosition()));
-                moves.addAll(legal);
+                List<UnitMove> massed = new ArrayList<>(moves);
+                massed.removeIf(move -> move.origin().equals(origin.getPosition()));
+                massed.addAll(legal);
+                if (!context.withinMoveBoosts(target, massed)) return;
+                moves.clear();
+                moves.addAll(massed);
             });
         }
         return new TacticalPlan(plan.kind(), plan.target(), merge(moves), plan.landings(), plan.score());
@@ -789,7 +793,7 @@ public class TacticalPlanner {
                 return Optional.empty();
             }
         }
-        return timed(span, plan);
+        return timed(span, plan).filter(found -> context.withinMoveBoosts(tile, found.moves()));
     }
 
     private static Optional<TacticalPlan> timed(String span, Supplier<Optional<TacticalPlan>> plan) {
@@ -1232,7 +1236,13 @@ public class TacticalPlanner {
             if (BoardView.capacity(seat, type) <= 0 || !context.reachesWithGravityDrive(origin, tile, type)) continue;
             int ships = BoardView.undamaged(space, seat, type);
             int taken = 0;
-            while (taken < ships && (capacity == 0 || capacity < wanted)) {
+            while (taken < ships
+                    && (capacity == 0 || capacity < wanted)
+                    && context.withinMoveBoosts(
+                            tile,
+                            concat(
+                                    transports,
+                                    List.of(new UnitMove(origin.getPosition(), BoardView.SPACE, type, taken + 1))))) {
                 taken++;
                 capacity += BoardView.capacity(seat, type);
             }
@@ -1362,9 +1372,15 @@ public class TacticalPlanner {
         }
         Player target = CannonWipeRules.shipOwner(game, seat, tile);
         double chance = CannonWipeRules.chanceToWipe(game, seat, tile, target, Map.of());
-        double score = secretShare(game, seat, CannonWipeRules.TURN_THEIR_FLEETS_TO_DUST)
+        double secretChance = TradedSecretPoint.gainsPoints(game, seat, tile, 1) ? chance : 0;
+        double score = TradedSecretPoint.share(
+                                game,
+                                seat,
+                                tile,
+                                CannonWipeRules.TURN_THEIR_FLEETS_TO_DUST,
+                                secretShare(game, seat, CannonWipeRules.TURN_THEIR_FLEETS_TO_DUST))
                         * ObjectiveValue.VICTORY_POINT_VALUE
-                        * chance
+                        * secretChance
                 + chance * (target.isNeutral() ? 0 : BoardView.shipCost(BoardView.space(tile), target));
         if (score < Math.max(MIN_SCORE, CardValueScale.TOKEN_FLOOR)) return Optional.empty();
         return Optional.of(new TacticalPlan(Kind.RAID, tile.getPosition(), List.of(), Map.of(), score));
@@ -1415,6 +1431,7 @@ public class TacticalPlanner {
             if (current.parts().size() >= MAX_ORIGINS) break;
             List<Part> parts = new ArrayList<>(current.parts());
             parts.addAll(next.parts());
+            if (!context.withinMoveBoosts(tile, departingShipsOf(parts))) continue;
             Optional<Candidate> merged =
                     candidate(context, tile, opponent, parts, current.heldBack() || next.heldBack(), null);
             if (merged.isEmpty()
@@ -1438,6 +1455,10 @@ public class TacticalPlanner {
     record Departure(List<UnitMove> ships, List<UnitMove> cargo, boolean heldBack) {}
 
     record Part(Tile origin, Departure departure) {}
+
+    private static List<UnitMove> departingShipsOf(List<Part> parts) {
+        return parts.stream().flatMap(part -> part.departure().ships().stream()).toList();
+    }
 
     record Candidate(
             List<Part> parts,
@@ -1574,6 +1595,7 @@ public class TacticalPlanner {
     private static Optional<Candidate> candidate(
             Context context, Tile tile, Player opponent, List<Part> parts, boolean heldBack, @Nullable Blend blend) {
         if (parts.stream().anyMatch(part -> part.departure().ships().isEmpty())) return Optional.empty();
+        if (!context.withinMoveBoosts(tile, departingShipsOf(parts))) return Optional.empty();
         Optional<Candidate> first = evaluated(context, tile, opponent, parts, heldBack, blend, true);
         if (first.isEmpty()) return first;
         boolean raidsAHome = isAnotherPlayersHome(context.game, context.seat, tile)
@@ -1682,14 +1704,15 @@ public class TacticalPlanner {
                 explore.put(name, unexploredValue(context, tile, planet, sent));
             }
         });
-        double[] secrets = secretBonuses(game, seat, tile, strike, estimate);
+        SecretSlots combatSecrets = secretSlots(game, seat, tile, strike, estimate);
         boolean ownHome = tile == seat.getHomeSystemTile();
         double homeDefence = ownHome && estimate.spaceCombat() ? HOME_DEFENCE_VALUE : 0;
         double retake = ownHome ? context.defense().publicScoringLock() : 0;
         Map<UnitType, Integer> bombarding =
                 StrikeEvaluator.bombardingShips(seat, BoardView.space(tile), new Side(seat, strike.ships()));
         Optional<BombardmentRules.Target> bombardment = BombardmentRules.target(game, seat, tile, bombarding);
-        double example = makeAnExampleBonus(game, seat, tile, bombarding, bombardment);
+        SecretSlot example = makeAnExample(game, seat, tile, bombarding, bombardment);
+        double[] secrets = secretTerms(game, seat, tile, combatSecrets, example);
         return new ContextTerms(
                 objective,
                 explore,
@@ -1697,7 +1720,7 @@ public class TacticalPlanner {
                 secrets[1],
                 homeDefence,
                 retake,
-                example,
+                secrets[2],
                 territoryValues(context, tile),
                 TraitRaid.exposedObjective(context, tile, strike, estimate),
                 context.seatStake(tile, estimate));
@@ -2456,17 +2479,32 @@ public class TacticalPlanner {
         return BoardView.model(seat, type).map(UnitModel::getCost).orElse(0f);
     }
 
-    private static double makeAnExampleBonus(
+    private static SecretSlot makeAnExample(
             Game game,
             Player seat,
             Tile tile,
             Map<UnitType, Integer> bombarding,
             Optional<BombardmentRules.Target> bombardment) {
-        if (!ImaginedTurn.unscoredSecrets(seat).containsKey(MAKE_AN_EXAMPLE) || bombardment.isEmpty()) return 0;
-        if (!(tile.getUnitHolders().get(bombardment.get().planet()) instanceof Planet planet)) return 0;
-        return ObjectiveValue.VICTORY_POINT_VALUE
-                * BombardmentRules.chanceToDestroyAll(
-                        seat, bombarding, planet, bombardment.get().defender());
+        if (!ImaginedTurn.unscoredSecrets(seat).containsKey(MAKE_AN_EXAMPLE) || bombardment.isEmpty()) {
+            return SecretSlot.NONE;
+        }
+        if (!(tile.getUnitHolders().get(bombardment.get().planet()) instanceof Planet planet)) return SecretSlot.NONE;
+        double chance = BombardmentRules.chanceToDestroyAll(
+                seat, bombarding, planet, bombardment.get().defender());
+        return SecretSlot.of(TradedSecretPoint.share(game, seat, tile, MAKE_AN_EXAMPLE, 1.0), chance);
+    }
+
+    private static double[] secretTerms(Game game, Player seat, Tile tile, SecretSlots combat, SecretSlot example) {
+        List<SecretSlot> scored = Stream.of(combat.space(), combat.ground(), example)
+                .filter(SecretSlot::scores)
+                .toList();
+        if (!TradedSecretPoint.gainsPoints(game, seat, tile, scored.size())) return new double[] {0, 0, 0};
+        if (!TradedSecretPoint.winsOnlyTogether(game, seat, tile, scored.size())) {
+            return new double[] {combat.space().points(), combat.ground().points(), example.points()};
+        }
+        double jointChance = scored.stream().mapToDouble(SecretSlot::chance).reduce(1.0, (left, right) -> left * right);
+        double win = ScoringStakes.WIN_VALUE * jointChance;
+        return combat.ground().scores() ? new double[] {0, win, 0} : new double[] {win, 0, 0};
     }
 
     static boolean isAnotherPlayersHome(Game game, Player seat, Tile tile) {
@@ -2488,16 +2526,26 @@ public class TacticalPlanner {
             boolean groundCombat) {
         Map<UnitType, Integer> moving = new EnumMap<>(UnitType.class);
         ships.forEach(move -> moving.merge(move.type(), move.count(), Integer::sum));
-        double[] bonuses = secretBonuses(game, seat, tile, opponent, moving, spaceCombat, groundCombat);
-        return bonuses[0] + bonuses[1];
+        return pointGaining(
+                        game, seat, tile, secretSlots(game, seat, tile, opponent, moving, spaceCombat, groundCombat))
+                .total();
     }
 
     static double[] secretBonuses(Game game, Player seat, Tile tile, Strike strike, StrikeEstimate estimate) {
-        return secretBonuses(
+        SecretSlots slots = pointGaining(game, seat, tile, secretSlots(game, seat, tile, strike, estimate));
+        return new double[] {slots.space().points(), slots.ground().points()};
+    }
+
+    private static SecretSlots pointGaining(Game game, Player seat, Tile tile, SecretSlots slots) {
+        return TradedSecretPoint.gainsPoints(game, seat, tile, slots.count()) ? slots : SecretSlots.NONE;
+    }
+
+    private static SecretSlots secretSlots(Game game, Player seat, Tile tile, Strike strike, StrikeEstimate estimate) {
+        return secretSlots(
                 game, seat, tile, strike.opponent(), strike.ships(), estimate.spaceCombat(), estimate.groundCombat());
     }
 
-    private static double[] secretBonuses(
+    private static SecretSlots secretSlots(
             Game game,
             Player seat,
             Tile tile,
@@ -2505,15 +2553,15 @@ public class TacticalPlanner {
             Map<UnitType, Integer> ships,
             boolean space,
             boolean ground) {
-        if (!space && !ground) return new double[] {0, 0};
+        if (!space && !ground) return SecretSlots.NONE;
         double wipe = space ? CannonWipeRules.chanceToWipe(game, seat, tile, opponent, ships) : 0;
-        double[] fought = allocatedBonuses(game, seat, tile, opponent, ships, space, ground, true, 0);
+        SecretSlots fought = allocatedSecrets(game, seat, tile, opponent, ships, space, ground, true, 0);
         if (wipe <= 0) return fought;
-        double[] wiped = allocatedBonuses(game, seat, tile, opponent, ships, space, ground, false, wipe);
-        return wiped[0] + wiped[1] > fought[0] + fought[1] ? wiped : fought;
+        SecretSlots wiped = allocatedSecrets(game, seat, tile, opponent, ships, space, ground, false, wipe);
+        return wiped.total() > fought.total() ? wiped : fought;
     }
 
-    private static double[] allocatedBonuses(
+    private static SecretSlots allocatedSecrets(
             Game game,
             Player seat,
             Tile tile,
@@ -2559,44 +2607,47 @@ public class TacticalPlanner {
                 spaceOnly.add(DESTROY_THEIR_GREATEST_SHIP);
             }
         }
-        double bestSpaceOnly = Math.max(
-                secretPoints(game, seat, opponent, spaceOnly).stream()
-                        .findFirst()
-                        .orElse(0.0),
-                Math.max(space ? barragePoints(game, seat, tile, opponent, ships) : 0, cannonWipe));
-        List<Double> genericPoints = secretPoints(game, seat, opponent, generic);
-        double firstGeneric = genericPoints.isEmpty() ? 0 : genericPoints.get(0);
-        double secondGeneric = genericPoints.size() < 2 ? 0 : genericPoints.get(1);
-        double spacePoints = 0;
-        double groundPoints = 0;
+        SecretSlot bestSpaceOnly = best(
+                best(
+                        secretSlots(game, seat, tile, opponent, spaceOnly).stream()
+                                .findFirst()
+                                .orElse(SecretSlot.NONE),
+                        space ? barrageSlot(game, seat, tile, opponent, ships) : SecretSlot.NONE),
+                cannonWipeSlot(game, seat, tile, cannonWipe));
+        List<SecretSlot> genericSlots = secretSlots(game, seat, tile, opponent, generic);
+        SecretSlot firstGeneric = genericSlots.isEmpty() ? SecretSlot.NONE : genericSlots.get(0);
+        SecretSlot secondGeneric = genericSlots.size() < 2 ? SecretSlot.NONE : genericSlots.get(1);
         if (space && ground) {
-            if (bestSpaceOnly + firstGeneric >= firstGeneric + secondGeneric) {
-                spacePoints = bestSpaceOnly;
-                groundPoints = firstGeneric;
-            } else {
-                spacePoints = firstGeneric;
-                groundPoints = secondGeneric;
-            }
-        } else if (space) {
-            spacePoints = Math.max(bestSpaceOnly, firstGeneric);
-        } else {
-            groundPoints = firstGeneric;
+            return bestSpaceOnly.points() >= secondGeneric.points()
+                    ? new SecretSlots(bestSpaceOnly, firstGeneric)
+                    : new SecretSlots(firstGeneric, secondGeneric);
         }
-        return new double[] {
-            ObjectiveValue.VICTORY_POINT_VALUE * spacePoints, ObjectiveValue.VICTORY_POINT_VALUE * groundPoints
-        };
+        if (space) return new SecretSlots(best(bestSpaceOnly, firstGeneric), SecretSlot.NONE);
+        return new SecretSlots(SecretSlot.NONE, firstGeneric);
     }
 
-    private static List<Double> secretPoints(Game game, Player seat, Player opponent, List<String> secrets) {
+    private static SecretSlot best(SecretSlot first, SecretSlot second) {
+        return second.points() > first.points() ? second : first;
+    }
+
+    private static SecretSlot cannonWipeSlot(Game game, Player seat, Tile tile, double chance) {
+        if (chance <= 0) return SecretSlot.NONE;
+        return SecretSlot.of(
+                TradedSecretPoint.share(game, seat, tile, CannonWipeRules.TURN_THEIR_FLEETS_TO_DUST, 1.0), chance);
+    }
+
+    private static List<SecretSlot> secretSlots(
+            Game game, Player seat, Tile tile, Player opponent, List<String> secrets) {
         return secrets.stream()
-                .map(secret -> secretShare(game, seat, opponent, secret))
-                .sorted(Comparator.reverseOrder())
+                .map(secret -> SecretSlot.of(secretShare(game, seat, tile, opponent, secret), 1.0))
+                .sorted(Comparator.comparingDouble(SecretSlot::points).reversed())
                 .toList();
     }
 
-    private static double secretShare(Game game, Player seat, Player opponent, String secret) {
-        if (opponent.isNeutral() && NEUTRAL_TARGET_SECRETS.contains(secret)) return 1.0;
-        return secretShare(game, seat, secret);
+    private static double secretShare(Game game, Player seat, Tile tile, Player opponent, String secret) {
+        double share =
+                opponent.isNeutral() && NEUTRAL_TARGET_SECRETS.contains(secret) ? 1.0 : secretShare(game, seat, secret);
+        return TradedSecretPoint.share(game, seat, tile, secret, share);
     }
 
     private static double secretShare(Game game, Player seat, String secret) {
@@ -2604,14 +2655,41 @@ public class TacticalPlanner {
         return ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE;
     }
 
-    private static double barragePoints(
+    private static SecretSlot barrageSlot(
             Game game, Player seat, Tile tile, Player opponent, Map<UnitType, Integer> arriving) {
-        if (!PrecisionRules.held(seat)) return 0;
+        if (!PrecisionRules.held(seat)) return SecretSlot.NONE;
         Map<UnitType, Integer> present = new EnumMap<>(BoardView.ships(BoardView.space(tile), seat));
         arriving.forEach((type, count) -> present.merge(type, count, Integer::sum));
         double chance = PrecisionRules.chanceToClear(
                 seat, present, BoardView.count(BoardView.space(tile), opponent, UnitType.Fighter));
-        return secretShare(game, seat, opponent, PrecisionRules.FIGHT_WITH_PRECISION) * chance;
+        if (chance <= 0) return SecretSlot.NONE;
+        return SecretSlot.of(secretShare(game, seat, tile, opponent, PrecisionRules.FIGHT_WITH_PRECISION), chance);
+    }
+
+    private record SecretSlot(double points, double chance) {
+
+        static final SecretSlot NONE = new SecretSlot(0, 0);
+
+        static SecretSlot of(double share, double chance) {
+            return new SecretSlot(ObjectiveValue.VICTORY_POINT_VALUE * share * chance, chance);
+        }
+
+        boolean scores() {
+            return chance > 0;
+        }
+    }
+
+    private record SecretSlots(SecretSlot space, SecretSlot ground) {
+
+        static final SecretSlots NONE = new SecretSlots(SecretSlot.NONE, SecretSlot.NONE);
+
+        double total() {
+            return space.points() + ground.points();
+        }
+
+        int count() {
+            return (space.scores() ? 1 : 0) + (ground.scores() ? 1 : 0);
+        }
     }
 
     private static Optional<TacticalPlan> produce(Context context, Tile tile) {
@@ -3954,7 +4032,7 @@ public class TacticalPlanner {
 
         boolean canPayCustodians() {
             if (canPayCustodians == null) {
-                SpendCost cost = SpendCost.influence(CUSTODIANS_COST);
+                SpendCost cost = SpendCost.influence(CustodiansRace.cost(seat));
                 canPayCustodians = ScoringReserve.planForCustodians(game, seat).isPresent()
                         || IconStake.behindCustodians(game, seat)
                                 && Wallet.of(game, seat).plan(cost).isPresent();
@@ -3980,9 +4058,10 @@ public class TacticalPlanner {
         }
 
         double mecatolTakeValue() {
-            return MecatolCash.points(game, seat) > 0
+            double hold = MecatolCash.points(game, seat) > 0
                     ? MecatolStake.ownHoldValue(game, seat)
                     : MecatolStake.redrawValue(game, seat);
+            return hold + Reclamation.captureBonus(game, seat);
         }
 
         double mecatolCash() {
@@ -4062,6 +4141,42 @@ public class TacticalPlanner {
 
         boolean reachesWithGravityDrive(Tile origin, Tile target, UnitType type) {
             return distance(origin, target, type) <= BoardView.moveValueWithBoosts(seat, type);
+        }
+
+        boolean withinMoveBoosts(Tile target, List<UnitMove> moves) {
+            return moveBoostsNeeded(target, moves) <= BoardView.singleShipBoosts(seat);
+        }
+
+        int moveBoostsNeeded(Tile target, List<UnitMove> moves) {
+            Map<String, List<UnitMove>> byOrigin = moves.stream()
+                    .filter(move -> BoardView.MOVING_SHIPS.contains(move.type()))
+                    .filter(move -> !move.origin().equals(target.getPosition()))
+                    .collect(Collectors.groupingBy(UnitMove::origin, LinkedHashMap::new, Collectors.toList()));
+            int needed = 0;
+            for (Map.Entry<String, List<UnitMove>> group : byOrigin.entrySet()) {
+                Tile origin = game.getTileByPosition(group.getKey());
+                if (origin != null) needed += moveBoostsNeededFrom(origin, target, group.getValue());
+            }
+            return needed;
+        }
+
+        private int moveBoostsNeededFrom(Tile origin, Tile target, List<UnitMove> group) {
+            if (GravleashPlan.hasBreakthrough(seat)) {
+                return group.stream()
+                        .map(UnitMove::type)
+                        .max(Comparator.comparingInt(type -> BoardView.moveValue(seat, type)))
+                        .map(fastest -> moveShortfall(origin, target, fastest))
+                        .orElse(0);
+            }
+            return group.stream()
+                    .mapToInt(move -> move.count() * moveShortfall(origin, target, move.type()))
+                    .sum();
+        }
+
+        private int moveShortfall(Tile origin, Tile target, UnitType type) {
+            int distance = distance(origin, target, type);
+            if (distance == Integer.MAX_VALUE) return 0;
+            return Math.max(0, distance - BoardView.moveValue(seat, type));
         }
 
         Map<String, Integer> reach(Tile from, int move) {

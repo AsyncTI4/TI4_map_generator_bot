@@ -1,13 +1,19 @@
 package ti4.ai.tactical;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.DoubleSupplier;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -33,6 +39,7 @@ import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.strategy.TechnologyFollowReserve;
 import ti4.ai.strategy.TokenPurchase;
 import ti4.ai.trace.Thinking;
+import ti4.ai.winnu.WinnuProduction;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -54,8 +61,8 @@ public class ProductionPlanner {
     private static final int BONUS_FIELD = 8;
     private static final String BELLUM_GLORIOSUM = "solbt";
     public static final String BELLUM_SOURCE = "solBtBuild";
-    private static final int WANTED_CARRIERS = 2;
     private static final int WANTED_DREADNOUGHTS = 4;
+    private static final int EXPANSION_ROUNDS = 2;
     private static final double FRONTLINE_BONUS = 0.5;
     private static final int FRONTLINE_RANGE = 2;
     private static final int FRACTURE_RANGE = 2;
@@ -69,17 +76,17 @@ public class ProductionPlanner {
     static final int WANTED_SPARE_INFANTRY = 4;
     private static final int MIN_SPARE_INFANTRY = 2;
     private static final int INFANTRY_ROOM_PER_CARRIER = 2;
+    private static final int MIN_CARGO_LOAD = INFANTRY_ROOM_PER_CARRIER;
+    private static final double BUILT_CARGO_SHARE = 0.5;
+    private static final double PRESENCE_SCORE_TOLERANCE = 1e-9;
+    private static final double SWAP_DEFENSE_TOLERANCE = 1e-9;
     private static final int ENABLING_SHIPS = 2;
     private static final int MIGHTY_FLEET_DREADNOUGHTS = 5;
     private static final int ARMADA_SHIPS = 8;
     private static final int RAISE_A_FLEET_SHIPS = 5;
-    private static final int WANTED_PAWNS = 4;
-    private static final int PAWNS_PER_BUILD = 2;
     private static final double CHEAPEST_UNIT_COST = 0.5;
     private static final int INFANTRY_PER_RESOURCE = 2;
     private static final int RESEARCH_SAVINGS = 4;
-    private static final double CARRIER_VALUE = 2.5;
-    private static final int HEAVY_LIFT_CAPACITY = 8;
     private static final double SUSTAINING_CARRIER_BONUS = 0.5;
     private static final double NEEDED_INFANTRY_VALUE = 0.5;
     private static final double SCORING_VALUE_PER_RESOURCE = 0.5;
@@ -339,7 +346,11 @@ public class ProductionPlanner {
         try (Thinking.Span ignored = Thinking.enter("production.budget")) {
             budget = new Budget(
                     Helper.getProductionValue(seat, game, tile, false) + extraProduction,
-                    spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
+                    spendableResources(game, seat)
+                            + extraResources
+                            + (seat.hasTech("st") ? 1 : 0)
+                            + aidaDiscount(seat)
+                            + WinnuProduction.plannedDiscount(seat),
                     FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(tile), seat) + fleetRoomBonus,
                     seat.hasUnlockedBreakthrough(BELLUM_GLORIOSUM));
         }
@@ -364,7 +375,11 @@ public class ProductionPlanner {
         if (!AiExperiments.enabled(seat, AiExperiments.Experiment.BLOCKADE_GROUND)) return new BuildPlan(List.of());
         Budget budget = new Budget(
                 Helper.getProductionValue(seat, game, tile, false) + extraProduction,
-                spendableResources(game, seat) + extraResources + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat),
+                spendableResources(game, seat)
+                        + extraResources
+                        + (seat.hasTech("st") ? 1 : 0)
+                        + aidaDiscount(seat)
+                        + WinnuProduction.plannedDiscount(seat),
                 0);
         Builder builder = new Builder(game, seat, tile, budget, null, defense, true);
         phase("production.blockadedGround", () -> planDefensiveUnits(builder));
@@ -381,7 +396,11 @@ public class ProductionPlanner {
             Game game, Player seat, Tile tile, int limit, @Nullable String groundPlanet, DefenseOutlook defense) {
         if (BoardView.hasEnemyShips(game, seat, tile)) return new BuildPlan(List.of());
         Budget budget = Budget.bonusOnly(
-                limit, spendableResources(game, seat) + (seat.hasTech("st") ? 1 : 0) + aidaDiscount(seat));
+                limit,
+                spendableResources(game, seat)
+                        + (seat.hasTech("st") ? 1 : 0)
+                        + aidaDiscount(seat)
+                        + WinnuProduction.plannedDiscount(seat));
         Builder builder = new Builder(game, seat, tile, budget, groundPlanet, defense);
         planDefensiveUnits(builder);
         int spare = TacticalPlanner.movableGroundForces(game, seat, tile, defense);
@@ -390,15 +409,11 @@ public class ProductionPlanner {
         return new BuildPlan(builder.orders);
     }
 
-    private static int wantedCarriers(Player seat) {
-        return BoardView.capacity(seat, UnitType.Carrier) >= HEAVY_LIFT_CAPACITY ? 1 : WANTED_CARRIERS;
-    }
-
-    private static double carrierValue(Player seat) {
+    private static double sustainingCarrierBonus(Player seat) {
         boolean sustains = BoardView.model(seat, UnitType.Carrier)
                 .map(UnitModel::getSustainDamage)
                 .orElse(false);
-        return CARRIER_VALUE + (sustains ? SUSTAINING_CARRIER_BONUS : 0);
+        return sustains ? SUSTAINING_CARRIER_BONUS : 0;
     }
 
     public static boolean holdsHero(Player seat) {
@@ -531,11 +546,15 @@ public class ProductionPlanner {
         if (resources <= 0 || BoardView.hasEnemyShips(game, seat, tile)) return List.of();
         Builder planned = oneShipBuilder(game, seat, tile, resources);
         planScoringUnits(planned);
-        planned.shipsUpTo(UnitType.Carrier, wantedCarriers(seat), carrierValue(seat), false);
+        planned.expansionCarriers();
+        planned.cargoCarriers();
         planSurplusShips(planned);
         Builder cheapest = oneShipBuilder(game, seat, tile, resources);
         cheapest.ship(UnitType.Destroyer, cheapest.fillerValue(UnitType.Destroyer), false);
         List<BuildOrder> options = new ArrayList<>(planned.orders);
+        planned.displaced.stream()
+                .filter(order -> options.stream().noneMatch(other -> other.type() == order.type()))
+                .forEach(options::add);
         cheapest.orders.stream()
                 .filter(order -> options.stream().noneMatch(other -> other.type() == order.type()))
                 .forEach(options::add);
@@ -581,11 +600,7 @@ public class ProductionPlanner {
             if (builder.ship(type, builder.scoringValue(type) + enabler, true)) break;
         }
         int fleetShips = fleetShipsWanted(builder.game, seat, builder.tile, builder.budget.units);
-        builder.shipsUpTo(
-                UnitType.Destroyer,
-                builder.count(UnitType.Destroyer) + fleetShips,
-                builder.scoringValue(UnitType.Destroyer),
-                true);
+        builder.fleetShipsUpTo(builder.count(UnitType.Destroyer) + fleetShips);
         if (ImaginedTurn.unscoredSecrets(seat).containsKey(MIGHTY_FLEET)) {
             builder.shipsUpTo(
                     UnitType.Dreadnought, MIGHTY_FLEET_DREADNOUGHTS, builder.scoringValue(UnitType.Dreadnought), true);
@@ -596,10 +611,8 @@ public class ProductionPlanner {
         if (PrecisionRules.held(seat)) builder.barrageShips();
         if (builder.campaign().holdsFringe()) planFringeInfantry(builder);
         planTraitRaidInfantry(builder);
-        if (fleetShips == 0 && new ObjectiveValue(builder.game, seat).caresAboutPresence()) {
-            int pawns = Math.min(WANTED_PAWNS, builder.count(UnitType.Destroyer) + PAWNS_PER_BUILD);
-            builder.shipsUpTo(UnitType.Destroyer, pawns, builder.scoringValue(UnitType.Destroyer), true);
-        }
+        if (fleetShips > 0) return;
+        for (PresenceReach.Opening opening : builder.presence().openings()) builder.presenceShip(opening);
     }
 
     private static void planTraitRaidInfantry(Builder builder) {
@@ -661,8 +674,9 @@ public class ProductionPlanner {
     }
 
     private static void planCoreShips(Builder builder) {
-        builder.shipsUpTo(UnitType.Carrier, wantedCarriers(builder.seat), carrierValue(builder.seat), false);
-        builder.overSuppliedCarriersUpTo(wantedCarriers(builder.seat));
+        builder.expansionCarriers();
+        builder.overSuppliedCarriers();
+        builder.cargoCarriers();
         int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense);
         builder.infantry(MIN_SPARE_INFANTRY - spare, NEEDED_INFANTRY_VALUE);
         int wantedMechs = builder.campaign().mechsWanted(WANTED_MECHS);
@@ -676,7 +690,8 @@ public class ProductionPlanner {
         if (!GravleashPlan.hasBreakthrough(builder.seat)) return;
         for (UnitType type : VARIETY_SHIPS) {
             if (builder.countHere(type) > 0 || !builder.leavesRoomToFill(builder.cost(type))) continue;
-            builder.ship(type, builder.fillerValue(type) + GravleashPlan.SHIP_TYPE_VALUE, false);
+            double value = builder.fillerValue(type) + GravleashPlan.SHIP_TYPE_VALUE;
+            builder.evictableShip(type, () -> value);
         }
     }
 
@@ -692,8 +707,8 @@ public class ProductionPlanner {
 
     private static void planFractureFleet(Builder builder) {
         if (!FractureCampaign.isDock(builder.game, builder.seat, builder.tile)) return;
-        fractureShipsUpTo(builder, UnitType.Carrier, FractureCampaign.CARRIERS);
-        fractureShipsUpTo(builder, UnitType.Dreadnought, FractureCampaign.DREADNOUGHTS);
+        fractureShipsUpTo(builder, UnitType.Carrier, FractureCampaign.CARRIERS, builder::lockedShip);
+        fractureShipsUpTo(builder, UnitType.Dreadnought, FractureCampaign.DREADNOUGHTS, builder::evictableShip);
         int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense)
                 + builder.planned(UnitType.Infantry);
         builder.infantry(
@@ -709,17 +724,18 @@ public class ProductionPlanner {
         return FRACTURE_FLEET_VALUE_PER_RESOURCE * FractureCampaign.routeShare(builder.game, builder.seat);
     }
 
-    private static void fractureShipsUpTo(Builder builder, UnitType type, int wanted) {
+    private static void fractureShipsUpTo(
+            Builder builder, UnitType type, int wanted, BiPredicate<UnitType, DoubleSupplier> add) {
         double value = fractureValuePerResource(builder) * builder.cost(type);
         while (BoardView.count(BoardView.space(builder.tile), builder.seat, type) + builder.planned(type) < wanted) {
-            if (!builder.ship(type, value, false)) return;
+            if (!add.test(type, () -> value)) return;
         }
     }
 
     private static void planSurplusShips(Builder builder) {
         Player seat = builder.seat;
         double fracture = fractureInterest(builder);
-        double frontline = 1 + FRONTLINE_BONUS * Math.max(frontlineInterest(builder), fracture);
+        double frontline = frontline(builder, fracture);
         int dreadnoughts = fracture > 0 ? FRACTURE_DREADNOUGHTS : WANTED_DREADNOUGHTS;
         builder.surplusShipsUpTo(UnitType.Flagship, 1, frontline, FlagshipRating.spareResourcesNeeded(seat));
         builder.surplusShipsUpTo(UnitType.Warsun, 1, frontline);
@@ -730,6 +746,14 @@ public class ProductionPlanner {
         if (!isUpgraded(seat, UnitType.Cruiser)) {
             builder.surplusShipsUpTo(UnitType.Cruiser, WANTED_CRUISERS, UNUPGRADED_LIGHT_SHIP_SHARE * frontline);
         }
+    }
+
+    private static double frontline(Builder builder) {
+        return frontline(builder, fractureInterest(builder));
+    }
+
+    private static double frontline(Builder builder, double fracture) {
+        return 1 + FRONTLINE_BONUS * Math.max(frontlineInterest(builder), fracture);
     }
 
     private static double fractureInterest(Builder builder) {
@@ -843,6 +867,20 @@ public class ProductionPlanner {
         return false;
     }
 
+    private record Claim(
+            DoubleSupplier value,
+            boolean scoring,
+            boolean forDefense,
+            boolean evictable,
+            @Nullable ToDoubleFunction<UnitType> role,
+            double fillReserve) {
+        private static final double NO_FILL_CHECK = -1;
+
+        boolean checksFill() {
+            return fillReserve >= 0;
+        }
+    }
+
     private static final class Budget {
         private int units;
         private double resources;
@@ -914,6 +952,12 @@ public class ProductionPlanner {
         private final String groundPlanet;
         private final DefenseOutlook defense;
         private final boolean groundOnly;
+        private final Set<BuildOrder> evictable = Collections.newSetFromMap(new IdentityHashMap<>());
+        private final Map<BuildOrder, ToDoubleFunction<UnitType>> roles = new IdentityHashMap<>();
+        private final List<BuildOrder> displaced = new ArrayList<>();
+        private Integer spareGroundForces;
+        private Integer groundToPickUp;
+        private Integer claimableSystems;
 
         Builder(Game game, Player seat, Tile tile, Budget budget) {
             this(game, seat, tile, budget, null, new DefenseOutlook(game, seat));
@@ -958,20 +1002,188 @@ public class ProductionPlanner {
             return defense.campaign();
         }
 
+        PresenceReach presence() {
+            return defense.presenceReach(game, seat, tile);
+        }
+
         boolean ship(UnitType type, double value, boolean scoring) {
             return ship(type, value, scoring, false);
         }
 
         boolean ship(UnitType type, double value, boolean scoring, boolean forDefense) {
+            return ship(type, new Claim(() -> value, scoring, forDefense, false, null, Claim.NO_FILL_CHECK));
+        }
+
+        boolean evictableShip(UnitType type, DoubleSupplier value) {
+            return ship(type, new Claim(value, false, false, true, null, Claim.NO_FILL_CHECK));
+        }
+
+        boolean rankedShip(UnitType type, DoubleSupplier value, double fillReserve) {
+            return ship(type, new Claim(value, false, false, true, null, Math.max(0, fillReserve)));
+        }
+
+        boolean lockedShip(UnitType type, DoubleSupplier value) {
+            return ship(type, new Claim(value, false, false, false, null, Claim.NO_FILL_CHECK));
+        }
+
+        boolean roleShip(UnitType type, DoubleSupplier value, ToDoubleFunction<UnitType> role) {
+            return ship(type, new Claim(value, true, false, true, role, Claim.NO_FILL_CHECK));
+        }
+
+        private boolean ship(UnitType type, Claim claim) {
             UnitModel model = seat.getUnitByType(type);
             if (groundOnly || model == null || !underCap(model.getAsyncId(), planned(type) + 1)) return false;
             double cost = model.getCost();
-            if (!budget.allows(1, cost, true)) return false;
-            budget.spend(1, cost, true);
+            if (fits(cost, claim)) {
+                BuildOrder order = shipOrder(type, cost, claim.value().getAsDouble(), claim.scoring(), claim);
+                placeShip(orders.size(), order, model, claim.evictable(), claim.role());
+                return true;
+            }
+            boolean onlyCashShort = budget.units > 0 && budget.fleetRoom > 0;
+            if (onlyCashShort && !claim.checksFill()) return false;
+            return swapIn(type, model, claim);
+        }
+
+        private boolean fits(double cost, Claim claim) {
+            return budget.allows(1, cost, true)
+                    && (!claim.checksFill() || leavesRoomToFill(cost + claim.fillReserve()));
+        }
+
+        private BuildOrder shipOrder(UnitType type, double cost, double value, boolean scoring, Claim claim) {
+            return new BuildOrder(
+                    type.name().toLowerCase(), tile.getPosition(), type, 1, cost, value, scoring, claim.forDefense());
+        }
+
+        private void placeShip(
+                int index,
+                BuildOrder order,
+                UnitModel model,
+                boolean canBeEvicted,
+                @Nullable ToDoubleFunction<UnitType> role) {
+            budget.spend(1, order.cost(), true);
             budget.gainBonus(model.getCapacityValue());
-            orders.add(new BuildOrder(
-                    type.name().toLowerCase(), tile.getPosition(), type, 1, cost, value, scoring, forDefense));
+            orders.add(index, order);
+            if (canBeEvicted) evictable.add(order);
+            if (role != null) roles.put(order, role);
+        }
+
+        private record Swap(
+                BuildOrder victim,
+                BuildOrder order,
+                @Nullable ToDoubleFunction<UnitType> role,
+                double gain) {}
+
+        private record DockState(int fighterRoom, double defenseCost, int capacity) {}
+
+        private boolean swapIn(UnitType type, UnitModel model, Claim claim) {
+            List<BuildOrder> victims = evictable.stream()
+                    .filter(order -> order.type() != type)
+                    .filter(order -> !budget.bonusEnabled || budget.bonus >= BoardView.capacity(seat, order.type()))
+                    .sorted(Comparator.comparingDouble(BuildOrder::value).thenComparing(order -> -indexOf(order)))
+                    .toList();
+            if (victims.isEmpty()) return false;
+            List<Swap> priced = new ArrayList<>();
+            for (BuildOrder victim : victims) {
+                Swap swap = price(victim, type, model, claim);
+                if (swap != null) priced.add(swap);
+            }
+            if (priced.isEmpty()) return false;
+            priced.sort(Comparator.comparingDouble(Swap::gain).reversed());
+            DockState before = new DockState(rawFighterRoom(), guardedDefenseCost(), capacityHere());
+            for (Swap swap : priced) {
+                if (keepsTheDock(swap, before)) return apply(swap, model, claim);
+            }
+            return false;
+        }
+
+        private boolean apply(Swap best, UnitModel model, Claim claim) {
+            int index = indexOf(best.victim());
+            orders.remove(index);
+            refund(best.victim());
+            evictable.remove(best.victim());
+            roles.remove(best.victim());
+            displaced.add(best.victim());
+            placeShip(index, best.order(), model, claim.evictable(), best.role());
             return true;
+        }
+
+        @Nullable
+        private Swap price(BuildOrder victim, UnitType type, UnitModel model, Claim claim) {
+            int index = indexOf(victim);
+            orders.remove(index);
+            refund(victim);
+            try {
+                ToDoubleFunction<UnitType> victimRole = roles.get(victim);
+                double carried = victimRole == null ? 0 : victimRole.applyAsDouble(type);
+                ToDoubleFunction<UnitType> role = carried > 0 ? joined(claim.role(), victimRole) : claim.role();
+                double value = claim.value().getAsDouble() + carried;
+                BuildOrder order = shipOrder(type, model.getCost(), value, claim.scoring() || carried > 0, claim);
+                double gain = swapGain(order, victim);
+                if (gain <= 0 || !fitsTheBudget(order, claim)) return null;
+                return new Swap(victim, order, role, gain);
+            } finally {
+                budget.spend(1, victim.cost(), true);
+                budget.gainBonus(BoardView.capacity(seat, victim.type()));
+                orders.add(index, victim);
+            }
+        }
+
+        private static ToDoubleFunction<UnitType> joined(
+                @Nullable ToDoubleFunction<UnitType> own, ToDoubleFunction<UnitType> carried) {
+            if (own == null) return carried;
+            return type -> own.applyAsDouble(type) + carried.applyAsDouble(type);
+        }
+
+        private double swapGain(BuildOrder order, BuildOrder victim) {
+            double extraCash = Math.max(0, order.cost() - victim.cost());
+            return order.value() - victim.value() - fillerValuePerResource(game) * extraCash;
+        }
+
+        private boolean fitsTheBudget(BuildOrder order, Claim claim) {
+            return budget.allows(1, order.cost(), true)
+                    && leavesRoomToFill(order.cost() + Math.max(0, claim.fillReserve()));
+        }
+
+        private boolean keepsTheDock(Swap swap, DockState before) {
+            int index = indexOf(swap.victim());
+            orders.set(index, swap.order());
+            boolean keeps = rawFighterRoom() >= Math.min(0, before.fighterRoom())
+                    && !strandsGroundForces(before.capacity())
+                    && guardedDefenseCost() <= before.defenseCost() + SWAP_DEFENSE_TOLERANCE;
+            orders.set(index, swap.victim());
+            return keeps;
+        }
+
+        private boolean strandsGroundForces(int capacityBefore) {
+            int ground = spareGroundForces() + planned(UnitType.Infantry) + planned(UnitType.Mech);
+            return ground > 0 && capacityBefore > 0 && capacityHere() == 0;
+        }
+
+        private int capacityHere() {
+            UnitHolder space = BoardView.space(tile);
+            int capacity = 0;
+            for (UnitType type : BoardView.MOVING_SHIPS) {
+                capacity += (BoardView.count(space, seat, type) + planned(type)) * BoardView.capacity(seat, type);
+            }
+            return capacity;
+        }
+
+        private double guardedDefenseCost() {
+            return defense.isGuarded(tile) ? defense.cost(tile, plannedDefenders()) : 0;
+        }
+
+        private int indexOf(BuildOrder wanted) {
+            for (int index = 0; index < orders.size(); index++) {
+                if (orders.get(index) == wanted) return index;
+            }
+            throw new IllegalStateException("evictable order is not planned");
+        }
+
+        private void refund(BuildOrder order) {
+            budget.units++;
+            budget.resources += order.cost();
+            budget.fleetRoom++;
+            if (budget.bonusEnabled) budget.bonus -= BoardView.capacity(seat, order.type());
         }
 
         void shipsUpTo(UnitType type, int target, double value, boolean scoring) {
@@ -980,19 +1192,194 @@ public class ProductionPlanner {
             }
         }
 
+        void fleetShipsUpTo(int target) {
+            double value = scoringValue(UnitType.Destroyer);
+            while (count(UnitType.Destroyer) < target) {
+                if (!roleShip(UnitType.Destroyer, () -> value, ignored -> value)) return;
+            }
+        }
+
+        void expansionCarriers() {
+            while (wantsAnExpansionCarrier()) {
+                if (!evictableShip(UnitType.Carrier, this::carrierWorth)) return;
+            }
+        }
+
+        private boolean wantsAnExpansionCarrier() {
+            int carriers = count(UnitType.Carrier);
+            if (carriers == 0) return true;
+            return carriers < claimableSystemsInReach() && groundForExpansion() > carriers;
+        }
+
+        private int groundForExpansion() {
+            int ground = spareGroundForces() + groundToPickUp() + planned(UnitType.Infantry) + planned(UnitType.Mech);
+            return ground + cargoStillBuildable(cost(UnitType.Carrier));
+        }
+
+        private int claimableSystemsInReach() {
+            if (claimableSystems == null)
+                claimableSystems =
+                        defense.dockCount("claimableSystems", game, seat, tile, this::countClaimableSystemsInReach);
+            return claimableSystems;
+        }
+
+        private int countClaimableSystemsInReach() {
+            int move = BoardView.moveValue(seat, UnitType.Carrier);
+            if (move <= 0) return 0;
+            int claimable = 0;
+            for (String position : MovementGraph.reach(game, seat, tile.getPosition(), EXPANSION_ROUNDS * move)
+                    .keySet()) {
+                Tile system = game.getTileByPosition(position);
+                if (system != null && hasClaimablePlanet(system)) claimable++;
+            }
+            return claimable;
+        }
+
+        private boolean hasClaimablePlanet(Tile system) {
+            if (BoardView.hasEnemyUnits(game, seat, system)) return false;
+            return system.getPlanetUnitHolders().stream()
+                    .anyMatch(planet ->
+                            BoardView.controller(game, planet.getName()) == null && !BoardView.hasCustodians(planet));
+        }
+
+        void cargoCarriers() {
+            while (wantsACargoCarrier()) {
+                if (!rankedShip(UnitType.Carrier, this::carrierWorth, 0)) return;
+            }
+        }
+
+        private boolean wantsACargoCarrier() {
+            double cost = cost(UnitType.Carrier);
+            return cargoOnHand() - capacityHere() >= MIN_CARGO_LOAD
+                    || cargoWaiting(cost) >= BoardView.capacity(seat, UnitType.Carrier);
+        }
+
+        void presenceShip(PresenceReach.Opening opening) {
+            PresenceReach presence = presence();
+            UnitType best = null;
+            double bestScore = Double.NEGATIVE_INFINITY;
+            UnitType cheapest = null;
+            for (UnitType type : BoardView.MOVING_SHIPS) {
+                UnitModel model = seat.getUnitByType(type);
+                if (model == null || !underCap(model.getAsyncId(), planned(type) + 1)) continue;
+                double credit = presence.credit(opening, type);
+                double cost = model.getCost();
+                if (credit <= 0 || budget.resources < cost) continue;
+                if (cheapest == null || cost < cost(cheapest)) cheapest = type;
+                double spare = type == UnitType.Flagship ? FlagshipRating.spareResourcesNeeded(seat) : 0;
+                if (!leavesRoomToFill(cost + spare)) continue;
+                double score = credit - fillerValuePerResource(game) * cost;
+                if (best == null || outscores(score, cost, bestScore, cost(best))) {
+                    best = type;
+                    bestScore = score;
+                }
+            }
+            UnitType chosen = best != null ? best : cheapest;
+            if (chosen == null) return;
+            double frontline = frontline(this);
+            roleShip(
+                    chosen,
+                    () -> presence.credit(opening, chosen) + shipWorth(chosen, frontline),
+                    type -> presence.credit(opening, type));
+        }
+
+        private static boolean outscores(double score, double cost, double bestScore, double bestCost) {
+            if (score > bestScore + PRESENCE_SCORE_TOLERANCE) return true;
+            return score > bestScore - PRESENCE_SCORE_TOLERANCE && cost < bestCost;
+        }
+
+        double shipWorth(UnitType type, double share) {
+            double ability = type == UnitType.Flagship ? 1 + FlagshipRating.of(seat) : 1;
+            return share * fillerValue(type) * ability + cargoWorth(type);
+        }
+
+        double cargoWorth(UnitType type) {
+            int capacity = BoardView.capacity(seat, type);
+            if (capacity == 0) return 0;
+            int onHand = Math.min(capacity, Math.max(0, cargoOnHand() - capacityHere()));
+            int stillToBuild = Math.min(capacity, cargoWaiting(cost(type))) - onHand;
+            return CapacityUse.EMPTY_SLOT_VALUE * (onHand + BUILT_CARGO_SHARE * Math.max(0, stillToBuild));
+        }
+
+        double carrierWorth() {
+            return fillerValue(UnitType.Carrier) + cargoWorth(UnitType.Carrier) + sustainingCarrierBonus(seat);
+        }
+
+        int cargoWaiting(double shipCost) {
+            return Math.max(0, cargoOnHand() + cargoStillBuildable(shipCost) - capacityHere());
+        }
+
+        private int cargoOnHand() {
+            int ground = spareGroundForces() + groundToPickUp() + planned(UnitType.Infantry) + planned(UnitType.Mech);
+            return ground + fightersNeedingCapacity();
+        }
+
+        private int fightersNeedingCapacity() {
+            int allowance = dockPlanet().isPresent() ? BoardView.DOCK_FIGHTER_ALLOWANCE : 0;
+            int fighters = BoardView.count(BoardView.space(tile), seat, UnitType.Fighter) + planned(UnitType.Fighter);
+            return Math.max(0, fighters - allowance);
+        }
+
+        private int cargoStillBuildable(double shipCost) {
+            int slots = budget.slots() - 1;
+            int affordable = (int) Math.floor((budget.resources - shipCost) / CHEAPEST_UNIT_COST);
+            return Math.max(0, Math.min(slots, affordable));
+        }
+
+        private int spareGroundForces() {
+            if (spareGroundForces == null) {
+                spareGroundForces = TacticalPlanner.movableGroundForces(game, seat, tile, defense);
+            }
+            return spareGroundForces;
+        }
+
+        private int groundToPickUp() {
+            if (groundToPickUp == null)
+                groundToPickUp = defense.dockCount("groundToPickUp", game, seat, tile, this::countGroundToPickUp);
+            return groundToPickUp;
+        }
+
+        private int countGroundToPickUp() {
+            int move = BoardView.moveValue(seat, UnitType.Carrier);
+            if (move <= 0) return 0;
+            int waiting = 0;
+            for (String position :
+                    MovementGraph.reach(game, seat, tile.getPosition(), move).keySet()) {
+                Tile system = game.getTileByPosition(position);
+                if (system == null || system == tile || !hasGroundForcesOnPlanets(system)) continue;
+                UnitHolder space = BoardView.space(system);
+                int room = 0;
+                for (UnitType type : BoardView.MOVING_SHIPS) {
+                    room += BoardView.count(space, seat, type) * BoardView.capacity(seat, type);
+                }
+                room = Math.max(0, room - BoardView.count(space, seat, UnitType.Fighter));
+                int spare = TacticalPlanner.movableGroundForces(game, seat, system, defense);
+                waiting += Math.max(0, spare - room);
+            }
+            return waiting;
+        }
+
+        private boolean hasGroundForcesOnPlanets(Tile system) {
+            return system.getPlanetUnitHolders().stream()
+                    .anyMatch(planet ->
+                            seat.getPlanets().contains(planet.getName()) && BoardView.groundForces(planet, seat) > 0);
+        }
+
         void groundUpTo(UnitType type, int target, double value) {
             while (count(type) < target) {
                 if (!ground(type, 1, value)) return;
             }
         }
 
-        void overSuppliedCarriersUpTo(int target) {
+        void overSuppliedCarriers() {
             OptionalDouble scrap = cheapestShipToScrap(seat, tile);
             if (scrap.isEmpty()) return;
-            while (budget.overSupply > 0 && budget.fleetRoom <= 0 && count(UnitType.Carrier) < target) {
+            DoubleSupplier worth = () -> carrierWorth() - scrap.getAsDouble();
+            while (budget.overSupply > 0 && budget.fleetRoom <= 0 && wantsAnExpansionCarrier()) {
                 budget.overSupply--;
                 budget.fleetRoom++;
-                if (!ship(UnitType.Carrier, carrierValue(seat) - scrap.getAsDouble(), false)) {
+                boolean fits = budget.allows(1, cost(UnitType.Carrier), true);
+                if (!fits || !lockedShip(UnitType.Carrier, worth)) {
                     budget.fleetRoom--;
                     return;
                 }
@@ -1004,9 +1391,8 @@ public class ProductionPlanner {
         }
 
         void surplusShipsUpTo(UnitType type, int target, double share, double spareNeeded) {
-            double value = share * fillerValue(type);
-            while (count(type) < target && leavesRoomToFill(cost(type) + spareNeeded)) {
-                if (!ship(type, value, false)) return;
+            while (count(type) < target) {
+                if (!rankedShip(type, () -> shipWorth(type, share), spareNeeded)) return;
             }
         }
 
@@ -1109,6 +1495,10 @@ public class ProductionPlanner {
         }
 
         int fighterRoom() {
+            return Math.max(0, rawFighterRoom());
+        }
+
+        private int rawFighterRoom() {
             UnitHolder space = BoardView.space(tile);
             int shipCapacity = 0;
             int carriers = 0;
@@ -1122,7 +1512,7 @@ public class ProductionPlanner {
                     Math.min(INFANTRY_ROOM_PER_CARRIER * carriers, boardable), BoardView.groundForces(space, seat));
             int allowance = dockPlanet().isPresent() ? BoardView.DOCK_FIGHTER_ALLOWANCE : 0;
             int fighters = BoardView.count(space, seat, UnitType.Fighter) + planned(UnitType.Fighter);
-            return Math.max(0, allowance + Math.max(0, shipCapacity - keptForGroundForces) - fighters);
+            return allowance + Math.max(0, shipCapacity - keptForGroundForces) - fighters;
         }
 
         private int groundOnPlanets() {

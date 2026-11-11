@@ -110,12 +110,15 @@ class AiGameSupportTest extends BaseTi4Test {
         assertThat(AiGameSupport.firstFreeFaction(test.game)).isEqualTo("hacan");
     }
 
-    // L1Z1X, Naalu, Jol-Nar and Yin stay selectable by name but are never picked by default.
+    // L1Z1X and Jol-Nar, and the work-in-progress Naalu, Winnu and Yin, stay selectable by name but are never
+    // picked by default.
     @Test
     void theDefaultFactionIsOneOfTheSixImplementedOnes() {
         assertThat(AiSettings.DEFAULT_FACTIONS).containsExactly("nekro", "sardakk", "hacan", "letnev", "sol", "xxcha");
         assertThat(AiSettings.SUPPORTED_FACTIONS).containsAll(AiSettings.DEFAULT_FACTIONS);
-        assertThat(AiSettings.DEFAULT_FACTIONS).doesNotContain("l1z1x", "naalu", "jolnar", "yin");
+        assertThat(AiSettings.SUPPORTED_FACTIONS).containsAll(AiSettings.WIP_FACTIONS);
+        assertThat(AiSettings.DEFAULT_FACTIONS).doesNotContain("l1z1x", "jolnar");
+        assertThat(AiSettings.DEFAULT_FACTIONS).doesNotContainAnyElementsOf(AiSettings.WIP_FACTIONS);
         assertThat(AiSettings.DEFAULT_FACTIONS).contains(AiGameSupport.firstFreeFaction(test.game));
     }
 

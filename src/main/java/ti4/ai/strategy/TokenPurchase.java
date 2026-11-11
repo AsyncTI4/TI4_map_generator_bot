@@ -76,10 +76,12 @@ public class TokenPurchase {
         Wallet influencePlanets = new Wallet(
                 influenceLeaning(wallet), wallet.tradeGoods(), 0, 0, wallet.tradeGoodValue(), wallet.pooling());
         SpendCost keep = kept(game, seat, wallet);
+        SpendCost claimNow = ScoringReserve.custodiansReserve(game, seat);
         for (int tokens = Math.min(maxTokens(game, seat), reinforcements); tokens > 0; tokens--) {
             Optional<Wallet.Payment> payment = influencePlanets
                     .plan(SpendCost.influence(INFLUENCE_PER_TOKEN * tokens))
-                    .filter(plan -> afterPaying(game, seat, wallet, plan).canPay(keep));
+                    .filter(plan -> afterPaying(game, seat, wallet, plan).canPay(keep))
+                    .filter(plan -> wallet.without(plan).canPay(claimNow));
             if (payment.isPresent()) return Optional.of(new Purchase(tokens, payment.get()));
         }
         return Optional.empty();
@@ -160,7 +162,7 @@ public class TokenPurchase {
 
     private static SpendCost custodiansReserve(Game game, Player seat) {
         if (!ScoringReserve.custodiansReserve(game, seat).isNone()) return SpendCost.NONE;
-        if (!custodiansWithinReach(game, seat)) return SpendCost.NONE;
+        if (!ScoringReserve.contendsForCustodians(game, seat)) return SpendCost.NONE;
         return SpendCost.influence(ScoringReserve.custodiansInfluenceHeld(CustodiansRace.of(game, seat), seat));
     }
 

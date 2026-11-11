@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.ai.AiSettings;
 import ti4.ai.runtime.AiRuntime;
 import ti4.ai.seat.AiSeatService;
+import ti4.ai.trace.AiLogStore;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -188,6 +189,7 @@ public class SelfPlaySetup {
 
     private static void discard(String name) {
         AiRuntime.forget(name);
+        AiLogStore.delete(name);
         GameManager.delete(name);
     }
 }

@@ -3,6 +3,7 @@ package ti4.ai.strategy;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
+import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.scoring.ObjectiveOdds;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -23,8 +24,6 @@ import ti4.game.Tile;
 class ImperialUses {
 
     private static final int FIRST_IMPERIAL_ROUND = 2;
-
-    private static final int CUSTODIANS_COST = 6;
 
     static List<Benefit> benefits(PlanInputs in, int initiative) {
         Game game = in.game();
@@ -155,6 +154,6 @@ class ImperialUses {
 
     private static boolean takesCustodiansThisRound(Game game, Player seat) {
         return TokenPurchase.custodiansWithinReach(game, seat)
-                && Wallet.of(game, seat).canPay(SpendCost.influence(CUSTODIANS_COST));
+                && Wallet.of(game, seat).canPay(SpendCost.influence(CustodiansRace.cost(seat)));
     }
 }

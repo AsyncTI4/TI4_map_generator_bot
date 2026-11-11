@@ -17,35 +17,45 @@ import ti4.service.strategycard.PickStrategyCardService;
 @UtilityClass
 public class StrategyCardRanking {
 
-    public record Pick(PromptButton button, CardPlan plan, double value) {}
+    public record Pick(PromptButton button, CardPlan plan, double value, double race) {}
 
     public static Optional<PromptButton> best(Game game, Player seat, List<PromptButton> pickButtons) {
         return bestPick(game, seat, pickButtons).map(Pick::button);
     }
 
     public static Optional<Pick> bestPick(Game game, Player seat, List<PromptButton> pickButtons) {
+        return ranked(game, seat, pickButtons).stream().findFirst();
+    }
+
+    public static List<Pick> ranked(Game game, Player seat, List<PromptButton> pickButtons) {
         try (Thinking.Span ignored = Thinking.enter("strategy.bestPick")) {
-            return pickBest(game, seat, pickButtons);
+            return rank(game, seat, pickButtons);
         }
     }
 
-    private static Optional<Pick> pickBest(Game game, Player seat, List<PromptButton> pickButtons) {
+    private static List<Pick> rank(Game game, Player seat, List<PromptButton> pickButtons) {
         List<PromptButton> offered =
                 pickButtons.stream().filter(button -> initiative(button) > 0).toList();
-        if (offered.isEmpty()) return Optional.empty();
+        if (offered.isEmpty()) return List.of();
         List<CardPlan> plans = StrategyCardPlanner.planAll(
                 game,
                 seat,
                 offered.stream().map(StrategyCardRanking::initiative).toList(),
                 PlanMoment.PICK);
         return java.util.stream.IntStream.range(0, offered.size())
-                .mapToObj(index -> new Pick(offered.get(index), plans.get(index), value(game, seat, plans.get(index))))
-                .max(Comparator.comparingDouble(Pick::value)
-                        .thenComparing(pick -> pick.plan().initiative(), Comparator.reverseOrder()));
+                .mapToObj(index -> pick(game, seat, offered.get(index), plans.get(index)))
+                .sorted(Comparator.comparingDouble(Pick::value)
+                        .reversed()
+                        .thenComparing(pick -> pick.plan().initiative()))
+                .toList();
     }
 
     public static double value(Game game, Player seat, int initiative) {
         return value(game, seat, plan(game, seat, initiative));
+    }
+
+    public static double pickValue(Game game, Player seat, int initiative) {
+        return value(game, seat, initiative) + InitiativeRace.gain(game, seat, initiative);
     }
 
     public static double baseValue(Game game, Player seat, int initiative) {
@@ -68,6 +78,11 @@ public class StrategyCardRanking {
 
     private static CardPlan plan(Game game, Player seat, int initiative) {
         return StrategyCardPlanner.plan(PlanInputs.of(game, seat, PlanMoment.PICK), initiative);
+    }
+
+    private static Pick pick(Game game, Player seat, PromptButton button, CardPlan plan) {
+        double race = InitiativeRace.gain(game, seat, plan.initiative());
+        return new Pick(button, plan, value(game, seat, plan) + race, race);
     }
 
     private static double value(Game game, Player seat, CardPlan plan) {

@@ -20,6 +20,7 @@ public class AiSettings {
     public static final SequencedMap<String, String> FACTION_NAMES = factionNames();
     public static final List<String> SUPPORTED_FACTIONS = List.copyOf(FACTION_NAMES.keySet());
     public static final List<String> DEFAULT_FACTIONS = List.of(NEKRO, "sardakk", "hacan", "letnev", "sol", "xxcha");
+    public static final List<String> WIP_FACTIONS = List.of("naalu", "winnu", "yin");
     public static final int MAX_SEATS = 8;
     public static final Duration POLL_PERIOD = Duration.ofSeconds(3);
     public static final Duration DEBOUNCE = Duration.ofMillis(2500);
@@ -68,6 +69,7 @@ public class AiSettings {
         names.put("jolnar", "The Universities of Jol-Nar");
         names.put("xxcha", "The Xxcha Kingdom");
         names.put("yin", "The Yin Brotherhood");
+        names.put("winnu", "The Winnu");
         return Collections.unmodifiableSequencedMap(names);
     }
 

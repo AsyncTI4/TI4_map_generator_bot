@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.tactical.ProductionPlanner.BuildOrder;
 import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.game.Tile;
 import ti4.helpers.Helper;
@@ -58,10 +59,11 @@ class ProductionPlannerTest extends BaseTi4Test {
         assertThat(plan.totalCost()).isLessThanOrEqualTo(4);
     }
 
-    // Carriers and the infantry they carry come first: with one carrier and an empty home, the second carrier and a
-    // carrier load of infantry are bought before anything else.
+    // Carriers and the infantry they carry come first: with one carrier, an empty home and two free systems next door
+    // to claim, the second carrier and a carrier load of infantry are bought before anything else.
     @Test
     void buildsTheSecondCarrierAndItsInfantryFirst() {
+        test.claimableSystemsBeside(AiTestGame.HOME, 2);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.nekro.setTg(3);
 
@@ -203,11 +205,12 @@ class ProductionPlannerTest extends BaseTi4Test {
     }
 
     // A war sun is a luxury: with the technology it is only built once the resources would still fill the rest of
-    // the production.
+    // the production. Three carriers at home already have room for every ground force and fighter the dock can add,
+    // so no carrier competes for the resources.
     @Test
     void buildsAWarSunOnlyWithResourcesToSpare() {
         test.nekro.addOwnedUnitByID("warsun");
-        test.units(home, "space", test.nekro, UnitType.Carrier, 2);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 3);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         test.units(home, "mordaiii", test.nekro, UnitType.Mech, 2);
         test.nekro.setTg(10);
@@ -249,9 +252,11 @@ class ProductionPlannerTest extends BaseTi4Test {
     }
 
     // Nekro's start fills all three fleet tokens. Normally no ship can be added, but when the opening asks for it a
-    // second carrier is built past the limit; it is priced net of the destroyer that has to be removed for it.
+    // second carrier is built past the limit, for the second free system next door; it is priced net of the destroyer
+    // that has to be removed for it.
     @Test
     void buildsACarrierPastTheFleetLimitOnlyWhenAsked() {
+        test.claimableSystemsBeside(AiTestGame.HOME, 2);
         test.nekro.setFleetCC(3);
         test.nekro.setTg(3);
         test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
@@ -304,21 +309,25 @@ class ProductionPlannerTest extends BaseTi4Test {
         assertThat(plan().units(UnitType.Mech)).isEqualTo(3);
     }
 
-    // Four mechs sit on Mordai II and both carriers are away: while Mechanize the Military is held, a carrier is built
-    // at
-    // home to take the spare mechs out.
+    // Four mechs sit on Mordai II and both carriers are away. The mechs are cargo waiting at the dock, so a carrier is
+    // built at home to take them out either way; while Mechanize the Military is held, it is the scoring hauler.
     @Test
     void buildsACarrierAtHomeForMechsStuckThereWhileMechanizeIsHeld() {
         Tile away = test.place("22", AiTestGame.neighbourOf(AiTestGame.HOME));
         test.units(away, "space", test.nekro, UnitType.Carrier, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Mech, 4);
         test.nekro.setTg(10);
-        int without = plan().units(UnitType.Carrier);
+        BuildPlan without = plan();
 
         test.nekro.setSecret("mtm");
+        BuildPlan with = plan();
 
-        assertThat(without).isZero();
-        assertThat(plan().units(UnitType.Carrier)).isEqualTo(1);
+        assertThat(without.units(UnitType.Carrier)).isEqualTo(1);
+        assertThat(without.scoring()).isFalse();
+        assertThat(with.units(UnitType.Carrier)).isEqualTo(1);
+        assertThat(with.orders())
+                .filteredOn(order -> order.type() == UnitType.Carrier)
+                .allMatch(BuildOrder::scoring);
     }
 
     private static String otherNeighbour(String position) {

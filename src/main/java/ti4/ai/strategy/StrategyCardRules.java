@@ -19,6 +19,7 @@ import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.explore.ExploreValues;
+import ti4.ai.naalu.MindsieveFollow;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
@@ -41,6 +42,7 @@ import ti4.ai.tactical.TacticalRules;
 import ti4.ai.trade.TradeCardRules;
 import ti4.ai.trade.TradeCardRules.FollowChoice;
 import ti4.ai.trade.TradeTerms;
+import ti4.ai.yin.BrotherOmarRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -378,7 +380,9 @@ public class StrategyCardRules {
         closeFinishedFollows(context);
         List<Integer> unfollowed = game.getPlayedSCs().stream()
                 .filter(initiative -> !seat.getSCs().contains(initiative)
-                        && (!seat.hasFollowedSC(initiative) || ScepterFollow.pending(context, initiative)))
+                        && (!seat.hasFollowedSC(initiative)
+                                || ScepterFollow.pending(context, initiative)
+                                || MindsieveFollow.pending(context, initiative)))
                 .filter(initiative -> SecondaryQueue.blockerFor(game, seat, initiative, context.now())
                         .isEmpty())
                 .sorted(Comparator.comparingInt(initiative -> followRank(context, StrategyCard.of(game, initiative))))
@@ -407,6 +411,14 @@ public class StrategyCardRules {
                     context.memory().restore(before);
                     ScepterFollow.remember(context, initiative);
                     return scepter;
+                }
+                Optional<AiDecision> mindsieve = ScepterFollow.pending(context, initiative)
+                        ? Optional.empty()
+                        : MindsieveFollow.giveNoteFirst(context, initiative, decision.get());
+                if (mindsieve.isPresent()) {
+                    context.memory().restore(before);
+                    MindsieveFollow.remember(context, initiative);
+                    return mindsieve;
                 }
                 if (decision.get() instanceof AiDecision.Press) {
                     SecondaryQueue.followStarted(game, seat, initiative, context.now());
@@ -570,7 +582,9 @@ public class StrategyCardRules {
         int room = limit - seat.getAcCount();
         int strategyTokens = seat.getStrategicCC();
         if (holdsNoActionCards(seat)
-                || (strategyTokens == 0 && !ScepterFollow.covers(context, StrategyCard.POLITICS))
+                || (strategyTokens == 0
+                        && !ScepterFollow.covers(context, StrategyCard.POLITICS)
+                        && !MindsieveFollow.covers(context, StrategyCard.POLITICS))
                 || room < 1) {
             return false;
         }
@@ -700,6 +714,7 @@ public class StrategyCardRules {
         if (best.isEmpty()) return Optional.empty();
         PrerequisiteSkips.Plan skips = PrerequisiteSkips.of(game, seat, Mapper.getTech(best.get()));
         if (skips.aiDevelopment()) context.memory().put(AIDA_RESEARCH_KEY + game.getRound(), "skip");
+        if (skips.returnsInfantry()) BrotherOmarRules.expect(context);
         rememberProphetsTears(context, skips);
         Wallet wallet = withoutPlanets(Wallet.of(game, seat), skips.planets());
         Optional<Wallet.Payment> payment = cost > 0
@@ -1378,7 +1393,7 @@ public class StrategyCardRules {
         int saved = tokensSavedForBetterCards(context, card);
         int reservedTokens = ScoringReserve.of(context.game(), seat).tokens();
         int scar = ScarToken.kept(context.game(), seat);
-        if (ScepterFollow.covers(context, card)) {
+        if (ScepterFollow.covers(context, card) || MindsieveFollow.covers(context, card)) {
             return seat.getStrategicCC() - saved - scar >= 0
                     && seat.getStrategicCC() + seat.getTacticalCC() - saved - scar >= reservedTokens;
         }

@@ -136,6 +136,17 @@ class AiPerceptionTest extends BaseTi4Test {
                 .isFalse();
     }
 
+    // The Leadership Rider payout line has no buttons, but it is how the AI knows the gain buttons below it are its
+    // rider's: the resolved outcome may already be gone (Miscount Disclosed reveals the revote at once).
+    @Test
+    void keepsTheLeadershipRiderPayoutLine() {
+        assertThat(AiPerception.kept(
+                        PromptSource.PUBLIC,
+                        List.of(),
+                        "Letnev resolve _Leadership Rider_ by using the button to gain 3 command tokens."))
+                .isTrue();
+    }
+
     // The bot tells an offerer in its private thread, with no buttons, that its offer was rejected; without seeing that
     // notice the AI keeps waiting on a dead offer until its reply time runs out.
     @Test

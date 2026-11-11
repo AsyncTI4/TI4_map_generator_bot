@@ -103,6 +103,16 @@ public class CombatForecast {
 
     public static double landingWin(
             Game game, Player seat, String position, String planetName, Map<UnitType, Integer> landing) {
+        return landingWin(game, seat, position, planetName, landing, true);
+    }
+
+    public static double landingWin(
+            Game game,
+            Player seat,
+            String position,
+            String planetName,
+            Map<UnitType, Integer> landing,
+            boolean facesSpaceCannon) {
         Tile tile = game.getTileByPosition(position);
         UnitHolder planet = tile == null ? null : tile.getUnitHolders().get(planetName);
         if (planet == null) return 0;
@@ -113,7 +123,7 @@ public class CombatForecast {
         Player opponent = defender.get();
         Map<UnitType, Integer> attackers = new EnumMap<>(UnitType.class);
         landing.forEach((type, count) -> attackers.merge(type, count, Integer::sum));
-        int shotDown = (int) Math.round(BattleMath.spaceCannonHits(opponent, planet));
+        int shotDown = facesSpaceCannon ? (int) Math.round(BattleMath.spaceCannonHits(opponent, planet)) : 0;
         for (UnitType type : BoardView.GROUND_FORCES) {
             int removed = Math.min(shotDown, attackers.getOrDefault(type, 0));
             if (removed > 0) attackers.merge(type, -removed, Integer::sum);
@@ -158,6 +168,28 @@ public class CombatForecast {
         return duel(game, seat, position, planet)
                 .filter(Duel::ground)
                 .map(Duel::mechSwapGain)
+                .orElse(FirstRoundGain.NONE);
+    }
+
+    public static FirstRoundGain conversionGain(
+            Game game, Player seat, String position, String planet, UnitType replacement) {
+        return duel(game, seat, position, planet)
+                .filter(Duel::ground)
+                .map(duel -> duel.conversionGain(replacement))
+                .orElse(FirstRoundGain.NONE);
+    }
+
+    public static FirstRoundGain shipTradeGain(
+            Game game, Player seat, String position, UnitType sacrifice, UnitType target) {
+        return duel(game, seat, position, BoardView.SPACE)
+                .map(duel -> duel.shipTradeGain(sacrifice, target))
+                .orElse(FirstRoundGain.NONE);
+    }
+
+    public static FirstRoundGain reinforcementGain(
+            Game game, Player seat, String position, String holderName, UnitType type, int count) {
+        return duel(game, seat, position, holderName)
+                .map(duel -> duel.reinforcementGain(type, count))
                 .orElse(FirstRoundGain.NONE);
     }
 
@@ -286,6 +318,95 @@ public class CombatForecast {
                     planetStake(),
                     detailed(own, own, enemy),
                     detailed(swapped.get(), swapped.get(), enemy));
+        }
+
+        FirstRoundGain conversionGain(UnitType replacement) {
+            Map<UnitType, Integer> ours = unitsOf(seat);
+            Map<UnitType, Integer> theirs = unitsOf(opponent);
+            if (theirs.getOrDefault(UnitType.Infantry, 0) == 0 || seat.getUnitByType(replacement) == null) {
+                return FirstRoundGain.NONE;
+            }
+            Map<UnitType, Integer> converted = adjusted(ours, replacement, 1);
+            Map<UnitType, Integer> remaining = adjusted(theirs, UnitType.Infantry, -1);
+            double immediate = unitCost(seat, replacement) + unitCost(opponent, UnitType.Infantry);
+            return changed(
+                    forceOf(seat, converted, opponent, remaining),
+                    forceOf(opponent, remaining, seat, converted),
+                    planetStake(),
+                    immediate);
+        }
+
+        FirstRoundGain shipTradeGain(UnitType sacrifice, UnitType target) {
+            Map<UnitType, Integer> ours = unitsOf(seat);
+            Map<UnitType, Integer> theirs = unitsOf(opponent);
+            if (ours.getOrDefault(sacrifice, 0) == 0 || theirs.getOrDefault(target, 0) == 0) {
+                return FirstRoundGain.NONE;
+            }
+            Map<UnitType, Integer> kept = adjusted(ours, sacrifice, -1);
+            Force enemy = forceOf(opponent, theirs, seat, kept);
+            List<Combatant> hit = new ArrayList<>(enemy.units());
+            int index = IntStream.range(0, hit.size())
+                    .filter(i -> hit.get(i).type() == target)
+                    .reduce((first, second) -> hit.get(second).sustain() ? first : second)
+                    .orElse(-1);
+            if (index < 0) return FirstRoundGain.NONE;
+            Combatant struck = hit.get(index);
+            double immediate = -unitCost(seat, sacrifice);
+            if (struck.sustain()) {
+                hit.set(index, struck.withoutSustain());
+            } else {
+                hit.remove(index);
+                immediate += struck.cost();
+            }
+            return changed(forceOf(seat, kept, opponent, theirs), enemy.withUnits(hit), 0, immediate);
+        }
+
+        FirstRoundGain reinforcementGain(UnitType type, int count) {
+            Map<UnitType, Integer> theirs = unitsOf(opponent);
+            Map<UnitType, Integer> reinforced = adjusted(unitsOf(seat), type, count);
+            double immediate = ground ? count * unitCost(seat, type) : 0;
+            return changed(
+                    forceOf(seat, reinforced, opponent, theirs),
+                    forceOf(opponent, theirs, seat, reinforced),
+                    planetStake(),
+                    immediate);
+        }
+
+        private FirstRoundGain changed(Force changedOwn, Force changedEnemy, double extraStake, double immediate) {
+            Force own = own();
+            Force enemy = enemy();
+            Detailed plain = detailed(own, own, enemy);
+            Detailed after = detailed(changedOwn, changedOwn, changedEnemy);
+            double winBefore = winOf(plain);
+            double swing = (winOf(after) - winBefore) * (stake(own, enemy) + extraStake);
+            double costs = netLoss(plain) - netLoss(after);
+            return new FirstRoundGain(swing + costs + immediate, winBefore);
+        }
+
+        private Force forceOf(
+                Player player, Map<UnitType, Integer> units, Player other, Map<UnitType, Integer> otherUnits) {
+            Side side = new Side(player, units);
+            return CombatForces.force(
+                    player,
+                    CombatForces.combatants(
+                            game, tile, holder, side, new Side(other, otherUnits), CombatForces.damaged(holder, side)),
+                    ground);
+        }
+
+        private static Map<UnitType, Integer> adjusted(Map<UnitType, Integer> units, UnitType type, int delta) {
+            Map<UnitType, Integer> copy = new EnumMap<>(UnitType.class);
+            copy.putAll(units);
+            int count = copy.getOrDefault(type, 0) + delta;
+            if (count > 0) {
+                copy.put(type, count);
+            } else {
+                copy.remove(type);
+            }
+            return copy;
+        }
+
+        private static double unitCost(Player player, UnitType type) {
+            return BoardView.model(player, type).map(UnitModel::getCost).orElse(0f);
         }
 
         private FirstRoundGain compare(Force own, Force enemy, double extraStake, Detailed plain, Detailed changed) {

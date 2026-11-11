@@ -215,9 +215,8 @@ class TacticalPlannerTest extends BaseTi4Test {
     }
 
     // Nothing claimable is in reach this turn; the free planets are two systems out. With tokens to spare the carrier
-    // and
-    // its infantry move to the empty system between, to take them next time, rather than wait at home. The move is too
-    // small to count as a planned activation.
+    // and its infantry move to the empty system between, to take them next time, rather than wait at home. The move is
+    // too small to count as a planned activation. Mordai II is exhausted, so a build at home is not an option either.
     @Test
     void advancesACarrierTowardPlanetsOutOfReachWhenTokensAreSpare() {
         test.game.setRound(1);
@@ -226,6 +225,7 @@ class TacticalPlannerTest extends BaseTi4Test {
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 3);
         test.place("47", neighbour);
         test.place("27", twoSystemsFromHome());
+        test.nekro.exhaustPlanet("mordaiii");
 
         TacticalPlan plan = TacticalPlanner.best(test.game, test.nekro).orElseThrow();
 
@@ -351,9 +351,11 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.filter(found -> found.kind() == Kind.EXPAND)).isEmpty();
     }
 
-    // With nothing to take, it builds at its home dock: a second carrier first, then infantry.
+    // With no ground forces to take the two free systems next door, it builds at its home dock: a second carrier first,
+    // then infantry.
     @Test
     void producesAtHomeWhenThereIsNothingToTake() {
+        test.claimableSystemsBeside(AiTestGame.HOME, 2);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
         test.nekro.setTg(2);
 
@@ -366,10 +368,11 @@ class TacticalPlannerTest extends BaseTi4Test {
                 .isEqualTo(1);
     }
 
-    // Mordai II's 4 resources buy a carrier and two infantry: three units are not worth activating the system, so
-    // the seat keeps its token and its resources for a bigger build.
+    // Mordai II's 4 resources buy a carrier and two infantry for the two free systems next door: three units are not
+    // worth activating the system, so the seat keeps its token and its resources for a bigger build.
     @Test
     void doesNotActivateADockToBuildFewerThanFourUnits() {
+        test.claimableSystemsBeside(AiTestGame.HOME, 2);
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
 
         assertThat(ProductionPlanner.plan(test.game, test.nekro, home).units()).isEqualTo(3);
@@ -723,21 +726,35 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(shortOfInfantry).isGreaterThan(stocked);
     }
 
-    // Destroyers built as pawns for a revealed presence objective are not filler: building them at home moves no
-    // objective yet, so builtGain does not value them. Four fighters (2 resources at 0.2) plus two pawns (2
-    // resources at 0.5) score 1.4, so the build is still worth a spare token early; discounting the pawns as filler
-    // too would score 0.8.
+    // An empty system next to home would count for Deep Space. The home fleet can move a ship there next round, so
+    // the build adds no presence ship for it.
     @Test
-    void keepsTheValueOfDestroyerPawnsForAPresenceObjectiveEarly() {
+    void buildsNoPresenceShipWhenTheHomeFleetCoversAPresenceObjective() {
         test.game.setPhaseOfGame("action");
         test.game.getRevealedPublicObjectives().put("deep_space", 1);
+        test.place("46", neighbour);
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
         test.units(home, "space", test.nekro, UnitType.Dreadnought, 3);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 6);
         test.nekro.setFleetCC(7);
-        assertThat(ProductionPlanner.plan(test.game, test.nekro, home).units(UnitType.Destroyer))
-                .isEqualTo(2);
 
+        assertThat(ProductionPlanner.plan(test.game, test.nekro, home).scoring())
+                .isFalse();
+    }
+
+    // With no ship on the board to take that system, one ship is built for it. Building it at home moves no objective
+    // yet, so builtGain does not value it; its presence credit keeps the build worth a spare token early.
+    @Test
+    void keepsTheValueOfAPresenceShipForAPresenceObjectiveEarly() {
+        test.game.setPhaseOfGame("action");
+        test.game.getRevealedPublicObjectives().put("deep_space", 1);
+        test.place("46", neighbour);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 6);
+        test.nekro.setFleetCC(7);
+        ProductionPlanner.BuildPlan plan = ProductionPlanner.plan(test.game, test.nekro, home);
+
+        assertThat(plan.orders().stream().filter(ProductionPlanner.BuildOrder::scoring))
+                .hasSize(1);
         assertThat(productionScoreAtHome()).isGreaterThanOrEqualTo(TacticalPlanner.MIN_SCORE);
     }
 

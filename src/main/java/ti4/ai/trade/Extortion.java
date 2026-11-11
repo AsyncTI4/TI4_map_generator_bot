@@ -11,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.AiGameWrites;
 import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -29,13 +30,10 @@ import ti4.ai.tactical.ExtortionPlans;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner;
-import ti4.executors.ExecutionLockManager;
-import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.game.persistence.GameManager;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
@@ -556,17 +554,7 @@ class Extortion {
     }
 
     private static void persist(Game game, Consumer<Game> change) {
-        change.accept(game);
-        String name = game.getName();
-        if (!GameManager.isValid(name)) return;
-        ExecutionLockManager.lock(name, ExecutionLockType.WRITE);
-        try {
-            Game latest = GameManager.getManagedGame(name).getGame();
-            if (latest != game) change.accept(latest);
-            GameManager.save(latest, SAVE_REASON);
-        } finally {
-            ExecutionLockManager.unlock(name, ExecutionLockType.WRITE);
-        }
+        AiGameWrites.persist(game, SAVE_REASON, change);
     }
 
     static long replyTimeout(Player victim) {

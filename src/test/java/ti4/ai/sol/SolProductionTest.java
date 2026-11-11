@@ -13,8 +13,9 @@ import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
-// Advanced Carrier II carries 8 and sustains damage, so one of them does the work the planner otherwise buys two
-// carriers for.
+// Advanced Carrier II carries 8 and sustains damage, so one of them carries what the planner otherwise buys two
+// carriers for. A second carrier for expansion still comes when two free systems are in reach (one carrier claims one
+// system per activation); without them, only cargo decides.
 class SolProductionTest extends BaseTi4Test {
 
     private AiTestGame test;
@@ -44,6 +45,7 @@ class SolProductionTest extends BaseTi4Test {
 
     @Test
     void buildsASecondCarrierWhileTheCarriersCarryLittle() {
+        test.claimableSystemsBeside(AiTestGame.HOME, 2);
         test.units(home, "space", sol, UnitType.Carrier, 1);
         BuildPlan plan = ProductionPlanner.plan(test.game, sol, home);
 

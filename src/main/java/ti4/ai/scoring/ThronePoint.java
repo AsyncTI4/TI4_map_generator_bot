@@ -19,6 +19,10 @@ public class ThronePoint {
         return worth(game, holder, giver, holder.getTotalVictoryPoints() - 1);
     }
 
+    public static double lost(Game game, Player holder) {
+        return ScoringStakes.vpWorth(game, holder);
+    }
+
     public static double gained(Game game, Player holder, Player giver) {
         int points = holder.getTotalVictoryPoints();
         if (points + 1 >= GameHorizon.goal(game)) return ScoringStakes.WIN_VALUE;

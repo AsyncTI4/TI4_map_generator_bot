@@ -223,4 +223,20 @@ class DiplomacyTimingTest extends BaseTi4Test {
         AiDecision decision = brain.decide(test.context(Set.of(), turnStart()));
         assertThat(AiTestGame.pressedId(decision)).isEqualTo(DIPLOMACY_BUTTON);
     }
+
+    // Live game aiplay1, round 2: Sol played Diplomacy (worth 5) to lock a threatened system while an attack worth 16
+    // waited. Diplomacy can be played later in the round, so it is only due now when it beats the best tactical action.
+    @Test
+    void waitsWhileATacticalActionIsWorthMore() {
+        productionFundedByReadying();
+        assertThat(dueNow()).isTrue();
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        test.place("27", AiTestGame.neighbourOf(AiTestGame.HOME));
+        changed();
+
+        PlanInputs in = PlanInputs.of(test.game, test.nekro, PlanMoment.ACTION);
+        assertThat(StrategyCardPlanner.plan(in, DIPLOMACY).value()).isLessThan(in.bestScore());
+        assertThat(dueNow()).isFalse();
+    }
 }

@@ -15,6 +15,8 @@ import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.letnev.LetnevSpaceCombat;
 import ti4.ai.strategy.CopiedTechPolicy;
 import ti4.ai.trace.Thinking;
+import ti4.ai.winnu.SalaiSaiCorian;
+import ti4.ai.yin.VanHauge;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -51,9 +53,10 @@ class CombatForces {
                     CombatStatsService.getCombatRoundProfile(true, model, player, tile, opponent.player(), false);
             int hitsOn = profile.hitsOn() - modifiers.getOrDefault(type, 0);
             int hurt = damaged.getOrDefault(type, 0);
+            int dice = SalaiSaiCorian.dice(model, profile.diceCount(), opponent);
             for (int i = 0; i < count; i++) {
                 boolean sustain = model.getSustainDamage() && i >= hurt;
-                Combatant combatant = new Combatant(hitsOn, profile.diceCount(), sustain, model.getCost(), type);
+                Combatant combatant = new Combatant(hitsOn, dice, sustain, model.getCost(), type);
                 combatants.add(
                         sustain && retaliatesOnSustain(game, model) ? combatant.retaliatingOnSustain() : combatant);
             }
@@ -69,6 +72,7 @@ class CombatForces {
             if (ground && player.hasTech(X89_DOUBLING)) force = force.doublingHits();
             if (ground && player.hasTech(PARTICLE_WEAVE)) force = force.weaving();
             if (!ground) force = LetnevSpaceCombat.applyTo(player, force);
+            if (!ground) force = VanHauge.applyTo(player, force);
             return force;
         }
     }

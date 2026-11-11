@@ -64,8 +64,11 @@ class WarMachineBuildTest extends BaseTi4Test {
         messages.close();
     }
 
-    // Mordai II (4 resources) gives the home dock production 6; with 10 trade goods the plan fills all of it.
+    // Mordai II (4 resources) gives the home dock production 6; with 10 trade goods the plan fills all of it. The
+    // flagship is already out: built here, it would be worth more than anything the extra production adds.
     private void dockShortOfProduction() {
+        Tile away = test.place("47", AiTestGame.neighbourOf(AiTestGame.HOME));
+        test.units(away, "space", test.nekro, UnitType.Flagship, 1);
         test.units(home, "space", test.nekro, UnitType.Carrier, 2);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 5);
         test.nekro.setTg(10);

@@ -39,6 +39,7 @@ public class AiPerception {
     private static final int COMBAT_THREADS_TO_READ = 2;
     private static final long STRATEGY_THREAD_WINDOW_MILLIS = 15 * 60_000L;
     public static final String OFFER_REJECTED = "has been rejected";
+    public static final String LEADERSHIP_RIDER_PAYOUT = " resolve _Leadership Rider_ by using the button";
     private static final Pattern SYSTEM_POSITION = Pattern.compile("-system-([^-]+)-turn-");
     private static final Pattern THREAD_PARTIES = Pattern.compile("-turn-\\d+-(.+?)-vs-(.+)$");
 
@@ -155,7 +156,8 @@ public class AiPerception {
     static boolean kept(PromptSource source, List<PromptButton> buttons, String content) {
         if (source == PromptSource.COMBAT_THREAD) return true;
         if (source == PromptSource.AI_THREAD && content != null && content.contains(OFFER_REJECTED)) return true;
-        return source == PromptSource.PUBLIC && AiPrompt.isTableTalk(buttons, content);
+        if (source != PromptSource.PUBLIC) return false;
+        return AiPrompt.isTableTalk(buttons, content) || (content != null && content.contains(LEADERSHIP_RIDER_PAYOUT));
     }
 
     static boolean isRelevantInPrivateThread(AiPrompt prompt, String faction, Set<String> prefixes) {

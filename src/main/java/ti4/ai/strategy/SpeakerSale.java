@@ -313,7 +313,7 @@ public class SpeakerSale {
         return game.getSCList().stream()
                 .filter(initiative -> !taken.contains(initiative))
                 .max(Comparator.comparingDouble(
-                                (Integer initiative) -> StrategyCardRanking.value(game, seat, initiative))
+                                (Integer initiative) -> StrategyCardRanking.pickValue(game, seat, initiative))
                         .thenComparing(Comparator.reverseOrder()));
     }
 

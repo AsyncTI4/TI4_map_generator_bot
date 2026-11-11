@@ -74,6 +74,10 @@ public class ActionSecretOdds {
         return atLeastOnce(perRound(game, seat, secretId), GameHorizon.roundsLeft(game));
     }
 
+    public static double afterThisRound(Game game, Player seat, String secretId) {
+        return atLeastOnce(lastingPerRound(game, seat, secretId), GameHorizon.roundsLeft(game) - 1);
+    }
+
     public static double atLeastOnce(double perRound, double opportunities) {
         return 1 - Math.pow(1 - perRound, opportunities);
     }

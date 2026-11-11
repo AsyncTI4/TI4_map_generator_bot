@@ -38,13 +38,19 @@ public class NekroRules {
 
     public static Optional<AiDecision> gainTokens(
             AiTurnContext context, AiPrompt prompt, int target, String memoryKey, String source) {
+        int gained = CommandTokenPolicy.netGainSoFar(context.game(), context.seat());
+        return gainTokens(context, prompt, gained, target, memoryKey, source);
+    }
+
+    public static Optional<AiDecision> gainTokens(
+            AiTurnContext context, AiPrompt prompt, int gained, int target, String memoryKey, String source) {
         Game game = context.game();
         Player seat = context.seat();
         Optional<PromptButton> done = prompt.firstEnabled(button -> isOwnOrOpen(button, context.faction())
                 && "deleteButtons".equals(button.handlerId())
                 && button.label().startsWith("Done Gaining"));
         if (done.isEmpty()) return Optional.empty();
-        if (CommandTokenPolicy.netGainSoFar(game, seat) < target) {
+        if (gained < target) {
             Optional<PromptButton> grow = prompt.enabledHandler(CommandTokenPolicy.poolToGrow(game, seat));
             if (grow.isPresent()) {
                 return Optional.of(AiDecision.press(prompt, grow.get(), "gain a command token from " + source));
