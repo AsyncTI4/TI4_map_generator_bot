@@ -2888,6 +2888,7 @@ public final class ButtonHelperModifyUnits {
         if ("warsun".equalsIgnoreCase(unitLong) && !willSkipBuild) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         } else if ("sd".equalsIgnoreCase(unitID)) {
+            CommanderUnlockCheckService.checkPlayer(player, "cabal");
             tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
