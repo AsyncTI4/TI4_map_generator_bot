@@ -1596,7 +1596,9 @@ Seven small generic changes don't reference `ti4.ai`:
     | `WIN_THREAT_FEASIBLE` | −0.09 ± 0.16 | 0.50 ± 0.07 |
     `WIN_THREAT_FEASIBLE` stays on: it reads rivals' real paths to points (including taking Mecatol Rex from its
     holder) and costs nothing measurable. The first three runs each lost one to three games to a stack overflow in
-    the Mecatol take, since fixed; those games still count in their pairs.
+    the Mecatol take, since fixed; those games still count in their pairs. With the fix, everything on versus
+    everything off (`ab=all`, 24 pairs, seed 9100) gave +0.29 ± 0.21 points and a 0.60 ± 0.07 treatment win share;
+    all 48 games ended on points, average final round 5.6, leader 10.2 points, table total 42.5.
   - A stack overflow inside a decision is caught (`AiTickRunner`), and the abort log line names the repeating cycle
     of AI frames (`keys=[cycle]`, cycle in `path`). Three such aborts in 10 minutes log an abort storm error. Pricing
     paths that can call themselves again break the cycle with a per-thread guard: a hand's per-card keep values
