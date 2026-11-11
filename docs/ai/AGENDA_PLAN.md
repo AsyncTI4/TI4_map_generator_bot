@@ -63,7 +63,7 @@ Rules for every milestone:
 
 ### 1c. Elect Player constants (S), in `src/main/java/ti4/ai/agenda/ElectionValues.java`
 
-Your flat numbers are the holder's worth. The only scaling kept is the existing `winsWithPoint` override (`ElectionValues.java:185-194`), which stops the AI handing a rival the winning point. An end-game scale-up of point elections is not in the plan. It is a possible later experiment behind its own flag (open question 1).
+Your flat numbers are the holder's worth. The only scaling kept is the existing `winsWithPoint` override (`ElectionValues.java:185-194`), which stops the AI handing a rival the winning point. An end-game scale-up of point elections is not in the plan. It is a possible later experiment behind its own flag (still open).
 
 | Agenda | Change |
 | --- | --- |
@@ -95,7 +95,7 @@ All of these stay behind `electedGain` and `rivalGainCost`, so the threat-scaled
 ### 1e. Law and directive fixes that need only existing inputs (S each)
 
 In `src/main/java/ti4/ai/agenda/ForAgainstLawValues.java`:
-- **Anti-Intellectual Revolution (34-35, 83-86):** already matches your note (1.0 × 1.5 TG per round, Nekro/Propagation exempt), apart from the 5-round `lawRounds` cap (`AgendaValueMath.java:31,91-92`). Add assertions: about 1.5 TG per round left for non-Nekro seats, 0 for Nekro. The cap is open question 5.
+- **Anti-Intellectual Revolution (34-35, 83-86):** already matches your note (1.0 × 1.5 TG per round, Nekro/Propagation exempt), apart from the 5-round `lawRounds` cap (`AgendaValueMath.java:31,91-92`). Add assertions: about 1.5 TG per round left for non-Nekro seats, 0 for Nekro. Done: it uses the true rounds left.
 - **Homeland Defense (166-177):** For = 0. The Against PDS loss stays.
 - **Executive Sanctions (137-151):** own cost is the keep value of the cards after the top 3 in `ActionCardValue.discardOrder` (`src/main/java/ti4/ai/actioncards/ActionCardValue.java:210`), viewer only. Rivals use excess × `AVERAGE_CARD`. Yssaril stays exempt.
 - **Fleet Regulations (153-164):** subtract `FleetLimit.bonus` (`src/main/java/ti4/ai/eval/FleetLimit.java:18`) for Letnev's Armada.
@@ -107,7 +107,7 @@ In `src/main/java/ti4/ai/agenda/ForAgainstLawValues.java`:
 - **Checks and Balances (319-344):** For = the existing `pointGapBehind` term (320-325) + a `speakerPosition` term. Late seats get +, early seats get -. The early-seat penalty drops when the speaker is a contender (`ScoringStakes.contender`).
 - **Nexus Sovereignty (346-358):** the Mallice controller also likes For.
 - **Enforced Travel Ban (111-135):** add wormholes in `Territory.of(game, seat)` times plastic weakness (`FactionAggression`, `src/main/java/ti4/ai/eval/FactionAggression.java:29`). Positive for weak seats, negative for aggressive ones.
-- **Arms Reduction:** add a leader-target term through `ScoringStakes.contender`, so the table likes For when it hurts the leader. The anger/grudge input is open question 14.
+- **Arms Reduction:** add a leader-target term through `ScoringStakes.contender`, so the table likes For when it hurts the leader. The anger/grudge input is skipped for now.
 
 In `src/main/java/ti4/ai/agenda/DirectiveValues.java`:
 - **Incentive Program (108-131):** Against bonus for Jol-Nar, Deepwrought and Hacan, plus a points-lead term. Faction scoring stats are deferred.
@@ -151,7 +151,7 @@ In `src/main/java/ti4/ai/agenda/CardElectionValues.java`:
   - Tests: Arborec, Saar or Naaz with several mechs out fight Against. Hacan, Nekro or Jol-Nar support Against cheaply.
 
 ### Guidance covered
-The whole value review except the items marked **design**, Miscount Disclosed table behaviour (milestone 9), the Arms Reduction anger term (open question 14), Dictate Policy (milestone 3) and Covert (milestones 3 and 6).
+The whole value review except the items marked **design**, Miscount Disclosed table behaviour (milestone 9), the Arms Reduction anger term (skipped), Dictate Policy (milestone 3) and Covert (milestones 3 and 6).
 
 ### Tests (`AgendaValuesTest`)
 - One holder-worth assertion per constant, on a solo table or with voter = elected.
@@ -210,7 +210,7 @@ The whole value review except the items marked **design**, Miscount Disclosed ta
 **Goal:** the opponent model and the AI's own ballot get the rules right. Everything after this is measured against this forecast.
 
 ### 4a. Voting order bug (S, first)
-- `AgendaForecast.votingOrder` (`AgendaForecast.java:171-178`) ignores Zeal (Argent votes first), Hack Election and Conspirators. So `activeVoter` (280-286) can zero the votes of seats that haven't voted yet.
+- `AgendaForecast.votingOrder` (`AgendaForecast.java:171-178`) ignores Zeal (Argent votes first) and Hack Election. So `activeVoter` (280-286) can zero the votes of seats that haven't voted yet.
 - Make `AgendaHelper.getVotingOrder` (`src/main/java/ti4/helpers/AgendaHelper.java:1552-1600`) public, use it, and find the speaker by seat rather than by position.
 - Test: with Argent active, the seats after it keep their votes.
 
@@ -254,7 +254,7 @@ A `RiderEffect` has three parts:
 - **Voter penalty.** Sanction: voters on that outcome pay one fleet token. This needs a new `CommandTokenValue.fleet(game, seat, n)`; the class has only `tactic(...)` and `lockLoss(...)` (`src/main/java/ti4/ai/strategy/CommandTokenValue.java:13,17`). It is cheaper when the voter has spare fleet tokens. Sanction has no owner payoff, so it stops being read as a positive rider.
 - **Rival cost:**
   - **Politics Rider:** each seat's `SpeakerTokenValue` change when the token moves. Seats that move up gain and the rest lose, which is how the rider "recruits votes".
-  - **Galactic Threat:** unchanged from today until you answer open question 12.
+  - **Galactic Threat:** unchanged from today as decided: -1 TG, or -0.5 TG once others voted that way (done).
   - **Other riders:** the rival-gain term `rivalStake × payoff / TG per point`.
 
 With these, a rider on a disliked outcome dissuades others, and the poison-pill Imperial Rider falls out of `withRider` with no new rule.
@@ -389,8 +389,8 @@ Table talk and Support for the Throne swaps come in milestone 12.
   - **Buying:** when the AI cares, it offers 1-2 TG per vote to seats that don't care and haven't voted, until chance(wanted) is about 0.8 or the marginal gain falls below the price.
   - **Selling:** when it doesn't care, it sells its own votes at a reserve (its utility gap plus the value of its kept vote).
   - Pay up front.
-- **Price:** `clamp(reserve + 1, 1, gain × share)`, under a per-agenda cap (open question 8).
-- **Transaction rule (LRR 94.6, `docs/rules/reference/transactions.md:17`):** one transaction with each other player per agenda. A vote payment is that pair's single transaction for the agenda. An up-front payment and an after-vote payment are exclusive, and the payment must not be bundled with any other deal with that seat in the same agenda. Keep `TradeLegality.window` (`TradeLegality.java:95-107`) as the guard, with no windowless purpose. If after-vote settlement is used for humans (open question 7), it is the only leg, or it moves to the next legal window.
+- **Price:** `clamp(reserve + 1, 1, gain × share)`, under a per-agenda cap (your caps: Veto 1-3 TG, Quash 3-5 TG).
+- **Transaction rule (LRR 94.6, `docs/rules/reference/transactions.md:17`):** one transaction with each other player per agenda. A vote payment is that pair's single transaction for the agenda. An up-front payment and an after-vote payment are exclusive, and the payment must not be bundled with any other deal with that seat in the same agenda. Keep `TradeLegality.window` (`TradeLegality.java:95-107`) as the guard, with no windowless purpose. If after-vote settlement is used for humans (through the button deal card), it is the only leg, or it moves to the next legal window.
 - **Waiting:** reuse whatever hold the audit branch's deals use. If there isn't one, add a bounded wait (about 3 min with AIs, 10 min with humans) with a hard give-up, and test that agendas never stall (cf. the earlier 24 h Veto stall).
 - **Deferred until A/B shows the simple loop helps:** avoidance bribes on Public Execution and Colonial Redistribution, vote extortion, and Hacan commander pricing.
 - **Tests:** in the `PromiseDealsTest` / `PromisedVotesTest` style:
@@ -399,7 +399,7 @@ Table talk and Support for the Throne swaps come in milestone 12.
   - The promised ballot overrides the planner.
   - One pair never makes two transactions in one agenda.
   - A hold times out cleanly.
-- **Risk:** humans can't be read (`OfferResponder` strips human `DETAILS`, `Stinginess.java:146-151`), and promises aren't binding. So prices are capped, and human deals wait on open question 7.
+- **Risk:** humans can't be read (`OfferResponder` strips human `DETAILS`, `Stinginess.java:146-151`), and promises aren't binding. So prices are capped, and human deals go through an explicit button deal card with a trust ledger.
 
 ---
 
@@ -426,7 +426,7 @@ Start only after milestones 10-11 show gains in A/B. Each item is built on the `
   - `BallotPlanner` needs to accept a forced 1-vote option.
 - **Seed of an Empire Support swaps and lending:** relax `ThroneSale.allowed` (`src/main/java/ti4/ai/trade/ThroneSale.java:28-36`), with win-race guards.
 - **Keleres rider split:** a note for TG after the payout, or splitting the 2 TG.
-- **Mutiny announcements:** only if open question 9 allows them.
+- **Mutiny announcements:** not for now (no bluffing on Mutiny).
 - **Tests:** end-to-end TG nets for the boat float on a 6-seat fixture, a single defector, and the speaker honouring the plan.
 
 ---
@@ -439,23 +439,31 @@ Start only after milestones 10-11 show gains in A/B. Each item is built on the `
 
 ---
 
-## Open questions for you
+## Your answers (2026-11-11)
 
-1. **End-game scale-up of point elections.** The plan ships your flat numbers (Shard 6, Holy Planet 3, Censure 3/5) plus the existing `winsWithPoint` guard. Do you want an optional experiment flag that scales them toward `ScoringStakes` near the goal, or none?
-2. **Deals with humans.** The AI can't read chat. Should human vote deals go only through terms the AI itself announces, or through an explicit button card (`ti4.ai.deal.HumanAiDeal`)? Up front, or after the vote (as the only transaction leg)? Does the AI always keep its own promises?
-3. **Price caps.** A maximum TG per agenda for vote buying and Veto/Quash/Deadly Plot bounties: an absolute number, or a share of the stake?
-4. **Integration direction.** Merge the audit branch into this one, or rebase this branch onto it?
-5. **Anti-Intellectual Revolution.** Use the true rounds left instead of the 5-round cap in `lawRounds`?
-6. **Public Execution.** How much is moving up one seat in pick order worth? I propose a share of `SpeakerTokenValue`. What size of bonus for Yssaril and Ral Nel as targets?
-7. **Unconventional Measures and Mutiny.** May the AI ever betray a deal or bluff in table talk, or only stay quiet and vote?
-8. **Table talk in agenda play.** Is it OK to post announcements ("I hold Veto", "if nobody votes I pick Against", boat float proposals) in non-fog games?
-9. **Mutiny stance announcements.** Allowed, or silent only?
-10. **Boat float.** Should the AI start it, or only join one a human proposes? Only when the speaker is an AI?
-11. **Galactic Threat.** The hosts say feed Nekro rather than abstain, and your notes don't say. Which? The rival cost stays as it is until you answer.
-12. **Mech priors.** Accept the non-user ratings in ai-mech-notes as the MechRating priors?
-13. **Arms Reduction anger term.** Share a grudge input with `tactical/OffenseOutlook`, or skip it for now?
-14. **Incentive Program faction stage 1 / stage 2 stats.** Defer (as proposed), or mine game saves for them?
-15. **Homeland Defense.** For = 0 always, or follow the table mood (PDS holders defend)?
+- **Deals with humans:** an explicit button deal card, like the Hacan agent deal. The AI assumes humans follow through. If a human ever breaks a deal, every AI at the table records it and never trusts that player again (a per-game trust ledger).
+- **Price caps:** 1-3 TG to pay for a Veto, 3-5 TG for a Quash. Several players often pool the cost, so milestone 11 needs a multi-party deal that collects TG from several seats for one payment.
+- **Integration:** done. This branch is based on the audit branch, with the Nekro branch merged in.
+- **Anti-Intellectual Revolution:** uses the true rounds left (implemented).
+- **Bluffing and betrayal on Mutiny and Unconventional Measures:** not for now. The AI stays honest and keeps its deals.
+- **Table talk:** allowed ("I hold Veto", boat float proposals, ...). Answers are collected with buttons and the reaction system.
+- **Galactic Threat:** voting for the outcome Nekro predicted costs the voter 1 TG, or 0.5 TG once others have already voted that way (implemented behind `GALACTIC_THREAT_COST`). A new mechanism for milestones 5 and 10: any player may offer TG to players who vote the way their rider points, paid if it resolves. Nekro offering 1-2 TG is one case.
+- **Mech priors:** accepted as work-in-progress values to verify.
+
+### Rules corrections
+- **Speaker tie-break** (no votes, or tied votes) is not voting, for any effect that refers to players who voted. Milestone 4b relies on this.
+- **Argent Zeal:** Argent votes first and also gets extra votes, one per player in the game. Milestone 4d must count them.
+- **Conspirators** is a Discordant Stars ability (homebrew). It is dropped from milestone 4a.
+- **Xxcha hero:** changed in Thunder's Edge. The combined-votes effect is now a nerfed version on Xxcha's breakthrough. Milestone 4e values it from the current card data.
+- **Predictive Intelligence** is public, so rivals' forecasts count its +3 votes. It stays exhausted if the vote goes the other way, so milestone 7 keeps the decisive-only rule.
+
+### Still open
+1. **End-game scale-up of point elections.** Ships as flat values plus the `winsWithPoint` guard (now also on Shard, Political Censure and Holy Planet).
+2. **Public Execution.** Implemented as a share of `SpeakerTokenValue` for moving up one pick, plus 1.5 TG for Yssaril or Ral Nel as targets.
+3. **Arms Reduction anger term.** Skipped for now.
+4. **Incentive Program stage I / stage II stats.** Deferred; flat 1.5 TG stage II faction bonus.
+5. **Homeland Defense.** For = 0; PDS holders prefer For because Against hurts them.
+6. **Magnitudes the notes only gave a direction for** (Travel Ban wormholes, Bastion, Cabal/L1Z1X, Wormhole Reconstruction plastic, Checks and Balances speaker lean, Mallice). Picked by the implementer; see `ExpertLawValues`.
 
 ---
 
