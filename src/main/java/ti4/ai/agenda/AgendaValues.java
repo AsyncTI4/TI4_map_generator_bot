@@ -4,6 +4,8 @@ import java.util.OptionalDouble;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -24,15 +26,27 @@ public class AgendaValues {
     }
 
     static OptionalDouble of(Game game, Player voter, String agenda, String outcome, String ownVote) {
+        return of(game, voter, false, agenda, outcome, ownVote);
+    }
+
+    static OptionalDouble of(Game game, Player voter, boolean ownView, String agenda, String outcome, String ownVote) {
         if (agenda == null) return OptionalDouble.empty();
-        Double value = valueOf(game, voter, agenda, outcome, ownVote);
+        Double value = expertValue(game, voter, ownView, agenda, outcome, ownVote);
+        if (value == null) value = valueOf(game, voter, agenda, outcome, ownVote);
         return value == null ? OptionalDouble.empty() : OptionalDouble.of(value);
+    }
+
+    @Nullable
+    private static Double expertValue(
+            Game game, Player voter, boolean ownView, String agenda, String outcome, String ownVote) {
+        if (!AiExperiments.enabled(voter, Experiment.AGENDA_VALUE_TABLE)) return null;
+        return ExpertAgendaValues.valueOf(new AgendaView(game, voter, ownView), agenda, outcome, ownVote);
     }
 
     static double ownVoteAdjustment(Game game, Player voter, String agenda, String winner, String ownVote) {
         if (!dependsOnOwnVote(agenda)) return 0;
-        OptionalDouble actual = of(game, voter, agenda, winner, ownVote);
-        OptionalDouble assumed = of(game, voter, agenda, winner, winner);
+        OptionalDouble actual = of(game, voter, true, agenda, winner, ownVote);
+        OptionalDouble assumed = of(game, voter, true, agenda, winner, winner);
         if (actual.isEmpty() || assumed.isEmpty()) return 0;
         return actual.getAsDouble() - assumed.getAsDouble();
     }

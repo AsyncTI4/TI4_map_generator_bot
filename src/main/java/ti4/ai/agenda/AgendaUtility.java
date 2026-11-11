@@ -14,7 +14,7 @@ class AgendaUtility {
     private static final int POINT = 1;
 
     static double of(Game game, Player voter, boolean readsOwnSecrets, String agenda, String outcome) {
-        OptionalDouble value = AgendaValues.of(game, voter, agenda, outcome, outcome);
+        OptionalDouble value = AgendaValues.of(game, voter, readsOwnSecrets, agenda, outcome, outcome);
         if (value.isPresent()) return value.getAsDouble() + driveTheDebate(game, voter, readsOwnSecrets, outcome);
         if (AgendaPolicy.givesElectedPlayerAPoint(agenda)) return pointElection(game, voter, outcome);
         double policy = readsOwnSecrets

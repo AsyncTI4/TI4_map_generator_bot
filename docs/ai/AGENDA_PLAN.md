@@ -1,0 +1,501 @@
+# Plan: expert-level agenda play for the AI
+
+Worktree: `C:/Users/willh/OneDrive/Documents/GitHub/TI4_map_generator_bot/.claude/worktrees/vigorous-cerf-c2baec`, branch `claude/ai-player-nekro-72bbce`. All paths below are relative to that root. The plan draws on your four guidance notes (`ai-agenda-value-review`, `ai-agenda-politics-guidance`, `ai-agenda-timing-windows`, `ai-mech-notes`) and on maps of the current code. Nothing has been changed or built.
+
+## How the work is ordered
+
+0. **Integrate branches first.** `claude/ai-strength-audit` is 66 commits ahead of this branch, and this branch is 3 commits ahead of it. The audit branch already has the experiment flags (`ti4/ai/AiExperiments.java`, `src/test/java/ti4/ai/runtime/AbSummary.java`), a promise layer (`ti4/ai/promise/Promise.java`, `PromiseBook.java`, `PromiseChecks.java`, `Presence.java`, `ti4/ai/trade/PromiseDeals.java`), vote deals (`ti4/ai/agenda/VoteDeals.java`, `PromisedVotes.java`), agenda card swings (`ti4/ai/agenda/AgendaSwing.java`, `ti4/ai/actioncards/ShenaniganCards.java`, `EarlyDeadlyPlot.java`) and `ti4/ai/strategy/SpeakerPromise.java`. Every later milestone builds on those classes. None of them gets a parallel copy.
+1. **Measurement before any behaviour change.** The agenda tracker and agenda-heavy harness (milestone 2) land first. The milestone 1 value table goes behind one experiment flag, and the baseline is taken with that flag off. Final VP is too noisy for this (±0.26 VP at 12 pairs), so the harness needs an agenda-level metric.
+2. **Values next** (milestone 1). Most later features price things through `AgendaForecast` utilities: vote prices, Veto bounties, rider gains and bluff risk.
+3. **Forecast correctness before new card plays and deals.** Every card rule and every deal compares two forecasts.
+4. **Negotiation last, and kept simple.** It is the only layer that depends on human behaviour the AI can't read.
+
+Execution order: 0 → 2 → 1 → 3 → 4 → 5 … 13.
+
+Rules for every milestone:
+- No comments in `src/main/java`.
+- Official content only. Filter out `dspn*`, Edyn, Kyro, gamma and absol ids.
+- Values are in TG units (`ValueScale`: 1 resource = 1 influence = 0.8 TG).
+- Keep heuristics simple. No fog-of-war branches in `ti4.ai`.
+- `AiSegregationTest` (`src/test/java/ti4/ai/AiSegregationTest.java`): engine code must not reference `ti4.ai`. An engine seam I add (for example making `AgendaHelper.getVotingOrder` public) is a plain helper that ti4.ai calls.
+- New unowned buttons reach the AI only once their prefix is in `NekroBrain.PUBLIC_WINDOW_PREFIXES` (`src/main/java/ti4/ai/nekro/NekroBrain.java:118`).
+- Never write markers into `currentAgendaVotes`, because resolution reads it.
+- **Hidden information:** a value function may read real hand or secret contents only when the holder is the viewer. Every other holder, including a rival modelled as voting for itself inside the forecast, gets priors (see 1b).
+- **No forecasts inside value functions:** nothing under `AgendaValues` may call `BallotPlanner` or `AgendaForecast`. `BallotPlanner.choose` → `AgendaForecast.of` → `AgendaUtility.of` → `AgendaValues` would recurse.
+- Each behaviour change gets its own `AiExperiments` flag.
+
+---
+
+## Milestone 0: branch integration (S-M, first)
+
+- Decide the direction: merge `claude/ai-strength-audit` into this branch, or rebase this branch's 3 commits onto it. Either way, both lines end up on one branch before agenda work starts. Cherry-picking `AiExperiments` alone is not enough.
+- What this brings in: `AiExperiments`, the `-Dai.selfplay.ab` mixed-brain switch and the `SelfPlayEnvironment` control-seat wiring, `AbSummary`, the committed `AiGameWrites` fix, the promise layer (including the `PROMISE_DEALS` experiment with vote promises), `VoteDeals` (outlook, bestSale, bestPurchase), `PromisedVotes` (binding, forbidsRider, verdict), `AgendaSwing` (Veto, Bribery, Deadly Plot, Confounding), `ShenaniganCards`, `EarlyDeadlyPlot` (AGENDA_SABOTAGE) and `SpeakerPromise`.
+- After integrating, re-derive every line citation in this plan. They are taken from the current branch.
+- Run all of `ti4.ai.*Test` on the merged branch, and write down which audit experiments are on by default.
+
+---
+
+## Milestone 1: point-law bug and your value table (M overall, many small changes, behind flag `AGENDA_VALUE_TABLE`)
+
+**Goal:** `AgendaValues` returns your numbers for every official agenda, and the discard bug is fixed. The bug fix (1a) ships unflagged. The value table ships behind the flag and is A/B'd on the milestone 2 harness against the flag-off baseline.
+
+### 1a. Point laws lose their point when discarded (S)
+- `src/main/java/ti4/ai/agenda/LawChangeValues.java:21-47`: delete `POINTS_KEPT_ON_DISCARD` and its three uses (`judicialAbolishment` at 30, `miscountDisclosed` at 37, `newConstitution` at 43).
+- A discarded point law costs its holder a full point (`ScoringStakes.scoreValue` for 1 VP), not the keep-chance-weighted election value. When a rival loses one, you gain its `rivalPointStake`.
+- Tests in `src/test/java/ti4/ai/agenda/AgendaValuesTest.java`:
+  - Abolishing your own Shard costs about one point.
+  - Abolishing a rival's Shard is positive.
+  - New Constitution with your Holy Planet law in play is negative for you.
+  - Miscount Disclosed on a rival's Crown counts it at full value.
+
+### 1b. Shared helpers and the viewer seam (S-M)
+- **Viewer seam (new, before any own-hand term).** `AgendaValues.of(game, voter, agenda, outcome, ownVote)` (`src/main/java/ti4/ai/agenda/AgendaValues.java:26`) has no viewer, and `AgendaForecast.baseUtilities` (`src/main/java/ti4/ai/agenda/AgendaForecast.java:193-203`) calls it with every rival as voter.
+  - Thread a `viewer` (or a `readsOwnHand` flag, like the `readsOwnSecrets` that `AgendaUtility.of` already takes) down into `AgendaValues` and the value classes.
+  - Real hand and secret contents are read only when holder == viewer.
+  - Every other holder gets priors: `getAcCount × ActionCardPrior.AVERAGE_CARD` for hands, `SecretOdds` for secrets. This follows the existing `AgendaValueMath.handValue` pattern (`src/main/java/ti4/ai/agenda/AgendaValueMath.java:112-117`).
+  - **Leak test:** swap a rival's hand and secrets, and the AI's forecast stays the same.
+- `AgendaValueMath` gets:
+  - `roundTable(game, r2, r3, r4plus)`, where round 1 counts as round 2.
+  - `endsSoon(game)`: `GameHorizon.roundsLeft <= 1` (`src/main/java/ti4/ai/eval/GameHorizon.java:14-50`).
+  - `speakerPosition(game, seat)`, from `Helper.getSpeakerOrFullPriorityOrder`.
+  - `isEasySecret(seat, secret)`: one threshold on `SecretValue.keepValue`, used by Archived Secret, Search Warrant and Classified Leaks. It applies to the viewer's own secrets only; rivals use `SecretOdds.chanceReady`.
+- Faction checks follow the existing alias style (`ForAgainstLawValues.YSSARIL` at line 45, and the `startsWith("keleres")` pattern at `AllianceValue.java:123`). Creuss is `ghost` and Last Bastion is `bastion`. Before coding, check the aliases for Jol-Nar, Cabal, L1Z1X and Deepwrought, and the planet id for Mallice, against the faction and planet data. A wrong alias fails silently, so each one gets a test.
+
+### 1c. Elect Player constants (S), in `src/main/java/ti4/ai/agenda/ElectionValues.java`
+
+Your flat numbers are the holder's worth. The only scaling kept is the existing `winsWithPoint` override (`ElectionValues.java:185-194`), which stops the AI handing a rival the winning point. An end-game scale-up of point elections is not in the plan. It is a possible later experiment behind its own flag (open question 1).
+
+| Agenda | Change |
+| --- | --- |
+| Archived Secret (68-78) | Own: 1 TG if all secrets are scored or any unscored secret `isEasySecret`, else 4. Rivals: `SecretOdds.chanceReady`, and 4 when unknown. |
+| Committee Formation (80-89) | roundTable 4/2/1. The +2 for a known good election comes in milestone 6. |
+| Imperial Arbiter (41, 91) | 5. |
+| Commerce (95) | roundTable 3/2/1, +2 for Keleres. |
+| Exploration (103) | 1. |
+| Industry (112) | 1, or 3 for Keleres or Creuss before round 4. |
+| Peace and War (47, 49) | 5. |
+| Policy (120) | 1, or 0 when `endsSoon`. +2 for Yssaril unless `endsSoon`. |
+| Sciences (124) | `max(1, 4 - (max(round, 2) - 2))`, +2 for Jol-Nar. Round 1 gives 4. Gets a round-1 test. |
+| Antiquities (133) | Flat 5. |
+| Prophecy (137) | 1. |
+| Thalnos (196) | 0.25. |
+| Research Grant Reallocation (245-260) | 3. The use side is in milestone 13. |
+| Search Warrant (262-269) | Own: `2 TG × min(2, 3 - scored - easy unscored)`. Hard secrets in hand don't count against the cap, because the holder discards them. -1 TG if the holder has an easy unscored secret, more for `SecretPhase.ACTION`. Rivals: counts and `SecretOdds` only. Test: a holder with 2 hard unscored secrets values it at 4 TG. |
+| Political Censure (220-243) | Own: 3 if the hand is good (sum of `ActionCardValue.keepValue` above a threshold, or at least one A/S card via `ExpertTiers`), else 5. Rivals: `getAcCount` and `AVERAGE_CARD`, through the viewer seam. |
+| Shard of the Throne / Crown of Emphidia (173-194) | 6 and 1, as you gave them. |
+| Armed Forces Standardization | Unchanged. |
+
+All of these stay behind `electedGain` and `rivalGainCost`, so the threat-scaled rival weighting stays.
+
+### 1d. Elect Planet constants (S), `src/main/java/ti4/ai/agenda/PlanetElectionValues.java:106-197`
+- Core Mining 1, DMZ 2, Holy Planet 3, each Research Team 1, Senate Sanctuary 1, Terraforming 1.
+- Compensated Disarmament (88-104): add a `needsTradeGoods(seat)` check from `Wallet.of` (`src/main/java/ti4/ai/scoring/Wallet.java:46`). Without that need the own-planet gain is zero, so the threat-weighted leader target wins.
+- Colonial Redistribution: value unchanged. Bribes are a later variant (milestone 10).
+
+### 1e. Law and directive fixes that need only existing inputs (S each)
+
+In `src/main/java/ti4/ai/agenda/ForAgainstLawValues.java`:
+- **Anti-Intellectual Revolution (34-35, 83-86):** already matches your note (1.0 × 1.5 TG per round, Nekro/Propagation exempt), apart from the 5-round `lawRounds` cap (`AgendaValueMath.java:31,91-92`). Add assertions: about 1.5 TG per round left for non-Nekro seats, 0 for Nekro. The cap is open question 5.
+- **Homeland Defense (166-177):** For = 0. The Against PDS loss stays.
+- **Executive Sanctions (137-151):** own cost is the keep value of the cards after the top 3 in `ActionCardValue.discardOrder` (`src/main/java/ti4/ai/actioncards/ActionCardValue.java:210`), viewer only. Rivals use excess × `AVERAGE_CARD`. Yssaril stays exempt.
+- **Fleet Regulations (153-164):** subtract `FleetLimit.bonus` (`src/main/java/ti4/ai/eval/FleetLimit.java:18`) for Letnev's Armada.
+- **Publicize Weapon Schematics (194-198):** drop or lower `WAR_SUN_SUSTAIN_PER_ROUND`. Test: a war-sun owner with a hand prefers For.
+- **Regulated Conscription (206-223):** For bonus for Cabal and L1Z1X. The swarm-share term stays.
+- **Shared Research (225-246):** For bonus for Bastion only. Against counts each seat's ship value in its home system, through `relativeToRivals`.
+- **Wormhole Reconstruction (248-278):** For scales with fleet strength against the table mean. Against sums the unit cost of locked ships, not a tile count.
+- **Representative Government (280-306):** clamp to ±2 TG a round.
+- **Checks and Balances (319-344):** For = the existing `pointGapBehind` term (320-325) + a `speakerPosition` term. Late seats get +, early seats get -. The early-seat penalty drops when the speaker is a contender (`ScoringStakes.contender`).
+- **Nexus Sovereignty (346-358):** the Mallice controller also likes For.
+- **Enforced Travel Ban (111-135):** add wormholes in `Territory.of(game, seat)` times plastic weakness (`FactionAggression`, `src/main/java/ti4/ai/eval/FactionAggression.java:29`). Positive for weak seats, negative for aggressive ones.
+- **Arms Reduction:** add a leader-target term through `ScoringStakes.contender`, so the table likes For when it hurts the leader. The anger/grudge input is open question 14.
+
+In `src/main/java/ti4/ai/agenda/DirectiveValues.java`:
+- **Incentive Program (108-131):** Against bonus for Jol-Nar, Deepwrought and Hacan, plus a points-lead term. Faction scoring stats are deferred.
+- **Swords to Plowshares (211-232):** leader term (`ScoringStakes.contender`) plus the count of revealed spend objectives (`ObjectiveCatalog.isSpend`).
+- **Clandestine Operations (295-312):**
+  - Against: the value of the cheapest ships over the new fleet limit in each system, including `FleetLimit.bonus`.
+  - For: a cost when the seat's tactic pool or strategy pool drops to zero. It is the token at a marginal-token premium; for strategy tokens, add the value of the secondaries lost.
+  - Both sides go through `relativeToRivals` ("maximum damage to others, little to yourself").
+- **Economic Equality** and **Ixthian Artifact:** a small For bias in each seat's utility, unless that seat is badly hurt (a large TG loss, or a devastating Ixthian blast). Your notes say tables usually vote For (spite aside) and like Ixthian because it is fun.
+
+In `src/main/java/ti4/ai/agenda/CardElectionValues.java`:
+- **Classified Document Leaks (47-84):** the viewer's own secret is worth 3 TG. Each seat's gain is weighted by `SecretPhase` and readiness (`SecretOdds` for rivals), with a bonus for ACTION secrets when the seat leads or is far behind.
+- **Galactic Crisis Pact (31-34, 106-117):**
+  - Diplomacy is 0.
+  - Technology is 0 unless ready resources minus a **static** vote-exhaustion estimate leave at least 4. Tech specialty discounts count as free.
+  - Leadership and Warfare subtract the same static estimate.
+  - The estimate is a fixed share of ready influence: the `BallotPlanner` reserve-style cap, or the snapshot count from `AgendaHelper.getAgendaStartVoteCounts`. Never `BallotPlanner` or a forecast; this is the recursion rule above.
+
+**Miscount Disclosed table behaviour** (count the votes left, place a few votes on a winnable outcome to steer others, maybe with bribes) is not covered here. It is a later item in milestone 9.
+
+### 1f. Public Execution value (M), `ElectionValues.java:148-170`
+- Replace "the single heir gains the speaker token" with a speaker-order shift. When the speaker is executed, every seat after it moves up one pick, worth a share of `SpeakerTokenValue.of` (`src/main/java/ti4/ai/strategy/SpeakerTokenValue.java:10`).
+- Add target bonuses for Yssaril and Ral Nel, whose hand and silencing matter more.
+- **Points leaders as targets:** check that `rivalGainCost`'s threat weighting already makes leaders the preferred target, and pin it with a test. Add an explicit contender bonus only if the test fails.
+- The -10 in `AgendaPolicy.outcomeScore` (`src/main/java/ti4/ai/agenda/AgendaPolicy.java:229`) is reached only when `AgendaValues` has no value, and Execution has a case (`AgendaValues.java:55`). So it is left alone.
+
+### 1g. Mech ratings (M): new `src/main/java/ti4/ai/eval/MechRating.java`
+- Modelled on `FlagshipRating` (`src/main/java/ti4/ai/eval/FlagshipRating.java:12-51`: tier constants, a `RATINGS` map, `of(Player)`).
+- Per official faction mech:
+  - `articlesStake`: a flat per-faction value of what Articles of War For takes away. It doesn't scale with board count, because DEPLOY mechs (Letnev, Yssaril, Sol, Saar, Titans, Yin, Naalu TE, Crimson) come from reinforcements.
+  - `onBoardAbility`: a small per-mech term, set only for mechs with on-board abilities (Xxcha cannon, Arborec production/shield, Deepwrought production, Empyrean cancel).
+  - `homeWorth`: the value of a Rearmament home mech.
+- Your marked ratings override; the rest use the ai-mech-notes priors (Articles column very high to none; Rearmament column home production, shield/cannon, home defense).
+- **Articles of War (`ForAgainstLawValues.java:308-317`):**
+  - Seat stake = `articlesStake + onBoardAbility × mechs on board`.
+  - Keep `relativeToRivals`, and weight up neighbours' stakes through `Player.getNeighbouringPlayers` / `Adjacency`. That is your pattern (1): rival mechs next to you, such as Xxcha's cannon or facing Sardakk or Titans.
+  - Keep the 3 TG Against-pays-For term, and push Against only with real vote weight.
+- **Rearmament Agreement (`DirectiveValues.java:314-325`):**
+  - Against = mechs on board × (the existing body downgrade `MECH_WORTH - INFANTRY_WORTH` + ability quality).
+  - For = `homeWorth`, only when a mech is in reinforcements and the seat controls a home planet. Seats with all 4 mechs out gain nothing.
+  - Tests: Arborec, Saar or Naaz with several mechs out fight Against. Hacan, Nekro or Jol-Nar support Against cheaply.
+
+### Guidance covered
+The whole value review except the items marked **design**, Miscount Disclosed table behaviour (milestone 9), the Arms Reduction anger term (open question 14), Dictate Policy (milestone 3) and Covert (milestones 3 and 6).
+
+### Tests (`AgendaValuesTest`)
+- One holder-worth assertion per constant, on a solo table or with voter = elected.
+- Round-table cases for Commerce, Sciences (round 1 too) and Committee.
+- One test per faction bonus. These double as the alias checks.
+- AIR assertions, a Search Warrant hard-secrets case, and the Checks and Balances behind-on-points case.
+- The viewer-seam leak test.
+- `MechRatingTest`: every official faction mech has a rating, and homebrew falls back to the prior.
+- Update the tests that will break: Peace/War order (line 137) and the Core Mining/DMZ signs (163-184).
+- `everyOfficialAgendaHasAFiniteValue` (63-93) stays.
+
+### Risks
+- Big value drops (Sciences ~12 → 4, Commerce ~8 → 3) move the thresholds built on these values: `AgendaPolicy.importantFor` and `veryBadFor` (`VERY_BAD_LOSS` 3.5, `AgendaPolicy.java:70,137-147`), the Quash threshold, and the `NotesForTrade` SECRET_IMPORTANT_AGENDA trigger. Re-check each and add a regression test per threshold. The flag A/B (milestone 2) measures the net effect.
+- Base-only agendas (Elect Planet cards, Shard, Crowns, Rep Govt) never appear in PoK self-play, so only unit tests cover them.
+
+---
+
+## Milestone 2: measurement harness (M; before milestone 1's flag is turned on)
+
+**Goal:** an agenda-local metric that shows a single change, with a baseline taken before any value or forecast change.
+
+- **A/B slot pairing in `RoundTwoSelfPlayTest`.** The `-Dai.selfplay.ab` switch and `AbSummary` come from milestone 0, but only `AiSelfPlayTest#sixAiSeatsPlayFullGames` uses them. Add the same control-seat pairing to `RoundTwoSelfPlayTest` explicitly.
+- **Add `src/test/java/ti4/ai/runtime/AgendaTracker.java`.**
+  - Modelled on `DebateTracker` (`src/test/java/ti4/ai/runtime/DebateTracker.java:19`) and wired through `ObjectiveTracker.observe` (`ObjectiveTracker.java:126,146`).
+  - Per agenda, keyed by `currentAgendaInfo`, it records round, agenda id, speaker, votes per seat, riders, outcome, and per-seat VP and TG deltas from this reveal to the next.
+  - It reports only realized agenda utility, rider net value, agenda-sourced VP and harness defects.
+- **Agenda-heavy self-play mode:**
+  - Add a `-Dai.selfplay.roundtwo.playagenda` flag. Today `forceagenda` exists (lines 164, 322) but the agenda phases are skipped (30, 200, 343). With the flag, `forceagenda` credits custodians and the agenda phases are played.
+  - The harness plays two rounds (`RoundTwoSelfPlayTest.java:30`), so that is 2 agenda phases, about 4 agendas a game. Add a `-Dai.selfplay.roundtwo.rounds=N` option; 3 rounds gives about 6 agendas.
+  - Pair games with `objectiveseed`. The full `AiSelfPlayTest#sixAiSeatsPlayFullGames` stays as the guard run.
+- **Harness defect:** `RefereeRules` (`src/main/java/ti4/ai/selfplay/RefereeRules.java:57,111`) presses tie-break buttons for AI owners after the referee delay. Give that step a long minAge, as `agendaResolution_` already has, so the AI's own `breakAgendaTie` always acts first. Count referee tie presses as defects.
+- **Expert exam:** a new `AgendaExamTest` in `src/test/java/ti4/ai/agenda/`. Hand-built table positions, one or more per guidance bullet, each asserting the expert answer: which outcome to vote, whether to abstain, which rider, whether to Veto. Cases are added as milestones land. It is the cheapest regression signal and reads like your notes.
+- **Baseline:** run A/A and the flag-off baseline here, before milestone 1's flag is turned on.
+
+---
+
+## Milestone 3: Dictate Policy and the Covert prior (S)
+
+- **Dictate Policy:**
+  - In `AgendaUtility.of` (`src/main/java/ti4/ai/agenda/AgendaUtility.java:16-30`, next to the Drive the Debate term), for the viewer's own secret only.
+  - If the viewer holds Dictate Policy and fewer than 3 laws are in play, add `scoreValue(1) × P(reaching 3 laws)` to For on any law. P is 1 when this law makes 3, and lower when more laws are needed.
+  - `SecretValue.agendaChance` is private (`src/main/java/ti4/ai/secrets/SecretValue.java:231`), and its Dictate branch is just laws/`LAWS_FOR_DICTATE_POLICY`. Expose a new public `SecretValue.lawCountChance(game)` helper rather than calling it.
+  - Once vote buying exists (milestone 10), this term makes the AI buy For votes with no extra code.
+- **Covert Legislation, non-speakers:**
+  - Replace the flat `COVERT_ELECTION_GAIN` (`ElectionValues.java:62,216`) with the average `AgendaValues` over the agendas still possible for the announced target type.
+  - That average uses the deck composition from public data (all official agendas minus discards and laws), not the deck order.
+  - Use the announced target only. Never read the type stored in `currentAgendaInfo`, which is not announced.
+- **Tests:**
+  - A Dictate Policy holder with 2 laws in play votes For on a mildly bad law, while a non-holder votes Against.
+  - A Covert non-speaker's value doesn't change when the deck's top card is swapped (leak check).
+
+---
+
+## Milestone 4: forecast and ballot correctness (M-L, in this order)
+
+**Goal:** the opponent model and the AI's own ballot get the rules right. Everything after this is measured against this forecast.
+
+### 4a. Voting order bug (S, first)
+- `AgendaForecast.votingOrder` (`AgendaForecast.java:171-178`) ignores Zeal (Argent votes first), Hack Election and Conspirators. So `activeVoter` (280-286) can zero the votes of seats that haven't voted yet.
+- Make `AgendaHelper.getVotingOrder` (`src/main/java/ti4/helpers/AgendaHelper.java:1552-1600`) public, use it, and find the speaker by seat rather than by position.
+- Test: with Argent active, the seats after it keep their votes.
+
+### 4b. Abstained values and the speaker's free Against (M)
+- Split the forecast's utilities into an abstained value (`ownVote = ""`) and `penalty[voter][outcome]` (the dependsOnOwnVote difference, `AgendaValues.java:13-38`).
+- `winner()` (365-373) and `AgendaPolicy.chooseOutcome` (`AgendaPolicy.java:98-109`) judge the speaker's tie-break with abstained values.
+- `simulate` (306-333) gets a real **abstain** choice in each seat's softmax, priced as the seat's abstained utility of the outcome the speaker would pick. Penalty agendas then show the table abstaining.
+- `BallotPlanner.expectedValue` (`src/main/java/ti4/ai/agenda/BallotPlanner.java:88-94`) keeps adding the viewer's own penalty only for the ballot it actually casts.
+- Covers Conventions, Representative Government and Wormhole Research: the speaker picks Against for free, and the AI knows it both as voter and as speaker.
+- Tests:
+  - All seats are near-indifferent on Conventions, and the forecast gives Against about 100%.
+  - The AI speaker on a 0-0 tie picks Against.
+  - The AI non-speaker abstains on Wormhole Research when the speaker gains from Against.
+  - Mutiny and Unconventional are checked separately, since they value the own vote differently.
+
+### 4c. Opponents keep a vote back (S)
+- In `remainingVotes` (253), on a first agenda while `AgendaRound.keepsAVoteBack` holds (`src/main/java/ti4/ai/agenda/AgendaRound.java:19-21`), cap each human seat at its snapshot minus its smallest planet.
+
+### 4d. Argent Zeal (S)
+- `AgendaVoting.spendPlanets` (`src/main/java/ti4/ai/agenda/AgendaVoting.java:171-201`) presses `exhaustForVotes_zeal_N` and counts those votes in the plan.
+- For Argent on the first agenda, raise the per-vote reserve cost so it votes light and spends on the second agenda.
+- Test: the Argent AI casts Zeal.
+
+### 4e. Blood Pact and the Xxcha hero (S)
+- In `AgendaVoting`, cast Blood Pact (Empyrean note) when both seats vote the same outcome.
+- Cast the Xxcha hero's votes in the casting window when they are decisive. Today only `Pooling.java:12` reads the hero, and only for scoring.
+
+### 4f. Cost control
+- Utilities are cached per Frame. Hypothetical forecasts recompute only what changed.
+- Track ms/tick against the self-play CPU profile.
+
+**Risk:** the 4b split touches every consumer of `forecast.utility`: `AgendaCardRules` gains, `GalacticThreatRules`, `CardScoring.imperialRiderChance`, `AgendaPolicy.expectedLoss`, `importantFor`, and the audit branch's `VoteDeals` and `AgendaSwing`. Re-run all of `ti4.ai.agenda.*Test` and `ti4.ai.actioncards.*Test`.
+
+---
+
+## Milestone 5: rider policy and weighing other players' riders (M)
+
+### 5a. Typed rider effects in `AgendaForecast` (`readPlaced` / `utilities`, 215-304)
+A `RiderEffect` has three parts:
+- **Owner payoff.**
+- **Voter penalty.** Sanction: voters on that outcome pay one fleet token. This needs a new `CommandTokenValue.fleet(game, seat, n)`; the class has only `tactic(...)` and `lockLoss(...)` (`src/main/java/ti4/ai/strategy/CommandTokenValue.java:13,17`). It is cheaper when the voter has spare fleet tokens. Sanction has no owner payoff, so it stops being read as a positive rider.
+- **Rival cost:**
+  - **Politics Rider:** each seat's `SpeakerTokenValue` change when the token moves. Seats that move up gain and the rest lose, which is how the rider "recruits votes".
+  - **Galactic Threat:** unchanged from today until you answer open question 12.
+  - **Other riders:** the rival-gain term `rivalStake × payoff / TG per point`.
+
+With these, a rider on a disliked outcome dissuades others, and the poison-pill Imperial Rider falls out of `withRider` with no new rule.
+
+**Resolution order:**
+- On Economic Equality, a Trade Rider's TG are kept.
+- An Imperial Rider pays before the Dictate Policy and Drive the Debate checks, so at 9 VP an Imperial Rider is valued as a win ahead of rival secrets.
+
+### 5b. Rider payoffs (`src/main/java/ti4/ai/agenda/RiderPayoff.java:17-49`)
+- Warfare: dreadnought value. Construction: space dock value. Diplomacy: Diplomacy primary value.
+- Keleres Rider promissory note: 1 action card + 2 TG.
+- An opponent's Technology or Leadership Rider is valued from public data instead of the 2-card default.
+
+### 5c. Rider play (`src/main/java/ti4/ai/actioncards/AgendaCardRules.java:138-246`)
+- Add Warfare, Construction and Diplomacy to `RIDER_TITLES` (28-33), and register them in `AiActionCards` (`src/main/java/ti4/ai/actioncards/AiActionCards.java:81-86`).
+- With a single outcome, always play: skip the `keepPrior` gate at line 177.
+- **Keep the with-ballot baseline** in `bestRider` (173-178). `withRider` already zeroes the owner's votes unless the Xxcha commander keeps them (`AgendaForecast.java:134-142`), so rule (1), "likely without your votes", already holds, and the baseline correctly prices the votes given up.
+- Test for rule (1): a rider is skipped when the outcome's chance under `withRider` is low.
+- The hedge rule (2) comes free once 5a exists. Pin it with a test.
+- Respect `PromisedVotes.forbidsRider` from the audit branch.
+- Keleres Rider promissory note: in `AgendaNotes` (`src/main/java/ti4/ai/promissory/AgendaNotes.java`), play a foreign `queueAfter_pn_` whose id contains "rider", official ids only, through the same `rider_` placement.
+
+### 5d. Payout follow-ups
+- Warfare, Construction and Diplomacy payouts in `RiderPayouts` (`src/main/java/ti4/ai/agenda/RiderPayouts.java`).
+- Add their button prefixes to `PUBLIC_WINDOW_PREFIXES`.
+
+### 5e. Wait and see
+- Check the engine's queue semantics first. After each after resolves, declines are wiped and everyone is asked again (`src/main/java/ti4/helpers/AgendaWhensAftersHelper.java:757-790`), so the chicken loop already exists.
+- Make sure `declineAfters` (`NekroBrain.java:465-472`) re-decides on a re-ask, with the visible riders now in the forecast, instead of short-circuiting on the stored decline. No holding.
+
+### Tests
+In `AgendaForecastTest` and `AgendaCardRulesTest`:
+- A rival Politics Rider lowers the utility of the seat that loses pick order.
+- Indifferent seats abstain on a Sanction outcome, and the AI won't vote it.
+- An Imperial poison pill flips a 2-outcome agenda.
+- A single-outcome Elect Player always gets a rider.
+- A Keleres rider note is placed.
+- A Trade Rider survives Economic Equality.
+
+**Risk:** fixing Sanction changes every seat's voting, so take a new self-play baseline.
+
+---
+
+## Milestone 6: legal agenda-deck knowledge (M)
+
+- **New `src/main/java/ti4/ai/agenda/AgendaKnowledge.java`**, stored in seat memory (`context.memory()`, as `AgendaClock` does):
+  - It is written in the same tick the AI presses a peek: Politics `topAgenda_` / `bottomAgenda_` (`PlannedPrimaries.placeAgenda`, `src/main/java/ti4/ai/strategy/PlannedPrimaries.java:147`), Insider Information, the Naalu commander, and the hidden Covert card for the speaker.
+  - It holds an ordered list of known ids plus a fingerprint (deck size, discards, round, `agendaCount`), and is invalidated on a mismatch.
+  - It is the only `ti4.ai` class that may call `game.lookAtTopAgenda`, `lookAtBottomAgenda` or `getSentAgendas` (PlannedPrimaries excepted).
+  - **Guard test:** `AgendaDeckReadsTest` scans the source and fails if any other `ti4.ai` file calls them.
+- **Covert speaker:** value the real hidden id through `AgendaValues.of(hiddenAlias, ...)`. It votes for what it wants the hidden card to resolve to, and gives no hints. Other seats' models of the speaker keep the prior.
+- **Committee Formation +2** when a good Elect Player agenda is known to be coming.
+- **Kept vote:** a new `SecondAgendaValue.marginalVote` replaces the flat `KEPT_VOTE` 0.05 (`BallotPlanner.java:16`). It uses the known next agenda if there is one, otherwise the deck-composition average.
+- **`AgendaPeek` rewrite** (`src/main/java/ti4/ai/agenda/AgendaPeek.java`, marked WIP): keep a card on top when its expected `AgendaUtility` beats the deck average.
+  - The legacy `AgendaPolicy` GOOD/BAD sets (38-72) stay: `TableCards` (`src/main/java/ti4/ai/actioncards/TableCards.java:164-174`) and `AgendaUtility.of` (19) still use them. Migrating `TableCards` to `AgendaValues`-based judgements is an optional follow-up.
+- **Insider Information:** a new `AgendaCards` card in the after window, played on the first agenda only.
+- **Maw of Worlds** (`src/main/java/ti4/ai/explore/MawOfWorldsRules.java:41-44`): raise the vote cost when Mutiny hasn't been discarded or a known important agenda is next.
+- **Tests:**
+  - Each knowledge source has a positive test.
+  - A non-holder's values don't change when the deck top is swapped.
+  - Fingerprint invalidation.
+- **Risk:** `Determinizer.shuffleHiddenDecks` (`src/test/java/ti4/ai/runtime/Determinizer.java:73`) must keep known positions and the Covert top card fixed for rollouts.
+
+---
+
+## Milestone 7: the AI's own hidden and extra votes (M)
+
+Built on `AgendaSwing` and `ShenaniganCards` from the audit branch. First check what they already cover (Bribery, for one), and extend them rather than adding parallel rules.
+- **Predictive Intelligence** (`AgendaVoting.java:177-193` before integration): press it only when `withVotes(+3)` materially changes the outcome's chance and the gain beats keeping the card ready for token redistribution.
+- **Distinguished Councilor:** press `distinguished_` (`AgendaHelper.java:769`) after casting, when +5 is decisive by more than the card's keep value.
+- **Bribery:** when holding it, spend the smallest TG that flips or secures the outcome, instead of `ShenanigansRules`'s automatic "No Bribery" (`src/main/java/ti4/ai/agenda/ShenanigansRules.java:20-42`). `BallotPlanner` casts at least 1 vote while holding Bribery.
+- **Opponent hidden votes, as a margin buffer only:** don't trust a 1-3 vote lead while rivals hold unknown action cards (from `getAcCount`, never their hands). No per-sample card priors.
+- **Rule order:** every new play runs before `ShenanigansRules.react`, or the AI refuses first.
+- **Tests:**
+  - PI is not pressed on a landslide and is pressed when decisive.
+  - Bribery spends the minimum.
+  - A narrow lead with unknown rival cards is not treated as safe.
+
+---
+
+## Milestone 8: card targeting (M each, ships piecemeal)
+
+All of these go through `AgendaForecast` (`without`, `withRider`, a forced outcome) against the card's keep value. Where `AgendaSwing`, `EarlyDeadlyPlot` or `ShenaniganCards` already plays the card, re-tune that code instead of adding a new AiCard.
+- **Veto:** the self-interest threshold, re-tuned after milestone 1. Payment comes in milestone 11.
+- **Quash** (`src/main/java/ti4/ai/xxcha/QuashRules.java:35-43`): cheaper when the Xxcha hero economy applies. Payment comes in milestone 11.
+- **Deadly Plot** (extend `EarlyDeadlyPlot` / `AgendaSwing`):
+  - Eligibility: the AI voted for, or predicted, another outcome.
+  - Play it when the winning outcome's loss exceeds the keep value plus the cost of exhausting all planets. That cost is much higher on the first agenda.
+  - While Deadly Plot is held, lower the vote-commitment reserve in `BallotPlanner` (it "lets you vote loosely").
+- **Confounding Legal Text** (extend `AgendaSwing`): play it when electing yourself is worth more than the card, for example to steal Censure or the Arbiter.
+- **Confusing Legal Text:** play it when you were elected to a punishing agenda, retargeting to your best rival.
+- **Assassinate Representative:**
+  - In the after window, target `argmax(utility(without(rival)))`. It is strongest on Mutiny.
+  - Skip Xxcha seats with the commander or Alliance, since they can still vote.
+  - Prefer to wait until the riders are down, through re-ask (5e).
+- **Hack Election and Ancient Burial Sites:** low-value dumps. Burial Sites goes at the start-of-agenda window (`StartPhaseService.java:908`).
+- **Diplomatic Pressure:** a when-window play aimed at the seat holding the most valuable foreign note (`NoteGiving.giveRank`).
+- **Political Secret** (`AgendaNotes.java:65-70`):
+  - Use `forecast.without(owner)` on every agenda type, not only Elect Player.
+  - Skip owners with the Xxcha commander or Alliance.
+  - Value only active abilities blocked. Passives such as Letnev's fleet bonus still work.
+  - On the giving side, the AI keeps Political Secret back, and Xxcha keeps Political Favor back.
+- **Committee Formation use:** a new `CommitteeFormationRules` that runs before players vote, using `presetCommitteeFormation` (`AgendaHelper.java:1676-1700`; add the prefix if it is unowned).
+  - Use it when the best election plus rider gains beat keeping the law, coordinated with an Imperial Rider on itself (predict yourself, then elect yourself).
+  - In the forecast, a rival holder's Elect Player agendas collapse toward that holder's best outcome.
+- **Galactic Threat:** Nekro skips the prediction when its best chance is low (`GalacticThreatRules.java:81-112`).
+- **Sabotage of agenda cards** (`SabotagePolicy.java:79-92`): value a rival's Veto or rider by the forecast delta, not the baseline.
+- **Tests:** a prompt-fixture test per card in the `VetoCardTest` style, and the rule order in `NekroBrainTest`.
+
+---
+
+## Milestone 9: Mutiny, Unconventional Measures, Seed of an Empire, Miscount Disclosed (S-M, simple first)
+
+- **Seed of an Empire:** a default lean toward Against, since Seed usually lets the players in last gain points. Switch to the AI's own side only when that side can form a majority block, where a block is the seats tied at the lowest or highest point totals and their votes, counted from the snapshot.
+- **Mutiny:** abstain when later or stronger voters (the speaker last) could punish. Otherwise, if the AI can't win, go For silently and hope.
+- **Unconventional Measures:** the same rule with lower stakes.
+- **Miscount Disclosed:** count the votes left. When an outcome is winnable, place a few votes on it to steer others. Bribes join once milestone 10 exists.
+- **Escalate only if needed:** add correlated block sampling in `simulate`, and an explicit `forVoters` overload for bluff propagation, only if `AgendaExamTest` or the tracker shows the simple version failing.
+- **Tests:**
+  - The AI with few votes and stronger punishing voters after it abstains or votes Against on Mutiny.
+  - A 4,4,5,5,6,7 Seed table leans Against for a mid-table AI.
+  - A low-block AI with a majority votes its own side.
+
+Table talk and Support for the Throne swaps come in milestone 12.
+
+---
+
+## Milestone 10: vote selling and buying (M, one simple loop on the audit branch's classes)
+
+- **Start from what exists:** `VoteDeals` (outlook, bestSale, bestPurchase), `PromisedVotes` (binding, forbidsRider, verdict), and `Promise` / `PromiseBook` / `PromiseChecks` / `PromiseDeals` under the `PROMISE_DEALS` experiment. Audit what they already do, then fill gaps there. No new `AgendaPromises`, `VoteValue`, `Trust` event or `OfferResponder` vote path.
+- **Simple loop (AI-to-AI first):**
+  - **Buying:** when the AI cares, it offers 1-2 TG per vote to seats that don't care and haven't voted, until chance(wanted) is about 0.8 or the marginal gain falls below the price.
+  - **Selling:** when it doesn't care, it sells its own votes at a reserve (its utility gap plus the value of its kept vote).
+  - Pay up front.
+- **Price:** `clamp(reserve + 1, 1, gain × share)`, under a per-agenda cap (open question 8).
+- **Transaction rule (LRR 94.6, `docs/rules/reference/transactions.md:17`):** one transaction with each other player per agenda. A vote payment is that pair's single transaction for the agenda. An up-front payment and an after-vote payment are exclusive, and the payment must not be bundled with any other deal with that seat in the same agenda. Keep `TradeLegality.window` (`TradeLegality.java:95-107`) as the guard, with no windowless purpose. If after-vote settlement is used for humans (open question 7), it is the only leg, or it moves to the next legal window.
+- **Waiting:** reuse whatever hold the audit branch's deals use. If there isn't one, add a bounded wait (about 3 min with AIs, 10 min with humans) with a hard give-up, and test that agendas never stall (cf. the earlier 24 h Veto stall).
+- **Deferred until A/B shows the simple loop helps:** avoidance bribes on Public Execution and Colonial Redistribution, vote extortion, and Hacan commander pricing.
+- **Tests:** in the `PromiseDealsTest` / `PromisedVotesTest` style:
+  - The buyer picks the cheapest sufficient seller.
+  - The seller accepts only at or above its reserve.
+  - The promised ballot overrides the planner.
+  - One pair never makes two transactions in one agenda.
+  - A hold times out cleanly.
+- **Risk:** humans can't be read (`OfferResponder` strips human `DETAILS`, `Stinginess.java:146-151`), and promises aren't binding. So prices are capped, and human deals wait on open question 7.
+
+---
+
+## Milestone 11: paying for Veto, Quash and Deadly Plot (S-M)
+
+- **One offer each way, built on the promise layer:**
+  - **Holder:** an AI holding Veto or Deadly Plot (or Xxcha with a strategy token for Quash) whose table pain is high announces once: "I hold Veto, n TG and I play it". Table pain is the sum of each seat's `max(0, -expectedUtility)`. Payments received lower its own `veryBadFor` / `worthQuashing` / Deadly Plot threshold.
+  - **Payer:** an AI losing more than about 3 TG pays an announced holder, or posts "I pay X to whoever vetoes".
+- Payment counts as that pair's single transaction for the agenda (LRR 94.6).
+- A holder that took payment and didn't play is tracked through the existing `PromiseBook` / Trust.
+- **Tests:**
+  - The holder announces and waits, the payer pays, the holder plays.
+  - On timeout, the agenda ends in a normal pass.
+
+---
+
+## Milestone 12: coordinated multi-party plans (L, deferred; AI-only first)
+
+Start only after milestones 10-11 show gains in A/B. Each item is built on the `TradeTerms` / `TradeCardRules` announced-shape pattern (`src/main/java/ti4/ai/trade/TradeTerms.java:20-40`), `SpeakerPromise` and the promise layer.
+- **Speaker free-Against announcement:** "if nobody votes I pick Against". Non-speaker AIs that read it raise the value of abstaining. No payment.
+- **Boat float on Articles of War:**
+  - Trigger: the table's mech stake is small (MechRating).
+  - Plan: For voters cast exactly 1 vote, the designated Against seat casts enough to tie, and the speaker's `breakAgendaTie` (`NekroBrain.java:486-510`) honours the plan. Each For voter settles 1 TG to the Against seat, as that pair's one transaction.
+  - `BallotPlanner` needs to accept a forced 1-vote option.
+- **Seed of an Empire Support swaps and lending:** relax `ThroneSale.allowed` (`src/main/java/ti4/ai/trade/ThroneSale.java:28-36`), with win-race guards.
+- **Keleres rider split:** a note for TG after the payout, or splitting the 2 TG.
+- **Mutiny announcements:** only if open question 9 allows them.
+- **Tests:** end-to-end TG nets for the boat float on a 6-seat fixture, a single defector, and the speaker honouring the plan.
+
+---
+
+## Milestone 13: the use side of elected laws (S-M, any time after milestone 1)
+
+- **Imperial Arbiter:** hold it until `GameHorizon.roundsLeft <= 1`, then swap a poor last-round strategy card (4, 5 or 7) to a rival. The engine's Arbiter swap flow hasn't been mapped yet. Find the button family first, and add its prefix if it is unowned.
+- **Prophecy of Ixth:** when holding the law, add the extra fighter roll to fighter value in the production planners (`getLaws().containsKey("prophecy")` together with the holder).
+- **Research Grant Reallocation:** when elected, prefer techs with no prerequisites, since each prerequisite costs a token. Weigh the tokens lost through `CommandTokenValue`.
+
+---
+
+## Open questions for you
+
+1. **End-game scale-up of point elections.** The plan ships your flat numbers (Shard 6, Holy Planet 3, Censure 3/5) plus the existing `winsWithPoint` guard. Do you want an optional experiment flag that scales them toward `ScoringStakes` near the goal, or none?
+2. **Deals with humans.** The AI can't read chat. Should human vote deals go only through terms the AI itself announces, or through an explicit button card (`ti4.ai.deal.HumanAiDeal`)? Up front, or after the vote (as the only transaction leg)? Does the AI always keep its own promises?
+3. **Price caps.** A maximum TG per agenda for vote buying and Veto/Quash/Deadly Plot bounties: an absolute number, or a share of the stake?
+4. **Integration direction.** Merge the audit branch into this one, or rebase this branch onto it?
+5. **Anti-Intellectual Revolution.** Use the true rounds left instead of the 5-round cap in `lawRounds`?
+6. **Public Execution.** How much is moving up one seat in pick order worth? I propose a share of `SpeakerTokenValue`. What size of bonus for Yssaril and Ral Nel as targets?
+7. **Unconventional Measures and Mutiny.** May the AI ever betray a deal or bluff in table talk, or only stay quiet and vote?
+8. **Table talk in agenda play.** Is it OK to post announcements ("I hold Veto", "if nobody votes I pick Against", boat float proposals) in non-fog games?
+9. **Mutiny stance announcements.** Allowed, or silent only?
+10. **Boat float.** Should the AI start it, or only join one a human proposes? Only when the speaker is an AI?
+11. **Galactic Threat.** The hosts say feed Nekro rather than abstain, and your notes don't say. Which? The rival cost stays as it is until you answer.
+12. **Mech priors.** Accept the non-user ratings in ai-mech-notes as the MechRating priors?
+13. **Arms Reduction anger term.** Share a grudge input with `tactical/OffenseOutlook`, or skip it for now?
+14. **Incentive Program faction stage 1 / stage 2 stats.** Defer (as proposed), or mine game saves for them?
+15. **Homeland Defense.** For = 0 always, or follow the table mood (PDS holders defend)?
+
+---
+
+## Measurement: how to tell agenda play improved
+
+1. **Unit and exam tests (every change).**
+   - `AgendaValuesTest` holds your number for each agenda. `AgendaExamTest` asserts the expert answer per guidance bullet in a realistic position. The leak tests (viewer seam, Covert, deck reads) guard hidden information.
+   - They run with `mvn -Dtest='ti4.ai.agenda.*Test,ti4.ai.actioncards.*Test' test` (mvn, no mvnw).
+   - Building in vigorous-cerf rewrites the dev bot's `target/classes`, so restart the dev bot afterwards.
+2. **Agenda-local self-play metric (milestone 1's flag and every forecast or behaviour milestone).** On the `playagenda` harness (about 4 agendas a game at 2 rounds, about 6 at 3), `AgendaTracker` reports per seat:
+   - realized agenda utility: the `AgendaUtility` of the winner at reveal minus the mean over outcomes, in TG;
+   - rider net value;
+   - agenda-sourced VP;
+   - harness defects: referee-broken ties, and waits over budget.
+3. **Mixed-brain A/B.** Each milestone sits behind an `AiExperiments` flag and runs with `-Dai.selfplay.ab=<flag>` from a frozen worktree (never recompile under a running batch).
+   - Run an A/A first to calibrate the noise of the per-agenda metric.
+   - Primary: treatment minus control realized agenda utility per agenda, with SE over pairs (`AbSummary`), confirmed on 2+ seeds.
+   - Guard: final VP and win share on full games, reporting the average final round, leader VP and table total.
+4. **Single-decision branching.** For rider placement, Politics placement, Covert and Committee, branch from an agenda-reveal snapshot (`EnvironmentSnapshotTest` / `RolloutExperimentTest`). Use common random numbers and a `Determinizer` that keeps known agenda positions fixed.
+5. **Human comparison.** The `SelfPlayEnvironment` eventsdir recorder logs AI ballots against human games for review by hand.
+6. **CPU budget.** Track ms/tick in agenda phases. The forecast reruns 256 samples per hypothetical, so caching is required.
+7. **Base-only agendas** (Elect Planet cards, Shard, Crowns, Rep Govt) never come up in PoK self-play, so only unit tests cover them.
+8. **Optional testbed check.** A dev-bot testbed run would help for the Discord flows: Zeal, Blood Pact, Committee, Bribery, Deadly Plot, Distinguished Councilor and human vote deals. This is a suggestion only; no testbed scripts get written unless you ask.
+
+## Sizes at a glance
+| Milestone | Size |
+| --- | --- |
+| 0 Branch integration | S-M |
+| 2 Measurement harness (done before 1's flag is on) | M |
+| 1 Values and point-law bug (flagged) | M (MechRating M) |
+| 3 Dictate Policy and Covert prior | S |
+| 4 Forecast and ballot correctness | M-L |
+| 5 Riders | M |
+| 6 Agenda-deck knowledge | M |
+| 7 Own hidden and extra votes | M |
+| 8 Card targeting | M per card group |
+| 9 Mutiny, Unconventional, Seed, Miscount | S-M |
+| 10 Vote selling and buying (simple loop) | M |
+| 11 Paying for Veto, Quash and Deadly Plot | S-M |
+| 12 Coordinated plans (deferred) | L |
+| 13 Arbiter, Prophecy and Research Grant use side | S-M |
+
+Milestone 1a, milestone 3 and milestone 13 can ship on unit tests alone. Milestone 1's value table ships behind its flag after the milestone 2 baseline. Milestone 4 lands before milestones 5 through 12.

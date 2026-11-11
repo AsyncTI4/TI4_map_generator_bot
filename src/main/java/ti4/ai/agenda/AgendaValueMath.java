@@ -16,6 +16,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
@@ -86,6 +87,20 @@ class AgendaValueMath {
     static double pointsTo(Game game, Player voter, Player gainer, double points) {
         if (gainer == voter) return ScoringStakes.scoreValue(game, voter, points);
         return -ScoringStakes.rivalPointStake(game, gainer, points);
+    }
+
+    static double roundTable(Game game, double roundTwo, double roundThree, double later) {
+        int round = game.getRound();
+        if (round <= 2) return roundTwo;
+        return round == 3 ? roundThree : later;
+    }
+
+    static boolean endsSoon(Game game) {
+        return GameHorizon.roundsLeft(game) <= 1;
+    }
+
+    static int speakerPosition(Game game, Player seat) {
+        return Helper.getSpeakerOrFullPriorityOrder(game).indexOf(seat);
     }
 
     static int lawRounds(Game game) {

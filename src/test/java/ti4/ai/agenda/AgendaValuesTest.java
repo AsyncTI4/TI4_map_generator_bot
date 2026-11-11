@@ -2,12 +2,17 @@ package ti4.ai.agenda;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.OptionalDouble;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -27,6 +32,7 @@ class AgendaValuesTest extends BaseTi4Test {
     private Player hacan;
     private Tile lodorTile;
 
+    // These tests pin the legacy formulas, so the expert value table (its own tests) is switched off here.
     // A simple three-seat table: Nekro and Sol at home, Hacan seated without anything on the board, Lodor (cultural,
     // with an alpha wormhole) beside Nekro's home and Mehar Xull (hazardous) somewhere unowned.
     @BeforeEach
@@ -42,6 +48,8 @@ class AgendaValuesTest extends BaseTi4Test {
         test.place("18", "000");
         test.solHomeBeside(lodorPosition);
         test.game.setSpeaker(sol);
+        for (Player seat : List.of(nekro, sol, hacan))
+            AiExperiments.disable(seat, EnumSet.of(Experiment.AGENDA_VALUE_TABLE));
     }
 
     private double value(Player voter, String agenda, String outcome, String ownVote) {
@@ -189,5 +197,24 @@ class AgendaValuesTest extends BaseTi4Test {
 
         assertThat(value(nekro, "abolishment", "minister_war", "")).isNegative();
         assertThat(value(sol, "abolishment", "minister_war", "")).isPositive();
+    }
+
+    // Point laws lose their point when discarded: the card says the holder loses the point if they lose the card.
+    @Test
+    void discardingAPointLawCostsItsHolderThePoint() {
+        test.game.addLaw("shard_of_the_throne", "nekro");
+        double point = ScoringStakes.scoreValue(test.game, nekro, 1);
+
+        assertThat(value(nekro, "abolishment", "shard_of_the_throne", "")).isCloseTo(-point, within(1e-9));
+        assertThat(value(sol, "abolishment", "shard_of_the_throne", "")).isPositive();
+        assertThat(value(nekro, "constitution", "for", "for")).isLessThanOrEqualTo(-point);
+    }
+
+    @Test
+    void miscountCountsAPointLawAtItsFullPoint() {
+        test.game.addLaw("crown_of_emphidia", "sol");
+
+        assertThat(value(nekro, "miscount", "crown_of_emphidia", "")).isPositive();
+        assertThat(value(sol, "miscount", "crown_of_emphidia", "")).isNegative();
     }
 }
