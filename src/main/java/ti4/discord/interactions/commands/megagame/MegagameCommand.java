@@ -18,7 +18,11 @@ public class MegagameCommand implements ParentCommand {
                     new MegagameSetSpeaker(),
                     new MegagameMove(),
                     new MegagameRotate(),
-                    new MegagameClear())
+                    new MegagameClear(),
+                    new MegagameGm(),
+                    new MegagameCardsInfo(),
+                    new MegagameShowGameAs(),
+                    new MegagameChannels())
             .collect(Collectors.toMap(Subcommand::getName, Function.identity(), (a, b) -> a, LinkedHashMap::new));
 
     @Override

@@ -31,7 +31,8 @@ public final class PlayerAreas {
         List<Player> playersWithAreas = game.getRealAndEliminatedPlayers().stream()
                 .filter(player -> !PlayerArea.isSkipped(ctx, player))
                 .toList();
-        List<List<Player>> columns = PlayerAreaColumns.split(game, playersWithAreas);
+        List<List<Player>> columns =
+                ctx.showsOnePlayer() ? List.of(playersWithAreas) : PlayerAreaColumns.split(game, playersWithAreas);
         int columnWidth = PlayerAreaColumns.columnWidth(totalWidth, x, columns.size());
 
         int y = topLeft.y;
@@ -53,7 +54,7 @@ public final class PlayerAreas {
             frames.forEach(frame -> frame.draw(g2, rowHeight));
             if (rowHeight > 0) y += rowHeight + AREA_GAP;
         }
-        return drawSpectators(ctx, x, y, totalWidth);
+        return ctx.showsOnePlayer() ? y : drawSpectators(ctx, x, y, totalWidth);
     }
 
     public static Rectangle drawSingle(PlayerAreaContext ctx, Player player, Point topLeft, int totalWidth) {

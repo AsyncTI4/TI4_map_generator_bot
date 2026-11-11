@@ -63,6 +63,7 @@ import ti4.service.game.SpeakerService;
 import ti4.service.leader.agent.modules.MahactAgent;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.megagame.MegagameImperialQueue;
+import ti4.service.megagame.MegagameScOverviewService;
 import ti4.service.megagame.MegagameScThreads;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.turn.EndTurnService;
@@ -211,6 +212,10 @@ public class PlayStrategyCardService {
                 }
 
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
+                if (scGroups) {
+                    MegagameScOverviewService.update(
+                            game, "**" + stratCardName + "** played by " + player.getRepresentationNoPing());
+                }
                 if (game.getPhaseOfGame().contains("action")) {
                     TurnActionLog.record(game, TurnActionLog.STRATEGIC);
                 }

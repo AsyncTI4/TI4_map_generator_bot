@@ -430,7 +430,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    private static String getActionCardInfo(Game game, Player player) {
+    public static String getActionCardInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder();
 
         // ACTION CARDS
