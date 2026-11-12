@@ -264,7 +264,7 @@ A `RiderEffect` has three parts:
 - **Voter penalty.** Sanction: voters on that outcome pay one fleet token. This needs a new `CommandTokenValue.fleet(game, seat, n)`; the class has only `tactic(...)` and `lockLoss(...)` (`src/main/java/ti4/ai/strategy/CommandTokenValue.java:13,17`). It is cheaper when the voter has spare fleet tokens. Sanction has no owner payoff, so it stops being read as a positive rider.
 - **Rival cost:**
   - **Politics Rider:** each seat's `SpeakerTokenValue` change when the token moves. Seats that move up gain and the rest lose, which is how the rider "recruits votes".
-  - **Galactic Threat:** unchanged from today as decided: -1 TG, or -0.5 TG once others voted that way (done). Revised 2026-11-12 after self-play (Xxcha fed Nekro on Representative Government): the cost now scales with the technology Nekro would copy from the voter, see the Galactic Threat note below.
+  - **Galactic Threat:** unchanged from today as decided: -1 TG, or -0.5 TG once others voted that way (done). A tech-scaled cost tried on 2026-11-12 was reverted: the user's flat rule stands, see the Galactic Threat note below.
   - **Other riders:** the rival-gain term `rivalStake × payoff / TG per point`.
 
 With these, a rider on a disliked outcome dissuades others, and the poison-pill Imperial Rider falls out of `withRider` with no new rule.
@@ -457,7 +457,7 @@ Start only after milestones 10-11 show gains in A/B. Each item is built on the `
 - **Anti-Intellectual Revolution:** uses the true rounds left (implemented).
 - **Bluffing and betrayal on Mutiny and Unconventional Measures:** not for now. The AI stays honest and keeps its deals.
 - **Table talk:** allowed ("I hold Veto", boat float proposals, ...). Answers are collected with buttons and the reaction system.
-- **Galactic Threat:** voting for the outcome Nekro predicted costs the voter about 1 TG, less once others have already voted that way (implemented behind `GALACTIC_THREAT_COST`). Since 2026-11-12 the cost is the best technology Nekro would copy from the voter beyond what earlier voters on that outcome offer (public tech value), times Nekro's threat, shared over the voter's rivals, capped at 3 TG; 0 when the voter has nothing Nekro can copy. Vote deals charge it to the seller. The rider pays only through winning voters, so a speaker pick with no votes is worth 0. A new mechanism for milestones 5 and 10: any player may offer TG to players who vote the way their rider points, paid if it resolves. Nekro offering 1-2 TG is one case.
+- **Galactic Threat:** voting for the outcome Nekro predicted costs the voter 1 TG of disincentive, or 0.5 TG once other (non-Nekro) players have already voted that way (user's decided rule, implemented in `GalacticThreatCost.ofBallot` behind `GALACTIC_THREAT_COST`; a tech-scaled cost from 2026-11-12 was reverted). Vote deals and promise deals charge it to the seller. Nekro's payoff side is the technology it would actually copy: the forecast's `threatWorth` is the best technology of the non-Nekro voters on the winning outcome, so a speaker pick with no votes is worth 0, and Nekro picks the prediction with the highest `threatWorth`. A new mechanism for milestones 5 and 10: any player may offer TG to players who vote the way their rider points, paid if it resolves. Nekro offering 1-2 TG is one case.
 - **Mech priors:** accepted as work-in-progress values to verify.
 
 ### Rules corrections

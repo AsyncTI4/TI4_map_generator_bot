@@ -1,6 +1,8 @@
 package ti4.ai.agenda;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
@@ -88,11 +90,21 @@ public class VoteDeals {
         int most = AgendaVoting.castableVotes(game, seller);
         Terms all = terms(game, forecast, withoutDeal, seller, buyer, outcome, most);
         if (!AiExperiments.enabled(buyer, Experiment.AGENDA_VALUE_TABLE)) return all;
+        List<Terms> sizes = new ArrayList<>();
         for (int votes = 1; votes < most; votes++) {
-            Terms fewer = terms(game, forecast, withoutDeal, seller, buyer, outcome, votes);
-            if (fewer.buyerGain() >= all.buyerGain() - ENOUGH) return fewer;
+            sizes.add(terms(game, forecast, withoutDeal, seller, buyer, outcome, votes));
         }
-        return all;
+        sizes.add(all);
+        double best = sizes.stream().mapToDouble(Terms::surplus).max().orElse(all.surplus());
+        return sizes.stream()
+                .filter(terms -> terms.surplus() >= best - ENOUGH)
+                .findFirst()
+                .orElse(all);
+    }
+
+    static double spentVotes(Game game, Player seller, int votes) {
+        if (!AiExperiments.enabled(seller, Experiment.AGENDA_VALUE_TABLE)) return 0;
+        return BallotPlanner.keptVote(game, seller) * votes;
     }
 
     private static Terms terms(
@@ -107,7 +119,8 @@ public class VoteDeals {
         double buyerGain = withDeal.expectedUtility(buyer) - withoutDeal.expectedUtility(buyer);
         double sellerCost = withoutDeal.expectedUtility(seller)
                 - withDeal.expectedUtility(seller)
-                + GalacticThreatCost.ofBallot(game, seller, outcome, votes);
+                + GalacticThreatCost.ofBallot(game, seller, outcome, votes)
+                + spentVotes(game, seller, votes);
         return new Terms(outcome, votes, buyerGain, sellerCost);
     }
 }

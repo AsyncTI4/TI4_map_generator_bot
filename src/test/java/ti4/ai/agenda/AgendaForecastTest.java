@@ -248,6 +248,32 @@ class AgendaForecastTest extends BaseTi4Test {
         assertThat(predicted.withVotes(test.sol, "for", 1).votedChance("for")).isEqualTo(1.0);
     }
 
+    // Galactic Threat copies a technology from a player who voted the predicted way, so the prediction is worth the
+    // best technology of the voters on that outcome, not the best one at the table: with only Sol (Antimass
+    // Deflectors) voting for, Xxcha's Gravity Drive is out of reach and Nekro counts Antimass Deflectors.
+    @Test
+    void aGalacticThreatIsWorthTheTechnologyOfTheVotersOnThatOutcome() {
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        votes(0, 0, 0);
+        test.nekro.setTechs(new java.util.ArrayList<>());
+        test.sol.setTechs(new java.util.ArrayList<>(java.util.List.of("amd")));
+        xxcha.setTechs(new java.util.ArrayList<>(java.util.List.of("gd")));
+        AgendaForecast base = forecast();
+        AgendaForecast predicted = base.withRider(test.nekro, GalacticThreatCost.RIDER, "for");
+        assertThat(RiderPayoff.galacticThreat(test.game, test.nekro, test.nekro))
+                .isCloseTo(ti4.ai.strategy.CopiedTechPolicy.copiedWorth("gd"), within(1e-9));
+
+        AgendaForecast solVotes = predicted.withVotes(test.sol, "for", 1);
+        double amd = ti4.ai.strategy.CopiedTechPolicy.copiedWorth("amd");
+        assertThat(solVotes.threatWorth("for")).isCloseTo(amd, within(1e-9));
+        assertThat(solVotes.expectedUtility(test.nekro))
+                .isCloseTo(solVotes.expected(outcome -> base.utility(test.nekro, outcome)) + amd, within(1e-9));
+
+        AgendaForecast bothVote = solVotes.withVotes(xxcha, "for", 1);
+        assertThat(bothVote.threatWorth("for"))
+                .isCloseTo(ti4.ai.strategy.CopiedTechPolicy.copiedWorth("gd"), within(1e-9));
+    }
+
     // With voters on the predicted outcome the prediction pays, and Nekro's expected utility counts it.
     @Test
     void aGalacticThreatOnAnOutcomeWithVotersCountsItsPayoff() {

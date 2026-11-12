@@ -47,28 +47,21 @@ class GalacticThreatCostTest extends BaseTi4Test {
         assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isZero();
     }
 
-    // The cost is the best technology Nekro would copy from the voter, shared over the voter's rivals and weighted by
-    // how much of a threat Nekro is.
+    // The user's decided rule: the first voter for the outcome Nekro predicted pays 1 trade good of disincentive.
     @Test
-    void theFirstVoteForThePredictedOutcomeCostsWhatNekroWouldCopy() {
+    void theFirstVoteForThePredictedOutcomeCostsOneTradeGood() {
         nekroPredictsXxcha();
-        double copied =
-                GalacticThreatCost.bestCopy(test.nekro, GalacticThreatCost.copyable(test.game, test.nekro, test.sol));
-        assertThat(copied).isPositive();
 
-        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3))
-                .isCloseTo(soloCost(test.sol), within(1e-9))
-                .isPositive()
-                .isLessThanOrEqualTo(GalacticThreatCost.MAX_COST);
+        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isEqualTo(1.0);
     }
 
-    // A voter with no technology Nekro lacks gives it nothing, so voting with the prediction costs nothing.
+    // The disincentive is flat: it does not depend on which technologies the voter holds.
     @Test
-    void aVoterWithNothingToCopyPaysNothing() {
+    void theCostDoesNotDependOnTheVotersTechnology() {
         nekroPredictsXxcha();
         test.sol.setTechs(new java.util.ArrayList<>());
 
-        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isZero();
+        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isEqualTo(1.0);
     }
 
     @Test
@@ -80,19 +73,21 @@ class GalacticThreatCostTest extends BaseTi4Test {
         assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "", 0)).isZero();
     }
 
-    // Once someone else has voted for the prediction Nekro gets a technology anyway: joining costs only what the voter
-    // adds over the technologies the earlier voters already offer.
+    // Once another (non-Nekro) player has voted for the prediction Nekro gets a technology anyway, so joining costs
+    // half.
     @Test
-    void joiningOtherVotersForThePredictionCostsOnlyWhatTheVoterAdds() {
-        double alone = soloCost(test.sol);
+    void joiningOtherVotersForThePredictionCostsHalf() {
         test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER + ";red_4");
 
-        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3))
-                .isGreaterThanOrEqualTo(0)
-                .isLessThan(alone);
+        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isEqualTo(0.5);
+    }
 
-        test.sol.setTechs(new java.util.ArrayList<>(xxcha.getTechs()));
-        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isZero();
+    // Nekro's own votes on its prediction do not count as others having voted.
+    @Test
+    void nekrosOwnVotesDoNotHalveTheCost() {
+        test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER + ";black_2");
+
+        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isEqualTo(1.0);
     }
 
     // The voter's own earlier votes are not "other players" having voted.
@@ -100,8 +95,7 @@ class GalacticThreatCostTest extends BaseTi4Test {
     void ownEarlierVotesDoNotHalveTheCost() {
         test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER + ";blue_2");
 
-        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3))
-                .isCloseTo(soloCost(test.sol), within(1e-9));
+        assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isEqualTo(1.0);
     }
 
     @Test
@@ -128,7 +122,7 @@ class GalacticThreatCostTest extends BaseTi4Test {
         AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST));
         double withoutCost = AgendaForecast.of(test.game, xxcha).utility(test.sol, "xxcha");
 
-        assertThat(withoutCost - withCost).isCloseTo(soloCost(test.sol), within(1e-9));
+        assertThat(withoutCost - withCost).isCloseTo(1.0, within(1e-9));
     }
 
     @Test
@@ -138,7 +132,7 @@ class GalacticThreatCostTest extends BaseTi4Test {
         AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST));
         double withoutCost = AgendaForecast.of(test.game, xxcha).utility(test.sol, "xxcha");
 
-        assertThat(withoutCost - withCost).isLessThan(soloCost(test.sol));
+        assertThat(withoutCost - withCost).isCloseTo(0.5, within(1e-9));
     }
 
     // The viewing seat's own cost is charged on its ballot, not in its forecast, so it is not counted twice.
@@ -178,13 +172,6 @@ class GalacticThreatCostTest extends BaseTi4Test {
         test.game.setCurrentAgendaVote("sol", "black_" + GalacticThreatCost.RIDER);
 
         assertThat(solsBallot().outcome()).isEqualTo("sol");
-    }
-
-    private double soloCost(Player voter) {
-        double copied =
-                GalacticThreatCost.bestCopy(test.nekro, GalacticThreatCost.copyable(test.game, test.nekro, voter));
-        int rivals = AgendaValueMath.liveRivals(test.game, voter).size();
-        return Math.min(GalacticThreatCost.MAX_COST, copied * AgendaValueMath.threat(test.game, test.nekro) / rivals);
     }
 
     private BallotPlanner.Choice solsBallot() {

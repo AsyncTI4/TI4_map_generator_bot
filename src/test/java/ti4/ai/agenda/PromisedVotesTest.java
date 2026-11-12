@@ -186,8 +186,10 @@ class PromisedVotesTest extends BaseTi4Test {
     }
 
     // A seller that would feed Nekro a technology by voting for its prediction counts that in its cost of the deal.
+    // The buyer runs without the expert value table so both deals name the same (whole) stack of votes.
     @Test
     void aVoteSaleOnNekrosPredictionCostsTheSellerTheGalacticThreat() {
+        AiExperiments.disable(sol, Set.of(Experiment.AGENDA_VALUE_TABLE));
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
         test.game.setCurrentAgendaVote("sol", "black_" + GalacticThreatCost.RIDER);
         VoteDeals.Terms withThreat =
@@ -200,6 +202,38 @@ class PromisedVotesTest extends BaseTi4Test {
                 VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
 
         assertThat(withThreat.sellerCost() - without.sellerCost()).isCloseTo(threat, within(1e-9));
+    }
+
+    // Votes sold on a first agenda are votes the seller no longer has for the second, priced like its own ballot
+    // (0.1 TG a vote); on the last agenda they are free. Without the expert value table the seller does not price them.
+    @Test
+    void votesSoldBeforeTheLastAgendaCostTheSellerItsNextAgenda() {
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isZero();
+
+        test.game.setStoredValue("agendaCount", "1");
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isCloseTo(0.5, within(1e-9));
+
+        AiExperiments.disable(xxcha, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isZero();
+    }
+
+    // A seller whose votes are not needed to win sells the fewest that still lock the outcome: on a first agenda Sol
+    // already wins, so Xxcha's deal names fewer votes than its whole stack. Xxcha holds its home planets too, since on
+    // a first agenda it keeps its smallest planet back and Wellon alone would leave nothing to sell.
+    @Test
+    void anUncontestedVoteSaleOnAFirstAgendaNamesFewerVotesThanTheStack() {
+        test.place("14", "101");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+        assertThat(castable).isGreaterThan(1);
+
+        VoteDeals.Terms terms =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+
+        assertThat(terms.votes()).isLessThan(castable);
     }
 
     // A binding promise casts the votes agreed, not the promiser's whole stack.

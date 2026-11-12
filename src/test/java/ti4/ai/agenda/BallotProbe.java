@@ -178,6 +178,17 @@ public final class BallotProbe {
         }
     }
 
+    // Galactic Threat pays through other seats' votes only: the technology the owner expects to copy on that outcome.
+    public static double threatWorth(Game game, Player owner, String outcome) {
+        try (Thinking.Decision isolated = Thinking.open(ThinkingLimits.unlimited())) {
+            AgendaForecast forecast = AgendaForecast.of(game, owner);
+            if (forecast.isEmpty()) return Double.NaN;
+            for (String known : forecast.outcomes())
+                if (known.equalsIgnoreCase(outcome)) return forecast.threatWorth(known);
+            return 0;
+        }
+    }
+
     private static List<Integer> sampled(List<Integer> totals) {
         if (totals.size() <= 8) return totals;
         List<Integer> picked = new ArrayList<>();

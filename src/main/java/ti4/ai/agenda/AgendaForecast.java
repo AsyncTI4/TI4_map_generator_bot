@@ -27,6 +27,7 @@ public final class AgendaForecast {
     private static final double ABSTAINS_WHEN_INDIFFERENT = 0.3;
     private static final String ASSASSINATED = "AssassinatedReps";
     private static final String XXCHA_COMMANDER = "xxchacommander";
+    private static final String GALACTIC_THREAT = "galactic_threat";
     private static final String AGENDA_PHASE = "agenda";
     private static final String VOTING_PHASE = "agendavoting";
     private static final String END_PHASE = "agendaend";
@@ -43,7 +44,9 @@ public final class AgendaForecast {
             double[][] base,
             double[][] draws,
             int speaker,
-            boolean[] keepsVotesWithRider) {}
+            boolean[] keepsVotesWithRider,
+            int threatOwner,
+            double[] copyWorth) {}
 
     private record Placed(int[] castByOutcome, int[] castByVoter, int[][] castBy, List<Rider> riders) {}
 
@@ -55,6 +58,7 @@ public final class AgendaForecast {
     private double[][] utilities;
     private Map<String, Double> chances;
     private Map<String, Double> votedChances;
+    private Map<String, Double> threatWorths;
 
     private AgendaForecast(Frame frame, int[] votes, int[] cast, int[][] castBy, List<Rider> riders) {
         this.frame = frame;
@@ -72,6 +76,7 @@ public final class AgendaForecast {
             if (outcomes.isEmpty() || voters.isEmpty()) return NONE;
             String agenda = AgendaPolicy.currentAgenda(game);
             Placed placed = readPlaced(game, viewer, voters, outcomes);
+            int threatOwner = threatOwner(voters);
             Frame frame = new Frame(
                     game,
                     viewer,
@@ -80,7 +85,9 @@ public final class AgendaForecast {
                     baseUtilities(game, viewer, voters, outcomes, agenda),
                     draws(game, viewer, voters.size()),
                     speakerIndex(game, voters),
-                    keepsVotesWithRider(game, voters));
+                    keepsVotesWithRider(game, voters),
+                    threatOwner,
+                    copyWorth(game, viewer, voters, threatOwner));
             return PromisedVotes.placeAccepted(
                     game,
                     viewer,
@@ -107,6 +114,12 @@ public final class AgendaForecast {
         if (isEmpty()) return 0;
         if (votedChances == null) simulate();
         return votedChances.getOrDefault(outcome, 0.0);
+    }
+
+    public double threatWorth(String outcome) {
+        if (isEmpty()) return 0;
+        if (threatWorths == null) simulate();
+        return threatWorths.getOrDefault(outcome, 0.0);
     }
 
     public java.util.Set<String> outcomes() {
@@ -167,7 +180,7 @@ public final class AgendaForecast {
                 .filter(rider -> GalacticThreatCost.RIDER.equals(rider.title()))
                 .mapToDouble(rider -> {
                     String outcome = frame.outcomes().get(rider.outcome());
-                    return rider.payoff() * Math.max(0, chance(outcome) - votedChance(outcome));
+                    return Math.max(0, rider.payoff() * chance(outcome) - threatWorth(outcome));
                 })
                 .sum();
     }
@@ -229,6 +242,25 @@ public final class AgendaForecast {
             keeps[voter] = game.playerHasLeaderUnlockedOrAlliance(voters.get(voter), XXCHA_COMMANDER);
         }
         return keeps;
+    }
+
+    private static int threatOwner(List<Player> voters) {
+        for (int voter = 0; voter < voters.size(); voter++) {
+            if (voters.get(voter).hasAbility(GALACTIC_THREAT)) return voter;
+        }
+        return -1;
+    }
+
+    private static double[] copyWorth(Game game, Player viewer, List<Player> voters, int threatOwner) {
+        double[] worth = new double[voters.size()];
+        if (threatOwner < 0 || !AiExperiments.enabled(viewer, Experiment.GALACTIC_THREAT_COST)) return worth;
+        Player nekro = voters.get(threatOwner);
+        for (int voter = 0; voter < worth.length; voter++) {
+            if (voter == threatOwner) continue;
+            worth[voter] =
+                    GalacticThreatCost.bestCopy(nekro, GalacticThreatCost.copyable(game, nekro, voters.get(voter)));
+        }
+        return worth;
     }
 
     private static int speakerIndex(Game game, List<Player> voters) {
@@ -385,35 +417,53 @@ public final class AgendaForecast {
         boolean abstainsWhenIndifferent = AiExperiments.enabled(frame.viewer(), Experiment.AGENDA_VALUE_TABLE);
         int[] wins = new int[outcomes];
         int[] votedWins = new int[outcomes];
+        double[] copied = new double[outcomes];
         boolean[] predictor = predictors(voters);
+        int[] picks = new int[voters];
         for (double[] draw : frame.draws()) {
             int[] tally = cast.clone();
             int[] predictorTally = predictorCast(predictor, outcomes);
             for (int voter = 0; voter < voters; voter++) {
+                picks[voter] = -1;
                 if (votes[voter] == 0) continue;
                 int pick = indifferent[voter]
                         ? (abstainsWhenIndifferent ? -1 : indifferentPick(draw[voter], outcomes))
                         : softmaxPick(cumulative[voter], draw[voter]);
                 if (pick < 0) continue;
+                picks[voter] = pick;
                 tally[pick] += votes[voter];
                 if (predictor[voter]) predictorTally[pick] += votes[voter];
             }
             int winner = winner(tally, utility[frame.speaker()]);
             wins[winner]++;
             if (tally[winner] > predictorTally[winner]) votedWins[winner]++;
+            copied[winner] += bestCopyFromVoters(predictor, picks, winner);
         }
         Map<String, Double> result = new LinkedHashMap<>();
         Map<String, Double> voted = new LinkedHashMap<>();
+        Map<String, Double> worth = new LinkedHashMap<>();
         for (int outcome = 0; outcome < outcomes; outcome++) {
             result.put(frame.outcomes().get(outcome), (double) wins[outcome] / SAMPLES);
             voted.put(frame.outcomes().get(outcome), (double) votedWins[outcome] / SAMPLES);
+            worth.put(frame.outcomes().get(outcome), copied[outcome] / SAMPLES);
         }
         chances = Collections.unmodifiableMap(result);
         votedChances = Collections.unmodifiableMap(voted);
+        threatWorths = Collections.unmodifiableMap(worth);
+    }
+
+    private double bestCopyFromVoters(boolean[] predictor, int[] picks, int winner) {
+        double best = 0;
+        for (int voter = 0; voter < picks.length; voter++) {
+            if (predictor[voter]) continue;
+            if (picks[voter] == winner || castBy[voter][winner] > 0) best = Math.max(best, frame.copyWorth()[voter]);
+        }
+        return best;
     }
 
     private boolean[] predictors(int voters) {
         boolean[] predictor = new boolean[voters];
+        if (frame.threatOwner() >= 0) predictor[frame.threatOwner()] = true;
         for (Rider rider : riders) {
             if (GalacticThreatCost.RIDER.equals(rider.title())) predictor[rider.owner()] = true;
         }

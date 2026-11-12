@@ -277,13 +277,15 @@ final class AgendaTracker {
     private AgendaTrace.RiderSeen riderSeen(
             Game game, Player owner, String rider, String outcome, double payoff, long now) {
         double chance;
+        double threatWorth = Double.NaN;
         try {
             chance = ti4.ai.agenda.BallotProbe.riderChance(game, owner, outcome);
+            if (isGalacticThreat(rider)) threatWorth = ti4.ai.agenda.BallotProbe.threatWorth(game, owner, outcome);
         } catch (RuntimeException e) {
             chance = Double.NaN;
         }
         int ballots = votesBySeat(game, open.votes).size();
-        return new AgendaTrace.RiderSeen(owner.getFaction(), rider, outcome, payoff, chance, now, ballots);
+        return new AgendaTrace.RiderSeen(owner.getFaction(), rider, outcome, payoff, chance, threatWorth, now, ballots);
     }
 
     private void close(Game game, long now) {

@@ -96,6 +96,8 @@ final class AgendaTrace {
             String outcome,
             double payoff,
             double chance,
+            // Galactic Threat only: the technology Nekro expects to copy from seats voting that way (NaN otherwise).
+            double threatWorth,
             long seenAt,
             int ballotsBefore) {}
 
@@ -577,6 +579,17 @@ final class AgendaTrace {
                     .orElse(agenda.resolved() && rider.outcome().equalsIgnoreCase(agenda.outcome()));
         }
 
+        // What the tracker scored the won rider at: the copied technology for Galactic Threat, else its payoff.
+        private static String realizedWorth(RiderSeen rider, AgendaTracker.Agenda agenda) {
+            return agenda.riders().stream()
+                    .filter(placed -> placed.faction().equals(rider.faction())
+                            && placed.rider().equals(rider.rider())
+                            && placed.outcome().equals(rider.outcome()))
+                    .findFirst()
+                    .map(placed -> String.format(" (worth %.1f TG)", placed.payoff()))
+                    .orElse("");
+        }
+
         private String riderLine(RiderSeen rider, AgendaTracker.Agenda agenda, Map<String, Snap> atClose) {
             boolean won = won(rider, agenda);
             String name = rider.rider().toLowerCase(Locale.ROOT).trim();
@@ -587,7 +600,7 @@ final class AgendaTrace {
                 paid = before == null || after == null ? "?" : change(before, after);
             }
             return String.format(
-                    "%-8s %s on %s | seen %s after %d ballot%s | its forecast chance %s | valued %.1f TG%s | %s | owner"
+                    "%-8s %s on %s | seen %s after %d ballot%s | its forecast chance %s%s | valued %.1f TG%s | %s%s | owner"
                             + " change after resolution: %s",
                     rider.faction(),
                     rider.rider(),
@@ -596,9 +609,13 @@ final class AgendaTrace {
                     rider.ballotsBefore(),
                     rider.ballotsBefore() == 1 ? "" : "s",
                     Double.isNaN(rider.chance()) ? "-" : String.format("%.0f%%", 100 * rider.chance()),
+                    Double.isNaN(rider.threatWorth())
+                            ? ""
+                            : String.format(", expected copy through other voters %.1f TG", rider.threatWorth()),
                     rider.payoff(),
                     NOT_ACTION_CARDS.contains(name) || !name.endsWith("rider") ? "" : ", cost 1 action card",
                     won ? "WON" : agenda.resolved() ? "lost" : "unresolved",
+                    won ? realizedWorth(rider, agenda) : "",
                     paid);
         }
 

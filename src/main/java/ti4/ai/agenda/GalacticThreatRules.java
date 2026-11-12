@@ -36,6 +36,7 @@ public class GalacticThreatRules {
     private static final String SILENCED_REPRESENTATIVES = "AssassinatedReps";
     private static final String DECLINED_AFTERS = "declinedAfters";
     private static final String QUEUE_WINDOW_PHASE = "agendawaiting";
+    private static final double VOTED_TIE_BREAK = 1e-3;
 
     public static boolean holdsQueuedPrediction(Game game, Player seat) {
         return seat.hasAbility(ABILITY)
@@ -126,7 +127,7 @@ public class GalacticThreatRules {
         String target = StringUtils.substringBefore(StringUtils.removeStart(id, RIDER_PREFIX), "_" + RIDER_SUFFIX);
         String outcome = StringUtils.substringAfter(target, ";");
         return AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_COST)
-                ? forecast.votedChance(outcome)
+                ? forecast.threatWorth(outcome) + VOTED_TIE_BREAK * forecast.votedChance(outcome)
                 : forecast.chance(outcome);
     }
 

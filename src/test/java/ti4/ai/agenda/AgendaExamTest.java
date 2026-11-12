@@ -312,11 +312,7 @@ class AgendaExamTest extends BaseTi4Test {
 
     // ---- Galactic Threat ---------------------------------------------------------------------------------------
 
-    /**
-     * Politics answers: voting for the outcome Nekro predicted costs the voter about 1 TG, less once others voted that
-     * way. The cost is the technology Nekro would copy from the voter, over what earlier voters already offer, shared
-     * over the voter's rivals; a voter with nothing Nekro can copy pays nothing.
-     */
+    /** Politics answers: voting for the outcome Nekro predicted costs 1 TG, or 0.5 TG once others voted that way. */
     @Nested
     class GalacticThreat {
 
@@ -338,26 +334,15 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ballot(sol, 3, 2, 4)).isPresent().get().isNotEqualTo(unpredicted);
         }
 
-        // Once another seat has voted for the prediction Nekro gets a technology anyway, so the cost falls.
+        // Once another seat has voted for the prediction Nekro gets its technology anyway, so the cost halves.
         @Test
-        void joiningOthersOnThePredictionCostsLess() {
+        void joiningOthersOnThePredictionCostsHalf() {
             reveal("Law_Elect Player_7_minister_war", "blue", 9, "red", 4, "black", 0);
             test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER);
-            double alone = GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3);
-            assertThat(alone).isBetween(0.5, 3.0);
+            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isEqualTo(1.0);
 
             test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER + ";red_4");
-            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isLessThan(alone);
-        }
-
-        // Sol holds only technologies Nekro already has: voting with the prediction feeds Nekro nothing, so it is free.
-        @Test
-        void aVoterNekroCannotCopyFromPaysNothing() {
-            reveal("Law_Elect Player_7_minister_war", "blue", 9, "red", 4, "black", 0);
-            test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER);
-            sol.setTechs(new java.util.ArrayList<>(nekro.getTechs()));
-
-            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isZero();
+            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isEqualTo(0.5);
         }
 
         // A 5 TG minister is worth more than the 1 TG: Sol still votes itself after Nekro predicted Sol.

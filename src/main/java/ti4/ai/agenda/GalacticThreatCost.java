@@ -2,11 +2,9 @@ package ti4.ai.agenda;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.ai.AiExperiments;
@@ -20,7 +18,8 @@ import ti4.helpers.ButtonHelperAbilities;
 public class GalacticThreatCost {
 
     public static final String RIDER = "Galactic Threat Rider";
-    static final double MAX_COST = 3.0;
+    static final double ALONE = 1.0;
+    static final double JOINED = 0.5;
 
     record Prediction(Player predictor, String outcome) {}
 
@@ -33,16 +32,7 @@ public class GalacticThreatCost {
 
     static double cost(Game game, Player voter, Player predictor, String predicted, String outcome) {
         if (voter == predictor || predicted == null || !predicted.equals(outcome)) return 0;
-        Set<String> alreadyOffered = new LinkedHashSet<>();
-        for (Player other : othersVotedFor(game, outcome, voter, predictor)) {
-            alreadyOffered.addAll(copyable(game, predictor, other));
-        }
-        Set<String> withVoter = new LinkedHashSet<>(alreadyOffered);
-        withVoter.addAll(copyable(game, predictor, voter));
-        double marginal = bestCopy(predictor, withVoter) - bestCopy(predictor, alreadyOffered);
-        if (marginal <= 0) return 0;
-        int rivals = Math.max(1, AgendaValueMath.liveRivals(game, voter).size());
-        return Math.min(MAX_COST, marginal * AgendaValueMath.threat(game, predictor) / rivals);
+        return othersVotedFor(game, outcome, voter, predictor) ? JOINED : ALONE;
     }
 
     static List<String> copyable(Game game, Player nekro, Player from) {
@@ -68,19 +58,18 @@ public class GalacticThreatCost {
         return Optional.empty();
     }
 
-    private static Set<Player> othersVotedFor(Game game, String outcome, Player voter, Player predictor) {
-        Set<Player> others = new LinkedHashSet<>();
+    private static boolean othersVotedFor(Game game, String outcome, Player voter, Player predictor) {
         String placed = game.getCurrentAgendaVotes().get(outcome);
-        if (placed == null) return others;
+        if (placed == null) return false;
         for (String piece : placed.split(";")) {
             int split = piece.indexOf('_');
             if (split < 0) continue;
             String votes = piece.substring(split + 1);
             if (!NumberUtils.isDigits(votes) || Integer.parseInt(votes) <= 0) continue;
             Player caster = playerOf(game, piece);
-            if (caster != null && caster != voter && caster != predictor) others.add(caster);
+            if (caster != null && caster != voter && caster != predictor) return true;
         }
-        return others;
+        return false;
     }
 
     private static Player playerOf(Game game, String piece) {
