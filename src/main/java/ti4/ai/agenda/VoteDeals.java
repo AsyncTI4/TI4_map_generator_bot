@@ -220,7 +220,6 @@ public class VoteDeals {
         List<Integer> planets = BallotPlanner.reachableTotals(AgendaVoting.readiedPlanetVotes(game, seller), most);
         TreeSet<Integer> sizes = new TreeSet<>(planets);
         if (AgendaVoting.plansPredictive(seller)) {
-            sizes.add(BallotPlanner.PREDICTIVE_VOTES);
             planets.forEach(votes -> sizes.add(votes + BallotPlanner.PREDICTIVE_VOTES));
         }
         sizes.add(most);

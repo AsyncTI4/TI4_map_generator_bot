@@ -338,7 +338,8 @@ class PromisedVotesTest extends BaseTi4Test {
     }
 
     // Planets are exhausted whole, so a deal only names vote totals the seller's readied planets can make (plus the 3
-    // of a ready Predictive Intelligence), never one that would make it cast more than it promised.
+    // of a ready Predictive Intelligence), never one that would make it cast more than it promised. Predictive
+    // Intelligence adds to votes cast, so it is never sold on its own: 3 is a size only when planets make 3.
     @Test
     void aVoteDealOnlyNamesTotalsThePlanetsCanMake() {
         test.place("14", "101");
@@ -350,13 +351,14 @@ class PromisedVotesTest extends BaseTi4Test {
         assertThat(VoteDeals.saleSizes(test.game, xxcha, most)).isEqualTo(BallotPlanner.reachableTotals(planets, most));
 
         xxcha.addTech("pi");
-        assertThat(VoteDeals.saleSizes(test.game, xxcha, most))
-                .contains(BallotPlanner.PREDICTIVE_VOTES)
+        java.util.List<Integer> reachable = BallotPlanner.reachableTotals(planets, most);
+        java.util.List<Integer> withPredictive = VoteDeals.saleSizes(test.game, xxcha, most);
+        assertThat(withPredictive)
                 .allMatch(votes -> votes <= most)
-                .allMatch(votes -> BallotPlanner.reachableTotals(planets, most).contains(votes)
-                        || votes == BallotPlanner.PREDICTIVE_VOTES
-                        || BallotPlanner.reachableTotals(planets, most)
-                                .contains(votes - BallotPlanner.PREDICTIVE_VOTES));
+                .allMatch(votes ->
+                        reachable.contains(votes) || reachable.contains(votes - BallotPlanner.PREDICTIVE_VOTES));
+        if (!reachable.contains(BallotPlanner.PREDICTIVE_VOTES))
+            assertThat(withPredictive).doesNotContain(BallotPlanner.PREDICTIVE_VOTES);
     }
 
     // When the buyer values a deal, its forecast already lowers the seller's utility of Nekro's predicted outcome by

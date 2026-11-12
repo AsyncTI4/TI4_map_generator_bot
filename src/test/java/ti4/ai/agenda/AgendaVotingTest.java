@@ -98,7 +98,8 @@ class AgendaVotingTest extends BaseTi4Test {
         assertThat(press(predictivePrompt())).isEqualTo("exhaustForVotes_planet_jord");
     }
 
-    // A promise for fewer than 3 votes never adds the card's 3 on top; a promise for 3 or more counts them.
+    // A promise for 3 votes or fewer never uses the card, since its 3 votes only add to at least one planet vote; a
+    // promise for more counts them.
     @Test
     void aSmallVotePromiseNeverAddsPredictiveIntelligence() {
         test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
@@ -109,7 +110,7 @@ class AgendaVotingTest extends BaseTi4Test {
     }
 
     @Test
-    void aPromiseOfThreeOrMoreVotesCountsPredictiveIntelligenceInThem() {
+    void aPromiseOfThreeVotesCastsPlanetsWithoutPredictiveIntelligence() {
         test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
         test.place("19", AiTestGame.neighbourOf("304"));
         sol.addPlanet("wellon");
@@ -117,7 +118,66 @@ class AgendaVotingTest extends BaseTi4Test {
         assertThat(AgendaVoting.castableVotes(test.game, sol)).isGreaterThanOrEqualTo(3);
         ti4.ai.promise.PromiseBook.save(test.game, promiseOfVotes(3).accepted(test.game));
 
-        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("nekro", "", 3, true));
+        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("nekro", "", 3, false));
+    }
+
+    // Predictive Intelligence adds 3 votes to votes cast, so it never makes a ballot alone: once the card is used, a
+    // seat that has spent no planet still exhausts one, even when the card's 3 already cover its planned votes. The
+    // seat here plays without the expert value table, which uses the card on every ballot (the self-play Mutiny
+    // ballot of 3 card votes and no planet).
+    @Test
+    void predictiveIntelligenceNeverCastsWithoutAPlanetVote() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaCount", "1");
+        test.place("19", AiTestGame.neighbourOf("304"));
+        sol.addPlanet("wellon");
+        ti4.ai.AiExperiments.disable(sol, java.util.Set.of(ti4.ai.AiExperiments.Experiment.AGENDA_VALUE_TABLE));
+        sol.addTech("pi");
+        AgendaVoting.Ballot ballot = new AgendaVoting.Ballot("sol", "", 1, false);
+        AiPrompt planets = prompt(
+                "planets",
+                PromptSource.PUBLIC,
+                NOW,
+                List.of(
+                        "exhaustForVotes_planet_jord",
+                        "exhaustForVotes_planet_wellon",
+                        "exhaustForVotes_predictive_3",
+                        "FFCC_sol_proceedToFinalizingVote"),
+                List.of("Jord (4)", "Wellon (2)", "Use Predictive Intelligence Votes (3)", "Done exhausting planets."));
+        assertThat(pressWith(ballot, planets)).isEqualTo("exhaustForVotes_predictive_3");
+
+        sol.addSpentThing("predictive_3");
+        assertThat(pressWith(ballot, planets)).startsWith("exhaustForVotes_planet_");
+    }
+
+    private String pressWith(AgendaVoting.Ballot ballot, AiPrompt... prompts) {
+        ti4.ai.brain.AiTurnContext context = test.contextFor(sol, java.util.Set.of(), NOW, prompts);
+        context.memory().put("agendaBallot|" + test.game.getCurrentAgendaInfo(), ballot.encode());
+        return AgendaVoting.next(context).map(AiTestGame::pressedId).orElse("");
+    }
+
+    // With no planet it may exhaust (its only planet is kept back for the second agenda), the card is never used.
+    @Test
+    void predictiveIntelligenceWaitsForAPlanetItMayExhaust() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.game.setStoredValue("agendaCount", "1");
+        ti4.ai.AiExperiments.disable(sol, java.util.Set.of(ti4.ai.AiExperiments.Experiment.AGENDA_VALUE_TABLE));
+        sol.addTech("pi");
+        AgendaVoting.Ballot ballot = new AgendaVoting.Ballot("sol", "", 1, false);
+
+        assertThat(pressWith(ballot, predictivePrompt())).isEqualTo("FFCC_sol_proceedToFinalizingVote");
+    }
+
+    @Test
+    void aPromiseOfMoreThanThreeVotesCountsPredictiveIntelligenceInThem() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.place("19", AiTestGame.neighbourOf("304"));
+        sol.addPlanet("wellon");
+        sol.addTech("pi");
+        assertThat(AgendaVoting.castableVotes(test.game, sol)).isGreaterThanOrEqualTo(4);
+        ti4.ai.promise.PromiseBook.save(test.game, promiseOfVotes(4).accepted(test.game));
+
+        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("nekro", "", 4, true));
     }
 
     private ti4.ai.promise.Promise promiseOfVotes(int votes) {

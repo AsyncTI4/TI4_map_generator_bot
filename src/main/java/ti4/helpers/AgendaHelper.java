@@ -1504,7 +1504,7 @@ public final class AgendaHelper {
         return "\nYou have " + getVoteTotal(player, game)[0] + " votes available.";
     }
 
-    static int[] getVoteTotal(Player player, Game game) {
+    public static int[] getVoteTotal(Player player, Game game) {
         int hasXxchaAlliance = game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") ? 1 : 0;
         int hasXxchaHero = player.hasLeaderUnlocked("xxchahero") ? 1 : 0;
         int voteCount = getTotalVoteCount(game, player);
@@ -1549,7 +1549,7 @@ public final class AgendaHelper {
         return new int[] {voteCount, hasXxchaHero, hasXxchaAlliance};
     }
 
-    private static List<Player> getVotingOrder(Game game) {
+    public static List<Player> getVotingOrder(Game game) {
         List<Player> orderList = Helper.getSpeakerOrFullPriorityOrder(game);
         String speakerName = game.getSpeakerUserID();
         Optional<Player> optSpeaker = orderList.stream()

@@ -148,7 +148,6 @@ class BallotPlanner {
         for (String outcome : outcomes) {
             for (int votes : totals) options.add(new Option(outcome, votes, 0));
             if (!predictive) continue;
-            options.add(new Option(outcome, PREDICTIVE_VOTES, 0, true));
             for (int votes : totals) options.add(new Option(outcome, votes + PREDICTIVE_VOTES, 0, true));
         }
         return options;

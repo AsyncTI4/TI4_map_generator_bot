@@ -264,6 +264,9 @@ public final class AgendaForecast {
     }
 
     static List<Player> votingOrder(Game game) {
+        List<Player> engineOrder = new ArrayList<>(AgendaHelper.getVotingOrder(game));
+        engineOrder.removeIf(player -> !game.getRealPlayers().contains(player));
+        if (!engineOrder.isEmpty()) return engineOrder;
         List<Player> order = new ArrayList<>(Helper.getSpeakerOrFullPriorityOrder(game));
         if (order.isEmpty()) order.addAll(game.getRealPlayers());
         order.removeIf(player -> !game.getRealPlayers().contains(player));

@@ -17,6 +17,7 @@ import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.AgendaHelper;
 
 /**
  * The human-readable explanation of each agenda in a self-play run: one "AGENDA TRACE" block per agenda, printed when
@@ -35,6 +36,8 @@ final class AgendaTrace {
     static final String PREFIX = "AGENDA TRACE";
     private static final String AGENDA_PHASE = "agenda";
     private static final String SEND_TG = "sendTGTo_";
+    private static final String RISKED_PREDICTIVE = "riskedPredictive";
+    private static final String XXCHA_COMMANDER = "xxchacommander";
 
     // Seat state the trace follows, by index into Snap.values.
     static final String[] KINDS = {"tg", "comm", "vp", "tech", "ac", "pn", "cc"};
@@ -308,13 +311,22 @@ final class AgendaTrace {
         private final List<Flow> sends = new ArrayList<>();
         private int pressesSeen;
         private String agendaKey = "";
+        // The engine's vote count per seat at reveal (planets plus other sources such as Predictive Intelligence).
+        private final Map<String, Integer> votesAtReveal = new LinkedHashMap<>();
+        // Factions in the engine's voting order, refreshed until the agenda resolves (Hack Election can reverse it).
+        private List<String> votingOrder = List.of();
+        private final Set<String> usedPredictive = new LinkedHashSet<>();
 
         private Window(Game game, String info, long now) {
             this.info = info;
             this.openedAt = now;
-            for (Player seat : game.getRealPlayers()) atReveal.put(seat.getFaction(), Snap.of(game, seat));
+            for (Player seat : game.getRealPlayers()) {
+                atReveal.put(seat.getFaction(), Snap.of(game, seat));
+                votesAtReveal.put(seat.getFaction(), engineVotes(game, seat));
+            }
             last = new LinkedHashMap<>(atReveal);
             ledgerStart = ledgerSize();
+            votingOrder = votingOrderOf(game);
         }
 
         long openedAt() {
@@ -329,6 +341,11 @@ final class AgendaTrace {
             for (Player seat : game.getRealPlayers()) current.put(seat.getFaction(), Snap.of(game, seat));
             if (!resolved) {
                 beforeResolution = current;
+                List<String> order = votingOrderOf(game);
+                if (!order.isEmpty()) votingOrder = order;
+                String risked = game.getStoredValue(RISKED_PREDICTIVE);
+                for (Player seat : game.getRealPlayers())
+                    if (risked.contains(seat.getFaction())) usedPredictive.add(seat.getFaction());
             } else if (resolvedAt < 0) {
                 resolvedAt = now;
                 ledgerAtResolution = ledgerSize();
@@ -486,6 +503,7 @@ final class AgendaTrace {
                             ? " | tie broken by referee " + agenda.refereeTieBreaks() + ", fallback "
                                     + agenda.fallbackTieBreaks()
                             : ""));
+            out.add("  " + votingOrderLine(game, agenda, heard));
             out.add("  BALLOTS (votes cast; AI reason; planner view: own utility in TG, forecast win chance)");
             for (Player seat : game.getRealPlayers()) {
                 String faction = seat.getFaction();
@@ -496,10 +514,7 @@ final class AgendaTrace {
                         .map(event -> "\"" + event.text() + "\"")
                         .distinct()
                         .reduce((a, b) -> a + ", " + b)
-                        .orElse(
-                                BallotProbe.cannotVote(game, seat)
-                                        ? "cannot vote (Galactic Threat)"
-                                        : "no ballot decision heard");
+                        .orElse(notHeard(game, seat, agenda));
                 out.add(String.format("    %-8s cast %-14s %s", faction, cast, reasons));
                 BallotProbe.Explanation why = explained.get(faction);
                 if (why != null) out.addAll(explanation(why));
@@ -538,6 +553,130 @@ final class AgendaTrace {
             out.add("  ATTRIBUTION reveal->close: total = deal + rider + agenda effect + other");
             out.addAll(attribution(atClose, flows, riders, agenda));
             return String.join(System.lineSeparator(), out);
+        }
+
+        // Why a seat made no ballot decision: the engine skips a seat with no votes to cast (all planets exhausted, a
+        // rider placed without the Xxcha commander, Galactic Threat) and never asks it.
+        private String notHeard(Game game, Player seat, AgendaTracker.Agenda agenda) {
+            if (BallotProbe.cannotVote(game, seat)) return "cannot vote (Galactic Threat)";
+            if (placedARider(game, seat, agenda)) return "skipped by the engine: placed a rider, so it cannot vote";
+            if (votesAtReveal.getOrDefault(seat.getFaction(), -1) == 0)
+                return "skipped by the engine: no votes to cast (0 at reveal)";
+            return "no ballot decision heard";
+        }
+
+        private static boolean placedARider(Game game, Player seat, AgendaTracker.Agenda agenda) {
+            if (game.playerHasLeaderUnlockedOrAlliance(seat, XXCHA_COMMANDER)) return false;
+            return agenda.riders().stream()
+                    .anyMatch(rider -> rider.faction().equals(seat.getFaction())
+                            && !AgendaTracker.isGalacticThreat(rider.rider()));
+        }
+
+        // "VOTING ORDER: Xxcha (6) 1 For, Nekro (0) -, ...; tally For 5, Against 5; speaker Sol broke the 5-5 tie:
+        // Against": every seat in the engine's voting order with its vote count at reveal and its ballot.
+        String votingOrderLine(Game game, AgendaTracker.Agenda agenda, List<Event> heard) {
+            List<String> order = new ArrayList<>(votingOrder);
+            for (Player seat : game.getRealPlayers())
+                if (!order.contains(seat.getFaction())) order.add(seat.getFaction());
+            List<String> seats = new ArrayList<>();
+            for (String faction : order) {
+                Player seat = game.getPlayerFromColorOrFaction(faction);
+                Integer atReveal = votesAtReveal.get(faction);
+                seats.add(String.format(
+                        "%s (%s) %s",
+                        StringUtils.capitalize(faction),
+                        atReveal == null ? "?" : atReveal,
+                        seat == null ? "?" : ballotText(game, seat, agenda, heard)));
+            }
+            Map<String, Integer> tally = tally(agenda);
+            String tallied = tally.isEmpty()
+                    ? "no votes cast"
+                    : "tally "
+                            + String.join(
+                                    ", ",
+                                    tally.entrySet().stream()
+                                            .map(entry ->
+                                                    StringUtils.capitalize(entry.getKey()) + " " + entry.getValue())
+                                            .toList());
+            return "VOTING ORDER: " + String.join(", ", seats) + "; " + tallied + tieText(agenda, tally, heard);
+        }
+
+        private String ballotText(Game game, Player seat, AgendaTracker.Agenda agenda, List<Event> heard) {
+            String faction = seat.getFaction();
+            String cast = agenda.votesBySeat().getOrDefault(faction, "");
+            if (!cast.isBlank()) {
+                List<String> pieces = new ArrayList<>();
+                for (String piece : cast.split("\\+"))
+                    pieces.add(StringUtils.substringAfterLast(piece, " ") + " "
+                            + StringUtils.capitalize(StringUtils.substringBeforeLast(piece, " ")));
+                return String.join(" + ", pieces)
+                        + (usedPredictive(faction, heard) ? " (PI)" : "")
+                        + (seat.hasAbility("galactic_threat") ? " (Xxcha commander lifts Galactic Threat)" : "");
+            }
+            if (BallotProbe.cannotVote(game, seat)) return "-";
+            if (placedARider(game, seat, agenda)) return "skipped (rider)";
+            if (votesAtReveal.getOrDefault(faction, -1) == 0) return "skipped (no votes)";
+            boolean abstained = heard.stream()
+                    .anyMatch(event -> event.kind() == Kind.BALLOT
+                            && event.faction().equals(faction)
+                            && event.text().toLowerCase(Locale.ROOT).startsWith("abstain"));
+            return abstained ? "abstain" : "no vote";
+        }
+
+        private boolean usedPredictive(String faction, List<Event> heard) {
+            return usedPredictive.contains(faction)
+                    || heard.stream()
+                            .anyMatch(event -> event.faction().equals(faction)
+                                    && event.text().contains("Predictive Intelligence"));
+        }
+
+        private static Map<String, Integer> tally(AgendaTracker.Agenda agenda) {
+            Map<String, Integer> tally = new LinkedHashMap<>();
+            for (String cast : agenda.votesBySeat().values()) {
+                for (String piece : cast.split("\\+")) {
+                    String votes = StringUtils.substringAfterLast(piece, " ");
+                    if (!StringUtils.isNumeric(votes)) continue;
+                    tally.merge(StringUtils.substringBeforeLast(piece, " "), Integer.parseInt(votes), Integer::sum);
+                }
+            }
+            List<Map.Entry<String, Integer>> sorted = new ArrayList<>(tally.entrySet());
+            sorted.sort(Map.Entry.<String, Integer>comparingByValue().reversed());
+            Map<String, Integer> ordered = new LinkedHashMap<>();
+            sorted.forEach(entry -> ordered.put(entry.getKey(), entry.getValue()));
+            return ordered;
+        }
+
+        private static String tieText(AgendaTracker.Agenda agenda, Map<String, Integer> tally, List<Event> heard) {
+            if (!agenda.resolved()) return "; unresolved";
+            String outcome = StringUtils.capitalize(agenda.outcome());
+            List<Integer> totals = new ArrayList<>(tally.values());
+            boolean tied =
+                    totals.isEmpty() || totals.size() > 1 && totals.get(0).equals(totals.get(1));
+            if (!tied) {
+                String leader = tally.keySet().iterator().next();
+                return leader.equalsIgnoreCase(agenda.outcome()) ? "" : "; resolved " + outcome + " against the tally";
+            }
+            int top = totals.isEmpty() ? 0 : totals.getFirst();
+            String tie = totals.isEmpty()
+                    ? "the no-vote tie"
+                    : "the "
+                            + String.join(
+                                    "-",
+                                    java.util.Collections.nCopies(
+                                            (int) totals.stream()
+                                                    .filter(total -> total == top)
+                                                    .count(),
+                                            String.valueOf(top)))
+                            + " tie";
+            if (agenda.refereeTieBreaks() > 0) return "; the referee broke " + tie + ": " + outcome;
+            if (agenda.fallbackTieBreaks() > 0)
+                return "; speaker " + StringUtils.capitalize(agenda.speaker()) + " broke " + tie
+                        + " through its stall fallback: " + outcome;
+            boolean speakerBroke = heard.stream()
+                    .anyMatch(event -> event.faction().equals(agenda.speaker())
+                            && event.text().startsWith("break the agenda tie"));
+            return "; " + (speakerBroke ? "speaker " + StringUtils.capitalize(agenda.speaker()) : "the speaker")
+                    + " broke " + tie + ": " + outcome;
         }
 
         private List<String> explanation(BallotProbe.Explanation why) {
@@ -766,6 +905,26 @@ final class AgendaTrace {
                 if (!gained.isEmpty()) lines.add("             techs gained: " + gained);
             }
             return lines;
+        }
+    }
+
+    private static int engineVotes(Game game, Player seat) {
+        try {
+            return AgendaHelper.getVoteTotal(seat, game)[0];
+        } catch (RuntimeException e) {
+            return -1;
+        }
+    }
+
+    private static List<String> votingOrderOf(Game game) {
+        try {
+            return AgendaHelper.getVotingOrder(game).stream()
+                    .filter(java.util.Objects::nonNull)
+                    .filter(seat -> game.getRealPlayers().contains(seat))
+                    .map(Player::getFaction)
+                    .toList();
+        } catch (RuntimeException e) {
+            return List.of();
         }
     }
 

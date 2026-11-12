@@ -206,7 +206,14 @@ public class AgendaVoting {
         AiPrompt prompt = finish.get().prompt();
         boolean expert = AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE);
         boolean wantsPredictive = expert ? ballot.predictive() : ballot.votes() > 0;
-        if (wantsPredictive && !seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES)) {
+        int spent = seat.getSpentThingsThisWindow().stream()
+                .filter(thing -> thing.startsWith(SPENT_PLANET_PREFIX))
+                .map(thing -> StringUtils.removeStart(thing, SPENT_PLANET_PREFIX))
+                .filter(seat.getPlanets()::contains)
+                .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
+                .sum();
+        boolean predictiveSpent = seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES);
+        if (wantsPredictive && !predictiveSpent && castsAPlanetVote(game, seat, prompt, spent)) {
             Optional<PromptButton> predictive =
                     prompt.firstEnabled(button -> button.isUnowned() && PREDICTIVE_BUTTON.equals(button.handlerId()));
             if (predictive.isPresent()) {
@@ -214,23 +221,21 @@ public class AgendaVoting {
                         AiDecision.press(prompt, predictive.get(), "cast 3 votes with Predictive Intelligence"));
             }
         }
-        int spent = seat.getSpentThingsThisWindow().stream()
-                .filter(thing -> thing.startsWith(SPENT_PLANET_PREFIX))
-                .map(thing -> StringUtils.removeStart(thing, SPENT_PLANET_PREFIX))
-                .filter(seat.getPlanets()::contains)
-                .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
-                .sum();
-        boolean countsPredictive = (expert || !AgendaRound.isFinalAgenda(game))
-                && seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES);
+        boolean countsPredictive = (expert || !AgendaRound.isFinalAgenda(game)) && predictiveSpent;
         int predictive = countsPredictive ? PREDICTIVE_VOTE_COUNT : 0;
-        if (spent + predictive < ballot.votes()) {
-            Optional<PromptButton> planet = planetToExhaust(game, seat, prompt, ballot.votes() - spent - predictive);
+        int needed = Math.max(ballot.votes() - spent - predictive, predictiveSpent && spent == 0 ? 1 : 0);
+        if (needed > 0) {
+            Optional<PromptButton> planet = planetToExhaust(game, seat, prompt, needed);
             if (planet.isPresent())
                 return Optional.of(AiDecision.press(prompt, planet.get(), "exhaust a planet for votes"));
         }
         Optional<AiDecision> tradeGoods = spendTradeGoods(context, prompt, ballot, spent);
         if (tradeGoods.isPresent()) return tradeGoods;
         return Optional.of(finish.get().press("finish casting its votes"));
+    }
+
+    private static boolean castsAPlanetVote(Game game, Player seat, AiPrompt prompt, int spent) {
+        return spent > 0 || planetToExhaust(game, seat, prompt, 1).isPresent();
     }
 
     private static Optional<PromptButton> planetToExhaust(Game game, Player seat, AiPrompt prompt, int needed) {
@@ -306,7 +311,7 @@ public class AgendaVoting {
     }
 
     private static Optional<Ballot> promisedBallot(Game game, Player seat, String outcome, int votes) {
-        return ballotFor(game, outcome, votes, plansPredictive(seat) && votes >= BallotPlanner.PREDICTIVE_VOTES);
+        return ballotFor(game, outcome, votes, plansPredictive(seat) && votes > BallotPlanner.PREDICTIVE_VOTES);
     }
 
     static boolean plansPredictive(Player seat) {
