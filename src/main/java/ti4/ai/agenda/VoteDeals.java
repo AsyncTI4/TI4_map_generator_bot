@@ -19,6 +19,9 @@ public class VoteDeals {
     private static final int MAX_BLOC_PARTNERS = 3;
     private static final String VOTING_PHASE = "agendaVoting";
     private static final String WAITING_PHASE = "agendawaiting";
+    private static final String ABSTAIN = "";
+    private static final String GALACTIC_THREAT = "galactic_threat";
+    private static final String GALACTIC_THREAT_USED = "galacticThreatUsed";
 
     public record Terms(String outcome, int votes, double buyerGain, double sellerCost, double chance) {
 
@@ -45,7 +48,7 @@ public class VoteDeals {
         private final Game game;
         private final Player viewer;
         private final AgendaForecast forecast;
-        private AgendaForecast withItsBallot;
+        private AgendaVoting.PlannedBallot itsBallot;
 
         private Outlook(Game game, Player viewer) {
             this.game = game;
@@ -55,8 +58,21 @@ public class VoteDeals {
 
         private AgendaForecast withoutDeal(Player seller) {
             if (viewer != seller) return forecast;
-            if (withItsBallot == null) withItsBallot = AgendaVoting.forecastWithItsBallot(game, seller);
-            return withItsBallot;
+            return itsBallot().forecast();
+        }
+
+        private AgendaVoting.PlannedBallot itsBallot() {
+            if (itsBallot == null) itsBallot = AgendaVoting.itsBallot(game, viewer);
+            return itsBallot;
+        }
+
+        private String plannedVote(Player seller) {
+            return viewer == seller ? itsBallot().outcome() : ABSTAIN;
+        }
+
+        private int plannedVotes(Player seller, String outcome) {
+            if (viewer != seller || !AiExperiments.enabled(viewer, Experiment.AGENDA_VALUE_TABLE)) return 0;
+            return itsBallot().votesOn(outcome);
         }
     }
 
@@ -102,13 +118,14 @@ public class VoteDeals {
                 .limit(MAX_BLOC_PARTNERS)
                 .toList();
         AgendaForecast joint = base.withVotes(seller, outcome, first.terms().votes());
-        double before = base.expectedUtility(buyer);
+        double before = base.expectedUtility(buyer, ABSTAIN);
         List<Member> members = new ArrayList<>(List.of(first));
         Optional<Bloc> best = Optional.empty();
         for (Member member : candidates) {
             joint = joint.withVotes(member.seller(), outcome, member.terms().votes());
             members.add(member);
-            Bloc bloc = new Bloc(outcome, members, joint.expectedUtility(buyer) - before, joint.chance(outcome));
+            Bloc bloc =
+                    new Bloc(outcome, members, joint.expectedUtility(buyer, ABSTAIN) - before, joint.chance(outcome));
             if (best.isEmpty() || surplus(bloc) > surplus(best.get())) best = Optional.of(bloc);
         }
         return best;
@@ -146,10 +163,18 @@ public class VoteDeals {
         List<Player> order = AgendaForecast.votingOrder(game);
         int position = order.indexOf(seat);
         if (position < 0) return false;
-        if (WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return position == nextVoter(game, order, -1);
+        if (WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
+            return position == nextVoter(game, order, -1) && !predictionStillOpen(game);
+        }
         if (!VOTING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return false;
         int active = activeVoter(game, order);
         return active >= 0 && (position == active || position == nextVoter(game, order, active));
+    }
+
+    static boolean predictionStillOpen(Game game) {
+        if (!game.getStoredValue(GALACTIC_THREAT_USED).isEmpty()) return false;
+        return game.getRealPlayers().stream()
+                .anyMatch(player -> player.hasAbility(GALACTIC_THREAT) && !AgendaQueue.passedOnAfters(game, player));
     }
 
     public static List<Player> votingAfter(Game game, Player seat) {
@@ -235,11 +260,12 @@ public class VoteDeals {
             Outlook outlook, AgendaForecast withoutDeal, Player seller, Player buyer, String outcome, int votes) {
         Game game = outlook.game;
         AgendaForecast withDeal = outlook.forecast.withVotes(seller, outcome, votes);
-        double buyerGain = withDeal.expectedUtility(buyer) - withoutDeal.expectedUtility(buyer);
-        double sellerCost = withoutDeal.expectedUtility(seller)
-                - withDeal.expectedUtility(seller)
-                + GalacticThreatCost.ofBallot(game, seller, outcome, votes)
-                + spentVotes(game, outlook.viewer, votes);
+        double buyerGain = withDeal.expectedUtility(buyer, ABSTAIN) - withoutDeal.expectedUtility(buyer, ABSTAIN);
+        int planned = outlook.plannedVotes(seller, outcome);
+        double sellerCost = withoutDeal.expectedUtility(seller, outlook.plannedVote(seller))
+                - withDeal.expectedUtility(seller, outcome)
+                + (planned > 0 ? 0 : GalacticThreatCost.ofBallot(game, seller, outcome, votes))
+                + spentVotes(game, outlook.viewer, Math.max(0, votes - planned));
         return new Terms(outcome, votes, buyerGain, sellerCost, withDeal.chance(outcome));
     }
 }

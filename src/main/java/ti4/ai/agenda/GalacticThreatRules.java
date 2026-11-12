@@ -39,6 +39,7 @@ public class GalacticThreatRules {
     private static final double VOTED_TIE_BREAK = 1e-3;
     private static final int FEW_OUTCOMES = 2;
     private static final double SURE_OF_VOTERS = 0.7;
+    private static final double SOME_VOTERS = 0.2;
 
     public static boolean holdsQueuedPrediction(Game game, Player seat) {
         return seat.hasAbility(ABILITY)
@@ -62,9 +63,22 @@ public class GalacticThreatRules {
         if (holdsQueuedPrediction(game, seat) && QUEUE_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
             return pressHidden(context, "lockAftersIn", "keep its prediction queued");
         }
-        if (PromisedVotes.forbidsRider(game, seat) || !worthPredicting(game, seat)) return Optional.empty();
+        if (!mayQueueNow(context) || PromisedVotes.forbidsRider(game, seat) || !worthPredicting(game, seat)) {
+            return Optional.empty();
+        }
         return pressHidden(context, QUEUE_ABILITY, "queue Galactic Threat")
                 .or(() -> pressHidden(context, "queueAnAfter", "look at its \"after\" options"));
+    }
+
+    private static boolean mayQueueNow(AiTurnContext context) {
+        Game game = context.game();
+        if (!QUEUE_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return false;
+        if (AgendaQueue.passedOnAfters(game, context.seat())) return false;
+        return hiddenButton(context, QUEUE_ABILITY) || hiddenButton(context, "queueAnAfter");
+    }
+
+    private static boolean hiddenButton(AiTurnContext context, String handlerId) {
+        return pressHidden(context, handlerId, "").isPresent();
     }
 
     private static boolean silencedByPoliticalSecret(Game game, Player seat) {
@@ -98,13 +112,15 @@ public class GalacticThreatRules {
         if (!AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING) || AgendaRound.isFinalAgenda(game)) {
             return true;
         }
+        boolean fewOutcomes = AgendaOutcomes.of(game).size() <= FEW_OUTCOMES;
         AgendaForecast forecast = AgendaForecast.of(game, seat);
-        if (forecast.isEmpty() || forecast.outcomes().size() <= FEW_OUTCOMES) return true;
-        return forecast.outcomes().stream()
-                        .mapToDouble(forecast::votedChance)
-                        .max()
-                        .orElse(0)
-                >= SURE_OF_VOTERS;
+        if (forecast.isEmpty()) return fewOutcomes;
+        double bar = fewOutcomes ? SOME_VOTERS : SURE_OF_VOTERS;
+        return forecast.outcomes().stream().anyMatch(outcome -> votedOncePredicted(forecast, seat, outcome) >= bar);
+    }
+
+    static double votedOncePredicted(AgendaForecast forecast, Player seat, String outcome) {
+        return forecast.withRider(seat, GalacticThreatCost.RIDER, outcome).votedChance(outcome);
     }
 
     private static Optional<AiDecision> predict(AiTurnContext context) {
@@ -141,9 +157,11 @@ public class GalacticThreatRules {
         }
         String target = StringUtils.substringBefore(StringUtils.removeStart(id, RIDER_PREFIX), "_" + RIDER_SUFFIX);
         String outcome = StringUtils.substringAfter(target, ";");
-        return AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_COST)
-                ? forecast.threatWorth(outcome) + VOTED_TIE_BREAK * forecast.votedChance(outcome)
-                : forecast.chance(outcome);
+        if (!AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_COST)) return forecast.chance(outcome);
+        AgendaForecast predicted = AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING)
+                ? forecast.withRider(seat, GalacticThreatCost.RIDER, outcome)
+                : forecast;
+        return predicted.threatWorth(outcome) + VOTED_TIE_BREAK * predicted.votedChance(outcome);
     }
 
     private static double votesBasedLikelihood(Game game, Player seat, PromptButton rider) {

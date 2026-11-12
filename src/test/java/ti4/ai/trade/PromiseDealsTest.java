@@ -660,4 +660,45 @@ class PromiseDealsTest extends BaseTi4Test {
         AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, dear));
         assertThat(PromiseDeals.accepts(context, dear)).isTrue();
     }
+
+    // The 2 TG cap is a budget for the predicted outcome, not a per-deal limit: once Nekro owes 2 TG toward For on this
+    // agenda (an accepted vote deal with another seat), it takes no further vote toward For at any price.
+    @Test
+    void thePredictionCapIsABudgetForTheWholeAgenda() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Player xxcha = test.addSeat("200000000000000002", "xxcha", "red");
+        Promise second = threatVoteOffer(test, 1);
+        Promise first = Promise.offer(
+                        test.game,
+                        Promise.Term.VOTE_FOR,
+                        xxcha,
+                        test.nekro,
+                        test.nekro,
+                        PromisedVotes.agendaKey(test.game),
+                        "for",
+                        1,
+                        2,
+                        NOW,
+                        NOW + 60_000)
+                .accepted(test.game);
+        PromiseBook.save(test.game, first);
+
+        assertThat(PromiseDeals.promisedToward(test.game, test.nekro, "for", ""))
+                .isEqualTo(2);
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, second));
+        assertThat(PromiseDeals.accepts(context, second)).isFalse();
+    }
+
+    // Flag discipline: a seller's own asking cap follows its own experiment flag, not the buyer's.
+    @Test
+    void theSellersCapFollowsTheSellersFlag() {
+        AiTestGame test = AiTestGame.withSolAi();
+        threatVoteOffer(test, 2);
+        AiExperiments.disable(test.sol, Set.of(Experiment.AGENDA_VALUE_TABLE));
+
+        assertThat(PromiseDeals.predictionCap(test.game, test.sol, test.nekro, "for"))
+                .isZero();
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, test.nekro, "for"))
+                .isEqualTo(PromiseDeals.PREDICTION_VOTE_PRICE_CAP);
+    }
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
 
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -162,17 +163,53 @@ class GalacticThreatRulesTest extends BaseTi4Test {
         assertThat(press(window)).isEqualTo("queueAnAfter");
     }
 
-    // A For/Against agenda has two outcomes, so even an unsure prediction is a coin flip worth taking on the first
-    // agenda.
-    @Test
-    void usesGalacticThreatOnAFirstAgendaWithTwoOutcomes() {
+    private void firstAgendaSanctions() {
         test.game.setVp(10);
-        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setSpeakerUserID(test.nekro.getUserID());
         test.game.setStoredValue("agendaCount", "1");
         test.game.setCurrentAgendaInfo("Law_For/Against_7_sanctions");
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"black\":0}");
+    }
+
+    // A For/Against agenda has two outcomes, so an unsure prediction is worth taking on the first agenda once some seat
+    // is likely to vote: Sol holds seven action cards and votes Against Executive Sanctions.
+    @Test
+    void usesGalacticThreatOnAFirstAgendaWithTwoOutcomes() {
+        firstAgendaSanctions();
+        int index = 1;
+        for (String card : List.of("sabo1", "sabo2", "sabo3", "sabo4", "veto", "veto2", "veto3"))
+            test.sol.setActionCard(card, index++);
 
         assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // Traces (aiselfplay528616 r1 #1, Economic Equality; aiselfplay753673 r3 #6, Executive Sanctions): Nekro predicted
+    // a
+    // first two-outcome agenda that nobody voted on, so the speaker's tie-break gave it nothing. With no likely voter
+    // even after the prediction is placed, it keeps Galactic Threat for the second agenda.
+    @Test
+    void keepsGalacticThreatOnAFirstTwoOutcomeAgendaNobodyWillVoteOn() {
+        firstAgendaSanctions();
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isFalse();
+
+        test.game.setStoredValue("agendaCount", "2");
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // CPU: outside the "after" window, with no queue button to press, Nekro builds no forecast for its timing.
+    @Test
+    void looksAtTheTimingOnlyWhenItCanQueue() {
+        openMinisterOfWar("2");
+        test.game.setPhaseOfGame("agendavoting");
+        AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(press(window)).isEmpty();
+        test.game.setPhaseOfGame("agendawaiting");
+        assertThat(press()).isEmpty();
+        assertThat(press(window)).isEqualTo("queueAnAfter");
+        test.game.setStoredValue("declinedAfters", "nekro_");
+        assertThat(press(window)).isEmpty();
     }
 
     // Without the timing experiment Nekro predicts on the first agenda, as before.

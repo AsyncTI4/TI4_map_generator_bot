@@ -390,11 +390,12 @@ class AgendaExamTest extends BaseTi4Test {
         }
 
         // Traces-4b (aiselfplay293998 r1 #1): Executive Sanctions on the first agenda has two outcomes, so Nekro
-        // predicts
-        // even without a sure voter.
+        // predicts without a sure voter, as long as someone is likely to vote: Sol holds seven action cards.
         @Test
         void usesGalacticThreatOnAFirstAgendaForAgainst() {
             sol.addTech("gd");
+            hand(sol, "sabo1", "sabo2", "sabo3", "sabo4", "veto", "veto2", "veto3");
+            test.game.setSpeakerUserID(nekro.getUserID());
             test.game.setStoredValue("agendaCount", "1");
             reveal("Law_For/Against_7_sanctions", "blue", 6, "red", 6, "black", 0);
 
@@ -418,6 +419,72 @@ class AgendaExamTest extends BaseTi4Test {
 
             assertThat(answerVoteOffer(4)).contains("aiPromiseNo_");
             assertThat(answerVoteOffer(2)).contains("aiPromiseYes_");
+        }
+
+        // "Nekro bought Hacan's 1 vote for 4 TG ... cap it at 2 TGs." Review: the cap is checked per deal, so two
+        // sellers
+        // at 2 TG each still cost Nekro 4 TG for one technology. Nekro already owes Xxcha 2 TG for its vote on For, so
+        // it
+        // turns down Sol's 2 TG vote for the same prediction.
+        @Test
+        void spendsAtMostTwoTradeGoodsInAllTowardItsPrediction() {
+            test.place("01", "304");
+            sol.addPlanet("jord");
+            test.place("19", "310");
+            sol.addPlanet("wellon");
+            sol.addTech("gd");
+            nekro.setTg(10);
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setSpeakerUserID(sol.getUserID());
+            reveal("Law_For/Against_7_sanctions", "blue", 6, "red", 1, "black", 0);
+            test.game.setCurrentAgendaVote("for", "black_" + GalacticThreatCost.RIDER);
+            assertThat(answerVoteOffer(2)).contains("aiPromiseYes_");
+            PromiseBook.save(
+                    test.game,
+                    Promise.offer(
+                                    test.game,
+                                    Promise.Term.VOTE_FOR,
+                                    xxcha,
+                                    nekro,
+                                    nekro,
+                                    PromisedVotes.agendaKey(test.game),
+                                    "for",
+                                    1,
+                                    2,
+                                    NOW,
+                                    NOW + 60_000)
+                            .accepted(test.game));
+
+            assertThat(answerVoteOffer(2)).contains("aiPromiseNo_");
+        }
+
+        // Review of aiselfplay528616 r1 #1 (Economic Equality) and aiselfplay753673 r3 #6 (Executive Sanctions): Nekro
+        // predicted a first two-outcome agenda nobody voted on ("expected copy through other voters 0.0 TG"), the
+        // speaker
+        // broke the tie and Galactic Threat was wasted. With no likely voter once the prediction is placed, it waits
+        // for
+        // the second agenda.
+        @Test
+        void keepsGalacticThreatOnAFirstTwoOutcomeAgendaNobodyWillVoteOn() {
+            sol.addTech("gd");
+            test.game.setStoredValue("agendaCount", "1");
+            reveal("Law_For/Against_7_sanctions", "blue", 6, "red", 6, "black", 0);
+
+            assertThat(nekroAfterWindow()).isEmpty();
+        }
+
+        // Review of aiselfplay257038 r1 #1 (Wormhole Research): Letnev sold its 1 For vote to Hacan in the "after"
+        // window, before Nekro had placed Galactic Threat; Nekro then predicted For at 99% because of that promise and
+        // copied a technology. While a seat may still place Galactic Threat, no seat is about to vote.
+        @Test
+        void dealsNoVotesBeforeNekroHasPlacedItsPrediction() {
+            reveal("Directive_For/Against_7_wormhole_research", "blue", 3, "red", 3, "black", 0);
+            Player first = AgendaForecast.votingOrder(test.game).getFirst();
+
+            assertThat(VoteDeals.aboutToVote(test.game, first)).isFalse();
+
+            test.game.setStoredValue("declinedAfters", "nekro_");
+            assertThat(VoteDeals.aboutToVote(test.game, first)).isTrue();
         }
 
         private String answerVoteOffer(int price) {
@@ -568,6 +635,28 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ballot(hacan, 5)).contains("for");
         }
 
+        // Review of aiselfplay528616 r2 #3 (Incentive Program): Hacan, the speaker with 15 votes, put an Imperial Rider
+        // on For, which it liked less, at a 12% forecast chance, and lost the card and its votes. An Imperial Rider is
+        // a
+        // point: it is held for an outcome likely to win, not spent to sway a small preference. (This board does not
+        // reproduce the trace's forecast exactly; the control-seat difference is in AgendaCardRulesTest.)
+        @Test
+        void keepsAnImperialRiderOffAnUnlikelyOutcome() {
+            Player hacan = seat(FOURTH_ID, "hacan", "green");
+            test.place("16", "101");
+            test.place("25", "102");
+            test.place("26", "103");
+            test.place("27", "104");
+            for (String planet : List.of("hercant", "kamdorn", "quann", "lodor", "newalbion")) hacan.addPlanet(planet);
+            test.game.setSpeakerUserID(hacan.getUserID());
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setStoredValue("whensResolved", "Yes");
+            reveal("Directive_For/Against_7_incentive", "blue", 5, "red", 5, "green", 15, "black", 0);
+            hand(hacan, "imp_rider");
+
+            assertThat(AgendaCardRules.queueRider(context(hacan, afterOffer()))).isEmpty();
+        }
+
         @Disabled("milestone 5c: with a single outcome a rider is always played, skipping the keep-prior gate, even a"
                 + " minor one")
         @Test
@@ -591,6 +680,120 @@ class AgendaExamTest extends BaseTi4Test {
         @Test
         void anImperialPoisonPillPushesTheTableToTheOtherOutcome() {
             fail("expected an Imperial Rider on one side to move the indifferent voters to the other side");
+        }
+    }
+
+    /**
+     * Politics guidance, "weigh other players' riders", and the user's note on traces-4b (aiselfplay293998 r1 #1
+     * Executive Sanctions): only Hacan cast 1 For, Xxcha's Trade Rider on For paid 5 TG and Nekro's Galactic Threat
+     * copied a technology, while everyone else abstained to keep its random action card. "The other players should have
+     * weighed Nekro getting a tech and Xxcha getting 5 TG against losing 1 random AC."
+     */
+    @Nested
+    class RivalRiders {
+
+        private static final String SANCTIONS = "Law_For/Against_7_sanctions";
+
+        private Player hacan;
+
+        private void executiveSanctionsAfterHacanVotedFor() {
+            hacan = seat(FOURTH_ID, "hacan", "green");
+            hacan.addTech("gd");
+            test.game.setRound(1);
+            test.game.setStoredValue("agendaCount", "1");
+            for (Player player : List.of(nekro, sol, xxcha, hacan)) anonymousHand(player, 3);
+            reveal(SANCTIONS, "blue", 9, "green", 1, "red", 6, "black", 0);
+            test.game.setCurrentAgendaVote(
+                    "for", "green_1;red_" + RiderPayoff.TRADE + ";black_" + GalacticThreatCost.RIDER);
+        }
+
+        @Test
+        void votesAgainstWhenForPaysARivalsTradeRiderAndGalacticThreat() {
+            executiveSanctionsAfterHacanVotedFor();
+
+            assertThat(ballot(sol, 3, 3, 3)).contains("against");
+        }
+
+        // "...or extort Xxcha to give some of the Trade Rider TGs not to vote Against." A six-seat AI table in round 1:
+        // Xxcha (speaker) placed a Trade Rider on For and nobody has voted. Sol, about to vote Against, offers Xxcha
+        // to stay out of the vote for at most half the rider (2 TG), paid only if For resolves, and Xxcha takes it.
+        @Test
+        void extortsTheTradeRiderHolderNotToVoteAgainst() {
+            AiTestGame table = AiTestGame.withSolAi();
+            Player aiSol = table.sol;
+            Player aiXxcha = table.addSeat("7100000555555555", "xxcha", "red");
+            table.addSeat("7100000666666666", "hacan", "green");
+            table.addSeat("7100000777777777", "letnev", "purple");
+            table.addSeat("7100000888888888", "sardakk", "orange");
+            table.game.setVp(10);
+            table.game.setRound(1);
+            table.place("01", "304");
+            aiSol.addPlanet("jord");
+            table.game.setStoredValue("agendaCount", "2");
+            table.game.setSpeakerUserID(aiXxcha.getUserID());
+            table.game.setCurrentAgendaInfo(SANCTIONS);
+            table.game.setStoredValue(
+                    "agendaStartVoteCounts",
+                    "{\"blue\":4,\"red\":0,\"green\":0,\"purple\":0,\"orange\":0,\"black\":0}");
+            table.game.setCurrentAgendaVote("for", "red_" + RiderPayoff.TRADE);
+            table.isActive(aiSol, "agendaVoting");
+            aiXxcha.setTg(5);
+            assertThat(AgendaVoting.plan(table.game, aiSol).map(AgendaVoting.Ballot::outcome))
+                    .contains("against");
+
+            AiPrompt turn = prompt("turn", PromptSource.PUBLIC, NOW - 500, "FFCC_nekro_done");
+            assertThat(TradeRules.startDeals(table.contextFor(aiSol, Set.of(), NOW, turn)))
+                    .isPresent();
+
+            Promise offer = PromiseBook.proposedBy(table.game, aiSol).getFirst();
+            assertThat(offer.term()).isEqualTo(Promise.Term.NOT_AGAINST);
+            assertThat(offer.promisee()).isEqualTo("xxcha");
+            assertThat(offer.target()).isEqualTo("for");
+            assertThat(offer.price()).isBetween(1, 2);
+            AiPrompt card = prompt(
+                    "offer",
+                    PromptSource.PUBLIC,
+                    NOW,
+                    "FFCC_xxcha_aiPromiseYes_" + offer.id(),
+                    "FFCC_xxcha_aiPromiseNo_" + offer.id());
+            assertThat(pressed(TradeRules.answerPromises(table.contextFor(aiXxcha, Set.of(), NOW, card))))
+                    .contains("aiPromiseYes_");
+        }
+
+        @Test
+        void abstainedWhenRivalRidersWereLeftOutOfTheOutcome() {
+            executiveSanctionsAfterHacanVotedFor();
+            AiExperiments.disable(sol, Set.of(Experiment.RIVAL_RIDER_STAKES));
+
+            assertThat(ballot(sol, 3, 3, 3)).isEmpty();
+        }
+    }
+
+    /**
+     * Review of aiselfplay528616 r3 #6 (Ixthian Artifact, the last agenda): with Against already carried, Letnev and
+     * Xxcha cast their whole stacks For, an outcome they liked less, because the ballot tied with abstaining ("gain
+     * +0.00"). A ballot that gains nothing goes only to the outcome the seat likes best, or the seat abstains.
+     */
+    @Nested
+    class ZeroGainBallots {
+
+        @Test
+        void castsNoZeroGainBallotForAnOutcomeItLikesLess() {
+            seat(FOURTH_ID, "hacan", "green");
+            reveal("Directive_For/Against_7_artifact", "blue", 6, "red", 2, "green", 21, "black", 0);
+            test.game.setCurrentAgendaVote("against", "black_" + GalacticThreatCost.RIDER + ";green_21");
+
+            for (Player seat : List.of(sol, xxcha)) {
+                AgendaForecast forecast = AgendaForecast.of(test.game, seat);
+                double best = forecast.outcomes().stream()
+                        .mapToDouble(outcome -> forecast.utility(seat, outcome))
+                        .max()
+                        .orElseThrow();
+                Optional<String> cast = ballot(seat, seat == sol ? 6 : 2);
+                assertThat(cast.map(outcome -> forecast.utility(seat, outcome)).orElse(best))
+                        .as("%s casts %s", seat.getFaction(), cast)
+                        .isGreaterThanOrEqualTo(best - 1e-6);
+            }
         }
     }
 
@@ -1402,6 +1605,38 @@ class AgendaExamTest extends BaseTi4Test {
                             .orElseThrow()
                             .votes())
                     .isEqualTo(AgendaVoting.castableVotes(test.game, xxcha));
+        }
+
+        // Review of aiselfplay528616 r3 #5 (Public Execution): Sardakk paid Xxcha 5 TG for 21 votes Xxcha's own ballot
+        // already put on Sol. A seller charges nothing for the votes its planned ballot casts that way anyway.
+        @Test
+        void aSellerChargesNoReserveForVotesItWouldCastThatWayAnyway() {
+            board();
+            Player hacan = seat(FOURTH_ID, "hacan", "green");
+            for (Player rival : List.of(nekro, sol, hacan)) anonymousHand(rival, 3);
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setSpeakerUserID(sol.getUserID());
+            reveal("Directive_Elect Player_7_execution", "blue", 2, "red", 6, "green", 3, "black", 0);
+            AgendaVoting.Ballot planned = AgendaVoting.plan(test.game, xxcha).orElseThrow();
+
+            VoteDeals.Terms terms = VoteDeals.valuedAt(
+                            test.game, xxcha, xxcha, hacan, planned.outcome(), planned.votes())
+                    .orElseThrow();
+            assertThat(terms.sellerCost()).isCloseTo(0.0, within(1e-6));
+        }
+
+        // Review of aiselfplay257038 r1 #1 (Wormhole Research): Hacan, the speaker, bought Letnev's For vote. Against
+        // costs only the seats that vote Against, so abstaining the speaker gets Against for free; the deal was valued
+        // as if Hacan voted for whichever outcome won. A buyer values a deal with its own ballot left out.
+        @Test
+        void theSpeakerSeesNoGainInBuyingAVoteAgainstWhatItGetsByAbstaining() {
+            board();
+            reveal("Directive_For/Against_7_wormhole_research", "blue", 1, "red", 6, "black", 0);
+
+            assertThat(VoteDeals.valuedAt(test.game, xxcha, sol, xxcha, "for", 1)
+                            .orElseThrow()
+                            .buyerGain())
+                    .isLessThanOrEqualTo(1e-9);
         }
 
         // "The usual deal is 'I pay you 1 TG to put your votes on For, if it resolves For': payment happens after

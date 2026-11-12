@@ -274,6 +274,16 @@ final class AgendaTrace {
                         promise.price(),
                         promise.proposer(),
                         promise.status());
+            case NOT_AGAINST ->
+                String.format(
+                        "[%s promises %s not to vote against %s, %s pays %d TG; proposed by %s; %s]",
+                        promise.promiser(),
+                        promise.promisee(),
+                        promise.target(),
+                        promise.promisee(),
+                        promise.price(),
+                        promise.proposer(),
+                        promise.status());
             case DISCARD_AGENDA ->
                 String.format(
                         "[%s owes %s %d TG for discarding the agenda with %s; %s]",

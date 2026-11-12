@@ -388,6 +388,9 @@ class AgendaVotingTest extends BaseTi4Test {
 
     @Test
     void leavesTheVoteAloneWithoutARivalsImperialRider() {
+        // Other rival riders are weighed by RIVAL_RIDER_STAKES (see the RivalRiders exams); this case is the Imperial
+        // stake alone.
+        ti4.ai.AiExperiments.disable(sol, java.util.Set.of(ti4.ai.AiExperiments.Experiment.RIVAL_RIDER_STAKES));
         rivalRacesOnForWith("Trade Rider");
 
         assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();

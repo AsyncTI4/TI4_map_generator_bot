@@ -101,8 +101,10 @@ class AgendaForecastTest extends BaseTi4Test {
         assertThat(forecast().chances()).isEqualTo(hypothetical.chances());
     }
 
+    // Votes only: the rival cost of the rider (RIVAL_RIDER_STAKES) would move the other seats' choices.
     @Test
     void theXxchaCommanderLetsARiderOwnerKeepItsVotes() {
+        AiExperiments.disable(test.nekro, Set.of(Experiment.RIVAL_RIDER_STAKES));
         xxcha.addLeader("xxchacommander");
         xxcha.unsafeGetLeader("xxchacommander").setLocked(false);
         AgendaForecast forecast = forecast();
@@ -140,8 +142,10 @@ class AgendaForecastTest extends BaseTi4Test {
         assertThat(forecast().chances()).isEqualTo(forecast().chances());
     }
 
+    // A rider by a seat without votes, with its rival cost (RIVAL_RIDER_STAKES) left out.
     @Test
     void aHypotheticalThatChangesNothingChangesNothing() {
+        AiExperiments.disable(test.nekro, Set.of(Experiment.RIVAL_RIDER_STAKES));
         AgendaForecast forecast = forecast();
 
         assertThat(forecast.withRider(test.nekro, "Politics Rider", "sol").chances())
@@ -170,6 +174,56 @@ class AgendaForecastTest extends BaseTi4Test {
 
         assertThat(forecast.chance("for")).isCloseTo(0.5, within(0.2));
         assertThat(withRider.chance("for")).isLessThan(0.1);
+    }
+
+    // Milestone 5a, rival cost: a rival's Trade Rider on "for" hands it 5 TG, so every other seat likes "for" less by
+    // its share of that gain, and "against" is untouched.
+    @Test
+    void aRivalsTradeRiderLowersThatOutcomeForTheOtherSeats() {
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        votes(3, 3, 0);
+        AgendaForecast forecast = forecast();
+
+        AgendaForecast withRider = forecast.withRider(xxcha, RiderPayoff.TRADE, "for");
+
+        double share = RiderPayoff.of(test.game, test.nekro, xxcha, RiderPayoff.TRADE)
+                * AgendaValueMath.threat(test.game, xxcha)
+                / 2;
+        assertThat(forecast.utility(test.sol, "for") - withRider.utility(test.sol, "for"))
+                .isCloseTo(share, within(1e-9));
+        assertThat(withRider.utility(test.sol, "against")).isEqualTo(forecast.utility(test.sol, "against"));
+        assertThat(withRider.utility(xxcha, "for")).isGreaterThan(forecast.utility(xxcha, "for"));
+    }
+
+    @Test
+    void withoutRivalRiderStakesARivalsTradeRiderChangesNothingForTheOthers() {
+        AiExperiments.disable(test.nekro, Set.of(Experiment.RIVAL_RIDER_STAKES));
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        votes(3, 3, 0);
+        AgendaForecast forecast = forecast();
+
+        assertThat(forecast.withRider(xxcha, RiderPayoff.TRADE, "for").utility(test.sol, "for"))
+                .isEqualTo(forecast.utility(test.sol, "for"));
+    }
+
+    // Once Xxcha has voted for Nekro's prediction, Nekro copies Xxcha's technology if "for" wins whatever Sol does, so
+    // Sol counts that copy against "for". A seat's own hypothetical vote is not counted there: its voter cost is the
+    // flat Galactic Threat ballot cost.
+    @Test
+    void aGalacticThreatCopyFromCastVotesLowersThatOutcomeForTheOtherSeats() {
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        votes(3, 3, 0);
+        test.nekro.setTechs(new java.util.ArrayList<>());
+        test.sol.setTechs(new java.util.ArrayList<>());
+        xxcha.setTechs(new java.util.ArrayList<>(java.util.List.of("gd")));
+        test.game.setCurrentAgendaVote("for", "black_" + GalacticThreatCost.RIDER);
+        AgendaForecast predicted = forecast();
+
+        AgendaForecast xxchaVoted = predicted.withVotes(xxcha, "for", 3);
+
+        assertThat(predicted.utility(test.sol, "for") - xxchaVoted.utility(test.sol, "for"))
+                .isGreaterThan(0.5);
+        assertThat(xxchaVoted.utility(xxcha, "for")).isEqualTo(predicted.utility(xxcha, "for"));
     }
 
     // A point is a big deal for anyone in the race, but a rider owner far behind the leader is no threat yet.

@@ -18,7 +18,7 @@ class PromiseValue {
 
     static double protection(Game game, Player buyer, Player seller, Promise.Term term, String target) {
         return switch (term) {
-            case VOTE_FOR, DISCARD_AGENDA -> 0;
+            case VOTE_FOR, NOT_AGAINST, DISCARD_AGENDA -> 0;
             case NO_ATTACK ->
                 CeasefireValue.DURESS_SHARE
                         * threatened(game, buyer, seller).stream()

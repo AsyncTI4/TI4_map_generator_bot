@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
@@ -56,6 +57,9 @@ class PromiseDeals {
     private static final Comparator<Proposal> BEST = Comparator.comparingDouble(Proposal::gain)
             .thenComparing(proposal -> proposal.term() == Promise.Term.STAY_OUT);
 
+    private static final Comparator<Proposal> LIGHTEST_VOTE_DEAL = Comparator.comparingDouble(Proposal::gain)
+            .thenComparing(proposal -> proposal.term() == Promise.Term.NOT_AGAINST);
+
     record Proposal(
             Promise.Term term, Player promiser, Player promisee, String target, int votes, int price, double gain) {}
 
@@ -93,7 +97,7 @@ class PromiseDeals {
         Predicate<String> backed = backedOutcome(context);
         return open.stream()
                 .flatMap(partner -> votes(context, outlook, mayPromiseVotes, backed, partner).stream())
-                .max(Comparator.comparingDouble(Proposal::gain))
+                .max(LIGHTEST_VOTE_DEAL)
                 .flatMap(proposal -> post(context, proposal));
     }
 
@@ -102,7 +106,7 @@ class PromiseDeals {
     }
 
     static boolean paysOnResolution(Game game, Promise promise) {
-        if (promise.term() != Promise.Term.VOTE_FOR) return false;
+        if (!promise.aboutVotes()) return false;
         Player proposer = game.getPlayerFromColorOrFaction(promise.proposer());
         return proposer != null && AiSeats.isAiSeat(proposer) && conditional(proposer);
     }
@@ -208,9 +212,13 @@ class PromiseDeals {
     }
 
     static String billText(Game game, Player payer, Player payee, Promise promise) {
-        String reason = promise.term() == Promise.Term.DISCARD_AGENDA
-                ? "for discarding the agenda with " + promise.target()
-                : "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
+        String reason =
+                switch (promise.term()) {
+                    case DISCARD_AGENDA -> "for discarding the agenda with " + promise.target();
+                    case NOT_AGAINST ->
+                        "for not voting against **" + outcomeName(game, promise.target()) + "**, which won";
+                    default -> "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
+                };
         return payer.getRepresentationUnfogged() + " owes " + payee.getFactionEmojiOrColor() + " " + promise.price()
                 + " trade goods " + reason + ".";
     }
@@ -255,9 +263,7 @@ class PromiseDeals {
             return PromisedVotes.settlement(game, promise);
         }
         if (promise.status() != Promise.Status.ACCEPTED) return Optional.empty();
-        return promise.term() == Promise.Term.VOTE_FOR
-                ? PromisedVotes.verdict(game, promise)
-                : PromiseChecks.territorial(game, promise);
+        return promise.aboutVotes() ? PromisedVotes.verdict(game, promise) : PromiseChecks.territorial(game, promise);
     }
 
     private static boolean leftUnpaid(AiTurnContext context, Promise promise) {
@@ -313,7 +319,7 @@ class PromiseDeals {
         if (!promise.thisRound(game)) return false;
         Optional<Player> promiser = promise.promiserIn(game);
         if (promiser.isEmpty() || promise.promiseeIn(game).isEmpty()) return false;
-        if (promise.term() == Promise.Term.VOTE_FOR) {
+        if (promise.aboutVotes()) {
             return PromisedVotes.onThisAgenda(game, promise) && !PromisedVotes.hasVoted(game, promiser.get());
         }
         Optional<Player> proposer = Optional.ofNullable(game.getPlayerFromColorOrFaction(promise.proposer()));
@@ -337,8 +343,8 @@ class PromiseDeals {
         }
         double margin = TradeValue.margin(proposer);
         if (promise.isPromiser(seat)) return sells(context, promise, promisee, margin);
-        if (promise.term() == Promise.Term.VOTE_FOR
-                && overPredictionCap(game, seat, promise.target(), promise.price())) {
+        if (promise.aboutVotes()
+                && overPredictionCap(game, seat, seat, promise.target(), promise.price(), promise.id())) {
             return false;
         }
         double paid = payChance(game, seat, promiser, promise) * promise.price();
@@ -350,6 +356,11 @@ class PromiseDeals {
     private static double payChance(Game game, Player viewer, Player seller, Promise promise) {
         if (!paysOnResolution(game, promise)) return 1;
         Player buyer = promise.promiseeIn(game).orElse(viewer);
+        if (promise.term() == Promise.Term.NOT_AGAINST) {
+            return RiderExtortion.toHolder(game, buyer, seller, promise.target())
+                    .map(RiderExtortion.Stake::chance)
+                    .orElse(0.0);
+        }
         return VoteDeals.valuedAt(game, viewer, seller, buyer, promise.target(), promise.votes())
                 .map(VoteDeals.Terms::chance)
                 .orElse(0.0);
@@ -358,6 +369,7 @@ class PromiseDeals {
     private static boolean sells(AiTurnContext context, Promise promise, Player buyer, double margin) {
         Game game = context.game();
         Player seat = context.seat();
+        if (promise.term() == Promise.Term.NOT_AGAINST) return false;
         boolean votes = promise.term() == Promise.Term.VOTE_FOR;
         if (votes
                 && (votesCommittedElsewhere(context) || !backedOutcome(context).test(promise.target()))) {
@@ -388,13 +400,43 @@ class PromiseDeals {
     }
 
     static int predictionCap(Game game, Player buyer, String outcome) {
-        if (!marketPrices(buyer) || !GalacticThreatCost.predicts(game, buyer, outcome)) return 0;
-        return PREDICTION_VOTE_PRICE_CAP;
+        return predictionCap(game, buyer, buyer, outcome);
     }
 
-    private static boolean overPredictionCap(Game game, Player buyer, String outcome, int price) {
-        int cap = predictionCap(game, buyer, outcome);
-        return cap > 0 && price > cap;
+    static int predictionCap(Game game, Player flagSeat, Player buyer, String outcome) {
+        OptionalInt budget = predictionBudget(game, flagSeat, buyer, outcome, "");
+        return budget.isPresent() ? Math.max(MIN_PRICE, budget.getAsInt()) : 0;
+    }
+
+    private static boolean overPredictionCap(
+            Game game, Player flagSeat, Player buyer, String outcome, int price, String exceptId) {
+        OptionalInt budget = predictionBudget(game, flagSeat, buyer, outcome, exceptId);
+        return budget.isPresent() && price > budget.getAsInt();
+    }
+
+    private static OptionalInt predictionBudget(
+            Game game, Player flagSeat, Player buyer, String outcome, String exceptId) {
+        if (!marketPrices(flagSeat) || !GalacticThreatCost.predicts(game, buyer, outcome)) return OptionalInt.empty();
+        return OptionalInt.of(Math.max(0, PREDICTION_VOTE_PRICE_CAP - promisedToward(game, buyer, outcome, exceptId)));
+    }
+
+    static int promisedToward(Game game, Player buyer, String outcome, String exceptId) {
+        return PromiseBook.all(game).stream()
+                .filter(promise -> promise.isPromisee(buyer) && promise.aboutVotes())
+                .filter(promise -> !promise.id().equals(exceptId))
+                .filter(promise -> PromisedVotes.onThisAgenda(game, promise))
+                .filter(promise -> promise.target().equalsIgnoreCase(outcome))
+                .filter(promise -> committedBy(buyer, promise))
+                .mapToInt(Promise::price)
+                .sum();
+    }
+
+    private static boolean committedBy(Player buyer, Promise promise) {
+        if (promise.open()) return promise.proposer().equals(buyer.getFaction());
+        return switch (promise.status()) {
+            case ACCEPTED, KEPT, OWED, PAID -> true;
+            default -> false;
+        };
     }
 
     static int marketAsk(Game game, double cost, double chance, int monopoly) {
@@ -422,6 +464,7 @@ class PromiseDeals {
         Player seat = context.seat();
         Optional<String> backed = AgendaVoting.ballotInProgress(context)
                 .or(() -> PromisedVotes.binding(game, seat).map(Promise::target))
+                .or(() -> PromisedVotes.restraint(game, seat).map(Promise::target))
                 .or(() -> openSaleTarget(game, seat));
         return backed.<Predicate<String>>map(outcome -> outcome::equalsIgnoreCase)
                 .orElse(outcome -> true);
@@ -464,6 +507,11 @@ class PromiseDeals {
     }
 
     private static double protection(Game game, Player promisee, Player promiser, Promise promise) {
+        if (promise.term() == Promise.Term.NOT_AGAINST) {
+            return RiderExtortion.toHolder(game, promisee, promiser, promise.target())
+                    .map(RiderExtortion.Stake::holderGain)
+                    .orElse(0.0);
+        }
         if (promise.term() != Promise.Term.VOTE_FOR) {
             return PromiseValue.protection(game, promisee, promiser, promise.term(), promise.target());
         }
@@ -536,11 +584,11 @@ class PromiseDeals {
             VoteDeals.bestSale(outlook, seat, partner, backed)
                     .flatMap(terms -> {
                         double chance = payChance(conditional, terms);
-                        int cap = predictionCap(game, partner, terms.outcome());
+                        int cap = predictionCap(game, seat, partner, terms.outcome());
                         return sellerPrice(terms.buyerGain(), terms.sellerCost(), partner, partner.getTg(), cap, chance)
                                 .map(price ->
                                         marketPrices(seat) ? marketAsk(game, terms.sellerCost(), chance, price) : price)
-                                .filter(price -> !overPredictionCap(game, partner, terms.outcome(), price))
+                                .filter(price -> !overPredictionCap(game, seat, partner, terms.outcome(), price, ""))
                                 .map(price -> new Proposal(
                                         Promise.Term.VOTE_FOR,
                                         seat,
@@ -560,6 +608,9 @@ class PromiseDeals {
             if (purchase.isEmpty() && conditional) purchase = blocPurchase(context, outlook, partner, backed, trust);
             purchase.ifPresent(proposals::add);
         }
+        if (mayPromiseVotes && !sellingVotes(game, seat)) {
+            RiderExtortion.offer(game, seat, partner, backed).ifPresent(proposals::add);
+        }
         return proposals;
     }
 
@@ -568,6 +619,7 @@ class PromiseDeals {
         int ask = voteAsk(game, seller, buyer, terms, chance);
         int cap = predictionCap(game, buyer, terms.outcome());
         return buyerPrice(value, terms.sellerCost(), seller, spendableTradeGoods(game, buyer), cap, ask, chance)
+                .filter(price -> !overPredictionCap(game, buyer, buyer, terms.outcome(), price, ""))
                 .map(price -> new Proposal(
                         Promise.Term.VOTE_FOR,
                         seller,
@@ -603,10 +655,10 @@ class PromiseDeals {
             VoteDeals.Terms terms = member.terms();
             int ask = voteAsk(context.game(), member.seller(), seat, terms, chance);
             int price = Math.max(ask, floorPrice(terms.sellerCost(), member.seller(), chance));
-            if (overPredictionCap(context.game(), seat, bloc.outcome(), price)) return Optional.empty();
             prices.add(price);
             total += price;
         }
+        if (overPredictionCap(context.game(), seat, seat, bloc.outcome(), total, "")) return Optional.empty();
         double trust = bloc.members().stream()
                 .mapToDouble(member -> Trust.of(context, member.seller()))
                 .min()
@@ -715,7 +767,9 @@ class PromiseDeals {
         Optional<String> channel = channelId(context);
         if (channel.isEmpty()) return Optional.empty();
         Player partner = proposal.promiser() == seat ? proposal.promisee() : proposal.promiser();
-        String agenda = proposal.term() == Promise.Term.VOTE_FOR ? PromisedVotes.agendaKey(game) : "";
+        String agenda = proposal.term() == Promise.Term.VOTE_FOR || proposal.term() == Promise.Term.NOT_AGAINST
+                ? PromisedVotes.agendaKey(game)
+                : "";
         Promise promise = Promise.offer(
                 game,
                 proposal.term(),
@@ -771,6 +825,9 @@ class PromiseDeals {
             case VOTE_FOR ->
                 "cast " + (promiserSpeaks ? "its" : "your") + " votes for **" + outcomeName(game, promise.target())
                         + "** on this agenda";
+            case NOT_AGAINST ->
+                "not vote against **" + outcomeName(game, promise.target()) + "** on this agenda ("
+                        + (promiserSpeaks ? "it abstains or votes" : "you abstain or vote") + " for it)";
             case NO_ATTACK ->
                 "not attack " + (promiserSpeaks ? "your" : "its") + " units or planets this round (no combat or"
                         + " invasion against them, and no activation of a system that holds them)";

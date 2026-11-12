@@ -28,6 +28,7 @@ public final class AgendaForecast {
     private static final String ASSASSINATED = "AssassinatedReps";
     private static final String XXCHA_COMMANDER = "xxchacommander";
     private static final String GALACTIC_THREAT = "galactic_threat";
+    private static final String SANCTION = "Sanction";
     private static final String AGENDA_PHASE = "agenda";
     private static final String VOTING_PHASE = "agendavoting";
     private static final String END_PHASE = "agendaend";
@@ -166,6 +167,19 @@ public final class AgendaForecast {
         return riders.stream()
                 .anyMatch(rider ->
                         rider.owner() != voter && RiderPayoff.isImperial(rider.title()) && rider.outcome() >= 0);
+    }
+
+    public record PlacedRider(String outcome, double payoff) {}
+
+    public List<PlacedRider> ridersOf(Player owner) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(owner);
+        if (voter < 0) return List.of();
+        return riders.stream()
+                .filter(rider -> rider.owner() == voter
+                        && rider.outcome() >= 0
+                        && !rider.title().contains(SANCTION))
+                .map(rider -> new PlacedRider(frame.outcomes().get(rider.outcome()), rider.payoff()))
+                .toList();
     }
 
     public Optional<String> riderOutcome(Player owner, String title) {
@@ -493,11 +507,37 @@ public final class AgendaForecast {
                     merged[voter][rider.outcome()] += ownRiderPayoff(rider);
                 } else if (RiderPayoff.isImperial(rider.title())) {
                     merged[voter][rider.outcome()] -= rider.rivalStake();
+                } else if (weighsRivalRiders()) {
+                    merged[voter][rider.outcome()] -= rivalRiderCost(voter, rider);
                 }
             }
         }
         utilities = merged;
         return merged;
+    }
+
+    private boolean weighsRivalRiders() {
+        return AiExperiments.enabled(frame.viewer(), Experiment.RIVAL_RIDER_STAKES);
+    }
+
+    private double rivalRiderCost(int voter, Rider rider) {
+        if (rider.title().contains(SANCTION)) return 0;
+        double gain = copiesFromVoters(rider) ? copySeenBy(voter, rider.outcome()) : rider.payoff();
+        if (gain <= 0) return 0;
+        Player player = frame.voters().get(voter);
+        return gain
+                * AgendaValueMath.threatOfStake(rider.rivalStake())
+                / Math.max(1, AgendaValueMath.liveRivals(frame.game(), player).size());
+    }
+
+    private double copySeenBy(int seer, int outcome) {
+        boolean[] predictor = predictors(castBy.length);
+        double best = 0;
+        for (int voter = 0; voter < castBy.length; voter++) {
+            int votes = castBy[voter][outcome] - (voter == seer ? pending[voter][outcome] : 0);
+            if (!predictor[voter] && votes > 0) best = Math.max(best, frame.copyWorth()[voter]);
+        }
+        return best;
     }
 
     private boolean copiesFromVoters(Rider rider) {

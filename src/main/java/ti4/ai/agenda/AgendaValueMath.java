@@ -55,7 +55,11 @@ class AgendaValueMath {
     }
 
     static double threat(Game game, Player rival) {
-        return Math.clamp(ScoringStakes.rivalPointStake(game, rival, 1) / ORDINARY_RIVAL_STAKE, MIN_THREAT, MAX_THREAT);
+        return threatOfStake(ScoringStakes.rivalPointStake(game, rival, 1));
+    }
+
+    static double threatOfStake(double rivalPointStake) {
+        return Math.clamp(rivalPointStake / ORDINARY_RIVAL_STAKE, MIN_THREAT, MAX_THREAT);
     }
 
     static boolean votedOn(Game game, Player player, Predicate<String> outcome) {

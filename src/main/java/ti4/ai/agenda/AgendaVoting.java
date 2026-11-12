@@ -115,8 +115,21 @@ public class AgendaVoting {
                 .filter(promise -> !promise.target().equalsIgnoreCase(planned.outcome())
                         || castsTooFew(game, context.seat(), promise, planned))
                 .isPresent();
-        if (!breaksPromise) return planned;
+        if (!breaksPromise) return keepingOutOfTheVote(context, key, planned);
         Ballot kept = plan(game, context.seat()).orElse(planned);
+        context.memory().put(key, kept.encode());
+        return kept;
+    }
+
+    private static Ballot keepingOutOfTheVote(AiTurnContext context, String key, Ballot planned) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (PromisedVotes.keepsOutOfTheVote(game, seat, planned.outcome())) return planned;
+        Optional<Promise> restraint = PromisedVotes.restraint(game, seat);
+        if (restraint.isEmpty()) return planned;
+        Ballot kept = plan(game, seat)
+                .or(() -> promisedBallot(game, seat, restraint.get().target(), 1))
+                .orElse(planned);
         context.memory().put(key, kept.encode());
         return kept;
     }
@@ -289,20 +302,24 @@ public class AgendaVoting {
         return itsBallot(game, seat).forecast();
     }
 
-    public record PlannedBallot(AgendaForecast forecast, String outcome) {
+    public record PlannedBallot(AgendaForecast forecast, String outcome, int votes) {
 
         public double value(Player seat) {
             return forecast.expectedUtility(seat, outcome);
+        }
+
+        int votesOn(String target) {
+            return outcome.equalsIgnoreCase(target) ? votes : 0;
         }
     }
 
     public static PlannedBallot itsBallot(Game game, Player seat) {
         AgendaForecast forecast = AgendaForecast.of(game, seat);
-        if (forecast.isEmpty()) return new PlannedBallot(forecast, "");
+        if (forecast.isEmpty()) return new PlannedBallot(forecast, "", 0);
         return plan(game, seat)
-                .map(ballot ->
-                        new PlannedBallot(forecast.withVotes(seat, ballot.outcome(), ballot.votes()), ballot.outcome()))
-                .orElseGet(() -> new PlannedBallot(forecast.without(seat), ""));
+                .map(ballot -> new PlannedBallot(
+                        forecast.withVotes(seat, ballot.outcome(), ballot.votes()), ballot.outcome(), ballot.votes()))
+                .orElseGet(() -> new PlannedBallot(forecast.without(seat), "", 0));
     }
 
     static Optional<Ballot> plan(Game game, Player seat) {
@@ -318,6 +335,7 @@ public class AgendaVoting {
                             promisedBallot(game, seat, promise.target(), promisedVotes(promise, planetVotes, game)));
             if (promised.isPresent()) return promised;
             return BallotPlanner.choose(game, seat, agenda, planetVotes)
+                    .filter(choice -> PromisedVotes.keepsOutOfTheVote(game, seat, choice.outcome()))
                     .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes(), choice.predictive()));
         }
     }

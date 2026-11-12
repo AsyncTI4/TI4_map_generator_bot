@@ -119,11 +119,23 @@ class BallotPlanner {
             options.add(new Option(outcome, cap, 0));
             if (predictive) options.add(new Option(outcome, cap + PREDICTIVE_VOTES, 0, true));
         }
+        ToDoubleFunction<String> liking = outcome -> liking(forecast, seat, outcome);
+        double bestLiked = outcomes.stream().mapToDouble(liking).max().orElse(0);
         return options.stream()
                 .max(Comparator.comparingDouble(worth)
-                        .thenComparingDouble(option -> forecast.utility(seat, option.outcome())))
-                .filter(option -> worth.applyAsDouble(option) >= abstain - INDIFFERENT)
+                        .thenComparingDouble(option -> liking.applyAsDouble(option.outcome())))
+                .filter(option -> worth.applyAsDouble(option) > abstain + INDIFFERENT
+                        || (worth.applyAsDouble(option) >= abstain - INDIFFERENT
+                                && liking.applyAsDouble(option.outcome()) >= bestLiked - INDIFFERENT))
                 .map(option -> new Choice(option.outcome(), option.votes(), option.predictive()));
+    }
+
+    static double liking(AgendaForecast forecast, Player seat, String outcome) {
+        double prediction = forecast.riderOutcome(seat, GalacticThreatCost.RIDER)
+                .filter(outcome::equalsIgnoreCase)
+                .map(forecast::threatWorth)
+                .orElse(0.0);
+        return forecast.utility(seat, outcome) + prediction;
     }
 
     private static Optional<Choice> withoutForecast(

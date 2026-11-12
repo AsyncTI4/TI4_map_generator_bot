@@ -27,6 +27,7 @@ public record Promise(
 
     public enum Term {
         VOTE_FOR,
+        NOT_AGAINST,
         NO_ATTACK,
         STAY_OUT,
         DISCARD_AGENDA
@@ -151,6 +152,10 @@ public record Promise(
                 .owing(now + OWED_GRACE_MILLIS);
     }
 
+    public boolean aboutVotes() {
+        return term == Term.VOTE_FOR || term == Term.NOT_AGAINST;
+    }
+
     public boolean territorial() {
         return term == Term.NO_ATTACK || term == Term.STAY_OUT;
     }
@@ -178,7 +183,7 @@ public record Promise(
     public boolean forbidsActivating(Game game, Tile tile) {
         if (tile == null) return false;
         return switch (term) {
-            case VOTE_FOR, DISCARD_AGENDA -> false;
+            case VOTE_FOR, NOT_AGAINST, DISCARD_AGENDA -> false;
             case STAY_OUT -> target.equals(tile.getPosition());
             case NO_ATTACK -> {
                 Player victim = game.getPlayerFromColorOrFaction(promisee);
@@ -197,7 +202,7 @@ public record Promise(
 
     private List<String> watchedPositions(Game game, Player by, Player to) {
         return switch (term) {
-            case VOTE_FOR, DISCARD_AGENDA -> List.of();
+            case VOTE_FOR, NOT_AGAINST, DISCARD_AGENDA -> List.of();
             case STAY_OUT -> {
                 Tile tile = game.getTileByPosition(target);
                 yield tile == null || tile.hasPlayerCC(by) ? List.of() : List.of(target);

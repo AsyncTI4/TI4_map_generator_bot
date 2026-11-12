@@ -30,6 +30,10 @@ class GalacticThreatCostTest extends BaseTi4Test {
         test.game.setCurrentAgendaInfo(SHARD);
         test.game.setSpeakerUserID(test.sol.getUserID());
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");
+        // These cases isolate the ballot cost; the prediction as a rival rider in the outcome is RIVAL_RIDER_STAKES.
+        for (Player seat : List.of(test.sol, xxcha, test.nekro)) {
+            AiExperiments.disable(seat, Set.of(Experiment.RIVAL_RIDER_STAKES));
+        }
     }
 
     // Nekro (the "black" seat) predicts that Xxcha is elected.
@@ -109,7 +113,7 @@ class GalacticThreatCostTest extends BaseTi4Test {
     @Test
     void theCostIsOffWithoutTheExperiment() {
         nekroPredictsXxcha();
-        AiExperiments.disable(test.sol, Set.of(Experiment.GALACTIC_THREAT_COST));
+        AiExperiments.disable(test.sol, Set.of(Experiment.GALACTIC_THREAT_COST, Experiment.RIVAL_RIDER_STAKES));
 
         assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isZero();
     }
@@ -123,7 +127,7 @@ class GalacticThreatCostTest extends BaseTi4Test {
         AgendaForecast forecast = AgendaForecast.of(test.game, xxcha);
         double withCost = forecast.utility(test.sol, "xxcha");
         assertThat(forecast.ballotCost(test.sol, "xxcha")).isCloseTo(1.0, within(1e-9));
-        AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST));
+        AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST, Experiment.RIVAL_RIDER_STAKES));
         AgendaForecast without = AgendaForecast.of(test.game, xxcha);
 
         assertThat(without.utility(test.sol, "xxcha")).isCloseTo(withCost, within(1e-9));
@@ -143,7 +147,7 @@ class GalacticThreatCostTest extends BaseTi4Test {
     void theViewersOwnUtilityIsLeftToTheBallot() {
         nekroPredictsXxcha();
         double withCost = AgendaForecast.of(test.game, test.sol).utility(test.sol, "xxcha");
-        AiExperiments.disable(test.sol, Set.of(Experiment.GALACTIC_THREAT_COST));
+        AiExperiments.disable(test.sol, Set.of(Experiment.GALACTIC_THREAT_COST, Experiment.RIVAL_RIDER_STAKES));
         double withoutCost = AgendaForecast.of(test.game, test.sol).utility(test.sol, "xxcha");
 
         assertThat(withCost).isCloseTo(withoutCost, within(1e-9));
@@ -165,7 +169,7 @@ class GalacticThreatCostTest extends BaseTi4Test {
 
         assertThat(solsBallot().outcome()).isNotEqualTo(unpredicted);
 
-        AiExperiments.disable(test.sol, Set.of(Experiment.GALACTIC_THREAT_COST));
+        AiExperiments.disable(test.sol, Set.of(Experiment.GALACTIC_THREAT_COST, Experiment.RIVAL_RIDER_STAKES));
         assertThat(solsBallot().outcome()).isEqualTo(unpredicted);
     }
 

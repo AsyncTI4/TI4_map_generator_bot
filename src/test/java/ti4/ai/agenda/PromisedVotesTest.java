@@ -381,4 +381,73 @@ class PromisedVotesTest extends BaseTi4Test {
         assertThat(withDeal.chance("sol")).isGreaterThan(forecast.chance("sol"));
         assertThat(forecast.ballotCost(xxcha, "sol")).isPositive();
     }
+
+    // Rider extortion: "pay me and I will not vote against your outcome" (the user's note on traces-4b). The promiser
+    // abstains or votes the promised outcome, never another one.
+    private Promise notAgainst(Player promiser, Player promisee, String outcome) {
+        return Promise.offer(
+                test.game,
+                Promise.Term.NOT_AGAINST,
+                promiser,
+                promisee,
+                promiser,
+                PromisedVotes.agendaKey(test.game),
+                outcome,
+                0,
+                2,
+                1,
+                60_000);
+    }
+
+    @Test
+    void aSeatThatPromisedNotToVoteAgainstAnOutcomeAbstainsInsteadOfVotingAnother() {
+        assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
+                .contains("sol");
+
+        PromiseBook.save(test.game, notAgainst(sol, xxcha, "xxcha").accepted(test.game));
+
+        assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
+        assertThat(AgendaForecast.of(test.game, test.nekro).votesLeft(sol)).isZero();
+    }
+
+    // The seat started its ballot for itself before the rider holder accepted: it switches to the promised outcome
+    // rather than break the promise.
+    @Test
+    void aBallotInProgressAgainstTheOutcomeIsRebuilt() {
+        AiTurnContext context = test.contextFor(sol, Set.of(), AiTestGame.NOW);
+        String key = "agendaBallot|test";
+        AgendaVoting.Ballot planned = AgendaVoting.plan(test.game, sol).orElseThrow();
+        context.memory().put(key, planned.encode());
+
+        PromiseBook.save(test.game, notAgainst(sol, xxcha, "xxcha").accepted(test.game));
+
+        assertThat(AgendaVoting.keepingPromise(context, key, planned).outcome()).isEqualTo("xxcha");
+    }
+
+    @Test
+    void votingAgainstTheOutcomeBreaksANotAgainstPromise() {
+        Promise promise = notAgainst(sol, xxcha, "xxcha").accepted(test.game);
+        assertThat(PromisedVotes.verdict(test.game, promise)).isEmpty();
+
+        test.game.setCurrentAgendaVote("sol", "blue_4");
+
+        assertThat(PromisedVotes.verdict(test.game, promise)).contains(Promise.Status.BROKEN);
+    }
+
+    // Abstaining leaves no trace in the votes, so the promise is kept once the agenda resolves, and owed only if the
+    // promised outcome won.
+    @Test
+    void aNotAgainstPromiseIsKeptAtResolutionAndOwedIfItsOutcomeWon() {
+        Promise promise = notAgainst(sol, xxcha, "xxcha").accepted(test.game);
+        test.game.setStoredValue("resolvedAgendaId", PromisedVotes.agendaKey(test.game));
+        test.game.setStoredValue("resolvedAgendaOutcome", "xxcha");
+
+        assertThat(PromisedVotes.verdict(test.game, promise)).contains(Promise.Status.KEPT);
+        assertThat(PromisedVotes.settlement(test.game, promise.with(Promise.Status.KEPT)))
+                .contains(Promise.Status.OWED);
+
+        test.game.setStoredValue("resolvedAgendaOutcome", "sol");
+        assertThat(PromisedVotes.settlement(test.game, promise.with(Promise.Status.KEPT)))
+                .isEmpty();
+    }
 }

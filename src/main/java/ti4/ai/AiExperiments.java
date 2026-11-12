@@ -32,7 +32,10 @@ public class AiExperiments {
         CONDITIONAL_VOTE_DEALS,
         DISCARD_BOUNTIES,
         AGENDA_ABSTAIN_CHOICE,
-        GALACTIC_THREAT_TIMING
+        GALACTIC_THREAT_TIMING,
+        RIVAL_RIDER_STAKES,
+        RIDER_EXTORTION,
+        IMPERIAL_RIDER_HOLD
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";
