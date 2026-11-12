@@ -52,6 +52,7 @@ public final class AgendaForecast {
     private final List<Rider> riders;
     private double[][] utilities;
     private Map<String, Double> chances;
+    private Map<String, Double> votedChances;
 
     private AgendaForecast(Frame frame, int[] votes, int[] cast, List<Rider> riders) {
         this.frame = frame;
@@ -91,8 +92,14 @@ public final class AgendaForecast {
 
     public Map<String, Double> chances() {
         if (isEmpty()) return Map.of();
-        if (chances == null) chances = simulate();
+        if (chances == null) simulate();
         return chances;
+    }
+
+    public double votedChance(String outcome) {
+        if (isEmpty()) return 0;
+        if (votedChances == null) simulate();
+        return votedChances.getOrDefault(outcome, 0.0);
     }
 
     public java.util.Set<String> outcomes() {
@@ -142,7 +149,20 @@ public final class AgendaForecast {
     }
 
     public double expectedUtility(Player player) {
-        return expected(outcome -> utility(player, outcome));
+        return expected(outcome -> utility(player, outcome)) - unvotedThreatPayoff(player);
+    }
+
+    private double unvotedThreatPayoff(Player player) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        if (voter < 0 || !AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST)) return 0;
+        return riders.stream()
+                .filter(rider -> rider.owner() == voter && rider.outcome() >= 0)
+                .filter(rider -> GalacticThreatCost.RIDER.equals(rider.title()))
+                .mapToDouble(rider -> {
+                    String outcome = frame.outcomes().get(rider.outcome());
+                    return rider.payoff() * Math.max(0, chance(outcome) - votedChance(outcome));
+                })
+                .sum();
     }
 
     public AgendaForecast withRider(Player owner, String title, String outcome) {
@@ -272,9 +292,17 @@ public final class AgendaForecast {
             Player player = frame.voters().get(voter);
             boolean done = isEnded(game) || voter < activeVoter;
             if (done || blocked(game, player, hasRider(placed, voter), frame.keepsVotesWithRider()[voter])) continue;
-            remaining[voter] = Math.max(0, snapshot.getOrDefault(player.getColor(), 0) - placed.castByVoter()[voter]);
+            int left = Math.max(0, snapshot.getOrDefault(player.getColor(), 0) - placed.castByVoter()[voter]);
+            remaining[voter] = Math.max(0, left - keptBack(game, frame.viewer(), player));
         }
         return remaining;
+    }
+
+    private static int keptBack(Game game, Player viewer, Player player) {
+        if (!AgendaRound.keepsAVoteBack(game) || !AiExperiments.enabled(viewer, Experiment.AGENDA_VALUE_TABLE)) {
+            return 0;
+        }
+        return BallotPlanner.reserve(AgendaVoting.readiedPlanetVotes(game, player));
     }
 
     private static boolean hasRider(Placed placed, int voter) {
@@ -328,7 +356,7 @@ public final class AgendaForecast {
         return GalacticThreatCost.cost(frame.game(), player, frame.voters().get(rider.owner()), outcome, outcome);
     }
 
-    private Map<String, Double> simulate() {
+    private void simulate() {
         double[][] utility = utilities();
         int voters = utility.length;
         int outcomes = frame.outcomes().size();
@@ -338,23 +366,30 @@ public final class AgendaForecast {
             indifferent[voter] = spread(utility[voter]) <= INDIFFERENT_SPREAD;
             cumulative[voter] = cumulative(utility[voter]);
         }
+        boolean abstainsWhenIndifferent = AiExperiments.enabled(frame.viewer(), Experiment.AGENDA_VALUE_TABLE);
         int[] wins = new int[outcomes];
+        int[] votedWins = new int[outcomes];
         for (double[] draw : frame.draws()) {
             int[] tally = cast.clone();
             for (int voter = 0; voter < voters; voter++) {
                 if (votes[voter] == 0) continue;
                 int pick = indifferent[voter]
-                        ? indifferentPick(draw[voter], outcomes)
+                        ? (abstainsWhenIndifferent ? -1 : indifferentPick(draw[voter], outcomes))
                         : softmaxPick(cumulative[voter], draw[voter]);
                 if (pick >= 0) tally[pick] += votes[voter];
             }
-            wins[winner(tally, utility[frame.speaker()])]++;
+            int winner = winner(tally, utility[frame.speaker()]);
+            wins[winner]++;
+            if (tally[winner] > 0) votedWins[winner]++;
         }
         Map<String, Double> result = new LinkedHashMap<>();
+        Map<String, Double> voted = new LinkedHashMap<>();
         for (int outcome = 0; outcome < outcomes; outcome++) {
             result.put(frame.outcomes().get(outcome), (double) wins[outcome] / SAMPLES);
+            voted.put(frame.outcomes().get(outcome), (double) votedWins[outcome] / SAMPLES);
         }
-        return Collections.unmodifiableMap(result);
+        chances = Collections.unmodifiableMap(result);
+        votedChances = Collections.unmodifiableMap(voted);
     }
 
     private static double spread(double[] utility) {

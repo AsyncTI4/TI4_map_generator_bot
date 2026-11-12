@@ -11,7 +11,6 @@ import static ti4.ai.agenda.AgendaValueMath.relativeToRivals;
 import static ti4.ai.agenda.AgendaValueMath.unitsOnBoard;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -22,7 +21,6 @@ import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.explore.ExploreValues;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -278,24 +276,9 @@ class ForAgainstLawValues {
     }
 
     static double representativeGovernment(Game game, Player voter, String outcome, String ownVote) {
-        if (isFor(outcome)) return voteShareSwing(game, voter) * AGENDA_CONTROL_PER_ROUND * lawRounds(game);
+        if (isFor(outcome)) return VoteCapacity.shareSwing(game, voter) * AGENDA_CONTROL_PER_ROUND * lawRounds(game);
         if (isAgainst(outcome) && isAgainst(ownVote)) return -culturalExhaustion(game, voter);
         return 0;
-    }
-
-    private static double voteShareSwing(Game game, Player voter) {
-        List<Player> seats = livePlayers(game);
-        int total =
-                seats.stream().mapToInt(player -> totalInfluence(game, player)).sum();
-        if (total <= 0) return 0;
-        double current = totalInfluence(game, voter) / (double) total;
-        return 1.0 / seats.size() - current;
-    }
-
-    private static int totalInfluence(Game game, Player player) {
-        return ownedPlanets(game, player).stream()
-                .mapToInt(Planet::getInfluence)
-                .sum();
     }
 
     private static double culturalExhaustion(Game game, Player voter) {

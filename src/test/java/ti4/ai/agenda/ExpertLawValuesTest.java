@@ -261,17 +261,54 @@ class ExpertLawValuesTest extends BaseTi4Test {
         assertThat(value(nekro, "wormhole_recon", "against", "")).isPositive();
     }
 
-    // Representative Government is worth at most 2 TG a round either way: Nekro holds all the influence here.
+    // Representative Government is worth at most 2 TG a round either way: Hacan holds all the votes here. Nekro cannot
+    // vote with or without the law (Galactic Threat), so it does not care.
     @Test
     void representativeGovernmentIsCappedAtTwoPerRound() {
         test.place(LODOR, AiTestGame.HOME);
-        nekro.addPlanet("lodor");
+        hacan.addPlanet("lodor");
         double rounds = AgendaValueMath.lawRounds(test.game);
 
-        assertThat(value(nekro, "rep_govt", "for", "")).isCloseTo(-2 * rounds, within(1e-9));
-        assertThat(value(hacan, "representative_government", "for", ""))
+        assertThat(value(hacan, "rep_govt", "for", "")).isCloseTo(-2 * rounds, within(1e-9));
+        assertThat(value(sol, "representative_government", "for", ""))
                 .isPositive()
                 .isLessThanOrEqualTo(2 * rounds);
+        assertThat(value(nekro, "representative_government", "for", "")).isZero();
+    }
+
+    // Vote power is real vote capacity, not planet influence: Xxcha has less influence than Hacan (2 against 3), but
+    // the Xxcha commander adds a vote on every planet, so Xxcha dislikes For (one vote each) more than Hacan does, and
+    // the commander moves both values.
+    @Test
+    void representativeGovernmentMeasuresVotePowerFromVoteCapacity() {
+        Player xxcha = seat("xxcha");
+        test.place("27", AiTestGame.HOME);
+        test.place("28", "102");
+        hacan.addPlanet("torkan");
+        xxcha.addPlanet("newalbion");
+        xxcha.addPlanet("starpoint");
+        double withoutCommander = value(xxcha, "representative_government", "for", "");
+        double hacanBefore = value(hacan, "representative_government", "for", "");
+        xxcha.addLeader("xxchacommander");
+        xxcha.unsafeGetLeader("xxchacommander").setLocked(false);
+
+        assertThat(VoteCapacity.of(test.game, xxcha)).isGreaterThan(VoteCapacity.of(test.game, hacan));
+        assertThat(value(xxcha, "representative_government", "for", ""))
+                .isNegative()
+                .isLessThan(withoutCommander);
+        assertThat(value(hacan, "representative_government", "for", "")).isGreaterThan(hacanBefore);
+        assertThat(value(xxcha, "representative_government", "for", ""))
+                .isLessThan(value(hacan, "representative_government", "for", ""));
+    }
+
+    // Nekro's Galactic Threat keeps it out of the vote, so it is left out of the table's vote capacity.
+    @Test
+    void aSeatThatCannotVoteHasNoVoteCapacity() {
+        test.place(LODOR, AiTestGame.HOME);
+        nekro.addPlanet("lodor");
+
+        assertThat(VoteCapacity.of(test.game, nekro)).isZero();
+        assertThat(VoteCapacity.shareSwing(test.game, nekro)).isZero();
     }
 
     // Checks and Balances: the last seat in speaker order likes For, the speaker dislikes it.

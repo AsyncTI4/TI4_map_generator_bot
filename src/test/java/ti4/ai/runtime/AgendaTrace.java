@@ -567,8 +567,18 @@ final class AgendaTrace {
             return lines;
         }
 
+        private static boolean won(RiderSeen rider, AgendaTracker.Agenda agenda) {
+            return agenda.riders().stream()
+                    .filter(placed -> placed.faction().equals(rider.faction())
+                            && placed.rider().equals(rider.rider())
+                            && placed.outcome().equals(rider.outcome()))
+                    .findFirst()
+                    .map(AgendaTracker.Rider::won)
+                    .orElse(agenda.resolved() && rider.outcome().equalsIgnoreCase(agenda.outcome()));
+        }
+
         private String riderLine(RiderSeen rider, AgendaTracker.Agenda agenda, Map<String, Snap> atClose) {
-            boolean won = agenda.resolved() && rider.outcome().equalsIgnoreCase(agenda.outcome());
+            boolean won = won(rider, agenda);
             String name = rider.rider().toLowerCase(Locale.ROOT).trim();
             String paid = "-";
             if (won && beforeResolution != null) {
@@ -714,7 +724,7 @@ final class AgendaTrace {
                         if (!seen.faction().equals(faction)) continue;
                         String name = seen.rider().toLowerCase(Locale.ROOT).trim();
                         if (!NOT_ACTION_CARDS.contains(name) && name.endsWith("rider")) rider[AC]--;
-                        boolean won = agenda.resolved() && seen.outcome().equalsIgnoreCase(agenda.outcome());
+                        boolean won = won(seen, agenda);
                         if (!won) continue;
                         for (int kind : RIDER_KINDS.getOrDefault(name, new int[0])) {
                             rider[kind] += resolution[kind];

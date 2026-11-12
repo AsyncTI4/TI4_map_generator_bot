@@ -8,6 +8,8 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -122,7 +124,10 @@ public class GalacticThreatRules {
                     : forecast.expected(outcome -> owner.getPlanets().contains(outcome) ? 1 : 0);
         }
         String target = StringUtils.substringBefore(StringUtils.removeStart(id, RIDER_PREFIX), "_" + RIDER_SUFFIX);
-        return forecast.chance(StringUtils.substringAfter(target, ";"));
+        String outcome = StringUtils.substringAfter(target, ";");
+        return AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_COST)
+                ? forecast.votedChance(outcome)
+                : forecast.chance(outcome);
     }
 
     private static double votesBasedLikelihood(Game game, Player seat, PromptButton rider) {

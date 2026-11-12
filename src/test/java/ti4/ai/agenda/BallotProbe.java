@@ -19,7 +19,6 @@ public final class BallotProbe {
 
     // Mirrors of BallotPlanner's private constants, so the trace shows the margins the planner applied.
     static final double MIN_GAIN = 0.5;
-    static final double KEPT_VOTE = 0.05;
 
     public record Explanation(
             String planned,
@@ -110,7 +109,7 @@ public final class BallotProbe {
         double ballot = planned.isBlank() ? abstain : value(game, seat, agenda, forecast, planned, plannedVotes);
         double threat = planned.isBlank() ? 0 : GalacticThreatCost.ofBallot(game, seat, planned, plannedVotes);
         List<Integer> totals = cap <= 0 ? List.of() : BallotPlanner.reachableTotals(planetVotes, cap);
-        double keptVote = finalAgenda ? 0 : KEPT_VOTE;
+        double keptVote = BallotPlanner.keptVote(game, seat);
         String bestOutcome = "";
         int bestVotes = 0;
         double bestValue = Double.NEGATIVE_INFINITY;

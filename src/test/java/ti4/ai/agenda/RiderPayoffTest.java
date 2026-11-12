@@ -30,6 +30,32 @@ class RiderPayoffTest extends BaseTi4Test {
         assertThat(RiderPayoff.of(test.game, test.sol, RiderPayoff.IMPERIAL)).isEqualTo(ScoringStakes.WIN_VALUE);
     }
 
+    // Galactic Threat pays Nekro the best technology it can copy from a voter, not a stand-in for cards.
+    @Test
+    void aGalacticThreatIsTheBestTechnologyNekroCanCopy() {
+        double best =
+                GalacticThreatCost.bestCopy(test.nekro, GalacticThreatCost.copyable(test.game, test.nekro, test.sol));
+
+        assertThat(best).isPositive();
+        assertThat(RiderPayoff.of(test.game, test.nekro, GalacticThreatCost.RIDER))
+                .isEqualTo(best);
+        assertThat(RiderPayoff.of(test.game, test.sol, test.nekro, GalacticThreatCost.RIDER))
+                .isEqualTo(best);
+
+        test.sol.setTechs(new java.util.ArrayList<>(test.nekro.getTechs()));
+        assertThat(RiderPayoff.of(test.game, test.nekro, GalacticThreatCost.RIDER))
+                .isZero();
+    }
+
+    @Test
+    void aGalacticThreatKeepsTheOldPriorWithoutTheExperiment() {
+        ti4.ai.AiExperiments.disable(
+                test.nekro, java.util.Set.of(ti4.ai.AiExperiments.Experiment.GALACTIC_THREAT_COST));
+
+        assertThat(RiderPayoff.of(test.game, test.nekro, GalacticThreatCost.RIDER))
+                .isEqualTo(2 * ActionCardPrior.AVERAGE_CARD);
+    }
+
     @Test
     void aTradeRiderIsFiveTradeGoods() {
         assertThat(RiderPayoff.of(test.game, test.sol, RiderPayoff.TRADE)).isGreaterThanOrEqualTo(5);

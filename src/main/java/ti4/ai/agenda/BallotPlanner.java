@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -14,6 +16,8 @@ class BallotPlanner {
 
     private static final double MIN_GAIN = 0.5;
     private static final double KEPT_VOTE = 0.05;
+    private static final double NEXT_AGENDA_VOTE = 0.1;
+    private static final double NEAR_BEST = 0.3;
     private static final double INDIFFERENT = 1e-6;
     private static final double STRONG_PREFERENCE = 8;
     private static final String ABSTAIN = "";
@@ -39,15 +43,27 @@ class BallotPlanner {
         if (finalAgenda && !AgendaValues.dependsOnOwnVote(agenda)) {
             return allIn(forecast, seat, outcomes, cap, worth, abstain);
         }
-        double keptVote = finalAgenda ? 0 : KEPT_VOTE;
-        Optional<Option> best = options(outcomes, totals).stream()
+        double keptVote = keptVote(game, seat);
+        List<Option> valued = options(outcomes, totals).stream()
                 .map(option -> new Option(
                         option.outcome(), option.votes(), worth.applyAsDouble(option) - keptVote * option.votes()))
+                .toList();
+        Optional<Option> best = valued.stream()
                 .max(Comparator.comparingDouble(Option::value)
                         .thenComparingInt(option -> finalAgenda ? option.votes() : -option.votes()));
         double needed = finalAgenda ? INDIFFERENT : MIN_GAIN;
         return best.filter(option -> option.value() - abstain > needed)
+                .map(option -> fewestNearBest(seat, valued, option, finalAgenda))
                 .map(option -> new Choice(option.outcome(), option.votes()));
+    }
+
+    private static Option fewestNearBest(Player seat, List<Option> valued, Option best, boolean finalAgenda) {
+        if (finalAgenda || !AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)) return best;
+        return valued.stream()
+                .filter(option -> option.outcome().equals(best.outcome()))
+                .filter(option -> option.value() >= best.value() - NEAR_BEST)
+                .min(Comparator.comparingInt(Option::votes))
+                .orElse(best);
     }
 
     private static Optional<Choice> allIn(
@@ -101,6 +117,11 @@ class BallotPlanner {
             for (int votes : totals) options.add(new Option(outcome, votes, 0));
         }
         return options;
+    }
+
+    static double keptVote(Game game, Player seat) {
+        if (AgendaRound.isFinalAgenda(game)) return 0;
+        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE) ? NEXT_AGENDA_VOTE : KEPT_VOTE;
     }
 
     static int reserve(List<Integer> planetVotes) {

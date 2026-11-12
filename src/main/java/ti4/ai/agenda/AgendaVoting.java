@@ -274,7 +274,8 @@ public class AgendaVoting {
             List<Integer> planetVotes = readiedPlanetVotes(game, seat);
             Optional<Ballot> promised = PromisedVotes.binding(game, seat)
                     .filter(promise -> castable(game, planetVotes) > 0)
-                    .flatMap(promise -> ballotFor(game, promise.target(), castable(game, planetVotes)));
+                    .flatMap(promise -> ballotFor(
+                            game, promise.target(), PromisedVotes.promisedVotes(promise, castable(game, planetVotes))));
             if (promised.isPresent()) return promised;
             return BallotPlanner.choose(game, seat, agenda, planetVotes)
                     .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes()));
@@ -291,7 +292,7 @@ public class AgendaVoting {
         return AgendaRound.keepsAVoteBack(game) ? available - BallotPlanner.reserve(planetVotes) : available;
     }
 
-    private static List<Integer> readiedPlanetVotes(Game game, Player seat) {
+    static List<Integer> readiedPlanetVotes(Game game, Player seat) {
         return seat.getReadiedPlanets().stream()
                 .map(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
                 .toList();

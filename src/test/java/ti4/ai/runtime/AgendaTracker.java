@@ -10,7 +10,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.agenda.AgendaUtilityProbe;
+import ti4.ai.agenda.GalacticThreatCost;
 import ti4.ai.agenda.RiderPayoff;
+import ti4.ai.strategy.CopiedTechPolicy;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -119,6 +121,7 @@ final class AgendaTracker {
         int fallbackTieBreaks;
         final Map<String, Integer> vpAtReveal = new LinkedHashMap<>();
         final Map<String, Integer> tgAtReveal = new LinkedHashMap<>();
+        final Map<String, List<String>> techsAtReveal = new LinkedHashMap<>();
         Map<String, Map<String, Double>> utilities = Map.of();
         final Map<String, Rider> riders = new LinkedHashMap<>();
         final Map<String, AgendaTrace.RiderSeen> ridersSeen = new LinkedHashMap<>();
@@ -216,6 +219,7 @@ final class AgendaTracker {
         for (Player seat : game.getRealPlayers()) {
             opened.vpAtReveal.put(seat.getFaction(), seat.getTotalVictoryPoints());
             opened.tgAtReveal.put(seat.getFaction(), seat.getTg());
+            opened.techsAtReveal.put(seat.getFaction(), List.copyOf(seat.getTechs()));
         }
         if (AgendaTrace.ENABLED) {
             try {
@@ -291,9 +295,14 @@ final class AgendaTracker {
         Map<String, double[]> riderBySeat = new LinkedHashMap<>();
         for (Rider placed : closing.riders.values()) {
             boolean won = !closing.outcome.isBlank() && placed.outcome().equalsIgnoreCase(closing.outcome);
+            double payoff = placed.payoff();
+            if (isGalacticThreat(placed.rider())) {
+                won = won && votedByAnotherSeat(game, closing.votes, placed.outcome(), placed.faction());
+                payoff = techsGainedWorth(game, closing, placed.faction());
+            }
             double cost = cardCost(placed.rider());
-            double net = (won ? placed.payoff() : 0) - cost;
-            riders.add(new Rider(placed.faction(), placed.rider(), placed.outcome(), placed.payoff(), won, net));
+            double net = (won ? payoff : 0) - cost;
+            riders.add(new Rider(placed.faction(), placed.rider(), placed.outcome(), payoff, won, net));
             double[] seat = riderBySeat.computeIfAbsent(placed.faction(), key -> new double[2]);
             seat[0] += net;
             seat[1]++;
@@ -342,6 +351,35 @@ final class AgendaTracker {
             System.out.println(AgendaTrace.PREFIX + " " + game.getName() + " #" + closing.number + " error " + e);
             e.printStackTrace(System.out);
         }
+    }
+
+    // Galactic Threat pays only through the winning voters (AgendaHelper.getWinningVoters): an outcome the speaker
+    // picks
+    // with no votes on it gives Nekro nothing, and what it does give is the technology Nekro actually copied.
+    static boolean isGalacticThreat(String rider) {
+        return GalacticThreatCost.RIDER.equalsIgnoreCase(rider.trim());
+    }
+
+    static boolean votedByAnotherSeat(Game game, Map<String, String> votes, String outcome, String owner) {
+        for (Map.Entry<String, String> entry : votes.entrySet()) {
+            if (!entry.getKey().equalsIgnoreCase(outcome)) continue;
+            for (String piece : entry.getValue().split(";")) {
+                int split = piece.indexOf('_');
+                if (split <= 0 || !isNumber(piece.substring(split + 1))) continue;
+                if (Integer.parseInt(piece.substring(split + 1)) <= 0) continue;
+                Player voter = game.getPlayerFromColorOrFaction(piece.substring(0, split));
+                if (voter != null && !voter.getFaction().equals(owner)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static double techsGainedWorth(Game game, Open closing, String faction) {
+        Player owner = game.getPlayerFromColorOrFaction(faction);
+        if (owner == null) return 0;
+        List<String> gained = new ArrayList<>(owner.getTechs());
+        gained.removeAll(closing.techsAtReveal.getOrDefault(faction, List.of()));
+        return gained.stream().mapToDouble(CopiedTechPolicy::copiedWorth).sum();
     }
 
     private static double cardCost(String rider) {

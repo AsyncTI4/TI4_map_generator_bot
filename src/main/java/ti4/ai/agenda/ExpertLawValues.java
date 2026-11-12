@@ -5,7 +5,6 @@ import static ti4.ai.agenda.AgendaValueMath.isFor;
 import static ti4.ai.agenda.AgendaValueMath.lawRounds;
 import static ti4.ai.agenda.AgendaValueMath.livePlayers;
 import static ti4.ai.agenda.AgendaValueMath.liveRivals;
-import static ti4.ai.agenda.AgendaValueMath.ownedPlanets;
 import static ti4.ai.agenda.AgendaValueMath.relativeToRivals;
 import static ti4.ai.agenda.AgendaValueMath.speakerPosition;
 import static ti4.ai.agenda.AgendaValueMath.unitsOnBoard;
@@ -26,7 +25,6 @@ import ti4.ai.explore.ExploreValues;
 import ti4.ai.legendary.LegendaryPlanets;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Game;
-import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -275,25 +273,10 @@ class ExpertLawValues {
     private static double representativeGovernment(Game game, Player voter, String outcome, String ownVote) {
         if (isAgainst(outcome)) return ForAgainstLawValues.representativeGovernment(game, voter, outcome, ownVote);
         double perRound = Math.clamp(
-                voteShareSwing(game, voter) * AGENDA_CONTROL_PER_ROUND,
+                VoteCapacity.shareSwing(game, voter) * AGENDA_CONTROL_PER_ROUND,
                 -MAX_REPRESENTATIVE_PER_ROUND,
                 MAX_REPRESENTATIVE_PER_ROUND);
         return perRound * lawRounds(game);
-    }
-
-    private static double voteShareSwing(Game game, Player voter) {
-        List<Player> seats = livePlayers(game);
-        int total =
-                seats.stream().mapToInt(player -> totalInfluence(game, player)).sum();
-        if (total <= 0) return 0;
-        double current = totalInfluence(game, voter) / (double) total;
-        return 1.0 / seats.size() - current;
-    }
-
-    private static int totalInfluence(Game game, Player player) {
-        return ownedPlanets(game, player).stream()
-                .mapToInt(Planet::getInfluence)
-                .sum();
     }
 
     private static double checksAndBalances(Game game, Player voter, String outcome) {

@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
@@ -38,6 +41,11 @@ class AgendaForecastTest extends BaseTi4Test {
 
     private void points(Player player, int points) {
         test.game.scorePublicObjective(player.getUserID(), test.game.addCustomPO("Test points " + ++awards, points));
+    }
+
+    // The legacy forecast, where a voter with no view on the outcome votes at random 70% of the time.
+    private void randomIndifferentVoters() {
+        AiExperiments.disable(test.nekro, Set.of(Experiment.AGENDA_VALUE_TABLE));
     }
 
     private AgendaForecast forecast() {
@@ -152,6 +160,7 @@ class AgendaForecastTest extends BaseTi4Test {
     // so the nearer the rival is to winning.
     @Test
     void aRivalsImperialRiderMovesTheVotersWhoHadNoPreference() {
+        randomIndifferentVoters();
         test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
         votes(3, 3, 0);
         points(xxcha, 9);
@@ -166,6 +175,7 @@ class AgendaForecastTest extends BaseTi4Test {
     // A point is a big deal for anyone in the race, but a rider owner far behind the leader is no threat yet.
     @Test
     void anImperialRiderOfASeatFarBehindBarelyMovesTheVoters() {
+        randomIndifferentVoters();
         test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
         votes(3, 3, 0);
         points(test.sol, 4);
@@ -174,6 +184,63 @@ class AgendaForecastTest extends BaseTi4Test {
         AgendaForecast withRider = forecast.withRider(xxcha, RiderPayoff.IMPERIAL, "for");
 
         assertThat(withRider.chance("for")).isCloseTo(forecast.chance("for"), within(0.3));
+    }
+
+    // On the expert table a voter with no view on the outcome abstains instead of voting at random, so a table that
+    // does not care leaves the outcome to the speaker's tie-break (milestone 4b, first step).
+    @Test
+    void anIndifferentTableLeavesTheOutcomeToTheSpeaker() {
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        votes(3, 3, 0);
+
+        assertThat(forecast().chances().values()).contains(1.0);
+
+        randomIndifferentVoters();
+        assertThat(forecast().chance("for")).isCloseTo(0.5, within(0.2));
+    }
+
+    // On a first agenda each seat keeps its smallest planet's votes back for the second (milestone 4c): Sol, with one
+    // planet (Jord, 2 influence), has nothing left to cast; on the last agenda it casts both votes.
+    @Test
+    void votersKeepTheirSmallestPlanetBackOnTheFirstAgenda() {
+        test.game.setStoredValue("agendaCount", "1");
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        votes(2, 2, 0);
+
+        assertThat(forecast().votesLeft(test.sol)).isZero();
+
+        test.game.setStoredValue("agendaCount", "2");
+        assertThat(forecast().votesLeft(test.sol)).isEqualTo(2);
+    }
+
+    // Galactic Threat pays only through winning voters: with no votes left at the table the speaker picks the outcome
+    // and Nekro's prediction pays nothing, so Nekro's expected utility leaves the payoff out.
+    @Test
+    void aGalacticThreatOnAnOutcomeWithoutVotersIsWorthNothing() {
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        votes(0, 0, 0);
+        AgendaForecast forecast = forecast();
+        String picked = forecast.mostLikely().orElseThrow();
+        assertThat(forecast.chance(picked)).isEqualTo(1.0);
+        assertThat(forecast.votedChance(picked)).isZero();
+
+        AgendaForecast predicted = forecast.withRider(test.nekro, GalacticThreatCost.RIDER, picked);
+
+        assertThat(predicted.utility(test.nekro, picked)).isGreaterThan(forecast.utility(test.nekro, picked));
+        assertThat(predicted.votedChance(picked)).isZero();
+        assertThat(predicted.expectedUtility(test.nekro))
+                .isCloseTo(predicted.expected(outcome -> forecast.utility(test.nekro, outcome)), within(1e-9));
+    }
+
+    // With voters on the predicted outcome the prediction pays, and Nekro's expected utility counts it.
+    @Test
+    void aGalacticThreatOnAnOutcomeWithVotersCountsItsPayoff() {
+        AgendaForecast forecast = forecast();
+        AgendaForecast predicted = forecast.withRider(test.nekro, GalacticThreatCost.RIDER, "sol");
+
+        assertThat(forecast.votedChance("sol")).isPositive();
+        assertThat(predicted.expectedUtility(test.nekro)).isGreaterThan(forecast.expectedUtility(test.nekro));
     }
 
     @Test

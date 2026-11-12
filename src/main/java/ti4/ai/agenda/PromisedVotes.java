@@ -55,6 +55,10 @@ public class PromisedVotes {
                 .map(ignored -> Promise.Status.KEPT);
     }
 
+    static int promisedVotes(Promise promise, int castable) {
+        return promise.votes() > 0 ? Math.min(promise.votes(), castable) : castable;
+    }
+
     static AgendaForecast placeAccepted(Game game, Player viewer, AgendaForecast forecast) {
         if (forecast.isEmpty() || !PromiseBook.active(game, viewer)) return forecast;
         AgendaForecast placed = forecast;
@@ -63,7 +67,7 @@ public class PromisedVotes {
             Player promiser = game.getPlayerFromColorOrFaction(promise.promiser());
             if (promiser == null || promiser == viewer) continue;
             int left = placed.votesLeft(promiser);
-            if (left > 0) placed = placed.withVotes(promiser, promise.target(), left);
+            if (left > 0) placed = placed.withVotes(promiser, promise.target(), promisedVotes(promise, left));
         }
         return placed;
     }

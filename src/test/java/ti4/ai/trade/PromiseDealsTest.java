@@ -88,6 +88,16 @@ class PromiseDealsTest extends BaseTi4Test {
         assertThat(PromiseDeals.sellerPrice(1.2, 0, test.sol, 10, 5)).isEmpty();
     }
 
+    // A vote sale never goes below the seller's cost plus its proposing margin: votes sell for 1 trade good only when
+    // the seller does not care how the agenda goes.
+    @Test
+    void votesNeverSellBelowTheSellersCost() {
+        assertThat(PromiseDeals.voteFloor(0)).isEqualTo(1);
+        assertThat(PromiseDeals.voteFloor(0.4)).isEqualTo(1);
+        assertThat(PromiseDeals.voteFloor(0.6)).isEqualTo(2);
+        assertThat(PromiseDeals.voteFloor(3.2)).isEqualTo(4);
+    }
+
     // The buyer offers the least the seller would take (its cost plus the seller's margin, at least 1 trade good) and
     // only when it keeps at least its proposing margin.
     @Test

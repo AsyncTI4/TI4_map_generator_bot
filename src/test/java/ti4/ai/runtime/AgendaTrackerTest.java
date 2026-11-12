@@ -62,6 +62,59 @@ class AgendaTrackerTest extends BaseTi4Test {
         assertThat(AgendaTracker.lines(summary).getLast()).contains("2 agendas (1 resolved)", "referee-broken ties 0");
     }
 
+    // Galactic Threat pays Nekro a technology from a winning voter (AgendaHelper.getWinningVoters). Nobody votes on
+    // Arms Reduction and the speaker picks For, the outcome Nekro predicted: the rider is not won and nets nothing.
+    @Test
+    void aGalacticThreatOnAnOutcomeNobodyVotedForIsNotWon() {
+        AiTestGame test = new AiTestGame();
+        AgendaTracker tracker = new AgendaTracker();
+        test.game.setPhaseOfGame("agendaVoting");
+        test.game.setCurrentAgendaInfo("Directive_For/Against_8_arms_reduction");
+        tracker.observe(test.game, 0);
+
+        test.game.setCurrentAgendaVote("for", "nekro_Galactic Threat Rider");
+        tracker.observe(test.game, 60_000);
+        test.game.setStoredValue("resolvedAgendaOutcome", "for");
+        tracker.observe(test.game, 120_000);
+
+        AgendaTracker.Rider rider = tracker.summary(test.game, 120_000)
+                .agendas()
+                .getFirst()
+                .riders()
+                .getFirst();
+        assertThat(rider.won()).isFalse();
+        assertThat(rider.net()).isZero();
+    }
+
+    // With a voter on the predicted outcome the rider is won, and it is worth the technology Nekro actually copied.
+    @Test
+    void aGalacticThreatIsWorthTheTechnologyNekroCopied() {
+        AiTestGame test = new AiTestGame();
+        AgendaTracker tracker = new AgendaTracker();
+        test.game.setPhaseOfGame("agendaVoting");
+        test.game.setCurrentAgendaInfo("Directive_For/Against_8_arms_reduction");
+        tracker.observe(test.game, 0);
+
+        test.game.setCurrentAgendaVote("for", "nekro_Galactic Threat Rider;sol_3");
+        tracker.observe(test.game, 60_000);
+        test.game.setStoredValue("resolvedAgendaOutcome", "for");
+        String copied = test.sol.getTechs().stream()
+                .filter(tech -> !test.nekro.hasTech(tech))
+                .findFirst()
+                .orElseThrow();
+        test.nekro.addTech(copied);
+        tracker.observe(test.game, 120_000);
+
+        AgendaTracker.Rider rider = tracker.summary(test.game, 120_000)
+                .agendas()
+                .getFirst()
+                .riders()
+                .getFirst();
+        assertThat(rider.won()).isTrue();
+        assertThat(rider.payoff()).isEqualTo(ti4.ai.strategy.CopiedTechPolicy.copiedWorth(copied));
+        assertThat(rider.net()).isPositive();
+    }
+
     // An A/B on the value table must grade treatment and control on one yardstick: switching AGENDA_VALUE_TABLE off
     // for a seat changes how it votes, never the utilities the tracker records for it.
     @Test

@@ -312,7 +312,11 @@ class AgendaExamTest extends BaseTi4Test {
 
     // ---- Galactic Threat ---------------------------------------------------------------------------------------
 
-    /** Politics answers: voting for the outcome Nekro predicted costs 1 TG, or 0.5 TG once others voted that way. */
+    /**
+     * Politics answers: voting for the outcome Nekro predicted costs the voter about 1 TG, less once others voted that
+     * way. The cost is the technology Nekro would copy from the voter, over what earlier voters already offer, shared
+     * over the voter's rivals; a voter with nothing Nekro can copy pays nothing.
+     */
     @Nested
     class GalacticThreat {
 
@@ -334,15 +338,26 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ballot(sol, 3, 2, 4)).isPresent().get().isNotEqualTo(unpredicted);
         }
 
-        // Once another seat has voted for the prediction Nekro gets its technology anyway, so the cost halves.
+        // Once another seat has voted for the prediction Nekro gets a technology anyway, so the cost falls.
         @Test
-        void joiningOthersOnThePredictionCostsHalf() {
+        void joiningOthersOnThePredictionCostsLess() {
             reveal("Law_Elect Player_7_minister_war", "blue", 9, "red", 4, "black", 0);
             test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER);
-            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isEqualTo(1.0);
+            double alone = GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3);
+            assertThat(alone).isBetween(0.5, 3.0);
 
             test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER + ";red_4");
-            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isEqualTo(0.5);
+            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isLessThan(alone);
+        }
+
+        // Sol holds only technologies Nekro already has: voting with the prediction feeds Nekro nothing, so it is free.
+        @Test
+        void aVoterNekroCannotCopyFromPaysNothing() {
+            reveal("Law_Elect Player_7_minister_war", "blue", 9, "red", 4, "black", 0);
+            test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER);
+            sol.setTechs(new java.util.ArrayList<>(nekro.getTechs()));
+
+            assertThat(GalacticThreatCost.ofBallot(test.game, sol, "xxcha", 3)).isZero();
         }
 
         // A 5 TG minister is worth more than the 1 TG: Sol still votes itself after Nekro predicted Sol.
@@ -956,6 +971,78 @@ class AgendaExamTest extends BaseTi4Test {
         }
     }
 
+    // ---- vote power and spare votes ---------------------------------------------------------------------------
+
+    /**
+     * Review, Representative Government: For (one vote each) wipes out a vote-rich seat's edge, so Xxcha, with its
+     * commander's extra vote on every planet, votes Against or abstains, never For. Vote power is real vote capacity,
+     * not planet influence. Politics guidance: keep votes back on a first agenda nobody contests.
+     */
+    @Nested
+    class VotePower {
+
+        private static final String REP_GOVT = "Law_For/Against_7_representative_government";
+        private static final String NEXUS = "Law_For/Against_7_nexus";
+
+        // Xxcha and Sol hold the same influence (4), but Xxcha's commander makes it 6 votes against Sol's 4.
+        private void evenInfluenceWithTheXxchaCommander() {
+            test.place("14", "101");
+            test.place("01", "304");
+            test.place("26", "102");
+            test.place("27", "103");
+            xxcha.addPlanet("archonren");
+            xxcha.addPlanet("archontau");
+            sol.addPlanet("jord");
+            sol.addPlanet("lodor");
+            sol.addPlanet("newalbion");
+            xxcha.addLeader("xxchacommander");
+            xxcha.unsafeGetLeader("xxchacommander").setLocked(false);
+        }
+
+        private int votesOf(Player seat, String planet) {
+            return ti4.helpers.AgendaHelper.getSpecificPlanetsVoteWorth(seat, test.game, planet);
+        }
+
+        @Test
+        void aVoteRichSeatValuesRepresentativeGovernmentForBelowZero() {
+            evenInfluenceWithTheXxchaCommander();
+            reveal(REP_GOVT, "blue", 4, "red", 6, "black", 0);
+
+            assertThat(VoteCapacity.of(test.game, xxcha)).isGreaterThan(VoteCapacity.of(test.game, sol));
+            assertThat(ownValue(xxcha, "representative_government", "for", "for"))
+                    .isNegative();
+            assertThat(ownValue(sol, "representative_government", "for", "for")).isPositive();
+        }
+
+        @Test
+        void aVoteRichSeatNeverVotesForRepresentativeGovernmentInRoundOne() {
+            evenInfluenceWithTheXxchaCommander();
+            test.game.setRound(1);
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setSpeakerUserID(sol.getUserID());
+            reveal(REP_GOVT, "blue", 4, "red", 6, "black", 0);
+
+            assertThat(ballot(xxcha, votesOf(xxcha, "archonren"), votesOf(xxcha, "archontau")))
+                    .isNotEqualTo(Optional.of("for"));
+        }
+
+        // Xxcha holds Mallice and wants Nexus Sovereignty; nobody else cares, so nobody else votes and the smallest
+        // ballot Xxcha can cast already wins. It keeps the rest for the second agenda instead of piling on.
+        @Test
+        void castsNoMoreThanItNeedsOnAnUncontestedFirstAgenda() {
+            xxcha.addPlanet("mallice");
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setSpeakerUserID(sol.getUserID());
+            reveal(NEXUS, "blue", 4, "red", 11, "black", 0);
+
+            int votes = BallotPlanner.choose(test.game, xxcha, "nexus", List.of(4, 2, 3, 2))
+                    .map(BallotPlanner.Choice::votes)
+                    .orElse(0);
+
+            assertThat(votes).isLessThanOrEqualTo(2);
+        }
+    }
+
     // ---- For/Against laws by faction and position --------------------------------------------------------------
 
     /** Review, For/Against laws: the faction and board leanings behind each law. */
@@ -1120,7 +1207,6 @@ class AgendaExamTest extends BaseTi4Test {
             fail("expected the non-speaker's Covert value to stay the same when the hidden agenda is swapped");
         }
 
-        @Disabled("milestone 4c: on the first agenda the forecast has opponents keep a vote back for the second")
         @Test
         void opponentsKeepAVoteBackOnTheFirstAgenda() {
             test.game.setStoredValue("agendaCount", "1");

@@ -199,9 +199,13 @@ class PromiseDeals {
                         .map(VoteDeals.Terms::buyerGain)
                         .orElse(0.0)
                 : PromiseValue.protection(game, buyer, seat, promise.term(), promise.target());
-        int ask = sellerPrice(worth, cost, buyer, buyer.getTg(), votes ? 0 : MAX_TERRITORY_PRICE)
-                .orElse(0);
+        Optional<Integer> asked = sellerPrice(worth, cost, buyer, buyer.getTg(), votes ? 0 : MAX_TERRITORY_PRICE);
+        int ask = votes ? Math.max(asked.orElse(0), voteFloor(cost)) : asked.orElse(0);
         return promise.price() >= ask && promise.price() - cost >= margin;
+    }
+
+    static int voteFloor(double sellerCost) {
+        return Math.max(MIN_PRICE, (int) Math.ceil(sellerCost + TradeValue.PROPOSE_MIN));
     }
 
     private static boolean votesCommittedElsewhere(AiTurnContext context) {

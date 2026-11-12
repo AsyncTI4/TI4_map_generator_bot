@@ -27,6 +27,15 @@ public class CopiedTechPolicy {
         return allowed(seat, alias) ? ResearchPolicy.value(game, seat, alias) : 0;
     }
 
+    public static double publicValue(Player seat, String alias) {
+        return allowed(seat, alias) ? copiedWorth(alias) : 0;
+    }
+
+    public static double copiedWorth(String alias) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        return tech == null ? 0 : ResearchPolicy.TECH_TEMPO * ResearchPolicy.baseValue(tech);
+    }
+
     private static boolean allowed(Player seat, String alias) {
         TechnologyModel tech = Mapper.getTech(alias);
         if (tech == null || seat.hasTech(alias)) return false;

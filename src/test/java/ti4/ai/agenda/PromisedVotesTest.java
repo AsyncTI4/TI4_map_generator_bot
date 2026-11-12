@@ -1,6 +1,7 @@
 package ti4.ai.agenda;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,9 +160,71 @@ class PromisedVotesTest extends BaseTi4Test {
         VoteDeals.Terms terms =
                 VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
 
-        assertThat(terms.votes()).isEqualTo(AgendaVoting.castableVotes(test.game, xxcha));
+        assertThat(terms.votes()).isBetween(1, AgendaVoting.castableVotes(test.game, xxcha));
         assertThat(terms.buyerGain()).isPositive();
         assertThat(terms.sellerCost()).isPositive();
+    }
+
+    // The deal names the fewest votes that still win the buyer the outcome: one of Xxcha's two votes already puts Sol
+    // ahead once Xxcha no longer votes for itself. Without the expert value table the deal buys the whole stack.
+    @Test
+    void aVoteDealBuysOnlyTheVotesItNeeds() {
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+        assertThat(castable).isGreaterThan(1);
+
+        assertThat(VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol")
+                        .orElseThrow()
+                        .votes())
+                .isLessThan(castable);
+
+        AiExperiments.disable(sol, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        assertThat(VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol")
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(castable);
+    }
+
+    // A seller that would feed Nekro a technology by voting for its prediction counts that in its cost of the deal.
+    @Test
+    void aVoteSaleOnNekrosPredictionCostsTheSellerTheGalacticThreat() {
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        test.game.setCurrentAgendaVote("sol", "black_" + GalacticThreatCost.RIDER);
+        VoteDeals.Terms withThreat =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+        double threat = GalacticThreatCost.ofBallot(test.game, xxcha, "sol", withThreat.votes());
+        assertThat(threat).isPositive();
+
+        AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST));
+        VoteDeals.Terms without =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+
+        assertThat(withThreat.sellerCost() - without.sellerCost()).isCloseTo(threat, within(1e-9));
+    }
+
+    // A binding promise casts the votes agreed, not the promiser's whole stack.
+    @Test
+    void aPromiseForFewerVotesCastsOnlyThose() {
+        Promise promise = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "nekro",
+                1,
+                2,
+                1,
+                60_000);
+        PromiseBook.save(test.game, promise.accepted(test.game));
+
+        AgendaVoting.Ballot ballot = AgendaVoting.plan(test.game, sol).orElseThrow();
+        assertThat(ballot.outcome()).isEqualTo("nekro");
+        assertThat(ballot.votes()).isEqualTo(1);
+        assertThat(PromisedVotes.promisedVotes(promise, 4)).isEqualTo(1);
+        assertThat(PromisedVotes.promisedVotes(votesFor(sol, test.nekro, "nekro"), 3))
+                .isEqualTo(3);
     }
 
     // Once a vote promise is accepted, everyone's forecast puts the promiser's votes on the promised outcome.
