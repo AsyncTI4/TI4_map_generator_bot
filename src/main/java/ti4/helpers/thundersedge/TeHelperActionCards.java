@@ -95,7 +95,7 @@ public class TeHelperActionCards {
         return false;
     }
 
-    private static List<Button> getOverruleButtons(Game game, Player player, boolean blueReverie) {
+    public static List<Button> getOverrulePrimaryButtons(Game game, Player player, boolean blueReverie) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
             if (sc <= 0
@@ -457,7 +457,7 @@ public class TeHelperActionCards {
 
     @ButtonHandler("overruleStart")
     private static void resolveOverrule(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverruleButtons(game, player, false);
+        List<Button> buttons = getOverrulePrimaryButtons(game, player, false);
         String message = "Choose the strategy card you wish to perform the primary of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -465,7 +465,7 @@ public class TeHelperActionCards {
 
     @ButtonHandler("overruleBrStart")
     private static void resolveBlueReverieOverrule(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = getOverruleButtons(game, player, true);
+        List<Button> buttons = getOverrulePrimaryButtons(game, player, true);
         String message = "Choose the strategy card you wish to perform the primary of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);

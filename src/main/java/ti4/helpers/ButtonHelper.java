@@ -56,6 +56,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
@@ -823,6 +824,7 @@ public class ButtonHelper {
         if (player.getTg() > 2) {
             buttons.add(Buttons.red("reduceTG_3_" + whatIsItFor, "Spend 3 Trade Goods"));
         }
+        buttons.addAll(BeansRelicHandler.getHamitsTreasurePaymentButtons(game, player, whatIsItFor));
         if (KaltrimTechHandler.canSpendCapturedInfantry(player)) {
             buttons.add(KaltrimTechHandler.getSpendCapturedInfantryButton(player, whatIsItFor));
         }
@@ -5241,7 +5243,8 @@ public class ButtonHelper {
                 "phantasm",
                 "eko", // Ixth
                 "lapidus",
-                "lloyd");
+                "lloyd",
+                "libertalia");
         for (String planet : implementedLegendaryPlanets) {
             String label = "Use " + Mapper.getPlanet(planet).getName() + " Ability";
 

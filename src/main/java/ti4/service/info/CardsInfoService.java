@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
@@ -132,6 +133,14 @@ public class CardsInfoService {
         Button tomeCardsButton = XyrixTomeHandler.getTomeCardsInfoButton(game, player);
         if (tomeCardsButton != null) {
             buttons.add(tomeCardsButton);
+        }
+        Button hamitsTreasureButton = BeansRelicHandler.getHamitsTreasureCardsInfoButton(game, player);
+        if (hamitsTreasureButton != null) {
+            buttons.add(hamitsTreasureButton);
+        }
+        Button ouroborosFragmentsButton = BeansRelicHandler.getOuroborosFragmentsCardsInfoButton(player);
+        if (ouroborosFragmentsButton != null) {
+            buttons.add(ouroborosFragmentsButton);
         }
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));

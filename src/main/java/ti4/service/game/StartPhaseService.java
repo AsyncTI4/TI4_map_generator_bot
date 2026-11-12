@@ -21,6 +21,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -646,6 +647,8 @@ public class StartPhaseService {
         String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
+        BeansRelicHandler.addHamitsTreasureTradeGoodsAtStrategyPhaseStart(game);
+        BeansRelicHandler.offerTheSilenceAtStrategyPhaseStart(game);
         for (Player player : game.getRealPlayers()) {
             XyrixLeadersHandler.offerHeroAtStrategyPhaseStart(game, player);
         }

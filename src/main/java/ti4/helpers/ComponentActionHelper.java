@@ -14,6 +14,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
@@ -387,6 +388,9 @@ public class ComponentActionHelper {
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
+                continue;
+            }
+            if ("temporaldissidence".equals(relic)) {
                 continue;
             }
             if ("quantum_entangler".equalsIgnoreCase(relic)
@@ -1508,6 +1512,8 @@ public class ComponentActionHelper {
                         + " If scoring one of your unscored secret objectives, just score it via the normal process after pressing the button.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
+            case "hamitstreasure" -> BeansRelicHandler.resolveHamitsTreasure(game, player, event);
+            case "ouroboros" -> BeansRelicHandler.resolveOuroboros(game, player, event);
             case "dynamiscore", "absol_dynamiscore" -> {
                 int oldTg = player.getTg();
                 if ("absol_dynamiscore".equals(relicID)) {
