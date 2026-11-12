@@ -91,6 +91,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                         .toList()));
         printTempo(outcomes);
         if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get());
+        AgendaTracker.report(outcomes);
 
         String reports = String.join(
                 System.lineSeparator() + System.lineSeparator(),

@@ -37,11 +37,25 @@ import ti4.testUtils.discord.FakeMessage;
 // -Dai.selfplay.roundtwo.lines=true for one line per seat and -Dai.selfplay.scorediag.lines=true for the per-seat
 // scoring diagnostic; both name the game, so the lines can be matched to traces. -Dai.selfplay.objectiveseed=N fixes
 // the stage one objectives of each game slot, so two batches with the same seed can be compared game by game.
+//
+// -Dai.selfplay.roundtwo.rounds=N plays N rounds instead of two (the time and tick budgets scale with it).
+// -Dai.selfplay.roundtwo.playagenda=true credits the first seat with the custodians before round 1 (as forceagenda
+// does),
+// so every status phase leads into an agenda phase, and the AI seats play those agenda phases instead of skipping them;
+// the last round's agenda phase is played too, and the game stops when the next strategy phase starts. AgendaTracker
+// then prints AGENDA lines per agenda, per seat and for the batch.
+// -Dai.selfplay.ab=EXPERIMENT,...|all|none pairs the games as AiSelfPlayTest#sixAiSeatsPlayFullGames does: slots 2k
+// and 2k+1 share a seed, seating and seeded objectives, and alternate seats play with the experiments off (control).
+// The batch then prints ABGAME lines and treatment minus control with the standard error over pairs, for points and,
+// with playagenda, for every agenda metric.
 class RoundTwoSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = factions();
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    private static final int LAST_ROUND = 2;
+    private static final int LAST_ROUND = Integer.getInteger("ai.selfplay.roundtwo.rounds", 2);
+    private static final boolean PLAY_AGENDA = Boolean.getBoolean("ai.selfplay.roundtwo.playagenda");
+    // Played agenda phases take extra virtual time and ticks on top of the rounds themselves.
+    private static final int BUDGET_SCALE = PLAY_AGENDA ? 2 : 1;
 
     // -Dai.selfplay.roundtwo.factions=xxcha,hacan,... seats those factions instead of the built-out default factions.
     private static List<String> factions() {
@@ -71,7 +85,8 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             List<String> revealedPublics,
             List<SeatResult> seats,
             List<ScoringDiagnostic.SeatRound> scoring,
-            String name) {
+            String name,
+            SelfPlayGame.Outcome outcome) {
 
         double meanPoints() {
             return seats.stream().mapToInt(SeatResult::points).average().orElse(0);
@@ -112,6 +127,10 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                                 ScoringDiagnostic.line(seat).replaceFirst(" g ", " " + result.name() + " ")));
         }
         ScoringDiagnostic.report(scoring);
+        List<SelfPlayGame.Outcome> outcomes =
+                results.stream().map(GameResult::outcome).toList();
+        if (PLAY_AGENDA) AgendaTracker.report(outcomes);
+        if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get());
     }
 
     private static final AtomicInteger COMMANDER_PULLS = new AtomicInteger();
@@ -143,7 +162,7 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             List<Future<GameResult>> futures = new ArrayList<>();
             for (int i = 0; i < games; i++) {
                 int slot = i;
-                futures.add(pool.submit(() -> playOne(clockStart + slot, slot)));
+                futures.add(pool.submit(() -> playOne(clockStart + SelfPlayGame.pairSlot(slot), slot)));
             }
             List<GameResult> results = new ArrayList<>();
             for (Future<GameResult> future : futures) results.add(future.get());
@@ -155,13 +174,15 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
 
     private static GameResult playOne(long clockStart, int slot) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
-            String name = "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
+            String name = SelfPlayGame.AB.isPresent()
+                    ? "aiab" + Math.floorMod(SelfPlayGame.seedFor(slot), 1_000_000L) + (slot % 2 == 0 ? "a" : "b")
+                    : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
             SelfPlayGame selfPlay = new SelfPlayGame(env, name, slot);
             List<String> seating = new ArrayList<>(FACTIONS);
-            Collections.rotate(seating, slot);
+            Collections.rotate(seating, SelfPlayGame.pairSlot(slot));
             Game game = selfPlay.setUp(seating);
             if (Boolean.getBoolean("ai.selfplay.roundtwo.sardakkleaders")) unlockSardakkLeaders(game);
-            if (Boolean.getBoolean("ai.selfplay.roundtwo.forceagenda"))
+            if (PLAY_AGENDA || Boolean.getBoolean("ai.selfplay.roundtwo.forceagenda"))
                 selfPlay.force(game, RoundTwoSelfPlayTest::takeCustodians);
             Map<String, Map<String, Double>> ownArea = new HashMap<>();
             Map<String, Integer> planetsAtStart = new HashMap<>();
@@ -195,14 +216,14 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                             recordCards(current, cards);
                         }
                         if (round > LAST_ROUND) return true;
-                        if (!inAgendaPhase(current)) return false;
+                        if (!inAgendaPhase(current) || PLAY_AGENDA) return false;
                         if (round >= LAST_ROUND) return true;
                         skipAgenda(selfPlay, env, current);
                         agendasSkipped[0]++;
                         return false;
                     },
-                    (2 + LAST_ROUND) * VIRTUAL_DAY,
-                    40_000 * LAST_ROUND);
+                    (2 + LAST_ROUND) * BUDGET_SCALE * VIRTUAL_DAY,
+                    40_000 * LAST_ROUND * BUDGET_SCALE);
             if (Boolean.getBoolean("ai.selfplay.report") && slot == 0) System.out.println(outcome.report());
             Game end = live.get();
             diagnostic.finish(end);
@@ -242,7 +263,8 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                     new ArrayList<>(end.getRevealedPublicObjectives().keySet()),
                     seats,
                     diagnostic.results,
-                    name);
+                    name,
+                    outcome);
         }
     }
 
@@ -320,7 +342,8 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
     private static final java.util.Set<String> playedLines = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     // -Dai.selfplay.roundtwo.forceagenda=true credits the first seat with the custodians before round 1, so every
-    // status phase leads into an agenda phase. It exists to check the agenda skip, not to measure play.
+    // status phase leads into an agenda phase. Alone it exists to check the agenda skip, not to measure play;
+    // playagenda uses the same credit to measure agenda play.
     private static void takeCustodians(Game game) {
         Integer custodians = game.getRevealedPublicObjectives().get(Constants.CUSTODIAN);
         if (custodians != null)
@@ -391,14 +414,16 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                 .mapToDouble(GameResult::meanPointsAfterRoundOne)
                 .toArray();
         System.out.printf(
-                "ROUND2 SUMMARY over %d games (%d did not finish round 2, %d agenda phases skipped):"
-                        + " points %.2f +- %.2f per seat after round 2 (%.2f +- %.2f after round 1),"
+                "ROUND2 SUMMARY over %d games (%d did not finish round %d, %d agenda phases skipped):"
+                        + " points %.2f +- %.2f per seat after round %d (%.2f +- %.2f after round 1),"
                         + " leader %.2f, table %.2f%n",
                 games,
                 incomplete,
+                LAST_ROUND,
                 results.stream().mapToInt(GameResult::agendasSkipped).sum(),
                 mean(perGame),
                 standardError(perGame),
+                LAST_ROUND,
                 mean(perGameRoundOne),
                 standardError(perGameRoundOne),
                 results.stream().mapToInt(GameResult::leaderPoints).average().orElse(0),

@@ -81,7 +81,8 @@ final class SelfPlayGame {
             String report,
             long wallSeconds,
             int slot,
-            java.util.Set<String> controlSeats) {
+            java.util.Set<String> controlSeats,
+            AgendaTracker.Summary agendas) {
 
         // Per seat, for each round the game reached: how many presses of this kind the AI made.
         List<Double> perSeat(java.util.function.Predicate<String> kinds) {
@@ -207,6 +208,7 @@ final class SelfPlayGame {
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
     private final List<Integer> playRounds = new ArrayList<>();
     private final ObjectiveTracker objectives = new ObjectiveTracker();
+    private final AgendaTracker agendas = new AgendaTracker();
     private final RelicTracker relics = new RelicTracker();
     private boolean relicsHandedOut;
     private final FractureTracker fracture;
@@ -226,8 +228,13 @@ final class SelfPlayGame {
     static final java.util.Optional<java.util.Set<ti4.ai.AiExperiments.Experiment>> AB =
             ti4.ai.AiExperiments.abExperiments();
 
+    // The game slot with A/B pairs folded together, so both games of a pair get the same objectives and seating.
+    static int pairSlot(int slot) {
+        return AB.isPresent() ? slot / 2 : slot;
+    }
+
     static long seedFor(int slot) {
-        return BASE_SEED + (AB.isPresent() ? slot / 2 : slot);
+        return BASE_SEED + pairSlot(slot);
     }
 
     SelfPlayGame(SelfPlayEnvironment env, String name, int slot) {
@@ -279,7 +286,7 @@ final class SelfPlayGame {
             }
         }
         giveChosenTechs(game);
-        revealChosenObjectives(game, slot);
+        revealChosenObjectives(game, pairSlot(slot));
         GameManager.save(game, "AI self-play setup");
         if (!GameManager.isValid(name) || GameManager.getManagedGame(name) == null) {
             throw new IllegalStateException(
@@ -438,6 +445,7 @@ final class SelfPlayGame {
             recordPlayRounds(game);
             env.promissory.observe(game);
             objectives.observe(game);
+            agendas.observe(game, now);
             relics.observe(game);
             env.leaders.observe(game);
             if (fracture.due(game)) force(game, fracture::enter);
@@ -775,7 +783,15 @@ final class SelfPlayGame {
                 report(ending, game, ticks),
                 (System.nanoTime() - wallStart) / 1_000_000_000L,
                 slot,
-                java.util.Set.copyOf(controlSeats));
+                java.util.Set.copyOf(controlSeats),
+                agendaSummary(game));
+    }
+
+    private AgendaTracker.Summary agendaSummary(Game game) {
+        if (game == null) return AgendaTracker.Summary.NOTHING;
+        AgendaTracker.Summary summary = agendas.summary(game, env.now());
+        AgendaTracker.lines(summary).forEach(System.out::println);
+        return summary;
     }
 
     // A play is stamped with the round the game was in when it was first seen, which is within one tick of the play.
