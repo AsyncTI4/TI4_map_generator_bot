@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionT
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
@@ -1887,6 +1888,8 @@ public class StartCombatService {
         }
 
         if (isSpaceCombat) {
+            BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p1, p2, tile);
+            BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p2, p1, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p2, p1, tile);
             ChoirTechHandler.addOblivionsEchoCombatButton(buttons, game, p1, p2, tile);

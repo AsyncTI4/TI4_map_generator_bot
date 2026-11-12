@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
@@ -231,6 +232,7 @@ public class ButtonHelperExplore {
         for (Player gamePlayer : game.getPlayers().values()) {
             unavailableFragments.addAll(gamePlayer.getFragments());
         }
+        unavailableFragments.addAll(BeansRelicHandler.getOuroborosFragmentsInPlay(game));
 
         return explorationDeck.getNewDeck().stream()
                 .distinct()
@@ -380,6 +382,7 @@ public class ButtonHelperExplore {
             message.append(" relic fragments.");
         }
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
+        BeansRelicHandler.offerOuroborosFragments(game, player, fragmentsToPurge);
         OblivionUnitHandler.doOblivionMechCheck(game, player);
         StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, player);
         StonebornAbilityHandler.offerFragmentumTokenPlacement(game, player, event, fragmentsToPurge);
