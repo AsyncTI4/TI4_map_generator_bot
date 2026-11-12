@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -16,6 +17,7 @@ import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSeats;
 import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.agenda.AgendaQueue;
+import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
@@ -80,8 +82,9 @@ class PromiseDeals {
         if (open.isEmpty()) return Optional.empty();
         VoteDeals.Outlook outlook = VoteDeals.outlook(game, seat);
         boolean mayPromiseVotes = !votesCommittedElsewhere(context);
+        Predicate<String> backed = backedOutcome(context);
         return open.stream()
-                .flatMap(partner -> votes(context, outlook, mayPromiseVotes, partner).stream())
+                .flatMap(partner -> votes(context, outlook, mayPromiseVotes, backed, partner).stream())
                 .max(Comparator.comparingDouble(Proposal::gain))
                 .flatMap(proposal -> post(context, proposal));
     }
@@ -192,10 +195,13 @@ class PromiseDeals {
         Game game = context.game();
         Player seat = context.seat();
         boolean votes = promise.term() == Promise.Term.VOTE_FOR;
-        if (votes && votesCommittedElsewhere(context)) return false;
+        if (votes
+                && (votesCommittedElsewhere(context) || !backedOutcome(context).test(promise.target()))) {
+            return false;
+        }
         double cost = restraint(game, seat, promise);
         double worth = votes
-                ? VoteDeals.valued(game, seat, seat, buyer, promise.target())
+                ? VoteDeals.valuedAt(game, seat, seat, buyer, promise.target(), promise.votes())
                         .map(VoteDeals.Terms::buyerGain)
                         .orElse(0.0)
                 : PromiseValue.protection(game, buyer, seat, promise.term(), promise.target());
@@ -206,6 +212,25 @@ class PromiseDeals {
 
     static int voteFloor(double sellerCost) {
         return Math.max(MIN_PRICE, (int) Math.ceil(sellerCost + TradeValue.PROPOSE_MIN));
+    }
+
+    static Predicate<String> backedOutcome(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        Optional<String> backed = AgendaVoting.ballotInProgress(context)
+                .or(() -> PromisedVotes.binding(game, seat).map(Promise::target))
+                .or(() -> openSaleTarget(game, seat));
+        return backed.<Predicate<String>>map(outcome -> outcome::equalsIgnoreCase)
+                .orElse(outcome -> true);
+    }
+
+    private static Optional<String> openSaleTarget(Game game, Player seat) {
+        return PromiseBook.all(game).stream()
+                .filter(promise -> PromisedVotes.onThisAgenda(game, promise))
+                .filter(promise -> promise.open() && promise.isPromiser(seat))
+                .filter(promise -> promise.proposer().equals(seat.getFaction()))
+                .map(Promise::target)
+                .findFirst();
     }
 
     private static boolean votesCommittedElsewhere(AiTurnContext context) {
@@ -230,7 +255,7 @@ class PromiseDeals {
     private static double restraint(Game game, Player promiser, Promise promise) {
         if (promise.term() != Promise.Term.VOTE_FOR) return PromiseValue.restraintCost(game, promiser, promise);
         Player promisee = promise.promiseeIn(game).orElseThrow();
-        return VoteDeals.valued(game, promiser, promiser, promisee, promise.target())
+        return VoteDeals.valuedAt(game, promiser, promiser, promisee, promise.target(), promise.votes())
                 .map(VoteDeals.Terms::sellerCost)
                 .orElse(Double.POSITIVE_INFINITY);
     }
@@ -239,7 +264,7 @@ class PromiseDeals {
         if (promise.term() != Promise.Term.VOTE_FOR) {
             return PromiseValue.protection(game, promisee, promiser, promise.term(), promise.target());
         }
-        return VoteDeals.valued(game, promisee, promiser, promisee, promise.target())
+        return VoteDeals.valuedAt(game, promisee, promiser, promisee, promise.target(), promise.votes())
                 .map(VoteDeals.Terms::buyerGain)
                 .orElse(0.0);
     }
@@ -295,12 +320,16 @@ class PromiseDeals {
     }
 
     private static List<Proposal> votes(
-            AiTurnContext context, VoteDeals.Outlook outlook, boolean mayPromiseVotes, Player partner) {
+            AiTurnContext context,
+            VoteDeals.Outlook outlook,
+            boolean mayPromiseVotes,
+            Predicate<String> backed,
+            Player partner) {
         Game game = context.game();
         Player seat = context.seat();
         List<Proposal> proposals = new ArrayList<>();
         if (mayPromiseVotes && !sellingVotes(game, seat)) {
-            VoteDeals.bestSale(outlook, seat, partner)
+            VoteDeals.bestSale(outlook, seat, partner, backed)
                     .flatMap(terms -> sellerPrice(terms.buyerGain(), terms.sellerCost(), partner, partner.getTg(), 0)
                             .map(price -> new Proposal(
                                     Promise.Term.VOTE_FOR,
@@ -314,7 +343,7 @@ class PromiseDeals {
         }
         if (!sellingVotes(game, partner)) {
             double trust = Trust.of(context, partner);
-            VoteDeals.bestPurchase(outlook, seat, partner)
+            VoteDeals.bestPurchase(outlook, seat, partner, backed)
                     .flatMap(terms -> buyerPrice(
                                     trust * terms.buyerGain(),
                                     terms.sellerCost(),

@@ -165,10 +165,14 @@ class PromisedVotesTest extends BaseTi4Test {
         assertThat(terms.sellerCost()).isPositive();
     }
 
-    // The deal names the fewest votes that still win the buyer the outcome: one of Xxcha's two votes already puts Sol
-    // ahead once Xxcha no longer votes for itself. Without the expert value table the deal buys the whole stack.
+    // The deal names the fewest votes that still win the buyer the outcome: any one of Xxcha's planets already puts Sol
+    // ahead once Xxcha no longer votes for itself. A viewer (here Nekro) without the expert value table sizes every
+    // deal at the whole stack: the seat that decides uses its own flags, not those of the buyer or seller.
     @Test
     void aVoteDealBuysOnlyTheVotesItNeeds() {
+        test.place("14", "101");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
         int castable = AgendaVoting.castableVotes(test.game, xxcha);
         assertThat(castable).isGreaterThan(1);
@@ -178,7 +182,7 @@ class PromisedVotesTest extends BaseTi4Test {
                         .votes())
                 .isLessThan(castable);
 
-        AiExperiments.disable(sol, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        AiExperiments.disable(test.nekro, Set.of(Experiment.AGENDA_VALUE_TABLE));
         assertThat(VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol")
                         .orElseThrow()
                         .votes())
@@ -186,10 +190,10 @@ class PromisedVotesTest extends BaseTi4Test {
     }
 
     // A seller that would feed Nekro a technology by voting for its prediction counts that in its cost of the deal.
-    // The buyer runs without the expert value table so both deals name the same (whole) stack of votes.
+    // The viewer runs without the expert value table so both deals name the same (whole) stack of votes.
     @Test
     void aVoteSaleOnNekrosPredictionCostsTheSellerTheGalacticThreat() {
-        AiExperiments.disable(sol, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        AiExperiments.disable(test.nekro, Set.of(Experiment.AGENDA_VALUE_TABLE));
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
         test.game.setCurrentAgendaVote("sol", "black_" + GalacticThreatCost.RIDER);
         VoteDeals.Terms withThreat =
@@ -271,5 +275,75 @@ class PromisedVotesTest extends BaseTi4Test {
         assertThat(AgendaForecast.of(test.game, test.nekro).chance("xxcha")).isGreaterThan(before);
         assertThat(AgendaForecast.of(test.game, test.nekro).votesLeft(sol)).isZero();
         assertThat(VoteDeals.valued(test.game, test.nekro, sol, xxcha, "xxcha")).isEmpty();
+    }
+
+    // A promise is valued at the votes it names, since those are the votes the binding ballot casts; the seat that
+    // decides does not size the deal again. A promise for more votes than the seller can cast is held to its stack.
+    @Test
+    void aPromiseIsValuedAtTheVotesItNames() {
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+
+        assertThat(VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", 1)
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(1);
+        assertThat(VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", 0)
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(castable);
+        assertThat(VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", castable + 5)
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(castable);
+    }
+
+    // Planets are exhausted whole, so a deal only names vote totals the seller's readied planets can make (plus the 3
+    // of a ready Predictive Intelligence), never one that would make it cast more than it promised.
+    @Test
+    void aVoteDealOnlyNamesTotalsThePlanetsCanMake() {
+        test.place("14", "101");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        int most = AgendaVoting.castableVotes(test.game, xxcha);
+        java.util.List<Integer> planets = AgendaVoting.readiedPlanetVotes(test.game, xxcha);
+
+        assertThat(VoteDeals.saleSizes(test.game, xxcha, most)).isEqualTo(BallotPlanner.reachableTotals(planets, most));
+
+        xxcha.addTech("pi");
+        assertThat(VoteDeals.saleSizes(test.game, xxcha, most))
+                .contains(BallotPlanner.PREDICTIVE_VOTES)
+                .allMatch(votes -> votes <= most)
+                .allMatch(votes -> BallotPlanner.reachableTotals(planets, most).contains(votes)
+                        || votes == BallotPlanner.PREDICTIVE_VOTES
+                        || BallotPlanner.reachableTotals(planets, most)
+                                .contains(votes - BallotPlanner.PREDICTIVE_VOTES));
+    }
+
+    // When the buyer values a deal, its forecast already lowers the seller's utility of Nekro's predicted outcome by
+    // the Galactic Threat disincentive. The deal adds the flat cost of the seller's ballot once, so the seller's cost
+    // is its change in outcome value without that disincentive plus the flat cost, and not both.
+    @Test
+    void theGalacticThreatCostIsCountedOnceWhenTheBuyerValuesTheDeal() {
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        test.game.setCurrentAgendaVote("sol", "black_" + GalacticThreatCost.RIDER);
+        int votes = AgendaVoting.castableVotes(test.game, xxcha);
+        VoteDeals.Terms terms =
+                VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", votes).orElseThrow();
+        AgendaForecast forecast = AgendaForecast.of(test.game, sol);
+        AgendaForecast withDeal = forecast.withVotes(xxcha, "sol", votes);
+        double flat = GalacticThreatCost.ofBallot(test.game, xxcha, "sol", votes)
+                + VoteDeals.spentVotes(test.game, sol, votes);
+        assertThat(GalacticThreatCost.ofBallot(test.game, xxcha, "sol", votes)).isPositive();
+
+        assertThat(terms.sellerCost())
+                .isCloseTo(
+                        forecast.expectedUtilityWithoutThreatDislike(xxcha)
+                                - withDeal.expectedUtilityWithoutThreatDislike(xxcha)
+                                + flat,
+                        within(1e-9));
+        double doubleCounted = forecast.expectedUtility(xxcha) - withDeal.expectedUtility(xxcha) + flat;
+        assertThat(withDeal.chance("sol")).isGreaterThan(forecast.chance("sol"));
+        assertThat(doubleCounted).isGreaterThan(terms.sellerCost());
     }
 }

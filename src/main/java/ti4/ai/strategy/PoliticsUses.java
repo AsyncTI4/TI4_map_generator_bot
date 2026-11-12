@@ -43,6 +43,10 @@ class PoliticsUses {
 
     private static double speakerValue(Game game, Player seat) {
         if (isSpeaker(game, seat)) return CardValueScale.SPEAKER_HANDOFF_SHARE * CardValueScale.SPEAKER;
+        return holdingValue(game, seat);
+    }
+
+    static double holdingValue(Game game, Player seat) {
         double value = CardValueScale.SPEAKER;
         if (wantsImperialNextRound(game, seat)) value += CardValueScale.SPEAKER_FOR_IMPERIAL;
         if (game.isCustodiansScored()) value += CardValueScale.AGENDA_PEEK;

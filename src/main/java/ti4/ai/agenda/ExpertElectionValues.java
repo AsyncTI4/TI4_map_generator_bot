@@ -221,7 +221,7 @@ class ExpertElectionValues {
 
     private static double executionLoss(AgendaView view, Player elected) {
         Game game = view.game();
-        double speaker = elected.isSpeaker() ? SpeakerTokenValue.of(game, elected) : 0;
+        double speaker = elected.isSpeaker() ? SpeakerTokenValue.ofHolding(game, elected) : 0;
         double silenced = AgendaRound.isFinalAgenda(game) ? 0 : EXECUTION_SILENCED;
         double target = EXECUTION_TARGETS.contains(elected.getFaction()) ? EXECUTION_TARGET_BONUS : 0;
         return handWorth(view, elected) + speaker + silenced + target;

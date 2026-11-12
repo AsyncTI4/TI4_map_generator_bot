@@ -172,6 +172,20 @@ public final class AgendaForecast {
         return expected(outcome -> utility(player, outcome)) - unvotedThreatPayoff(player);
     }
 
+    double expectedUtilityWithoutThreatDislike(Player player) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        if (voter < 0) return expectedUtility(player);
+        return expectedUtility(player) + expected(outcome -> threatDislike(voter, outcome));
+    }
+
+    private double threatDislike(int voter, String outcome) {
+        int index = frame.outcomes().indexOf(outcome);
+        return riders.stream()
+                .filter(rider -> rider.outcome() == index && index >= 0)
+                .mapToDouble(rider -> threatDislike(voter, rider))
+                .sum();
+    }
+
     double unvotedThreatPayoff(Player player) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
         if (voter < 0 || !AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST)) return 0;
@@ -347,7 +361,9 @@ public final class AgendaForecast {
     }
 
     private static int keptBack(Game game, Player viewer, Player player) {
-        if (!AgendaRound.keepsAVoteBack(game) || !AiExperiments.enabled(viewer, Experiment.AGENDA_VALUE_TABLE)) {
+        if (!AgendaRound.keepsAVoteBack(game)
+                || AgendaRound.underRepresentativeGovernment(game)
+                || !AiExperiments.enabled(viewer, Experiment.AGENDA_VALUE_TABLE)) {
             return 0;
         }
         return BallotPlanner.reserve(AgendaVoting.readiedPlanetVotes(game, player));

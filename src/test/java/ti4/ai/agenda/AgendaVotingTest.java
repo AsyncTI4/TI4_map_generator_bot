@@ -63,15 +63,80 @@ class AgendaVotingTest extends BaseTi4Test {
         assertThat(press(confirm)).isEqualTo("FFCC_sol_resolveAgendaVote_4");
     }
 
-    // Predictive Intelligence adds 3 votes that only cost anything if the outcome loses, so they go in first, on top
-    // of the planets.
+    // Predictive Intelligence adds 3 votes but stays exhausted when its outcome loses, so it is used only when the 3
+    // votes decide the outcome. Xxcha already cast 4 votes for itself: Jord's 2 lose, Jord plus the card's 3 win.
     @Test
-    void addsPredictiveIntelligenceVotesBeforeItsPlanets() {
+    void addsPredictiveIntelligenceVotesWhenTheyDecideTheOutcome() {
         test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setSpeakerUserID(sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":5,\"red\":4,\"black\":0}");
+        test.game.setCurrentAgendaVote("xxcha", "red_4");
         sol.addTech("pi");
+        assertThat(everythingSolHas()).isEqualTo(2);
+        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("sol", "", 5, true));
+
         AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_sol_vote", "FFCC_sol_resolveAgendaVote_0");
         assertThat(press(start)).isEqualTo("FFCC_sol_vote");
-        AiPrompt planets = prompt(
+        AiPrompt planets = predictivePrompt();
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_predictive_3");
+
+        sol.addSpentThing("predictive_3");
+        assertThat(press(planets)).isEqualTo("exhaustForVotes_planet_jord");
+    }
+
+    // Alone on the agenda Sol wins with Jord's votes whatever it does, so it keeps Predictive Intelligence ready.
+    @Test
+    void keepsPredictiveIntelligenceWhenItsVotesDecideNothing() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        sol.addTech("pi");
+        assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::predictive))
+                .contains(false);
+
+        AiPrompt start = prompt("start", PromptSource.PUBLIC, NOW, "FFCC_sol_vote", "FFCC_sol_resolveAgendaVote_0");
+        assertThat(press(start)).isEqualTo("FFCC_sol_vote");
+        assertThat(press(predictivePrompt())).isEqualTo("exhaustForVotes_planet_jord");
+    }
+
+    // A promise for fewer than 3 votes never adds the card's 3 on top; a promise for 3 or more counts them.
+    @Test
+    void aSmallVotePromiseNeverAddsPredictiveIntelligence() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        sol.addTech("pi");
+        ti4.ai.promise.PromiseBook.save(test.game, promiseOfVotes(1).accepted(test.game));
+
+        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("nekro", "", 1, false));
+    }
+
+    @Test
+    void aPromiseOfThreeOrMoreVotesCountsPredictiveIntelligenceInThem() {
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        test.place("19", AiTestGame.neighbourOf("304"));
+        sol.addPlanet("wellon");
+        sol.addTech("pi");
+        assertThat(AgendaVoting.castableVotes(test.game, sol)).isGreaterThanOrEqualTo(3);
+        ti4.ai.promise.PromiseBook.save(test.game, promiseOfVotes(3).accepted(test.game));
+
+        assertThat(AgendaVoting.plan(test.game, sol)).contains(new AgendaVoting.Ballot("nekro", "", 3, true));
+    }
+
+    private ti4.ai.promise.Promise promiseOfVotes(int votes) {
+        return ti4.ai.promise.Promise.offer(
+                test.game,
+                ti4.ai.promise.Promise.Term.VOTE_FOR,
+                sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "nekro",
+                votes,
+                1,
+                1,
+                60_000);
+    }
+
+    private AiPrompt predictivePrompt() {
+        return prompt(
                 "planets",
                 PromptSource.PUBLIC,
                 NOW,
@@ -80,11 +145,6 @@ class AgendaVotingTest extends BaseTi4Test {
                         "exhaustForVotes_predictive_3",
                         "FFCC_sol_proceedToFinalizingVote"),
                 List.of("Jord (4)", "Use Predictive Intelligence Votes (3)", "Done exhausting planets."));
-
-        assertThat(press(planets)).isEqualTo("exhaustForVotes_predictive_3");
-
-        sol.addSpentThing("predictive_3");
-        assertThat(press(planets)).isEqualTo("exhaustForVotes_planet_jord");
     }
 
     // Galactic Threat: Nekro cannot vote, so it never plans a ballot, even on an agenda it would like to win and

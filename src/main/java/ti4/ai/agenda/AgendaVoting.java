@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -13,6 +15,7 @@ import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.promise.Promise;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -30,6 +33,7 @@ public class AgendaVoting {
     private static final String PLANET_VOTE_PREFIX = "exhaustForVotes_planet_";
     private static final String CONFIRM_PREFIX = "resolveAgendaVote_";
     private static final String PREDICTIVE_VOTES = "predictive_3";
+    private static final String PREDICTIVE_INTELLIGENCE = "pi";
     private static final int PREDICTIVE_VOTE_COUNT = 3;
     private static final String PREDICTIVE_BUTTON = "exhaustForVotes_" + PREDICTIVE_VOTES;
     private static final String SPENT_PLANET_PREFIX = "planet_";
@@ -41,16 +45,23 @@ public class AgendaVoting {
     private static final String XXCHA_COMMANDER = "xxchacommander";
     private static final String ASSASSINATED = "AssassinatedReps";
 
-    record Ballot(String outcome, String planetOwner, int votes) {
+    record Ballot(String outcome, String planetOwner, int votes, boolean predictive) {
+
+        Ballot(String outcome, String planetOwner, int votes) {
+            this(outcome, planetOwner, votes, false);
+        }
 
         String encode() {
-            return String.join(FIELD, outcome, planetOwner, String.valueOf(votes));
+            return String.join(FIELD, outcome, planetOwner, String.valueOf(votes), String.valueOf(predictive));
         }
 
         static Optional<Ballot> decode(String encoded) {
             String[] fields = StringUtils.splitPreserveAllTokens(encoded, FIELD);
-            if (fields == null || fields.length != 3 || !StringUtils.isNumeric(fields[2])) return Optional.empty();
-            return Optional.of(new Ballot(fields[0], fields[1], Integer.parseInt(fields[2])));
+            if (fields == null || fields.length < 3 || fields.length > 4 || !StringUtils.isNumeric(fields[2])) {
+                return Optional.empty();
+            }
+            boolean predictive = fields.length == 4 && Boolean.parseBoolean(fields[3]);
+            return Optional.of(new Ballot(fields[0], fields[1], Integer.parseInt(fields[2]), predictive));
         }
     }
 
@@ -173,7 +184,7 @@ public class AgendaVoting {
                 context.memory()
                         .put(
                                 BALLOT_KEY + context.game().getCurrentAgendaInfo(),
-                                new Ballot(ballot.outcome(), ballot.planetOwner(), 0).encode());
+                                new Ballot(ballot.outcome(), ballot.planetOwner(), 0, false).encode());
                 return Optional.of(
                         AiDecision.press(prompt, anyOutcome.get(), "its outcome is not offered, so cast no votes"));
             }
@@ -187,7 +198,9 @@ public class AgendaVoting {
         Optional<Match> finish = Prompts.owned(turn, context.faction(), "proceedToFinalizingVote"::equals);
         if (finish.isEmpty()) return Optional.empty();
         AiPrompt prompt = finish.get().prompt();
-        if (ballot.votes() > 0 && !seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES)) {
+        boolean expert = AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE);
+        boolean wantsPredictive = expert ? ballot.predictive() : ballot.votes() > 0;
+        if (wantsPredictive && !seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES)) {
             Optional<PromptButton> predictive =
                     prompt.firstEnabled(button -> button.isUnowned() && PREDICTIVE_BUTTON.equals(button.handlerId()));
             if (predictive.isPresent()) {
@@ -201,7 +214,7 @@ public class AgendaVoting {
                 .filter(seat.getPlanets()::contains)
                 .mapToInt(planet -> AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet))
                 .sum();
-        boolean countsPredictive = !AgendaRound.isFinalAgenda(game)
+        boolean countsPredictive = (expert || !AgendaRound.isFinalAgenda(game))
                 && seat.getSpentThingsThisWindow().contains(PREDICTIVE_VOTES);
         int predictive = countsPredictive ? PREDICTIVE_VOTE_COUNT : 0;
         if (spent + predictive < ballot.votes()) {
@@ -274,12 +287,35 @@ public class AgendaVoting {
             List<Integer> planetVotes = readiedPlanetVotes(game, seat);
             Optional<Ballot> promised = PromisedVotes.binding(game, seat)
                     .filter(promise -> castable(game, planetVotes) > 0)
-                    .flatMap(promise -> ballotFor(
-                            game, promise.target(), PromisedVotes.promisedVotes(promise, castable(game, planetVotes))));
+                    .flatMap(promise ->
+                            promisedBallot(game, seat, promise.target(), promisedVotes(promise, planetVotes, game)));
             if (promised.isPresent()) return promised;
             return BallotPlanner.choose(game, seat, agenda, planetVotes)
-                    .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes()));
+                    .flatMap(choice -> ballotFor(game, choice.outcome(), choice.votes(), choice.predictive()));
         }
+    }
+
+    private static int promisedVotes(Promise promise, List<Integer> planetVotes, Game game) {
+        return PromisedVotes.promisedVotes(promise, castable(game, planetVotes));
+    }
+
+    private static Optional<Ballot> promisedBallot(Game game, Player seat, String outcome, int votes) {
+        return ballotFor(game, outcome, votes, plansPredictive(seat) && votes >= BallotPlanner.PREDICTIVE_VOTES);
+    }
+
+    static boolean plansPredictive(Player seat) {
+        return predictiveReady(seat) && AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE);
+    }
+
+    static boolean predictiveReady(Player seat) {
+        return seat.hasTechReady(PREDICTIVE_INTELLIGENCE);
+    }
+
+    public static Optional<String> ballotInProgress(AiTurnContext context) {
+        return context.memory()
+                .get(BALLOT_KEY + context.game().getCurrentAgendaInfo())
+                .flatMap(Ballot::decode)
+                .map(Ballot::outcome);
     }
 
     public static int castableVotes(Game game, Player seat) {
@@ -298,7 +334,7 @@ public class AgendaVoting {
                 .toList();
     }
 
-    private static Optional<Ballot> ballotFor(Game game, String outcome, int votes) {
+    private static Optional<Ballot> ballotFor(Game game, String outcome, int votes, boolean predictive) {
         String owner = "";
         Planet planet = game.getPlanetsInfo().get(outcome);
         if (planet != null) {
@@ -306,7 +342,7 @@ public class AgendaVoting {
             if (planetOwner == null) return Optional.empty();
             owner = planetOwner.getFaction();
         }
-        return Optional.of(new Ballot(outcome, owner, votes));
+        return Optional.of(new Ballot(outcome, owner, votes, predictive));
     }
 
     private static boolean ownedOrOpen(PromptButton button, String faction) {

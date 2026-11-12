@@ -21,10 +21,26 @@ class BallotPlanner {
     private static final double INDIFFERENT = 1e-6;
     private static final double STRONG_PREFERENCE = 8;
     private static final String ABSTAIN = "";
+    static final int PREDICTIVE_VOTES = 3;
+    static final double PREDICTIVE_EXHAUSTED = 0.5;
 
-    record Choice(String outcome, int votes) {}
+    record Choice(String outcome, int votes, boolean predictive) {
 
-    private record Option(String outcome, int votes, double value) {}
+        Choice(String outcome, int votes) {
+            this(outcome, votes, false);
+        }
+    }
+
+    record Option(String outcome, int votes, double value, boolean predictive) {
+
+        Option(String outcome, int votes, double value) {
+            this(outcome, votes, value, false);
+        }
+
+        int planetVotes() {
+            return predictive ? votes - PREDICTIVE_VOTES : votes;
+        }
+    }
 
     static Optional<Choice> choose(Game game, Player seat, String agenda, List<Integer> planetVotes) {
         int available = planetVotes.stream().mapToInt(Integer::intValue).sum();
@@ -37,32 +53,40 @@ class BallotPlanner {
         AgendaForecast forecast = AgendaForecast.of(game, seat);
         if (forecast.isEmpty()) return withoutForecast(game, seat, agenda, outcomes, cap, finalAgenda);
         List<Integer> totals = reachableTotals(planetVotes, cap);
+        boolean predictive = AgendaVoting.plansPredictive(seat);
         ToDoubleFunction<Option> worth = option -> expectedValue(game, seat, agenda, forecast, option)
                 - GalacticThreatCost.ofBallot(game, seat, option.outcome(), option.votes());
         double abstain = expectedValue(game, seat, agenda, forecast, new Option(ABSTAIN, 0, 0));
         if (finalAgenda && !AgendaValues.dependsOnOwnVote(agenda)) {
-            return allIn(forecast, seat, outcomes, cap, worth, abstain);
+            return allIn(forecast, seat, outcomes, cap, predictive, worth, abstain);
         }
         double keptVote = keptVote(game, seat);
-        List<Option> valued = options(outcomes, totals).stream()
+        List<Option> valued = options(outcomes, totals, predictive).stream()
                 .map(option -> new Option(
-                        option.outcome(), option.votes(), worth.applyAsDouble(option) - keptVote * option.votes()))
+                        option.outcome(),
+                        option.votes(),
+                        worth.applyAsDouble(option) - keptVote * option.planetVotes(),
+                        option.predictive()))
                 .toList();
         Optional<Option> best = valued.stream()
                 .max(Comparator.comparingDouble(Option::value)
                         .thenComparingInt(option -> finalAgenda ? option.votes() : -option.votes()));
         double needed = finalAgenda ? INDIFFERENT : MIN_GAIN;
-        return best.filter(option -> option.value() - abstain > needed)
-                .map(option -> fewestNearBest(seat, valued, option, finalAgenda))
-                .map(option -> new Choice(option.outcome(), option.votes()));
+        double floor = abstain + needed;
+        return best.filter(option -> option.value() > floor)
+                .map(option -> finalAgenda || !AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)
+                        ? option
+                        : fewestNearBest(valued, option, floor))
+                .map(option -> new Choice(option.outcome(), option.votes(), option.predictive()));
     }
 
-    private static Option fewestNearBest(Player seat, List<Option> valued, Option best, boolean finalAgenda) {
-        if (finalAgenda || !AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)) return best;
+    static Option fewestNearBest(List<Option> valued, Option best, double floor) {
         return valued.stream()
                 .filter(option -> option.outcome().equals(best.outcome()))
                 .filter(option -> option.value() >= best.value() - NEAR_BEST)
-                .min(Comparator.comparingInt(Option::votes))
+                .filter(option -> option.value() > floor)
+                .min(Comparator.comparingInt(Option::votes)
+                        .thenComparing(Comparator.comparingDouble(Option::value).reversed()))
                 .orElse(best);
     }
 
@@ -71,6 +95,7 @@ class BallotPlanner {
             Player seat,
             List<String> outcomes,
             int cap,
+            boolean predictive,
             ToDoubleFunction<Option> worth,
             double abstain) {
         double most = outcomes.stream()
@@ -82,12 +107,16 @@ class BallotPlanner {
                 .min()
                 .orElse(0);
         if (most - least <= INDIFFERENT && most <= INDIFFERENT) return Optional.empty();
-        return outcomes.stream()
-                .map(outcome -> new Option(outcome, cap, 0))
+        List<Option> options = new ArrayList<>();
+        for (String outcome : outcomes) {
+            options.add(new Option(outcome, cap, 0));
+            if (predictive) options.add(new Option(outcome, cap + PREDICTIVE_VOTES, 0, true));
+        }
+        return options.stream()
                 .max(Comparator.comparingDouble(worth)
                         .thenComparingDouble(option -> forecast.utility(seat, option.outcome())))
                 .filter(option -> worth.applyAsDouble(option) >= abstain - INDIFFERENT)
-                .map(option -> new Choice(option.outcome(), cap));
+                .map(option -> new Choice(option.outcome(), option.votes(), option.predictive()));
     }
 
     private static Optional<Choice> withoutForecast(
@@ -107,15 +136,20 @@ class BallotPlanner {
         AgendaForecast cast = option.outcome().isEmpty()
                 ? forecast.without(seat)
                 : forecast.withVotes(seat, option.outcome(), option.votes());
-        return cast.expected(winner -> forecast.utility(seat, winner)
+        double value = cast.expected(winner -> forecast.utility(seat, winner)
                         + AgendaValues.ownVoteAdjustment(game, seat, agenda, winner, option.outcome()))
                 - cast.unvotedThreatPayoff(seat);
+        if (!option.predictive()) return value;
+        return value - PREDICTIVE_EXHAUSTED * (1 - cast.chance(option.outcome()));
     }
 
-    private static List<Option> options(List<String> outcomes, List<Integer> totals) {
+    private static List<Option> options(List<String> outcomes, List<Integer> totals, boolean predictive) {
         List<Option> options = new ArrayList<>();
         for (String outcome : outcomes) {
             for (int votes : totals) options.add(new Option(outcome, votes, 0));
+            if (!predictive) continue;
+            options.add(new Option(outcome, PREDICTIVE_VOTES, 0, true));
+            for (int votes : totals) options.add(new Option(outcome, votes + PREDICTIVE_VOTES, 0, true));
         }
         return options;
     }

@@ -214,6 +214,22 @@ class AgendaForecastTest extends BaseTi4Test {
         assertThat(forecast().votesLeft(test.sol)).isEqualTo(2);
     }
 
+    // Under Representative Government each seat casts 1 vote and exhausts no planet for it, so nothing is kept back for
+    // the second agenda: the agenda-start snapshot of 1 vote stays castable.
+    @Test
+    void representativeGovernmentKeepsNoVoteBack() {
+        test.game.setStoredValue("agendaCount", "1");
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.game.addLaw("rep_govt", null);
+        votes(1, 1, 0);
+
+        assertThat(forecast().votesLeft(test.sol)).isEqualTo(1);
+
+        test.game.setStoredValue("executiveOrder", "sol");
+        assertThat(forecast().votesLeft(test.sol)).isZero();
+    }
+
     // Galactic Threat pays only through winning voters: with no votes left at the table the speaker picks the outcome
     // and Nekro's prediction pays nothing, so Nekro's expected utility leaves the payoff out.
     @Test

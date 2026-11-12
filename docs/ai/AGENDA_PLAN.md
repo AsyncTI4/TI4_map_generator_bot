@@ -254,6 +254,12 @@ The whole value review except the items marked **design**, Miscount Disclosed ta
 
 **Risk:** the 4b split touches every consumer of `forecast.utility`: `AgendaCardRules` gains, `GalacticThreatRules`, `CardScoring.imperialRiderChance`, `AgendaPolicy.expectedLoss`, `importantFor`, and the audit branch's `VoteDeals` and `AgendaSwing`. Re-run all of `ti4.ai.agenda.*Test` and `ti4.ai.actioncards.*Test`.
 
+### 4g. Review fixes and open findings (2026-11-12, self-play traces)
+- **Done:** Representative Government keeps no vote back in the forecast (each seat has its 1 vote). Predictive Intelligence is a ballot option, planned by the AI (behind `AGENDA_VALUE_TABLE`): it is cast only when its 3 votes are worth more than 0.5 TG times the chance its outcome loses (the card stays exhausted), its votes count in the ballot on every agenda, and a promise for fewer than 3 votes never adds them. `fewestNearBest` never drops below the floor the best ballot had to clear. The speaker's own Public Execution counts the speaker token it hands on (`SpeakerTokenValue.ofHolding`; it was 0 for the speaker).
+- **Open: rivals on Mutiny and other own-vote agendas (part of 4b).** The forecast gives every rival `ownVote = outcome`, so no rival ever votes Against to make the For voters lose a point, and the speaker's last vote and tie-break are not modelled. Fix: for `dependsOnOwnVote` agendas, each rival takes the better of joining and opposing an outcome, with cast votes counted; the speaker's tie-break uses the same utility. Seen on Mutiny: Xxcha (1), Sardakk (1) and Hacan (3) voted For at 94-100%, Sol (speaker, 5 ready) cast Against 5 and broke the tie.
+- **Open: the forecast's abstain rule (part of 4b).** Rivals cast their full stack whenever they are not indifferent, while real planners abstain unless the gain beats `MIN_GAIN` plus the kept-vote cost, and cast the fewest near-best votes. Use the planner's rule in `simulate`: abstain when the spread is under that cost, otherwise a minimal decisive ballot. Seen on Nexus Sovereignty: Hacan abstained believing it was outvoted, everyone else abstained, and one Hacan vote would have won.
+- **Open: kept-vote cost for vote-rich seats.** `NEXT_AGENDA_VOTE` (0.1 TG a vote) on top of the reserve planet makes an 18-vote seat pay 1.8 TG to vote at all. Charge only for votes below what the next agenda plausibly needs, or a flat cost for spending the reserve. Measure with the A/B harness before changing (Classified Document Leaks: Xxcha preferred lsc by 4.5 TG and abstained).
+
 ---
 
 ## Milestone 5: rider policy and weighing other players' riders (M)
@@ -410,6 +416,18 @@ Table talk and Support for the Throne swaps come in milestone 12.
   - One pair never makes two transactions in one agenda.
   - A hold times out cleanly.
 - **Risk:** humans can't be read (`OfferResponder` strips human `DETAILS`, `Stinginess.java:146-151`), and promises aren't binding. So prices are capped, and human deals go through an explicit button deal card with a trust ledger.
+
+### Review fixes and open findings (2026-11-12, self-play traces)
+- **Done:**
+  - A promise is valued at the votes it names (`VoteDeals.valuedAt`), not re-sized by whoever decides.
+  - Deal sizes are totals the seller's readied planets can make (plus Predictive Intelligence's 3), so a promise never casts more than it names.
+  - Deal sizing and the spent-vote price use the deciding seat's (the viewer's) experiment flags.
+  - When the buyer values a deal, the seller's cost leaves out the Galactic Threat dislike that the buyer's forecast already put in the seller's utilities, and adds the flat cost once.
+  - A seat that has started its ballot (stored `agendaBallot|`) refuses vote offers for another outcome, and a seat that promised or offered its votes buys and sells only for that outcome (`PromiseDeals.backedOutcome`). This was how Letnev and Hacan broke promises they accepted mid-ballot.
+- **Open: vote-market pricing.** Prices are set at the buyer's gain less its margin (`PromiseDeals.sellerPrice`), and buyers accept the first ask, so Nekro paid 3-5 TG for a Galactic Threat voter where 1-2 TG is the table rate. Price at `max(voteFloor(sellerCost), 1)` plus a small premium, capped by the buyer's gain. When several sellers give the same marginal value, offer the minimum to the cheapest first, and cap Nekro's bounty at 1-2 TG.
+- **Open: selling against your own preference.** Add a floor when the seller's utility for the target is far below its best outcome (for example over 2 TG): require a price of the stake times a decisiveness margin, or refuse. The forecast can call 5 votes non-decisive and be wrong. Hacan sold its votes for '8' on Galactic Crisis Pact at 3 TG while valuing it 9 TG below its favourite. Predictive Intelligence then added 3 more, which the PI fix above now stops.
+- **Open: blocs and counter-bids.** `sellingVotes` locks out a rival buyer once another buyer has an open offer on a seller, and offers are valued one at a time, so seats never build a bloc. Allow counter-bids on open (not accepted) offers. Value a bundle together: rank sellers by votes per TG and add them until the outcome flips, then take it if the total gain beats the total price. Seen on Public Execution (Sol declined 8+9+7 votes, which together with its own 6 beat Xxcha's 18) and Colonial Redistribution (Sol stood to lose 21.8 TG and never bought).
+- **Open: declined decisive blocs (Minister of Antiquities).** Hacan declined 14-vote blocs at 3-4 TG that would have won it the relic. The likeliest cause was re-sizing the promise below 14 votes in `protection`, which `valuedAt` now fixes. If it recurs, log `buyerGain`, trust and margin for each declined `VOTE_FOR` offer, and check `ScoringStakes.contender`.
 
 ---
 

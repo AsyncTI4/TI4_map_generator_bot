@@ -303,4 +303,17 @@ class ExpertElectionValuesTest extends BaseTi4Test {
         hacan.setActionCard("sabo2");
         assertThat(value(nekro, "execution", "sol", true)).isGreaterThan(value(nekro, "execution", "hacan", true));
     }
+
+    // Public Execution of the speaker also passes the speaker token to the left, so the speaker's own loss is its
+    // hand plus what holding the token is worth to it, not its hand alone.
+    @Test
+    void theSpeakersOwnExecutionAlsoCostsItTheSpeakerToken() {
+        nekro.setActionCard("sabo1");
+        double asRival = -ownValue(nekro, "execution");
+        test.game.setSpeaker(nekro);
+        double asSpeaker = -ownValue(nekro, "execution");
+
+        assertThat(asSpeaker - asRival).isCloseTo(SpeakerTokenValue.ofHolding(test.game, nekro), within(EPS));
+        assertThat(asSpeaker - asRival).isGreaterThan(1);
+    }
 }

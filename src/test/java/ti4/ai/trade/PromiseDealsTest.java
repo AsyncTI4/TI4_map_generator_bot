@@ -523,4 +523,82 @@ class PromiseDealsTest extends BaseTi4Test {
         assertThat(PromiseDeals.proposeVotes(test.contextFor(test.sol, Set.of(), NOW, table()), List.of(xxcha)))
                 .isEmpty();
     }
+
+    // A seat that has started its ballot (pressed vote and stored the outcome it backs) can no longer change the
+    // outcome, only the number of votes, so it refuses even a generous offer for another outcome: accepting would
+    // break the promise. An offer for the outcome it already backs is still open to it.
+    @Test
+    void aSeatInTheMiddleOfItsBallotSellsNoVotesForAnotherOutcome() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.game.setVp(10);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo(SHARD);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"black\":0}");
+        test.isActive(test.sol, "agendawaiting");
+        test.nekro.setTg(40);
+        Promise generous = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "nekro",
+                4,
+                40,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, generous);
+        AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, offerPrompt(test.sol, generous));
+        assertThat(PromiseDeals.accepts(context, generous)).isTrue();
+
+        // The ballot AgendaVoting stores once the seat presses "vote": outcome, planet owner, votes, Predictive.
+        context.memory().put("agendaBallot|" + test.game.getCurrentAgendaInfo(), "sol~~4~false");
+
+        assertThat(PromiseDeals.accepts(context, generous)).isFalse();
+        assertThat(PromiseDeals.backedOutcome(context).test("sol")).isTrue();
+        assertThat(PromiseDeals.backedOutcome(context).test("nekro")).isFalse();
+    }
+
+    // A seat that promised its votes to one outcome offers to buy votes only for that outcome: buying for another
+    // would mean it means to break its own promise.
+    @Test
+    void aSeatThatPromisedItsVotesBuysOnlyForThePromisedOutcome() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Player xxcha = test.addSeat(THIRD_AI_ID, "xxcha", "red");
+        test.game.setVp(10);
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.place("19", "310");
+        xxcha.addPlanet("wellon");
+        test.points(xxcha, 4);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo(SHARD);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":2,\"red\":5,\"black\":0}");
+        test.isActive(test.sol, "agendawaiting");
+        test.sol.setTg(7);
+        Promise sold = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "nekro",
+                2,
+                1,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, sold.accepted(test.game));
+        AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, table());
+
+        PromiseDeals.proposeVotes(context, List.of(xxcha));
+
+        assertThat(PromiseBook.proposedBy(test.game, test.sol)).allMatch(promise -> "nekro".equals(promise.target()));
+        assertThat(PromiseDeals.backedOutcome(context).test("sol")).isFalse();
+    }
 }
