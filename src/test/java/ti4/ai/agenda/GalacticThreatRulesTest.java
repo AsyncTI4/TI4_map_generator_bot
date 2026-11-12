@@ -68,10 +68,12 @@ class GalacticThreatRulesTest extends BaseTi4Test {
     }
 
     // With the agenda in view the prediction follows the forecast, which counts the votes a rider has already taken
-    // out of the election: Sol has the most votes at the start, but its own rider is on Xxcha.
+    // out of the election: Sol has the most votes at the start, but its own rider is on Xxcha. Sol is the speaker, so
+    // Xxcha cannot leave its election to a tie-break and must cast votes for it.
     @Test
     void predictsTheOutcomeTheForecastFavoursNotJustTheMostVotes() {
         test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setSpeakerUserID(test.sol.getUserID());
         test.game.setStoredValue("galacticThreatUsed", "Yes");
         test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");

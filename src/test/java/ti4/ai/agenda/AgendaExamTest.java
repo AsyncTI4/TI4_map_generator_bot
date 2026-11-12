@@ -1101,6 +1101,70 @@ class AgendaExamTest extends BaseTi4Test {
 
     // ---- For/Against directives by position --------------------------------------------------------------------
 
+    /**
+     * Politics notes after the traced self-play: "vote what the forecast assumed". A seat that feels safe only because
+     * it assumes its allies cast X votes needs those allies to cast X; minimal ballots that each lean on everyone
+     * else's full stack lose to a speaker who votes last.
+     */
+    @Nested
+    class VoteWhatTheForecastAssumed {
+
+        private void castInOrder(List<Player> order, int... stacks) {
+            test.game.setPhaseOfGame("agendaVoting");
+            for (int index = 0; index < order.size(); index++) {
+                Player seat = order.get(index);
+                test.game.setActivePlayerID(seat.getUserID());
+                BallotPlanner.choose(
+                                test.game,
+                                seat,
+                                AgendaPolicy.currentAgenda(test.game),
+                                java.util.Collections.nCopies(stacks[index], 1))
+                        .ifPresent(choice -> {
+                            String earlier = test.game.getCurrentAgendaVotes().getOrDefault(choice.outcome(), "");
+                            test.game.setCurrentAgendaVote(
+                                    choice.outcome(),
+                                    (earlier.isEmpty() ? "" : earlier + ";") + seat.getColor() + "_" + choice.votes());
+                        });
+            }
+        }
+
+        private int votesBy(String outcome, Player... seats) {
+            int total = 0;
+            for (String piece :
+                    test.game.getCurrentAgendaVotes().getOrDefault(outcome, "").split(";")) {
+                for (Player seat : seats) {
+                    if (piece.startsWith(seat.getColor() + "_"))
+                        total += Integer.parseInt(piece.substring(piece.indexOf('_') + 1));
+                }
+            }
+            return total;
+        }
+
+        // The Mutiny of self-play game aiselfplay337972: Xxcha 6, Sardakk 4, Hacan 9, Letnev 5, then Sol (speaker) 5,
+        // on the first agenda, with Xxcha and Hacan on a point each. In the game the For voters cast 1, 1 and 3, and
+        // Sol
+        // tied it with 5 Against and broke the tie Against. Played out now, the seats voting For before Letnev and Sol
+        // put more on For than those two have left, so the speaker can neither tie nor win it.
+        @Test
+        void mutinyForVotersOutvoteWhatTheSpeakerAndLaterSeatsStillHold() {
+            Player sardakk = seat(FOURTH_ID, "sardakk", "orange");
+            Player hacan = seat(FIFTH_ID, "hacan", "yellow");
+            Player letnev = seat("200000000000000005", "letnev", "purple");
+            test.game.setRound(1);
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setSpeakerUserID(sol.getUserID());
+            points(xxcha, 1);
+            points(hacan, 1);
+            reveal("Directive_For/Against_7_mutiny", "red", 6, "orange", 4, "yellow", 9, "purple", 5, "blue", 5);
+
+            castInOrder(List.of(xxcha, sardakk, hacan, letnev, sol), 6, 4, 9, 5, 5);
+
+            assertThat(votesBy("for", xxcha, sardakk, hacan)).isGreaterThan(10);
+            assertThat(votesBy("for", xxcha, sardakk, hacan, letnev, sol))
+                    .isGreaterThan(votesBy("against", xxcha, sardakk, hacan, letnev, sol));
+        }
+    }
+
     /** Review, For/Against directives: who likes which side of Incentive Program, Plowshares and Clandestine. */
     @Nested
     class DirectiveLeanings {

@@ -36,6 +36,7 @@ import ti4.model.WormholeModel.Wormhole;
 @UtilityClass
 class DirectiveValues {
 
+    static final String MUTINY = "mutiny";
     private static final int KEPT_DREADNOUGHTS = 2;
     private static final int KEPT_CRUISERS = 4;
     private static final int EQUALITY_TRADE_GOODS = 5;
@@ -163,6 +164,12 @@ class DirectiveValues {
                 .mapToDouble(rival -> ScoringStakes.rivalStake(game, rival, pointChange(rival, direction)))
                 .sum();
         return own - rivals;
+    }
+
+    static double mutinyForVoterJoins(Game game, Player voter, Player joiner, String outcome) {
+        int direction = mutinyDirection(outcome);
+        if (direction == 0 || joiner == voter) return 0;
+        return -ScoringStakes.rivalStake(game, joiner, pointChange(joiner, direction));
     }
 
     private static int mutinyDirection(String outcome) {
