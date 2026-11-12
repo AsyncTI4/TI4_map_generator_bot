@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.draft.items.FactionDraftItem;
@@ -78,6 +79,24 @@ class FrankenItemTest extends BaseTi4Test {
                         .map(item -> item.getAlias())
                         .filter("MONUMENT:firmament_monument"::equals)
                         .toList());
+    }
+
+    @Test
+    void linkedComponentsIncludeTheirTextInFrankenDisplays() {
+        assertLinkedComponentText("TECH:lw2", "ABILITY:mitosis");
+        assertLinkedComponentText("ABILITY:star_forge", "MECH:muaat_mech");
+    }
+
+    private static void assertLinkedComponentText(String itemAlias, String linkedAlias) {
+        String displayText = DraftItem.generateFromAlias(itemAlias).getTextDisplays(null, null, true).stream()
+                .map(TextDisplay::getContent)
+                .collect(java.util.stream.Collectors.joining("\n"));
+        DraftItem linkedItem = DraftItem.generateFromAlias(linkedAlias);
+
+        assertTrue(displayText.contains(linkedItem.getTitle(null)));
+        assertTrue(displayText
+                .replace("> ", "")
+                .contains(linkedItem.getLongDescription().trim()));
     }
 
     @Test

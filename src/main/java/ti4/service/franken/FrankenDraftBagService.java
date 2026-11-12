@@ -124,12 +124,12 @@ public class FrankenDraftBagService {
                 frankenDrazDraft.sendPostDraftComponentButtons(player);
             } else {
                 for (DraftCategory category : componentCategories) {
-                    Container c = postDraftCategoryContainer(player, category);
-                    if (c == null) continue;
-                    MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
-                    builder.append(c.withAccentColor(accents.getFirst()));
-                    Collections.rotate(accents, -1);
-                    builder.send();
+                    for (Container container : postDraftCategoryContainers(player, category)) {
+                        MessageV2Builder builder = new MessageV2Builder(cardsInfoThread);
+                        builder.append(container.withAccentColor(accents.getFirst()));
+                        Collections.rotate(accents, -1);
+                        builder.send();
+                    }
                 }
             }
 
@@ -235,18 +235,20 @@ public class FrankenDraftBagService {
                     int containerNumber = i / FACTIONS_PER_CONTAINER + 1;
                     List<DraftItem> containerItems =
                             items.subList(i, Math.min(i + FACTIONS_PER_CONTAINER, items.size()));
-                    Container c = draftBagCategoryContainer(
+                    for (Container container : draftBagCategoryContainers(
                             player,
                             DraftCategory.FACTION,
                             containerItems,
-                            " (" + containerNumber + "/" + containerCount + ")");
-                    if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
-                    Collections.rotate(accents, -1);
+                            " (" + containerNumber + "/" + containerCount + ")")) {
+                        builder.append(container.withAccentColor(accents.getFirst()));
+                        Collections.rotate(accents, -1);
+                    }
                 }
             } else {
-                Container c = draftBagCategoryContainer(player, cat, items, "");
-                if (c != null) builder.append(c.withAccentColor(accents.getFirst()));
-                Collections.rotate(accents, -1);
+                for (Container container : draftBagCategoryContainers(player, cat, items, "")) {
+                    builder.append(container.withAccentColor(accents.getFirst()));
+                    Collections.rotate(accents, -1);
+                }
             }
         }
         builder.send();
@@ -298,11 +300,22 @@ public class FrankenDraftBagService {
         updateDraftStatusMessage(game);
     }
 
-    private static Container draftBagCategoryContainer(
+    private static List<Container> draftBagCategoryContainers(
             Player player, DraftCategory cat, List<DraftItem> items, String titleSuffix) {
         Game game = player.getGame();
         int catLimit = FrankenDraft.getItemLimitForCategory(cat, game);
-        if (catLimit == 0) return null;
+        if (catLimit == 0) return List.of();
+
+        List<List<DraftItem>> groups = splitItemsIntoContainers(
+                items, group -> buildDraftBagCategoryContainer(player, cat, group, titleSuffix));
+        return buildCategoryContainers(
+                groups, titleSuffix, (group, suffix) -> buildDraftBagCategoryContainer(player, cat, group, suffix));
+    }
+
+    private static Container buildDraftBagCategoryContainer(
+            Player player, DraftCategory cat, List<DraftItem> items, String titleSuffix) {
+        Game game = player.getGame();
+        int catLimit = FrankenDraft.getItemLimitForCategory(cat, game);
 
         List<ContainerChildComponent> components = new ArrayList<>();
         int amtTaken = player.getDraftHand().getCategoryCount(cat);
@@ -350,29 +363,72 @@ public class FrankenDraftBagService {
         return buttons;
     }
 
-    public static Container postDraftCategoryContainer(Player player, DraftCategory cat) {
+    public static List<Container> postDraftCategoryContainers(Player player, DraftCategory cat) {
         Game game = player.getGame();
-
-        List<ContainerChildComponent> components = new ArrayList<>();
-        components.add(TextDisplay.of(cat.title(game)));
-
-        List<DraftItem> all = player.getDraftHand().getDistinctCategory(cat);
-        if (all.isEmpty()) {
-            return null;
-        } else {
-            // Add each item to the container
-            for (DraftItem item : all) {
-                if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
-                components.addAll(item.getTextDisplays(game, player, true));
-            }
-
-            components.addAll(ActionRow.partitionOf(getApplyButtons(player, cat)));
+        List<DraftItem> items = player.getDraftHand().getDistinctCategory(cat);
+        if (items.isEmpty()) {
+            return List.of();
         }
+        List<List<DraftItem>> groups = splitItemsIntoContainers(
+                items, group -> buildPostDraftCategoryContainer(player, cat, group, cat.title(game)));
+        return buildCategoryContainers(
+                groups,
+                "",
+                (group, suffix) -> buildPostDraftCategoryContainer(player, cat, group, cat.title(game) + suffix));
+    }
+
+    private static Container buildPostDraftCategoryContainer(
+            Player player, DraftCategory cat, List<DraftItem> items, String title) {
+        List<ContainerChildComponent> components = new ArrayList<>();
+        components.add(TextDisplay.of(title));
+        for (DraftItem item : items) {
+            if (components.size() > 1) components.add(Separator.createDivider(Spacing.LARGE));
+            components.addAll(item.getTextDisplays(player.getGame(), player, true));
+        }
+        components.addAll(ActionRow.partitionOf(getApplyButtons(player, cat, items)));
         return Container.of(components);
     }
 
-    private static List<Button> getApplyButtons(Player player, DraftCategory cat) {
-        List<DraftItem> items = player.getDraftHand().getDistinctCategory(cat);
+    private static List<List<DraftItem>> splitItemsIntoContainers(
+            List<DraftItem> items, java.util.function.Function<List<DraftItem>, Container> containerBuilder) {
+        if (items.isEmpty()) {
+            return List.of(List.of());
+        }
+        List<List<DraftItem>> groups = new ArrayList<>();
+        List<DraftItem> current = new ArrayList<>();
+        for (DraftItem item : items) {
+            current.add(item);
+            if (isOversized(containerBuilder.apply(current)) && current.size() > 1) {
+                current.removeLast();
+                groups.add(current);
+                current = new ArrayList<>(List.of(item));
+            }
+        }
+        groups.add(current);
+        return groups;
+    }
+
+    private static List<Container> buildCategoryContainers(
+            List<List<DraftItem>> groups,
+            String titleSuffix,
+            java.util.function.BiFunction<List<DraftItem>, String, Container> containerBuilder) {
+        List<Container> containers = new ArrayList<>();
+        for (int i = 0; i < groups.size(); i++) {
+            String suffix = titleSuffix;
+            if (groups.size() > 1) {
+                suffix += " (" + (i + 1) + "/" + groups.size() + ")";
+            }
+            containers.add(containerBuilder.apply(groups.get(i), suffix));
+        }
+        return containers;
+    }
+
+    private static boolean isOversized(Container container) {
+        return MessageV2Builder.CountComponents(container) > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
+                || MessageV2Builder.CountCharacters(container) > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
+    }
+
+    private static List<Button> getApplyButtons(Player player, DraftCategory cat, List<DraftItem> items) {
         List<Button> buttons = new ArrayList<>();
 
         List<String> appliedItems = player.getStoredList("appliedFrankenItems");
