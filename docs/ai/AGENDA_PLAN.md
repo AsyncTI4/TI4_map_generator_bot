@@ -126,6 +126,10 @@ In `src/main/java/ti4/ai/agenda/CardElectionValues.java`:
   - Leadership and Warfare subtract the same static estimate.
   - The estimate is a fixed share of ready influence: the `BallotPlanner` reserve-style cap, or the snapshot count from `AgendaHelper.getAgendaStartVoteCounts`. Never `BallotPlanner` or a forecast; this is the recursion rule above.
 
+**Follow-ups found by `AgendaExamTest`** (disabled there as `milestone 1e (follow-up)`; they ride the `AGENDA_VALUE_TABLE` flag A/B):
+- **Articles of War For-voter payout netting** (`ArticlesOfWar.aStrongMechFactionVotesAgainst`): a strong-mech seat (Mahact) votes For, because the 3 TG every For voter collects when Against wins outweighs its For loss once the rivals' smaller losses are netted off. The payout should only count when Against is likely to win anyway, and the seat's own For votes should not be what passes the law.
+- **Classified Document Leaks early secret** (`ClassifiedDocumentLeaks.votesForItsOwnScoredSecretEarly`): in round 2 the rivals' flat 50% later-score chance (`MAX_LATER_CHANCE`) cancels the own secret's 3 TG, so the seat abstains. The later chance should scale with the rivals' real odds of meeting the objective.
+
 **Miscount Disclosed table behaviour** (count the votes left, place a few votes on a winnable outcome to steer others, maybe with bribes) is not covered here. It is a later item in milestone 9.
 
 ### 1f. Public Execution value (M), `ElectionValues.java:148-170`
@@ -185,6 +189,10 @@ The whole value review except the items marked **design**, Miscount Disclosed ta
 - **Harness defect:** `RefereeRules` (`src/main/java/ti4/ai/selfplay/RefereeRules.java:57,111`) presses tie-break buttons for AI owners after the referee delay. Give that step a long minAge, as `agendaResolution_` already has, so the AI's own `breakAgendaTie` always acts first. Count referee tie presses as defects.
 - **Expert exam:** a new `AgendaExamTest` in `src/test/java/ti4/ai/agenda/`. Hand-built table positions, one or more per guidance bullet, each asserting the expert answer: which outcome to vote, whether to abstain, which rider, whether to Veto. Cases are added as milestones land. It is the cheapest regression signal and reads like your notes.
 - **Baseline:** run A/A and the flag-off baseline here, before milestone 1's flag is turned on.
+  - **Status (2026-11-11): not run yet, so milestone 2 is not done.** `AGENDA_VALUE_TABLE` and `GALACTIC_THREAT_COST` are already on by default, so the control seats of an A/B are the flag-off baseline.
+  - From a frozen worktree, on at least 2 `-Dai.selfplay.objectiveseed` values: `mvn -o test -Dtest=RoundTwoSelfPlayTest -Dai.selfplay.roundtwo=true -Dai.selfplay.roundtwo.playagenda=true -Dai.selfplay.roundtwo.rounds=3 -Dai.selfplay.games=N -Dai.selfplay.ab=none` (A/A), then the same with `-Dai.selfplay.ab=AGENDA_VALUE_TABLE`.
+  - Record the `AGENDA A/B` lines here (utility, rider net, agenda VP, agenda TG, SE over pairs) and the `AGENDA DEFECTS` line (referee-broken ties, fallback-broken ties, waits over budget).
+  - Every seat's realized utility is scored with the expert table whatever its flags (`AgendaUtilityProbe`), so treatment and control share one yardstick. That yardstick is also the treatment's own value model, so read utility gains on the value-table flag together with agenda VP and the full-game guard.
 
 ---
 

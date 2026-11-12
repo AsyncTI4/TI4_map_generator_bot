@@ -271,6 +271,7 @@ final class SelfPlayGame {
             ManagedGame managed = GameManager.getManagedGame(name);
             return managed == null ? null : managed.getGame();
         };
+        env.agendaTieBroken = agendas::tieBroken;
         game.setShowBanners(false);
         markLegacySeats(game);
         markControlSeats(game);

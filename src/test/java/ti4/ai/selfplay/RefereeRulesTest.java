@@ -231,19 +231,15 @@ class RefereeRulesTest extends BaseTi4Test {
     }
 
     // The speaker AI breaks a tie itself (NekroBrain#breakAgendaTie); the referee only steps in once the tie has stood
-    // for ten minutes, and every such press is counted so the agenda harness can report it as a defect.
+    // for ten minutes. The agenda harness counts the presses that land (SelfPlayEnvironment) as defects.
     @Test
     void breaksAnAgendaTieOnlyAfterTheSpeakerHadTenMinutes() {
         String tie = "FFCC_sol_resolveAgendaVote_outcomeTie*_for";
-        RefereeRules.forgetTieBreaks(test.game.getName());
         AiPrompt fresh = prompt("fresh", PromptSource.PUBLIC, NOW - 599_000L, tie);
         assertThat(next(fresh)).isEmpty();
-        assertThat(RefereeRules.tieBreaksPressed(test.game.getName())).isZero();
 
         AiPrompt settled = prompt("settled", PromptSource.PUBLIC, NOW - 600_000L, tie);
         assertThat(next(settled).map(press -> press.button().customId())).contains(tie);
-        assertThat(RefereeRules.tieBreaksPressed(test.game.getName())).isEqualTo(1);
-        RefereeRules.forgetTieBreaks(test.game.getName());
     }
 
     private AiPrompt allHaveScoredPrompt() {

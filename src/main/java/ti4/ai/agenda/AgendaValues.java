@@ -30,17 +30,27 @@ public class AgendaValues {
     }
 
     static OptionalDouble of(Game game, Player voter, boolean ownView, String agenda, String outcome, String ownVote) {
+        return of(game, voter, ownView, usesExpertTable(voter), agenda, outcome, ownVote);
+    }
+
+    static OptionalDouble of(
+            Game game,
+            Player voter,
+            boolean ownView,
+            boolean expertTable,
+            String agenda,
+            String outcome,
+            String ownVote) {
         if (agenda == null) return OptionalDouble.empty();
-        Double value = expertValue(game, voter, ownView, agenda, outcome, ownVote);
-        if (value == null) value = valueOf(game, voter, agenda, outcome, ownVote);
+        Double value = expertTable
+                ? ExpertAgendaValues.valueOf(new AgendaView(game, voter, ownView), agenda, outcome, ownVote)
+                : null;
+        if (value == null) value = valueOf(game, voter, expertTable, agenda, outcome, ownVote);
         return value == null ? OptionalDouble.empty() : OptionalDouble.of(value);
     }
 
-    @Nullable
-    private static Double expertValue(
-            Game game, Player voter, boolean ownView, String agenda, String outcome, String ownVote) {
-        if (!AiExperiments.enabled(voter, Experiment.AGENDA_VALUE_TABLE)) return null;
-        return ExpertAgendaValues.valueOf(new AgendaView(game, voter, ownView), agenda, outcome, ownVote);
+    static boolean usesExpertTable(Player voter) {
+        return AiExperiments.enabled(voter, Experiment.AGENDA_VALUE_TABLE);
     }
 
     static double ownVoteAdjustment(Game game, Player voter, String agenda, String winner, String ownVote) {
@@ -52,7 +62,8 @@ public class AgendaValues {
     }
 
     @Nullable
-    private static Double valueOf(Game game, Player voter, String agenda, String outcome, String ownVote) {
+    private static Double valueOf(
+            Game game, Player voter, boolean expertTable, String agenda, String outcome, String ownVote) {
         return switch (agenda) {
             case "secret" -> ElectionValues.archivedSecret(game, voter, outcome);
             case "committee" -> ElectionValues.committeeFormation(game, voter, outcome);
@@ -112,9 +123,9 @@ public class AgendaValues {
             case "wormhole_research" -> DirectiveValues.wormholeResearch(game, voter, outcome, ownVote);
             case "cladenstine" -> DirectiveValues.clandestineOperations(game, voter, outcome);
             case "rearmament" -> DirectiveValues.rearmamentAgreement(game, voter, outcome);
-            case "abolishment" -> LawChangeValues.judicialAbolishment(game, voter, outcome);
-            case "miscount" -> LawChangeValues.miscountDisclosed(game, voter, outcome);
-            case "constitution" -> LawChangeValues.newConstitution(game, voter, outcome);
+            case "abolishment" -> LawChangeValues.judicialAbolishment(game, voter, expertTable, outcome);
+            case "miscount" -> LawChangeValues.miscountDisclosed(game, voter, expertTable, outcome);
+            case "constitution" -> LawChangeValues.newConstitution(game, voter, expertTable, outcome);
             case "classified" -> CardElectionValues.classifiedDocumentLeaks(game, voter, outcome);
             case "crisis" -> CardElectionValues.galacticCrisisPact(game, voter, outcome);
             default -> null;

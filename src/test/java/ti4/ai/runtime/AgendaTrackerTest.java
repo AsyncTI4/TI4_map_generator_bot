@@ -2,8 +2,15 @@ package ti4.ai.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.agenda.AgendaUtilityProbe;
 import ti4.testUtils.BaseTi4Test;
 
 class AgendaTrackerTest extends BaseTi4Test {
@@ -53,5 +60,114 @@ class AgendaTrackerTest extends BaseTi4Test {
         assertThat(first.seats().get("nekro").realizedUtility()).isNegative();
         assertThat(summary.agendas().get(1).resolved()).isFalse();
         assertThat(AgendaTracker.lines(summary).getLast()).contains("2 agendas (1 resolved)", "referee-broken ties 0");
+    }
+
+    // An A/B on the value table must grade treatment and control on one yardstick: switching AGENDA_VALUE_TABLE off
+    // for a seat changes how it votes, never the utilities the tracker records for it.
+    @Test
+    void utilitiesUseOneReferenceTableWhateverTheSeatsFlags() {
+        AiTestGame test = new AiTestGame();
+        test.game.setPhaseOfGame("agendaVoting");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_8_minister_sciences");
+        Map<String, Double> enabled = AgendaUtilityProbe.utilities(test.game, test.sol);
+
+        AiExperiments.disable(test.sol, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        assertThat(AiExperiments.enabled(test.sol, Experiment.AGENDA_VALUE_TABLE))
+                .isFalse();
+        assertThat(AgendaUtilityProbe.utilities(test.game, test.sol)).isEqualTo(enabled);
+
+        AgendaTracker tracker = new AgendaTracker();
+        tracker.observe(test.game, 0);
+        test.game.setStoredValue("resolvedAgendaOutcome", "sol");
+        tracker.observe(test.game, 60_000);
+        test.game.setPhaseOfGame("strategy");
+        AgendaTracker.Agenda agenda =
+                tracker.summary(test.game, 60_000).agendas().getFirst();
+        // Nekro keeps the table on, Sol has it off; both are valued on the expert table (Sciences is 4 TG in round 2).
+        double mean = enabled.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElseThrow();
+        assertThat(agenda.seats().get("sol").realizedUtility()).isEqualTo(enabled.get("sol") - mean);
+    }
+
+    // Covert Legislation: the hidden agenda the speaker drew (top of the deck, sent to the speaker) is what gets
+    // valued and reported, not the flat "covert" prior.
+    @Test
+    void valuesTheAgendaHiddenUnderCovertLegislation() {
+        AiTestGame test = new AiTestGame();
+        test.game.setAgendas(new ArrayList<>(List.of("minister_war", "arms_reduction")));
+        test.game.drawAgenda();
+        test.game.setPhaseOfGame("agendaVoting");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_CL_covert");
+        assertThat(AgendaUtilityProbe.currentAgenda(test.game)).isEqualTo("covert");
+        assertThat(AgendaTracker.valuedAgenda(test.game, test.game.getCurrentAgendaInfo()))
+                .isEqualTo("minister_war");
+
+        AgendaTracker tracker = new AgendaTracker();
+        tracker.observe(test.game, 0);
+        test.game.setStoredValue("resolvedAgendaOutcome", "sol");
+        tracker.observe(test.game, 60_000);
+        test.game.setPhaseOfGame("strategy");
+        AgendaTracker.Agenda agenda =
+                tracker.summary(test.game, 60_000).agendas().getFirst();
+
+        assertThat(agenda.agenda()).isEqualTo("minister_war");
+        Map<String, Double> war = AgendaUtilityProbe.utilities(test.game, test.sol, "minister_war");
+        double mean =
+                war.values().stream().mapToDouble(Double::doubleValue).average().orElseThrow();
+        assertThat(agenda.seats().get("sol").realizedUtility()).isEqualTo(war.get("sol") - mean);
+    }
+
+    // An agenda the probe cannot value is its own defect, not a pile of seats without a matching outcome.
+    @Test
+    void anAgendaWithoutUtilitiesIsCountedAsMissingNotUnmatched() {
+        AiTestGame test = new AiTestGame();
+        AgendaTracker tracker = new AgendaTracker();
+        test.game.setPhaseOfGame("agendaVoting");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_8_notanagenda");
+        tracker.observe(test.game, 0);
+        test.game.setStoredValue("resolvedAgendaOutcome", "sol");
+        tracker.observe(test.game, 60_000);
+        test.game.setPhaseOfGame("strategy");
+
+        AgendaTracker.Summary summary = tracker.summary(test.game, 60_000);
+        assertThat(summary.agendas().getFirst().utilitiesMissing()).isTrue();
+        assertThat(summary.missingUtilities()).isEqualTo(1);
+        assertThat(summary.unmatchedUtilities()).isZero();
+    }
+
+    // Tie-break presses are attributed from the call stack: the referee and a stalled seat's fallback are defects,
+    // the speaker AI's own press is not, and each defect lands on the agenda that was open.
+    @Test
+    void countsTieBreaksByWhoPressedThem() {
+        assertThat(SelfPlayEnvironment.tieBreakerOf(stack("referee"))).contains(AgendaTracker.TieBreaker.REFEREE);
+        assertThat(SelfPlayEnvironment.tieBreakerOf(stack("fallBack"))).contains(AgendaTracker.TieBreaker.FALLBACK);
+        assertThat(SelfPlayEnvironment.tieBreakerOf(stack("pressDelegated")))
+                .contains(AgendaTracker.TieBreaker.FALLBACK);
+        assertThat(SelfPlayEnvironment.tieBreakerOf(stack("pressAsSeat"))).isEmpty();
+
+        AiTestGame test = new AiTestGame();
+        AgendaTracker tracker = new AgendaTracker();
+        test.game.setPhaseOfGame("agendaVoting");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_8_minister_war");
+        tracker.observe(test.game, 0);
+        tracker.tieBroken(AgendaTracker.TieBreaker.REFEREE);
+        tracker.tieBroken(AgendaTracker.TieBreaker.FALLBACK);
+        test.game.setPhaseOfGame("strategy");
+
+        AgendaTracker.Summary summary = tracker.summary(test.game, 60_000);
+        assertThat(summary.refereeTieBreaks()).isEqualTo(1);
+        assertThat(summary.fallbackTieBreaks()).isEqualTo(1);
+        assertThat(summary.agendas().getFirst().refereeTieBreaks()).isEqualTo(1);
+        assertThat(AgendaTracker.lines(summary).getLast()).contains("referee-broken ties 1", "fallback-broken ties 1");
+    }
+
+    private static StackTraceElement[] stack(String tickRunnerMethod) {
+        return new StackTraceElement[] {
+            new StackTraceElement("ti4.ai.actuation.AiActuator", "press", null, 1),
+            new StackTraceElement("ti4.ai.runtime.AiTickRunner", "pressAsSeat", null, 2),
+            new StackTraceElement("ti4.ai.runtime.AiTickRunner", tickRunnerMethod, null, 3)
+        };
     }
 }

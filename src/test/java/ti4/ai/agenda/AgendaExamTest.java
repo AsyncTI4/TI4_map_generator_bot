@@ -26,6 +26,8 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.xxcha.QuashRules;
 import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -35,8 +37,8 @@ import ti4.testUtils.BaseTi4Test;
  * default; the setup asserts it).
  *
  * <p>Cases for behaviour the AI does not have yet are {@link Disabled} with the plan milestone (docs/ai/AGENDA_PLAN.md)
- * that delivers it, so the exam doubles as a to-do list. A case disabled with "fails today" is a guidance bullet the AI
- * is supposed to follow already but gets wrong.
+ * that delivers it, so the exam doubles as a to-do list. A case disabled with "milestone 1e (follow-up)" is a guidance
+ * bullet the AI is supposed to follow already but gets wrong; docs/ai/AGENDA_PLAN.md tracks each one under 1e.
  *
  * <p>Table: AiTestGame always seats Nekro (black, cannot vote because of Galactic Threat) and Sol (blue); most cases add
  * Xxcha (red) and sometimes Hacan (green) or another faction. Games are to 10 points, round 2, on the second agenda of
@@ -560,12 +562,13 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ownValue(sol, "conventions", "against", "against")).isNegative();
         }
 
+        // Nobody cares enough to vote: the seat abstains and leaves Against to the speaker.
         @Test
-        void neverVotesAgainstOnConventions() {
+        void abstainsOnConventions() {
             hand(sol, "sabo1", "sabo2", "veto");
             reveal(CONVENTIONS, "blue", 3, "red", 3, "black", 0);
 
-            assertThat(ballot(sol, 3)).isNotEqualTo(Optional.of("against"));
+            assertThat(ballot(sol, 3)).isEmpty();
         }
 
         @Test
@@ -581,12 +584,12 @@ class AgendaExamTest extends BaseTi4Test {
         }
 
         @Test
-        void neverVotesAgainstOnRepresentativeGovernment() {
+        void abstainsOnRepresentativeGovernment() {
             test.place("26", "000");
             sol.addPlanet("lodor");
             reveal(REP_GOVT, "blue", 3, "red", 3, "black", 0);
 
-            assertThat(ballot(sol, 3)).isNotEqualTo(Optional.of("against"));
+            assertThat(ballot(sol, 3)).isEmpty();
         }
 
         @Disabled("milestone 4b: the speaker's tie-break is judged on abstained values, so Against is free for it")
@@ -623,31 +626,33 @@ class AgendaExamTest extends BaseTi4Test {
 
         private static final String ARTICLES = "Law_For/Against_7_articles_war";
 
+        // Mahact is the user's own strong-mech rating (ai-mech-notes); Letnev's rating is still a WIP prior.
         @Test
         void aStrongMechFactionDislikesFor() {
-            Player letnev = seat(FOURTH_ID, "letnev", "green");
+            Player mahact = seat(FOURTH_ID, "mahact", "green");
             reveal(ARTICLES, "blue", 3, "red", 3, "green", 3, "black", 0);
 
-            assertThat(ownValue(letnev, "articles_war", "for", "")).isNegative();
+            assertThat(ownValue(mahact, "articles_war", "for", "")).isNegative();
         }
 
-        // Letnev values For at only about -2.9 TG once the rivals' smaller losses are netted off, which is no more than
-        // the 3 TG every For voter collects when Against wins. So it votes For as a hedge, and its own 3 votes push the
-        // law towards passing.
-        @Disabled("fails today: the strong-mech seat votes For to collect the 3 TG For-voter payout (For valued about"
-                + " -2.9 TG relative to rivals, payout +3 TG); the expert votes Against")
+        // The strong-mech seat values For at only a few TG once the rivals' smaller losses are netted off, which is no
+        // more than the 3 TG every For voter collects when Against wins. So it votes For as a hedge, and its own 3
+        // votes
+        // push the law towards passing.
+        @Disabled("milestone 1e (follow-up): the strong-mech seat votes For to collect the 3 TG For-voter payout, which"
+                + " outweighs its netted For loss; the expert votes Against")
         @Test
         void aStrongMechFactionVotesAgainst() {
-            Player letnev = seat(FOURTH_ID, "letnev", "green");
+            Player mahact = seat(FOURTH_ID, "mahact", "green");
             reveal(ARTICLES, "blue", 3, "red", 3, "green", 3, "black", 0);
 
-            assertThat(ballot(letnev, 3)).contains("against");
+            assertThat(ballot(mahact, 3)).contains("against");
         }
 
         @Test
         void aMediocreMechFactionVotesForToShutTheStrongOnesDown() {
             Player hacan = seat(FOURTH_ID, "hacan", "green");
-            seat(FIFTH_ID, "letnev", "yellow");
+            seat(FIFTH_ID, "mahact", "yellow");
             reveal(ARTICLES, "blue", 3, "red", 3, "green", 3, "yellow", 3, "black", 0);
 
             assertThat(ballot(hacan, 3)).contains("for");
@@ -692,14 +697,402 @@ class AgendaExamTest extends BaseTi4Test {
         // Round 2 with five law rounds left: each rival's chance to score the leaked Gather a Mighty Fleet comes out at
         // the 50% "later" cap (no dreadnoughts on the board), worth exactly the 3 TG of the freed slot, so Sol is
         // indifferent between its own secret and Xxcha's and abstains.
-        @Disabled("fails today: in round 2 the rivals' flat 50% later-score chance (MAX_LATER_CHANCE) cancels the own"
-                + " secret's 3 TG, so the seat abstains instead of voting its own secret")
+        @Disabled("milestone 1e (follow-up): in round 2 the rivals' flat 50% later-score chance (MAX_LATER_CHANCE)"
+                + " cancels the own secret's 3 TG, so the seat abstains instead of voting its own secret")
         @Test
         void votesForItsOwnScoredSecretEarly() {
             test.game.setRound(2);
             ownAndRivalSecretScored();
 
             assertThat(ballot(sol, 3)).contains("gamf");
+        }
+    }
+
+    // ---- point laws leaving play (milestone 1a) ----------------------------------------------------------------
+
+    /**
+     * Review, Judicial Abolishment, Miscount Disclosed and New Constitution: Political Censure, Shard of the Throne and
+     * Holy Planet of Ixth do not keep their point when the law leaves play, so discarding a rival's point law takes a
+     * point away from it and discarding your own costs you one.
+     */
+    @Nested
+    class PointLawsLeavingPlay {
+
+        private static final String ABOLISHMENT = "Directive_Elect Law_7_abolishment";
+        private static final String MISCOUNT = "Directive_Elect Law_7_miscount";
+        private static final String CONSTITUTION = "Directive_For/Against_7_constitution";
+
+        // Xxcha holds Political Censure and Sol holds Minister of War: Sol discards the Censure, not its own office.
+        @Test
+        void abolishesARivalsPoliticalCensure() {
+            points(xxcha, 4);
+            test.game.addLaw("censure", "xxcha");
+            test.game.addLaw("minister_war", "sol");
+            reveal(ABOLISHMENT, "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ownValue(sol, "abolishment", "censure", "censure")).isPositive();
+            assertThat(ballot(sol, 3)).contains("censure");
+        }
+
+        @Test
+        void abolishesARivalsShardOfTheThrone() {
+            points(xxcha, 4);
+            test.game.addLaw("shard_of_the_throne", "xxcha");
+            test.game.addLaw("minister_war", "sol");
+            reveal(ABOLISHMENT, "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ballot(sol, 3)).contains("shard_of_the_throne");
+        }
+
+        // Holy Planet of Ixth is elected onto a planet: whoever controls Lodor holds the point.
+        @Test
+        void abolishesARivalsHolyPlanet() {
+            test.place("26", "000");
+            xxcha.addPlanet("lodor");
+            points(xxcha, 4);
+            test.game.addLaw("holy_planet_of_ixth", "lodor");
+            test.game.addLaw("minister_war", "sol");
+            reveal(ABOLISHMENT, "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ownValue(sol, "abolishment", "holy_planet_of_ixth", "holy_planet_of_ixth"))
+                    .isPositive();
+            assertThat(ballot(sol, 3)).contains("holy_planet_of_ixth");
+        }
+
+        // Sol's own Shard is a point it would lose: it votes to discard Xxcha's office instead.
+        @Test
+        void neverAbolishesItsOwnShard() {
+            test.game.addLaw("shard_of_the_throne", "sol");
+            test.game.addLaw("minister_war", "xxcha");
+            reveal(ABOLISHMENT, "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ownValue(sol, "abolishment", "shard_of_the_throne", "shard_of_the_throne"))
+                    .isNegative();
+            assertThat(ballot(sol, 3)).contains("minister_war");
+        }
+
+        // A revote on Xxcha's Censure may hand the point to someone else, so Sol picks it over its own office.
+        @Test
+        void miscountRevotesARivalsPoliticalCensure() {
+            points(xxcha, 4);
+            test.game.addLaw("censure", "xxcha");
+            test.game.addLaw("minister_war", "sol");
+            reveal(MISCOUNT, "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ownValue(sol, "miscount", "censure", "censure")).isPositive();
+            assertThat(ballot(sol, 3)).contains("censure");
+        }
+
+        @Test
+        void aNewConstitutionThatStripsARivalsPointLawsIsGood() {
+            points(xxcha, 4);
+            test.game.addLaw("censure", "xxcha");
+            test.game.addLaw("shard_of_the_throne", "xxcha");
+
+            assertThat(ownValue(sol, "constitution", "for", "for")).isPositive();
+            assertThat(ownValue(xxcha, "constitution", "for", "for")).isNegative();
+        }
+
+        @Test
+        void votesAgainstANewConstitutionThatStripsItsOwnShard() {
+            test.game.addLaw("shard_of_the_throne", "sol");
+            reveal(CONSTITUTION, "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ballot(sol, 3)).contains("against");
+        }
+    }
+
+    // ---- elections by holder -----------------------------------------------------------------------------------
+
+    /** Review, Elect Player: the holder-dependent numbers (hand quality, secrets, round, faction, game end). */
+    @Nested
+    class ElectionsByHolder {
+
+        @Test
+        void politicalCensureIsWorthFiveWithAWeakHandAndThreeWithAGoodOne() {
+            assertThat(ownValue(sol, "censure", "sol", "sol")).isCloseTo(5, within(1e-9));
+            sol.setActionCard("overrule");
+            assertThat(ownValue(sol, "censure", "sol", "sol")).isCloseTo(3, within(1e-9));
+        }
+
+        // Two hard secrets in hand: both Search Warrant draws count, 2 TG each.
+        @Test
+        void searchWarrantIsWorthFourWithHardSecretsInHand() {
+            sol.setSecret("ose");
+            sol.setSecret("sb");
+
+            assertThat(ownValue(sol, "warrant", "sol", "sol")).isCloseTo(4, within(1e-9));
+        }
+
+        // Dictate Policy with three laws in play is an easy action-phase secret: revealing it costs the holder.
+        @Test
+        void searchWarrantLosesValueWhenItRevealsAnEasyActionPhaseSecret() {
+            test.game.getLaws().put("minister_war", 1);
+            test.game.getLaws().put("conventions", 2);
+            test.game.getLaws().put("regulations", 3);
+            sol.setSecret("dp");
+
+            assertThat(ownValue(sol, "warrant", "sol", "sol")).isLessThan(4);
+        }
+
+        @Test
+        void committeeFormationIsFourTwoThenOne() {
+            test.game.setRound(2);
+            assertThat(ownValue(sol, "committee", "sol", "sol")).isEqualTo(4.0);
+            test.game.setRound(3);
+            assertThat(ownValue(sol, "committee", "sol", "sol")).isEqualTo(2.0);
+            test.game.setRound(4);
+            assertThat(ownValue(sol, "committee", "sol", "sol")).isEqualTo(1.0);
+        }
+
+        @Test
+        void ministerOfPolicyIsWorthTwoMoreToYssaril() {
+            Player yssaril = seat(FOURTH_ID, "yssaril", "yellow");
+
+            assertThat(ownValue(sol, "minister_policy", "sol", "sol")).isEqualTo(1.0);
+            assertThat(ownValue(yssaril, "minister_policy", "yssaril", "yssaril"))
+                    .isEqualTo(3.0);
+        }
+
+        // Xxcha at 9 of 10 is about to end the game: Minister of Policy has no rounds left to pay out.
+        @Test
+        void ministerOfPolicyIsWorthNothingWhenTheGameEndsSoon() {
+            Player yssaril = seat(FOURTH_ID, "yssaril", "yellow");
+            test.game.setRound(7);
+            points(xxcha, 9);
+            assertThat(AgendaValueMath.endsSoon(test.game)).isTrue();
+
+            assertThat(ownValue(sol, "minister_policy", "sol", "sol")).isZero();
+            assertThat(ownValue(yssaril, "minister_policy", "yssaril", "yssaril"))
+                    .isZero();
+        }
+
+        @Test
+        void ministerOfIndustryIsWorthThreeToKeleresBeforeRoundFour() {
+            Player keleres = seat(FOURTH_ID, "keleresa", "purple");
+            test.game.setRound(3);
+            assertThat(ownValue(keleres, "minister_industry", "keleresa", "keleresa"))
+                    .isEqualTo(3.0);
+            test.game.setRound(4);
+            assertThat(ownValue(keleres, "minister_industry", "keleresa", "keleresa"))
+                    .isEqualTo(1.0);
+        }
+
+        @Test
+        void votesItselfImperialArbiter() {
+            reveal("Law_Elect Player_7_arbiter", "blue", 3, "red", 2, "black", 0);
+
+            assertThat(ownValue(sol, "arbiter", "sol", "sol")).isEqualTo(5.0);
+            assertThat(ballot(sol, 3)).contains("sol");
+        }
+    }
+
+    // ---- planet elections --------------------------------------------------------------------------------------
+
+    /** Review, Elect Planet: Holy Planet is 3 TG; Colonial Redistribution and Compensated Disarmament hit the leader. */
+    @Nested
+    class PlanetElections {
+
+        private static final String LODOR = "lodor";
+
+        private Player hacan;
+        private Tile lodorTile;
+
+        // Lodor (cultural) beside Nekro's home; Hacan joins the table. Sol leads on 6 and Hacan trails on 2.
+        @BeforeEach
+        void board() {
+            hacan = seat(FOURTH_ID, "hacan", "green");
+            test.nekroHome();
+            lodorTile = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+            points(sol, 6);
+            points(hacan, 2);
+            for (Player player : List.of(sol, hacan, xxcha)) player.setTg(8);
+        }
+
+        private void garrison(Player owner) {
+            for (Player player : List.of(sol, hacan, xxcha)) {
+                player.removePlanet(LODOR);
+                lodorTile.removeAllUnits(player.getColor());
+            }
+            owner.addPlanet(LODOR);
+            test.units(lodorTile, LODOR, owner, UnitType.Infantry, 2);
+        }
+
+        @Test
+        void holyPlanetIsWorthThreeToItsOwner() {
+            xxcha.addPlanet(LODOR);
+
+            assertThat(ownValue(xxcha, "holy_planet_of_ixth", LODOR, LODOR)).isCloseTo(3, within(1e-9));
+        }
+
+        @Test
+        void colonialRedistributionIsAimedAtTheLeader() {
+            garrison(sol);
+            double onLeader = ownValue(xxcha, "redistribution", LODOR, LODOR);
+            garrison(hacan);
+            double onTrailer = ownValue(xxcha, "redistribution", LODOR, LODOR);
+
+            assertThat(onLeader).isGreaterThan(onTrailer);
+        }
+
+        // Xxcha has plenty of trade goods, so it aims Compensated Disarmament at the leader's garrison.
+        @Test
+        void compensatedDisarmamentIsAimedAtTheLeaderWhenTheVoterHasMoney() {
+            garrison(sol);
+            double onLeader = ownValue(xxcha, "disarmament", LODOR, LODOR);
+            garrison(hacan);
+            double onTrailer = ownValue(xxcha, "disarmament", LODOR, LODOR);
+
+            assertThat(onLeader).isPositive().isGreaterThan(onTrailer);
+        }
+
+        // Short of trade goods, Xxcha would rather cash in its own infantry.
+        @Test
+        void compensatedDisarmamentOnItsOwnUnitsWhenShortOfMoney() {
+            garrison(xxcha);
+            xxcha.setTg(0);
+
+            assertThat(ownValue(xxcha, "disarmament", LODOR, LODOR)).isPositive();
+        }
+    }
+
+    // ---- For/Against laws by faction and position --------------------------------------------------------------
+
+    /** Review, For/Against laws: the faction and board leanings behind each law. */
+    @Nested
+    class LawLeanings {
+
+        @Test
+        void nobodyGainsFromHomelandDefenseActFor() {
+            for (Player voter : List.of(nekro, sol, xxcha))
+                assertThat(ownValue(voter, "defense_act", "for", "")).isZero();
+        }
+
+        // Sol owns war suns and holds a hand: Against would discard the hand, so it votes For.
+        @Test
+        void aWarSunOwnerVotesForPublicizeWeaponSchematics() {
+            sol.addTech("ws");
+            hand(sol, "bribery", "cripple", "dh1");
+            reveal("Law_For/Against_7_schematics", "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ownValue(sol, "schematics", "for", ""))
+                    .isGreaterThan(ownValue(sol, "schematics", "against", ""));
+            assertThat(ballot(sol, 3)).contains("for");
+        }
+
+        @Test
+        void cabalLikesRegulatedConscriptionAndFighterHeavySolDislikesIt() {
+            Player cabal = seat(FOURTH_ID, "cabal", "green");
+
+            assertThat(ExpertLawValues.conscriptionGain(test.game, cabal, 0)).isPositive();
+            assertThat(ExpertLawValues.conscriptionGain(test.game, sol, 0)).isNegative();
+        }
+
+        @Test
+        void fleetRegulationsHurtLetnevLessThanOthers() {
+            Player letnev = seat(FOURTH_ID, "letnev", "green");
+            letnev.setFleetCC(5);
+            xxcha.setFleetCC(5);
+
+            assertThat(ExpertLawValues.fleetCapCost(test.game, letnev))
+                    .isLessThan(ExpertLawValues.fleetCapCost(test.game, xxcha));
+        }
+
+        @Test
+        void creussVotesForTheTravelBan() {
+            Player creuss = seat(FOURTH_ID, "ghost", "green");
+            reveal("Law_For/Against_7_travel_ban", "blue", 3, "red", 3, "green", 3, "black", 0);
+
+            assertThat(ownValue(creuss, "travel_ban", "for", "")).isPositive();
+            assertThat(ballot(creuss, 3)).contains("for");
+        }
+
+        // Checks and Balances suits the last seat in speaker order and hurts the speaker.
+        @Test
+        void checksAndBalancesSuitsTheLastSeatAndHurtsTheSpeaker() {
+            List<Player> order = ti4.helpers.Helper.getSpeakerOrFullPriorityOrder(test.game);
+
+            assertThat(ownValue(order.getLast(), "checks", "for", "")).isPositive();
+            assertThat(ownValue(order.getFirst(), "checks", "for", "")).isNegative();
+        }
+
+        @Test
+        void theMalliceHolderAndCreussLikeNexusSovereignty() {
+            Player creuss = seat(FOURTH_ID, "ghost", "green");
+            assertThat(ownValue(creuss, "nexus", "for", "")).isPositive();
+            assertThat(ownValue(sol, "nexus", "for", "")).isZero();
+
+            sol.addPlanet("mallice");
+            assertThat(ownValue(sol, "nexus", "for", "")).isPositive();
+        }
+    }
+
+    // ---- For/Against directives by position --------------------------------------------------------------------
+
+    /** Review, For/Against directives: who likes which side of Incentive Program, Plowshares and Clandestine. */
+    @Nested
+    class DirectiveLeanings {
+
+        private double forLean(Player voter, String agenda) {
+            return ownValue(voter, agenda, "for", "") - ownValue(voter, agenda, "against", "");
+        }
+
+        // Sol leads by 3: Incentive For (a stage I) suits it more than it suits the trailing Xxcha.
+        @Test
+        void theLeaderLikesIncentiveProgramForMoreThanTheTrailer() {
+            points(sol, 5);
+            points(xxcha, 2);
+            points(nekro, 2);
+
+            assertThat(forLean(sol, "incentive")).isGreaterThan(forLean(xxcha, "incentive"));
+        }
+
+        @Test
+        void hacanLeansAgainstIncentiveProgram() {
+            Player hacan = seat(FOURTH_ID, "hacan", "green");
+
+            assertThat(forLean(hacan, "incentive")).isLessThan(forLean(sol, "incentive"));
+        }
+
+        @Test
+        void aContenderLikesSwordsToPlowsharesMore() {
+            double before = ownValue(sol, "plowshares", "for", "");
+            points(sol, 9);
+
+            assertThat(ownValue(sol, "plowshares", "for", "")).isGreaterThan(before);
+        }
+
+        // Against drops every fleet pool by one: Xxcha with three cruisers on a 3-token fleet pool loses a ship as
+        // well as the token, so it dislikes Against while Sol, with no fleet out, likes it.
+        @Test
+        void clandestineOperationsAgainstHurtsTheSeatOverItsNewFleetLimit() {
+            test.nekroHome();
+            Tile lodor = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
+            for (Player seat : List.of(nekro, sol, xxcha)) {
+                seat.setTacticalCC(3);
+                seat.setFleetCC(3);
+                seat.setStrategicCC(2);
+            }
+            test.units(lodor, "space", xxcha, UnitType.Cruiser, 3);
+
+            assertThat(ownValue(xxcha, "cladenstine", "against", "")).isNegative();
+            assertThat(ownValue(sol, "cladenstine", "against", "")).isPositive();
+        }
+
+        // Rearmament Against turns every mech on the board into infantry: Arborec with three mechs out fights it.
+        @Test
+        void aSeatWithSeveralMechsOutDislikesRearmamentAgainst() {
+            Player arborec = seat(FOURTH_ID, "arborec", "green");
+            Tile field = test.place("26", "000");
+            test.units(field, "space", arborec, UnitType.Mech, 3);
+
+            assertThat(ownValue(arborec, "rearmament", "against", "")).isNegative();
+        }
+
+        // Galactic Crisis Pact: Diplomacy's secondary does nothing in the agenda phase.
+        @Test
+        void diplomacyIsWorthNothingOnGalacticCrisisPact() {
+            assertThat(ownValue(sol, "crisis", "2", "2")).isZero();
         }
     }
 
@@ -753,6 +1146,113 @@ class AgendaExamTest extends BaseTi4Test {
         @Test
         void committeeFormationIsWorthMoreWhenAGoodElectionIsKnownToBeNext() {
             fail("expected +2 TG on Committee Formation after a Politics peek shows a good Elect Player agenda");
+        }
+
+        @Disabled(
+                "milestone 4a: the forecast's voting order follows AgendaHelper.getVotingOrder, so Zeal (Argent first)"
+                        + " never zeroes the votes of seats that have not voted yet")
+        @Test
+        void seatsAfterAnArgentZealVoterKeepTheirVotes() {
+            fail("expected the seats after Argent in the Zeal voting order to keep their votes in the forecast");
+        }
+
+        @Disabled("milestone 4d: the Argent AI casts its Zeal votes, and votes light on the first agenda")
+        @Test
+        void argentCastsZealVotes() {
+            fail("expected the Argent AI to press exhaustForVotes_zeal_N and count those votes in its plan");
+        }
+
+        @Disabled("milestone 4e: Blood Pact is cast when both seats vote the same outcome, and the Xxcha hero's votes"
+                + " when they are decisive")
+        @Test
+        void castsBloodPactAndTheXxchaHeroWhenTheyDecideTheOutcome() {
+            fail("expected Blood Pact on a shared outcome and the Xxcha hero's votes when decisive");
+        }
+
+        @Disabled(
+                "milestone 5b: rider payoffs value Warfare (dreadnought), Construction (space dock), Diplomacy and the"
+                        + " Keleres Rider (1 action card + 2 TG)")
+        @Test
+        void ridersArePricedByWhatTheyActuallyPay() {
+            fail("expected RiderPayoff to value each rider by its real payout");
+        }
+
+        @Disabled("milestone 5d: Warfare, Construction and Diplomacy rider payouts are pressed by the AI")
+        @Test
+        void collectsWarfareConstructionAndDiplomacyRiderPayouts() {
+            fail("expected the AI to press the Warfare, Construction and Diplomacy rider payout buttons");
+        }
+
+        @Disabled("milestone 7: Predictive Intelligence is pressed only when its 3 votes change the outcome")
+        @Test
+        void playsPredictiveIntelligenceOnlyWhenDecisive() {
+            fail("expected Predictive Intelligence to stay ready unless +3 votes materially change the outcome");
+        }
+
+        @Disabled("milestone 7: while holding Bribery the AI casts at least 1 vote and pays the smallest TG that flips"
+                + " or secures the outcome")
+        @Test
+        void castsAtLeastOneVoteWhileHoldingBribery() {
+            fail("expected a ballot of at least 1 vote and a Bribery payment that just secures the outcome");
+        }
+
+        @Disabled("milestone 8: Deadly Plot is played when the winning outcome's loss beats the card and the planets it"
+                + " exhausts")
+        @Test
+        void playsDeadlyPlotAgainstAVeryBadOutcome() {
+            fail("expected Deadly Plot when the winning outcome costs more than the card plus the exhausted planets");
+        }
+
+        @Disabled("milestone 8: Assassinate Representative targets the rival whose removal helps most, strongest on"
+                + " Mutiny, and skips Xxcha seats that can still vote")
+        @Test
+        void assassinatesTheRepresentativeWhoseVotesMatterMost() {
+            fail("expected Assassinate Representative on the rival whose votes change the outcome most");
+        }
+
+        @Disabled("milestone 8: Confounding Legal Text steals an election worth more than the card (Censure, Arbiter)")
+        @Test
+        void playsConfoundingLegalTextToStealPoliticalCensure() {
+            fail("expected Confounding Legal Text when electing itself to Censure is worth more than the card");
+        }
+
+        @Disabled("milestone 9: Mutiny, abstain when later or stronger voters could punish; otherwise go For if it"
+                + " cannot win")
+        @Test
+        void abstainsOnMutinyWhenTheSpeakerCanPunish() {
+            fail("expected an abstain ballot on Mutiny when the voters after it could flip the outcome");
+        }
+
+        @Disabled("milestone 9: Seed of an Empire leans Against unless the AI's own side can form a majority block")
+        @Test
+        void seedOfAnEmpireLeansAgainstWithoutAMajorityBlock() {
+            fail("expected Against on Seed of an Empire when the AI's points block cannot win the vote");
+        }
+
+        @Disabled("milestone 9: Unconventional Measures follows the Mutiny rule with lower stakes")
+        @Test
+        void unconventionalMeasuresFollowsTheMutinyRule() {
+            fail("expected the Mutiny abstain/For rule on Unconventional Measures");
+        }
+
+        @Disabled("milestone 9: on Miscount Disclosed the AI counts the votes left and puts a few votes on a winnable"
+                + " outcome to steer the table")
+        @Test
+        void steersAMiscountRevoteTowardsAWinnableOutcome() {
+            fail("expected a few votes on a winnable outcome of the Miscount revote");
+        }
+
+        @Disabled("milestone 13: the Imperial Arbiter holder keeps it until the likely last round, then swaps a poor"
+                + " last-round strategy card (4, 5 or 7) to a rival")
+        @Test
+        void savesImperialArbiterForTheLastRound() {
+            fail("expected the Arbiter swap only when GameHorizon.roundsLeft <= 1");
+        }
+
+        @Disabled("milestone 13: the Prophecy of Ixth holder values fighters with the extra roll when it builds")
+        @Test
+        void prophecyOfIxthRaisesFighterValueForItsHolder() {
+            fail("expected production planners to add the Prophecy roll to fighter value for the holder");
         }
     }
 }

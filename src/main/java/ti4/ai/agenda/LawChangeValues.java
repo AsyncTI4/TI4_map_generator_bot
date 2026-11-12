@@ -29,21 +29,21 @@ class LawChangeValues {
     private static final double REVOTE_FLIP_CHANCE = 0.5;
     private static final double HOME_EXHAUST_SHARE = 0.75;
 
-    static double judicialAbolishment(Game game, Player voter, String outcome) {
+    static double judicialAbolishment(Game game, Player voter, boolean expertTable, String outcome) {
         if (!isLawInPlay(game, outcome)) return 0;
-        return -lawInPlayValue(game, voter, outcome);
+        return -lawInPlayValue(game, voter, expertTable, outcome);
     }
 
-    static double miscountDisclosed(Game game, Player voter, String outcome) {
+    static double miscountDisclosed(Game game, Player voter, boolean expertTable, String outcome) {
         if (!isLawInPlay(game, outcome)) return 0;
-        double current = lawInPlayValue(game, voter, outcome);
-        return REVOTE_FLIP_CHANCE * (revoteAlternative(game, voter, outcome) - current);
+        double current = lawInPlayValue(game, voter, expertTable, outcome);
+        return REVOTE_FLIP_CHANCE * (revoteAlternative(game, voter, expertTable, outcome) - current);
     }
 
-    static double newConstitution(Game game, Player voter, String outcome) {
+    static double newConstitution(Game game, Player voter, boolean expertTable, String outcome) {
         if (!isFor(outcome)) return 0;
         double lawsLost = List.copyOf(game.getLaws().keySet()).stream()
-                .mapToDouble(law -> lawInPlayValue(game, voter, law))
+                .mapToDouble(law -> lawInPlayValue(game, voter, expertTable, law))
                 .sum();
         return -lawsLost - homeExhaustionCost(game, voter);
     }
@@ -52,12 +52,13 @@ class LawChangeValues {
         return game.getLaws().containsKey(law) && !LAW_CHANGES.contains(law);
     }
 
-    private static double lawInPlayValue(Game game, Player voter, String law) {
+    private static double lawInPlayValue(Game game, Player voter, boolean expertTable, String law) {
         if (LAW_CHANGES.contains(law)) return 0;
         if (POINT_LAWS.contains(law)) return pointLawValue(game, voter, law);
         String resolved = resolvedLawOutcome(game, law);
         if (resolved.isEmpty()) return 0;
-        return AgendaValues.of(game, voter, law, resolved, "").orElse(0);
+        return AgendaValues.of(game, voter, false, expertTable, law, resolved, "")
+                .orElse(0);
     }
 
     private static double pointLawValue(Game game, Player voter, String law) {
@@ -84,12 +85,12 @@ class LawChangeValues {
         return model != null && model.getTarget().toLowerCase().contains(target);
     }
 
-    private static double revoteAlternative(Game game, Player voter, String law) {
+    private static double revoteAlternative(Game game, Player voter, boolean expertTable, String law) {
         if (!targetContains(law, ELECT_PLAYER)) return 0;
         Player holder = game.getPlayerFromColorOrFaction(game.getLawsInfo().getOrDefault(law, ""));
         return game.getRealPlayers().stream()
                 .filter(player -> player != holder && !player.isEliminated())
-                .mapToDouble(player -> AgendaValues.of(game, voter, law, player.getFaction(), "")
+                .mapToDouble(player -> AgendaValues.of(game, voter, false, expertTable, law, player.getFaction(), "")
                         .orElse(0))
                 .average()
                 .orElse(0);

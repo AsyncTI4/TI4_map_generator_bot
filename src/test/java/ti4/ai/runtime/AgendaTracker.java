@@ -11,7 +11,6 @@ import java.util.TreeMap;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.agenda.AgendaUtilityProbe;
 import ti4.ai.agenda.RiderPayoff;
-import ti4.ai.selfplay.RefereeRules;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -23,18 +22,22 @@ import ti4.game.Player;
  *
  * <ul>
  *   <li>realized agenda utility: AgendaUtility of the winning outcome at reveal minus the mean over all outcomes, in
- *       TG, each seat valued from its own view (its own secrets only);
+ *       TG, each seat valued from its own view (its own secrets only) on one reference value table whatever its
+ *       experiment flags (see AgendaUtilityProbe). Under Covert Legislation the hidden agenda the speaker drew is
+ *       valued, never the "covert" prior; that id is read here for measurement only and never reaches the AI;
  *   <li>rider net value: for every rider the seat placed, the RiderPayoff (valued when the rider was first seen) if
  *       its outcome won, minus the average action card it cost;
  *   <li>agenda-sourced VP: the seat's VP change over the agenda's window;
- *   <li>harness defects: ties the referee broke instead of the speaker AI, and agendas whose reveal-to-resolution wait
- *       went over budget (-Dai.selfplay.agenda.waitbudget minutes, default 30 virtual minutes).
+ *   <li>harness defects: ties the referee broke instead of the speaker AI, ties a stalled speaker broke through its
+ *       fallback, agendas whose utilities could not be taken, and agendas whose reveal-to-resolution wait went over
+ *       budget (-Dai.selfplay.agenda.waitbudget minutes, default 30 virtual minutes).
  * </ul>
  */
 final class AgendaTracker {
 
     private static final String AGENDA_PHASE_PREFIX = "agenda";
     private static final String RESOLVED_OUTCOME = "resolvedAgendaOutcome";
+    private static final String COVERT_SUFFIX = "_CL_covert";
     private static final long WAIT_BUDGET_MILLIS = Long.getLong("ai.selfplay.agenda.waitbudget", 30L) * 60_000L;
     // Riders that are not action cards cost no card: Galactic Threat is a Nekro ability, the Keleres Rider a promissory
     // note. Predictions that are not named riders cost nothing either.
@@ -58,20 +61,28 @@ final class AgendaTracker {
             Map<String, SeatAgenda> seats,
             long waitMillis,
             boolean overBudget,
-            int refereeTieBreaks) {
+            int refereeTieBreaks,
+            int fallbackTieBreaks,
+            boolean utilitiesMissing) {
 
         boolean resolved() {
             return !outcome.isBlank();
         }
     }
 
-    record Summary(String game, List<Agenda> agendas, int refereeTieBreaks, int waitsOverBudget) {
+    record Summary(
+            String game, List<Agenda> agendas, int refereeTieBreaks, int fallbackTieBreaks, int waitsOverBudget) {
 
-        static final Summary NOTHING = new Summary("", List.of(), 0, 0);
+        static final Summary NOTHING = new Summary("", List.of(), 0, 0, 0);
+
+        int missingUtilities() {
+            return (int) agendas.stream().filter(Agenda::utilitiesMissing).count();
+        }
 
         int unmatchedUtilities() {
             return (int) agendas.stream()
                     .filter(Agenda::resolved)
+                    .filter(agenda -> !agenda.utilitiesMissing())
                     .flatMap(agenda -> agenda.seats().values().stream())
                     .filter(seat -> seat.realizedUtility() == null)
                     .count();
@@ -104,23 +115,23 @@ final class AgendaTracker {
         final int number;
         final long openedAt;
         final String speaker;
-        final int tieBreaksBefore;
+        int refereeTieBreaks;
+        int fallbackTieBreaks;
         final Map<String, Integer> vpAtReveal = new LinkedHashMap<>();
         final Map<String, Integer> tgAtReveal = new LinkedHashMap<>();
-        final Map<String, Map<String, Double>> utilities = new LinkedHashMap<>();
+        Map<String, Map<String, Double>> utilities = Map.of();
         final Map<String, Rider> riders = new LinkedHashMap<>();
         Map<String, String> votes = new LinkedHashMap<>();
         String agenda = "";
         String outcome = "";
         long resolvedAt = -1;
 
-        Open(String info, int round, int number, long openedAt, String speaker, int tieBreaksBefore) {
+        Open(String info, int round, int number, long openedAt, String speaker) {
             this.info = info;
             this.round = round;
             this.number = number;
             this.openedAt = openedAt;
             this.speaker = speaker;
-            this.tieBreaksBefore = tieBreaksBefore;
         }
     }
 
@@ -128,6 +139,22 @@ final class AgendaTracker {
     private final Set<String> closedInfos = new HashSet<>();
     private Open open;
     private Summary finished;
+    private int refereeTieBreaks;
+    private int fallbackTieBreaks;
+
+    enum TieBreaker {
+        REFEREE,
+        FALLBACK
+    }
+
+    // A tie-break press that landed, made by someone other than the speaker AI's own agenda logic.
+    synchronized void tieBroken(TieBreaker by) {
+        if (by == TieBreaker.REFEREE) refereeTieBreaks++;
+        else fallbackTieBreaks++;
+        if (open == null) return;
+        if (by == TieBreaker.REFEREE) open.refereeTieBreaks++;
+        else open.fallbackTieBreaks++;
+    }
 
     synchronized void observe(Game game, long now) {
         if (finished != null) return;
@@ -152,22 +179,15 @@ final class AgendaTracker {
     synchronized Summary summary(Game game, long now) {
         if (finished != null) return finished;
         if (open != null) close(game, now);
-        int tieBreaks = RefereeRules.tieBreaksPressed(game.getName());
-        RefereeRules.forgetTieBreaks(game.getName());
         int overBudget = (int) agendas.stream().filter(Agenda::overBudget).count();
-        finished = new Summary(game.getName(), List.copyOf(agendas), tieBreaks, overBudget);
+        finished = new Summary(game.getName(), List.copyOf(agendas), refereeTieBreaks, fallbackTieBreaks, overBudget);
         return finished;
     }
 
     private Open opened(Game game, String info, long now) {
         Player speaker = game.getPlayer(game.getSpeakerUserID());
-        Open opened = new Open(
-                info,
-                game.getRound(),
-                agendas.size() + 1,
-                now,
-                speaker == null ? "-" : speaker.getFaction(),
-                RefereeRules.tieBreaksPressed(game.getName()));
+        Open opened =
+                new Open(info, game.getRound(), agendas.size() + 1, now, speaker == null ? "-" : speaker.getFaction());
         for (Player seat : game.getRealPlayers()) {
             opened.vpAtReveal.put(seat.getFaction(), seat.getTotalVictoryPoints());
             opened.tgAtReveal.put(seat.getFaction(), seat.getTg());
@@ -175,13 +195,27 @@ final class AgendaTracker {
         return opened;
     }
 
+    // All or nothing: if any seat gets no values the agenda is retried on the next step, and if it never succeeds the
+    // agenda is counted as a missing-utilities defect rather than as seats without a matching outcome.
     private void recordUtilities(Game game) {
-        open.agenda = AgendaUtilityProbe.currentAgenda(game);
+        String agenda = valuedAgenda(game, open.info);
+        open.agenda = agenda;
+        Map<String, Map<String, Double>> taken = new LinkedHashMap<>();
         for (Player seat : game.getRealPlayers()) {
-            Map<String, Double> values = AgendaUtilityProbe.utilities(game, seat);
+            Map<String, Double> values = AgendaUtilityProbe.utilities(game, seat, agenda);
             if (values.isEmpty()) return;
-            open.utilities.put(seat.getFaction(), values);
+            taken.put(seat.getFaction(), values);
         }
+        open.utilities = taken;
+    }
+
+    // The agenda whose effect will resolve: under Covert Legislation that is the hidden card the speaker drew, which
+    // stays on top of the agenda deck, marked as sent to the speaker's hand, while the table votes.
+    static String valuedAgenda(Game game, String info) {
+        String agenda = AgendaUtilityProbe.currentAgenda(game);
+        if (info == null || !info.endsWith(COVERT_SUFFIX) || game.getAgendas().isEmpty()) return agenda;
+        String top = game.lookAtTopAgenda(0);
+        return game.getSentAgendas().containsKey(top) ? top : agenda;
     }
 
     private void recordRiders(Game game) {
@@ -246,7 +280,9 @@ final class AgendaTracker {
                 seats,
                 wait,
                 wait > WAIT_BUDGET_MILLIS,
-                RefereeRules.tieBreaksPressed(game.getName()) - closing.tieBreaksBefore));
+                closing.refereeTieBreaks,
+                closing.fallbackTieBreaks,
+                closing.utilities.isEmpty()));
     }
 
     private static double cardCost(String rider) {
@@ -326,7 +362,7 @@ final class AgendaTracker {
                             rider.faction(), rider.rider(), rider.outcome(), rider.won() ? "won" : "lost", rider.net()))
                     .toList();
             lines.add(String.format(
-                    "AGENDA %s r%d #%d %s speaker %s outcome %s wait %.1fm%s%s votes %s riders %s |%s",
+                    "AGENDA %s r%d #%d %s speaker %s outcome %s wait %.1fm%s%s%s%s votes %s riders %s |%s",
                     summary.game(),
                     agenda.round(),
                     agenda.number(),
@@ -336,6 +372,8 @@ final class AgendaTracker {
                     agenda.waitMillis() / 60_000.0,
                     agenda.overBudget() ? " OVER-BUDGET" : "",
                     agenda.refereeTieBreaks() > 0 ? " REFEREE-TIE " + agenda.refereeTieBreaks() : "",
+                    agenda.fallbackTieBreaks() > 0 ? " FALLBACK-TIE " + agenda.fallbackTieBreaks() : "",
+                    agenda.utilitiesMissing() ? " NO-UTILITIES" : "",
                     agenda.votesBySeat(),
                     riders,
                     seats));
@@ -352,13 +390,15 @@ final class AgendaTracker {
                         values[2],
                         values[3])));
         lines.add(String.format(
-                "AGENDA GAME %s: %d agendas (%d resolved), referee-broken ties %d, waits over budget %d,"
-                        + " seat utilities without a matching outcome %d",
+                "AGENDA GAME %s: %d agendas (%d resolved), referee-broken ties %d, fallback-broken ties %d, waits over"
+                        + " budget %d, agendas without utilities %d, seat utilities without a matching outcome %d",
                 summary.game(),
                 summary.agendas().size(),
                 summary.agendas().stream().filter(Agenda::resolved).count(),
                 summary.refereeTieBreaks(),
+                summary.fallbackTieBreaks(),
                 summary.waitsOverBudget(),
+                summary.missingUtilities(),
                 summary.unmatchedUtilities()));
         return lines;
     }
@@ -373,12 +413,16 @@ final class AgendaTracker {
         int agendaCount = 0;
         int resolved = 0;
         int tieBreaks = 0;
+        int fallbackTieBreaks = 0;
+        int missing = 0;
         int overBudget = 0;
         int unmatched = 0;
         long waitMillis = 0;
         for (Summary summary : summaries) {
             agendaCount += summary.agendas().size();
             tieBreaks += summary.refereeTieBreaks();
+            fallbackTieBreaks += summary.fallbackTieBreaks();
+            missing += summary.missingUtilities();
             overBudget += summary.waitsOverBudget();
             unmatched += summary.unmatchedUtilities();
             for (Agenda agenda : summary.agendas()) {
@@ -405,13 +449,16 @@ final class AgendaTracker {
                 totalsLine("AGENDA TOTAL", table) + " | utility per game " + AbSummary.meanAndError(perGameUtility));
         System.out.printf(
                 "AGENDA DEFECTS over %d games: %d agendas (%d resolved, mean wait %.1fm), referee-broken ties %d,"
-                        + " waits over budget %d, seat utilities without a matching outcome %d%n",
+                        + " fallback-broken ties %d, waits over budget %d, agendas without utilities %d, seat utilities"
+                        + " without a matching outcome %d%n",
                 summaries.size(),
                 agendaCount,
                 resolved,
                 resolved == 0 ? 0 : waitMillis / 60_000.0 / resolved,
                 tieBreaks,
+                fallbackTieBreaks,
                 overBudget,
+                missing,
                 unmatched);
         if (SelfPlayGame.AB.isPresent()) reportAb(outcomes);
     }

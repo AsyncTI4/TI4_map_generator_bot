@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiSeats;
@@ -43,8 +41,6 @@ public class RefereeRules {
     private static final String CURRENT_WINNER_LABEL = "Resolve with Current Winner";
     private static final long AGENDA_RESOLUTION_MIN_AGE_MILLIS = 60_000L;
     private static final long TIE_BREAK_MIN_AGE_MILLIS = 10 * 60_000L;
-    private static final String TIE_BREAK_REASON = "break the agenda tie";
-    private static final ConcurrentMap<String, Integer> TIE_BREAKS_BY_GAME = new ConcurrentHashMap<>();
     private static final List<Step> STEPS = List.of(
             new Step("deal2SOToAll"::equals, "deal the starting secret objectives"),
             new Step("startOfGameObjReveal"::equals, "reveal the first objectives"),
@@ -61,18 +57,10 @@ public class RefereeRules {
                     AGENDA_RESOLUTION_MIN_AGE_MILLIS),
             new Step(
                     id -> id.startsWith("resolveAgendaVote_outcomeTie"),
-                    TIE_BREAK_REASON,
+                    "break the agenda tie",
                     "",
                     TIE_BREAK_MIN_AGE_MILLIS),
             new Step("proceed_to_strategy"::equals, "move on to the strategy phase"));
-
-    public static int tieBreaksPressed(String gameName) {
-        return TIE_BREAKS_BY_GAME.getOrDefault(gameName, 0);
-    }
-
-    public static void forgetTieBreaks(String gameName) {
-        TIE_BREAKS_BY_GAME.remove(gameName);
-    }
 
     public static boolean trackExhausted(Game game) {
         if (game.isOmegaPhaseMode()) return game.getPublicObjectives1Peekable().isEmpty();
@@ -119,8 +107,6 @@ public class RefereeRules {
                 if (button.isEmpty()) continue;
                 Optional<Player> presser = presser(game, seats, button.get());
                 if (presser.isPresent()) {
-                    if (TIE_BREAK_REASON.equals(step.reason()))
-                        TIE_BREAKS_BY_GAME.merge(game.getName(), 1, Integer::sum);
                     return Optional.of(new RefereePress(presser.get(), prompt, button.get(), step.reason()));
                 }
             }
