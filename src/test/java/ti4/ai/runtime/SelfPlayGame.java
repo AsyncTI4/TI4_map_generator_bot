@@ -272,6 +272,9 @@ final class SelfPlayGame {
             return managed == null ? null : managed.getGame();
         };
         env.agendaTieBroken = agendas::tieBroken;
+        agendas.readTradesFrom(() -> env.tradeLedger);
+        env.agendaDecisions = agendas::decided;
+        env.agendaPresses = (faction, customId, outcome) -> agendas.pressed(env.now(), faction, customId, outcome);
         game.setShowBanners(false);
         markLegacySeats(game);
         markControlSeats(game);

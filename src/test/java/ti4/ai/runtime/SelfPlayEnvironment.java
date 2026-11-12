@@ -113,6 +113,15 @@ final class SelfPlayEnvironment implements AutoCloseable {
     // Hears every agenda tie-break press that landed but did not come from the speaker AI's own agenda logic (the
     // referee, or a stalled seat's fallback); the running game points it at its AgendaTracker.
     volatile java.util.function.Consumer<AgendaTracker.TieBreaker> agendaTieBroken = by -> {};
+    // The agenda trace hears every seat decision and every press that landed, apart from decisionListener, which a
+    // harness may replace.
+    volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> agendaDecisions = (context, decision) -> {};
+
+    interface PressHeard {
+        void heard(String faction, String customId, String outcome);
+    }
+
+    volatile PressHeard agendaPresses = (faction, customId, outcome) -> {};
     Supplier<Game> game = () -> null;
     // Sees every decision a seat makes, with the board it made it on; a harness sets it to follow what seats spend.
     volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> decisionListener = (context, decision) -> {};
@@ -365,6 +374,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     tieBreakerOf(Thread.currentThread().getStackTrace()).ifPresent(agendaTieBroken);
                 offered.filter(this::accepted).ifPresent(this::recordTrade);
                 overruled.ifPresent(this::recordOverrulePick);
+                agendaPresses.heard(
+                        seat.faction(), target.customId(), outcome.outcome().name());
             }
             record(seat.faction() + " pressed " + target.customId() + " -> " + outcome.outcome() + " ("
                     + outcome.detail() + ")");
@@ -485,6 +496,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 AiDecision decision = overridden(context, brain.decide(context));
                 if (log != null) log.decided(context, memoryBefore, decision);
                 decisionListener.accept(context, decision);
+                agendaDecisions.accept(context, decision);
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
                 countReason(decision);

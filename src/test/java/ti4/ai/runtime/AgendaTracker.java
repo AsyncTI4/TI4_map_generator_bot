@@ -121,6 +121,8 @@ final class AgendaTracker {
         final Map<String, Integer> tgAtReveal = new LinkedHashMap<>();
         Map<String, Map<String, Double>> utilities = Map.of();
         final Map<String, Rider> riders = new LinkedHashMap<>();
+        final Map<String, AgendaTrace.RiderSeen> ridersSeen = new LinkedHashMap<>();
+        AgendaTrace.Window window;
         Map<String, String> votes = new LinkedHashMap<>();
         String agenda = "";
         String outcome = "";
@@ -141,6 +143,22 @@ final class AgendaTracker {
     private Summary finished;
     private int refereeTieBreaks;
     private int fallbackTieBreaks;
+    private java.util.function.Supplier<List<SelfPlayEnvironment.TradeRecord>> trades = () -> null;
+    private final AgendaTrace trace = new AgendaTrace(() -> trades.get());
+
+    void readTradesFrom(java.util.function.Supplier<List<SelfPlayEnvironment.TradeRecord>> ledger) {
+        trades = ledger;
+    }
+
+    void decided(ti4.ai.brain.AiTurnContext context, ti4.ai.brain.AiDecision decision) {
+        trace.decided(context, decision);
+    }
+
+    // Keyed by the open agenda, never by reading the game: fetching the managed game on a press can reload it and
+    // change the run.
+    synchronized void pressed(long now, String faction, String customId, String outcome) {
+        if (open != null) trace.pressed(open.info, now, faction, customId, outcome);
+    }
 
     enum TieBreaker {
         REFEREE,
@@ -167,12 +185,19 @@ final class AgendaTracker {
         if (open.utilities.isEmpty()) recordUtilities(game);
         if (!game.getCurrentAgendaVotes().isEmpty()) {
             open.votes = new LinkedHashMap<>(game.getCurrentAgendaVotes());
-            recordRiders(game);
+            recordRiders(game, now);
         }
         String resolved = game.getStoredValue(RESOLVED_OUTCOME);
         if (!resolved.isBlank() && open.outcome.isBlank()) {
             open.outcome = resolved;
             open.resolvedAt = now;
+        }
+        if (AgendaTrace.ENABLED && open.window != null) {
+            try {
+                open.window.observe(game, now, !open.outcome.isBlank());
+            } catch (RuntimeException e) {
+                System.out.println(AgendaTrace.PREFIX + " observe error " + e);
+            }
         }
     }
 
@@ -191,6 +216,13 @@ final class AgendaTracker {
         for (Player seat : game.getRealPlayers()) {
             opened.vpAtReveal.put(seat.getFaction(), seat.getTotalVictoryPoints());
             opened.tgAtReveal.put(seat.getFaction(), seat.getTg());
+        }
+        if (AgendaTrace.ENABLED) {
+            try {
+                opened.window = trace.open(game, info, now);
+            } catch (RuntimeException e) {
+                System.out.println(AgendaTrace.PREFIX + " open error " + e);
+            }
         }
         return opened;
     }
@@ -218,7 +250,7 @@ final class AgendaTracker {
         return game.getSentAgendas().containsKey(top) ? top : agenda;
     }
 
-    private void recordRiders(Game game) {
+    private void recordRiders(Game game, long now) {
         for (Map.Entry<String, String> entry : open.votes.entrySet()) {
             for (String piece : entry.getValue().split(";")) {
                 int split = piece.indexOf('_');
@@ -231,8 +263,23 @@ final class AgendaTracker {
                 if (owner == null) continue;
                 double payoff = RiderPayoff.of(game, owner, what);
                 open.riders.put(key, new Rider(owner.getFaction(), what, entry.getKey(), payoff, false, 0));
+                if (AgendaTrace.ENABLED)
+                    open.ridersSeen.put(key, riderSeen(game, owner, what, entry.getKey(), payoff, now));
             }
         }
+    }
+
+    // The rider as first seen: its owner's own forecast chance of the outcome and how many seats had voted by then.
+    private AgendaTrace.RiderSeen riderSeen(
+            Game game, Player owner, String rider, String outcome, double payoff, long now) {
+        double chance;
+        try {
+            chance = ti4.ai.agenda.BallotProbe.riderChance(game, owner, outcome);
+        } catch (RuntimeException e) {
+            chance = Double.NaN;
+        }
+        int ballots = votesBySeat(game, open.votes).size();
+        return new AgendaTrace.RiderSeen(owner.getFaction(), rider, outcome, payoff, chance, now, ballots);
     }
 
     private void close(Game game, long now) {
@@ -283,6 +330,18 @@ final class AgendaTracker {
                 closing.refereeTieBreaks,
                 closing.fallbackTieBreaks,
                 closing.utilities.isEmpty()));
+        printTrace(game, closing, agendas.getLast());
+    }
+
+    private static void printTrace(Game game, Open closing, Agenda agenda) {
+        if (!AgendaTrace.ENABLED || closing.window == null) return;
+        try {
+            System.out.println(closing.window.close(
+                    game, game.getName(), agenda, List.copyOf(closing.ridersSeen.values()), closing.utilities));
+        } catch (RuntimeException e) {
+            System.out.println(AgendaTrace.PREFIX + " " + game.getName() + " #" + closing.number + " error " + e);
+            e.printStackTrace(System.out);
+        }
     }
 
     private static double cardCost(String rider) {
