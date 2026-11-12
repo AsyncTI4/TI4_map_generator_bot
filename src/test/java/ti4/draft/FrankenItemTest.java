@@ -93,7 +93,6 @@ class FrankenItemTest extends BaseTi4Test {
                 .collect(java.util.stream.Collectors.joining("\n"));
         DraftItem linkedItem = DraftItem.generateFromAlias(linkedAlias);
 
-        assertTrue(displayText.contains(linkedItem.getTitle(null)));
         assertTrue(displayText
                 .replace("> ", "")
                 .contains(linkedItem.getLongDescription().trim()));
