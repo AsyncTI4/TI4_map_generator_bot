@@ -17,6 +17,7 @@ class BallotPlanner {
     private static final double MIN_GAIN = 0.5;
     private static final double KEPT_VOTE = 0.05;
     private static final double NEXT_AGENDA_VOTE = 0.1;
+    static final double LAST_VOTE = 0.5;
     private static final double NEAR_BEST = 0.3;
     private static final double INDIFFERENT = 1e-6;
     private static final double STRONG_PREFERENCE = 8;
@@ -46,12 +47,16 @@ class BallotPlanner {
         int available = planetVotes.stream().mapToInt(Integer::intValue).sum();
         if (available <= 0) return Optional.empty();
         boolean finalAgenda = AgendaRound.isFinalAgenda(game);
-        int cap = AgendaRound.keepsAVoteBack(game) ? available - reserve(planetVotes) : available;
+        int keep = AgendaRound.keepsAVoteBack(game) ? available - reserve(planetVotes) : available;
+        boolean spendsTheLastVote = keep < available && AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE);
+        int cap = spendsTheLastVote ? available : keep;
         if (cap <= 0) return Optional.empty();
         List<String> outcomes = AgendaOutcomes.of(game);
         if (outcomes.isEmpty()) return Optional.empty();
         AgendaForecast forecast = AgendaForecast.of(game, seat);
-        if (forecast.isEmpty()) return withoutForecast(game, seat, agenda, outcomes, cap, finalAgenda);
+        if (forecast.isEmpty()) {
+            return keep <= 0 ? Optional.empty() : withoutForecast(game, seat, agenda, outcomes, keep, finalAgenda);
+        }
         List<Integer> totals = reachableTotals(planetVotes, cap);
         boolean predictive = AgendaVoting.plansPredictive(seat);
         ToDoubleFunction<Option> worth = option -> expectedValue(game, seat, agenda, forecast, option)
@@ -65,7 +70,9 @@ class BallotPlanner {
                 .map(option -> new Option(
                         option.outcome(),
                         option.votes(),
-                        worth.applyAsDouble(option) - keptVote * option.planetVotes(),
+                        worth.applyAsDouble(option)
+                                - keptVote * option.planetVotes()
+                                - (option.planetVotes() > keep ? LAST_VOTE : 0),
                         option.predictive()))
                 .toList();
         Optional<Option> best = valued.stream()
@@ -138,7 +145,7 @@ class BallotPlanner {
                 : forecast.withVotes(seat, option.outcome(), option.votes());
         double value = cast.expected(winner -> forecast.utility(seat, winner)
                         + AgendaValues.ownVoteAdjustment(game, seat, agenda, winner, option.outcome()))
-                - cast.unvotedThreatPayoff(seat);
+                - cast.threatPayoffCorrection(seat);
         if (!option.predictive()) return value;
         return value - PREDICTIVE_EXHAUSTED * (1 - cast.chance(option.outcome()));
     }

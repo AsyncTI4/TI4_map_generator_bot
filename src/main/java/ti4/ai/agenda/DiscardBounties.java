@@ -11,6 +11,7 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiGameWrites;
 import ti4.ai.AiSeats;
+import ti4.ai.AiSettings;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.game.Game;
@@ -24,6 +25,7 @@ public class DiscardBounties {
     public static final int VETO_CAP = 3;
     public static final int QUASH_CAP = 5;
     public static final double MIN_LOSS = 2.0;
+    public static final double OFFER_MARGIN = 0.5;
     static final String KEY = "aiDiscardBounties";
     private static final long WAIT_MILLIS = 90_000L;
     private static final String RECORDS = ";";
@@ -95,7 +97,8 @@ public class DiscardBounties {
     }
 
     public static boolean active(Player seat) {
-        return AiExperiments.enabled(seat, Experiment.DISCARD_BOUNTIES);
+        return AiExperiments.enabled(seat, Experiment.PROMISE_DEALS)
+                && AiExperiments.enabled(seat, Experiment.DISCARD_BOUNTIES);
     }
 
     public static List<Bounty> all(Game game) {
@@ -171,7 +174,9 @@ public class DiscardBounties {
     public static Optional<AiDecision> awaitOffers(AiTurnContext context) {
         Game game = context.game();
         Player holder = context.seat();
-        if (!active(holder) || !AgendaQueue.whenWindowOpen(game)) return Optional.empty();
+        if (!active(holder) || !AiSettings.isTradingEnabled() || !AgendaQueue.whenWindowOpen(game)) {
+            return Optional.empty();
+        }
         long until = AgendaClock.seenAt(context) + WAIT_MILLIS;
         if (context.now() >= until || !somePayerMayOffer(game, holder)) return Optional.empty();
         return Optional.of(new AiDecision.Wait(until, "wait for a bounty to discard the agenda"));
@@ -182,8 +187,12 @@ public class DiscardBounties {
         if (forecast.isEmpty()) return false;
         return game.getRealPlayers().stream()
                 .filter(payer -> payer != holder && AiSeats.isAiSeat(payer) && active(payer))
-                .filter(payer -> payer.getTg() > 0)
                 .filter(payer -> postedOnThisAgenda(game, payer).isEmpty())
-                .anyMatch(payer -> forecast.expectedUtility(payer) <= -MIN_LOSS);
+                .anyMatch(payer -> mostOffered(payer.getTg(), -forecast.expectedUtility(payer)) >= 1);
+    }
+
+    public static int mostOffered(int tradeGoods, double loss) {
+        if (loss < MIN_LOSS) return 0;
+        return Math.min(tradeGoods, (int) Math.floor(loss - OFFER_MARGIN));
     }
 }

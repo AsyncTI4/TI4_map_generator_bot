@@ -2,8 +2,10 @@ package ti4.ai.promise;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +25,8 @@ public class PromiseBook {
     static final int MAX_RECORDS = 48;
     static final String RECORDS = ";";
     private static final String SAVE_REASON = "AI promise";
+    private static final Set<Promise.Status> LASTING =
+            EnumSet.of(Promise.Status.BROKEN, Promise.Status.OWED, Promise.Status.UNPAID);
 
     public static List<Promise> all(Game game) {
         List<Promise> promises = new ArrayList<>();
@@ -49,7 +53,7 @@ public class PromiseBook {
     }
 
     private static boolean worthKeeping(Game game, Promise promise) {
-        return promise.thisRound(game) || promise.status() == Promise.Status.BROKEN;
+        return promise.thisRound(game) || LASTING.contains(promise.status());
     }
 
     public static void persist(Game game, Promise promise) {
@@ -90,9 +94,14 @@ public class PromiseBook {
     }
 
     public static long brokenBy(Game game, Player promiser, Player victim) {
-        return brokenAgainst(game, victim).stream()
-                .filter(promise -> promise.isPromiser(promiser))
+        return all(game).stream()
+                .filter(promise -> brokeItsWord(promise, promiser, victim))
                 .count();
+    }
+
+    private static boolean brokeItsWord(Promise promise, Player breaker, Player victim) {
+        if (promise.status() == Promise.Status.BROKEN) return promise.isPromiser(breaker) && promise.isPromisee(victim);
+        return promise.status() == Promise.Status.UNPAID && promise.isPromisee(breaker) && promise.isPromiser(victim);
     }
 
     public static List<Promise> proposedBy(Game game, Player proposer) {

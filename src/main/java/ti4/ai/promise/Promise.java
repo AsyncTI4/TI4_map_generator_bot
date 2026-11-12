@@ -41,9 +41,11 @@ public record Promise(
         BROKEN,
         VOID,
         OWED,
-        PAID
+        PAID,
+        UNPAID
     }
 
+    public static final long OWED_GRACE_MILLIS = 15 * 60_000L;
     private static final String FIELD = "|";
     private static final String POSITIONS = "+";
     private static final int FIELDS = 15;
@@ -91,6 +93,25 @@ public record Promise(
                 guarded, held);
     }
 
+    public Promise owing(long dueAt) {
+        return new Promise(
+                id,
+                term,
+                promiser,
+                promisee,
+                proposer,
+                round,
+                agenda,
+                target,
+                votes,
+                price,
+                Status.OWED,
+                offeredAt,
+                dueAt,
+                guarded,
+                held);
+    }
+
     public Promise withGuarded(List<String> positions) {
         return new Promise(
                 id, term, promiser, promisee, proposer, round, agenda, target, votes, price, status, offeredAt,
@@ -127,7 +148,7 @@ public record Promise(
     public static Promise owed(
             Game game, Term term, Player promiser, Player promisee, String agenda, String target, int price, long now) {
         return offer(game, term, promiser, promisee, promisee, agenda, target, 0, price, now, now)
-                .with(Status.OWED);
+                .owing(now + OWED_GRACE_MILLIS);
     }
 
     public boolean territorial() {

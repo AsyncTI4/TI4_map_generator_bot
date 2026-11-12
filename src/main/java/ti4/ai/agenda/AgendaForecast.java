@@ -66,6 +66,7 @@ public final class AgendaForecast {
     private final int[][] pending;
     private final List<Rider> riders;
     private double[][] utilities;
+    private double[][] ballotCosts;
     private Map<String, Double> chances;
     private Map<String, Double> votedChances;
     private Map<String, Double> threatWorths;
@@ -201,32 +202,25 @@ public final class AgendaForecast {
     }
 
     public double expectedUtility(Player player) {
-        return expected(outcome -> utility(player, outcome)) - unvotedThreatPayoff(player);
+        return expected(outcome -> utility(player, outcome)) - threatPayoffCorrection(player);
     }
 
-    double expectedUtilityWithoutThreatDislike(Player player) {
+    double ballotCost(Player player, String outcome) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
-        if (voter < 0) return expectedUtility(player);
-        return expectedUtility(player) + expected(outcome -> threatDislike(voter, outcome));
+        int index = isEmpty() ? -1 : frame.outcomes().indexOf(outcome);
+        return voter < 0 || index < 0 ? 0 : ballotCosts()[voter][index];
     }
 
-    private double threatDislike(int voter, String outcome) {
-        int index = frame.outcomes().indexOf(outcome);
-        return riders.stream()
-                .filter(rider -> rider.outcome() == index && index >= 0)
-                .mapToDouble(rider -> threatDislike(voter, rider))
-                .sum();
-    }
-
-    double unvotedThreatPayoff(Player player) {
+    double threatPayoffCorrection(Player player) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
-        if (voter < 0 || !AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST)) return 0;
+        if (voter < 0) return 0;
         return riders.stream()
                 .filter(rider -> rider.owner() == voter && rider.outcome() >= 0)
-                .filter(rider -> GalacticThreatCost.RIDER.equals(rider.title()))
+                .filter(this::copiesFromVoters)
                 .mapToDouble(rider -> {
                     String outcome = frame.outcomes().get(rider.outcome());
-                    return Math.max(0, rider.payoff() * chance(outcome) - threatWorth(outcome));
+                    double earned = Math.min(rider.payoff() * chance(outcome), threatWorth(outcome));
+                    return castCopy(rider.outcome()) * chance(outcome) - earned;
                 })
                 .sum();
     }
@@ -482,15 +476,52 @@ public final class AgendaForecast {
             if (rider.outcome() < 0) continue;
             for (int voter = 0; voter < merged.length; voter++) {
                 if (voter == rider.owner()) {
-                    merged[voter][rider.outcome()] += rider.payoff();
+                    merged[voter][rider.outcome()] += ownRiderPayoff(rider);
                 } else if (RiderPayoff.isImperial(rider.title())) {
                     merged[voter][rider.outcome()] -= rider.rivalStake();
                 }
-                merged[voter][rider.outcome()] -= threatDislike(voter, rider);
             }
         }
         utilities = merged;
         return merged;
+    }
+
+    private boolean copiesFromVoters(Rider rider) {
+        return GalacticThreatCost.RIDER.equals(rider.title())
+                && AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST);
+    }
+
+    private double ownRiderPayoff(Rider rider) {
+        return copiesFromVoters(rider) ? castCopy(rider.outcome()) : rider.payoff();
+    }
+
+    private double castCopy(int outcome) {
+        boolean[] predictor = predictors(castBy.length);
+        double best = 0;
+        for (int voter = 0; voter < castBy.length; voter++) {
+            if (!predictor[voter] && castBy[voter][outcome] > 0) best = Math.max(best, frame.copyWorth()[voter]);
+        }
+        return best;
+    }
+
+    private double[][] ballotCosts() {
+        if (ballotCosts != null) return ballotCosts;
+        double[][] costs = new double[frame.voters().size()][frame.outcomes().size()];
+        for (Rider rider : riders) {
+            if (rider.outcome() < 0) continue;
+            for (int voter = 0; voter < costs.length; voter++) {
+                costs[voter][rider.outcome()] += threatDislike(voter, rider);
+            }
+        }
+        ballotCosts = costs;
+        return costs;
+    }
+
+    private double[] choiceRow(double[][] live, int voter) {
+        double[] cost = ballotCosts()[voter];
+        double[] row = live[voter].clone();
+        for (int outcome = 0; outcome < row.length; outcome++) row[outcome] -= cost[outcome];
+        return row;
     }
 
     private double threatDislike(int voter, Rider rider) {
@@ -518,11 +549,12 @@ public final class AgendaForecast {
         double[] copied = new double[outcomes];
         boolean[] predictor = predictors(voters);
         int[] picks = new int[voters];
+        double[][] fixed = shifting ? null : choiceCumulatives(utility);
         for (double[] draw : frame.draws()) {
             double[][] live = shifting ? copyUtilities(utility) : utility;
             int[] tally = cast.clone();
             int[] predictorTally = predictorCast(predictor, outcomes);
-            pick(picks, live, draw, 0);
+            pick(picks, live, draw, 0, fixed);
             for (int voter = 0; voter < voters; voter++) {
                 for (int outcome = 0; outcome < outcomes; outcome++) tally[outcome] += pending[voter][outcome];
                 if (shifting && pending[voter][frame.joinOutcome()] > 0) joinFor(live, picks, draw, voter, 1);
@@ -568,25 +600,41 @@ public final class AgendaForecast {
         threatWorths = Collections.unmodifiableMap(worth);
     }
 
-    private void pick(int[] picks, double[][] live, double[] draw, int from) {
+    private double[][] choiceCumulatives(double[][] live) {
+        double[][] rows = new double[live.length][];
+        for (int voter = 0; voter < live.length; voter++) rows[voter] = choiceCumulative(live, voter);
+        return rows;
+    }
+
+    private void pick(int[] picks, double[][] live, double[] draw, int from, double[][] fixed) {
         boolean abstainsWhenIndifferent = AiExperiments.enabled(frame.viewer(), Experiment.AGENDA_VALUE_TABLE);
         int outcomes = frame.outcomes().size();
         for (int voter = from; voter < picks.length; voter++) {
             if (votes[voter] == 0) {
                 picks[voter] = ABSTAIN;
-            } else if (spread(live[voter]) <= INDIFFERENT_SPREAD) {
+                continue;
+            }
+            double[] cumulative = fixed != null ? fixed[voter] : choiceCumulative(live, voter);
+            if (cumulative == null) {
                 picks[voter] = abstainsWhenIndifferent ? ABSTAIN : indifferentPick(draw[voter], outcomes);
             } else {
-                picks[voter] = softmaxPick(cumulative(live[voter]), draw[voter]);
+                picks[voter] = softmaxPick(cumulative, draw[voter]);
             }
         }
     }
 
+    private double[] choiceCumulative(double[][] live, int voter) {
+        double[] row = choiceRow(live, voter);
+        return spread(row) <= INDIFFERENT_SPREAD ? null : cumulative(row);
+    }
+
     private int pickOrAbstain(int voter, double[] utility, int unvoted, double draw) {
         double abstained = utility[unvoted] + ownVoteTerm(voter, unvoted, ABSTAIN);
-        double best = Arrays.stream(utility).max().orElse(0);
-        if (best - abstained <= INDIFFERENT_SPREAD) return ABSTAIN;
+        double[] cost = ballotCosts()[voter];
         double[] prices = Arrays.copyOf(utility, utility.length + 1);
+        for (int outcome = 0; outcome < utility.length; outcome++) prices[outcome] -= cost[outcome];
+        double best = Arrays.stream(prices, 0, utility.length).max().orElse(0);
+        if (best - abstained <= INDIFFERENT_SPREAD) return ABSTAIN;
         prices[utility.length] = abstained;
         int pick = softmaxPick(cumulative(prices), draw);
         return pick == utility.length ? ABSTAIN : pick;
@@ -616,7 +664,7 @@ public final class AgendaForecast {
             tally[outcome] += ballot;
             winner = winner(tally, tie);
             tally[outcome] -= ballot;
-            double value = live[voter][winner] + ownVoteTerm(voter, winner, outcome);
+            double value = live[voter][winner] + ownVoteTerm(voter, winner, outcome) - ballotCosts()[voter][outcome];
             if (value > bestValue + EVEN) {
                 bestValue = value;
                 bestPick = outcome;
@@ -671,7 +719,7 @@ public final class AgendaForecast {
                 live[voter][outcome] += sign * shift[voter][joiner][outcome];
             }
         }
-        pick(picks, live, draw, joiner + 1);
+        pick(picks, live, draw, joiner + 1, null);
     }
 
     private int heldBallot(int voter, int pick, int[] tally, int[] picks, double[] speakerUtility) {

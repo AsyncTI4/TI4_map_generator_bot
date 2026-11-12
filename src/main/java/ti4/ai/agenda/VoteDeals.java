@@ -236,8 +236,8 @@ public class VoteDeals {
         Game game = outlook.game;
         AgendaForecast withDeal = outlook.forecast.withVotes(seller, outcome, votes);
         double buyerGain = withDeal.expectedUtility(buyer) - withoutDeal.expectedUtility(buyer);
-        double sellerCost = withoutDeal.expectedUtilityWithoutThreatDislike(seller)
-                - withDeal.expectedUtilityWithoutThreatDislike(seller)
+        double sellerCost = withoutDeal.expectedUtility(seller)
+                - withDeal.expectedUtility(seller)
                 + GalacticThreatCost.ofBallot(game, seller, outcome, votes)
                 + spentVotes(game, outlook.viewer, votes);
         return new Terms(outcome, votes, buyerGain, sellerCost, withDeal.chance(outcome));

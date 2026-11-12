@@ -13,6 +13,7 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.agenda.PromisedVotes;
+import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
@@ -486,13 +487,12 @@ class PromiseDealsTest extends BaseTi4Test {
                 .isEqualTo("FFCC_sol_" + PromiseDeals.ACCEPT_PREFIX + cheap.id());
     }
 
-    // Agenda phase: Xxcha (an AI, 4 points) holds the bigger bloc on Shard of the Throne. Sol (an AI) wants the point
-    // and offers to buy Xxcha's votes for itself; the offer uses up this agenda's transaction between them (LRR 94.6).
-    // Sol holds 7 TG: on the expert value table the Shard is worth 6 TG to each holder, so with a 10 TG wallet Xxcha
-    // would ask 8 and leave Sol under the proposal minimum. With 7 TG Xxcha has no ask that clears its own minimum and
-    // Sol offers 7, the lowest price that covers Xxcha's cost.
+    // Agenda phase: Xxcha (an AI, 4 points) holds the bigger bloc on Shard of the Throne. Sol (an AI) wants the point.
+    // Xxcha's 2 votes are worth about 8.3 TG to Sol and cost Xxcha about 6.6, so on the last agenda Xxcha takes no
+    // less than its floor of 8 (cost plus the 0.5 minimum). That leaves Sol under its own 0.5 minimum, so Sol makes no
+    // offer it knows would be refused (it used to offer 7). Sol's offers in ConditionalVoteDealsTest cover the post.
     @Test
-    void anAiOffersToBuyVotes() {
+    void anAiOffersOnlyAPriceTheSellerTakes() {
         AiTestGame test = AiTestGame.withSolAi();
         Player xxcha = test.addSeat(THIRD_AI_ID, "xxcha", "red");
         test.game.setVp(10);
@@ -506,22 +506,16 @@ class PromiseDealsTest extends BaseTi4Test {
         test.game.setSpeakerUserID(test.sol.getUserID());
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":2,\"red\":5,\"black\":0}");
         test.isActive(test.sol, "agendawaiting");
-        test.sol.setTg(7);
+        test.sol.setTg(10);
         AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, table());
 
-        AiDecision.Post post = (AiDecision.Post)
-                PromiseDeals.proposeVotes(context, List.of(xxcha)).orElseThrow();
+        VoteDeals.Terms terms = VoteDeals.valuedAt(test.game, test.sol, xxcha, test.sol, "sol", 2)
+                .orElseThrow();
+        int floor = PromiseDeals.voteFloor(terms.sellerCost(), terms.chance());
+        assertThat(terms.buyerGain() - floor).isLessThan(0.5);
 
-        Promise promise = PromiseBook.proposedBy(test.game, test.sol).getFirst();
-        assertThat(promise.term()).isEqualTo(Promise.Term.VOTE_FOR);
-        assertThat(promise.isPromiser(xxcha)).isTrue();
-        assertThat(promise.target()).isEqualTo("sol");
-        assertThat(post.buttons()).hasSize(2);
-        assertThat(TradeLegality.windowUsed(context, xxcha)).isTrue();
-
-        AiExperiments.disable(test.sol, Set.of(Experiment.PROMISE_DEALS));
-        assertThat(PromiseDeals.proposeVotes(test.contextFor(test.sol, Set.of(), NOW, table()), List.of(xxcha)))
-                .isEmpty();
+        assertThat(PromiseDeals.proposeVotes(context, List.of(xxcha))).isEmpty();
+        assertThat(PromiseBook.proposedBy(test.game, test.sol)).isEmpty();
     }
 
     // A seat that has started its ballot (pressed vote and stored the outcome it backs) can no longer change the

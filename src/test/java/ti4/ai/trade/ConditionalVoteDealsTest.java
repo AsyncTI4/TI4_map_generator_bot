@@ -20,6 +20,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.game.Player;
+import ti4.helpers.AgendaHistory;
 import ti4.testUtils.BaseTi4Test;
 
 // Politics notes after the traced self-play (2026-11-12): a vote deal is made when the seller is about to vote, and
@@ -32,6 +33,7 @@ import ti4.testUtils.BaseTi4Test;
 class ConditionalVoteDealsTest extends BaseTi4Test {
 
     private static final String SHARD = "Law_Elect Player_7_shard_of_the_throne";
+    private static final String NEXT_AGENDA = "Law_Elect Player_8_minister_war";
 
     private AiTestGame test;
     private Player sol;
@@ -118,8 +120,10 @@ class ConditionalVoteDealsTest extends BaseTi4Test {
         assertThat(blocs.getFirst().members()).hasSize(2);
         assertThat(blocs.getFirst().buyerGain()).isGreaterThan(alone + 1);
 
+        AiTurnContext buyer = context(sol, table());
         AiDecision.Post post = (AiDecision.Post)
-                PromiseDeals.proposeVotes(context(sol, table()), List.of(hacan)).orElseThrow();
+                PromiseDeals.proposeVotes(buyer, List.of(hacan)).orElseThrow();
+        assertThat(TradeLegality.windowUsed(buyer, hacan)).isFalse();
 
         Promise offer = PromiseBook.proposedBy(test.game, sol).getFirst();
         assertThat(offer.isPromiser(hacan)).isTrue();
@@ -173,6 +177,98 @@ class ConditionalVoteDealsTest extends BaseTi4Test {
                 AiTestGame.prompt("bill", PromptSource.PUBLIC, NOW, "FFCC_sol_" + PromiseDeals.PAY_PREFIX + owed.id());
         Optional<AiDecision> pay = PromiseDeals.answer(context(sol, billPrompt));
         assertThat(pay.map(AiTestGame::pressedId)).contains("FFCC_sol_" + PromiseDeals.PAY_PREFIX + owed.id());
+    }
+
+    // The engine clears resolvedAgendaId on the next flip, and on the last agenda the round goes up at strategy start.
+    // The agenda history keeps the outcome, so a promise kept for the winner is still billed after both.
+    @Test
+    void aKeptPromiseIsStillOwedAfterTheNextFlipAndTheNextRound() {
+        Promise kept = sold(hacan, "sol", 2).accepted(test.game).with(Promise.Status.KEPT);
+        PromiseBook.save(test.game, kept);
+        AgendaHistory.recordResolved(test.game, "shard_of_the_throne", "sol");
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+        assertThat(PromiseDeals.settled(context(sol), kept)).contains(Promise.Status.OWED);
+
+        test.game.setRound(test.game.getRound() + 1);
+        assertThat(PromiseDeals.settled(context(sol), kept)).contains(Promise.Status.OWED);
+
+        PromiseBook.save(test.game, kept.owing(NOW + Promise.OWED_GRACE_MILLIS));
+        PromiseBook.save(
+                test.game,
+                Promise.offer(
+                        test.game, Promise.Term.VOTE_FOR, letnev, sol, sol, "", "sol", 3, 1, NOW + 1, NOW + 60_000));
+        assertThat(PromiseBook.find(test.game, kept.id()).map(Promise::status)).contains(Promise.Status.OWED);
+    }
+
+    // Nobody observed the vote before the next agenda was revealed. Hacan voted for Sol, which won, so the promise is
+    // kept rather than expired, and the debt still follows.
+    @Test
+    void aMissedObserveStillFindsTheKeptPromise() {
+        Promise accepted = sold(hacan, "sol", 2).accepted(test.game);
+        PromiseBook.save(test.game, accepted);
+        test.game.setCurrentAgendaVote("sol", hacan.getColor() + "_3");
+        AgendaHistory.recordResolved(test.game, "shard_of_the_throne", "sol");
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+
+        assertThat(PromiseDeals.settled(context(sol), accepted)).contains(Promise.Status.KEPT);
+    }
+
+    // LRR 94.6: one transaction per pair per agenda. If Sol already traded with Hacan on this agenda, the bill waits;
+    // paying it uses the window.
+    @Test
+    void payingADebtUsesThePairsTransactionWindow() {
+        Promise owed = sold(hacan, "sol", 2).accepted(test.game).owing(NOW + Promise.OWED_GRACE_MILLIS);
+        PromiseBook.save(test.game, owed);
+        AiTurnContext busy = context(sol, table());
+        TradeLegality.useWindow(busy, hacan);
+        assertThat(PromiseDeals.answer(busy)).isEmpty();
+
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+        AiPrompt billPrompt =
+                AiTestGame.prompt("bill", PromptSource.PUBLIC, NOW, "FFCC_sol_" + PromiseDeals.PAY_PREFIX + owed.id());
+        AiTurnContext pay = context(sol, billPrompt);
+        assertThat(PromiseDeals.answer(pay)).isPresent();
+        assertThat(TradeLegality.windowUsed(pay, hacan)).isTrue();
+    }
+
+    // A bill left unpaid past its grace, once the agenda has moved on and the pair could trade, counts against the
+    // buyer
+    // the way a broken promise counts against a seller.
+    @Test
+    void anIgnoredBillCountsAgainstTheBuyer() {
+        Promise owed = sold(hacan, "sol", 2).accepted(test.game).owing(NOW);
+        PromiseBook.save(test.game, owed);
+        assertThat(PromiseDeals.settled(context(hacan), owed)).isEmpty();
+
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+        assertThat(PromiseDeals.settled(context(sol), owed)).isEmpty();
+        assertThat(PromiseDeals.settled(context(hacan), owed)).contains(Promise.Status.UNPAID);
+
+        PromiseBook.save(test.game, owed.with(Promise.Status.UNPAID));
+        assertThat(PromiseBook.brokenBy(test.game, sol, hacan)).isEqualTo(1);
+        assertThat(PromiseDeals.owedBy(test.game, sol, owed.id())).isPresent();
+    }
+
+    // Sol holds 3 trade goods and already promised Hacan 2 on this agenda: it may promise at most 1 more.
+    @Test
+    void promisedTradeGoodsAreNotPromisedTwice() {
+        sol.setTg(3);
+        PromiseBook.save(test.game, sold(hacan, "sol", 2).accepted(test.game));
+
+        assertThat(PromiseDeals.spendableTradeGoods(test.game, sol)).isEqualTo(1);
+        assertThat(PromiseDeals.buyerPrice(3.0, 1.5, letnev, PromiseDeals.spendableTradeGoods(test.game, sol), 0))
+                .isEmpty();
+    }
+
+    // Politics notes: votes are sold at the seller's cost plus a little, not at the buyer's whole gain. On the last
+    // agenda, or when the seller backs the outcome anyway, its floor is the price; otherwise 1 trade good of premium.
+    @Test
+    void voteDealsPriceFromTheSellersCost() {
+        assertThat(PromiseDeals.marketAsk(test.game, 0.0, 1, 6)).isEqualTo(1);
+        assertThat(PromiseDeals.marketAsk(test.game, 1.0, 1, 6)).isEqualTo(2);
+        test.game.setStoredValue("agendaCount", "1");
+        assertThat(PromiseDeals.marketAsk(test.game, -1.0, 1, 6)).isEqualTo(1);
+        assertThat(PromiseDeals.marketAsk(test.game, 1.0, 1, 6)).isEqualTo(3);
     }
 
     // The AI seller of a conditional deal values it at the chance it gets paid (Sol is unlikely to win on Hacan's

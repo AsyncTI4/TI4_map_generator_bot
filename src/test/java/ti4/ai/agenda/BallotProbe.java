@@ -205,6 +205,6 @@ public final class BallotProbe {
         AgendaForecast cast = outcome.isEmpty() ? forecast.without(seat) : forecast.withVotes(seat, outcome, votes);
         return cast.expected(winner -> forecast.utility(seat, winner)
                         + AgendaValues.ownVoteAdjustment(game, seat, agenda, winner, outcome))
-                - cast.unvotedThreatPayoff(seat);
+                - cast.threatPayoffCorrection(seat);
     }
 }

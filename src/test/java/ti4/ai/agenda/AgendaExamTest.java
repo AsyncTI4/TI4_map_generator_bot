@@ -1036,6 +1036,22 @@ class AgendaExamTest extends BaseTi4Test {
 
             assertThat(votes).isLessThanOrEqualTo(2);
         }
+
+        // Swords to Plowshares trace: the speaker votes last on the first agenda with one 6-vote planet, facing 6
+        // Against. Keeping a vote back is a price, not a cap: spending all 6 ties, and the speaker breaks the tie its
+        // way, which is worth far more than a vote for the next agenda.
+        @Test
+        void theSpeakerSpendsItsLastVoteWhenItDecidesTheAgenda() {
+            xxcha.addPlanet("mallice");
+            test.game.setStoredValue("agendaCount", "1");
+            reveal(NEXUS, "blue", 6, "red", 6, "black", 0);
+            test.game.setCurrentAgendaVote("against", "blue_6");
+
+            Optional<BallotPlanner.Choice> choice = BallotPlanner.choose(test.game, xxcha, "nexus", List.of(6));
+
+            assertThat(choice.map(BallotPlanner.Choice::outcome)).contains("for");
+            assertThat(choice.map(BallotPlanner.Choice::votes)).contains(6);
+        }
     }
 
     // ---- For/Against laws by faction and position --------------------------------------------------------------

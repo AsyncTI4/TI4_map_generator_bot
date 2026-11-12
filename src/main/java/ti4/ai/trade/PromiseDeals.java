@@ -17,6 +17,7 @@ import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiSeats;
 import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.agenda.AgendaQueue;
+import ti4.ai.agenda.AgendaRound;
 import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
@@ -48,6 +49,7 @@ class PromiseDeals {
     static final int MAX_BLOC_OFFERS = 4;
     static final double MIN_PAY_CHANCE = 0.2;
     private static final int MIN_PRICE = 1;
+    static final int MARKET_PREMIUM = 1;
     private static final String PAY_POSTED_KEY = "promisePayPosted|";
     private static final Comparator<Proposal> BEST = Comparator.comparingDouble(Proposal::gain)
             .thenComparing(proposal -> proposal.term() == Promise.Term.STAY_OUT);
@@ -128,7 +130,10 @@ class PromiseDeals {
                 Optional<Promise> promise = openFor(game, seat, id);
                 if (promise.isEmpty()) continue;
                 if (accepts(context, promise.get())) {
-                    proposerOf(game, promise.get()).ifPresent(proposer -> TradeLegality.useWindow(context, proposer));
+                    if (!paysOnResolution(game, promise.get())) {
+                        proposerOf(game, promise.get())
+                                .ifPresent(proposer -> TradeLegality.useWindow(context, proposer));
+                    }
                     return Optional.of(AiDecision.press(prompt, button, "accept the promise deal"));
                 }
                 Optional<PromptButton> decline = prompt.firstEnabled(candidate -> candidate.isOwnedBy(context.faction())
@@ -153,9 +158,12 @@ class PromiseDeals {
                 Optional<Promise> owed =
                         owedBy(game, context.seat(), StringUtils.removeStart(button.handlerId(), PAY_PREFIX));
                 if (owed.isEmpty() || context.seat().getTg() < owed.get().price()) continue;
-                if (owed.get().term() == Promise.Term.DISCARD_AGENDA) {
-                    owed.get().promiserIn(game).ifPresent(holder -> TradeLegality.useWindow(context, holder));
+                Player payee = owed.get().promiserIn(game).orElseThrow();
+                if (!TradeLegality.canTransact(game, context.seat(), payee)
+                        || TradeLegality.windowUsed(context, payee)) {
+                    continue;
                 }
+                TradeLegality.useWindow(context, payee);
                 return Optional.of(AiDecision.press(prompt, button, "pay what it owes for the agenda deal"));
             }
         }
@@ -164,7 +172,7 @@ class PromiseDeals {
 
     static Optional<Promise> owedBy(Game game, Player payer, String id) {
         return PromiseBook.find(game, id)
-                .filter(promise -> promise.status() == Promise.Status.OWED)
+                .filter(promise -> promise.status() == Promise.Status.OWED || promise.status() == Promise.Status.UNPAID)
                 .filter(promise -> promise.isPromisee(payer))
                 .filter(promise -> promise.promiserIn(game).isPresent());
     }
@@ -173,11 +181,12 @@ class PromiseDeals {
         Game game = context.game();
         Player seat = context.seat();
         for (Promise promise : PromiseBook.all(game)) {
-            if (promise.status() != Promise.Status.OWED || !promise.thisRound(game)) continue;
+            if (promise.status() != Promise.Status.OWED) continue;
             Optional<Player> payee = promise.promiserIn(game);
             Optional<Player> payer = promise.promiseeIn(game);
             if (payee.isEmpty() || payer.isEmpty() || !postsTheBill(seat, payer.get(), payee.get())) continue;
             if (!TradeLegality.canTransact(game, payer.get(), payee.get())) continue;
+            if (seat == payer.get() && TradeLegality.windowUsed(context, payee.get())) continue;
             String key = PAY_POSTED_KEY + promise.id();
             if (context.memory().has(key)) continue;
             Optional<String> channel = channelId(context);
@@ -216,7 +225,11 @@ class PromiseDeals {
         for (Promise promise : PromiseBook.all(game)) {
             Optional<Promise.Status> status = settled(context, promise);
             if (status.isPresent()) {
-                PromiseBook.persist(game, promise.with(status.get()));
+                PromiseBook.persist(
+                        game,
+                        status.get() == Promise.Status.OWED
+                                ? promise.owing(context.now() + Promise.OWED_GRACE_MILLIS)
+                                : promise.with(status.get()));
             } else if (promise.isPromisee(seat)) {
                 PromiseChecks.withoutLeftSystems(game, promise).ifPresent(pruned -> PromiseBook.persist(game, pruned));
             }
@@ -231,6 +244,11 @@ class PromiseDeals {
             return lapsed ? Optional.of(Promise.Status.EXPIRED) : Optional.empty();
         }
         if (!promise.isPromisee(seat) && !promise.isPromiser(seat)) return Optional.empty();
+        if (promise.status() == Promise.Status.OWED) {
+            return promise.isPromiser(seat) && leftUnpaid(context, promise)
+                    ? Optional.of(Promise.Status.UNPAID)
+                    : Optional.empty();
+        }
         if (promise.status() == Promise.Status.KEPT && paysOnResolution(game, promise)) {
             return PromisedVotes.settlement(game, promise);
         }
@@ -238,6 +256,39 @@ class PromiseDeals {
         return promise.term() == Promise.Term.VOTE_FOR
                 ? PromisedVotes.verdict(game, promise)
                 : PromiseChecks.territorial(game, promise);
+    }
+
+    private static boolean leftUnpaid(AiTurnContext context, Promise promise) {
+        Game game = context.game();
+        Optional<Player> payer = promise.promiseeIn(game);
+        Optional<Player> payee = promise.promiserIn(game);
+        if (payer.isEmpty() || payee.isEmpty() || context.now() < promise.expiresAt()) return false;
+        boolean sameAgenda = promise.thisRound(game) && promise.agenda().equals(PromisedVotes.agendaKey(game));
+        return !sameAgenda && TradeLegality.canTransact(game, payer.get(), payee.get());
+    }
+
+    static boolean billPending(Game game, Player seat, Player partner) {
+        return PromiseBook.all(game).stream()
+                .filter(promise -> promise.status() == Promise.Status.OWED)
+                .anyMatch(promise -> PromiseBook.between(promise, seat, partner));
+    }
+
+    static int promisedTradeGoods(Game game, Player buyer, String exceptId) {
+        return PromiseBook.all(game).stream()
+                .filter(promise -> promise.isPromisee(buyer) && !promise.id().equals(exceptId))
+                .filter(promise -> stillToPay(game, promise))
+                .mapToInt(Promise::price)
+                .sum();
+    }
+
+    private static boolean stillToPay(Game game, Promise promise) {
+        if (promise.status() == Promise.Status.OWED) return true;
+        if (!paysOnResolution(game, promise) || !PromisedVotes.onThisAgenda(game, promise)) return false;
+        return promise.open() || promise.status() == Promise.Status.ACCEPTED || promise.status() == Promise.Status.KEPT;
+    }
+
+    static int spendableTradeGoods(Game game, Player buyer) {
+        return Math.max(0, buyer.getTg() - promisedTradeGoods(game, buyer, ""));
     }
 
     static Optional<Promise> openFor(Game game, Player party, String id) {
@@ -277,14 +328,17 @@ class PromiseDeals {
         if (promiser == null || promisee == null) return false;
         Player proposer = promise.isPromiser(seat) ? promisee : promiser;
         if (ScoringStakes.contender(game, seat, proposer)) return false;
-        if (!TradeLegality.canTransact(game, seat, proposer) || TradeLegality.windowUsed(context, proposer)) {
+        if (!TradeLegality.canTransact(game, seat, proposer)
+                || TradeLegality.windowUsed(context, proposer)
+                || billPending(game, seat, proposer)) {
             return false;
         }
         double margin = TradeValue.margin(proposer);
         if (promise.isPromiser(seat)) return sells(context, promise, promisee, margin);
         double paid = payChance(game, seat, promiser, promise) * promise.price();
         double gain = Trust.of(context, promiser) * protection(game, seat, promiser, promise);
-        return seat.getTg() >= promise.price() && gain - paid >= margin;
+        int spendable = seat.getTg() - promisedTradeGoods(game, seat, promise.id());
+        return spendable >= promise.price() && gain - paid >= margin;
     }
 
     private static double payChance(Game game, Player viewer, Player seller, Promise promise) {
@@ -314,8 +368,29 @@ class PromiseDeals {
         double received = chance * (paysOnResolution(game, promise) ? Trust.of(context, buyer) : 1);
         Optional<Integer> asked =
                 sellerPrice(worth, cost, buyer, buyer.getTg(), votes ? 0 : MAX_TERRITORY_PRICE, chance);
-        int ask = votes ? Math.max(asked.orElse(0), voteFloor(cost, chance)) : asked.orElse(0);
+        int ask = votes ? sellerAsk(game, seat, cost, chance, asked.orElse(0)) : asked.orElse(0);
         return promise.price() >= ask && received * promise.price() - cost >= margin;
+    }
+
+    private static int sellerAsk(Game game, Player seller, double cost, double chance, int monopoly) {
+        if (!marketPrices(seller)) return Math.max(monopoly, voteFloor(cost, chance));
+        return marketAsk(game, cost, chance, monopoly);
+    }
+
+    static boolean marketPrices(Player seat) {
+        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE);
+    }
+
+    static int marketAsk(Game game, double cost, double chance, int monopoly) {
+        int floor = voteFloor(cost, chance);
+        if (AgendaRound.isFinalAgenda(game) || cost <= 0) return floor;
+        return Math.max(floor, Math.min(monopoly, floor + MARKET_PREMIUM));
+    }
+
+    private static int voteAsk(Game game, Player seller, Player buyer, VoteDeals.Terms terms, double chance) {
+        int monopoly = askOf(seller, terms.buyerGain(), terms.sellerCost(), buyer, 0, chance);
+        if (!marketPrices(buyer) || !AiSeats.isAiSeat(seller)) return monopoly;
+        return marketAsk(game, terms.sellerCost(), chance, monopoly);
     }
 
     static int voteFloor(double sellerCost) {
@@ -427,7 +502,7 @@ class PromiseDeals {
         if (value <= 0) return Optional.empty();
         double cost = restraintCost(game, plans, seller, hypothetical(game, term, seller, seat, target));
         int ask = askOf(seller, worth, cost, seat, MAX_TERRITORY_PRICE);
-        return buyerPrice(value, cost, seller, seat.getTg(), MAX_TERRITORY_PRICE, ask)
+        return buyerPrice(value, cost, seller, spendableTradeGoods(game, seat), MAX_TERRITORY_PRICE, ask)
                 .map(price -> new Proposal(term, seller, seat, target, 0, price, value - price));
     }
 
@@ -446,6 +521,8 @@ class PromiseDeals {
                     .flatMap(terms -> {
                         double chance = payChance(conditional, terms);
                         return sellerPrice(terms.buyerGain(), terms.sellerCost(), partner, partner.getTg(), 0, chance)
+                                .map(price ->
+                                        marketPrices(seat) ? marketAsk(game, terms.sellerCost(), chance, price) : price)
                                 .map(price -> new Proposal(
                                         Promise.Term.VOTE_FOR,
                                         seat,
@@ -460,8 +537,8 @@ class PromiseDeals {
         if (!sellingVotes(game, partner) && (!conditional || VoteDeals.aboutToVote(game, partner))) {
             double trust = Trust.of(context, partner);
             Optional<Proposal> purchase = VoteDeals.bestPurchase(outlook, seat, partner, backed)
-                    .flatMap(terms ->
-                            purchase(seat, partner, terms, trust * terms.buyerGain(), payChance(conditional, terms)));
+                    .flatMap(terms -> purchase(
+                            seat, partner, terms, trust * terms.buyerGain(), payChance(conditional, terms), game));
             if (purchase.isEmpty() && conditional) purchase = blocPurchase(context, outlook, partner, backed, trust);
             purchase.ifPresent(proposals::add);
         }
@@ -469,9 +546,9 @@ class PromiseDeals {
     }
 
     private static Optional<Proposal> purchase(
-            Player buyer, Player seller, VoteDeals.Terms terms, double value, double chance) {
-        int ask = askOf(seller, terms.buyerGain(), terms.sellerCost(), buyer, 0, chance);
-        return buyerPrice(value, terms.sellerCost(), seller, buyer.getTg(), 0, ask, chance)
+            Player buyer, Player seller, VoteDeals.Terms terms, double value, double chance, Game game) {
+        int ask = voteAsk(game, seller, buyer, terms, chance);
+        return buyerPrice(value, terms.sellerCost(), seller, spendableTradeGoods(game, buyer), 0, ask, chance)
                 .map(price -> new Proposal(
                         Promise.Term.VOTE_FOR,
                         seller,
@@ -505,7 +582,7 @@ class PromiseDeals {
         List<Integer> prices = new ArrayList<>();
         for (VoteDeals.Member member : bloc.members()) {
             VoteDeals.Terms terms = member.terms();
-            int ask = askOf(member.seller(), terms.buyerGain(), terms.sellerCost(), seat, 0, chance);
+            int ask = voteAsk(context.game(), member.seller(), seat, terms, chance);
             int price = Math.max(ask, floorPrice(terms.sellerCost(), member.seller(), chance));
             prices.add(price);
             total += price;
@@ -515,7 +592,8 @@ class PromiseDeals {
                 .min()
                 .orElse(firstTrust);
         double value = trust * bloc.buyerGain() - chance * total;
-        if (total > seat.getTg() || value < TradeValue.PROPOSE_MIN) return Optional.empty();
+        if (total > spendableTradeGoods(context.game(), seat) || value < TradeValue.PROPOSE_MIN)
+            return Optional.empty();
         VoteDeals.Member first = bloc.first();
         return Optional.of(new Proposal(
                 Promise.Term.VOTE_FOR,
@@ -631,7 +709,7 @@ class PromiseDeals {
                 context.now(),
                 context.now() + TradeRules.ownTurnReplyMillis(partner));
         PromiseBook.persist(game, promise);
-        TradeLegality.useWindow(context, partner);
+        if (!paysOnResolution(game, promise)) TradeLegality.useWindow(context, partner);
         return Optional.of(new AiDecision.Post(
                 channel.get(), offerText(game, seat, partner, promise), offerButtons(partner, promise)));
     }

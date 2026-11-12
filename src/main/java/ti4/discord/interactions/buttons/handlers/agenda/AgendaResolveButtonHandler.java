@@ -63,6 +63,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.AgendaHistory;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
@@ -148,6 +149,7 @@ class AgendaResolveButtonHandler {
         // Keyed by the id the web state reads back (for Covert Legislation that is "covert", not the hidden agenda).
         game.setStoredValue("resolvedAgendaId", StringUtils.defaultString(AgendaHelper.getCurrentAgendaId(game)));
         game.setStoredValue("resolvedAgendaOutcome", winner);
+        AgendaHistory.recordResolved(game, StringUtils.defaultString(AgendaHelper.getCurrentAgendaId(game)), winner);
         GameEventService.commit(
                 game,
                 GameEventType.AGENDA_RESOLVED,

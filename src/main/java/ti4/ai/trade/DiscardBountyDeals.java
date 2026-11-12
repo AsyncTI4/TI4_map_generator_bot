@@ -18,6 +18,7 @@ import ti4.ai.xxcha.QuashRules;
 import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.Player;
+import ti4.helpers.AgendaHistory;
 
 @UtilityClass
 class DiscardBountyDeals {
@@ -32,8 +33,9 @@ class DiscardBountyDeals {
         String agenda = PromisedVotes.agendaKey(game);
         if (agenda.isBlank() || DiscardBounties.postedOnThisAgenda(game, seat).isPresent()) return Optional.empty();
         OptionalDouble loss = AgendaPolicy.expectedLoss(game, seat);
-        if (loss.isEmpty() || loss.getAsDouble() < DiscardBounties.MIN_LOSS) return Optional.empty();
-        int most = Math.min(seat.getTg(), (int) Math.floor(loss.getAsDouble() - TradeValue.PROPOSE_MIN));
+        if (loss.isEmpty()) return Optional.empty();
+        int most = DiscardBounties.mostOffered(PromiseDeals.spendableTradeGoods(game, seat), loss.getAsDouble());
+        if (most < 1) return Optional.empty();
         Optional<Player> quasher = quasher(game, seat);
         int veto = AgendaCardRules.holdsVeto(seat)
                 ? 0
@@ -79,7 +81,12 @@ class DiscardBountyDeals {
             }
             return;
         }
-        Optional<Claim> claim = vetoClaim(game, payer, bounty).or(() -> quashClaim(game, payer, bounty));
+        Optional<AgendaHistory.Entry> fate = AgendaHistory.of(game, bounty.round(), bounty.agenda());
+        boolean resolved = fate.filter(AgendaHistory.Entry::resolved).isPresent();
+        boolean quashed = fate.filter(AgendaHistory.Entry::quashed).isPresent();
+        Optional<Claim> claim = resolved
+                ? Optional.empty()
+                : quashed ? quashClaim(game, payer, bounty) : vetoClaim(game, payer, bounty);
         if (claim.isEmpty()) {
             DiscardBounties.persist(game, bounty.with(DiscardBounties.Status.LAPSED));
             return;
@@ -119,7 +126,7 @@ class DiscardBountyDeals {
     private static Optional<Claim> quashClaim(Game game, Player payer, Bounty bounty) {
         if (bounty.quash() <= 0 || bounty.quasher().isBlank()) return Optional.empty();
         Player quasher = game.getPlayerFromColorOrFaction(bounty.quasher());
-        if (quasher == null || quasher == payer || quasher.getStrategicCC() >= bounty.quashTokens()) {
+        if (quasher == null || quasher == payer) {
             return Optional.empty();
         }
         return Optional.of(new Claim(quasher, DiscardBounties.QUASH, bounty.quash()));

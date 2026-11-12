@@ -6,6 +6,7 @@ import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.AgendaHistory;
 
 @UtilityClass
 public class PromisedVotes {
@@ -47,9 +48,9 @@ public class PromisedVotes {
         if (promise.status() != Promise.Status.ACCEPTED || promise.term() != Promise.Term.VOTE_FOR) {
             return Optional.empty();
         }
-        if (!onThisAgenda(game, promise)) return Optional.of(Promise.Status.EXPIRED);
         Player promiser = game.getPlayerFromColorOrFaction(promise.promiser());
         if (promiser == null) return Optional.of(Promise.Status.VOID);
+        if (!onThisAgenda(game, promise)) return Optional.of(afterTheAgenda(game, promise, promiser));
         if (AgendaSwing.backedAnotherOutcome(game, promiser, promise.target())) {
             return Optional.of(Promise.Status.BROKEN);
         }
@@ -58,7 +59,21 @@ public class PromisedVotes {
                 .map(ignored -> Promise.Status.KEPT);
     }
 
+    private static Promise.Status afterTheAgenda(Game game, Promise promise, Player promiser) {
+        return AgendaHistory.of(game, promise.round(), promise.agenda())
+                .filter(AgendaHistory.Entry::resolved)
+                .filter(entry -> entry.outcome().equalsIgnoreCase(promise.target()))
+                .filter(entry ->
+                        entry.votedForOutcome(promiser.getColor()) || entry.votedForOutcome(promiser.getFaction()))
+                .map(entry -> Promise.Status.KEPT)
+                .orElse(Promise.Status.EXPIRED);
+    }
+
     public static Optional<String> resolvedOutcome(Game game, Promise promise) {
+        Optional<String> recorded = AgendaHistory.of(game, promise.round(), promise.agenda())
+                .filter(AgendaHistory.Entry::resolved)
+                .map(AgendaHistory.Entry::outcome);
+        if (recorded.isPresent()) return recorded;
         String outcome = game.getStoredValue(RESOLVED_OUTCOME);
         if (!promise.thisRound(game) || outcome.isBlank() || promise.agenda().isBlank()) return Optional.empty();
         return promise.agenda().equals(game.getStoredValue(RESOLVED_AGENDA)) ? Optional.of(outcome) : Optional.empty();

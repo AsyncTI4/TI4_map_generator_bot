@@ -114,25 +114,28 @@ class GalacticThreatCostTest extends BaseTi4Test {
         assertThat(GalacticThreatCost.ofBallot(test.game, test.sol, "xxcha", 3)).isZero();
     }
 
-    // In Xxcha's forecast, Sol dislikes voting for the predicted outcome by the same cost.
+    // In Xxcha's forecast, Sol pays the same cost to vote for the predicted outcome. It is a cost of Sol's ballot, not
+    // a
+    // dislike of the outcome: Sol still values Xxcha's election as before when others carry it or the speaker picks it.
     @Test
-    void otherVotersDislikeThePredictedOutcomeInTheForecast() {
+    void otherVotersPayForABallotOnThePredictedOutcomeInTheForecast() {
         nekroPredictsXxcha();
-        double withCost = AgendaForecast.of(test.game, xxcha).utility(test.sol, "xxcha");
+        AgendaForecast forecast = AgendaForecast.of(test.game, xxcha);
+        double withCost = forecast.utility(test.sol, "xxcha");
+        assertThat(forecast.ballotCost(test.sol, "xxcha")).isCloseTo(1.0, within(1e-9));
         AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST));
-        double withoutCost = AgendaForecast.of(test.game, xxcha).utility(test.sol, "xxcha");
+        AgendaForecast without = AgendaForecast.of(test.game, xxcha);
 
-        assertThat(withoutCost - withCost).isCloseTo(1.0, within(1e-9));
+        assertThat(without.utility(test.sol, "xxcha")).isCloseTo(withCost, within(1e-9));
+        assertThat(without.ballotCost(test.sol, "xxcha")).isZero();
     }
 
     @Test
-    void theForecastDislikeHalvesOnceOthersHaveVotedForThePrediction() {
+    void theForecastBallotCostHalvesOnceOthersHaveVotedForThePrediction() {
         test.game.setCurrentAgendaVote("xxcha", "black_" + GalacticThreatCost.RIDER + ";red_4");
-        double withCost = AgendaForecast.of(test.game, xxcha).utility(test.sol, "xxcha");
-        AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST));
-        double withoutCost = AgendaForecast.of(test.game, xxcha).utility(test.sol, "xxcha");
 
-        assertThat(withoutCost - withCost).isCloseTo(0.5, within(1e-9));
+        assertThat(AgendaForecast.of(test.game, xxcha).ballotCost(test.sol, "xxcha"))
+                .isCloseTo(0.5, within(1e-9));
     }
 
     // The viewing seat's own cost is charged on its ballot, not in its forecast, so it is not counted twice.

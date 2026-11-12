@@ -231,7 +231,9 @@ class AgendaForecastTest extends BaseTi4Test {
     }
 
     // Galactic Threat pays only through winning voters: with no votes left at the table the speaker picks the outcome
-    // and Nekro's prediction pays nothing, so Nekro's expected utility leaves the payoff out.
+    // and Nekro's prediction pays nothing, so Nekro's expected, per-outcome and tie-break utilities all leave the
+    // payoff
+    // out (a Nekro speaker does not break a tie toward a prediction nobody voted for).
     @Test
     void aGalacticThreatOnAnOutcomeWithoutVotersIsWorthNothing() {
         test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
@@ -243,7 +245,9 @@ class AgendaForecastTest extends BaseTi4Test {
 
         AgendaForecast predicted = forecast.withRider(test.nekro, GalacticThreatCost.RIDER, picked);
 
-        assertThat(predicted.utility(test.nekro, picked)).isGreaterThan(forecast.utility(test.nekro, picked));
+        assertThat(predicted.utility(test.nekro, picked)).isCloseTo(forecast.utility(test.nekro, picked), within(1e-9));
+        assertThat(predicted.tieBreakUtility(test.nekro, picked))
+                .isCloseTo(forecast.tieBreakUtility(test.nekro, picked), within(1e-9));
         assertThat(predicted.votedChance(picked)).isZero();
         assertThat(predicted.expectedUtility(test.nekro))
                 .isCloseTo(predicted.expected(outcome -> forecast.utility(test.nekro, outcome)), within(1e-9));
@@ -282,6 +286,8 @@ class AgendaForecastTest extends BaseTi4Test {
         AgendaForecast solVotes = predicted.withVotes(test.sol, "for", 1);
         double amd = ti4.ai.strategy.CopiedTechPolicy.copiedWorth("amd");
         assertThat(solVotes.threatWorth("for")).isCloseTo(amd, within(1e-9));
+        assertThat(solVotes.utility(test.nekro, "for") - base.utility(test.nekro, "for"))
+                .isCloseTo(amd, within(1e-9));
         assertThat(solVotes.expectedUtility(test.nekro))
                 .isCloseTo(solVotes.expected(outcome -> base.utility(test.nekro, outcome)) + amd, within(1e-9));
 

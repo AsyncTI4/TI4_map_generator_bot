@@ -361,9 +361,8 @@ class PromisedVotesTest extends BaseTi4Test {
             assertThat(withPredictive).doesNotContain(BallotPlanner.PREDICTIVE_VOTES);
     }
 
-    // When the buyer values a deal, its forecast already lowers the seller's utility of Nekro's predicted outcome by
-    // the Galactic Threat disincentive. The deal adds the flat cost of the seller's ballot once, so the seller's cost
-    // is its change in outcome value without that disincentive plus the flat cost, and not both.
+    // The buyer's forecast charges the Galactic Threat cost on the seller's ballot, not on its value of Nekro's
+    // predicted outcome, so the seller's cost of a deal is its change in outcome value plus the flat ballot cost, once.
     @Test
     void theGalacticThreatCostIsCountedOnceWhenTheBuyerValuesTheDeal() {
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
@@ -378,13 +377,8 @@ class PromisedVotesTest extends BaseTi4Test {
         assertThat(GalacticThreatCost.ofBallot(test.game, xxcha, "sol", votes)).isPositive();
 
         assertThat(terms.sellerCost())
-                .isCloseTo(
-                        forecast.expectedUtilityWithoutThreatDislike(xxcha)
-                                - withDeal.expectedUtilityWithoutThreatDislike(xxcha)
-                                + flat,
-                        within(1e-9));
-        double doubleCounted = forecast.expectedUtility(xxcha) - withDeal.expectedUtility(xxcha) + flat;
+                .isCloseTo(forecast.expectedUtility(xxcha) - withDeal.expectedUtility(xxcha) + flat, within(1e-9));
         assertThat(withDeal.chance("sol")).isGreaterThan(forecast.chance("sol"));
-        assertThat(doubleCounted).isGreaterThan(terms.sellerCost());
+        assertThat(forecast.ballotCost(xxcha, "sol")).isPositive();
     }
 }

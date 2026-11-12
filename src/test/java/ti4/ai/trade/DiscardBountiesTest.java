@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
 import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.agenda.AgendaPolicy;
@@ -22,6 +23,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.game.Player;
+import ti4.helpers.AgendaHistory;
 import ti4.testUtils.BaseTi4Test;
 
 // Politics notes after the traced self-play (2026-11-12), "pay to kill a doomed loss": a seat that loses trade goods to
@@ -181,6 +183,7 @@ class DiscardBountiesTest extends BaseTi4Test {
     void aQuashIsPaidToXxcha() {
         DiscardBounties.save(test.game, bounty(sol, 3, 5));
         xxcha.setStrategicCC(xxcha.getStrategicCC() - 1);
+        AgendaHistory.recordQuashed(test.game, "economic_equality");
         test.game.setCurrentAgendaInfo(NEXT_AGENDA);
 
         DiscardBountyDeals.observe(context(sol));
@@ -215,6 +218,58 @@ class DiscardBountiesTest extends BaseTi4Test {
 
         assertThat(DiscardBounties.awaitOffers(test.contextFor(nekro, Set.of(), NOW + 120_000L)))
                 .isEmpty();
+    }
+
+    // Political Favor also takes a token from Xxcha's strategy pool and discards the agenda, but it is not a Quash:
+    // only the engine's record of a Quash on this very agenda pays the Quash bounty.
+    @Test
+    void aPoliticalFavorDiscardDoesNotPayXxcha() {
+        DiscardBounties.save(test.game, bounty(sol, 0, 5));
+        xxcha.setStrategicCC(xxcha.getStrategicCC() - 1);
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+
+        DiscardBountyDeals.observe(context(sol));
+
+        assertThat(PromiseBook.all(test.game)).isEmpty();
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.LAPSED);
+    }
+
+    // Sol's observe lagged: Economic Equality resolved, the next agenda came up and Nekro vetoed that one. The old
+    // bounty was never earned, because its agenda resolved.
+    @Test
+    void aVetoOnTheNextAgendaDoesNotPayTheOldBounty() {
+        DiscardBounties.save(test.game, bounty(sol, 3, 0));
+        AgendaHistory.recordResolved(test.game, "economic_equality", "for");
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+        test.game.getGameStats().recordAcPlay(DiscardBounties.VETO, nekro);
+
+        DiscardBountyDeals.observe(context(sol));
+
+        assertThat(PromiseBook.all(test.game)).isEmpty();
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.LAPSED);
+    }
+
+    // Bounties are paid through promise deals, so without that experiment a seat posts none.
+    @Test
+    void noBountyIsPostedWithoutPromiseDeals() {
+        nekro.setTg(5);
+        xxcha.setTg(5);
+        AiExperiments.disable(sol, Set.of(Experiment.PROMISE_DEALS));
+
+        assertThat(DiscardBountyDeals.offer(context(sol, table()))).isEmpty();
+        assertThat(DiscardBounties.postedOnThisAgenda(test.game, sol)).isEmpty();
+    }
+
+    // With trading off no payer can post, so a holder does not wait for one.
+    @Test
+    void aHolderDoesNotWaitWhenTradingIsOff() {
+        nekro.setTg(7);
+        System.setProperty(AiSettings.TRADING_PROPERTY, "false");
+        try {
+            assertThat(DiscardBounties.awaitOffers(context(nekro))).isEmpty();
+        } finally {
+            System.clearProperty(AiSettings.TRADING_PROPERTY);
+        }
     }
 
     @Test

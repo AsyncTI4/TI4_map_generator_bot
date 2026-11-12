@@ -5337,6 +5337,7 @@ public final class ButtonHelperFactionSpecific {
                         + " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1)
                         + ").");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
+        AgendaHistory.recordQuashed(game, defaultString(AgendaHelper.getCurrentAgendaId(game)));
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {
