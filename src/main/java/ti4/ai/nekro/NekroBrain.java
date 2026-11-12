@@ -480,6 +480,9 @@ public class NekroBrain implements FactionBrain {
         if (veto.isPresent()) return veto;
         Optional<AiDecision> quash = QuashRules.queue(context);
         if (quash.isPresent()) return quash;
+        Optional<AiDecision> bounty =
+                AgendaCardRules.awaitVetoBounty(context).or(() -> QuashRules.awaitBounty(context));
+        if (bounty.isPresent()) return bounty;
         return firstHandler(context, "declineToQueueAWhen", "pass on playing a \"when\"");
     }
 

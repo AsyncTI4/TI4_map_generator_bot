@@ -24,6 +24,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.promise.Promise;
 import ti4.ai.xxcha.QuashRules;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -1162,6 +1163,96 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(votesBy("for", xxcha, sardakk, hacan)).isGreaterThan(10);
             assertThat(votesBy("for", xxcha, sardakk, hacan, letnev, sol))
                     .isGreaterThan(votesBy("against", xxcha, sardakk, hacan, letnev, sol));
+        }
+    }
+
+    /**
+     * Politics notes after the traced self-play (2026-11-12): vote prices by agenda, vote deals that pay only if the
+     * outcome wins, and paying to kill a doomed loss.
+     */
+    @Nested
+    class VoteAndDiscardDeals {
+
+        private void board() {
+            test.place("01", "304");
+            sol.addPlanet("jord");
+            test.place("14", "310");
+            test.place("19", "311");
+            xxcha.addPlanet("archonren");
+            xxcha.addPlanet("archontau");
+            xxcha.addPlanet("wellon");
+        }
+
+        // "On the second (last) agenda, a buyer buys all of a seller's votes for the same price as any number, since
+        // unspent votes vanish."
+        @Test
+        void aLastAgendaDealBuysTheSellersWholeStack() {
+            board();
+            reveal("Law_Elect Player_7_shard_of_the_throne", "blue", 2, "red", 6, "black", 0);
+
+            assertThat(VoteDeals.valued(test.game, nekro, xxcha, sol, "sol")
+                            .orElseThrow()
+                            .votes())
+                    .isEqualTo(AgendaVoting.castableVotes(test.game, xxcha));
+        }
+
+        // "The usual deal is 'I pay you 1 TG to put your votes on For, if it resolves For': payment happens after
+        // resolution and only when the outcome wins."
+        @Test
+        void aKeptVoteDealIsOwedOnlyWhenItsOutcomeWins() {
+            reveal("Directive_For/Against_7_economic_equality", "blue", 2, "red", 6, "black", 0);
+            Promise kept = Promise.offer(
+                            test.game,
+                            Promise.Term.VOTE_FOR,
+                            xxcha,
+                            nekro,
+                            nekro,
+                            PromisedVotes.agendaKey(test.game),
+                            "for",
+                            0,
+                            1,
+                            NOW,
+                            NOW + 60_000)
+                    .accepted(test.game)
+                    .with(Promise.Status.KEPT);
+            test.game.setStoredValue("resolvedAgendaId", "economic_equality");
+
+            test.game.setStoredValue("resolvedAgendaOutcome", "against");
+            assertThat(PromisedVotes.settlement(test.game, kept)).isEmpty();
+
+            test.game.setStoredValue("resolvedAgendaOutcome", "for");
+            assertThat(PromisedVotes.settlement(test.game, kept)).contains(Promise.Status.OWED);
+        }
+
+        // "A seat that will lose N TG to an agenda whatever it votes (Economic Equality going For) should offer up to
+        // N TG for a Veto." Nekro, holding Veto and 7 trade goods, barely minds Economic Equality, so it keeps the
+        // card; a pooled 3 trade good bounty from the rich seats makes the Veto worth playing.
+        @Test
+        void aVetoHolderPlaysForABountyThatCoversItsCard() {
+            board();
+            reveal("Directive_For/Against_7_economic_equality", "blue", 2, "red", 6, "black", 0);
+            sol.setTg(12);
+            xxcha.setTg(0);
+            nekro.setTg(7);
+            hand(nekro, "veto");
+            OptionalDouble loss = AgendaPolicy.signedLoss(test.game, nekro);
+            assertThat(loss.orElseThrow()).isLessThan(1.0);
+            assertThat(AgendaCardRules.worthVetoing(test.game, nekro)).isFalse();
+
+            DiscardBounties.save(
+                    test.game,
+                    new DiscardBounties.Bounty(
+                            test.game.getRound(),
+                            PromisedVotes.agendaKey(test.game),
+                            sol.getFaction(),
+                            DiscardBounties.VETO_CAP,
+                            0,
+                            0,
+                            "",
+                            -1,
+                            DiscardBounties.Status.OPEN));
+
+            assertThat(AgendaCardRules.worthVetoing(test.game, nekro)).isTrue();
         }
     }
 

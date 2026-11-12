@@ -89,6 +89,24 @@ class PromisedVotesTest extends BaseTi4Test {
                 .contains(kept);
     }
 
+    // A deal struck at the seller's turn can come after it planned a smaller ballot for the same outcome: the ballot is
+    // rebuilt so it casts the votes it promised, not the fewer it planned.
+    @Test
+    void aBallotSmallerThanThePromiseIsRebuilt() {
+        AiTurnContext context = test.contextFor(sol, Set.of(), AiTestGame.NOW);
+        String key = "agendaBallot|test";
+        int castable = AgendaVoting.castableVotes(test.game, sol);
+        assertThat(castable).isGreaterThan(1);
+        AgendaVoting.Ballot planned = new AgendaVoting.Ballot("nekro", "", 1, false);
+        context.memory().put(key, planned.encode());
+
+        PromiseBook.save(test.game, votesFor(sol, test.nekro, "nekro").accepted(test.game));
+
+        AgendaVoting.Ballot kept = AgendaVoting.keepingPromise(context, key, planned);
+        assertThat(kept.outcome()).isEqualTo("nekro");
+        assertThat(kept.votes()).isEqualTo(Math.min(4, castable));
+    }
+
     // A seat that sold its votes, or offered them for sale, plays no rider on this agenda, since a rider would stop it
     // voting; a seat that was only asked to sell is free.
     @Test
@@ -165,14 +183,17 @@ class PromisedVotesTest extends BaseTi4Test {
         assertThat(terms.sellerCost()).isPositive();
     }
 
-    // The deal names the fewest votes that still win the buyer the outcome: any one of Xxcha's planets already puts Sol
-    // ahead once Xxcha no longer votes for itself. A viewer (here Nekro) without the expert value table sizes every
-    // deal at the whole stack: the seat that decides uses its own flags, not those of the buyer or seller.
+    // On a first agenda the deal names the fewest votes that still win the buyer the outcome: votes not cast stay for
+    // the second agenda. A viewer (here Nekro) without the expert value table sizes every deal at the whole stack: the
+    // seat that decides uses its own flags, not those of the buyer or seller.
     @Test
-    void aVoteDealBuysOnlyTheVotesItNeeds() {
+    void aFirstAgendaVoteDealBuysOnlyTheVotesItNeeds() {
         test.place("14", "101");
+        test.place("20", "102");
         xxcha.addPlanet("archonren");
         xxcha.addPlanet("archontau");
+        xxcha.addPlanet("vefutii");
+        test.game.setStoredValue("agendaCount", "1");
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
         int castable = AgendaVoting.castableVotes(test.game, xxcha);
         assertThat(castable).isGreaterThan(1);
@@ -187,6 +208,24 @@ class PromisedVotesTest extends BaseTi4Test {
                         .orElseThrow()
                         .votes())
                 .isEqualTo(castable);
+    }
+
+    // Politics notes, "vote prices by agenda": on the last agenda of the phase unspent votes vanish, so the buyer buys
+    // the seller's whole stack for the same price as any part of it.
+    @Test
+    void aLastAgendaVoteDealBuysTheWholeStack() {
+        test.place("14", "101");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+        assertThat(AgendaRound.isFinalAgenda(test.game)).isTrue();
+
+        VoteDeals.Terms terms =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+
+        assertThat(terms.votes()).isEqualTo(castable);
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, castable)).isZero();
     }
 
     // A seller that would feed Nekro a technology by voting for its prediction counts that in its cost of the deal.

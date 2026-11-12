@@ -112,12 +112,18 @@ public class AgendaVoting {
     static Ballot keepingPromise(AiTurnContext context, String key, Ballot planned) {
         Game game = context.game();
         boolean breaksPromise = PromisedVotes.binding(game, context.seat())
-                .filter(promise -> !promise.target().equalsIgnoreCase(planned.outcome()))
+                .filter(promise -> !promise.target().equalsIgnoreCase(planned.outcome())
+                        || castsTooFew(game, context.seat(), promise, planned))
                 .isPresent();
         if (!breaksPromise) return planned;
         Ballot kept = plan(game, context.seat()).orElse(planned);
         context.memory().put(key, kept.encode());
         return kept;
+    }
+
+    private static boolean castsTooFew(Game game, Player seat, Promise promise, Ballot planned) {
+        int promised = promisedVotes(promise, readiedPlanetVotes(game, seat), game);
+        return planned.votes() < promised && planned.votes() < castableVotes(game, seat);
     }
 
     private static boolean confirmsVotes(String handlerId) {

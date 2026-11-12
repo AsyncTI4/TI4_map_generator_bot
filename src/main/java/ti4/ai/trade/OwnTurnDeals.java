@@ -102,6 +102,8 @@ class OwnTurnDeals {
     }
 
     private static Optional<AiDecision> agenda(AiTurnContext context) {
+        Optional<AiDecision> bounty = timed("trade.discardBounty", () -> DiscardBountyDeals.offer(context));
+        if (bounty.isPresent()) return bounty;
         List<Player> partners = timed("trade.partners", () -> partners(context));
         if (partners.isEmpty()) return Optional.empty();
         String ours = context.faction();

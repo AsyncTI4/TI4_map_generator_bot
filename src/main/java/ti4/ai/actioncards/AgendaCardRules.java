@@ -12,6 +12,7 @@ import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.RiderPayoff;
 import ti4.ai.brain.AiDecision;
@@ -131,9 +132,25 @@ public class AgendaCardRules {
                 .sorted()
                 .filter(alias -> AgendaCards.VETO_TITLE.equals(SabotageWindow.title(alias)))
                 .findFirst();
-        if (veto.isEmpty() || !AgendaPolicy.veryBadFor(game, seat)) return Optional.empty();
+        if (veto.isEmpty() || !worthVetoing(game, seat)) return Optional.empty();
         return pressHidden(context, QUEUE_WHEN_PREFIX + veto.get(), "queue Veto")
                 .or(() -> pressHidden(context, OPEN_WHENS, "look at its when options to play Veto"));
+    }
+
+    public static boolean worthVetoing(Game game, Player seat) {
+        return AgendaPolicy.veryBadFor(game, seat)
+                || AgendaPolicy.worthDiscardingFor(game, seat, DiscardBounties.vetoBounty(game, seat));
+    }
+
+    public static boolean holdsVeto(Player seat) {
+        return seat.getActionCards().keySet().stream()
+                .anyMatch(alias -> AgendaCards.VETO_TITLE.equals(SabotageWindow.title(alias)));
+    }
+
+    public static Optional<AiDecision> awaitVetoBounty(AiTurnContext context) {
+        Player seat = context.seat();
+        if (!holdsVeto(seat) || !ActionCardRules.mayPlayNow(context.game(), seat)) return Optional.empty();
+        return DiscardBounties.awaitOffers(context);
     }
 
     public static Optional<AiDecision> queueRider(AiTurnContext context) {

@@ -428,6 +428,12 @@ Table talk and Support for the Throne swaps come in milestone 12.
 - **Open: selling against your own preference.** Add a floor when the seller's utility for the target is far below its best outcome (for example over 2 TG): require a price of the stake times a decisiveness margin, or refuse. The forecast can call 5 votes non-decisive and be wrong. Hacan sold its votes for '8' on Galactic Crisis Pact at 3 TG while valuing it 9 TG below its favourite. Predictive Intelligence then added 3 more, which the PI fix above now stops.
 - **Open: blocs and counter-bids.** `sellingVotes` locks out a rival buyer once another buyer has an open offer on a seller, and offers are valued one at a time, so seats never build a bloc. Allow counter-bids on open (not accepted) offers. Value a bundle together: rank sellers by votes per TG and add them until the outcome flips, then take it if the total gain beats the total price. Seen on Public Execution (Sol declined 8+9+7 votes, which together with its own 6 beat Xxcha's 18) and Colonial Redistribution (Sol stood to lose 21.8 TG and never bought).
 - **Open: declined decisive blocs (Minister of Antiquities).** Hacan declined 14-vote blocs at 3-4 TG that would have won it the relic. The likeliest cause was re-sizing the promise below 14 votes in `protection`, which `valuedAt` now fixes. If it recurs, log `buyerGain`, trust and margin for each declined `VOTE_FOR` offer, and check `ScoringStakes.contender`.
+- **Done (2026-11-12, user's notes after the traced self-play):**
+  - **Vote prices by agenda** (behind `AGENDA_VALUE_TABLE`): on the last agenda a deal names the seller's whole castable stack (unspent votes vanish, and the spent-vote price is 0 there); only first-agenda deals are sized to the fewest votes near the best surplus.
+  - **Deals at the seller's turn** (behind the new `CONDITIONAL_VOTE_DEALS`, default on): a buyer offers only to a seat about to vote (`VoteDeals.aboutToVote`: the active voter or the next one in `agendaVoting`, the first voter in `agendawaiting`), and a seller offers its own votes only at its turn. Price is set then. A ballot planned smaller than an accepted promise for the same outcome is rebuilt (`AgendaVoting.keepingPromise`).
+  - **Pay on resolution** (same flag, decided by the AI proposer): accepting a vote deal moves nothing. Once the promiser voted the target (`KEPT`) and `resolvedAgendaOutcome` for that agenda is the target, the promise becomes `OWED`; the AI payer posts a bill with a pay button it owns (or the AI payee does, for a human payer) and presses it (`aiPromisePay_`), which pays and marks it `PAID`. A lost outcome owes nothing. It is the leg of the transaction struck on accepting, so it uses no new window (LRR 94.6). Prices and accept/decline value the deal as conditional: the seller expects `chance × price` (times its trust in a human buyer), the buyer pays `chance × price`, where chance is the outcome's chance with the votes; no conditional deal below a 20% chance.
+  - **Simplest bloc** (same flag): when no single seller is decisive, the buyer values the seat about to vote together with up to three later sellers (cheapest per vote first, whole stacks) and offers the first its share if the joint gain beats the summed floor prices weighted by the joint chance. Later members are approached at their own turns; since payment is conditional, a bloc that falls apart costs the buyer nothing. Up to 4 vote offers per agenda under the flag (2 without).
+- **Open:** a human payer who never presses the bill is not yet recorded as a broken promise; a bill not settled before the agenda phase ends is dropped (no action-phase settlement). Counter-bids on open offers, and the open pricing items above, are unchanged.
 
 ---
 
@@ -441,6 +447,8 @@ Table talk and Support for the Throne swaps come in milestone 12.
 - **Tests:**
   - The holder announces and waits, the payer pays, the holder plays.
   - On timeout, the agenda ends in a normal pass.
+- **Done (2026-11-12, behind the new `DISCARD_BOUNTIES`, default on): pay to kill a doomed loss.** In the when window, an AI seat whose expected loss with its own best ballot is 2 TG or more posts once per agenda: up to `floor(loss - 0.5)` TG to whoever plays Veto (none if it holds Veto itself), and to Xxcha for a Quash when Xxcha can Quash. Offers pool across payers within the caps (Veto 3, Quash 5); a later payer offers only what the cap leaves (`DiscardBounties`, stored value `aiDiscardBounties`). The holder adds the pooled bounty (from others) to its signed loss: Veto when `bounty - EU >= very-bad threshold` (`AgendaPolicy.worthDiscardingFor`), Quash when `loss + bounty > strategy token + margin`. A Veto holder or Xxcha waits up to 90 s in the when window while an AI seat in pain has TG and has not posted yet. After the agenda is replaced, the payer finds a non-canceled Veto play since its offer (or Xxcha's strategy tokens below what they were) and records an `OWED` `DISCARD_AGENDA` promise to that holder, paid through the same bill and pay button (it uses that pair's window). If voting starts on the same agenda, the bounty lapses.
+- **Open:** Deadly Plot bounties; holders announcing "I hold Veto, n TG and I play it"; a holder that takes a bounty is not tracked (it is paid only after playing, so there is nothing to break).
 
 ---
 
@@ -456,6 +464,7 @@ Start only after milestones 10-11 show gains in A/B. Each item is built on the `
 - **Keleres rider split:** a note for TG after the payout, or splitting the 2 TG.
 - **Mutiny announcements:** not for now (no bluffing on Mutiny).
 - **Tests:** end-to-end TG nets for the boat float on a 6-seat fixture, a single defector, and the speaker honouring the plan.
+- **Started (2026-11-12):** the simplest AI-to-AI vote bloc is in milestone 10 (joint valuation, one offer at a time at each seller's turn, conditional payment). The boat float, Support swaps and Keleres split are still open.
 
 ---
 

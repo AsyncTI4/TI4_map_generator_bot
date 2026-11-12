@@ -143,6 +143,19 @@ public class AgendaPolicy {
         return loss.getAsDouble() >= veryBadLoss(seat);
     }
 
+    public static boolean worthDiscardingFor(Game game, Player seat, int bounty) {
+        if (bounty <= 0) return false;
+        AgendaForecast forecast = AgendaVoting.forecastWithItsBallot(game, seat);
+        if (forecast.isEmpty()) return false;
+        return bounty - forecast.expectedUtility(seat) >= veryBadLoss(seat);
+    }
+
+    public static OptionalDouble signedLoss(Game game, Player seat) {
+        AgendaForecast forecast = AgendaVoting.forecastWithItsBallot(game, seat);
+        if (forecast.isEmpty()) return OptionalDouble.empty();
+        return OptionalDouble.of(-forecast.expectedUtility(seat));
+    }
+
     private static double veryBadLoss(Player seat) {
         return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE) ? EXPERT_VERY_BAD_LOSS : VERY_BAD_LOSS;
     }

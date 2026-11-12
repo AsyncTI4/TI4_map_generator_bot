@@ -16,11 +16,27 @@ import ti4.game.Player;
 public class VoteDeals {
 
     private static final double ENOUGH = 0.1;
+    private static final int MAX_BLOC_PARTNERS = 3;
+    private static final String VOTING_PHASE = "agendaVoting";
+    private static final String WAITING_PHASE = "agendawaiting";
 
-    public record Terms(String outcome, int votes, double buyerGain, double sellerCost) {
+    public record Terms(String outcome, int votes, double buyerGain, double sellerCost, double chance) {
 
         public double surplus() {
             return buyerGain - sellerCost;
+        }
+    }
+
+    public record Member(Player seller, Terms terms) {}
+
+    public record Bloc(String outcome, List<Member> members, double buyerGain, double chance) {
+
+        public Bloc {
+            members = List.copyOf(members);
+        }
+
+        public Member first() {
+            return members.getFirst();
         }
     }
 
@@ -57,6 +73,59 @@ public class VoteDeals {
         return best(outlook, seller, buyer, allowed, Comparator.comparingDouble(Terms::buyerGain));
     }
 
+    public static List<Bloc> blocs(
+            Outlook outlook, Player buyer, Player seller, List<Player> later, Predicate<String> allowed) {
+        AgendaForecast base = outlook.forecast;
+        if (!votesForSale(outlook.game, base, seller)) return List.of();
+        List<Player> partners = later.stream()
+                .filter(partner -> partner != seller && partner != buyer)
+                .filter(partner -> votesForSale(outlook.game, base, partner))
+                .toList();
+        if (partners.isEmpty()) return List.of();
+        List<Bloc> blocs = new ArrayList<>();
+        for (String outcome : base.outcomes()) {
+            if (allowed.test(outcome))
+                bloc(outlook, buyer, seller, partners, outcome).ifPresent(blocs::add);
+        }
+        return blocs;
+    }
+
+    private static Optional<Bloc> bloc(
+            Outlook outlook, Player buyer, Player seller, List<Player> partners, String outcome) {
+        AgendaForecast base = outlook.forecast;
+        Member first = wholeStack(outlook, seller, buyer, outcome);
+        List<Member> candidates = partners.stream()
+                .map(partner -> wholeStack(outlook, partner, buyer, outcome))
+                .filter(member -> member.terms().sellerCost() < Double.POSITIVE_INFINITY)
+                .sorted(Comparator.comparingDouble(member ->
+                        member.terms().sellerCost() / Math.max(1, member.terms().votes())))
+                .limit(MAX_BLOC_PARTNERS)
+                .toList();
+        AgendaForecast joint = base.withVotes(seller, outcome, first.terms().votes());
+        double before = base.expectedUtility(buyer);
+        List<Member> members = new ArrayList<>(List.of(first));
+        Optional<Bloc> best = Optional.empty();
+        for (Member member : candidates) {
+            joint = joint.withVotes(member.seller(), outcome, member.terms().votes());
+            members.add(member);
+            Bloc bloc = new Bloc(outcome, members, joint.expectedUtility(buyer) - before, joint.chance(outcome));
+            if (best.isEmpty() || surplus(bloc) > surplus(best.get())) best = Optional.of(bloc);
+        }
+        return best;
+    }
+
+    private static double surplus(Bloc bloc) {
+        return bloc.buyerGain()
+                - bloc.members().stream()
+                        .mapToDouble(member -> member.terms().sellerCost())
+                        .sum();
+    }
+
+    private static Member wholeStack(Outlook outlook, Player seller, Player buyer, String outcome) {
+        int votes = AgendaVoting.castableVotes(outlook.game, seller);
+        return new Member(seller, terms(outlook, outlook.withoutDeal(seller), seller, buyer, outcome, votes));
+    }
+
     public static Optional<Terms> valued(Game game, Player viewer, Player seller, Player buyer, String outcome) {
         Outlook outlook = outlook(game, viewer);
         if (!sellable(outlook, seller, outcome)) return Optional.empty();
@@ -70,6 +139,40 @@ public class VoteDeals {
         int castable = AgendaVoting.castableVotes(game, seller);
         int votes = promisedVotes > 0 ? Math.min(promisedVotes, castable) : castable;
         return Optional.of(terms(outlook, outlook.withoutDeal(seller), seller, buyer, outcome, votes));
+    }
+
+    public static boolean aboutToVote(Game game, Player seat) {
+        if (PromisedVotes.hasVoted(game, seat)) return false;
+        List<Player> order = AgendaForecast.votingOrder(game);
+        int position = order.indexOf(seat);
+        if (position < 0) return false;
+        if (WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return position == nextVoter(game, order, -1);
+        if (!VOTING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return false;
+        int active = activeVoter(game, order);
+        return active >= 0 && (position == active || position == nextVoter(game, order, active));
+    }
+
+    public static List<Player> votingAfter(Game game, Player seat) {
+        List<Player> order = AgendaForecast.votingOrder(game);
+        int position = order.indexOf(seat);
+        if (position < 0) return List.of();
+        return order.subList(position + 1, order.size()).stream()
+                .filter(player -> !PromisedVotes.hasVoted(game, player))
+                .toList();
+    }
+
+    private static int activeVoter(Game game, List<Player> order) {
+        for (int voter = 0; voter < order.size(); voter++) {
+            if (order.get(voter).getUserID().equals(game.getActivePlayerID())) return voter;
+        }
+        return -1;
+    }
+
+    private static int nextVoter(Game game, List<Player> order, int after) {
+        for (int voter = after + 1; voter < order.size(); voter++) {
+            if (!PromisedVotes.hasVoted(game, order.get(voter))) return voter;
+        }
+        return -1;
     }
 
     private static boolean sellable(Outlook outlook, Player seller, String outcome) {
@@ -100,6 +203,7 @@ public class VoteDeals {
         int most = AgendaVoting.castableVotes(game, seller);
         Terms all = terms(outlook, withoutDeal, seller, buyer, outcome, most);
         if (!AiExperiments.enabled(outlook.viewer, Experiment.AGENDA_VALUE_TABLE)) return all;
+        if (AgendaRound.isFinalAgenda(game)) return all;
         List<Terms> sizes = new ArrayList<>();
         for (int votes : saleSizes(game, seller, most)) {
             sizes.add(votes == most ? all : terms(outlook, withoutDeal, seller, buyer, outcome, votes));
@@ -137,6 +241,6 @@ public class VoteDeals {
                 - withDeal.expectedUtilityWithoutThreatDislike(seller)
                 + GalacticThreatCost.ofBallot(game, seller, outcome, votes)
                 + spentVotes(game, outlook.viewer, votes);
-        return new Terms(outcome, votes, buyerGain, sellerCost);
+        return new Terms(outcome, votes, buyerGain, sellerCost, withDeal.chance(outcome));
     }
 }

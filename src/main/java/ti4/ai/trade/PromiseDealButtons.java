@@ -42,6 +42,17 @@ class PromiseDealButtons {
             return;
         }
         ButtonHelper.deleteAllButtons(event);
+        if (PromiseDeals.paysOnResolution(game, promise.get())) {
+            PromiseBook.save(game, promise.get().accepted(game));
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    promiser.getFactionEmojiOrColor() + " promises to "
+                            + PromiseDeals.describe(game, promise.get(), true) + ". "
+                            + promisee.getFactionEmojiOrColor() + " pays it "
+                            + promise.get().price()
+                            + " trade goods after the agenda if it resolves that way.");
+            return;
+        }
         HumanAiDealRunner.run(event, game, payment(promise.get()));
         PromiseBook.save(game, promise.get().accepted(game));
         MessageHelper.sendMessageToChannel(
@@ -49,6 +60,32 @@ class PromiseDealButtons {
                 promisee.getFactionEmojiOrColor() + " paid " + promiser.getFactionEmojiOrColor() + " "
                         + promise.get().price() + " trade goods. " + promiser.getFactionEmojiOrColor()
                         + " promises to " + PromiseDeals.describe(game, promise.get(), true) + ".");
+    }
+
+    @ButtonHandler(PromiseDeals.PAY_PREFIX)
+    public static void pay(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (player == null || !buttonID.startsWith(PromiseDeals.PAY_PREFIX)) return;
+        Optional<Promise> owed =
+                PromiseDeals.owedBy(game, player, StringUtils.removeStart(buttonID, PromiseDeals.PAY_PREFIX));
+        if (owed.isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "Nothing is owed on this deal any more.");
+            return;
+        }
+        Player payee = owed.get().promiserIn(game).orElseThrow();
+        if (player.getTg() < owed.get().price() || !TradeLegality.canTransact(game, player, payee)) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event,
+                    "You cannot pay " + owed.get().price() + " trade goods to " + payee.getFactionEmojiOrColor()
+                            + " right now.");
+            return;
+        }
+        ButtonHelper.deleteAllButtons(event);
+        HumanAiDealRunner.run(event, game, payment(owed.get()));
+        PromiseBook.save(game, owed.get().with(Promise.Status.PAID));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                player.getFactionEmojiOrColor() + " paid " + payee.getFactionEmojiOrColor() + " "
+                        + owed.get().price() + " trade goods as agreed.");
     }
 
     @ButtonHandler(PromiseDeals.DECLINE_PREFIX)

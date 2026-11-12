@@ -28,7 +28,9 @@ public class AiExperiments {
         PROMISE_DEALS,
         AGENDA_VALUE_TABLE,
         GALACTIC_THREAT_COST,
-        AGENDA_HELD_BALLOTS
+        AGENDA_HELD_BALLOTS,
+        CONDITIONAL_VOTE_DEALS,
+        DISCARD_BOUNTIES
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

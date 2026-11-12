@@ -22,6 +22,7 @@ public class TradeRules {
             TradeCardRules.observe(context);
             HumanDealWatch.observe(context);
             PromiseDeals.observe(context);
+            DiscardBountyDeals.observe(context);
             return Optional.empty();
         }
     }

@@ -7,6 +7,7 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
+import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -42,7 +43,19 @@ public class QuashRules {
     public static boolean worthQuashing(Game game, Player seat) {
         OptionalDouble loss = AgendaPolicy.expectedLoss(game, seat);
         if (loss.isEmpty()) return AgendaPolicy.worthDiscarding(game, seat);
-        return loss.getAsDouble() > CardFacade.strategyToken() + quashMargin(seat);
+        return loss.getAsDouble() > CardFacade.strategyToken() + quashMargin(seat) || paidEnough(game, seat);
+    }
+
+    private static boolean paidEnough(Game game, Player seat) {
+        int bounty = DiscardBounties.quashBounty(game, seat);
+        if (bounty <= 0) return false;
+        OptionalDouble loss = AgendaPolicy.signedLoss(game, seat);
+        return loss.isPresent() && loss.getAsDouble() + bounty > CardFacade.strategyToken() + quashMargin(seat);
+    }
+
+    public static Optional<AiDecision> awaitBounty(AiTurnContext context) {
+        if (!canQuash(context.seat())) return Optional.empty();
+        return DiscardBounties.awaitOffers(context);
     }
 
     private static double quashMargin(Player seat) {

@@ -10,6 +10,9 @@ import ti4.game.Player;
 @UtilityClass
 public class PromisedVotes {
 
+    private static final String RESOLVED_AGENDA = "resolvedAgendaId";
+    private static final String RESOLVED_OUTCOME = "resolvedAgendaOutcome";
+
     public static String agendaKey(Game game) {
         return AgendaPolicy.currentAgenda(game);
     }
@@ -53,6 +56,21 @@ public class PromisedVotes {
         return AgendaSwing.votedFor(game, promiser)
                 .filter(promise.target()::equalsIgnoreCase)
                 .map(ignored -> Promise.Status.KEPT);
+    }
+
+    public static Optional<String> resolvedOutcome(Game game, Promise promise) {
+        String outcome = game.getStoredValue(RESOLVED_OUTCOME);
+        if (!promise.thisRound(game) || outcome.isBlank() || promise.agenda().isBlank()) return Optional.empty();
+        return promise.agenda().equals(game.getStoredValue(RESOLVED_AGENDA)) ? Optional.of(outcome) : Optional.empty();
+    }
+
+    public static Optional<Promise.Status> settlement(Game game, Promise promise) {
+        if (promise.term() != Promise.Term.VOTE_FOR || promise.status() != Promise.Status.KEPT) {
+            return Optional.empty();
+        }
+        return resolvedOutcome(game, promise)
+                .filter(promise.target()::equalsIgnoreCase)
+                .map(ignored -> Promise.Status.OWED);
     }
 
     static int promisedVotes(Promise promise, int castable) {

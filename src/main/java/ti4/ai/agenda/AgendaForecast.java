@@ -263,7 +263,7 @@ public final class AgendaForecast {
                 && game.getPhaseOfGame().toLowerCase().startsWith(AGENDA_PHASE);
     }
 
-    private static List<Player> votingOrder(Game game) {
+    static List<Player> votingOrder(Game game) {
         List<Player> order = new ArrayList<>(Helper.getSpeakerOrFullPriorityOrder(game));
         if (order.isEmpty()) order.addAll(game.getRealPlayers());
         order.removeIf(player -> !game.getRealPlayers().contains(player));
