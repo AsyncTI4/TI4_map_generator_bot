@@ -30,7 +30,8 @@ public final class AgendaForecast {
     private static final String AGENDA_PHASE = "agenda";
     private static final String VOTING_PHASE = "agendavoting";
     private static final String END_PHASE = "agendaend";
-    private static final AgendaForecast NONE = new AgendaForecast(null, new int[0], new int[0], List.of());
+    private static final AgendaForecast NONE =
+            new AgendaForecast(null, new int[0], new int[0], new int[0][0], List.of());
 
     private record Rider(int owner, String title, int outcome, double payoff, double rivalStake) {}
 
@@ -44,20 +45,22 @@ public final class AgendaForecast {
             int speaker,
             boolean[] keepsVotesWithRider) {}
 
-    private record Placed(int[] castByOutcome, int[] castByVoter, List<Rider> riders) {}
+    private record Placed(int[] castByOutcome, int[] castByVoter, int[][] castBy, List<Rider> riders) {}
 
     private final Frame frame;
     private final int[] votes;
     private final int[] cast;
+    private final int[][] castBy;
     private final List<Rider> riders;
     private double[][] utilities;
     private Map<String, Double> chances;
     private Map<String, Double> votedChances;
 
-    private AgendaForecast(Frame frame, int[] votes, int[] cast, List<Rider> riders) {
+    private AgendaForecast(Frame frame, int[] votes, int[] cast, int[][] castBy, List<Rider> riders) {
         this.frame = frame;
         this.votes = votes;
         this.cast = cast;
+        this.castBy = castBy;
         this.riders = riders;
     }
 
@@ -82,7 +85,11 @@ public final class AgendaForecast {
                     game,
                     viewer,
                     new AgendaForecast(
-                            frame, remainingVotes(game, frame, placed), placed.castByOutcome(), placed.riders()));
+                            frame,
+                            remainingVotes(game, frame, placed),
+                            placed.castByOutcome(),
+                            placed.castBy(),
+                            placed.riders()));
         }
     }
 
@@ -152,7 +159,7 @@ public final class AgendaForecast {
         return expected(outcome -> utility(player, outcome)) - unvotedThreatPayoff(player);
     }
 
-    private double unvotedThreatPayoff(Player player) {
+    double unvotedThreatPayoff(Player player) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
         if (voter < 0 || !AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST)) return 0;
         return riders.stream()
@@ -172,7 +179,7 @@ public final class AgendaForecast {
         more.add(rider(frame, voter, title, frame.outcomes().indexOf(outcome)));
         int[] remaining = votes.clone();
         if (!frame.keepsVotesWithRider()[voter]) remaining[voter] = 0;
-        return new AgendaForecast(frame, remaining, cast, more);
+        return new AgendaForecast(frame, remaining, cast, castBy, more);
     }
 
     public AgendaForecast withVotes(Player seat, String outcome, int count) {
@@ -182,8 +189,13 @@ public final class AgendaForecast {
         remaining[voter] = 0;
         int[] placed = cast.clone();
         int index = frame.outcomes().indexOf(outcome);
-        if (index >= 0) placed[index] += count;
-        return new AgendaForecast(frame, remaining, placed, riders);
+        int[][] by = new int[castBy.length][];
+        for (int other = 0; other < by.length; other++) by[other] = castBy[other].clone();
+        if (index >= 0) {
+            placed[index] += count;
+            by[voter][index] += count;
+        }
+        return new AgendaForecast(frame, remaining, placed, by, riders);
     }
 
     public AgendaForecast without(Player silenced) {
@@ -191,7 +203,7 @@ public final class AgendaForecast {
         if (voter < 0) return this;
         int[] remaining = votes.clone();
         remaining[voter] = 0;
-        return new AgendaForecast(frame, remaining, cast, riders);
+        return new AgendaForecast(frame, remaining, cast, castBy, riders);
     }
 
     private static boolean applies(Game game) {
@@ -249,6 +261,7 @@ public final class AgendaForecast {
     private static Placed readPlaced(Game game, Player viewer, List<Player> voters, List<String> outcomes) {
         int[] byOutcome = new int[outcomes.size()];
         int[] byVoter = new int[voters.size()];
+        int[][] by = new int[voters.size()][outcomes.size()];
         List<Rider> riders = new ArrayList<>();
         for (Map.Entry<String, String> entry : game.getCurrentAgendaVotes().entrySet()) {
             int outcome = outcomes.indexOf(entry.getKey());
@@ -261,13 +274,16 @@ public final class AgendaForecast {
                 if (voter < 0) continue;
                 if (NumberUtils.isDigits(what)) {
                     byVoter[voter] += Integer.parseInt(what);
-                    if (outcome >= 0) byOutcome[outcome] += Integer.parseInt(what);
+                    if (outcome >= 0) {
+                        byOutcome[outcome] += Integer.parseInt(what);
+                        by[voter][outcome] += Integer.parseInt(what);
+                    }
                 } else if (what.contains("Rider") || what.contains("Sanction")) {
                     riders.add(riderOf(game, viewer, voters, voter, what, outcome));
                 }
             }
         }
-        return new Placed(byOutcome, byVoter, riders);
+        return new Placed(byOutcome, byVoter, by, riders);
     }
 
     private static Rider riderOf(Game game, Player viewer, List<Player> voters, int voter, String title, int outcome) {
@@ -369,18 +385,22 @@ public final class AgendaForecast {
         boolean abstainsWhenIndifferent = AiExperiments.enabled(frame.viewer(), Experiment.AGENDA_VALUE_TABLE);
         int[] wins = new int[outcomes];
         int[] votedWins = new int[outcomes];
+        boolean[] predictor = predictors(voters);
         for (double[] draw : frame.draws()) {
             int[] tally = cast.clone();
+            int[] predictorTally = predictorCast(predictor, outcomes);
             for (int voter = 0; voter < voters; voter++) {
                 if (votes[voter] == 0) continue;
                 int pick = indifferent[voter]
                         ? (abstainsWhenIndifferent ? -1 : indifferentPick(draw[voter], outcomes))
                         : softmaxPick(cumulative[voter], draw[voter]);
-                if (pick >= 0) tally[pick] += votes[voter];
+                if (pick < 0) continue;
+                tally[pick] += votes[voter];
+                if (predictor[voter]) predictorTally[pick] += votes[voter];
             }
             int winner = winner(tally, utility[frame.speaker()]);
             wins[winner]++;
-            if (tally[winner] > 0) votedWins[winner]++;
+            if (tally[winner] > predictorTally[winner]) votedWins[winner]++;
         }
         Map<String, Double> result = new LinkedHashMap<>();
         Map<String, Double> voted = new LinkedHashMap<>();
@@ -390,6 +410,23 @@ public final class AgendaForecast {
         }
         chances = Collections.unmodifiableMap(result);
         votedChances = Collections.unmodifiableMap(voted);
+    }
+
+    private boolean[] predictors(int voters) {
+        boolean[] predictor = new boolean[voters];
+        for (Rider rider : riders) {
+            if (GalacticThreatCost.RIDER.equals(rider.title())) predictor[rider.owner()] = true;
+        }
+        return predictor;
+    }
+
+    private int[] predictorCast(boolean[] predictor, int outcomes) {
+        int[] placed = new int[outcomes];
+        for (int voter = 0; voter < predictor.length; voter++) {
+            if (!predictor[voter]) continue;
+            for (int outcome = 0; outcome < outcomes; outcome++) placed[outcome] += castBy[voter][outcome];
+        }
+        return placed;
     }
 
     private static double spread(double[] utility) {

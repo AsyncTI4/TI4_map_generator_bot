@@ -108,7 +108,8 @@ class BallotPlanner {
                 ? forecast.without(seat)
                 : forecast.withVotes(seat, option.outcome(), option.votes());
         return cast.expected(winner -> forecast.utility(seat, winner)
-                + AgendaValues.ownVoteAdjustment(game, seat, agenda, winner, option.outcome()));
+                        + AgendaValues.ownVoteAdjustment(game, seat, agenda, winner, option.outcome()))
+                - cast.unvotedThreatPayoff(seat);
     }
 
     private static List<Option> options(List<String> outcomes, List<Integer> totals) {

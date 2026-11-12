@@ -233,6 +233,21 @@ class AgendaForecastTest extends BaseTi4Test {
                 .isCloseTo(predicted.expected(outcome -> forecast.utility(test.nekro, outcome)), within(1e-9));
     }
 
+    // Nekro's own votes (with the Xxcha commander's alliance) give it no technology: an outcome only Nekro voted for
+    // pays its prediction nothing.
+    @Test
+    void nekrosOwnVotesDoNotPayItsGalacticThreat() {
+        test.game.setCurrentAgendaInfo(ARMS_REDUCTION);
+        votes(0, 0, 0);
+        AgendaForecast predicted = forecast()
+                .withRider(test.nekro, GalacticThreatCost.RIDER, "for")
+                .withVotes(test.nekro, "for", 5);
+
+        assertThat(predicted.chance("for")).isEqualTo(1.0);
+        assertThat(predicted.votedChance("for")).isZero();
+        assertThat(predicted.withVotes(test.sol, "for", 1).votedChance("for")).isEqualTo(1.0);
+    }
+
     // With voters on the predicted outcome the prediction pays, and Nekro's expected utility counts it.
     @Test
     void aGalacticThreatOnAnOutcomeWithVotersCountsItsPayoff() {

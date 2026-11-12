@@ -192,7 +192,8 @@ public final class BallotProbe {
     private static double value(
             Game game, Player seat, String agenda, AgendaForecast forecast, String outcome, int votes) {
         AgendaForecast cast = outcome.isEmpty() ? forecast.without(seat) : forecast.withVotes(seat, outcome, votes);
-        return cast.expected(winner ->
-                forecast.utility(seat, winner) + AgendaValues.ownVoteAdjustment(game, seat, agenda, winner, outcome));
+        return cast.expected(winner -> forecast.utility(seat, winner)
+                        + AgendaValues.ownVoteAdjustment(game, seat, agenda, winner, outcome))
+                - cast.unvotedThreatPayoff(seat);
     }
 }
