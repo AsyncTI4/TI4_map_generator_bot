@@ -312,17 +312,19 @@ public class FrankenButtonHandler {
     private static void refreshContainers(ButtonInteractionEvent event, Player player) {
         MessageV2Editor editor = new MessageV2Editor();
         List<Color> accents = FrankenDraftBagService.getAccents();
+        int limit = 4;
         for (DraftCategory cat : FrankenDraftBagService.componentCategories) {
-            Container c2 = FrankenDraftBagService.postDraftCategoryContainer(player, cat);
-            if (c2 == null) continue;
-            c2 = c2.withAccentColor(accents.getFirst());
-            editor.replace(replaceContainer(c2), c2);
+            List<Container> containers = FrankenDraftBagService.postDraftCategoryContainers(player, cat);
+            limit += containers.size() * 2;
+            for (Container container : containers) {
+                Container updatedContainer = container.withAccentColor(accents.getFirst());
+                editor.replace(replaceContainer(updatedContainer), updatedContainer);
+            }
         }
 
         Container summary = FrankenDraftBagService.getFrankenPlayerSummaryContainer(player);
         editor.replace(replaceContainer(summary), summary);
 
-        int limit = FrankenDraftBagService.componentCategories.size() * 2 + 4;
         editor.applyAroundMessage(event.getMessage(), limit, null);
     }
 
