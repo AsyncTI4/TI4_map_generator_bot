@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
@@ -67,6 +68,7 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
@@ -83,6 +85,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
+import ti4.service.map.RefractureRulesService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -97,6 +100,7 @@ public class CardsInfoService {
     public static void sendCardsInfo(Game game, Player player) {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
+        XyrixTomeHandler.sendTomeInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, """
@@ -118,6 +122,16 @@ public class CardsInfoService {
         Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptCardsInfoButton(player);
         if (lyraOfTheCryptButton != null) {
             buttons.add(lyraOfTheCryptButton);
+        }
+        if (RefractureRulesService.canUseExperiment(game, player)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "refractureExperimentStart",
+                    "Use Experiment",
+                    MiscEmojis.LegendaryPlanet));
+        }
+        Button tomeCardsButton = XyrixTomeHandler.getTomeCardsInfoButton(game, player);
+        if (tomeCardsButton != null) {
+            buttons.add(tomeCardsButton);
         }
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
@@ -173,6 +187,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("atokeraagent")) {
             buttons.add(AtokeraAgent.button(player));
+        }
+        if (player.hasUnexhaustedLeader(XyrixAgent.ID)) {
+            buttons.add(XyrixAgent.cardsInfoButton(player));
         }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnAgent.cardsInfoButton(player));

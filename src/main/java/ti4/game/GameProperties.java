@@ -179,6 +179,7 @@ public class GameProperties {
     private @ExportableField boolean blueReverieMode;
     private @ExportableField boolean unchartedSpaceStuff;
     private @ExportableField boolean lostLegaciesTiles;
+    private @ExportableField boolean refractureMode;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;
     private @ExportableField boolean flagshippingMode;

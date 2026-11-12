@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -880,6 +881,12 @@ public class MessageHelper {
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
                                         "Discord server error while sending message in channel " + channel.getId());
+                            }
+                            if (channel.getType() == ChannelType.PRIVATE
+                                    && isUserUnreachableByDirectMessageError(error)) {
+                                BotLogger.warning("Could not DM user in private channel " + channel.getId() + ": "
+                                        + error.getMessage());
+                                return;
                             }
                             if (isInvalidComponentEmojiError(error) && hasButtonEmoji(messageCreateData)) {
                                 BotLogger.warning(

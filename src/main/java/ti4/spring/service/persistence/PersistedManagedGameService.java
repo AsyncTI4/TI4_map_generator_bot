@@ -1,5 +1,6 @@
 package ti4.spring.service.persistence;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,22 @@ public class PersistedManagedGameService {
 
     @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ, timeout = WARMUP_READ_TIMEOUT_SECONDS)
     public Map<String, ManagedGameState> loadAll() {
-        Map<String, List<ManagedGameState.Participant>> participantsByGame =
-                playerEntityRepository.findAllParticipantsByGameName();
+        return toManagedGameStates(
+                gameEntityRepository.findAll(), playerEntityRepository.findAllParticipantsByGameName());
+    }
 
+    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ, timeout = WARMUP_READ_TIMEOUT_SECONDS)
+    public Map<String, ManagedGameState> loadAll(Collection<String> gameNames) {
+        if (gameNames.isEmpty()) return Map.of();
+        return toManagedGameStates(
+                gameEntityRepository.findAllById(gameNames),
+                playerEntityRepository.findParticipantsByGameName(gameNames));
+    }
+
+    private static Map<String, ManagedGameState> toManagedGameStates(
+            List<GameEntity> games, Map<String, List<ManagedGameState.Participant>> participantsByGame) {
         Map<String, ManagedGameState> persistedGames = new HashMap<>();
-        for (GameEntity game : gameEntityRepository.findAll()) {
+        for (GameEntity game : games) {
             if (!Objects.equals(game.getMappingVersion(), GameEntityMapper.MAPPING_VERSION)) continue;
             String gameName = game.getGameName();
             persistedGames.put(

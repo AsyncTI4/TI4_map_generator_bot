@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.Dee
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
@@ -1841,6 +1842,10 @@ public class ExploreService {
         boolean hasGhotiAnchorpointFrontier =
                 MonumentsService.treatsSystemAsGhotiAnchorpointFrontier(game, player, tile);
         boolean hasArbiterInSystem = DeepUnitHandler.hasArbiterInSystem(player, tile);
+        if ((hasFrontierToken || hasGhotiAnchorpointFrontier || hasArbiterInSystem || force)
+                && XyrixPromissoryHandler.offerAdditionalFrontierExplore(event, game, player, tile)) {
+            return;
+        }
         if (hasFrontierToken || hasGhotiAnchorpointFrontier || hasArbiterInSystem || force) {
             if (hasFrontierToken && !force) {
                 space.removeToken(frontierFilename);

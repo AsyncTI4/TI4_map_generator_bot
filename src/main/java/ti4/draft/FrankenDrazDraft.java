@@ -36,6 +36,7 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.message.componentsV2.MessageV2Editor;
+import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
@@ -49,6 +50,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     public static final String DISCORDANT_STARS_FACTION_LIMITS_KEY = "frankenDrazDiscordantStarsFactionLimits";
     public static final String BLUE_REVERIE_FACTION_LIMITS_KEY = "frankenDrazBlueReverieFactionLimits";
     public static final String LOST_LEGACIES_FACTION_LIMITS_KEY = "frankenDrazLostLegaciesFactionLimits";
+    public static final String WFTV_FACTION_LIMITS_KEY = "frankenDrazWftvFactionLimits";
     private static final int DEFAULT_MONUMENT_LIMIT = 2;
     private static final int DEFAULT_FACTION_LIMIT = 6;
     private static final Set<String> EXCLUDED_FACTIONS =
@@ -147,7 +149,8 @@ public class FrankenDrazDraft extends FrankenDraft {
         for (Map.Entry<ComponentSource, String> entry : Map.of(
                         ComponentSource.ds, DISCORDANT_STARS_FACTION_LIMITS_KEY,
                         ComponentSource.blue_reverie, BLUE_REVERIE_FACTION_LIMITS_KEY,
-                        ComponentSource.theodisi, LOST_LEGACIES_FACTION_LIMITS_KEY)
+                        ComponentSource.theodisi, LOST_LEGACIES_FACTION_LIMITS_KEY,
+                        ComponentSource.wftv, WFTV_FACTION_LIMITS_KEY)
                 .entrySet()) {
             String[] limits = game.getStoredValue(entry.getValue()).split("\\|", 2);
             if (limits.length == 2) {
@@ -301,9 +304,9 @@ public class FrankenDrazDraft extends FrankenDraft {
         MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
         builder.append("## " + item.getTitle(player.getGame()) + " Components");
         for (DraftItem component : components) {
-            List<ContainerChildComponent> cardComponents =
-                    new ArrayList<>(component.getTextDisplays(player.getGame(), player, true, true));
-            builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
+            for (Container container : buildFactionComponentContainers(component, player, accents.getFirst())) {
+                builder.append(container);
+            }
             Collections.rotate(accents, -1);
         }
         builder.send();
@@ -323,9 +326,9 @@ public class FrankenDrazDraft extends FrankenDraft {
         MessageV2Builder builder = new MessageV2Builder(event.getMessageChannel());
         builder.append("## " + item.getTitle(null) + " Components");
         for (DraftItem component : components) {
-            List<ContainerChildComponent> cardComponents =
-                    new ArrayList<>(component.getTextDisplays(null, null, true, true));
-            builder.append(Container.of(cardComponents).withAccentColor(accents.getFirst()));
+            for (Container container : buildFactionComponentContainers(component, null, accents.getFirst())) {
+                builder.append(container);
+            }
             Collections.rotate(accents, -1);
         }
         builder.send();
@@ -510,6 +513,55 @@ public class FrankenDrazDraft extends FrankenDraft {
     private static boolean isOversized(Container container) {
         return MessageV2Builder.CountComponents(container) > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
                 || MessageV2Builder.CountCharacters(container) > Message.MAX_CONTENT_LENGTH_COMPONENT_V2;
+    }
+
+    private static List<Container> buildFactionComponentContainers(DraftItem component, Player player, Color accent) {
+        Game game = player == null ? null : player.getGame();
+        List<ContainerChildComponent> components =
+                new ArrayList<>(component.getTextDisplaysWithoutLinkedComponents(game, player, true, true));
+        appendLinkedComponentText(
+                components,
+                component.getErrata().getAdditionalComponents(),
+                "Additional Added Components",
+                game,
+                player);
+        appendLinkedComponentText(
+                components, component.getAvailableOptionalSwaps(game), "Optional Component Swaps", game, player);
+        return splitFactionComponentContainers(components, accent);
+    }
+
+    private static void appendLinkedComponentText(
+            List<ContainerChildComponent> components,
+            List<DraftErrataModel> linkedComponents,
+            String title,
+            Game game,
+            Player player) {
+        if (linkedComponents.isEmpty()) {
+            return;
+        }
+        components.add(TextDisplay.of("**__" + title + ":__**"));
+        for (DraftErrataModel linkedComponent : linkedComponents) {
+            DraftItem item = DraftItem.generate(linkedComponent.getItemCategory(), linkedComponent.getItemId());
+            components.addAll(item.getTextDisplaysWithoutLinkedComponents(game, player, true, true));
+        }
+    }
+
+    private static List<Container> splitFactionComponentContainers(
+            List<ContainerChildComponent> components, Color accent) {
+        List<Container> containers = new ArrayList<>();
+        List<ContainerChildComponent> current = new ArrayList<>();
+        for (ContainerChildComponent component : components) {
+            current.add(component);
+            if (isOversized(Container.of(current)) && current.size() > 1) {
+                current.removeLast();
+                containers.add(Container.of(current).withAccentColor(accent));
+                current = new ArrayList<>(List.of(component));
+            }
+        }
+        if (!current.isEmpty()) {
+            containers.add(Container.of(current).withAccentColor(accent));
+        }
+        return containers;
     }
 
     private static boolean isManualSetupCategory(DraftCategory category) {

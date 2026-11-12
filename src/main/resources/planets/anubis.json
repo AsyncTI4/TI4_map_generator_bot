@@ -1,9 +1,9 @@
 {
-    "id": "anubius",
+    "id": "anubis",
     "tileId": "fracture10",
-    "name": "Anubius",
+    "name": "Anubis",
     "aliases": [
-        "anibus",
+        "anubis",
         "anub"
         
     ],
@@ -13,7 +13,7 @@
         "LIGHTNING"
     ],
     "planetLayout": {
-        "unitHolderName": "anubius",
+        "unitHolderName": "anubis",
         "resourcesLocation": "BottomRight",
         "centerPosition": {
            "x": 86.0,

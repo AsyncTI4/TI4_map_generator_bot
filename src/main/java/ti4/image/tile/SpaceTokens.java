@@ -90,6 +90,10 @@ final class SpaceTokens {
                     ? merged.image()
                     : oneWayToken != null ? OneWayWormholeIcon.image(oneWayToken) : ImageHelper.read(tokenPath);
             if (tokenImage == null) continue;
+            TokenModel tokenModel = Mapper.getToken(tokenID);
+            if (Constants.TOKEN_PLANETS.contains(tokenName) && tokenModel != null && tokenModel.getScale() != null) {
+                tokenImage = ImageHelper.scale(tokenImage, tokenModel.getScale().floatValue());
+            }
 
             if (Constants.TOKEN_PLANETS.contains(tokenName)) {
                 Point tokenCenter = TokenPlanetPlacement.getTokenPlanetCenterOfImage(tile, tokenName);

@@ -43,6 +43,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGame
 import ti4.discord.interactions.buttons.handlers.actioncards.secretsonly.CovertExchangeActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -82,6 +83,8 @@ import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.homebrew.CymiaeAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
+import ti4.service.megagame.MegagameActionCardRules;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -428,7 +431,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    private static String getActionCardInfo(Game game, Player player) {
+    public static String getActionCardInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder();
 
         // ACTION CARDS
@@ -819,11 +822,18 @@ public class ActionCardHelper {
         if (player.hasAbility("hydromorphic")) {
             return "You cannot use Action Card effects while you have Hydromorphic.";
         }
+        if (XyrixLeadersHandler.preventsOpponentActionCards(game, player)) {
+            return "You cannot play action cards during the active player's turn due to _Intillectual Immunity_.";
+        }
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? channel : game.getMainGameChannel();
         ActionCardModel actionCard = Mapper.getActionCard(acID);
         String actionCardTitle = actionCard.getName();
         String actionCardWindow = actionCard.getWindow();
         boolean twinned = (acIndex == -99);
+        String megagameRefusal = MegagameActionCardRules.presetOnlyRefusal(event, game, acID, actionCardTitle);
+        if (megagameRefusal != null) {
+            return megagameRefusal;
+        }
 
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
@@ -1533,6 +1543,11 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveDataArchive", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
+            }
+
+            if ("oracle".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveOracle", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("intrigue".equals(automationID)) {
@@ -2528,6 +2543,7 @@ public class ActionCardHelper {
     public static void serveManipulateInvestmentButtons(Game game, Player player) {
         List<Button> scButtons = new ArrayList<>();
         for (int sc : game.getSCList()) {
+            if (!MegagameGroupService.allowsCardInStrategyPhase(game, player, sc)) continue;
             Button button;
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
 

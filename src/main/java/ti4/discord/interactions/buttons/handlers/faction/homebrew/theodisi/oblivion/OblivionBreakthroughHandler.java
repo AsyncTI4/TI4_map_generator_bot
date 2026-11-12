@@ -17,15 +17,18 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.model.TileHelper;
 import ti4.service.explore.ExploreService;
+import ti4.service.map.AddTileService;
 
 @UtilityClass
 public class OblivionBreakthroughHandler {
     private static final String CALL_OF_THE_VOID = "oblivionbt";
+    private static final String COSMIC_MANIFESTATIONS_SYSTEM = "cosmicManifestationsSystem_";
 
     private static final String REMAINING_TILES = "oblivionBtRemainingTiles_";
     private static final String PLAYER_QUEUE = "oblivionBtPlayerQueue_";
@@ -36,6 +39,91 @@ public class OblivionBreakthroughHandler {
     private static final String RESOLVE_FRONTIER = "resolveOblivionBtFrontier_";
     private static final String RESOLVE_COMBINED_FRONTIER = "obvBtR3_";
     private static final String DISCARD_COMBINED_FRONTIER = "obvBtD3_";
+
+    public static void startCosmicManifestations(GenericInteractionCreateEvent event, Game game, Player player) {
+        List<Button> buttons = cosmicManifestationsButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationNoPing() + " has no eligible system for _Cosmic Manifestations_.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing()
+                        + ", choose a system adjacent to your home system to replace with a random red-backed tile.",
+                NewStuffHelper.buttonPagination(
+                        buttons, player.factionButtonChecker() + COSMIC_MANIFESTATIONS_SYSTEM, 0));
+    }
+
+    @ButtonHandler(COSMIC_MANIFESTATIONS_SYSTEM)
+    public static void resolveCosmicManifestations(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String message = player.getRepresentationNoPing()
+                + ", choose a system adjacent to your home system to replace with a random red-backed tile.";
+        List<Button> buttons = cosmicManifestationsButtons(game, player);
+        String buttonPrefix = player.factionButtonChecker() + COSMIC_MANIFESTATIONS_SYSTEM;
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event, event.getMessageChannel(), buttons, message, buttonPrefix, buttonID)) {
+            return;
+        }
+        String position = buttonID.substring(COSMIC_MANIFESTATIONS_SYSTEM.length());
+        Tile replacedTile = game.getTileByPosition(position);
+        if (!player.hasUnlockedBreakthrough(CALL_OF_THE_VOID)
+                || !isCosmicManifestationsTarget(game, player, replacedTile)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        List<String> drawnTiles = OblivionTileHelper.drawUnusedTiles(game, 1, null);
+        if (drawnTiles.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "There are no unused red-backed tiles for _Cosmic Manifestations_.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String replacedTileId = replacedTile.getTileID();
+        String replacedTileRepresentation = replacedTile.getRepresentationForButtons(game, player);
+        Tile newTile = new Tile(drawnTiles.getFirst(), replacedTile.getPosition(), replacedTile.getSpaceUnitHolder());
+        newTile.inheritFogData(replacedTile);
+        newTile.removeToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+        AddTileService.addTile(game, newTile);
+        OblivionTileHelper.purgeTiles(game, List.of(replacedTileId));
+        if (newTile.getPlanetUnitHolders().isEmpty()) {
+            newTile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+        }
+        game.clearPlanetsCache();
+
+        message = player.getRepresentationNoPing() + " replaced "
+                + replacedTileRepresentation + " with "
+                + newTile.getRepresentationForButtons(game, player) + " using _Cosmic Manifestations_.";
+        if (newTile.getPlanetUnitHolders().isEmpty()) {
+            message += " A frontier token was placed in that system.";
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> cosmicManifestationsButtons(Game game, Player player) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> isCosmicManifestationsTarget(game, player, tile))
+                .map(tile -> Buttons.green(
+                        player.factionButtonChecker() + COSMIC_MANIFESTATIONS_SYSTEM + tile.getPosition(),
+                        "Replace " + tile.getRepresentationForButtons(game, player)))
+                .toList();
+    }
+
+    private static boolean isCosmicManifestationsTarget(Game game, Player player, Tile tile) {
+        Tile homeSystem = player.getHomeSystemTile();
+        return tile != null
+                && homeSystem != null
+                && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())
+                && tile.getPlanetUnitHolders().isEmpty()
+                && Adjacency.of(game, player)
+                        .forEffects()
+                        .either(homeSystem.getPosition())
+                        .contains(tile.getPosition());
+    }
 
     public static void startCallOfTheVoid(Game game, Player owner) {
         if (game == null || owner == null || !owner.hasUnlockedBreakthrough(CALL_OF_THE_VOID)) {

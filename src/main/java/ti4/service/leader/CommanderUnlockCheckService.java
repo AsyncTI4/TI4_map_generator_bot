@@ -25,6 +25,7 @@ import ti4.helpers.adjacency.Adjacency;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -160,7 +161,11 @@ public class CommanderUnlockCheckService {
             }
             case "empyrean" ->
                 shouldBeUnlocked = (player.getAbilityNeighbours().size()
-                        >= (game.getRealPlayers().size() - 1));
+                        >= (MegagameGroupService.isActive(game)
+                                ? Math.min(
+                                        MegagameGroupService.EMPYREAN_COMMANDER_NEIGHBOURS,
+                                        game.getRealPlayers().size() - 1)
+                                : game.getRealPlayers().size() - 1));
             case "mahact" -> shouldBeUnlocked = (player.getMahactCC().size() >= 2);
             case "mahact_y" -> shouldBeUnlocked = (player.getMahactCC().size() >= 3);
             case "naaz" ->
@@ -425,6 +430,8 @@ public class CommanderUnlockCheckService {
                     "thurviali" ->
                 shouldBeUnlocked =
                         LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
+
+            case "xyrix" -> shouldBeUnlocked = true;
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

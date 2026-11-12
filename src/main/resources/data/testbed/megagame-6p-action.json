@@ -1,0 +1,59 @@
+{
+  "name": "megagame-6p-action",
+  "description": "megagame-6p in the action phase: sol 11, hacan 21, jolnar 12, xxcha 22, letnev 13, winnu 23; everyone holds 2 strategy tokens.",
+  "fog": false,
+  "strategyCardSet": "pbd30k",
+  "tags": [
+    "megagame_sc_groups"
+  ],
+  "seats": [
+    {
+      "faction": "sol",
+      "sc": 11,
+      "color": "blue"
+    },
+    {
+      "faction": "hacan",
+      "sc": 21,
+      "color": "yellow"
+    },
+    {
+      "faction": "jolnar",
+      "sc": 12,
+      "color": "purple"
+    },
+    {
+      "faction": "xxcha",
+      "sc": 22,
+      "color": "green"
+    },
+    {
+      "faction": "letnev",
+      "speaker": true,
+      "sc": 13,
+      "color": "red"
+    },
+    {
+      "faction": "winnu",
+      "sc": 23,
+      "color": "orange"
+    }
+  ],
+  "defaults": {
+    "ccs": "3/3/2"
+  },
+  "stored": {
+    "megagameGroup_A": "sol_hacan",
+    "megagameGroup_B": "jolnar_xxcha",
+    "megagameGroup_C": "letnev_winnu",
+    "megagameSpeaker_A": "hacan",
+    "megagameSpeaker_B": "jolnar"
+  },
+  "gameOptions": {
+    "sc_count_for_map": "1"
+  },
+  "start": "action",
+  "decks": {
+    "ac": "action_cards_pok_te_30k_jmsc"
+  }
+}

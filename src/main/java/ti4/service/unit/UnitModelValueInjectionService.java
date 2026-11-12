@@ -20,6 +20,7 @@ import ti4.model.UnitModel;
 import ti4.service.franken.FrankenUnitService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.NekroMonumentService;
+import ti4.service.map.RefractureRulesService;
 
 @UtilityClass
 public class UnitModelValueInjectionService {
@@ -51,6 +52,13 @@ public class UnitModelValueInjectionService {
 
         UnitValueInjection values = getPlayerUnitValueInjection(player, unit);
         UnitModel injectedUnit = values.isEmpty() ? unit : injectValues(unit, values);
+        if (RefractureRulesService.hasDoubledDemeterCapacity(player.getGame(), player)
+                && injectedUnit.getCapacityValue() > 0) {
+            if (injectedUnit == unit) {
+                injectedUnit = copyUnit(unit);
+            }
+            injectedUnit.setCapacityValue(injectedUnit.getCapacityValue() * 2);
+        }
         String salvageRules = IronSalvageRelicHandler.getUnitRulesText(player, unit.getUnitType());
         if (!salvageRules.isBlank()) {
             if (injectedUnit == unit) injectedUnit = copyUnit(unit);

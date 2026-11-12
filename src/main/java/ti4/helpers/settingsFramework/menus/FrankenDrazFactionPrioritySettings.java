@@ -30,6 +30,7 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
     private final IntegerRangeSetting discordantStarsFactionLimits;
     private final IntegerRangeSetting blueReverieFactionLimits;
     private final IntegerRangeSetting lostLegaciesFactionLimits;
+    private final IntegerRangeSetting wftvFactionLimits;
 
     FrankenDrazFactionPrioritySettings(JsonNode json, SettingsMenu parent) {
         super(
@@ -54,6 +55,7 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
         discordantStarsFactionLimits = sourceRange("DiscordantStars", "Discordant Stars Factions", ComponentSource.ds);
         blueReverieFactionLimits = sourceRange("BlueReverie", "Blue Reverie Factions", ComponentSource.blue_reverie);
         lostLegaciesFactionLimits = sourceRange("LostLegacies", "Lost Legacies Factions", ComponentSource.theodisi);
+        wftvFactionLimits = sourceRange("Wftv", "WFTV Factions", ComponentSource.wftv);
 
         updateTransientSettings();
         if (json != null && json.has("factionPrioritySettings")) json = json.get("factionPrioritySettings");
@@ -68,6 +70,9 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
             if (json.has("lostLegaciesFactionLimits")) {
                 lostLegaciesFactionLimits.initialize(json.get("lostLegaciesFactionLimits"));
             }
+            if (json.has("wftvFactionLimits")) {
+                wftvFactionLimits.initialize(json.get("wftvFactionLimits"));
+            }
         }
     }
 
@@ -80,6 +85,7 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
         if (settings.isEffectiveDiscordantStarsEnabled()) output.add(discordantStarsFactionLimits);
         if (settings.isEffectiveBlueReverieEnabled()) output.add(blueReverieFactionLimits);
         if (settings.isLostLegaciesEnabled()) output.add(lostLegaciesFactionLimits);
+        if (settings.isWftvEnabled()) output.add(wftvFactionLimits);
         return output;
     }
 
@@ -99,6 +105,9 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
         if (settings.isLostLegaciesEnabled()) {
             buttons.add(Buttons.blue(prefix + "prioritizeAllLL", "Prioritize Lost Legacies"));
         }
+        if (settings.isWftvEnabled()) {
+            buttons.add(Buttons.blue(prefix + "prioritizeAllWftv", "Prioritize WFTV"));
+        }
         return buttons;
     }
 
@@ -108,6 +117,7 @@ class FrankenDrazFactionPrioritySettings extends SettingsMenu {
             case "prioritizeAllDS" -> ComponentSource.ds;
             case "prioritizeAllBR" -> ComponentSource.blue_reverie;
             case "prioritizeAllLL" -> ComponentSource.theodisi;
+            case "prioritizeAllWftv" -> ComponentSource.wftv;
             default -> null;
         };
         if (source == null) return null;

@@ -1,26 +1,28 @@
 package ti4.image.map;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
+import ti4.image.tile.ExtrasStepTiles;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
-import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
 import ti4.service.map.FractureService;
 
 final class BoardSection {
+
+    private static final Color OUT_OF_FOCUS_SHADE = new Color(0, 0, 0, 165);
 
     private final RenderContext ctx;
     private final Graphics2D g2;
@@ -33,7 +35,7 @@ final class BoardSection {
         this.g2 = g2;
         this.game = ctx.game();
         this.board = ctx.board();
-        this.tileLayers = TileLayers.forPreparedViewer(game, ctx.fog().fogViewer(), ctx.displayType());
+        this.tileLayers = ctx.fog().tileLayers(ctx.displayType());
     }
 
     static void draw(RenderContext ctx, Graphics2D g2) {
@@ -68,11 +70,7 @@ final class BoardSection {
 
         tileMap.remove(null);
         List<String> sortedTiles = tileMap.keySet().stream().sorted().toList();
-        Set<String> tilesWithExtra =
-                new HashSet<>(game.getAdjacentTileOverrides().values());
-        tilesWithExtra.addAll(game.getBorderAnomalies().stream()
-                .map(BorderAnomalyHolder::getTile)
-                .collect(Collectors.toSet()));
+        Set<String> tilesWithExtra = ExtrasStepTiles.positions(game);
 
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
         GhostHexes.draw(ctx, g2, tileMap.keySet());
@@ -85,7 +83,24 @@ final class BoardSection {
         if (displayTypeStep != null) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), displayTypeStep));
         }
+        dimOutOfFocus(sortedTiles);
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
+    }
+
+    private void dimOutOfFocus(List<String> positions) {
+        MapFocus focus = ctx.focus();
+        if (focus == null) {
+            return;
+        }
+        Color previousColor = g2.getColor();
+        g2.setColor(OUT_OF_FOCUS_SHADE);
+        for (String position : positions) {
+            Rectangle hex = focus.isDimmed(position) ? board.hexBounds(position) : null;
+            if (hex != null) {
+                g2.fillPolygon(MapFrame.hexPolygon(hex));
+            }
+        }
+        g2.setColor(previousColor);
     }
 
     private void drawSetupTiles(Map<String, Tile> tileMap) {

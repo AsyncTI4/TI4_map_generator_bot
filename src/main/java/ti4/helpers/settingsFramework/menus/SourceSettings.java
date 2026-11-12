@@ -45,6 +45,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting lostLegacies;
     private final BooleanSetting monuments;
     private final BooleanSetting echoesOfYggdrasil;
+    private final BooleanSetting refracture;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -77,6 +78,7 @@ public class SourceSettings extends SettingsMenu {
         lostLegacies = new BooleanSetting("LostLegacies", "Lost Legacies", false);
         monuments = new BooleanSetting("Monuments", "Monuments+", game.isMonumentsMode());
         echoesOfYggdrasil = new BooleanSetting("EchoesOfYggdrasil", "Echoes of Yggdrasil", false);
+        refracture = new BooleanSetting("Refracture", "Refracture", game.isRefractureMode());
         actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
@@ -102,6 +104,7 @@ public class SourceSettings extends SettingsMenu {
         monuments.setExtraInfo(
                 "Adds faction monuments plus Monuments action cards, agendas, secrets, and strategy cards.");
         echoesOfYggdrasil.setExtraInfo("Adds the nine Echoes of Yggdrasil tiles to the draft tile pool.");
+        refracture.setExtraInfo("Enables Refracture layouts and Neutral Reference II.");
         // miltymod.setExtraInfo("NOTE: this is NOT \"milty draft\", this is a homebrew mod that replaces components in
         // the game");
 
@@ -130,6 +133,7 @@ public class SourceSettings extends SettingsMenu {
             lostLegacies.initialize(json.get("lostLegacies"));
             monuments.initialize(json.get("monuments"));
             echoesOfYggdrasil.initialize(json.get("echoesOfYggdrasil"));
+            refracture.initialize(json.get("refracture"));
             actionCardDeck2.initialize(json.get("actionCardDeck2"));
         }
         base.setEditable(false);
@@ -158,6 +162,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(lostLegacies);
         ls.add(monuments);
         ls.add(echoesOfYggdrasil);
+        ls.add(refracture);
         ls.add(actionCardDeck2);
         return ls;
     }
@@ -310,6 +315,7 @@ public class SourceSettings extends SettingsMenu {
             }
             case "Eronous" -> {}
             case "Monuments" -> game.setMonumentsMode(monuments.isVal());
+            case "Refracture" -> game.setRefractureMode(refracture.isVal());
             case "EchoesOfYggdrasil" ->
                 game.setStoredValue(
                         ti4.helpers.Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,

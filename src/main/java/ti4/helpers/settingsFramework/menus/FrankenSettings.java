@@ -233,6 +233,7 @@ public class FrankenSettings extends SettingsMenu {
         game.removeStoredValue(FrankenDrazDraft.DISCORDANT_STARS_FACTION_LIMITS_KEY);
         game.removeStoredValue(FrankenDrazDraft.BLUE_REVERIE_FACTION_LIMITS_KEY);
         game.removeStoredValue(FrankenDrazDraft.LOST_LEGACIES_FACTION_LIMITS_KEY);
+        game.removeStoredValue(FrankenDrazDraft.WFTV_FACTION_LIMITS_KEY);
         if (isFrankendrazMode()
                 && !factionPrioritySettings.getPrioritizedFactions().getKeys().isEmpty()) {
             game.setStoredValue(
@@ -265,6 +266,12 @@ public class FrankenSettings extends SettingsMenu {
                                     .getLostLegaciesFactionLimits()
                                     .getValHigh());
         }
+        if (isFrankendrazMode() && isWftvEnabled()) {
+            game.setStoredValue(
+                    FrankenDrazDraft.WFTV_FACTION_LIMITS_KEY,
+                    factionPrioritySettings.getWftvFactionLimits().getValLow() + "|"
+                            + factionPrioritySettings.getWftvFactionLimits().getValHigh());
+        }
     }
 
     private void applySourceFactionBans(BanService banService, ComponentSource source, boolean enabled) {
@@ -292,6 +299,7 @@ public class FrankenSettings extends SettingsMenu {
                 Constants.INCLUDE_ECHOES_OF_YGGDRASIL_TILES,
                 Boolean.toString(homebrewSettings.getEchoesOfYggdrasil().isVal()));
         game.setMonumentsMode(homebrewSettings.getMonuments().isVal());
+        game.setRefractureMode(homebrewSettings.getRefracture().isVal());
     }
 
     private FrankenDraftMode selectedDraftMode() {

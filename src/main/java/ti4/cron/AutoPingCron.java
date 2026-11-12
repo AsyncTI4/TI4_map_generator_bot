@@ -25,6 +25,8 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.model.metadata.AutoPingMetadataManager.AutoPing;
 import ti4.service.button.ReactionService;
 import ti4.service.fow.GMService;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameStrategyPhaseService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.deploy.ActiveLeaseService;
@@ -163,6 +165,10 @@ public class AutoPingCron {
             statusHomeworkPing(game, milliSinceLastPing);
             return;
         }
+        if ("strategy".equalsIgnoreCase(game.getPhaseOfGame()) && MegagameGroupService.isActive(game)) {
+            groupPickersPing(game, latestAutoPing, milliSinceLastPing);
+            return;
+        }
 
         Player player = game.getActivePlayer();
         if (player == null || player.isAFK()) {
@@ -212,6 +218,16 @@ public class AutoPingCron {
 
     private static void pingPlayer(
             Game game, Player player, int pingNumber, long milliSinceLastPing, boolean quickPing) {
+        pingPlayer(game, player, pingNumber, milliSinceLastPing, quickPing, true);
+    }
+
+    private static void pingPlayer(
+            Game game,
+            Player player,
+            int pingNumber,
+            long milliSinceLastPing,
+            boolean quickPing,
+            boolean offerPingDisable) {
         if (pingNumber == PING_NUMBER_TO_GIVE_UP_ON) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
@@ -234,7 +250,7 @@ public class AutoPingCron {
             return;
         }
         MessageHelper.sendMessageToChannel(gameChannel, pingMessage);
-        if (pingNumber == 2) {
+        if (pingNumber == 2 && offerPingDisable) {
             offerTemporaryPingDisable(player, gameChannel);
         }
     }
@@ -355,6 +371,26 @@ public class AutoPingCron {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw ACs.");
         }
+    }
+
+    private static void groupPickersPing(Game game, AutoPing latestAutoPing, long milliSinceLastPing) {
+        int pingNumber = latestAutoPing.pingCount() + 1;
+        if (pingNumber > PING_NUMBER_TO_GIVE_UP_ON) {
+            return;
+        }
+        List<Player> pickers = MegagameStrategyPhaseService.currentPickers(game).stream()
+                .filter(picker -> !picker.isAFK())
+                .toList();
+        int spacer = game.getAutoPingSpacer() > 0 ? game.getAutoPingSpacer() : DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS;
+        if (pickers.isEmpty() || !hoursHavePassed(milliSinceLastPing, spacer)) {
+            return;
+        }
+        if (pingNumber == PING_NUMBER_TO_GIVE_UP_ON) {
+            pingPlayer(game, pickers.getFirst(), pingNumber, milliSinceLastPing, false, false);
+        } else {
+            pickers.forEach(picker -> pingPlayer(game, picker, pingNumber, milliSinceLastPing, false, false));
+        }
+        AutoPingMetadataManager.addPing(game.getName());
     }
 
     private static UserSettings settingsFor(Player player, Map<String, UserSettings> activePlayerSettings) {

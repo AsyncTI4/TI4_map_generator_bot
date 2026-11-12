@@ -23,8 +23,12 @@ import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageResources;
 import ti4.logging.BotLogger;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.BorderAnomalyIds;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.MapPositionMapper;
+import ti4.model.Mapper;
+import ti4.service.map.BridgeMatrix;
+import ti4.service.map.HyperlaneBridges;
 
 final class BorderDecorationsStep implements TileStepPainter {
 
@@ -38,9 +42,55 @@ final class BorderDecorationsStep implements TileStepPainter {
         if (!scene.hidesFogged(tile)) {
             drawAdjacencyArrows(game, layer);
         }
+        OneWayLaneHints.drawOn(scene, layer);
         if (!game.getBorderAnomalies().isEmpty()) {
             drawBorderAnomalies(scene, layer);
         }
+        if (scene.isPrivateView()) {
+            drawLaneBlockedBorders(scene, layer);
+        }
+    }
+
+    private static void drawLaneBlockedBorders(TileScene scene, TileLayer layer) {
+        Tile tile = layer.tile();
+        Set<Integer> laneSides = HyperlaneBridges.laneSides(scene.game(), tile.getPosition());
+        if (laneSides.isEmpty() || UnexploredBridges.UNEXPLORED_TILE_ID.equals(tile.getTileID())) {
+            return;
+        }
+        BorderAnomalyModel tear = Mapper.getBorderAnomaly(BorderAnomalyIds.SPATIAL_TEAR);
+        if (tear == null) {
+            return;
+        }
+        BridgeMatrix drawn = BridgeEndsLookup.drawnMatrix(scene, tile);
+        List<String> neighbours = MapPositionMapper.getAdjacentTilePositions(tile.getPosition());
+        for (int side : laneSides) {
+            if (drawn.sides().contains(side)) continue;
+            if (blocksAHiddenLane(scene, tile.getPosition(), side, neighbours.get(side))) {
+                drawDecoration(side, null, layer.g(), ImageResources.border(tear.getImagePath()));
+            }
+        }
+    }
+
+    private static boolean blocksAHiddenLane(TileScene scene, String position, int side, String neighbourPosition) {
+        Game game = scene.game();
+        Tile neighbour = game.getTileByPosition(neighbourPosition);
+        int facing = (side + 3) % 6;
+        if (neighbour == null
+                || !neighbour.isValid()
+                || HyperlaneBridges.isHyperlane(neighbour)
+                || !scene.seesPosition(neighbourPosition)
+                || game.hasBorderAnomalyOn(position, side)
+                || game.hasBorderAnomalyOn(neighbourPosition, facing)) {
+            return false;
+        }
+        if (!HyperlaneBridges.laneSides(game, neighbourPosition).contains(facing)) {
+            return true;
+        }
+        if (BridgeEndsLookup.drawnMatrix(scene, neighbour).sides().contains(facing)) {
+            return false;
+        }
+        boolean neighbourDrawsIt = neighbourPosition.compareTo(position) < 0 && scene.seesPosition(position);
+        return !neighbourDrawsIt;
     }
 
     private static void drawAdjacencyArrows(Game game, TileLayer layer) {

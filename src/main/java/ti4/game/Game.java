@@ -1052,6 +1052,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Prophecy of Kings", isProphecyOfKings());
         gameModes.put("Thunder's Edge", isThundersEdge());
         gameModes.put("Twilight's Fall", isTwilightsFallMode());
+        gameModes.put("Refracture", isRefractureMode());
 
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
@@ -2084,6 +2085,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
             if (!Constants.CUSTODIAN.equals(id)
                     && !Constants.IMPERIAL_RIDER.equals(id)
+                    && !Constants.SOVEREIGN_CROWN.equals(id)
                     && scoredPlayerList.contains(userID)) {
                 return false;
             }
@@ -3486,6 +3488,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 MorphaUnitHandler.recordCytoplasmicTransportDiscards(this, player, 1);
             }
             CommanderUnlockCheckService.checkAllPlayersInGame(this, "morpha");
+            CommanderUnlockCheckService.checkPlayer(player, "xyrix");
             return true;
         }
         return false;
@@ -3525,6 +3528,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             }
             setPurgedActionCard(acID, played);
+            if (played) {
+                CommanderUnlockCheckService.checkPlayer(player, "xyrix");
+            }
             return true;
         }
         return false;
@@ -5337,6 +5343,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isBlueReverieMode()
                 || isUnchartedSpaceStuff()
                 || isLostLegaciesTiles()
+                || isRefractureMode()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()

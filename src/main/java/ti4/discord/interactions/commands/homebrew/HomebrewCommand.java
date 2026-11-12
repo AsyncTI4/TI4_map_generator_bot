@@ -8,11 +8,12 @@ import ti4.discord.interactions.commands.SubcommandGroup;
 import ti4.discord.interactions.commands.homebrew.lost_legacies.LostLegaciesGroup;
 import ti4.discord.interactions.commands.homebrew.monuments.MonumentsGroup;
 import ti4.discord.interactions.commands.homebrew.omega_phase.OmegaPhaseGroup;
+import ti4.discord.interactions.commands.homebrew.refracture.RefractureGroup;
 
 public class HomebrewCommand implements ParentCommand {
 
     private final Map<String, SubcommandGroup> subcommandGroups = Stream.of(
-                    new LostLegaciesGroup(), new MonumentsGroup(), new OmegaPhaseGroup())
+                    new LostLegaciesGroup(), new MonumentsGroup(), new OmegaPhaseGroup(), new RefractureGroup())
             .collect(Collectors.toMap(SubcommandGroup::getName, subcommandGroup -> subcommandGroup));
 
     @Override

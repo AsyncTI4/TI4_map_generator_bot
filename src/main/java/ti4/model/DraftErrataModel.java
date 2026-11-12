@@ -47,7 +47,7 @@ public class DraftErrataModel implements ModelInterface {
     public List<DraftErrataModel> getAdditionalComponents() {
         if (additionalComponents == null) return List.of();
         return additionalComponents.stream()
-                .map(Mapper::getFrankenErrata)
+                .map(DraftErrataModel::resolveOrBlank)
                 .filter(Objects::nonNull)
                 .toList();
     }
@@ -57,9 +57,27 @@ public class DraftErrataModel implements ModelInterface {
             return List.of();
         }
         return optionalSwaps.stream()
-                .map(Mapper::getFrankenErrata)
+                .map(DraftErrataModel::resolveOrBlank)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    /**
+     * Resolves a "CATEGORY:itemId" reference to its own errata entry, or a plain stand-in carrying just that
+     * category and id when the referenced item has no errata entry of its own (i.e. no special flags, just an
+     * otherwise-ordinary draftable item). Returns null only when the reference itself is malformed.
+     */
+    private static DraftErrataModel resolveOrBlank(String reference) {
+        DraftErrataModel resolved = Mapper.getFrankenErrata(reference);
+        if (resolved != null) return resolved;
+        String[] parts = reference.split(":", 2);
+        if (parts.length != 2) return null;
+        try {
+            return new DraftErrataModel(
+                    DraftCategory.valueOf(parts[0]), parts[1], List.of(), List.of(), false, null, false, null);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public boolean isAlwaysAddToPool() {

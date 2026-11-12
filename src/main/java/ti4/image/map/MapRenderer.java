@@ -44,7 +44,7 @@ final class MapRenderer {
         timings.stopGraphics();
         timings.stopDraw();
         boolean eligibleForWebsite =
-                ctx.basicType() == DisplayType.all && !ctx.fog().isPrivate();
+                ctx.basicType() == DisplayType.all && !ctx.fog().isPrivate() && ctx.focus() == null;
         return new MapRenderResult(canvas, ctx.overlays().asList(), eligibleForWebsite);
     }
 

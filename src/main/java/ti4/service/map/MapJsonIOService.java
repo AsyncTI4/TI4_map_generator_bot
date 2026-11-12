@@ -84,6 +84,14 @@ public class MapJsonIOService {
                 if (custom != null) {
                     t.setCustomHyperlaneString(CustomHyperlaneService.toTypedMatrix(custom));
                 }
+                List<PortalSlot> portalSlots = HyperlanePortals.slotsOf(game, tile.getPosition());
+                if (!portalSlots.isEmpty()) {
+                    t.setPortals(HyperlanePortals.describe(portalSlots));
+                }
+                BridgeMatrix bridge = HyperlaneBridges.matrixOf(game, tile.getPosition());
+                if (bridge != null) {
+                    t.setBridgeLanes(CustomHyperlaneService.toTypedMatrix(bridge.stored()));
+                }
 
                 // border anomalies
                 List<BorderAnomalyIO> baList = new ArrayList<>();
@@ -194,6 +202,8 @@ public class MapJsonIOService {
             game.clearCustomAdjacentTiles();
             game.setBorderAnomalies(null);
             game.getCustomHyperlaneData().clear();
+            HyperlaneBridges.clear(game);
+            HyperlanePortals.clear(game);
             LoreService.clearLore(game);
 
             List<TileIO> placedTiles = new ArrayList<>();
@@ -206,6 +216,8 @@ public class MapJsonIOService {
                         placedTiles.add(tileIO);
                         handleTokens(tileIO, game, errorSb);
                         handleCustomHyperlane(tileIO, game, errorSb);
+                        handleBridgeLanes(tileIO, game, errorSb);
+                        handlePortals(tileIO, game, errorSb);
                         handleBorderAnomalies(tileIO, game, errorSb);
                         handlePlanetAttachments(tileIO, game, errorSb);
                         handleAdjacencyOverrides(tileIO, game, errorSb);
@@ -317,6 +329,22 @@ public class MapJsonIOService {
             }
             CustomHyperlaneService.insertData(game, tileIO.getPosition(), customHypeString);
         }
+    }
+
+    private static void handlePortals(TileIO tileIO, Game game, StringBuilder sb) {
+        String typed = tileIO.getPortals();
+        if (StringUtils.isBlank(typed)) return;
+        HyperlanePortals.trySet(game, tileIO.getPosition(), typed)
+                .ifPresent(problem -> appendError(sb, tileIO, "Portals `" + typed + "`: " + problem));
+    }
+
+    private static void handleBridgeLanes(TileIO tileIO, Game game, StringBuilder sb) {
+        String typed = tileIO.getBridgeLanes();
+        if (StringUtils.isBlank(typed)) return;
+        HyperlaneBridges.problemWith(game, tileIO.getPosition(), typed)
+                .ifPresentOrElse(
+                        problem -> appendError(sb, tileIO, "Bridge `" + typed + "`: " + problem),
+                        () -> HyperlaneBridges.set(game, tileIO.getPosition(), typed));
     }
 
     private static void handleBorderAnomalies(TileIO tileIO, Game game, StringBuilder sb) {
@@ -552,6 +580,8 @@ public class MapJsonIOService {
         private List<PlanetIO> planets;
         private List<String> tokens;
         private String customHyperlaneString;
+        private String bridgeLanes;
+        private String portals;
         private List<BorderAnomalyIO> borderAnomalies;
         private LoreIO systemLore;
         // Full set of entries sharing this position, including "#tag" siblings — systemLore above
