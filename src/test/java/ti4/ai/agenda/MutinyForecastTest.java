@@ -64,7 +64,7 @@ class MutinyForecastTest extends BaseTi4Test {
     @Test
     void theOldForecastLeanedOnAlliesCastingTheirWholeStack() {
         turnOf(xxcha);
-        AiExperiments.disable(xxcha, Set.of(Experiment.AGENDA_HELD_BALLOTS));
+        AiExperiments.disable(xxcha, Set.of(Experiment.AGENDA_HELD_BALLOTS, Experiment.AGENDA_ABSTAIN_CHOICE));
 
         assertThat(forChance(xxcha, 1)).isGreaterThan(0.95);
         assertThat(forChance(xxcha, 5) - forChance(xxcha, 1)).isLessThan(0.05);
@@ -91,6 +91,24 @@ class MutinyForecastTest extends BaseTi4Test {
 
         assertThat(forChance(hacan, 1)).isLessThan(0.75);
         assertThat(forChance(hacan, 9)).isEqualTo(1.0);
+    }
+
+    // The trace's own ending: three seats put one vote each on For and Letnev abstains. Sol votes last, sees For 3 with
+    // two point holders on it, and casts what ties or beats it Against (it breaks the tie itself), so Against is
+    // certain. Before the speaker answered the tally it was a draw from Sol's joining values.
+    @Test
+    void theSpeakerAnswersTheTallyAndPunishesTheForVoters() {
+        voted(xxcha, "for", 1);
+        voted(sardakk, "for", 1);
+        voted(hacan, "for", 1);
+        turnOf(letnev);
+
+        double answering = AgendaForecast.of(test.game, letnev).without(letnev).chance("against");
+        AiExperiments.disable(letnev, Set.of(Experiment.AGENDA_ABSTAIN_CHOICE));
+        double drawn = AgendaForecast.of(test.game, letnev).without(letnev).chance("against");
+
+        assertThat(answering).isEqualTo(1.0);
+        assertThat(drawn).isLessThan(answering);
     }
 
     // A seat on For with a point is worth less to its rivals on For (it gains one too) and more to them on Against

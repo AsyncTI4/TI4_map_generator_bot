@@ -593,7 +593,6 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ballot(sol, 3)).isEmpty();
         }
 
-        @Disabled("milestone 4b: the speaker's tie-break is judged on abstained values, so Against is free for it")
         @Test
         void theSpeakerPicksAgainstForFreeOnConventions() {
             hand(sol, "sabo1", "sabo2", "veto");
@@ -603,8 +602,6 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(tieBreak(sol, "for", "against")).contains("against");
         }
 
-        @Disabled("milestone 4b: the forecast gives seats a real abstain choice, so an indifferent table abstains and"
-                + " Against wins on the speaker's tie-break")
         @Test
         void theForecastExpectsAgainstWhenTheTableIsIndifferent() {
             hand(sol, "sabo1", "sabo2", "veto");
@@ -614,10 +611,22 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(AgendaForecast.of(test.game, sol).chance("against")).isGreaterThan(0.9);
         }
 
-        @Disabled("milestone 4b: the AI non-speaker abstains on Wormhole Research when the speaker gains from Against")
+        // Sol and the speaker Xxcha each have six dreadnoughts at Lodor (an alpha wormhole), so For costs both of them
+        // a
+        // fleet worth more than the free technology. Against only costs the seats that voted Against a command token.
+        // Nobody needs to pay that: Sol abstains and Xxcha, voting last, picks Against on the tie for free.
         @Test
         void abstainsOnWormholeResearchAndLetsTheSpeakerPickAgainst() {
-            fail("expected an abstain ballot on Wormhole Research when Against is the speaker's free pick");
+            Tile lodor = test.place("26", "000");
+            test.units(lodor, "space", sol, UnitType.Dreadnought, 6);
+            test.units(lodor, "space", xxcha, UnitType.Dreadnought, 6);
+            for (Player seat : List.of(nekro, sol, xxcha)) seat.setTacticalCC(3);
+            reveal("Directive_For/Against_7_wormhole_research", "blue", 3, "red", 3, "black", 0);
+
+            assertThat(ownValue(sol, "wormhole_research", "for", "for")).isNegative();
+            assertThat(ballot(sol, 3)).isEmpty();
+            assertThat(AgendaForecast.of(test.game, sol).without(sol).chance("against"))
+                    .isGreaterThan(0.9);
         }
     }
 

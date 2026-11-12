@@ -104,7 +104,8 @@ public class AgendaPolicy {
         AgendaForecast forecast = AgendaForecast.of(game, speaker);
         if (!forecast.isEmpty()) {
             return outcomes.stream()
-                    .max(Comparator.comparingDouble(button -> forecast.utility(speaker, outcomeOf(button))));
+                    .reduce((best, next) ->
+                            forecast.breaksTieToward(speaker, outcomeOf(next), outcomeOf(best)) ? next : best);
         }
         return outcomes.stream()
                 .max(Comparator.comparingDouble(

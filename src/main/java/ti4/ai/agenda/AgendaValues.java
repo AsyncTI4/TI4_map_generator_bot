@@ -54,9 +54,14 @@ public class AgendaValues {
     }
 
     static double ownVoteAdjustment(Game game, Player voter, String agenda, String winner, String ownVote) {
+        return ownVoteAdjustment(game, voter, true, agenda, winner, ownVote);
+    }
+
+    static double ownVoteAdjustment(
+            Game game, Player voter, boolean ownView, String agenda, String winner, String ownVote) {
         if (!dependsOnOwnVote(agenda)) return 0;
-        OptionalDouble actual = of(game, voter, true, agenda, winner, ownVote);
-        OptionalDouble assumed = of(game, voter, true, agenda, winner, winner);
+        OptionalDouble actual = of(game, voter, ownView, agenda, winner, ownVote);
+        OptionalDouble assumed = of(game, voter, ownView, agenda, winner, winner);
         if (actual.isEmpty() || assumed.isEmpty()) return 0;
         return actual.getAsDouble() - assumed.getAsDouble();
     }
