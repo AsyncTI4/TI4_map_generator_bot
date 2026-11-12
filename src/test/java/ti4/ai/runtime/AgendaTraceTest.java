@@ -18,6 +18,14 @@ class AgendaTraceTest {
     }
 
     @Test
+    void postedOffersKeepEmojiNamesAndDropMentions() {
+        assertEquals(
+                "verdigris Verdigris Hacan offers you 3 trade goods to cast your votes for Hacan",
+                AgendaTrace.clean("<@123456> <verdigris>**Verdigris** <Hacan> offers you 3 trade goods to cast your"
+                        + " votes for **<:Hacan:98765>**"));
+    }
+
+    @Test
     void anEmptyOfferSaysSo() {
         assertEquals("{nothing}", AgendaTrace.items(List.of()));
     }

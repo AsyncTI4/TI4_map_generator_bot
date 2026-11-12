@@ -220,9 +220,11 @@ final class AgendaTrace {
         return reason;
     }
 
-    private static String clean(String text) {
-        return text.replaceAll("<a?:([A-Za-z_0-9]+):[0-9]+>", "$1")
-                .replaceAll("<[@#!&:a-zA-Z_0-9]*>", "")
+    // Emoji keep their names (the self-play harness renders them as <Name>), mentions and channel links are dropped.
+    static String clean(String text) {
+        return text.replaceAll("<a?:([A-Za-z_0-9]+):[0-9]+>", "$1 ")
+                .replaceAll("<[@#][!&]?[0-9]+>", "")
+                .replaceAll("<([A-Za-z][A-Za-z_0-9' -]*)>", "$1 ")
                 .replaceAll("\\*\\*", "")
                 .replaceAll("\\s+", " ")
                 .trim();
@@ -364,7 +366,7 @@ final class AgendaTrace {
                         .orElse(
                                 heard.isEmpty()
                                         ? "none"
-                                        : "others: "
+                                        : "none of its own; others pressed "
                                                 + heard.stream()
                                                         .map(press -> press.faction() + " "
                                                                 + StringUtils.abbreviate(press.customId(), 50))
@@ -373,7 +375,7 @@ final class AgendaTrace {
                                                         .reduce((a, b) -> a + ", " + b)
                                                         .orElse(""));
                 changes.add(String.format(
-                        "%s %-8s %s  [own presses this step: %s]",
+                        "%s %-8s %s  [presses this step: %s]",
                         minutes(now), entry.getKey(), change(before, entry.getValue()), presses));
             }
             heard.forEach(this::recordSend);
