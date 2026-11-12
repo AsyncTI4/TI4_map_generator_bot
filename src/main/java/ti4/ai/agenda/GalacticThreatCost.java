@@ -35,6 +35,13 @@ public class GalacticThreatCost {
         return othersVotedFor(game, outcome, voter, predictor) ? JOINED : ALONE;
     }
 
+    public static boolean predicts(Game game, Player seat, String outcome) {
+        return prediction(game)
+                .filter(prediction ->
+                        prediction.predictor() == seat && prediction.outcome().equalsIgnoreCase(outcome))
+                .isPresent();
+    }
+
     static List<String> copyable(Game game, Player nekro, Player from) {
         if (from == nekro) return List.of();
         return ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(nekro, from, new ArrayList<>(), game);

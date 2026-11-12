@@ -286,11 +286,23 @@ public class AgendaVoting {
     }
 
     public static AgendaForecast forecastWithItsBallot(Game game, Player seat) {
+        return itsBallot(game, seat).forecast();
+    }
+
+    public record PlannedBallot(AgendaForecast forecast, String outcome) {
+
+        public double value(Player seat) {
+            return forecast.expectedUtility(seat, outcome);
+        }
+    }
+
+    public static PlannedBallot itsBallot(Game game, Player seat) {
         AgendaForecast forecast = AgendaForecast.of(game, seat);
-        if (forecast.isEmpty()) return forecast;
+        if (forecast.isEmpty()) return new PlannedBallot(forecast, "");
         return plan(game, seat)
-                .map(ballot -> forecast.withVotes(seat, ballot.outcome(), ballot.votes()))
-                .orElseGet(() -> forecast.without(seat));
+                .map(ballot ->
+                        new PlannedBallot(forecast.withVotes(seat, ballot.outcome(), ballot.votes()), ballot.outcome()))
+                .orElseGet(() -> new PlannedBallot(forecast.without(seat), ""));
     }
 
     static Optional<Ballot> plan(Game game, Player seat) {

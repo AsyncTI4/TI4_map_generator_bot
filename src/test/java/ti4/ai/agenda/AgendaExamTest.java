@@ -25,6 +25,8 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promise.Promise;
+import ti4.ai.promise.PromiseBook;
+import ti4.ai.trade.TradeRules;
 import ti4.ai.xxcha.QuashRules;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -355,6 +357,92 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ballot(sol, 4)).contains("sol");
         }
 
+        private static final AiPrompt AFTER_WINDOW = hidden("window", "queueAnAfter", "declineToQueueAnAfter");
+
+        private String nekroAfterWindow() {
+            return pressed(GalacticThreatRules.next(context(nekro, AFTER_WINDOW)));
+        }
+
+        private void openMinisterOfWar(String agendaCount) {
+            seat(FOURTH_ID, "hacan", "green");
+            sol.addTech("gd");
+            test.game.setStoredValue("agendaCount", agendaCount);
+            reveal("Law_Elect Player_7_minister_war", "blue", 6, "red", 6, "green", 6, "black", 0);
+        }
+
+        // Traces-4b (aiselfplay945838 r1 #1): Nekro predicted Sol on a first-agenda Minister of War at a 14% chance and
+        // lost. "Use it on an outcome they are pretty sure other players will vote on; if not sure, on an agenda with 2
+        // or fewer outcomes." Four open candidates: Nekro keeps it for the second agenda.
+        @Test
+        void keepsGalacticThreatForTheSecondAgendaOnAnOpenElection() {
+            openMinisterOfWar("1");
+
+            assertThat(nekroAfterWindow()).isEmpty();
+        }
+
+        // "Nekro should always use their Galactic Threat every agenda phase: if they didn't use it on the first agenda,
+        // use it on the second no matter what."
+        @Test
+        void usesGalacticThreatOnTheSecondAgendaNoMatterWhat() {
+            openMinisterOfWar("2");
+
+            assertThat(nekroAfterWindow()).endsWith("queueAnAfter");
+        }
+
+        // Traces-4b (aiselfplay293998 r1 #1): Executive Sanctions on the first agenda has two outcomes, so Nekro
+        // predicts
+        // even without a sure voter.
+        @Test
+        void usesGalacticThreatOnAFirstAgendaForAgainst() {
+            sol.addTech("gd");
+            test.game.setStoredValue("agendaCount", "1");
+            reveal("Law_For/Against_7_sanctions", "blue", 6, "red", 6, "black", 0);
+
+            assertThat(nekroAfterWindow()).endsWith("queueAnAfter");
+        }
+
+        // Traces-4b (aiselfplay293998 r1 #1): "Nekro bought Hacan's 1 vote for 4 TG, paid only if For won" after it
+        // predicted For. The user: "cap it at 2 TGs."
+        @Test
+        void paysAtMostTwoTradeGoodsForAVoteTowardItsPrediction() {
+            test.place("01", "304");
+            sol.addPlanet("jord");
+            test.place("19", "310");
+            sol.addPlanet("wellon");
+            sol.addTech("gd");
+            nekro.setTg(10);
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setSpeakerUserID(sol.getUserID());
+            reveal("Law_For/Against_7_sanctions", "blue", 6, "black", 0);
+            test.game.setCurrentAgendaVote("for", "black_" + GalacticThreatCost.RIDER);
+
+            assertThat(answerVoteOffer(4)).contains("aiPromiseNo_");
+            assertThat(answerVoteOffer(2)).contains("aiPromiseYes_");
+        }
+
+        private String answerVoteOffer(int price) {
+            Promise offer = Promise.offer(
+                    test.game,
+                    Promise.Term.VOTE_FOR,
+                    sol,
+                    nekro,
+                    sol,
+                    PromisedVotes.agendaKey(test.game),
+                    "for",
+                    1,
+                    price,
+                    NOW,
+                    NOW + 60_000);
+            PromiseBook.save(test.game, offer);
+            AiPrompt prompt = prompt(
+                    "offer" + price,
+                    PromptSource.PUBLIC,
+                    NOW,
+                    "FFCC_nekro_aiPromiseYes_" + offer.id(),
+                    "FFCC_nekro_aiPromiseNo_" + offer.id());
+            return pressed(TradeRules.answerPromises(context(nekro, prompt)));
+        }
+
         @Disabled("milestones 5 and 10: any seat may offer TG to voters who vote the way its rider points; Nekro"
                 + " offering 1-2 TG to back its prediction is one case")
         @Test
@@ -456,6 +544,28 @@ class AgendaExamTest extends BaseTi4Test {
             AiPrompt options = hidden("options", "queueAfter_ac_trade_rider", "declineToQueueAnAfter");
             assertThat(pressed(AgendaCardRules.queueRider(context(sol, options))))
                     .isEqualTo("queueAfter_ac_trade_rider");
+        }
+
+        // The Mutiny of self-play game aiselfplay945838 (round 1, second agenda): Xxcha, Sardakk and Letnev carry For.
+        // Hacan played a Leadership Rider on For there and so could not vote, losing the point Mutiny gives For voters.
+        // Three command tokens are worth less than that point: Hacan keeps the rider and votes For.
+        @Test
+        void hacanVotesForOnMutinyRatherThanPlayALeadershipRider() {
+            Player hacan = seat(FOURTH_ID, "hacan", "green");
+            test.place("16", "101");
+            test.place("25", "102");
+            test.place("26", "103");
+            test.place("27", "104");
+            for (String planet : List.of("hercant", "kamdorn", "quann", "lodor", "newalbion")) hacan.addPlanet(planet);
+            test.game.setRound(1);
+            test.game.setStoredValue("whensResolved", "Yes");
+            reveal("Directive_For/Against_7_mutiny", "blue", 0, "red", 14, "green", 5, "black", 0);
+            hand(hacan, "lead_rider");
+
+            assertThat(AgendaForecast.of(test.game, hacan).chance("for")).isGreaterThan(0.7);
+            assertThat(pressed(AgendaCardRules.queueRider(context(hacan, afterOffer()))))
+                    .isEmpty();
+            assertThat(ballot(hacan, 5)).contains("for");
         }
 
         @Disabled("milestone 5c: with a single outcome a rider is always played, skipping the keep-prior gate, even a"
@@ -627,6 +737,51 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ballot(sol, 3)).isEmpty();
             assertThat(AgendaForecast.of(test.game, sol).without(sol).chance("against"))
                     .isGreaterThan(0.9);
+        }
+    }
+
+    /**
+     * Wormhole Research in self-play game aiselfplay524170 (round 3, first agenda): every other seat abstained, and the
+     * speaker Nekro (voting through the Xxcha commander, its Galactic Threat on For) cast 1 Against, taking the Against
+     * voters' command token loss. Breaking the 0-0 tie is not voting, so Against was free.
+     */
+    @Nested
+    class SpeakerFreePick {
+
+        @Test
+        void theSpeakerAbstainsAndPicksAgainstOnWormholeResearch() {
+            test.game.setRound(3);
+            test.game.setStoredValue("agendaCount", "1");
+            test.game.setSpeakerUserID(nekro.getUserID());
+            nekro.addLeader("xxchacommander");
+            nekro.unsafeGetLeader("xxchacommander").setLocked(false);
+            Tile lodor = test.place("26", "000");
+            test.units(lodor, "space", nekro, UnitType.Dreadnought, 3);
+            test.units(lodor, "space", sol, UnitType.Dreadnought, 2);
+            for (Player seat : List.of(nekro, sol, xxcha)) seat.setTacticalCC(3);
+            reveal("Directive_For/Against_7_wormhole_research", "blue", 6, "red", 6, "black", 6);
+            test.game.setCurrentAgendaVote("for", "black_" + GalacticThreatCost.RIDER);
+            test.game.setPhaseOfGame("agendaVoting");
+            test.game.setActivePlayerID(nekro.getUserID());
+
+            assertThat(ownValue(nekro, "wormhole_research", "against", "against"))
+                    .isNegative();
+            assertThat(ballot(nekro, 2, 2, 2)).isEmpty();
+            assertThat(tieBreak(nekro, "for", "against")).contains("against");
+        }
+
+        // Conventions of War on the last agenda: nobody else voted, so the speaker's own Against ballot would only
+        // cost it its hand. It abstains and breaks the tie Against.
+        @Test
+        void theSpeakerAbstainsOnTheLastAgendaWhenVotingCostsIt() {
+            hand(sol, "sabo1", "sabo2", "veto");
+            test.game.setSpeakerUserID(sol.getUserID());
+            reveal("Law_For/Against_7_conventions", "blue", 6, "red", 6, "black", 0);
+            test.game.setPhaseOfGame("agendaVoting");
+            test.game.setActivePlayerID(sol.getUserID());
+
+            assertThat(ballot(sol, 3, 3)).isEmpty();
+            assertThat(tieBreak(sol, "for", "against")).contains("against");
         }
     }
 
@@ -1094,6 +1249,34 @@ class AgendaExamTest extends BaseTi4Test {
 
             assertThat(ExpertLawValues.fleetCapCost(test.game, letnev))
                     .isLessThan(ExpertLawValues.fleetCapCost(test.game, xxcha));
+        }
+
+        // Auto-Factories puts a command token in Hacan's fleet pool whenever it builds 3 ships; Fleet Regulations caps
+        // the pool at 4, so Hacan never wants For, even with a small fleet pool.
+        @Test
+        void hacanVotesAgainstFleetRegulations() {
+            Player hacan = seat(FOURTH_ID, "hacan", "green");
+            hacan.addBreakthrough("hacanbt");
+            hacan.setFleetCC(3);
+            xxcha.setFleetCC(3);
+            reveal("Law_For/Against_7_regulations", "blue", 3, "red", 3, "green", 3, "black", 0);
+
+            assertThat(ownValue(hacan, "regulations", "for", "for"))
+                    .isLessThan(ownValue(hacan, "regulations", "against", "against") - 2);
+            assertThat(ballot(hacan, 3)).contains("against");
+        }
+
+        // Mahact's Imperia works through other players' tokens in its fleet pool, so a 4-token cap hurts it a little
+        // more than a seat with the same fleet pool.
+        @Test
+        void mahactDislikesFleetRegulationsABit() {
+            Player mahact = seat(FOURTH_ID, "mahact", "green");
+            mahact.setFleetCC(3);
+            xxcha.setFleetCC(3);
+
+            double extra =
+                    ExpertLawValues.fleetCapCost(test.game, mahact) - ExpertLawValues.fleetCapCost(test.game, xxcha);
+            assertThat(extra).isPositive().isLessThan(ExpertLawValues.fleetCapCost(test.game, xxcha) * 3);
         }
 
         @Test

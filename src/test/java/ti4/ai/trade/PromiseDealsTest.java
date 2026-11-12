@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.agenda.GalacticThreatCost;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
@@ -594,5 +595,69 @@ class PromiseDealsTest extends BaseTi4Test {
 
         assertThat(PromiseBook.proposedBy(test.game, test.sol)).allMatch(promise -> "nekro".equals(promise.target()));
         assertThat(PromiseDeals.backedOutcome(context).test("sol")).isFalse();
+    }
+
+    // Traces-4b, Executive Sanctions: Hacan offered Nekro its 1 vote for For at 4 TG, after Nekro predicted For, and
+    // Nekro took it. A vote toward its Galactic Threat prediction is worth at most 2 TG to Nekro.
+    private static Promise threatVoteOffer(AiTestGame test, int price) {
+        test.game.setVp(10);
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Law_For/Against_7_sanctions");
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"black\":0}");
+        test.game.setCurrentAgendaVote("for", "black_" + GalacticThreatCost.RIDER);
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.place("19", "310");
+        test.sol.addPlanet("wellon");
+        test.sol.addTech("gd");
+        test.isActive(test.nekro, "agendawaiting");
+        test.nekro.setTg(10);
+        Promise promise = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.sol,
+                PromisedVotes.agendaKey(test.game),
+                "for",
+                1,
+                price,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, promise);
+        return promise;
+    }
+
+    @Test
+    void nekroPaysNoMoreThanTwoTradeGoodsForAVoteTowardItsPrediction() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Promise dear = threatVoteOffer(test, 4);
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, "for"))
+                .isEqualTo(PromiseDeals.PREDICTION_VOTE_PRICE_CAP);
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, "against")).isZero();
+
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, dear));
+        assertThat(PromiseDeals.accepts(context, dear)).isFalse();
+    }
+
+    @Test
+    void nekroTakesATwoTradeGoodVoteTowardItsPrediction() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Promise fair = threatVoteOffer(test, 2);
+
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, fair));
+        assertThat(PromiseDeals.accepts(context, fair)).isTrue();
+    }
+
+    @Test
+    void controlSeatHasNoPredictionPriceCap() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Promise dear = threatVoteOffer(test, 4);
+        AiExperiments.disable(test.nekro, Set.of(Experiment.AGENDA_VALUE_TABLE));
+
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, "for")).isZero();
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, dear));
+        assertThat(PromiseDeals.accepts(context, dear)).isTrue();
     }
 }

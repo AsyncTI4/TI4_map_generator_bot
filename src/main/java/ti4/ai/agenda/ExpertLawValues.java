@@ -49,6 +49,11 @@ class ExpertLawValues {
     private static final double FLEET_CAP_COST_PER_ROUND = 0.4;
     private static final String ARMADA = "armada";
     private static final int ARMADA_ROOM = 2;
+    private static final String AUTO_FACTORIES = "hacanbt";
+    private static final double AUTO_FACTORIES_PER_ROUND = 2.0;
+    private static final double LOCKED_AUTO_FACTORIES_SHARE = 0.75;
+    private static final String IMPERIA = "imperia";
+    private static final double IMPERIA_PER_ROUND = 0.15;
     private static final String WAR_SUN_TECH = "ws";
     private static final double WAR_SUN_SUSTAIN_PER_ROUND = 0.3;
     private static final int SUSTAIN_ROUNDS_CAP = 3;
@@ -160,7 +165,16 @@ class ExpertLawValues {
         double pressure = fleet >= REGULATED_FLEET ? FLEET_CAP_COST_PER_ROUND : FLEET_CAP_COST_PER_ROUND / 2;
         int room = player.hasAbility(ARMADA) ? ARMADA_ROOM : 0;
         double shipsPerToken = REGULATED_FLEET / (double) (REGULATED_FLEET + room);
-        return (excess * ExploreValues.COMMAND_TOKEN + pressure * lawRounds(game)) * shipsPerToken;
+        double ownFleetCost = (excess * ExploreValues.COMMAND_TOKEN + pressure * lawRounds(game)) * shipsPerToken;
+        return ownFleetCost + fleetPoolAbilityCost(player) * lawRounds(game);
+    }
+
+    private static double fleetPoolAbilityCost(Player player) {
+        double cost = player.hasAbility(IMPERIA) ? IMPERIA_PER_ROUND : 0;
+        if (player.hasUnlockedBreakthrough(AUTO_FACTORIES)) return cost + AUTO_FACTORIES_PER_ROUND;
+        if (player.hasBreakthrough(AUTO_FACTORIES))
+            return cost + AUTO_FACTORIES_PER_ROUND * LOCKED_AUTO_FACTORIES_SHARE;
+        return cost;
     }
 
     private static double homelandDefenseAct(Game game, Player voter, String outcome) {

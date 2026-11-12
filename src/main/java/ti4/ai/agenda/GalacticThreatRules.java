@@ -37,6 +37,8 @@ public class GalacticThreatRules {
     private static final String DECLINED_AFTERS = "declinedAfters";
     private static final String QUEUE_WINDOW_PHASE = "agendawaiting";
     private static final double VOTED_TIE_BREAK = 1e-3;
+    private static final int FEW_OUTCOMES = 2;
+    private static final double SURE_OF_VOTERS = 0.7;
 
     public static boolean holdsQueuedPrediction(Game game, Player seat) {
         return seat.hasAbility(ABILITY)
@@ -86,10 +88,23 @@ public class GalacticThreatRules {
             if (other == seat) continue;
             if (!ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(seat, other, new ArrayList<>(), game)
                     .isEmpty()) {
-                return true;
+                return suitsThisAgenda(game, seat);
             }
         }
         return false;
+    }
+
+    static boolean suitsThisAgenda(Game game, Player seat) {
+        if (!AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING) || AgendaRound.isFinalAgenda(game)) {
+            return true;
+        }
+        AgendaForecast forecast = AgendaForecast.of(game, seat);
+        if (forecast.isEmpty() || forecast.outcomes().size() <= FEW_OUTCOMES) return true;
+        return forecast.outcomes().stream()
+                        .mapToDouble(forecast::votedChance)
+                        .max()
+                        .orElse(0)
+                >= SURE_OF_VOTERS;
     }
 
     private static Optional<AiDecision> predict(AiTurnContext context) {

@@ -205,6 +205,20 @@ public final class AgendaForecast {
         return expected(outcome -> utility(player, outcome)) - threatPayoffCorrection(player);
     }
 
+    public double expectedUtility(Player player, String ownVote) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        if (voter < 0) return expectedUtility(player);
+        int ballot = frame.outcomes().indexOf(ownVote);
+        return expected(outcome -> utility(player, outcome)
+                        + ownVoteTerm(voter, frame.outcomes().indexOf(outcome), ballot))
+                - threatPayoffCorrection(player);
+    }
+
+    public boolean keepsVotesWithRider(Player player) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        return voter >= 0 && frame.keepsVotesWithRider()[voter];
+    }
+
     double ballotCost(Player player, String outcome) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
         int index = isEmpty() ? -1 : frame.outcomes().indexOf(outcome);

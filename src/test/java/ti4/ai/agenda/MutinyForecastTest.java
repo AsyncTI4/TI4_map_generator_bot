@@ -124,4 +124,18 @@ class MutinyForecastTest extends BaseTi4Test {
         assertThat(DirectiveValues.mutinyForVoterJoins(test.game, hacan, hacan, "for"))
                 .isZero();
     }
+
+    // A seat that does not vote (it placed a rider, say) gets no point when For wins: its own-vote value says so.
+    @Test
+    void abstainingOnAForWinGivesUpTheForPoint() {
+        turnOf(xxcha);
+        AgendaForecast forecast = AgendaForecast.of(test.game, hacan).withVotes(xxcha, "for", 30);
+        double point = ti4.ai.scoring.ScoringStakes.scoreValue(test.game, hacan, 1);
+
+        assertThat(forecast.chance("for")).isGreaterThan(0.99);
+        assertThat(forecast.expectedUtility(hacan, "for") - forecast.expectedUtility(hacan, ""))
+                .isCloseTo(point, org.assertj.core.api.Assertions.within(0.05 * point));
+        assertThat(forecast.expectedUtility(hacan, "for"))
+                .isCloseTo(forecast.expectedUtility(hacan), org.assertj.core.api.Assertions.within(1e-9));
+    }
 }

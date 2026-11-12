@@ -19,6 +19,7 @@ import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaRound;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.GalacticThreatCost;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
@@ -50,6 +51,7 @@ class PromiseDeals {
     static final double MIN_PAY_CHANCE = 0.2;
     private static final int MIN_PRICE = 1;
     static final int MARKET_PREMIUM = 1;
+    static final int PREDICTION_VOTE_PRICE_CAP = 2;
     private static final String PAY_POSTED_KEY = "promisePayPosted|";
     private static final Comparator<Proposal> BEST = Comparator.comparingDouble(Proposal::gain)
             .thenComparing(proposal -> proposal.term() == Promise.Term.STAY_OUT);
@@ -335,6 +337,10 @@ class PromiseDeals {
         }
         double margin = TradeValue.margin(proposer);
         if (promise.isPromiser(seat)) return sells(context, promise, promisee, margin);
+        if (promise.term() == Promise.Term.VOTE_FOR
+                && overPredictionCap(game, seat, promise.target(), promise.price())) {
+            return false;
+        }
         double paid = payChance(game, seat, promiser, promise) * promise.price();
         double gain = Trust.of(context, promiser) * protection(game, seat, promiser, promise);
         int spendable = seat.getTg() - promisedTradeGoods(game, seat, promise.id());
@@ -379,6 +385,16 @@ class PromiseDeals {
 
     static boolean marketPrices(Player seat) {
         return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE);
+    }
+
+    static int predictionCap(Game game, Player buyer, String outcome) {
+        if (!marketPrices(buyer) || !GalacticThreatCost.predicts(game, buyer, outcome)) return 0;
+        return PREDICTION_VOTE_PRICE_CAP;
+    }
+
+    private static boolean overPredictionCap(Game game, Player buyer, String outcome, int price) {
+        int cap = predictionCap(game, buyer, outcome);
+        return cap > 0 && price > cap;
     }
 
     static int marketAsk(Game game, double cost, double chance, int monopoly) {
@@ -520,9 +536,11 @@ class PromiseDeals {
             VoteDeals.bestSale(outlook, seat, partner, backed)
                     .flatMap(terms -> {
                         double chance = payChance(conditional, terms);
-                        return sellerPrice(terms.buyerGain(), terms.sellerCost(), partner, partner.getTg(), 0, chance)
+                        int cap = predictionCap(game, partner, terms.outcome());
+                        return sellerPrice(terms.buyerGain(), terms.sellerCost(), partner, partner.getTg(), cap, chance)
                                 .map(price ->
                                         marketPrices(seat) ? marketAsk(game, terms.sellerCost(), chance, price) : price)
+                                .filter(price -> !overPredictionCap(game, partner, terms.outcome(), price))
                                 .map(price -> new Proposal(
                                         Promise.Term.VOTE_FOR,
                                         seat,
@@ -548,7 +566,8 @@ class PromiseDeals {
     private static Optional<Proposal> purchase(
             Player buyer, Player seller, VoteDeals.Terms terms, double value, double chance, Game game) {
         int ask = voteAsk(game, seller, buyer, terms, chance);
-        return buyerPrice(value, terms.sellerCost(), seller, spendableTradeGoods(game, buyer), 0, ask, chance)
+        int cap = predictionCap(game, buyer, terms.outcome());
+        return buyerPrice(value, terms.sellerCost(), seller, spendableTradeGoods(game, buyer), cap, ask, chance)
                 .map(price -> new Proposal(
                         Promise.Term.VOTE_FOR,
                         seller,
@@ -584,6 +603,7 @@ class PromiseDeals {
             VoteDeals.Terms terms = member.terms();
             int ask = voteAsk(context.game(), member.seller(), seat, terms, chance);
             int price = Math.max(ask, floorPrice(terms.sellerCost(), member.seller(), chance));
+            if (overPredictionCap(context.game(), seat, bloc.outcome(), price)) return Optional.empty();
             prices.add(price);
             total += price;
         }

@@ -4,8 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
 
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
@@ -127,5 +130,70 @@ class GalacticThreatRulesTest extends BaseTi4Test {
         AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
 
         assertThat(press(window)).isEqualTo("queueAnAfter");
+    }
+
+    private void openMinisterOfWar(String agendaCount) {
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.addSeat("200000000000000003", "hacan", "green");
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaCount", agendaCount);
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_minister_war");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"red\":6,\"green\":6,\"black\":0}");
+    }
+
+    // Traces-4b, Minister of War on the first agenda: four candidates and no seat sure to vote any of them. Nekro keeps
+    // Galactic Threat for the second agenda rather than spend it on a 14% guess.
+    @Test
+    void keepsGalacticThreatForTheSecondAgendaOnAnOpenElection() {
+        openMinisterOfWar("1");
+        AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isFalse();
+        assertThat(press(window)).isEmpty();
+    }
+
+    // Nekro uses Galactic Threat every agenda phase: unused on the first agenda, it goes on the second whatever it is.
+    @Test
+    void usesGalacticThreatOnTheSecondAgendaWhateverItIs() {
+        openMinisterOfWar("2");
+        AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(press(window)).isEqualTo("queueAnAfter");
+    }
+
+    // A For/Against agenda has two outcomes, so even an unsure prediction is a coin flip worth taking on the first
+    // agenda.
+    @Test
+    void usesGalacticThreatOnAFirstAgendaWithTwoOutcomes() {
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Law_For/Against_7_sanctions");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"black\":0}");
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // Without the timing experiment Nekro predicts on the first agenda, as before.
+    @Test
+    void controlSeatPredictsOnTheFirstAgenda() {
+        openMinisterOfWar("1");
+        AiExperiments.disable(test.nekro, Set.of(Experiment.GALACTIC_THREAT_TIMING));
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // A first-agenda election that one seat is sure to carry with its own votes: Nekro predicts it right away.
+    @Test
+    void usesGalacticThreatOnAFirstAgendaElectionWithASureVoter() {
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_minister_war");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":12,\"red\":1,\"black\":0}");
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
     }
 }

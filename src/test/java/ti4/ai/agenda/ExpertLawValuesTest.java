@@ -185,6 +185,37 @@ class ExpertLawValuesTest extends BaseTi4Test {
         assertThat(ExpertLawValues.sanctionedCards(ownView(yssaril), yssaril)).isZero();
     }
 
+    // Auto-Factories adds fleet pool tokens that the 4-token cap throws away, locked or not; unlocked costs most.
+    @Test
+    void fleetRegulationsCostHacanItsAutoFactoriesTokens() {
+        Player xxcha = seat("xxcha");
+        hacan.setFleetCC(3);
+        xxcha.setFleetCC(3);
+        double plain = ExpertLawValues.fleetCapCost(test.game, hacan);
+        assertThat(plain).isEqualTo(ExpertLawValues.fleetCapCost(test.game, xxcha));
+
+        hacan.addBreakthrough("hacanbt");
+        double locked = ExpertLawValues.fleetCapCost(test.game, hacan);
+        hacan.setBreakthroughUnlocked("hacanbt", true);
+        double unlocked = ExpertLawValues.fleetCapCost(test.game, hacan);
+
+        assertThat(locked).isGreaterThan(plain + 2);
+        assertThat(unlocked).isGreaterThan(locked);
+        assertThat(value(hacan, "regulations", "for", "for")).isLessThan(value(hacan, "regulations", "against", ""));
+    }
+
+    // Imperia uses other players' tokens in Mahact's fleet pool: the cap costs it a little more than its fleet alone.
+    @Test
+    void fleetRegulationsCostMahactALittleMore() {
+        Player mahact = seat("mahact");
+        mahact.setFleetCC(3);
+        hacan.setFleetCC(3);
+
+        assertThat(ExpertLawValues.fleetCapCost(test.game, mahact))
+                .isGreaterThan(ExpertLawValues.fleetCapCost(test.game, hacan))
+                .isLessThan(2 * ExpertLawValues.fleetCapCost(test.game, hacan));
+    }
+
     // Letnev's Armada keeps two more ships per system than its fleet tokens, so the four-token cap hurts it less.
     @Test
     void fleetRegulationsHurtLetnevLess() {

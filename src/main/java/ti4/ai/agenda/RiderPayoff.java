@@ -8,6 +8,7 @@ import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.strategy.CardValueScale;
 import ti4.ai.strategy.CommandTokenValue;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.SpeakerTokenValue;
@@ -44,12 +45,19 @@ public class RiderPayoff {
             case POLITICS -> DrawnCardValue.of(game, player, POLITICS_CARDS) + SpeakerTokenValue.of(game, player);
             case TECHNOLOGY ->
                 StrategyCardRules.cannotResearch(player)
-                        ? CommandTokenValue.tactic(game, player, LEADERSHIP_TOKENS)
+                        ? leadershipTokens(game, player)
                         : ResearchPolicy.freeResearchWorth(game, player);
-            case LEADERSHIP -> CommandTokenValue.tactic(game, player, LEADERSHIP_TOKENS);
+            case LEADERSHIP -> leadershipTokens(game, player);
             case GalacticThreatCost.RIDER -> galacticThreat(game, player, player);
             default -> OTHER_RIDER;
         };
+    }
+
+    static double leadershipTokens(Game game, Player player) {
+        if (AiExperiments.enabled(player, Experiment.AGENDA_VALUE_TABLE)) {
+            return LEADERSHIP_TOKENS * CardValueScale.HELD_TOKEN;
+        }
+        return CommandTokenValue.tactic(game, player, LEADERSHIP_TOKENS);
     }
 
     public static double galacticThreat(Game game, Player viewer, Player nekro) {

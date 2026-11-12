@@ -56,6 +56,8 @@ public class AgendaCardRules {
 
     record Choice(String alias, String title, String outcome, double gain) {}
 
+    private record Baseline(double value, String keptVote) {}
+
     private record Entry(String alias, int playsBefore) {
 
         String encode() {
@@ -188,7 +190,7 @@ public class AgendaCardRules {
         if (riders.isEmpty()) return Optional.empty();
         AgendaForecast untouched = AgendaForecast.of(game, seat);
         if (untouched.isEmpty()) return Optional.empty();
-        double current = AgendaVoting.forecastWithItsBallot(game, seat).expectedUtility(seat);
+        Baseline current = baseline(game, seat, untouched);
         return riders.stream()
                 .map(alias -> bestOutcome(untouched, current, seat, alias))
                 .flatMap(Optional::stream)
@@ -196,15 +198,21 @@ public class AgendaCardRules {
                 .max(Comparator.comparingDouble(Choice::gain));
     }
 
-    private static Optional<Choice> bestOutcome(AgendaForecast untouched, double current, Player seat, String alias) {
+    private static Optional<Choice> bestOutcome(AgendaForecast untouched, Baseline current, Player seat, String alias) {
         String title = SabotageWindow.title(alias);
         return untouched.outcomes().stream()
                 .map(outcome -> new Choice(alias, title, outcome, gain(untouched, current, seat, title, outcome)))
                 .max(Comparator.comparingDouble(Choice::gain));
     }
 
-    private static double gain(AgendaForecast untouched, double current, Player seat, String title, String outcome) {
-        return untouched.withRider(seat, title, outcome).expectedUtility(seat) - current;
+    private static double gain(AgendaForecast untouched, Baseline current, Player seat, String title, String outcome) {
+        return untouched.withRider(seat, title, outcome).expectedUtility(seat, current.keptVote()) - current.value();
+    }
+
+    private static Baseline baseline(Game game, Player seat, AgendaForecast untouched) {
+        AgendaVoting.PlannedBallot planned = AgendaVoting.itsBallot(game, seat);
+        String keptVote = untouched.keepsVotesWithRider(seat) ? planned.outcome() : "";
+        return new Baseline(planned.value(seat), keptVote);
     }
 
     private static Optional<AiDecision> abandonQueuedRider(AiTurnContext context) {
@@ -252,7 +260,7 @@ public class AgendaCardRules {
         Player seat = context.seat();
         AgendaForecast untouched = AgendaForecast.of(game, seat);
         if (untouched.isEmpty()) return options.getFirst();
-        double current = AgendaVoting.forecastWithItsBallot(game, seat).expectedUtility(seat);
+        Baseline current = baseline(game, seat, untouched);
         ToDoubleFunction<String> gain = outcome -> gain(untouched, current, seat, title, outcome);
         return options.stream()
                 .max(Comparator.comparingDouble(button -> outcomesOf(game, button).stream()
