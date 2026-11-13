@@ -457,6 +457,7 @@ public class StartCombatService {
         }
 
         TextChannel textChannel = (TextChannel) channel;
+        List<Player> cannonCover = spaceCannonCover(game, player1, tile, spaceOrGround);
 
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
@@ -471,7 +472,8 @@ public class StartCombatService {
                         spaceOrGround,
                         null,
                         unitHolderName,
-                        firstCombatThread);
+                        firstCombatThread,
+                        cannonCover);
                 CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
                 CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
                 return;
@@ -483,8 +485,8 @@ public class StartCombatService {
             CommanderUnlockCheckService.checkPlayer(player2, "winnu");
         }
 
-        int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
+        FileUpload systemWithContext =
+                SystemContextImage.upload(game, event, pdsImageContext(game, cannonCover), tile.getPosition(), player1);
 
         // Create the thread
         String finalThreadName = threadName;
@@ -509,7 +511,8 @@ public class StartCombatService {
                     spaceOrGround,
                     systemWithContext,
                     unitHolderName,
-                    firstCombatThread);
+                    firstCombatThread,
+                    cannonCover);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to create combat thread for game: " + game.getName(), e);
         }
@@ -539,7 +542,8 @@ public class StartCombatService {
             String spaceOrGround,
             FileUpload file,
             String unitHolderName,
-            boolean firstCombatThread) {
+            boolean firstCombatThread,
+            List<Player> cannonCover) {
         StringBuilder message = new StringBuilder();
         message.append(player1.getRepresentationUnfogged());
         if (!game.isFowMode()) message.append(player2.getRepresentation());
@@ -551,12 +555,10 @@ public class StartCombatService {
         if (isSpaceCombat) message.append(getSpaceCombatIntroMessage());
         if (isGroundCombat) message.append(getGroundCombatIntroMessage());
 
-        // PDS2 Context
-        int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        if (threadChannel.getName().toLowerCase().contains("benediction")) {
-            context = 0;
-        }
         if (file == null) {
+            int context = threadChannel.getName().toLowerCase().contains("benediction")
+                    ? 0
+                    : pdsImageContext(game, cannonCover);
             file = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
         }
 
@@ -577,7 +579,7 @@ public class StartCombatService {
 
         // Space Cannon Offense
         if (isSpaceCombat && !threadChannel.getName().toLowerCase().contains("benediction")) {
-            sendSpaceCannonButtonsToThread(threadChannel, game, player1, tile);
+            sendSpaceCannonButtonsToThread(threadChannel, game, player1, tile, cannonCover);
         }
 
         // Start of Space Combat Buttons
@@ -1041,8 +1043,17 @@ public class StartCombatService {
 
     public static void sendSpaceCannonButtonsToThread(
             MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
+        sendSpaceCannonButtonsToThread(
+                threadChannel,
+                game,
+                activePlayer,
+                tile,
+                ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition()));
+    }
+
+    private static void sendSpaceCannonButtonsToThread(
+            MessageChannel threadChannel, Game game, Player activePlayer, Tile tile, List<Player> playersWithPds2) {
         StringBuilder pdsMessage = new StringBuilder();
-        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition());
         if (tile.isScar(game)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
@@ -1063,7 +1074,7 @@ public class StartCombatService {
                         .append('\n');
             }
         }
-        List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);
+        List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile, playersWithPds2);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
         MonumentsDSButtonHandler.sendPerditionArrayReminder(threadChannel, game, tile, activePlayer);
         if (!game.isFowMode()) {
@@ -1649,14 +1660,26 @@ public class StartCombatService {
     }
 
     public static List<Button> getSpaceCannonButtons(Game game, Player activePlayer, Tile tile) {
+        if (game.isFowMode()) return getSpaceCannonButtons(game, activePlayer, tile, List.of());
+        return getSpaceCannonButtons(
+                game, activePlayer, tile, ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition()));
+    }
+
+    private static List<Button> getSpaceCannonButtons(
+            Game game, Player activePlayer, Tile tile, List<Player> shooters) {
         List<Button> spaceCannonButtons = new ArrayList<>();
-        spaceCannonButtons.add(Buttons.gray(
-                "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll SPACE CANNON Offence"));
+        String rollId = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        spaceCannonButtons.add(Buttons.gray(rollId, "Roll SPACE CANNON Offence"));
         if (game.isFowMode()) return spaceCannonButtons;
+        for (Player shooter : shooters) {
+            if (shooter != activePlayer && (shooter.isDummy() || shooter.isNpc())) {
+                spaceCannonButtons.add(rollForDummyButton(shooter, rollId, "Roll SPACE CANNON Offence"));
+            }
+        }
         spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
 
         // Add Graviton Laser System button if applicable
-        for (Player playerWithPds : ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition())) {
+        for (Player playerWithPds : shooters) {
             if (playerWithPds.hasTechReady("gls")) { // Graviton Laser Systems
                 spaceCannonButtons.add(
                         Buttons.gray("exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
@@ -1813,20 +1836,19 @@ public class StartCombatService {
         return buttons;
     }
 
-    /**
-     * # of extra rings to show around the tile image
-     *
-     * @return 0 if no PDS2 nearby, 1 if PDS2 is nearby
-     */
-    private static int getTileImageContextForPDS2(Game game, Player player1, Tile tile, String spaceOrGround) {
-        if (game.isFowMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
-            return 0;
-        }
-        if (!ButtonHelper.getPlayersWithPds2Cover(player1, game, tile.getPosition())
-                .isEmpty()) {
-            return 1;
-        }
-        return 0;
+    public static Button rollForDummyButton(Player dummy, String rollButtonId, String label) {
+        String suffix = dummy.isNeutral() ? " For Neutral" : " For Dummy";
+        return Buttons.gray(dummy.dummyPlayerSpoof() + rollButtonId, label + suffix)
+                .withEmoji(Emoji.fromFormatted(dummy.fogSafeEmoji()));
+    }
+
+    private static List<Player> spaceCannonCover(Game game, Player player1, Tile tile, String spaceOrGround) {
+        if (!"space".equalsIgnoreCase(spaceOrGround)) return List.of();
+        return ButtonHelper.getPlayersWithPds2Cover(player1, game, tile.getPosition());
+    }
+
+    private static int pdsImageContext(Game game, List<Player> cannonCover) {
+        return game.isFowMode() || cannonCover.isEmpty() ? 0 : 1;
     }
 
     private static void sendGeneralCombatButtonsToThread(
@@ -3017,10 +3039,13 @@ public class StartCombatService {
                     }
                     if (CombatRollService.checkIfUnitsOfType(
                             nonActive, game, null, tile, unitH.getName(), CombatRollType.SpaceCannonDefence)) {
-                        Player target = nonActive == p1 ? p2 : p1;
-                        buttons.add(Buttons.gray(
-                                "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",
-                                "Roll SPACE CANNON Defence for " + nameOfHolder));
+                        String rollId =
+                                "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence";
+                        String label = "Roll SPACE CANNON Defence for " + nameOfHolder;
+                        buttons.add(
+                                nonActive.isDummy() || nonActive.isNpc()
+                                        ? rollForDummyButton(nonActive, rollId, label)
+                                        : Buttons.gray(rollId, label));
                     }
                 }
             }

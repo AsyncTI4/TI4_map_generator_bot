@@ -662,6 +662,10 @@ public final class ButtonHelperTacticalAction {
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
             for (Player playerWithPds : playersWithPds2) {
+                if (playerWithPds.isDummy() || playerWithPds.isNpc()) {
+                    offerDummySpaceCannonOffence(player, playerWithPds, tile, title);
+                    continue;
+                }
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
@@ -674,6 +678,19 @@ public final class ButtonHelperTacticalAction {
         } else {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
         }
+    }
+
+    private static void offerDummySpaceCannonOffence(Player activePlayer, Player dummy, Tile tile, String title) {
+        String rollId = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        List<Button> buttons = List.of(
+                StartCombatService.rollForDummyButton(dummy, rollId, "Roll SPACE CANNON Offence"),
+                Buttons.DECLINE_DELETE_BUTTONS);
+        String owner = dummy.isNeutral() ? "The neutral units have" : "A dummy player has";
+        MessageHelper.sendMessageToChannelWithButtons(
+                activePlayer.getCorrectChannel(),
+                title + owner + " SPACE CANNON coverage in " + tile.getRepresentation() + " (" + tile.getPosition()
+                        + "). Use the button to roll for them:",
+                buttons);
     }
 
     @ButtonHandler("useSafeHarbor")

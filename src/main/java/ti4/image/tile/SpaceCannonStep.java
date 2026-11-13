@@ -43,7 +43,7 @@ final class SpaceCannonStep implements TileStepPainter {
         Map<String, List<Integer>> pdsDice = new HashMap<>();
         Map<String, PdsCoverage> pdsCoverageByFaction = new HashMap<>();
         if (pdsCoverageMap != null) {
-            for (Player player : game.getRealPlayers()) {
+            for (Player player : game.getRealPlayersNNeutral()) {
                 PdsCoverage coverage = pdsCoverageMap.get(player.getFaction());
                 if (coverage != null) {
                     pdsDice.put(player.getUserID(), coverage.getDiceValues());
