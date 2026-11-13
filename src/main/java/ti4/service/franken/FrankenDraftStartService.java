@@ -2,6 +2,7 @@ package ti4.service.franken;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.AuctionFrankenDraft;
 import ti4.draft.FrankenDraft;
 import ti4.draft.FrankenDrazDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
@@ -42,6 +43,11 @@ public class FrankenDraftStartService {
                 case INAUGURALSPLICE -> {
                     game.setupTwilightsFallMode(event);
                     game.setBagDraft(new InauguralSpliceFrankenDraft(game));
+                }
+                case AUCTION -> {
+                    game.setBagDraft(new AuctionFrankenDraft(game));
+                    AuctionFrankenDraftService.start(game);
+                    return null;
                 }
             }
         }

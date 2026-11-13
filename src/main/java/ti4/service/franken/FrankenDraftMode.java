@@ -9,7 +9,8 @@ public enum FrankenDraftMode {
     FRANKENDRAZ(
             "frankendraz", "Draft faction packages, then build from their components using powered franken limits."),
     TWILIGHTSFALL("twilights_fall", "Used for Thunder's Edge Twilights Fall Franken Draft"),
-    INAUGURALSPLICE("inaugural_splice", "Used for Thunder's Edge Twilights Fall RAW Draft");
+    INAUGURALSPLICE("inaugural_splice", "Used for Thunder's Edge Twilights Fall RAW Draft"),
+    AUCTION("auction", "Privately bid on nominated Franken components.");
 
     private final String name;
     private final String description;
