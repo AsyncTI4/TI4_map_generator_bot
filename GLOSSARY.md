@@ -370,6 +370,16 @@ _Avoid_: Directional mode
 The Twilight Imperium Global Ladder, whose competitive Games report results and move Players through ranks.
 _Avoid_: Ladder game
 
+**Tournament pool**:
+One round of a tournament run with `/tournament`: its sign-up posts, seated Players, Waitlist, groups and the Games created from them. Each round, such as Prelims or Semifinals, is its own pool, and several pools can run at once.
+_Avoid_: Tournament queue, matchmaking queue
+
+**Waitlist**:
+Players who signed up after a Tournament pool reached its target size. When a seated Player withdraws, the first Player on the Waitlist takes their seat and group.
+
+**Tourney Mod**:
+The Discord role that, with Admin, may run tournaments: create Tournament pools, edit their panel and create their Games.
+
 ### Combat
 
 **Combat**:

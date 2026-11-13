@@ -1,0 +1,29 @@
+package ti4.discord.interactions.commands.tournament;
+
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.service.tournament.TournamentInvites;
+import ti4.spring.service.tournament.Tournament;
+
+class TournamentPostInvite extends TournamentSubcommand {
+
+    TournamentPostInvite() {
+        super("post_invite", "Post the host server invite, pinging players who aren't on it yet");
+        addOptions(tournamentOption(), channelOption(CHANNEL, "Where to post it (default: this channel)"));
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Tournament tournament = tournament(event);
+        if (tournament == null) {
+            reply(event, "Pick a tournament from the list.");
+            return;
+        }
+        GuildMessageChannel channel = channel(event, CHANNEL);
+        if (channel == null) {
+            reply(event, "Pick a text channel.");
+            return;
+        }
+        reply(event, TournamentInvites.send(tournament, channel));
+    }
+}

@@ -138,7 +138,10 @@ public class UserSettings {
     }
 
     public static String summarizeActiveHours(String activity) {
-        Set<Integer> hotHours = getHotHours(activity);
+        return summarizeHours(getHotHours(activity));
+    }
+
+    public static String summarizeHours(Set<Integer> hotHours) {
         if (hotHours.isEmpty()) {
             return null;
         }
