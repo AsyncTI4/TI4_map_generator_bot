@@ -481,7 +481,8 @@ class PromiseDeals {
 
     private static boolean votesCommittedElsewhere(AiTurnContext context) {
         return AgendaQueue.holdsQueuedAfter(context.game(), context.seat())
-                || AgendaCardRules.holdsUnplacedRider(context);
+                || AgendaCardRules.holdsUnplacedRider(context)
+                || AgendaVoting.abstained(context);
     }
 
     private static Optional<Player> proposerOf(Game game, Promise promise) {

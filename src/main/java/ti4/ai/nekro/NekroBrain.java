@@ -504,8 +504,10 @@ public class NekroBrain implements FactionBrain {
             Optional<PromptButton> abstain = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
                     && "resolveAgendaVote_0".equals(button.handlerId())
                     && !context.alreadyPressed(prompt, button));
-            if (abstain.isPresent())
+            if (abstain.isPresent()) {
+                AgendaVoting.markAbstained(context);
                 return Optional.of(AiDecision.press(prompt, abstain.get(), "abstain from the vote"));
+            }
         }
         return Optional.empty();
     }

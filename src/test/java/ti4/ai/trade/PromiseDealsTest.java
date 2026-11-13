@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.GalacticThreatCost;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
@@ -556,6 +557,43 @@ class PromiseDealsTest extends BaseTi4Test {
         assertThat(PromiseDeals.accepts(context, generous)).isFalse();
         assertThat(PromiseDeals.backedOutcome(context).test("sol")).isTrue();
         assertThat(PromiseDeals.backedOutcome(context).test("nekro")).isFalse();
+    }
+
+    // Self-play trace: the speaker abstained (planning to pick the outcome by tie-break), then accepted a vote sale it
+    // could no longer cast, so the promise was never delivered and the buyer never paid. Once a seat has abstained on
+    // this agenda it sells no votes on it, even for the outcome it means to pick.
+    @Test
+    void aSeatThatAbstainedSellsNoVotesOnThatAgenda() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.game.setVp(10);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo(SHARD);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"black\":0}");
+        test.isActive(test.sol, "agendawaiting");
+        test.nekro.setTg(40);
+        Promise forSol = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "sol",
+                4,
+                40,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, forSol);
+        AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, offerPrompt(test.sol, forSol));
+        assertThat(PromiseDeals.accepts(context, forSol)).isTrue();
+
+        AgendaVoting.markAbstained(context);
+
+        assertThat(AgendaVoting.abstained(context)).isTrue();
+        assertThat(PromiseDeals.accepts(context, forSol)).isFalse();
     }
 
     // A seat that promised its votes to one outcome offers to buy votes only for that outcome: buying for another

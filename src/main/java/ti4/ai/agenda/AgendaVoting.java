@@ -28,6 +28,7 @@ import ti4.model.Mapper;
 public class AgendaVoting {
 
     private static final String BALLOT_KEY = "agendaBallot|";
+    private static final String ABSTAINED_KEY = "agendaAbstained|";
     private static final String OUTCOME_PREFIX = "outcome_";
     private static final String PLANET_OUTCOMES_PREFIX = "planetOutcomes_";
     private static final String PLANET_VOTE_PREFIX = "exhaustForVotes_planet_";
@@ -354,6 +355,16 @@ public class AgendaVoting {
 
     static boolean predictiveReady(Player seat) {
         return seat.hasTechReady(PREDICTIVE_INTELLIGENCE);
+    }
+
+    public static void markAbstained(AiTurnContext context) {
+        context.memory().put(ABSTAINED_KEY + context.game().getCurrentAgendaInfo(), "yes");
+    }
+
+    public static boolean abstained(AiTurnContext context) {
+        return context.memory()
+                .get(ABSTAINED_KEY + context.game().getCurrentAgendaInfo())
+                .isPresent();
     }
 
     public static Optional<String> ballotInProgress(AiTurnContext context) {
