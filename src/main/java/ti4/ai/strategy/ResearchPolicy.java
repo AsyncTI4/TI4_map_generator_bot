@@ -244,9 +244,7 @@ public class ResearchPolicy {
 
     private static FreeTech freeTech(Game game, Player seat, String alias, boolean readsOwnHand) {
         TechnologyModel tech = Mapper.getTech(alias);
-        double tempo = readsOwnHand
-                ? researchValue(game, seat, alias) - OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
-                : baseValue(tech);
+        double tempo = baseValue(tech);
         int points = publicPointsCompletedBy(game, seat, alias)
                 + (readsOwnHand ? secretPointsCompletedBy(game, seat, tech) : 0);
         return new FreeTech(alias, TECH_TEMPO * tempo, points, ScoringStakes.scoreValue(game, seat, points));
