@@ -14,6 +14,7 @@ import static ti4.ai.agenda.AgendaValueMath.votedOn;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.ToDoubleFunction;
 import javax.annotation.Nullable;
@@ -22,6 +23,7 @@ import ti4.ai.eval.Adjacency;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.PlanetStake;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectiveCatalog;
 import ti4.ai.scoring.ScoringStakes;
@@ -31,6 +33,8 @@ import ti4.ai.strategy.ResearchPolicy;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.UnitHolder;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel.Wormhole;
@@ -65,7 +69,9 @@ class ExpertDirectiveValues {
     private static final double MAX_STRENGTH = 1.5;
     private static final double TECH_ROLL_CHANCE = 0.5;
     private static final double TWO_TECHS = 1.8;
-    private static final double LOST_UNIT = 1.5;
+    static final double BLAST_UNIT_LOSS = 0.5;
+    static final double MECATOL_CONTROL_LOSS = 4.0;
+    static final double ARTIFACT_POINT_SHARE = 0.5;
     private static final int ADJACENT_LOSSES = 3;
     private static final double INFANTRY_BOARD_WORTH = 0.8;
     private static final int INFANTRY_SUPPLY = 12;
@@ -198,7 +204,9 @@ class ExpertDirectiveValues {
             double rivalBlast,
             int mecatolUnits,
             int adjacentUnits,
-            double forBias) {
+            double forBias,
+            String ownTech,
+            int ownTechPoints) {
 
         double research() {
             return ownResearch - rivalResearch;
@@ -213,6 +221,8 @@ class ExpertDirectiveValues {
         }
     }
 
+    record MecatolBlast(int mecatolUnits, int adjacentUnits, double loss) {}
+
     private static double ixthianArtifact(AgendaView view, String outcome) {
         return isFor(outcome) ? artifactParts(view).value() : 0;
     }
@@ -220,19 +230,22 @@ class ExpertDirectiveValues {
     static ArtifactParts artifactParts(AgendaView view) {
         Game game = view.game();
         Player voter = view.voter();
-        ToDoubleFunction<Player> research = player -> TWO_TECHS * researchWorth(view, player);
-        ToDoubleFunction<Player> blast = player -> -mecatolBlastLoss(game, player);
+        ToDoubleFunction<Player> research = player -> ixthianResearchWorth(view, player);
+        ToDoubleFunction<Player> blast = player -> -mecatolBlast(game, player).loss();
         double ownResearch = research.applyAsDouble(voter);
         double ownBlast = blast.applyAsDouble(voter);
-        int[] units = mecatolUnits(game, voter);
+        MecatolBlast units = mecatolBlast(game, voter);
+        Optional<ResearchPolicy.FreeTech> ownTech = ixthianTech(view, voter);
         return new ArtifactParts(
                 ownResearch,
                 ownResearch - relativeToRivals(game, voter, research),
                 ownBlast,
                 ownBlast - relativeToRivals(game, voter, blast),
-                units[0],
-                units[1],
-                -ownBlast < ARTIFACT_DEVASTATING ? ARTIFACT_FOR_BIAS : 0);
+                units.mecatolUnits(),
+                units.adjacentUnits(),
+                -ownBlast < ARTIFACT_DEVASTATING ? ARTIFACT_FOR_BIAS : 0,
+                ownTech.map(ResearchPolicy.FreeTech::alias).orElse("-"),
+                ownTech.map(ResearchPolicy.FreeTech::points).orElse(0));
     }
 
     static double researchWorth(AgendaView view, Player player) {
@@ -241,26 +254,58 @@ class ExpertDirectiveValues {
                 : ResearchPolicy.publicResearchWorth(view.game(), player);
     }
 
-    private static double mecatolBlastLoss(Game game, Player player) {
-        int[] units = mecatolUnits(game, player);
-        return LOST_UNIT * (units[0] + units[1]);
+    static double ixthianResearchWorth(AgendaView view, Player player) {
+        return ixthianTech(view, player)
+                .map(ExpertDirectiveValues::ixthianTechWorth)
+                .orElse(0.0);
     }
 
-    private static int[] mecatolUnits(Game game, Player player) {
+    private static Optional<ResearchPolicy.FreeTech> ixthianTech(AgendaView view, Player player) {
+        return ResearchPolicy.bestFreeTech(
+                view.game(), player, view.readsHandOf(player), ExpertDirectiveValues::ixthianTechWorth);
+    }
+
+    static double ixthianTechWorth(ResearchPolicy.FreeTech tech) {
+        return TWO_TECHS * tech.tempo() + ARTIFACT_POINT_SHARE * tech.pointValue();
+    }
+
+    static MecatolBlast mecatolBlast(Game game, Player player) {
         Tile mecatol = game.getMecatolTile();
-        if (mecatol == null) return new int[2];
-        int adjacent = Adjacency.withSystem(game, player, mecatol.getPosition()).stream()
+        if (mecatol == null) return new MecatolBlast(0, 0, 0);
+        List<Double> inMecatol = unitWorths(mecatol, player);
+        List<Double> adjacent = Adjacency.withSystem(game, player, mecatol.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .filter(tile -> tile != null && tile != mecatol)
-                .mapToInt(tile -> Math.min(ADJACENT_LOSSES, unitsIn(tile, player)))
-                .sum();
-        return new int[] {unitsIn(mecatol, player), adjacent};
+                .flatMap(tile -> unitWorths(tile, player).stream().sorted().limit(ADJACENT_LOSSES))
+                .toList();
+        double worth = inMecatol.stream().mapToDouble(Double::doubleValue).sum()
+                + adjacent.stream().mapToDouble(Double::doubleValue).sum();
+        int lost = inMecatol.size() + adjacent.size();
+        double control = controlsMecatol(mecatol, player) ? MECATOL_CONTROL_LOSS : 0;
+        return new MecatolBlast(inMecatol.size(), adjacent.size(), worth + BLAST_UNIT_LOSS * lost + control);
     }
 
-    private static int unitsIn(Tile tile, Player player) {
-        return tile.getUnitHolders().values().stream()
-                .mapToInt(holder -> holder.getUnitCount(player.getColorID()))
-                .sum();
+    private static List<Double> unitWorths(Tile tile, Player player) {
+        List<Double> worths = new ArrayList<>();
+        for (UnitHolder holder : tile.getUnitHolders().values()) {
+            for (UnitKey key : holder.getUnitKeysForPlayer(player)) {
+                double worth = unitWorth(player, key);
+                for (int i = 0; i < holder.getUnitCount(key); i++) worths.add(worth);
+            }
+        }
+        return worths;
+    }
+
+    private static double unitWorth(Player player, UnitKey key) {
+        if (key.unitType() == UnitType.Spacedock) return PlanetStake.SPACE_DOCK;
+        if (key.unitType() == UnitType.Pds) return PlanetStake.PDS;
+        UnitModel model = player.getUnitFromUnitKey(key);
+        return model == null ? 0 : ValueScale.RESOURCE * model.getCost();
+    }
+
+    private static boolean controlsMecatol(Tile mecatol, Player player) {
+        return mecatol.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> player.getPlanets().contains(planet.getName()));
     }
 
     private static double swordsToPlowshares(Game game, Player voter, String outcome) {

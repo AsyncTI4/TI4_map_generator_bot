@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -227,6 +229,45 @@ public class ResearchPolicy {
     private static double publicResearchWorth(Game game, Player seat, String alias) {
         return TECH_TEMPO * baseValue(Mapper.getTech(alias))
                 + ScoringStakes.scoreValue(game, seat, publicPointsCompletedBy(game, seat, alias));
+    }
+
+    public record FreeTech(String alias, double tempo, int points, double pointValue) {}
+
+    public static Optional<FreeTech> bestFreeTech(
+            Game game, Player seat, boolean readsOwnHand, ToDoubleFunction<FreeTech> worth) {
+        return researchable(game, seat).stream()
+                .filter(alias -> Mapper.getTech(alias) != null && !seat.hasTech(alias))
+                .distinct()
+                .map(alias -> freeTech(game, seat, alias, readsOwnHand))
+                .max(Comparator.comparingDouble(worth).thenComparing(FreeTech::alias));
+    }
+
+    private static FreeTech freeTech(Game game, Player seat, String alias, boolean readsOwnHand) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        double tempo = readsOwnHand
+                ? researchValue(game, seat, alias) - OBJECTIVE_WEIGHT * objectiveGain(game, seat, tech)
+                : baseValue(tech);
+        int points = publicPointsCompletedBy(game, seat, alias)
+                + (readsOwnHand ? secretPointsCompletedBy(game, seat, tech) : 0);
+        return new FreeTech(alias, TECH_TEMPO * tempo, points, ScoringStakes.scoreValue(game, seat, points));
+    }
+
+    static int secretPointsCompletedBy(Game game, Player seat, TechnologyModel tech) {
+        return seat.getSecretsUnscored().keySet().stream().anyMatch(secret -> completes(game, seat, secret, tech))
+                ? 1
+                : 0;
+    }
+
+    private static boolean completes(Game game, Player seat, String objective, TechnologyModel tech) {
+        if (TechPath.follows(objective)) {
+            OptionalInt before = TechPath.researchesNeeded(game, seat, objective, null);
+            OptionalInt after = TechPath.researchesNeeded(game, seat, objective, tech);
+            return before.orElse(0) > 0 && after.isPresent() && after.getAsInt() == 0;
+        }
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
+        return threshold > 0
+                && progress(game, objective, seat, null) < threshold
+                && progress(game, objective, seat, tech) >= threshold;
     }
 
     private static List<String> researchable(Game game, Player seat) {

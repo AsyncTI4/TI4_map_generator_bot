@@ -1759,6 +1759,37 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(ownValue(arborec, "rearmament", "against", "")).isNegative();
         }
 
+        // Ixthian Artifact (user, 2026-11-13): the blast costs each seat its units in the Mecatol system, the 3
+        // cheapest in each adjacent system, 0.5 TG per unit lost and 4 TG for controlling Mecatol Rex. Xxcha holds
+        // Mecatol Rex with three cruisers and two infantry (about 12 TG on a 1-5), so it leans Against; Sol, with
+        // nothing near the centre, still likes For.
+        @Test
+        void theSeatHoldingMecatolRexLeansAgainstIxthianArtifact() {
+            Tile mecatol = test.place("18", "000");
+            xxcha.addPlanet("mr");
+            test.units(mecatol, "space", xxcha, UnitType.Cruiser, 3);
+            test.units(mecatol, "mr", xxcha, UnitType.Infantry, 2);
+
+            assertThat(forLean(xxcha, "artifact")).isNegative();
+            assertThat(forLean(sol, "artifact")).isPositive();
+        }
+
+        // Only the 3 cheapest units die in a system next to Mecatol: fighters screening two dreadnoughts there cost
+        // far less than the same fleet sitting on Mecatol Rex itself.
+        @Test
+        void fightersScreenAFleetNextToMecatolRexFromTheIxthianBlast() {
+            Tile mecatol = test.place("18", "000");
+            Tile beside = test.place("26", "101");
+            test.units(beside, "space", xxcha, UnitType.Dreadnought, 2);
+            test.units(beside, "space", xxcha, UnitType.Fighter, 3);
+            double screened = forLean(xxcha, "artifact");
+            beside.removeAllUnits(xxcha.getColor());
+            test.units(mecatol, "space", xxcha, UnitType.Dreadnought, 2);
+            test.units(mecatol, "space", xxcha, UnitType.Fighter, 3);
+
+            assertThat(screened).isGreaterThan(forLean(xxcha, "artifact") + 3);
+        }
+
         // Galactic Crisis Pact: Diplomacy's secondary does nothing in the agenda phase.
         @Test
         void diplomacyIsWorthNothingOnGalacticCrisisPact() {

@@ -25,23 +25,21 @@ public final class AgendaUtilityProbe {
         if (!"artifact".equals(agenda)) return "";
         ExpertDirectiveValues.ArtifactParts parts =
                 ExpertDirectiveValues.artifactParts(new AgendaView(game, seat, true));
-        String tech =
-                ti4.ai.strategy.ResearchPolicy.bestResearchable(game, seat).orElse("-");
-        int points = "-".equals(tech) ? 0 : ti4.ai.strategy.ResearchPolicy.publicPointsCompletedBy(game, seat, tech);
+        int points = parts.ownTechPoints();
         return String.format(
                 "For %+.1f = 0.5 x research %+.1f (own %.1f, rivals %.1f; best tech %s%s) + 0.5 x blast %+.1f"
-                        + " (own %.1f from %d units in Mecatol + %d adjacent counted, rivals %.1f) + bias %.1f",
+                        + " (own loss %.1f TG from %d units in Mecatol + %d adjacent, rivals %.1f) + bias %.1f",
                 parts.value(),
                 parts.research(),
                 parts.ownResearch(),
                 parts.rivalResearch(),
-                tech,
-                points > 0 ? ", completes " + points + " public point" + (points == 1 ? "" : "s") : "",
+                parts.ownTech(),
+                points > 0 ? ", completes " + points + " point" + (points == 1 ? "" : "s") + " at half value" : "",
                 parts.blast(),
-                parts.ownBlast(),
+                -parts.ownBlast(),
                 parts.mecatolUnits(),
                 parts.adjacentUnits(),
-                parts.rivalBlast(),
+                -parts.rivalBlast(),
                 parts.forBias());
     }
 

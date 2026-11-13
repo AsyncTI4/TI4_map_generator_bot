@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.ValueScale;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.strategy.CardValueScale;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.game.Player;
@@ -203,21 +204,51 @@ class ExpertDirectiveValuesTest extends BaseTi4Test {
         assertThat(expert(nekro, "artifact", "against")).isZero();
     }
 
-    // Six Nekro ships on Mecatol Rex would all die on a 1-5, a devastating blast, so the bias is dropped.
+    // Six Nekro cruisers on Mecatol Rex would all die on a 1-5: 6 x (2 resources x 0.8) + 6 x 0.5 = 12.6 TG, a
+    // devastating blast, so the bias is dropped.
     @Test
     void ixthianArtifactDropsTheBiasWhenTheBlastIsDevastating() {
         test.units(mecatol, "space", nekro, UnitType.Cruiser, 6);
         ExpertDirectiveValues.ArtifactParts parts = artifactParts(nekro);
 
         assertThat(parts.mecatolUnits()).isEqualTo(6);
-        assertThat(parts.ownBlast()).isCloseTo(-9.0, within(EPSILON));
+        assertThat(parts.ownBlast()).isCloseTo(-12.6, within(EPSILON));
         assertThat(parts.forBias()).isZero();
         assertThat(expert(nekro, "artifact", "for"))
                 .isCloseTo(0.5 * parts.research() + 0.5 * parts.blast(), within(EPSILON));
     }
 
+    // In a system next to Mecatol Rex only the 3 cheapest units die: two fighters (0.5 resources each) and a destroyer
+    // (1), never the dreadnoughts. Loss = (0.5 + 0.5 + 1) x 0.8 + 3 x 0.5 = 3.1 TG.
+    @Test
+    void ixthianArtifactBlastTakesTheThreeCheapestUnitsInAnAdjacentSystem() {
+        Tile beside = test.game.getTileByPosition("105");
+        test.units(beside, "space", hacan, UnitType.Fighter, 2);
+        test.units(beside, "space", hacan, UnitType.Destroyer, 1);
+        test.units(beside, "space", hacan, UnitType.Dreadnought, 2);
+
+        ExpertDirectiveValues.MecatolBlast blast = ExpertDirectiveValues.mecatolBlast(test.game, hacan);
+
+        assertThat(blast.mecatolUnits()).isZero();
+        assertThat(blast.adjacentUnits()).isEqualTo(3);
+        assertThat(blast.loss()).isCloseTo(3.1, within(EPSILON));
+    }
+
+    // Controlling Mecatol Rex adds 4 TG to the blast loss on top of its units: one infantry there is 0.4 + 0.5.
+    @Test
+    void ixthianArtifactBlastCountsControlOfMecatolRex() {
+        hacan.addPlanet("mr");
+        test.units(mecatol, "mr", hacan, UnitType.Infantry, 1);
+
+        ExpertDirectiveValues.MecatolBlast blast = ExpertDirectiveValues.mecatolBlast(test.game, hacan);
+
+        assertThat(blast.mecatolUnits()).isEqualTo(1);
+        assertThat(blast.loss()).isCloseTo(4 + 0.4 + 0.5, within(EPSILON));
+        assertThat(artifactParts(hacan).ownBlast()).isCloseTo(-blast.loss(), within(EPSILON));
+    }
+
     // A rival's research is judged from public information only: handing Sol a technology secret must not change
-    // how Nekro values Sol's two free technologies. Sol's own view of itself does read its own secret.
+    // how Nekro values Sol's two free technologies.
     @Test
     void ixthianArtifactJudgesRivalsResearchWithoutTheirSecrets() {
         double before = artifactParts(nekro).rivalResearch();
@@ -228,6 +259,54 @@ class ExpertDirectiveValuesTest extends BaseTi4Test {
                 .isCloseTo(ResearchPolicy.publicResearchWorth(test.game, sol), within(EPSILON));
         assertThat(ExpertDirectiveValues.researchWorth(new AgendaView(test.game, sol, true), sol))
                 .isCloseTo(ResearchPolicy.freeResearchWorth(test.game, sol), within(EPSILON));
+    }
+
+    // Sol holds Master the Laws of Physics with three blue technologies, so Light/Wave Deflector would complete it.
+    // In its own view that secret point counts at half its value on top of the two-tech tempo; Nekro, who cannot see
+    // the secret, values Sol's research the same with or without it.
+    @Test
+    void ixthianArtifactCountsAnOwnTechnologySecretAtHalfAPoint() {
+        for (String tech : List.of("amd", "gd", "fl")) sol.addTech(tech);
+        double rivalBefore = ExpertDirectiveValues.ixthianResearchWorth(new AgendaView(test.game, nekro, true), sol);
+        sol.setSecret("mlp");
+
+        ExpertDirectiveValues.ArtifactParts own = artifactParts(sol);
+        ResearchPolicy.FreeTech deflector = ResearchPolicy.bestFreeTech(
+                        test.game, sol, true, tech -> "lwd".equals(tech.alias()) ? 1 : 0)
+                .orElseThrow();
+
+        ResearchPolicy.FreeTech unseen = ResearchPolicy.bestFreeTech(
+                        test.game, sol, false, tech -> "lwd".equals(tech.alias()) ? 1 : 0)
+                .orElseThrow();
+
+        assertThat(deflector.points()).isEqualTo(1);
+        assertThat(deflector.pointValue()).isCloseTo(ScoringStakes.scoreValue(test.game, sol, 1), within(EPSILON));
+        assertThat(ExpertDirectiveValues.ixthianTechWorth(deflector))
+                .isCloseTo(1.8 * deflector.tempo() + 0.5 * deflector.pointValue(), within(EPSILON));
+        assertThat(unseen.points()).isZero();
+        assertThat(own.ownResearch())
+                .isGreaterThanOrEqualTo(
+                        1.8 * deflector.tempo() + 0.5 * ScoringStakes.scoreValue(test.game, sol, 1) - EPSILON);
+        assertThat(ExpertDirectiveValues.ixthianResearchWorth(new AgendaView(test.game, nekro, true), sol))
+                .isCloseTo(rivalBefore, within(EPSILON));
+    }
+
+    // Diversify Research (2 technologies in each of 2 colours) is revealed and Sol owns two blue and one green, so
+    // Psychoarchaeology would complete it. Every seat, rivals included, counts that public point at half its value.
+    @Test
+    void ixthianArtifactCountsAPublicObjectiveAtHalfAPoint() {
+        for (String tech : List.of("amd", "gd", "nm")) sol.addTech(tech);
+        test.game.getRevealedPublicObjectives().put("diversify", 7);
+        AgendaView nekroView = new AgendaView(test.game, nekro, true);
+
+        ResearchPolicy.FreeTech psychoarchaeology = ResearchPolicy.bestFreeTech(
+                        test.game, sol, false, tech -> "pa".equals(tech.alias()) ? 1 : 0)
+                .orElseThrow();
+
+        assertThat(psychoarchaeology.points()).isEqualTo(1);
+        assertThat(ExpertDirectiveValues.ixthianResearchWorth(nekroView, sol))
+                .isGreaterThanOrEqualTo(
+                        1.8 * psychoarchaeology.tempo() + 0.5 * ScoringStakes.scoreValue(test.game, sol, 1) - EPSILON);
     }
 
     // A revealed spend objective (Erect a Monument) makes the trade goods from For worth more to every seat.
