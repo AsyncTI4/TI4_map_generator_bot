@@ -18,6 +18,33 @@ public final class AgendaUtilityProbe {
 
     private AgendaUtilityProbe() {}
 
+    // How a seat's Ixthian Artifact "For" value is built, from its own view (its own secrets for its own research,
+    // public information for rivals'): research and Mecatol blast, each as own minus the threat-weighted rival
+    // average, plus the units it would lose and its best tech. Empty for any other agenda.
+    public static String artifactSplit(Game game, Player seat, String agenda) {
+        if (!"artifact".equals(agenda)) return "";
+        ExpertDirectiveValues.ArtifactParts parts =
+                ExpertDirectiveValues.artifactParts(new AgendaView(game, seat, true));
+        String tech =
+                ti4.ai.strategy.ResearchPolicy.bestResearchable(game, seat).orElse("-");
+        int points = "-".equals(tech) ? 0 : ti4.ai.strategy.ResearchPolicy.publicPointsCompletedBy(game, seat, tech);
+        return String.format(
+                "For %+.1f = 0.5 x research %+.1f (own %.1f, rivals %.1f; best tech %s%s) + 0.5 x blast %+.1f"
+                        + " (own %.1f from %d units in Mecatol + %d adjacent counted, rivals %.1f) + bias %.1f",
+                parts.value(),
+                parts.research(),
+                parts.ownResearch(),
+                parts.rivalResearch(),
+                tech,
+                points > 0 ? ", completes " + points + " public point" + (points == 1 ? "" : "s") : "",
+                parts.blast(),
+                parts.ownBlast(),
+                parts.mecatolUnits(),
+                parts.adjacentUnits(),
+                parts.rivalBlast(),
+                parts.forBias());
+    }
+
     public static String currentAgenda(Game game) {
         return AgendaPolicy.currentAgenda(game);
     }

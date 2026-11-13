@@ -81,9 +81,9 @@ class ExpertDirectiveValues {
             case "arms_reduction" -> armsReduction(game, voter, outcome);
             case "economic_equality" -> economicEquality(game, voter, outcome);
             case "incentive" -> incentiveProgram(game, voter, outcome);
-            case "artifact" -> ixthianArtifact(game, voter, outcome);
+            case "artifact" -> ixthianArtifact(view, outcome);
             case "plowshares" -> swordsToPlowshares(game, voter, outcome);
-            case "wormhole_research" -> wormholeResearch(game, voter, outcome, ownVote);
+            case "wormhole_research" -> wormholeResearch(view, outcome, ownVote);
             case "cladenstine" -> clandestineOperations(game, voter, outcome);
             default -> null;
         };
@@ -191,24 +191,70 @@ class ExpertDirectiveValues {
         return Math.clamp(player.getPlanets().size() / average, MIN_STRENGTH, MAX_STRENGTH);
     }
 
-    private static double ixthianArtifact(Game game, Player voter, String outcome) {
-        if (!isFor(outcome)) return 0;
-        double research =
-                relativeToRivals(game, voter, player -> TWO_TECHS * ResearchPolicy.freeResearchWorth(game, player));
-        double blast = relativeToRivals(game, voter, player -> -mecatolBlastLoss(game, player));
-        double value = TECH_ROLL_CHANCE * research + (1 - TECH_ROLL_CHANCE) * blast;
-        return mecatolBlastLoss(game, voter) < ARTIFACT_DEVASTATING ? value + ARTIFACT_FOR_BIAS : value;
+    record ArtifactParts(
+            double ownResearch,
+            double rivalResearch,
+            double ownBlast,
+            double rivalBlast,
+            int mecatolUnits,
+            int adjacentUnits,
+            double forBias) {
+
+        double research() {
+            return ownResearch - rivalResearch;
+        }
+
+        double blast() {
+            return ownBlast - rivalBlast;
+        }
+
+        double value() {
+            return TECH_ROLL_CHANCE * research() + (1 - TECH_ROLL_CHANCE) * blast() + forBias;
+        }
+    }
+
+    private static double ixthianArtifact(AgendaView view, String outcome) {
+        return isFor(outcome) ? artifactParts(view).value() : 0;
+    }
+
+    static ArtifactParts artifactParts(AgendaView view) {
+        Game game = view.game();
+        Player voter = view.voter();
+        ToDoubleFunction<Player> research = player -> TWO_TECHS * researchWorth(view, player);
+        ToDoubleFunction<Player> blast = player -> -mecatolBlastLoss(game, player);
+        double ownResearch = research.applyAsDouble(voter);
+        double ownBlast = blast.applyAsDouble(voter);
+        int[] units = mecatolUnits(game, voter);
+        return new ArtifactParts(
+                ownResearch,
+                ownResearch - relativeToRivals(game, voter, research),
+                ownBlast,
+                ownBlast - relativeToRivals(game, voter, blast),
+                units[0],
+                units[1],
+                -ownBlast < ARTIFACT_DEVASTATING ? ARTIFACT_FOR_BIAS : 0);
+    }
+
+    static double researchWorth(AgendaView view, Player player) {
+        return view.readsHandOf(player)
+                ? ResearchPolicy.freeResearchWorth(view.game(), player)
+                : ResearchPolicy.publicResearchWorth(view.game(), player);
     }
 
     private static double mecatolBlastLoss(Game game, Player player) {
+        int[] units = mecatolUnits(game, player);
+        return LOST_UNIT * (units[0] + units[1]);
+    }
+
+    private static int[] mecatolUnits(Game game, Player player) {
         Tile mecatol = game.getMecatolTile();
-        if (mecatol == null) return 0;
+        if (mecatol == null) return new int[2];
         int adjacent = Adjacency.withSystem(game, player, mecatol.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .filter(tile -> tile != null && tile != mecatol)
                 .mapToInt(tile -> Math.min(ADJACENT_LOSSES, unitsIn(tile, player)))
                 .sum();
-        return LOST_UNIT * (unitsIn(mecatol, player) + adjacent);
+        return new int[] {unitsIn(mecatol, player), adjacent};
     }
 
     private static int unitsIn(Tile tile, Player player) {
@@ -250,11 +296,13 @@ class ExpertDirectiveValues {
         return BoardView.count(game.getUnitHolderFromPlanet(planet), player, UnitType.Infantry);
     }
 
-    private static double wormholeResearch(Game game, Player voter, String outcome, String ownVote) {
+    private static double wormholeResearch(AgendaView view, String outcome, String ownVote) {
+        Game game = view.game();
+        Player voter = view.voter();
         if (isAgainst(outcome))
             return relativeToRivals(game, voter, player -> -againstVoterTokenLoss(game, voter, player, ownVote));
         if (!isFor(outcome)) return 0;
-        return relativeToRivals(game, voter, player -> wormholeResearchGain(game, player));
+        return relativeToRivals(game, voter, player -> wormholeResearchGain(view, player));
     }
 
     private static double againstVoterTokenLoss(Game game, Player voter, Player player, String ownVote) {
@@ -262,8 +310,9 @@ class ExpertDirectiveValues {
         return votedOn(game, player, AgendaValueMath::isAgainst) ? CardValueScale.HELD_TOKEN : 0;
     }
 
-    private static double wormholeResearchGain(Game game, Player player) {
-        double research = hasShipsAtAnyWormhole(game, player) ? ResearchPolicy.freeResearchWorth(game, player) : 0;
+    private static double wormholeResearchGain(AgendaView view, Player player) {
+        Game game = view.game();
+        double research = hasShipsAtAnyWormhole(game, player) ? researchWorth(view, player) : 0;
         return research - ValueScale.RESOURCE * unitsLostAtAlphaOrBeta(game, player);
     }
 

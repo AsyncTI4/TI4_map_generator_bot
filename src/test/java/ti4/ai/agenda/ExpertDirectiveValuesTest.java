@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.strategy.CardValueScale;
+import ti4.ai.strategy.ResearchPolicy;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -183,13 +184,22 @@ class ExpertDirectiveValuesTest extends BaseTi4Test {
                 .isCloseTo(ExpertDirectiveValues.INCENTIVE_STAGE_TWO_FACTION_BONUS, within(EPSILON));
     }
 
-    // With nothing near Mecatol Rex the blast cannot hurt Nekro, so it gets the small "fun" For bias.
+    private ExpertDirectiveValues.ArtifactParts artifactParts(Player voter) {
+        return ExpertDirectiveValues.artifactParts(new AgendaView(test.game, voter, true));
+    }
+
+    // For is half the two-tech roll and half the Mecatol blast, each as own minus the rival average. With nothing
+    // near Mecatol Rex the blast cannot hurt Nekro, so it also gets the small "fun" For bias.
     @Test
     void ixthianArtifactHasASmallForBiasWhenTheBlastIsHarmless() {
-        double legacy = DirectiveValues.ixthianArtifact(test.game, nekro, "for");
+        ExpertDirectiveValues.ArtifactParts parts = artifactParts(nekro);
 
+        assertThat(parts.mecatolUnits()).isZero();
+        assertThat(parts.forBias()).isEqualTo(ExpertDirectiveValues.ARTIFACT_FOR_BIAS);
         assertThat(expert(nekro, "artifact", "for"))
-                .isCloseTo(legacy + ExpertDirectiveValues.ARTIFACT_FOR_BIAS, within(EPSILON));
+                .isCloseTo(
+                        0.5 * parts.research() + 0.5 * parts.blast() + ExpertDirectiveValues.ARTIFACT_FOR_BIAS,
+                        within(EPSILON));
         assertThat(expert(nekro, "artifact", "against")).isZero();
     }
 
@@ -197,9 +207,27 @@ class ExpertDirectiveValuesTest extends BaseTi4Test {
     @Test
     void ixthianArtifactDropsTheBiasWhenTheBlastIsDevastating() {
         test.units(mecatol, "space", nekro, UnitType.Cruiser, 6);
-        double legacy = DirectiveValues.ixthianArtifact(test.game, nekro, "for");
+        ExpertDirectiveValues.ArtifactParts parts = artifactParts(nekro);
 
-        assertThat(expert(nekro, "artifact", "for")).isCloseTo(legacy, within(EPSILON));
+        assertThat(parts.mecatolUnits()).isEqualTo(6);
+        assertThat(parts.ownBlast()).isCloseTo(-9.0, within(EPSILON));
+        assertThat(parts.forBias()).isZero();
+        assertThat(expert(nekro, "artifact", "for"))
+                .isCloseTo(0.5 * parts.research() + 0.5 * parts.blast(), within(EPSILON));
+    }
+
+    // A rival's research is judged from public information only: handing Sol a technology secret must not change
+    // how Nekro values Sol's two free technologies. Sol's own view of itself does read its own secret.
+    @Test
+    void ixthianArtifactJudgesRivalsResearchWithoutTheirSecrets() {
+        double before = artifactParts(nekro).rivalResearch();
+        sol.setSecret("mlp");
+
+        assertThat(artifactParts(nekro).rivalResearch()).isCloseTo(before, within(EPSILON));
+        assertThat(ExpertDirectiveValues.researchWorth(new AgendaView(test.game, nekro, true), sol))
+                .isCloseTo(ResearchPolicy.publicResearchWorth(test.game, sol), within(EPSILON));
+        assertThat(ExpertDirectiveValues.researchWorth(new AgendaView(test.game, sol, true), sol))
+                .isCloseTo(ResearchPolicy.freeResearchWorth(test.game, sol), within(EPSILON));
     }
 
     // A revealed spend objective (Erect a Monument) makes the trade goods from For worth more to every seat.

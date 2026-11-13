@@ -315,6 +315,7 @@ final class AgendaTrace {
         private final int ledgerStart;
         private int ledgerAtResolution = -1;
         private Map<String, Map<String, Double>> chancesAtReveal = Map.of();
+        private Map<String, String> splitsAtReveal = Map.of();
         private final Map<String, Promise> promises = new LinkedHashMap<>();
         private final Map<String, Long> promiseAcceptedAt = new LinkedHashMap<>();
         private final List<String> changes = new ArrayList<>();
@@ -347,6 +348,7 @@ final class AgendaTrace {
             if (!ENABLED) return;
             if (chancesAtReveal.isEmpty()) chancesAtReveal = chancesOf(game);
             if (agendaKey.isBlank()) agendaKey = ti4.ai.agenda.AgendaUtilityProbe.currentAgenda(game);
+            if (splitsAtReveal.isEmpty()) splitsAtReveal = splitsOf(game, agendaKey);
             Map<String, Snap> current = new LinkedHashMap<>();
             for (Player seat : game.getRealPlayers()) current.put(seat.getFaction(), Snap.of(game, seat));
             if (!resolved) {
@@ -364,6 +366,21 @@ final class AgendaTrace {
             recordChanges(now, current);
             last = current;
             recordPromises(game, now);
+        }
+
+        // Per-seat value breakdown at reveal, for agendas the probe can split (Ixthian Artifact today).
+        private Map<String, String> splitsOf(Game game, String agenda) {
+            Map<String, String> splits = new LinkedHashMap<>();
+            try {
+                for (Player seat : game.getRealPlayers()) {
+                    String split = ti4.ai.agenda.AgendaUtilityProbe.artifactSplit(game, seat, agenda);
+                    if (split.isEmpty()) return Map.of();
+                    splits.put(seat.getFaction(), split);
+                }
+            } catch (RuntimeException e) {
+                return Map.of();
+            }
+            return splits;
         }
 
         private Map<String, Map<String, Double>> chancesOf(Game game) {
@@ -533,6 +550,8 @@ final class AgendaTrace {
                 if (reveal != null || chances != null)
                     out.add("             at reveal: reference utility " + values(reveal, "%+.1f") + "; forecast "
                             + values(chances, "pct"));
+                String split = splitsAtReveal.get(faction);
+                if (split != null) out.add("             split: " + split);
             }
             out.add("  RIDERS");
             if (riders.isEmpty()) out.add("    none");
