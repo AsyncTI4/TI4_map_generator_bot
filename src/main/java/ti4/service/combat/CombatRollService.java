@@ -1294,12 +1294,12 @@ public class CombatRollService {
             }
         }
 
-        if ((!game.isFowMode() || isFoWPrivateChannelRoll(player, event))
+        boolean assignInOpponentChannel = isFoWPrivateChannelRoll(player, event) || isFoWDummyRoll(game, player);
+        if ((!game.isFowMode() || assignInOpponentChannel)
                 && rollType == CombatRollType.SpaceCannonOffence
                 && h > 0
                 && (opponent != player || targetPlayer != null)) {
-            MessageChannel channel =
-                    isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
+            MessageChannel channel = assignInOpponentChannel ? opponent.getCorrectChannel() : event.getMessageChannel();
             if (!ValhavnBreakthroughHandler.offerYggdrasilCannon(event, game, player, opponent, tile, h)
                     && !BlueReverieTechHelper.offerGravitonLaserSystemAfterSpaceCannon(
                             game, player, opponent, tile, h, event)) {
@@ -1582,6 +1582,10 @@ public class CombatRollService {
     }
 
     // This roll was made from fow private channel and not from a combat thread
+    private static boolean isFoWDummyRoll(Game game, Player player) {
+        return game.isFowMode() && (player.isDummy() || player.isNpc());
+    }
+
     private static boolean isFoWPrivateChannelRoll(Player player, GenericInteractionCreateEvent event) {
         return event.getMessageChannel().equals(player.getPrivateChannel());
     }
