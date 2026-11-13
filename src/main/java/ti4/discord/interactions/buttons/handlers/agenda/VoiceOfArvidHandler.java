@@ -33,62 +33,79 @@ public class VoiceOfArvidHandler {
     private static final String STATE_KEY = "voiceOfArvid";
     private static final int AGENDAS_TO_LOOK_AT = 5;
 
-    private static final String PLAY = "voiceOfArvidPlay";
+    private static final String PREPARE = "voiceOfArvidPlay";
+    private static final String CANCEL = "voiceOfArvidCancel";
     private static final String CHOOSE = "voiceOfArvidChoose_";
     private static final String PLANET_OWNER = "voiceOfArvidOwner_";
     private static final String OUTCOME = "voiceOfArvidOutcome";
     private static final String RESOLVE = "voiceOfArvidResolve_";
 
     private static final Set<String> MANUAL_AGENDA_IDS = Set.of("miscount", "absol_miscount");
+    private static final Set<String> PREPARE_PHASES = Set.of("action", "statusScoring", "statusHomework");
 
     public static Button playButton() {
-        return Buttons.green(PLAY, "Play The Voice of Arvid (megagame)", ExploreEmojis.Relic);
+        return Buttons.green(PREPARE, "Prepare The Voice of Arvid (megagame)", ExploreEmojis.Relic);
     }
 
-    public static boolean blocksAgendaFlip(Game game, ButtonInteractionEvent event) {
-        if (ArvidPlay.current(game) == null) return false;
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "Waiting for " + RELIC_NAME + " to be resolved before the agenda is flipped."
-                        + " A GM may override this with `/agenda reveal`.");
-        return true;
+    public static boolean holdsFirstFlip(Game game, ButtonInteractionEvent event) {
+        ArvidPlay play = ArvidPlay.current(game);
+        String phase = StringUtils.defaultString(game.getPhaseOfGame());
+        boolean agendaPhaseFlip = "statusHomework".equalsIgnoreCase(phase) || phase.startsWith("agenda");
+        if (play == null
+                || !agendaPhaseFlip
+                || !game.getStoredValue("executiveOrder").isEmpty()) {
+            return false;
+        }
+        if (!isAgendaStart(game)) {
+            game.removeStoredValue(STATE_KEY);
+            return false;
+        }
+        if (play.isRevealed()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Waiting for " + RELIC_NAME + " to be resolved before the first agenda is flipped."
+                            + " A GM may override this with `/agenda reveal`.");
+            return true;
+        }
+        return reveal(game, play);
     }
 
-    @ButtonHandler(PLAY)
-    public static void play(ButtonInteractionEvent event, Game game, Player player) {
-        String refusal = playRefusal(game, player);
+    @ButtonHandler(PREPARE)
+    public static void prepare(ButtonInteractionEvent event, Game game, Player player) {
+        String refusal = prepareRefusal(game, player);
         if (refusal != null) {
             MessageHelper.sendMessageToEventChannel(event, refusal);
             return;
         }
-        List<String> agendaIds = agendasToLookAt(game);
-        new ArvidPlay(game.getRound(), player.getFaction(), agendaIds, "").write(game);
-        MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                "**" + FoWHelper.actorOrAnon(game, player, "A player") + " plays " + RELIC_NAME
-                        + " and will have the top " + agendaIds.size()
-                        + " agenda cards shown privately. Please be patient.**");
-        String extraDrawn = agendaIds.size() > AGENDAS_TO_LOOK_AT
-                ? " None of the top " + AGENDAS_TO_LOOK_AT + " had a valid target, so more were drawn until one did."
-                : "";
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+        new ArvidPlay(game.getRound(), player.getFaction(), List.of(), "").write(game);
+        MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", these are the top " + agendaIds.size() + " agendas."
-                        + extraDrawn
-                        + " Choose 1 with a valid target to resolve with your vote; all the others are discarded.",
-                agendaIds.stream()
-                        .map(id -> Mapper.getAgenda(id).getRepresentationEmbed())
-                        .toList(),
-                agendaIds.stream().map(id -> chooseButton(game, id)).toList());
+                player.getRepresentationUnfogged() + ", " + RELIC_NAME + " is prepared. At the start of the agenda"
+                        + " phase, before the first agenda is flipped, you will see the top 5 agendas privately and"
+                        + " choose 1.",
+                List.of(Buttons.red(CANCEL, "Cancel the preparation")));
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler(CANCEL)
+    public static void cancel(ButtonInteractionEvent event, Game game, Player player) {
+        ArvidPlay play = ArvidPlay.current(game);
+        if (play == null || !play.isOwnedBy(player) || play.isRevealed()) {
+            MessageHelper.sendMessageToEventChannel(event, RELIC_NAME + " can no longer be cancelled.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        game.removeStoredValue(STATE_KEY);
+        MessageHelper.sendMessageToEventChannel(event, RELIC_NAME + " is no longer prepared; you keep the relic.");
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(CHOOSE)
     public static void choose(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (refuseDuringAgendaVote(event, game)) return;
+        if (refuseOutsideAgendaStart(event, game)) return;
         ArvidPlay play = ArvidPlay.current(game);
         String chosen = buttonID.substring(CHOOSE.length());
-        if (play == null || play.hasChosen()) {
+        if (play == null || !play.isRevealed() || play.hasChosen()) {
             MessageHelper.sendMessageToEventChannel(
                     event,
                     "This " + RELIC_NAME + " choice is no longer open. If the agenda deck changed after you looked at"
@@ -125,7 +142,7 @@ public class VoiceOfArvidHandler {
 
     @ButtonHandler(PLANET_OWNER)
     public static void choosePlanetOwner(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (refuseDuringAgendaVote(event, game)) return;
+        if (refuseOutsideAgendaStart(event, game)) return;
         Player owner = game.getPlayerFromColorOrFaction(buttonID.substring(PLANET_OWNER.length()));
         if (!isOpenFor(game, player) || owner == null) {
             MessageHelper.sendMessageToEventChannel(event, "This " + RELIC_NAME + " choice is no longer open.");
@@ -139,7 +156,7 @@ public class VoiceOfArvidHandler {
 
     @ButtonHandler(OUTCOME + "_")
     public static void chooseOutcome(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (refuseDuringAgendaVote(event, game)) return;
+        if (refuseOutsideAgendaStart(event, game)) return;
         ArvidPlay play = ArvidPlay.current(game);
         if (play == null || !play.isOwnedBy(player) || !play.hasChosen()) {
             MessageHelper.sendMessageToEventChannel(event, "This " + RELIC_NAME + " choice is no longer open.");
@@ -161,7 +178,7 @@ public class VoiceOfArvidHandler {
 
     @ButtonHandler(RESOLVE)
     public static void resolve(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (refuseDuringAgendaVote(event, game)) return;
+        if (refuseOutsideAgendaStart(event, game)) return;
         ArvidPlay play = ArvidPlay.current(game);
         if (play == null || !play.isOwnedBy(player) || !play.hasChosen()) {
             MessageHelper.sendMessageToEventChannel(event, "This " + RELIC_NAME + " has already been resolved.");
@@ -178,29 +195,59 @@ public class VoiceOfArvidHandler {
         game.resetCurrentAgendaVotes();
     }
 
-    private static String playRefusal(Game game, Player player) {
+    private static boolean reveal(Game game, ArvidPlay play) {
+        Player player = game.getPlayerFromColorOrFaction(play.faction());
+        boolean anyValid = game.getAgendas().stream().anyMatch(id -> hasValidTarget(game, id));
+        if (player == null || !player.hasRelic(RELIC_ID) || !anyValid) {
+            game.removeStoredValue(STATE_KEY);
+            return false;
+        }
+        List<String> agendaIds = agendasToLookAt(game);
+        new ArvidPlay(play.round(), play.faction(), agendaIds, "").write(game);
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                "**" + FoWHelper.actorOrAnon(game, player, "A player") + " uses " + RELIC_NAME
+                        + " and will have the top " + agendaIds.size()
+                        + " agenda cards shown privately. Please be patient; the first agenda is flipped after it"
+                        + " is resolved.**");
+        String extraDrawn = agendaIds.size() > AGENDAS_TO_LOOK_AT
+                ? " None of the top " + AGENDAS_TO_LOOK_AT + " had a valid target, so more were drawn until one did."
+                : "";
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", these are the top " + agendaIds.size() + " agendas."
+                        + extraDrawn
+                        + " Choose 1 with a valid target to resolve with your vote; all the others are discarded.",
+                agendaIds.stream()
+                        .map(id -> Mapper.getAgenda(id).getRepresentationEmbed())
+                        .toList(),
+                agendaIds.stream().map(id -> chooseButton(game, id)).toList());
+        return true;
+    }
+
+    private static String prepareRefusal(Game game, Player player) {
         if (!player.hasRelic(RELIC_ID)) return "You no longer hold " + RELIC_NAME + ".";
-        if (!isOutsideAgendaVote(game)) {
-            return RELIC_NAME + " can only be prepared during the action phase.";
+        if (!PREPARE_PHASES.contains(StringUtils.defaultString(game.getPhaseOfGame()))
+                || !game.getStoredValue("executiveOrder").isEmpty()) {
+            return RELIC_NAME + " can only be prepared during the action or status phase.";
         }
-        if (ArvidPlay.current(game) != null) return RELIC_NAME + " is already being resolved.";
-        if (game.getAgendas().stream().noneMatch(id -> hasValidTarget(game, id))) {
-            return "No agenda left in the agenda deck has a valid target.";
-        }
+        if (ArvidPlay.current(game) != null) return RELIC_NAME + " is already prepared.";
         return null;
     }
 
-    private static boolean isOutsideAgendaVote(Game game) {
-        return "action".equalsIgnoreCase(game.getPhaseOfGame())
-                && game.getStoredValue("executiveOrder").isEmpty();
+    private static boolean isAgendaStart(Game game) {
+        String agendaCount = game.getStoredValue("agendaCount");
+        return !"action".equalsIgnoreCase(game.getPhaseOfGame())
+                && game.getStoredValue("executiveOrder").isEmpty()
+                && (agendaCount.isEmpty() || "0".equals(agendaCount));
     }
 
-    private static boolean refuseDuringAgendaVote(ButtonInteractionEvent event, Game game) {
-        if (isOutsideAgendaVote(game)) return false;
+    private static boolean refuseOutsideAgendaStart(ButtonInteractionEvent event, Game game) {
+        if (isAgendaStart(game)) return false;
         MessageHelper.sendMessageToEventChannel(
                 event,
-                RELIC_NAME + " can only be resolved during the action phase, while no agenda is being voted on."
-                        + " Try again once the vote is over.");
+                RELIC_NAME + " can only be resolved at the start of the agenda phase, before the first agenda is"
+                        + " flipped.");
         return true;
     }
 
@@ -273,7 +320,7 @@ public class VoiceOfArvidHandler {
                 game.getMainGameChannel(),
                 gmPing(game) + " " + FoWHelper.actorOrAnon(game, player, "A player") + " chose _" + agenda.getName()
                         + "_ with " + RELIC_NAME + ". The bot cannot resolve this agenda with a single vote and no"
-                        + " windows, so please resolve it by hand. The agenda deck is unlocked again.",
+                        + " windows, so please resolve it by hand. The first agenda can be flipped afterwards.",
                 agenda.getRepresentationEmbed());
     }
 
@@ -301,9 +348,9 @@ public class VoiceOfArvidHandler {
         static ArvidPlay current(Game game) {
             ArvidPlay play = read(game);
             if (play == null) return null;
-            boolean stale = play.round() != game.getRound()
-                    || (!play.hasChosen() && !game.getAgendas().containsAll(play.agendaIds()));
-            if (!stale) return play;
+            boolean deckChanged =
+                    play.isRevealed() && !play.hasChosen() && !game.getAgendas().containsAll(play.agendaIds());
+            if (play.round() == game.getRound() && !deckChanged) return play;
             game.removeStoredValue(STATE_KEY);
             return null;
         }
@@ -311,7 +358,8 @@ public class VoiceOfArvidHandler {
         private static ArvidPlay read(Game game) {
             String[] parts = game.getStoredValue(STATE_KEY).split("\\|", -1);
             if (parts.length != 4 || !StringUtils.isNumeric(parts[0])) return null;
-            return new ArvidPlay(Integer.parseInt(parts[0]), parts[1], Arrays.asList(parts[2].split(";")), parts[3]);
+            List<String> ids = parts[2].isEmpty() ? List.of() : Arrays.asList(parts[2].split(";"));
+            return new ArvidPlay(Integer.parseInt(parts[0]), parts[1], ids, parts[3]);
         }
 
         void write(Game game) {
@@ -324,6 +372,10 @@ public class VoiceOfArvidHandler {
 
         boolean isOwnedBy(Player player) {
             return player != null && faction.equals(player.getFaction());
+        }
+
+        boolean isRevealed() {
+            return !agendaIds.isEmpty();
         }
 
         boolean hasChosen() {
