@@ -151,6 +151,65 @@ public final class ButtonHelperFactionSpecific {
                 buttons);
     }
 
+    @ButtonHandler("viewAvailableIntrigues")
+    public static void viewAvailableIntrigues(Game game, ButtonInteractionEvent event) {
+        if (game.getRealPlayers().stream().noneMatch(p -> p.hasAbility("intrigue"))) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        StringBuilder message = new StringBuilder("__Available Intrigues__");
+        appendIntrigue(
+                message, game, "Levy", "2 Steel", "The active player resolves PRODUCTION of 1 unit in any system.");
+        appendIntrigue(
+                message,
+                game,
+                "Intervention",
+                "3 Steel",
+                "The active player removes 1 of their command tokens from the game board.");
+        appendIntrigue(message, game, "Omen", "4 Steel", "The active player draws 3 action cards.");
+        appendIntrigue(
+                message,
+                game,
+                "Recruit",
+                "5 Steel",
+                "The active player moves up to 3 of their ground forces to adjacent systems.");
+        appendIntrigue(
+                message, game, "Gambit", "4 Steel, 3 Star", "The active player resolves the Warfare primary ability.");
+        appendIntrigue(
+                message,
+                game,
+                "Commission",
+                "2 Star",
+                "The active player gains 2 trade goods and replenishes their commodities.");
+        appendIntrigue(message, game, "Legislation", "3 Star", "The active player looks at the top 3 agenda cards.");
+        appendIntrigue(message, game, "Cosmos", "4 Star", "The active player researches 1 technology.");
+        appendIntrigue(
+                message,
+                game,
+                "Secure",
+                "5 Star",
+                "The active player receives 2 promissory notes from each of 3 neighboring players.");
+        appendIntrigue(
+                message,
+                game,
+                "Mandate",
+                "3 Steel, 4 Star",
+                "The active player draws either 1 relic or 1 secret objective.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+    }
+
+    private static void appendIntrigue(StringBuilder message, Game game, String name, String cost, String effect) {
+        if (!game.getStoredValue("intrigue" + name).isEmpty()) {
+            return;
+        }
+        message.append("\n- __")
+                .append(name)
+                .append("__ — Cost: ")
+                .append(cost)
+                .append(". Effect: ")
+                .append(effect);
+    }
+
     @ButtonHandler("intrigueCardOn")
     public static void intrigueCardOn(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         if (!player.hasAbility("intrigue")) {
