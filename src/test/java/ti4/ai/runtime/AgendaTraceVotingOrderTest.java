@@ -33,7 +33,8 @@ class AgendaTraceVotingOrderTest extends BaseTi4Test {
         String line = window.votingOrderLine(
                 test.game,
                 agenda("sol", "against", Map.of("xxcha", "for 5", "sol", "against 5"), List.of()),
-                List.of(new AgendaTrace.Event(1, "sol", AgendaTrace.Kind.OTHER, "break the agenda tie as speaker")));
+                List.of(new AgendaTrace.Event(
+                        1, "sol", AgendaTrace.Kind.OTHER, "break the agenda tie as speaker", "voting")));
 
         assertThat(line)
                 .startsWith("VOTING ORDER: ")

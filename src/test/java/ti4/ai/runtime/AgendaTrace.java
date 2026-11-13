@@ -43,6 +43,10 @@ final class AgendaTrace {
     private static final String BLOOD_PACT = "blood_pact";
     private static final String ZEAL = "zeal";
     private static final double INDIFFERENT = 0.05;
+    private static final String WAITING_PHASE = "agendawaiting";
+    private static final String VOTING_PHASE = "agendavoting";
+    private static final String WHENS_RESOLVED = "whensResolved";
+    private static final String RESOLVED_OUTCOME = "resolvedAgendaOutcome";
 
     // Seat state the trace follows, by index into Snap.values.
     static final String[] KINDS = {"tg", "comm", "vp", "tech", "ac", "pn", "cc"};
@@ -93,7 +97,8 @@ final class AgendaTrace {
         OTHER
     }
 
-    record Event(long at, String faction, Kind kind, String text) {}
+    // window: the agenda window the decision was made in, as windowOf words it.
+    record Event(long at, String faction, Kind kind, String text, String window) {}
 
     record Press(long at, String faction, String customId, String outcome) {}
 
@@ -107,9 +112,13 @@ final class AgendaTrace {
             // Galactic Threat only: the technology Nekro expects to copy from seats voting that way (NaN otherwise).
             double threatWorth,
             long seenAt,
-            int ballotsBefore) {}
+            int ballotsBefore,
+            String window) {}
 
     private record Flow(long at, boolean afterResolution, String text, Map<String, int[]> bySeat) {}
+
+    // When a deal or a use happened: minutes since reveal and the agenda window, as windowOf words it.
+    private record Moment(long at, String window) {}
 
     private final Map<String, List<Event>> events = new HashMap<>();
     private final Map<String, Map<String, BallotProbe.Explanation>> ballots = new HashMap<>();
@@ -124,6 +133,21 @@ final class AgendaTrace {
     static boolean inAgenda(Game game) {
         String phase = game.getPhaseOfGame();
         return phase != null && phase.toLowerCase(Locale.ROOT).startsWith(AGENDA_PHASE);
+    }
+
+    // The agenda window as the game stands: "when" or "after" while those windows are open, "voting, Nekro's turn"
+    // during voting (whose turn it is), "resolved" once an outcome is stored, else the engine's phase name.
+    static String windowOf(Game game) {
+        String phase = StringUtils.defaultString(game.getPhaseOfGame()).toLowerCase(Locale.ROOT);
+        if (!game.getStoredValue(RESOLVED_OUTCOME).isBlank()) return "resolved";
+        if (WAITING_PHASE.equals(phase))
+            return game.getStoredValue(WHENS_RESOLVED).isEmpty() ? "when" : "after";
+        if (!VOTING_PHASE.equals(phase)) return phase.isEmpty() ? "?" : phase;
+        String activeId = game.getActivePlayerID();
+        Player active = activeId == null ? null : game.getPlayer(activeId);
+        return active == null || active.getFaction() == null
+                ? "voting"
+                : "voting, " + StringUtils.capitalize(active.getFaction()) + "'s turn";
     }
 
     // Heard from the seat brains, on whatever thread decides; the ballot probe runs outside the lock.
@@ -146,6 +170,7 @@ final class AgendaTrace {
             }
         }
         String text = kind == Kind.DEAL ? dealText(game, context.seat(), decision, reason) : reason;
+        String window = windowOf(game);
         synchronized (this) {
             if (explanation != null)
                 ballots.computeIfAbsent(info, key -> new LinkedHashMap<>()).putIfAbsent(faction, explanation);
@@ -153,7 +178,8 @@ final class AgendaTrace {
                     && !seenBallotReasons
                             .computeIfAbsent(info, key -> new LinkedHashSet<>())
                             .add(faction + "|" + reason)) return;
-            events.computeIfAbsent(info, key -> new ArrayList<>()).add(new Event(context.now(), faction, kind, text));
+            events.computeIfAbsent(info, key -> new ArrayList<>())
+                    .add(new Event(context.now(), faction, kind, text, window));
         }
     }
 
@@ -323,6 +349,12 @@ final class AgendaTrace {
         private Map<String, String> splitsAtReveal = Map.of();
         private final Map<String, Promise> promises = new LinkedHashMap<>();
         private final Map<String, Long> promiseAcceptedAt = new LinkedHashMap<>();
+        // When each promise was first seen offered and first seen accepted, and each bounty first seen posted.
+        private final Map<String, Moment> promiseOffered = new LinkedHashMap<>();
+        private final Map<String, Moment> promiseAccepted = new LinkedHashMap<>();
+        private final Map<String, Moment> bountyPosted = new LinkedHashMap<>();
+        // "expected loss 2.3 TG, holds 6 TG": what the payer measured when its bounty was first seen.
+        private final Map<String, String> bountyLoss = new LinkedHashMap<>();
         private final List<String> changes = new ArrayList<>();
         private final List<Flow> sends = new ArrayList<>();
         private int pressesSeen;
@@ -372,9 +404,36 @@ final class AgendaTrace {
                 ledgerAtResolution = ledgerSize();
                 if (beforeResolution == null) beforeResolution = last;
             }
-            recordChanges(now, current);
+            recordChanges(game, now, current);
             last = current;
             recordPromises(game, now);
+            recordBounties(game, now);
+        }
+
+        private void recordBounties(Game game, long now) {
+            for (DiscardBounties.Bounty bounty : DiscardBounties.all(game)) {
+                if (bounty.round() != game.getRound()) continue;
+                if (!agendaKey.isBlank() && !agendaKey.equals(bounty.agenda())) continue;
+                String key = bounty.payer() + "|" + bounty.agenda();
+                if (bountyPosted.containsKey(key)) continue;
+                bountyPosted.put(key, new Moment(now, windowOf(game)));
+                Player payer = game.getPlayerFromColorOrFaction(bounty.payer());
+                if (payer != null) bountyLoss.put(key, lossText(game, payer));
+            }
+        }
+
+        private static String lossText(Game game, Player payer) {
+            try {
+                return String.format(
+                        "expected loss %.1f TG, holds %d TG",
+                        ti4.ai.agenda.AgendaPolicy.expectedLoss(game, payer).orElse(0), payer.getTg());
+            } catch (RuntimeException e) {
+                return "";
+            }
+        }
+
+        String when(long at, String window) {
+            return minutes(at) + ", " + window;
         }
 
         // Per-seat value breakdown at reveal, for agendas the probe can split (Ixthian Artifact today).
@@ -406,7 +465,7 @@ final class AgendaTrace {
             return chances;
         }
 
-        private void recordChanges(long now, Map<String, Snap> current) {
+        private void recordChanges(Game game, long now, Map<String, Snap> current) {
             List<Press> heard;
             synchronized (AgendaTrace.this) {
                 List<Press> all = presses.getOrDefault(info, List.of());
@@ -437,12 +496,13 @@ final class AgendaTrace {
                         "%s %-8s %s  [presses this step: %s]",
                         minutes(now), entry.getKey(), change(before, entry.getValue()), presses));
             }
-            heard.forEach(this::recordSend);
+            String window = windowOf(game);
+            heard.forEach(press -> recordSend(press, window));
         }
 
         // "sendTGTo_<receiver>_<tg|tg3|comm|comm3|debt|debt3>": the agenda-phase transfer buttons, which also pay
         // debts.
-        private void recordSend(Press press) {
+        private void recordSend(Press press, String window) {
             String rest = StringUtils.substringAfter(press.customId(), SEND_TG);
             if (rest.isEmpty()) return;
             String to = StringUtils.substringBefore(rest, "_");
@@ -466,7 +526,7 @@ final class AgendaTrace {
             sends.add(new Flow(
                     press.at(),
                     resolvedAt >= 0 && press.at() >= resolvedAt,
-                    String.format("%s SEND %s -> %s %s", minutes(press.at()), press.faction(), to, text),
+                    String.format("%s SEND %s -> %s %s", when(press.at(), window), press.faction(), to, text),
                     bySeat));
         }
 
@@ -476,10 +536,15 @@ final class AgendaTrace {
                 if (!promise.aboutVotes() || !agendaKey.equals(promise.agenda())) continue;
                 if (promise.round() != game.getRound()) continue;
                 promises.put(promise.id(), promise);
+                promiseOffered.putIfAbsent(
+                        promise.id(), new Moment(promise.offeredAt() > 0 ? promise.offeredAt() : now, windowOf(game)));
                 boolean accepted = promise.status() == Promise.Status.ACCEPTED
                         || promise.status() == Promise.Status.KEPT
                         || promise.status() == Promise.Status.BROKEN;
-                if (accepted) promiseAcceptedAt.putIfAbsent(promise.id(), now);
+                if (accepted) {
+                    promiseAcceptedAt.putIfAbsent(promise.id(), now);
+                    promiseAccepted.putIfAbsent(promise.id(), new Moment(now, windowOf(game)));
+                }
             }
         }
 
@@ -678,7 +743,8 @@ final class AgendaTrace {
             String faction = seat.faction();
             List<String> used = new ArrayList<>();
             for (RiderSeen rider : riders)
-                if (rider.faction().equals(faction)) used.add(riderUse(rider, agenda, atClose));
+                if (rider.faction().equals(faction))
+                    used.add(riderUse(rider, agenda, atClose) + " (" + when(rider.seenAt(), rider.window()) + ")");
             if (usedPredictive(faction, seat.heard())) used.add("Predictive Intelligence (+3 votes)");
             boolean voted = !agenda.votesBySeat().getOrDefault(faction, "").isBlank();
             if (voted && game.playerHasLeaderUnlockedOrAlliance(seat.player(), XXCHA_COMMANDER)) {
@@ -687,14 +753,13 @@ final class AgendaTrace {
                 else if (placedOwnRider(agenda, faction)) used.add("Xxcha commander (voted after placing a rider)");
             }
             if (seat.player().hasAbility(ZEAL)) used.add("Zeal (votes first, extra votes)");
+            Map<String, Event> firstUse = new LinkedHashMap<>();
             seat.heard().stream()
                     .filter(event ->
                             event.kind() == Kind.CARD || event.kind() == Kind.OTHER || event.kind() == Kind.RIDER)
-                    .map(Event::text)
-                    .filter(AgendaTrace::notable)
-                    .map(text -> StringUtils.abbreviate(text, 160))
-                    .distinct()
-                    .forEach(used::add);
+                    .filter(event -> notable(event.text()))
+                    .forEach(event -> firstUse.putIfAbsent(StringUtils.abbreviate(event.text(), 160), event));
+            firstUse.forEach((text, event) -> used.add(text + " (" + when(event.at(), event.window()) + ")"));
             return used;
         }
 
@@ -739,7 +804,12 @@ final class AgendaTrace {
             for (DiscardBounties.Bounty bounty : DiscardBounties.all(game)) {
                 if (bounty.round() != agenda.round() || !bounty.payer().equals(faction)) continue;
                 if (!agendaKey.isBlank() && !agendaKey.equals(bounty.agenda())) continue;
-                deals.add(bountyText(bounty));
+                String key = bounty.payer() + "|" + bounty.agenda();
+                Moment posted = bountyPosted.get(key);
+                String loss = bountyLoss.getOrDefault(key, "");
+                deals.add((posted == null ? "" : when(posted.at(), posted.window()) + ": ")
+                        + bountyText(bounty)
+                        + (loss.isEmpty() ? "" : " (" + loss + ")"));
             }
             return deals;
         }
@@ -752,7 +822,12 @@ final class AgendaTrace {
             String delivery = promise.term() == Promise.Term.VOTE_FOR && promiseAcceptedAt.containsKey(promise.id())
                     ? " (" + delivery(promise, agenda) + ")"
                     : "";
-            return role + ": " + promiseText(promise) + " - " + outcomeOf(promise.status()) + delivery;
+            Moment offered = promiseOffered.get(promise.id());
+            Moment accepted = promiseAccepted.get(promise.id());
+            return (offered == null ? "" : when(offered.at(), offered.window()) + ": ") + role + ": "
+                    + promiseText(promise) + " - " + outcomeOf(promise.status())
+                    + (accepted == null ? "" : " at " + when(accepted.at(), accepted.window()))
+                    + delivery;
         }
 
         private String result(

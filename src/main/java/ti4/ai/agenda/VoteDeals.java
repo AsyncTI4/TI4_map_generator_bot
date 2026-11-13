@@ -164,7 +164,9 @@ public class VoteDeals {
         int position = order.indexOf(seat);
         if (position < 0) return false;
         if (WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
-            return position == nextVoter(game, order, -1) && !predictionStillOpen(game);
+            return !AgendaQueue.whenWindowOpen(game)
+                    && position == nextVoter(game, order, -1)
+                    && !predictionStillOpen(game);
         }
         if (!VOTING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return false;
         int active = activeVoter(game, order);

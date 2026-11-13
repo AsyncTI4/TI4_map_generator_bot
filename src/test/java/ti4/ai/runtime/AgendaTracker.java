@@ -285,7 +285,16 @@ final class AgendaTracker {
             chance = Double.NaN;
         }
         int ballots = votesBySeat(game, open.votes).size();
-        return new AgendaTrace.RiderSeen(owner.getFaction(), rider, outcome, payoff, chance, threatWorth, now, ballots);
+        return new AgendaTrace.RiderSeen(
+                owner.getFaction(),
+                rider,
+                outcome,
+                payoff,
+                chance,
+                threatWorth,
+                now,
+                ballots,
+                AgendaTrace.windowOf(game));
     }
 
     private void close(Game game, long now) {

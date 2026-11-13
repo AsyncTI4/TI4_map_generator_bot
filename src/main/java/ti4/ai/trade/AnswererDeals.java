@@ -39,7 +39,8 @@ class AnswererDeals {
         Player payer = context.seat();
         if (!active(payer) || PromisedVotes.agendaKey(game).isBlank()) return Optional.empty();
         if (!VoteDeals.aboutToVote(game, payer) || offeredThisAgenda(game, payer)) return Optional.empty();
-        String considered = CONSIDERED_KEY + game.getCurrentAgendaInfo() + "|" + game.getCurrentAgendaVotes();
+        String considered = CONSIDERED_KEY + game.getCurrentAgendaInfo() + "|" + game.getPhaseOfGame() + "|"
+                + game.getActivePlayerID() + "|" + payer.getTg() + "|" + game.getCurrentAgendaVotes();
         if (context.memory().has(considered)) return Optional.empty();
         context.memory().put(considered, "1");
         Predicate<String> backed = PromiseDeals.backedOutcome(context);
@@ -92,11 +93,8 @@ class AnswererDeals {
         double value = trust * stake.payerGain();
         double cost = stake.answererCost();
         double chance = stake.chance();
-        int monopoly = PromiseDeals.sellerPrice(value, cost, payer, payer.getTg(), 0, chance)
-                .orElse(0);
-        int ask = PromiseDeals.marketAsk(game, cost, chance, monopoly);
         int spendable = PromiseDeals.spendableTradeGoods(game, payer);
-        return PromiseDeals.buyerPrice(value, cost, answerer, spendable, 0, ask, chance)
+        return PromiseDeals.buyerPrice(value, cost, answerer, spendable, 0, 0, chance)
                 .map(least -> generousShare(least, mostWorthPaying(value, chance, spendable)))
                 .map(price -> new PromiseDeals.Proposal(
                         Promise.Term.NOT_AGAINST, answerer, payer, stake.outcome(), 0, price, value - chance * price));

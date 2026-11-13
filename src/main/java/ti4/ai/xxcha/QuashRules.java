@@ -43,14 +43,22 @@ public class QuashRules {
     public static boolean worthQuashing(Game game, Player seat) {
         OptionalDouble loss = AgendaPolicy.expectedLoss(game, seat);
         if (loss.isEmpty()) return AgendaPolicy.worthDiscarding(game, seat);
-        return loss.getAsDouble() > CardFacade.strategyToken() + quashMargin(seat) || paidEnough(game, seat);
+        return loss.getAsDouble() > threshold(seat) || paidEnough(game, seat);
     }
 
     private static boolean paidEnough(Game game, Player seat) {
         int bounty = DiscardBounties.quashBounty(game, seat);
         if (bounty <= 0) return false;
         OptionalDouble loss = AgendaPolicy.signedLoss(game, seat);
-        return loss.isPresent() && loss.getAsDouble() + bounty > CardFacade.strategyToken() + quashMargin(seat);
+        return loss.isPresent() && loss.getAsDouble() + bounty > threshold(seat);
+    }
+
+    public static int bountyNeeded(Player quasher, double quasherLoss) {
+        return Math.max(1, (int) Math.floor(threshold(quasher) - quasherLoss) + 1);
+    }
+
+    private static double threshold(Player seat) {
+        return CardFacade.strategyToken() + quashMargin(seat);
     }
 
     public static Optional<AiDecision> awaitBounty(AiTurnContext context) {

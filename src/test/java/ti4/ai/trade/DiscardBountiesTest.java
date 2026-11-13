@@ -89,12 +89,15 @@ class DiscardBountiesTest extends BaseTi4Test {
                 DiscardBounties.Status.OPEN);
     }
 
-    // Sol loses 7 whatever it votes, so it offers the most each card's cap allows: 3 for a Veto and 5 to Xxcha for a
-    // Quash, paid only once the card is played. It offers once per agenda.
+    // Sol (14 trade goods) loses 9 whatever it votes, so it offers the most each card's cap allows: 3 for a Veto and 5
+    // to Xxcha for a Quash, paid only once the card is played. Xxcha (10 trade goods) loses a little to For itself, so
+    // 5
+    // is enough to buy its Quash. It offers once per agenda.
     @Test
     void aSeatThatLosesWhateverItVotesOffersABounty() {
         nekro.setTg(5);
-        xxcha.setTg(5);
+        sol.setTg(14);
+        xxcha.setTg(10);
         assertThat(AgendaPolicy.expectedLoss(test.game, sol).orElseThrow()).isGreaterThan(DiscardBounties.MIN_LOSS);
 
         AiDecision.Post post = (AiDecision.Post)
@@ -114,7 +117,8 @@ class DiscardBountiesTest extends BaseTi4Test {
     @Test
     void aSeatInPainPostsItsBountyBeforePassingOnWhens() {
         nekro.setTg(5);
-        xxcha.setTg(5);
+        sol.setTg(14);
+        xxcha.setTg(10);
         sol.setActionCard("veto", 9);
         AiPrompt whens = AiTestGame.prompt(
                 "whens", PromptSource.AI_THREAD, NOW, "queueAWhen", "declineToQueueAWhen", "explainQueue");
@@ -131,6 +135,7 @@ class DiscardBountiesTest extends BaseTi4Test {
     // what the cap leaves, and the holder counts the pool up to the cap and never its own offer.
     @Test
     void bountiesPoolUpToEachCardsCap() {
+        xxcha.setTg(10);
         DiscardBounties.save(test.game, bounty(xxcha, 2, 4));
         DiscardBounties.save(test.game, bounty(nekro, 2, 0));
 
@@ -143,6 +148,22 @@ class DiscardBountiesTest extends BaseTi4Test {
         Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
         assertThat(posted.veto()).isZero();
         assertThat(posted.quash()).isEqualTo(1);
+    }
+
+    // Trace aiselfplay763641 r2 #3 (Ixthian Artifact): Hacan offered Xxcha 1 TG for a Quash although Xxcha liked For.
+    // Xxcha spends a strategy token on a Quash and plays it only when its own loss plus the bounty beats that, so a
+    // bounty that cannot buy the Quash is not posted. Here Xxcha (5 trade goods) gains from For, since Sol loses 7:
+    // even the 5 trade good cap is too little, and Sol posts only its Veto bounty.
+    @Test
+    void noQuashBountyTooSmallToBuyTheQuash() {
+        nekro.setTg(5);
+        xxcha.setTg(5);
+
+        DiscardBountyDeals.offer(context(sol, table()));
+
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.veto()).isEqualTo(DiscardBounties.VETO_CAP);
+        assertThat(posted.quash()).isZero();
     }
 
     // With 7 trade goods of its own, Nekro loses only 0.5 on Economic Equality, too little to spend its Veto; a 3 trade

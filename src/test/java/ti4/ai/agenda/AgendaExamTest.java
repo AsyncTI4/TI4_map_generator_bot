@@ -483,6 +483,7 @@ class AgendaExamTest extends BaseTi4Test {
 
             assertThat(VoteDeals.aboutToVote(test.game, first)).isFalse();
 
+            test.game.setStoredValue("whensResolved", "Yes");
             test.game.setStoredValue("declinedAfters", "nekro_");
             assertThat(VoteDeals.aboutToVote(test.game, first)).isTrue();
         }
@@ -1893,6 +1894,109 @@ class AgendaExamTest extends BaseTi4Test {
 
             PromiseBook.save(test.game, offer.accepted(test.game));
             assertThat(AgendaVoting.itsBallot(test.game, sol).outcome()).isEqualTo("against");
+        }
+    }
+
+    /**
+     * Traced self-play (aiselfplay763641 r2 #3, Ixthian Artifact, user 2026-11-13): Hacan (18 votes, first to vote) held
+     * Mecatol Rex and stood 4.6 TG worse off if For won (64% likely); Xxcha (30 votes, later) liked For by +1.2. Hacan
+     * abstained because Xxcha would answer an Against vote, and never offered Xxcha anything to stay out; everyone
+     * abstained until the speaker broke a 1-1 tie For. Hacan's offer died on its price: it priced Xxcha's stay-out at
+     * the vote market's ask (2 TG at about 70% that Against then wins), which left Hacan less than its margin, although
+     * Xxcha (whose stay-out costs it about 0.3 TG) takes 1 TG.
+     */
+    @Nested
+    class PayTheAnswererAfterTheFirstVoter {
+
+        private static final String AI_HACAN_ID = "7100000666666666";
+        private static final String AI_LETNEV_ID = "7100000777777777";
+        private static final String AI_XXCHA_ID = "7100000555555555";
+        private static final String AI_SARDAKK_ID = "7100000888888888";
+
+        private Player hacan;
+
+        // Voting order Hacan (9), Letnev (3), Xxcha (10), Sardakk (2), Nekro (cannot vote), Sol (2, the speaker). Hacan
+        // holds Mecatol Rex with two dreadnoughts, a cruiser and two infantry; everyone else likes For a little.
+        @BeforeEach
+        void ixthianWithHacanVotingFirst() {
+            test = AiTestGame.withSolAi();
+            nekro = test.nekro;
+            sol = test.sol;
+            hacan = seat(AI_HACAN_ID, "hacan", "yellow");
+            Player letnev = seat(AI_LETNEV_ID, "letnev", "purple");
+            xxcha = seat(AI_XXCHA_ID, "xxcha", "red");
+            Player sardakk = seat(AI_SARDAKK_ID, "sardakk", "orange");
+            test.game.setVp(10);
+            test.game.setRound(2);
+            Tile mecatol = test.place("18", "000");
+            hacan.addPlanet("mr");
+            hacan.addPlanet("torkan");
+            test.units(mecatol, "space", hacan, UnitType.Dreadnought, 2);
+            test.units(mecatol, "space", hacan, UnitType.Cruiser, 1);
+            test.units(mecatol, "mr", hacan, UnitType.Infantry, 2);
+            for (String planet : List.of("archonren", "archontau", "wellon", "meer")) xxcha.addPlanet(planet);
+            letnev.addPlanet("rarron");
+            sardakk.addPlanet("arinam");
+            sol.addPlanet("mellon");
+            test.game.setStoredValue("agendaCount", "2");
+            test.game.setSpeakerUserID(sol.getUserID());
+            reveal(
+                    "Directive_For/Against_7_artifact",
+                    "yellow",
+                    9,
+                    "purple",
+                    3,
+                    "red",
+                    10,
+                    "orange",
+                    2,
+                    "blue",
+                    2,
+                    "black",
+                    0);
+            hacan.setTg(5);
+        }
+
+        private AiTurnContext hacanAtTheTable() {
+            return test.contextFor(hacan, Set.of(), NOW, prompt("table", PromptSource.PUBLIC, NOW, "FFCC_hacan_vote"));
+        }
+
+        // "Each deal in its own window": in the "when" window the first voter offers nothing yet, even with no Galactic
+        // Threat prediction pending; that window is for bounties. Once the whens are resolved it may deal.
+        @Test
+        void noStayOutOfferInTheWhenWindow() {
+            nekro.removeAbility("galactic_threat");
+            test.isActive(hacan, "agendawaiting");
+
+            assertThat(VoteDeals.aboutToVote(test.game, hacan)).isFalse();
+            assertThat(TradeRules.payTheAnswerer(hacanAtTheTable())).isEmpty();
+
+            test.game.setStoredValue("whensResolved", "Yes");
+            assertThat(VoteDeals.aboutToVote(test.game, hacan)).isTrue();
+        }
+
+        @Test
+        void atItsTurnHacanPaysXxchaToStayOutAndXxchaAccepts() {
+            test.isActive(hacan, "agendaVoting");
+
+            assertThat(TradeRules.payTheAnswerer(hacanAtTheTable())).containsInstanceOf(AiDecision.Post.class);
+            Promise offer = PromiseBook.all(test.game).stream()
+                    .filter(promise -> promise.term() == Promise.Term.NOT_AGAINST)
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(offer.isPromiser(xxcha)).isTrue();
+            assertThat(offer.isPromisee(hacan)).isTrue();
+            assertThat(offer.target()).isEqualTo("against");
+            assertThat(offer.price()).isEqualTo(1);
+
+            AiPrompt answer = prompt(
+                    "offer",
+                    PromptSource.PUBLIC,
+                    NOW,
+                    "FFCC_xxcha_aiPromiseYes_" + offer.id(),
+                    "FFCC_xxcha_aiPromiseNo_" + offer.id());
+            assertThat(pressed(TradeRules.answerPromises(test.contextFor(xxcha, Set.of(), NOW, answer))))
+                    .contains("aiPromiseYes_");
         }
     }
 

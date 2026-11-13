@@ -5,8 +5,10 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.AgendaCardRules;
+import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
+import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.agenda.DiscardBounties.Bounty;
 import ti4.ai.agenda.PromisedVotes;
@@ -40,7 +42,7 @@ class DiscardBountyDeals {
         int veto = AgendaCardRules.holdsVeto(seat)
                 ? 0
                 : remaining(game, seat, most, DiscardBounties.VETO_CAP, Bounty::veto);
-        int quash = quasher.isEmpty() ? 0 : remaining(game, seat, most, DiscardBounties.QUASH_CAP, Bounty::quash);
+        int quash = quasher.map(xxcha -> quashShare(game, seat, xxcha, most)).orElse(0);
         if (veto <= 0 && quash <= 0) return Optional.empty();
         Optional<String> channel = PromiseDeals.channelId(context);
         if (channel.isEmpty()) return Optional.empty();
@@ -136,6 +138,14 @@ class DiscardBountyDeals {
             Game game, Player payer, int most, int cap, java.util.function.ToIntFunction<Bounty> amount) {
         int pooled = DiscardBounties.pooledFromOthers(game, payer, amount);
         return Math.max(0, Math.min(most, cap - pooled));
+    }
+
+    private static int quashShare(Game game, Player payer, Player quasher, int most) {
+        int offered = remaining(game, payer, most, DiscardBounties.QUASH_CAP, Bounty::quash);
+        int pooled = DiscardBounties.pooledFromOthers(game, payer, Bounty::quash);
+        AgendaForecast forecast = AgendaVoting.forecastWithItsBallot(game, payer);
+        double quasherLoss = forecast.isEmpty() ? 0 : -forecast.expectedUtility(quasher);
+        return pooled + offered >= QuashRules.bountyNeeded(quasher, quasherLoss) ? offered : 0;
     }
 
     private static Optional<Player> quasher(Game game, Player payer) {
