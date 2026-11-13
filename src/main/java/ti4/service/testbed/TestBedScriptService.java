@@ -311,6 +311,12 @@ public class TestBedScriptService {
                     errors.add(label + ": unknown explore card `" + step.getValue() + "`.");
                 }
             }
+            case "stackAgenda" -> {
+                requireValue(step.getValue(), "value", label, errors);
+                if (step.getValue() != null && !Mapper.isValidAgenda(step.getValue())) {
+                    errors.add(label + ": unknown agenda `" + step.getValue() + "`.");
+                }
+            }
             case "removeToken" -> {
                 requireValue(step.getKey(), "key", label, errors);
                 requireValue(step.getValue(), "value", label, errors);

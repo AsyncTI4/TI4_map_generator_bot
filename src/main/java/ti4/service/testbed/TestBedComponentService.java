@@ -167,6 +167,15 @@ public class TestBedComponentService {
         return true;
     }
 
+    static boolean stackAgenda(Game game, String agendaId) {
+        boolean inDiscard = game.getDiscardAgendas().containsKey(agendaId);
+        if (!game.getAgendas().contains(agendaId) && !inDiscard) return false;
+        if (inDiscard) game.getDiscardAgendas().remove(agendaId);
+        game.getAgendas().remove(agendaId);
+        game.getAgendas().addFirst(agendaId);
+        return true;
+    }
+
     static Integer borderDirection(String border) {
         return AddBorderAnomaly.parseDirection(
                 StringUtils.substringBefore(border, ":").trim().toLowerCase());

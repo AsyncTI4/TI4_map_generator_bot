@@ -257,6 +257,20 @@ class TestBedDataTest extends BaseTi4Test {
         assertTrue(errors.stream().noneMatch(error -> error.contains("at `000`")), String.join("\n", errors));
     }
 
+    // Stacked agendas need a real agenda id.
+    @Test
+    void stackAgendaIsValidated() {
+        List<String> scriptErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "30k-2p",
+                  "steps": [
+                    { "do": "stackAgenda", "value": "notanagenda" },
+                    { "do": "stackAgenda" },
+                    { "do": "stackAgenda", "value": "mutiny" }
+                  ] }"""));
+        assertContains(scriptErrors, "unknown agenda `notanagenda`", "needs `value`");
+        assertEquals(2, scriptErrors.size(), String.join("\n", scriptErrors));
+    }
+
     // Homebrew card tests switch decks in the preset and stack explores in scripts; wrong slots, unknown decks,
     // decks of the wrong type and unknown explore ids must be caught before a live run.
     @Test
