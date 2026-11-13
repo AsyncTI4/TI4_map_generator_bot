@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.agenda.BallotProbe;
+import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.promise.Promise;
@@ -38,6 +39,10 @@ final class AgendaTrace {
     private static final String SEND_TG = "sendTGTo_";
     private static final String RISKED_PREDICTIVE = "riskedPredictive";
     private static final String XXCHA_COMMANDER = "xxchacommander";
+    private static final String PREDICTIVE_INTELLIGENCE = "pi";
+    private static final String BLOOD_PACT = "blood_pact";
+    private static final String ZEAL = "zeal";
+    private static final double INDIFFERENT = 0.05;
 
     // Seat state the trace follows, by index into Snap.values.
     static final String[] KINDS = {"tg", "comm", "vp", "tech", "ac", "pn", "cc"};
@@ -327,13 +332,17 @@ final class AgendaTrace {
         // Factions in the engine's voting order, refreshed until the agenda resolves (Hack Election can reverse it).
         private List<String> votingOrder = List.of();
         private final Set<String> usedPredictive = new LinkedHashSet<>();
+        // "16 votes at reveal (13 from planets, Predictive Intelligence +3)", per seat.
+        private final Map<String, String> voteSourcesAtReveal = new LinkedHashMap<>();
 
         private Window(Game game, String info, long now) {
             this.info = info;
             this.openedAt = now;
             for (Player seat : game.getRealPlayers()) {
                 atReveal.put(seat.getFaction(), Snap.of(game, seat));
-                votesAtReveal.put(seat.getFaction(), engineVotes(game, seat));
+                int votes = engineVotes(game, seat);
+                votesAtReveal.put(seat.getFaction(), votes);
+                voteSourcesAtReveal.put(seat.getFaction(), voteSources(game, seat, votes));
             }
             last = new LinkedHashMap<>(atReveal);
             ledgerStart = ledgerSize();
@@ -464,7 +473,7 @@ final class AgendaTrace {
         private void recordPromises(Game game, long now) {
             if (agendaKey.isBlank()) return;
             for (Promise promise : PromiseBook.all(game)) {
-                if (promise.term() != Promise.Term.VOTE_FOR || !agendaKey.equals(promise.agenda())) continue;
+                if (!promise.aboutVotes() || !agendaKey.equals(promise.agenda())) continue;
                 if (promise.round() != game.getRound()) continue;
                 promises.put(promise.id(), promise);
                 boolean accepted = promise.status() == Promise.Status.ACCEPTED
@@ -531,67 +540,271 @@ final class AgendaTrace {
                                     + agenda.fallbackTieBreaks()
                             : ""));
             out.add("  " + votingOrderLine(game, agenda, heard));
-            out.add("  BALLOTS (votes cast; AI reason; planner view: own utility in TG, forecast win chance)");
-            for (Player seat : game.getRealPlayers()) {
-                String faction = seat.getFaction();
-                String cast = agenda.votesBySeat().getOrDefault(faction, "none");
-                String reasons = heard.stream()
-                        .filter(event ->
-                                event.kind() == Kind.BALLOT && event.faction().equals(faction))
-                        .map(event -> "\"" + event.text() + "\"")
-                        .distinct()
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse(notHeard(game, seat, agenda));
-                out.add(String.format("    %-8s cast %-14s %s", faction, cast, reasons));
-                BallotProbe.Explanation why = explained.get(faction);
-                if (why != null) out.addAll(explanation(why));
-                Map<String, Double> reveal = utilities.get(faction);
-                Map<String, Double> chances = chancesAtReveal.get(faction);
-                if (reveal != null || chances != null)
-                    out.add("             at reveal: reference utility " + values(reveal, "%+.1f") + "; forecast "
-                            + values(chances, "pct"));
-                String split = splitsAtReveal.get(faction);
-                if (split != null) out.add("             split: " + split);
+            out.add("  SEATS in voting order. Likes and dislikes: the seat's own utility of each outcome in TG,"
+                    + " relative to the mean over the outcomes. Odds: its own forecast at its turn (at reveal if it"
+                    + " had no turn).");
+            for (String faction : orderedFactions(game)) {
+                Player seat = game.getPlayerFromColorOrFaction(faction);
+                if (seat == null) continue;
+                Seat view = new Seat(
+                        seat,
+                        explained.get(faction),
+                        utilities.get(faction),
+                        heard.stream()
+                                .filter(event -> event.faction().equals(faction))
+                                .toList());
+                out.addAll(seatLines(game, agenda, view, riders, flows, atClose));
             }
-            out.add("  RIDERS");
-            if (riders.isEmpty()) out.add("    none");
-            for (RiderSeen rider : riders) out.add("    " + riderLine(rider, agenda, atClose));
-            out.add("  DEALS (agenda window)");
-            List<String> deals = dealLines(heard, flows, agenda);
-            if (deals.isEmpty()) out.add("    none");
-            deals.forEach(line -> out.add("    " + line));
-            List<Event> other = heard.stream()
-                    .filter(event ->
-                            event.kind() == Kind.CARD || event.kind() == Kind.OTHER || event.kind() == Kind.RIDER)
-                    .toList();
-            if (!other.isEmpty()) {
-                out.add("  OTHER AGENDA DECISIONS");
-                other.stream()
-                        .map(event -> String.format(
-                                "%s %-8s %s: %s",
-                                minutes(event.at()),
-                                event.faction(),
-                                event.kind().name().toLowerCase(Locale.ROOT),
-                                StringUtils.abbreviate(event.text(), 200)))
-                        .distinct()
-                        .forEach(line -> out.add("    " + line));
-            }
-            out.add("  STATE CHANGES (tg comm vp tech ac pn cc speaker)");
-            if (changes.isEmpty()) out.add("    none");
-            changes.forEach(line -> out.add("    " + line));
-            out.add("  ATTRIBUTION reveal->close: total = deal + rider + agenda effect + other");
-            out.addAll(attribution(atClose, flows, riders, agenda));
             return String.join(System.lineSeparator(), out);
         }
 
-        // Why a seat made no ballot decision: the engine skips a seat with no votes to cast (all planets exhausted, a
-        // rider placed without the Xxcha commander, Galactic Threat) and never asks it.
-        private String notHeard(Game game, Player seat, AgendaTracker.Agenda agenda) {
-            if (BallotProbe.cannotVote(game, seat)) return "cannot vote (Galactic Threat)";
-            if (placedARider(game, seat, agenda)) return "skipped by the engine: placed a rider, so it cannot vote";
-            if (votesAtReveal.getOrDefault(seat.getFaction(), -1) == 0)
-                return "skipped by the engine: no votes to cast (0 at reveal)";
-            return "no ballot decision heard";
+        // One seat as the trace saw it: the ballot probe at its turn, its reference utility at reveal, what it did.
+        private record Seat(
+                Player player, BallotProbe.Explanation why, Map<String, Double> revealUtility, List<Event> heard) {
+
+            String faction() {
+                return player.getFaction();
+            }
+        }
+
+        List<String> seatLines(
+                Game game,
+                AgendaTracker.Agenda agenda,
+                Seat seat,
+                List<RiderSeen> riders,
+                List<Flow> flows,
+                Map<String, Snap> atClose) {
+            String faction = seat.faction();
+            List<String> lines = new ArrayList<>();
+            lines.add("  - " + StringUtils.capitalize(faction) + ": "
+                    + voteSourcesAtReveal.getOrDefault(faction, "? votes at reveal"));
+            lines.add("    - ballot: " + ballotSummary(game, agenda, seat));
+            lines.add("    - odds: " + odds(seat));
+            Map<String, Double> values = ownValues(seat);
+            lines.add("    - dislikes: " + ranked(values, false));
+            lines.add("    - likes: " + ranked(values, true));
+            List<String> used = used(game, agenda, seat, riders, atClose);
+            lines.add("    - used: " + (used.isEmpty() ? "nothing" : String.join("; ", used)));
+            List<String> deals = seatDeals(game, agenda, faction, flows);
+            if (deals.isEmpty()) {
+                lines.add("    - deals: none");
+            } else {
+                lines.add("    - deals:");
+                deals.forEach(deal -> lines.add("      - " + deal));
+            }
+            String split = splitsAtReveal.get(faction);
+            if (split != null) lines.add("    - Ixthian Artifact value at reveal: " + split);
+            lines.add("    - result reveal to close: " + result(faction, atClose, flows, riders, agenda));
+            return lines;
+        }
+
+        private String ballotSummary(Game game, AgendaTracker.Agenda agenda, Seat seat) {
+            String cast = agenda.votesBySeat().getOrDefault(seat.faction(), "");
+            String text = ballotText(game, seat.player(), agenda, seat.heard());
+            String ballot = cast.isBlank()
+                    ? switch (text) {
+                        case "-" -> "cannot vote (Galactic Threat)";
+                        case "skipped (rider)" -> "skipped: placed a rider, so it cannot vote";
+                        case "skipped (no votes)" -> "skipped: no votes to cast";
+                        case "abstain" -> "abstained";
+                        default -> text;
+                    }
+                    : "cast " + text;
+            List<String> reasons = seat.heard().stream()
+                    .filter(event -> event.kind() == Kind.BALLOT)
+                    .map(event -> "\"" + event.text() + "\"")
+                    .distinct()
+                    .toList();
+            String why = reasons.isEmpty() ? "" : " (" + String.join(", ", reasons) + ")";
+            return ballot + why + plannerText(seat.why());
+        }
+
+        private static String plannerText(BallotProbe.Explanation why) {
+            if (why == null) return "";
+            String planned = why.planned().isBlank()
+                    ? "abstain"
+                    : why.planned() + " x" + why.plannedVotes() + (why.promised() ? " (promised)" : "");
+            String best = why.bestOutcome().isBlank()
+                    ? ""
+                    : String.format(
+                            ", best ballot %s x%d %+.1f vs abstaining",
+                            why.bestOutcome(), why.bestVotes(), why.bestValue() - why.abstainValue());
+            return String.format(
+                    "; planner: %s of %d votes ready, expects %+.1f TG if it abstains%s%s%s",
+                    planned,
+                    why.available(),
+                    why.abstainValue(),
+                    best,
+                    why.threatCost() > 0 ? String.format(", Galactic Threat cost %.1f", why.threatCost()) : "",
+                    why.sitsOut().isBlank() ? "" : ", " + why.sitsOut());
+        }
+
+        private String odds(Seat seat) {
+            BallotProbe.Explanation why = seat.why();
+            if (why != null && !why.chanceIfAbstain().isEmpty()) {
+                List<String> parts = new ArrayList<>();
+                for (Map.Entry<String, Double> entry : top(why.chanceIfAbstain())) {
+                    double withBallot = why.chanceWithBallot().getOrDefault(entry.getKey(), entry.getValue());
+                    parts.add(String.format(
+                            "%s %.0f%%%s",
+                            StringUtils.capitalize(entry.getKey()),
+                            100 * entry.getValue(),
+                            Math.abs(withBallot - entry.getValue()) >= 0.005
+                                    ? String.format(" (%.0f%% with its ballot)", 100 * withBallot)
+                                    : ""));
+                }
+                return "at its turn " + String.join(", ", parts);
+            }
+            Map<String, Double> reveal = chancesAtReveal.get(seat.faction());
+            if (reveal == null || reveal.isEmpty()) return "-";
+            return "at reveal "
+                    + String.join(
+                            ", ",
+                            top(reveal).stream()
+                                    .map(entry -> String.format(
+                                            "%s %.0f%%",
+                                            StringUtils.capitalize(entry.getKey()), 100 * entry.getValue()))
+                                    .toList());
+        }
+
+        private static Map<String, Double> ownValues(Seat seat) {
+            if (seat.why() != null && !seat.why().utility().isEmpty())
+                return seat.why().utility();
+            return seat.revealUtility() == null ? Map.of() : seat.revealUtility();
+        }
+
+        private List<String> used(
+                Game game, AgendaTracker.Agenda agenda, Seat seat, List<RiderSeen> riders, Map<String, Snap> atClose) {
+            String faction = seat.faction();
+            List<String> used = new ArrayList<>();
+            for (RiderSeen rider : riders)
+                if (rider.faction().equals(faction)) used.add(riderUse(rider, agenda, atClose));
+            if (usedPredictive(faction, seat.heard())) used.add("Predictive Intelligence (+3 votes)");
+            boolean voted = !agenda.votesBySeat().getOrDefault(faction, "").isBlank();
+            if (voted && game.playerHasLeaderUnlockedOrAlliance(seat.player(), XXCHA_COMMANDER)) {
+                if (seat.player().hasAbility("galactic_threat"))
+                    used.add("Xxcha commander (voted despite Galactic Threat)");
+                else if (placedOwnRider(agenda, faction)) used.add("Xxcha commander (voted after placing a rider)");
+            }
+            if (seat.player().hasAbility(ZEAL)) used.add("Zeal (votes first, extra votes)");
+            seat.heard().stream()
+                    .filter(event ->
+                            event.kind() == Kind.CARD || event.kind() == Kind.OTHER || event.kind() == Kind.RIDER)
+                    .map(Event::text)
+                    .filter(AgendaTrace::notable)
+                    .map(text -> StringUtils.abbreviate(text, 160))
+                    .distinct()
+                    .forEach(used::add);
+            return used;
+        }
+
+        private static boolean placedOwnRider(AgendaTracker.Agenda agenda, String faction) {
+            return agenda.riders().stream()
+                    .anyMatch(
+                            rider -> rider.faction().equals(faction) && !AgendaTracker.isGalacticThreat(rider.rider()));
+        }
+
+        private String riderUse(RiderSeen rider, AgendaTracker.Agenda agenda, Map<String, Snap> atClose) {
+            boolean won = won(rider, agenda);
+            String paid = "";
+            if (won && beforeResolution != null) {
+                Snap before = beforeResolution.get(rider.faction());
+                Snap after = atClose.get(rider.faction());
+                paid = before == null || after == null ? "" : ", paid " + change(before, after);
+            }
+            return String.format(
+                    "%s on %s (valued %.1f TG at %s%s): %s%s",
+                    rider.rider(),
+                    StringUtils.capitalize(rider.outcome()),
+                    rider.payoff(),
+                    Double.isNaN(rider.chance()) ? "?" : String.format("%.0f%%", 100 * rider.chance()),
+                    Double.isNaN(rider.threatWorth())
+                            ? ""
+                            : String.format(", expected copy through other voters %.1f TG", rider.threatWorth()),
+                    won ? "won" + realizedWorth(rider, agenda) : agenda.resolved() ? "lost" : "unresolved",
+                    paid);
+        }
+
+        private List<String> seatDeals(Game game, AgendaTracker.Agenda agenda, String faction, List<Flow> flows) {
+            List<String> deals = new ArrayList<>();
+            for (Promise promise : promises.values()) {
+                if (promise.promiser().equals(faction) || promise.promisee().equals(faction))
+                    deals.add(promiseDeal(faction, promise, agenda));
+            }
+            for (Flow flow : flows) {
+                if (!flow.bySeat().containsKey(faction)) continue;
+                if (!flow.text().startsWith("TRADE") && !flow.text().contains(" SEND ")) continue;
+                deals.add((flow.afterResolution() ? "after resolution: " : "") + flow.text());
+            }
+            for (DiscardBounties.Bounty bounty : DiscardBounties.all(game)) {
+                if (bounty.round() != agenda.round() || !bounty.payer().equals(faction)) continue;
+                if (!agendaKey.isBlank() && !agendaKey.equals(bounty.agenda())) continue;
+                deals.add(bountyText(bounty));
+            }
+            return deals;
+        }
+
+        private String promiseDeal(String faction, Promise promise, AgendaTracker.Agenda agenda) {
+            String partner = promise.promiser().equals(faction) ? promise.promisee() : promise.promiser();
+            String role = promise.proposer().equals(faction)
+                    ? "proposed to " + StringUtils.capitalize(partner)
+                    : "offered by " + StringUtils.capitalize(partner);
+            String delivery = promise.term() == Promise.Term.VOTE_FOR && promiseAcceptedAt.containsKey(promise.id())
+                    ? " (" + delivery(promise, agenda) + ")"
+                    : "";
+            return role + ": " + promiseText(promise) + " - " + outcomeOf(promise.status()) + delivery;
+        }
+
+        private String result(
+                String faction,
+                Map<String, Snap> atClose,
+                List<Flow> flows,
+                List<RiderSeen> riders,
+                AgendaTracker.Agenda agenda) {
+            Snap reveal = atReveal.get(faction);
+            Snap close = atClose.get(faction);
+            if (reveal == null || close == null) return "?";
+            int[] total = minus(close.values(), reveal.values());
+            int[] deal = new int[KINDS.length];
+            int[] dealAfter = new int[KINDS.length];
+            for (Flow flow : flows) {
+                int[] mine = flow.bySeat().get(faction);
+                if (mine == null) continue;
+                add(deal, mine);
+                if (flow.afterResolution()) add(dealAfter, mine);
+            }
+            int[] rider = new int[KINDS.length];
+            int[] effect = new int[KINDS.length];
+            if (beforeResolution != null && beforeResolution.get(faction) != null) {
+                int[] resolution = minus(
+                        minus(close.values(), beforeResolution.get(faction).values()), dealAfter);
+                for (RiderSeen seen : riders) {
+                    if (!seen.faction().equals(faction)) continue;
+                    String name = seen.rider().toLowerCase(Locale.ROOT).trim();
+                    if (!NOT_ACTION_CARDS.contains(name) && name.endsWith("rider")) rider[AC]--;
+                    if (!won(seen, agenda)) continue;
+                    for (int kind : RIDER_KINDS.getOrDefault(name, new int[0])) {
+                        rider[kind] += resolution[kind];
+                        resolution[kind] = 0;
+                    }
+                }
+                effect = resolution;
+            }
+            int[] other = minus(minus(minus(total, deal), rider), effect);
+            String speaker =
+                    reveal.speaker() == close.speaker() ? "" : close.speaker() ? ", gained speaker" : ", lost speaker";
+            List<String> gained = new ArrayList<>(close.techs());
+            gained.removeAll(reveal.techs());
+            if (java.util.Arrays.stream(total).allMatch(value -> value == 0) && speaker.isEmpty()) return "no change";
+            return String.format(
+                    "%s%s (deal %s | rider %s | agenda %s | other %s)%s",
+                    delta(total),
+                    speaker,
+                    delta(deal),
+                    delta(rider),
+                    delta(effect),
+                    delta(other),
+                    gained.isEmpty() ? "" : ", techs gained " + gained);
         }
 
         private static boolean placedARider(Game game, Player seat, AgendaTracker.Agenda agenda) {
@@ -601,14 +814,18 @@ final class AgendaTrace {
                             && !AgendaTracker.isGalacticThreat(rider.rider()));
         }
 
-        // "VOTING ORDER: Xxcha (6) 1 For, Nekro (0) -, ...; tally For 5, Against 5; speaker Sol broke the 5-5 tie:
-        // Against": every seat in the engine's voting order with its vote count at reveal and its ballot.
-        String votingOrderLine(Game game, AgendaTracker.Agenda agenda, List<Event> heard) {
+        private List<String> orderedFactions(Game game) {
             List<String> order = new ArrayList<>(votingOrder);
             for (Player seat : game.getRealPlayers())
                 if (!order.contains(seat.getFaction())) order.add(seat.getFaction());
+            return order;
+        }
+
+        // "VOTING ORDER: Xxcha (6) 1 For, Nekro (0) -, ...; tally For 5, Against 5; speaker Sol broke the 5-5 tie:
+        // Against": every seat in the engine's voting order with its vote count at reveal and its ballot.
+        String votingOrderLine(Game game, AgendaTracker.Agenda agenda, List<Event> heard) {
             List<String> seats = new ArrayList<>();
-            for (String faction : order) {
+            for (String faction : orderedFactions(game)) {
                 Player seat = game.getPlayerFromColorOrFaction(faction);
                 Integer atReveal = votesAtReveal.get(faction);
                 seats.add(String.format(
@@ -708,39 +925,6 @@ final class AgendaTrace {
                     + " broke " + tie + ": " + outcome;
         }
 
-        private List<String> explanation(BallotProbe.Explanation why) {
-            List<String> lines = new ArrayList<>();
-            String planned = why.planned().isBlank()
-                    ? "abstain"
-                    : why.planned() + " x" + why.plannedVotes() + (why.promised() ? " (promised)" : "");
-            lines.add(String.format(
-                    "             planner: %s | votes ready %d, cap %d%s%s%s",
-                    planned,
-                    why.available(),
-                    why.cap(),
-                    why.keepsAVoteBack() ? " (keeps a vote back)" : "",
-                    why.finalAgenda() ? " (final agenda: all in)" : "",
-                    why.sitsOut().isBlank() ? "" : " | " + why.sitsOut()));
-            lines.add("             own utility " + values(why.utility(), "%+.1f") + " | chance if abstaining "
-                    + values(why.chanceIfAbstain(), "pct") + " -> with its ballot "
-                    + values(why.chanceWithBallot(), "pct"));
-            if (!why.chanceIfAbstain().isEmpty())
-                lines.add(String.format(
-                        "             value: abstain %+.2f, its ballot %+.2f (gain %+.2f, needs > %.2f; Galactic Threat"
-                                + " cost %.2f) | best %s x%d %+.2f over abstain",
-                        why.abstainValue(),
-                        why.ballotValue(),
-                        why.ballotValue() - why.abstainValue(),
-                        why.finalAgenda() ? 0 : 0.5,
-                        why.threatCost(),
-                        why.bestOutcome().isBlank() ? "-" : why.bestOutcome(),
-                        why.bestVotes(),
-                        why.bestValue() - why.abstainValue()));
-            if (!why.curve().isEmpty())
-                lines.add("             gain over abstain by votes (its chance): " + String.join(" ", why.curve()));
-            return lines;
-        }
-
         private static boolean won(RiderSeen rider, AgendaTracker.Agenda agenda) {
             return agenda.riders().stream()
                     .filter(placed -> placed.faction().equals(rider.faction())
@@ -760,35 +944,6 @@ final class AgendaTrace {
                     .findFirst()
                     .map(placed -> String.format(" (worth %.1f TG)", placed.payoff()))
                     .orElse("");
-        }
-
-        private String riderLine(RiderSeen rider, AgendaTracker.Agenda agenda, Map<String, Snap> atClose) {
-            boolean won = won(rider, agenda);
-            String name = rider.rider().toLowerCase(Locale.ROOT).trim();
-            String paid = "-";
-            if (won && beforeResolution != null) {
-                Snap before = beforeResolution.get(rider.faction());
-                Snap after = atClose.get(rider.faction());
-                paid = before == null || after == null ? "?" : change(before, after);
-            }
-            return String.format(
-                    "%-8s %s on %s | seen %s after %d ballot%s | its forecast chance %s%s | valued %.1f TG%s | %s%s | owner"
-                            + " change after resolution: %s",
-                    rider.faction(),
-                    rider.rider(),
-                    rider.outcome(),
-                    minutes(rider.seenAt()),
-                    rider.ballotsBefore(),
-                    rider.ballotsBefore() == 1 ? "" : "s",
-                    Double.isNaN(rider.chance()) ? "-" : String.format("%.0f%%", 100 * rider.chance()),
-                    Double.isNaN(rider.threatWorth())
-                            ? ""
-                            : String.format(", expected copy through other voters %.1f TG", rider.threatWorth()),
-                    rider.payoff(),
-                    NOT_ACTION_CARDS.contains(name) || !name.endsWith("rider") ? "" : ", cost 1 action card",
-                    won ? "WON" : agenda.resolved() ? "lost" : "unresolved",
-                    won ? realizedWorth(rider, agenda) : "",
-                    paid);
         }
 
         // Deals in the window: accepted trades from the ledger and vote promises, each a TG/card flow per seat.
@@ -813,7 +968,7 @@ final class AgendaTrace {
             }
             for (Promise promise : promises.values()) {
                 Long accepted = promiseAcceptedAt.get(promise.id());
-                if (accepted == null || promise.price() <= 0) continue;
+                if (accepted == null || promise.price() <= 0 || promise.term() != Promise.Term.VOTE_FOR) continue;
                 Map<String, int[]> bySeat = new LinkedHashMap<>();
                 bySeat.computeIfAbsent(promise.promisee(), key -> new int[KINDS.length])[TG] -= promise.price();
                 bySeat.computeIfAbsent(promise.promiser(), key -> new int[KINDS.length])[TG] += promise.price();
@@ -858,23 +1013,6 @@ final class AgendaTrace {
             return StringUtils.isNumeric(text) ? Integer.parseInt(text) : 0;
         }
 
-        private List<String> dealLines(List<Event> heard, List<Flow> flows, AgendaTracker.Agenda agenda) {
-            List<String> lines = new ArrayList<>();
-            heard.stream()
-                    .filter(event -> event.kind() == Kind.DEAL)
-                    .forEach(event -> lines.add(String.format(
-                            "%s %-8s %s",
-                            minutes(event.at()), event.faction(), StringUtils.abbreviate(event.text(), 400))));
-            flows.stream()
-                    .filter(flow ->
-                            flow.text().startsWith("TRADE") || flow.text().contains(" SEND "))
-                    .forEach(flow -> lines.add((flow.afterResolution() ? "after resolution " : "") + flow.text()));
-            for (Promise promise : promises.values()) {
-                lines.add("VOTE PROMISE " + promiseText(promise) + " | " + delivery(promise, agenda));
-            }
-            return lines;
-        }
-
         private String delivery(Promise promise, AgendaTracker.Agenda agenda) {
             if (!promiseAcceptedAt.containsKey(promise.id())) return "never accepted";
             String cast = agenda.votesBySeat().getOrDefault(promise.promiser(), "");
@@ -884,57 +1022,104 @@ final class AgendaTrace {
                             .startsWith(promise.target().toLowerCase(Locale.ROOT) + " "));
             return (onTarget ? "DELIVERED: " : "BROKEN: ") + promise.promiser() + " cast " + cast;
         }
+    }
 
-        private List<String> attribution(
-                Map<String, Snap> atClose, List<Flow> flows, List<RiderSeen> riders, AgendaTracker.Agenda agenda) {
-            List<String> lines = new ArrayList<>();
-            for (Map.Entry<String, Snap> entry : atClose.entrySet()) {
-                String faction = entry.getKey();
-                Snap reveal = atReveal.get(faction);
-                if (reveal == null) continue;
-                int[] total = minus(entry.getValue().values(), reveal.values());
-                int[] deal = new int[KINDS.length];
-                int[] dealAfter = new int[KINDS.length];
-                for (Flow flow : flows) {
-                    int[] mine = flow.bySeat().get(faction);
-                    if (mine == null) continue;
-                    add(deal, mine);
-                    if (flow.afterResolution()) add(dealAfter, mine);
-                }
-                int[] rider = new int[KINDS.length];
-                int[] effect = new int[KINDS.length];
-                if (beforeResolution != null && beforeResolution.get(faction) != null) {
-                    int[] resolution = minus(
-                            minus(
-                                    entry.getValue().values(),
-                                    beforeResolution.get(faction).values()),
-                            dealAfter);
-                    for (RiderSeen seen : riders) {
-                        if (!seen.faction().equals(faction)) continue;
-                        String name = seen.rider().toLowerCase(Locale.ROOT).trim();
-                        if (!NOT_ACTION_CARDS.contains(name) && name.endsWith("rider")) rider[AC]--;
-                        boolean won = won(seen, agenda);
-                        if (!won) continue;
-                        for (int kind : RIDER_KINDS.getOrDefault(name, new int[0])) {
-                            rider[kind] += resolution[kind];
-                            resolution[kind] = 0;
-                        }
-                    }
-                    effect = resolution;
-                }
-                int[] other = minus(minus(minus(total, deal), rider), effect);
-                String speaker = reveal.speaker() == entry.getValue().speaker()
-                        ? ""
-                        : entry.getValue().speaker() ? ", gained speaker" : ", lost speaker";
-                lines.add(String.format(
-                        "    %-8s total %s%s | deal %s | rider %s | agenda %s | other %s",
-                        faction, delta(total), speaker, delta(deal), delta(rider), delta(effect), delta(other)));
-                List<String> gained = new ArrayList<>(entry.getValue().techs());
-                gained.removeAll(reveal.techs());
-                if (!gained.isEmpty()) lines.add("             techs gained: " + gained);
-            }
-            return lines;
+    // "16 votes at reveal (13 from planets, Predictive Intelligence +3)": the engine's pre-vote total and its sources.
+    static String voteSources(Game game, Player seat, int total) {
+        if (total <= 0) return total + " votes at reveal";
+        int planets = 0;
+        try {
+            for (String planet : seat.getReadiedPlanets())
+                planets += AgendaHelper.getSpecificPlanetsVoteWorth(seat, game, planet);
+        } catch (RuntimeException e) {
+            return total + " votes at reveal";
         }
+        List<String> sources = new ArrayList<>();
+        sources.add(planets + " from planets");
+        int known = planets;
+        if (seat.hasTechReady(PREDICTIVE_INTELLIGENCE)) {
+            sources.add("Predictive Intelligence +3");
+            known += 3;
+        }
+        if (seat.getPromissoryNotesInPlayArea().contains(BLOOD_PACT)) {
+            sources.add("Blood Pact +4");
+            known += 4;
+        }
+        if (seat.hasAbility(ZEAL) && total > known) {
+            sources.add("Zeal +" + (total - known));
+            known = total;
+        }
+        if (total != known) sources.add(String.format("other %+d", total - known));
+        return total + " votes at reveal (" + String.join(", ", sources) + ")";
+    }
+
+    // Up to three outcomes the seat likes (or dislikes) most, as "For +3.4", relative to the mean over the outcomes.
+    static String ranked(Map<String, Double> values, boolean liked) {
+        if (values == null || values.isEmpty()) return "-";
+        double mean = values.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0);
+        List<String> parts = values.entrySet().stream()
+                .filter(entry -> liked ? entry.getValue() - mean > INDIFFERENT : mean - entry.getValue() > INDIFFERENT)
+                .sorted((a, b) ->
+                        liked ? Double.compare(b.getValue(), a.getValue()) : Double.compare(a.getValue(), b.getValue()))
+                .limit(3)
+                .map(entry ->
+                        String.format("%s %+.1f", StringUtils.capitalize(entry.getKey()), entry.getValue() - mean))
+                .toList();
+        return parts.isEmpty() ? "none" : String.join(", ", parts);
+    }
+
+    private static List<Map.Entry<String, Double>> top(Map<String, Double> values) {
+        return values.entrySet().stream()
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .limit(3)
+                .toList();
+    }
+
+    // Agenda decisions worth naming in a seat's "used" line: cards, riders, predictions, Quash and tie-breaks, not the
+    // routine passes and payment steps.
+    static boolean notable(String text) {
+        String lower = text.toLowerCase(Locale.ROOT);
+        if (lower.startsWith("no sabotage")
+                || lower.startsWith("choose the kind")
+                || lower.startsWith("finish paying")
+                || lower.startsWith("research ")
+                || lower.startsWith("wait ")) return false;
+        return lower.contains("rider")
+                || lower.contains("predict")
+                || lower.contains("galactic threat")
+                || lower.contains("veto")
+                || lower.contains("quash")
+                || lower.contains("sabotage")
+                || lower.contains("break the agenda tie")
+                || lower.startsWith("play ")
+                || lower.startsWith("queue ");
+    }
+
+    static String bountyText(DiscardBounties.Bounty bounty) {
+        List<String> offers = new ArrayList<>();
+        if (bounty.veto() > 0) offers.add(bounty.veto() + " TG for a Veto");
+        if (bounty.quash() > 0)
+            offers.add(bounty.quash() + " TG to " + StringUtils.capitalize(bounty.quasher()) + " for a Quash");
+        return "posted a discard bounty: " + String.join(", ", offers) + " - "
+                + bounty.status().name().toLowerCase(Locale.ROOT);
+    }
+
+    static String outcomeOf(Promise.Status status) {
+        return switch (status) {
+            case OFFERED -> "never answered";
+            case DECLINED -> "declined";
+            case EXPIRED -> "expired, nothing owed";
+            case ACCEPTED -> "accepted, not settled at close";
+            case KEPT -> "accepted and kept";
+            case OWED -> "accepted and kept, payment owed";
+            case PAID -> "accepted, kept and paid";
+            case UNPAID -> "accepted and kept, left unpaid";
+            case BROKEN -> "accepted and broken";
+            case VOID -> "void";
+        };
     }
 
     private static int engineVotes(Game game, Player seat) {
