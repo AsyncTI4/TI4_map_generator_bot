@@ -29,6 +29,7 @@ import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.model.FactionModel;
 import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.franken.AuctionFrankenDraftService;
 import ti4.service.franken.FrankenBanList;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.franken.FrankenDraftStartService;
@@ -55,6 +56,8 @@ public class FrankenSettings extends SettingsMenu {
     private final FrankenDrazFactionPrioritySettings factionPrioritySettings;
 
     private final FrankenDeckSettings deckSettings;
+
+    private final AuctionDraftSettings auctionDraftSettings;
 
     @JsonIgnore
     private final FrankenDraftLimitSettings draftLimitSettings;
@@ -117,6 +120,7 @@ public class FrankenSettings extends SettingsMenu {
         homebrewSettings = new FrankenHomebrewSettings(game, json, this);
         factionPrioritySettings = new FrankenDrazFactionPrioritySettings(json, this);
         deckSettings = new FrankenDeckSettings(game, json, this);
+        auctionDraftSettings = new AuctionDraftSettings(json, this);
         draftLimitSettings = new FrankenDraftLimitSettings(game, json, this);
 
         if (json != null && json.has("messageId")) {
@@ -141,6 +145,7 @@ public class FrankenSettings extends SettingsMenu {
     @Override
     protected List<SettingsMenu> categories() {
         List<SettingsMenu> categories = new ArrayList<>(List.of(homebrewSettings, deckSettings, draftLimitSettings));
+        if (FrankenDraftMode.AUCTION.toString().equals(draftMode.getValue())) categories.add(auctionDraftSettings);
         if (isFrankendrazMode()) {
             categories.add(factionPrioritySettings);
         }
@@ -189,6 +194,7 @@ public class FrankenSettings extends SettingsMenu {
         homebrewSettings.resetSettings();
         deckSettings.resetSettings();
         draftLimitSettings.resetSettings();
+        auctionDraftSettings.resetSettings();
         if (isFrankendrazMode()) {
             factionPrioritySettings.resetSettings();
             banAllDsFactions.setVal(true);
@@ -212,6 +218,14 @@ public class FrankenSettings extends SettingsMenu {
         MonumentsService.applyMonuments(game);
         applyBanSettings();
         applyPriorityFactionSettings();
+        if (FrankenDraftMode.AUCTION.toString().equals(draftMode.getValue())) {
+            AuctionFrankenDraftService.configure(
+                    game,
+                    auctionDraftSettings.getStartingVotes().getVal(),
+                    auctionDraftSettings.getStartingBans().getVal(),
+                    auctionDraftSettings.getStartingMulligans().getVal(),
+                    auctionDraftSettings.getExtraComponents().getVal());
+        }
         return FrankenDraftStartService.startFrankenDraft(event, game, force.isVal(), selectedDraftMode());
     }
 
