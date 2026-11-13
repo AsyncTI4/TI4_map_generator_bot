@@ -1,0 +1,9 @@
+[
+    {
+        "alias": "megagame_voiceofarvid",
+        "name": "The Voice of Arvid (megagame)",
+        "text": "At the start of the agenda phase, you may look at the top 5 cards of the agenda deck. Choose 1 and immediately resolve it as if you had cast 1 vote for an outcome of your choice; discard the rest. Then, purge this card.",
+        "notes": "Megagame ruling: prepared and resolved during the action phase; no whens or afters, no window for Confounding Disclosure and no Committee Formation; the chosen agenda resolves straight away.",
+        "source": "other"
+    }
+]

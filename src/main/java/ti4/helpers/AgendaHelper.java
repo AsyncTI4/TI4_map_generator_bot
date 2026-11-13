@@ -32,6 +32,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.acd2.PublicOutrageA
 import ti4.discord.interactions.buttons.handlers.actioncards.acd2.SettlementsAcd2ButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExplorationRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.VoiceOfArvidHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
@@ -2829,8 +2830,6 @@ public final class AgendaHelper {
         game.setStoredValue("resolvedAgendaId", "");
         game.setStoredValue("resolvedAgendaOutcome", "");
         String agendaID = game.revealAgenda(revealFromBottom);
-        Map<String, Integer> discardAgendas = game.getDiscardAgendas();
-        Integer uniqueID = discardAgendas.get(agendaID);
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
@@ -2859,8 +2858,7 @@ public final class AgendaHelper {
             return;
         }
         snapshotAgendaStartVoteCounts(game);
-        if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(agendaID))
-                && game.getLaws().isEmpty()) {
+        if (isElectLawWithoutLaws(game, agendaID, agendaTarget)) {
             MessageHelper.sendMessageToChannel(
                     channel,
                     game.getPing() + "An \"elect law\" agenda (" + agendaName
@@ -2871,7 +2869,7 @@ public final class AgendaHelper {
             revealAgenda(event, revealFromBottom, game, channel);
             return;
         }
-        if ((agendaTarget.toLowerCase().contains("secret objective")) && game.getScoredSecrets() < 1) {
+        if (isElectSecretWithoutScoredSecrets(game, agendaTarget)) {
             MessageHelper.sendMessageToChannel(
                     channel,
                     game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName
@@ -2883,7 +2881,7 @@ public final class AgendaHelper {
             return;
         }
         if (agendaName != null && !"Covert Legislation".equalsIgnoreCase(agendaName)) {
-            game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_" + uniqueID + "_" + agendaID);
+            game.setCurrentAgendaInfo(agendaInfoFor(game, agendaID));
         } else {
             boolean notEmergency = false;
             String agendaName2 = agendaName;
@@ -2902,8 +2900,7 @@ public final class AgendaHelper {
                 agendaName2 = agendaDetails2.getName();
                 notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName2);
                 game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
-                if ((agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(id2))
-                        && game.getLaws().isEmpty()) {
+                if (isElectLawWithoutLaws(game, id2, agendaTarget)) {
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(
@@ -2916,7 +2913,7 @@ public final class AgendaHelper {
                     revealAgenda(event, revealFromBottom, game, channel);
                     return;
                 }
-                if ((agendaTarget.toLowerCase().contains("secret objective")) && game.getScoredSecrets() < 1) {
+                if (isElectSecretWithoutScoredSecrets(game, agendaTarget)) {
                     MessageHelper.sendMessageToChannel(
                             channel,
                             game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName2
@@ -3549,8 +3546,25 @@ public final class AgendaHelper {
         flipAgenda(event, game);
     }
 
+    public static boolean isElectLawWithoutLaws(Game game, String agendaID, String agendaTarget) {
+        boolean electsLaw =
+                agendaTarget.toLowerCase().contains("elect law") || "constitution".equalsIgnoreCase(agendaID);
+        return electsLaw && game.getLaws().isEmpty();
+    }
+
+    public static boolean isElectSecretWithoutScoredSecrets(Game game, String agendaTarget) {
+        return agendaTarget.toLowerCase().contains("secret objective") && game.getScoredSecrets() < 1;
+    }
+
+    public static String agendaInfoFor(Game game, String agendaID) {
+        AgendaModel agenda = Mapper.getAgenda(agendaID);
+        return agenda.getType() + "_" + agenda.getTarget() + "_"
+                + game.getDiscardAgendas().get(agendaID) + "_" + agendaID;
+    }
+
     @ButtonHandler("flip_agenda")
     private static void flipAgenda(ButtonInteractionEvent event, Game game) {
+        if (VoiceOfArvidHandler.blocksAgendaFlip(game, event)) return;
 
         if ("agendas_br".equalsIgnoreCase(game.getAgendaDeckID())) {
             String mandateID = game.getMandates().getFirst();
