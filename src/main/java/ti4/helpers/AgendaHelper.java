@@ -3564,7 +3564,7 @@ public final class AgendaHelper {
 
     @ButtonHandler("flip_agenda")
     private static void flipAgenda(ButtonInteractionEvent event, Game game) {
-        if (VoiceOfArvidHandler.blocksAgendaFlip(game, event)) return;
+        if (VoiceOfArvidHandler.holdsFirstFlip(game, event)) return;
 
         if ("agendas_br".equalsIgnoreCase(game.getAgendaDeckID())) {
             String mandateID = game.getMandates().getFirst();
