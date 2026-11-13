@@ -184,6 +184,7 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             if (Boolean.getBoolean("ai.selfplay.roundtwo.sardakkleaders")) unlockSardakkLeaders(game);
             if (PLAY_AGENDA || Boolean.getBoolean("ai.selfplay.roundtwo.forceagenda"))
                 selfPlay.force(game, RoundTwoSelfPlayTest::takeCustodians);
+            if (!TOP_AGENDAS.isEmpty()) selfPlay.force(game, RoundTwoSelfPlayTest::stackAgendas);
             Map<String, Map<String, Double>> ownArea = new HashMap<>();
             Map<String, Integer> planetsAtStart = new HashMap<>();
             for (Player seat : game.getRealPlayers()) {
@@ -344,6 +345,26 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
     // -Dai.selfplay.roundtwo.forceagenda=true credits the first seat with the custodians before round 1, so every
     // status phase leads into an agenda phase. Alone it exists to check the agenda skip, not to measure play;
     // playagenda uses the same credit to measure agenda play.
+    // -Dai.selfplay.roundtwo.topagendas=artifact,mutiny puts those agendas on top of the deck, in that order, so a
+    // traced run is sure to see them; id@N puts it at deck position N instead (0 is the next reveal, so artifact@4 is
+    // the first agenda of round 3 when two agendas are revealed a round). Ids not in the deck are ignored. For
+    // inspecting how one agenda is played, not for measuring: it changes which agendas the A/B pairs face.
+    private static final List<String> TOP_AGENDAS = java.util.Arrays.stream(
+                    System.getProperty("ai.selfplay.roundtwo.topagendas", "").split(","))
+            .map(String::trim)
+            .filter(id -> !id.isEmpty())
+            .toList();
+
+    private static void stackAgendas(Game game) {
+        List<String> deck = game.getAgendas();
+        for (int i = TOP_AGENDAS.size() - 1; i >= 0; i--) {
+            String[] entry = TOP_AGENDAS.get(i).split("@");
+            if (!deck.remove(entry[0])) continue;
+            int position = entry.length > 1 ? Integer.parseInt(entry[1]) : 0;
+            deck.add(Math.min(position, deck.size()), entry[0]);
+        }
+    }
+
     private static void takeCustodians(Game game) {
         Integer custodians = game.getRevealedPublicObjectives().get(Constants.CUSTODIAN);
         if (custodians != null)
