@@ -120,6 +120,12 @@ class OwnTurnDeals {
                 .or(() -> wash(context, partners, partner -> !AiSeats.isAiSeat(partner)));
     }
 
+    static Optional<AiDecision> payTheAnswerer(AiTurnContext context) {
+        if (!TradeLegality.isAgendaPhase(context.game())) return Optional.empty();
+        return timed("trade.payTheAnswerer", () -> AnswererDeals.propose(context, () -> partners(context)))
+                .or(() -> AnswererDeals.awaitAnswer(context));
+    }
+
     private static boolean startOfOwnTurn(AiTurnContext context) {
         return context.isActivePlayer()
                 && !TacticalRules.inProgress(context.game(), context.seat())

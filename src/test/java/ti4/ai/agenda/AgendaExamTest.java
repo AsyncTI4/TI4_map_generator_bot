@@ -1830,6 +1830,72 @@ class AgendaExamTest extends BaseTi4Test {
         }
     }
 
+    // ---- pay the answerer ----------------------------------------------------------------------------------------
+
+    /**
+     * Traced self-play (aiselfplay509377 r3 #5, Ixthian Artifact): Hacan (16 votes) stood to lose about 8.7 TG if For
+     * won (82% likely) and abstained, because Xxcha (32 votes, liking For by +3.4) would answer an Against vote; then
+     * everyone abstained and the speaker picked For. The user (2026-11-13): "A seat facing a big loss should pay the
+     * seat that would answer its vote (e.g. Hacan pays Xxcha not to vote For on Ixthian)."
+     */
+    @Nested
+    class PayTheAnswerer {
+
+        private static final String AI_XXCHA_ID = "7100000222222222";
+
+        // Sol (an AI, 6 votes, voting now) holds Mecatol Rex with a big fleet; Xxcha (also an AI, the speaker, 6 votes)
+        // votes last and likes For. A 6-6 tie goes to Xxcha, so Sol's own Against ballot is answered.
+        @BeforeEach
+        void ixthianWithTheAnswererVotingLast() {
+            test = AiTestGame.withSolAi();
+            nekro = test.nekro;
+            sol = test.sol;
+            xxcha = seat(AI_XXCHA_ID, "xxcha", "red");
+            seat(FOURTH_ID, "hacan", "yellow");
+            test.game.setVp(10);
+            test.game.setRound(3);
+            Tile mecatol = test.place("18", "000");
+            sol.addPlanet("mr");
+            test.units(mecatol, "space", sol, UnitType.Dreadnought, 4);
+            test.units(mecatol, "space", sol, UnitType.Cruiser, 3);
+            test.units(mecatol, "mr", sol, UnitType.Infantry, 2);
+            test.place("14", "310");
+            test.place("19", "311");
+            for (String planet : List.of("archonren", "archontau", "wellon")) xxcha.addPlanet(planet);
+            test.game.setStoredValue("agendaCount", "2");
+            test.game.setSpeakerUserID(xxcha.getUserID());
+            reveal("Directive_For/Against_7_artifact", "blue", 6, "red", 6, "yellow", 0, "black", 0);
+            test.isActive(sol, "agendaVoting");
+            sol.setTg(10);
+        }
+
+        @Test
+        void theSeatFacingABigLossPaysTheAnswererAndThenVotes() {
+            AiPrompt table = prompt("table", PromptSource.PUBLIC, NOW, "FFCC_sol_vote");
+
+            Optional<AiDecision> posted = TradeRules.payTheAnswerer(test.contextFor(sol, Set.of(), NOW, table));
+            assertThat(posted).containsInstanceOf(AiDecision.Post.class);
+            Promise offer = PromiseBook.all(test.game).stream()
+                    .filter(promise -> promise.term() == Promise.Term.NOT_AGAINST)
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(offer.isPromiser(xxcha)).isTrue();
+            assertThat(offer.target()).isEqualTo("against");
+
+            AiPrompt answer = prompt(
+                    "offer",
+                    PromptSource.PUBLIC,
+                    NOW,
+                    "FFCC_xxcha_aiPromiseYes_" + offer.id(),
+                    "FFCC_xxcha_aiPromiseNo_" + offer.id());
+            assertThat(pressed(TradeRules.answerPromises(test.contextFor(xxcha, Set.of(), NOW, answer))))
+                    .contains("aiPromiseYes_");
+
+            PromiseBook.save(test.game, offer.accepted(test.game));
+            assertThat(AgendaVoting.itsBallot(test.game, sol).outcome()).isEqualTo("against");
+        }
+    }
+
     // ---- not implemented yet -----------------------------------------------------------------------------------
 
     /** Politics guidance and timing notes the AI does not follow yet. */

@@ -251,7 +251,7 @@ public class VoteDeals {
         return List.copyOf(sizes.headSet(most, true));
     }
 
-    static double spentVotes(Game game, Player viewer, int votes) {
+    public static double spentVotes(Game game, Player viewer, int votes) {
         if (!AiExperiments.enabled(viewer, Experiment.AGENDA_VALUE_TABLE)) return 0;
         return BallotPlanner.keptVote(game, viewer) * votes;
     }

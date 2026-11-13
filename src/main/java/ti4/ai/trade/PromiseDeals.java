@@ -369,7 +369,7 @@ class PromiseDeals {
     private static boolean sells(AiTurnContext context, Promise promise, Player buyer, double margin) {
         Game game = context.game();
         Player seat = context.seat();
-        if (promise.term() == Promise.Term.NOT_AGAINST) return false;
+        if (promise.term() == Promise.Term.NOT_AGAINST) return AnswererDeals.accepts(context, promise, buyer, margin);
         boolean votes = promise.term() == Promise.Term.VOTE_FOR;
         if (votes
                 && (votesCommittedElsewhere(context) || !backedOutcome(context).test(promise.target()))) {
@@ -728,6 +728,14 @@ class PromiseDeals {
 
     private static Promise hypothetical(Game game, Promise.Term term, Player promiser, Player promisee, String target) {
         return Promise.offer(game, term, promiser, promisee, promiser, "", target, 0, 0, 0, 0);
+    }
+
+    static boolean approachableForVotes(AiTurnContext context, Player partner) {
+        return approachable(context, partner) && noVoteDealYet(context.game(), context.seat(), partner);
+    }
+
+    static Optional<AiDecision> postProposal(AiTurnContext context, Proposal proposal) {
+        return post(context, proposal);
     }
 
     private static boolean approachable(AiTurnContext context, Player partner) {

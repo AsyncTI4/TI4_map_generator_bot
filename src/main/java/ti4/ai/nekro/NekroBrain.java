@@ -310,6 +310,7 @@ public class NekroBrain implements FactionBrain {
             GalacticThreatRules::next,
             AgendaCardRules::riders,
             this::declineAfters,
+            TradeRules::payTheAnswerer,
             AgendaVoting::next,
             this::abstainFromAgenda,
             this::breakAgendaTie,
@@ -475,6 +476,8 @@ public class NekroBrain implements FactionBrain {
     private Optional<AiDecision> declineWhens(AiTurnContext context) {
         if (context.game().getStoredValue("declinedWhens").contains(context.faction() + "_")) return Optional.empty();
         if (AgendaQueue.holdsQueuedWhen(context.game(), context.seat())) return Optional.empty();
+        Optional<AiDecision> bountyOffer = TradeRules.offerDiscardBounty(context);
+        if (bountyOffer.isPresent()) return bountyOffer;
         if (AgendaCardRules.holdsPlayedVeto(context)) return Optional.empty();
         Optional<AiDecision> veto = AgendaCardRules.queueVeto(context);
         if (veto.isPresent()) return veto;

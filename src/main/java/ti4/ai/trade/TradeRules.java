@@ -66,6 +66,16 @@ public class TradeRules {
         return Extortion.await(context);
     }
 
+    public static Optional<AiDecision> payTheAnswerer(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return OwnTurnDeals.payTheAnswerer(context);
+    }
+
+    public static Optional<AiDecision> offerDiscardBounty(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return DiscardBountyDeals.offer(context);
+    }
+
     public static Optional<AiDecision> startDeals(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         return OwnTurnDeals.start(context);

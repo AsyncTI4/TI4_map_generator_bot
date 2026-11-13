@@ -107,6 +107,26 @@ class DiscardBountiesTest extends BaseTi4Test {
         assertThat(DiscardBountyDeals.offer(context(sol, table()))).isEmpty();
     }
 
+    // Trace aiselfplay509377 r3 #5 (Ixthian Artifact): Hacan, facing about 8.7 TG of loss, queued its own Veto (which
+    // Xxcha sabotaged) and passed on "when"s without ever posting a bounty: the brain passed on the window before the
+    // trade rules that post bounties ran. The seat in pain now posts its bounty first, a Quash bounty even while it
+    // holds Veto itself, and only then queues its card or passes.
+    @Test
+    void aSeatInPainPostsItsBountyBeforePassingOnWhens() {
+        nekro.setTg(5);
+        xxcha.setTg(5);
+        sol.setActionCard("veto", 9);
+        AiPrompt whens = AiTestGame.prompt(
+                "whens", PromptSource.AI_THREAD, NOW, "queueAWhen", "declineToQueueAWhen", "explainQueue");
+
+        AiDecision decision = new ti4.ai.nekro.NekroBrain().decide(context(sol, whens, table()));
+
+        assertThat(decision).isInstanceOf(AiDecision.Post.class);
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.veto()).isZero();
+        assertThat(posted.quash()).isEqualTo(DiscardBounties.QUASH_CAP);
+    }
+
     // Several losers pool their offers, but each card's pooled bounty stays within its cap: a second payer offers only
     // what the cap leaves, and the holder counts the pool up to the cap and never its own offer.
     @Test
