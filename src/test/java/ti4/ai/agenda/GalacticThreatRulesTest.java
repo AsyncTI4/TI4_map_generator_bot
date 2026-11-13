@@ -13,6 +13,9 @@ import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 class GalacticThreatRulesTest extends BaseTi4Test {
@@ -232,5 +235,39 @@ class GalacticThreatRulesTest extends BaseTi4Test {
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":12,\"red\":1,\"black\":0}");
 
         assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // Ixthian Artifact as the last agenda, Sol (9 votes) For and Xxcha (4 votes, holding Mecatol Rex) Against. Only
+    // Xxcha
+    // has technologies Nekro lacks, so the expected copy is on Against. The prediction follows the likely voters (For);
+    // a seat without GALACTIC_THREAT_BY_VOTERS still ranks by the copy and predicts Against.
+    @Test
+    void predictsTheOutcomeMostLikelyToBeVotedRatherThanTheBestCopy() {
+        Player xxcha = test.addSeat("200000000000000002", "xxcha", "red");
+        test.sol.removeTech("gd");
+        Tile mecatol = test.place("18", "000");
+        xxcha.addPlanet("mr");
+        test.units(mecatol, "space", xxcha, UnitType.Cruiser, 3);
+        test.units(mecatol, "mr", xxcha, UnitType.Infantry, 2);
+        for (String tech : List.copyOf(test.sol.getTechs())) test.nekro.addTech(tech);
+        for (String tech : List.of("gd", "st", "hm", "sdn")) xxcha.addTech(tech);
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("galacticThreatUsed", "Yes");
+        test.game.setRound(2);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo("Directive_For/Against_7_artifact");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");
+        AiPrompt riders = prompt(
+                "riders",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_rider_fa;for_Galactic Threat Rider",
+                "FFCC_nekro_rider_fa;against_Galactic Threat Rider");
+
+        assertThat(press(riders)).isEqualTo("FFCC_nekro_rider_fa;for_Galactic Threat Rider");
+
+        AiExperiments.disable(test.nekro, Set.of(Experiment.GALACTIC_THREAT_BY_VOTERS));
+        assertThat(press(riders)).isEqualTo("FFCC_nekro_rider_fa;against_Galactic Threat Rider");
     }
 }

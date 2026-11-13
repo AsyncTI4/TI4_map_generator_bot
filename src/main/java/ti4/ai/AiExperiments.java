@@ -35,7 +35,9 @@ public class AiExperiments {
         GALACTIC_THREAT_TIMING,
         RIVAL_RIDER_STAKES,
         RIDER_EXTORTION,
-        IMPERIAL_RIDER_HOLD
+        IMPERIAL_RIDER_HOLD,
+        GALACTIC_THREAT_BY_VOTERS,
+        PAY_THE_ANSWERER
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

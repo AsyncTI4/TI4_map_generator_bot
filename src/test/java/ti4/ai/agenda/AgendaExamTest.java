@@ -487,6 +487,39 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(VoteDeals.aboutToVote(test.game, first)).isTrue();
         }
 
+        // User (2026-11-13): "Galactic Threat ranks by likely voters, not by the tech." Ixthian Artifact: Sol (9
+        // votes, nothing near Mecatol Rex) is sure to vote For, Xxcha (4 votes) holds Mecatol Rex with a fleet and
+        // votes Against. Xxcha owns the technologies Nekro would most like to copy, Sol only ones Nekro already has,
+        // so the expected copy is larger on Against; Nekro still predicts For, the outcome other seats will vote for.
+        @Test
+        void predictsTheOutcomeOthersWillVoteForEvenWhenItsVotersHaveWeakerTechnologies() {
+            Tile mecatol = test.place("18", "000");
+            xxcha.addPlanet("mr");
+            test.units(mecatol, "space", xxcha, UnitType.Cruiser, 3);
+            test.units(mecatol, "mr", xxcha, UnitType.Infantry, 2);
+            sol.addTech("amd");
+            for (String tech : List.copyOf(sol.getTechs())) nekro.addTech(tech);
+            for (String tech : List.of("gd", "st", "hm", "sdn")) xxcha.addTech(tech);
+            test.game.setSpeakerUserID(sol.getUserID());
+            test.game.setStoredValue("galacticThreatUsed", "Yes");
+            reveal("Directive_For/Against_7_artifact", "blue", 9, "red", 4, "black", 0);
+            AgendaForecast placed = AgendaForecast.of(test.game, nekro);
+            AgendaForecast onFor = placed.withRider(nekro, GalacticThreatCost.RIDER, "for");
+            AgendaForecast onAgainst = placed.withRider(nekro, GalacticThreatCost.RIDER, "against");
+            assertThat(onFor.votedChance("for")).isGreaterThan(onAgainst.votedChance("against"));
+            assertThat(onAgainst.threatWorth("against")).isGreaterThan(onFor.threatWorth("for"));
+
+            AiPrompt riders = prompt(
+                    "riders",
+                    PromptSource.PUBLIC,
+                    NOW,
+                    "FFCC_nekro_rider_fa;for_Galactic Threat Rider",
+                    "FFCC_nekro_rider_fa;against_Galactic Threat Rider");
+
+            assertThat(pressed(GalacticThreatRules.next(context(nekro, riders))))
+                    .isEqualTo("FFCC_nekro_rider_fa;for_Galactic Threat Rider");
+        }
+
         private String answerVoteOffer(int price) {
             Promise offer = Promise.offer(
                     test.game,

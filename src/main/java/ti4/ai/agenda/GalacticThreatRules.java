@@ -137,8 +137,10 @@ public class GalacticThreatRules {
                     .toList();
             if (riders.isEmpty()) continue;
             AgendaForecast forecast = AgendaForecast.of(game, context.seat());
+            Comparator<PromptButton> byLikelihood =
+                    Comparator.comparingDouble(button -> likelihood(game, context.seat(), forecast, button));
             PromptButton choice = riders.stream()
-                    .max(Comparator.comparingDouble(button -> likelihood(game, context.seat(), forecast, button)))
+                    .max(byLikelihood.thenComparingDouble(button -> copyTieBreak(context.seat(), forecast, button)))
                     .orElseThrow();
             return Optional.of(AiDecision.press(prompt, choice, "predict the agenda's outcome"));
         }
@@ -161,7 +163,26 @@ public class GalacticThreatRules {
         AgendaForecast predicted = AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING)
                 ? forecast.withRider(seat, GalacticThreatCost.RIDER, outcome)
                 : forecast;
+        if (AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_BY_VOTERS)) return predicted.votedChance(outcome);
         return predicted.threatWorth(outcome) + VOTED_TIE_BREAK * predicted.votedChance(outcome);
+    }
+
+    private static double copyTieBreak(Player seat, AgendaForecast forecast, PromptButton rider) {
+        String id = rider.handlerId();
+        if (forecast.isEmpty()
+                || !id.startsWith(RIDER_PREFIX)
+                || !AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_COST)
+                || !AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_BY_VOTERS)) return 0;
+        String outcome = outcomeOf(id);
+        AgendaForecast predicted = AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING)
+                ? forecast.withRider(seat, GalacticThreatCost.RIDER, outcome)
+                : forecast;
+        return predicted.threatWorth(outcome);
+    }
+
+    private static String outcomeOf(String riderId) {
+        String target = StringUtils.substringBefore(StringUtils.removeStart(riderId, RIDER_PREFIX), "_" + RIDER_SUFFIX);
+        return StringUtils.substringAfter(target, ";");
     }
 
     private static double votesBasedLikelihood(Game game, Player seat, PromptButton rider) {
