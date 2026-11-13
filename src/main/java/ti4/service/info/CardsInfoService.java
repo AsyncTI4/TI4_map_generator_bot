@@ -251,6 +251,9 @@ public class CardsInfoService {
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
         }
+        if (game.getRealPlayers().stream().anyMatch(p -> p.hasAbility("intrigue"))) {
+            buttons.add(Buttons.blue("viewAvailableIntrigues", "View Available Intrigues", FactionEmojis.xin));
+        }
         if (player.hasRelicReady("superweaponavailyn")) {
             String factionChecker = player.factionButtonChecker();
             buttons.add(Buttons.gray(
