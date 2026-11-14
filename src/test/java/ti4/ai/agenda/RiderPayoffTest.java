@@ -110,4 +110,13 @@ class RiderPayoffTest extends BaseTi4Test {
         assertThat(RiderPayoff.of(test.game, test.sol, RiderPayoff.LEADERSHIP))
                 .isEqualTo(CommandTokenValue.tactic(test.game, test.sol, 3));
     }
+
+    // A rival's Politics Rider is three average cards plus the speaker token: valuing the draw does not look at the
+    // rival's hand (Nekro's Malleon check would otherwise read it).
+    @Test
+    void aRivalsPoliticsRiderDoesNotReadTheirHand() {
+        assertThat(RiderPayoff.of(test.game, test.sol, test.nekro, RiderPayoff.POLITICS))
+                .isEqualTo(
+                        3 * ActionCardPrior.AVERAGE_CARD + ti4.ai.strategy.SpeakerTokenValue.of(test.game, test.nekro));
+    }
 }

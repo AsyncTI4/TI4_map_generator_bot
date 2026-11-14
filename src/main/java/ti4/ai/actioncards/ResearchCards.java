@@ -10,7 +10,6 @@ import ti4.ai.actioncards.CardPrompts.Offer;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.scoring.ScoringReserve;
-import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.ResearchPolicy;
@@ -70,9 +69,8 @@ class ResearchCards {
     }
 
     private static double researchGain(Game game, Player seat, String tech, double valueGivenUp) {
-        int points = ResearchPolicy.publicPointsCompletedBy(game, seat, tech);
-        double tempo = ResearchPolicy.TECH_TEMPO * (ResearchPolicy.researchValue(game, seat, tech) - valueGivenUp);
-        return tempo + ScoringStakes.scoreValue(game, seat, points);
+        return ResearchPolicy.worthWithPoints(
+                game, seat, tech, ResearchPolicy.researchValue(game, seat, tech) - valueGivenUp);
     }
 
     private static Optional<AiDecision> getTechnology(AiTurnContext context, String key, CardPlay play) {
@@ -135,9 +133,7 @@ class ResearchCards {
         double cost = InfluencePayments.cost(game, seat, payment.get());
         return copyable(game, seat).stream()
                 .map(alias -> Plan.aimedAt(
-                        ResearchPolicy.TECH_TEMPO * ResearchPolicy.value(game, seat, alias)
-                                + ScoringStakes.scoreValue(
-                                        game, seat, ResearchPolicy.publicPointsCompletedBy(game, seat, alias))
+                        ResearchPolicy.worthWithPoints(game, seat, alias, ResearchPolicy.value(game, seat, alias))
                                 - cost,
                         alias,
                         "to copy " + nameOf(alias) + "."))

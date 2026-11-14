@@ -249,9 +249,7 @@ class ExpertDirectiveValues {
     }
 
     static double researchWorth(AgendaView view, Player player) {
-        return view.readsHandOf(player)
-                ? ResearchPolicy.freeResearchWorth(view.game(), player)
-                : ResearchPolicy.publicResearchWorth(view.game(), player);
+        return ResearchPolicy.freeResearchWorth(view.game(), player, view.readsHandOf(player));
     }
 
     static double ixthianResearchWorth(AgendaView view, Player player) {

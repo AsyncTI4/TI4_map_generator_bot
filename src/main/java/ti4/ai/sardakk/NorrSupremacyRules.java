@@ -12,7 +12,6 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.nekro.NekroRules;
 import ti4.ai.perception.AiPrompt;
-import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.strategy.CommandTokenValue;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRules;
@@ -90,9 +89,8 @@ public class NorrSupremacyRules {
         if (StrategyCardRules.cannotResearch(seat)) return 0;
         List<String> researchable = researchableUpgrades(game, seat);
         return ResearchPolicy.best(game, seat, researchable)
-                .map(alias -> ResearchPolicy.TECH_TEMPO * ResearchPolicy.researchValue(game, seat, alias)
-                        + ScoringStakes.scoreValue(
-                                game, seat, ResearchPolicy.publicPointsCompletedBy(game, seat, alias)))
+                .map(alias -> ResearchPolicy.worthWithPoints(
+                        game, seat, alias, ResearchPolicy.researchValue(game, seat, alias)))
                 .orElse(0.0);
     }
 

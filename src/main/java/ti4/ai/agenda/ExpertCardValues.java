@@ -149,7 +149,7 @@ class ExpertCardValues {
             case CONSTRUCTION -> CONSTRUCTION_SECONDARY;
             case TRADE -> replenishValue(seat);
             case WARFARE -> warfareSecondary(game, seat);
-            case TECHNOLOGY -> technologySecondary(game, seat);
+            case TECHNOLOGY -> technologySecondary(view, seat);
             case IMPERIAL -> imperialSecondary(view, seat);
             default -> 0;
         };
@@ -168,10 +168,10 @@ class ExpertCardValues {
         return WARFARE_SECONDARY * Math.min(1.0, (double) resources / FULL_PRODUCTION_RESOURCES);
     }
 
-    private static double technologySecondary(Game game, Player seat) {
-        if (resourcesLeftAfterVoting(game, seat) < TECHNOLOGY_RESOURCES) return 0;
+    private static double technologySecondary(AgendaView view, Player seat) {
+        if (resourcesLeftAfterVoting(view.game(), seat) < TECHNOLOGY_RESOURCES) return 0;
         double cost = TECHNOLOGY_RESOURCES * ValueScale.RESOURCE;
-        return Math.max(0, ResearchPolicy.freeResearchWorth(game, seat) - cost);
+        return Math.max(0, ResearchPolicy.freeResearchWorth(view.game(), seat, view.readsHandOf(seat)) - cost);
     }
 
     private static double politicsSecondary(AgendaView view, Player seat) {

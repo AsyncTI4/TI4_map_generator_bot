@@ -418,4 +418,22 @@ class ExpertDirectiveValuesTest extends BaseTi4Test {
             assertThat(expert(nekro, agenda, "sol")).as(agenda).isZero();
         }
     }
+
+    // Unconventional Measures still uses the older value code. When another seat forecasts Sol, Sol's loss if Against
+    // wins comes from its card count, not from the cards it holds; only Sol's own view reads its hand.
+    @Test
+    void unconventionalMeasuresReadsAHandOnlyInItsOwnView() {
+        sol.setActionCard("sabo1", 1);
+        sol.setActionCard("sabo2", 2);
+        sol.setActionCard("veto", 3);
+        double strongForecast = DirectiveValues.unconventionalMeasures(test.game, sol, false, "against", "for");
+        double strongOwn = DirectiveValues.unconventionalMeasures(test.game, sol, true, "against", "for");
+        for (int index = 1; index <= 3; index++) sol.removeActionCard(index);
+        for (int index = 1; index <= 3; index++) sol.setActionCard("examcard" + index, index);
+
+        assertThat(DirectiveValues.unconventionalMeasures(test.game, sol, false, "against", "for"))
+                .isCloseTo(strongForecast, within(EPSILON));
+        assertThat(DirectiveValues.unconventionalMeasures(test.game, sol, true, "against", "for"))
+                .isNotCloseTo(strongOwn, within(EPSILON));
+    }
 }

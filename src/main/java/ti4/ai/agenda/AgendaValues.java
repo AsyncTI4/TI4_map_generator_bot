@@ -45,7 +45,7 @@ public class AgendaValues {
         Double value = expertTable
                 ? ExpertAgendaValues.valueOf(new AgendaView(game, voter, ownView), agenda, outcome, ownVote)
                 : null;
-        if (value == null) value = valueOf(game, voter, expertTable, agenda, outcome, ownVote);
+        if (value == null) value = valueOf(game, voter, ownView, expertTable, agenda, outcome, ownVote);
         return value == null ? OptionalDouble.empty() : OptionalDouble.of(value);
     }
 
@@ -68,7 +68,13 @@ public class AgendaValues {
 
     @Nullable
     private static Double valueOf(
-            Game game, Player voter, boolean expertTable, String agenda, String outcome, String ownVote) {
+            Game game,
+            Player voter,
+            boolean ownView,
+            boolean expertTable,
+            String agenda,
+            String outcome,
+            String ownVote) {
         return switch (agenda) {
             case "secret" -> ElectionValues.archivedSecret(game, voter, outcome);
             case "committee" -> ElectionValues.committeeFormation(game, voter, outcome);
@@ -124,7 +130,7 @@ public class AgendaValues {
             case "mutiny" -> DirectiveValues.mutiny(game, voter, outcome, ownVote);
             case "seed_empire" -> DirectiveValues.seedOfAnEmpire(game, voter, outcome);
             case "plowshares" -> DirectiveValues.swordsToPlowshares(game, voter, outcome);
-            case "unconventional" -> DirectiveValues.unconventionalMeasures(game, voter, outcome, ownVote);
+            case "unconventional" -> DirectiveValues.unconventionalMeasures(game, voter, ownView, outcome, ownVote);
             case "wormhole_research" -> DirectiveValues.wormholeResearch(game, voter, outcome, ownVote);
             case "cladenstine" -> DirectiveValues.clandestineOperations(game, voter, outcome);
             case "rearmament" -> DirectiveValues.rearmamentAgreement(game, voter, outcome);

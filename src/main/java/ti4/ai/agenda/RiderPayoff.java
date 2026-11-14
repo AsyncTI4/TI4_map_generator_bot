@@ -34,6 +34,7 @@ public class RiderPayoff {
     public static double of(Game game, Player viewer, Player owner, String rider) {
         if (GalacticThreatCost.RIDER.equals(rider)) return galacticThreat(game, viewer, owner);
         if (owner != viewer && NEEDS_THE_HAND.contains(rider)) return OTHER_RIDER;
+        if (owner != viewer && POLITICS.equals(rider)) return rivalPolitics(game, owner);
         return of(game, owner, rider);
     }
 
@@ -51,6 +52,10 @@ public class RiderPayoff {
             case GalacticThreatCost.RIDER -> galacticThreat(game, player, player);
             default -> OTHER_RIDER;
         };
+    }
+
+    private static double rivalPolitics(Game game, Player owner) {
+        return POLITICS_CARDS * ActionCardPrior.AVERAGE_CARD + SpeakerTokenValue.of(game, owner);
     }
 
     static double leadershipTokens(Game game, Player player) {

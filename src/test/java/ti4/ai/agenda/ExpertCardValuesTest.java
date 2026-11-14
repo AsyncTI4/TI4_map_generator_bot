@@ -222,4 +222,24 @@ class ExpertCardValuesTest extends BaseTi4Test {
         assertThat(ExpertCardValues.secondaryGain(view, sol, ExpertCardValues.POLITICS))
                 .isCloseTo(2 * ActionCardPrior.AVERAGE_CARD, within(EPS));
     }
+
+    // A rival's Technology secondary is judged from public information only: Nekro values Sol's free research at its
+    // public worth, and handing Sol a technology secret does not change it.
+    @Test
+    void aRivalsTechnologySecondaryIgnoresTheirSecrets() {
+        sol.addPlanet(LODOR);
+        sol.addPlanet(MEHAR_XULL);
+        AgendaView nekroView = ownView(nekro);
+        double before = ExpertCardValues.secondaryGain(nekroView, sol, ExpertCardValues.TECHNOLOGY);
+        sol.setSecret("mlp");
+
+        assertThat(ExpertCardValues.secondaryGain(nekroView, sol, ExpertCardValues.TECHNOLOGY))
+                .isCloseTo(before, within(EPS))
+                .isCloseTo(
+                        Math.max(
+                                0,
+                                ResearchPolicy.publicResearchWorth(test.game, sol)
+                                        - ExpertCardValues.TECHNOLOGY_RESOURCES * ValueScale.RESOURCE),
+                        within(EPS));
+    }
 }

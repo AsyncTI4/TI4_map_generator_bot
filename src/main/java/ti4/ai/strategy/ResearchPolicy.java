@@ -200,9 +200,17 @@ public class ResearchPolicy {
 
     public static double freeResearchWorth(Game game, Player seat) {
         return bestResearchable(game, seat)
-                .map(tech -> TECH_TEMPO * researchValue(game, seat, tech)
-                        + ScoringStakes.scoreValue(game, seat, publicPointsCompletedBy(game, seat, tech)))
+                .map(tech -> worthWithPoints(game, seat, tech, researchValue(game, seat, tech)))
                 .orElse(0.0);
+    }
+
+    public static double freeResearchWorth(Game game, Player seat, boolean readsOwnHand) {
+        return readsOwnHand ? freeResearchWorth(game, seat) : publicResearchWorth(game, seat);
+    }
+
+    public static double worthWithPoints(Game game, Player seat, String alias, double researchValue) {
+        int points = publicPointsCompletedBy(game, seat, alias);
+        return TECH_TEMPO * (researchValue - OBJECTIVE_WEIGHT * points) + ScoringStakes.scoreValue(game, seat, points);
     }
 
     public static Optional<String> bestResearchable(Game game, Player seat) {

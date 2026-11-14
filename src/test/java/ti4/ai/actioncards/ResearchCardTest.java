@@ -21,6 +21,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.PaymentRules;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.ai.tactical.Stall;
@@ -340,5 +341,23 @@ class ResearchCardTest extends BaseTi4Test {
                 .isEqualTo(1);
         assertThat(ResearchPolicy.publicPointsCompletedBy(table.game, table.nekro, "ps"))
                 .isZero();
+    }
+
+    // A technology that completes a public objective counts that point once. Revealing Diversify Research makes
+    // Psychoarchaeology complete it, and its free-research worth rises by exactly one point's value: the research
+    // value no longer adds its own objective bonus on top of the point.
+    @Test
+    void aCompletedPublicObjectiveIsCountedOnce() {
+        table.nekro.setTechs(List.of("nm", "gd", "amd"));
+        double hidden = researchWorth("pa");
+        table.reveal("diversify");
+
+        assertThat(researchWorth("pa") - hidden)
+                .isCloseTo(ScoringStakes.scoreValue(table.game, table.nekro, 1), within(1e-9));
+    }
+
+    private double researchWorth(String alias) {
+        return ResearchPolicy.worthWithPoints(
+                table.game, table.nekro, alias, ResearchPolicy.researchValue(table.game, table.nekro, alias));
     }
 }

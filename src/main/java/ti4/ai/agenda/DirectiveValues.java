@@ -239,16 +239,22 @@ class DirectiveValues {
     }
 
     static double unconventionalMeasures(Game game, Player voter, String outcome, String ownVote) {
+        return unconventionalMeasures(game, voter, true, outcome, ownVote);
+    }
+
+    static double unconventionalMeasures(Game game, Player voter, boolean ownView, String outcome, String ownVote) {
         if (!isFor(outcome) && !isAgainst(outcome)) return 0;
         boolean forWins = isFor(outcome);
-        return relativeToRivals(game, voter, player -> unconventionalEffect(game, voter, player, forWins, ownVote));
+        Player handReader = ownView ? voter : null;
+        return relativeToRivals(
+                game, voter, player -> unconventionalEffect(game, voter, handReader, player, forWins, ownVote));
     }
 
     private static double unconventionalEffect(
-            Game game, Player voter, Player player, boolean forWins, String ownVote) {
+            Game game, Player voter, Player handReader, Player player, boolean forWins, String ownVote) {
         if (!votedFor(game, voter, player, ownVote)) return 0;
-        if (!forWins) return -handValue(game, player, voter);
-        if (player == voter) return DrawnCardValue.of(game, voter, UNCONVENTIONAL_DRAW);
+        if (!forWins) return -handValue(game, player, handReader);
+        if (player == handReader) return DrawnCardValue.of(game, voter, UNCONVENTIONAL_DRAW);
         return UNCONVENTIONAL_DRAW * ActionCardPrior.AVERAGE_CARD;
     }
 
