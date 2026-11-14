@@ -217,7 +217,7 @@ class ExpertCardValuesTest extends BaseTi4Test {
         assertThat(ExpertCardValues.secondaryGain(view, sol, ExpertCardValues.IMPERIAL))
                 .isEqualTo(imperial)
                 .isCloseTo(
-                        ExpertCardValues.RIVAL_SECRET_DRAW_POINTS * ScoringStakes.scoreValue(test.game, sol, 1),
+                        AgendaValueMath.RIVAL_SECRET_DRAW_POINTS * ScoringStakes.scoreValue(test.game, sol, 1),
                         within(EPS));
         assertThat(ExpertCardValues.secondaryGain(view, sol, ExpertCardValues.POLITICS))
                 .isCloseTo(2 * ActionCardPrior.AVERAGE_CARD, within(EPS));

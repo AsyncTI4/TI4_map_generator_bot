@@ -15,7 +15,6 @@ import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
-import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretPhase;
 import ti4.ai.secrets.SecretValue;
@@ -39,7 +38,6 @@ class ExpertCardValues {
     static final int FULL_PRODUCTION_RESOURCES = 4;
     static final double CONSTRUCTION_SECONDARY = 2.0;
     static final double WARFARE_SECONDARY = 2.0;
-    static final double RIVAL_SECRET_DRAW_POINTS = 0.4;
     private static final double ONE_STEP_SHORT_CHANCE = 0.5;
     private static final double UNMODELLED_CHANCE = 0.25;
     private static final double LATER_CHANCE_PER_ROUND = 0.1;
@@ -180,11 +178,7 @@ class ExpertCardValues {
     }
 
     private static double imperialSecondary(AgendaView view, Player seat) {
-        Game game = view.game();
-        if (view.readsHandOf(seat)) return SecretDrawValue.of(game, seat);
-        boolean room = seat.getSo() < Math.max(0, seat.getMaxSOCount() - seat.getSoScored());
-        if (!room) return SecretDrawValue.SWAP_VALUE;
-        return RIVAL_SECRET_DRAW_POINTS * ScoringStakes.scoreValue(game, seat, 1);
+        return AgendaValueMath.secretDrawWorth(view, seat);
     }
 
     private static double replenishValue(Player seat) {

@@ -131,10 +131,14 @@ class DirectiveValues {
         return Math.clamp(player.getPlanets().size() / average, MIN_STRENGTH, MAX_STRENGTH);
     }
 
-    static double ixthianArtifact(Game game, Player voter, String outcome) {
+    static double ixthianArtifact(AgendaView view, String outcome) {
         if (!isFor(outcome)) return 0;
-        double research =
-                relativeToRivals(game, voter, player -> TWO_TECHS * ResearchPolicy.freeResearchWorth(game, player));
+        Game game = view.game();
+        Player voter = view.voter();
+        double research = relativeToRivals(
+                game,
+                voter,
+                player -> TWO_TECHS * ResearchPolicy.freeResearchWorth(game, player, view.readsHandOf(player)));
         double blast = relativeToRivals(game, voter, player -> -mecatolBlastLoss(game, player));
         return TECH_ROLL_CHANCE * research + (1 - TECH_ROLL_CHANCE) * blast;
     }
@@ -238,10 +242,6 @@ class DirectiveValues {
         return BoardView.count(game.getUnitHolderFromPlanet(planet), player, UnitType.Infantry);
     }
 
-    static double unconventionalMeasures(Game game, Player voter, String outcome, String ownVote) {
-        return unconventionalMeasures(game, voter, true, outcome, ownVote);
-    }
-
     static double unconventionalMeasures(Game game, Player voter, boolean ownView, String outcome, String ownVote) {
         if (!isFor(outcome) && !isAgainst(outcome)) return 0;
         boolean forWins = isFor(outcome);
@@ -273,16 +273,21 @@ class DirectiveValues {
         return game.getPlayerFromColorOrFaction(piece.substring(0, split).toLowerCase()) == player;
     }
 
-    static double wormholeResearch(Game game, Player voter, String outcome, String ownVote) {
+    static double wormholeResearch(AgendaView view, String outcome, String ownVote) {
+        Game game = view.game();
+        Player voter = view.voter();
         if (isAgainst(outcome)) {
             return isAgainst(ownVote) ? -CommandTokenValue.tactic(game, voter, ONE_TOKEN) : 0;
         }
         if (!isFor(outcome)) return 0;
-        return relativeToRivals(game, voter, player -> wormholeResearchGain(game, player));
+        return relativeToRivals(game, voter, player -> wormholeResearchGain(view, player));
     }
 
-    private static double wormholeResearchGain(Game game, Player player) {
-        double research = hasShipsAtAnyWormhole(game, player) ? ResearchPolicy.freeResearchWorth(game, player) : 0;
+    private static double wormholeResearchGain(AgendaView view, Player player) {
+        Game game = view.game();
+        double research = hasShipsAtAnyWormhole(game, player)
+                ? ResearchPolicy.freeResearchWorth(game, player, view.readsHandOf(player))
+                : 0;
         return research - ValueScale.RESOURCE * unitsLostAtAlphaOrBeta(game, player);
     }
 

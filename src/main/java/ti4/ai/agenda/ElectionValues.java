@@ -13,7 +13,6 @@ import java.util.function.ToDoubleFunction;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardPrior;
-import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.RelicValue;
 import ti4.ai.eval.ValueScale;
@@ -65,10 +64,12 @@ class ElectionValues {
     private static final double SECOND_SECRET_SHARE = 0.5;
     private static final double REVEALED_SECRETS_COST_PER_ROUND = 0.5;
 
-    static double archivedSecret(Game game, Player voter, String outcome) {
+    static double archivedSecret(AgendaView view, String outcome) {
+        Game game = view.game();
+        Player voter = view.voter();
         Player elected = electedPlayer(game, outcome);
         if (elected == null || hasScoredAllSecrets(elected)) return 0;
-        if (elected == voter) return SecretDrawValue.of(game, voter);
+        if (elected == voter) return AgendaValueMath.secretDrawWorth(view, voter);
         double points = SecretDrawValue.hasRoom(elected) ? RIVAL_SECRET_DRAW_POINTS : RIVAL_SECRET_SWAP_POINTS;
         return -ScoringStakes.rivalPointStake(game, elected, 1) * points;
     }
@@ -117,8 +118,10 @@ class ElectionValues {
         return electedGain(game, voter, outcome, holder -> PEACE_VALUE);
     }
 
-    static double ministerOfPolicy(Game game, Player voter, String outcome) {
-        return electedGain(game, voter, outcome, holder -> DrawnCardValue.of(game, holder, lawRounds(game)));
+    static double ministerOfPolicy(AgendaView view, String outcome) {
+        Game game = view.game();
+        return electedGain(
+                game, view.voter(), outcome, holder -> AgendaValueMath.cardDrawWorth(view, holder, lawRounds(game)));
     }
 
     static double ministerOfSciences(Game game, Player voter, String outcome) {
@@ -145,20 +148,22 @@ class ElectionValues {
         return perRound * Math.min(GameHorizon.roundsLeft(game), PROPHECY_HELD_ROUNDS);
     }
 
-    static double publicExecution(Game game, Player voter, String outcome) {
+    static double publicExecution(AgendaView view, String outcome) {
+        Game game = view.game();
+        Player voter = view.voter();
         Player elected = electedPlayer(game, outcome);
         if (elected == null) return 0;
         Player heir = speakerHeir(game, elected);
-        double loss = executionLoss(game, voter, elected, heir);
+        double loss = executionLoss(game, AgendaValueMath.handReader(view), elected, heir);
         if (elected == voter) return -loss;
         double inheritance = heir == voter ? SpeakerTokenValue.of(game, voter) : 0;
         return rivalGainCost(game, voter, elected, loss) + inheritance;
     }
 
-    private static double executionLoss(Game game, Player voter, Player elected, @Nullable Player heir) {
+    private static double executionLoss(Game game, @Nullable Player reader, Player elected, @Nullable Player heir) {
         double speaker = heir == null ? 0 : SpeakerTokenValue.of(game, heir);
         double silenced = AgendaRound.isFinalAgenda(game) ? 0 : EXECUTION_SILENCED;
-        return handValue(game, elected, voter) + speaker + silenced;
+        return handValue(game, elected, reader) + speaker + silenced;
     }
 
     @Nullable
@@ -242,16 +247,20 @@ class ElectionValues {
         return hand + future;
     }
 
-    static double researchGrantReallocation(Game game, Player voter, String outcome) {
-        return electedGain(game, voter, outcome, holder -> grantWorth(game, holder));
+    static double researchGrantReallocation(AgendaView view, String outcome) {
+        return electedGain(view.game(), view.voter(), outcome, holder -> grantWorth(view, holder));
     }
 
-    private static double grantWorth(Game game, Player player) {
-        Optional<String> tech = ResearchPolicy.bestResearchable(game, player);
+    private static double grantWorth(AgendaView view, Player player) {
+        Game game = view.game();
+        boolean readsHand = view.readsHandOf(player);
+        Optional<String> tech = readsHand
+                ? ResearchPolicy.bestResearchable(game, player)
+                : ResearchPolicy.publicBestResearchable(game, player);
         if (tech.isEmpty()) return 0;
         int lost = Math.min(player.getFleetCC(), prerequisites(tech.get()));
         double tokenLoss = lost > 0 ? CommandTokenValue.tactic(game, player, lost) : 0;
-        return Math.max(0, ResearchPolicy.freeResearchWorth(game, player) - tokenLoss);
+        return Math.max(0, ResearchPolicy.freeResearchWorth(game, player, readsHand) - tokenLoss);
     }
 
     private static int prerequisites(String alias) {
@@ -259,12 +268,12 @@ class ElectionValues {
         return tech == null ? 0 : tech.getRequirements().orElse("").length();
     }
 
-    static double searchWarrant(Game game, Player voter, String outcome) {
-        return electedGain(game, voter, outcome, holder -> warrantWorth(game, holder));
+    static double searchWarrant(AgendaView view, String outcome) {
+        return electedGain(view.game(), view.voter(), outcome, holder -> warrantWorth(view, holder));
     }
 
-    private static double warrantWorth(Game game, Player player) {
-        double draws = SecretDrawValue.of(game, player) * (1 + SECOND_SECRET_SHARE);
-        return draws - REVEALED_SECRETS_COST_PER_ROUND * lawRounds(game);
+    private static double warrantWorth(AgendaView view, Player player) {
+        double draws = AgendaValueMath.secretDrawWorth(view, player) * (1 + SECOND_SECRET_SHARE);
+        return draws - REVEALED_SECRETS_COST_PER_ROUND * lawRounds(view.game());
     }
 }

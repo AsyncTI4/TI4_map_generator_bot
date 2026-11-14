@@ -13,6 +13,7 @@ import static ti4.ai.agenda.AgendaValueMath.unitsOnBoard;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.eval.Adjacency;
@@ -91,9 +92,11 @@ class ForAgainstLawValues {
                 .sum();
     }
 
-    static double conventionsOfWar(Game game, Player voter, String outcome, String ownVote) {
+    static double conventionsOfWar(AgendaView view, String outcome, String ownVote) {
+        Game game = view.game();
+        Player voter = view.voter();
         if (isFor(outcome)) return relativeToRivals(game, voter, player -> bombardmentBanGain(game, player));
-        if (isAgainst(outcome) && isAgainst(ownVote)) return -handValue(game, voter, voter);
+        if (isAgainst(outcome) && isAgainst(ownVote)) return -handValue(game, voter, AgendaValueMath.handReader(view));
         return 0;
     }
 
@@ -174,9 +177,12 @@ class ForAgainstLawValues {
         return PDS_STACKING_EDGE_PER_ROUND * share * lawRounds(game);
     }
 
-    static double publicizeWeaponSchematics(Game game, Player voter, String outcome) {
+    static double publicizeWeaponSchematics(AgendaView view, String outcome) {
+        Game game = view.game();
+        Player voter = view.voter();
+        Player reader = AgendaValueMath.handReader(view);
         if (isFor(outcome)) return relativeToRivals(game, voter, player -> schematicsFor(game, player));
-        if (isAgainst(outcome)) return relativeToRivals(game, voter, player -> schematicsAgainst(game, voter, player));
+        if (isAgainst(outcome)) return relativeToRivals(game, voter, player -> schematicsAgainst(game, reader, player));
         return 0;
     }
 
@@ -192,9 +198,9 @@ class ForAgainstLawValues {
         return anyOwner ? WAR_SUN_ACCESS : 0;
     }
 
-    private static double schematicsAgainst(Game game, Player voter, Player player) {
+    private static double schematicsAgainst(Game game, @Nullable Player reader, Player player) {
         if (!ownsWarSunTech(player)) return 0;
-        return -handValue(game, player, voter);
+        return -handValue(game, player, reader);
     }
 
     private static boolean ownsWarSunTech(Player player) {

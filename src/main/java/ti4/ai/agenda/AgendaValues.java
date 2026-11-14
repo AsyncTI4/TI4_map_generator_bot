@@ -75,28 +75,29 @@ public class AgendaValues {
             String agenda,
             String outcome,
             String ownVote) {
+        AgendaView view = new AgendaView(game, voter, ownView);
         return switch (agenda) {
-            case "secret" -> ElectionValues.archivedSecret(game, voter, outcome);
+            case "secret" -> ElectionValues.archivedSecret(view, outcome);
             case "committee" -> ElectionValues.committeeFormation(game, voter, outcome);
             case "arbiter" -> ElectionValues.imperialArbiter(game, voter, outcome);
             case "minister_commerce" -> ElectionValues.ministerOfCommerce(game, voter, outcome);
             case "minister_exploration" -> ElectionValues.ministerOfExploration(game, voter, outcome);
             case "minister_industry" -> ElectionValues.ministerOfIndustry(game, voter, outcome);
             case "minister_peace" -> ElectionValues.ministerOfPeace(game, voter, outcome);
-            case "minister_policy" -> ElectionValues.ministerOfPolicy(game, voter, outcome);
+            case "minister_policy" -> ElectionValues.ministerOfPolicy(view, outcome);
             case "minister_sciences" -> ElectionValues.ministerOfSciences(game, voter, outcome);
             case "minister_war" -> ElectionValues.ministerOfWar(game, voter, outcome);
             case "minister_antiquities" -> ElectionValues.ministerOfAntiquities(game, voter, outcome);
             case "prophecy" -> ElectionValues.prophecyOfIxth(game, voter, outcome);
-            case "execution" -> ElectionValues.publicExecution(game, voter, outcome);
+            case "execution" -> ElectionValues.publicExecution(view, outcome);
             case "shard_of_the_throne" -> ElectionValues.shardOfTheThrone(game, voter, outcome);
             case "crown_of_emphidia" -> ElectionValues.crownOfEmphidia(game, voter, outcome);
             case "crown_of_thalnos" -> ElectionValues.crownOfThalnos(game, voter, outcome);
             case "standardization" -> ElectionValues.armedForcesStandardization(game, voter, outcome);
             case "covert" -> ElectionValues.covertLegislation(game, voter, outcome);
             case "censure" -> ElectionValues.politicalCensure(game, voter, outcome);
-            case "grant_reallocation" -> ElectionValues.researchGrantReallocation(game, voter, outcome);
-            case "warrant" -> ElectionValues.searchWarrant(game, voter, outcome);
+            case "grant_reallocation" -> ElectionValues.researchGrantReallocation(view, outcome);
+            case "warrant" -> ElectionValues.searchWarrant(view, outcome);
             case "redistribution" -> PlanetElectionValues.colonialRedistribution(game, voter, outcome);
             case "disarmament" -> PlanetElectionValues.compensatedDisarmament(game, voter, outcome);
             case "core_mining" -> PlanetElectionValues.coreMining(game, voter, outcome);
@@ -109,12 +110,12 @@ public class AgendaValues {
             case "senate_sanctuary" -> PlanetElectionValues.senateSanctuary(game, voter, outcome);
             case "terraforming_initiative" -> PlanetElectionValues.terraformingInitiative(game, voter, outcome);
             case "revolution" -> ForAgainstLawValues.antiIntellectualRevolution(game, voter, outcome);
-            case "conventions" -> ForAgainstLawValues.conventionsOfWar(game, voter, outcome, ownVote);
+            case "conventions" -> ForAgainstLawValues.conventionsOfWar(view, outcome, ownVote);
             case "travel_ban" -> ForAgainstLawValues.enforcedTravelBan(game, voter, outcome);
             case "sanctions" -> ForAgainstLawValues.executiveSanctions(game, voter, outcome);
             case "regulations" -> ForAgainstLawValues.fleetRegulations(game, voter, outcome);
             case "defense_act" -> ForAgainstLawValues.homelandDefenseAct(game, voter, outcome);
-            case "schematics" -> ForAgainstLawValues.publicizeWeaponSchematics(game, voter, outcome);
+            case "schematics" -> ForAgainstLawValues.publicizeWeaponSchematics(view, outcome);
             case "conscription" -> ForAgainstLawValues.regulatedConscription(game, voter, outcome);
             case "shared_research" -> ForAgainstLawValues.sharedResearch(game, voter, outcome);
             case "wormhole_recon" -> ForAgainstLawValues.wormholeReconstruction(game, voter, outcome);
@@ -126,19 +127,19 @@ public class AgendaValues {
             case "arms_reduction" -> DirectiveValues.armsReduction(game, voter, outcome);
             case "economic_equality" -> DirectiveValues.economicEquality(game, voter, outcome);
             case "incentive" -> DirectiveValues.incentiveProgram(game, voter, outcome);
-            case "artifact" -> DirectiveValues.ixthianArtifact(game, voter, outcome);
+            case "artifact" -> DirectiveValues.ixthianArtifact(view, outcome);
             case "mutiny" -> DirectiveValues.mutiny(game, voter, outcome, ownVote);
             case "seed_empire" -> DirectiveValues.seedOfAnEmpire(game, voter, outcome);
             case "plowshares" -> DirectiveValues.swordsToPlowshares(game, voter, outcome);
             case "unconventional" -> DirectiveValues.unconventionalMeasures(game, voter, ownView, outcome, ownVote);
-            case "wormhole_research" -> DirectiveValues.wormholeResearch(game, voter, outcome, ownVote);
+            case "wormhole_research" -> DirectiveValues.wormholeResearch(view, outcome, ownVote);
             case "cladenstine" -> DirectiveValues.clandestineOperations(game, voter, outcome);
             case "rearmament" -> DirectiveValues.rearmamentAgreement(game, voter, outcome);
             case "abolishment" -> LawChangeValues.judicialAbolishment(game, voter, expertTable, outcome);
             case "miscount" -> LawChangeValues.miscountDisclosed(game, voter, expertTable, outcome);
             case "constitution" -> LawChangeValues.newConstitution(game, voter, expertTable, outcome);
             case "classified" -> CardElectionValues.classifiedDocumentLeaks(game, voter, outcome);
-            case "crisis" -> CardElectionValues.galacticCrisisPact(game, voter, outcome);
+            case "crisis" -> CardElectionValues.galacticCrisisPact(view, outcome);
             default -> null;
         };
     }

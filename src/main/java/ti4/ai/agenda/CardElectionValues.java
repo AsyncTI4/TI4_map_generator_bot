@@ -8,11 +8,9 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
-import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringStakes;
-import ti4.ai.secrets.SecretDrawValue;
 import ti4.ai.strategy.CommandTokenValue;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.game.Game;
@@ -83,22 +81,27 @@ class CardElectionValues {
         return progress + 1 >= threshold ? ONE_STEP_SHORT_CHANCE : 0;
     }
 
-    static double galacticCrisisPact(Game game, Player voter, String outcome) {
+    static double galacticCrisisPact(AgendaView view, String outcome) {
         if (!StringUtils.isNumeric(outcome)) return 0;
         int card = Integer.parseInt(outcome);
-        return relativeToRivals(game, voter, player -> freeSecondary(game, player, card));
+        return relativeToRivals(view.game(), view.voter(), player -> freeSecondary(view, player, card));
     }
 
-    private static double freeSecondary(Game game, Player player, int card) {
+    private static double freeSecondary(AgendaView view, Player player, int card) {
+        Game game = view.game();
         return switch (card) {
             case LEADERSHIP -> leadershipSecondary(game, player);
             case DIPLOMACY -> DIPLOMACY_SECONDARY;
-            case POLITICS -> DrawnCardValue.of(game, player, POLITICS_CARDS);
+            case POLITICS -> AgendaValueMath.cardDrawWorth(view, player, POLITICS_CARDS);
             case CONSTRUCTION -> CONSTRUCTION_SECONDARY;
             case TRADE -> replenishValue(player);
             case WARFARE -> WARFARE_SECONDARY;
-            case TECHNOLOGY -> Math.max(0, ResearchPolicy.freeResearchWorth(game, player) - TECHNOLOGY_SECONDARY_COST);
-            case IMPERIAL -> SecretDrawValue.of(game, player);
+            case TECHNOLOGY ->
+                Math.max(
+                        0,
+                        ResearchPolicy.freeResearchWorth(game, player, view.readsHandOf(player))
+                                - TECHNOLOGY_SECONDARY_COST);
+            case IMPERIAL -> AgendaValueMath.secretDrawWorth(view, player);
             default -> 0;
         };
     }

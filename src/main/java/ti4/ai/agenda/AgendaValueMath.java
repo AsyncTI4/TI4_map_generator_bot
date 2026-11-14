@@ -9,10 +9,12 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.actioncards.ActionCardValue;
+import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.scoring.ScoringStakes;
+import ti4.ai.secrets.SecretDrawValue;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -25,6 +27,8 @@ import ti4.model.UnitModel;
 
 @UtilityClass
 class AgendaValueMath {
+
+    static final double RIVAL_SECRET_DRAW_POINTS = 0.4;
 
     static final String FOR = "for";
     static final String AGAINST = "against";
@@ -145,11 +149,29 @@ class AgendaValueMath {
                 .sum();
     }
 
-    static double handValue(Game game, Player holder, Player voter) {
-        if (holder != voter) return holder.getAcCount() * ActionCardPrior.AVERAGE_CARD;
+    static double handValue(Game game, Player holder, @Nullable Player reader) {
+        if (holder != reader) return holder.getAcCount() * ActionCardPrior.AVERAGE_CARD;
         return holder.getActionCards().keySet().stream()
                 .mapToDouble(alias -> ActionCardValue.keepValue(game, holder, alias))
                 .sum();
+    }
+
+    @Nullable
+    static Player handReader(AgendaView view) {
+        return view.readsHandOf(view.voter()) ? view.voter() : null;
+    }
+
+    static double cardDrawWorth(AgendaView view, Player seat, int cards) {
+        if (view.readsHandOf(seat)) return DrawnCardValue.of(view.game(), seat, cards);
+        return Math.max(0, cards) * ActionCardPrior.AVERAGE_CARD;
+    }
+
+    static double secretDrawWorth(AgendaView view, Player seat) {
+        Game game = view.game();
+        if (view.readsHandOf(seat)) return SecretDrawValue.of(game, seat);
+        boolean room = seat.getSo() < Math.max(0, seat.getMaxSOCount() - seat.getSoScored());
+        if (!room) return SecretDrawValue.SWAP_VALUE;
+        return RIVAL_SECRET_DRAW_POINTS * ScoringStakes.scoreValue(game, seat, 1);
     }
 
     static boolean controlsHomePlanet(Player player) {
