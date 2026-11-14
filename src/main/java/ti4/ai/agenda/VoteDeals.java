@@ -16,6 +16,7 @@ import ti4.game.Player;
 public class VoteDeals {
 
     private static final double ENOUGH = 0.1;
+    private static final double FREE_PICK_MARGIN = 1e-6;
     private static final int MAX_BLOC_PARTNERS = 3;
     private static final String VOTING_PHASE = "agendaVoting";
     private static final String ABSTAIN = "";
@@ -83,7 +84,29 @@ public class VoteDeals {
 
     public static Optional<Terms> bestPurchase(
             Outlook outlook, Player buyer, Player seller, Predicate<String> allowed) {
-        return best(outlook, seller, buyer, allowed, Comparator.comparingDouble(Terms::buyerGain));
+        Predicate<String> worthPaying = freePick(outlook, seller)
+                .map(free -> allowed.and(outcome -> !outcome.equalsIgnoreCase(free)))
+                .orElse(allowed);
+        return best(outlook, seller, buyer, worthPaying, Comparator.comparingDouble(Terms::buyerGain));
+    }
+
+    public static Optional<String> freePick(Outlook outlook, Player seller) {
+        Game game = outlook.game;
+        AgendaForecast forecast = outlook.forecast;
+        if (forecast.isEmpty() || !votingAfter(game, seller).isEmpty()) return Optional.empty();
+        int votes = AgendaVoting.castableVotes(game, seller);
+        AgendaForecast abstaining = forecast.without(seller);
+        Optional<String> best = abstaining.mostLikely();
+        double bestValue = abstaining.expectedUtility(seller, ABSTAIN);
+        for (String outcome : forecast.outcomes()) {
+            AgendaForecast cast = forecast.withVotes(seller, outcome, votes);
+            double value = cast.expectedUtility(seller, outcome);
+            if (value > bestValue + FREE_PICK_MARGIN) {
+                bestValue = value;
+                best = cast.mostLikely();
+            }
+        }
+        return best;
     }
 
     public static List<Bloc> blocs(

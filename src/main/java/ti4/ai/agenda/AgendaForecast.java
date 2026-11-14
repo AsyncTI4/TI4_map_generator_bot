@@ -621,7 +621,7 @@ public final class AgendaForecast {
                 }
                 if (weighsAbstaining && votes[voter] > 0) {
                     int unvoted = winnerWithout(voter, tally, live, picks);
-                    picks[voter] = pickOrAbstain(voter, live[voter], unvoted, draw[voter]);
+                    picks[voter] = pickOrAbstain(voter, tally, live, picks, unvoted, draw[voter]);
                 }
                 int pick = picks[voter];
                 if (pick < 0) continue;
@@ -682,16 +682,32 @@ public final class AgendaForecast {
         return spread(row) <= INDIFFERENT_SPREAD ? null : cumulative(row);
     }
 
-    private int pickOrAbstain(int voter, double[] utility, int unvoted, double draw) {
+    private int pickOrAbstain(int voter, int[] tally, double[][] live, int[] picks, int unvoted, double draw) {
+        double[] utility = live[voter];
         double abstained = utility[unvoted] + ownVoteTerm(voter, unvoted, ABSTAIN);
         double[] cost = ballotCosts()[voter];
-        double[] prices = Arrays.copyOf(utility, utility.length + 1);
-        for (int outcome = 0; outcome < utility.length; outcome++) prices[outcome] -= cost[outcome];
+        double[] prices = new double[utility.length + 1];
+        for (int outcome = 0; outcome < utility.length; outcome++) {
+            int winner = winnerWith(voter, outcome, tally, live, picks);
+            prices[outcome] = utility[winner] + ownVoteTerm(voter, winner, outcome) - cost[outcome];
+        }
         double best = Arrays.stream(prices, 0, utility.length).max().orElse(0);
         if (best - abstained <= INDIFFERENT_SPREAD) return ABSTAIN;
         prices[utility.length] = abstained;
         int pick = softmaxPick(cumulative(prices), draw);
         return pick == utility.length ? ABSTAIN : pick;
+    }
+
+    private int winnerWith(int voter, int ballot, int[] tally, double[][] live, int[] picks) {
+        int own = picks[voter];
+        picks[voter] = ballot;
+        int[] later = laterVotes(voter, picks);
+        int[] expected = tally.clone();
+        for (int outcome = 0; outcome < expected.length; outcome++) expected[outcome] += later[outcome];
+        expected[ballot] += votes[voter];
+        int winner = winner(expected, tieValues(live, picks));
+        picks[voter] = own;
+        return winner;
     }
 
     private int winnerWithout(int voter, int[] tally, double[][] live, int[] picks) {

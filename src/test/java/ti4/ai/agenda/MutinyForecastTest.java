@@ -138,4 +138,17 @@ class MutinyForecastTest extends BaseTi4Test {
         assertThat(forecast.expectedUtility(hacan, "for"))
                 .isCloseTo(forecast.expectedUtility(hacan), org.assertj.core.api.Assertions.within(1e-9));
     }
+
+    // A modelled seat prices each ballot by the outcome it actually leads to, so a For voter counts the point it loses
+    // when Against wins anyway. Xxcha and Sardakk have put 10 on Against; Hacan, holding a point, no longer throws
+    // nine votes on a For that the seats after it would likely sink, so For drops from about 62% (when each ballot was
+    // priced as if it won) to about 51%.
+    @Test
+    void aForVoterWeighsThePointItLosesWhenAgainstWins() {
+        voted(xxcha, "against", 6);
+        voted(sardakk, "against", 4);
+        turnOf(hacan);
+
+        assertThat(AgendaForecast.of(test.game, test.sol).chance("for")).isLessThan(0.56);
+    }
 }

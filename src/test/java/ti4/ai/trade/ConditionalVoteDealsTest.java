@@ -308,4 +308,19 @@ class ConditionalVoteDealsTest extends BaseTi4Test {
         assertThat(OwnTurnDeals.holdVoteForDeals(later).filter(decision -> decision instanceof AiDecision.Wait))
                 .isEmpty();
     }
+
+    // Item 7 (2026-11-14): buyers paid a speaker that would pick their outcome for free. Xxcha (6, on 4 points) and
+    // Letnev (3 + Hacan's 3) tie 6-6; Sol, the speaker, votes last and would rather not hand the leader a point, so
+    // abstaining and breaking the tie for Letnev is its free pick. Letnev buys nothing from Sol.
+    @Test
+    void aBuyerDoesNotPayTheLastVoterForItsFreePick() {
+        test.game.setCurrentAgendaVote("xxcha", "red_6");
+        test.game.setCurrentAgendaVote("letnev", "yellow_3;purple_3");
+        test.isActive(sol, "agendaVoting");
+        VoteDeals.Outlook outlook = VoteDeals.outlook(test.game, letnev);
+
+        assertThat(VoteDeals.freePick(outlook, sol)).contains("letnev");
+        assertThat(VoteDeals.bestPurchase(outlook, letnev, sol, "letnev"::equals))
+                .isEmpty();
+    }
 }
