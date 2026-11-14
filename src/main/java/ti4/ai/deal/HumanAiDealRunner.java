@@ -59,11 +59,18 @@ public class HumanAiDealRunner {
         transferAll(event, game, ai, human, batch);
     }
 
-    static String item(HumanAiDeal.Step.Transfer transfer) {
-        String detail =
-                transfer.item() == HumanAiDeal.Item.PROMISSORY ? transfer.detail() : String.valueOf(transfer.amount());
+    static String item(Game game, HumanAiDeal.Step.Transfer transfer) {
+        String detail = transfer.item() == HumanAiDeal.Item.PROMISSORY
+                ? noteNumber(game, transfer)
+                : String.valueOf(transfer.amount());
         return "sending" + transfer.fromFaction() + "_receiving" + transfer.toFaction() + "_"
                 + transfer.item().token() + "_" + detail;
+    }
+
+    private static String noteNumber(Game game, HumanAiDeal.Step.Transfer transfer) {
+        Player sender = game.getPlayerFromColorOrFaction(transfer.fromFaction());
+        Integer number = sender == null ? null : sender.getPromissoryNotes().get(transfer.detail());
+        return number == null ? transfer.detail() : String.valueOf(number);
     }
 
     private static void transferAll(
@@ -71,7 +78,7 @@ public class HumanAiDealRunner {
         if (batch.isEmpty()) return;
         ai.clearTransactionItemsWithPlayer(human);
         for (HumanAiDeal.Step.Transfer transfer : batch) {
-            ai.addTransactionItem(item(transfer));
+            ai.addTransactionItem(item(game, transfer));
         }
         batch.clear();
         TransactionHelper.acceptTransactionOffer(ai, human, game, event);

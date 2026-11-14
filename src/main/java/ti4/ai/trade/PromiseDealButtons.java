@@ -1,5 +1,6 @@
 package ti4.ai.trade;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
@@ -9,6 +10,7 @@ import ti4.ai.deal.HumanAiDeal;
 import ti4.ai.deal.HumanAiDealRunner;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
+import ti4.ai.promise.PromisePayment;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -34,11 +36,12 @@ class PromiseDealButtons {
                             + promisee.getFactionEmojiOrColor() + " cannot transact right now.");
             return;
         }
-        if (promisee.getTg() < promise.get().price()) {
+        PromisePayment payment = PromisePayment.of(game, promise.get());
+        if (!payment.affordable(promisee)) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event,
-                    "The deal is off: " + promisee.getFactionEmojiOrColor() + " no longer has "
-                            + promise.get().price() + " trade goods.");
+                    "The deal is off: " + promisee.getFactionEmojiOrColor() + " no longer has " + payment.describe()
+                            + ".");
             return;
         }
         ButtonHelper.deleteAllButtons(event);
@@ -49,16 +52,16 @@ class PromiseDealButtons {
                     promiser.getFactionEmojiOrColor() + " promises to "
                             + PromiseDeals.describe(game, promise.get(), true) + ". "
                             + promisee.getFactionEmojiOrColor() + " pays it "
-                            + promise.get().price()
-                            + " trade goods after the agenda if it resolves that way.");
+                            + payment.describe()
+                            + " after the agenda if it resolves that way.");
             return;
         }
-        HumanAiDealRunner.run(event, game, payment(promise.get()));
+        HumanAiDealRunner.run(event, game, payment(game, promise.get()));
         PromiseBook.save(game, promise.get().accepted(game));
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 promisee.getFactionEmojiOrColor() + " paid " + promiser.getFactionEmojiOrColor() + " "
-                        + promise.get().price() + " trade goods. " + promiser.getFactionEmojiOrColor()
+                        + payment.describe() + ". " + promiser.getFactionEmojiOrColor()
                         + " promises to " + PromiseDeals.describe(game, promise.get(), true) + ".");
     }
 
@@ -72,20 +75,20 @@ class PromiseDealButtons {
             return;
         }
         Player payee = owed.get().promiserIn(game).orElseThrow();
-        if (player.getTg() < owed.get().price() || !TradeLegality.canTransact(game, player, payee)) {
+        PromisePayment payment = PromisePayment.of(game, owed.get());
+        if (!payment.affordable(player) || !TradeLegality.canTransact(game, player, payee)) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event,
-                    "You cannot pay " + owed.get().price() + " trade goods to " + payee.getFactionEmojiOrColor()
-                            + " right now.");
+                    "You cannot pay " + payment.describe() + " to " + payee.getFactionEmojiOrColor() + " right now.");
             return;
         }
         ButtonHelper.deleteAllButtons(event);
-        HumanAiDealRunner.run(event, game, payment(owed.get()));
+        HumanAiDealRunner.run(event, game, payment(game, owed.get()));
         PromiseBook.save(game, owed.get().with(Promise.Status.PAID));
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                player.getFactionEmojiOrColor() + " paid " + payee.getFactionEmojiOrColor() + " "
-                        + owed.get().price() + " trade goods as agreed.");
+                player.getFactionEmojiOrColor() + " paid " + payee.getFactionEmojiOrColor() + " " + payment.describe()
+                        + " as agreed.");
     }
 
     @ButtonHandler(PromiseDeals.DECLINE_PREFIX)
@@ -103,19 +106,31 @@ class PromiseDealButtons {
         return PromiseDeals.openFor(game, player, StringUtils.removeStart(buttonID, prefix));
     }
 
-    private static HumanAiDeal payment(Promise promise) {
+    private static HumanAiDeal payment(Game game, Promise promise) {
         String other = promise.proposer().equals(promise.promiser()) ? promise.promisee() : promise.promiser();
+        PromisePayment payment = PromisePayment.of(game, promise);
         return new HumanAiDeal(
                 promise.id(),
                 promise.proposer(),
                 other,
-                "A promise for " + promise.price() + " trade goods",
+                "A promise for " + payment.describe(),
                 promise.round(),
                 promise.expiresAt(),
                 HumanAiDeal.Status.PENDING,
                 "",
                 "",
-                List.of(HumanAiDeal.Step.transfer(
-                        promise.promisee(), promise.promiser(), HumanAiDeal.Item.TRADE_GOODS, promise.price())));
+                steps(promise, payment));
+    }
+
+    private static List<HumanAiDeal.Step> steps(Promise promise, PromisePayment payment) {
+        List<HumanAiDeal.Step> steps = new ArrayList<>();
+        String from = promise.promisee();
+        String to = promise.promiser();
+        if (payment.tradeGoods() > 0) {
+            steps.add(HumanAiDeal.Step.transfer(from, to, HumanAiDeal.Item.TRADE_GOODS, payment.tradeGoods()));
+        }
+        if (payment.debt() > 0) steps.add(HumanAiDeal.Step.transfer(from, to, HumanAiDeal.Item.DEBT, payment.debt()));
+        payment.notes().forEach(note -> steps.add(HumanAiDeal.Step.note(from, to, note)));
+        return steps;
     }
 }

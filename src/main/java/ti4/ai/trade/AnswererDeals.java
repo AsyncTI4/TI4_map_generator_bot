@@ -18,6 +18,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
+import ti4.ai.promise.PromisePayment;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -114,9 +115,9 @@ class AnswererDeals {
                 "staying out on %s gains %.1f TG, costs it %.1f TG, %.0f%% to resolve",
                 stake.outcome(), stake.payerGain(), stake.answererCost(), 100 * stake.chance());
         return proposal(game, payer, answerer, stake, 1.0)
-                .map(proposal -> terms + "; would offer " + proposal.price() + " TG")
-                .orElseGet(() ->
-                        terms + "; no price fits (" + PromiseDeals.spendableTradeGoods(game, payer) + " TG spendable)");
+                .map(proposal -> terms + "; would offer " + proposal.payment().describe())
+                .orElseGet(() -> terms + "; no payment fits (" + PromiseDeals.spendableTradeGoods(game, payer)
+                        + " TG spendable, room for " + DebtRules.room(payer, answerer) + " debt)");
     }
 
     private static Optional<Stake> stake(
@@ -144,10 +145,24 @@ class AnswererDeals {
         double cost = stake.answererCost();
         double chance = stake.chance();
         int spendable = PromiseDeals.spendableTradeGoods(game, payer);
-        return PromiseDeals.buyerPrice(value, cost, answerer, spendable, 0, 0, chance)
+        Optional<PromiseDeals.Proposal> inTradeGoods = PromiseDeals.buyerPrice(
+                        value, cost, answerer, spendable, 0, 0, chance)
                 .map(least -> generousShare(least, mostWorthPaying(value, chance, spendable)))
                 .map(price -> new PromiseDeals.Proposal(
                         Promise.Term.NOT_AGAINST, answerer, payer, stake.outcome(), 0, price, value - chance * price));
+        if (inTradeGoods.isPresent() || chance < PromiseDeals.MIN_PAY_CHANCE) return inTradeGoods;
+        double needed = (cost + PromiseDeals.partnerMinimum(answerer)) / chance;
+        return PaymentValue.cheapestCovering(game, payer, answerer, needed, spendable)
+                .map(payment -> new PromiseDeals.Proposal(
+                        Promise.Term.NOT_AGAINST,
+                        answerer,
+                        payer,
+                        stake.outcome(),
+                        0,
+                        payment.tradeGoods(),
+                        value - chance * PaymentValue.cost(game, payer, answerer, payment),
+                        payment))
+                .filter(proposal -> proposal.gain() >= TradeValue.PROPOSE_MIN);
     }
 
     private static int mostWorthPaying(double value, double chance, int spendable) {
@@ -166,7 +181,9 @@ class AnswererDeals {
         if (!PromiseDeals.backedOutcome(context).test(promise.target())) return false;
         Optional<Stake> stake = answererView(game, answerer, payer, promise.target());
         if (stake.isEmpty() || stake.get().chance() < PromiseDeals.MIN_PAY_CHANCE) return false;
-        double received = stake.get().chance() * Trust.of(context, payer) * promise.price();
+        double received = stake.get().chance()
+                * PaymentValue.received(
+                        game, answerer, payer, PromisePayment.of(game, promise), Trust.of(context, payer));
         return received - stake.get().answererCost() >= margin;
     }
 

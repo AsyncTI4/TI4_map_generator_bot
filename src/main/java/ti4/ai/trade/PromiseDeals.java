@@ -31,6 +31,7 @@ import ti4.ai.perception.PromptButton;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.ai.promise.PromiseChecks;
+import ti4.ai.promise.PromisePayment;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlanner;
@@ -61,7 +62,20 @@ class PromiseDeals {
             .thenComparing(proposal -> proposal.term() == Promise.Term.NOT_AGAINST);
 
     record Proposal(
-            Promise.Term term, Player promiser, Player promisee, String target, int votes, int price, double gain) {}
+            Promise.Term term,
+            Player promiser,
+            Player promisee,
+            String target,
+            int votes,
+            int price,
+            double gain,
+            PromisePayment payment) {
+
+        Proposal(
+                Promise.Term term, Player promiser, Player promisee, String target, int votes, int price, double gain) {
+            this(term, promiser, promisee, target, votes, price, gain, PromisePayment.tradeGoods(price));
+        }
+    }
 
     static boolean active(Player seat) {
         return AiExperiments.enabled(seat, Experiment.PROMISE_DEALS);
@@ -163,7 +177,7 @@ class PromiseDeals {
                 }
                 Optional<Promise> owed =
                         owedBy(game, context.seat(), StringUtils.removeStart(button.handlerId(), PAY_PREFIX));
-                if (owed.isEmpty() || context.seat().getTg() < owed.get().price()) continue;
+                if (owed.isEmpty() || !PromisePayment.of(game, owed.get()).affordable(context.seat())) continue;
                 Player payee = owed.get().promiserIn(game).orElseThrow();
                 if (!TradeLegality.canTransact(game, context.seat(), payee)
                         || TradeLegality.windowUsed(context, payee)) {
@@ -201,7 +215,7 @@ class PromiseDeals {
             return Optional.of(new AiDecision.Post(
                     channel.get(),
                     billText(game, payer.get(), payee.get(), promise),
-                    payButtons(payer.get(), promise)));
+                    payButtons(game, payer.get(), promise)));
         }
         return Optional.empty();
     }
@@ -219,13 +233,15 @@ class PromiseDeals {
                         "for not voting against **" + outcomeName(game, promise.target()) + "**, which won";
                     default -> "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
                 };
-        return payer.getRepresentationUnfogged() + " owes " + payee.getFactionEmojiOrColor() + " " + promise.price()
-                + " trade goods " + reason + ".";
+        return payer.getRepresentationUnfogged() + " owes " + payee.getFactionEmojiOrColor() + " "
+                + PromisePayment.of(game, promise).describe() + " " + reason + ".";
     }
 
-    private static List<Button> payButtons(Player payer, Promise promise) {
+    private static List<Button> payButtons(Game game, Player payer, Promise promise) {
         String owner = ComponentIdEnvelope.ownedBy(payer.getFaction());
-        return List.of(Buttons.green(owner + PAY_PREFIX + promise.id(), "Pay " + promise.price() + " TG"));
+        return List.of(Buttons.green(
+                owner + PAY_PREFIX + promise.id(),
+                "Pay " + PromisePayment.of(game, promise).label()));
     }
 
     static void observe(AiTurnContext context) {
@@ -723,7 +739,7 @@ class PromiseDeals {
         return sellerPrice(worth, cost, buyer, buyer.getTg(), cap, payChance).orElse(0);
     }
 
-    private static double partnerMinimum(Player partner) {
+    static double partnerMinimum(Player partner) {
         return AiSeats.isAiSeat(partner) ? TradeValue.PREDICTED_MIN : TradeValue.HUMAN_GAIN_MIN;
     }
 
@@ -791,10 +807,11 @@ class PromiseDeals {
                 proposal.price(),
                 context.now(),
                 context.now() + TradeRules.ownTurnReplyMillis(partner));
+        PromisePayment.attach(game, promise.id(), proposal.payment());
         PromiseBook.persist(game, promise);
         if (!paysOnResolution(game, promise)) TradeLegality.useWindow(context, partner);
         return Optional.of(new AiDecision.Post(
-                channel.get(), offerText(game, seat, partner, promise), offerButtons(partner, promise)));
+                channel.get(), offerText(game, seat, partner, promise), offerButtons(game, partner, promise)));
     }
 
     static Optional<String> channelId(AiTurnContext context) {
@@ -809,7 +826,7 @@ class PromiseDeals {
 
     static String offerText(Game game, Player proposer, Player partner, Promise promise) {
         String name = proposer.getFactionEmojiOrColor();
-        String price = promise.price() + " trade goods";
+        String price = PromisePayment.of(game, promise).describe();
         String deal = promise.isPromiser(proposer)
                 ? name + " offers to " + describe(game, promise, true) + " if you pay it " + price + "."
                 : name + " offers you " + price + " to " + describe(game, promise, false) + ".";
@@ -817,15 +834,17 @@ class PromiseDeals {
     }
 
     private static String paymentTerms(Game game, Promise promise) {
-        if (!paysOnResolution(game, promise)) return "The trade goods change hands when you accept.";
-        return "Nothing is paid now: the trade goods change hands after the agenda, and only if it resolves for **"
+        if (!paysOnResolution(game, promise)) return "The payment changes hands when you accept.";
+        return "Nothing is paid now: the payment changes hands after the agenda, and only if it resolves for **"
                 + outcomeName(game, promise.target()) + "**.";
     }
 
-    private static List<Button> offerButtons(Player partner, Promise promise) {
+    private static List<Button> offerButtons(Game game, Player partner, Promise promise) {
         String owner = ComponentIdEnvelope.ownedBy(partner.getFaction());
         return List.of(
-                Buttons.green(owner + ACCEPT_PREFIX + promise.id(), "Accept (" + promise.price() + " TG)"),
+                Buttons.green(
+                        owner + ACCEPT_PREFIX + promise.id(),
+                        "Accept (" + PromisePayment.of(game, promise).label() + ")"),
                 Buttons.gray(owner + DECLINE_PREFIX + promise.id(), "Decline"));
     }
 

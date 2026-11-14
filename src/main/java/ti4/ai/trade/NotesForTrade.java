@@ -94,6 +94,10 @@ class NotesForTrade {
                 seatPrivate);
     }
 
+    static double publicReceiveValue(Game game, Player seat, String alias) {
+        return baseReceiveValue(game, seat, alias, true);
+    }
+
     private static double baseReceiveValue(Game game, Player seat, String alias, boolean seatPrivate) {
         Player owner = game.getPNOwner(alias);
         boolean own = Standings.same(owner, seat);

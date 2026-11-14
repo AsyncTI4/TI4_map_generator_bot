@@ -26,6 +26,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
+import ti4.ai.promise.PromisePayment;
 import ti4.ai.trade.TradeRules;
 import ti4.ai.xxcha.QuashRules;
 import ti4.game.Player;
@@ -1989,7 +1990,7 @@ class AgendaExamTest extends BaseTi4Test {
             // The trace explains the offer it is about to make (or why it makes none).
             assertThat(TradeRules.explainPayTheAnswerer(test.game, hacan))
                     .contains("Xxcha: staying out on against")
-                    .contains("would offer 1 TG");
+                    .contains("would offer 1 trade good");
 
             assertThat(TradeRules.payTheAnswerer(hacanAtTheTable())).containsInstanceOf(AiDecision.Post.class);
             Promise offer = PromiseBook.all(test.game).stream()
@@ -2000,6 +2001,34 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(offer.isPromisee(hacan)).isTrue();
             assertThat(offer.target()).isEqualTo("against");
             assertThat(offer.price()).isEqualTo(1);
+
+            AiPrompt answer = prompt(
+                    "offer",
+                    PromptSource.PUBLIC,
+                    NOW,
+                    "FFCC_xxcha_aiPromiseYes_" + offer.id(),
+                    "FFCC_xxcha_aiPromiseNo_" + offer.id());
+            assertThat(pressed(TradeRules.answerPromises(test.contextFor(xxcha, Set.of(), NOW, answer))))
+                    .contains("aiPromiseYes_");
+        }
+
+        // User (2026-11-14): with no trade goods to spend, Hacan pays in debt instead (promissory notes are the other
+        // option, when one is cheaper). The debt is sent only if Against resolves; Xxcha values it at its reach and
+        // trust and still accepts.
+        @Test
+        void withNoTradeGoodsHacanOffersDebtAndXxchaAccepts() {
+            hacan.setTg(0);
+            test.isActive(hacan, "agendaVoting");
+            assertThat(TradeRules.explainPayTheAnswerer(test.game, hacan)).contains("debt token");
+
+            assertThat(TradeRules.payTheAnswerer(hacanAtTheTable())).containsInstanceOf(AiDecision.Post.class);
+            Promise offer = PromiseBook.all(test.game).stream()
+                    .filter(promise -> promise.term() == Promise.Term.NOT_AGAINST)
+                    .findFirst()
+                    .orElseThrow();
+            PromisePayment payment = PromisePayment.of(test.game, offer);
+            assertThat(payment.tradeGoods()).isZero();
+            assertThat(payment.debt()).isPositive();
 
             AiPrompt answer = prompt(
                     "offer",
