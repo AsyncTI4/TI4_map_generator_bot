@@ -12,7 +12,6 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaVoting;
-import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
@@ -29,6 +28,7 @@ class AnswererDeals {
     private static final String CONSIDERED_KEY = "answererDealConsidered|";
     private static final String VOTING_PHASE = "agendaVoting";
     static final double GENEROUS_SHARE = 0.75;
+    static final double MIN_LOSS = 1.0;
 
     record Stake(String outcome, int votes, double payerGain, double answererCost, double chance) {}
 
@@ -62,7 +62,7 @@ class AnswererDeals {
         AgendaForecast forecast = AgendaForecast.of(game, payer);
         if (forecast.isEmpty() || forecast.votesLeft(answerer) <= 0) return Optional.empty();
         double baseline = planned.value(payer);
-        if (-baseline < DiscardBounties.MIN_LOSS) return Optional.empty();
+        if (-baseline < MIN_LOSS) return Optional.empty();
         return forecast.outcomes().stream()
                 .filter(backed)
                 .map(outcome -> stake(game, forecast, planned, payer, answerer, outcome, votes, baseline))
@@ -82,10 +82,10 @@ class AnswererDeals {
         if (forecast.isEmpty()) return "no forecast";
         AgendaVoting.PlannedBallot planned = AgendaVoting.itsBallot(game, payer);
         double baseline = planned.value(payer);
-        if (-baseline < DiscardBounties.MIN_LOSS) {
+        if (-baseline < MIN_LOSS) {
             return String.format(
                     "its planned ballot leaves it at %+.1f TG; it pays only to avoid a loss of %.0f TG or more",
-                    baseline, DiscardBounties.MIN_LOSS);
+                    baseline, MIN_LOSS);
         }
         List<String> parts = new ArrayList<>();
         for (Player answerer : answerers) {
