@@ -7,8 +7,12 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.service.tournament.TournamentMemberResolver.Candidate;
@@ -164,17 +168,46 @@ class TournamentHelpersTest {
     }
 
     @Test
-    void tourneyModRoleOrAdminRoleGrantsAccess() {
+    void tourneyModAdminOrAddedRoleGrantsAccess() {
         Role adminRole = role("Admin");
         Role tourneyMod = role("tourney mod");
+        Role staff = role("Staff");
         Role bothelper = role("Bothelper");
+        Set<String> added = Set.of("Staff-id");
 
-        assertThat(TournamentAccess.hasTournamentAdminRole(List.of(tourneyMod), List.of(adminRole)))
+        assertThat(TournamentAccess.hasTournamentAdminRole(List.of(tourneyMod), List.of(adminRole), added))
                 .isTrue();
-        assertThat(TournamentAccess.hasTournamentAdminRole(List.of(adminRole), List.of(adminRole)))
+        assertThat(TournamentAccess.hasTournamentAdminRole(List.of(adminRole), List.of(adminRole), added))
                 .isTrue();
-        assertThat(TournamentAccess.hasTournamentAdminRole(List.of(bothelper), List.of(adminRole)))
+        assertThat(TournamentAccess.hasTournamentAdminRole(List.of(staff), List.of(adminRole), added))
+                .isTrue();
+        assertThat(TournamentAccess.hasTournamentAdminRole(List.of(bothelper), List.of(adminRole), added))
                 .isFalse();
+    }
+
+    @Test
+    void rolesFromEveryServerTheUserSharesWithTheBotCount() {
+        // Running the command on server B, while the rights-giving role is held on the tournament server A.
+        User user = mock(User.class);
+        Guild serverA = mock(Guild.class);
+        Guild serverB = mock(Guild.class);
+        Role staffOnA = role("Staff");
+        Role playerOnB = role("Player");
+        Member onA = member(user, serverA, staffOnA);
+        Member onB = member(user, serverB, playerOnB);
+        when(user.getMutualGuilds()).thenReturn(List.of(serverA, serverB));
+        when(serverA.getMember(user)).thenReturn(onA);
+        when(serverB.getMember(user)).thenReturn(onB);
+
+        assertThat(TournamentAccess.rolesOnSharedServers(onB)).containsExactly(playerOnB, staffOnA);
+    }
+
+    private static Member member(User user, Guild guild, Role role) {
+        Member member = mock(Member.class);
+        when(member.getUser()).thenReturn(user);
+        when(member.getGuild()).thenReturn(guild);
+        when(member.getRoles()).thenReturn(List.of(role));
+        return member;
     }
 
     @Test
@@ -215,6 +248,7 @@ class TournamentHelpersTest {
     private static Role role(String name) {
         Role role = mock(Role.class);
         when(role.getName()).thenReturn(name);
+        when(role.getId()).thenReturn(name + "-id");
         return role;
     }
 

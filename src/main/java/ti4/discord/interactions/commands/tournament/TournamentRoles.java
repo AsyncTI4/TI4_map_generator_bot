@@ -15,6 +15,7 @@ class TournamentRoles extends TournamentSubcommand {
 
     private static final String ACTION = "action";
     private static final String ROLE = "role";
+    private static final String ROLE_ID = "role_id";
 
     TournamentRoles() {
         super("roles", "Give or take tournament admin rights from a role, or list the roles that have them");
@@ -23,7 +24,8 @@ class TournamentRoles extends TournamentSubcommand {
                         .addChoice("add", "add")
                         .addChoice("remove", "remove")
                         .addChoice("list", "list"),
-                new OptionData(OptionType.ROLE, ROLE, "The role (not needed for list)"));
+                new OptionData(OptionType.ROLE, ROLE, "The role (not needed for list)"),
+                new OptionData(OptionType.STRING, ROLE_ID, "To remove a role from another server: its ID from list"));
     }
 
     @Override
@@ -35,6 +37,11 @@ class TournamentRoles extends TournamentSubcommand {
             return;
         }
         Role role = event.getOption(ROLE, OptionMapping::getAsRole);
+        String roleId = event.getOption(ROLE_ID, OptionMapping::getAsString);
+        if ("remove".equals(action) && role == null && roleId != null) {
+            reply(event, removeById(service, roleId.trim()));
+            return;
+        }
         if (role == null) {
             reply(event, "Pick a role.");
             return;
@@ -63,11 +70,20 @@ class TournamentRoles extends TournamentSubcommand {
                                 + " always have them.");
     }
 
+    private static String removeById(TournamentAdminRoleService service, String roleId) {
+        if (!service.remove(roleId)) return "No added role has the ID `" + roleId + "`. `list` shows the IDs.";
+        Role role = JdaService.jda.getRoleById(roleId);
+        String name = role == null
+                ? "Role `" + roleId + "`"
+                : role.getAsMention() + " (" + role.getGuild().getName() + ")";
+        return name + " no longer has tournament admin rights.";
+    }
+
     private static String list(List<TournamentAdminRole> roles) {
         StringBuilder text = new StringBuilder(
                 "**Tournament admins:** Admin roles and any role named **" + TournamentAccess.TOURNEY_MOD_ROLE + "**");
         if (roles.isEmpty()) return text.append(".\nNo extra roles added.").toString();
-        text.append(", plus:");
+        text.append(", plus these roles. Holding one on its own server gives rights on every server:");
         for (TournamentAdminRole added : roles) {
             Role role = JdaService.jda.getRoleById(added.getRoleId());
             text.append("\n> ")
@@ -75,7 +91,7 @@ class TournamentRoles extends TournamentSubcommand {
                             role == null
                                     ? "deleted role " + added.getRoleId()
                                     : role.getAsMention() + " ("
-                                            + role.getGuild().getName() + ")")
+                                            + role.getGuild().getName() + ", ID `" + role.getId() + "`)")
                     .append(" · added by <@")
                     .append(added.getAddedBy())
                     .append(">");

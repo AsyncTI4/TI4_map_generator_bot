@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.json.JsonMapperManager;
@@ -126,8 +127,10 @@ class TournamentSetupCopierTest extends BaseTi4Test {
     private static Member memberWithRole(String roleName) {
         Role role = mock(Role.class);
         when(role.getName()).thenReturn(roleName);
+        when(role.getId()).thenReturn(roleName + "-id");
         Member member = mock(Member.class);
         when(member.getRoles()).thenReturn(List.of(role));
+        when(member.getUser()).thenReturn(mock(User.class));
         return member;
     }
 }
