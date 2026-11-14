@@ -54,15 +54,11 @@ public final class PlayerStatsHelper {
 
         // 1.
         boolean rand = randomizeLocation;
-        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
-            Point positionPoint = MapPositionMapper.getTilePosition(pos);
-            if (positionPoint == null) return 100_000_000.0f;
-            int ring = tileRing(pos);
-            Point realPosition = MapPositionMapper.getScaledTilePosition(game, pos, positionPoint.x, positionPoint.y);
-            double distance = realPosition.distance(anchorPt);
-            distance = rand ? RenderRandom.nextInt("statTiles.randomDistance", 0, 200) : distance + ring * 75;
-            return distance;
-        }));
+        Map<String, Double> priorities = new HashMap<>();
+        for (String pos : validPositions) {
+            priorities.put(pos, statTilePriority(game, pos, anchorPt, rand));
+        }
+        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(priorities::get));
         pq.addAll(validPositions);
 
         // 2. Take tiles from the PQ until we have 3 adj
@@ -92,6 +88,14 @@ public final class PlayerStatsHelper {
             }
         }
         return null;
+    }
+
+    private static double statTilePriority(Game game, String pos, Point anchorPt, boolean randomize) {
+        Point positionPoint = MapPositionMapper.getTilePosition(pos);
+        if (positionPoint == null) return 100_000_000.0;
+        if (randomize) return RenderRandom.nextInt("statTiles.randomDistance", 0, 200);
+        Point realPosition = MapPositionMapper.getScaledTilePosition(game, pos, positionPoint.x, positionPoint.y);
+        return realPosition.distance(anchorPt) + tileRing(pos) * 75;
     }
 
     private static int tileRing(String pos) {
