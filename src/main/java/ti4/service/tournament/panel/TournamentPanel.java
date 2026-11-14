@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -195,10 +196,15 @@ public final class TournamentPanel {
         int waitlisted = context.entries().size() - seated;
         long groups = TournamentService.groups(context.entries()).size();
         Guild host = TournamentDiscord.hostGuild(tournament);
+        long notOnHost = context.entries().stream()
+                .filter(entry -> !entry.isWaitlisted())
+                .filter(entry -> TournamentDiscord.isMissingFrom(host, entry.getUserId()))
+                .count();
         String title = "### Tournament · " + tournament.displayName() + (tournament.isFogMode() ? " · Fog of War" : "");
         String summary = statusLabel(tournament.getStatus()) + " · " + seated + "/" + tournament.getTargetSize()
                 + " players" + (waitlisted > 0 ? " · " + waitlisted + " waitlisted" : "")
                 + (groups > 0 ? " · " + groups + " groups" : "")
+                + (notOnHost > 0 ? " · " + notOnHost + " not on host" : "")
                 + " · " + (host == null ? "no host server" : host.getName());
         return title + "\n-# " + summary;
     }
@@ -266,12 +272,17 @@ public final class TournamentPanel {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    static void openNamesModal(ButtonInteractionEvent event, String id, String title, String label) {
+    static void openNamesModal(
+            ButtonInteractionEvent event, String id, String title, String label, ModalTopLevelComponent... extras) {
         TextInput names = TextInput.create("names", TextInputStyle.PARAGRAPH)
                 .setRequired(true)
                 .setPlaceholder(NAMES_PLACEHOLDER)
                 .build();
-        openModal(event, id, title, Label.of(label, names));
+        openModal(
+                event,
+                id,
+                title,
+                ArrayUtils.addFirst(extras, Label.of(label, names)));
     }
 
     static void change(ButtonInteractionEvent event, long id, Tab tab, Consumer<Tournament> change, String notice) {
@@ -287,6 +298,11 @@ public final class TournamentPanel {
     static String value(ModalInteractionEvent event, String field) {
         ModalMapping mapping = event.getValue(field);
         return mapping == null ? "" : mapping.getAsString().trim();
+    }
+
+    static boolean checked(ModalInteractionEvent event, String field) {
+        ModalMapping mapping = event.getValue(field);
+        return mapping != null && mapping.getAsBoolean();
     }
 
     static String names(List<String> userIds) {

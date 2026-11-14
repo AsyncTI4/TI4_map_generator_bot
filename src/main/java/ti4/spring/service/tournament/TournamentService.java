@@ -64,11 +64,12 @@ public class TournamentService {
             List<String> added,
             List<String> promoted,
             List<String> waitlisted,
+            List<String> pastTarget,
             List<String> alreadyIn,
             String refusal) {
 
         static BulkAddResult refused(String refusal) {
-            return new BulkAddResult(List.of(), List.of(), List.of(), List.of(), refusal);
+            return new BulkAddResult(List.of(), List.of(), List.of(), List.of(), List.of(), refusal);
         }
     }
 
@@ -164,6 +165,7 @@ public class TournamentService {
     public Optional<String> promoteNext(long id) {
         Tournament tournament = tournaments.lockById(id).orElse(null);
         if (tournament == null || !tournament.getStatus().allowsRosterChanges()) return Optional.empty();
+        if (activeCount(entries(id)) >= tournament.getTargetSize()) return Optional.empty();
         String promoted = promoteFirstWaitlisted(id, null);
         if (promoted != null) reopenIfGrouped(tournament);
         return Optional.ofNullable(promoted);
@@ -203,7 +205,8 @@ public class TournamentService {
     }
 
     @Transactional
-    public BulkAddResult bulkAdd(long id, Collection<String> userIds, BooleanSupplier creationRunning) {
+    public BulkAddResult bulkAdd(
+            long id, Collection<String> userIds, boolean seatPastTarget, BooleanSupplier creationRunning) {
         Tournament tournament = tournaments.lockById(id).orElse(null);
         if (tournament == null) return BulkAddResult.refused("Tournament not found.");
         boolean toWaitlist = !tournament.getStatus().allowsRosterChanges();
@@ -211,35 +214,43 @@ public class TournamentService {
             String refusal = partialCreationRefusal(tournament, creationRunning);
             if (refusal != null) return BulkAddResult.refused(refusal);
         }
+        List<TournamentEntry> all = entries(id);
         Map<String, TournamentEntry> existing = new LinkedHashMap<>();
-        for (TournamentEntry entry : entries(id)) {
+        for (TournamentEntry entry : all) {
             existing.put(entry.getUserId(), entry);
         }
+        int openSeats = seatPastTarget ? Integer.MAX_VALUE : tournament.getTargetSize() - activeCount(all);
         List<String> added = new ArrayList<>();
         List<String> promoted = new ArrayList<>();
         List<String> waitlisted = new ArrayList<>();
+        List<String> pastTarget = new ArrayList<>();
         List<String> alreadyIn = new ArrayList<>();
         for (String userId : userIds) {
             TournamentEntry entry = existing.get(userId);
+            boolean seatOpen = openSeats > 0;
             if (entry == null && toWaitlist) {
                 entries.save(new TournamentEntry(id, userId, Instant.now(), true, true));
                 waitlisted.add(userId);
             } else if (entry == null) {
-                entries.save(new TournamentEntry(id, userId, Instant.now(), false, true));
-                added.add(userId);
+                entries.save(new TournamentEntry(id, userId, Instant.now(), !seatOpen, true));
+                (seatOpen ? added : pastTarget).add(userId);
+                openSeats--;
             } else if (entry.isWaitlisted() && toWaitlist) {
                 alreadyIn.add(userId);
+            } else if (entry.isWaitlisted() && !seatOpen) {
+                pastTarget.add(userId);
             } else if (entry.isWaitlisted()) {
                 entry.setWaitlisted(false);
                 entry.setAddedByAdmin(true);
                 entries.save(entry);
                 promoted.add(userId);
+                openSeats--;
             } else {
                 alreadyIn.add(userId);
             }
         }
         if (!added.isEmpty() || !promoted.isEmpty()) reopenIfGrouped(tournament);
-        return new BulkAddResult(added, promoted, waitlisted, alreadyIn, null);
+        return new BulkAddResult(added, promoted, waitlisted, pastTarget, alreadyIn, null);
     }
 
     @Transactional

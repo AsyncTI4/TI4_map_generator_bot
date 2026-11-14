@@ -134,7 +134,7 @@ class TournamentServiceTest {
 
         // Replacing needs someone on the waitlist; bulk add puts newcomers there while games exist.
         assertThat(service.removeByAdmin(ID, "b", () -> false).refusal()).isNotNull();
-        var added = service.bulkAdd(ID, List.of("d"), () -> false);
+        var added = service.bulkAdd(ID, List.of("d"), false, () -> false);
         assertThat(added.waitlisted()).containsExactly("d");
         LeaveResult removed = service.removeByAdmin(ID, "b", () -> false);
         assertThat(removed.promotedUserId()).isEqualTo("d");
@@ -145,7 +145,7 @@ class TournamentServiceTest {
     @Test
     void withdrawingDoesNotPromotePastTheTargetSize() {
         tournament.setTargetSize(1);
-        service.bulkAdd(ID, List.of("a", "b"), () -> false);
+        service.bulkAdd(ID, List.of("a", "b"), true, () -> false);
         service.join(ID, "c");
 
         assertThat(service.leave(ID, "a").promotedUserId()).isNull();
@@ -163,6 +163,21 @@ class TournamentServiceTest {
         // New seats have no group yet, so the approved groups have to be drawn again.
         assertThat(tournament.getStatus()).isEqualTo(TournamentStatus.CLOSED);
         assertThat(service.fillToTarget(ID)).isEmpty();
+    }
+
+    @Test
+    void bulkAddStopsAtTheTargetUnlessTickedPastIt() {
+        service.join(ID, "a");
+        var result = service.bulkAdd(ID, List.of("b", "c"), false, () -> false);
+
+        assertThat(result.added()).containsExactly("b");
+        assertThat(result.pastTarget()).containsExactly("c");
+        assertThat(entry("c").isWaitlisted()).isTrue();
+        // At the target, Promote refuses; ticking past the target seats a waitlisted player.
+        assertThat(service.promoteNext(ID)).isEmpty();
+        assertThat(service.bulkAdd(ID, List.of("c"), true, () -> false).promoted())
+                .containsExactly("c");
+        assertThat(service.activeEntries(ID)).hasSize(3);
     }
 
     private void seat(String userId, int group, String gameName) {

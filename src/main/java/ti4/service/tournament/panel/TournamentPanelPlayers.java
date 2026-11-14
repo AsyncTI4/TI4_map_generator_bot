@@ -6,10 +6,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.checkbox.Checkbox;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -51,6 +54,7 @@ final class TournamentPanelPlayers {
     private static final String GM_REMOVE_MODAL = "trnGmRemove~MDL_";
     private static final String GM_REMOVE_SAVE = "trnGmRemoveSave_";
     private static final String POST_REMOVE = "trnPostRemove_";
+    private static final String PAST_TARGET = "pastTarget";
     private static final int LINES_PER_PAGE = 20;
     private static final int MAX_LIST_LENGTH = 450;
 
@@ -89,13 +93,13 @@ final class TournamentPanelPlayers {
 
         boolean editable = tournament.getStatus().allowsRosterChanges();
         boolean replacing = TournamentPanel.canEditGroupsWithoutGame(tournament);
+        boolean noOpenSeat = openSeats(tournament, context) == 0;
         List<ActionRow> controls = new ArrayList<>();
         controls.add(ActionRow.of(
                 Buttons.green(BULK_ADD_MODAL + id, "Bulk add").withDisabled(!editable && !replacing),
                 Buttons.red(REMOVE_MODAL + id, "Remove").withDisabled(!editable && !replacing),
-                Buttons.blue(PROMOTE + id, "Promote from waitlist").withDisabled(!editable),
-                Buttons.blue(FILL + id, "Fill to target")
-                        .withDisabled(!editable || openSeats(tournament, context) == 0),
+                Buttons.blue(PROMOTE + id, "Promote from waitlist").withDisabled(!editable || noOpenSeat),
+                Buttons.blue(FILL + id, "Fill to target").withDisabled(!editable || noOpenSeat),
                 Buttons.gray(SYNC_ROLES + id, "Sync roles")));
         if (tournament.isFogMode()) {
             controls.add(ActionRow.of(
@@ -114,10 +118,13 @@ final class TournamentPanelPlayers {
         List<TournamentEntry> waitlist = byWaitlisted.get(true);
         Map<String, Profile> hours = TournamentHours.profiles(
                 entries.stream().map(TournamentEntry::getUserId).toList());
+        Guild host = TournamentDiscord.hostGuild(tournament);
         List<String> lines = new ArrayList<>();
         if (!seated.isEmpty()) lines.add("**Seated (" + seated.size() + "/" + tournament.getTargetSize() + ")**");
         for (int i = 0; i < seated.size(); i++) {
-            lines.add(line(i + 1, seated.get(i), hours));
+            String userId = seated.get(i).getUserId();
+            lines.add(line(i + 1, seated.get(i), hours)
+                    + (TournamentDiscord.isMissingFrom(host, userId) ? " · not on host server" : ""));
         }
         if (!waitlist.isEmpty()) lines.add("**Waitlist (" + waitlist.size() + ")**");
         for (int i = 0; i < waitlist.size(); i++) {
@@ -149,7 +156,15 @@ final class TournamentPanelPlayers {
     @ButtonHandler(value = BULK_ADD_MODAL, save = false)
     static void openBulkAdd(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, BULK_ADD_MODAL);
-        TournamentPanel.openNamesModal(event, BULK_ADD_SAVE + id, "Bulk add players", "Players");
+        TournamentPanel.openNamesModal(
+                event,
+                BULK_ADD_SAVE + id,
+                "Bulk add players",
+                "Players",
+                Label.of(
+                        "Seat them past the target size",
+                        "Unticked, players past the target go on the waitlist.",
+                        Checkbox.of(PAST_TARGET)));
     }
 
     @ModalHandler(value = BULK_ADD_SAVE, save = false)
@@ -159,7 +174,11 @@ final class TournamentPanelPlayers {
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
         Resolution resolution = TournamentPanel.resolve(tournament, TournamentPanel.value(event, "names"));
-        BulkAddResult result = service.bulkAdd(id, resolution.userIds(), TournamentPanel.creationRunning(id));
+        BulkAddResult result = service.bulkAdd(
+                id,
+                resolution.userIds(),
+                TournamentPanel.checked(event, PAST_TARGET),
+                TournamentPanel.creationRunning(id));
         if (result.refusal() != null) {
             TournamentPanel.show(event, id, Tab.PLAYERS, result.refusal());
             return;
@@ -176,6 +195,10 @@ final class TournamentPanelPlayers {
             notice.add("Put on the waitlist because games are being created: "
                     + TournamentPanel.names(result.waitlisted())
                     + ". Remove a player from a group without a game and the first waitlisted player takes the seat.");
+        if (!result.pastTarget().isEmpty())
+            notice.add("On the waitlist, the target of " + tournament.getTargetSize() + " is reached: "
+                    + TournamentPanel.names(result.pastTarget())
+                    + ". Bulk add them again with **Seat them past the target size** ticked to seat them anyway.");
         if (!result.alreadyIn().isEmpty()) notice.add("Already seated: " + TournamentPanel.names(result.alreadyIn()));
         if (!resolution.problems().isEmpty()) notice.add(resolution.problems());
         TournamentPanel.show(event, id, Tab.PLAYERS, String.join("\n", notice));
@@ -262,7 +285,8 @@ final class TournamentPanelPlayers {
                 id,
                 Tab.PLAYERS,
                 promoted == null
-                        ? "The waitlist is empty."
+                        ? "No open seat, or nobody on the waitlist. To seat past the target, bulk add them with"
+                                + " **Seat them past the target size** ticked."
                         : "Moved " + TournamentDiscord.userName(promoted) + " off the waitlist.");
     }
 

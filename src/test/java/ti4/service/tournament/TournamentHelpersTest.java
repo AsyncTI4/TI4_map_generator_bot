@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -136,6 +137,21 @@ class TournamentHelpersTest {
         assertThat(TournamentInvites.channelId("<#" + id + ">")).isEqualTo(id);
         assertThat(TournamentInvites.channelId(" " + id + " ")).isEqualTo(id);
         assertThat(TournamentInvites.channelId("#general")).isNull();
+    }
+
+    @Test
+    void eachMissingPlayerIsPingedOnceOnTheFirstServerTheyAreOn() {
+        Guild hub = mock(Guild.class);
+        Guild other = mock(Guild.class);
+        when(hub.getMemberById(ALICE)).thenReturn(mock(Member.class));
+        when(other.getMemberById(ALICE)).thenReturn(mock(Member.class));
+        when(other.getMemberById(BOB)).thenReturn(mock(Member.class));
+        Set<String> notPinged = new LinkedHashSet<>(List.of(ALICE, BOB, BOBBY));
+
+        assertThat(TournamentInvites.takeMembersOf(hub, notPinged)).containsExactly(ALICE);
+        assertThat(TournamentInvites.takeMembersOf(other, notPinged)).containsExactly(BOB);
+        // BOBBY shares no posting server, so the panel lists them to DM instead.
+        assertThat(notPinged).containsExactly(BOBBY);
     }
 
     @Test
