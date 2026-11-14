@@ -82,7 +82,7 @@ import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
 @UtilityClass
-class AgendaResolveButtonHandler {
+public class AgendaResolveButtonHandler {
     private static final Map<String, AgendaResolver> AGENDA_HANDLERS = new LinkedHashMap<>();
 
     static {

@@ -928,6 +928,11 @@ class GameSaveService {
 
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getHydromorphicCards(), writer, Constants.HYDROMORPHIC_CARDS);
+            writeCards(player.getTomeCards(), writer, Constants.TOME_CARDS);
+            writer.write(Constants.TOME_CARD_IN_PLAY + " " + player.getTomeCardInPlay());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TOME_CARDS_INITIALIZED + " " + player.isTomeCardsInitialized());
+            writer.write(System.lineSeparator());
             writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
 

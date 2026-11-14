@@ -46,6 +46,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
@@ -1427,7 +1428,9 @@ public final class Helper {
                 "res".equalsIgnoreCase(resOrInfOrBoth) && EmergencyAppropriationsLLButtonHandler.isActive(game, player);
         boolean countResourcesAsInfluence =
                 "inf".equalsIgnoreCase(resOrInfOrBoth) && WildlifePreservationLLButtonHandler.isActive(game, player);
-        int tg = player.getSpentTgsThisWindow();
+        int regularTradeGoods = player.getSpentTgsThisWindow();
+        int hamitsTreasureTradeGoods = BeansRelicHandler.getHamitsTreasureSpent(player);
+        int tg = regularTradeGoods + hamitsTreasureTradeGoods;
         int kaldurCapturedInfantry = KaltrimTechHandler.getCapturedInfantrySpent(player);
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
         boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
@@ -1521,6 +1524,7 @@ public final class Helper {
                     && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("arcanumRunebound")
+                    && !thing.contains("hamitstreasure_")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
                     && !thing.contains("Agent")) {
@@ -1737,18 +1741,25 @@ public final class Helper {
         }
         res += tg + keleresAgent + kaldurCapturedInfantry;
         inf += tg + keleresAgent + kaldurCapturedInfantry;
-        if (tg > 0) {
+        if (regularTradeGoods > 0) {
             msg.append("> Spent ")
-                    .append(tg)
+                    .append(regularTradeGoods)
                     .append(" trade good")
-                    .append(tg == 1 ? "" : "s")
+                    .append(regularTradeGoods == 1 ? "" : "s")
                     .append(' ')
                     .append(MiscEmojis.getTGorNomadCoinEmoji(game))
                     .append(" (")
-                    .append(player.getTg() + tg)
+                    .append(player.getTg() + regularTradeGoods)
                     .append("->")
                     .append(player.getTg())
                     .append(") \n");
+        }
+        if (hamitsTreasureTradeGoods > 0) {
+            msg.append("> Spent ")
+                    .append(hamitsTreasureTradeGoods)
+                    .append(" trade good")
+                    .append(hamitsTreasureTradeGoods == 1 ? "" : "s")
+                    .append(" from _Hamit's Treasure_\n");
         }
         if (kaldurCapturedInfantry > 0) {
             msg.append("> Spent ")
@@ -1758,9 +1769,9 @@ public final class Helper {
                     .append(kaldurCapturedInfantry == 1 ? "" : "s")
                     .append(" with _Kaldur Arrest Field_\n");
         }
-        if (player.hasTech("mc") && tg + keleresAgent + kaldurCapturedInfantry > 0) {
-            res += tg + keleresAgent + kaldurCapturedInfantry;
-            inf += tg + keleresAgent + kaldurCapturedInfantry;
+        if (player.hasTech("mc") && regularTradeGoods + keleresAgent + kaldurCapturedInfantry > 0) {
+            res += regularTradeGoods + keleresAgent + kaldurCapturedInfantry;
+            inf += regularTradeGoods + keleresAgent + kaldurCapturedInfantry;
             msg.append("> Counted the trade goods twice due to _Mirror Computing_\n");
         }
 

@@ -34,6 +34,7 @@ public abstract class BagDraft {
             case "frankendraz" -> new FrankenDrazDraft(game);
             case "twilights_fall" -> new TwilightsFallFrankenDraft(game);
             case "inaugural_splice" -> new InauguralSpliceFrankenDraft(game);
+            case "auction_franken" -> new AuctionFrankenDraft(game);
             default -> null;
         };
     }

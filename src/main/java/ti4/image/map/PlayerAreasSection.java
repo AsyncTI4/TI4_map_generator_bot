@@ -16,8 +16,9 @@ final class PlayerAreasSection {
             return y;
         }
         Point topLeft = new Point(BoardLayout.PLAYER_AREAS_LEFT + left, y);
-        PlayerAreaContext areaContext =
-                PlayerAreaContext.of(g2, ctx.game(), ctx.fog().fogViewer(), ctx.overlays(), ctx.neighbours());
+        PlayerAreaContext areaContext = PlayerAreaContext.of(
+                        g2, ctx.game(), ctx.fog().fogViewer(), ctx.overlays(), ctx.neighbours())
+                .onlyShowing(ctx.focusPlayer());
         int bottom = PlayerAreas.drawAll(areaContext, topLeft, ctx.canvas().playerAreasWidth());
         return bottom;
     }

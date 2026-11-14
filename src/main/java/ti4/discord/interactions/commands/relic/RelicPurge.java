@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
@@ -40,6 +41,7 @@ class RelicPurge extends GameStateSubcommand {
         if (!discardedArtifact) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
+            BeansRelicHandler.onRelicPurged(getGame(), player, relicId);
         }
         if (!discardedArtifact) {
             OblivionUnitHandler.doOblivionMechCheck(getGame(), player);

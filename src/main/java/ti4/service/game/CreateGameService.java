@@ -724,6 +724,10 @@ public class CreateGameService {
             return categories.getFirst();
         }
 
+        return createGameCategory(guild, categoryName);
+    }
+
+    public static Category createGameCategory(Guild guild, String categoryName) {
         EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
         EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
         Role bothelperRole = DiscordRoleUtility.getRole("Bothelper", guild);

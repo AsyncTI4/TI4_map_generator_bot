@@ -27,6 +27,7 @@ public final class Adjacency {
             new GhotiCommanderRule(),
             new ObsidianMirrorRule(),
             new UydaiHeroRule(),
+            new XyrixFlagshipRule(),
             new RefractureFenrirRule(),
             new TreatedAsAdjacentRule());
 

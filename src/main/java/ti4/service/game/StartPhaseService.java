@@ -21,10 +21,13 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
@@ -644,6 +647,11 @@ public class StartPhaseService {
         String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
+        BeansRelicHandler.addHamitsTreasureTradeGoodsAtStrategyPhaseStart(game);
+        BeansRelicHandler.offerTheSilenceAtStrategyPhaseStart(game);
+        for (Player player : game.getRealPlayers()) {
+            XyrixLeadersHandler.offerHeroAtStrategyPhaseStart(game, player);
+        }
         if (game.getRound() == 1) {
             GameStartedRecorder.recordOnce(game);
         }
@@ -1272,6 +1280,9 @@ public class StartPhaseService {
         playPreassignedGiftOfPrescience(event, game);
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        for (Player player : game.getRealPlayers()) {
+            XyrixTomeHandler.offerEndOfStrategyTome(game, player);
+        }
         TurnActionLog.drain(game);
         for (Player player : game.getRealPlayers()) {
             MonumentsBRButtonHandler.offerArmageddonProject(game, player);

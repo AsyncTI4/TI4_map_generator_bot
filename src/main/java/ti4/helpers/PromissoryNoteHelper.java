@@ -23,6 +23,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaPro
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinPnHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionPromissoryHandler;
@@ -286,6 +287,14 @@ public class PromissoryNoteHelper {
                             + ", there are no legal non-home planets for _Advanced Structural Engineering_.");
             return;
         }
+        if ("bepnxyrix".equalsIgnoreCase(id)
+                && !XyrixPromissoryHandler.hasLegalDarkMatterSpawningStationTarget(game, player)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " has no eligible non-home, non-Mecatol planet for _Dark Matter Spawning Station_.");
+            return;
+        }
         if ("dspnphar".equalsIgnoreCase(id)) {
             if (owner != null && owner.isPassed()) {
                 ButtonHelperFactionSpecific.resolveDeathBinding(game, player, event);
@@ -344,6 +353,9 @@ public class PromissoryNoteHelper {
         }
         if ("bepnnatau".equalsIgnoreCase(id)) {
             NatauPromissoryHandler.offerRuptureSystems(game, player);
+        }
+        if ("bepnxyrix".equalsIgnoreCase(id)) {
+            XyrixPromissoryHandler.offerDarkMatterSpawningStationTarget(game, player);
         }
         if ("thpnxytheris".equalsIgnoreCase(id)) {
             XytherisPromissoryHandler.activateSwarmSpawn(game, player);

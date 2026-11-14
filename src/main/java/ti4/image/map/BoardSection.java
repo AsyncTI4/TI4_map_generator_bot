@@ -1,7 +1,9 @@
 package ti4.image.map;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,8 @@ import ti4.model.MapPositionMapper;
 import ti4.service.map.FractureService;
 
 final class BoardSection {
+
+    private static final Color OUT_OF_FOCUS_SHADE = new Color(0, 0, 0, 165);
 
     private final RenderContext ctx;
     private final Graphics2D g2;
@@ -79,7 +83,24 @@ final class BoardSection {
         if (displayTypeStep != null) {
             sortedTiles.forEach(key -> addTile(tileMap.get(key), displayTypeStep));
         }
+        dimOutOfFocus(sortedTiles);
         sortedTiles.forEach(key -> addTile(tileMap.get(key), TileStep.TileNumber));
+    }
+
+    private void dimOutOfFocus(List<String> positions) {
+        MapFocus focus = ctx.focus();
+        if (focus == null) {
+            return;
+        }
+        Color previousColor = g2.getColor();
+        g2.setColor(OUT_OF_FOCUS_SHADE);
+        for (String position : positions) {
+            Rectangle hex = focus.isDimmed(position) ? board.hexBounds(position) : null;
+            if (hex != null) {
+                g2.fillPolygon(MapFrame.hexPolygon(hex));
+            }
+        }
+        g2.setColor(previousColor);
     }
 
     private void drawSetupTiles(Map<String, Tile> tileMap) {

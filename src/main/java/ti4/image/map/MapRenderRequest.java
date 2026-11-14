@@ -9,4 +9,14 @@ record MapRenderRequest(
         Game game,
         @Nullable DisplayType displayType,
         @Nullable GenericInteractionCreateEvent event,
-        @Nullable String segment) {}
+        @Nullable String segment,
+        @Nullable MapFocus focus) {
+
+    MapRenderRequest(
+            Game game,
+            @Nullable DisplayType displayType,
+            @Nullable GenericInteractionCreateEvent event,
+            @Nullable String segment) {
+        this(game, displayType, event, segment, null);
+    }
+}

@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
@@ -63,6 +65,7 @@ import ti4.service.game.SpeakerService;
 import ti4.service.leader.agent.modules.MahactAgent;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.megagame.MegagameImperialQueue;
+import ti4.service.megagame.MegagameScOverviewService;
 import ti4.service.megagame.MegagameScThreads;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.turn.EndTurnService;
@@ -153,6 +156,9 @@ public class PlayStrategyCardService {
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " played "
                         + game.getSCEmojiWordRepresentation(scToPlay));
+        if (!winnuHero && !isOverrule) {
+            XyrixBreakthroughHandler.offerStrategicAction(game, player, scToPlay, false);
+        }
         ThurvialiAbilityHandler.clearCelestialEnvoysUsed(game);
 
         StringBuilder message = new StringBuilder();
@@ -211,11 +217,16 @@ public class PlayStrategyCardService {
                 }
 
                 game.setSCPlayed(scToPlay, Boolean.TRUE);
+                if (scGroups) {
+                    MegagameScOverviewService.update(
+                            game, "**" + stratCardName + "** played by " + player.getRepresentationNoPing());
+                }
                 if (game.getPhaseOfGame().contains("action")) {
                     TurnActionLog.record(game, TurnActionLog.STRATEGIC);
                 }
                 GameEventService.commit(
                         game, GameEventType.SC_PLAYED, player, Map.of("scNumber", scToPlay, "scName", stratCardName));
+                BeansRelicHandler.offerTemporalDissidence(game, player, scToPlay);
                 scoreMaterCalyxaSovereignCrown(event, game, player, scModel);
                 // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
                 if (scModel.hasImageFile()) {
@@ -442,6 +453,7 @@ public class PlayStrategyCardService {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + sillySpelling);
             Button cognitiveParallax =
                     Buttons.green("thardentiag_follow_" + scToPlay, "Exhaust Cognitive Parallax Engine");
+            Button alexandria = Buttons.green("alexandria_follow_" + scToPlay, "Exhaust Iterative Indexing");
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
                     continue;
@@ -474,6 +486,15 @@ public class PlayStrategyCardService {
                             player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
                                     + "** with _Cognitive Parallax Engine_",
                             empNMahButtons);
+                }
+                if (player3.hasPlanet("alexandria")
+                        && !player3.getExhaustedPlanetsAbilities().contains("alexandria")
+                        && player3.getTacticalCC() + player3.getFleetCC() + player3.getStrategicCC() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player3.getCardsInfoThread(),
+                            player3.getRepresentationUnfogged() + ", you may follow **" + stratCardName
+                                    + "** with _Iterative Indexing_.",
+                            List.of(alexandria, deleteB));
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent")) {
                     List<Tile> tilesWithPrimaryPlayersCC = ButtonHelper.getTilesWithYourCC(player, game, event);

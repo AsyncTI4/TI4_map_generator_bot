@@ -469,6 +469,7 @@ public final class Constants {
     private static final String LOST_STATION = "loststation";
     private static final String ILLUSTRION = "illustrion";
     private static final String CHARON = "charon";
+    private static final String LIBERTALIA = "libertalia";
     public static final List<String> TOKEN_PLANETS = List.of(
             MIRAGE,
             OASIS,
@@ -482,6 +483,7 @@ public final class Constants {
             LOST_STATION,
             ILLUSTRION,
             CHARON,
+            LIBERTALIA,
             AVERNUS,
             OCEANUS,
             THUNDERSEDGE,
@@ -812,6 +814,9 @@ public final class Constants {
     public static final String FACTION6 = "faction6";
     public static final String AC = "action_cards";
     public static final String HYDROMORPHIC_CARDS = "hydromorphic_cards";
+    public static final String TOME_CARDS = "tome_cards";
+    public static final String TOME_CARD_IN_PLAY = "tome_card_in_play";
+    public static final String TOME_CARDS_INITIALIZED = "tome_cards_initialized";
     public static final String HYDROMORPHIC_CARD_ID = "hydromorphic_card_id";
     public static final String HYDROMORPHIC_CARD = "hydromorphic_card";
     public static final String ACTION_CARD = "action_card";

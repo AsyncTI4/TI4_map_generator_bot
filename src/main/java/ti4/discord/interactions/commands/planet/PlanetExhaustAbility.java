@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.planet.AlfheimLegendaryButtonHandler;
@@ -215,7 +216,6 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = player.getFactionEmoji() + " exhausted Conviction to gain 2 commodities. They now have "
                         + player.getCommodities() + " commodities.";
             }
-
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(
@@ -320,6 +320,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Please choose which planet you would like to explore.";
                 buttons.addAll(ButtonHelper.getButtonsToExploreAllPlanets(player, game));
             }
+            case "libertalia" -> BeansRelicHandler.chooseRiverOfParadisePlanet(game, player);
             default -> {
                 if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
                         && game.isAbsolMode()

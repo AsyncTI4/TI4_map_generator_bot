@@ -1,0 +1,10 @@
+{
+  "name": "neutral-pds-2p",
+  "description": "Hacan at 301 next to Quann (201, from the default map), where the neutral has a PDS and an infantry.",
+  "fog": false,
+  "you": { "faction": "hacan", "home": "301", "units": { "301": "2 gf" } },
+  "seats": [ { "faction": "sol", "home": "310" } ],
+  "defaults": { "tg": 3, "ccs": "8/3/3" },
+  "neutralUnits": { "201": "pds quann, gf quann" },
+  "start": "action"
+}

@@ -47,6 +47,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AncientMap
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExtensionRefitLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
@@ -1598,6 +1599,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
         TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(this);
+        BeansRelicHandler.clearAshenHourglassTargets(this);
         setStoredValue("factionsInCombat", "");
         setTemporaryPingDisable(false);
         // reset timers for ping and stats
@@ -3488,6 +3490,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 MorphaUnitHandler.recordCytoplasmicTransportDiscards(this, player, 1);
             }
             CommanderUnlockCheckService.checkAllPlayersInGame(this, "morpha");
+            CommanderUnlockCheckService.checkPlayer(player, "xyrix");
             return true;
         }
         return false;
@@ -3527,6 +3530,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             }
             setPurgedActionCard(acID, played);
+            if (played) {
+                CommanderUnlockCheckService.checkPlayer(player, "xyrix");
+            }
             return true;
         }
         return false;
