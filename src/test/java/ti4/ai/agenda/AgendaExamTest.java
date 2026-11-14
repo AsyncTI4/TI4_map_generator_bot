@@ -475,9 +475,11 @@ class AgendaExamTest extends BaseTi4Test {
 
         // Review of aiselfplay257038 r1 #1 (Wormhole Research): Letnev sold its 1 For vote to Hacan in the "after"
         // window, before Nekro had placed Galactic Threat; Nekro then predicted For at 99% because of that promise and
-        // copied a technology. While a seat may still place Galactic Threat, no seat is about to vote.
+        // copied a technology. User (2026-11-14): deals are struck on the paid voter's own turn, so before voting
+        // starts (whens and afters, Galactic Threat included) no seat is about to vote; the first voter is once its
+        // turn to vote begins.
         @Test
-        void dealsNoVotesBeforeNekroHasPlacedItsPrediction() {
+        void dealsNoVotesBeforeTheVotersOwnTurn() {
             reveal("Directive_For/Against_7_wormhole_research", "blue", 3, "red", 3, "black", 0);
             Player first = AgendaForecast.votingOrder(test.game).getFirst();
 
@@ -485,6 +487,9 @@ class AgendaExamTest extends BaseTi4Test {
 
             test.game.setStoredValue("whensResolved", "Yes");
             test.game.setStoredValue("declinedAfters", "nekro_");
+            assertThat(VoteDeals.aboutToVote(test.game, first)).isFalse();
+
+            test.isActive(first, "agendaVoting");
             assertThat(VoteDeals.aboutToVote(test.game, first)).isTrue();
         }
 
@@ -1962,7 +1967,7 @@ class AgendaExamTest extends BaseTi4Test {
         }
 
         // "Each deal in its own window": in the "when" window the first voter offers nothing yet, even with no Galactic
-        // Threat prediction pending; that window is for bounties. Once the whens are resolved it may deal.
+        // Threat prediction pending; that window is for bounties. It deals once its own turn to vote begins.
         @Test
         void noStayOutOfferInTheWhenWindow() {
             nekro.removeAbility("galactic_threat");
@@ -1972,12 +1977,19 @@ class AgendaExamTest extends BaseTi4Test {
             assertThat(TradeRules.payTheAnswerer(hacanAtTheTable())).isEmpty();
 
             test.game.setStoredValue("whensResolved", "Yes");
+            assertThat(VoteDeals.aboutToVote(test.game, hacan)).isFalse();
+
+            test.isActive(hacan, "agendaVoting");
             assertThat(VoteDeals.aboutToVote(test.game, hacan)).isTrue();
         }
 
         @Test
         void atItsTurnHacanPaysXxchaToStayOutAndXxchaAccepts() {
             test.isActive(hacan, "agendaVoting");
+            // The trace explains the offer it is about to make (or why it makes none).
+            assertThat(TradeRules.explainPayTheAnswerer(test.game, hacan))
+                    .contains("Xxcha: staying out on against")
+                    .contains("would offer 1 TG");
 
             assertThat(TradeRules.payTheAnswerer(hacanAtTheTable())).containsInstanceOf(AiDecision.Post.class);
             Promise offer = PromiseBook.all(test.game).stream()

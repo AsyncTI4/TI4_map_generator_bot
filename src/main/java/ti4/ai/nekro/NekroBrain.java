@@ -311,6 +311,7 @@ public class NekroBrain implements FactionBrain {
             AgendaCardRules::riders,
             this::declineAfters,
             TradeRules::payTheAnswerer,
+            TradeRules::holdVoteForDeals,
             AgendaVoting::next,
             this::abstainFromAgenda,
             this::breakAgendaTie,

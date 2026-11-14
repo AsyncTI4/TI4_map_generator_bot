@@ -757,7 +757,7 @@ class PromiseDeals {
                 .noneMatch(promise -> PromiseBook.between(promise, seat, partner));
     }
 
-    private static boolean noVoteDealYet(Game game, Player seat, Player partner) {
+    static boolean noVoteDealYet(Game game, Player seat, Player partner) {
         return PromiseBook.all(game).stream()
                 .filter(promise -> PromisedVotes.onThisAgenda(game, promise))
                 .noneMatch(promise -> PromiseBook.between(promise, seat, partner));

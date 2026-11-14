@@ -96,11 +96,12 @@ class ConditionalVoteDealsTest extends BaseTi4Test {
                 NOW + 60_000);
     }
 
-    // Hacan votes next (Xxcha is voting), so Sol may approach it; Letnev votes later, so Sol waits for its turn.
+    // User (2026-11-14): a vote deal is struck on the paid voter's own turn. Xxcha is voting, so Sol may approach
+    // it; Hacan votes next and Letnev later, so Sol waits for their turns.
     @Test
     void aBuyerApproachesOnlyTheSeatAboutToVote() {
         assertThat(VoteDeals.aboutToVote(test.game, xxcha)).isTrue();
-        assertThat(VoteDeals.aboutToVote(test.game, hacan)).isTrue();
+        assertThat(VoteDeals.aboutToVote(test.game, hacan)).isFalse();
         assertThat(VoteDeals.aboutToVote(test.game, letnev)).isFalse();
 
         PromiseDeals.proposeVotes(context(sol, table()), List.of(letnev));
@@ -108,9 +109,12 @@ class ConditionalVoteDealsTest extends BaseTi4Test {
     }
 
     // Neither Hacan's 3 votes nor Letnev's 3 alone lift Sol (2) past Xxcha's 6, but both together do (8). Sol offers
-    // Hacan, the seat about to vote, its part of that bloc; Letnev is approached at its own turn.
+    // Hacan its part of that bloc once Xxcha has cast its 6 and Hacan's turn to vote begins; Letnev is approached at
+    // its own turn.
     @Test
     void aBuyerBuildsABlocWhenNoSingleSellerIsDecisive() {
+        test.game.setCurrentAgendaVote("xxcha", "red_6");
+        test.isActive(hacan, "agendaVoting");
         VoteDeals.Outlook outlook = VoteDeals.outlook(test.game, sol);
         double alone = VoteDeals.bestPurchase(outlook, sol, hacan, outcome -> true)
                 .map(VoteDeals.Terms::buyerGain)
@@ -291,5 +295,17 @@ class ConditionalVoteDealsTest extends BaseTi4Test {
             if (PromiseDeals.accepts(context(hacan), offer)) return price;
         }
         return Integer.MAX_VALUE;
+    }
+
+    // User (2026-11-14): deals are struck on the paid voter's turn, so a seller holds its vote at the start of its own
+    // turn: it offers its votes or waits a short while for buyers' offers. A seat whose turn it is not holds nothing.
+    @Test
+    void theSellerHoldsItsVoteAtItsOwnTurnForDeals() {
+        assertThat(OwnTurnDeals.holdVoteForDeals(context(xxcha, table()))).isPresent();
+        assertThat(OwnTurnDeals.holdVoteForDeals(context(hacan, table()))).isEmpty();
+
+        AiTurnContext later = test.contextFor(xxcha, Set.of(), NOW + VoteTurnDeals.OFFER_WAIT_MILLIS + 1, table());
+        assertThat(OwnTurnDeals.holdVoteForDeals(later).filter(decision -> decision instanceof AiDecision.Wait))
+                .isEmpty();
     }
 }

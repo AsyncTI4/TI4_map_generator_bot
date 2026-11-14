@@ -16,6 +16,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
+import ti4.ai.trade.TradeRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
@@ -123,6 +124,7 @@ final class AgendaTrace {
     private final Map<String, List<Event>> events = new HashMap<>();
     private final Map<String, Map<String, BallotProbe.Explanation>> ballots = new HashMap<>();
     private final Map<String, Set<String>> seenBallotReasons = new HashMap<>();
+    private final Map<String, Map<String, String>> answererNotes = new HashMap<>();
     private final Map<String, List<Press>> presses = new HashMap<>();
     private final Supplier<List<SelfPlayEnvironment.TradeRecord>> ledger;
 
@@ -162,9 +164,11 @@ final class AgendaTrace {
         Kind kind = kindOf(decision, reason);
         String faction = context.faction();
         BallotProbe.Explanation explanation = null;
+        String answererNote = null;
         if (kind == Kind.BALLOT && needsBallot(info, faction)) {
             try {
                 explanation = BallotProbe.explain(game, context.seat()).orElse(null);
+                answererNote = TradeRules.explainPayTheAnswerer(game, context.seat());
             } catch (RuntimeException e) {
                 explanation = null;
             }
@@ -174,6 +178,10 @@ final class AgendaTrace {
         synchronized (this) {
             if (explanation != null)
                 ballots.computeIfAbsent(info, key -> new LinkedHashMap<>()).putIfAbsent(faction, explanation);
+            if (answererNote != null)
+                answererNotes
+                        .computeIfAbsent(info, key -> new LinkedHashMap<>())
+                        .putIfAbsent(faction, answererNote);
             if (kind == Kind.BALLOT
                     && !seenBallotReasons
                             .computeIfAbsent(info, key -> new LinkedHashSet<>())
@@ -577,9 +585,12 @@ final class AgendaTrace {
                 Map<String, Map<String, Double>> utilities) {
             List<Event> heard;
             Map<String, BallotProbe.Explanation> explained;
+            Map<String, String> answerers;
             synchronized (AgendaTrace.this) {
                 heard = events.getOrDefault(info, List.of());
                 explained = ballots.getOrDefault(info, Map.of());
+                answerers = answererNotes.getOrDefault(info, Map.of());
+                answererNotes.remove(info);
                 events.remove(info);
                 ballots.remove(info);
                 seenBallotReasons.remove(info);
@@ -614,6 +625,7 @@ final class AgendaTrace {
                 Seat view = new Seat(
                         seat,
                         explained.get(faction),
+                        answerers.get(faction),
                         utilities.get(faction),
                         heard.stream()
                                 .filter(event -> event.faction().equals(faction))
@@ -625,7 +637,11 @@ final class AgendaTrace {
 
         // One seat as the trace saw it: the ballot probe at its turn, its reference utility at reveal, what it did.
         private record Seat(
-                Player player, BallotProbe.Explanation why, Map<String, Double> revealUtility, List<Event> heard) {
+                Player player,
+                BallotProbe.Explanation why,
+                String payTheAnswerer,
+                Map<String, Double> revealUtility,
+                List<Event> heard) {
 
             String faction() {
                 return player.getFaction();
@@ -657,6 +673,7 @@ final class AgendaTrace {
                 lines.add("    - deals:");
                 deals.forEach(deal -> lines.add("      - " + deal));
             }
+            if (seat.payTheAnswerer() != null) lines.add("    - pay the answerer: " + seat.payTheAnswerer());
             String split = splitsAtReveal.get(faction);
             if (split != null) lines.add("    - Ixthian Artifact value at reveal: " + split);
             lines.add("    - result reveal to close: " + result(faction, atClose, flows, riders, agenda));

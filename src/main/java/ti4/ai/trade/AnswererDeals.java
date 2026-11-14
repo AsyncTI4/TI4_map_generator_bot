@@ -1,11 +1,13 @@
 package ti4.ai.trade;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.agenda.AgendaForecast;
@@ -67,6 +69,54 @@ class AnswererDeals {
                 .flatMap(Optional::stream)
                 .flatMap(stake -> proposal(game, payer, answerer, stake, trust).stream())
                 .max(Comparator.comparingDouble(PromiseDeals.Proposal::gain));
+    }
+
+    static String explain(Game game, Player payer) {
+        if (!active(payer)) return "not in use";
+        if (PromisedVotes.hasVoted(game, payer)) return "already voted";
+        int votes = AgendaVoting.castableVotes(game, payer);
+        if (votes <= 0) return "no votes to cast";
+        List<Player> answerers = VoteDeals.votingAfter(game, payer);
+        if (answerers.isEmpty()) return "nobody votes after it";
+        AgendaForecast forecast = AgendaForecast.of(game, payer);
+        if (forecast.isEmpty()) return "no forecast";
+        AgendaVoting.PlannedBallot planned = AgendaVoting.itsBallot(game, payer);
+        double baseline = planned.value(payer);
+        if (-baseline < DiscardBounties.MIN_LOSS) {
+            return String.format(
+                    "its planned ballot leaves it at %+.1f TG; it pays only to avoid a loss of %.0f TG or more",
+                    baseline, DiscardBounties.MIN_LOSS);
+        }
+        List<String> parts = new ArrayList<>();
+        for (Player answerer : answerers) {
+            parts.add(StringUtils.capitalize(answerer.getFaction()) + ": "
+                    + explainAnswerer(game, forecast, planned, payer, answerer, votes, baseline));
+        }
+        return String.format("planned ballot at %+.1f TG; ", baseline) + String.join("; ", parts);
+    }
+
+    private static String explainAnswerer(
+            Game game,
+            AgendaForecast forecast,
+            AgendaVoting.PlannedBallot planned,
+            Player payer,
+            Player answerer,
+            int votes,
+            double baseline) {
+        if (forecast.votesLeft(answerer) <= 0) return "no votes left";
+        Optional<Stake> best = forecast.outcomes().stream()
+                .map(outcome -> stake(game, forecast, planned, payer, answerer, outcome, votes, baseline))
+                .flatMap(Optional::stream)
+                .max(Comparator.comparingDouble(Stake::payerGain));
+        if (best.isEmpty()) return "its staying out gains nothing";
+        Stake stake = best.get();
+        String terms = String.format(
+                "staying out on %s gains %.1f TG, costs it %.1f TG, %.0f%% to resolve",
+                stake.outcome(), stake.payerGain(), stake.answererCost(), 100 * stake.chance());
+        return proposal(game, payer, answerer, stake, 1.0)
+                .map(proposal -> terms + "; would offer " + proposal.price() + " TG")
+                .orElseGet(() ->
+                        terms + "; no price fits (" + PromiseDeals.spendableTradeGoods(game, payer) + " TG spendable)");
     }
 
     private static Optional<Stake> stake(

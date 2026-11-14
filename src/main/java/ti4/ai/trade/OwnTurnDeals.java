@@ -126,6 +126,11 @@ class OwnTurnDeals {
                 .or(() -> AnswererDeals.awaitAnswer(context));
     }
 
+    static Optional<AiDecision> holdVoteForDeals(AiTurnContext context) {
+        if (!TradeLegality.isAgendaPhase(context.game())) return Optional.empty();
+        return timed("trade.voteTurnDeals", () -> VoteTurnDeals.hold(context, () -> partners(context)));
+    }
+
     private static boolean startOfOwnTurn(AiTurnContext context) {
         return context.isActivePlayer()
                 && !TacticalRules.inProgress(context.game(), context.seat())

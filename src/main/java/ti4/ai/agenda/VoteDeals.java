@@ -18,10 +18,7 @@ public class VoteDeals {
     private static final double ENOUGH = 0.1;
     private static final int MAX_BLOC_PARTNERS = 3;
     private static final String VOTING_PHASE = "agendaVoting";
-    private static final String WAITING_PHASE = "agendawaiting";
     private static final String ABSTAIN = "";
-    private static final String GALACTIC_THREAT = "galactic_threat";
-    private static final String GALACTIC_THREAT_USED = "galacticThreatUsed";
 
     public record Terms(String outcome, int votes, double buyerGain, double sellerCost, double chance) {
 
@@ -163,20 +160,8 @@ public class VoteDeals {
         List<Player> order = AgendaForecast.votingOrder(game);
         int position = order.indexOf(seat);
         if (position < 0) return false;
-        if (WAITING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
-            return !AgendaQueue.whenWindowOpen(game)
-                    && position == nextVoter(game, order, -1)
-                    && !predictionStillOpen(game);
-        }
         if (!VOTING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return false;
-        int active = activeVoter(game, order);
-        return active >= 0 && (position == active || position == nextVoter(game, order, active));
-    }
-
-    static boolean predictionStillOpen(Game game) {
-        if (!game.getStoredValue(GALACTIC_THREAT_USED).isEmpty()) return false;
-        return game.getRealPlayers().stream()
-                .anyMatch(player -> player.hasAbility(GALACTIC_THREAT) && !AgendaQueue.passedOnAfters(game, player));
+        return position == activeVoter(game, order);
     }
 
     public static List<Player> votingAfter(Game game, Player seat) {
@@ -191,13 +176,6 @@ public class VoteDeals {
     private static int activeVoter(Game game, List<Player> order) {
         for (int voter = 0; voter < order.size(); voter++) {
             if (order.get(voter).getUserID().equals(game.getActivePlayerID())) return voter;
-        }
-        return -1;
-    }
-
-    private static int nextVoter(Game game, List<Player> order, int after) {
-        for (int voter = after + 1; voter < order.size(); voter++) {
-            if (!PromisedVotes.hasVoted(game, order.get(voter))) return voter;
         }
         return -1;
     }

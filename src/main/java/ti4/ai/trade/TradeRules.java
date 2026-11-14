@@ -71,6 +71,15 @@ public class TradeRules {
         return OwnTurnDeals.payTheAnswerer(context);
     }
 
+    public static String explainPayTheAnswerer(Game game, Player payer) {
+        return AnswererDeals.explain(game, payer);
+    }
+
+    public static Optional<AiDecision> holdVoteForDeals(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return OwnTurnDeals.holdVoteForDeals(context);
+    }
+
     public static Optional<AiDecision> offerDiscardBounty(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         return DiscardBountyDeals.offer(context);
