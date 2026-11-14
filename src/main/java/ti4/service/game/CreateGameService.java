@@ -110,6 +110,18 @@ public class CreateGameService {
             String gameName,
             Member gameOwner,
             Category categoryChannel) {
+        return createGameChannels(
+                members, event.getMessageChannel(), gameFunName, gameName, gameOwner, categoryChannel, true);
+    }
+
+    public static Game createGameChannels(
+            List<Member> members,
+            MessageChannel reportChannel,
+            String gameFunName,
+            String gameName,
+            Member gameOwner,
+            Category categoryChannel,
+            boolean offerSetupChoices) {
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
 
@@ -119,7 +131,7 @@ public class CreateGameService {
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    reportChannel,
                     "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return null;
         }
@@ -127,14 +139,14 @@ public class CreateGameService {
         // CHECK IF CATEGORY HAS ROOM
         if (categoryChannel.getChannels().size() > 48) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
+                    reportChannel,
                     "Category: **" + categoryChannel.getName() + "** is full on server **" + guild.getName()
                             + "**. Create a new category then try again.");
             return null;
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<Member> missingMembers = inviteUsersToServer(guild, members, event.getMessageChannel(), gameName);
+        List<Member> missingMembers = inviteUsersToServer(guild, members, reportChannel, gameName);
 
         // CREATE ROLE
         Role role = guild.createRole().setName(gameName).setMentionable(true).complete();
@@ -146,7 +158,7 @@ public class CreateGameService {
         // CREATE GAME
         Game newGame = createNewGame(gameName, gameOwner);
         boolean isTiglGame = TiglSetupService.looksLikeTiglGame(gameFunName);
-        if (event.getChannel() instanceof ThreadChannel thread) {
+        if (reportChannel instanceof ThreadChannel thread) {
             isTiglGame = isTiglGame
                     || TiglSetupService.looksLikeTiglGame(thread.getName())
                     || CreateGameLaunchPostService.MAKING_TIGL_GAMES_CHANNEL.equals(
@@ -239,12 +251,12 @@ public class CreateGameService {
         String message = "Role and Channels have been set up:\n> " + role.getName()
                 + "\n> " + chatChannel.getAsMention()
                 + "\n> " + actionsChannel.getAsMention();
-        MessageHelper.sendMessageToEventChannel(event, message);
-        reportMembersWithoutRole(event, membersWithoutRole, newGame);
+        MessageHelper.sendMessageToChannel(reportChannel, message);
+        reportMembersWithoutRole(reportChannel, membersWithoutRole, newGame);
 
         reportNewGameCreated(newGame);
 
-        presentSetupToPlayers(newGame);
+        presentSetupToPlayers(newGame, offerSetupChoices);
 
         if (isTiglGame) {
             TIGLHelper.markAsTIGLGame(newGame, false);
@@ -252,7 +264,7 @@ public class CreateGameService {
         }
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
-        if (event.getChannel() instanceof ThreadChannel thread
+        if (reportChannel instanceof ThreadChannel thread
                 && ("making-new-games".equals(thread.getParentChannel().getName())
                         || "making-private-games"
                                 .equals(thread.getParentChannel().getName())
@@ -297,13 +309,13 @@ public class CreateGameService {
     }
 
     private static void reportMembersWithoutRole(
-            GenericInteractionCreateEvent event, List<Member> membersWithoutRole, Game game) {
+            MessageChannel reportChannel, List<Member> membersWithoutRole, Game game) {
         if (membersWithoutRole.isEmpty()) return;
         String mentions = membersWithoutRole.stream().map(Member::getAsMention).collect(Collectors.joining(", "));
         String message = mentions + ", the bot couldn't give you the **" + game.getName()
                 + "** role, so you can't see the game channels yet. Press **Locate My Game** to try again.";
         Button locateGame = Buttons.green("pingGame_" + game.getName(), "Locate My Game");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, List.of(locateGame));
+        MessageHelper.sendMessageToChannelWithButtons(reportChannel, message, List.of(locateGame));
     }
 
     private static Map<Player, ThreadChannel> createCardsInfoThreads(Game game) {
@@ -316,12 +328,28 @@ public class CreateGameService {
     }
 
     public static void presentSetupToPlayers(Game game) {
+        presentSetupToPlayers(game, true);
+    }
+
+    public static void presentSetupToPlayers(Game game, boolean offerSetupChoices) {
         introductionToTableTalkChannel(game);
         introductionToActionsChannel(game);
         // sendMessageAboutAggressionMetas(game);
 
         MessageChannel actionsChannel = game.getActionsChannel();
+        if (offerSetupChoices) {
+            offerMapSetupChoices(actionsChannel);
+        }
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
+        MessageHelper.sendMessageToChannel(
+                actionsChannel,
+                "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
+        if (offerSetupChoices) {
+            offerGameModeAndExpansionChoices(actionsChannel);
+        }
+    }
 
+    public static void offerMapSetupChoices(MessageChannel actionsChannel) {
         Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
         Button nucleusButton = Buttons.green("startDraftSystem_nucleusPreset", "Start Nucleus Setup");
         Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
@@ -329,8 +357,9 @@ public class CreateGameService {
                 actionsChannel,
                 "How would you like to set up the players and map?",
                 List.of(miltyButton, nucleusButton, addMapString));
+    }
 
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
+    private static void offerGameModeAndExpansionChoices(MessageChannel actionsChannel) {
         List<Button> setupButtons = new ArrayList<>();
         setupButtons.add(Buttons.green("offerGameOptionButtons", "Aesthetic Options"));
         setupButtons.add(Buttons.green("getHomebrewButtons", "Supported Homebrew"));
@@ -339,9 +368,6 @@ public class CreateGameService {
 
         // HomebrewService.offerGameHomebrewButtons(actionsChannel);
 
-        MessageHelper.sendMessageToChannel(
-                actionsChannel,
-                "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
         setupButtons.add(Buttons.green("offerTEOptionButtons", "Galactic Events"));
         // MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
 
@@ -603,7 +629,7 @@ public class CreateGameService {
         return true;
     }
 
-    private static int getServerCapacityForNewGames(Guild guild) {
+    public static int getServerCapacityForNewGames(Guild guild) {
         int roleCount = guild.getRoles().size();
         int gameCountByRole = MAX_ROLE_COUNT - roleCount;
 
