@@ -1,10 +1,14 @@
 package ti4.service.tournament;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.JdaService;
 import ti4.spring.context.SpringContext;
@@ -16,21 +20,32 @@ public class TournamentAccess {
 
     public static final String TOURNEY_MOD_ROLE = "Tourney Mod";
     public static final String DENIED = "Only Admins, **" + TOURNEY_MOD_ROLE
-            + "** and roles added with `/tournament roles` can manage tournaments.";
+            + "** and roles added with `/tournament roles` can manage tournaments. Holding one of them on any"
+            + " server the bot is on is enough.";
 
     public static boolean isTournamentAdmin(Member member) {
         if (member == null) return false;
-        if (hasTournamentAdminRole(member.getRoles(), JdaService.adminRoles)) return true;
-        Set<String> extraRoleIds = extraRoleIds();
-        if (extraRoleIds.isEmpty()) return false;
-        return member.getRoles().stream()
-                .map(Role::getId)
-                .anyMatch(roleId -> roleId != null && extraRoleIds.contains(roleId));
+        return hasTournamentAdminRole(rolesOnSharedServers(member), JdaService.adminRoles, extraRoleIds());
     }
 
-    static boolean hasTournamentAdminRole(Collection<Role> memberRoles, Collection<Role> adminRoles) {
+    static List<Role> rolesOnSharedServers(Member member) {
+        User user = member.getUser();
+        return Stream.concat(
+                        Stream.of(member),
+                        user.getMutualGuilds().stream()
+                                .filter(guild -> !guild.equals(member.getGuild()))
+                                .map(guild -> guild.getMember(user))
+                                .filter(Objects::nonNull))
+                .flatMap(membership -> membership.getRoles().stream())
+                .toList();
+    }
+
+    static boolean hasTournamentAdminRole(
+            Collection<Role> memberRoles, Collection<Role> adminRoles, Set<String> extraRoleIds) {
         return memberRoles.stream()
-                .anyMatch(role -> adminRoles.contains(role) || TOURNEY_MOD_ROLE.equalsIgnoreCase(role.getName()));
+                .anyMatch(role -> adminRoles.contains(role)
+                        || TOURNEY_MOD_ROLE.equalsIgnoreCase(role.getName())
+                        || extraRoleIds.contains(role.getId()));
     }
 
     private static Set<String> extraRoleIds() {
