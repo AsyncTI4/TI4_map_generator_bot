@@ -30,6 +30,7 @@ import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
 import ti4.model.TileHelper;
+import ti4.service.fow.FogPreset;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
@@ -363,6 +364,10 @@ public class TestBedPresetService {
                 errors.add("preset: unknown tile `" + tileId + "` at `" + position + "` in `tiles`.");
             }
         });
+        preset.getNeutralUnits().keySet().stream()
+                .filter(position -> !MapPositionMapper.isTilePositionValid(position.toLowerCase()))
+                .forEach(position ->
+                        errors.add("preset: `neutralUnits` position `" + position + "` is not a tile position."));
         preset.getDecks().forEach((slot, deckId) -> {
             String problem = TestBedComponentService.deckProblem(slot, deckId);
             if (problem != null) errors.add("preset: " + problem);
@@ -390,6 +395,17 @@ public class TestBedPresetService {
         }
         if (!preset.getFowOptions().isEmpty() && Boolean.FALSE.equals(preset.getFog())) {
             errors.add("preset: `fowOptions` need a fog game; drop `\"fog\": false`.");
+        }
+        if (preset.getFogPreset() != null) {
+            if (Boolean.FALSE.equals(preset.getFog())) {
+                errors.add("preset: `fogPreset` needs a fog game; drop `\"fog\": false`.");
+            }
+            if (!isKnownFogPreset(preset.getFogPreset())) {
+                errors.add("preset: unknown `fogPreset` `" + preset.getFogPreset() + "`; use "
+                        + Arrays.stream(FogPreset.values())
+                                .map(FogPreset::getId)
+                                .toList() + ".");
+            }
         }
         preset.getStored().forEach((key, value) -> {
             if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
@@ -422,6 +438,15 @@ public class TestBedPresetService {
                     errors.add("Objective `" + objective + "` is scored but not in `revealedObjectives`.");
                 }
             }
+        }
+    }
+
+    private static boolean isKnownFogPreset(String id) {
+        try {
+            FogPreset.fromId(id);
+            return true;
+        } catch (IllegalArgumentException unknown) {
+            return false;
         }
     }
 

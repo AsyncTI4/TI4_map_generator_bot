@@ -28,7 +28,9 @@ public class TestBedPreset {
     private Map<String, List<String>> borderAnomalies = new LinkedHashMap<>();
     private Map<String, List<String>> customAdjacencies = new LinkedHashMap<>();
     private Map<String, String> tiles = new LinkedHashMap<>();
+    private Map<String, String> neutralUnits = new LinkedHashMap<>();
     private Map<String, String> customHyperlanes = new LinkedHashMap<>();
+    private String fogPreset;
     private List<String> fowOptions = new ArrayList<>();
     private Map<String, String> stored = new LinkedHashMap<>();
     private Map<String, String> gameOptions = new LinkedHashMap<>();

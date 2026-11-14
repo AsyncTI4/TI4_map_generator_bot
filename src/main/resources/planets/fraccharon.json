@@ -1,6 +1,6 @@
 {
     "id": "charon",
-    "tileId": null,
+    "tileId": "fracture15",
     "name": "Charon",
     "aliases": [
         "charon",
@@ -19,10 +19,11 @@
         "unitHolderName": "charon",
         "resourcesLocation": "BottomLeft",
         "centerPosition": {
-            "x": 72,
-            "y": 58
+            "x": 80,
+            "y": 66
         },
-        "planetRadius": 52
+        "planetRadius": 75,
+        "extraIcons": 1
     },
     "contrastColor": "orange",
     "flavourText": "*A shattered world of extreme thermal violence, floating through the dark like a jagged, burning eye.*",

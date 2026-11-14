@@ -1,0 +1,37 @@
+[
+    {
+        "id": "xyrix_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Echolocator",
+        "source": "frmisc",
+        "faction": "xyrix",
+        "moveValue": 0,
+        "capacityValue": 5,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "afbDieCount": 2,
+        "afbHitsOn": 6,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "You may treat this ship as adjacent to each system containing or adjacent to your ships."
+    },
+    {
+        "id": "xyrix_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Scholars",
+        "source": "frmisc",
+        "faction": "xyrix",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "After you win a combat in a system that contains one or more of your mechs, you may sustain one of those mechs to draw an action card."
+    }
+]

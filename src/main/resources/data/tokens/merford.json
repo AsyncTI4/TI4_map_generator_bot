@@ -1,0 +1,15 @@
+[
+    {
+        "id": "charon",
+        "imagePath": "charontoken.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "charon",
+            "charontoken"
+        ],
+        "tokenPlanetName": "charon",
+        "scale": 1.7,
+        "isPlanet": true,
+        "source": "merford"
+    }
+]

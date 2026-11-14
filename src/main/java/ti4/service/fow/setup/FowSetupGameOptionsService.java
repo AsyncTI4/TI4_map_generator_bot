@@ -39,7 +39,12 @@ final class FowSetupGameOptionsService {
     enum Category {
         HOMEBREW(
                 "Homebrew Options",
-                List.of(Homebrew.HBVOTC, Homebrew.HBHBSC, Homebrew.HBREMOVESFTT, Homebrew.HBLOSTLEGACIESTILES)),
+                List.of(
+                        Homebrew.HBVOTC,
+                        Homebrew.HBHBSC,
+                        Homebrew.HBREMOVESFTT,
+                        Homebrew.HBLOSTLEGACIESTILES,
+                        Homebrew.HBREFRACTURE)),
         FACTIONS("Faction Options", List.of(Homebrew.HBDSFACTIONS, Homebrew.HBBRFACTIONS)),
         DECKS(
                 "Major Card Deck Overhauls",
@@ -175,6 +180,7 @@ final class FowSetupGameOptionsService {
             case HBBRFACTIONS -> game.isBlueReverieMode();
             case HBDSEXPLORES -> game.isUnchartedSpaceStuff();
             case HBLOSTLEGACIESTILES -> game.isLostLegaciesTiles();
+            case HBREFRACTURE -> game.isRefractureMode();
             case HBACDECK2 -> game.isAcd2();
             // Both toggles share Game.absolMode - no single flag can tell them apart, so this is
             // tracked in wizard state instead. Can drift if absolMode is set from outside this
@@ -244,6 +250,10 @@ final class FowSetupGameOptionsService {
             }
             case HBLOSTLEGACIESTILES -> {
                 game.setLostLegaciesTiles(false);
+                yield null;
+            }
+            case HBREFRACTURE -> {
+                game.setRefractureMode(false);
                 yield null;
             }
             case HBABSOLRELICSAGENDAS, HBABSOLTECHSMECHS -> {

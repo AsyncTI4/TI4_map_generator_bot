@@ -41,6 +41,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -133,6 +134,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
@@ -398,6 +400,7 @@ public final class ButtonHelperTacticalAction {
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         endOfTacticalActionThings(player, game, event);
+        XyrixTechHandler.clearCrepuscularCopy(game);
 
         if (SarcosaHeroHandler.consumeNeutralTacticalActionContinuation(game, player)) {
             ButtonHelper.deleteMessage(event);
@@ -659,6 +662,10 @@ public final class ButtonHelperTacticalAction {
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
             for (Player playerWithPds : playersWithPds2) {
+                if (playerWithPds.isDummy() || playerWithPds.isNpc()) {
+                    offerDummySpaceCannonOffence(player, playerWithPds, tile, title);
+                    continue;
+                }
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
@@ -671,6 +678,19 @@ public final class ButtonHelperTacticalAction {
         } else {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
         }
+    }
+
+    private static void offerDummySpaceCannonOffence(Player activePlayer, Player dummy, Tile tile, String title) {
+        String rollId = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        List<Button> buttons = List.of(
+                StartCombatService.rollForDummyButton(dummy, rollId, "Roll SPACE CANNON Offence"),
+                Buttons.DECLINE_DELETE_BUTTONS);
+        String owner = dummy.isNeutral() ? "The neutral units have" : "A dummy player has";
+        MessageHelper.sendMessageToChannelWithButtons(
+                activePlayer.getCorrectChannel(),
+                title + owner + " SPACE CANNON coverage in " + tile.getRepresentation() + " (" + tile.getPosition()
+                        + "). Use the button to roll for them:",
+                buttons);
     }
 
     @ButtonHandler("useSafeHarbor")
@@ -787,6 +807,7 @@ public final class ButtonHelperTacticalAction {
         MorphaUnitHandler.clearCytoplasmicTransports(game);
         MorphaAbilityHandler.clearHydrosphericExtraction(game);
         HydromorphicCardHandler.clearTacticalActionEffects(game);
+        RefractureRulesService.clearTacticalState(game);
         GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
@@ -938,12 +959,22 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        XyrixTechHandler.offerCrepuscularCopy(game, player, tile);
         BloomAbilityHandler.snapshotCoexistingPlanetsAtAction(game);
         MigoHarvestHandler.offerBlueHarvest(game, player);
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
         FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        if (RefractureRulesService.canUseFenrir(game, player)) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you may exhaust _Homotopic Engines_.",
+                    Buttons.green(
+                            player.factionButtonChecker() + "planetAbilityExhaust_fenrir",
+                            "Use Homotopic Engines",
+                            PlanetEmojis.getPlanetEmojiOrNull("fenrir")));
+        }
         if (ButtonHelper.isLawInPlay(game, "lightspeedregulations")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -46,7 +47,11 @@ public class MapRenderPipeline {
                     try {
                         MapRenderResult result = MapRenderer.render(
                                 new MapRenderRequest(
-                                        snapshot, renderEvent.displayType, renderEvent.event, renderEvent.segment),
+                                        snapshot,
+                                        renderEvent.displayType,
+                                        renderEvent.event,
+                                        renderEvent.segment,
+                                        renderEvent.focus),
                                 timings);
                         uploadToDiscord(snapshot, result, timings, renderEvent.callback());
                         if (renderEvent.uploadToWebsite) {
@@ -76,6 +81,22 @@ public class MapRenderPipeline {
                         BotLogger.error(new LogOrigin(game), "Failed to render " + label + ".", e);
                     }
                 });
+        ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
+    }
+
+    public static void queueDetachedImage(String label, Supplier<FileUpload> image, Consumer<FileUpload> callback) {
+        if (CircuitBreaker.isOpen()) {
+            return;
+        }
+        var timedRunnable = new TimedRunnable(label, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+            try (FileUpload fileUpload = image.get()) {
+                if (fileUpload != null) {
+                    callback.accept(fileUpload);
+                }
+            } catch (Exception e) {
+                BotLogger.error("Failed to render " + label + ".", e);
+            }
+        });
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
@@ -127,6 +148,13 @@ public class MapRenderPipeline {
         queue(game, null, displayType, null, callback, false);
     }
 
+    public static void queueFocused(Game game, MapFocus focus, Consumer<FileUpload> callback) {
+        if (game == null) {
+            throw new IllegalArgumentException("game cannot be null in render pipeline");
+        }
+        render(new RenderEvent(game, null, DisplayType.all, null, callback, false, focus));
+    }
+
     private static void queue(
             Game game,
             @Nullable GenericInteractionCreateEvent event,
@@ -137,7 +165,7 @@ public class MapRenderPipeline {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
-        render(new RenderEvent(game, event, displayType, segment, callback, uploadToWebsite));
+        render(new RenderEvent(game, event, displayType, segment, callback, uploadToWebsite, null));
     }
 
     public static ShutdownResult shutdown() {
@@ -151,5 +179,6 @@ public class MapRenderPipeline {
             DisplayType displayType,
             String segment,
             Consumer<FileUpload> callback,
-            boolean uploadToWebsite) {}
+            boolean uploadToWebsite,
+            MapFocus focus) {}
 }

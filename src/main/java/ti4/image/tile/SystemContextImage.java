@@ -111,10 +111,11 @@ public final class SystemContextImage {
             Player fowPlayer = viewer.player();
             Set<String> hidden = new HashSet<>(tilesToDisplay.keySet());
             hidden.removeAll(viewer.visibleSystems());
+            UnexploredBridges bridges = new UnexploredBridges(layers);
             for (String position : hidden) {
                 tilesToDisplay.remove(position);
                 if (fowPlayer != null) {
-                    tilesToDisplay.put(position, fowPlayer.buildFogTile(position, fowPlayer));
+                    tilesToDisplay.put(position, bridges.fogTile(fowPlayer, position));
                 }
             }
         }

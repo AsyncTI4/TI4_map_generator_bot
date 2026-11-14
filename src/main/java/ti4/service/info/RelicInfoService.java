@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.agenda.VoiceOfArvidHandler;
 import ti4.discord.interactions.commands.CommandHelper;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,7 +26,7 @@ public class RelicInfoService {
 
     public static void sendRelicInfo(Player player) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                player.getCardsInfoThread(), null, getRelicEmbeds(player), getRelicButtons());
+                player.getCardsInfoThread(), null, getRelicEmbeds(player), getRelicButtons(player));
     }
 
     private static List<MessageEmbed> getRelicEmbeds(Player player) {
@@ -40,8 +41,11 @@ public class RelicInfoService {
         return messageEmbeds;
     }
 
-    private static List<Button> getRelicButtons() {
+    private static List<Button> getRelicButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
+        if (player.hasRelic(VoiceOfArvidHandler.RELIC_ID)) {
+            buttons.add(VoiceOfArvidHandler.playButton());
+        }
         buttons.add(Buttons.REFRESH_RELIC_INFO);
         return buttons;
     }

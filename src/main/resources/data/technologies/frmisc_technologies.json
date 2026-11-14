@@ -1,0 +1,24 @@
+[
+    {
+        "alias": "frmiscxyrixg",
+        "name": "Intergalactic Library Loans",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "xyrix",
+        "source": "frmisc",
+        "text": "ACTION: Exhaust this card and give one action card to another player. Draw two action cards.\n\nThe number of action cards you can have in your hand is unaffected by laws. Laws and other player’s abilities cannot take or discard your action cards."
+    },
+    {
+        "alias": "frmiscxyrixb",
+        "name": "Crepuscular Copy",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "xyrix",
+        "source": "frmisc",
+        "text": "When you activate a system or a system containing your units is activated, choose 1 non-faction, non-unit upgrade technology. While you do not own that technology and until the end of that action, this technology also has the ability text of that technology."
+    }
+]

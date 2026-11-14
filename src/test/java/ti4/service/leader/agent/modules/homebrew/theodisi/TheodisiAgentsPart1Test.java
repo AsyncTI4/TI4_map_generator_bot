@@ -238,7 +238,7 @@ class TheodisiAgentsPart1Test extends BaseTi4Test {
         assertThat(arcanum.unusableReason(fixture.game, fixture.user, swap)).isPresent();
 
         fixture.target.addTech("nm");
-        assertThat(ArcanumAgent.replacementButtons(fixture.game, fixture.target, "nm"))
+        assertThat(ArcanumAgent.replacementTechs(fixture.game, fixture.target, Mapper.getTech("nm")))
                 .isNotEmpty();
         assertThat(arcanum.unusableReason(fixture.game, fixture.user, swap)).isEmpty();
         assertThat(ArcanumAgent.returnTechButtons(fixture.game, fixture.user, fixture.target))

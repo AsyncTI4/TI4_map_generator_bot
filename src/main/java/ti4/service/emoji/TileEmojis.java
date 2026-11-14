@@ -214,6 +214,7 @@ public enum TileEmojis implements TI4Emoji {
     th16b_stonebornhs,
     th17_morphahs,
     th18_thurvialihs,
+    frmisc1_xyrixhs,
     fracture8,
     fracture9,
     fracture10,
@@ -481,6 +482,7 @@ public enum TileEmojis implements TI4Emoji {
             case "th16b" -> th16b_stonebornhs;
             case "th17" -> th17_morphahs;
             case "th18" -> th18_thurvialihs;
+            case "frmisc1" -> frmisc1_xyrixhs;
             case "fracture8" -> fracture8;
             case "fracture9" -> fracture9;
             case "fracture10" -> fracture10;

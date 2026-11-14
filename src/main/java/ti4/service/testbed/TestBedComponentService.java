@@ -23,6 +23,8 @@ import ti4.model.TestBedPreset;
 import ti4.model.TestBedPreset.Seat;
 import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.FogPreset;
+import ti4.service.fow.FogPresetService;
 import ti4.service.map.AddTileService;
 import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -66,6 +68,9 @@ public class TestBedComponentService {
     }
 
     static void applyGameState(Game game, TestBedPreset preset, List<String> warnings) {
+        if (preset.getFogPreset() != null) {
+            FogPresetService.apply(game, FogPreset.fromId(preset.getFogPreset()));
+        }
         for (String option : preset.getFowOptions()) {
             FOWOption fowOption = FOWOption.fromString(option);
             if (fowOption == FOWOption.FOW_PLUS) {
@@ -159,6 +164,15 @@ public class TestBedComponentService {
             discard.remove(exploreId);
             game.setExploreDiscard(discard);
         }
+        return true;
+    }
+
+    static boolean stackAgenda(Game game, String agendaId) {
+        boolean inDiscard = game.getDiscardAgendas().containsKey(agendaId);
+        if (!game.getAgendas().contains(agendaId) && !inDiscard) return false;
+        if (inDiscard) game.getDiscardAgendas().remove(agendaId);
+        game.getAgendas().remove(agendaId);
+        game.getAgendas().addFirst(agendaId);
         return true;
     }
 

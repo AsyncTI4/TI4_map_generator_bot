@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -27,9 +28,24 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class RematchService {
 
+    private static final String ARCHIVE_CATEGORY_NAME = "The in-limbo PBD Archive";
+    private static final long ARCHIVE_MOVE_SETTLE_MILLIS = 60_000;
+    private static final int MAX_CATEGORY_CHANNELS_BEFORE_ADDING_A_GAME = 48;
+
     public static void rematch(Game game, GenericInteractionCreateEvent event) {
-        EndGameService.gameEndStuff(game, event, true);
+        if (!game.isHasEnded()) {
+            EndGameService.gameEndStuff(game, event, true);
+        } else if (channelsMayStillBeMovingToArchive(game)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "This game only just ended and its channels are still being moved to the archive. Please try the rematch again in a minute.");
+            return;
+        }
         secondHalfOfRematch(event, game);
+    }
+
+    private static boolean channelsMayStillBeMovingToArchive(Game game) {
+        return System.currentTimeMillis() - game.getEndedDate() < ARCHIVE_MOVE_SETTLE_MILLIS;
     }
 
     public static void secondHalfOfRematch(GenericInteractionCreateEvent event, Game game) {
@@ -48,14 +64,17 @@ public class RematchService {
 
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if ("The in-limbo PBD Archive"
-                        .equals(tableTalkChannel.getParentCategory().getName())
-                || "The in-limbo PBD Archive"
-                        .equals(actionsChannel.getParentCategory().getName())) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "These game channels are in the archive, so they cannot have a rematch created. Please create new game channels in the \"Making New Games\" forum channel in the HUB server");
-            return;
+        if (isInArchive(tableTalkChannel) || isInArchive(actionsChannel)) {
+            Category category = gameCategoryOnGuild(name, actionsChannel.getGuild());
+            if (category == null) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "These game channels are in the archive and could not be moved back into a game category. Please ask a bothelper to move them out of **"
+                                + ARCHIVE_CATEGORY_NAME + "**, then try the rematch again.");
+                return;
+            }
+            tableTalkChannel.getManager().setParent(category).queue(Consumers.nop(), BotLogger::catchRestError);
+            actionsChannel.getManager().setParent(category).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         if (gameRole != null) {
@@ -70,8 +89,14 @@ public class RematchService {
             }
 
             Set<Permission> allow = Set.of(Permission.PIN_MESSAGES, Permission.VIEW_CHANNEL);
-            tableTalkChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
-            actionsChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
+            tableTalkChannel
+                    .getManager()
+                    .putRolePermissionOverride(gameRole.getIdLong(), allow, null)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+            actionsChannel
+                    .getManager()
+                    .putRolePermissionOverride(gameRole.getIdLong(), allow, null)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         // CLOSE THREADS IN CHANNELS
@@ -161,6 +186,26 @@ public class RematchService {
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    private static boolean isInArchive(TextChannel channel) {
+        Category category = channel.getParentCategory();
+        return category != null && ARCHIVE_CATEGORY_NAME.equalsIgnoreCase(category.getName());
+    }
+
+    private static Category gameCategoryOnGuild(String gameName, Guild guild) {
+        String categoryName = CreateGameService.getCategoryNameForGame(baseGameName(gameName));
+        if (categoryName == null) return null;
+        return guild.getCategories().stream()
+                .filter(category -> category.getName().toUpperCase().startsWith(categoryName))
+                .filter(category -> category.getChannels().size() <= MAX_CATEGORY_CHANNELS_BEFORE_ADDING_A_GAME)
+                .findFirst()
+                .orElseGet(() -> CreateGameService.createGameCategory(guild, categoryName));
+    }
+
+    private static String baseGameName(String gameName) {
+        Matcher matcher = gameNamePattern.matcher(gameName);
+        return matcher.matches() ? matcher.group("prefix") : gameName;
     }
 
     private static final Pattern gameNamePattern = Pattern.compile("(?<prefix>[a-zA-Z]+[0-9]+)(?<rematchId>[a-z]*)");

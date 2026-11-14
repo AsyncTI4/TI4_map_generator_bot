@@ -14,6 +14,7 @@ import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.map.TileBoundData;
 
 @UtilityClass
 class SpatialCollapseAcd2ButtonHandler {
@@ -74,6 +75,7 @@ class SpatialCollapseAcd2ButtonHandler {
         tile2.setPosition(position);
         game.setTile(tile);
         game.setTile(tile2);
+        TileBoundData.move(game, position, position2, true);
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

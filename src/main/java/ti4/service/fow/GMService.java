@@ -40,12 +40,10 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
 import ti4.model.MapPositionMapper;
-import ti4.model.Mapper;
 import ti4.service.ShowGameService;
-import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.explore.ExploreService;
-import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.info.HandCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 public final class GMService {
@@ -238,99 +236,13 @@ public final class GMService {
     @ButtonHandler(value = "gmCheckPlayerHands_", save = false)
     public static void checkPlayerHands(ButtonInteractionEvent event, String buttonID, Game game) {
         String option = buttonID.replace("gmCheckPlayerHands_", "");
-        switch (option) {
-            case "sabotage" -> {
-                checkWhoHas("sabo", game, event);
-                for (Player p : game.getRealPlayers()) {
-                    if (SabotageService.couldUseWatcherMech(p, game)) {
-                        MessageHelper.sendMessageToChannel(
-                                event.getChannel(), "> " + p.getRepresentationUnfoggedNoPing() + " has Watcher mechs");
-                    }
-                    if (SabotageService.couldUseInstinctTraining(p)) {
-                        MessageHelper.sendMessageToChannel(
-                                event.getChannel(),
-                                "> " + p.getRepresentationUnfoggedNoPing() + " has Instinct Training");
-                    }
-                }
-            }
-            case "deadly" -> {
-                checkWhoHas("deadly_plot", game, event);
-                checkWhoHas("bribery", game, event);
-            }
-            case "confusing" -> {
-                checkWhoHas("confusing", game, event);
-                checkWhoHas("confounding", game, event);
-            }
-            case "whens" -> {
-                StringBuilder sbWhens = new StringBuilder("Following players have \"when\"s in hand:\n");
-                StringBuilder sbAfters = new StringBuilder("Following players have \"after\"s in hand:\n");
-
-                for (Player player : game.getRealPlayers()) {
-                    List<String> whens = AgendaWhensAftersHelper.getPossibleWhenNames(player);
-                    if (!whens.isEmpty()) {
-                        sbWhens.append("> ")
-                                .append(player.getRepresentationUnfoggedNoPing())
-                                .append(": ");
-                        sbWhens.append(String.join(", ", whens)).append('\n');
-                    }
-                    List<String> afters = AgendaWhensAftersHelper.getPossibleAfterNames(player);
-                    if (!afters.isEmpty()) {
-                        sbAfters.append("> ")
-                                .append(player.getRepresentationUnfoggedNoPing())
-                                .append(": ");
-                        sbAfters.append(String.join(", ", afters)).append('\n');
-                    }
-                }
-                MessageHelper.sendMessageToChannel(event.getChannel(), sbWhens.toString());
-                MessageHelper.sendMessageToChannel(event.getChannel(), sbAfters.toString());
-            }
-            case "secret" -> {
-                StringBuilder sos = new StringBuilder();
-                for (Player player : game.getRealPlayers()) {
-                    String allSecrets = SecretObjectiveInfoService.getSecretObjectiveCardInfo(game, player);
-                    String unscored = StringUtils.substringAfter(allSecrets, "Unscored");
-                    sos.append("__")
-                            .append(player.getRepresentationUnfoggedNoPing())
-                            .append(" Unscored")
-                            .append(unscored)
-                            .append('\n');
-                }
-                MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
-            }
-            case "acs" -> {
-                StringBuilder acs = new StringBuilder();
-                for (Player player : game.getRealPlayers()) {
-                    acs.append("__")
-                            .append(player.getRepresentationUnfoggedNoPing())
-                            .append("__\n");
-                    player.getActionCards()
-                            .forEach((key, value) -> acs.append("> ")
-                                    .append(Mapper.getActionCard(key).getNameRepresentation())
-                                    .append(" (")
-                                    .append(value)
-                                    .append(")\n"));
-                }
-                MessageHelper.sendMessageToChannel(event.getChannel(), acs.toString());
-            }
-            case "pns" -> {
-                StringBuilder pns = new StringBuilder();
-                for (Player player : game.getRealPlayers()) {
-                    pns.append("__")
-                            .append(player.getRepresentationUnfoggedNoPing())
-                            .append("__\n");
-                    player.getPromissoryNotes()
-                            .forEach((key, value) -> pns.append("> ")
-                                    .append(Mapper.getPromissoryNote(key).getNameRepresentation())
-                                    .append(" (")
-                                    .append(value)
-                                    .append(")\n"));
-                }
-                MessageHelper.sendMessageToChannel(event.getChannel(), pns.toString());
-            }
-            default ->
-                MessageHelper.sendMessageToChannelWithButtons(
-                        event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
+        List<String> reports = HandCheckService.reports(game, option);
+        if (reports.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
+            return;
         }
+        reports.forEach(report -> MessageHelper.sendMessageToChannel(event.getChannel(), report));
     }
 
     @ButtonHandler(value = "gmWhoCanSee~MDL", save = false)
@@ -392,22 +304,6 @@ public final class GMService {
                 event.getChannel(),
                 "Players who cannot follow a strategy card are auto-declined after " + base + " hours +/- " + spread
                         + " hours (random), or as soon as they react. Needs the **Fog QoL 01** option.");
-    }
-
-    private static void checkWhoHas(String acId, Game game, ButtonInteractionEvent event) {
-        StringBuilder sb = new StringBuilder("Following players have **");
-        sb.append(acId).append("** in hand:\n");
-        for (Player player : game.getRealPlayers()) {
-            for (String ac : player.getActionCards().keySet()) {
-                if (ac.startsWith(acId)) {
-                    sb.append("> ")
-                            .append(player.getRepresentationUnfoggedNoPing())
-                            .append('\n');
-                    break;
-                }
-            }
-        }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
     public static void createFOWStatusSummary(Game game) {

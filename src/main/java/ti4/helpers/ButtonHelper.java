@@ -56,6 +56,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
@@ -68,6 +69,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -190,6 +193,7 @@ import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.map.SystemPickerService;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.megagame.MegagameScThreads;
@@ -820,6 +824,7 @@ public class ButtonHelper {
         if (player.getTg() > 2) {
             buttons.add(Buttons.red("reduceTG_3_" + whatIsItFor, "Spend 3 Trade Goods"));
         }
+        buttons.addAll(BeansRelicHandler.getHamitsTreasurePaymentButtons(game, player, whatIsItFor));
         if (KaltrimTechHandler.canSpendCapturedInfantry(player)) {
             buttons.add(KaltrimTechHandler.getSpendCapturedInfantryButton(player, whatIsItFor));
         }
@@ -2528,10 +2533,15 @@ public class ButtonHelper {
             return 999;
         }
         int limit = 7;
-        if (isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")
+                && !player.hasTech("frmiscxyrixg")
+                && isLawInPlay(game, "sanctions")
+                && !game.isAbsolMode()) {
             limit = 3;
         }
-        if (isLawInPlay(game, "absol_sanctions")) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")
+                && !player.hasTech("frmiscxyrixg")
+                && isLawInPlay(game, "absol_sanctions")) {
             limit = 3;
             if (game.getLawsInfo().get("absol_sanctions") != null
                     && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
@@ -2554,6 +2564,9 @@ public class ButtonHelper {
         }
         if (player.hasAbility("neurotropic_active")) {
             limit += 2;
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")) {
+            limit += 3;
         }
         return limit;
     }
@@ -5182,6 +5195,17 @@ public class ButtonHelper {
         if (player.hasReadyBreakthrough("choirbt")) {
             endButtons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
         }
+        Button tomeOfNegotiation = XyrixTomeHandler.getNegotiationEndTurnButton(game, player);
+        if (tomeOfNegotiation != null) {
+            endButtons.add(tomeOfNegotiation);
+        }
+
+        if (RefractureRulesService.canUseExperiment(game, player)) {
+            endButtons.add(Buttons.gray(
+                    player.factionButtonChecker() + "refractureExperimentStart",
+                    "Use Experiment",
+                    PlanetEmojis.getPlanetEmojiOrNull("experiment")));
+        }
 
         if (player.hasRelicReady("full_moonphase")) {
             endButtons.add(AeternaAbilityHandler.getFullMoonButton(player));
@@ -5219,7 +5243,8 @@ public class ButtonHelper {
                 "phantasm",
                 "eko", // Ixth
                 "lapidus",
-                "lloyd");
+                "lloyd",
+                "libertalia");
         for (String planet : implementedLegendaryPlanets) {
             String label = "Use " + Mapper.getPlanet(planet).getName() + " Ability";
 
@@ -5912,10 +5937,11 @@ public class ButtonHelper {
         String ringNum = buttonID.replace("ring_", "");
 
         if ("corners".equalsIgnoreCase(ringNum)) {
-            List<String> cornerPositions = List.of(
-                    "tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7", "frac8",
-                    "frac9", "frac10", "frac11", "frac12", "frac13", "frac14", "frac15", "frac16", "frac17", "frac18",
-                    "frac19", "frac20", "frac21", "frac22", "frac23", "frac24", "frac25");
+            List<String> cornerPositions = new ArrayList<>(List.of("tl", "tr", "bl", "br"));
+            game.getTileMap().keySet().stream()
+                    .filter(position -> position.startsWith("frac"))
+                    .sorted()
+                    .forEach(cornerPositions::add);
             for (String pos : cornerPositions) {
                 Tile t = game.getTileByPosition(pos);
                 if (canActivateTile(game, player, t, visiblePositions)) {
@@ -6312,7 +6338,9 @@ public class ButtonHelper {
 
     public static void resolveFullFrontierExplore(
             Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
-        if (player.hasUnlockedBreakthrough("oblivionbt")) {
+        if (XyrixPromissoryHandler.offerAdditionalFrontierExplore(event, game, player, tile)) {
+            return;
+        } else if (player.hasUnlockedBreakthrough("oblivionbt")) {
             OblivionBreakthroughHandler.offerFrontierExplores(
                     event, game, player, tile, player.hasAbility("voidsailors") ? 3 : 2);
         } else if (player.hasAbility("voidsailors")) {
@@ -6635,6 +6663,7 @@ public class ButtonHelper {
                         + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
                 StonebornTechHandler.addDormantXenolithExploreButton(buttons, player, planetId, trait);
+                XyrixTomeHandler.addIndustrializationExploreButton(buttons, game, player, planetId);
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.factionButtonChecker() + "movedNExplored_" + source + planetId + "_"
                             + trait + "kolleccbt";
@@ -7505,6 +7534,12 @@ public class ButtonHelper {
                     }
                 }
             }
+        }
+        if ("spacecombat".equalsIgnoreCase(type)
+                && RefractureRulesService.charonCanParticipateInCombat(game, player, tile)) {
+            buttons.add(Buttons.red(
+                    player.factionButtonChecker() + "refractureCharonAssignHit_" + tile.getPosition(),
+                    "Exhaust Charon to Assign 1 Hit"));
         }
         buttons.add(Buttons.gray(
                 player.factionButtonChecker() + "assignHits_" + tile.getPosition() + "_AllShips", "Remove All Ships"));

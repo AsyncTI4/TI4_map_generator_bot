@@ -38,6 +38,7 @@ public class HomebrewService {
                 "Uncharted Space Explores, Relics and Action Cards",
                 SourceEmojis.UnchartedSpace),
         HBLOSTLEGACIESTILES("Lost Legacies Tiles", "Adds Lost Legacies tiles", SourceEmojis.Theodisi),
+        HBREFRACTURE("Refracture", "Enable the Refracture expansion", null),
         HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
         HBREDTAPE("Red Tape", "Red Tape mode", null),
         HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null),
@@ -103,6 +104,7 @@ public class HomebrewService {
         game.setBlueReverieMode(false);
         game.setUnchartedSpaceStuff(false);
         game.setLostLegaciesTiles(false);
+        game.setRefractureMode(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
         game.setVotcMode(false);
@@ -213,6 +215,16 @@ public class HomebrewService {
             case HBLOSTLEGACIESTILES -> {
                 game.setLostLegaciesTiles(true);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added Lost Legacies tiles.");
+            }
+            case HBREFRACTURE -> {
+                game.setRefractureMode(true);
+                var reference = Mapper.getGalacticEvent("refracture_reference");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Enabled Refracture.");
+                if (reference != null) {
+                    event.getMessageChannel()
+                            .sendMessageEmbeds(reference.getRepresentationEmbed(true))
+                            .queue();
+                }
             }
             case HBACDECK2 -> {
                 String acd2 = "action_deck_2";

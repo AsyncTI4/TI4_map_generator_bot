@@ -104,6 +104,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantScrapyardAgent
 import ti4.service.leader.genome.homebrew.tknova.DeploymentGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.PlayerAreaWarningService;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.megagame.MegagameGroupService;
 import ti4.service.relic.QuantumEntanglerService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -588,6 +589,18 @@ public class StartTurnService {
         Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptStartTurnButton(game, player);
         if (lyraOfTheCryptButton != null) {
             startButtons.add(lyraOfTheCryptButton);
+        }
+        if (!doneActionThisTurn && RefractureRulesService.canDoubleDemeterCapacity(game, player)) {
+            startButtons.add(Buttons.gray(
+                    factionChecker + "refractureDemeterDoubleCapacity", "Use Demeter II", MiscEmojis.LegendaryPlanet));
+        }
+        if (RefractureRulesService.canUseMaahes(game, player)) {
+            startButtons.add(
+                    Buttons.gray(factionChecker + "refractureMaahesStart", "Use Maahes", MiscEmojis.LegendaryPlanet));
+        }
+        if (RefractureRulesService.canUseExperiment(game, player)) {
+            startButtons.add(Buttons.gray(
+                    factionChecker + "refractureExperimentStart", "Use Experiment", MiscEmojis.LegendaryPlanet));
         }
         Button economicBoonButton = LostLegaciesRelicHandler.getEconomicBoonStartTurnButton(game, player);
         if (economicBoonButton != null) startButtons.add(economicBoonButton);

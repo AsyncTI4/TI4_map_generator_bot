@@ -1,0 +1,45 @@
+[
+    {
+        "alias": "xyrix",
+        "factionName": "The Xyrix Archivists",
+        "homeSystem": "frmisc1",
+        "startingFleet": "1 cv, 1 dd, 4 ff, 5 inf a, 1 mf a, 1 sd a, 1 pds a",
+        "commodities": 3,
+        "factionTech": [
+            "frmiscxyrixg",
+            "frmiscxyrixb"
+        ],
+        "startingTech": [
+            "nm",
+            "inf2"
+        ],
+        "homePlanets": [
+            "alexandria"
+        ],
+        "abilities": [
+            "tomebound_tutelage"
+        ],
+        "leaders": [
+            "xyrixagent",
+            "xyrixcommander",
+            "xyrixhero"
+        ],
+        "promissoryNotes": [
+            "frmiscpnxyrix"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "xyrix_flagship",
+            "infantry",
+            "xyrix_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "frmisc"
+    }
+]

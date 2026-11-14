@@ -62,6 +62,7 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit, bo
         public enum Route {
             REPLY,
             EVERYONE,
+            CORRECT_CHANNEL,
             CARDS_INFO_THREAD
         }
 
@@ -87,6 +88,10 @@ public record AgentOutcome(List<Message> messages, String pressedMessageEdit, bo
 
         public Message inCardsInfoThread() {
             return new Message(recipient, text, buttons, Route.CARDS_INFO_THREAD, namesRecipient, pagedButtons);
+        }
+
+        public Message inCorrectChannel() {
+            return new Message(recipient, text, buttons, Route.CORRECT_CHANNEL, namesRecipient, pagedButtons);
         }
 
         public Message forEveryone() {

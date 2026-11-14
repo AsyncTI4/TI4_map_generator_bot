@@ -29,7 +29,10 @@ final class FogOverlay {
         }
         Player fowPlayer = scene.fowPlayer();
         Graphics2D g = layer.g();
-        g.drawImage(ImageHelper.read(ImageResources.fogTilePath(tile, fowPlayer)), TILE_PADDING, TILE_PADDING, null);
+        if (!TileArtwork.showsUnexploredBridge(scene, tile)) {
+            g.drawImage(
+                    ImageHelper.read(ImageResources.fogTilePath(tile, fowPlayer)), TILE_PADDING, TILE_PADDING, null);
+        }
         String label = tile.getFogLabel(fowPlayer);
         if (label == null) {
             return;

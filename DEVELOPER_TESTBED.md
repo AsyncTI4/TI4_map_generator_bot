@@ -83,10 +83,13 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Relic fragment | seat `fragments` | `"fragments": ["crf1"]` |
 | Tile outside the map string (maps A-G, corners, Fracture) | game `tiles`: position to tile id | `"tiles": { "a000": "39", "tl": "82" }` |
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
+| Fog preset (reset a reused fog game's options, e.g. FoW+ off) | game `fogPreset`: `standard`, `plus`, `normal` or `beginner`; applied before `fowOptions` | `"fogPreset": "normal"` |
 | Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
 | Game option (`/custom` setting or game mode; currently `wormhole_token_merge`, `one_way_adjacency`, `secrets_only_mode`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
 | Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
 | Next explore card | script `do: stackExplore` (value: explore id) puts the card on top of its deck | `{ "do": "stackExplore", "value": "tourismbureau30k" }` |
+| Next agendas | script `do: stackAgenda` (value: agenda id) puts the agenda on top of the agenda deck; stack in reverse to set the order | `{ "do": "stackAgenda", "value": "mutiny" }` |
+| Neutral units | game `neutralUnits`: tile position to units, as in `/add_units` | `"neutralUnits": { "201": "pds quann, gf quann" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
 | TG, commodities, command tokens | seat `tg`, `commodities`, `ccs` | `"ccs": "3/3/2"` |
 | State a feature keeps in stored values | script `do: setStored` | `{ "do": "setStored", "key": "x", "value": "y" }` |
@@ -270,6 +273,8 @@ copy-paste templates.
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
 | `revealedObjectives`, `laws`, `tokens`, `borderAnomalies`, `customAdjacencies` | Game state; see [Set up any component](#set-up-any-component). |
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
+| `neutralUnits` | Units for the neutral player by tile position, as in `/add_units` (`"201": "pds quann"`); creates the neutral player if needed. |
+| `fogPreset` | Fog preset applied before `fowOptions`, like choosing one in the fog settings: `standard`, `plus`, `normal` (classic fog, FoW+ off) or `beginner`. Use it when a reused fog game must not keep FoW+ or other options. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
 | `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens), `sc_count_for_map` (strategy cards per player, `1`-`9`), `one_way_adjacency` (`true` or `false`) and `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
@@ -304,7 +309,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `stackAgenda` (value: agenda id; moves it from the deck or discard to the top of the agenda deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -335,6 +340,8 @@ Every step may also have a `label` for the report.
   still in the deck), `soDeckSize`,
   `decks` (`ac:<id>,so:<id>,relic:<id>,explore:<id>,agenda:<id>`), `borderAnomalies` (`<tile>:<direction>:<type>`),
   `customAdjacencies` (`<primary>><listed>`), `customHyperlanes` (`<position>:<matrix>`, one-way lanes as `2`),
+  `hyperlaneBridges` (bridged systems as `<position>:<matrix>`, same format), `hyperlanePortals` (portal hyperlanes as
+  `<position>:<slots>`, e.g. `000:0=A, 3=B>`),
   `fowOptions` (enabled fog options, e.g. `fow_plus,ghost_hexes`; includes `disable_fracture`), `fogPreset`
   (`standard`, `plus`, `normal`, `beginner` or `custom`), `sectors` (every map sector as
   `<name>:<kind>:<positions with a system>`, e.g. `rim:shape:a101 a102`; kinds `circle`, `cluster`, `shape`,

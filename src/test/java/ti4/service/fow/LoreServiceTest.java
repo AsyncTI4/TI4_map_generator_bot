@@ -28,6 +28,8 @@ import ti4.model.Mapper;
 import ti4.model.TileModel;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.HyperlanePortals;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -2651,6 +2653,49 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!rotatehyperlane 000"), systemTile, Constants.SPACE, true);
             assertEquals(CustomHyperlaneService.encodeMatrix(SIDES_1_4), storedEncoded());
+        }
+
+        // Portals: set from the Export form or the modal form, removed again; rotation turns them with the lanes.
+        @Test
+        void setAndRemovePortals() {
+            CustomHyperlaneService.insertData(
+                    game, "000", "1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!setportals 000 0A1B>"), systemTile, Constants.SPACE, true);
+            assertEquals("0=A, 1=B>", HyperlanePortals.describe(HyperlanePortals.slotsOf(game, "000")));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000"), systemTile, Constants.SPACE, true);
+            assertEquals("0=A, 2=B>", HyperlanePortals.describe(HyperlanePortals.slotsOf(game, "000")));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!spor 000 C,3=D<"), systemTile, Constants.SPACE, true);
+            assertEquals("0=C, 3=D<", HyperlanePortals.describe(HyperlanePortals.slotsOf(game, "000")));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removeportals 000"), systemTile, Constants.SPACE, true);
+            assertTrue(HyperlanePortals.slotsOf(game, "000").isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!setportals 000 9Z"), game)
+                    .isEmpty());
+        }
+
+        // Bridges: set from the Export form on a system, removed again; a crossing matrix is refused by validation.
+        @Test
+        void setAndRemoveBridge() {
+            game.setTile(new Tile("19", "101"));
+            String northToSouth = CustomHyperlaneService.encodeMatrix(
+                    "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!setbridge 101 " + northToSouth), systemTile, Constants.SPACE, true);
+            assertEquals(Set.of(0, 3), HyperlaneBridges.laneSides(game, "101"));
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!rbr 101"), systemTile, Constants.SPACE, true);
+            assertTrue(HyperlaneBridges.laneSides(game, "101").isEmpty());
+
+            String crossing = CustomHyperlaneService.encodeMatrix(
+                    "0,0,0,1,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+            assertFalse(LoreEffects.validateEffects(entry("!setbridge 101 " + crossing), game)
+                    .isEmpty());
         }
 
         @Test

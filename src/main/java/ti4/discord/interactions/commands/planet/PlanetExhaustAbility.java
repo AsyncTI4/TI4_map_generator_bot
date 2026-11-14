@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPrimordialTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thrones.ThronesThroneHandler;
 import ti4.discord.interactions.buttons.handlers.planet.AlfheimLegendaryButtonHandler;
@@ -30,6 +31,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
+import ti4.service.map.RefractureRulesService;
 import ti4.service.planet.AsgardLegendaryService;
 import ti4.service.planet.EmelparService;
 import ti4.service.planet.FaunusService;
@@ -52,6 +54,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust) {
         if (player == null) return;
         planet = AliasHandler.resolvePlanet(planet);
+        if (isRefractureLegendary(planet)
+                && (!game.isRefractureMode()
+                        || !player.getPlanets().contains(planet)
+                        || player.getExhaustedPlanetsAbilities().contains(planet))) {
+            return;
+        }
         if (("innersanctum".equals(planet) && !player.hasTech("thveylorg"))
                 || ("fabricatestation".equals(planet) && !player.hasTech("tharcanumpmy"))) {
             return;
@@ -60,10 +68,20 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 && (game.getCurrentActiveSystem().isEmpty() || player != game.getActivePlayer())) {
             return;
         }
+        if ("fenrir".equals(planet) && !RefractureRulesService.canUseFenrir(game, player)) {
+            return;
+        }
         if (exhaust) {
             player.exhaustPlanetAbility(planet);
         }
         resolveAbility(event, player, planet, game);
+    }
+
+    private static boolean isRefractureLegendary(String planet) {
+        return switch (planet) {
+            case "matercalyxa", "experiment", "fenrir", "lekythoi", "maahes" -> true;
+            default -> false;
+        };
     }
 
     private static void resolveAbility(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
@@ -162,6 +180,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                         + "_ to apply +1 movement to one ship.";
                 game.setStoredValue("tempestaUsed", player.getFaction());
             }
+            case "fenrir" -> {
+                if (!game.isRefractureMode()) return;
+                RefractureRulesService.activateFenrir(game, player);
+                output = player.getRepresentationNoPing()
+                        + " exhausted _Homotopic Engines_. Non-home edge systems are adjacent until the end of this tactical action.";
+            }
 
             case "uikos" -> {
                 int comms = player.getHarvestCounter();
@@ -192,7 +216,6 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = player.getFactionEmoji() + " exhausted Conviction to gain 2 commodities. They now have "
                         + player.getCommodities() + " commodities.";
             }
-
             case "silence" -> {
                 output = "Use buttons to put 1 cruiser with your ships.";
                 buttons.addAll(
@@ -297,6 +320,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Please choose which planet you would like to explore.";
                 buttons.addAll(ButtonHelper.getButtonsToExploreAllPlanets(player, game));
             }
+            case "libertalia" -> BeansRelicHandler.chooseRiverOfParadisePlanet(game, player);
             default -> {
                 if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null
                         && game.isAbsolMode()
