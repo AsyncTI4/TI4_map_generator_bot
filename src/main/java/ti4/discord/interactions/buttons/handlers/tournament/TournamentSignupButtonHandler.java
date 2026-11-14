@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.helpers.Helper;
-import ti4.message.MessageHelper;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentRoles;
 import ti4.service.tournament.TournamentSignupPosts;
@@ -72,17 +71,8 @@ class TournamentSignupButtonHandler {
         }
         TournamentRoles.take(tournament, userId);
         TournamentDiscord.ephemeral(event, "You've withdrawn from **" + tournament.displayName() + "**.");
-        announcePromotion(event, tournament, result.promotedUserId());
+        TournamentSignupPosts.announcePromotion(tournament, result.promotedUserId(), event.getMessageChannel());
         TournamentSignupPosts.scheduleRefresh(tournament.getId());
-    }
-
-    static void announcePromotion(ButtonInteractionEvent event, Tournament tournament, String promotedUserId) {
-        if (promotedUserId == null) return;
-        TournamentRoles.give(tournament, promotedUserId);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "<@" + promotedUserId + ">, a seat opened up in **" + tournament.displayName()
-                        + "**, so you've moved off the waitlist. You're in!");
     }
 
     @SelectionHandler(value = TournamentTimeZones.SELECT, save = false)

@@ -2,12 +2,14 @@ package ti4.service.tournament;
 
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
@@ -29,6 +31,31 @@ public class TournamentDiscord {
         } else {
             callback.reply(text).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
         }
+    }
+
+    public static void ephemeral(GenericInteractionCreateEvent event, String message, List<FileUpload> files) {
+        if (!(event instanceof IReplyCallback callback)) return;
+        String text = StringUtils.abbreviate(message, 2000);
+        if (callback.isAcknowledged()) {
+            callback.getHook()
+                    .sendMessage(text)
+                    .addFiles(files)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            callback.reply(text).addFiles(files).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    public static boolean isPublic(GuildMessageChannel channel) {
+        if (channel == null) return false;
+        return channel.getGuild()
+                .getPublicRole()
+                .hasPermission(channel.getPermissionContainer(), Permission.VIEW_CHANNEL);
+    }
+
+    public static boolean isPanelPublic(Tournament tournament) {
+        return isPublic(channel(tournament.getPanelChannelId()));
     }
 
     public static Guild hostGuild(Tournament tournament) {

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,5 +102,68 @@ class TournamentServiceTest {
 
         assertThat(service.leave(ID, "a").refusal()).isNotNull();
         assertThat(stored).hasSize(1);
+    }
+
+    @Test
+    void aPartialRunStaysCreatingAndArchiveIsNeverUndone() {
+        seat("a", 1, "pbd1");
+        seat("b", 2, null);
+        tournament.setStatus(TournamentStatus.GROUPED);
+
+        assertThat(service.beginCreating(ID)).isTrue();
+        assertThat(service.finishCreating(ID).orElseThrow().getStatus()).isEqualTo(TournamentStatus.CREATING);
+        // A stopped run can be continued.
+        assertThat(service.beginCreating(ID)).isTrue();
+
+        tournament.setStatus(TournamentStatus.ARCHIVED);
+        assertThat(service.finishCreating(ID).orElseThrow().getStatus()).isEqualTo(TournamentStatus.ARCHIVED);
+        assertThat(service.beginCreating(ID)).isFalse();
+    }
+
+    @Test
+    void afterAPartialRunOnlyPlayersWithoutAGameCanBeSwappedOrReplaced() {
+        seat("a", 1, "pbd1");
+        seat("b", 2, null);
+        seat("c", 2, null);
+        tournament.setStatus(TournamentStatus.CREATING);
+
+        assertThat(service.swap(ID, "a", "b", () -> false)).isPresent();
+        assertThat(service.swap(ID, "b", "c", () -> true)).isPresent();
+        assertThat(service.swap(ID, "b", "c", () -> false)).isEmpty();
+        assertThat(service.saveGroups(ID, Map.of(), 1)).isPresent();
+
+        // Replacing needs someone on the waitlist; bulk add puts newcomers there while games exist.
+        assertThat(service.removeByAdmin(ID, "b", () -> false).refusal()).isNotNull();
+        var added = service.bulkAdd(ID, List.of("d"), () -> false);
+        assertThat(added.waitlisted()).containsExactly("d");
+        LeaveResult removed = service.removeByAdmin(ID, "b", () -> false);
+        assertThat(removed.promotedUserId()).isEqualTo("d");
+        assertThat(entry("d").getGroupNumber()).isEqualTo(2);
+        assertThat(service.removeByAdmin(ID, "a", () -> false).refusal()).contains("pbd1");
+    }
+
+    @Test
+    void withdrawingDoesNotPromotePastTheTargetSize() {
+        tournament.setTargetSize(1);
+        service.bulkAdd(ID, List.of("a", "b"), () -> false);
+        service.join(ID, "c");
+
+        assertThat(service.leave(ID, "a").promotedUserId()).isNull();
+        assertThat(entry("c").isWaitlisted()).isTrue();
+    }
+
+    private void seat(String userId, int group, String gameName) {
+        TournamentEntry entry = new TournamentEntry(ID, userId, clock, false, false);
+        entry.setGroupNumber(group);
+        entry.setGameName(gameName);
+        stored.add(entry);
+        entry.setId(nextEntryId++);
+    }
+
+    private TournamentEntry entry(String userId) {
+        return stored.stream()
+                .filter(entry -> entry.getUserId().equals(userId))
+                .findFirst()
+                .orElseThrow();
     }
 }

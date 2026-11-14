@@ -31,7 +31,15 @@ public class TournamentSetupApplier {
     }
 
     public static boolean canCopy(Game source) {
-        return source != null && TournamentSetupCopier.unsupportedModes(source).isEmpty();
+        return source != null
+                && TournamentSetupCopier.unsupportedModes(source).isEmpty()
+                && startedProblem(source) == null;
+    }
+
+    public static String startedProblem(Game source) {
+        if (source == null || !TournamentSetupGame.cardsDealt(source)) return null;
+        return source.getName() + " has already dealt, revealed or scored cards, so its decks no longer show which"
+                + " cards were removed. Use a game that hasn't started.";
     }
 
     public static List<String> applyToNewGame(Game source, Game target) {
@@ -98,6 +106,8 @@ public class TournamentSetupApplier {
 
     public static List<String> warnings(Game source, int groupSize) {
         List<String> warnings = new ArrayList<>();
+        String started = startedProblem(source);
+        if (started != null) warnings.add(started + " Nothing is copied.");
         List<String> unsupported = TournamentSetupCopier.unsupportedModes(source);
         if (!unsupported.isEmpty()) {
             warnings.add("Not supported yet, so nothing is copied: " + String.join(", ", unsupported) + ".");

@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
@@ -24,6 +23,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
+import ti4.executors.CircuitBreaker;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -99,7 +99,9 @@ final class TournamentPanelCreate {
             case CREATING ->
                 running
                         ? "Creating games on **" + hostName + "**…"
-                        : "A creation run was interrupted. Press **Create** to continue where it stopped.";
+                        : "**" + preflight.pendingGames() + "** of " + preflight.groupCount()
+                                + " games still to create. Press **Create** to continue. Groups with a game are"
+                                + " locked; players in the other groups can still be swapped or replaced.";
             case CREATED -> "All " + preflight.groupCount() + " games are created.";
             case ARCHIVED -> "This tournament is archived.";
         };
@@ -133,19 +135,12 @@ final class TournamentPanelCreate {
             warnings.add("⚠️ No GM for group(s) " + StringUtils.join(preflight.groupsWithoutGameMaster(), ", ")
                     + ". Those games are skipped.");
         }
-        if (tournament.isFogMode() && panelIsPublic(tournament)) {
-            warnings.add("⚠️ This channel is visible to everyone. In a Fog of War tournament, keep the panel in a"
-                    + " private channel so groups and GMs stay hidden.");
+        if (tournament.isFogMode() && !preflight.groupsWhereGameMasterPlays().isEmpty()) {
+            warnings.add("⚠️ The GM also plays in group(s) "
+                    + StringUtils.join(preflight.groupsWhereGameMasterPlays(), ", ")
+                    + ". Those games are skipped until you set another GM.");
         }
         return warnings;
-    }
-
-    private static boolean panelIsPublic(Tournament tournament) {
-        GuildMessageChannel channel = TournamentDiscord.channel(tournament.getPanelChannelId());
-        if (channel == null) return false;
-        return channel.getGuild()
-                .getPublicRole()
-                .hasPermission(channel.getPermissionContainer(), Permission.VIEW_CHANNEL);
     }
 
     private static List<ActionRow> controls(Context context, Preflight preflight, boolean running) {
@@ -225,7 +220,7 @@ final class TournamentPanelCreate {
                 Tab.CREATE,
                 started
                         ? "Sending the message to " + gameNames.size() + " game(s), one at a time."
-                        : "A message is already being sent, or the bot is under load. Try again in a minute.");
+                        : notStarted("A message is already being sent. Wait until it has finished."));
     }
 
     private static String sendToGame(String gameName, String text) {
@@ -260,7 +255,13 @@ final class TournamentPanelCreate {
                 Tab.CREATE,
                 started
                         ? "Applying the game setup to " + gameNames.size() + " game(s), one at a time."
-                        : "The setup is already being applied, or the bot is under load. Try again in a minute.");
+                        : notStarted("The setup is already being applied. Wait until it has finished."));
+    }
+
+    private static String notStarted(String alreadyRunning) {
+        return CircuitBreaker.isOpen()
+                ? "The bot is pausing work after repeated errors. Try again in a few minutes."
+                : alreadyRunning;
     }
 
     @ButtonHandler(value = INVITE_MODAL, save = false)
@@ -312,6 +313,11 @@ final class TournamentPanelCreate {
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         String text = TournamentResults.text(TournamentResults.results(id));
         String header = "Results for **" + tournament.displayName() + "**";
+        if (tournament.isFogMode()) {
+            TournamentDiscord.ephemeral(
+                    event, header, List.of(FileUpload.fromData(text.getBytes(StandardCharsets.UTF_8), "results.txt")));
+            return;
+        }
         if (text.length() <= 1800) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), header + "\n```\n" + text + "\n```");
             return;
@@ -403,8 +409,9 @@ final class TournamentPanelCreate {
             return;
         }
         TournamentService service = TournamentService.getBean();
-        Tournament next = service.nextRound(id, round, event.getUser().getId());
-        String advanced = advancing == 0 ? null : advancePlayers(id, next, advancing);
+        Tournament created = service.nextRound(id, round, event.getUser().getId());
+        String advanced = advancing == 0 ? null : advancePlayers(id, created, advancing);
+        Tournament next = service.find(created.getId()).orElse(created);
         TournamentPanel.post(
                 next,
                 event.getMessageChannel(),
@@ -422,7 +429,7 @@ final class TournamentPanelCreate {
         List<String> players = advancement.advancing();
         TournamentService service = TournamentService.getBean();
         service.update(next.getId(), pool -> pool.setTargetSize(Math.max(advancing, players.size())));
-        service.bulkAdd(next.getId(), players);
+        service.bulkAdd(next.getId(), players, () -> false);
         players.forEach(userId -> TournamentRoles.give(next, userId));
         List<String> lines = new ArrayList<>();
         lines.add("Advanced " + advancement.winners().size() + " winner(s)"

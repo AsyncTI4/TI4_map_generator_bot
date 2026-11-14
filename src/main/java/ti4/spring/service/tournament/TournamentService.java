@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +60,17 @@ public class TournamentService {
         }
     }
 
-    public record BulkAddResult(List<String> added, List<String> promoted, List<String> alreadyIn, String refusal) {}
+    public record BulkAddResult(
+            List<String> added,
+            List<String> promoted,
+            List<String> waitlisted,
+            List<String> alreadyIn,
+            String refusal) {
+
+        static BulkAddResult refused(String refusal) {
+            return new BulkAddResult(List.of(), List.of(), List.of(), List.of(), refusal);
+        }
+    }
 
     @Transactional
     public Tournament create(
@@ -147,7 +158,8 @@ public class TournamentService {
         if (entry == null) return new LeaveResult(false, false, null, null);
         entries.delete(entry);
         if (entry.isWaitlisted()) return new LeaveResult(true, false, null, null);
-        String promoted = promoteFirstWaitlisted(id, entry.getGroupNumber());
+        boolean seatNeeded = entry.getGroupNumber() != null || activeCount(entries(id)) < tournament.getTargetSize();
+        String promoted = seatNeeded ? promoteFirstWaitlisted(id, entry.getGroupNumber()) : null;
         if (promoted == null && entry.getGroupNumber() != null && tournament.getStatus() == TournamentStatus.GROUPED) {
             tournament.setStatus(TournamentStatus.CLOSED);
             tournaments.save(tournament);
@@ -180,11 +192,13 @@ public class TournamentService {
     }
 
     @Transactional
-    public BulkAddResult bulkAdd(long id, Collection<String> userIds) {
+    public BulkAddResult bulkAdd(long id, Collection<String> userIds, BooleanSupplier creationRunning) {
         Tournament tournament = tournaments.lockById(id).orElse(null);
-        if (tournament == null) return new BulkAddResult(List.of(), List.of(), List.of(), "Tournament not found.");
-        if (!tournament.getStatus().allowsRosterChanges()) {
-            return new BulkAddResult(List.of(), List.of(), List.of(), "Games are already being created.");
+        if (tournament == null) return BulkAddResult.refused("Tournament not found.");
+        boolean toWaitlist = !tournament.getStatus().allowsRosterChanges();
+        if (toWaitlist) {
+            String refusal = partialCreationRefusal(tournament, creationRunning);
+            if (refusal != null) return BulkAddResult.refused(refusal);
         }
         Map<String, TournamentEntry> existing = new LinkedHashMap<>();
         for (TournamentEntry entry : entries(id)) {
@@ -192,12 +206,18 @@ public class TournamentService {
         }
         List<String> added = new ArrayList<>();
         List<String> promoted = new ArrayList<>();
+        List<String> waitlisted = new ArrayList<>();
         List<String> alreadyIn = new ArrayList<>();
         for (String userId : userIds) {
             TournamentEntry entry = existing.get(userId);
-            if (entry == null) {
+            if (entry == null && toWaitlist) {
+                entries.save(new TournamentEntry(id, userId, Instant.now(), true, true));
+                waitlisted.add(userId);
+            } else if (entry == null) {
                 entries.save(new TournamentEntry(id, userId, Instant.now(), false, true));
                 added.add(userId);
+            } else if (entry.isWaitlisted() && toWaitlist) {
+                alreadyIn.add(userId);
             } else if (entry.isWaitlisted()) {
                 entry.setWaitlisted(false);
                 entry.setAddedByAdmin(true);
@@ -211,17 +231,55 @@ public class TournamentService {
             tournament.setStatus(TournamentStatus.CLOSED);
             tournaments.save(tournament);
         }
-        return new BulkAddResult(added, promoted, alreadyIn, null);
+        return new BulkAddResult(added, promoted, waitlisted, alreadyIn, null);
     }
 
     @Transactional
-    public LeaveResult removeByAdmin(long id, String userId) {
-        return leave(id, userId);
+    public LeaveResult removeByAdmin(long id, String userId, BooleanSupplier creationRunning) {
+        Tournament tournament = tournaments.lockById(id).orElse(null);
+        if (tournament == null) return LeaveResult.refused("This tournament no longer exists.");
+        if (tournament.getStatus().allowsRosterChanges()) return leave(id, userId);
+        TournamentEntry entry = entries.findByTournamentIdAndUserId(id, userId).orElse(null);
+        String refusal = partialCreationRefusal(tournament, creationRunning, entry);
+        if (refusal != null) return LeaveResult.refused(refusal);
+        if (entry == null) return new LeaveResult(false, false, null, null);
+        if (entry.isWaitlisted()) {
+            entries.delete(entry);
+            return new LeaveResult(true, false, null, null);
+        }
+        if (waitlistIsEmpty(id)) {
+            return LeaveResult.refused("Nobody is on the waitlist to take that seat. Bulk add a replacement first:"
+                    + " while games are being created, new players go on the waitlist.");
+        }
+        entries.delete(entry);
+        return new LeaveResult(true, true, promoteFirstWaitlisted(id, entry.getGroupNumber()), null);
+    }
+
+    private boolean waitlistIsEmpty(long id) {
+        return entries(id).stream().noneMatch(TournamentEntry::isWaitlisted);
+    }
+
+    static String partialCreationRefusal(
+            Tournament tournament, BooleanSupplier creationRunning, TournamentEntry... touched) {
+        if (tournament.getStatus() != TournamentStatus.CREATING) {
+            return "The roster is locked because all games are created.";
+        }
+        if (creationRunning.getAsBoolean()) {
+            return "Games are being created right now. Try again when the run has finished.";
+        }
+        for (TournamentEntry entry : touched) {
+            if (entry != null && entry.getGameName() != null) {
+                return "That player already plays in **" + entry.getGameName()
+                        + "**. Only players in groups without a game can change.";
+            }
+        }
+        return null;
     }
 
     @Transactional
-    public void saveGroups(long id, Map<String, Integer> groupByUserId, long seed) {
+    public Optional<String> saveGroups(long id, Map<String, Integer> groupByUserId, long seed) {
         Tournament tournament = tournaments.lockById(id).orElseThrow();
+        if (!tournament.getStatus().allowsRosterChanges()) return Optional.of("Games are already being created.");
         for (TournamentEntry entry : entries(id)) {
             entry.setGroupNumber(entry.isWaitlisted() ? null : groupByUserId.get(entry.getUserId()));
             entries.save(entry);
@@ -230,16 +288,20 @@ public class TournamentService {
         tournament.setGameMastersByGroupJson(null);
         if (tournament.getStatus() == TournamentStatus.GROUPED) tournament.setStatus(TournamentStatus.CLOSED);
         tournaments.save(tournament);
+        return Optional.empty();
     }
 
     @Transactional
-    public Optional<String> swap(long id, String firstUserId, String secondUserId) {
+    public Optional<String> swap(long id, String firstUserId, String secondUserId, BooleanSupplier creationRunning) {
         Tournament tournament = tournaments.lockById(id).orElseThrow();
-        if (!tournament.getStatus().allowsRosterChanges()) return Optional.of("Games are already being created.");
         TournamentEntry first =
                 entries.findByTournamentIdAndUserId(id, firstUserId).orElse(null);
         TournamentEntry second =
                 entries.findByTournamentIdAndUserId(id, secondUserId).orElse(null);
+        if (!tournament.getStatus().allowsRosterChanges()) {
+            String refusal = partialCreationRefusal(tournament, creationRunning, first, second);
+            if (refusal != null) return Optional.of(refusal);
+        }
         if (first == null || second == null || first.isWaitlisted() || second.isWaitlisted()) {
             return Optional.of("Both players must have a seat in this tournament.");
         }
@@ -268,6 +330,34 @@ public class TournamentService {
         tournament.setStatus(TournamentStatus.GROUPED);
         tournaments.save(tournament);
         return Optional.empty();
+    }
+
+    @Transactional
+    public boolean beginCreating(long id) {
+        Tournament tournament = tournaments.lockById(id).orElse(null);
+        if (tournament == null) return false;
+        TournamentStatus status = tournament.getStatus();
+        if (status != TournamentStatus.GROUPED && status != TournamentStatus.CREATING) return false;
+        tournament.setStatus(TournamentStatus.CREATING);
+        tournaments.save(tournament);
+        return true;
+    }
+
+    @Transactional
+    public Optional<Tournament> finishCreating(long id) {
+        Tournament tournament = tournaments.lockById(id).orElse(null);
+        if (tournament == null) return Optional.empty();
+        if (tournament.getStatus() == TournamentStatus.ARCHIVED) return Optional.of(tournament);
+        Collection<List<TournamentEntry>> groups = groups(entries(id)).values();
+        boolean anyCreated =
+                groups.stream().anyMatch(members -> members.getFirst().getGameName() != null);
+        boolean allCreated = anyCreated
+                && groups.stream().allMatch(members -> members.getFirst().getGameName() != null);
+        TournamentStatus status = TournamentStatus.GROUPED;
+        if (allCreated) status = TournamentStatus.CREATED;
+        else if (anyCreated) status = TournamentStatus.CREATING;
+        tournament.setStatus(status);
+        return Optional.of(tournaments.save(tournament));
     }
 
     @Transactional
@@ -336,6 +426,16 @@ public class TournamentService {
     @Transactional
     public void saveGameMastersByGroup(long id, Map<Integer, String> assignments) {
         update(id, tournament -> tournament.setGameMastersByGroupJson(writeJson(new TreeMap<>(assignments))));
+    }
+
+    @Transactional
+    public void setGameMaster(long id, int group, String userId) {
+        addGameMasters(id, List.of(userId));
+        update(id, tournament -> {
+            Map<Integer, String> assignments = gameMastersByGroup(tournament);
+            assignments.put(group, userId);
+            tournament.setGameMastersByGroupJson(writeJson(assignments));
+        });
     }
 
     public static Map<String, String> gameSetup(Tournament tournament) {

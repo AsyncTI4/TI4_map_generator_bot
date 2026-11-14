@@ -2,6 +2,7 @@ package ti4.service.tournament;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,13 +13,17 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
@@ -100,10 +105,33 @@ public class TournamentSignupPosts {
     public static void scheduleRefresh(long tournamentId) {
         if (!PENDING_REFRESHES.add(tournamentId)) return;
         CompletableFuture.delayedExecutor(REFRESH_DELAY_SECONDS, TimeUnit.SECONDS)
-                .execute(() -> ExecutorServiceManager.runAsync("Tournament sign-up refresh " + tournamentId, () -> {
+                .execute(() -> {
                     PENDING_REFRESHES.remove(tournamentId);
-                    refreshNow(tournamentId);
-                }));
+                    ExecutorServiceManager.runAsync(
+                            "Tournament sign-up refresh " + tournamentId, () -> refreshNow(tournamentId));
+                });
+    }
+
+    public static void announcePromotion(Tournament tournament, String userId) {
+        GuildMessageChannel channel = TournamentService.getBean().signupPosts(tournament.getId()).stream()
+                .map(post -> TournamentDiscord.channel(post.getChannelId()))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+        announcePromotion(tournament, userId, channel);
+    }
+
+    public static void announcePromotion(Tournament tournament, String userId, MessageChannel channel) {
+        if (userId == null) return;
+        TournamentRoles.give(tournament, userId);
+        String text = "<@" + userId + ">, a seat opened up in **" + tournament.displayName()
+                + "**, so you've moved off the waitlist. You're in!";
+        if (channel != null) {
+            MessageHelper.sendMessageToChannel(channel, text);
+            return;
+        }
+        User user = JdaService.jda.getUserById(userId);
+        if (user != null) MessageHelper.sendMessageToUser(text, user);
     }
 
     public static void refreshNow(long tournamentId) {

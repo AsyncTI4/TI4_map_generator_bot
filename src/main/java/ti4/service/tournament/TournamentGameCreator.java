@@ -3,9 +3,7 @@ package ti4.service.tournament;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionLockManager;
 import ti4.executors.ExecutionLockType;
-import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
@@ -34,13 +31,16 @@ import ti4.spring.service.tournament.TournamentStatus;
 @UtilityClass
 public class TournamentGameCreator {
 
-    private static final Set<Long> RUNNING = ConcurrentHashMap.newKeySet();
+    static final int CHANNEL_NAME_LIMIT = 100;
+    private static final int TIGL_PREFIX_ROOM = 5;
+    private static final TournamentJobGuard<Long> RUNNING = new TournamentJobGuard<>();
 
     public record Preflight(
             int groupCount,
             int pendingGames,
             Map<Integer, List<String>> missingFromHostByGroup,
             List<Integer> groupsWithoutGameMaster,
+            List<Integer> groupsWhereGameMasterPlays,
             List<String> takenNames,
             String capacityProblem) {
 
@@ -65,7 +65,7 @@ public class TournamentGameCreator {
     }
 
     public static boolean isRunning(long tournamentId) {
-        return RUNNING.contains(tournamentId);
+        return RUNNING.isRunning(tournamentId);
     }
 
     public static Preflight preflight(Tournament tournament, List<TournamentEntry> entries) {
@@ -74,6 +74,7 @@ public class TournamentGameCreator {
         Map<Integer, String> gameMasters = TournamentService.gameMastersByGroup(tournament);
         Map<Integer, List<String>> missing = new TreeMap<>();
         List<Integer> withoutGameMaster = new ArrayList<>();
+        List<Integer> gameMasterPlays = new ArrayList<>();
         List<String> takenNames = new ArrayList<>();
         boolean customNames = TournamentGameNames.usesCustomNames(tournament);
         int pending = 0;
@@ -91,6 +92,7 @@ public class TournamentGameCreator {
             String gm = gameMasters.get(group.getKey());
             if (tournament.isFogMode()) {
                 if (gm == null) withoutGameMaster.add(group.getKey());
+                else if (playsIn(group.getValue(), gm)) gameMasterPlays.add(group.getKey());
                 else if (TournamentDiscord.member(guild, gm) == null) absent.add(gm);
             }
             if (!absent.isEmpty()) missing.put(group.getKey(), absent);
@@ -100,8 +102,13 @@ public class TournamentGameCreator {
                 pending,
                 missing,
                 withoutGameMaster,
+                gameMasterPlays,
                 takenNames,
                 capacityProblem(tournament, guild, pending));
+    }
+
+    private static boolean playsIn(List<TournamentEntry> members, String userId) {
+        return members.stream().anyMatch(entry -> entry.getUserId().equals(userId));
     }
 
     private static String capacityProblem(Tournament tournament, Guild guild, int pendingGames) {
@@ -118,16 +125,10 @@ public class TournamentGameCreator {
             return "Admins have temporarily turned off game creation.";
         }
         if (CircuitBreaker.isOpen()) return "The bot is pausing work after repeated errors. Try again later.";
-        if (RUNNING.contains(tournament.getId())) return "Games are already being created.";
         long id = tournament.getId();
-        ExecutorServiceManager.runAsync("Tournament game creation " + id, 3600, () -> {
-            if (!RUNNING.add(id)) return;
-            try {
-                run(id);
-            } finally {
-                RUNNING.remove(id);
-            }
-        });
+        if (!RUNNING.submit(id, "Tournament game creation " + id, 3600, () -> run(id))) {
+            return "Games are already being created.";
+        }
         return null;
     }
 
@@ -141,7 +142,11 @@ public class TournamentGameCreator {
             TournamentPanel.refresh(id, "The host server or the panel channel can't be found.");
             return;
         }
-        service.update(id, pool -> pool.setStatus(TournamentStatus.CREATING));
+        if (!service.beginCreating(id)) {
+            TournamentPanel.refresh(id, "Approve the groups before creating games.");
+            return;
+        }
+        tournament = service.find(id).orElse(tournament);
         TournamentSignupPosts.refreshNow(id);
 
         List<String> created = new ArrayList<>();
@@ -162,7 +167,6 @@ public class TournamentGameCreator {
                     skipped.add("Group " + group.getKey() + ": " + step.skipped());
                     continue;
                 }
-                service.markGameCreated(id, group.getKey(), step.gameName());
                 created.add(step.gameName());
                 TournamentPanel.refresh(
                         id, "Creating games… " + created.size() + " done, latest **" + step.gameName() + "**.");
@@ -182,21 +186,27 @@ public class TournamentGameCreator {
     private static void finish(
             long id, List<String> created, List<String> skipped, String failure, GuildMessageChannel reportChannel) {
         TournamentService service = TournamentService.getBean();
+        Tournament tournament = service.finishCreating(id).orElse(null);
         List<TournamentEntry> entries = service.entries(id);
-        boolean allCreated = TournamentService.groups(entries).values().stream()
-                .allMatch(members -> members.getFirst().getGameName() != null);
-        Tournament tournament = service.update(
-                        id, pool -> pool.setStatus(allCreated ? TournamentStatus.CREATED : TournamentStatus.GROUPED))
-                .orElse(null);
+        boolean allCreated = tournament != null && tournament.getStatus() == TournamentStatus.CREATED;
         List<String> lines = new ArrayList<>();
         lines.add("Created " + created.size() + " game(s)"
                 + (created.isEmpty() ? "." : ": " + String.join(", ", created)));
         if (!skipped.isEmpty()) lines.add("Skipped:\n" + String.join("\n", skipped));
         if (failure != null) lines.add("Stopped: " + failure + "\nPress Create again to continue.");
         if (allCreated) lines.add("All games are created.");
+        else if (tournament != null && tournament.getStatus() == TournamentStatus.CREATING) {
+            lines.add("Groups with a game are locked. You can still swap or replace players in the other groups.");
+        }
         TournamentPanel.refresh(id, String.join("\n", lines));
         TournamentSignupPosts.refreshNow(id);
-        if (tournament != null && !created.isEmpty()) TournamentRoster.post(tournament, entries, reportChannel);
+        if (tournament == null || created.isEmpty()) return;
+        if (tournament.isFogMode() && TournamentDiscord.isPublic(reportChannel)) {
+            MessageHelper.sendMessageToChannel(
+                    reportChannel, "The roster isn't posted because this channel is public. Use **Copy roster**.");
+            return;
+        }
+        TournamentRoster.post(tournament, entries, reportChannel);
     }
 
     private static Step createOne(
@@ -206,15 +216,23 @@ public class TournamentGameCreator {
             int group,
             List<TournamentEntry> members,
             int groupCount) {
-        String funName =
-                tournament.getSeriesName() + " " + tournament.getRoundLabel() + " " + String.format("%02d", group);
         Step step = tournament.isFogMode()
-                ? createFog(tournament, guild, reportChannel, group, members, funName)
-                : createNormal(tournament, guild, reportChannel, group, members, groupCount, funName);
+                ? createFog(tournament, guild, reportChannel, group, members)
+                : createNormal(tournament, guild, reportChannel, group, members, groupCount);
         if (step.gameName() != null) {
             finishGame(members);
         }
         return step;
+    }
+
+    static String funName(Tournament tournament, int group, int maxLength) {
+        String number = " " + String.format("%02d", group);
+        String title = tournament.getSeriesName() + " " + tournament.getRoundLabel();
+        return StringUtils.left(title, Math.max(0, maxLength - number.length())).strip() + number;
+    }
+
+    private static void recordGame(Tournament tournament, int group, String gameName) {
+        TournamentService.getBean().markGameCreated(tournament.getId(), group, gameName);
     }
 
     private static Step createNormal(
@@ -223,8 +241,7 @@ public class TournamentGameCreator {
             GuildMessageChannel reportChannel,
             int group,
             List<TournamentEntry> entries,
-            int groupCount,
-            String funName) {
+            int groupCount) {
         List<Member> members = new ArrayList<>();
         for (TournamentEntry entry : entries) {
             Member member = TournamentDiscord.anyMember(guild, entry.getUserId());
@@ -240,6 +257,7 @@ public class TournamentGameCreator {
         if (customName && TournamentGameNames.isTaken(gameName)) {
             return Step.skip("the name **" + gameName + "** is already used by a game or role.");
         }
+        String funName = funName(tournament, group, CHANNEL_NAME_LIMIT - gameName.length() - 1 - TIGL_PREFIX_ROOM);
         Category category = category(tournament, guild, group, groupCount);
         Game source =
                 TournamentSetupApplier.hasSource(tournament) ? TournamentSetupApplier.loadSource(tournament) : null;
@@ -256,14 +274,21 @@ public class TournamentGameCreator {
             resetPbdNumber(gameName);
             return Step.fail("Could not create **" + gameName + "**. Check the server and category capacity.");
         }
+        recordGame(tournament, group, gameName);
         Game created = game;
         List<String> setupProblems = new ArrayList<>();
-        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
-                    if (copySetup) setupProblems.addAll(TournamentSetupApplier.applyToNewGame(source, created));
-                    TournamentSetupOptions.applyAll(created, TournamentService.gameSetup(tournament));
-                    GameManager.save(created, "Tournament game created");
-                })
-                .run();
+        try {
+            ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                        if (copySetup) setupProblems.addAll(TournamentSetupApplier.applyToNewGame(source, created));
+                        TournamentSetupOptions.applyAll(created, TournamentService.gameSetup(tournament));
+                        GameManager.save(created, "Tournament game created");
+                    })
+                    .run();
+        } catch (RuntimeException e) {
+            BotLogger.error("Could not finish the setup of tournament game " + gameName, e);
+            setupProblems.add("The setup could not be finished: " + e.getMessage()
+                    + ". Use **Apply game setup to all games** or set it up by hand.");
+        }
         if (!setupProblems.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     reportChannel, "Setup notes for **" + gameName + "**:\n" + String.join("\n", setupProblems));
@@ -276,8 +301,7 @@ public class TournamentGameCreator {
             Guild guild,
             GuildMessageChannel reportChannel,
             int group,
-            List<TournamentEntry> entries,
-            String funName) {
+            List<TournamentEntry> entries) {
         List<Member> members = new ArrayList<>();
         List<String> missing = new ArrayList<>();
         for (TournamentEntry entry : entries) {
@@ -287,6 +311,10 @@ public class TournamentGameCreator {
         }
         String gameMasterId = TournamentService.gameMastersByGroup(tournament).get(group);
         if (gameMasterId == null) return Step.skip("no GM assigned.");
+        if (playsIn(entries, gameMasterId)) {
+            return Step.skip(
+                    "the GM " + TournamentDiscord.userName(gameMasterId) + " plays in this group. Set another GM.");
+        }
         Member gameMaster = TournamentDiscord.member(guild, gameMasterId);
         if (gameMaster == null) missing.add(TournamentDiscord.userName(gameMasterId) + " (GM)");
         if (!missing.isEmpty()) {
@@ -296,8 +324,17 @@ public class TournamentGameCreator {
             return Step.fail("**" + guild.getName() + "** is full.");
         }
         String gameName = CreateFoWGameService.getNextFOWGameName();
-        CreateFoWGameService.executeCreateFoWGame(guild, gameName, funName, gameMaster, members, reportChannel);
-        applySetup(tournament, gameName);
+        CreateFoWGameService.executeCreateFoWGame(
+                guild, gameName, funName(tournament, group, CHANNEL_NAME_LIMIT), gameMaster, members, reportChannel);
+        recordGame(tournament, group, gameName);
+        try {
+            String problem = applySetup(tournament, gameName);
+            if (problem != null) MessageHelper.sendMessageToChannel(reportChannel, "Setup notes for " + problem);
+        } catch (RuntimeException e) {
+            BotLogger.error("Could not finish the setup of tournament game " + gameName, e);
+            MessageHelper.sendMessageToChannel(
+                    reportChannel, "Setup notes for **" + gameName + "**: the setup could not be finished.");
+        }
         return Step.created(gameName);
     }
 

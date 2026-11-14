@@ -145,6 +145,12 @@ final class TournamentPanelSetup {
             TournamentPanel.show(event, id, Tab.SETUP, "There is no game called " + gameName + ".");
             return;
         }
+        String started = TournamentSetupApplier.startedProblem(
+                GameManager.getManagedGame(gameName).getGame());
+        if (started != null) {
+            TournamentPanel.show(event, id, Tab.SETUP, started);
+            return;
+        }
         TournamentService.getBean().update(id, pool -> pool.setSetupSourceGame(gameName));
         TournamentPanel.show(event, id, Tab.SETUP, "New games will copy the setup of **" + gameName + "**.");
     }

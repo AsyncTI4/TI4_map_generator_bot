@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import net.dv8tion.jda.api.entities.Role;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -153,6 +154,41 @@ class TournamentHelpersTest {
                 .isTrue();
         assertThat(TournamentAccess.hasTournamentAdminRole(List.of(bothelper), List.of(adminRole)))
                 .isFalse();
+    }
+
+    @Test
+    void jobGuardAllowsOneRunAndDropsTasksTheExecutorNeverStarted() {
+        AtomicLong now = new AtomicLong(0);
+        TournamentJobGuard<Long> guard = new TournamentJobGuard<>(now::get);
+        List<Runnable> queued = new ArrayList<>();
+        List<String> ran = new ArrayList<>();
+
+        assertThat(guard.submit(1L, () -> ran.add("first"), queued::add)).isTrue();
+        // Claimed at submit time, so a second press before the task starts is refused.
+        assertThat(guard.isRunning(1L)).isTrue();
+        assertThat(guard.submit(1L, () -> ran.add("second"), queued::add)).isFalse();
+
+        // The executor dropped the first task (e.g. circuit breaker); the claim expires.
+        now.set(TournamentJobGuard.UNSTARTED_TIMEOUT_MILLIS);
+        assertThat(guard.isRunning(1L)).isFalse();
+        assertThat(guard.submit(1L, () -> ran.add("third"), queued::add)).isTrue();
+
+        // If the dropped task starts late after all, it must not run next to the new one.
+        queued.getFirst().run();
+        queued.getLast().run();
+        assertThat(ran).containsExactly("third");
+        assertThat(guard.isRunning(1L)).isFalse();
+    }
+
+    @Test
+    void funNameKeepsTheGroupNumberAndFitsTheGivenLength() {
+        Tournament tournament = new Tournament();
+        tournament.setSeriesName("A".repeat(90));
+        tournament.setRoundLabel("Quarterfinals");
+
+        String name = TournamentGameCreator.funName(tournament, 7, 40);
+
+        assertThat(name).hasSize(40).endsWith(" 07");
     }
 
     private static Role role(String name) {

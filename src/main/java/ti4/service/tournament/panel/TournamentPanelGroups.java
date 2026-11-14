@@ -80,11 +80,13 @@ final class TournamentPanelGroups {
         if (!warnings.isEmpty()) body.add(TextDisplay.of("⚠️ " + String.join("\n⚠️ ", warnings)));
 
         boolean editable = tournament.getStatus().allowsRosterChanges();
+        boolean replacing = TournamentPanel.canEditGroupsWithoutGame(tournament);
         List<ActionRow> controls = new ArrayList<>();
         controls.add(ActionRow.of(
                 Buttons.blue(GENERATE + id, groups.isEmpty() ? "Generate" : "Reshuffle")
                         .withDisabled(!editable),
-                Buttons.gray(SWAP_MODAL + id, "Swap two players").withDisabled(!editable || groups.isEmpty()),
+                Buttons.gray(SWAP_MODAL + id, "Swap two players")
+                        .withDisabled((!editable && !replacing) || groups.isEmpty()),
                 Buttons.green(APPROVE + id, "Approve")
                         .withDisabled(
                                 !editable || groups.isEmpty() || tournament.getStatus() == TournamentStatus.GROUPED),
@@ -92,7 +94,8 @@ final class TournamentPanelGroups {
         if (tournament.isFogMode()) {
             controls.add(ActionRow.of(
                     Buttons.blue(ASSIGN_GMS + id, "Assign GMs").withDisabled(!editable || groups.isEmpty()),
-                    Buttons.gray(SET_GM_MODAL + id, "Set a GM").withDisabled(!editable || groups.isEmpty())));
+                    Buttons.gray(SET_GM_MODAL + id, "Set a GM")
+                            .withDisabled((!editable && !replacing) || groups.isEmpty())));
         }
         return View.of(body, controls).withWarning(!warnings.isEmpty()).withPages(pageCount);
     }
@@ -176,9 +179,12 @@ final class TournamentPanelGroups {
                 groupByUser.put(userId, group + 1);
             }
         }
-        service.saveGroups(id, groupByUser, seed);
+        String refusal = service.saveGroups(id, groupByUser, seed).orElse(null);
         TournamentPanel.show(
-                event, id, Tab.GROUPS, "Drew " + drawn.size() + " groups. Not final until you press **Approve**.");
+                event,
+                id,
+                Tab.GROUPS,
+                refusal != null ? refusal : "Drew " + drawn.size() + " groups. Not final until you press **Approve**.");
     }
 
     @ButtonHandler(value = SWAP_MODAL, save = false)
@@ -207,7 +213,7 @@ final class TournamentPanelGroups {
         String first = resolution.userIds().get(0);
         String second = resolution.userIds().get(1);
         String notice = TournamentService.getBean()
-                .swap(id, first, second)
+                .swap(id, first, second, TournamentPanel.creationRunning(id))
                 .orElse("Swapped " + TournamentDiscord.userName(first) + " and " + TournamentDiscord.userName(second)
                         + ".");
         TournamentPanel.show(event, id, Tab.GROUPS, notice);
@@ -285,6 +291,11 @@ final class TournamentPanelGroups {
             return;
         }
         String gameMaster = resolution.userIds().getFirst();
+        String gameName = groups.get(group).getFirst().getGameName();
+        if (gameName != null) {
+            TournamentPanel.show(event, id, Tab.GROUPS, "Group " + group + " already has its game, " + gameName + ".");
+            return;
+        }
         boolean playsInGroup =
                 groups.get(group).stream().anyMatch(entry -> entry.getUserId().equals(gameMaster));
         if (playsInGroup) {
@@ -292,10 +303,7 @@ final class TournamentPanelGroups {
                     event, id, Tab.GROUPS, TournamentDiscord.userName(gameMaster) + " plays in group " + group + ".");
             return;
         }
-        service.addGameMasters(id, List.of(gameMaster));
-        Map<Integer, String> assignments = TournamentService.gameMastersByGroup(tournament);
-        assignments.put(group, gameMaster);
-        service.saveGameMastersByGroup(id, assignments);
+        service.setGameMaster(id, group, gameMaster);
         TournamentPanel.show(
                 event, id, Tab.GROUPS, TournamentDiscord.userName(gameMaster) + " is the GM of group " + group + ".");
     }
@@ -306,6 +314,10 @@ final class TournamentPanelGroups {
         long id = TournamentPanel.idOf(buttonID, ROSTER);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
+        if (tournament.isFogMode()) {
+            TournamentRoster.reply(tournament, service.entries(id), event);
+            return;
+        }
         TournamentRoster.post(tournament, service.entries(id), event.getMessageChannel());
     }
 }

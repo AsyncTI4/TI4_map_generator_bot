@@ -31,13 +31,11 @@ public class TournamentRoles {
         Guild guild = TournamentDiscord.hostGuild(tournament);
         if (guild == null) return null;
         try {
-            Role role = guild.getRolesByName(roleName(tournament), true).stream()
-                    .findFirst()
-                    .orElseGet(() -> guild.createRole()
-                            .setName(roleName(tournament))
-                            .setMentionable(false)
-                            .complete());
-            return role.getId();
+            return guild.createRole()
+                    .setName(roleName(tournament))
+                    .setMentionable(false)
+                    .complete()
+                    .getId();
         } catch (RuntimeException e) {
             BotLogger.error("Could not create the tournament role on " + guild.getName(), e);
             return null;

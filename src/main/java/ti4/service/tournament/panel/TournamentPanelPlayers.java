@@ -92,10 +92,11 @@ final class TournamentPanelPlayers {
         }
 
         boolean editable = tournament.getStatus().allowsRosterChanges();
+        boolean replacing = TournamentPanel.canEditGroupsWithoutGame(tournament);
         List<ActionRow> controls = new ArrayList<>();
         controls.add(ActionRow.of(
-                Buttons.green(BULK_ADD_MODAL + id, "Bulk add").withDisabled(!editable),
-                Buttons.red(REMOVE_MODAL + id, "Remove").withDisabled(!editable),
+                Buttons.green(BULK_ADD_MODAL + id, "Bulk add").withDisabled(!editable && !replacing),
+                Buttons.red(REMOVE_MODAL + id, "Remove").withDisabled(!editable && !replacing),
                 Buttons.blue(PROMOTE + id, "Promote from waitlist").withDisabled(!editable),
                 Buttons.gray(SYNC_ROLES + id, "Sync roles")));
         if (tournament.isFogMode()) {
@@ -166,20 +167,24 @@ final class TournamentPanelPlayers {
         long id = TournamentPanel.idOf(event.getModalId(), BULK_ADD_SAVE);
         Resolution resolution = resolve(id, TournamentPanel.value(event, "names"));
         TournamentService service = TournamentService.getBean();
-        BulkAddResult result = service.bulkAdd(id, resolution.userIds());
+        BulkAddResult result = service.bulkAdd(id, resolution.userIds(), TournamentPanel.creationRunning(id));
         if (result.refusal() != null) {
             TournamentPanel.show(event, id, Tab.PLAYERS, result.refusal());
             return;
         }
         Tournament tournament = service.find(id).orElseThrow();
         result.added().forEach(userId -> TournamentRoles.give(tournament, userId));
-        result.promoted().forEach(userId -> TournamentRoles.give(tournament, userId));
+        result.promoted().forEach(userId -> TournamentSignupPosts.announcePromotion(tournament, userId));
         TournamentSignupPosts.scheduleRefresh(id);
         List<String> notice = new ArrayList<>();
         notice.add("Added " + result.added().size()
                 + (result.added().isEmpty() ? "" : ": " + TournamentPanel.names(result.added())));
         if (!result.promoted().isEmpty())
             notice.add("Moved off the waitlist: " + TournamentPanel.names(result.promoted()));
+        if (!result.waitlisted().isEmpty())
+            notice.add("Put on the waitlist because games are being created: "
+                    + TournamentPanel.names(result.waitlisted())
+                    + ". Remove a player from a group without a game and the first waitlisted player takes the seat.");
         if (!result.alreadyIn().isEmpty()) notice.add("Already seated: " + TournamentPanel.names(result.alreadyIn()));
         if (!resolution.problems().isEmpty()) notice.add(resolution.problems());
         TournamentPanel.show(event, id, Tab.PLAYERS, String.join("\n", notice));
@@ -203,7 +208,7 @@ final class TournamentPanelPlayers {
         List<String> promoted = new ArrayList<>();
         List<String> notice = new ArrayList<>();
         for (String userId : resolution.userIds()) {
-            LeaveResult result = service.removeByAdmin(id, userId);
+            LeaveResult result = service.removeByAdmin(id, userId, TournamentPanel.creationRunning(id));
             if (result.refusal() != null) {
                 notice.add(result.refusal());
                 break;
@@ -213,7 +218,7 @@ final class TournamentPanelPlayers {
             TournamentRoles.take(tournament, userId);
             if (result.promotedUserId() != null) {
                 promoted.add(result.promotedUserId());
-                TournamentRoles.give(tournament, result.promotedUserId());
+                TournamentSignupPosts.announcePromotion(tournament, result.promotedUserId());
             }
         }
         TournamentSignupPosts.scheduleRefresh(id);
@@ -230,7 +235,7 @@ final class TournamentPanelPlayers {
         TournamentService service = TournamentService.getBean();
         String promoted = service.promoteNext(id).orElse(null);
         if (promoted != null) {
-            service.find(id).ifPresent(tournament -> TournamentRoles.give(tournament, promoted));
+            service.find(id).ifPresent(tournament -> TournamentSignupPosts.announcePromotion(tournament, promoted));
             TournamentSignupPosts.scheduleRefresh(id);
         }
         TournamentPanel.show(

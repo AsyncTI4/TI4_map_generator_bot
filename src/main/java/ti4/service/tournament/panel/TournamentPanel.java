@@ -2,6 +2,7 @@ package ti4.service.tournament.panel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -29,6 +30,7 @@ import ti4.logging.BotLogger;
 import ti4.message.componentsV2.ComponentPanel;
 import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
+import ti4.service.tournament.TournamentGameCreator;
 import ti4.service.tournament.TournamentSignupPosts;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
@@ -152,11 +154,18 @@ public final class TournamentPanel {
         if (StringUtils.isNotBlank(notice)) {
             children.add(TextDisplay.of(quote(StringUtils.abbreviate(notice.trim(), MAX_NOTICE_LENGTH))));
         }
+        boolean publicFogPanel = tournament.isFogMode() && TournamentDiscord.isPanelPublic(tournament);
+        if (publicFogPanel) {
+            children.add(TextDisplay.of("⚠️ This channel is visible to everyone. In a Fog of War tournament, keep the"
+                    + " panel in a private channel so groups and GMs stay hidden. Rosters and results are only"
+                    + " shown to you."));
+        }
         children.add(Separator.createDivider(Separator.Spacing.SMALL));
         children.addAll(view.body());
 
         List<MessageTopLevelComponent> components = new ArrayList<>();
-        components.add(Container.of(children).withAccentColor(view.warning() ? WARNING_ACCENT : ACCENT));
+        boolean warning = view.warning() || publicFogPanel;
+        components.add(Container.of(children).withAccentColor(warning ? WARNING_ACCENT : ACCENT));
         components.addAll(view.controls());
         components.add(ActionRow.of(ComponentPanel.tabButtons(
                 List.of(Tab.values()), context.tab(), tab -> TAB + context.id() + "_" + tab.name(), tab -> tab.label)));
@@ -220,6 +229,15 @@ public final class TournamentPanel {
                     .withDisabled(page >= pageCount - 1));
         }
         return buttons;
+    }
+
+    static boolean canEditGroupsWithoutGame(Tournament tournament) {
+        return tournament.getStatus() == TournamentStatus.CREATING
+                && !TournamentGameCreator.isRunning(tournament.getId());
+    }
+
+    static BooleanSupplier creationRunning(long id) {
+        return () -> TournamentGameCreator.isRunning(id);
     }
 
     static String quote(String text) {

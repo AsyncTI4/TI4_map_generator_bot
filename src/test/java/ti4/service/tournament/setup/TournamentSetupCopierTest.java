@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -101,6 +102,19 @@ class TournamentSetupCopierTest extends BaseTi4Test {
                 .isFalse();
         assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, player, "jmfA_main_startMilty"))
                 .isFalse();
+    }
+
+    @Test
+    void gamesWithScoredOrDealtCardsCannotBeTheSource() {
+        Game source = freshGame();
+        assertThat(TournamentSetupApplier.canCopy(source)).isTrue();
+
+        // Purged or held cards would otherwise look "removed" in every tournament game.
+        source.getScoredPublicObjectives().put("some_objective", new ArrayList<>(List.of("player")));
+
+        assertThat(TournamentSetupApplier.canCopy(source)).isFalse();
+        assertThat(TournamentSetupApplier.warnings(source, 6))
+                .anySatisfy(warning -> assertThat(warning).contains("hasn't started"));
     }
 
     private static Game freshGame() {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.logging.BotLogger;
@@ -66,7 +67,22 @@ public class TournamentRoster {
                 + name + "\"\n";
     }
 
+    private record Upload(String content, List<FileUpload> files) {}
+
     public static void post(Tournament tournament, List<TournamentEntry> entries, MessageChannel channel) {
+        Upload upload = upload(tournament, entries);
+        channel.sendMessage(upload.content())
+                .addFiles(upload.files())
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static void reply(
+            Tournament tournament, List<TournamentEntry> entries, GenericInteractionCreateEvent event) {
+        Upload upload = upload(tournament, entries);
+        TournamentDiscord.ephemeral(event, upload.content(), upload.files());
+    }
+
+    private static Upload upload(Tournament tournament, List<TournamentEntry> entries) {
         String text = text(tournament, entries);
         String baseName = (tournament.getSeriesName() + "-" + tournament.getRoundLabel())
                 .replaceAll("[^A-Za-z0-9-]+", "-")
@@ -80,7 +96,7 @@ public class TournamentRoster {
             content = "Roster for **" + tournament.displayName() + "** is attached.";
             files.add(FileUpload.fromData(text.getBytes(StandardCharsets.UTF_8), baseName + ".txt"));
         }
-        channel.sendMessage(content).addFiles(files).queue(Consumers.nop(), BotLogger::catchRestError);
+        return new Upload(content, files);
     }
 
     private static List<String> names(List<TournamentEntry> entries) {

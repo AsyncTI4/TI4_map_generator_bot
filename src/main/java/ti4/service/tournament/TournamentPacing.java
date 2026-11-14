@@ -2,14 +2,11 @@ package ti4.service.tournament;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import ti4.discord.JdaService;
 import ti4.executors.CircuitBreaker;
-import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
 
 @UtilityClass
@@ -21,7 +18,7 @@ public class TournamentPacing {
     static final long SLOW_GATEWAY_PING_MILLIS = 500;
     static final int SLOW_GATEWAY_MULTIPLIER = 4;
     private static final int WARN_AFTER_SECONDS = 3600;
-    private static final Set<String> RUNNING = ConcurrentHashMap.newKeySet();
+    private static final TournamentJobGuard<String> RUNNING = new TournamentJobGuard<>();
 
     public record Result(int done, List<String> problems, boolean stoppedForLoad) {
 
@@ -35,16 +32,8 @@ public class TournamentPacing {
     }
 
     public static <T> boolean forEach(String jobKey, List<T> items, Function<T, String> step, Consumer<Result> onDone) {
-        if (CircuitBreaker.isOpen() || RUNNING.contains(jobKey)) return false;
-        ExecutorServiceManager.runAsync(jobKey, WARN_AFTER_SECONDS, () -> {
-            if (!RUNNING.add(jobKey)) return;
-            try {
-                onDone.accept(runSequentially(items, step));
-            } finally {
-                RUNNING.remove(jobKey);
-            }
-        });
-        return true;
+        if (CircuitBreaker.isOpen()) return false;
+        return RUNNING.submit(jobKey, jobKey, WARN_AFTER_SECONDS, () -> onDone.accept(runSequentially(items, step)));
     }
 
     private static <T> Result runSequentially(List<T> items, Function<T, String> step) {

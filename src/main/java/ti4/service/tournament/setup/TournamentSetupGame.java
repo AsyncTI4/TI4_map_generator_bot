@@ -113,10 +113,15 @@ public class TournamentSetupGame {
     }
 
     public static boolean dealtOrDrafted(Game game) {
-        return draftStarted(game)
-                || game.getRevealedPublicObjectives().size() > 1
+        return draftStarted(game) || cardsDealt(game);
+    }
+
+    public static boolean cardsDealt(Game game) {
+        return game.getRevealedPublicObjectives().size() > 1
+                || !game.getScoredPublicObjectives().isEmpty()
                 || game.getPlayers().values().stream()
-                        .anyMatch(player -> !player.getSecrets().isEmpty());
+                        .anyMatch(player -> !player.getSecrets().isEmpty()
+                                || !player.getActionCards().isEmpty());
     }
 
     public static boolean draftStarted(Game game) {
