@@ -20,6 +20,15 @@ import ti4.model.UnitModel;
 
 public final class PdsCoverageHelper {
 
+    private static boolean isTakenOverFromNeutral(
+            Game game, Player player, UnitHolder unitHolder, Units.UnitKey unitKey) {
+        Player active = game.getActivePlayer();
+        return player.isNeutral()
+                && active != null
+                && active != player
+                && SarcosaBreakthroughHandler.canControlNeutralStructure(game, active, unitHolder, unitKey);
+    }
+
     /**
      * Calculate PDS coverage for a specific tile, returning comprehensive coverage data per faction.
      * This method contains all the logic from the tile renderer's SpaceCannon step.
@@ -36,7 +45,7 @@ public final class PdsCoverageHelper {
         String tilePos = tile.getPosition();
         Map<String, List<Integer>> pdsDiceByPlayer = new HashMap<>();
 
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealPlayersNNeutral()) {
             List<Integer> diceCount = new ArrayList<>();
             List<Integer> diceCountMirveda = new ArrayList<>();
             int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
@@ -90,7 +99,8 @@ public final class PdsCoverageHelper {
                         boolean borrowed =
                                 ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitKey)
                                         || graveholdControlled;
-                        if (unitOwner != player && !borrowed) {
+                        if ((unitOwner != player && !borrowed)
+                                || isTakenOverFromNeutral(game, player, unitHolder, unitKey)) {
                             continue;
                         }
 
