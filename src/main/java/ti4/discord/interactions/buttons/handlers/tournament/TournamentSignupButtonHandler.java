@@ -5,12 +5,17 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentRoles;
 import ti4.service.tournament.TournamentSignupPosts;
+import ti4.service.tournament.TournamentTimeZones;
+import ti4.settings.users.UserSettings;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
@@ -78,6 +83,28 @@ class TournamentSignupButtonHandler {
                 event.getMessageChannel(),
                 "<@" + promotedUserId + ">, a seat opened up in **" + tournament.displayName()
                         + "**, so you've moved off the waitlist. You're in!");
+    }
+
+    @SelectionHandler(value = TournamentTimeZones.SELECT, save = false)
+    static void timeZone(StringSelectInteractionEvent event) {
+        if (TournamentService.isUnavailable()) {
+            TournamentDiscord.ephemeral(event, TournamentService.UNAVAILABLE);
+            return;
+        }
+        int offset;
+        try {
+            offset = Integer.parseInt(event.getValues().getFirst());
+        } catch (NumberFormatException e) {
+            return;
+        }
+        if (!TournamentTimeZones.isKnown(offset)) return;
+        UserSettings settings = UserSettingsManager.get(event.getUser().getId());
+        settings.setUtcOffsetMinutes(offset);
+        UserSettingsManager.save(settings);
+        TournamentDiscord.ephemeral(
+                event,
+                "Saved your time zone as **" + TournamentTimeZones.describe(offset) + "**. Groups use it only when the"
+                        + " bot has no recorded active hours or AFK hours for you. It stays saved for future tournaments.");
     }
 
     @ButtonHandler(value = TournamentSignupPosts.STATUS, save = false)

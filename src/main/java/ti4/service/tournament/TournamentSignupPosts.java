@@ -50,6 +50,9 @@ public class TournamentSignupPosts {
         if (tournament.getStatus().isActive()) {
             components.add(ActionRow.of(buttons(tournament)));
         }
+        if (tournament.getStatus().allowsRosterChanges()) {
+            components.add(ActionRow.of(TournamentTimeZones.select(tournament.getId())));
+        }
         return components;
     }
 

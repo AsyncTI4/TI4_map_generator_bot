@@ -33,6 +33,7 @@ import ti4.service.tournament.TournamentGameCreator.Preflight;
 import ti4.service.tournament.TournamentInvites;
 import ti4.service.tournament.TournamentMemberResolver;
 import ti4.service.tournament.TournamentMemberResolver.Resolution;
+import ti4.service.tournament.TournamentPacing;
 import ti4.service.tournament.TournamentRoles;
 import ti4.service.tournament.TournamentSetupOptions;
 import ti4.service.tournament.TournamentSignupPosts;
@@ -118,6 +119,10 @@ final class TournamentPanelCreate {
                         "-# …and " + (preflight.missingFromHostByGroup().size() - MAX_MISSING_LINES) + " more groups");
             }
         }
+        if (!preflight.takenNames().isEmpty()) {
+            warnings.add("⚠️ These names are already used by a game or role, so those games are skipped: "
+                    + String.join(", ", preflight.takenNames()) + ". Pick another prefix in Settings.");
+        }
         if (tournament.isFogMode() && !preflight.groupsWithoutGameMaster().isEmpty()) {
             warnings.add("⚠️ No GM for group(s) " + StringUtils.join(preflight.groupsWithoutGameMaster(), ", ")
                     + ". Those games are skipped.");
@@ -201,25 +206,28 @@ final class TournamentPanelCreate {
         Tournament tournament = service.find(id).orElseThrow();
         String text = "**Message from the " + tournament.getSeriesName() + " organizers:**\n"
                 + TournamentPanel.value(event, "message");
-        List<String> missing = new ArrayList<>();
-        int sent = 0;
-        for (String gameName : createdGameNames(service.entries(id))) {
-            MessageChannel channel = GameManager.isValid(gameName)
-                    ? GameManager.getManagedGame(gameName).getGame().getMainGameChannel()
-                    : null;
-            if (channel == null) {
-                missing.add(gameName);
-                continue;
-            }
-            MessageHelper.sendMessageToChannel(channel, text);
-            sent++;
-        }
+        List<String> gameNames = createdGameNames(service.entries(id));
+        boolean started = TournamentPacing.forEach(
+                "tournamentBroadcast" + id,
+                gameNames,
+                gameName -> sendToGame(gameName, text),
+                result -> TournamentPanel.refresh(id, result.summary("Sent the message to")));
         TournamentPanel.show(
                 event,
                 id,
                 Tab.CREATE,
-                "Sent the message to " + sent + " game(s)."
-                        + (missing.isEmpty() ? "" : " Couldn't find: " + String.join(", ", missing)));
+                started
+                        ? "Sending the message to " + gameNames.size() + " game(s), one at a time."
+                        : "A message is already being sent, or the bot is under load. Try again in a minute.");
+    }
+
+    private static String sendToGame(String gameName, String text) {
+        MessageChannel channel = GameManager.isValid(gameName)
+                ? GameManager.getManagedGame(gameName).getGame().getMainGameChannel()
+                : null;
+        if (channel == null) return "Couldn't find " + gameName + ".";
+        MessageHelper.sendMessageToChannel(channel, text);
+        return null;
     }
 
     @ButtonHandler(value = APPLY_SETUP, save = false)
@@ -234,8 +242,18 @@ final class TournamentPanelCreate {
         }
         Map<String, String> values = TournamentService.gameSetup(tournament);
         List<String> gameNames = createdGameNames(service.entries(id));
-        gameNames.forEach(gameName -> TournamentGameCreator.applySetup(gameName, values, event.getMessageChannel()));
-        TournamentPanel.show(event, id, Tab.CREATE, "Applying the game setup to " + gameNames.size() + " game(s).");
+        boolean started = TournamentPacing.forEach(
+                "tournamentApplySetup" + id,
+                gameNames,
+                gameName -> TournamentGameCreator.applySetup(gameName, values),
+                result -> TournamentPanel.refresh(id, result.summary("Applied the game setup to")));
+        TournamentPanel.show(
+                event,
+                id,
+                Tab.CREATE,
+                started
+                        ? "Applying the game setup to " + gameNames.size() + " game(s), one at a time."
+                        : "The setup is already being applied, or the bot is under load. Try again in a minute.");
     }
 
     @ButtonHandler(value = INVITE_MODAL, save = false)
@@ -352,7 +370,8 @@ final class TournamentPanelCreate {
                 next,
                 event.getMessageChannel(),
                 "New round created with the same settings and an empty pool. Bulk add the players on the **Players**"
-                        + " tab, or reopen sign-ups and use `/tournament post_signup`.");
+                        + " tab, or reopen sign-ups and use `/tournament post_signup`. Game names are back to pbd"
+                        + " numbers; set a new prefix in Settings for custom names.");
         TournamentPanel.show(event, id, Tab.CREATE, "Started **" + next.displayName() + "**. Its panel is below.");
     }
 

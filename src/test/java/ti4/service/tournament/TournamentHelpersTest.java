@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.service.tournament.TournamentMemberResolver.Candidate;
 import ti4.service.tournament.TournamentMemberResolver.Resolution;
+import ti4.settings.users.UserSettings;
+import ti4.spring.service.tournament.Tournament;
 
 class TournamentHelpersTest {
 
@@ -33,6 +35,69 @@ class TournamentHelpersTest {
         assertThat(resolution.userIds()).containsExactly(ALICE, BOBBY, BOB);
         assertThat(resolution.ambiguous()).containsExactly("Captain");
         assertThat(resolution.notFound()).containsExactly("nobody");
+    }
+
+    @Test
+    void hourProfilesFallBackFromActivityToAfkToTimeZone() {
+        UserSettings settings = new UserSettings();
+        settings.setUtcOffsetMinutes(60);
+        // Central Europe 15:00-23:00 local is 14:00-22:00 UTC.
+        assertThat(TournamentHours.profile(settings).source()).isEqualTo(TournamentHours.Source.TIME_ZONE);
+        assertThat(TournamentHours.profile(settings).hours()).containsExactly(14, 15, 16, 17, 18, 19, 20, 21);
+
+        settings.setAfkHours("0;1;2;3;4;5;6;7");
+        assertThat(TournamentHours.profile(settings).source()).isEqualTo(TournamentHours.Source.AFK_SETTINGS);
+        assertThat(TournamentHours.profile(settings).hours())
+                .hasSize(16)
+                .doesNotContain(0, 7)
+                .contains(8, 23);
+
+        // 300 check-ins, all at 19:00 UTC: enough activity data to win over the fallbacks.
+        settings.setActiveHours("0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;300;0;0;0;0");
+        assertThat(TournamentHours.profile(settings).source()).isEqualTo(TournamentHours.Source.ACTIVITY);
+        assertThat(TournamentHours.profile(settings).hours()).containsExactly(19);
+
+        assertThat(TournamentHours.profile(new UserSettings()).source()).isEqualTo(TournamentHours.Source.NONE);
+    }
+
+    @Test
+    void timeZoneHoursWrapAroundMidnightAndHandleHalfHours() {
+        // India 15:00-23:00 local starts at 09:30 UTC, counted from hour 9.
+        assertThat(TournamentHours.likelyActiveUtcHours(330)).containsExactly(9, 10, 11, 12, 13, 14, 15, 16);
+        // US Pacific 15:00-23:00 local is 23:00-07:00 UTC.
+        assertThat(TournamentHours.likelyActiveUtcHours(-480)).containsExactly(23, 0, 1, 2, 3, 4, 5, 6);
+        assertThat(TournamentTimeZones.offsets()).hasSize(25);
+        assertThat(TournamentTimeZones.label(330)).isEqualTo("UTC+5:30");
+        assertThat(TournamentTimeZones.label(-300)).isEqualTo("UTC-5");
+    }
+
+    @Test
+    void pacingSlowsDownAfterSlowStepsAndWhenDiscordIsLaggy() {
+        assertThat(TournamentPacing.pauseAfter(3000, 80)).isEqualTo(TournamentPacing.BASE_PAUSE_MILLIS);
+        // A 25 s game creation earns a 25 s breather before the next one.
+        assertThat(TournamentPacing.pauseAfter(25_000, 80)).isEqualTo(25_000);
+        assertThat(TournamentPacing.pauseAfter(3000, 900)).isEqualTo(4 * TournamentPacing.BASE_PAUSE_MILLIS);
+        assertThat(TournamentPacing.pauseAfter(40_000, 900)).isEqualTo(TournamentPacing.MAX_PAUSE_MILLIS);
+    }
+
+    @Test
+    void customGameNamesFollowTheChannelNameRules() {
+        assertThat(TournamentGameNames.normalize("  T8P ")).isEqualTo("t8p");
+        assertThat(TournamentGameNames.problem("t8p")).isEmpty();
+        assertThat(TournamentGameNames.problem("tourney7semi")).isEmpty();
+        // A dash would break finding the game from its channel names (name-before-first-dash).
+        assertThat(TournamentGameNames.problem("t8-p")).isPresent();
+        assertThat(TournamentGameNames.problem("8tp")).isPresent();
+        assertThat(TournamentGameNames.problem("t")).isPresent();
+        assertThat(TournamentGameNames.problem("pbdtourney")).isPresent();
+        assertThat(TournamentGameNames.problem("fowcup")).isPresent();
+
+        var tournament = new Tournament();
+        tournament.setGameNamePrefix("t8p");
+        assertThat(TournamentGameNames.customName(tournament, 4)).isEqualTo("t8p04");
+        assertThat(TournamentGameNames.customName(tournament, 12)).isEqualTo("t8p12");
+        tournament.setFogMode(true);
+        assertThat(TournamentGameNames.usesCustomNames(tournament)).isFalse();
     }
 
     @Test

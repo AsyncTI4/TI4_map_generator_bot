@@ -66,6 +66,9 @@ public class Tournament {
     @Column(name = "group_seed")
     private Long groupSeed;
 
+    @Column(name = "game_name_prefix")
+    private String gameNamePrefix;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TournamentStatus status = TournamentStatus.OPEN;

@@ -23,6 +23,8 @@ import ti4.logging.BotLogger;
 import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentHours;
+import ti4.service.tournament.TournamentHours.Profile;
+import ti4.service.tournament.TournamentHours.Source;
 import ti4.service.tournament.TournamentMemberResolver;
 import ti4.service.tournament.TournamentMemberResolver.Resolution;
 import ti4.service.tournament.TournamentRoles;
@@ -111,7 +113,7 @@ final class TournamentPanelPlayers {
                 entries.stream().filter(entry -> !entry.isWaitlisted()).toList();
         List<TournamentEntry> waitlist =
                 entries.stream().filter(TournamentEntry::isWaitlisted).toList();
-        Map<String, Set<Integer>> hours = TournamentHours.activeHours(
+        Map<String, Profile> hours = TournamentHours.profiles(
                 entries.stream().map(TournamentEntry::getUserId).toList());
         List<String> lines = new ArrayList<>();
         if (!seated.isEmpty()) lines.add("**Seated (" + seated.size() + "/" + tournament.getTargetSize() + ")**");
@@ -125,9 +127,9 @@ final class TournamentPanelPlayers {
         return lines;
     }
 
-    private static String line(int number, TournamentEntry entry, Map<String, Set<Integer>> hours) {
-        Set<Integer> active = hours.getOrDefault(entry.getUserId(), Set.of());
-        String hourInfo = active.isEmpty() ? "no hour data" : active.size() + " active hours";
+    private static String line(int number, TournamentEntry entry, Map<String, Profile> hours) {
+        String hourInfo = hours.getOrDefault(entry.getUserId(), new Profile(Set.of(), Source.NONE))
+                .describe();
         return number + ". " + TournamentDiscord.userName(entry.getUserId()) + " · " + hourInfo
                 + (entry.isAddedByAdmin() ? " · added by admin" : "");
     }

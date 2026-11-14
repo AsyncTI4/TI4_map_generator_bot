@@ -29,6 +29,7 @@ import ti4.service.fow.CreateFoWGameService;
 import ti4.service.game.CreateGameService;
 import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
+import ti4.service.tournament.TournamentGameNames;
 import ti4.service.tournament.TournamentRoles;
 import ti4.service.tournament.TournamentSignupPosts;
 import ti4.service.tournament.panel.TournamentPanel.Context;
@@ -46,6 +47,8 @@ final class TournamentPanelSettings {
     private static final String PER_CATEGORY = "trnPerCat_";
     private static final String HOURS = "trnHours_";
     private static final String SERVER = "trnServer_";
+    private static final String NAMES_MODAL = "trnNames~MDL_";
+    private static final String NAMES_SAVE = "trnNamesSave_";
     private static final int MIN_GROUP_SIZE = 3;
     private static final int MAX_GROUP_SIZE = 8;
 
@@ -76,6 +79,13 @@ final class TournamentPanelSettings {
                             + tournament.getSeriesName() + " " + tournament.getRoundLabel() + " 1-"
                             + tournament.getGamesPerCategory() + "*.")));
         }
+        body.add(Section.of(
+                Buttons.gray(NAMES_MODAL + id, "Change").withDisabled(!editable || tournament.isFogMode()),
+                TextDisplay.of("**Game names:** " + TournamentGameNames.example(tournament) + "\n-# "
+                        + (tournament.isFogMode()
+                                ? "Fog of War games always use fow numbers."
+                                : "Custom names show the tournament in every channel name. Bot cleanup tools"
+                                        + " only look at pbd names."))));
         body.add(ComponentPanel.toggleSection(
                 "Match active hours",
                 "Random groups that prefer players whose active hours overlap. Off means purely random.",
@@ -205,6 +215,42 @@ final class TournamentPanelSettings {
         long id = TournamentPanel.idOf(buttonID, HOURS);
         TournamentService.getBean().update(id, pool -> pool.setMatchActiveHours(!pool.isMatchActiveHours()));
         TournamentPanel.show(event, id, Tab.SETTINGS, null);
+    }
+
+    @ButtonHandler(value = NAMES_MODAL, save = false)
+    static void openNames(ButtonInteractionEvent event, String buttonID) {
+        long id = TournamentPanel.idOf(buttonID, NAMES_MODAL);
+        Tournament tournament = TournamentService.getBean().find(id).orElse(null);
+        String current = tournament == null ? null : tournament.getGameNamePrefix();
+        Modal modal = Modal.create(NAMES_SAVE + id, "Game names")
+                .addComponents(
+                        TextDisplay.of("Games are named with this prefix plus the group number, for example t8p01."
+                                + " Leave it empty for normal pbd numbers."),
+                        Label.of("Name prefix", TournamentPanel.input("prefix", TextInputStyle.SHORT, current, false)))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ModalHandler(value = NAMES_SAVE, save = false)
+    static void saveNames(ModalInteractionEvent event) {
+        if (!TournamentAccess.require(event)) return;
+        long id = TournamentPanel.idOf(event.getModalId(), NAMES_SAVE);
+        String prefix = TournamentGameNames.normalize(TournamentPanel.value(event, "prefix"));
+        if (!prefix.isEmpty()) {
+            String problem = TournamentGameNames.problem(prefix).orElse(null);
+            if (problem != null) {
+                TournamentPanel.show(event, id, Tab.SETTINGS, problem);
+                return;
+            }
+        }
+        TournamentService.getBean().update(id, pool -> pool.setGameNamePrefix(prefix.isEmpty() ? null : prefix));
+        TournamentPanel.show(
+                event,
+                id,
+                Tab.SETTINGS,
+                prefix.isEmpty()
+                        ? "Games will get pbd numbers."
+                        : "Games will be named " + prefix + "01, " + prefix + "02, …");
     }
 
     @SelectionHandler(value = SERVER, save = false)
