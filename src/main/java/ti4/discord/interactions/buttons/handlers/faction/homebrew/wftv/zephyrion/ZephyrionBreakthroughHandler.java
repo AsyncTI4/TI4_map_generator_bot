@@ -35,7 +35,9 @@ public class ZephyrionBreakthroughHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 msg
-                        + ", a reminder that if you win this space combat, you may resolve _Subdue Chancellor_ to draw an unused agent.",
+                        + ", a reminder that if you destroy the last of "
+                        + otherPlayer.getRepresentationNoPing()
+                        + "'s ships here, you may resolve _Subdue Chancellor_ to draw an unused agent.",
                 buttons);
     }
 

@@ -276,7 +276,7 @@
         "alias": "vyserix",
         "factionName": "The Vyserix Ascendancy",
         "homeSystem": "ba3",
-        "startingFleet": "2 dd, 1 cv, 2 ff, 4 inf v, sd v, pds h",
+        "startingFleet": "1 dd, 2 cv, 2 ff, 4 inf v, sd v, pds h",
         "commodities": 3,
         "factionTech": [
             "bavyseb",
@@ -322,7 +322,7 @@
         "alias": "zephyrion",
         "factionName": "The Zephyrion Pursuit",
         "homeSystem": "ba8",
-        "startingFleet": "2 cr, 1 cv, 2 ff, 3 inf d, sd d, pds z",
+        "startingFleet": "1 cr, 1 cv, 2 ff, 3 inf d, sd d, pds z",
         "commodities": 2,
         "factionTech": [
             "bazephcr",
