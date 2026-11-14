@@ -43,6 +43,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanHeroHandler;
@@ -317,6 +318,7 @@ public class PlayHeroService {
             }
             case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
             case "xinhero" -> XinHeroHandler.startXinHero(game, player);
+            case "veylorhero" -> VeylorLeadersHandler.startVeylorHero(game, player);
             case "xyrixhero" -> XyrixLeadersHandler.startHero(game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);

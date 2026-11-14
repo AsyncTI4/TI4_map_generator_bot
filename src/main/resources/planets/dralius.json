@@ -18,7 +18,7 @@
         "y": 200.0
     },
     "resources": 2,
-    "influence": 2,
+    "influence": 0,
     "factionHomeworld": "zephyrion",
     "planetType": "FACTION",
     "cardImagePath": null,
