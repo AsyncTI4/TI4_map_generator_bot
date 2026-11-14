@@ -15,7 +15,7 @@ import ti4.spring.service.tournament.TournamentService;
 @UtilityClass
 public class TournamentRoles {
 
-    public static String roleName(Tournament tournament) {
+    private static String roleName(Tournament tournament) {
         return StringUtils.left(tournament.getSeriesName() + " Player", 100);
     }
 
@@ -25,7 +25,14 @@ public class TournamentRoles {
         return guild.getRoleById(tournament.getParticipantRoleId());
     }
 
-    public static String ensureRole(Tournament tournament) {
+    public static Tournament ensureRoleSaved(Tournament tournament) {
+        String roleId = ensureRole(tournament);
+        return TournamentService.getBean()
+                .update(tournament.getId(), pool -> pool.setParticipantRoleId(roleId))
+                .orElseThrow();
+    }
+
+    private static String ensureRole(Tournament tournament) {
         Role existing = role(tournament);
         if (existing != null) return existing.getId();
         Guild guild = TournamentDiscord.hostGuild(tournament);

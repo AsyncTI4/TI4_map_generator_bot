@@ -50,6 +50,44 @@ class TournamentGrouperTest {
     }
 
     @Test
+    void narrowWindowPlayersAreNotLeftOverByWideOnes() {
+        // 12 players awake 16 hours (AFK settings) and 12 with one 3-hour evening slot in four time zones.
+        // Raw overlap would group the wide players together and leave the slots stranded.
+        List<Entrant> entrants = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            entrants.add(new Entrant("wide" + i, hours(6 * (i % 4) + 4, 16)));
+        }
+        for (int i = 0; i < 12; i++) {
+            entrants.add(new Entrant("slot" + i, hours(6 * (i % 4) + 10, 3)));
+        }
+        Map<String, Entrant> byId = entrants.stream().collect(Collectors.toMap(Entrant::userId, Function.identity()));
+
+        for (List<String> group : TournamentGrouper.group(entrants, 6, true, 11)) {
+            for (String member : group) {
+                Set<Integer> mine = byId.get(member).activeUtcHours();
+                int bestTogether = mine.stream()
+                        .mapToInt(hour -> (int) group.stream()
+                                .filter(other ->
+                                        byId.get(other).activeUtcHours().contains(hour))
+                                .count())
+                        .max()
+                        .orElse(0);
+                assertThat(bestTogether).as(member + " in " + group).isGreaterThanOrEqualTo(group.size() - 1);
+            }
+        }
+    }
+
+    @Test
+    void pairFitCountsHowWellTheNarrowerWindowIsCovered() {
+        int evening = 0b111 << 18;
+        int awake = 0xFFFF << 6;
+        // A fully covered 3-hour slot beats two wide windows that only partly overlap.
+        assertThat(TournamentGrouper.pairFit(evening, awake)).isEqualTo(100 + 3 * 5);
+        assertThat(TournamentGrouper.pairFit(awake, 0xFFFF << 8)).isEqualTo(14 * 100 / 16 + 14 * 5);
+        assertThat(TournamentGrouper.pairFit(evening, 0)).isZero();
+    }
+
+    @Test
     void previousWinnersAreSpreadAndRematchesAvoided() {
         // 16 players who played last round in 4 groups of 4 (cohort = previous group); c*p0 won each game.
         List<Entrant> entrants = timezoneCohorts(4, 4);
@@ -65,6 +103,13 @@ class TournamentGrouperTest {
             assertThat(group.stream().filter(previousWinners::contains)).hasSize(1);
             assertThat(group.stream().map(previousGroups::get).distinct()).hasSize(group.size());
         }
+    }
+
+    private static Set<Integer> hours(int start, int length) {
+        return IntStream.range(start, start + length)
+                .map(hour -> hour % 24)
+                .boxed()
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     private static List<Entrant> timezoneCohorts(int cohorts, int perCohort) {

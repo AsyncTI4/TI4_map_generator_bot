@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -21,6 +22,7 @@ public class TournamentHours {
     public enum Source {
         ACTIVITY("active hours"),
         AFK_SETTINGS("hours from AFK settings"),
+        PLAY_TIMES("hours from play times"),
         TIME_ZONE("hours from time zone"),
         NONE("no hour data");
 
@@ -59,13 +61,15 @@ public class TournamentHours {
         if (!activity.isEmpty()) return new Profile(activity, Source.ACTIVITY);
         Set<Integer> notAfk = hoursOutside(settings.getAfkHours());
         if (!notAfk.isEmpty()) return new Profile(notAfk, Source.AFK_SETTINGS);
+        Set<Integer> playTimes = TournamentPlayTimes.utcHours(settings);
+        if (!playTimes.isEmpty()) return new Profile(playTimes, Source.PLAY_TIMES);
         if (settings.getUtcOffsetMinutes() != null) {
             return new Profile(likelyActiveUtcHours(settings.getUtcOffsetMinutes()), Source.TIME_ZONE);
         }
         return new Profile(Set.of(), Source.NONE);
     }
 
-    static Set<Integer> hoursOutside(String afkHours) {
+    private static Set<Integer> hoursOutside(String afkHours) {
         if (afkHours == null || afkHours.isBlank()) return Set.of();
         Set<Integer> afk = new LinkedHashSet<>();
         for (String hour : afkHours.split(";")) {
@@ -80,12 +84,16 @@ public class TournamentHours {
     }
 
     static Set<Integer> likelyActiveUtcHours(int utcOffsetMinutes) {
-        Set<Integer> hours = new LinkedHashSet<>();
-        for (int local = LIKELY_ACTIVE_LOCAL_START; local < LIKELY_ACTIVE_LOCAL_END; local++) {
-            int utcMinutes = local * 60 - utcOffsetMinutes;
-            hours.add(Math.floorMod(Math.floorDiv(utcMinutes, 60), 24));
-        }
-        return hours;
+        return TournamentPlayTimes.toUtc(
+                utcOffsetMinutes,
+                IntStream.range(LIKELY_ACTIVE_LOCAL_START, LIKELY_ACTIVE_LOCAL_END)
+                        .boxed()
+                        .toList());
+    }
+
+    public static boolean needsPlayTimes(UserSettings settings) {
+        Source source = profile(settings).source();
+        return source == Source.NONE || source == Source.TIME_ZONE;
     }
 
     public static Window bestWindow(List<Set<Integer>> memberHours) {

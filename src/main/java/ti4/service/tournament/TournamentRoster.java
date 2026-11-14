@@ -19,7 +19,7 @@ public class TournamentRoster {
 
     private static final int INLINE_LIMIT = 1900;
 
-    public static String text(Tournament tournament, List<TournamentEntry> entries) {
+    private static String text(Tournament tournament, List<TournamentEntry> entries) {
         Map<Integer, List<TournamentEntry>> groups = TournamentService.groups(entries);
         Map<Integer, String> gameMasters = TournamentService.gameMastersByGroup(tournament);
         List<String> lines = new ArrayList<>();
@@ -42,7 +42,7 @@ public class TournamentRoster {
         return line + ": " + String.join(", ", names(members));
     }
 
-    public static String csv(Tournament tournament, List<TournamentEntry> entries) {
+    private static String csv(Tournament tournament, List<TournamentEntry> entries) {
         Map<Integer, String> gameMasters = TournamentService.gameMastersByGroup(tournament);
         StringBuilder csv = new StringBuilder("group,game,role,user_id,name\n");
         TournamentService.groups(entries).forEach((group, members) -> {

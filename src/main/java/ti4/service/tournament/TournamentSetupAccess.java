@@ -27,7 +27,7 @@ public class TournamentSetupAccess {
             "setupBaseGameMode",
             "frankenSetup");
 
-    public static boolean isSetupGame(Game game) {
+    private static boolean isSetupGame(Game game) {
         return game != null && StringUtils.isNotBlank(game.getStoredValue(SETUP_GAME_KEY));
     }
 

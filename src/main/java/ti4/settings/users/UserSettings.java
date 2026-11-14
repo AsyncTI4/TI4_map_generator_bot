@@ -28,6 +28,7 @@ public class UserSettings {
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
     private Integer utcOffsetMinutes;
+    private List<String> playTimeParts;
     private boolean hasIndicatedStatPreferences;
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;

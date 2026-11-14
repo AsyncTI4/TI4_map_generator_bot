@@ -14,8 +14,10 @@ public class TournamentGrouper {
     private static final int RESTARTS = 4;
     private static final int SWAP_ATTEMPTS_PER_RESTART = 20_000;
 
-    private static final int SPREAD_PENALTY = 1000;
-    private static final int REMATCH_PENALTY = 1000;
+    static final int FULL_FIT_SCORE = 100;
+    static final int SHARED_HOUR_BONUS = 5;
+    private static final int SPREAD_PENALTY = 10_000;
+    private static final int REMATCH_PENALTY = 10_000;
 
     public record Entrant(String userId, Set<Integer> activeUtcHours) {}
 
@@ -116,10 +118,17 @@ public class TournamentGrouper {
         int[][] overlap = new int[n][n];
         for (int a = 0; a < n; a++) {
             for (int b = 0; b < n; b++) {
-                overlap[a][b] = a == b ? 0 : Integer.bitCount(masks[a] & masks[b]);
+                if (a != b) overlap[a][b] = pairFit(masks[a], masks[b]);
             }
         }
         return overlap;
+    }
+
+    static int pairFit(int firstHours, int secondHours) {
+        int shared = Integer.bitCount(firstHours & secondHours);
+        int narrower = Math.min(Integer.bitCount(firstHours), Integer.bitCount(secondHours));
+        if (narrower == 0) return 0;
+        return shared * FULL_FIT_SCORE / narrower + shared * SHARED_HOUR_BONUS;
     }
 
     private static int[] randomAssignment(int n, int[] sizes, Random random) {

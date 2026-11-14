@@ -3,7 +3,9 @@ package ti4.service.tournament.panel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
+import net.dv8tion.jda.api.components.ModalTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
@@ -31,6 +33,8 @@ import ti4.message.componentsV2.ComponentPanel;
 import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentGameCreator;
+import ti4.service.tournament.TournamentMemberResolver;
+import ti4.service.tournament.TournamentMemberResolver.Resolution;
 import ti4.service.tournament.TournamentSignupPosts;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
@@ -47,6 +51,7 @@ public final class TournamentPanel {
     private static final int WARNING_ACCENT = 0xF0B232;
     private static final int ARCHIVED_ACCENT = 0x99AAB5;
     private static final int MAX_NOTICE_LENGTH = 900;
+    private static final String NAMES_PLACEHOLDER = "One per line: @mention, user id or name";
 
     private TournamentPanel() {}
 
@@ -186,10 +191,8 @@ public final class TournamentPanel {
 
     private static String header(Context context) {
         Tournament tournament = context.tournament();
-        long seated = context.entries().stream()
-                .filter(entry -> !entry.isWaitlisted())
-                .count();
-        long waitlisted = context.entries().size() - seated;
+        int seated = TournamentService.activeCount(context.entries());
+        int waitlisted = context.entries().size() - seated;
         long groups = TournamentService.groups(context.entries()).size();
         Guild host = TournamentDiscord.hostGuild(tournament);
         String title = "### Tournament · " + tournament.displayName() + (tournament.isFogMode() ? " · Fog of War" : "");
@@ -252,33 +255,38 @@ public final class TournamentPanel {
         return StringUtils.substringAfter(componentId.substring(prefix.length()), "_");
     }
 
-    static TextInput input(String id, TextInputStyle style, String value, boolean required) {
-        TextInput.Builder builder = TextInput.create(id, style).setRequired(required);
-        if (StringUtils.isNotBlank(value)) builder.setValue(value);
-        return builder.build();
+    static Label field(String label, String id, String value, boolean required) {
+        TextInput.Builder input = TextInput.create(id, TextInputStyle.SHORT).setRequired(required);
+        if (StringUtils.isNotBlank(value)) input.setValue(value);
+        return Label.of(label, input.build());
     }
 
-    static Modal namesModal(String modalId, String title, String label, String placeholder) {
+    static void openModal(ButtonInteractionEvent event, String id, String title, ModalTopLevelComponent... parts) {
+        event.replyModal(Modal.create(id, title).addComponents(parts).build())
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    static void openNamesModal(ButtonInteractionEvent event, String id, String title, String label) {
         TextInput names = TextInput.create("names", TextInputStyle.PARAGRAPH)
                 .setRequired(true)
-                .setPlaceholder(placeholder)
+                .setPlaceholder(NAMES_PLACEHOLDER)
                 .build();
-        return Modal.create(modalId, title)
-                .addComponents(Label.of(label, names))
-                .build();
+        openModal(event, id, title, Label.of(label, names));
+    }
+
+    static void change(ButtonInteractionEvent event, long id, Tab tab, Consumer<Tournament> change, String notice) {
+        if (!TournamentAccess.require(event)) return;
+        TournamentService.getBean().update(id, change);
+        show(event, id, tab, notice);
+    }
+
+    static Resolution resolve(Tournament tournament, String text) {
+        return TournamentMemberResolver.resolve(text, TournamentDiscord.lookupGuilds(tournament));
     }
 
     static String value(ModalInteractionEvent event, String field) {
         ModalMapping mapping = event.getValue(field);
         return mapping == null ? "" : mapping.getAsString().trim();
-    }
-
-    static Integer parseInt(String raw) {
-        try {
-            return Integer.parseInt(raw.trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     static String names(List<String> userIds) {

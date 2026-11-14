@@ -3,9 +3,11 @@ package ti4.service.tournament;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
@@ -15,22 +17,15 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 import ti4.spring.service.tournament.Tournament;
 
 @UtilityClass
 public class TournamentDiscord {
 
     public static void ephemeral(GenericInteractionCreateEvent event, String message) {
-        if (!(event instanceof IReplyCallback callback)) {
-            MessageHelper.sendMessageToEventChannel(event, message);
-            return;
-        }
-        String text = StringUtils.abbreviate(message, 2000);
-        if (callback.isAcknowledged()) {
-            callback.getHook().sendMessage(text).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
-        } else {
-            callback.reply(text).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
-        }
+        if (event instanceof IReplyCallback) ephemeral(event, message, List.of());
+        else MessageHelper.sendMessageToEventChannel(event, message);
     }
 
     public static void ephemeral(GenericInteractionCreateEvent event, String message, List<FileUpload> files) {
@@ -44,6 +39,24 @@ public class TournamentDiscord {
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             callback.reply(text).addFiles(files).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    public static void ephemeralWithComponents(
+            GenericInteractionCreateEvent event, String message, List<ActionRow> rows) {
+        if (!(event instanceof IReplyCallback callback)) return;
+        String text = StringUtils.abbreviate(message, 2000);
+        if (callback.isAcknowledged()) {
+            callback.getHook()
+                    .sendMessage(text)
+                    .setComponents(rows)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            callback.reply(text)
+                    .setComponents(rows)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -62,13 +75,19 @@ public class TournamentDiscord {
         return guild(tournament.getHostGuildId());
     }
 
-    public static Guild guild(String guildId) {
+    private static Guild guild(String guildId) {
         return StringUtils.isBlank(guildId) ? null : JdaService.jda.getGuildById(guildId);
     }
 
     public static GuildMessageChannel channel(String channelId) {
         if (StringUtils.isBlank(channelId)) return null;
         return JdaService.jda.getChannelById(GuildMessageChannel.class, channelId);
+    }
+
+    public static Category category(Guild guild, String name) {
+        return guild.getCategoriesByName(name, true).stream()
+                .findFirst()
+                .orElseGet(() -> CreateGameService.createGameCategory(guild, name));
     }
 
     public static Member member(Guild guild, String userId) {

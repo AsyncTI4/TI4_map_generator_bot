@@ -1,6 +1,5 @@
 package ti4.service.tournament;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +14,6 @@ import ti4.message.MessageHelper;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
-import ti4.spring.service.tournament.TournamentSignupPost;
 
 @UtilityClass
 public class TournamentInvites {
@@ -25,7 +23,7 @@ public class TournamentInvites {
     private static final Pattern RAW_ID = Pattern.compile("^\\d{15,21}$");
     private static final int UNLIMITED_USES = 0;
 
-    public static List<String> missingFromHost(Tournament tournament) {
+    private static List<String> missingFromHost(Tournament tournament) {
         Guild host = TournamentDiscord.hostGuild(tournament);
         if (host == null) return List.of();
         TournamentService service = TournamentService.getBean();
@@ -40,20 +38,24 @@ public class TournamentInvites {
     }
 
     public static String text(Tournament tournament) {
+        return text(tournament, missingFromHost(tournament));
+    }
+
+    private static String text(Tournament tournament, List<String> missing) {
         Guild host = TournamentDiscord.hostGuild(tournament);
         if (host == null) return null;
         String link = Helper.getGuildInviteURL(host, UNLIMITED_USES);
-        List<String> missing = missingFromHost(tournament);
         String where = "the **" + tournament.displayName() + "** games are on **" + host.getName() + "**. Join here: ";
         if (missing.isEmpty()) return StringUtils.capitalize(where) + link;
-        return TournamentDiscord.mentions(new ArrayList<>(missing)) + " " + where + link;
+        return TournamentDiscord.mentions(missing) + " " + where + link;
     }
 
     public static String send(Tournament tournament, GuildMessageChannel channel) {
-        String text = text(tournament);
+        List<String> missing = missingFromHost(tournament);
+        String text = text(tournament, missing);
         if (text == null) return "Pick a host server first.";
         MessageHelper.sendMessageToChannel(channel, text);
-        int pinged = missingFromHost(tournament).size();
+        int pinged = missing.size();
         return "Posted the invite in " + channel.getAsMention() + " ("
                 + channel.getGuild().getName() + ")"
                 + (pinged > 0 ? ", pinging " + pinged + " player(s) who aren't on the host server yet." : ".");
@@ -75,10 +77,7 @@ public class TournamentInvites {
     }
 
     public static String defaultChannelLink(Tournament tournament) {
-        for (TournamentSignupPost post : TournamentService.getBean().signupPosts(tournament.getId())) {
-            GuildMessageChannel channel = TournamentDiscord.channel(post.getChannelId());
-            if (channel != null) return channel.getJumpUrl();
-        }
-        return null;
+        GuildMessageChannel channel = TournamentSignupPosts.firstChannel(tournament);
+        return channel == null ? null : channel.getJumpUrl();
     }
 }

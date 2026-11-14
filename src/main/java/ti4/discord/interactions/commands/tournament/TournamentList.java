@@ -22,8 +22,7 @@ class TournamentList extends TournamentSubcommand {
         List<String> lines = new ArrayList<>();
         for (Tournament tournament : service.listActive()) {
             List<TournamentEntry> entries = service.entries(tournament.getId());
-            long seated =
-                    entries.stream().filter(entry -> !entry.isWaitlisted()).count();
+            int seated = TournamentService.activeCount(entries);
             Guild host = TournamentDiscord.hostGuild(tournament);
             lines.add("`#" + tournament.getId() + "` **" + tournament.displayName() + "**"
                     + (tournament.isFogMode() ? " (Fog)" : "") + " · "

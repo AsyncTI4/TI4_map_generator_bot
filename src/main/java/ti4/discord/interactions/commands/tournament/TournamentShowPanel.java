@@ -13,11 +13,8 @@ class TournamentShowPanel extends TournamentSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Tournament tournament = tournament(event);
-        if (tournament == null) {
-            reply(event, "Pick a tournament from the list.");
-            return;
-        }
+        Tournament tournament = tournamentOrReply(event);
+        if (tournament == null) return;
         if (refusePanelInGameChannel(event)) return;
         TournamentPanel.post(tournament, event.getMessageChannel(), null);
         reply(event, "Posted the **" + tournament.displayName() + "** panel.");

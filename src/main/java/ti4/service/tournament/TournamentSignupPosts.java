@@ -24,6 +24,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.executors.ExecutorServiceManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.ComponentPanel;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
@@ -42,8 +43,8 @@ public class TournamentSignupPosts {
     private static final Set<Long> PENDING_REFRESHES = ConcurrentHashMap.newKeySet();
 
     public static List<MessageTopLevelComponent> card(Tournament tournament, List<TournamentEntry> entries) {
-        long active = entries.stream().filter(entry -> !entry.isWaitlisted()).count();
-        long waitlisted = entries.size() - active;
+        int active = TournamentService.activeCount(entries);
+        int waitlisted = entries.size() - active;
         String text = "## " + tournament.getSeriesName() + " · " + tournament.getRoundLabel()
                 + "\n" + formatLine(tournament)
                 + "\n**" + active + "/" + tournament.getTargetSize() + "** players signed up"
@@ -55,19 +56,16 @@ public class TournamentSignupPosts {
         if (tournament.getStatus().isActive()) {
             components.add(ActionRow.of(buttons(tournament)));
         }
-        if (tournament.getStatus().allowsRosterChanges()) {
-            components.add(ActionRow.of(TournamentTimeZones.select(tournament.getId())));
-        }
         return components;
     }
 
-    public static String formatLine(Tournament tournament) {
+    private static String formatLine(Tournament tournament) {
         return (tournament.isFogMode() ? "Fog of War · " : "") + tournament.getGroupSize() + " players per game";
     }
 
     private static String statusLine(TournamentStatus status) {
         return switch (status) {
-            case OPEN -> "Press **I will play** to enter. That's all you need to do.";
+            case OPEN -> "Press **I will play** to enter. **Play times** tells the bot when you usually play.";
             case CLOSED, GROUPED -> "Sign-ups are closed.";
             case CREATING -> "Games are being created.";
             case CREATED -> "Games have been created. Good luck!";
@@ -85,21 +83,20 @@ public class TournamentSignupPosts {
             buttons.add(Buttons.red(LEAVE + id, "Withdraw"));
         }
         buttons.add(Buttons.gray(STATUS + id, "My status"));
+        if (tournament.getStatus().allowsRosterChanges()) {
+            buttons.add(Buttons.gray(TournamentPlayTimes.OPEN + id, "Play times"));
+        }
         return buttons;
     }
 
     public static void post(Tournament tournament, GuildMessageChannel channel) {
         List<TournamentEntry> entries = TournamentService.getBean().entries(tournament.getId());
-        channel.sendMessageComponents(card(tournament, entries))
-                .useComponentsV2()
-                .queue(
-                        message -> TournamentService.getBean()
-                                .addSignupPost(
-                                        tournament.getId(),
-                                        channel.getGuild().getId(),
-                                        channel.getId(),
-                                        message.getId()),
-                        BotLogger::catchRestError);
+        ComponentPanel.post(
+                channel,
+                card(tournament, entries),
+                message -> TournamentService.getBean()
+                        .addSignupPost(
+                                tournament.getId(), channel.getGuild().getId(), channel.getId(), message.getId()));
     }
 
     public static void scheduleRefresh(long tournamentId) {
@@ -112,13 +109,33 @@ public class TournamentSignupPosts {
                 });
     }
 
-    public static void announcePromotion(Tournament tournament, String userId) {
-        GuildMessageChannel channel = TournamentService.getBean().signupPosts(tournament.getId()).stream()
+    public static GuildMessageChannel firstChannel(Tournament tournament) {
+        return TournamentService.getBean().signupPosts(tournament.getId()).stream()
                 .map(post -> TournamentDiscord.channel(post.getChannelId()))
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
-        announcePromotion(tournament, userId, channel);
+    }
+
+    public static void announcePromotion(Tournament tournament, String userId) {
+        announcePromotion(tournament, userId, firstChannel(tournament));
+    }
+
+    public static void announcePromotions(Tournament tournament, List<String> userIds) {
+        if (userIds.size() == 1) {
+            announcePromotion(tournament, userIds.getFirst());
+            return;
+        }
+        GuildMessageChannel channel = firstChannel(tournament);
+        if (channel == null) {
+            userIds.forEach(userId -> announcePromotion(tournament, userId, null));
+            return;
+        }
+        userIds.forEach(userId -> TournamentRoles.give(tournament, userId));
+        MessageHelper.sendMessageToChannel(
+                channel,
+                TournamentDiscord.mentions(userIds) + ": seats opened up in **" + tournament.displayName()
+                        + "**, so you've moved off the waitlist. You're in!");
     }
 
     public static void announcePromotion(Tournament tournament, String userId, MessageChannel channel) {

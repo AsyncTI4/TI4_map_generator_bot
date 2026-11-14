@@ -59,18 +59,15 @@ class TournamentCreate extends TournamentSubcommand {
         int groupSize = event.getOption(GROUP_SIZE, Tournament.DEFAULT_GROUP_SIZE, OptionMapping::getAsInt);
         boolean fog = event.getOption(FOG, false, OptionMapping::getAsBoolean);
 
-        TournamentService service = TournamentService.getBean();
-        Tournament tournament = service.create(
-                name,
-                round,
-                target,
-                groupSize,
-                fog,
-                guild.getId(),
-                event.getUser().getId());
-        String roleId = TournamentRoles.ensureRole(tournament);
-        tournament = service.update(tournament.getId(), pool -> pool.setParticipantRoleId(roleId))
-                .orElseThrow();
+        Tournament tournament = TournamentRoles.ensureRoleSaved(TournamentService.getBean()
+                .create(
+                        name,
+                        round,
+                        target,
+                        groupSize,
+                        fog,
+                        guild.getId(),
+                        event.getUser().getId()));
 
         TournamentSignupPosts.post(tournament, signupChannel);
         TournamentPanel.post(

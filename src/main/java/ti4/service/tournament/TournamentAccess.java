@@ -42,13 +42,14 @@ public class TournamentAccess {
         return !role.isPublicRole() && !role.isManaged();
     }
 
+    public static String refusal(Member member) {
+        if (TournamentService.isUnavailable()) return TournamentService.UNAVAILABLE;
+        return isTournamentAdmin(member) ? null : DENIED;
+    }
+
     public static boolean require(GenericInteractionCreateEvent event) {
-        if (TournamentService.isUnavailable()) {
-            TournamentDiscord.ephemeral(event, TournamentService.UNAVAILABLE);
-            return false;
-        }
-        if (isTournamentAdmin(event.getMember())) return true;
-        TournamentDiscord.ephemeral(event, DENIED);
-        return false;
+        String refusal = refusal(event.getMember());
+        if (refusal != null) TournamentDiscord.ephemeral(event, refusal);
+        return refusal == null;
     }
 }

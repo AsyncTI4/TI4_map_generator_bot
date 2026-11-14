@@ -85,7 +85,7 @@ class TournamentServiceTest {
 
         LeaveResult result = service.leave(ID, "a");
 
-        assertThat(result.wasActive()).isTrue();
+        assertThat(result.removed()).isTrue();
         assertThat(result.promotedUserId()).isEqualTo("c");
         TournamentEntry promoted = stored.stream()
                 .filter(entry -> "c".equals(entry.getUserId()))
@@ -150,6 +150,19 @@ class TournamentServiceTest {
 
         assertThat(service.leave(ID, "a").promotedUserId()).isNull();
         assertThat(entry("c").isWaitlisted()).isTrue();
+    }
+
+    @Test
+    void fillToTargetMovesWaitlistedPlayersUpToTheRaisedTarget() {
+        for (String userId : List.of("a", "b", "c", "d", "e")) service.join(ID, userId);
+        tournament.setStatus(TournamentStatus.GROUPED);
+        tournament.setTargetSize(4);
+
+        assertThat(service.fillToTarget(ID)).containsExactly("c", "d");
+        assertThat(entry("e").isWaitlisted()).isTrue();
+        // New seats have no group yet, so the approved groups have to be drawn again.
+        assertThat(tournament.getStatus()).isEqualTo(TournamentStatus.CLOSED);
+        assertThat(service.fillToTarget(ID)).isEmpty();
     }
 
     private void seat(String userId, int group, String gameName) {

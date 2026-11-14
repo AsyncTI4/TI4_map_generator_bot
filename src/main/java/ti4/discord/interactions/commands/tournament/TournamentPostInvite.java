@@ -14,16 +14,10 @@ class TournamentPostInvite extends TournamentSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Tournament tournament = tournament(event);
-        if (tournament == null) {
-            reply(event, "Pick a tournament from the list.");
-            return;
-        }
-        GuildMessageChannel channel = channel(event, CHANNEL);
-        if (channel == null) {
-            reply(event, "Pick a text channel.");
-            return;
-        }
+        Tournament tournament = tournamentOrReply(event);
+        if (tournament == null) return;
+        GuildMessageChannel channel = channelOrReply(event, CHANNEL);
+        if (channel == null) return;
         reply(event, TournamentInvites.send(tournament, channel));
     }
 }

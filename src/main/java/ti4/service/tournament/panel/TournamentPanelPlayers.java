@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.selections.SelectOption;
@@ -14,18 +15,15 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
-import ti4.logging.BotLogger;
 import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentHours;
 import ti4.service.tournament.TournamentHours.Profile;
 import ti4.service.tournament.TournamentHours.Source;
-import ti4.service.tournament.TournamentMemberResolver;
 import ti4.service.tournament.TournamentMemberResolver.Resolution;
 import ti4.service.tournament.TournamentRoles;
 import ti4.service.tournament.TournamentSignupPosts;
@@ -47,12 +45,12 @@ final class TournamentPanelPlayers {
     private static final String REMOVE_SAVE = "trnRemoveSave_";
     private static final String PROMOTE = "trnPromote_";
     private static final String SYNC_ROLES = "trnSyncRoles_";
+    private static final String FILL = "trnFillTarget_";
     private static final String GM_ADD_MODAL = "trnGmAdd~MDL_";
     private static final String GM_ADD_SAVE = "trnGmAddSave_";
     private static final String GM_REMOVE_MODAL = "trnGmRemove~MDL_";
     private static final String GM_REMOVE_SAVE = "trnGmRemoveSave_";
     private static final String POST_REMOVE = "trnPostRemove_";
-    private static final String NAMES_PLACEHOLDER = "One per line: @mention, user id or name";
     private static final int LINES_PER_PAGE = 20;
     private static final int MAX_LIST_LENGTH = 450;
 
@@ -75,11 +73,9 @@ final class TournamentPanelPlayers {
                 "**Sign-up posts:** "
                         + (posts.isEmpty()
                                 ? "none. Use `/tournament post_signup` to add one."
-                                : String.join(
-                                        ", ",
-                                        posts.stream()
-                                                .map(TournamentSignupPosts::describe)
-                                                .toList())),
+                                : posts.stream()
+                                        .map(TournamentSignupPosts::describe)
+                                        .collect(Collectors.joining(", "))),
                 MAX_LIST_LENGTH)));
         if (tournament.isFogMode()) {
             List<String> gameMasters = service.gameMasterIds(id);
@@ -98,6 +94,8 @@ final class TournamentPanelPlayers {
                 Buttons.green(BULK_ADD_MODAL + id, "Bulk add").withDisabled(!editable && !replacing),
                 Buttons.red(REMOVE_MODAL + id, "Remove").withDisabled(!editable && !replacing),
                 Buttons.blue(PROMOTE + id, "Promote from waitlist").withDisabled(!editable),
+                Buttons.blue(FILL + id, "Fill to target")
+                        .withDisabled(!editable || openSeats(tournament, context) == 0),
                 Buttons.gray(SYNC_ROLES + id, "Sync roles")));
         if (tournament.isFogMode()) {
             controls.add(ActionRow.of(
@@ -110,10 +108,10 @@ final class TournamentPanelPlayers {
     }
 
     private static List<String> rosterLines(Tournament tournament, List<TournamentEntry> entries) {
-        List<TournamentEntry> seated =
-                entries.stream().filter(entry -> !entry.isWaitlisted()).toList();
-        List<TournamentEntry> waitlist =
-                entries.stream().filter(TournamentEntry::isWaitlisted).toList();
+        Map<Boolean, List<TournamentEntry>> byWaitlisted =
+                entries.stream().collect(Collectors.partitioningBy(TournamentEntry::isWaitlisted));
+        List<TournamentEntry> seated = byWaitlisted.get(false);
+        List<TournamentEntry> waitlist = byWaitlisted.get(true);
         Map<String, Profile> hours = TournamentHours.profiles(
                 entries.stream().map(TournamentEntry::getUserId).toList());
         List<String> lines = new ArrayList<>();
@@ -148,33 +146,26 @@ final class TournamentPanelPlayers {
                 .build();
     }
 
-    private static Resolution resolve(long id, String text) {
-        Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
-        return TournamentMemberResolver.resolve(text, TournamentDiscord.lookupGuilds(tournament));
-    }
-
     @ButtonHandler(value = BULK_ADD_MODAL, save = false)
     static void openBulkAdd(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, BULK_ADD_MODAL);
-        event.replyModal(TournamentPanel.namesModal(
-                        BULK_ADD_SAVE + id, "Bulk add players", "Players", NAMES_PLACEHOLDER))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        TournamentPanel.openNamesModal(event, BULK_ADD_SAVE + id, "Bulk add players", "Players");
     }
 
     @ModalHandler(value = BULK_ADD_SAVE, save = false)
     static void bulkAdd(ModalInteractionEvent event) {
         if (!TournamentAccess.require(event)) return;
         long id = TournamentPanel.idOf(event.getModalId(), BULK_ADD_SAVE);
-        Resolution resolution = resolve(id, TournamentPanel.value(event, "names"));
         TournamentService service = TournamentService.getBean();
+        Tournament tournament = service.find(id).orElseThrow();
+        Resolution resolution = TournamentPanel.resolve(tournament, TournamentPanel.value(event, "names"));
         BulkAddResult result = service.bulkAdd(id, resolution.userIds(), TournamentPanel.creationRunning(id));
         if (result.refusal() != null) {
             TournamentPanel.show(event, id, Tab.PLAYERS, result.refusal());
             return;
         }
-        Tournament tournament = service.find(id).orElseThrow();
         result.added().forEach(userId -> TournamentRoles.give(tournament, userId));
-        result.promoted().forEach(userId -> TournamentSignupPosts.announcePromotion(tournament, userId));
+        if (!result.promoted().isEmpty()) TournamentSignupPosts.announcePromotions(tournament, result.promoted());
         TournamentSignupPosts.scheduleRefresh(id);
         List<String> notice = new ArrayList<>();
         notice.add("Added " + result.added().size()
@@ -193,17 +184,16 @@ final class TournamentPanelPlayers {
     @ButtonHandler(value = REMOVE_MODAL, save = false)
     static void openRemove(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, REMOVE_MODAL);
-        event.replyModal(TournamentPanel.namesModal(REMOVE_SAVE + id, "Remove players", "Players", NAMES_PLACEHOLDER))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        TournamentPanel.openNamesModal(event, REMOVE_SAVE + id, "Remove players", "Players");
     }
 
     @ModalHandler(value = REMOVE_SAVE, save = false)
     static void remove(ModalInteractionEvent event) {
         if (!TournamentAccess.require(event)) return;
         long id = TournamentPanel.idOf(event.getModalId(), REMOVE_SAVE);
-        Resolution resolution = resolve(id, TournamentPanel.value(event, "names"));
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
+        Resolution resolution = TournamentPanel.resolve(tournament, TournamentPanel.value(event, "names"));
         List<String> removed = new ArrayList<>();
         List<String> promoted = new ArrayList<>();
         List<String> notice = new ArrayList<>();
@@ -226,6 +216,35 @@ final class TournamentPanelPlayers {
         if (!promoted.isEmpty()) notice.add("Moved off the waitlist: " + TournamentPanel.names(promoted));
         if (!resolution.problems().isEmpty()) notice.add(resolution.problems());
         TournamentPanel.show(event, id, Tab.PLAYERS, String.join("\n", notice));
+    }
+
+    static int openSeats(Tournament tournament, Context context) {
+        int seated = TournamentService.activeCount(context.entries());
+        int waitlisted = context.entries().size() - seated;
+        return Math.max(0, Math.min(waitlisted, tournament.getTargetSize() - seated));
+    }
+
+    @ButtonHandler(value = FILL, save = false)
+    static void fillToTarget(ButtonInteractionEvent event, String buttonID) {
+        if (!TournamentAccess.require(event)) return;
+        long id = TournamentPanel.idOf(buttonID, FILL);
+        TournamentService service = TournamentService.getBean();
+        List<String> promoted = service.fillToTarget(id);
+        Tournament tournament = service.find(id).orElseThrow();
+        if (!promoted.isEmpty()) {
+            TournamentSignupPosts.announcePromotions(tournament, promoted);
+            TournamentSignupPosts.scheduleRefresh(id);
+        }
+        TournamentPanel.show(
+                event,
+                id,
+                Tab.PLAYERS,
+                promoted.isEmpty()
+                        ? "No open seats, or nobody on the waitlist."
+                        : "Moved " + promoted.size() + " off the waitlist: " + TournamentPanel.names(promoted)
+                                + (TournamentService.groups(service.entries(id)).isEmpty()
+                                        ? "."
+                                        : ". Press **Reshuffle** on Groups to give them a group."));
     }
 
     @ButtonHandler(value = PROMOTE, save = false)
@@ -253,11 +272,7 @@ final class TournamentPanelPlayers {
         long id = TournamentPanel.idOf(buttonID, SYNC_ROLES);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
-        if (TournamentRoles.role(tournament) == null) {
-            String roleId = TournamentRoles.ensureRole(tournament);
-            tournament = service.update(id, pool -> pool.setParticipantRoleId(roleId))
-                    .orElseThrow();
-        }
+        if (TournamentRoles.role(tournament) == null) tournament = TournamentRoles.ensureRoleSaved(tournament);
         int given = TournamentRoles.sync(tournament, service.entries(id));
         TournamentPanel.show(
                 event,
@@ -269,16 +284,17 @@ final class TournamentPanelPlayers {
     @ButtonHandler(value = GM_ADD_MODAL, save = false)
     static void openGameMasterAdd(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, GM_ADD_MODAL);
-        event.replyModal(TournamentPanel.namesModal(GM_ADD_SAVE + id, "Add GMs", "GMs", NAMES_PLACEHOLDER))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        TournamentPanel.openNamesModal(event, GM_ADD_SAVE + id, "Add GMs", "GMs");
     }
 
     @ModalHandler(value = GM_ADD_SAVE, save = false)
     static void addGameMasters(ModalInteractionEvent event) {
         if (!TournamentAccess.require(event)) return;
         long id = TournamentPanel.idOf(event.getModalId(), GM_ADD_SAVE);
-        Resolution resolution = resolve(id, TournamentPanel.value(event, "names"));
-        List<String> added = TournamentService.getBean().addGameMasters(id, resolution.userIds());
+        TournamentService service = TournamentService.getBean();
+        Resolution resolution =
+                TournamentPanel.resolve(service.find(id).orElseThrow(), TournamentPanel.value(event, "names"));
+        List<String> added = service.addGameMasters(id, resolution.userIds());
         String notice =
                 "Added " + added.size() + " GM(s)" + (added.isEmpty() ? "." : ": " + TournamentPanel.names(added));
         if (!resolution.problems().isEmpty()) notice += "\n" + resolution.problems();
@@ -288,16 +304,16 @@ final class TournamentPanelPlayers {
     @ButtonHandler(value = GM_REMOVE_MODAL, save = false)
     static void openGameMasterRemove(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, GM_REMOVE_MODAL);
-        event.replyModal(TournamentPanel.namesModal(GM_REMOVE_SAVE + id, "Remove GMs", "GMs", NAMES_PLACEHOLDER))
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        TournamentPanel.openNamesModal(event, GM_REMOVE_SAVE + id, "Remove GMs", "GMs");
     }
 
     @ModalHandler(value = GM_REMOVE_SAVE, save = false)
     static void removeGameMasters(ModalInteractionEvent event) {
         if (!TournamentAccess.require(event)) return;
         long id = TournamentPanel.idOf(event.getModalId(), GM_REMOVE_SAVE);
-        Resolution resolution = resolve(id, TournamentPanel.value(event, "names"));
         TournamentService service = TournamentService.getBean();
+        Resolution resolution =
+                TournamentPanel.resolve(service.find(id).orElseThrow(), TournamentPanel.value(event, "names"));
         List<String> removed = resolution.userIds().stream()
                 .filter(userId -> service.removeGameMaster(id, userId))
                 .toList();

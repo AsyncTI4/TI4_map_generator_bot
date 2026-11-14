@@ -53,10 +53,10 @@ public class TournamentService {
 
     public record JoinResult(JoinOutcome outcome, int activeCount, int waitlistPosition) {}
 
-    public record LeaveResult(boolean removed, boolean wasActive, String promotedUserId, String refusal) {
+    public record LeaveResult(boolean removed, String promotedUserId, String refusal) {
 
         static LeaveResult refused(String refusal) {
-            return new LeaveResult(false, false, null, refusal);
+            return new LeaveResult(false, null, refusal);
         }
     }
 
@@ -118,10 +118,6 @@ public class TournamentService {
         return entries(id).stream().filter(entry -> !entry.isWaitlisted()).toList();
     }
 
-    public List<TournamentEntry> waitlist(long id) {
-        return entries(id).stream().filter(TournamentEntry::isWaitlisted).toList();
-    }
-
     @Transactional
     public JoinResult join(long id, String userId) {
         Tournament tournament = tournaments.lockById(id).orElse(null);
@@ -155,16 +151,13 @@ public class TournamentService {
             return LeaveResult.refused("The games are already being created. Please contact a tournament organizer.");
         }
         TournamentEntry entry = entries.findByTournamentIdAndUserId(id, userId).orElse(null);
-        if (entry == null) return new LeaveResult(false, false, null, null);
+        if (entry == null) return new LeaveResult(false, null, null);
         entries.delete(entry);
-        if (entry.isWaitlisted()) return new LeaveResult(true, false, null, null);
+        if (entry.isWaitlisted()) return new LeaveResult(true, null, null);
         boolean seatNeeded = entry.getGroupNumber() != null || activeCount(entries(id)) < tournament.getTargetSize();
         String promoted = seatNeeded ? promoteFirstWaitlisted(id, entry.getGroupNumber()) : null;
-        if (promoted == null && entry.getGroupNumber() != null && tournament.getStatus() == TournamentStatus.GROUPED) {
-            tournament.setStatus(TournamentStatus.CLOSED);
-            tournaments.save(tournament);
-        }
-        return new LeaveResult(true, true, promoted, null);
+        if (promoted == null && entry.getGroupNumber() != null) reopenIfGrouped(tournament);
+        return new LeaveResult(true, promoted, null);
     }
 
     @Transactional
@@ -172,11 +165,29 @@ public class TournamentService {
         Tournament tournament = tournaments.lockById(id).orElse(null);
         if (tournament == null || !tournament.getStatus().allowsRosterChanges()) return Optional.empty();
         String promoted = promoteFirstWaitlisted(id, null);
-        if (promoted != null && tournament.getStatus() == TournamentStatus.GROUPED) {
-            tournament.setStatus(TournamentStatus.CLOSED);
-            tournaments.save(tournament);
-        }
+        if (promoted != null) reopenIfGrouped(tournament);
         return Optional.ofNullable(promoted);
+    }
+
+    @Transactional
+    public List<String> fillToTarget(long id) {
+        Tournament tournament = tournaments.lockById(id).orElse(null);
+        if (tournament == null || !tournament.getStatus().allowsRosterChanges()) return List.of();
+        List<String> promoted = new ArrayList<>();
+        int open = tournament.getTargetSize() - activeCount(entries(id));
+        for (int seat = 0; seat < open; seat++) {
+            String userId = promoteFirstWaitlisted(id, null);
+            if (userId == null) break;
+            promoted.add(userId);
+        }
+        if (!promoted.isEmpty()) reopenIfGrouped(tournament);
+        return promoted;
+    }
+
+    private void reopenIfGrouped(Tournament tournament) {
+        if (tournament.getStatus() != TournamentStatus.GROUPED) return;
+        tournament.setStatus(TournamentStatus.CLOSED);
+        tournaments.save(tournament);
     }
 
     private String promoteFirstWaitlisted(long id, Integer groupNumber) {
@@ -227,10 +238,7 @@ public class TournamentService {
                 alreadyIn.add(userId);
             }
         }
-        if ((!added.isEmpty() || !promoted.isEmpty()) && tournament.getStatus() == TournamentStatus.GROUPED) {
-            tournament.setStatus(TournamentStatus.CLOSED);
-            tournaments.save(tournament);
-        }
+        if (!added.isEmpty() || !promoted.isEmpty()) reopenIfGrouped(tournament);
         return new BulkAddResult(added, promoted, waitlisted, alreadyIn, null);
     }
 
@@ -242,17 +250,17 @@ public class TournamentService {
         TournamentEntry entry = entries.findByTournamentIdAndUserId(id, userId).orElse(null);
         String refusal = partialCreationRefusal(tournament, creationRunning, entry);
         if (refusal != null) return LeaveResult.refused(refusal);
-        if (entry == null) return new LeaveResult(false, false, null, null);
+        if (entry == null) return new LeaveResult(false, null, null);
         if (entry.isWaitlisted()) {
             entries.delete(entry);
-            return new LeaveResult(true, false, null, null);
+            return new LeaveResult(true, null, null);
         }
         if (waitlistIsEmpty(id)) {
             return LeaveResult.refused("Nobody is on the waitlist to take that seat. Bulk add a replacement first:"
                     + " while games are being created, new players go on the waitlist.");
         }
         entries.delete(entry);
-        return new LeaveResult(true, true, promoteFirstWaitlisted(id, entry.getGroupNumber()), null);
+        return new LeaveResult(true, promoteFirstWaitlisted(id, entry.getGroupNumber()), null);
     }
 
     private boolean waitlistIsEmpty(long id) {
@@ -349,14 +357,13 @@ public class TournamentService {
         if (tournament == null) return Optional.empty();
         if (tournament.getStatus() == TournamentStatus.ARCHIVED) return Optional.of(tournament);
         Collection<List<TournamentEntry>> groups = groups(entries(id)).values();
-        boolean anyCreated =
-                groups.stream().anyMatch(members -> members.getFirst().getGameName() != null);
-        boolean allCreated = anyCreated
-                && groups.stream().allMatch(members -> members.getFirst().getGameName() != null);
-        TournamentStatus status = TournamentStatus.GROUPED;
-        if (allCreated) status = TournamentStatus.CREATED;
-        else if (anyCreated) status = TournamentStatus.CREATING;
-        tournament.setStatus(status);
+        long created = groups.stream()
+                .filter(members -> members.getFirst().getGameName() != null)
+                .count();
+        tournament.setStatus(
+                created == 0
+                        ? TournamentStatus.GROUPED
+                        : created == groups.size() ? TournamentStatus.CREATED : TournamentStatus.CREATING);
         return Optional.of(tournaments.save(tournament));
     }
 
@@ -493,7 +500,7 @@ public class TournamentService {
         return 0;
     }
 
-    private static int activeCount(List<TournamentEntry> entries) {
+    public static int activeCount(List<TournamentEntry> entries) {
         return (int) entries.stream().filter(entry -> !entry.isWaitlisted()).count();
     }
 

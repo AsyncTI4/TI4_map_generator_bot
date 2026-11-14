@@ -67,9 +67,30 @@ class TournamentHelpersTest {
         assertThat(TournamentHours.likelyActiveUtcHours(330)).containsExactly(9, 10, 11, 12, 13, 14, 15, 16);
         // US Pacific 15:00-23:00 local is 23:00-07:00 UTC.
         assertThat(TournamentHours.likelyActiveUtcHours(-480)).containsExactly(23, 0, 1, 2, 3, 4, 5, 6);
-        assertThat(TournamentTimeZones.offsets()).hasSize(25);
-        assertThat(TournamentTimeZones.label(330)).isEqualTo("UTC+5:30");
-        assertThat(TournamentTimeZones.label(-300)).isEqualTo("UTC-5");
+        assertThat(TournamentPlayTimes.offsets()).hasSize(25);
+        assertThat(TournamentPlayTimes.label(330)).isEqualTo("UTC+5:30");
+        assertThat(TournamentPlayTimes.label(-300)).isEqualTo("UTC-5");
+    }
+
+    @Test
+    void playTimesRankBelowAfkAndAboveTheTimeZoneGuess() {
+        UserSettings settings = new UserSettings();
+        settings.setUtcOffsetMinutes(60);
+        assertThat(TournamentHours.needsPlayTimes(settings)).isTrue();
+
+        // Central Europe: Morning 08-11 and Evening 17-20 local, with a gap in between.
+        settings.setPlayTimeParts(List.of("MORNING", "EVENING", "unknown"));
+        assertThat(TournamentHours.profile(settings).source()).isEqualTo(TournamentHours.Source.PLAY_TIMES);
+        assertThat(TournamentHours.profile(settings).hours()).containsExactly(7, 8, 9, 16, 17, 18);
+        assertThat(TournamentHours.needsPlayTimes(settings)).isFalse();
+
+        // Late night 02-05 in US Pacific wraps to 10-13 UTC.
+        settings.setUtcOffsetMinutes(-480);
+        settings.setPlayTimeParts(List.of("LATE_NIGHT"));
+        assertThat(TournamentHours.profile(settings).hours()).containsExactly(10, 11, 12);
+
+        settings.setAfkHours("0;1;2;3;4;5;6;7");
+        assertThat(TournamentHours.profile(settings).source()).isEqualTo(TournamentHours.Source.AFK_SETTINGS);
     }
 
     @Test

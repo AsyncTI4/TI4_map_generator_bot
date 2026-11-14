@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
@@ -37,7 +38,7 @@ public class TournamentResults {
     public record Progress(int finished, int total) {}
 
     public static Progress progress(List<TournamentEntry> entries) {
-        Set<String> games = gameNames(entries);
+        List<String> games = gameNames(entries);
         int finished = (int) games.stream()
                 .filter(GameManager::isValid)
                 .map(GameManager::getManagedGame)
@@ -127,20 +128,18 @@ public class TournamentResults {
         }
         Map<String, Integer> previousGroups = new HashMap<>();
         if (tournament.isAvoidRematches()) {
-            for (TournamentEntry entry : TournamentService.getBean().entries(previous)) {
-                if (!entry.isWaitlisted() && entry.getGroupNumber() != null) {
-                    previousGroups.put(entry.getUserId(), entry.getGroupNumber());
-                }
-            }
+            TournamentService.groups(TournamentService.getBean().entries(previous))
+                    .forEach(
+                            (group, members) -> members.forEach(entry -> previousGroups.put(entry.getUserId(), group)));
         }
         return new TournamentGrouper.Constraints(keepApart, previousGroups);
     }
 
-    private static Set<String> gameNames(List<TournamentEntry> entries) {
-        Set<String> names = new LinkedHashSet<>();
-        for (TournamentEntry entry : entries) {
-            if (entry.getGameName() != null) names.add(entry.getGameName());
-        }
-        return names;
+    public static List<String> gameNames(List<TournamentEntry> entries) {
+        return entries.stream()
+                .map(TournamentEntry::getGameName)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 }

@@ -5,7 +5,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -29,7 +28,7 @@ public class TournamentSetupGame {
 
     private static final String SEAT_NAME = "Setup seat ";
 
-    public static String gameName(Tournament tournament) {
+    private static String gameName(Tournament tournament) {
         return "tsetup" + tournament.getId();
     }
 
@@ -42,14 +41,13 @@ public class TournamentSetupGame {
         if (TournamentGameNames.isTaken(name)) {
             return "**" + name + "** already exists. Use **Use setup from game** to link it.";
         }
-        Category category = category(tournament, guild);
         Game game = CreateGameService.createGameChannels(
                 List.of(hostMember),
                 reportChannel,
                 tournament.getSeriesName() + " setup",
                 name,
                 hostMember,
-                category,
+                TournamentDiscord.category(guild, StringUtils.left(tournament.getSeriesName() + " Setup", 100)),
                 true);
         if (game == null) return "Could not create the setup game. Check the host server's capacity.";
         ExecutionLockManager.wrapWithLockAndRelease(name, ExecutionLockType.WRITE, () -> {
@@ -60,18 +58,14 @@ public class TournamentSetupGame {
                 .run();
         int admins = giveRoleToAdmins(guild, name);
         TournamentService.getBean().update(tournament.getId(), pool -> pool.setSetupSourceGame(name));
-        String channel = game.getActionsChannel() == null
-                ? name
-                : game.getActionsChannel().getAsMention();
-        return "Created setup game " + channel + " with " + tournament.getGroupSize() + " seats. " + admins
-                + " tournament admin(s) can see it. Set it up with the normal buttons there.";
+        return "Created setup game " + actionsChannelMention(game) + " with " + tournament.getGroupSize() + " seats. "
+                + admins + " tournament admin(s) can see it. Set it up with the normal buttons there.";
     }
 
-    private static Category category(Tournament tournament, Guild guild) {
-        String name = StringUtils.left(tournament.getSeriesName() + " Setup", 100);
-        return guild.getCategoriesByName(name, true).stream()
-                .findFirst()
-                .orElseGet(() -> CreateGameService.createGameCategory(guild, name));
+    public static String actionsChannelMention(Game game) {
+        return game.getActionsChannel() == null
+                ? game.getName()
+                : game.getActionsChannel().getAsMention();
     }
 
     private static int giveRoleToAdmins(Guild guild, String gameName) {
@@ -88,7 +82,7 @@ public class TournamentSetupGame {
         return given;
     }
 
-    public static void syncSeats(Game game, int groupSize) {
+    private static void syncSeats(Game game, int groupSize) {
         List<Player> seats = setupSeats(game);
         int realSeats = game.getPlayers().size() - seats.size();
         int wanted = Math.max(0, groupSize - realSeats);
@@ -124,18 +118,17 @@ public class TournamentSetupGame {
                                 || !player.getActionCards().isEmpty());
     }
 
-    public static boolean draftStarted(Game game) {
+    private static boolean draftStarted(Game game) {
         return "miltydraft".equals(game.getPhaseOfGame())
                 || game.getPlayers().values().stream()
                         .anyMatch(player -> !player.isDummy() && StringUtils.isNotBlank(player.getFaction()));
     }
 
     public static String resizeSeats(Tournament tournament) {
-        String name = tournament.getSetupSourceGame();
-        if (StringUtils.isBlank(name) || !GameManager.isValid(name)) return null;
-        Game probe = GameManager.getManagedGame(name).getGame();
+        Game probe = TournamentSetupApplier.loadSource(tournament);
         if (!isOwnSetupGame(probe, tournament)) return null;
         if (draftStarted(probe)) return "The setup game's draft has started, so its seats were not changed.";
+        String name = tournament.getSetupSourceGame();
         ExecutionLockManager.wrapWithLockAndRelease(name, ExecutionLockType.WRITE, () -> {
                     Game game = GameManager.getManagedGame(name).getGame();
                     syncSeats(game, tournament.getGroupSize());

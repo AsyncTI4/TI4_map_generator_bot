@@ -107,7 +107,7 @@ public class TournamentGameCreator {
                 capacityProblem(tournament, guild, pending));
     }
 
-    private static boolean playsIn(List<TournamentEntry> members, String userId) {
+    public static boolean playsIn(List<TournamentEntry> members, String userId) {
         return members.stream().anyMatch(entry -> entry.getUserId().equals(userId));
     }
 
@@ -220,7 +220,7 @@ public class TournamentGameCreator {
                 ? createFog(tournament, guild, reportChannel, group, members)
                 : createNormal(tournament, guild, reportChannel, group, members, groupCount);
         if (step.gameName() != null) {
-            finishGame(members);
+            members.forEach(member -> MatchmakerService.get().leaveQueue(member.getUserId()));
         }
         return step;
     }
@@ -259,9 +259,8 @@ public class TournamentGameCreator {
         }
         String funName = funName(tournament, group, CHANNEL_NAME_LIMIT - gameName.length() - 1 - TIGL_PREFIX_ROOM);
         Category category = category(tournament, guild, group, groupCount);
-        Game source =
-                TournamentSetupApplier.hasSource(tournament) ? TournamentSetupApplier.loadSource(tournament) : null;
-        boolean copySetup = TournamentSetupApplier.canCopy(source);
+        Game source = TournamentSetupApplier.copyableSource(tournament);
+        boolean copySetup = source != null;
         Game game;
         try {
             game = CreateGameService.createGameChannels(
@@ -338,12 +337,6 @@ public class TournamentGameCreator {
         return Step.created(gameName);
     }
 
-    private static void finishGame(List<TournamentEntry> members) {
-        for (TournamentEntry member : members) {
-            MatchmakerService.get().leaveQueue(member.getUserId());
-        }
-    }
-
     public static boolean hasAnySetup(Tournament tournament) {
         return TournamentSetupApplier.hasSource(tournament)
                 || !TournamentSetupOptions.all().isEmpty();
@@ -352,9 +345,8 @@ public class TournamentGameCreator {
     public static String applySetup(Tournament tournament, String gameName) {
         if (!hasAnySetup(tournament)) return null;
         if (!GameManager.isValid(gameName)) return gameName + " no longer exists.";
-        Game source =
-                TournamentSetupApplier.hasSource(tournament) ? TournamentSetupApplier.loadSource(tournament) : null;
-        boolean copySetup = TournamentSetupApplier.canCopy(source);
+        Game source = TournamentSetupApplier.copyableSource(tournament);
+        boolean copySetup = source != null;
         Map<String, String> values = TournamentService.gameSetup(tournament);
         List<String> problems = new ArrayList<>();
         ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
@@ -375,11 +367,10 @@ public class TournamentGameCreator {
         int perCategory = Math.max(1, tournament.getGamesPerCategory());
         int from = ((group - 1) / perCategory) * perCategory + 1;
         int to = Math.min(from + perCategory - 1, groupCount);
-        String name = StringUtils.left(
-                tournament.getSeriesName() + " " + tournament.getRoundLabel() + " " + from + "-" + to, 100);
-        return guild.getCategoriesByName(name, true).stream()
-                .findFirst()
-                .orElseGet(() -> CreateGameService.createGameCategory(guild, name));
+        return TournamentDiscord.category(
+                guild,
+                StringUtils.left(
+                        tournament.getSeriesName() + " " + tournament.getRoundLabel() + " " + from + "-" + to, 100));
     }
 
     private static void resetPbdNumber(String gameName) {

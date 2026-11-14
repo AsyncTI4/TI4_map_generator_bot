@@ -11,7 +11,6 @@ import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.logging.BotLogger;
 import ti4.service.tournament.TournamentAccess;
-import ti4.spring.service.tournament.TournamentService;
 
 public class TournamentCommand implements ParentCommand {
 
@@ -29,9 +28,7 @@ public class TournamentCommand implements ParentCommand {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         if (!ParentCommand.super.accept(event)) return false;
-        String refusal = null;
-        if (TournamentService.isUnavailable()) refusal = TournamentService.UNAVAILABLE;
-        else if (!TournamentAccess.isTournamentAdmin(event.getMember())) refusal = TournamentAccess.DENIED;
+        String refusal = TournamentAccess.refusal(event.getMember());
         if (refusal == null) return true;
         event.getHook().editOriginal(refusal).queue(Consumers.nop(), BotLogger::catchRestError);
         return false;

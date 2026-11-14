@@ -30,7 +30,12 @@ public class TournamentSetupApplier {
         return GameManager.getManagedGame(name).getGame();
     }
 
-    public static boolean canCopy(Game source) {
+    public static Game copyableSource(Tournament tournament) {
+        Game source = hasSource(tournament) ? loadSource(tournament) : null;
+        return canCopy(source) ? source : null;
+    }
+
+    static boolean canCopy(Game source) {
         return source != null
                 && TournamentSetupCopier.unsupportedModes(source).isEmpty()
                 && startedProblem(source) == null;
@@ -48,12 +53,10 @@ public class TournamentSetupApplier {
         return problems;
     }
 
-    public static void postDraftMenu(Game source, Game target) {
+    private static void postDraftMenu(Game source, Game target) {
         MessageChannel channel = target.getActionsChannel();
         if (channel == null) return;
-        boolean draftSystem = TournamentSetupCopier.usesDraftSystem(source)
-                && (source.isTwilightsFallMode() || StringUtils.isBlank(target.getMiltyJson()));
-        if (draftSystem) {
+        if (prefersDraftSystem(source)) {
             target.initializeDraftSystemSettings().postMessageAndButtons(channel);
         } else if (StringUtils.isNotBlank(target.getMiltyJson())) {
             MiltySettings settings = target.initializeMiltySettings();
@@ -93,13 +96,8 @@ public class TournamentSetupApplier {
         if (!TournamentSetupCopier.hasDraftSettings(source))
             return "no draft settings, each game sets up its own draft";
         JsonNode draft = draftNode(source);
-        String system = TournamentSetupCopier.usesDraftSystem(source) && source.isTwilightsFallMode()
-                ? "draft system"
-                : StringUtils.isNotBlank(source.getMiltyJson()) || source.getMiltySettingsUnsafe() != null
-                        ? "Milty"
-                        : "draft system";
         String slices = presetSlices(draft);
-        return system + " · map " + mapTemplate(draft) + " · "
+        return (prefersDraftSystem(source) ? "draft system" : "Milty") + " · map " + mapTemplate(draft) + " · "
                 + (slices == null ? "random slices per game" : sliceCount(slices) + " custom slices") + " · "
                 + listSize(draft, "banFactions") + " banned, " + listSize(draft, "priFactions") + " priority factions";
     }
@@ -126,16 +124,15 @@ public class TournamentSetupApplier {
         return warnings;
     }
 
+    private static boolean prefersDraftSystem(Game source) {
+        return TournamentSetupCopier.usesDraftSystem(source)
+                && (source.isTwilightsFallMode() || TournamentSetupCopier.miltyJson(source) == null);
+    }
+
     private static JsonNode draftNode(Game source) {
-        String json = source.getMiltySettingsUnsafe() != null
-                ? source.getMiltySettingsUnsafe().json()
-                : source.getMiltyJson();
-        if (TournamentSetupCopier.usesDraftSystem(source)
-                && (source.isTwilightsFallMode() || StringUtils.isBlank(json))) {
-            json = source.getDraftSystemSettingsUnsafe() != null
-                    ? source.getDraftSystemSettingsUnsafe().json()
-                    : source.getDraftSystemSettingsJson();
-        }
+        String json = prefersDraftSystem(source)
+                ? TournamentSetupCopier.draftSystemJson(source)
+                : TournamentSetupCopier.miltyJson(source);
         JsonNode root = JsonMapperManager.basic().readTree(json);
         return root.has("miltySettings") ? root.get("miltySettings") : root;
     }

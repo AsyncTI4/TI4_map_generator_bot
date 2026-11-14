@@ -111,17 +111,7 @@ public class CreateGameService {
             Member gameOwner,
             Category categoryChannel) {
         return createGameChannels(
-                members, event.getMessageChannel(), gameFunName, gameName, gameOwner, categoryChannel);
-    }
-
-    public static Game createGameChannels(
-            List<Member> members,
-            MessageChannel reportChannel,
-            String gameFunName,
-            String gameName,
-            Member gameOwner,
-            Category categoryChannel) {
-        return createGameChannels(members, reportChannel, gameFunName, gameName, gameOwner, categoryChannel, true);
+                members, event.getMessageChannel(), gameFunName, gameName, gameOwner, categoryChannel, true);
     }
 
     public static Game createGameChannels(

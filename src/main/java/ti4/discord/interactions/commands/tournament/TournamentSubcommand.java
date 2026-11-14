@@ -42,7 +42,19 @@ abstract class TournamentSubcommand extends Subcommand {
         event.getHook().editOriginal(message).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    static Tournament tournament(SlashCommandInteractionEvent event) {
+    static Tournament tournamentOrReply(SlashCommandInteractionEvent event) {
+        Tournament tournament = tournament(event);
+        if (tournament == null) reply(event, "Pick a tournament from the list.");
+        return tournament;
+    }
+
+    static GuildMessageChannel channelOrReply(SlashCommandInteractionEvent event, String optionName) {
+        GuildMessageChannel channel = channel(event, optionName);
+        if (channel == null) reply(event, "Pick a text channel.");
+        return channel;
+    }
+
+    private static Tournament tournament(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(TOURNAMENT);
         if (option == null) return null;
         try {

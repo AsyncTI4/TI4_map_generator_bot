@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
@@ -144,20 +145,20 @@ public class TournamentSetupCopier {
     }
 
     private static List<String> deckAliases(Game game) {
-        List<String> aliases = new ArrayList<>(List.of(
-                game.getAcDeckID(),
-                game.getSoDeckID(),
-                game.getStage1PublicDeckID(),
-                game.getStage2PublicDeckID(),
-                game.getRelicDeckID(),
-                game.getAgendaDeckID(),
-                game.getExplorationDeckID()));
-        if (StringUtils.isNotBlank(game.getEventDeckID())) aliases.add(game.getEventDeckID());
-        aliases.removeIf(StringUtils::isBlank);
-        return aliases;
+        return Stream.of(
+                        game.getAcDeckID(),
+                        game.getSoDeckID(),
+                        game.getStage1PublicDeckID(),
+                        game.getStage2PublicDeckID(),
+                        game.getRelicDeckID(),
+                        game.getAgendaDeckID(),
+                        game.getExplorationDeckID(),
+                        game.getEventDeckID())
+                .filter(StringUtils::isNotBlank)
+                .toList();
     }
 
-    static Set<String> presentCards(Game game, DeckType type) {
+    private static Set<String> presentCards(Game game, DeckType type) {
         Set<String> present = new LinkedHashSet<>();
         Collection<Player> players = game.getPlayers().values();
         switch (type) {
@@ -283,29 +284,29 @@ public class TournamentSetupCopier {
 
     private static void copyObjectiveDeck(Game source, Game target, int stage, List<String> problems) {
         String alias = stage == 1 ? source.getStage1PublicDeckID() : source.getStage2PublicDeckID();
-        DeckModel deck = Mapper.getDeck(alias);
-        if (deck == null) {
-            problems.add("Unknown deck " + alias + ".");
-            return;
-        }
         int peekable = stage == 1
                 ? source.getPublicObjectives1Peekable().size()
                 : source.getPublicObjectives2Peekable().size();
-        if (stage == 1) {
-            target.setStage1PublicDeckID(alias);
-            target.setPublicObjectives1(new ArrayList<>(deck.getNewShuffledDeck()));
-            target.getPublicObjectives1Peekable().clear();
-            target.getPublicObjectives1Peeked().clear();
-        } else {
-            target.setStage2PublicDeckID(alias);
-            target.setPublicObjectives2(new ArrayList<>(deck.getNewShuffledDeck()));
-            target.getPublicObjectives2Peekable().clear();
-            target.getPublicObjectives2Peeked().clear();
-        }
-        target.setUpPeekableObjectives(peekable, stage);
+        resetDeck(
+                alias,
+                deck -> {
+                    if (stage == 1) {
+                        target.setStage1PublicDeckID(alias);
+                        target.setPublicObjectives1(new ArrayList<>(deck.getNewShuffledDeck()));
+                        target.getPublicObjectives1Peekable().clear();
+                        target.getPublicObjectives1Peeked().clear();
+                    } else {
+                        target.setStage2PublicDeckID(alias);
+                        target.setPublicObjectives2(new ArrayList<>(deck.getNewShuffledDeck()));
+                        target.getPublicObjectives2Peekable().clear();
+                        target.getPublicObjectives2Peeked().clear();
+                    }
+                    target.setUpPeekableObjectives(peekable, stage);
+                },
+                problems);
     }
 
-    static void removeCards(Game target, Map<String, Set<String>> removed) {
+    private static void removeCards(Game target, Map<String, Set<String>> removed) {
         removed.forEach((alias, cards) -> {
             DeckModel deck = Mapper.getDeck(alias);
             if (deck == null || deck.getType() == null) return;
@@ -346,13 +347,13 @@ public class TournamentSetupCopier {
         return draftSystemJson(source) != null;
     }
 
-    private static String miltyJson(Game source) {
+    static String miltyJson(Game source) {
         if (source.getMiltySettingsUnsafe() != null)
             return source.getMiltySettingsUnsafe().json();
         return StringUtils.isBlank(source.getMiltyJson()) ? null : source.getMiltyJson();
     }
 
-    private static String draftSystemJson(Game source) {
+    static String draftSystemJson(Game source) {
         if (source.getDraftSystemSettingsUnsafe() != null)
             return source.getDraftSystemSettingsUnsafe().json();
         return StringUtils.isBlank(source.getDraftSystemSettingsJson()) ? null : source.getDraftSystemSettingsJson();
@@ -381,7 +382,7 @@ public class TournamentSetupCopier {
         return JsonMapperManager.basic().writeValueAsString(root);
     }
 
-    static String stripDraftSystemJson(String json) {
+    private static String stripDraftSystemJson(String json) {
         JsonNode root = JsonMapperManager.basic().readTree(json);
         if (root instanceof ObjectNode draft) {
             draft.remove("messageId");

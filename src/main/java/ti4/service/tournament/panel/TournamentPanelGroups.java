@@ -8,25 +8,21 @@ import java.util.Map;
 import java.util.Set;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
-import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
-import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
-import ti4.logging.BotLogger;
 import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
+import ti4.service.tournament.TournamentGameCreator;
 import ti4.service.tournament.TournamentGameMasterAssigner;
 import ti4.service.tournament.TournamentGrouper;
 import ti4.service.tournament.TournamentGrouper.Entrant;
 import ti4.service.tournament.TournamentHours;
-import ti4.service.tournament.TournamentMemberResolver;
 import ti4.service.tournament.TournamentMemberResolver.Resolution;
 import ti4.service.tournament.TournamentResults;
 import ti4.service.tournament.TournamentRoster;
@@ -190,12 +186,12 @@ final class TournamentPanelGroups {
     @ButtonHandler(value = SWAP_MODAL, save = false)
     static void openSwap(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, SWAP_MODAL);
-        Modal modal = Modal.create(SWAP_SAVE + id, "Swap two players")
-                .addComponents(
-                        Label.of("First player", TournamentPanel.input("first", TextInputStyle.SHORT, null, true)),
-                        Label.of("Second player", TournamentPanel.input("second", TextInputStyle.SHORT, null, true)))
-                .build();
-        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+        TournamentPanel.openModal(
+                event,
+                SWAP_SAVE + id,
+                "Swap two players",
+                TournamentPanel.field("First player", "first", null, true),
+                TournamentPanel.field("Second player", "second", null, true));
     }
 
     @ModalHandler(value = SWAP_SAVE, save = false)
@@ -203,9 +199,8 @@ final class TournamentPanelGroups {
         if (!TournamentAccess.require(event)) return;
         long id = TournamentPanel.idOf(event.getModalId(), SWAP_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
-        Resolution resolution = TournamentMemberResolver.resolve(
-                TournamentPanel.value(event, "first") + "\n" + TournamentPanel.value(event, "second"),
-                TournamentDiscord.lookupGuilds(tournament));
+        Resolution resolution = TournamentPanel.resolve(
+                tournament, TournamentPanel.value(event, "first") + "\n" + TournamentPanel.value(event, "second"));
         if (resolution.userIds().size() != 2) {
             TournamentPanel.show(event, id, Tab.GROUPS, "Couldn't find exactly two players.\n" + resolution.problems());
             return;
@@ -264,12 +259,12 @@ final class TournamentPanelGroups {
     @ButtonHandler(value = SET_GM_MODAL, save = false)
     static void openSetGameMaster(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, SET_GM_MODAL);
-        Modal modal = Modal.create(SET_GM_SAVE + id, "Set a GM")
-                .addComponents(
-                        Label.of("Group number", TournamentPanel.input("group", TextInputStyle.SHORT, null, true)),
-                        Label.of("GM", TournamentPanel.input("gm", TextInputStyle.SHORT, null, true)))
-                .build();
-        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+        TournamentPanel.openModal(
+                event,
+                SET_GM_SAVE + id,
+                "Set a GM",
+                TournamentPanel.field("Group number", "group", null, true),
+                TournamentPanel.field("GM", "gm", null, true));
     }
 
     @ModalHandler(value = SET_GM_SAVE, save = false)
@@ -278,27 +273,25 @@ final class TournamentPanelGroups {
         long id = TournamentPanel.idOf(event.getModalId(), SET_GM_SAVE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
-        Integer group = TournamentPanel.parseInt(TournamentPanel.value(event, "group"));
-        Map<Integer, List<TournamentEntry>> groups = TournamentService.groups(service.entries(id));
-        if (group == null || !groups.containsKey(group)) {
+        int group = NumberUtils.toInt(TournamentPanel.value(event, "group"), -1);
+        List<TournamentEntry> members =
+                TournamentService.groups(service.entries(id)).get(group);
+        if (members == null) {
             TournamentPanel.show(event, id, Tab.GROUPS, "There is no group with that number.");
             return;
         }
-        Resolution resolution = TournamentMemberResolver.resolve(
-                TournamentPanel.value(event, "gm"), TournamentDiscord.lookupGuilds(tournament));
+        Resolution resolution = TournamentPanel.resolve(tournament, TournamentPanel.value(event, "gm"));
         if (resolution.userIds().size() != 1) {
             TournamentPanel.show(event, id, Tab.GROUPS, "Couldn't find exactly one GM.\n" + resolution.problems());
             return;
         }
         String gameMaster = resolution.userIds().getFirst();
-        String gameName = groups.get(group).getFirst().getGameName();
+        String gameName = members.getFirst().getGameName();
         if (gameName != null) {
             TournamentPanel.show(event, id, Tab.GROUPS, "Group " + group + " already has its game, " + gameName + ".");
             return;
         }
-        boolean playsInGroup =
-                groups.get(group).stream().anyMatch(entry -> entry.getUserId().equals(gameMaster));
-        if (playsInGroup) {
+        if (TournamentGameCreator.playsIn(members, gameMaster)) {
             TournamentPanel.show(
                     event, id, Tab.GROUPS, TournamentDiscord.userName(gameMaster) + " plays in group " + group + ".");
             return;
