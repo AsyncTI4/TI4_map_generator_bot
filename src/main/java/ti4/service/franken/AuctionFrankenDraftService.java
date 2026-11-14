@@ -188,6 +188,7 @@ public class AuctionFrankenDraftService {
         addToList(game, "locked", player.getFaction());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Your bids are locked at 0 / 0 / 0.");
+        sendBidSubmissionStatus(game);
         if (locked(game).containsAll(playerIds(game))) resolveBids(game);
     }
 
@@ -239,6 +240,7 @@ public class AuctionFrankenDraftService {
         set(game, playerKey("bids", player), first + "," + second + "," + third);
         addToList(game, "locked", player.getFaction());
         respondToBidSubmission(event, "Your bids are locked.");
+        sendBidSubmissionStatus(game);
         if (locked(game).containsAll(playerIds(game))) resolveBids(game);
     }
 
@@ -265,11 +267,13 @@ public class AuctionFrankenDraftService {
         setList(game, "pool", pool);
         addToList(game, "removed", alias);
         addToList(game, playerKey("drafted", player), alias);
+        addToList(game, "picked", player.getFaction());
         int price = number(game, "price." + player.getFaction());
         set(game, playerKey("votes", player), String.valueOf(number(game, playerKey("votes", player)) - price));
         GameManager.save(game, "Auction draft pick");
         String draftedMessage = player.getRepresentationNoPing() + " drafted " + item.getTitle(game) + ".";
         MessageHelper.sendMessageToChannel(auctionChannel(game), draftedMessage);
+        updateDraftStatus(game);
     }
 
     private void advancePick(Game game, GenericInteractionCreateEvent event) {
@@ -320,6 +324,7 @@ public class AuctionFrankenDraftService {
     private void beginBidding(Game game) {
         set(game, "phase", "bid");
         set(game, "locked", "");
+        set(game, "bidStatusMessage", "");
         for (Player player : players(game)) {
             set(game, playerKey("bids", player), "");
             set(game, playerKey("rank", player), "");
@@ -411,11 +416,9 @@ public class AuctionFrankenDraftService {
         set(game, "pickIndex", "0");
         set(game, "picker", order.getFirst().getFaction());
         set(game, "phase", "pick");
-        String result = order.stream()
-                .map(player -> player.getRepresentationNoPing() + " (" + number(game, "price." + player.getFaction())
-                        + " votes)")
-                .collect(Collectors.joining("\n> ", "__Auction Order__\n> ", ""));
-        MessageHelper.sendMessageToChannel(auctionChannel(game), result);
+        set(game, "picked", "");
+        set(game, "draftStatusMessage", "");
+        updateDraftStatus(game);
         MessageHelper.sendMessageToChannel(auctionChannel(game), bidSummary(game));
         Player picker = player(game, value(game, "picker"));
         if (picker != null) {
@@ -619,6 +622,83 @@ public class AuctionFrankenDraftService {
                     .append('\n');
         }
         return text.toString();
+    }
+
+    private void sendBidSubmissionStatus(Game game) {
+        updateStatusMessage(game, "bidStatusMessage", bidSubmissionStatus(game));
+    }
+
+    private String bidSubmissionStatus(Game game) {
+        StringBuilder text = new StringBuilder("__Auction Bid Status__\n");
+        Set<String> submittedBids = new LinkedHashSet<>(locked(game));
+        for (Player player : players(game)) {
+            text.append("> ")
+                    .append(submittedBids.contains(player.getFaction()) ? "✅ " : "❌ ")
+                    .append(player.getRepresentationNoPing())
+                    .append(
+                            submittedBids.contains(player.getFaction())
+                                    ? " has submitted bids."
+                                    : " has not submitted bids.")
+                    .append('\n');
+        }
+        return text.toString();
+    }
+
+    private String draftStatus(Game game) {
+        StringBuilder text = new StringBuilder("__Auction Order__\n");
+        Set<String> draftedPlayers = new LinkedHashSet<>(list(game, "picked"));
+        for (String faction : list(game, "order")) {
+            Player player = player(game, faction);
+            if (player == null) continue;
+            boolean hasDrafted = draftedPlayers.contains(faction);
+            text.append("> ")
+                    .append(hasDrafted ? "✅ " : "❌ ")
+                    .append(player.getRepresentationNoPing())
+                    .append(" (")
+                    .append(number(game, "price." + faction))
+                    .append(" votes spent)")
+                    .append(hasDrafted ? " has drafted." : " has not drafted.")
+                    .append('\n');
+        }
+        return text.toString();
+    }
+
+    private void updateDraftStatus(Game game) {
+        updateStatusMessage(game, "draftStatusMessage", draftStatus(game));
+    }
+
+    private void updateStatusMessage(Game game, String key, String text) {
+        MessageChannel channel = auctionChannel(game);
+        set(game, key + "Text", text);
+        String messageId = value(game, key);
+        String pendingMessageId = "pending:" + currentNomination(game);
+        if (messageId.isBlank()) {
+            set(game, key, pendingMessageId);
+            postStatusMessage(game, key, text, channel);
+            return;
+        }
+        if (pendingMessageId.equals(messageId)) return;
+        channel.retrieveMessageById(messageId)
+                .queue(
+                        message -> message.editMessage(text).queue(Consumers.nop(), BotLogger::catchRestError),
+                        error -> {
+                            set(game, key, "");
+                            updateStatusMessage(game, key, value(game, key + "Text"));
+                        });
+    }
+
+    private void postStatusMessage(Game game, String key, String text, MessageChannel channel) {
+        channel.sendMessage(text)
+                .queue(
+                        message -> {
+                            set(game, key, message.getId());
+                            GameManager.save(game, "Auction draft status message");
+                            String latestText = value(game, key + "Text");
+                            if (!text.equals(latestText)) {
+                                message.editMessage(latestText).queue(Consumers.nop(), BotLogger::catchRestError);
+                            }
+                        },
+                        BotLogger::catchRestError);
     }
 
     private void retireUnchosenComponents(Game game) {
