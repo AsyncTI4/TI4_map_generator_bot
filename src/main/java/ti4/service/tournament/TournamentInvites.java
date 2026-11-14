@@ -87,8 +87,8 @@ public class TournamentInvites {
         for (GuildMessageChannel channel : channels) {
             List<String> pinged = takeMembersOf(channel.getGuild(), notPinged);
             MessageHelper.sendMessageToChannel(channel, text(tournament, host, link, pinged));
-            posted.add(channel.getAsMention() + " (" + channel.getGuild().getName() + ", " + pinged.size()
-                    + " pinged)");
+            posted.add(
+                    channel.getAsMention() + " (" + channel.getGuild().getName() + ", " + pinged.size() + " pinged)");
         }
         String notice = "Posted the invite in " + String.join(", ", posted) + ".";
         if (notPinged.isEmpty()) return notice;

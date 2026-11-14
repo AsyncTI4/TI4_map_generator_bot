@@ -278,11 +278,7 @@ public final class TournamentPanel {
                 .setRequired(true)
                 .setPlaceholder(NAMES_PLACEHOLDER)
                 .build();
-        openModal(
-                event,
-                id,
-                title,
-                ArrayUtils.addFirst(extras, Label.of(label, names)));
+        openModal(event, id, title, ArrayUtils.addFirst(extras, Label.of(label, names)));
     }
 
     static void change(ButtonInteractionEvent event, long id, Tab tab, Consumer<Tournament> change, String notice) {
