@@ -22,6 +22,7 @@ public class TournamentCommand implements ParentCommand {
                     new TournamentPostSignup(),
                     new TournamentPostInvite(),
                     new TournamentShowPanel(),
+                    new TournamentRoles(),
                     new TournamentList())
             .collect(Collectors.toMap(Subcommand::getName, Function.identity(), (a, b) -> a, LinkedHashMap::new));
 

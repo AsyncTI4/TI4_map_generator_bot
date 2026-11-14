@@ -19,9 +19,12 @@ import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.fow.CreateFoWGameService;
 import ti4.service.game.CreateGameService;
 import ti4.service.tournament.panel.TournamentPanel;
+import ti4.service.tournament.setup.TournamentSetupApplier;
+import ti4.service.tournament.setup.TournamentSetupGame;
 import ti4.spring.service.statistics.matchmaking.queue.MatchmakerService;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
@@ -209,7 +212,7 @@ public class TournamentGameCreator {
                 ? createFog(tournament, guild, reportChannel, group, members, funName)
                 : createNormal(tournament, guild, reportChannel, group, members, groupCount, funName);
         if (step.gameName() != null) {
-            finishGame(tournament, step.gameName(), members);
+            finishGame(members);
         }
         return step;
     }
@@ -238,10 +241,13 @@ public class TournamentGameCreator {
             return Step.skip("the name **" + gameName + "** is already used by a game or role.");
         }
         Category category = category(tournament, guild, group, groupCount);
+        Game source =
+                TournamentSetupApplier.hasSource(tournament) ? TournamentSetupApplier.loadSource(tournament) : null;
+        boolean copySetup = TournamentSetupApplier.canCopy(source);
         Game game;
         try {
             game = CreateGameService.createGameChannels(
-                    members, reportChannel, funName, gameName, members.getFirst(), category);
+                    members, reportChannel, funName, gameName, members.getFirst(), category, !copySetup);
         } catch (Exception e) {
             BotLogger.error("Could not create tournament game " + gameName, e);
             game = null;
@@ -249,6 +255,18 @@ public class TournamentGameCreator {
         if (game == null) {
             resetPbdNumber(gameName);
             return Step.fail("Could not create **" + gameName + "**. Check the server and category capacity.");
+        }
+        Game created = game;
+        List<String> setupProblems = new ArrayList<>();
+        ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
+                    if (copySetup) setupProblems.addAll(TournamentSetupApplier.applyToNewGame(source, created));
+                    TournamentSetupOptions.applyAll(created, TournamentService.gameSetup(tournament));
+                    GameManager.save(created, "Tournament game created");
+                })
+                .run();
+        if (!setupProblems.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    reportChannel, "Setup notes for **" + gameName + "**:\n" + String.join("\n", setupProblems));
         }
         return Step.created(gameName);
     }
@@ -279,26 +297,41 @@ public class TournamentGameCreator {
         }
         String gameName = CreateFoWGameService.getNextFOWGameName();
         CreateFoWGameService.executeCreateFoWGame(guild, gameName, funName, gameMaster, members, reportChannel);
+        applySetup(tournament, gameName);
         return Step.created(gameName);
     }
 
-    private static void finishGame(Tournament tournament, String gameName, List<TournamentEntry> members) {
-        applySetup(gameName, TournamentService.gameSetup(tournament));
+    private static void finishGame(List<TournamentEntry> members) {
         for (TournamentEntry member : members) {
             MatchmakerService.get().leaveQueue(member.getUserId());
         }
     }
 
-    public static String applySetup(String gameName, Map<String, String> values) {
-        if (TournamentSetupOptions.all().isEmpty()) return null;
+    public static boolean hasAnySetup(Tournament tournament) {
+        return TournamentSetupApplier.hasSource(tournament)
+                || !TournamentSetupOptions.all().isEmpty();
+    }
+
+    public static String applySetup(Tournament tournament, String gameName) {
+        if (!hasAnySetup(tournament)) return null;
         if (!GameManager.isValid(gameName)) return gameName + " no longer exists.";
+        Game source =
+                TournamentSetupApplier.hasSource(tournament) ? TournamentSetupApplier.loadSource(tournament) : null;
+        boolean copySetup = TournamentSetupApplier.canCopy(source);
+        Map<String, String> values = TournamentService.gameSetup(tournament);
+        List<String> problems = new ArrayList<>();
         ExecutionLockManager.wrapWithLockAndRelease(gameName, ExecutionLockType.WRITE, () -> {
                     Game game = GameManager.getManagedGame(gameName).getGame();
+                    if (copySetup && TournamentSetupGame.dealtOrDrafted(game)) {
+                        problems.add(gameName + " skipped: its draft or dealing has started.");
+                        return;
+                    }
+                    if (copySetup) problems.addAll(TournamentSetupApplier.applyToNewGame(source, game));
                     TournamentSetupOptions.applyAll(game, values);
                     GameManager.save(game, "Tournament game setup");
                 })
                 .run();
-        return null;
+        return problems.isEmpty() ? null : gameName + ": " + String.join(" ", problems);
     }
 
     private static Category category(Tournament tournament, Guild guild, int group, int groupCount) {

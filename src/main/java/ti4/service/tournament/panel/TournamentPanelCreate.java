@@ -1,8 +1,8 @@
 package ti4.service.tournament.panel;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
@@ -34,8 +35,8 @@ import ti4.service.tournament.TournamentInvites;
 import ti4.service.tournament.TournamentMemberResolver;
 import ti4.service.tournament.TournamentMemberResolver.Resolution;
 import ti4.service.tournament.TournamentPacing;
+import ti4.service.tournament.TournamentResults;
 import ti4.service.tournament.TournamentRoles;
-import ti4.service.tournament.TournamentSetupOptions;
 import ti4.service.tournament.TournamentSignupPosts;
 import ti4.service.tournament.panel.TournamentPanel.Context;
 import ti4.service.tournament.panel.TournamentPanel.Tab;
@@ -62,6 +63,7 @@ final class TournamentPanelCreate {
     private static final String BROADCAST_MODAL = "trnBroadcast~MDL_";
     private static final String BROADCAST_SAVE = "trnBroadcastSave_";
     private static final String APPLY_SETUP = "trnApplySetup_";
+    private static final String RESULTS = "trnResults_";
     private static final int BROADCAST_MAX_LENGTH = 1800;
     private static final int CONFIRM_CREATE = 1;
     private static final int CONFIRM_ARCHIVE = 2;
@@ -75,6 +77,10 @@ final class TournamentPanelCreate {
         boolean running = TournamentGameCreator.isRunning(tournament.getId());
         List<String> lines = new ArrayList<>();
         lines.add(intro(tournament, preflight, running));
+        if (!createdGameNames(context.entries()).isEmpty()) {
+            TournamentResults.Progress progress = TournamentResults.progress(context.entries());
+            lines.add("**Results:** " + progress.finished() + "/" + progress.total() + " games finished.");
+        }
         List<String> warnings = warnings(tournament, preflight);
         List<ContainerChildComponent> body = new ArrayList<>();
         body.add(TextDisplay.of(String.join("\n", lines)));
@@ -173,6 +179,7 @@ final class TournamentPanelCreate {
         if (!createdGameNames(context.entries()).isEmpty()) {
             sharing.add(Buttons.blue(BROADCAST_MODAL + id, "Message all games"));
             sharing.add(Buttons.gray(APPLY_SETUP + id, "Apply game setup to all games"));
+            sharing.add(Buttons.gray(RESULTS + id, "Copy results"));
         }
         return List.of(ActionRow.of(buttons), ActionRow.of(sharing));
     }
@@ -236,16 +243,16 @@ final class TournamentPanelCreate {
         long id = TournamentPanel.idOf(buttonID, APPLY_SETUP);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
-        if (TournamentSetupOptions.all().isEmpty()) {
-            TournamentPanel.show(event, id, Tab.CREATE, "There are no game setup options yet.");
+        if (!TournamentGameCreator.hasAnySetup(tournament)) {
+            TournamentPanel.show(
+                    event, id, Tab.CREATE, "There is no game setup to apply. Pick a setup game on the Game setup tab.");
             return;
         }
-        Map<String, String> values = TournamentService.gameSetup(tournament);
         List<String> gameNames = createdGameNames(service.entries(id));
         boolean started = TournamentPacing.forEach(
                 "tournamentApplySetup" + id,
                 gameNames,
-                gameName -> TournamentGameCreator.applySetup(gameName, values),
+                gameName -> TournamentGameCreator.applySetup(tournament, gameName),
                 result -> TournamentPanel.refresh(id, result.summary("Applied the game setup to")));
         TournamentPanel.show(
                 event,
@@ -298,6 +305,23 @@ final class TournamentPanelCreate {
                 event, "Copy this and paste it anywhere:\n```\n" + StringUtils.abbreviate(text, 1900) + "\n```");
     }
 
+    @ButtonHandler(value = RESULTS, save = false)
+    static void copyResults(ButtonInteractionEvent event, String buttonID) {
+        if (!TournamentAccess.require(event)) return;
+        long id = TournamentPanel.idOf(buttonID, RESULTS);
+        Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
+        String text = TournamentResults.text(TournamentResults.results(id));
+        String header = "Results for **" + tournament.displayName() + "**";
+        if (text.length() <= 1800) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), header + "\n```\n" + text + "\n```");
+            return;
+        }
+        event.getMessageChannel()
+                .sendMessage(header)
+                .addFiles(FileUpload.fromData(text.getBytes(StandardCharsets.UTF_8), "results.txt"))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     @ButtonHandler(value = CREATE_ASK, save = false)
     static void askCreate(ButtonInteractionEvent event, String buttonID) {
         if (!TournamentAccess.require(event)) return;
@@ -348,9 +372,17 @@ final class TournamentPanelCreate {
     @ButtonHandler(value = NEXT_ROUND_MODAL, save = false)
     static void openNextRound(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, NEXT_ROUND_MODAL);
+        int games = TournamentService.groups(TournamentService.getBean().entries(id))
+                .size();
         Modal modal = Modal.create(NEXT_ROUND_SAVE + id, "Start the next round")
-                .addComponents(Label.of(
-                        "Round name", TournamentPanel.input("round", TextInputStyle.SHORT, "Semifinals", true)))
+                .addComponents(
+                        Label.of(
+                                "Round name", TournamentPanel.input("round", TextInputStyle.SHORT, "Semifinals", true)),
+                        TextDisplay.of("Players advancing: each finished game's winner first, then the best runners-up"
+                                + " by VP. Leave it empty to start with an empty pool."),
+                        Label.of(
+                                "Players advancing",
+                                TournamentPanel.input("advancing", TextInputStyle.SHORT, String.valueOf(games), false)))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -364,15 +396,49 @@ final class TournamentPanelCreate {
             TournamentPanel.show(event, id, Tab.CREATE, "The round needs a name.");
             return;
         }
-        Tournament next =
-                TournamentService.getBean().nextRound(id, round, event.getUser().getId());
+        String advancingText = TournamentPanel.value(event, "advancing");
+        Integer advancing = advancingText.isBlank() ? Integer.valueOf(0) : TournamentPanel.parseInt(advancingText);
+        if (advancing == null || advancing < 0) {
+            TournamentPanel.show(event, id, Tab.CREATE, "Players advancing must be a number, or empty.");
+            return;
+        }
+        TournamentService service = TournamentService.getBean();
+        Tournament next = service.nextRound(id, round, event.getUser().getId());
+        String advanced = advancing == 0 ? null : advancePlayers(id, next, advancing);
         TournamentPanel.post(
                 next,
                 event.getMessageChannel(),
-                "New round created with the same settings and an empty pool. Bulk add the players on the **Players**"
-                        + " tab, or reopen sign-ups and use `/tournament post_signup`. Game names are back to pbd"
-                        + " numbers; set a new prefix in Settings for custom names.");
+                (advanced == null
+                                ? "New round created with the same settings and an empty pool. Bulk add the players on"
+                                        + " the **Players** tab, or reopen sign-ups and use `/tournament post_signup`."
+                                : advanced)
+                        + " Game names are back to pbd numbers; set a new prefix in Settings for custom names.");
         TournamentPanel.show(event, id, Tab.CREATE, "Started **" + next.displayName() + "**. Its panel is below.");
+    }
+
+    private static String advancePlayers(long previousId, Tournament next, int advancing) {
+        TournamentResults.Advancement advancement =
+                TournamentResults.advance(TournamentResults.results(previousId), advancing);
+        List<String> players = advancement.advancing();
+        TournamentService service = TournamentService.getBean();
+        service.update(next.getId(), pool -> pool.setTargetSize(Math.max(advancing, players.size())));
+        service.bulkAdd(next.getId(), players);
+        players.forEach(userId -> TournamentRoles.give(next, userId));
+        List<String> lines = new ArrayList<>();
+        lines.add("Advanced " + advancement.winners().size() + " winner(s)"
+                + (advancement.wildcards().isEmpty()
+                        ? ""
+                        : " and " + advancement.wildcards().size() + " by VP: "
+                                + TournamentPanel.names(advancement.wildcards()))
+                + ".");
+        if (!advancement.tiedAtCut().isEmpty()) {
+            lines.add("Tied at the cut, check by hand: " + TournamentPanel.names(advancement.tiedAtCut()) + ".");
+        }
+        if (!advancement.unfinishedGames().isEmpty()) {
+            lines.add("Still running, nobody advanced from them: " + String.join(", ", advancement.unfinishedGames())
+                    + ". Bulk add their players later.");
+        }
+        return String.join("\n", lines);
     }
 
     @ButtonHandler(value = WINNERS_MODAL, save = false)

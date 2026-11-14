@@ -49,6 +49,24 @@ class TournamentGrouperTest {
         assertThat(matched).isGreaterThan(shuffled);
     }
 
+    @Test
+    void previousWinnersAreSpreadAndRematchesAvoided() {
+        // 16 players who played last round in 4 groups of 4 (cohort = previous group); c*p0 won each game.
+        List<Entrant> entrants = timezoneCohorts(4, 4);
+        Map<String, Integer> previousGroups = entrants.stream()
+                .collect(Collectors.toMap(
+                        Entrant::userId, entrant -> entrant.userId().charAt(1) - '0'));
+        Set<String> previousWinners = Set.of("c0p0", "c1p0", "c2p0", "c3p0");
+
+        List<List<String>> groups = TournamentGrouper.group(
+                entrants, 4, true, new TournamentGrouper.Constraints(previousWinners, previousGroups), 3);
+
+        for (List<String> group : groups) {
+            assertThat(group.stream().filter(previousWinners::contains)).hasSize(1);
+            assertThat(group.stream().map(previousGroups::get).distinct()).hasSize(group.size());
+        }
+    }
+
     private static List<Entrant> timezoneCohorts(int cohorts, int perCohort) {
         List<Entrant> entrants = new ArrayList<>();
         for (int cohort = 0; cohort < cohorts; cohort++) {

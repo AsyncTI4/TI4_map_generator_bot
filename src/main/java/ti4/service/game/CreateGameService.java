@@ -121,6 +121,17 @@ public class CreateGameService {
             String gameName,
             Member gameOwner,
             Category categoryChannel) {
+        return createGameChannels(members, reportChannel, gameFunName, gameName, gameOwner, categoryChannel, true);
+    }
+
+    public static Game createGameChannels(
+            List<Member> members,
+            MessageChannel reportChannel,
+            String gameFunName,
+            String gameName,
+            Member gameOwner,
+            Category categoryChannel,
+            boolean offerSetupChoices) {
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
 
@@ -255,7 +266,7 @@ public class CreateGameService {
 
         reportNewGameCreated(newGame);
 
-        presentSetupToPlayers(newGame);
+        presentSetupToPlayers(newGame, offerSetupChoices);
 
         if (isTiglGame) {
             TIGLHelper.markAsTIGLGame(newGame, false);
@@ -327,12 +338,28 @@ public class CreateGameService {
     }
 
     public static void presentSetupToPlayers(Game game) {
+        presentSetupToPlayers(game, true);
+    }
+
+    public static void presentSetupToPlayers(Game game, boolean offerSetupChoices) {
         introductionToTableTalkChannel(game);
         introductionToActionsChannel(game);
         // sendMessageAboutAggressionMetas(game);
 
         MessageChannel actionsChannel = game.getActionsChannel();
+        if (offerSetupChoices) {
+            offerMapSetupChoices(actionsChannel);
+        }
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
+        MessageHelper.sendMessageToChannel(
+                actionsChannel,
+                "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
+        if (offerSetupChoices) {
+            offerGameModeAndExpansionChoices(actionsChannel);
+        }
+    }
 
+    public static void offerMapSetupChoices(MessageChannel actionsChannel) {
         Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
         Button nucleusButton = Buttons.green("startDraftSystem_nucleusPreset", "Start Nucleus Setup");
         Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
@@ -340,8 +367,9 @@ public class CreateGameService {
                 actionsChannel,
                 "How would you like to set up the players and map?",
                 List.of(miltyButton, nucleusButton, addMapString));
+    }
 
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
+    private static void offerGameModeAndExpansionChoices(MessageChannel actionsChannel) {
         List<Button> setupButtons = new ArrayList<>();
         setupButtons.add(Buttons.green("offerGameOptionButtons", "Aesthetic Options"));
         setupButtons.add(Buttons.green("getHomebrewButtons", "Supported Homebrew"));
@@ -350,9 +378,6 @@ public class CreateGameService {
 
         // HomebrewService.offerGameHomebrewButtons(actionsChannel);
 
-        MessageHelper.sendMessageToChannel(
-                actionsChannel,
-                "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
         setupButtons.add(Buttons.green("offerTEOptionButtons", "Galactic Events"));
         // MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
 

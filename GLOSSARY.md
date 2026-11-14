@@ -377,8 +377,12 @@ _Avoid_: Tournament queue, matchmaking queue
 **Waitlist**:
 Players who signed up after a Tournament pool reached its target size. When a seated Player withdraws, the first Player on the Waitlist takes their seat and group.
 
+**Setup game**:
+A private Game holding the setup for every Game of a Tournament pool: expansion, homebrew, decks, removed cards and draft settings. The organizer sits in it with bot setup seats up to the players per game, and every new Game of the round copies its settings, never its seating or drafted factions.
+_Avoid_: Template game
+
 **Tourney Mod**:
-The Discord role that, with Admin, may run tournaments: create Tournament pools, edit their panel and create their Games.
+The Discord role that, with Admin and any role added through `/tournament roles`, may run tournaments: create Tournament pools, edit their panel and create their Games.
 
 ### Combat
 

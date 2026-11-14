@@ -69,6 +69,15 @@ public class Tournament {
     @Column(name = "game_name_prefix")
     private String gameNamePrefix;
 
+    @Column(name = "setup_source_game")
+    private String setupSourceGame;
+
+    @Column(name = "spread_previous_winners", nullable = false, columnDefinition = "boolean default false")
+    private boolean spreadPreviousWinners;
+
+    @Column(name = "avoid_rematches", nullable = false, columnDefinition = "boolean default false")
+    private boolean avoidRematches;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TournamentStatus status = TournamentStatus.OPEN;

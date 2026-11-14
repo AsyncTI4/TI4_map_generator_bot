@@ -35,6 +35,7 @@ import ti4.service.tournament.TournamentSignupPosts;
 import ti4.service.tournament.panel.TournamentPanel.Context;
 import ti4.service.tournament.panel.TournamentPanel.Tab;
 import ti4.service.tournament.panel.TournamentPanel.View;
+import ti4.service.tournament.setup.TournamentSetupGame;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentService;
 import ti4.spring.service.tournament.TournamentStatus;
@@ -48,6 +49,8 @@ final class TournamentPanelSettings {
     private static final String HOURS = "trnHours_";
     private static final String SERVER = "trnServer_";
     private static final String NAMES_MODAL = "trnNames~MDL_";
+    private static final String SPREAD = "trnSpread_";
+    private static final String REMATCH = "trnRematch_";
     private static final String NAMES_SAVE = "trnNamesSave_";
     private static final int MIN_GROUP_SIZE = 3;
     private static final int MAX_GROUP_SIZE = 8;
@@ -91,6 +94,18 @@ final class TournamentPanelSettings {
                 "Random groups that prefer players whose active hours overlap. Off means purely random.",
                 tournament.isMatchActiveHours(),
                 ComponentPanel.toggleButton(HOURS + id, tournament.isMatchActiveHours())));
+        if (tournament.getPreviousRoundId() != null) {
+            body.add(ComponentPanel.toggleSection(
+                    "Spread previous winners",
+                    "Winners of the previous round are drawn into different groups.",
+                    tournament.isSpreadPreviousWinners(),
+                    ComponentPanel.toggleButton(SPREAD + id, tournament.isSpreadPreviousWinners())));
+            body.add(ComponentPanel.toggleSection(
+                    "Avoid rematches",
+                    "Players who shared a game in the previous round are drawn into different groups when possible.",
+                    tournament.isAvoidRematches(),
+                    ComponentPanel.toggleButton(REMATCH + id, tournament.isAvoidRematches())));
+        }
         Guild host = TournamentDiscord.hostGuild(tournament);
         body.add(TextDisplay.of("**Host server:** "
                 + (host == null ? "not set" : host.getName() + " · " + capacity(tournament, host))));
@@ -177,14 +192,17 @@ final class TournamentPanelSettings {
                             + MIN_GROUP_SIZE + "-" + MAX_GROUP_SIZE + ".");
             return;
         }
-        TournamentService.getBean().update(id, pool -> {
-            pool.setSeriesName(series);
-            pool.setRoundLabel(round);
-            pool.setTargetSize(target);
-            pool.setGroupSize(groupSize);
-        });
+        Tournament saved = TournamentService.getBean()
+                .update(id, pool -> {
+                    pool.setSeriesName(series);
+                    pool.setRoundLabel(round);
+                    pool.setTargetSize(target);
+                    pool.setGroupSize(groupSize);
+                })
+                .orElseThrow();
         TournamentSignupPosts.refreshNow(id);
-        TournamentPanel.show(event, id, Tab.SETTINGS, "Saved.");
+        String seats = TournamentSetupGame.resizeSeats(saved);
+        TournamentPanel.show(event, id, Tab.SETTINGS, seats == null ? "Saved." : "Saved. " + seats);
     }
 
     @ButtonHandler(value = FOG, save = false)
@@ -214,6 +232,22 @@ final class TournamentPanelSettings {
         if (!TournamentAccess.require(event)) return;
         long id = TournamentPanel.idOf(buttonID, HOURS);
         TournamentService.getBean().update(id, pool -> pool.setMatchActiveHours(!pool.isMatchActiveHours()));
+        TournamentPanel.show(event, id, Tab.SETTINGS, null);
+    }
+
+    @ButtonHandler(value = SPREAD, save = false)
+    static void toggleSpread(ButtonInteractionEvent event, String buttonID) {
+        if (!TournamentAccess.require(event)) return;
+        long id = TournamentPanel.idOf(buttonID, SPREAD);
+        TournamentService.getBean().update(id, pool -> pool.setSpreadPreviousWinners(!pool.isSpreadPreviousWinners()));
+        TournamentPanel.show(event, id, Tab.SETTINGS, null);
+    }
+
+    @ButtonHandler(value = REMATCH, save = false)
+    static void toggleRematches(ButtonInteractionEvent event, String buttonID) {
+        if (!TournamentAccess.require(event)) return;
+        long id = TournamentPanel.idOf(buttonID, REMATCH);
+        TournamentService.getBean().update(id, pool -> pool.setAvoidRematches(!pool.isAvoidRematches()));
         TournamentPanel.show(event, id, Tab.SETTINGS, null);
     }
 

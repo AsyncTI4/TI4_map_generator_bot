@@ -366,6 +366,9 @@ public class TournamentService {
         next.setGamesPerCategory(previous.getGamesPerCategory());
         next.setMatchActiveHours(previous.isMatchActiveHours());
         next.setGameSetupJson(previous.getGameSetupJson());
+        next.setSetupSourceGame(previous.getSetupSourceGame());
+        next.setSpreadPreviousWinners(true);
+        next.setAvoidRematches(true);
         next.setStatus(TournamentStatus.CLOSED);
         next.setCreatedBy(createdBy);
         next.setCreatedAt(Instant.now());

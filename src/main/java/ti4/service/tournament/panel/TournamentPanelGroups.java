@@ -28,6 +28,7 @@ import ti4.service.tournament.TournamentGrouper.Entrant;
 import ti4.service.tournament.TournamentHours;
 import ti4.service.tournament.TournamentMemberResolver;
 import ti4.service.tournament.TournamentMemberResolver.Resolution;
+import ti4.service.tournament.TournamentResults;
 import ti4.service.tournament.TournamentRoster;
 import ti4.service.tournament.panel.TournamentPanel.Context;
 import ti4.service.tournament.panel.TournamentPanel.Tab;
@@ -163,8 +164,12 @@ final class TournamentPanelGroups {
                 .map(entry -> new Entrant(entry.getUserId(), hours.getOrDefault(entry.getUserId(), Set.of())))
                 .toList();
         long seed = SEEDS.nextLong();
-        List<List<String>> drawn =
-                TournamentGrouper.group(entrants, tournament.getGroupSize(), tournament.isMatchActiveHours(), seed);
+        List<List<String>> drawn = TournamentGrouper.group(
+                entrants,
+                tournament.getGroupSize(),
+                tournament.isMatchActiveHours(),
+                TournamentResults.constraints(tournament),
+                seed);
         Map<String, Integer> groupByUser = new LinkedHashMap<>();
         for (int group = 0; group < drawn.size(); group++) {
             for (String userId : drawn.get(group)) {

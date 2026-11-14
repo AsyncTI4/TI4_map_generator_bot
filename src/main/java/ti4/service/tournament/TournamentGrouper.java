@@ -3,6 +3,7 @@ package ti4.service.tournament;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -13,21 +14,40 @@ public class TournamentGrouper {
     private static final int RESTARTS = 4;
     private static final int SWAP_ATTEMPTS_PER_RESTART = 20_000;
 
+    private static final int SPREAD_PENALTY = 1000;
+    private static final int REMATCH_PENALTY = 1000;
+
     public record Entrant(String userId, Set<Integer> activeUtcHours) {}
 
+    public record Constraints(Set<String> keepApart, Map<String, Integer> previousGroups) {
+
+        public static Constraints none() {
+            return new Constraints(Set.of(), Map.of());
+        }
+
+        boolean isActive() {
+            return keepApart.size() > 1 || !previousGroups.isEmpty();
+        }
+    }
+
     public static List<List<String>> group(List<Entrant> entrants, int groupSize, boolean matchActiveHours, long seed) {
+        return group(entrants, groupSize, matchActiveHours, Constraints.none(), seed);
+    }
+
+    public static List<List<String>> group(
+            List<Entrant> entrants, int groupSize, boolean matchActiveHours, Constraints constraints, long seed) {
         if (entrants.isEmpty()) return List.of();
         Random random = new Random(seed);
         int[] sizes = groupSizes(entrants.size(), groupSize);
-        int[][] overlap = overlapMatrix(entrants);
+        int[][] pairScores = pairScores(entrants, matchActiveHours, constraints);
 
         int[] best = randomAssignment(entrants.size(), sizes, random);
-        if (matchActiveHours) {
-            long bestScore = score(best, overlap);
+        if (matchActiveHours || constraints.isActive()) {
+            long bestScore = score(best, pairScores);
             for (int restart = 0; restart < RESTARTS; restart++) {
                 int[] candidate = restart == 0 ? best.clone() : randomAssignment(entrants.size(), sizes, random);
-                climb(candidate, overlap, random);
-                long candidateScore = score(candidate, overlap);
+                climb(candidate, pairScores, random);
+                long candidateScore = score(candidate, pairScores);
                 if (candidateScore > bestScore) {
                     best = candidate;
                     bestScore = candidateScore;
@@ -35,6 +55,27 @@ public class TournamentGrouper {
             }
         }
         return toGroups(best, sizes.length, entrants);
+    }
+
+    private static int[][] pairScores(List<Entrant> entrants, boolean matchActiveHours, Constraints constraints) {
+        int[][] scores = matchActiveHours ? overlapMatrix(entrants) : new int[entrants.size()][entrants.size()];
+        for (int a = 0; a < entrants.size(); a++) {
+            for (int b = 0; b < entrants.size(); b++) {
+                if (a == b) continue;
+                String first = entrants.get(a).userId();
+                String second = entrants.get(b).userId();
+                if (constraints.keepApart().contains(first)
+                        && constraints.keepApart().contains(second)) {
+                    scores[a][b] -= SPREAD_PENALTY;
+                }
+                Integer firstGroup = constraints.previousGroups().get(first);
+                if (firstGroup != null
+                        && firstGroup.equals(constraints.previousGroups().get(second))) {
+                    scores[a][b] -= REMATCH_PENALTY;
+                }
+            }
+        }
+        return scores;
     }
 
     public static int[] groupSizes(int entrantCount, int groupSize) {
