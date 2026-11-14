@@ -89,6 +89,7 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
 | Next explore card | script `do: stackExplore` (value: explore id) puts the card on top of its deck | `{ "do": "stackExplore", "value": "tourismbureau30k" }` |
 | Next agendas | script `do: stackAgenda` (value: agenda id) puts the agenda on top of the agenda deck; stack in reverse to set the order | `{ "do": "stackAgenda", "value": "mutiny" }` |
+| Neutral units | game `neutralUnits`: tile position to units, as in `/add_units` | `"neutralUnits": { "201": "pds quann, gf quann" }` |
 | Breakthrough | seat `breakthrough`: `unlocked` or `exhausted` | `"breakthrough": "unlocked"` |
 | TG, commodities, command tokens | seat `tg`, `commodities`, `ccs` | `"ccs": "3/3/2"` |
 | State a feature keeps in stored values | script `do: setStored` | `{ "do": "setStored", "key": "x", "value": "y" }` |
@@ -272,6 +273,7 @@ copy-paste templates.
 | `combat` | Positions where a combat check runs after the start phase; needs `start: action`. |
 | `revealedObjectives`, `laws`, `tokens`, `borderAnomalies`, `customAdjacencies` | Game state; see [Set up any component](#set-up-any-component). |
 | `tiles` | Extra tiles by position, placed over the map string: maps A-G (`a000`-`g848`), corners, Fracture. |
+| `neutralUnits` | Units for the neutral player by tile position, as in `/add_units` (`"201": "pds quann"`); creates the neutral player if needed. |
 | `fogPreset` | Fog preset applied before `fowOptions`, like choosing one in the fog settings: `standard`, `plus`, `normal` (classic fog, FoW+ off) or `beginner`. Use it when a reused fog game must not keep FoW+ or other options. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |

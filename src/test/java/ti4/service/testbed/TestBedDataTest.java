@@ -271,6 +271,15 @@ class TestBedDataTest extends BaseTi4Test {
         assertEquals(2, scriptErrors.size(), String.join("\n", scriptErrors));
     }
 
+    // Neutral units need a real tile position.
+    @Test
+    void neutralUnitsAreValidated() {
+        List<String> errors = TestBedPresetService.validate(TestBedPresetService.parse("""
+                { "you": { "faction": "sol" }, "neutralUnits": { "nowhere": "pds", "201": "pds quann" } }"""));
+        assertContains(errors, "`neutralUnits` position `nowhere` is not a tile position");
+        assertEquals(1, errors.size(), String.join("\n", errors));
+    }
+
     // Homebrew card tests switch decks in the preset and stack explores in scripts; wrong slots, unknown decks,
     // decks of the wrong type and unknown explore ids must be caught before a live run.
     @Test
