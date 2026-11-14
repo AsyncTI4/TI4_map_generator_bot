@@ -267,15 +267,13 @@ final class TournamentPanelCreate {
     @ButtonHandler(value = INVITE_MODAL, save = false)
     static void openInvite(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, INVITE_MODAL);
-        Tournament tournament = TournamentService.getBean().find(id).orElse(null);
-        String suggestion = tournament == null ? null : TournamentInvites.defaultChannelLink(tournament);
         TournamentPanel.openModal(
                 event,
                 INVITE_SAVE + id,
                 "Send the host server invite",
-                TextDisplay.of("Any channel on any server the bot is in. Players who aren't on the host"
-                        + " server yet are pinged."),
-                TournamentPanel.field("Channel link, #mention or id", "channel", suggestion, true));
+                TextDisplay.of("Leave the channel blank to post in every sign-up post channel off the host server."
+                        + " Each post pings the players there who aren't on the host server yet."),
+                TournamentPanel.field("Channel link, #mention or id (optional)", "channel", null, false));
     }
 
     @ModalHandler(value = INVITE_SAVE, save = false)
@@ -283,11 +281,21 @@ final class TournamentPanelCreate {
         if (!TournamentAccess.require(event)) return;
         long id = TournamentPanel.idOf(event.getModalId(), INVITE_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
-        GuildMessageChannel channel = TournamentInvites.resolveChannel(TournamentPanel.value(event, "channel"));
-        String notice = channel == null
+        String input = TournamentPanel.value(event, "channel");
+        TournamentPanel.show(event, id, Tab.CREATE, inviteNotice(tournament, input));
+    }
+
+    private static String inviteNotice(Tournament tournament, String input) {
+        if (input.isEmpty()) {
+            String notice = TournamentInvites.sendToSignupPosts(tournament);
+            return notice != null
+                    ? notice
+                    : "No sign-up post outside the host server. Send invite… again with a channel link.";
+        }
+        GuildMessageChannel channel = TournamentInvites.resolveChannel(input);
+        return channel == null
                 ? "Couldn't find that channel. Paste a channel link (right click › Copy Link), #mention or id."
                 : TournamentInvites.send(tournament, channel);
-        TournamentPanel.show(event, id, Tab.CREATE, notice);
     }
 
     @ButtonHandler(value = INVITE_COPY, save = false)
@@ -421,7 +429,7 @@ final class TournamentPanelCreate {
         List<String> players = advancement.advancing();
         TournamentService service = TournamentService.getBean();
         service.update(next.getId(), pool -> pool.setTargetSize(Math.max(advancing, players.size())));
-        service.bulkAdd(next.getId(), players, () -> false);
+        service.bulkAdd(next.getId(), players, true, () -> false);
         players.forEach(userId -> TournamentRoles.give(next, userId));
         List<String> lines = new ArrayList<>();
         lines.add("Advanced " + advancement.winners().size() + " winner(s)"

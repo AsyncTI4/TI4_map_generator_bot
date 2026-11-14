@@ -94,6 +94,10 @@ public class TournamentDiscord {
         return guild == null ? null : guild.getMemberById(userId);
     }
 
+    public static boolean isMissingFrom(Guild guild, String userId) {
+        return guild != null && member(guild, userId) == null;
+    }
+
     public static Member anyMember(Guild preferred, String userId) {
         Member member = member(preferred, userId);
         if (member != null) return member;
