@@ -427,6 +427,13 @@ All of these go through `AgendaForecast` (`without`, `withRider`, a forced outco
   - A 4,4,5,5,6,7 Seed table leans Against for a mid-table AI.
   - A low-block AI with a majority votes its own side.
 
+- **Checked (2026-11-15): the simple version already holds; no new code.** The forecast now prices each modelled ballot by the outcome it leads to (4b, 2026-11-14), the speaker answers the tally on own-vote agendas, and the AI's own ballot weighs the outcome its votes produce, so the plan's behaviours come out without special cases. Exams in `AgendaExamTest.TablePlays`:
+  - Mutiny: with two point holders already on For and a 14-vote speaker last who would sink it, a 1-point seat does not go For.
+  - Unconventional Measures: the same table with hands at stake; a seat with a strong hand does not go For.
+  - Seed of an Empire at 4, 4, 5, 5, 6, 7: the mid-table seat votes Against (the two at 4 gain, not the leader at 7).
+  - Seed: a seat tied lowest votes its own side (Against).
+  - Not done: Miscount Disclosed steering with a few votes (its value exists in `LawChangeValues`; no exam yet), correlated block sampling and bluff propagation (only if a trace shows the simple version failing). The `POINTS_KEPT_ON_DISCARD` bug is already gone.
+
 Table talk and Support for the Throne swaps come in milestone 12.
 
 ---

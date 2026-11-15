@@ -2042,6 +2042,104 @@ class AgendaExamTest extends BaseTi4Test {
         }
     }
 
+    /** Milestone 9: the trickster agendas (user's value review, 2026-11-11). */
+    @Nested
+    class TablePlays {
+
+        // Mutiny is a gamble: voting For while Against wins costs a point. Hacan and Letnev, a point each, have put 1
+        // vote on For. Sol (1 point, 3 votes) votes next and Xxcha, the speaker with 14 votes and no points, votes
+        // last. Joining For would hand three rivals a point for Xxcha's one, so Xxcha sinks it and every For voter
+        // loses a point. Sol does not go For.
+        @Test
+        void aWeakVoterDoesNotGoForOnMutinyWhenAStrongerOneVotesAfterIt() {
+            Player hacan = seat(FOURTH_ID, "hacan", "yellow");
+            Player letnev = seat(FIFTH_ID, "letnev", "purple");
+            points(sol, 1);
+            points(hacan, 1);
+            points(letnev, 1);
+            reveal("Directive_For/Against_7_mutiny", "yellow", 1, "purple", 1, "blue", 3, "red", 14, "black", 0);
+            test.game.setCurrentAgendaVote("for", "yellow_1;purple_1");
+            test.isActive(sol, "agendaVoting");
+
+            assertThat(ballot(sol, 3).filter("for"::equals)).isEmpty();
+        }
+
+        // Unconventional Measures, the same gamble with cards: For voters draw 2 action cards, but if Against wins they
+        // discard their hands. Hacan and Letnev have put 1 vote on For; Xxcha, the speaker with 14 votes and no hand,
+        // gains less from joining than the For voters would, so it sinks For. Sol, holding a strong hand, does not risk
+        // it on For.
+        @Test
+        void aSeatWithAGoodHandDoesNotRiskItOnUnconventionalMeasures() {
+            Player hacan = seat(FOURTH_ID, "hacan", "yellow");
+            Player letnev = seat(FIFTH_ID, "letnev", "purple");
+            hand(sol, "sabo1", "sabo2", "veto");
+            anonymousHand(hacan, 3);
+            anonymousHand(letnev, 3);
+            reveal(
+                    "Directive_For/Against_7_unconventional",
+                    "yellow",
+                    1,
+                    "purple",
+                    1,
+                    "blue",
+                    3,
+                    "red",
+                    14,
+                    "black",
+                    0);
+            test.game.setCurrentAgendaVote("for", "yellow_1;purple_1");
+            test.isActive(sol, "agendaVoting");
+
+            assertThat(ballot(sol, 3).filter("for"::equals)).isEmpty();
+        }
+
+        // Seed of an Empire at 4, 4, 5, 5, 6, 7: For gives the leader (7) a point, Against the two seats at 4. Sol, at
+        // 5 mid-table, leans Against.
+        @Test
+        void aMidTableSeatLeansAgainstOnSeedOfAnEmpire() {
+            Player hacan = seat(FOURTH_ID, "hacan", "yellow");
+            Player letnev = seat(FIFTH_ID, "letnev", "purple");
+            Player sardakk = seat("200000000000000009", "sardakk", "orange");
+            points(nekro, 4);
+            points(hacan, 4);
+            points(sol, 5);
+            points(letnev, 5);
+            points(sardakk, 6);
+            points(xxcha, 7);
+            reveal(
+                    "Directive_For/Against_7_seed_empire",
+                    "blue",
+                    3,
+                    "red",
+                    3,
+                    "yellow",
+                    3,
+                    "purple",
+                    3,
+                    "orange",
+                    3,
+                    "black",
+                    0);
+            test.isActive(sol, "agendaVoting");
+
+            assertThat(ballot(sol, 3)).contains("against");
+        }
+
+        // A seat in the low block votes its own side: Against gives Sol, tied lowest, a point.
+        @Test
+        void aLowBlockSeatVotesItsOwnSide() {
+            Player hacan = seat(FOURTH_ID, "hacan", "yellow");
+            points(sol, 2);
+            points(hacan, 2);
+            points(xxcha, 6);
+            points(nekro, 5);
+            reveal("Directive_For/Against_7_seed_empire", "blue", 4, "red", 3, "yellow", 4, "black", 0);
+            test.isActive(sol, "agendaVoting");
+
+            assertThat(ballot(sol, 4)).contains("against");
+        }
+    }
+
     /** User (2026-11-11): a Dictate Policy holder pushes laws For until 3 are in play, even mildly bad ones. */
     @Nested
     class DictatePolicy {
@@ -2113,13 +2211,6 @@ class AgendaExamTest extends BaseTi4Test {
         @Test
         void buysVotesFromAnIndifferentSeat() {
             fail("expected the AI to offer TG for an indifferent seat's votes on an outcome it cares about");
-        }
-
-        @Disabled("milestone 6: Committee Formation is worth 2 TG more when the holder knows a good Elect Player agenda"
-                + " is next")
-        @Test
-        void committeeFormationIsWorthMoreWhenAGoodElectionIsKnownToBeNext() {
-            fail("expected +2 TG on Committee Formation after a Politics peek shows a good Elect Player agenda");
         }
 
         @Disabled(
