@@ -355,6 +355,7 @@ final class AgendaTrace {
         private int ledgerAtResolution = -1;
         private Map<String, Map<String, Double>> chancesAtReveal = Map.of();
         private Map<String, String> splitsAtReveal = Map.of();
+        private String boatFloat = "";
         private final Map<String, Promise> promises = new LinkedHashMap<>();
         private final Map<String, Long> promiseAcceptedAt = new LinkedHashMap<>();
         // When each promise was first seen offered and first seen accepted, and each bounty first seen posted.
@@ -398,6 +399,10 @@ final class AgendaTrace {
             if (chancesAtReveal.isEmpty()) chancesAtReveal = chancesOf(game);
             if (agendaKey.isBlank()) agendaKey = ti4.ai.agenda.AgendaUtilityProbe.currentAgenda(game);
             if (splitsAtReveal.isEmpty()) splitsAtReveal = splitsOf(game, agendaKey);
+            if ("articles_war".equals(agendaKey)
+                    && game.getPhaseOfGame().toLowerCase().contains("voting")) {
+                boatFloat = ti4.ai.agenda.BoatFloat.explain(game);
+            }
             Map<String, Snap> current = new LinkedHashMap<>();
             for (Player seat : game.getRealPlayers()) current.put(seat.getFaction(), Snap.of(game, seat));
             if (!resolved) {
@@ -616,6 +621,7 @@ final class AgendaTrace {
                                     + agenda.fallbackTieBreaks()
                             : ""));
             out.add("  " + votingOrderLine(game, agenda, heard));
+            if (!boatFloat.isBlank()) out.add("  BOAT FLOAT (at voting): " + boatFloat);
             out.add("  SEATS in voting order. Likes and dislikes: the seat's own utility of each outcome in TG,"
                     + " relative to the mean over the outcomes. Odds: its own forecast at its turn (at reveal if it"
                     + " had no turn).");

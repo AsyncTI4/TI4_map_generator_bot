@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ai.AiExperiments;
@@ -98,6 +99,26 @@ public class BoatFloat {
                 .toList();
         if (AgendaVoting.castableVotes(game, against) < members.size() * FLOAT_VOTES) return Optional.empty();
         return Optional.of(new Plan(speaker.getFaction(), against.getFaction(), members));
+    }
+
+    public static String explain(Game game) {
+        Player speaker = game.getPlayer(game.getSpeakerUserID());
+        String gains = AgendaForecast.votingOrder(game).stream()
+                .filter(voter -> !AgendaVoting.cannotVote(game, voter) && VoteCapacity.of(game, voter) > 0)
+                .map(voter -> String.format("%s %+.1f", voter.getFaction(), lawGain(game, voter)))
+                .collect(Collectors.joining(", "));
+        String verdict = active(game)
+                .map(plan -> "floated: Against " + plan.against() + ", For " + String.join("/", plan.members()))
+                .orElseGet(() -> speaker == null ? "no speaker" : notFloated(game, speaker));
+        return verdict + "; law gain for each voter (float only if none above " + String.format("%.0f", MAX_LAW_GAIN)
+                + " TG): " + gains;
+    }
+
+    private static String notFloated(Game game, Player speaker) {
+        if (!AiSeats.isActiveAiSeat(speaker)) return "no float: the speaker is not an AI seat";
+        if (!AiSettings.isTradingEnabled()) return "no float: trading is off";
+        if (!AiExperiments.enabled(speaker, Experiment.BOAT_FLOAT)) return "no float: experiment off";
+        return propose(game, speaker).isPresent() ? "not arranged yet" : "no float";
     }
 
     static double lawGain(Game game, Player voter) {
