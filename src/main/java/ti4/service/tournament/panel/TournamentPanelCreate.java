@@ -291,11 +291,15 @@ final class TournamentPanelCreate {
     }
 
     private static StringSelectMenu inviteTargets(List<GuildMessageChannel> channels) {
-        StringSelectMenu.Builder menu = StringSelectMenu.create(INVITE_TARGET).addOption(ALL_SIGNUP_CHANNELS_LABEL, ALL);
+        StringSelectMenu.Builder menu =
+                StringSelectMenu.create(INVITE_TARGET).addOption(ALL_SIGNUP_CHANNELS_LABEL, ALL);
         channels.stream()
                 .limit(StringSelectMenu.OPTIONS_MAX_AMOUNT - 1)
                 .forEach(channel -> menu.addOption(
-                        StringUtils.left("#" + channel.getName() + " (" + channel.getGuild().getName() + ")", 100),
+                        StringUtils.left(
+                                "#" + channel.getName() + " ("
+                                        + channel.getGuild().getName() + ")",
+                                100),
                         channel.getId()));
         return menu.setRequiredRange(1, 1).setDefaultValues(ALL).build();
     }
@@ -307,7 +311,9 @@ final class TournamentPanelCreate {
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         String input = TournamentPanel.value(event, "channel");
         ModalMapping target = event.getValue(INVITE_TARGET);
-        String picked = target == null ? ALL : target.getAsStringList().stream().findFirst().orElse(ALL);
+        String picked = target == null
+                ? ALL
+                : target.getAsStringList().stream().findFirst().orElse(ALL);
         TournamentPanel.show(event, id, Tab.CREATE, inviteNotice(tournament, input, picked));
     }
 
