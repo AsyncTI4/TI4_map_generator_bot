@@ -31,6 +31,8 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.logging.BotLogger;
 import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelForms;
+import ti4.message.componentsV2.PanelView;
 import ti4.model.ColorModel;
 import ti4.service.game.GameColorsService;
 
@@ -52,7 +54,7 @@ final class FowSetupPanelPlayers {
 
     private FowSetupPanelPlayers() {}
 
-    static FowSetupPanel.View roles(Game game, FowSetupWizardState state) {
+    static PanelView roles(Game game, FowSetupWizardState state) {
         List<Player> roster = game.getPlayers().values().stream()
                 .filter(player -> !player.isDummy())
                 .toList();
@@ -84,7 +86,7 @@ final class FowSetupPanelPlayers {
                     .build()));
         }
         List<ContainerChildComponent> body = List.of(TextDisplay.of(text.toString()));
-        return FowSetupPanel.View.of(body, rows);
+        return PanelView.of(body, rows);
     }
 
     @SelectionHandler(ROLES_PREFIX)
@@ -113,7 +115,7 @@ final class FowSetupPanelPlayers {
                 .toList();
     }
 
-    static FowSetupPanel.View tableOrder(Game game, FowSetupWizardState state) {
+    static PanelView tableOrder(Game game, FowSetupWizardState state) {
         if (MANUAL_SUBVIEW.equals(state.getSubView())) {
             return manualOrder(game, state);
         }
@@ -149,10 +151,10 @@ final class FowSetupPanelPlayers {
             buttons.add(Buttons.green(RESOLVE_MIDDLE, "Resolve: closest to 50"));
         }
         rows.add(ActionRow.of(buttons));
-        return FowSetupPanel.View.of(List.of(TextDisplay.of(text.toString())), rows);
+        return PanelView.of(List.of(TextDisplay.of(text.toString())), rows);
     }
 
-    private static FowSetupPanel.View manualOrder(Game game, FowSetupWizardState state) {
+    private static PanelView manualOrder(Game game, FowSetupWizardState state) {
         List<String> picks = state.getManualOrderPicks();
         StringBuilder text = new StringBuilder("### Manual seat order\n");
         for (int index = 0; index < picks.size(); index++) {
@@ -172,7 +174,7 @@ final class FowSetupPanelPlayers {
             rows.add(ActionRow.of(playerSelect(SEAT, remaining, "Seat #" + (picks.size() + 1), null)));
         }
         rows.add(ActionRow.of(Buttons.gray(MANUAL_ORDER, "Start over"), FowSetupPanel.backButton()));
-        return FowSetupPanel.View.sub(List.of(TextDisplay.of(text.toString())), rows, false);
+        return PanelView.subView(List.of(TextDisplay.of(text.toString())), rows, false);
     }
 
     private static StringSelectMenu playerSelect(String id, List<Player> players, String placeholder, Player chosen) {
@@ -255,8 +257,8 @@ final class FowSetupPanelPlayers {
     @ModalHandler(DICE_RESOLVE)
     static void resolveDiceModal(ModalInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
-        Integer count = FowSetupPanel.parseInt(FowSetupPanel.value(event, "diceCount"));
-        Integer sides = FowSetupPanel.parseInt(FowSetupPanel.value(event, "diceSides"));
+        Integer count = PanelForms.parseInt(PanelForms.value(event, "diceCount"));
+        Integer sides = PanelForms.parseInt(PanelForms.value(event, "diceSides"));
         if (count == null || sides == null) {
             FowSetupPanel.show(event, game, "Dice count and sides must be whole numbers. Nothing was sent.");
             return;
@@ -278,7 +280,7 @@ final class FowSetupPanelPlayers {
         FowSetupPanel.show(event, game, "Seat order set from the rolls, closest to 50 first.");
     }
 
-    static FowSetupPanel.View neutral(Game game, FowSetupWizardState state) {
+    static PanelView neutral(Game game, FowSetupWizardState state) {
         Player neutral = game.getPlayer(Constants.dicecordId);
         String color = neutral != null && StringUtils.isNotBlank(neutral.getColor()) ? neutral.getColor() : null;
         String text = "Give the neutral player a colour, then add their units with the normal unit commands"
@@ -295,11 +297,11 @@ final class FowSetupPanelPlayers {
         if (page < pages - 1) buttons.add(Buttons.gray(NEUTRAL_PAGE_PREFIX + (page + 1), "More colours ▶"));
         buttons.add(Buttons.gray(NEUTRAL_RANDOM, "Random colour"));
         rows.add(ActionRow.of(buttons));
-        return FowSetupPanel.View.of(List.of(TextDisplay.of(text)), rows);
+        return PanelView.of(List.of(TextDisplay.of(text)), rows);
     }
 
     private static int pageOf(FowSetupWizardState state) {
-        Integer page = state.getStepTab() == null ? null : FowSetupPanel.parseInt(state.getStepTab());
+        Integer page = state.getStepTab() == null ? null : PanelForms.parseInt(state.getStepTab());
         return page == null || page < 0 ? 0 : page;
     }
 

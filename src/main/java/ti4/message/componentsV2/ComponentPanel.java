@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.selections.SelectMenu;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.separator.Separator;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -30,6 +34,64 @@ public class ComponentPanel {
 
     public static final String ON = "✅";
     public static final String OFF = "🚫";
+    public static final int ACCENT = 0x5865F2;
+    public static final int WARNING_ACCENT = 0xF0B232;
+    public static final int MAX_NOTICE_LENGTH = 900;
+
+    public static List<MessageTopLevelComponent> compose(
+            String header, String notice, PanelView view, List<ActionRow> navigation) {
+        List<ContainerChildComponent> children = new ArrayList<>();
+        children.add(TextDisplay.of(header));
+        if (StringUtils.isNotBlank(notice)) {
+            children.add(TextDisplay.of(quote(StringUtils.abbreviate(notice.trim(), MAX_NOTICE_LENGTH))));
+        }
+        children.add(Separator.createDivider(Separator.Spacing.SMALL));
+        children.addAll(view.body());
+
+        List<MessageTopLevelComponent> components = new ArrayList<>();
+        components.add(Container.of(children).withAccentColor(view.warning() ? WARNING_ACCENT : ACCENT));
+        components.addAll(view.controls());
+        if (!view.hideNavigation()) {
+            components.addAll(navigation);
+        }
+        if (!fits(components) && StringUtils.isNotBlank(notice)) {
+            return compose(header, null, view, navigation);
+        }
+        return components;
+    }
+
+    public static String quote(String text) {
+        return "> " + text.replace("\n", "\n> ");
+    }
+
+    public static boolean isPanelMessage(GenericInteractionCreateEvent event, String panelMessageId) {
+        Message message = messageOf(event);
+        return message != null && panelMessageId != null && message.getId().equals(panelMessageId);
+    }
+
+    public static void showOrRepost(
+            GenericInteractionCreateEvent event,
+            String panelMessageId,
+            Supplier<List<MessageTopLevelComponent>> build,
+            Runnable repost) {
+        if (!isPanelMessage(event, panelMessageId)) {
+            repost.run();
+            return;
+        }
+        show(event, build.get());
+    }
+
+    public static void repost(
+            MessageChannel target,
+            MessageChannel oldChannel,
+            String oldMessageId,
+            List<MessageTopLevelComponent> components,
+            Consumer<Message> onPosted) {
+        if (oldChannel != null && oldMessageId != null) {
+            oldChannel.deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+        post(target, components, onPosted);
+    }
 
     public static Section toggleSection(String title, String description, boolean on, Button accessory) {
         String text = "**" + title + "** " + (on ? ON : OFF) + "\n-# " + description;

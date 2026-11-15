@@ -19,6 +19,7 @@ import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
 import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.setup.FowSetupGameOptionsService.Category;
 import ti4.service.game.HomebrewService;
 import ti4.service.game.HomebrewService.Homebrew;
@@ -36,7 +37,7 @@ final class FowSetupPanelOptions {
 
     private FowSetupPanelOptions() {}
 
-    static FowSetupPanel.View view(Game game, FowSetupWizardState state) {
+    static PanelView view(Game game, FowSetupWizardState state) {
         Category tab = selectedTab(state);
         List<ContainerChildComponent> body = new ArrayList<>();
         List<ActionRow> controls = new ArrayList<>();
@@ -81,7 +82,7 @@ final class FowSetupPanelOptions {
         }
         controls.addFirst(ActionRow.of(ComponentPanel.tabButtons(
                 Arrays.asList(Category.values()), tab, category -> TAB_PREFIX + category, category -> category.title)));
-        return FowSetupPanel.View.of(body, controls);
+        return PanelView.of(body, controls);
     }
 
     private static Category selectedTab(FowSetupWizardState state) {

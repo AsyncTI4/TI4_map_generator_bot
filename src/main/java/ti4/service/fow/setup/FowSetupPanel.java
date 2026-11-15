@@ -4,36 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.attachmentupload.AttachmentUpload;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.container.Container;
-import net.dv8tion.jda.api.components.container.ContainerChildComponent;
-import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
-import net.dv8tion.jda.api.components.separator.Separator;
-import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
-import net.dv8tion.jda.api.components.textinput.TextInput;
-import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.modals.ModalMapping;
-import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
-import ti4.logging.BotLogger;
 import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.GMService;
 import ti4.service.option.FOWOptionService;
 
@@ -43,26 +31,8 @@ public final class FowSetupPanel {
     private static final String STEP_SELECT = "fowWizStep";
     private static final String GO_PREFIX = "fowWizGo_";
     private static final String REPOST = "fowWizRepost";
-    private static final int ACCENT = 0x5865F2;
-    private static final int WARNING_ACCENT = 0xF0B232;
-    private static final int MAX_NOTICE_LENGTH = 900;
 
     private FowSetupPanel() {}
-
-    record View(List<ContainerChildComponent> body, List<ActionRow> controls, boolean warning, boolean subView) {
-
-        static View of(List<ContainerChildComponent> body, List<ActionRow> controls) {
-            return new View(body, controls, false, false);
-        }
-
-        static View main(List<ContainerChildComponent> body, List<ActionRow> controls, boolean warning) {
-            return new View(body, controls, warning, false);
-        }
-
-        static View sub(List<ContainerChildComponent> body, List<ActionRow> controls, boolean warning) {
-            return new View(body, controls, warning, true);
-        }
-    }
 
     public static void repost(Game game) {
         repost(game, null);
@@ -73,11 +43,18 @@ public final class FowSetupPanel {
         TextChannel gmChannel = GMService.getGMChannel(game);
         if (gmChannel == null) return;
         FowSetupWizardService.postIntroOnce(game, gmChannel, state);
-        if (state.getPanelMessageId() != null) {
-            gmChannel.deleteMessageById(state.getPanelMessageId()).queue(Consumers.nop(), BotLogger::catchRestError);
-        }
-        ComponentPanel.post(gmChannel, build(game, state, notice), message -> rememberPanel(game, message));
+        ComponentPanel.repost(
+                gmChannel,
+                gmChannel,
+                panelMessageId(state),
+                build(game, state, notice),
+                message -> rememberPanel(game, message));
         FowSetupWizardService.postStepInfoThreadOnce(game, state);
+    }
+
+    private static String panelMessageId(FowSetupWizardState state) {
+        Long id = state.getPanelMessageId();
+        return id == null ? null : Long.toString(id);
     }
 
     private static void rememberPanel(Game game, Message message) {
@@ -88,15 +65,8 @@ public final class FowSetupPanel {
 
     static void show(GenericInteractionCreateEvent event, Game game, String notice) {
         FowSetupWizardState state = prepare(game);
-        Message message = ComponentPanel.messageOf(event);
-        boolean onPanel = message != null
-                && state.getPanelMessageId() != null
-                && message.getIdLong() == state.getPanelMessageId();
-        if (!onPanel) {
-            repost(game, notice);
-            return;
-        }
-        ComponentPanel.show(event, build(game, state, notice));
+        ComponentPanel.showOrRepost(
+                event, panelMessageId(state), () -> build(game, state, notice), () -> repost(game, notice));
     }
 
     static void show(GenericInteractionCreateEvent event, Game game) {
@@ -119,26 +89,11 @@ public final class FowSetupPanel {
     }
 
     public static List<MessageTopLevelComponent> build(Game game, FowSetupWizardState state, String notice) {
-        View view = viewFor(game, state);
-        List<ContainerChildComponent> children = new ArrayList<>();
-        children.add(TextDisplay.of(header(game, state)));
-        if (StringUtils.isNotBlank(notice)) {
-            children.add(TextDisplay.of(quote(StringUtils.abbreviate(notice.trim(), MAX_NOTICE_LENGTH))));
-        }
-        children.add(Separator.createDivider(Separator.Spacing.SMALL));
-        children.addAll(view.body());
-
-        List<MessageTopLevelComponent> components = new ArrayList<>();
-        components.add(Container.of(children).withAccentColor(view.warning() ? WARNING_ACCENT : ACCENT));
-        components.addAll(view.controls());
-        if (!view.subView()) {
-            components.add(ActionRow.of(stepSelect(game, state)));
-            components.add(ActionRow.of(navButtons(state)));
-        }
-        return components;
+        List<ActionRow> navigation = List.of(ActionRow.of(stepSelect(game, state)), ActionRow.of(navButtons(state)));
+        return ComponentPanel.compose(header(game, state), notice, viewFor(game, state), navigation);
     }
 
-    private static View viewFor(Game game, FowSetupWizardState state) {
+    private static PanelView viewFor(Game game, FowSetupWizardState state) {
         return switch (state.getStep()) {
             case GAME_TYPE -> FowSetupPanelBasics.gameType(game, state);
             case GAME_OPTIONS -> FowSetupPanelOptions.view(game, state);
@@ -163,10 +118,6 @@ public final class FowSetupPanel {
         String summary = expansionLabel(game) + " · " + playingCount(game, state) + " playing · "
                 + FOWOptionService.status(game) + " · " + game.getVp() + " VP";
         return title + "\n-# " + summary;
-    }
-
-    static String quote(String text) {
-        return "> " + text.replace("\n", "\n> ");
     }
 
     private static int stepCount() {
@@ -280,46 +231,6 @@ public final class FowSetupPanel {
 
     static Button backButton() {
         return Buttons.gray(BACK, "Back");
-    }
-
-    static Modal urlOrFileModal(String modalId, String title, String explanation, String urlPlaceholder) {
-        TextInput url = TextInput.create("url", TextInputStyle.SHORT)
-                .setRequired(false)
-                .setPlaceholder(urlPlaceholder)
-                .build();
-        AttachmentUpload file = AttachmentUpload.create("file")
-                .setRequiredRange(0, 1)
-                .setRequired(false)
-                .build();
-        return Modal.create(modalId, title)
-                .addComponents(
-                        TextDisplay.of(explanation),
-                        Label.of("JSON URL", url),
-                        Label.of("Or upload the .json file", file))
-                .build();
-    }
-
-    static String urlOrFile(ModalInteractionEvent event) {
-        ModalMapping file = event.getValue("file");
-        List<Message.Attachment> attachments = file == null ? List.of() : file.getAsAttachmentList();
-        if (!attachments.isEmpty()) {
-            return attachments.getFirst().getUrl();
-        }
-        ModalMapping url = event.getValue("url");
-        return url == null ? "" : url.getAsString().trim();
-    }
-
-    static String value(ModalInteractionEvent event, String field) {
-        ModalMapping mapping = event.getValue(field);
-        return mapping == null ? "" : mapping.getAsString().trim();
-    }
-
-    static Integer parseInt(String raw) {
-        try {
-            return Integer.parseInt(raw.trim());
-        } catch (NumberFormatException e) {
-            return null;
-        }
     }
 
     @SelectionHandler(STEP_SELECT)

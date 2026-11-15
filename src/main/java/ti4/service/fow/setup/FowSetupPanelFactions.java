@@ -32,6 +32,8 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.logging.BotLogger;
 import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelForms;
+import ti4.message.componentsV2.PanelView;
 import ti4.model.FactionModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
@@ -71,7 +73,7 @@ final class FowSetupPanelFactions {
         static PlayerView parse(String token) {
             String[] parts = token.split(":");
             String stage = parts.length > 1 ? parts[1] : AUTO;
-            Integer page = parts.length > 2 ? FowSetupPanel.parseInt(parts[2]) : null;
+            Integer page = parts.length > 2 ? PanelForms.parseInt(parts[2]) : null;
             return new PlayerView(parts[0], stage, page == null || page < 0 ? 0 : page);
         }
 
@@ -84,7 +86,7 @@ final class FowSetupPanelFactions {
         return new PlayerView(userId, stage, page).token();
     }
 
-    static FowSetupPanel.View view(Game game, FowSetupWizardState state) {
+    static PanelView view(Game game, FowSetupWizardState state) {
         String subView = StringUtils.defaultString(state.getSubView());
         if (subView.startsWith(PLAYER_SUBVIEW)) {
             PlayerView view = PlayerView.parse(subView.substring(PLAYER_SUBVIEW.length()));
@@ -92,13 +94,13 @@ final class FowSetupPanelFactions {
             if (player != null) return playerView(game, state, player, view);
         }
         if (subView.startsWith(BAN_SUBVIEW)) {
-            Integer page = FowSetupPanel.parseInt(subView.substring(BAN_SUBVIEW.length()));
+            Integer page = PanelForms.parseInt(subView.substring(BAN_SUBVIEW.length()));
             return banView(game, page == null ? 0 : page);
         }
         return overview(game, state);
     }
 
-    private static FowSetupPanel.View overview(Game game, FowSetupWizardState state) {
+    private static PanelView overview(Game game, FowSetupWizardState state) {
         boolean noMap = FowSetupFactionService.mapIsEmpty(game);
         boolean draftRunning = game.getActiveBagDraft() != null;
         StringBuilder text = new StringBuilder("Pick a player to give them a faction, a home position and a colour,")
@@ -141,7 +143,7 @@ final class FowSetupPanelFactions {
             buttons.add(Buttons.blue(ALLIANCE_MODAL, "Pair alliance..."));
         }
         rows.add(ActionRow.of(buttons));
-        return FowSetupPanel.View.main(List.of(TextDisplay.of(text.toString())), rows, noMap || draftRunning);
+        return PanelView.of(List.of(TextDisplay.of(text.toString())), rows, noMap || draftRunning);
     }
 
     private static String playerSummary(Game game, FowSetupWizardState state, Player player) {
@@ -164,7 +166,7 @@ final class FowSetupPanelFactions {
         return faction == null ? alias : faction.getFactionName();
     }
 
-    private static FowSetupPanel.View playerView(Game game, FowSetupWizardState state, Player player, PlayerView view) {
+    private static PanelView playerView(Game game, FowSetupWizardState state, Player player, PlayerView view) {
         String userId = player.getUserID();
         String faction = FowSetupFactionService.effectiveFaction(state, player);
         String pendingPosition = state.getPendingPositionByUserId().get(userId);
@@ -246,7 +248,7 @@ final class FowSetupPanelFactions {
         }
         buttons.add(FowSetupPanel.backButton());
         rows.add(ActionRow.of(buttons));
-        return FowSetupPanel.View.sub(List.of(TextDisplay.of(text.toString())), rows, warning);
+        return PanelView.subView(List.of(TextDisplay.of(text.toString())), rows, warning);
     }
 
     private static void addPaging(List<Button> buttons, String userId, String stage, int page, int pages) {
@@ -332,7 +334,7 @@ final class FowSetupPanelFactions {
     static void resolvePositionModal(ModalInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = event.getModalId().substring(POSITION_RESOLVE_PREFIX.length());
-        pendPosition(event, game, userId, FowSetupPanel.value(event, "position"));
+        pendPosition(event, game, userId, PanelForms.value(event, "position"));
     }
 
     private static void pendPosition(GenericInteractionCreateEvent event, Game game, String userId, String position) {
@@ -414,7 +416,7 @@ final class FowSetupPanelFactions {
     static void resolveGateModal(ModalInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = event.getModalId().substring(GATE_RESOLVE_PREFIX.length());
-        placeGateHome(event, game, userId, FowSetupPanel.value(event, "position"));
+        placeGateHome(event, game, userId, PanelForms.value(event, "position"));
     }
 
     private static void placeGateHome(GenericInteractionCreateEvent event, Game game, String userId, String position) {
@@ -429,7 +431,7 @@ final class FowSetupPanelFactions {
                 event, game, null, player.getUserName() + "'s home system placed at `" + position + "`.");
     }
 
-    private static FowSetupPanel.View banView(Game game, int requestedPage) {
+    private static PanelView banView(Game game, int requestedPage) {
         List<FactionModel> factions = FrankenDraft.getAllFrankenLegalFactions(game).stream()
                 .sorted(Comparator.comparing(FactionModel::getFactionName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
@@ -468,7 +470,7 @@ final class FowSetupPanelFactions {
         if (page < pages - 1) buttons.add(Buttons.gray(BAN_PAGE_PREFIX + (page + 1), "More factions ▶"));
         buttons.add(Buttons.green(FowSetupPanel.BACK, "Done"));
         rows.add(ActionRow.of(buttons));
-        return FowSetupPanel.View.sub(List.of(TextDisplay.of(text)), rows, false);
+        return PanelView.subView(List.of(TextDisplay.of(text)), rows, false);
     }
 
     @ButtonHandler(BAN_PAGE_PREFIX)
@@ -522,12 +524,12 @@ final class FowSetupPanelFactions {
     @ModalHandler(DEAL_RESOLVE)
     static void resolveDealModal(ModalInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
-        Integer count = FowSetupPanel.parseInt(FowSetupPanel.value(event, "count"));
+        Integer count = PanelForms.parseInt(PanelForms.value(event, "count"));
         if (count == null || count < 1) {
             FowSetupPanel.show(event, game, "The count must be a whole number of at least 1. Nothing was dealt.");
             return;
         }
-        boolean allowDuplicates = "dup".equals(FowSetupPanel.value(event, "duplicates"));
+        boolean allowDuplicates = "dup".equals(PanelForms.value(event, "duplicates"));
         FowSetupPanel.show(event, game, FowSetupFactionService.dealFactions(game, count, allowDuplicates));
     }
 

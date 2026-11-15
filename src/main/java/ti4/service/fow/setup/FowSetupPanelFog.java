@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FogPreset;
@@ -33,7 +34,7 @@ final class FowSetupPanelFog {
 
     private FowSetupPanelFog() {}
 
-    static FowSetupPanel.View view(Game game, FowSetupWizardState state) {
+    static PanelView view(Game game, FowSetupWizardState state) {
         String subView = StringUtils.defaultString(state.getSubView());
         if (subView.startsWith(PRESET_SUBVIEW)) {
             return presetPreview(game, FogPreset.fromId(subView.substring(PRESET_SUBVIEW.length())));
@@ -47,7 +48,7 @@ final class FowSetupPanelFog {
         return overview(game);
     }
 
-    private static FowSetupPanel.View overview(Game game) {
+    private static PanelView overview(Game game) {
         StringBuilder text = new StringBuilder("**")
                 .append(FOWOptionService.status(game))
                 .append("**\nPick a preset to see what it changes before you apply it, then fine-tune single")
@@ -77,17 +78,17 @@ final class FowSetupPanelFog {
                 Buttons.blue(TAB_PREFIX + FOWOptionCategory.COMMS, "Fine-tune options"),
                 Buttons.blue(FOWPLUS, "FoW+ ..."));
         List<ContainerChildComponent> body = List.of(TextDisplay.of(text.toString()));
-        return FowSetupPanel.View.of(body, List.of(ActionRow.of(presets), ActionRow.of(tools)));
+        return PanelView.of(body, List.of(ActionRow.of(presets), ActionRow.of(tools)));
     }
 
-    private static FowSetupPanel.View presetPreview(Game game, FogPreset preset) {
+    private static PanelView presetPreview(Game game, FogPreset preset) {
         List<ContainerChildComponent> body = List.of(TextDisplay.of(FogPresetService.preview(game, preset)));
         List<Button> buttons = List.of(
                 Buttons.green(APPLY_PREFIX + preset.getId(), "Apply " + preset.getTitle()), FowSetupPanel.backButton());
-        return FowSetupPanel.View.sub(body, List.of(ActionRow.of(buttons)), false);
+        return PanelView.subView(body, List.of(ActionRow.of(buttons)), false);
     }
 
-    private static FowSetupPanel.View options(Game game, FOWOptionCategory tab) {
+    private static PanelView options(Game game, FOWOptionCategory tab) {
         List<ContainerChildComponent> body = new ArrayList<>();
         body.add(TextDisplay.of("### Fog options · " + tab.getTitle() + "\n-# Same switches as `/fow fow_options`."));
         body.addAll(FOWOptionService.optionSections(game, tab, TOGGLE_PREFIX));
@@ -100,17 +101,17 @@ final class FowSetupPanelFog {
             tools.add(Buttons.blue("gmQolSettings~MDL", "Fog QoL 01 settings..."));
         }
         tools.add(FowSetupPanel.backButton());
-        return FowSetupPanel.View.sub(
+        return PanelView.subView(
                 body, List.of(ActionRow.of(FOWOptionService.tabButtons(tab, TAB_PREFIX)), ActionRow.of(tools)), false);
     }
 
-    private static FowSetupPanel.View fowPlus(Game game) {
+    private static PanelView fowPlus(Game game) {
         boolean active = FOWPlusService.isActive(game);
         Button toggle = active
                 ? Buttons.red(FOWPLUS_SET_PREFIX + false, "Turn FoW+ off")
                 : Buttons.green(FOWPLUS_SET_PREFIX + true, "Turn FoW+ on");
         List<ContainerChildComponent> body = List.of(TextDisplay.of(FOWOptionService.fowPlusText(game)));
-        return FowSetupPanel.View.sub(body, List.of(ActionRow.of(toggle, FowSetupPanel.backButton())), false);
+        return PanelView.subView(body, List.of(ActionRow.of(toggle, FowSetupPanel.backButton())), false);
     }
 
     @ButtonHandler(value = PRESET_PREFIX)
