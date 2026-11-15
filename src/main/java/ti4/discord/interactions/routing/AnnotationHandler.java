@@ -350,7 +350,7 @@ public class AnnotationHandler {
             Constructor<? extends HandlerGuard> constructor = guardedBy.value().getDeclaredConstructor();
             constructor.setAccessible(true);
             return constructor.newInstance();
-        } catch (ReflectiveOperationException | RuntimeException e) {
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
             BotLogger.error(
                     Constants.jazzPing() + " guard " + guardedBy.value().getName() + " on " + klass.getName()
                             + " could not be created; its handlers refuse every press until it has a no-arg"

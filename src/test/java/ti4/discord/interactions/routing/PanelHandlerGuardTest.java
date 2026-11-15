@@ -94,6 +94,30 @@ class PanelHandlerGuardTest {
         assertThat(guard.allows(null, null)).isFalse();
     }
 
+    @Test
+    void guardWhoseStaticSetupThrowsFailsClosedForItsClassOnly() {
+        // ExceptionInInitializerError is an Error, not an Exception; if it escaped, the scan in
+        // buildHandlerRegistry would not catch it and button routing would fail to register at startup.
+        assertThat(AnnotationHandler.guardOf(BrokenSetup.class)).isSameAs(AnnotationHandler.MISCONFIGURED);
+        // A second attempt sees NoClassDefFoundError instead; that must fail closed too.
+        assertThat(AnnotationHandler.guardOf(BrokenSetup.class)).isSameAs(AnnotationHandler.MISCONFIGURED);
+    }
+
+    static final class ExplodingGuard implements HandlerGuard {
+        static {
+            if (Boolean.parseBoolean("true")) throw new IllegalStateException("static setup failed");
+        }
+
+        @Override
+        public boolean allows(
+                net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent event, ti4.game.Game game) {
+            return true;
+        }
+    }
+
+    @GuardedBy(ExplodingGuard.class)
+    static final class BrokenSetup {}
+
     static final class ArgGuard implements HandlerGuard {
         ArgGuard(String unused) {}
 
