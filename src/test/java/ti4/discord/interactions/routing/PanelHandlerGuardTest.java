@@ -6,8 +6,10 @@ import static org.mockito.Mockito.mock;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.junit.jupiter.api.Test;
 import ti4.discord.interactions.listeners.context.ButtonContext;
+import ti4.game.Game;
 
 class PanelHandlerGuardTest {
 
@@ -30,28 +32,24 @@ class PanelHandlerGuardTest {
     }
 
     @Test
-    void everyPanelClassWithHandlersIsGuarded() {
-        List<Class<?>> panelClasses = AnnotationHandler.getAllClasses().stream()
-                .filter(PanelHandlerGuardTest::isGuardedPanel)
+    void panelClassesAreGuardedAndEveryGuardCanBeCreated() {
+        List<Class<?>> withHandlers = AnnotationHandler.getAllClasses().stream()
                 .filter(PanelHandlerGuardTest::hasHandlers)
                 .toList();
 
-        assertThat(panelClasses).isNotEmpty();
-        assertThat(panelClasses)
+        List<Class<?>> panels = withHandlers.stream()
+                .filter(PanelHandlerGuardTest::isGuardedPanel)
+                .toList();
+        assertThat(panels).isNotEmpty();
+        assertThat(panels)
                 .allSatisfy(klass -> assertThat(klass.getAnnotation(GuardedBy.class))
                         .as("%s needs @GuardedBy", klass.getName())
                         .isNotNull());
-    }
 
-    @Test
-    void everyGuardOnARealHandlerClassCanBeCreated() {
         // A guard the router cannot create makes all of that class's buttons refuse every press.
-        List<Class<?>> guarded = AnnotationHandler.getAllClasses().stream()
+        List<Class<?>> guarded = withHandlers.stream()
                 .filter(klass -> klass.getAnnotation(GuardedBy.class) != null)
-                .filter(PanelHandlerGuardTest::hasHandlers)
                 .toList();
-
-        assertThat(guarded).isNotEmpty();
         assertThat(guarded)
                 .allSatisfy(klass -> assertThat(AnnotationHandler.guardOf(klass))
                         .as("guard of %s", klass.getName())
@@ -81,27 +79,31 @@ class PanelHandlerGuardTest {
     }
 
     @Test
-    void unguardedClassLetsEveryoneThrough() {
+    void unguardedClassesPassAndBrokenGuardsFailClosedForTheirClassOnly() {
         assertThat(AnnotationHandler.guardOf(PanelHandlerGuardTest.class)).isSameAs(AnnotationHandler.ALLOW_ALL);
-    }
 
-    @Test
-    void guardThatCannotBeCreatedFailsClosedForItsClassOnly() {
-        // Throwing here would abort the whole handler scan and leave every button in the bot unrouted.
-        HandlerGuard guard = AnnotationHandler.guardOf(NeedsArgs.class);
+        // Throwing out of guardOf would abort the whole handler scan and leave every button in the bot unrouted.
+        HandlerGuard needsArgs = AnnotationHandler.guardOf(NeedsArgs.class);
+        assertThat(needsArgs).isSameAs(AnnotationHandler.MISCONFIGURED);
+        assertThat(needsArgs.allows(null, null)).isFalse();
 
-        assertThat(guard).isSameAs(AnnotationHandler.MISCONFIGURED);
-        assertThat(guard.allows(null, null)).isFalse();
-    }
-
-    @Test
-    void guardWhoseStaticSetupThrowsFailsClosedForItsClassOnly() {
-        // ExceptionInInitializerError is an Error, not an Exception; if it escaped, the scan in
-        // buildHandlerRegistry would not catch it and button routing would fail to register at startup.
+        // A static setup that throws gives ExceptionInInitializerError, an Error rather than an Exception;
+        // the second attempt gives NoClassDefFoundError. Both must fail closed too.
         assertThat(AnnotationHandler.guardOf(BrokenSetup.class)).isSameAs(AnnotationHandler.MISCONFIGURED);
-        // A second attempt sees NoClassDefFoundError instead; that must fail closed too.
         assertThat(AnnotationHandler.guardOf(BrokenSetup.class)).isSameAs(AnnotationHandler.MISCONFIGURED);
     }
+
+    static final class ArgGuard implements HandlerGuard {
+        ArgGuard(String unused) {}
+
+        @Override
+        public boolean allows(GenericInteractionCreateEvent event, Game game) {
+            return true;
+        }
+    }
+
+    @GuardedBy(ArgGuard.class)
+    static final class NeedsArgs {}
 
     static final class ExplodingGuard implements HandlerGuard {
         static {
@@ -109,25 +111,11 @@ class PanelHandlerGuardTest {
         }
 
         @Override
-        public boolean allows(
-                net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent event, ti4.game.Game game) {
+        public boolean allows(GenericInteractionCreateEvent event, Game game) {
             return true;
         }
     }
 
     @GuardedBy(ExplodingGuard.class)
     static final class BrokenSetup {}
-
-    static final class ArgGuard implements HandlerGuard {
-        ArgGuard(String unused) {}
-
-        @Override
-        public boolean allows(
-                net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent event, ti4.game.Game game) {
-            return true;
-        }
-    }
-
-    @GuardedBy(ArgGuard.class)
-    static final class NeedsArgs {}
 }

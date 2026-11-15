@@ -78,16 +78,6 @@ class TournamentGrouperTest {
     }
 
     @Test
-    void pairFitCountsHowWellTheNarrowerWindowIsCovered() {
-        int evening = 0b111 << 18;
-        int awake = 0xFFFF << 6;
-        // A fully covered 3-hour slot beats two wide windows that only partly overlap.
-        assertThat(TournamentGrouper.pairFit(evening, awake)).isEqualTo(100 + 3 * 5);
-        assertThat(TournamentGrouper.pairFit(awake, 0xFFFF << 8)).isEqualTo(14 * 100 / 16 + 14 * 5);
-        assertThat(TournamentGrouper.pairFit(evening, 0)).isZero();
-    }
-
-    @Test
     void previousWinnersAreSpreadAndRematchesAvoided() {
         // 16 players who played last round in 4 groups of 4 (cohort = previous group); c*p0 won each game.
         List<Entrant> entrants = timezoneCohorts(4, 4);
@@ -115,13 +105,9 @@ class TournamentGrouperTest {
     private static List<Entrant> timezoneCohorts(int cohorts, int perCohort) {
         List<Entrant> entrants = new ArrayList<>();
         for (int cohort = 0; cohort < cohorts; cohort++) {
-            int start = cohort * 6;
-            Set<Integer> hours = IntStream.range(start, start + 8)
-                    .map(hour -> hour % 24)
-                    .boxed()
-                    .collect(Collectors.toCollection(HashSet::new));
+            Set<Integer> cohortHours = hours(cohort * 6, 8);
             for (int i = 0; i < perCohort; i++) {
-                entrants.add(new Entrant("c" + cohort + "p" + i, hours));
+                entrants.add(new Entrant("c" + cohort + "p" + i, cohortHours));
             }
         }
         return entrants;

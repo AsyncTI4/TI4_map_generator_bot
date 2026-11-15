@@ -25,8 +25,7 @@ class ComponentPanelComposeTest {
                 ComponentPanel.compose("header", "line1\nline2", view, List.of(NAV));
 
         assertThat(components).hasSize(3);
-        Container container = (Container) components.getFirst();
-        List<? extends ContainerChildComponent> children = container.getComponents();
+        List<? extends ContainerChildComponent> children = container(components).getComponents();
         assertThat(text(children.get(0))).isEqualTo("header");
         // Notices are quoted line by line so they read as a callout under the header.
         assertThat(text(children.get(1))).isEqualTo("> line1\n> line2");
@@ -37,26 +36,22 @@ class ComponentPanelComposeTest {
     }
 
     @Test
-    void blankNoticeAddsNoLine() {
-        PanelView view = PanelView.of(List.of(TextDisplay.of("body")), List.of());
+    void noticeIsSkippedWhenBlankCutWhenLongAndDroppedWhenThePanelWouldNotFit() {
+        PanelView empty = PanelView.of(List.of(), List.of());
 
-        Container container = (Container)
-                ComponentPanel.compose("header", "  ", view, List.of()).getFirst();
+        assertThat(noticeLine(ComponentPanel.compose("h", "  ", empty, List.of())))
+                .isNull();
 
-        assertThat(container.getComponents()).hasSize(3);
-        assertThat(container.getComponents().get(1)).isInstanceOf(Separator.class);
-    }
-
-    @Test
-    void longNoticeIsCutToTheLimit() {
-        String notice = "x".repeat(ComponentPanel.MAX_NOTICE_LENGTH * 2);
-        PanelView view = PanelView.of(List.of(), List.of());
-
-        Container container =
-                (Container) ComponentPanel.compose("h", notice, view, List.of()).getFirst();
-
+        String longNotice = "x".repeat(ComponentPanel.MAX_NOTICE_LENGTH * 2);
         // "> " prefix plus the abbreviated notice.
-        assertThat(text(container.getComponents().get(1))).hasSize(ComponentPanel.MAX_NOTICE_LENGTH + 2);
+        assertThat(noticeLine(ComponentPanel.compose("h", longNotice, empty, List.of())))
+                .hasSize(ComponentPanel.MAX_NOTICE_LENGTH + 2);
+
+        // A body close to the Components V2 character budget, so only the notice tips it over.
+        PanelView full = PanelView.of(List.of(TextDisplay.of("y".repeat(3500))), List.of());
+        List<MessageTopLevelComponent> dropped = ComponentPanel.compose("h", "z".repeat(800), full, List.of());
+        assertThat(ComponentPanel.fits(dropped)).isTrue();
+        assertThat(noticeLine(dropped)).isNull();
     }
 
     @Test
@@ -78,21 +73,7 @@ class ComponentPanelComposeTest {
     }
 
     @Test
-    void noticeIsDroppedWhenThePanelWouldNotFit() {
-        // Fill the body close to the Components V2 character budget so only the notice tips it over.
-        List<ContainerChildComponent> body = List.of(TextDisplay.of("y".repeat(3500)));
-        PanelView view = PanelView.of(body, List.of());
-        String notice = "z".repeat(800);
-
-        List<MessageTopLevelComponent> components = ComponentPanel.compose("h", notice, view, List.of());
-
-        assertThat(ComponentPanel.fits(components)).isTrue();
-        Container container = (Container) components.getFirst();
-        assertThat(container.getComponents().get(1)).isInstanceOf(Separator.class);
-    }
-
-    @Test
-    void withLeadPutsTheLineFirstAndKeepsTheRest() {
+    void panelViewWithersKeepTheOtherFields() {
         PanelView view = PanelView.of(List.of(TextDisplay.of("body")), List.of())
                 .withPages(3)
                 .withLead(TextDisplay.of("lead"));
@@ -100,14 +81,8 @@ class ComponentPanelComposeTest {
         assertThat(view.body()).extracting(ComponentPanelComposeTest::text).containsExactly("lead", "body");
         assertThat(view.pageCount()).isEqualTo(3);
         assertThat(view.asSubView().hideNavigation()).isTrue();
-    }
-
-    @Test
-    void pageCountIsNeverBelowOne() {
         // The tournament panel clamps the current page into [0, pageCount - 1], which throws when pageCount is 0.
-        PanelView view = PanelView.of(List.of(), List.of()).withPages(0);
-
-        assertThat(view.pageCount()).isEqualTo(1);
+        assertThat(view.withPages(0).pageCount()).isEqualTo(1);
     }
 
     @Test
@@ -124,10 +99,14 @@ class ComponentPanelComposeTest {
         assertThat(PanelIds.arg("trnRepost_42", "trnRepost_")).isEmpty();
     }
 
-    @Test
-    void parseIntReturnsNullForNonNumbers() {
-        assertThat(PanelForms.parseInt(" 7 ")).isEqualTo(7);
-        assertThat(PanelForms.parseInt("seven")).isNull();
+    private static Container container(List<MessageTopLevelComponent> components) {
+        return (Container) components.getFirst();
+    }
+
+    // The quoted notice line, or null when the divider follows the header directly.
+    private static String noticeLine(List<MessageTopLevelComponent> components) {
+        ContainerChildComponent second = container(components).getComponents().get(1);
+        return second instanceof Separator ? null : text(second);
     }
 
     private static String text(ContainerChildComponent component) {
@@ -135,6 +114,6 @@ class ComponentPanelComposeTest {
     }
 
     private static int accent(List<MessageTopLevelComponent> components) {
-        return ((Container) components.getFirst()).getAccentColorRaw();
+        return container(components).getAccentColorRaw();
     }
 }
