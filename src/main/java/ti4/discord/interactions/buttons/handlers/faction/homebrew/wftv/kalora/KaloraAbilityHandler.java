@@ -24,6 +24,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.model.PublicObjectiveModel;
 import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
@@ -184,7 +185,8 @@ public class KaloraAbilityHandler {
     private static void grantFirstToScoreBonus(
             Player player, Game game, String objectiveId, boolean isFirst, KaloraCard card) {
         if (!isFirst) return;
-        String poName = Mapper.getPublicObjective(objectiveId).getName();
+        PublicObjectiveModel objective = Mapper.getPublicObjective(objectiveId);
+        String poName = objective == null ? objectiveId : objective.getName();
         int tgAmount = game.getRealPlayers().size() - 1;
         int before = player.getTg();
         player.setTg(before + tgAmount);
