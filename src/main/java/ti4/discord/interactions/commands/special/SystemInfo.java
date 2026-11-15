@@ -88,7 +88,8 @@ class SystemInfo extends GameStateSubcommand {
 
         if (game.isFowMode()
                 && (ogPlayer == null || !ogPlayer.isGM())
-                && !FoWHelper.getTilePositionsToShow(game, ogPlayer).contains(tile.getPosition())) {
+                && (ogPlayer == null
+                        || !FoWHelper.getTilePositionsToShow(game, ogPlayer).contains(tile.getPosition()))) {
             MessageHelper.sendMessageToChannel(channel, "You have no visibility to " + tile.getPosition() + ".");
             return;
         }
