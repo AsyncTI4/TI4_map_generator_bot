@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,12 +26,16 @@ import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
 import ti4.helpers.async.JimboHandlers;
 import ti4.logging.BotLogger;
+import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelForms;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.game.StartPhaseService;
 import ti4.service.map.AddTileListService;
 import ti4.service.map.MapJsonIOService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.service.option.TEOptionService;
 
+@GuardedBy(FowSetupPanelGuard.class)
 final class FowSetupPanelBasics {
 
     private static final String EXPANSION_PREFIX = "fowWizExp_";
@@ -51,7 +56,7 @@ final class FowSetupPanelBasics {
 
     private FowSetupPanelBasics() {}
 
-    static FowSetupPanel.View gameType(Game game, FowSetupWizardState state) {
+    static PanelView gameType(Game game, FowSetupWizardState state) {
         if (BASE_SUBVIEW.equals(state.getSubView())) {
             return baseGameConfirm();
         }
@@ -80,7 +85,7 @@ final class FowSetupPanelBasics {
                 Buttons.green("offerTEOptionButtons", "Galactic Events"),
                 Buttons.green("startTFGame", "Start Twilight's Fall"),
                 Buttons.green("frankenSetup", "Start Franken"));
-        return FowSetupPanel.View.of(body, List.of(ActionRow.of(expansions), ActionRow.of(modes)));
+        return PanelView.of(body, List.of(ActionRow.of(expansions), ActionRow.of(modes)));
     }
 
     private static String currentExpansion(Game game) {
@@ -96,19 +101,19 @@ final class FowSetupPanelBasics {
                 : Buttons.blue(EXPANSION_PREFIX + choice, label);
     }
 
-    private static FowSetupPanel.View baseGameConfirm() {
+    private static PanelView baseGameConfirm() {
         List<ContainerChildComponent> body = List.of(TextDisplay.of("""
                 ### Switch to base game only?
                 This removes all PoK expansion content from the game.
                 - Don't continue if you plan to use PoK, Discordant Stars, Blue Reverie, Thunder's Edge or other homebrew content.
                 - This only sets the base game flag. It does **not** open the Milty draft settings, since fog games don't use Milty."""));
-        List<Button> buttons = List.of(Buttons.red(BASE_CONFIRM, "Switch to base game"), FowSetupPanel.backButton());
-        return FowSetupPanel.View.sub(body, List.of(ActionRow.of(buttons)), true);
+        ActionRow confirm =
+                ComponentPanel.confirmRow(Buttons.red(BASE_CONFIRM, "Switch to base game"), FowSetupPanel.BACK);
+        return PanelView.subView(body, List.of(confirm), true);
     }
 
     @ButtonHandler(EXPANSION_PREFIX)
     static void chooseExpansion(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String choice = buttonID.substring(EXPANSION_PREFIX.length());
         switch (choice) {
             case "base" -> FowSetupPanel.openSubView(event, game, BASE_SUBVIEW, null);
@@ -127,7 +132,6 @@ final class FowSetupPanelBasics {
 
     @ButtonHandler(BASE_CONFIRM)
     static void confirmBaseGame(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         game.setBaseGameMode(true);
         FowSetupPanel.openSubView(event, game, null, "Game switched to base-game-only mode.");
     }
@@ -149,14 +153,13 @@ final class FowSetupPanelBasics {
 
     @ModalHandler(SCENARIO_RESOLVE)
     static void resolveScenarioModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
-        state.setScenarioNote(FowSetupPanel.value(event, "scenarioNote"));
+        state.setScenarioNote(PanelForms.value(event, "scenarioNote"));
         FowSetupWizardService.saveState(game, state);
         FowSetupPanel.show(event, game, "Scenario note saved.");
     }
 
-    static FowSetupPanel.View mapLoad(Game game) {
+    static PanelView mapLoad(Game game) {
         int tiles = game.getTileMap().size();
         long homeSystems =
                 game.getTileMap().values().stream().filter(Tile::isHomeSystem).count();
@@ -171,11 +174,11 @@ final class FowSetupPanelBasics {
                 Buttons.blue(MAP_STRING_MODAL, "Import map string"),
                 Buttons.green(MAP_BUILDER, "Interactive builder"),
                 Buttons.gray(MAP_DEV_TILES, "Dev: test tiles"));
-        return FowSetupPanel.View.of(body, List.of(ActionRow.of(buttons)));
+        return PanelView.of(body, List.of(ActionRow.of(buttons)));
     }
 
     static Modal mapJsonModal() {
-        return FowSetupPanel.urlOrFileModal(
+        return PanelForms.urlOrFileModal(
                 MAP_JSON_RESOLVE,
                 "Import Map from JSON",
                 "This **replaces the entire map**. Paste the URL of an exported map or upload the `.json` file,"
@@ -190,8 +193,7 @@ final class FowSetupPanelBasics {
 
     @ModalHandler(MAP_JSON_RESOLVE)
     static void resolveMapJsonModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
-        String source = FowSetupPanel.urlOrFile(event);
+        String source = PanelForms.urlOrFile(event);
         if (source.isEmpty()) {
             FowSetupPanel.show(event, game, "Give a URL or upload a file. Nothing was imported.");
             return;
@@ -216,8 +218,7 @@ final class FowSetupPanelBasics {
 
     @ModalHandler(MAP_STRING_RESOLVE)
     static void resolveMapStringModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
-        String mapString = FowSetupPanel.value(event, "mapString");
+        String mapString = PanelForms.value(event, "mapString");
         if (mapString.isEmpty()) {
             FowSetupPanel.show(event, game, "The map string was empty. Nothing was imported.");
             return;
@@ -233,28 +234,27 @@ final class FowSetupPanelBasics {
 
     @ButtonHandler(MAP_BUILDER)
     static void openMapBuilder(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         JimboHandlers.sendMainMenu(event.getMessageChannel(), game);
         FowSetupPanel.show(event, game, "Interactive builder posted below.");
     }
 
     @ButtonHandler(MAP_DEV_TILES)
     static void placeDevTestTiles(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         game.setTile(new Tile("18", "000"));
         game.setTile(new Tile("0g", "101"));
         game.setTile(new Tile("0g", "104"));
         FowSetupPanel.show(event, game, "Placed test tiles: 18@000, 0g@101, 0g@104.");
     }
 
-    static FowSetupPanel.View start(Game game, FowSetupWizardState state) {
+    static PanelView start(Game game, FowSetupWizardState state) {
         Checklist checklist = checklist(game, state);
         if (START_SUBVIEW.equals(state.getSubView())) {
             List<ContainerChildComponent> body = List.of(TextDisplay.of(checklist.text()
                     + "\n**Start the game?** This moves it into the strategy phase, the same as `/game start_phase`."
                     + " Players can act right away."));
-            List<Button> buttons = List.of(Buttons.green(START_CONFIRM, "Start the game"), FowSetupPanel.backButton());
-            return FowSetupPanel.View.sub(body, List.of(ActionRow.of(buttons)), checklist.warning());
+            ActionRow confirm =
+                    ComponentPanel.confirmRow(Buttons.green(START_CONFIRM, "Start the game"), FowSetupPanel.BACK);
+            return PanelView.subView(body, List.of(confirm), checklist.warning());
         }
         List<ContainerChildComponent> body = List.of(TextDisplay.of(checklist.text()
                 + "\n-# Dealing gives every real player 2 secret objectives. It only works while nobody has any"
@@ -262,7 +262,7 @@ final class FowSetupPanelBasics {
         Button deal = Buttons.green(DEAL_SO, "Deal 2 secret objectives to all");
         List<Button> buttons =
                 List.of(anyoneHasSecrets(game) ? deal.asDisabled() : deal, Buttons.green(START, "Start game"));
-        return FowSetupPanel.View.main(body, List.of(ActionRow.of(buttons)), checklist.warning());
+        return PanelView.of(body, List.of(ActionRow.of(buttons)), checklist.warning());
     }
 
     private record Checklist(String text, boolean warning) {}
@@ -316,7 +316,6 @@ final class FowSetupPanelBasics {
 
     @ButtonHandler(DEAL_SO)
     static void dealSecrets(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         if (anyoneHasSecrets(game)) {
             FowSetupPanel.show(
                     event,
@@ -331,13 +330,11 @@ final class FowSetupPanelBasics {
 
     @ButtonHandler(START)
     static void askToStart(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.openSubView(event, game, START_SUBVIEW, null);
     }
 
     @ButtonHandler(START_CONFIRM)
     static void startGame(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         StartPhaseService.startPhase(event, game, "strategy");
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.setStep(FowSetupStep.DONE);
@@ -346,11 +343,11 @@ final class FowSetupPanelBasics {
         FowSetupPanel.show(event, game, "Game started.");
     }
 
-    static FowSetupPanel.View done() {
+    static PanelView done() {
         List<ContainerChildComponent> body = List.of(
                 TextDisplay.of("Setup is complete. Use the step list to revisit anything; the wizard does not lock.\n"
                         + "**Close Wizard** removes this panel, archives its info threads and makes the next"
                         + " `/fow setup` start at step 1. Your answers (factions, map, rolls, options) stay as set."));
-        return FowSetupPanel.View.of(body, List.of());
+        return PanelView.of(body, List.of());
     }
 }

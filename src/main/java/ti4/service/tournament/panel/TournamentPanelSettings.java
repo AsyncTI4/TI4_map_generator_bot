@@ -18,25 +18,28 @@ import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelForms;
+import ti4.message.componentsV2.PanelIds;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.CreateFoWGameService;
 import ti4.service.game.CreateGameService;
-import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentGameNames;
 import ti4.service.tournament.TournamentRoles;
 import ti4.service.tournament.TournamentSignupPosts;
 import ti4.service.tournament.panel.TournamentPanel.Context;
 import ti4.service.tournament.panel.TournamentPanel.Tab;
-import ti4.service.tournament.panel.TournamentPanel.View;
 import ti4.service.tournament.setup.TournamentSetupGame;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
 import ti4.spring.service.tournament.TournamentStatus;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelSettings {
 
     private static final String BASICS_MODAL = "trnBasics~MDL_";
@@ -54,7 +57,7 @@ final class TournamentPanelSettings {
 
     private TournamentPanelSettings() {}
 
-    static View view(Context context) {
+    static PanelView view(Context context) {
         Tournament tournament = context.tournament();
         long id = context.id();
         boolean editable = tournament.getStatus().allowsRosterChanges();
@@ -79,13 +82,14 @@ final class TournamentPanelSettings {
                             + tournament.getSeriesName() + " " + tournament.getRoundLabel() + " 1-"
                             + tournament.getGamesPerCategory() + "*.")));
         }
-        body.add(Section.of(
-                Buttons.gray(NAMES_MODAL + id, "Change").withDisabled(!editable || tournament.isFogMode()),
-                TextDisplay.of("**Game names:** " + TournamentGameNames.example(tournament) + "\n-# "
-                        + (tournament.isFogMode()
-                                ? "Fog of War games always use fow numbers."
-                                : "Custom names show the tournament in every channel name. Bot cleanup tools"
-                                        + " only look at pbd names."))));
+        body.add(ComponentPanel.settingRow(
+                "Game names",
+                TournamentGameNames.example(tournament),
+                tournament.isFogMode()
+                        ? "Fog of War games always use fow numbers."
+                        : "Custom names show the tournament in every channel name. Bot cleanup tools only look at"
+                                + " pbd names.",
+                Buttons.gray(NAMES_MODAL + id, "Change").withDisabled(!editable || tournament.isFogMode())));
         body.add(ComponentPanel.toggleSection(
                 "Match active hours",
                 "Random groups that prefer players whose active hours overlap. Off means purely random.",
@@ -107,7 +111,7 @@ final class TournamentPanelSettings {
         body.add(TextDisplay.of("**Host server:** "
                 + (host == null ? "not set" : host.getName() + " · " + capacity(tournament, host))));
         List<ActionRow> controls = editable ? List.of(ActionRow.of(serverSelect(tournament, host))) : List.of();
-        return View.of(body, controls).withWarning(host == null);
+        return PanelView.of(body, controls).withWarning(host == null);
     }
 
     private static String capacity(Tournament tournament, Guild guild) {
@@ -136,17 +140,17 @@ final class TournamentPanelSettings {
 
     @ButtonHandler(value = BASICS_MODAL, save = false)
     static void openBasics(ButtonInteractionEvent event, String buttonID) {
-        long id = TournamentPanel.idOf(buttonID, BASICS_MODAL);
+        long id = PanelIds.key(buttonID, BASICS_MODAL);
         Tournament tournament = TournamentService.getBean().find(id).orElse(null);
         if (tournament == null) return;
-        TournamentPanel.openModal(
+        PanelForms.open(
                 event,
                 BASICS_SAVE + id,
                 "Tournament basics",
-                TournamentPanel.field("Tournament name", "series", tournament.getSeriesName(), true),
-                TournamentPanel.field("Round", "round", tournament.getRoundLabel(), true),
-                TournamentPanel.field("Target players", "target", String.valueOf(tournament.getTargetSize()), true),
-                TournamentPanel.field(
+                PanelForms.field("Tournament name", "series", tournament.getSeriesName(), true),
+                PanelForms.field("Round", "round", tournament.getRoundLabel(), true),
+                PanelForms.field("Target players", "target", String.valueOf(tournament.getTargetSize()), true),
+                PanelForms.field(
                         "Players per game (" + MIN_GROUP_SIZE + "-" + MAX_GROUP_SIZE + ")",
                         "groupSize",
                         String.valueOf(tournament.getGroupSize()),
@@ -155,12 +159,11 @@ final class TournamentPanelSettings {
 
     @ModalHandler(value = BASICS_SAVE, save = false)
     static void saveBasics(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(event.getModalId(), BASICS_SAVE);
-        String series = StringUtils.left(TournamentPanel.value(event, "series"), 60);
-        String round = StringUtils.left(TournamentPanel.value(event, "round"), 40);
-        int target = NumberUtils.toInt(TournamentPanel.value(event, "target"), -1);
-        int groupSize = NumberUtils.toInt(TournamentPanel.value(event, "groupSize"), -1);
+        long id = PanelIds.key(event.getModalId(), BASICS_SAVE);
+        String series = StringUtils.left(PanelForms.value(event, "series"), 60);
+        String round = StringUtils.left(PanelForms.value(event, "round"), 40);
+        int target = NumberUtils.toInt(PanelForms.value(event, "target"), -1);
+        int groupSize = NumberUtils.toInt(PanelForms.value(event, "groupSize"), -1);
         if (series.isBlank()
                 || round.isBlank()
                 || target < 1
@@ -194,8 +197,7 @@ final class TournamentPanelSettings {
 
     @ButtonHandler(value = FOG, save = false)
     static void toggleFog(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(buttonID, FOG);
+        long id = PanelIds.key(buttonID, FOG);
         TournamentService.getBean().update(id, pool -> {
             if (pool.getStatus() == TournamentStatus.OPEN || pool.getStatus() == TournamentStatus.CLOSED) {
                 pool.setFogMode(!pool.isFogMode());
@@ -209,7 +211,7 @@ final class TournamentPanelSettings {
     static void togglePerCategory(ButtonInteractionEvent event, String buttonID) {
         TournamentPanel.change(
                 event,
-                TournamentPanel.idOf(buttonID, PER_CATEGORY),
+                PanelIds.key(buttonID, PER_CATEGORY),
                 Tab.SETTINGS,
                 pool -> pool.setGamesPerCategory(pool.getGamesPerCategory() == 5 ? 10 : 5),
                 null);
@@ -219,7 +221,7 @@ final class TournamentPanelSettings {
     static void toggleHours(ButtonInteractionEvent event, String buttonID) {
         TournamentPanel.change(
                 event,
-                TournamentPanel.idOf(buttonID, HOURS),
+                PanelIds.key(buttonID, HOURS),
                 Tab.SETTINGS,
                 pool -> pool.setMatchActiveHours(!pool.isMatchActiveHours()),
                 null);
@@ -229,7 +231,7 @@ final class TournamentPanelSettings {
     static void toggleSpread(ButtonInteractionEvent event, String buttonID) {
         TournamentPanel.change(
                 event,
-                TournamentPanel.idOf(buttonID, SPREAD),
+                PanelIds.key(buttonID, SPREAD),
                 Tab.SETTINGS,
                 pool -> pool.setSpreadPreviousWinners(!pool.isSpreadPreviousWinners()),
                 null);
@@ -239,7 +241,7 @@ final class TournamentPanelSettings {
     static void toggleRematches(ButtonInteractionEvent event, String buttonID) {
         TournamentPanel.change(
                 event,
-                TournamentPanel.idOf(buttonID, REMATCH),
+                PanelIds.key(buttonID, REMATCH),
                 Tab.SETTINGS,
                 pool -> pool.setAvoidRematches(!pool.isAvoidRematches()),
                 null);
@@ -247,23 +249,22 @@ final class TournamentPanelSettings {
 
     @ButtonHandler(value = NAMES_MODAL, save = false)
     static void openNames(ButtonInteractionEvent event, String buttonID) {
-        long id = TournamentPanel.idOf(buttonID, NAMES_MODAL);
+        long id = PanelIds.key(buttonID, NAMES_MODAL);
         Tournament tournament = TournamentService.getBean().find(id).orElse(null);
         String current = tournament == null ? null : tournament.getGameNamePrefix();
-        TournamentPanel.openModal(
+        PanelForms.open(
                 event,
                 NAMES_SAVE + id,
                 "Game names",
                 TextDisplay.of("Games are named with this prefix plus the group number, for example t8p01."
                         + " Leave it empty for normal pbd numbers."),
-                TournamentPanel.field("Name prefix", "prefix", current, false));
+                PanelForms.field("Name prefix", "prefix", current, false));
     }
 
     @ModalHandler(value = NAMES_SAVE, save = false)
     static void saveNames(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(event.getModalId(), NAMES_SAVE);
-        String prefix = TournamentGameNames.normalize(TournamentPanel.value(event, "prefix"));
+        long id = PanelIds.key(event.getModalId(), NAMES_SAVE);
+        String prefix = TournamentGameNames.normalize(PanelForms.value(event, "prefix"));
         if (!prefix.isEmpty()) {
             String problem = TournamentGameNames.problem(prefix).orElse(null);
             if (problem != null) {
@@ -283,8 +284,7 @@ final class TournamentPanelSettings {
 
     @SelectionHandler(value = SERVER, save = false)
     static void pickServer(StringSelectInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(event.getComponentId(), SERVER);
+        long id = PanelIds.key(event.getComponentId(), SERVER);
         TournamentService service = TournamentService.getBean();
         Tournament before = service.find(id).orElse(null);
         String guildId = event.getValues().getFirst();

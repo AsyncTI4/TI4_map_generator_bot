@@ -6,27 +6,30 @@ import java.util.Map;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
-import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
-import ti4.service.tournament.TournamentAccess;
+import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelForms;
+import ti4.message.componentsV2.PanelIds;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.tournament.TournamentSetupOption;
 import ti4.service.tournament.TournamentSetupOptions;
 import ti4.service.tournament.panel.TournamentPanel.Context;
 import ti4.service.tournament.panel.TournamentPanel.Tab;
-import ti4.service.tournament.panel.TournamentPanel.View;
 import ti4.service.tournament.setup.TournamentSetupApplier;
 import ti4.service.tournament.setup.TournamentSetupGame;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentService;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelSetup {
 
     private static final String CYCLE = "trnSetup_";
@@ -39,7 +42,7 @@ final class TournamentPanelSetup {
 
     private TournamentPanelSetup() {}
 
-    static View view(Context context) {
+    static PanelView view(Context context) {
         Tournament tournament = context.tournament();
         List<ContainerChildComponent> body = new ArrayList<>();
         List<ActionRow> controls = new ArrayList<>();
@@ -50,7 +53,7 @@ final class TournamentPanelSetup {
             warning = sourceSection(tournament, body, controls);
         }
         registrySection(context, body);
-        return View.of(body, controls).withWarning(warning);
+        return PanelView.of(body, controls).withWarning(warning);
     }
 
     private static boolean sourceSection(
@@ -96,17 +99,18 @@ final class TournamentPanelSetup {
         boolean editable = tournament.getStatus().allowsRosterChanges();
         options.stream().limit(MAX_OPTIONS_SHOWN).forEach(option -> {
             String current = TournamentSetupOptions.currentChoice(option, values);
-            body.add(Section.of(
-                    Buttons.blue(CYCLE + context.id() + "_" + option.id(), "Change")
-                            .withDisabled(!editable),
-                    TextDisplay.of("**" + option.label() + ":** " + current + "\n-# " + option.description())));
+            body.add(ComponentPanel.settingRow(
+                    option.label(),
+                    current,
+                    option.description(),
+                    Buttons.blue(PanelIds.of(CYCLE, context.id(), option.id()), "Change")
+                            .withDisabled(!editable)));
         });
     }
 
     @ButtonHandler(value = CREATE_SETUP_GAME, save = false)
     static void createSetupGame(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(buttonID, CREATE_SETUP_GAME);
+        long id = PanelIds.key(buttonID, CREATE_SETUP_GAME);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         if (tournament.isFogMode()) {
             TournamentPanel.show(event, id, Tab.SETUP, FOG_COMES_LATER);
@@ -118,21 +122,20 @@ final class TournamentPanelSetup {
 
     @ButtonHandler(value = USE_GAME_MODAL, save = false)
     static void openUseGame(ButtonInteractionEvent event, String buttonID) {
-        long id = TournamentPanel.idOf(buttonID, USE_GAME_MODAL);
-        TournamentPanel.openModal(
+        long id = PanelIds.key(buttonID, USE_GAME_MODAL);
+        PanelForms.open(
                 event,
                 USE_GAME_SAVE + id,
                 "Use setup from game",
                 TextDisplay.of("Every new game of this round copies that game's settings. Only settings are"
                         + " copied; seating, slices and factions are drawn in each game."),
-                TournamentPanel.field("Game name, for example pbd9123", "game", null, true));
+                PanelForms.field("Game name, for example pbd9123", "game", null, true));
     }
 
     @ModalHandler(value = USE_GAME_SAVE, save = false)
     static void useGame(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(event.getModalId(), USE_GAME_SAVE);
-        String gameName = TournamentPanel.value(event, "game").toLowerCase();
+        long id = PanelIds.key(event.getModalId(), USE_GAME_SAVE);
+        String gameName = PanelForms.value(event, "game").toLowerCase();
         if (!GameManager.isValid(gameName)) {
             TournamentPanel.show(event, id, Tab.SETUP, "There is no game called " + gameName + ".");
             return;
@@ -151,7 +154,7 @@ final class TournamentPanelSetup {
     static void clearSource(ButtonInteractionEvent event, String buttonID) {
         TournamentPanel.change(
                 event,
-                TournamentPanel.idOf(buttonID, CLEAR_SOURCE),
+                PanelIds.key(buttonID, CLEAR_SOURCE),
                 Tab.SETUP,
                 pool -> pool.setSetupSourceGame(null),
                 "New games no longer copy a setup. The setup game itself is kept; end it by hand when you no longer"
@@ -160,9 +163,8 @@ final class TournamentPanelSetup {
 
     @ButtonHandler(value = CYCLE, save = false)
     static void cycle(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(buttonID, CYCLE);
-        String optionId = TournamentPanel.argOf(buttonID, CYCLE);
+        long id = PanelIds.key(buttonID, CYCLE);
+        String optionId = PanelIds.arg(buttonID, CYCLE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
         TournamentSetupOptions.find(optionId).ifPresent(option -> {

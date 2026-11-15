@@ -87,12 +87,8 @@ class TournamentServiceTest {
 
         assertThat(result.removed()).isTrue();
         assertThat(result.promotedUserId()).isEqualTo("c");
-        TournamentEntry promoted = stored.stream()
-                .filter(entry -> "c".equals(entry.getUserId()))
-                .findFirst()
-                .orElseThrow();
-        assertThat(promoted.isWaitlisted()).isFalse();
-        assertThat(promoted.getGroupNumber()).isEqualTo(3);
+        assertThat(entry("c").isWaitlisted()).isFalse();
+        assertThat(entry("c").getGroupNumber()).isEqualTo(3);
     }
 
     @Test

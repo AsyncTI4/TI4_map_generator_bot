@@ -1,18 +1,12 @@
 package ti4.service.tournament.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
 import ti4.json.JsonMapperManager;
-import ti4.service.tournament.TournamentSetupAccess;
 import ti4.testUtils.BaseTi4Test;
 import tools.jackson.databind.JsonNode;
 
@@ -89,23 +83,6 @@ class TournamentSetupCopierTest extends BaseTi4Test {
     }
 
     @Test
-    void seatlessTournamentAdminsMayOnlyPressSetupButtonsInASetupGame() {
-        Game setupGame = new Game();
-        Member mod = memberWithRole("Tourney Mod");
-        Member player = memberWithRole("Player");
-
-        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, mod, "jmfA_main_startMilty"))
-                .isFalse();
-        setupGame.setStoredValue(TournamentSetupAccess.SETUP_GAME_KEY, "12");
-        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, mod, "jmfA_main_startMilty"))
-                .isTrue();
-        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, mod, "exploreFront_"))
-                .isFalse();
-        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, player, "jmfA_main_startMilty"))
-                .isFalse();
-    }
-
-    @Test
     void gamesWithScoredOrDealtCardsCannotBeTheSource() {
         Game source = freshGame();
         assertThat(TournamentSetupApplier.canCopy(source)).isTrue();
@@ -122,15 +99,5 @@ class TournamentSetupCopierTest extends BaseTi4Test {
         Game game = new Game();
         game.newGameSetup();
         return game;
-    }
-
-    private static Member memberWithRole(String roleName) {
-        Role role = mock(Role.class);
-        when(role.getName()).thenReturn(roleName);
-        when(role.getId()).thenReturn(roleName + "-id");
-        Member member = mock(Member.class);
-        when(member.getRoles()).thenReturn(List.of(role));
-        when(member.getUser()).thenReturn(mock(User.class));
-        return member;
     }
 }

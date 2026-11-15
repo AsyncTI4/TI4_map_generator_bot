@@ -218,6 +218,23 @@ class TournamentHelpersTest {
         assertThat(TournamentAccess.rolesOnSharedServers(onB)).containsExactly(playerOnB, staffOnA);
     }
 
+    @Test
+    void seatlessTournamentAdminsMayOnlyPressSetupButtonsInASetupGame() {
+        Game setupGame = new Game();
+        Member mod = member(mock(User.class), mock(Guild.class), role("Tourney Mod"));
+        Member player = member(mock(User.class), mock(Guild.class), role("Player"));
+
+        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, mod, "jmfA_main_startMilty"))
+                .isFalse();
+        setupGame.setStoredValue(TournamentSetupAccess.SETUP_GAME_KEY, "12");
+        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, mod, "jmfA_main_startMilty"))
+                .isTrue();
+        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, mod, "exploreFront_"))
+                .isFalse();
+        assertThat(TournamentSetupAccess.allowsSeatlessAdmin(setupGame, player, "jmfA_main_startMilty"))
+                .isFalse();
+    }
+
     private static Member member(User user, Guild guild, Role role) {
         Member member = mock(Member.class);
         when(member.getUser()).thenReturn(user);

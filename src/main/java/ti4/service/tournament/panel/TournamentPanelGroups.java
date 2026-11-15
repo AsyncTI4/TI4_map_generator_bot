@@ -15,8 +15,11 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
-import ti4.service.tournament.TournamentAccess;
+import ti4.message.componentsV2.PanelForms;
+import ti4.message.componentsV2.PanelIds;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentGameCreator;
 import ti4.service.tournament.TournamentGameMasterAssigner;
@@ -28,12 +31,12 @@ import ti4.service.tournament.TournamentResults;
 import ti4.service.tournament.TournamentRoster;
 import ti4.service.tournament.panel.TournamentPanel.Context;
 import ti4.service.tournament.panel.TournamentPanel.Tab;
-import ti4.service.tournament.panel.TournamentPanel.View;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
 import ti4.spring.service.tournament.TournamentStatus;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelGroups {
 
     private static final String GENERATE = "trnGenerate_";
@@ -49,7 +52,7 @@ final class TournamentPanelGroups {
 
     private TournamentPanelGroups() {}
 
-    static View view(Context context) {
+    static PanelView view(Context context) {
         Tournament tournament = context.tournament();
         long id = context.id();
         Map<Integer, List<TournamentEntry>> groups = TournamentService.groups(context.entries());
@@ -93,7 +96,7 @@ final class TournamentPanelGroups {
                     Buttons.gray(SET_GM_MODAL + id, "Set a GM")
                             .withDisabled((!editable && !replacing) || groups.isEmpty())));
         }
-        return View.of(body, controls).withWarning(!warnings.isEmpty()).withPages(pageCount);
+        return PanelView.of(body, controls).withWarning(!warnings.isEmpty()).withPages(pageCount);
     }
 
     private static String groupBlock(
@@ -144,8 +147,7 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = GENERATE, save = false)
     static void generate(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(buttonID, GENERATE);
+        long id = PanelIds.key(buttonID, GENERATE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
         if (!tournament.getStatus().allowsRosterChanges()) {
@@ -185,22 +187,21 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = SWAP_MODAL, save = false)
     static void openSwap(ButtonInteractionEvent event, String buttonID) {
-        long id = TournamentPanel.idOf(buttonID, SWAP_MODAL);
-        TournamentPanel.openModal(
+        long id = PanelIds.key(buttonID, SWAP_MODAL);
+        PanelForms.open(
                 event,
                 SWAP_SAVE + id,
                 "Swap two players",
-                TournamentPanel.field("First player", "first", null, true),
-                TournamentPanel.field("Second player", "second", null, true));
+                PanelForms.field("First player", "first", null, true),
+                PanelForms.field("Second player", "second", null, true));
     }
 
     @ModalHandler(value = SWAP_SAVE, save = false)
     static void swap(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(event.getModalId(), SWAP_SAVE);
+        long id = PanelIds.key(event.getModalId(), SWAP_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         Resolution resolution = TournamentPanel.resolve(
-                tournament, TournamentPanel.value(event, "first") + "\n" + TournamentPanel.value(event, "second"));
+                tournament, PanelForms.value(event, "first") + "\n" + PanelForms.value(event, "second"));
         if (resolution.userIds().size() != 2) {
             TournamentPanel.show(event, id, Tab.GROUPS, "Couldn't find exactly two players.\n" + resolution.problems());
             return;
@@ -216,8 +217,7 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = APPROVE, save = false)
     static void approve(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(buttonID, APPROVE);
+        long id = PanelIds.key(buttonID, APPROVE);
         TournamentService service = TournamentService.getBean();
         String error = service.approveGroups(id).orElse(null);
         if (error != null) {
@@ -235,8 +235,7 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = ASSIGN_GMS, save = false)
     static void assignGameMastersButton(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(buttonID, ASSIGN_GMS);
+        long id = PanelIds.key(buttonID, ASSIGN_GMS);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         TournamentPanel.show(event, id, Tab.GROUPS, assignGameMasters(tournament));
     }
@@ -258,29 +257,28 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = SET_GM_MODAL, save = false)
     static void openSetGameMaster(ButtonInteractionEvent event, String buttonID) {
-        long id = TournamentPanel.idOf(buttonID, SET_GM_MODAL);
-        TournamentPanel.openModal(
+        long id = PanelIds.key(buttonID, SET_GM_MODAL);
+        PanelForms.open(
                 event,
                 SET_GM_SAVE + id,
                 "Set a GM",
-                TournamentPanel.field("Group number", "group", null, true),
-                TournamentPanel.field("GM", "gm", null, true));
+                PanelForms.field("Group number", "group", null, true),
+                PanelForms.field("GM", "gm", null, true));
     }
 
     @ModalHandler(value = SET_GM_SAVE, save = false)
     static void setGameMaster(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(event.getModalId(), SET_GM_SAVE);
+        long id = PanelIds.key(event.getModalId(), SET_GM_SAVE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
-        int group = NumberUtils.toInt(TournamentPanel.value(event, "group"), -1);
+        int group = NumberUtils.toInt(PanelForms.value(event, "group"), -1);
         List<TournamentEntry> members =
                 TournamentService.groups(service.entries(id)).get(group);
         if (members == null) {
             TournamentPanel.show(event, id, Tab.GROUPS, "There is no group with that number.");
             return;
         }
-        Resolution resolution = TournamentPanel.resolve(tournament, TournamentPanel.value(event, "gm"));
+        Resolution resolution = TournamentPanel.resolve(tournament, PanelForms.value(event, "gm"));
         if (resolution.userIds().size() != 1) {
             TournamentPanel.show(event, id, Tab.GROUPS, "Couldn't find exactly one GM.\n" + resolution.problems());
             return;
@@ -303,8 +301,7 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = ROSTER, save = false)
     static void roster(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
-        long id = TournamentPanel.idOf(buttonID, ROSTER);
+        long id = PanelIds.key(buttonID, ROSTER);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
         if (tournament.isFogMode()) {
