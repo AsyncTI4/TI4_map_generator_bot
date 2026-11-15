@@ -1,18 +1,12 @@
 package ti4.ai.agenda;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.OptionalDouble;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.model.DeckModel;
-import ti4.model.Mapper;
 
 @UtilityClass
 class CovertValues {
@@ -43,21 +37,10 @@ class CovertValues {
 
     static List<String> possibleAgendas(Game game) {
         String target = announcedTarget(game);
-        DeckModel deck = Mapper.getDeck(game.getAgendaDeckID());
-        if (deck == null || target.isBlank()) return List.of();
-        Set<String> gone = seen(game);
-        return deck.getNewDeck().stream()
-                .distinct()
-                .filter(alias -> !COVERT.equals(alias) && !gone.contains(alias))
+        if (target.isBlank()) return List.of();
+        return AgendaPrior.remainingDeck(game).stream()
                 .filter(alias -> AgendaKnowledge.hasTarget(alias, target))
-                .sorted()
                 .toList();
-    }
-
-    private static Set<String> seen(Game game) {
-        Set<String> seen = new HashSet<>(game.getDiscardAgendas().keySet());
-        seen.addAll(game.getLaws().keySet());
-        return seen.stream().filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     @Nullable

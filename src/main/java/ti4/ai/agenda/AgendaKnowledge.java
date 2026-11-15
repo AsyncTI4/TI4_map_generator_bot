@@ -18,6 +18,7 @@ public class AgendaKnowledge {
     private static final String FIELD = "~";
     private static final String CARD = "+";
     private static final int FIELDS = 3;
+    private static final String NAALU_COMMANDER = "naalucommander";
 
     private record Known(int round, int deckSize, List<String> top) {
 
@@ -35,19 +36,44 @@ public class AgendaKnowledge {
     }
 
     public static void placedOnTop(Game game, Player seat, String alias) {
-        List<String> top = new ArrayList<>(knownTop(game, seat));
+        List<String> top = new ArrayList<>(recordedTop(game, seat));
         top.remove(alias);
         top.addFirst(alias);
         seat.setStoredValue(KEY, new Known(game.getRound(), deckSize(game), top).encode());
     }
 
     public static void placedOnBottom(Game game, Player seat, String alias) {
-        List<String> top = new ArrayList<>(knownTop(game, seat));
+        List<String> top = new ArrayList<>(recordedTop(game, seat));
         if (!top.remove(alias)) return;
         seat.setStoredValue(KEY, new Known(game.getRound(), deckSize(game), top).encode());
     }
 
     public static List<String> knownTop(Game game, Player seat) {
+        List<String> recorded = recordedTop(game, seat);
+        if (!seesTheTop(game, seat)) return recorded;
+        Optional<String> top = topOutsideHands(game);
+        if (top.isEmpty() || recorded.contains(top.get())) return recorded;
+        List<String> known = new ArrayList<>();
+        known.add(top.get());
+        known.addAll(recorded);
+        return List.copyOf(known);
+    }
+
+    private static boolean seesTheTop(Game game, Player seat) {
+        return game.playerHasLeaderUnlockedOrAlliance(seat, NAALU_COMMANDER);
+    }
+
+    private static Optional<String> topOutsideHands(Game game) {
+        List<String> deck = game.getAgendas();
+        if (deck == null) return Optional.empty();
+        for (int index = 0; index < deck.size(); index++) {
+            String alias = game.lookAtTopAgenda(index);
+            if (!game.getSentAgendas().containsKey(alias)) return Optional.of(alias);
+        }
+        return Optional.empty();
+    }
+
+    private static List<String> recordedTop(Game game, Player seat) {
         Optional<Known> known = Known.decode(seat.getStoredValue(KEY));
         if (known.isEmpty() || known.get().round() != game.getRound()) return List.of();
         int drawn = known.get().deckSize() - deckSize(game);

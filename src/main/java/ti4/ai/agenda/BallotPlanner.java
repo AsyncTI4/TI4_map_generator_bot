@@ -16,7 +16,6 @@ class BallotPlanner {
 
     private static final double MIN_GAIN = 0.5;
     private static final double KEPT_VOTE = 0.05;
-    private static final double NEXT_AGENDA_VOTE = 0.1;
     static final double LAST_VOTE = 0.5;
     private static final double NEAR_BEST = 0.3;
     private static final double INDIFFERENT = 1e-6;
@@ -174,7 +173,9 @@ class BallotPlanner {
 
     static double keptVote(Game game, Player seat) {
         if (AgendaRound.isFinalAgenda(game)) return 0;
-        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE) ? NEXT_AGENDA_VOTE : KEPT_VOTE;
+        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)
+                ? AgendaPrior.marginalVote(game, seat)
+                : KEPT_VOTE;
     }
 
     static int reserve(List<Integer> planetVotes) {

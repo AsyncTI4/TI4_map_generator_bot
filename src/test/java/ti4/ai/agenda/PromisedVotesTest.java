@@ -248,13 +248,16 @@ class PromisedVotesTest extends BaseTi4Test {
     }
 
     // Votes sold on a first agenda are votes the seller no longer has for the second, priced like its own ballot
-    // (0.1 TG a vote); on the last agenda they are free. Without the expert value table the seller does not price them.
+    // (its kept-vote value, from the next agenda's stakes); on the last agenda they are free. Without the expert value
+    // table the seller does not price them.
     @Test
     void votesSoldBeforeTheLastAgendaCostTheSellerItsNextAgenda() {
         assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isZero();
 
         test.game.setStoredValue("agendaCount", "1");
-        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isCloseTo(0.5, within(1e-9));
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5))
+                .isPositive()
+                .isCloseTo(5 * BallotPlanner.keptVote(test.game, xxcha), within(1e-9));
 
         AiExperiments.disable(xxcha, Set.of(Experiment.AGENDA_VALUE_TABLE));
         assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isZero();

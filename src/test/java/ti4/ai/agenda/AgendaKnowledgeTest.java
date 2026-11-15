@@ -76,6 +76,19 @@ class AgendaKnowledgeTest extends BaseTi4Test {
         assertThat(AgendaKnowledge.knownTop(test.game, sol)).isEmpty();
     }
 
+    // M'aban, the Naalu commander, may look at the top of the agenda deck at any time, so its holder knows that card.
+    @Test
+    void theNaaluCommanderSeesTheTopCard() {
+        String top = test.game.lookAtTopAgenda(0);
+        assertThat(AgendaKnowledge.knownTop(test.game, sol)).isEmpty();
+
+        sol.addLeader("naalucommander");
+        sol.unsafeGetLeader("naalucommander").setLocked(false);
+
+        assertThat(AgendaKnowledge.next(test.game, sol)).contains(top);
+        assertThat(AgendaKnowledge.knownTop(test.game, test.nekro)).isEmpty();
+    }
+
     // User's value table: Committee Formation is worth 2 TG more to a holder who knows a good Elect Player agenda is
     // coming. Only the holder knows; Nekro's model of Sol keeps the round-table value.
     @Test

@@ -357,7 +357,14 @@ In `AgendaForecastTest` and `AgendaCardRulesTest`:
   - Covert's speaker reads its hidden card through `AgendaKnowledge.covertCard`.
   - Committee Formation is worth `COMMITTEE_KNOWN_ELECTION` (2 TG) more to a holder that, in its own view, knows an Elect Player agenda worth 2 TG or more to itself is on top (`ExpertElectionValues.knowsAGoodElectionComing`).
   - Guard: `AgendaKnowledgeTest.onlyAgendaKnowledgeReadsHiddenAgendaCards` fails if any other `ti4.ai` file calls `lookAtTopAgenda`, `lookAtBottomAgenda` or `getSentAgendas` (PlannedPrimaries excepted). `DriveTheDebateOdds` reads only the deck's composition, which is public.
-  - **Not done yet:** Insider Information and the Naalu commander as knowledge sources; the kept-vote `SecondAgendaValue.marginalVote`; the `AgendaPeek` rewrite; Maw of Worlds; `Determinizer` keeping known positions fixed.
+- **Done (2026-11-15), second part** (behind `AGENDA_VALUE_TABLE`; legacy unchanged):
+  - `AgendaPrior` judges agendas not on the table yet: `AgendaOutcomes.of(game, agenda)` lists any agenda's outcomes; `expected` weights each outcome by the vote capacity of the seats whose favourite it is (others from public values, the seat from its own); `spread` is best minus worst outcome for the seat; deck averages run over `remainingDeck` (the game's deck minus discards, laws in play, the current agenda and Covert).
+  - **Kept vote:** `BallotPlanner.keptVote` is now `AgendaPrior.marginalVote` = `PIVOTAL_SHARE` (0.25) x the next agenda's spread / the table's vote capacity, clamped to [0.02, 1.0]; it uses the known next card, else the deck average. The flat `NEXT_AGENDA_VOTE` 0.1 is gone (1/tableVotes alone held back far too many votes on small tables, hence the 0.25).
+  - **Politics placement** (`AgendaPeek.keepOnTop`): keep a card on top when its expected value for the seat is at least the deck average.
+  - **M'aban (Naalu commander)** may look at the top of the deck at any time, so its holder knows the top card outside players' hands.
+  - **Maw of Worlds:** influence given up costs `AgendaPrior.phaseVoteValue` per influence (the per-vote value of this phase's two agendas, known or deck average), with the old 0.25 as the floor.
+  - **Rollouts:** `Determinizer.shuffleHiddenDecks` puts the seat's known top cards back on top after shuffling.
+  - **Not done:** Insider Information (the AI never plays it; it is a pure-information card whose gain would rarely beat holding it, and it needs wiring into the agenda "after" flow). Tests: `AgendaPriorTest`, `AgendaKnowledgeTest.theNaaluCommanderSeesTheTopCard`.
 - **Risk:** `Determinizer.shuffleHiddenDecks` (`src/test/java/ti4/ai/runtime/Determinizer.java:73`) must keep known positions and the Covert top card fixed for rollouts.
 
 ---

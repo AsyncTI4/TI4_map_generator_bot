@@ -2,16 +2,23 @@ package ti4.ai.agenda;
 
 import java.util.function.ToIntFunction;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Helper;
 
-// TODO: WIP, needs a redesign. Election odds are guessed from total influence (votes are unknown in the action
-// phase), and only three agenda groups from AgendaPolicy are judged; everything else stays on top.
 @UtilityClass
 public class AgendaPeek {
 
     public static boolean keepOnTop(Game game, Player seat, String agenda) {
+        if (AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)) {
+            return AgendaPrior.expected(game, seat, agenda) >= AgendaPrior.deckExpected(game, seat);
+        }
+        return legacyKeepOnTop(game, seat, agenda);
+    }
+
+    private static boolean legacyKeepOnTop(Game game, Player seat, String agenda) {
         if (AgendaPolicy.punishesElectedPlayer(agenda) && isAhead(game, seat, Player::getTotalVictoryPoints)) {
             return false;
         }

@@ -17,7 +17,10 @@ public class AgendaOutcomes {
     private static final String COVERT = "covert";
 
     public static List<String> of(Game game) {
-        String agenda = AgendaPolicy.currentAgenda(game);
+        return of(game, AgendaPolicy.currentAgenda(game));
+    }
+
+    public static List<String> of(Game game, String agenda) {
         AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
         if (model == null || model.getTarget() == null) return List.of();
         String target = outcomeTarget(game, agenda, model).toLowerCase();
