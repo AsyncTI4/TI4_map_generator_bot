@@ -422,6 +422,7 @@ public class AuctionFrankenDraftService {
         set(game, "draftStatusMessage", "");
         updateDraftStatus(game);
         MessageHelper.sendMessageToChannel(auctionChannel(game), bidSummary(game));
+        MessageHelper.sendMessageToChannel(auctionChannel(game), remainingVotesSummary(game));
         Player picker = player(game, value(game, "picker"));
         if (picker != null) {
             int nomination = currentNomination(game);
@@ -621,6 +622,20 @@ public class AuctionFrankenDraftService {
                     .append(bids[1])
                     .append(" / ")
                     .append(bids[2])
+                    .append('\n');
+        }
+        return text.toString();
+    }
+
+    private String remainingVotesSummary(Game game) {
+        StringBuilder text = new StringBuilder("__Remaining Votes__\n");
+        for (Player player : players(game)) {
+            int remainingVotes =
+                    number(game, playerKey("votes", player)) - number(game, "price." + player.getFaction());
+            text.append("> ")
+                    .append(player.getRepresentationNoPing())
+                    .append(": ")
+                    .append(remainingVotes)
                     .append('\n');
         }
         return text.toString();
