@@ -7685,7 +7685,7 @@ public class ButtonHelper {
             msg.append(unitRoll);
         }
         msg.append(
-                "\nHave your opponent assign hits with the assign hits button present underneath the combat picture, and reroll their dice (if desired) using the roll space combat button.");
+                "\nHave your opponent reroll their dice (if desired) using the roll space combat button, and assign hits (if any) with the assign hits button present underneath the combat picture.");
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
     }
 

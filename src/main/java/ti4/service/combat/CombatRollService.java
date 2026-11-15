@@ -3014,6 +3014,16 @@ public class CombatRollService {
                     .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
+            } else {
+                if (unitHolders != null
+                        && unitHolders.getFirst() != null
+                        && unitHolders.getFirst() instanceof Planet planet) {
+                    String planetName = planet.getName();
+                    Player planetOwner = game.getPlanetOwner(planetName);
+                    if (opponents.contains(planetOwner)) {
+                        opponent = planetOwner;
+                    }
+                }
             }
             if (!game.getStoredValue("hiredGunsInPlay").isEmpty()) {
                 Player nokar = game.getPlayerFromColorOrFaction(

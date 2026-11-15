@@ -459,8 +459,8 @@ public final class AgendaHelper {
                     || willPrevote) {
                 String skippedMessage =
                         nextInLine.getRepresentation(true, false) + ", you are being skipped because you cannot vote.";
-                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
-                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
+                        && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
                     CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     skippedMessage = realIdentity2
                             + ", you are being skipped because you told the bot you wanted to preset an abstention.";
@@ -469,7 +469,7 @@ public final class AgendaHelper {
                             game.getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (willPrevote) {
+                if (willPrevote && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
                     skippedMessage = realIdentity2 + " had logged a pre-vote.";
                     votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
                     game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
@@ -484,7 +484,6 @@ public final class AgendaHelper {
                                 nextInLine.getPrivateChannel(),
                                 AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n ");
                     }
-                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     if (!game.isHiddenAgendaMode()) {
                         MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
@@ -810,8 +809,8 @@ public final class AgendaHelper {
                     && counter < game.getRealPlayers().size()) {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
                         + ", you are being skipped because the bot thinks you can't vote.";
-                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
-                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
+                        && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
                     skippedMessage = realIdentity
                             + ", you are being skipped because you told the bot you wanted to preset an abstention.";
                     game.setStoredValue(
@@ -819,8 +818,7 @@ public final class AgendaHelper {
                             game.getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (willPrevote) {
-                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (willPrevote && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
                     skippedMessage = realIdentity + " had logged a pre-vote.";
                     String votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
                     game.setStoredValue("preVoting" + nextInLine.getFaction(), "");

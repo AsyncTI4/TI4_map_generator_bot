@@ -180,6 +180,11 @@ public class RematchService {
         if (game.isCompetitiveTIGLGame()) {
             TIGLHelper.initializeTIGLGame(newGame, TIGLHelper.isFracturedTIGLGame(game));
         }
+        String oldFactions = "";
+        for (Player player : game.getRealPlayers()) {
+            oldFactions += player.getFaction() + "_";
+        }
+        newGame.setStoredValue("oldFactions", oldFactions);
 
         CreateGameService.presentSetupToPlayers(newGame);
         GameManager.save(newGame, "Rematch");

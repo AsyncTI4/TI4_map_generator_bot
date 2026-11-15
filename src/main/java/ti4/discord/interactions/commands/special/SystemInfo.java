@@ -26,7 +26,7 @@ import ti4.service.combat.StartCombatService;
 class SystemInfo extends GameStateSubcommand {
 
     SystemInfo() {
-        super(Constants.SYSTEM_INFO, "Info for system (all units)", true, true);
+        super(Constants.SYSTEM_INFO, "Info for system (all units)", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                 .setRequired(true)
                 .setAutoComplete(true));
