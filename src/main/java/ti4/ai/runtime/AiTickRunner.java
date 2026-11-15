@@ -43,6 +43,7 @@ import ti4.ai.selfplay.RefereeRules;
 import ti4.ai.selfplay.RefereeRules.RefereePress;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.trace.AiDebugLog;
+import ti4.ai.trace.ShadowCheck;
 import ti4.ai.trace.Thinking;
 import ti4.ai.trace.ThinkingAborted;
 import ti4.ai.trace.ThinkingProfile;
@@ -315,6 +316,7 @@ class AiTickRunner {
         ThinkingAborted aborted = null;
         boolean failed = false;
         TimingReport.startDecision();
+        ShadowCheck.startDecision();
         DecisionInputs before = TimingReport.enabled() ? DecisionInputs.of(context) : null;
         ClockReads.reset();
         long cpuStart = TimingReport.cpuNow();
@@ -335,6 +337,7 @@ class AiTickRunner {
         } finally {
             memo.close();
             thinking.close();
+            ShadowCheck.endDecision();
         }
         long cpu = TimingReport.cpuNow() - cpuStart;
         TimingReport.recordDecision(

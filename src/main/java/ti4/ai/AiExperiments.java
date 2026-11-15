@@ -25,7 +25,8 @@ public class AiExperiments {
         SPEAKER_SALE,
         WIN_BREAK_DENIAL,
         ATTACK_MEMORY,
-        PROMISE_DEALS
+        PROMISE_DEALS,
+        JOINT_WIN_THREAT
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

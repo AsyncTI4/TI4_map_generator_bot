@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
+import java.util.stream.DoubleStream;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.CustodiansRace;
@@ -19,6 +20,7 @@ import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.PlanetTake;
 import ti4.ai.tactical.StyxTake;
+import ti4.ai.trace.ShadowCheck;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -143,9 +145,24 @@ public class WinOdds {
 
     public static boolean outrunsEveryRival(Game game, Player seat, OptionalInt mine, Map<Player, Integer> given) {
         if (mine.isEmpty()) return false;
-        return game.getRealPlayers().stream()
+        boolean eachRivalBehind = game.getRealPlayers().stream()
                 .filter(other -> other != seat && !other.isEliminated())
                 .allMatch(other -> finishesBefore(game, seat, other, mine, given.getOrDefault(other, 0)) < MAJORITY);
+        if (!WinRace.weighsTheField(seat)) return eachRivalBehind;
+        return ShadowCheck.choose(
+                "win.outrunsEveryRival",
+                eachRivalBehind,
+                () -> fieldFinishesBefore(game, seat, mine, given) < MAJORITY);
+    }
+
+    public static double fieldFinishesBefore(Game game, Player seat, OptionalInt mine, Map<Player, Integer> given) {
+        return anyOf(game.getRealPlayers().stream()
+                .filter(other -> other != seat && !other.isEliminated())
+                .mapToDouble(other -> finishesBefore(game, seat, other, mine, given.getOrDefault(other, 0))));
+    }
+
+    static double anyOf(DoubleStream chances) {
+        return 1 - chances.reduce(1, (nobodyYet, chance) -> nobodyYet * (1 - chance));
     }
 
     private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {

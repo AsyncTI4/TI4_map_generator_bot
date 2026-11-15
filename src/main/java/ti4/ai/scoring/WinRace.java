@@ -3,6 +3,7 @@ package ti4.ai.scoring;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
@@ -13,6 +14,7 @@ import ti4.ai.eval.FractureCampaign;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretValue;
 import ti4.ai.tactical.StyxTake;
+import ti4.ai.trace.ShadowCheck;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -29,9 +31,7 @@ public class WinRace {
     private static final int STYX_POINT = 1;
 
     public static List<Player> winnersBefore(Game game, Player seat) {
-        if (game.isFowMode() || game.getVp() <= 0 || !ACTION_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
-            return List.of();
-        }
+        if (!racing(game)) return List.of();
         return DecisionMemo.remember(() -> computeWinnersBefore(game, seat), "win.race", seat, game.getRound());
     }
 
@@ -68,7 +68,30 @@ public class WinRace {
 
     public static boolean winsWithReserve(Game game, Player seat, String reservedId) {
         OptionalInt mine = finish(game, seat, ownSecret(game, seat), readyPublics(game, seat, reservedId));
-        return winnersBefore(game, seat).stream().noneMatch(rival -> likelyFirst(game, seat, rival, mine));
+        boolean noWinnerStillFirst =
+                winnersBefore(game, seat).stream().noneMatch(rival -> likelyFirst(game, seat, rival, mine));
+        if (!weighsTheField(seat)) return noWinnerStillFirst;
+        return ShadowCheck.choose(
+                "win.winsWithReserve",
+                noWinnerStillFirst,
+                () -> WinOdds.fieldFinishesBefore(game, seat, mine, Map.of()) < WinOdds.MAJORITY);
+    }
+
+    public static boolean fieldLikelyFirst(Game game, Player seat) {
+        boolean anyWinnerBefore = !winnersBefore(game, seat).isEmpty();
+        if (!weighsTheField(seat) || anyWinnerBefore || !racing(game)) return anyWinnerBefore;
+        return ShadowCheck.choose(
+                "win.fieldLikelyFirst",
+                false,
+                () -> WinOdds.fieldFinishesBefore(game, seat, seatFinish(game, seat), Map.of()) >= WinOdds.MAJORITY);
+    }
+
+    private static boolean racing(Game game) {
+        return !game.isFowMode() && game.getVp() > 0 && ACTION_PHASE.equalsIgnoreCase(game.getPhaseOfGame());
+    }
+
+    public static boolean weighsTheField(Player seat) {
+        return weighsFeasibility(seat) && AiExperiments.enabled(seat, AiExperiments.Experiment.JOINT_WIN_THREAT);
     }
 
     private static boolean finishesFirst(OptionalInt theirs, OptionalInt mine) {

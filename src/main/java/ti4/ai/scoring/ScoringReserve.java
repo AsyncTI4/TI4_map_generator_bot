@@ -48,8 +48,7 @@ public class ScoringReserve {
         if (!isActionPhase(game) || !Helper.canPlayerScorePOs(game, seat)) {
             return Optional.empty();
         }
-        boolean outrun = !timed("scoring.winRace", () -> WinRace.winnersBefore(game, seat))
-                .isEmpty();
+        boolean outrun = timed("scoring.winRace", () -> WinRace.fieldLikelyFirst(game, seat));
         boolean racesWithReserve = AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_THREAT_FEASIBLE);
         if (outrun && !racesWithReserve) return Optional.empty();
         Wallet wallet = timed(
