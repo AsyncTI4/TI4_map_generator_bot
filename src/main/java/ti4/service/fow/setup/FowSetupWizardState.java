@@ -22,7 +22,7 @@ public class FowSetupWizardState {
 
     private FowSetupStep step = FowSetupStep.GAME_TYPE;
     private Long panelMessageId;
-    private PanelStyle panelStyle = PanelStyle.LEGACY;
+    private PanelStyle panelStyle = PanelStyle.CONTAINER;
     private String subView;
     private String stepTab;
     private Set<FowSetupStep> infoThreadsPosted = EnumSet.noneOf(FowSetupStep.class);

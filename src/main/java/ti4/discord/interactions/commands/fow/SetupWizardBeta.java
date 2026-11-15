@@ -3,14 +3,13 @@ package ti4.discord.interactions.commands.fow;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
-import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.service.fow.setup.FowSetupWizardService;
 
 class SetupWizardBeta extends GameStateSubcommand {
 
-    SetupWizardBeta() {
-        super(Constants.SETUP_BETA, "Open (or refresh) the new single-panel FoW GM setup wizard", true, true);
+    SetupWizardBeta(String name) {
+        super(name, "Open (or refresh) the single-panel FoW GM setup wizard", true, true);
     }
 
     @Override
