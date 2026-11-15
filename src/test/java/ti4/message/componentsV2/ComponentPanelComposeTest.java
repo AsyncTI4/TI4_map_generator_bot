@@ -103,6 +103,14 @@ class ComponentPanelComposeTest {
     }
 
     @Test
+    void pageCountIsNeverBelowOne() {
+        // The tournament panel clamps the current page into [0, pageCount - 1], which throws when pageCount is 0.
+        PanelView view = PanelView.of(List.of(), List.of()).withPages(0);
+
+        assertThat(view.pageCount()).isEqualTo(1);
+    }
+
+    @Test
     void panelIdsRoundTripTheTournamentFormats() {
         // These exact strings are on panels already posted in Discord, so the format must not change.
         assertThat(PanelIds.of("trnTab_", 42L, "GROUPS")).isEqualTo("trnTab_42_GROUPS");

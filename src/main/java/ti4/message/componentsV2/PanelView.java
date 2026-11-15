@@ -12,6 +12,10 @@ public record PanelView(
         boolean hideNavigation,
         int pageCount) {
 
+    public PanelView {
+        pageCount = Math.max(1, pageCount);
+    }
+
     public static PanelView of(List<ContainerChildComponent> body, List<ActionRow> controls) {
         return new PanelView(body, controls, false, false, 1);
     }
