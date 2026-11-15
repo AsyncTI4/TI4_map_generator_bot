@@ -348,10 +348,9 @@ final class FowSetupPanelBasics {
 
     static FowSetupPanel.View done() {
         List<ContainerChildComponent> body = List.of(
-                TextDisplay.of(
-                        "Setup is complete. Use the step list to revisit anything; the wizard does not lock.\n"
-                                + "**Close Wizard** removes this panel, archives its info threads and makes the next"
-                                + " `/fow setup_beta` start at step 1. Your answers (factions, map, rolls, options) stay as set."));
+                TextDisplay.of("Setup is complete. Use the step list to revisit anything; the wizard does not lock.\n"
+                        + "**Close Wizard** removes this panel, archives its info threads and makes the next"
+                        + " `/fow setup` start at step 1. Your answers (factions, map, rolls, options) stay as set."));
         return FowSetupPanel.View.of(body, List.of());
     }
 }

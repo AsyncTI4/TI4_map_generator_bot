@@ -446,7 +446,7 @@ A single Components V2 message that the bot edits in place as it is used, with t
 _Avoid_: Menu message, button wall
 
 **FoW setup panel**:
-The panel version of the FoW setup wizard, opened with `/fow setup_beta` while it is tested next to the button wizard of `/fow setup`. Both share the same saved wizard state.
+The panel version of the FoW setup wizard, opened with `/fow setup` (and `/fow setup_beta`, kept for further development) and by the setup button posted when a FoW game is created. The older button wizard is still available as `/fow setup_old`. Both share the same saved wizard state.
 _Avoid_: Wizard v2
 
 ### Rules concepts
