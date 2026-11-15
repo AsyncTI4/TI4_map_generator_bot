@@ -29,6 +29,7 @@ import ti4.service.franken.AuctionFrankenDraftService;
 import ti4.service.game.GameNameService;
 import ti4.service.megagame.MegagameGmAccess;
 import ti4.service.testbed.TestBedService;
+import ti4.service.tournament.TournamentSetupAccess;
 import ti4.settings.users.UserSettingsManager;
 
 @Getter
@@ -68,7 +69,8 @@ public abstract class ListenerContext {
                 || (AuctionFrankenDraftService.ACTION_PREFIX + ";showDrafted").equals(componentID)
                 || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
                 || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX)
-                || MegagameGmAccess.allowsSeatlessGm(game, event.getMember(), componentID);
+                || MegagameGmAccess.allowsSeatlessGm(game, event.getMember(), componentID)
+                || TournamentSetupAccess.allowsSeatlessAdmin(game, event.getMember(), componentID);
     }
 
     ListenerContext(GenericInteractionCreateEvent event, String compID) {

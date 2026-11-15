@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.reven
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -1096,9 +1097,14 @@ public final class StatusHelper {
                             game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                         }
                         if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-                            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-                            if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
-                                Helper.resolvePOScoringQueue(game, event);
+                            if (LunariumLeaderHandler.isHeroActive(player)) {
+                                LunariumLeaderHandler.offerDoneScoringSecretsButton(game, player);
+                            } else {
+                                game.setStoredValue(
+                                        key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                                if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
+                                    Helper.resolvePOScoringQueue(game, event);
+                                }
                             }
                         }
 

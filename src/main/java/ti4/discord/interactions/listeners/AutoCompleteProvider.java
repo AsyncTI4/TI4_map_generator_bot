@@ -89,7 +89,9 @@ import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
 import ti4.service.testbed.TestBedAutoComplete;
 import ti4.service.testbed.TestBedService;
+import ti4.service.tournament.TournamentAccess;
 import ti4.settings.GlobalSettings;
+import ti4.spring.service.tournament.TournamentService;
 
 @UtilityClass
 class AutoCompleteProvider {
@@ -121,6 +123,7 @@ class AutoCompleteProvider {
                 case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN2 -> resolvePlotAutoComplete(event, optionName);
                 case "testbed" -> resolveTestBedAutoComplete(event, optionName);
+                case "tournament" -> resolveTournamentAutoComplete(event);
             }
             if (event.isAcknowledged()) return;
         }
@@ -1502,6 +1505,25 @@ class AutoCompleteProvider {
             default -> Collections.emptyList();
         };
         event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void resolveTournamentAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event) {
+        if (TournamentService.isUnavailable() || !TournamentAccess.isTournamentAdmin(event.getMember())) {
+            event.replyChoices(List.of()).queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+        String typed = event.getFocusedOption().getValue().toLowerCase();
+        List<Command.Choice> choices = TournamentService.getBean().listActive().stream()
+                .map(tournament -> new Command.Choice(
+                        StringUtils.left(
+                                "#" + tournament.getId() + " · " + tournament.displayName() + " ("
+                                        + tournament.getStatus().name().toLowerCase() + ")",
+                                100),
+                        String.valueOf(tournament.getId())))
+                .filter(choice -> choice.getName().toLowerCase().contains(typed))
+                .limit(25)
+                .toList();
+        event.replyChoices(choices).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveTestBedAutoComplete(

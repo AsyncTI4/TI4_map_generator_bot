@@ -71,6 +71,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
@@ -448,7 +449,11 @@ public final class Helper {
                     int soIndex = Integer.parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
                     SecretObjectiveHelper.scoreSO(event, game, player, soIndex, player.getCorrectChannel());
                     game.setStoredValue(key2b, game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
-                    game.setStoredValue(key3b, game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                    if (LunariumLeaderHandler.isHeroActive(player)) {
+                        LunariumLeaderHandler.offerDoneScoringSecretsButton(game, player);
+                    } else {
+                        game.setStoredValue(key3b, game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                    }
                 }
                 if (game.getHighestScore() + 1 > game.getVp()) {
                     return;

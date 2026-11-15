@@ -44,6 +44,8 @@ class ServerLimitStats extends Subcommand {
         int roomForGames = (int) Math.min(
                 250.0f - roleCount,
                 (500.0f - channelCount) / (!isFoWGuild ? CreateGameService.getChannelCountRequiredForEachGame() : 10));
+        // TODO: game channels with custom names (tourney7semi4-actions, tournament prefixes like t8p01) are not
+        //  counted. Count channels of every managed game on this guild instead of matching the name prefix.
         long pbdChannelCount = channels.stream()
                 .filter(c -> c.getName().startsWith(!isFoWGuild ? "pbd" : "fow"))
                 .count();

@@ -342,7 +342,8 @@ public class AuctionFrankenDraftService {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCardsInfoThread(),
                         player.getPing()
-                                + ", you have no votes. You may rank or auto-pick before submitting 0 / 0 / 0.",
+                                + ", you have no votes. You may rank or auto-pick before submitting 0 / 0 / 0."
+                                + "\n**If you want to toggle auto-pick or rank your choices, do so before submitting.**",
                         Buttons.green(
                                 player.factionButtonChecker() + ACTION_PREFIX + ";zeroBid;" + nomination,
                                 "Submit 0 Bids"));
@@ -350,7 +351,8 @@ public class AuctionFrankenDraftService {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCardsInfoThread(),
                         player.getPing() + ", submit your three private bids for " + auctionCategoryTitle(game)
-                                + ".\n-# Remaining votes: " + number(game, playerKey("votes", player)),
+                                + ".\n-# Remaining votes: " + number(game, playerKey("votes", player))
+                                + "\n**If you want to toggle auto-pick or rank your choices, do so before submitting.**",
                         Buttons.green(
                                 player.factionButtonChecker() + ACTION_PREFIX + "~MDL;bid;" + nomination,
                                 "Submit Private Bids"));
