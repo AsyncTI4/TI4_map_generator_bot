@@ -2020,10 +2020,7 @@ public final class Helper {
             int neighborDiscount =
                     ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
             if (neighborDiscount > 0) {
-                msg.append("\n-")
-                        .append(neighborDiscount)
-                        .append(" from matching neighboring player")
-                        .append(neighborDiscount > 1 ? "s" : "");
+                msg.append("\n-").append(neighborDiscount).append(" from Throne of Envy");
             }
         }
         if (game.isMonumentsMode()) {
@@ -2199,7 +2196,8 @@ public final class Helper {
             } else {
                 boolean graveholdControlled =
                         SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
-                if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit) && !graveholdControlled) {
+                if (!ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(game, player, uH, unit)
+                        && !graveholdControlled) {
                     continue;
                 }
                 Player structureOwner = game.getPlayerByColorID(unit.colorID()).orElse(null);
@@ -2618,7 +2616,7 @@ public final class Helper {
                     } else {
                         boolean graveholdControlled =
                                 SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
-                        if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)
+                        if (!ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(game, player, uH, unit)
                                 && !graveholdControlled) {
                             continue;
                         }

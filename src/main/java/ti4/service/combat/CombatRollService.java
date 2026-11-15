@@ -3290,7 +3290,7 @@ public class CombatRollService {
                     ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(
                             game, player, planet, unitEntry.getKey())
                     : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
-            if ((ThurvialiTechHandler.canUseCoexistingStructure(game, player, planet, unitEntry.getKey())
+            if ((ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(game, player, planet, unitEntry.getKey())
                             || graveholdControlled)
                     && structure != null) {
                 unitsOnPlanet.merge(structure, unitEntry.getValue(), Integer::sum);
@@ -3359,7 +3359,8 @@ public class CombatRollService {
                         ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(
                                 game, player, unitHolder, unitEntry.getKey())
                         : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
-                if ((ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitEntry.getKey())
+                if ((ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(
+                                        game, player, unitHolder, unitEntry.getKey())
                                 || graveholdControlled)
                         && structure != null) {
                     unitsOnTile.merge(new ImmutablePair<>(structure, unitHolder), unitEntry.getValue(), Integer::sum);
@@ -3404,7 +3405,8 @@ public class CombatRollService {
                             ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(
                                     game, player, unitHolder, unitEntry.getKey())
                             : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
-                    if ((ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitEntry.getKey())
+                    if ((ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(
+                                            game, player, unitHolder, unitEntry.getKey())
                                     || graveholdControlled)
                             && structure != null) {
                         unitsFromTile.merge(

@@ -47,8 +47,8 @@ public class RefractureLayoutRegistry {
                             tile(
                                     "fracture15",
                                     "frac16",
-                                    units(unit("2 cr, 2 ff", "space"), unit("1 inf", "charon")),
-                                    tokens(relic("charon"), charonToken())),
+                                    units(unit("2 cr, 2 ff", "space"), unit("1 inf", "charontoken")),
+                                    tokens(relic("charontoken"), charonToken())),
                             tile("fracture16", "frac17", List.of(), List.of())),
             3,
                     layout(
@@ -183,8 +183,8 @@ public class RefractureLayoutRegistry {
                             tile(
                                     "fracture15",
                                     "frac15",
-                                    units(unit("2 cr, 2 ff", "space"), unit("1 inf", "charon")),
-                                    tokens(relic("charon"), charonToken()))),
+                                    units(unit("2 cr, 2 ff", "space"), unit("1 inf", "charontoken")),
+                                    tokens(relic("charontoken"), charonToken()))),
             8,
                     layout(
                             8,

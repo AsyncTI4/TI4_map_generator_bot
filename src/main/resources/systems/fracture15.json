@@ -3,13 +3,12 @@
     "name": "Charon",
     "aliases": [
         "fracture15",
-        "charon",
-        "char",
+        "charontoken",
         "frac15"
     ],
     "imagePath": "fracture15.png",
     "planets": [
-        "charon"
+        "charontoken"
     ],
     "shipPositionsType": "TYPE04",
     "tileBack": "fracture",

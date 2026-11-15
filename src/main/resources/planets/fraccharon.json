@@ -1,10 +1,9 @@
 {
-    "id": "charon",
+    "id": "charontoken",
     "tileId": "fracture15",
     "name": "Charon",
     "aliases": [
-        "charon",
-        "char"
+        "charontoken"
     ],
     "positionInTile": null,
     "resources": 1,
@@ -16,7 +15,7 @@
     "legendaryAbilityName": "Shades in Heat and Frost",
     "legendaryAbilityText": "After you move 1 of your ships out of Charon's system and into a non-home system, you may move the Charon token with it. During space combat, if this planet is not exhausted, it may particpate as if it were a ship. When you would assign a hit to this planet, exhaust it instead.",
     "planetLayout": {
-        "unitHolderName": "charon",
+        "unitHolderName": "charontoken",
         "resourcesLocation": "BottomLeft",
         "centerPosition": {
             "x": 80,
