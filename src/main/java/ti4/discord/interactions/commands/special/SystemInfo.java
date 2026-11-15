@@ -26,7 +26,7 @@ import ti4.service.combat.StartCombatService;
 class SystemInfo extends GameStateSubcommand {
 
     SystemInfo() {
-        super(Constants.SYSTEM_INFO, "Info for system (all units)", true, false);
+        super(Constants.SYSTEM_INFO, "Info for system (all units)", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -87,15 +87,14 @@ class SystemInfo extends GameStateSubcommand {
             int context) {
 
         if (game.isFowMode()
-                && !ogPlayer.isGM()
+                && (ogPlayer == null || !ogPlayer.isGM())
                 && !FoWHelper.getTilePositionsToShow(game, ogPlayer).contains(tile.getPosition())) {
             MessageHelper.sendMessageToChannel(channel, "You have no visibility to " + tile.getPosition() + ".");
             return;
         }
 
         FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition());
-        MessageHelper.sendMessageToChannel(
-                channel, ButtonHelper.getTileSummaryMessage(game, justUnits, tile, ogPlayer, event));
+        MessageHelper.sendMessageToChannel(channel, ButtonHelper.getTileSummaryMessage(game, justUnits, tile, event));
         MessageHelper.sendMessageWithFile(channel, systemWithContext, tile.getRepresentationForButtons(), false);
         if (game.isFowMode()) {
             return;

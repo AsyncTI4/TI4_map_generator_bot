@@ -3751,32 +3751,25 @@ public class ButtonHelper {
     }
 
     public static String getTileSummaryMessage(
-            Game game, boolean justUnits, Tile tile, Player ogPlayer, GenericInteractionCreateEvent event) {
-        return getTileSummaryMessage(game, justUnits, tile, ogPlayer, event, null);
+            Game game, boolean justUnits, Tile tile, GenericInteractionCreateEvent event) {
+        return getTileSummaryMessage(game, justUnits, tile, event, null);
     }
 
     public static String getCombatTileSummaryMessage(
             Game game,
             Tile tile,
-            Player ogPlayer,
             GenericInteractionCreateEvent event,
             String combatType,
             @Nullable String combatHolderName,
             List<Player> combatPlayers) {
         return getTileSummaryMessage(
-                game,
-                true,
-                tile,
-                ogPlayer,
-                event,
-                new CombatSummaryContext(combatType, combatHolderName, combatPlayers));
+                game, true, tile, event, new CombatSummaryContext(combatType, combatHolderName, combatPlayers));
     }
 
     private static String getTileSummaryMessage(
             Game game,
             boolean justUnits,
             Tile tile,
-            Player ogPlayer,
             GenericInteractionCreateEvent event,
             @Nullable CombatSummaryContext combatSummaryContext) {
         String tileName = ImageResources.tilePath(tile);

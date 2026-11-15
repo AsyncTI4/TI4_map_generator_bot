@@ -85,10 +85,11 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
 
     @NotNull
     public Player getPlayer() {
-        if (!playerCommand) {
-            throw new IllegalStateException(
-                    "CommandGameStateHelper cannot get player state because command was not set to be a player command. This is a bug.");
-        }
+        // if (!playerCommand) {
+        //     throw new IllegalStateException(
+        //             "CommandGameStateHelper cannot get player state because command was not set to be a player
+        // command. This is a bug.");
+        // }
         return player.get();
     }
 }

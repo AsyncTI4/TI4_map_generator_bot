@@ -574,7 +574,7 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     ButtonHelper.getCombatTileSummaryMessage(
-                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
+                            game, tile, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
         }
 
         // Space Cannon Offense
