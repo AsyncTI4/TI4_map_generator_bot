@@ -96,9 +96,9 @@ public final class PdsCoverageHelper {
                                 game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                         boolean graveholdControlled = SarcosaBreakthroughHandler.canControlNeutralStructure(
                                 game, player, unitHolder, unitKey);
-                        boolean borrowed =
-                                ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitKey)
-                                        || graveholdControlled;
+                        boolean borrowed = ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(
+                                        game, player, unitHolder, unitKey)
+                                || graveholdControlled;
                         if ((unitOwner != player && !borrowed)
                                 || isTakenOverFromNeutral(game, player, unitHolder, unitKey)) {
                             continue;

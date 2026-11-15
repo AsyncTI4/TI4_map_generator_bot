@@ -15,6 +15,7 @@ import ti4.model.Mapper;
 public class RefractureRulesService {
 
     private static final String FENRIR_KEY = "refractureFenrir";
+    private static final String CHARON_PLANET = "charontoken";
     private static final String CHARON_MOVEMENT_KEY = "refractureCharonMovement_";
     private static final String DEMETER_CAPACITY_KEY = "refractureDemeterCapacity_";
     private static final String LEKYTHOI_PENDING_KEY = "refractureLekythoiPending_";
@@ -111,22 +112,22 @@ public class RefractureRulesService {
     }
 
     public static boolean charonCanParticipateInCombat(Game game, Player player, Tile tile) {
-        Tile charonTile = game.getTileFromPlanet("charon");
+        Tile charonTile = game.getTileFromPlanet(CHARON_PLANET);
         return game.isRefractureMode()
                 && !player.isNeutral()
-                && player.getPlanets().contains("charon")
-                && !player.getExhaustedPlanets().contains("charon")
+                && player.getPlanets().contains(CHARON_PLANET)
+                && !player.getExhaustedPlanets().contains(CHARON_PLANET)
                 && charonTile == tile
                 && tile != null
-                && tile.getUnitHolderFromPlanet("charon") != null;
+                && tile.getUnitHolderFromPlanet(CHARON_PLANET) != null;
     }
 
     public static void recordCharonShipMovement(Game game, Player player, Tile destination) {
-        Tile charonTile = game.getTileFromPlanet("charon");
+        Tile charonTile = game.getTileFromPlanet(CHARON_PLANET);
         if (!game.isRefractureMode()
                 || charonTile == null
                 || destination.isHomeSystem(game)
-                || !player.getPlanets().contains("charon")) {
+                || !player.getPlanets().contains(CHARON_PLANET)) {
             return;
         }
         boolean movedShip = game.getTacticalActionDisplacement().entrySet().stream()
@@ -143,7 +144,7 @@ public class RefractureRulesService {
 
     public static boolean canMoveCharonTo(Game game, Player player, Tile destination) {
         return game.isRefractureMode()
-                && player.getPlanets().contains("charon")
+                && player.getPlanets().contains(CHARON_PLANET)
                 && destination != null
                 && destination.getPosition().equals(game.getActiveSystem())
                 && destination.getPosition().equals(game.getStoredValue(CHARON_MOVEMENT_KEY + player.getFaction()));

@@ -3103,14 +3103,6 @@ public final class AgendaHelper {
             MessageHelper.sendMessageToChannel(
                     channel, "## A reminder that there are currently 2 laws in play, so this would be the 3rd law.");
         }
-        if (!action
-                && aCount <= 2
-                && game.getRealPlayers().stream()
-                        .anyMatch(player -> player.hasLeader("veylorhero") && player.hasLeaderUnlocked("veylorhero"))) {
-            MessageHelper.sendMessageToChannel(
-                    channel,
-                    "## This is a reminder that someone has _Speaker Gilbrand_ unlocked and that there will be 3 agendas this agenda phase.");
-        }
         RevenantLeadersHandler.offerRevVeylorCommanderPlanets(game);
         if (game.getLaws().size() > 2 && game.getStoredValue("executiveOrder").isEmpty()) {
             for (Player p : game.getRealPlayers()) {

@@ -468,7 +468,7 @@ public final class Constants {
     private static final String GYRAXIS = "gyraxis";
     private static final String LOST_STATION = "loststation";
     private static final String ILLUSTRION = "illustrion";
-    private static final String CHARON = "charon";
+    private static final String CHARON_TOKEN = "charontoken";
     private static final String LIBERTALIA = "libertalia";
     public static final List<String> TOKEN_PLANETS = List.of(
             MIRAGE,
@@ -482,7 +482,7 @@ public final class Constants {
             GYRAXIS,
             LOST_STATION,
             ILLUSTRION,
-            CHARON,
+            CHARON_TOKEN,
             LIBERTALIA,
             AVERNUS,
             OCEANUS,

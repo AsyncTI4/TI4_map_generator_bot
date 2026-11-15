@@ -19,7 +19,7 @@ public final class TokenPlanetService {
 
         cradle,
         oasis,
-        charon,
+        charontoken,
         avernus,
         oceanus,
         thundersedge,

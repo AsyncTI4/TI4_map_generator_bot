@@ -253,7 +253,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "skarnath" -> {
                 output = player.getRepresentation()
-                        + ", you may produce 2 different ships in a system containing your ships. Their cost is reduced by 2 if a neighbor owns a unit of both types.";
+                        + ", you may produce 2 ships of different types that a neighbor owns in a system containing your ships, reducing their cost by 2.";
                 buttons.addAll(ThronesThroneHandler.getSkarnathSystems(player, game));
             }
             case "gyraxis" -> {
