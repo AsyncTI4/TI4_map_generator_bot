@@ -4,10 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import net.dv8tion.jda.api.components.ModalTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -51,6 +54,9 @@ final class TournamentPanelCreate {
     private static final String INVITE_MODAL = "trnInvite~MDL_";
     private static final String INVITE_SAVE = "trnInviteSave_";
     private static final String INVITE_COPY = "trnInviteCopy_";
+    private static final String INVITE_TARGET = "target";
+    private static final String ALL = "all";
+    private static final String ALL_SIGNUP_CHANNELS_LABEL = "All sign-up channels listed below";
     private static final String CREATE_ASK = "trnCreateAsk_";
     private static final String CREATE_GO = "trnCreateGo_";
     private static final String ARCHIVE_ASK = "trnArchiveAsk_";
@@ -267,13 +273,31 @@ final class TournamentPanelCreate {
     @ButtonHandler(value = INVITE_MODAL, save = false)
     static void openInvite(ButtonInteractionEvent event, String buttonID) {
         long id = TournamentPanel.idOf(buttonID, INVITE_MODAL);
+        List<GuildMessageChannel> channels = TournamentService.getBean()
+                .find(id)
+                .map(TournamentInvites::signupChannelsOffHost)
+                .orElse(List.of());
+        List<ModalTopLevelComponent> parts = new ArrayList<>();
+        parts.add(TextDisplay.of("Each post pings the players on that server who aren't on the host server yet."
+                + (channels.isEmpty() ? "" : " A channel typed below replaces the pick.")));
+        if (!channels.isEmpty()) parts.add(Label.of("Post in", inviteTargets(channels)));
+        parts.add(TournamentPanel.field(
+                channels.isEmpty() ? "Channel link, #mention or id" : "Or another channel: link, #mention or id",
+                "channel",
+                null,
+                channels.isEmpty()));
         TournamentPanel.openModal(
-                event,
-                INVITE_SAVE + id,
-                "Send the host server invite",
-                TextDisplay.of("Leave the channel blank to post in every sign-up post channel off the host server."
-                        + " Each post pings the players there who aren't on the host server yet."),
-                TournamentPanel.field("Channel link, #mention or id (optional)", "channel", null, false));
+                event, INVITE_SAVE + id, "Send the host server invite", parts.toArray(ModalTopLevelComponent[]::new));
+    }
+
+    private static StringSelectMenu inviteTargets(List<GuildMessageChannel> channels) {
+        StringSelectMenu.Builder menu = StringSelectMenu.create(INVITE_TARGET).addOption(ALL_SIGNUP_CHANNELS_LABEL, ALL);
+        channels.stream()
+                .limit(StringSelectMenu.OPTIONS_MAX_AMOUNT - 1)
+                .forEach(channel -> menu.addOption(
+                        StringUtils.left("#" + channel.getName() + " (" + channel.getGuild().getName() + ")", 100),
+                        channel.getId()));
+        return menu.setRequiredRange(1, 1).setDefaultValues(ALL).build();
     }
 
     @ModalHandler(value = INVITE_SAVE, save = false)
@@ -282,15 +306,19 @@ final class TournamentPanelCreate {
         long id = TournamentPanel.idOf(event.getModalId(), INVITE_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         String input = TournamentPanel.value(event, "channel");
-        TournamentPanel.show(event, id, Tab.CREATE, inviteNotice(tournament, input));
+        ModalMapping target = event.getValue(INVITE_TARGET);
+        String picked = target == null ? ALL : target.getAsStringList().stream().findFirst().orElse(ALL);
+        TournamentPanel.show(event, id, Tab.CREATE, inviteNotice(tournament, input, picked));
     }
 
-    private static String inviteNotice(Tournament tournament, String input) {
+    private static String inviteNotice(Tournament tournament, String input, String picked) {
         if (input.isEmpty()) {
-            String notice = TournamentInvites.sendToSignupPosts(tournament);
-            return notice != null
-                    ? notice
-                    : "No sign-up post outside the host server. Send invite… again with a channel link.";
+            List<GuildMessageChannel> channels = TournamentInvites.signupChannelsOffHost(tournament).stream()
+                    .filter(channel -> ALL.equals(picked) || channel.getId().equals(picked))
+                    .toList();
+            return channels.isEmpty()
+                    ? "No sign-up post outside the host server to post in. Send invite… again with a channel link."
+                    : TournamentInvites.send(tournament, channels);
         }
         GuildMessageChannel channel = TournamentInvites.resolveChannel(input);
         return channel == null
