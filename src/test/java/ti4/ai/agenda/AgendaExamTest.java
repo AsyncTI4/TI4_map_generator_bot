@@ -27,6 +27,7 @@ import ti4.ai.perception.PromptButton;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.ai.promise.PromisePayment;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.trade.TradeRules;
 import ti4.ai.xxcha.QuashRules;
 import ti4.game.Player;
@@ -2041,22 +2042,58 @@ class AgendaExamTest extends BaseTi4Test {
         }
     }
 
+    /** User (2026-11-11): a Dictate Policy holder pushes laws For until 3 are in play, even mildly bad ones. */
+    @Nested
+    class DictatePolicy {
+
+        @BeforeEach
+        void twoLawsInPlay() {
+            test.game.addLaw("regulations", null);
+            test.game.addLaw("travel_ban", null);
+            reveal("Law_For/Against_7_conventions", "blue", 3, "red", 3, "black", 0);
+        }
+
+        // Without the secret Sol does not back Conventions of War; holding Dictate Policy, the third law is a point.
+        @Test
+        void aDictatePolicyHolderVotesForAMildlyBadLaw() {
+            assertThat(ballot(sol, 3).filter("for"::equals)).isEmpty();
+
+            sol.setSecret("dp");
+            assertThat(ballot(sol, 3)).contains("for");
+        }
+
+        // The secret is hidden: another seat's forecast of Sol does not add the point, and Against is worth nothing.
+        @Test
+        void onlyTheHolderCountsIt() {
+            sol.setSecret("dp");
+            double point = ScoringStakes.scoreValue(test.game, sol, 1);
+
+            assertThat(AgendaUtility.dictatePolicy(test.game, sol, "conventions", "for"))
+                    .isEqualTo(point);
+            assertThat(AgendaUtility.dictatePolicy(test.game, sol, "conventions", "against"))
+                    .isZero();
+            assertThat(AgendaUtility.of(test.game, sol, true, "conventions", "for")
+                            - AgendaUtility.of(test.game, sol, false, "conventions", "for"))
+                    .isGreaterThanOrEqualTo(point - 1e-9);
+        }
+
+        // With one law in play a For only gets Sol part of the way, so it is worth half a point.
+        @Test
+        void aLawThatLeavesOneMoreToGoIsWorthLess() {
+            sol.setSecret("dp");
+            test.game.removeLaw("travel_ban");
+            double point = ScoringStakes.scoreValue(test.game, sol, 1);
+
+            assertThat(AgendaUtility.dictatePolicy(test.game, sol, "conventions", "for"))
+                    .isCloseTo(point / 2, within(1e-9));
+        }
+    }
+
     // ---- not implemented yet -----------------------------------------------------------------------------------
 
     /** Politics guidance and timing notes the AI does not follow yet. */
     @Nested
     class ToDo {
-
-        @Disabled("milestone 3: a Dictate Policy holder pushes laws For until 3 are in play, even mildly bad ones")
-        @Test
-        void aDictatePolicyHolderVotesForAMildlyBadLaw() {
-            sol.setSecret("dp");
-            test.game.addLaw("regulations", null);
-            test.game.addLaw("travel_ban", null);
-            reveal("Law_For/Against_7_conventions", "blue", 3, "red", 3, "black", 0);
-
-            assertThat(ballot(sol, 3)).contains("for");
-        }
 
         @Disabled("milestone 3: a Covert Legislation non-speaker values the announced target type from the deck"
                 + " composition, never the hidden card")

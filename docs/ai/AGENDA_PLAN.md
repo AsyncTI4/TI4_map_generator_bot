@@ -203,6 +203,7 @@ The whole value review except the items marked **design**, Miscount Disclosed ta
   - If the viewer holds Dictate Policy and fewer than 3 laws are in play, add `scoreValue(1) × P(reaching 3 laws)` to For on any law. P is 1 when this law makes 3, and lower when more laws are needed.
   - `SecretValue.agendaChance` is private (`src/main/java/ti4/ai/secrets/SecretValue.java:231`), and its Dictate branch is just laws/`LAWS_FOR_DICTATE_POLICY`. Expose a new public `SecretValue.lawCountChance(game)` helper rather than calling it.
   - Once vote buying exists (milestone 10), this term makes the AI buy For votes with no extra code.
+  - **Done (2026-11-14, unflagged):** `AgendaUtility.dictatePolicy`, added in every branch of `AgendaUtility.of` when the voter reads its own secrets. Only For on a For/Against law counts (an elected law enters play whatever the vote). The point is worth `scoreValue(1)` when this law makes 3, halved for each further law still needed (`LATER_LAW_CHANCE` 0.5); nothing once 3 are in play or the holder has no room to score a secret. Other seats never see it. Tests: `AgendaExamTest.DictatePolicy`.
 - **Covert Legislation, non-speakers:**
   - Replace the flat `COVERT_ELECTION_GAIN` (`ElectionValues.java:62,216`) with the average `AgendaValues` over the agendas still possible for the announced target type.
   - That average uses the deck composition from public data (all official agendas minus discards and laws), not the deck order.
