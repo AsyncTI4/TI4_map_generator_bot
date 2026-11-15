@@ -76,9 +76,17 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
 - [ ] **2. Stop discarding slow decisions.** Give the AI's own turn about 60 s, count calls for the logic limits, and
   keep wall clock only as a backstop.
   - Check: if under 1% of decisions exceed 20 s without contention, leave the limit at 20 s.
-- [ ] **3. Joint win threat.** Five rivals at 0.40 each pass the per-rival 0.5 test, yet one of them finishes first 92%
+- [x] **3. Joint win threat.** Five rivals at 0.40 each pass the per-rival 0.5 test, yet one of them finishes first 92%
   of the time (`WinOdds`, `WinRace`). Use the combined chance, as `DenialMap` already does.
   - Check: a 48-game shadow run that changes under 5% of triggered decisions means drop it.
+  - Dropped 2026-11-15. `-Dai.shadow=true` (`ShadowCheck`) plays the current answer and counts the decisions the
+    candidate would change. 48 games, seed 9500, 8 threads, contended (one stall in round 1 on seed 9508, so 47 games
+    finished; final round 5.7, leader 9.9 VP, table 42.3). Of 82,965 decisions that reached a joint check, 542 would
+    change (0.7%). Nearly all of them came from the spend reserve's "is the field likely first" test, which changed
+    5,333 of 5.4M calls. The extortion / Support for the Throne check (164 decisions) and the reserve-still-wins
+    check (4,850 decisions) changed none. Rivals rarely sit just under 0.5 each in numbers large enough for the
+    combined chance to matter. The experiment code was removed; `ShadowCheck` stays for the shadow checks of
+    steps 5 and 7.
 - [ ] **4. Cheaper testing.** Paired continuations from snapshots with `decisionOverride`; randomized flags per seat.
   - Check: if the standard error is well above 0.08 VP at a one-round horizon, go back to whole-game A/B.
 - [ ] **5. One-round own-seat lookahead, logging only.** Imagine each top plan on a board copy and rank again. Needs

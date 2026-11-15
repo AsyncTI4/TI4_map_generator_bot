@@ -1303,11 +1303,7 @@ to build one by hand:
     2. **Standings.** From public information only (scores, objectives revealed and ready, techs, planets, the Imperial
        card): what each player can still score this round, how close each is to winning (_win threat_, full when the
        projected total reaches the goal; with `WIN_THREAT_FEASIBLE` a rival that can take Mecatol Rex from its holder
-       this round counts the points that control would score, at the chance it wins the invasion; with
-       `JOINT_WIN_THREAT` the seat beats the field only when the chance that some rival finishes first is under one
-       half, not when each rival alone is under it, which for five rivals at 0.4 each is 92%. This drives the extortion
-       and Support for the Throne deal checks and keeping a spend objective's reserve. Naming who to slay stays per
-       rival), how much hurting each is worth (more for the sole leader, less for a player
+       this round counts the points that control would score, at the chance it wins the invasion), how much hurting each is worth (more for the sole leader, less for a player
        behind) and how much denying a point to each is worth (little until the player is close to winning, then more than
        a point of its own).
     3. **Value.** In the planner's currency (a victory point is 8): the seat's own objective progress; the planets taken
