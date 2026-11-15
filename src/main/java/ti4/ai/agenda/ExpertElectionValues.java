@@ -69,6 +69,10 @@ class ExpertElectionValues {
     private static final double WARRANT_EASY_REVEALED = 1;
     private static final double WARRANT_ACTION_REVEALED = 1;
     private static final double EXECUTION_SILENCED = 1;
+    static final double COMMITTEE_KNOWN_ELECTION = 2;
+    private static final double GOOD_ELECTION = 2;
+    private static final String COMMITTEE = "committee";
+    private static final String ELECT_PLAYER = "Elect Player";
     private static final double EXECUTION_TARGET_BONUS = 1.5;
     private static final Set<String> EXECUTION_TARGETS = Set.of(YSSARIL, RAL_NEL);
 
@@ -76,9 +80,7 @@ class ExpertElectionValues {
     static Double valueOf(AgendaView view, String agenda, String outcome, String ownVote) {
         return switch (agenda) {
             case "secret" -> elected(view, outcome, holder -> archivedSecretWorth(view, holder));
-            // TODO: missing user's +2 TG when the holder knows a good Elect Player agenda is next; needs
-            // AgendaKnowledge (plan M6).
-            case "committee" -> elected(view, outcome, holder -> roundTable(view.game(), 4, 2, 1));
+            case "committee" -> elected(view, outcome, holder -> committeeWorth(view, holder));
             case "arbiter" -> elected(view, outcome, holder -> ARBITER);
             case "minister_commerce" -> elected(view, outcome, holder -> commerceWorth(view.game(), holder));
             case "minister_exploration" -> elected(view, outcome, holder -> EXPLORATION);
@@ -98,6 +100,24 @@ class ExpertElectionValues {
             case "execution" -> publicExecution(view, outcome);
             default -> null;
         };
+    }
+
+    private static double committeeWorth(AgendaView view, Player holder) {
+        double base = roundTable(view.game(), 4, 2, 1);
+        return knowsAGoodElectionComing(view, holder) ? base + COMMITTEE_KNOWN_ELECTION : base;
+    }
+
+    static boolean knowsAGoodElectionComing(AgendaView view, Player holder) {
+        if (!view.readsHandOf(holder)) return false;
+        return AgendaKnowledge.knownTop(view.game(), holder).stream()
+                .filter(alias -> !COMMITTEE.equals(alias) && AgendaKnowledge.hasTarget(alias, ELECT_PLAYER))
+                .anyMatch(alias -> ownElectionWorth(view, holder, alias) >= GOOD_ELECTION);
+    }
+
+    private static double ownElectionWorth(AgendaView view, Player holder, String alias) {
+        String self = holder.getFaction();
+        return AgendaValues.of(view.game(), holder, true, true, alias, self, self)
+                .orElse(0);
     }
 
     private static double elected(AgendaView view, String outcome, ToDoubleFunction<Player> worthToHolder) {

@@ -352,6 +352,12 @@ In `AgendaForecastTest` and `AgendaCardRulesTest`:
   - Each knowledge source has a positive test.
   - A non-holder's values don't change when the deck top is swapped.
   - Fingerprint invalidation.
+- **Done (2026-11-15), first part:**
+  - `AgendaKnowledge` (public, `ti4.ai.agenda`) keeps a seat's known top of the agenda deck in that seat's own stored value `aiAgendaKnowledge` (round, deck size, top-first list), not in turn memory, so value code without a turn context can read it. Politics placement (`PlannedPrimaries.PeekedAgenda.press`) records each card it keeps on top or sends to the bottom. Each reveal shrinks the deck, so the list moves down with it; a new round, or a deck that grew (a reshuffle), forgets it.
+  - Covert's speaker reads its hidden card through `AgendaKnowledge.covertCard`.
+  - Committee Formation is worth `COMMITTEE_KNOWN_ELECTION` (2 TG) more to a holder that, in its own view, knows an Elect Player agenda worth 2 TG or more to itself is on top (`ExpertElectionValues.knowsAGoodElectionComing`).
+  - Guard: `AgendaKnowledgeTest.onlyAgendaKnowledgeReadsHiddenAgendaCards` fails if any other `ti4.ai` file calls `lookAtTopAgenda`, `lookAtBottomAgenda` or `getSentAgendas` (PlannedPrimaries excepted). `DriveTheDebateOdds` reads only the deck's composition, which is public.
+  - **Not done yet:** Insider Information and the Naalu commander as knowledge sources; the kept-vote `SecondAgendaValue.marginalVote`; the `AgendaPeek` rewrite; Maw of Worlds; `Determinizer` keeping known positions fixed.
 - **Risk:** `Determinizer.shuffleHiddenDecks` (`src/test/java/ti4/ai/runtime/Determinizer.java:73`) must keep known positions and the Covert top card fixed for rollouts.
 
 ---
