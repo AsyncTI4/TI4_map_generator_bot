@@ -18,6 +18,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.message.componentsV2.ComponentPanel;
@@ -26,7 +27,6 @@ import ti4.message.componentsV2.PanelIds;
 import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.CreateFoWGameService;
 import ti4.service.game.CreateGameService;
-import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentGameNames;
 import ti4.service.tournament.TournamentRoles;
@@ -39,6 +39,7 @@ import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
 import ti4.spring.service.tournament.TournamentStatus;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelSettings {
 
     private static final String BASICS_MODAL = "trnBasics~MDL_";
@@ -81,13 +82,14 @@ final class TournamentPanelSettings {
                             + tournament.getSeriesName() + " " + tournament.getRoundLabel() + " 1-"
                             + tournament.getGamesPerCategory() + "*.")));
         }
-        body.add(Section.of(
-                Buttons.gray(NAMES_MODAL + id, "Change").withDisabled(!editable || tournament.isFogMode()),
-                TextDisplay.of("**Game names:** " + TournamentGameNames.example(tournament) + "\n-# "
-                        + (tournament.isFogMode()
-                                ? "Fog of War games always use fow numbers."
-                                : "Custom names show the tournament in every channel name. Bot cleanup tools"
-                                        + " only look at pbd names."))));
+        body.add(ComponentPanel.settingRow(
+                "Game names",
+                TournamentGameNames.example(tournament),
+                tournament.isFogMode()
+                        ? "Fog of War games always use fow numbers."
+                        : "Custom names show the tournament in every channel name. Bot cleanup tools only look at"
+                                + " pbd names.",
+                Buttons.gray(NAMES_MODAL + id, "Change").withDisabled(!editable || tournament.isFogMode())));
         body.add(ComponentPanel.toggleSection(
                 "Match active hours",
                 "Random groups that prefer players whose active hours overlap. Off means purely random.",
@@ -157,7 +159,6 @@ final class TournamentPanelSettings {
 
     @ModalHandler(value = BASICS_SAVE, save = false)
     static void saveBasics(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), BASICS_SAVE);
         String series = StringUtils.left(PanelForms.value(event, "series"), 60);
         String round = StringUtils.left(PanelForms.value(event, "round"), 40);
@@ -196,7 +197,6 @@ final class TournamentPanelSettings {
 
     @ButtonHandler(value = FOG, save = false)
     static void toggleFog(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, FOG);
         TournamentService.getBean().update(id, pool -> {
             if (pool.getStatus() == TournamentStatus.OPEN || pool.getStatus() == TournamentStatus.CLOSED) {
@@ -263,7 +263,6 @@ final class TournamentPanelSettings {
 
     @ModalHandler(value = NAMES_SAVE, save = false)
     static void saveNames(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), NAMES_SAVE);
         String prefix = TournamentGameNames.normalize(PanelForms.value(event, "prefix"));
         if (!prefix.isEmpty()) {
@@ -285,7 +284,6 @@ final class TournamentPanelSettings {
 
     @SelectionHandler(value = SERVER, save = false)
     static void pickServer(StringSelectInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getComponentId(), SERVER);
         TournamentService service = TournamentService.getBean();
         Tournament before = service.find(id).orElse(null);

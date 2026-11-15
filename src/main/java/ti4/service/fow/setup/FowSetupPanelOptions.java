@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.logging.BotLogger;
@@ -24,6 +25,7 @@ import ti4.service.fow.setup.FowSetupGameOptionsService.Category;
 import ti4.service.game.HomebrewService;
 import ti4.service.game.HomebrewService.Homebrew;
 
+@GuardedBy(FowSetupPanelGuard.class)
 final class FowSetupPanelOptions {
 
     private static final String TAB_PREFIX = "fowWizOptTab_";
@@ -103,7 +105,6 @@ final class FowSetupPanelOptions {
 
     @ButtonHandler(TAB_PREFIX)
     static void openTab(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.setStepTab(buttonID.substring(TAB_PREFIX.length()));
         FowSetupWizardService.saveState(game, state);
@@ -112,33 +113,28 @@ final class FowSetupPanelOptions {
 
     @ButtonHandler(HOMEBREW_PREFIX)
     static void toggleHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         Homebrew hb = Homebrew.valueOf(buttonID.substring(HOMEBREW_PREFIX.length()));
         FowSetupPanel.show(event, game, FowSetupGameOptionsService.toggle(event, game, hb));
     }
 
     @ButtonHandler(TIGL)
     static void toggleTigl(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.show(event, game, FowSetupGameOptionsService.toggleTigl(game));
     }
 
     @ButtonHandler(ALLIANCE)
     static void toggleAlliance(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.show(event, game, FowSetupGameOptionsService.toggleAllianceMode(game));
     }
 
     @ButtonHandler(REMOVE_ALL)
     static void removeAll(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupGameOptionsService.removeAllHomebrews(event, game);
         FowSetupPanel.show(event, game);
     }
 
     @ButtonHandler(SCORING_PRESET_PREFIX)
     static void applyScoringPreset(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         Homebrew hb = Homebrew.valueOf(buttonID.substring(SCORING_PRESET_PREFIX.length()));
         HomebrewService.applyHomebrew(game, event, hb);
         FowSetupPanel.show(event, game);
@@ -177,7 +173,6 @@ final class FowSetupPanelOptions {
 
     @ModalHandler(SCORING_RESOLVE)
     static void resolveScoringModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.show(event, game, FowSetupGameOptionsService.applyCustomScoring(event, game));
     }
 }

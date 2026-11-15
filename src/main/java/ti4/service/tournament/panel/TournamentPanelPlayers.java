@@ -20,12 +20,12 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.message.componentsV2.PanelForms;
 import ti4.message.componentsV2.PanelIds;
 import ti4.message.componentsV2.PanelView;
-import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentHours;
 import ti4.service.tournament.TournamentHours.Profile;
@@ -42,6 +42,7 @@ import ti4.spring.service.tournament.TournamentService.BulkAddResult;
 import ti4.spring.service.tournament.TournamentService.LeaveResult;
 import ti4.spring.service.tournament.TournamentSignupPost;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelPlayers {
 
     private static final String BULK_ADD_MODAL = "trnBulkAdd~MDL_";
@@ -171,7 +172,6 @@ final class TournamentPanelPlayers {
 
     @ModalHandler(value = BULK_ADD_SAVE, save = false)
     static void bulkAdd(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), BULK_ADD_SAVE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
@@ -211,7 +211,6 @@ final class TournamentPanelPlayers {
 
     @ModalHandler(value = REMOVE_SAVE, save = false)
     static void remove(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), REMOVE_SAVE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
@@ -248,7 +247,6 @@ final class TournamentPanelPlayers {
 
     @ButtonHandler(value = FILL, save = false)
     static void fillToTarget(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, FILL);
         TournamentService service = TournamentService.getBean();
         List<String> promoted = service.fillToTarget(id);
@@ -271,7 +269,6 @@ final class TournamentPanelPlayers {
 
     @ButtonHandler(value = PROMOTE, save = false)
     static void promote(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, PROMOTE);
         TournamentService service = TournamentService.getBean();
         String promoted = service.promoteNext(id).orElse(null);
@@ -291,7 +288,6 @@ final class TournamentPanelPlayers {
 
     @ButtonHandler(value = SYNC_ROLES, save = false)
     static void syncRoles(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, SYNC_ROLES);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
@@ -312,7 +308,6 @@ final class TournamentPanelPlayers {
 
     @ModalHandler(value = GM_ADD_SAVE, save = false)
     static void addGameMasters(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), GM_ADD_SAVE);
         TournamentService service = TournamentService.getBean();
         Resolution resolution =
@@ -332,7 +327,6 @@ final class TournamentPanelPlayers {
 
     @ModalHandler(value = GM_REMOVE_SAVE, save = false)
     static void removeGameMasters(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), GM_REMOVE_SAVE);
         TournamentService service = TournamentService.getBean();
         Resolution resolution =
@@ -348,7 +342,6 @@ final class TournamentPanelPlayers {
 
     @SelectionHandler(value = POST_REMOVE, save = false)
     static void removePost(StringSelectInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getComponentId(), POST_REMOVE);
         long postId = Long.parseLong(event.getValues().getFirst());
         TournamentService.getBean().signupPosts(id).stream()

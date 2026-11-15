@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.components.checkboxgroup.CheckboxGroup;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.label.LabelChildComponent;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
-import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.entities.Guild;
@@ -45,6 +44,7 @@ import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.TIGLHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.PanelPickers;
 import ti4.service.game.CreateGameLaunchPostService;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -198,11 +198,9 @@ class MatchmakingButtonHandler {
     public static void offerFormGroupModal(ButtonInteractionEvent event) {
         if (cannotForm(event)) return;
 
-        EntitySelectMenu memberSelect = EntitySelectMenu.create(GROUP_MEMBERS_ID, SelectTarget.USER)
-                .setRequiredRange(1, MAX_GROUP_MEMBERS)
-                .build();
+        EntitySelectMenu memberSelect = PanelPickers.users(GROUP_MEMBERS_ID, null, List.of(), 1, MAX_GROUP_MEMBERS);
         Modal modal = Modal.create(FORM_GROUP_MODAL_ID, "Form Group")
-                .addComponents(Label.of("Group Members (up to " + MAX_GROUP_MEMBERS + ")", memberSelect))
+                .addComponents(PanelPickers.inForm("Group Members (up to " + MAX_GROUP_MEMBERS + ")", memberSelect))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -427,16 +425,11 @@ class MatchmakingButtonHandler {
                 MAX_QUEUE_TIME_OPTIONS_TO_HOURS.keySet(),
                 selectedMaxQueueTime,
                 List.of(DEFAULT_MAX_QUEUE_TIME));
-        EntitySelectMenu avoidPlayers = EntitySelectMenu.create(AVOID_PLAYERS_ID, SelectTarget.USER)
-                .setRequired(false)
-                .setMaxValues(MAX_AVOID_PLAYERS)
-                .setDefaultValues(userSettings.getMatchmakingAvoidList().stream()
-                        .map(EntitySelectMenu.DefaultValue::user)
-                        .toList())
-                .build();
+        EntitySelectMenu avoidPlayers = PanelPickers.users(
+                AVOID_PLAYERS_ID, null, userSettings.getMatchmakingAvoidList(), 0, MAX_AVOID_PLAYERS);
         Modal modal = Modal.create(ADDITIONAL_SETTINGS_MODAL_ID, "Additional Queue Settings")
                 .addComponents(Label.of("Max Queue Time", maxQueueTime))
-                .addComponents(Label.of("Avoid List", avoidPlayers))
+                .addComponents(PanelPickers.inForm("Avoid List", avoidPlayers))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -62,6 +64,36 @@ public class ComponentPanel {
 
     public static String quote(String text) {
         return "> " + text.replace("\n", "\n> ");
+    }
+
+    public static void tell(GenericInteractionCreateEvent event, String text) {
+        if (!(event instanceof IReplyCallback callback)) return;
+        String message = StringUtils.abbreviate(text, Message.MAX_CONTENT_LENGTH);
+        if (callback.isAcknowledged()) {
+            callback.getHook()
+                    .sendMessage(message)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            callback.reply(message).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    public static Section settingRow(String name, String value, String hint, Button action) {
+        String text = "**" + name + ":** " + value + (StringUtils.isBlank(hint) ? "" : "\n-# " + hint);
+        return Section.of(action, TextDisplay.of(text));
+    }
+
+    public static ActionRow confirmRow(Button confirm, String cancelId) {
+        return ActionRow.of(confirm, Buttons.gray(cancelId, "Cancel"));
+    }
+
+    public static List<Button> pageButtons(
+            IntFunction<String> idOfPage, int page, int pageCount, String previousLabel, String nextLabel) {
+        List<Button> buttons = new ArrayList<>();
+        if (page > 0) buttons.add(Buttons.gray(idOfPage.apply(page - 1), previousLabel));
+        if (page < pageCount - 1) buttons.add(Buttons.gray(idOfPage.apply(page + 1), nextLabel));
+        return buttons;
     }
 
     public static boolean isPanelMessage(GenericInteractionCreateEvent event, String panelMessageId) {

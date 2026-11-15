@@ -15,11 +15,11 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.message.componentsV2.PanelForms;
 import ti4.message.componentsV2.PanelIds;
 import ti4.message.componentsV2.PanelView;
-import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentGameCreator;
 import ti4.service.tournament.TournamentGameMasterAssigner;
@@ -36,6 +36,7 @@ import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
 import ti4.spring.service.tournament.TournamentStatus;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelGroups {
 
     private static final String GENERATE = "trnGenerate_";
@@ -146,7 +147,6 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = GENERATE, save = false)
     static void generate(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, GENERATE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
@@ -198,7 +198,6 @@ final class TournamentPanelGroups {
 
     @ModalHandler(value = SWAP_SAVE, save = false)
     static void swap(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), SWAP_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         Resolution resolution = TournamentPanel.resolve(
@@ -218,7 +217,6 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = APPROVE, save = false)
     static void approve(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, APPROVE);
         TournamentService service = TournamentService.getBean();
         String error = service.approveGroups(id).orElse(null);
@@ -237,7 +235,6 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = ASSIGN_GMS, save = false)
     static void assignGameMastersButton(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, ASSIGN_GMS);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         TournamentPanel.show(event, id, Tab.GROUPS, assignGameMasters(tournament));
@@ -271,7 +268,6 @@ final class TournamentPanelGroups {
 
     @ModalHandler(value = SET_GM_SAVE, save = false)
     static void setGameMaster(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), SET_GM_SAVE);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();
@@ -305,7 +301,6 @@ final class TournamentPanelGroups {
 
     @ButtonHandler(value = ROSTER, save = false)
     static void roster(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, ROSTER);
         TournamentService service = TournamentService.getBean();
         Tournament tournament = service.find(id).orElseThrow();

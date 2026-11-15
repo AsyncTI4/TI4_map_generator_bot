@@ -25,6 +25,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.player.AddAllianceMember;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.draft.FrankenDraft;
@@ -38,6 +39,7 @@ import ti4.model.FactionModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 
+@GuardedBy(FowSetupPanelGuard.class)
 final class FowSetupPanelFactions {
 
     private static final String PLAYER_SELECT = "fowWizFacPlayer";
@@ -252,12 +254,8 @@ final class FowSetupPanelFactions {
     }
 
     private static void addPaging(List<Button> buttons, String userId, String stage, int page, int pages) {
-        if (page > 0) {
-            buttons.add(Buttons.gray(VIEW_PREFIX + userId + "_" + stage + "_" + (page - 1), "◀ More"));
-        }
-        if (page < pages - 1) {
-            buttons.add(Buttons.gray(VIEW_PREFIX + userId + "_" + stage + "_" + (page + 1), "More ▶"));
-        }
+        buttons.addAll(ComponentPanel.pageButtons(
+                target -> VIEW_PREFIX + userId + "_" + stage + "_" + target, page, pages, "◀ More", "More ▶"));
     }
 
     private static StringSelectMenu positionSelect(String id, List<String> positions, String placeholder) {
@@ -278,20 +276,17 @@ final class FowSetupPanelFactions {
 
     @SelectionHandler(PLAYER_SELECT)
     static void pickPlayer(StringSelectInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.openSubView(event, game, playerSubView(event.getValues().getFirst(), AUTO, 0), null);
     }
 
     @ButtonHandler(VIEW_PREFIX)
     static void changePlayerView(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String[] parts = buttonID.substring(VIEW_PREFIX.length()).split("_");
         FowSetupPanel.openSubView(event, game, PLAYER_SUBVIEW + String.join(":", parts), null);
     }
 
     @SelectionHandler(FACTION_PREFIX)
     static void pickFaction(StringSelectInteractionEvent event, Game game, String menuID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = userIdBeforeIndex(menuID.substring(FACTION_PREFIX.length()));
         Player player = game.getPlayer(userId);
         if (player == null) return;
@@ -304,7 +299,6 @@ final class FowSetupPanelFactions {
 
     @SelectionHandler(POSITION_PREFIX)
     static void pickPosition(StringSelectInteractionEvent event, Game game, String menuID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         pendPosition(
                 event,
                 game,
@@ -332,7 +326,6 @@ final class FowSetupPanelFactions {
 
     @ModalHandler(POSITION_RESOLVE_PREFIX)
     static void resolvePositionModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = event.getModalId().substring(POSITION_RESOLVE_PREFIX.length());
         pendPosition(event, game, userId, PanelForms.value(event, "position"));
     }
@@ -354,7 +347,6 @@ final class FowSetupPanelFactions {
 
     @ButtonHandler(POSITION_CLEAR_PREFIX)
     static void clearPosition(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = buttonID.substring(POSITION_CLEAR_PREFIX.length());
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.getPendingPositionByUserId().remove(userId);
@@ -365,7 +357,6 @@ final class FowSetupPanelFactions {
 
     @SelectionHandler(COLOUR_PREFIX)
     static void pickColour(StringSelectInteractionEvent event, Game game, String menuID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         Player player = game.getPlayer(userIdBeforeIndex(menuID.substring(COLOUR_PREFIX.length())));
         if (player == null) return;
         finishSetup(event, game, player, event.getValues().getFirst());
@@ -397,7 +388,6 @@ final class FowSetupPanelFactions {
 
     @SelectionHandler(GATE_PREFIX)
     static void pickGateHome(StringSelectInteractionEvent event, Game game, String menuID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         placeGateHome(
                 event,
                 game,
@@ -414,7 +404,6 @@ final class FowSetupPanelFactions {
 
     @ModalHandler(GATE_RESOLVE_PREFIX)
     static void resolveGateModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String userId = event.getModalId().substring(GATE_RESOLVE_PREFIX.length());
         placeGateHome(event, game, userId, PanelForms.value(event, "position"));
     }
@@ -466,8 +455,8 @@ final class FowSetupPanelFactions {
                     .build()));
         }
         List<Button> buttons = new ArrayList<>();
-        if (page > 0) buttons.add(Buttons.gray(BAN_PAGE_PREFIX + (page - 1), "◀ Previous factions"));
-        if (page < pages - 1) buttons.add(Buttons.gray(BAN_PAGE_PREFIX + (page + 1), "More factions ▶"));
+        buttons.addAll(ComponentPanel.pageButtons(
+                target -> BAN_PAGE_PREFIX + target, page, pages, "◀ Previous factions", "More factions ▶"));
         buttons.add(Buttons.green(FowSetupPanel.BACK, "Done"));
         rows.add(ActionRow.of(buttons));
         return PanelView.subView(List.of(TextDisplay.of(text)), rows, false);
@@ -475,13 +464,11 @@ final class FowSetupPanelFactions {
 
     @ButtonHandler(BAN_PAGE_PREFIX)
     static void openBanPage(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.openSubView(event, game, BAN_SUBVIEW + buttonID.substring(BAN_PAGE_PREFIX.length()), null);
     }
 
     @SelectionHandler(BAN_SELECT_PREFIX)
     static void setBans(StringSelectInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         List<String> banned = applyBans(
                 FowSetupFactionService.bannedFactionAliases(game),
                 FowSetupPanelPlayers.optionValues(event),
@@ -523,7 +510,6 @@ final class FowSetupPanelFactions {
 
     @ModalHandler(DEAL_RESOLVE)
     static void resolveDealModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         Integer count = PanelForms.parseInt(PanelForms.value(event, "count"));
         if (count == null || count < 1) {
             FowSetupPanel.show(event, game, "The count must be a whole number of at least 1. Nothing was dealt.");
@@ -562,7 +548,6 @@ final class FowSetupPanelFactions {
 
     @ModalHandler(ALLIANCE_RESOLVE)
     static void resolveAllianceModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         Player first = game.getPlayer(firstValue(event.getValue("first")));
         Player second = game.getPlayer(firstValue(event.getValue("second")));
         if (first == null || second == null || first == second) {
@@ -580,7 +565,6 @@ final class FowSetupPanelFactions {
 
     @ButtonHandler(RANDOMIZE)
     static void randomizePositions(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.show(event, game, FowSetupFactionService.placeAtRandomPositions(event, game));
     }
 }

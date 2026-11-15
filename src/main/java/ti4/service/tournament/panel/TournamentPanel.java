@@ -23,12 +23,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.logging.BotLogger;
 import ti4.message.componentsV2.ComponentPanel;
 import ti4.message.componentsV2.PanelForms;
 import ti4.message.componentsV2.PanelIds;
 import ti4.message.componentsV2.PanelView;
-import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentGameCreator;
 import ti4.service.tournament.TournamentMemberResolver;
@@ -39,6 +39,7 @@ import ti4.spring.service.tournament.TournamentEntry;
 import ti4.spring.service.tournament.TournamentService;
 import ti4.spring.service.tournament.TournamentStatus;
 
+@GuardedBy(TournamentPanelGuard.class)
 public final class TournamentPanel {
 
     static final String TAB = "trnTab_";
@@ -196,14 +197,10 @@ public final class TournamentPanel {
         } else if (status == TournamentStatus.CLOSED) {
             buttons.add(Buttons.green(SIGNUPS + id, "Reopen sign-ups"));
         }
-        if (pageCount > 1) {
-            int page = Math.min(context.page(), pageCount - 1);
-            String tab = context.tab().name();
-            String previous = PanelIds.of(PAGE, id, tab, Math.max(0, page - 1));
-            String next = PanelIds.of(PAGE, id, tab, "x" + Math.min(pageCount - 1, page + 1));
-            buttons.add(Buttons.gray(previous, "◀").withDisabled(page == 0));
-            buttons.add(Buttons.gray(next, "▶").withDisabled(page >= pageCount - 1));
-        }
+        int page = Math.clamp(context.page(), 0, pageCount - 1);
+        String tab = context.tab().name();
+        buttons.addAll(
+                ComponentPanel.pageButtons(target -> PanelIds.of(PAGE, id, tab, target), page, pageCount, "◀", "▶"));
         return buttons;
     }
 
@@ -226,7 +223,6 @@ public final class TournamentPanel {
     }
 
     static void change(ButtonInteractionEvent event, long id, Tab tab, Consumer<Tournament> change, String notice) {
-        if (!TournamentAccess.require(event)) return;
         TournamentService.getBean().update(id, change);
         show(event, id, tab, notice);
     }
@@ -241,13 +237,11 @@ public final class TournamentPanel {
 
     @ButtonHandler(value = TAB, save = false)
     static void tab(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         show(event, PanelIds.key(buttonID, TAB), Tab.valueOf(PanelIds.arg(buttonID, TAB)), null);
     }
 
     @ButtonHandler(value = PAGE, save = false)
     static void page(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         String[] parts = PanelIds.arg(buttonID, PAGE).split("_");
         int page = Integer.parseInt(parts[1].replace("x", ""));
         show(event, PanelIds.key(buttonID, PAGE), Tab.valueOf(parts[0]), page, null);
@@ -255,7 +249,6 @@ public final class TournamentPanel {
 
     @ButtonHandler(value = REPOST, save = false)
     static void repost(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         TournamentService.getBean()
                 .find(PanelIds.key(buttonID, REPOST))
                 .ifPresent(tournament -> post(tournament, event.getMessageChannel(), null));
@@ -263,7 +256,6 @@ public final class TournamentPanel {
 
     @ButtonHandler(value = SIGNUPS, save = false)
     static void toggleSignups(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, SIGNUPS);
         TournamentService.getBean().update(id, pool -> {
             if (pool.getStatus() == TournamentStatus.OPEN) pool.setStatus(TournamentStatus.CLOSED);

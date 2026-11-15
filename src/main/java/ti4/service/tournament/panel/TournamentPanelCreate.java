@@ -26,15 +26,16 @@ import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.executors.CircuitBreaker;
 import ti4.game.persistence.GameManager;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.ComponentPanel;
 import ti4.message.componentsV2.PanelForms;
 import ti4.message.componentsV2.PanelIds;
 import ti4.message.componentsV2.PanelView;
-import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentDiscord;
 import ti4.service.tournament.TournamentGameCreator;
 import ti4.service.tournament.TournamentGameCreator.Preflight;
@@ -51,6 +52,7 @@ import ti4.spring.service.tournament.TournamentService;
 import ti4.spring.service.tournament.TournamentStatus;
 import ti4.spring.service.tournamentwinner.TourneyWinnerService;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelCreate {
 
     private static final String INVITE_MODAL = "trnInvite~MDL_";
@@ -155,15 +157,14 @@ final class TournamentPanelCreate {
     private static List<ActionRow> controls(Context context, Preflight preflight, boolean running, boolean hasGames) {
         long id = context.id();
         TournamentStatus status = context.tournament().getStatus();
-        String cancel = TournamentPanel.PAGE + id + "_" + Tab.CREATE.name() + "_0";
+        String cancel = PanelIds.of(TournamentPanel.PAGE, id, Tab.CREATE.name(), 0);
         if (context.page() == CONFIRM_CREATE) {
-            return List.of(ActionRow.of(
-                    Buttons.green(CREATE_GO + id, "Yes, create " + preflight.pendingGames() + " games"),
-                    Buttons.gray(cancel, "Cancel")));
+            return List.of(ComponentPanel.confirmRow(
+                    Buttons.green(CREATE_GO + id, "Yes, create " + preflight.pendingGames() + " games"), cancel));
         }
         if (context.page() == CONFIRM_ARCHIVE) {
-            return List.of(ActionRow.of(
-                    Buttons.red(ARCHIVE_GO + id, "Yes, archive this tournament"), Buttons.gray(cancel, "Cancel")));
+            return List.of(
+                    ComponentPanel.confirmRow(Buttons.red(ARCHIVE_GO + id, "Yes, archive this tournament"), cancel));
         }
         if (running) return List.of();
         List<Button> buttons = new ArrayList<>();
@@ -204,7 +205,6 @@ final class TournamentPanelCreate {
 
     @ModalHandler(value = BROADCAST_SAVE, save = false)
     static void broadcast(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), BROADCAST_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         String text = "**Message from the " + tournament.getSeriesName() + " organizers:**\n"
@@ -249,7 +249,6 @@ final class TournamentPanelCreate {
 
     @ButtonHandler(value = APPLY_SETUP, save = false)
     static void applySetup(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, APPLY_SETUP);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         if (!TournamentGameCreator.hasAnySetup(tournament)) {
@@ -309,7 +308,6 @@ final class TournamentPanelCreate {
 
     @ModalHandler(value = INVITE_SAVE, save = false)
     static void sendInvite(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), INVITE_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         String input = PanelForms.value(event, "channel");
@@ -337,7 +335,6 @@ final class TournamentPanelCreate {
 
     @ButtonHandler(value = INVITE_COPY, save = false)
     static void copyInvite(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, INVITE_COPY);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         String text = TournamentInvites.text(tournament);
@@ -351,7 +348,6 @@ final class TournamentPanelCreate {
 
     @ButtonHandler(value = RESULTS, save = false)
     static void copyResults(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, RESULTS);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         String text = TournamentResults.text(TournamentResults.results(id));
@@ -370,13 +366,11 @@ final class TournamentPanelCreate {
 
     @ButtonHandler(value = CREATE_ASK, save = false)
     static void askCreate(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         TournamentPanel.show(event, PanelIds.key(buttonID, CREATE_ASK), Tab.CREATE, CONFIRM_CREATE, null);
     }
 
     @ButtonHandler(value = CREATE_GO, save = false)
     static void create(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, CREATE_GO);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         boolean ready = tournament.getStatus() == TournamentStatus.GROUPED
@@ -395,13 +389,11 @@ final class TournamentPanelCreate {
 
     @ButtonHandler(value = ARCHIVE_ASK, save = false)
     static void askArchive(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         TournamentPanel.show(event, PanelIds.key(buttonID, ARCHIVE_ASK), Tab.CREATE, CONFIRM_ARCHIVE, null);
     }
 
     @ButtonHandler(value = ARCHIVE_GO, save = false)
     static void archive(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, ARCHIVE_GO);
         if (TournamentGameCreator.isRunning(id)) {
             TournamentPanel.show(event, id, Tab.CREATE, "Wait until game creation has finished.");
@@ -432,7 +424,6 @@ final class TournamentPanelCreate {
 
     @ModalHandler(value = NEXT_ROUND_SAVE, save = false)
     static void nextRound(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), NEXT_ROUND_SAVE);
         String round = StringUtils.left(PanelForms.value(event, "round"), 40);
         if (round.isBlank()) {
@@ -493,7 +484,6 @@ final class TournamentPanelCreate {
 
     @ModalHandler(value = WINNERS_SAVE, save = false)
     static void recordWinners(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), WINNERS_SAVE);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         Resolution resolution = TournamentPanel.resolve(tournament, PanelForms.value(event, "names"));

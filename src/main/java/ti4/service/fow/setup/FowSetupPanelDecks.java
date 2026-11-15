@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.game.Game;
@@ -30,6 +31,7 @@ import ti4.service.fow.setup.FowSetupDecksService.DeckSlot;
 import ti4.service.game.DeckConfigImportService;
 import ti4.service.game.SetDeckService;
 
+@GuardedBy(FowSetupPanelGuard.class)
 final class FowSetupPanelDecks {
 
     private static final String SLOT_SELECT = "fowWizDeckSlot";
@@ -116,8 +118,8 @@ final class FowSetupPanelDecks {
         List<ActionRow> rows = new ArrayList<>(
                 ComponentPanel.selectPages(DECK_PREFIX + slotKey + "_", options, page, MENUS_PER_PAGE, "Pick one"));
         List<Button> buttons = new ArrayList<>();
-        if (page > 0) buttons.add(Buttons.gray(PAGE_PREFIX + slotKey + "_" + (page - 1), "◀ More"));
-        if (page < pages - 1) buttons.add(Buttons.gray(PAGE_PREFIX + slotKey + "_" + (page + 1), "More ▶"));
+        buttons.addAll(ComponentPanel.pageButtons(
+                target -> PAGE_PREFIX + slotKey + "_" + target, page, pages, "◀ More", "More ▶"));
         buttons.add(FowSetupPanel.backButton());
         rows.add(ActionRow.of(buttons));
         String text = "### Pick a " + label + "\n**Current:** " + current
@@ -127,13 +129,11 @@ final class FowSetupPanelDecks {
 
     @SelectionHandler(SLOT_SELECT)
     static void pickSlot(StringSelectInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.openSubView(event, game, SLOT_SUBVIEW + event.getValues().getFirst() + ":0", null);
     }
 
     @ButtonHandler(PAGE_PREFIX)
     static void pageSlot(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String tail = buttonID.substring(PAGE_PREFIX.length());
         int split = tail.lastIndexOf('_');
         FowSetupPanel.openSubView(
@@ -142,7 +142,6 @@ final class FowSetupPanelDecks {
 
     @SelectionHandler(DECK_PREFIX)
     static void pickDeck(StringSelectInteractionEvent event, Game game, String menuID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String tail = menuID.substring(DECK_PREFIX.length());
         String slotKey = tail.substring(0, tail.lastIndexOf('_'));
         String alias = event.getValues().getFirst();
@@ -184,7 +183,6 @@ final class FowSetupPanelDecks {
 
     @ModalHandler(IMPORT_RESOLVE)
     static void resolveImportModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String source = PanelForms.urlOrFile(event);
         if (source.isEmpty()) {
             FowSetupPanel.show(event, game, "Give a URL or upload a file. Nothing was imported.");

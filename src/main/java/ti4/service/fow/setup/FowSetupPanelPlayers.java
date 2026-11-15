@@ -23,6 +23,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.game.Game;
@@ -36,6 +37,7 @@ import ti4.message.componentsV2.PanelView;
 import ti4.model.ColorModel;
 import ti4.service.game.GameColorsService;
 
+@GuardedBy(FowSetupPanelGuard.class)
 final class FowSetupPanelPlayers {
 
     private static final String ROLES_PREFIX = "fowWizRoles_";
@@ -91,7 +93,6 @@ final class FowSetupPanelPlayers {
 
     @SelectionHandler(ROLES_PREFIX)
     static void setRoles(StringSelectInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         FowSetupPlayerRolesService.ensureInitialized(game, state);
         applyRoles(state, optionValues(event), event.getValues());
@@ -192,7 +193,6 @@ final class FowSetupPanelPlayers {
 
     @SelectionHandler(SPEAKER)
     static void pickSpeaker(StringSelectInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         Player player = game.getPlayer(event.getValues().getFirst());
         if (player == null) return;
         game.setSpeaker(player);
@@ -201,7 +201,6 @@ final class FowSetupPanelPlayers {
 
     @ButtonHandler(MANUAL_ORDER)
     static void startManualOrder(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.getManualOrderPicks().clear();
         FowSetupWizardService.saveState(game, state);
@@ -210,7 +209,6 @@ final class FowSetupPanelPlayers {
 
     @SelectionHandler(SEAT)
     static void pickSeat(StringSelectInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         String userId = event.getValues().getFirst();
         if (!state.getManualOrderPicks().contains(userId)) {
@@ -256,7 +254,6 @@ final class FowSetupPanelPlayers {
 
     @ModalHandler(DICE_RESOLVE)
     static void resolveDiceModal(ModalInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         Integer count = PanelForms.parseInt(PanelForms.value(event, "diceCount"));
         Integer sides = PanelForms.parseInt(PanelForms.value(event, "diceSides"));
         if (count == null || sides == null) {
@@ -268,14 +265,12 @@ final class FowSetupPanelPlayers {
 
     @ButtonHandler(RESOLVE_LOWEST)
     static void resolveLowestFirst(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupTableOrderService.applyDiceOrder(event, game, FowSetupTableOrderService.LOWEST_FIRST);
         FowSetupPanel.show(event, game, "Seat order set from the rolls, lowest first.");
     }
 
     @ButtonHandler(RESOLVE_MIDDLE)
     static void resolveClosestToFifty(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupTableOrderService.applyDiceOrder(event, game, FowSetupTableOrderService.CLOSEST_TO_50);
         FowSetupPanel.show(event, game, "Seat order set from the rolls, closest to 50 first.");
     }
@@ -293,8 +288,8 @@ final class FowSetupPanelPlayers {
         List<ActionRow> rows = new ArrayList<>(
                 ComponentPanel.selectPages(NEUTRAL_PREFIX, options, page, COLOUR_MENUS_PER_PAGE, "Neutral colour"));
         List<Button> buttons = new ArrayList<>();
-        if (page > 0) buttons.add(Buttons.gray(NEUTRAL_PAGE_PREFIX + (page - 1), "◀ More colours"));
-        if (page < pages - 1) buttons.add(Buttons.gray(NEUTRAL_PAGE_PREFIX + (page + 1), "More colours ▶"));
+        buttons.addAll(ComponentPanel.pageButtons(
+                target -> NEUTRAL_PAGE_PREFIX + target, page, pages, "◀ More colours", "More colours ▶"));
         buttons.add(Buttons.gray(NEUTRAL_RANDOM, "Random colour"));
         rows.add(ActionRow.of(buttons));
         return PanelView.of(List.of(TextDisplay.of(text)), rows);
@@ -314,7 +309,6 @@ final class FowSetupPanelPlayers {
 
     @SelectionHandler(NEUTRAL_PREFIX)
     static void pickNeutralColor(StringSelectInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String color = event.getValues().getFirst();
         game.setupNeutralPlayer(color);
         FowSetupPanel.show(event, game, "Neutral player set to **" + color + "**.");
@@ -322,7 +316,6 @@ final class FowSetupPanelPlayers {
 
     @ButtonHandler(NEUTRAL_PAGE_PREFIX)
     static void pageNeutralColors(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.setStepTab(buttonID.substring(NEUTRAL_PAGE_PREFIX.length()));
         FowSetupWizardService.saveState(game, state);
@@ -331,7 +324,6 @@ final class FowSetupPanelPlayers {
 
     @ButtonHandler(NEUTRAL_RANDOM)
     static void randomNeutralColor(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         String color = SetupNeutralPlayer.pickNeutralColor(game);
         game.setupNeutralPlayer(color);
         FowSetupPanel.show(event, game, "Neutral player set to **" + color + "**.");

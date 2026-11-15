@@ -6,20 +6,20 @@ import java.util.Map;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
-import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.game.persistence.GameManager;
+import ti4.message.componentsV2.ComponentPanel;
 import ti4.message.componentsV2.PanelForms;
 import ti4.message.componentsV2.PanelIds;
 import ti4.message.componentsV2.PanelView;
-import ti4.service.tournament.TournamentAccess;
 import ti4.service.tournament.TournamentSetupOption;
 import ti4.service.tournament.TournamentSetupOptions;
 import ti4.service.tournament.panel.TournamentPanel.Context;
@@ -29,6 +29,7 @@ import ti4.service.tournament.setup.TournamentSetupGame;
 import ti4.spring.service.tournament.Tournament;
 import ti4.spring.service.tournament.TournamentService;
 
+@GuardedBy(TournamentPanelGuard.class)
 final class TournamentPanelSetup {
 
     private static final String CYCLE = "trnSetup_";
@@ -98,16 +99,17 @@ final class TournamentPanelSetup {
         boolean editable = tournament.getStatus().allowsRosterChanges();
         options.stream().limit(MAX_OPTIONS_SHOWN).forEach(option -> {
             String current = TournamentSetupOptions.currentChoice(option, values);
-            body.add(Section.of(
-                    Buttons.blue(CYCLE + context.id() + "_" + option.id(), "Change")
-                            .withDisabled(!editable),
-                    TextDisplay.of("**" + option.label() + ":** " + current + "\n-# " + option.description())));
+            body.add(ComponentPanel.settingRow(
+                    option.label(),
+                    current,
+                    option.description(),
+                    Buttons.blue(PanelIds.of(CYCLE, context.id(), option.id()), "Change")
+                            .withDisabled(!editable)));
         });
     }
 
     @ButtonHandler(value = CREATE_SETUP_GAME, save = false)
     static void createSetupGame(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, CREATE_SETUP_GAME);
         Tournament tournament = TournamentService.getBean().find(id).orElseThrow();
         if (tournament.isFogMode()) {
@@ -132,7 +134,6 @@ final class TournamentPanelSetup {
 
     @ModalHandler(value = USE_GAME_SAVE, save = false)
     static void useGame(ModalInteractionEvent event) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(event.getModalId(), USE_GAME_SAVE);
         String gameName = PanelForms.value(event, "game").toLowerCase();
         if (!GameManager.isValid(gameName)) {
@@ -162,7 +163,6 @@ final class TournamentPanelSetup {
 
     @ButtonHandler(value = CYCLE, save = false)
     static void cycle(ButtonInteractionEvent event, String buttonID) {
-        if (!TournamentAccess.require(event)) return;
         long id = PanelIds.key(buttonID, CYCLE);
         String optionId = PanelIds.arg(buttonID, CYCLE);
         TournamentService service = TournamentService.getBean();

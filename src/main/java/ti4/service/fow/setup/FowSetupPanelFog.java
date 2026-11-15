@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.game.Game;
 import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.AnonymousCommsService;
@@ -20,6 +21,7 @@ import ti4.service.option.FOWOptionService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.option.FOWOptionService.FOWOptionCategory;
 
+@GuardedBy(FowSetupPanelGuard.class)
 final class FowSetupPanelFog {
 
     private static final String PRESET_PREFIX = "fowWizFogPreset_";
@@ -116,14 +118,12 @@ final class FowSetupPanelFog {
 
     @ButtonHandler(value = PRESET_PREFIX)
     static void previewPreset(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FogPreset preset = FogPreset.fromId(buttonID.substring(PRESET_PREFIX.length()));
         FowSetupPanel.openSubView(event, game, PRESET_SUBVIEW + preset.getId(), null);
     }
 
     @ButtonHandler(APPLY_PREFIX)
     static void applyPreset(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FogPreset preset = FogPreset.fromId(buttonID.substring(APPLY_PREFIX.length()));
         FogPresetService.applyAndAnnounce(game, preset);
         FowSetupPanel.openSubView(event, game, null, "Applied the " + preset.getTitle() + " preset.");
@@ -131,14 +131,12 @@ final class FowSetupPanelFog {
 
     @ButtonHandler(TAB_PREFIX)
     static void openOptionsTab(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FOWOptionCategory tab = FOWOptionCategory.valueOf(buttonID.substring(TAB_PREFIX.length()));
         FowSetupPanel.openSubView(event, game, OPTIONS_SUBVIEW + tab.name(), null);
     }
 
     @ButtonHandler(TOGGLE_PREFIX)
     static void toggleOption(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FOWOption option = FOWOptionService.applyToggle(game, buttonID.substring(TOGGLE_PREFIX.length()));
         FowSetupPanel.openSubView(
                 event, game, OPTIONS_SUBVIEW + option.getCategory().name(), null);
@@ -146,13 +144,11 @@ final class FowSetupPanelFog {
 
     @ButtonHandler(FOWPLUS)
     static void openFowPlus(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupPanel.openSubView(event, game, FOWPLUS_SUBVIEW, null);
     }
 
     @ButtonHandler(FOWPLUS_SET_PREFIX)
     static void setFowPlus(ButtonInteractionEvent event, Game game, String buttonID) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         boolean active = Boolean.parseBoolean(buttonID.substring(FOWPLUS_SET_PREFIX.length()));
         FOWPlusService.setActive(game, active);
         FowSetupPanel.openSubView(event, game, null, "FoW+ turned " + (active ? "on" : "off") + ".");

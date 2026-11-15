@@ -3,6 +3,7 @@ package ti4.discord.interactions.routing;
 import static org.reflections.scanners.Scanners.*;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -171,13 +172,14 @@ public class AnnotationHandler {
         };
     }
 
-    private static <T extends ListenerContext> Consumer<T> buildConsumer(
-            Method method, Function<T, List<Object>> getArgs, boolean save) {
+    static <T extends ListenerContext> Consumer<T> buildConsumer(
+            Method method, Function<T, List<Object>> getArgs, boolean save, HandlerGuard guard) {
         return context -> {
             List<Object> args = getArgs.apply(context);
             try {
                 method.setAccessible(true);
                 context.setShouldSave(save);
+                if (!guard.allows(context.getEvent(), context.getGame())) return;
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
                 GenericInteractionCreateEvent origin = context.getEvent();
@@ -289,6 +291,7 @@ public class AnnotationHandler {
     private static <C extends ListenerContext, H extends Annotation> void registerHandlers(
             Class<C> contextClass, Class<H> handlerClass, HandlerRegistry<C> handlerRegistry) {
         for (Class<?> klass : getAllClasses()) {
+            HandlerGuard guard = null;
             for (Method method : klass.getDeclaredMethods()) {
                 method.setAccessible(true);
                 List<H> annotationList = Arrays.asList(method.getAnnotationsByType(handlerClass));
@@ -305,6 +308,7 @@ public class AnnotationHandler {
                 if (argGetter == null) {
                     continue;
                 }
+                if (guard == null) guard = guardOf(klass);
                 List<String> prefixes = new ArrayList<>();
                 for (H handler : annotationList) {
                     String val = null;
@@ -328,11 +332,31 @@ public class AnnotationHandler {
                         save = mh.save();
                     }
                     if (val == null) continue;
-                    Consumer<C> consumer = buildConsumer(method, argGetter, save);
+                    Consumer<C> consumer = buildConsumer(method, argGetter, save, guard);
 
                     handlerRegistry.register(val, consumer, save);
                 }
             }
+        }
+    }
+
+    static final HandlerGuard ALLOW_ALL = (event, game) -> true;
+    static final HandlerGuard MISCONFIGURED = (event, game) -> false;
+
+    static HandlerGuard guardOf(Class<?> klass) {
+        GuardedBy guardedBy = klass.getAnnotation(GuardedBy.class);
+        if (guardedBy == null) return ALLOW_ALL;
+        try {
+            Constructor<? extends HandlerGuard> constructor = guardedBy.value().getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            BotLogger.error(
+                    Constants.jazzPing() + " guard " + guardedBy.value().getName() + " on " + klass.getName()
+                            + " could not be created; its handlers refuse every press until it has a no-arg"
+                            + " constructor.",
+                    e);
+            return MISCONFIGURED;
         }
     }
 

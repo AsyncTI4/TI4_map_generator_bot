@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
+import ti4.discord.interactions.routing.GuardedBy;
 import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,6 +26,7 @@ import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.GMService;
 import ti4.service.option.FOWOptionService;
 
+@GuardedBy(FowSetupPanelGuard.class)
 public final class FowSetupPanel {
 
     static final String BACK = "fowWizBack";
@@ -244,7 +246,6 @@ public final class FowSetupPanel {
     }
 
     private static void goTo(GenericInteractionCreateEvent event, Game game, FowSetupStep step) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         FowSetupWizardState state = FowSetupWizardService.loadState(game);
         state.setStep(step);
         state.setSubView(null);
@@ -256,13 +257,11 @@ public final class FowSetupPanel {
 
     @ButtonHandler(BACK)
     static void back(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         openSubView(event, game, null, null);
     }
 
     @ButtonHandler(REPOST)
     static void repostButton(ButtonInteractionEvent event, Game game) {
-        if (!FowSetupWizardService.requireGM(event, game)) return;
         repost(game);
     }
 }
