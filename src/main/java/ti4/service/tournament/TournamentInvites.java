@@ -67,7 +67,7 @@ public class TournamentInvites {
         return send(tournament, channels);
     }
 
-    private static List<GuildMessageChannel> signupChannelsOffHost(Tournament tournament) {
+    public static List<GuildMessageChannel> signupChannelsOffHost(Tournament tournament) {
         Guild host = TournamentDiscord.hostGuild(tournament);
         Map<Guild, GuildMessageChannel> firstPerServer = new LinkedHashMap<>();
         TournamentService.getBean().signupPosts(tournament.getId()).stream()
@@ -78,7 +78,7 @@ public class TournamentInvites {
         return List.copyOf(firstPerServer.values());
     }
 
-    private static String send(Tournament tournament, List<GuildMessageChannel> channels) {
+    public static String send(Tournament tournament, List<GuildMessageChannel> channels) {
         Guild host = TournamentDiscord.hostGuild(tournament);
         if (host == null) return "Pick a host server first.";
         String link = Helper.getGuildInviteURL(host, UNLIMITED_USES);
