@@ -25,6 +25,11 @@ public class FleetLimit {
         return seat.getFleetCC() + bonus(seat);
     }
 
+    public static String unlimitedFaction() {
+        Player unlimited = UNLIMITED_ASSUMED_FOR.get();
+        return unlimited == null ? "" : unlimited.getFaction();
+    }
+
     public static boolean heroLiftsLimit(Player seat) {
         return seat.getLeader(LETNEV_HERO).map(Leader::isActive).orElse(false);
     }

@@ -51,6 +51,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         int threads = Math.clamp(
                 Integer.getInteger("ai.selfplay.threads", Runtime.getRuntime().availableProcessors() / 2), 1, games);
         ti4.ai.trace.TimingReport.reset();
+        ti4.ai.brain.TickMemo.resetVerification();
+        ti4.ai.trace.ShadowCheck.reset();
         long batchStart = System.nanoTime();
         List<SelfPlayGame.Outcome> played = playAll(games, threads);
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
@@ -222,6 +224,14 @@ class AiSelfPlayTest extends BaseTi4Test {
         // -Dai.timing=true: where the AI spent its time, over every decision of the batch.
         if (ti4.ai.trace.TimingReport.enabled()) {
             ti4.ai.trace.TimingReport.lines().forEach(System.out::println);
+        }
+        // -Dai.tickmemo.verify=true: every answer shared within a tick was recomputed from scratch and compared.
+        if (ti4.ai.brain.TickMemo.verifying()) {
+            ti4.ai.brain.TickMemo.verificationLines().forEach(System.out::println);
+        }
+        // -Dai.shadow=true: the seats played the current answer; this counts the decisions a candidate would change.
+        if (ti4.ai.trace.ShadowCheck.enabled()) {
+            ti4.ai.trace.ShadowCheck.lines().forEach(System.out::println);
         }
     }
 

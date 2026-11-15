@@ -24,6 +24,7 @@ import ti4.ai.brain.ClockReads;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
+import ti4.ai.brain.TickMemo;
 import ti4.ai.deal.HumanAiDealMessage;
 import ti4.ai.fallback.AiConfusionService;
 import ti4.ai.fallback.DelegatedPress;
@@ -42,6 +43,7 @@ import ti4.ai.selfplay.RefereeRules;
 import ti4.ai.selfplay.RefereeRules.RefereePress;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.trace.AiDebugLog;
+import ti4.ai.trace.ShadowCheck;
 import ti4.ai.trace.Thinking;
 import ti4.ai.trace.ThinkingAborted;
 import ti4.ai.trace.ThinkingProfile;
@@ -129,6 +131,12 @@ class AiTickRunner {
         long loadStart = System.nanoTime();
         Game game = managed.getGame();
         TimingReport.recordOutside(LOAD_SPAN, System.nanoTime() - loadStart);
+        try (TickMemo.Open shared = TickMemo.open(game)) {
+            tickGame(lane, game, now);
+        }
+    }
+
+    private static void tickGame(AiLane lane, Game game, long now) {
         List<Player> seats = AiSeats.activeAiSeats(game);
         if (seats.isEmpty()) {
             AiRuntime.forget(lane);
@@ -308,6 +316,7 @@ class AiTickRunner {
         ThinkingAborted aborted = null;
         boolean failed = false;
         TimingReport.startDecision();
+        ShadowCheck.startDecision();
         DecisionInputs before = TimingReport.enabled() ? DecisionInputs.of(context) : null;
         ClockReads.reset();
         long cpuStart = TimingReport.cpuNow();
@@ -328,10 +337,15 @@ class AiTickRunner {
         } finally {
             memo.close();
             thinking.close();
+            ShadowCheck.endDecision();
         }
         long cpu = TimingReport.cpuNow() - cpuStart;
         TimingReport.recordDecision(
-                thinking.profile(), cpu, outcomeName(decision, aborted), inputChange(tick, context, before));
+                thinking.profile(),
+                cpu,
+                outcomeName(decision, aborted),
+                inputChange(tick, context, before),
+                new TimingReport.Save(context.game().getName(), context.game().getLastModifiedDate()));
         noteThinking(tick, thinking.profile(), decision, aborted);
         if (aborted == null && !failed) decidedNormally(tick);
         return decision;

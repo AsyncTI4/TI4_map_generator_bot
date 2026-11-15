@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.brain.TickMemo;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.MoveBoost;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.trace.Thinking;
@@ -76,6 +79,8 @@ final class IncomingForces {
     private static final String THUNDERS_EDGE_WARFARE = "te6warfare";
     private static final int ONE_MOVE = 1;
     private static final int TWO_MOVES = 2;
+    private static final String SHARED_FORCES = "incoming.forces";
+    private static final String SHARED_REACHES = "incoming.reaches";
 
     private record Slot(Tile origin, UnitType type, double cost) {}
 
@@ -84,14 +89,15 @@ final class IncomingForces {
     private final Exclusion exclusion;
     private final IncomingForces base;
     private final Map<String, Map<String, Integer>> reaches;
-    private final Map<String, IncomingForce> forces = new HashMap<>();
+    private final Map<String, IncomingForce> forces;
+    private final boolean plain;
 
     IncomingForces(Game game) {
         this(game, null, null);
     }
 
     IncomingForces(Game game, @Nullable Exclusion exclusion) {
-        this(game, exclusion, null);
+        this(game, exclusion, exclusion == null ? null : new IncomingForces(game));
     }
 
     IncomingForces(Game game, @Nullable Exclusion exclusion, @Nullable IncomingForces base) {
@@ -108,7 +114,19 @@ final class IncomingForces {
         this.exclusion = exclusion;
         this.base = base;
         this.screened = screened;
-        this.reaches = base == null ? new HashMap<>() : base.reaches;
+        this.plain = exclusion == null && screened.isEmpty();
+        this.reaches = base != null ? base.reaches : plain ? TickMemo.mapFor(game, SHARED_REACHES) : new HashMap<>();
+        this.forces = plain ? TickMemo.mapFor(game, SHARED_FORCES) : new HashMap<>();
+    }
+
+    private IncomingForce remembered(String key, Function<IncomingForces, IncomingForce> compute) {
+        IncomingForce found = forces.computeIfAbsent(key, ignored -> compute.apply(this));
+        if (!plain) return found;
+        return TickMemo.checked(SHARED_FORCES, key, found, () -> compute.apply(new IncomingForces(game)));
+    }
+
+    private static String assumptions() {
+        return MoveBoost.boostedFaction() + "/" + FleetLimit.unlimitedFaction() + "/" + MovementGraph.assumesAntimass();
     }
 
     private boolean isGone(Player enemy, Tile tile) {
@@ -141,36 +159,39 @@ final class IncomingForces {
     }
 
     IncomingForce of(Player enemy, Tile target, Horizon horizon) {
-        try (Thinking.Span timing = Thinking.measure("incoming.force")) {
-            if (base != null && exclusion != null && enemy != exclusion.owner()) return base.of(enemy, target, horizon);
-            return forces.computeIfAbsent(
-                    enemy.getFaction() + "#" + target.getPosition() + "#" + horizon,
-                    key -> scan(enemy, target, horizon, ONE_MOVE));
-        }
+        if (base != null && exclusion != null && enemy != exclusion.owner()) return base.of(enemy, target, horizon);
+        return remembered(
+                enemy.getFaction() + "#" + target.getPosition() + "#" + horizon + "#" + assumptions(),
+                forcesOf -> forcesOf.scan(enemy, target, horizon, ONE_MOVE));
     }
 
     IncomingForce approaching(Player enemy, Tile target) {
         if (base != null && exclusion != null && enemy != exclusion.owner()) return base.approaching(enemy, target);
-        return forces.computeIfAbsent(
-                enemy.getFaction() + "#" + target.getPosition() + "#approaching",
-                key -> scan(enemy, target, Horizon.NEXT_ROUND, TWO_MOVES));
+        return remembered(
+                enemy.getFaction() + "#" + target.getPosition() + "#approaching#" + assumptions(),
+                forcesOf -> forcesOf.scan(enemy, target, Horizon.NEXT_ROUND, TWO_MOVES));
     }
 
     Map<String, Integer> reach(Player enemy, Tile origin, int move) {
-        return reaches.computeIfAbsent(
-                enemy.getFaction() + "#" + origin.getPosition() + "#" + move,
-                key -> MovementGraph.reach(game, enemy, origin.getPosition(), move, screened));
+        String key = enemy.getFaction() + "#" + origin.getPosition() + "#" + move + "#" + assumptions();
+        Map<String, Integer> found = reaches.computeIfAbsent(
+                key, ignored -> MovementGraph.reach(game, enemy, origin.getPosition(), move, screened));
+        if (!screened.isEmpty()) return found;
+        return TickMemo.checked(
+                SHARED_REACHES, key, found, () -> MovementGraph.reach(game, enemy, origin.getPosition(), move));
     }
 
     IncomingForce activating(Player enemy, Tile target) {
-        return forces.computeIfAbsent(
-                enemy.getFaction() + "#" + target.getPosition() + "#activating",
-                key -> gather(enemy, target, Horizon.IMMEDIATE, ONE_MOVE));
+        return remembered(
+                enemy.getFaction() + "#" + target.getPosition() + "#activating#" + assumptions(),
+                forcesOf -> forcesOf.gather(enemy, target, Horizon.IMMEDIATE, ONE_MOVE));
     }
 
     private IncomingForce scan(Player enemy, Tile target, Horizon horizon, int moves) {
-        if (blocked(enemy, target, horizon)) return IncomingForce.none(enemy, horizon);
-        return gather(enemy, target, horizon, moves);
+        try (Thinking.Span timing = Thinking.measure("incoming.force")) {
+            if (blocked(enemy, target, horizon)) return IncomingForce.none(enemy, horizon);
+            return gather(enemy, target, horizon, moves);
+        }
     }
 
     private IncomingForce gather(Player enemy, Tile target, Horizon horizon, int moves) {
