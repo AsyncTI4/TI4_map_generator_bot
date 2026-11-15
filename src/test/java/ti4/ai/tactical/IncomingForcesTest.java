@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.brain.TickMemo;
+import ti4.ai.eval.FleetLimit;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.tactical.IncomingForces.Horizon;
 import ti4.ai.tactical.IncomingForces.IncomingForce;
@@ -61,6 +63,52 @@ class IncomingForcesTest extends BaseTi4Test {
         IncomingForce force = force(Horizon.IMMEDIATE);
 
         assertThat(force.ships()).containsEntry(UnitType.Carrier, 1).doesNotContainKey(UnitType.Cruiser);
+    }
+
+    // Within one tick every planner context sees the same board, so a second outlook reuses the first one's scan.
+    @Test
+    void outlooksInOneTickShareTheirScans() {
+        board.raidingFleet(1, 2, 4);
+
+        try (TickMemo.Open tick = TickMemo.open(board.test.game)) {
+            assertThat(force(Horizon.IMMEDIATE)).isSameAs(force(Horizon.IMMEDIATE));
+        }
+    }
+
+    @Test
+    void withoutATickEachOutlookScansForItself() {
+        board.raidingFleet(1, 2, 4);
+
+        assertThat(force(Horizon.IMMEDIATE))
+                .isNotSameAs(force(Horizon.IMMEDIATE))
+                .isEqualTo(force(Horizon.IMMEDIATE));
+    }
+
+    // A tick opened for another game object, such as a reloaded copy, must not hand this board's scans around.
+    @Test
+    void aTickForAnotherGameSharesNothing() {
+        board.raidingFleet(1, 2, 4);
+
+        try (TickMemo.Open tick = TickMemo.open(new DefenseScenario().test.game)) {
+            assertThat(force(Horizon.IMMEDIATE)).isNotSameAs(force(Horizon.IMMEDIATE));
+        }
+    }
+
+    // Assuming the enemy has no fleet limit is a different question about the same board, so it gets its own entry,
+    // and the ordinary answer is unchanged afterwards.
+    @Test
+    void anAssumedUnlimitedFleetIsScannedApart() {
+        board.raidingFleet(1, 2, 4);
+        board.sardakk.setFleetCC(1);
+
+        try (TickMemo.Open tick = TickMemo.open(board.test.game)) {
+            IncomingForce limited = force(Horizon.IMMEDIATE);
+            IncomingForce unlimited = FleetLimit.assumingUnlimited(board.sardakk, () -> force(Horizon.IMMEDIATE));
+
+            assertThat(limited.ships()).doesNotContainKey(UnitType.Cruiser);
+            assertThat(unlimited.ships()).containsEntry(UnitType.Cruiser, 2);
+            assertThat(force(Horizon.IMMEDIATE)).isSameAs(limited);
+        }
     }
 
     // Each origin's ships carry only that origin's units: cruisers cannot take the infantry of the carrier's system.

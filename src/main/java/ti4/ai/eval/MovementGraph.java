@@ -34,6 +34,10 @@ public class MovementGraph {
         }
     }
 
+    public static boolean assumesAntimass() {
+        return Boolean.TRUE.equals(ASSUMING_ANTIMASS.get());
+    }
+
     public static Map<String, Integer> reach(Game game, Player player, String origin, int moveValue) {
         return reach(game, player, origin, moveValue, Set.of());
     }

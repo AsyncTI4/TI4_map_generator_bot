@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.trace.ThinkingProfile.SpanTotal;
 
@@ -45,6 +47,13 @@ public class TimingReport {
     private static final Map<String, Tally> OUTCOMES = new HashMap<>();
     private static final Map<String, Tally> DECIDING_RULES = new HashMap<>();
     private static final Map<String, Tally> INPUT_CHANGES = new HashMap<>();
+    private static final Map<String, Tally> REPEATS = new HashMap<>();
+    private static final Map<String, SeenOnSave> SEEN_ON_LATEST_SAVE = new HashMap<>();
+
+    public record Save(String game, long modified) {}
+
+    private record SeenOnSave(long modified, Set<String> spans) {}
+
     private static final List<Long> WALL = new ArrayList<>();
     private static final List<Long> CPU = new ArrayList<>();
 
@@ -74,6 +83,12 @@ public class TimingReport {
     }
 
     public static void recordDecision(ThinkingProfile profile, long cpuNanos, String outcome, String inputChange) {
+        recordDecision(profile, cpuNanos, outcome, inputChange, null);
+    }
+
+    public static void recordDecision(
+            ThinkingProfile profile, long cpuNanos, String outcome, String inputChange, Save save) {
+        if (enabled && save != null) recordRepeats(profile, save);
         String rule = DECIDED_BY.get();
         DECIDED_BY.remove();
         if (!enabled) return;
@@ -97,6 +112,19 @@ public class TimingReport {
         }
     }
 
+    private static synchronized void recordRepeats(ThinkingProfile profile, Save save) {
+        SeenOnSave seen = SEEN_ON_LATEST_SAVE.get(save.game());
+        if (seen == null || seen.modified() != save.modified()) {
+            seen = new SeenOnSave(save.modified(), new HashSet<>());
+            SEEN_ON_LATEST_SAVE.put(save.game(), seen);
+        }
+        for (SpanTotal span : profile.spans()) {
+            if (seen.spans().add(span.name())) continue;
+            REPEATS.computeIfAbsent(span.name(), key -> new Tally())
+                    .add(span.calls(), span.totalNanos(), span.selfNanos(), span.maxNanos());
+        }
+    }
+
     public static void recordOutside(String name, long nanos) {
         if (!enabled) return;
         synchronized (TimingReport.class) {
@@ -110,6 +138,8 @@ public class TimingReport {
         OUTCOMES.clear();
         DECIDING_RULES.clear();
         INPUT_CHANGES.clear();
+        REPEATS.clear();
+        SEEN_ON_LATEST_SAVE.clear();
         WALL.clear();
         CPU.clear();
     }
@@ -152,6 +182,12 @@ public class TimingReport {
                 "TIMING spans by self time (calls, self and share of decision wall, total, mean per call, max call):");
         rows(SPANS, SPAN_ROWS, Comparator.comparingLong(tally -> -tally.selfNanos))
                 .forEach(row -> lines.add("TIMING   " + spanRow(row.getKey(), row.getValue(), wallTotal)));
+        if (!REPEATS.isEmpty()) {
+            lines.add("TIMING spans an earlier decision on the same save already ran, the most sharing within a save"
+                    + " could save (calls, self and share of decision wall, total, mean per call, max call):");
+            rows(REPEATS, SPAN_ROWS, Comparator.comparingLong(tally -> -tally.totalNanos))
+                    .forEach(row -> lines.add("TIMING   " + spanRow(row.getKey(), row.getValue(), wallTotal)));
+        }
         lines.add("TIMING around decisions; ai.tick and ai.seat include the decisions (calls, total, mean, max):");
         rows(OUTSIDE, Integer.MAX_VALUE, Comparator.comparingLong(tally -> -tally.totalNanos))
                 .forEach(row -> lines.add("TIMING   " + outsideRow(row.getKey(), row.getValue())));

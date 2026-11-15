@@ -34,6 +34,11 @@ public class MoveBoost {
         return extra(player) > 0;
     }
 
+    public static String boostedFaction() {
+        Player boosted = BOOSTED.get();
+        return boosted == null ? "" : boosted.getFaction();
+    }
+
     public static <T> T withOneMore(Player seat, Supplier<T> evaluation) {
         @Nullable Player before = BOOSTED.get();
         BOOSTED.set(seat);

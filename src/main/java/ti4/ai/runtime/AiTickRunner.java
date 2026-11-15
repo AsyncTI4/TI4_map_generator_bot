@@ -24,6 +24,7 @@ import ti4.ai.brain.ClockReads;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.brain.FactionBrain;
 import ti4.ai.brain.FactionBrainRegistry;
+import ti4.ai.brain.TickMemo;
 import ti4.ai.deal.HumanAiDealMessage;
 import ti4.ai.fallback.AiConfusionService;
 import ti4.ai.fallback.DelegatedPress;
@@ -129,6 +130,12 @@ class AiTickRunner {
         long loadStart = System.nanoTime();
         Game game = managed.getGame();
         TimingReport.recordOutside(LOAD_SPAN, System.nanoTime() - loadStart);
+        try (TickMemo.Open shared = TickMemo.open(game)) {
+            tickGame(lane, game, now);
+        }
+    }
+
+    private static void tickGame(AiLane lane, Game game, long now) {
         List<Player> seats = AiSeats.activeAiSeats(game);
         if (seats.isEmpty()) {
             AiRuntime.forget(lane);
@@ -331,7 +338,11 @@ class AiTickRunner {
         }
         long cpu = TimingReport.cpuNow() - cpuStart;
         TimingReport.recordDecision(
-                thinking.profile(), cpu, outcomeName(decision, aborted), inputChange(tick, context, before));
+                thinking.profile(),
+                cpu,
+                outcomeName(decision, aborted),
+                inputChange(tick, context, before),
+                new TimingReport.Save(context.game().getName(), context.game().getLastModifiedDate()));
         noteThinking(tick, thinking.profile(), decision, aborted);
         if (aborted == null && !failed) decidedNormally(tick);
         return decision;

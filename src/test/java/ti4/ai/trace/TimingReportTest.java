@@ -68,6 +68,27 @@ class TimingReportTest {
         assertThat(lines).noneMatch(line -> line.contains("press, "));
     }
 
+    // The first decision on a save pays for a span; a later one on the same save would have been free with sharing.
+    // A new save starts the count over.
+    @Test
+    void spansRepeatedOnTheSameSaveAreCountedAfterTheFirstDecision() {
+        TimingReport.Save first = new TimingReport.Save("g1", 100);
+        TimingReport.recordDecision(profile(10 * MILLI, span("winOdds.compute", 10 * MILLI)), 0, "idle", "", first);
+        TimingReport.recordDecision(profile(7 * MILLI, span("winOdds.compute", 7 * MILLI)), 0, "idle", "", first);
+        TimingReport.recordDecision(
+                profile(5 * MILLI, span("winOdds.compute", 5 * MILLI)),
+                0,
+                "idle",
+                "",
+                new TimingReport.Save("g1", 101));
+
+        List<String> lines = TimingReport.lines();
+        int section = indexOf(lines, "already ran");
+
+        assertThat(section).isPositive();
+        assertThat(lines.get(section + 1)).contains("winOdds.compute: 1 calls, self 7 ms");
+    }
+
     @Test
     void nothingIsRecordedWhileDisabled() {
         TimingReport.enable(false);

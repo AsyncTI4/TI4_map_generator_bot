@@ -106,6 +106,14 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
 - 2026-11-11: three harness leaks fixed (commit 7a9b10daf7): rollouts saw the next objectives, snapshots left the
   attack ledger's picture behind, copying a game stamped the live game as modified.
 
+- 2026-11-15: incoming-force scans are shared within a tick (`TickMemo`, opened by `AiTickRunner` for the game object
+  it loaded; every press ends the tick). A shared answer is keyed by enemy, tile, horizon and the three "assume"
+  thread-locals (flank-speed boost, no fleet limit, antimass). `-Dai.tickmemo.verify=true` recomputes every shared
+  answer without sharing: 2 games, seed 9400, 8,177,860 forces and 4,531,747 reach maps checked, none differed. Time
+  in incoming-force scans fell from 5.1 ms to 2.3 ms per decision (3 games, seed 9300, contended), about 3-4% of
+  thinking time. The audit found the other heavy board facts (defense, rankings, win odds) read the deciding seat's
+  hidden hand or perspective, so they are not shared across seats.
+
 ## Unknowns
 
 - Production vCPU count, RAM and heap headroom.
