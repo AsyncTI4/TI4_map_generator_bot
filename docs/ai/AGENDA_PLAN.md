@@ -208,6 +208,7 @@ The whole value review except the items marked **design**, Miscount Disclosed ta
   - Replace the flat `COVERT_ELECTION_GAIN` (`ElectionValues.java:62,216`) with the average `AgendaValues` over the agendas still possible for the announced target type.
   - That average uses the deck composition from public data (all official agendas minus discards and laws), not the deck order.
   - Use the announced target only. Never read the type stored in `currentAgendaInfo`, which is not announced.
+  - **Done (2026-11-14, behind `AGENDA_VALUE_TABLE`):** `CovertValues` (first in `ExpertAgendaValues`). A seat's value of each outcome is the average of `AgendaValues` over the agendas in the game's agenda deck with the announced target, minus discards and laws in play (`CovertValues.possibleAgendas`). The AI speaker, in its own view, values the card it holds (`sentAgendas` with that target) exactly. Legacy keeps the flat `COVERT_ELECTION_GAIN`. Tests: `CovertValuesTest` (leak check: swapping the speaker's card leaves a non-speaker's value unchanged).
 - **Tests:**
   - A Dictate Policy holder with 2 laws in play votes For on a mildly bad law, while a non-holder votes Against.
   - A Covert non-speaker's value doesn't change when the deck's top card is swapped (leak check).

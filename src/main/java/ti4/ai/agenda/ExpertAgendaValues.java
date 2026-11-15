@@ -13,6 +13,7 @@ class ExpertAgendaValues {
     }
 
     private static final List<Group> GROUPS = List.of(
+            CovertValues::valueOf,
             ExpertElectionValues::valueOf,
             ExpertPlanetValues::valueOf,
             ExpertLawValues::valueOf,

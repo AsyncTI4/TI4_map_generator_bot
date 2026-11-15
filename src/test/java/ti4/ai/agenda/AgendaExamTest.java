@@ -2095,13 +2095,6 @@ class AgendaExamTest extends BaseTi4Test {
     @Nested
     class ToDo {
 
-        @Disabled("milestone 3: a Covert Legislation non-speaker values the announced target type from the deck"
-                + " composition, never the hidden card")
-        @Test
-        void aCovertNonSpeakerDoesNotReadTheHiddenAgenda() {
-            fail("expected the non-speaker's Covert value to stay the same when the hidden agenda is swapped");
-        }
-
         @Test
         void opponentsKeepAVoteBackOnTheFirstAgenda() {
             test.game.setStoredValue("agendaCount", "1");
