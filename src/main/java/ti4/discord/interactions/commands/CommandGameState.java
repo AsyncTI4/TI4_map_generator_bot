@@ -30,6 +30,10 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
         CommandGameState.game.set(game);
 
         if (!playerCommand) {
+            var player = CommandHelper.getPlayerFromEvent(game, event);
+            if (player != null) {
+                CommandGameState.player.set(player);
+            }
             return;
         }
         var player = CommandHelper.getPlayerFromEvent(game, event);
