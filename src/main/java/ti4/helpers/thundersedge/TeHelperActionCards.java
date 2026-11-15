@@ -488,7 +488,7 @@ public class TeHelperActionCards {
             buttons.add(Buttons.CONSTRUCTION_PLACE_1_PDS);
         }
         if (isReadiedForStrategize(game, player, 5)) {
-            buttons.add(Buttons.green("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            buttons.add(Buttons.green("non_sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
         if (isReadiedForStrategize(game, player, 6)) {
             buttons.add(Buttons.green("warfareBuild", "Build At Home", CardEmojis.SC6));

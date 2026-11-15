@@ -30,6 +30,10 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
         CommandGameState.game.set(game);
 
         if (!playerCommand) {
+            var player = CommandHelper.getPlayerFromEvent(game, event);
+            if (player != null) {
+                CommandGameState.player.set(player);
+            }
             return;
         }
         var player = CommandHelper.getPlayerFromEvent(game, event);
@@ -85,10 +89,11 @@ record CommandGameState(boolean saveGame, boolean playerCommand) {
 
     @NotNull
     public Player getPlayer() {
-        if (!playerCommand) {
-            throw new IllegalStateException(
-                    "CommandGameStateHelper cannot get player state because command was not set to be a player command. This is a bug.");
-        }
+        // if (!playerCommand) {
+        //     throw new IllegalStateException(
+        //             "CommandGameStateHelper cannot get player state because command was not set to be a player
+        // command. This is a bug.");
+        // }
         return player.get();
     }
 }

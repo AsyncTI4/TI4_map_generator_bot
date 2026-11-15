@@ -3751,32 +3751,25 @@ public class ButtonHelper {
     }
 
     public static String getTileSummaryMessage(
-            Game game, boolean justUnits, Tile tile, Player ogPlayer, GenericInteractionCreateEvent event) {
-        return getTileSummaryMessage(game, justUnits, tile, ogPlayer, event, null);
+            Game game, boolean justUnits, Tile tile, GenericInteractionCreateEvent event) {
+        return getTileSummaryMessage(game, justUnits, tile, event, null);
     }
 
     public static String getCombatTileSummaryMessage(
             Game game,
             Tile tile,
-            Player ogPlayer,
             GenericInteractionCreateEvent event,
             String combatType,
             @Nullable String combatHolderName,
             List<Player> combatPlayers) {
         return getTileSummaryMessage(
-                game,
-                true,
-                tile,
-                ogPlayer,
-                event,
-                new CombatSummaryContext(combatType, combatHolderName, combatPlayers));
+                game, true, tile, event, new CombatSummaryContext(combatType, combatHolderName, combatPlayers));
     }
 
     private static String getTileSummaryMessage(
             Game game,
             boolean justUnits,
             Tile tile,
-            Player ogPlayer,
             GenericInteractionCreateEvent event,
             @Nullable CombatSummaryContext combatSummaryContext) {
         String tileName = ImageResources.tilePath(tile);
@@ -7685,7 +7678,7 @@ public class ButtonHelper {
             msg.append(unitRoll);
         }
         msg.append(
-                "\nHave your opponent assign hits with the assign hits button present underneath the combat picture, and reroll their dice (if desired) using the roll space combat button.");
+                "\nHave your opponent reroll their dice (if desired) using the roll space combat button, and assign hits (if any) with the assign hits button present underneath the combat picture.");
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
     }
 

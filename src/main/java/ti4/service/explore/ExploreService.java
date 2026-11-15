@@ -1419,6 +1419,7 @@ public class ExploreService {
             }
             case "distinguishedadmiral" -> {
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+                buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "You can use these buttons to redistribute or gain a command token, along with spending 2 influence potentially..",

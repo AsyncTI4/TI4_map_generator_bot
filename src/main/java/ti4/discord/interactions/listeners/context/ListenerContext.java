@@ -66,6 +66,7 @@ public abstract class ListenerContext {
     private boolean allowsNonPlayerInteraction() {
         String componentID = getComponentID();
         return "showGameAgain".equalsIgnoreCase(componentID)
+                || (componentID != null && componentID.contains("refreshViewOfSystem"))
                 || (AuctionFrankenDraftService.ACTION_PREFIX + ";showDrafted").equals(componentID)
                 || componentID.startsWith(CombatSideBetButtonIds.PREFIX)
                 || componentID.startsWith(CombatDoubleOrBustButtonIds.PREFIX)

@@ -583,6 +583,21 @@ public final class ButtonHelperSCs {
         return true;
     }
 
+    @ButtonHandler("non_sc_refresh")
+    private static boolean resolveNonTradeRefresh(Game game, Player player, ButtonInteractionEvent event) {
+        int initComm = player.getCommodities();
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentationNoPing() + "has replenished commodities.");
+        ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
+        ButtonHelperAgents.cabalAgentInitiation(game, player);
+        BloomStrainHandler.resolveRhizomaticActive(player, game);
+        ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
+        ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
+        return true;
+    }
+
     @ButtonHandler("sc_refresh_and_wash")
     public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
         if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {

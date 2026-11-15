@@ -3124,7 +3124,7 @@ public final class ButtonHelperFactionSpecific {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    public static void checkForGeneticRecombination(Player voter, Game game) {
+    public static boolean checkForGeneticRecombination(Player voter, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == voter) {
                 continue;
@@ -3147,9 +3147,11 @@ public final class ButtonHelperFactionSpecific {
                         buttons.add(Buttons.red(prefix + "decline", "Remove Fleet Token"));
                         MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), msg, buttons);
                     }
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @ButtonHandler("geneticRecombination")
