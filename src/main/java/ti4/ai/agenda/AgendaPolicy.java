@@ -100,6 +100,12 @@ public class AgendaPolicy {
 
     public static Optional<PromptButton> chooseOutcome(Game game, Player speaker, List<PromptButton> outcomes) {
         if (outcomes.isEmpty()) return Optional.empty();
+        if (BoatFloat.speakerHonoursAgainst(game, speaker)) {
+            Optional<PromptButton> against = outcomes.stream()
+                    .filter(button -> AgendaValueMath.AGAINST.equalsIgnoreCase(outcomeOf(button)))
+                    .findFirst();
+            if (against.isPresent()) return against;
+        }
         String agenda = currentAgenda(game);
         AgendaForecast forecast = AgendaForecast.of(game, speaker);
         if (!forecast.isEmpty()) {

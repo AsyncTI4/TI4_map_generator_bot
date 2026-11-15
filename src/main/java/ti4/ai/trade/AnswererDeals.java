@@ -12,6 +12,7 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.BoatFloat;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
@@ -41,6 +42,7 @@ class AnswererDeals {
         Game game = context.game();
         Player payer = context.seat();
         if (!active(payer) || PromisedVotes.agendaKey(game).isBlank()) return Optional.empty();
+        if (BoatFloat.active(game).isPresent()) return Optional.empty();
         if (!VoteDeals.aboutToVote(game, payer) || offeredThisAgenda(game, payer)) return Optional.empty();
         String considered = CONSIDERED_KEY + game.getCurrentAgendaInfo() + "|" + game.getPhaseOfGame() + "|"
                 + game.getActivePlayerID() + "|" + payer.getTg() + "|" + game.getCurrentAgendaVotes();

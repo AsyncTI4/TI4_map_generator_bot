@@ -330,6 +330,11 @@ public class AgendaVoting {
             AgendaModel model = agenda.isBlank() ? null : Mapper.getAgenda(agenda);
             if (model == null || model.getTarget() == null) return Optional.empty();
             List<Integer> planetVotes = readiedPlanetVotes(game, seat);
+            Optional<Ballot> floated = BoatFloat.memberOutcome(game, seat)
+                    .filter(outcome ->
+                            planetVotes.stream().mapToInt(Integer::intValue).sum() > 0)
+                    .flatMap(outcome -> ballotFor(game, outcome, BoatFloat.FLOAT_VOTES, false));
+            if (floated.isPresent()) return floated;
             Optional<Ballot> promised = PromisedVotes.binding(game, seat)
                     .filter(promise -> castable(game, planetVotes) > 0)
                     .flatMap(promise ->

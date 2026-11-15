@@ -16,6 +16,7 @@ import ti4.ai.actioncards.SabotageRules;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.BoatFloat;
 import ti4.ai.agenda.GalacticThreatRules;
 import ti4.ai.agenda.RiderPayouts;
 import ti4.ai.agenda.ShenanigansRules;
@@ -306,6 +307,7 @@ public class NekroBrain implements FactionBrain {
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,
             PromissoryRules::queueAgendaNote,
+            BoatFloat::arrange,
             this::declineWhens,
             GalacticThreatRules::next,
             AgendaCardRules::riders,

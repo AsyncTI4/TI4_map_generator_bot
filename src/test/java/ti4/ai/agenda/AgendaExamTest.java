@@ -1066,14 +1066,6 @@ class AgendaExamTest extends BaseTi4Test {
 
             assertThat(ballot(hacan, 3)).contains("for");
         }
-
-        @Disabled(
-                "milestone 12: the boat float (everyone but one puts 1 vote For, one seat ties it Against, the speaker"
-                        + " breaks for Against, the For voters each pass 1 TG to the Against seat)")
-        @Test
-        void joinsTheBoatFloat() {
-            fail("expected the AI to cast exactly 1 vote For as part of an agreed boat float");
-        }
     }
 
     // ---- Classified Document Leaks -----------------------------------------------------------------------------

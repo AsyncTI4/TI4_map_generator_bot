@@ -20,6 +20,7 @@ import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaRound;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.BoatFloat;
 import ti4.ai.agenda.GalacticThreatCost;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.VoteDeals;
@@ -99,7 +100,7 @@ class PromiseDeals {
         Game game = context.game();
         Player seat = context.seat();
         if (!active(seat) || !TradeLegality.isAgendaPhase(game)) return Optional.empty();
-        if (PromisedVotes.agendaKey(game).isBlank()) return Optional.empty();
+        if (PromisedVotes.agendaKey(game).isBlank() || BoatFloat.active(game).isPresent()) return Optional.empty();
         if (proposedThisScope(game, seat, true) >= maxVoteOffers(seat)) return Optional.empty();
         List<Player> open = partners.stream()
                 .filter(partner -> approachable(context, partner))
