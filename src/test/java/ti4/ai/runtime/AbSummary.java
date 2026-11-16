@@ -105,10 +105,10 @@ final class AbSummary {
                 "A/B unfinished games: %d; their pairs are excluded from paired estimates%n",
                 results.stream().filter(game -> !game.completed()).count());
         System.out.printf(
-                "A/B %s: %d games, %d complete pairs; treatment minus control victory points %s; treatment win share"
+                "A/B %s: %d finished games in %d complete pairs; treatment minus control victory points %s; treatment win share"
                         + " %s (null 0.500); treatment %.2f vs control %.2f average points%n",
                 experiments.isEmpty() ? "none (A/A)" : experiments,
-                results.size(),
+                completedResults.size(),
                 pairDifferences.size(),
                 meanAndError(pairDifferences),
                 meanAndError(pairWinShares, 0.5),
@@ -131,8 +131,7 @@ final class AbSummary {
     }
 
     private static boolean finished(String ending) {
-        return SelfPlayGame.Ending.VICTORY_POINTS.name().equals(ending)
-                || SelfPlayGame.Ending.OBJECTIVES_EXHAUSTED.name().equals(ending);
+        return SelfPlayGame.Ending.valueOf(ending).finished();
     }
 
     // t is measured against the null hypothesis: 0 for the point difference, 0.5 for the win share.

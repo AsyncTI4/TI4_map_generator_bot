@@ -31,7 +31,8 @@ class PublicScoringPlan {
     }
 
     private static int compute(Game game, Player player, int slots) {
-        List<String> candidates = ObjectivePolicy.scorablePublics(game, player);
+        Wallet wallet = Wallet.of(game, player);
+        List<String> candidates = ObjectivePolicy.scorablePublics(game, player, wallet);
         if (slots == 1)
             return candidates.stream()
                     .mapToInt(ObjectivePolicy::victoryPoints)
@@ -48,7 +49,7 @@ class PublicScoringPlan {
                         ObjectivePolicy.victoryPoints(id),
                         ObjectiveCatalog.spendCost(id).orElseThrow()))
                 .toList();
-        return best(Wallet.of(game, player), free, spends, slots);
+        return best(wallet, free, spends, slots);
     }
 
     private static int best(Wallet wallet, List<Integer> free, List<Spend> spends, int slots) {
