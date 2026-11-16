@@ -14,6 +14,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -137,6 +138,7 @@ public class CheckDistanceHelper {
                                     && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                                     && !DreamFactionTechHandler.treatsNebulasAsAdjacent(game, player, tile)
                                     && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
+                                    && !BeansMonumentHandler.playerIgnoresNatauMonumentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
@@ -149,6 +151,7 @@ public class CheckDistanceHelper {
                                     && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
                                     && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
+                                    && !BeansMonumentHandler.playerIgnoresNatauMonumentAnomaly(game, player, tile)
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !ThronesLeadersHandler.veythrosIgnoresAnomalies(game, player)
                                     && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
@@ -179,6 +182,7 @@ public class CheckDistanceHelper {
                                     && !RealityFieldImpactorService.nullifies(game, tile)
                                     && player != null
                                     && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
+                                    && !BeansMonumentHandler.playerIgnoresNatauMonumentAnomaly(game, player, tile)
                                     && !player.hasTech("amd")
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
@@ -196,6 +200,7 @@ public class CheckDistanceHelper {
                             && tile.isGravityRift(game, player)
                             && !RealityFieldImpactorService.nullifies(game, tile)
                             && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
+                            && !BeansMonumentHandler.playerIgnoresNatauMonumentAnomaly(game, player, tile)
                             && !ArcanumPrimordialTechHandler.planeShiftIgnoresAnomalies(game, player)
                             && !AsgardLegendaryService.isBifrostBridgeActive(game, player)
                             && !TheodisiLegendaryButtonHandler.ignoresAvarinAnomaly(game, player, tile)

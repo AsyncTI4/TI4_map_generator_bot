@@ -28,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BRLightrailOrdnanceRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -144,6 +145,12 @@ public class CardsInfoService {
         }
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
+        }
+        if (MonumentsService.isMonumentReady(game, player, "bloom_monument")) {
+            buttons.add(BeansMonumentHandler.getBloomMonumentButton(player));
+        }
+        if (MonumentsService.isMonumentReady(game, player, "choir_monument")) {
+            buttons.add(BeansMonumentHandler.getChoirMonumentButton(player));
         }
         if (MonumentsService.isMonumentOnBoard(game, player, "lanefir_monument")
                 && game.getStoredValue("lanefirMonumentUsed_" + player.getFaction())

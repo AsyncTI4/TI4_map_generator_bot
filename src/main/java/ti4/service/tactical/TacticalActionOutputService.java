@@ -29,6 +29,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -471,6 +472,7 @@ public class TacticalActionOutputService {
                 && !RealityFieldImpactorService.nullifies(game, tile)
                 && !DreamAbilitiesHandler.ignoresNebula(player, game, tile)
                 && !DreamAgent.playerIgnoresAnomaly(game, player, tile)
+                && !BeansMonumentHandler.playerIgnoresNatauMonumentAnomaly(game, player, tile)
                 && !player.hasAbility("voidborn")
                 && !player.hasTech("absol_amd")
                 && !player.getRelics().contains("circletofthevoid")

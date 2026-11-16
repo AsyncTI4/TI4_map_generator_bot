@@ -56,6 +56,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morph
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
@@ -1590,6 +1591,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         ExtensionRefitLLButtonHandler.clearExtensionRefit(this);
+        BeansMonumentHandler.clearMonumentActions(this);
         AncientMapsLLButtonHandler.clearAncientMaps(this);
         MirrorShieldingLLButtonHandler.clearMirrorShielding(this);
         RaisedMoraleLLButtonHandler.clearRaisedMorale(this);

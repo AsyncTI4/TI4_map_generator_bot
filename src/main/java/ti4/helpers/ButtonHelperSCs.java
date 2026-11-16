@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vangu
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -1247,6 +1248,45 @@ public final class ButtonHelperSCs {
                             player.getRepresentationNoPing()
                                     + ", choose a planet adjacent to your or neutral units on which to place _Raider Stronghold_.",
                             buttons);
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("dream_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "dream_monument"))) {
+                    List<Button> buttons = BeansMonumentHandler.getDreamMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event, "There is no system containing your ships in which to place _Plateau of Leng_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Plateau of Leng_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeDreamMonument_", 0));
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("deep_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "deep_monument"))) {
+                    List<Button> buttons = BeansMonumentHandler.getDeepMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event,
+                                "There is no system containing your ships and no planets in which to place _Ether Anchor_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Ether Anchor_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeDeepMonument_", 0));
                     return;
                 }
                 if (game.isMonumentsMode()
