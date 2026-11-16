@@ -4114,7 +4114,7 @@ public final class ButtonHelperFactionSpecific {
             }
             msg = msg.replace("infantrys", "infantry");
 
-            AddUnitService.addUnits(event, cabal.getNomboxTile(), game, color, amount + " " + unit.replace(" ", ""));
+            AddUnitService.addUnits(event, cabal.getNomboxTile(), game, color, amount + " " + unitP);
         }
         MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
     }
