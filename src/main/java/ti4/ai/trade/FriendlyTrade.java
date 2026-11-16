@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiGameWrites;
 import ti4.ai.AiPersonality;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -18,6 +19,7 @@ class FriendlyTrade {
     private static final String FLIP_OFFERED_KEY = "friendlyFlipOffered|";
     static final String SNUBS_KEY = "aiBoatFloatSnubs";
     private static final String SNUB_SEPARATOR = ",";
+    private static final String SNUB_REASON = "AI BOAT_FLOAT stops floating a player who charged it";
     private static final int FRIENDLY_FEE = 1;
 
     static boolean applies(Game game, Player seat, Player partner, double trust) {
@@ -138,9 +140,14 @@ class FriendlyTrade {
 
     private static void snub(Player seat, Player partner) {
         if (snubbedBy(seat, partner)) return;
-        String stored = seat.getStoredValue(SNUBS_KEY);
-        seat.setStoredValue(
-                SNUBS_KEY, stored.isBlank() ? partner.getFaction() : stored + SNUB_SEPARATOR + partner.getFaction());
+        String ours = seat.getFaction();
+        String theirs = partner.getFaction();
+        AiGameWrites.persist(seat.getGame(), SNUB_REASON, latest -> {
+            Player recorder = latest.getPlayerFromColorOrFaction(ours);
+            if (recorder == null || snubs(recorder).contains(theirs)) return;
+            String stored = recorder.getStoredValue(SNUBS_KEY);
+            recorder.setStoredValue(SNUBS_KEY, stored.isBlank() ? theirs : stored + SNUB_SEPARATOR + theirs);
+        });
     }
 
     private record Flip(Player partner, Deal deal, int amount) {}

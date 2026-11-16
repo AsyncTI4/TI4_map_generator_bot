@@ -376,14 +376,36 @@ final class SelfPlayGame {
     }
 
     // The control half of an A/B pair: seats 0, 2, 4 in the even game of the pair and 1, 3, 5 in the odd one.
+    // -Dai.selfplay.ab.personality=BOAT_FLOAT gives the treatment half that personality (the control half stays
+    // STANDARD).
+    static final String AB_PERSONALITY = System.getProperty("ai.selfplay.ab.personality", "");
+
     private void markControlSeats(Game game) {
         if (AB.isEmpty()) return;
         List<Player> seats = game.getRealPlayers();
         for (int index = 0; index < seats.size(); index++) {
-            if ((index + slot) % 2 != 0) continue;
+            if ((index + slot) % 2 != 0) {
+                if (!AB_PERSONALITY.isBlank()) {
+                    ti4.ai.AiPersonality.set(
+                            seats.get(index),
+                            ti4.ai.AiPersonality.valueOf(AB_PERSONALITY.trim().toUpperCase()));
+                }
+                continue;
+            }
             ti4.ai.AiExperiments.disable(seats.get(index), AB.get());
+            ti4.ai.AiPersonality.set(seats.get(index), ti4.ai.AiPersonality.STANDARD);
             controlSeats.add(seats.get(index).getFaction());
         }
+    }
+
+    private void printPersonalities(Game game) {
+        if (game == null || AB_PERSONALITY.isBlank()) return;
+        String seats = game.getRealPlayers().stream()
+                .map(player -> player.getFaction() + "=" + ti4.ai.AiPersonality.of(player) + " vp="
+                        + player.getTotalVictoryPoints() + " tg=" + player.getTg() + " snubs=["
+                        + player.getStoredValue("aiBoatFloatSnubs") + "]")
+                .collect(java.util.stream.Collectors.joining("; "));
+        System.out.printf("PERSONALITY slot=%d seed=%d %s%n", slot, seed, seats);
     }
 
     private final java.util.Set<String> controlSeats = new java.util.LinkedHashSet<>();
@@ -796,6 +818,7 @@ final class SelfPlayGame {
     }
 
     private AgendaTracker.Summary agendaSummary(Game game) {
+        printPersonalities(game);
         if (game == null) return AgendaTracker.Summary.NOTHING;
         AgendaTracker.Summary summary = agendas.summary(game, env.now());
         AgendaTracker.lines(summary).forEach(System.out::println);
