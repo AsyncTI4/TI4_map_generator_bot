@@ -18,6 +18,7 @@ class FriendlyTradeTest extends BaseTi4Test {
 
     private static final double FULL_TRUST = 1.0;
     private static final long NOW = AiTestGame.NOW;
+    private static final int TRADE = 5;
 
     private static TradeTable boatFloatTable() {
         TradeTable table = TradeTable.withAiSol();
@@ -113,5 +114,84 @@ class FriendlyTradeTest extends BaseTi4Test {
         assertThat(TradeTerms.feeFor(table.game, table.nekro, naalu, 0.7)).contains(2);
         assertThat(FriendlyTrade.goodRelations(table.game, table.nekro, naalu, 0.7))
                 .isFalse();
+    }
+
+    // ---- reciprocity: BOAT_FLOAT seats float each other, not players who charge them ------------------------------
+
+    /** Sol (an AI) played Trade and Nekro, a 4-commodity seat in this test, followed it. */
+    private static TradeTable solPlayedTrade(TradeTable table) {
+        table.sol.addSC(TRADE);
+        table.game.setSCPlayed(TRADE, true);
+        table.game.setStoredValue("followedSC" + TRADE + "_" + table.game.getRound(), "_sol_nekro");
+        table.nekro.setCommoditiesBase(4);
+        return table;
+    }
+
+    private static Deal ourCommoditiesFor(int commodities, int tradeGoods) {
+        return Deal.EMPTY
+                .adjust("nekro", "sol", ItemType.COMMODITIES, commodities)
+                .adjust("sol", "nekro", ItemType.TRADE_GOODS, tradeGoods);
+    }
+
+    private static boolean floatsSol(TradeTable table) {
+        return FriendlyTrade.applies(table.game, table.nekro, table.sol, FULL_TRUST);
+    }
+
+    // A standard Sol offers Nekro X-2 for its 4 commodities, so Nekro stops floating Sol: no free flip, and X-2 back.
+    @Test
+    void aHolderOfferingXMinusTwoIsNoLongerFloated() {
+        TradeTable table = solPlayedTrade(boatFloatTable());
+        TradeCardRules.followChoice(nekroTurn(table), table.sol);
+
+        assertThat(FriendlyTrade.snubbedBy(table.nekro, table.sol)).isTrue();
+        assertThat(floatsSol(table)).isFalse();
+        table.sol.setCommoditiesBase(4);
+        assertThat(TradeTerms.feeFor(table.game, table.nekro, table.sol, FULL_TRUST))
+                .contains(2);
+    }
+
+    // Two BOAT_FLOAT seats: Sol charges X-1, so Nekro keeps floating it.
+    @Test
+    void aBoatFloatHolderKeepsTheFloat() {
+        TradeTable table = solPlayedTrade(boatFloatTable());
+        AiPersonality.set(table.sol, AiPersonality.BOAT_FLOAT);
+        TradeCardRules.followChoice(nekroTurn(table), table.sol);
+
+        assertThat(floatsSol(table)).isTrue();
+    }
+
+    // Nekro found 2 commodities on an explore; Sol offers 1 trade good for them, charging for the flip.
+    @Test
+    void chargingToFlipOurCommoditiesEndsTheFloat() {
+        TradeTable table = boatFloatTable();
+        AiTurnContext context = nekroTurn(table);
+
+        FriendlyTrade.observeOffer(context, table.sol, ourCommoditiesFor(2, 2));
+        assertThat(floatsSol(table)).isTrue();
+
+        FriendlyTrade.observeOffer(context, table.sol, ourCommoditiesFor(2, 1));
+        assertThat(floatsSol(table)).isFalse();
+    }
+
+    // After following Sol's Trade, a bill of X-1 is friendly and X-2 is not.
+    @Test
+    void aTradeBillAboveXMinusOneEndsTheFloat() {
+        TradeTable friendly = solPlayedTrade(boatFloatTable());
+        FriendlyTrade.observeOffer(nekroTurn(friendly), friendly.sol, ourCommoditiesFor(4, 3));
+        assertThat(floatsSol(friendly)).isTrue();
+
+        TradeTable charging = solPlayedTrade(boatFloatTable());
+        FriendlyTrade.observeOffer(nekroTurn(charging), charging.sol, ourCommoditiesFor(4, 2));
+        assertThat(floatsSol(charging)).isFalse();
+    }
+
+    // A standard seat records nothing.
+    @Test
+    void theStandardPersonalityKeepsNoLedger() {
+        TradeTable table = TradeTable.withAiSol();
+        table.nekroAndSolNeighbour();
+        FriendlyTrade.observeOffer(nekroTurn(table), table.sol, ourCommoditiesFor(2, 1));
+
+        assertThat(FriendlyTrade.snubbedBy(table.nekro, table.sol)).isFalse();
     }
 }
