@@ -160,6 +160,31 @@ class ReadyForDiceTest extends BaseTi4Test {
                 .isEqualTo("announceReadyForDice_black_blue");
     }
 
+    // A later combat at the same system opens its own thread, and both trackers start again at round 0. The
+    // declaration used to be remembered by system, holder and round only, so the second combat looked declared: in
+    // self-play the defender never declared or rolled, and the stall detector timed out on it in a live combat.
+    @Test
+    void declaresAgainInALaterCombatAtTheSameSystem() {
+        long first = decisionMoment(test.contextAt(NOW, readyButton(), roll("space")), noCard);
+        next(test.contextAt(first, readyButton(), roll("space")), noCard);
+        long later = NOW + 3_600_000L;
+        AiPrompt laterButton =
+                inThread("later-thread", "later-ready-button", later - 5_000L, "", "announceReadyForDice_black_blue");
+        AiPrompt laterRoll =
+                inThread("later-thread", "later-roll", later, "Round started", "combatRoll_" + position + "_space");
+
+        long moment = decisionMoment(test.contextAt(later, laterButton, laterRoll), noCard);
+
+        assertThat(pressedId(next(test.contextAt(moment, laterButton, laterRoll), noCard)
+                        .orElseThrow()))
+                .isEqualTo("announceReadyForDice_black_blue");
+    }
+
+    private AiPrompt inThread(String thread, String id, long created, String content, String... customIds) {
+        AiPrompt base = prompt(id, PromptSource.COMBAT_THREAD, created, customIds);
+        return new AiPrompt(thread, id, PromptSource.COMBAT_THREAD, content, base.buttons(), created);
+    }
+
     @Test
     void waitsForAHumanOpponentToBeReadyThenRollsAtOnce() {
         long moment = decisionMoment(test.contextAt(NOW, readyButton(), roll("space")), noCard);
@@ -180,10 +205,34 @@ class ReadyForDiceTest extends BaseTi4Test {
         long moment = decisionMoment(test.contextAt(NOW, readyButton(), roll("space")), noCard);
         next(test.contextAt(moment, readyButton(), roll("space")), noCard);
         AiPrompt stale = declaredTo(test.nekro, NOW - 60_000L);
+        AiPrompt previousRoundRolled = message("header-1", NOW - 30_000L, "## __Start of Combat Round #1__");
 
-        assertThat(next(test.contextAt(moment + 3_000L, readyButton(), roll("space"), stale), noCard)
+        assertThat(next(
+                                test.contextAt(
+                                        moment + 3_000L, readyButton(), roll("space"), stale, previousRoundRolled),
+                                noCard)
                         .orElseThrow())
                 .isInstanceOf(AiDecision.Wait.class);
+    }
+
+    // In self-play the defender declared a few seconds before the attacker fired anti-fighter barrage. The attacker
+    // only counted declarations newer than the thread's newest message, so the barrage result hid the defender's
+    // declaration and the attacker waited the full three minutes while the stall detector timed out on the defender.
+    @Test
+    void aDeclarationBeforeAntiFighterBarrageStillCounts() {
+        test = AiTestGame.withSolAi();
+        arrange();
+        AiPrompt defenderReady = declaredTo(test.nekro, NOW - 2_000L);
+        AiPrompt barrage = message("afb", NOW + 1_000L, "<Sol> rolls for ANTI-FIGHTER BARRAGE");
+        long moment = decisionMoment(
+                test.contextAt(NOW + 1_000L, readyButton(), roll("space"), defenderReady, barrage), noCard);
+        next(test.contextAt(moment, readyButton(), roll("space"), defenderReady, barrage), noCard);
+
+        assertThat(pressedId(next(
+                                test.contextAt(moment + 1_000L, readyButton(), roll("space"), defenderReady, barrage),
+                                noCard)
+                        .orElseThrow()))
+                .isEqualTo("combatRoll_" + position + "_space");
     }
 
     @Test
