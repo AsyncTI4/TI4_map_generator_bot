@@ -448,7 +448,7 @@ Table talk and Support for the Throne swaps come in milestone 12.
 - **Price:** `clamp(reserve + 1, 1, gain × share)`, under a per-agenda cap (your caps: Veto 1-3 TG, Quash 3-5 TG).
 - **Transaction rule (LRR 94.6, `docs/rules/reference/transactions.md:17`):** one transaction with each other player per agenda. A vote payment is that pair's single transaction for the agenda. An up-front payment and an after-vote payment are exclusive, and the payment must not be bundled with any other deal with that seat in the same agenda. Keep `TradeLegality.window` (`TradeLegality.java:95-107`) as the guard, with no windowless purpose. If after-vote settlement is used for humans (through the button deal card), it is the only leg, or it moves to the next legal window.
 - **Waiting:** reuse whatever hold the audit branch's deals use. If there isn't one, add a bounded wait (about 3 min with AIs, 10 min with humans) with a hard give-up, and test that agendas never stall (cf. the earlier 24 h Veto stall).
-- **Deferred until A/B shows the simple loop helps:** avoidance bribes on Public Execution and Colonial Redistribution, vote extortion beyond riders (rider extortion is done, see the traces-4b notes below), and Hacan commander pricing.
+- **Deferred until A/B shows the simple loop helps:** vote extortion beyond riders (rider extortion is done, see the traces-4b notes below), and Hacan commander pricing.
 - **Tests:** in the `PromiseDealsTest` / `PromisedVotesTest` style:
   - The buyer picks the cheapest sufficient seller.
   - The seller accepts only at or above its reserve.
@@ -456,6 +456,9 @@ Table talk and Support for the Throne swaps come in milestone 12.
   - One pair never makes two transactions in one agenda.
   - A hold times out cleanly.
 - **Risk:** humans can't be read (`OfferResponder` strips human `DETAILS`, `Stinginess.java:146-151`), and promises aren't binding. So prices are capped, and human deals go through an explicit button deal card with a trust ledger.
+
+- **Done (2026-11-15, behind the new `AVOIDANCE_BRIBES`): avoidance bribes on Public Execution and Colonial Redistribution** (`ti4.ai.trade.AvoidanceBribes`). A new promise term `NOT_FOR`: the promiser does not vote for the target outcome (it abstains or votes anything else). In the voting phase of those two agendas, a seat whose own forecast has an outcome at least 10% likely and at least 2 TG worse than the average of the other outcomes (its own name, or its planet) offers each seat that has not voted, whose best ballot in the payer's forecast is that outcome, a price not to vote for it (at most 2 offers per agenda, one deal per pair). Gain and cost compare the seller's best ballot with and without the outcome barred (whole castable stack, less the kept-vote price); the price and the fallback to debt or promissory notes reuse pay-the-answerer's builder. Payment is on resolution, owed only if the target does not win; voting the target breaks the promise. `BallotPlanner` leaves a barred outcome out, and a ballot already planned for it is replanned. The seller accepts when the payment, weighted by the chance the target loses and its trust in the payer, beats its cost. The forecast does not place the promise for other viewers. Tests: `AvoidanceBribesTest`. Trace: the per-seat "pay the answerer" line adds an AVOIDANCE BRIBE note, and each unvoted seat gets an "avoidance bribe at X's ballot" line (what it dreads, the seller's best ballot, gain, cost and the offer); `-Dai.selfplay.roundtwo.keeptop=true` restacks the topagendas each action phase, since Politics holders bury Public Execution.
+- Not done: human sellers beyond the existing deal card, a payer bidding against a rival's VOTE_FOR purchase on its name, and other agendas with one dreaded outcome.
 
 ### Review fixes and open findings (2026-11-12, self-play traces)
 - **Done:**
@@ -631,3 +634,6 @@ Start only after milestones 10-11 show gains in A/B. Each item is built on the `
 | 13 Arbiter, Prophecy and Research Grant use side | S-M |
 
 Milestone 1a, milestone 3 and milestone 13 can ship on unit tests alone. Milestone 1's value table ships behind its flag after the milestone 2 baseline. Milestone 4 lands before milestones 5 through 12.
+## Table-wide debt limit (2026-11-15, user's rule)
+
+- **Done:** an AI never offers or accepts a deal that leaves one player owing 3 or more debt across the whole table. `DebtRules.room(debtor, creditor)` is the gate: the per-creditor cap of 4 and `TABLE_DEBT_LIMIT` 2 in total, counting the debtor's tokens held by every other seat plus debt promised in unpaid pay-on-resolution deals (`PromiseDeals.promisedDebt`). It covers the AI as debtor (loans, Facilitation, technology requests, counter-offers, promise payments) and as creditor (`TradeValue.theirSideCovered`, `PromiseDeals.accepts`). Trade follow fees use it only when the fee is paid in debt (the holder is not paid on the spot). Tests: `DebtRulesTest`, `PaymentValueTest`, `OfferResponderTest`.

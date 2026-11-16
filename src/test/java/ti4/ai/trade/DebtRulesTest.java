@@ -212,10 +212,11 @@ class DebtRulesTest extends BaseTi4Test {
                 .orElse("");
     }
 
-    // Nekro owes Sol 3, so it may sign at most 1 more over to Sol: no package it builds asks for more.
+    // The user's rule (2026-11-15): no deal may leave one player owing 3 or more debt across the whole table. Nekro
+    // owes Sol 1, so it may sign at most 1 more over: no package it builds asks for more.
     @Test
-    void neverOwesOneCreditorMoreThanFour() {
-        TradeTable table = owing(3);
+    void neverOwesThreeOrMoreAcrossTheTable() {
+        TradeTable table = owing(1);
         table.stock(table.nekro, 0, 0);
         table.stock(table.sol, 0, 4);
 
@@ -224,8 +225,52 @@ class DebtRulesTest extends BaseTi4Test {
         assertThat(packages)
                 .allSatisfy(candidate ->
                         assertThat(candidate.total("nekro", ItemType.SEND_DEBT)).isLessThanOrEqualTo(1));
-        TradeTable full = owing(4);
+        TradeTable full = owing(2);
         assertThat(DebtRules.room(full.nekro, full.sol)).isZero();
+    }
+
+    // The user's example: Sol owes Hacan 2, so Xxcha must refuse 2 more debt from Sol (4 across the table), and even
+    // 1 more (3). With nothing owed elsewhere, 2 is fine.
+    @Test
+    void debtOwedToOneSeatLeavesNoRoomWithAnother() {
+        TradeTable table = TradeTable.withAiSol();
+        Player hacan = table.aiSeat("hacan", "yellow");
+        Player xxcha = table.secondAiSeat("xxcha", "red");
+        Deal twoDebt = Deal.EMPTY.adjust("sol", "xxcha", ItemType.SEND_DEBT, 2);
+        Deal oneDebt = Deal.EMPTY.adjust("sol", "xxcha", ItemType.SEND_DEBT, 1);
+
+        assertThat(TradeValue.theirSideCovered(xxcha, table.sol, twoDebt)).isTrue();
+
+        hacan.addDebtTokens(table.sol.getColor(), 2);
+        assertThat(DebtRules.room(table.sol, xxcha)).isZero();
+        assertThat(TradeValue.theirSideCovered(xxcha, table.sol, twoDebt)).isFalse();
+        assertThat(TradeValue.theirSideCovered(xxcha, table.sol, oneDebt)).isFalse();
+    }
+
+    // Debt promised in a pay-on-resolution deal counts before it is sent.
+    @Test
+    void promisedDebtCountsTowardTheLimit() {
+        TradeTable table = TradeTable.withAiSol();
+        ti4.ai.promise.Promise promise = ti4.ai.promise.Promise.offer(
+                        table.game,
+                        ti4.ai.promise.Promise.Term.VOTE_FOR,
+                        table.sol,
+                        table.nekro,
+                        table.nekro,
+                        "",
+                        "for",
+                        0,
+                        0,
+                        NOW,
+                        NOW + 60_000)
+                .with(ti4.ai.promise.Promise.Status.OWED);
+        ti4.ai.promise.PromiseBook.save(table.game, promise);
+        ti4.ai.promise.PromisePayment.attach(
+                table.game, promise.id(), new ti4.ai.promise.PromisePayment(0, 2, List.of()));
+
+        assertThat(DebtRules.owedAcrossTable(table.nekro, "")).isEqualTo(2);
+        assertThat(DebtRules.room(table.nekro, table.sol)).isZero();
+        assertThat(DebtRules.room(table.nekro, table.sol, promise.id())).isEqualTo(2);
     }
 
     private static AiTurnContext turnContext(TradeTable table) {

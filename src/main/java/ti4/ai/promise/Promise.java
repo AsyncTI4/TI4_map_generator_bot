@@ -28,9 +28,14 @@ public record Promise(
     public enum Term {
         VOTE_FOR,
         NOT_AGAINST,
+        NOT_FOR,
         NO_ATTACK,
         STAY_OUT,
-        DISCARD_AGENDA
+        DISCARD_AGENDA;
+
+        public boolean aboutVotes() {
+            return this == VOTE_FOR || this == NOT_AGAINST || this == NOT_FOR;
+        }
     }
 
     public enum Status {
@@ -153,7 +158,7 @@ public record Promise(
     }
 
     public boolean aboutVotes() {
-        return term == Term.VOTE_FOR || term == Term.NOT_AGAINST;
+        return term.aboutVotes();
     }
 
     public boolean territorial() {
@@ -183,7 +188,7 @@ public record Promise(
     public boolean forbidsActivating(Game game, Tile tile) {
         if (tile == null) return false;
         return switch (term) {
-            case VOTE_FOR, NOT_AGAINST, DISCARD_AGENDA -> false;
+            case VOTE_FOR, NOT_AGAINST, NOT_FOR, DISCARD_AGENDA -> false;
             case STAY_OUT -> target.equals(tile.getPosition());
             case NO_ATTACK -> {
                 Player victim = game.getPlayerFromColorOrFaction(promisee);
@@ -202,7 +207,7 @@ public record Promise(
 
     private List<String> watchedPositions(Game game, Player by, Player to) {
         return switch (term) {
-            case VOTE_FOR, NOT_AGAINST, DISCARD_AGENDA -> List.of();
+            case VOTE_FOR, NOT_AGAINST, NOT_FOR, DISCARD_AGENDA -> List.of();
             case STAY_OUT -> {
                 Tile tile = game.getTileByPosition(target);
                 yield tile == null || tile.hasPlayerCC(by) ? List.of() : List.of(target);

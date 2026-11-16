@@ -50,7 +50,10 @@ class BallotPlanner {
         boolean spendsTheLastVote = keep < available && AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE);
         int cap = spendsTheLastVote ? available : keep;
         if (cap <= 0) return Optional.empty();
-        List<String> outcomes = AgendaOutcomes.of(game);
+        Optional<String> avoided = PromisedVotes.avoided(game, seat);
+        List<String> outcomes = AgendaOutcomes.of(game).stream()
+                .filter(outcome -> avoided.filter(outcome::equalsIgnoreCase).isEmpty())
+                .toList();
         if (outcomes.isEmpty()) return Optional.empty();
         AgendaForecast forecast = AgendaForecast.of(game, seat);
         if (forecast.isEmpty()) {

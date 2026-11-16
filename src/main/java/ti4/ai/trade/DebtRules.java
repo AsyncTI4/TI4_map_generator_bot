@@ -19,6 +19,7 @@ import ti4.game.Player;
 class DebtRules {
 
     static final int DEBT_CAP = 4;
+    static final int TABLE_DEBT_LIMIT = 2;
     static final String PAY_PREFIX = "sendTGTo_";
     private static final String SEPARATOR = "_";
     private static final int BULK = 3;
@@ -42,7 +43,22 @@ class DebtRules {
     }
 
     static int room(Player debtor, Player creditor) {
-        return Math.max(0, DEBT_CAP - creditor.getDebtTokenCount(debtor.getColor()));
+        return room(debtor, creditor, "");
+    }
+
+    static int room(Player debtor, Player creditor, String exceptPromiseId) {
+        int pair = Math.max(0, DEBT_CAP - creditor.getDebtTokenCount(debtor.getColor()));
+        return Math.min(pair, Math.max(0, TABLE_DEBT_LIMIT - owedAcrossTable(debtor, exceptPromiseId)));
+    }
+
+    static int owedAcrossTable(Player debtor, String exceptPromiseId) {
+        Game game = debtor.getGame();
+        if (game == null) return 0;
+        int held = game.getRealPlayers().stream()
+                .filter(creditor -> creditor != debtor)
+                .mapToInt(creditor -> creditor.getDebtTokenCount(debtor.getColor()))
+                .sum();
+        return held + PromiseDeals.promisedDebt(game, debtor, exceptPromiseId);
     }
 
     static Optional<AiDecision> payInAgenda(AiTurnContext context) {

@@ -75,6 +75,14 @@ public class TradeRules {
         return AnswererDeals.explain(game, payer);
     }
 
+    public static Optional<String> explainAvoidanceBribeAt(Game game, Player payer, Player seller) {
+        return AvoidanceBribes.explainAt(game, payer, seller);
+    }
+
+    public static Optional<String> explainAvoidanceBribe(Game game, Player payer) {
+        return AvoidanceBribes.explainOnItsAgendas(game, payer);
+    }
+
     public static Optional<AiDecision> holdVoteForDeals(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         return OwnTurnDeals.holdVoteForDeals(context);

@@ -113,6 +113,7 @@ class OwnTurnDeals {
         return payDebt(context, creditors)
                 .or(() -> collect(context, partners))
                 .or(() -> timed("trade.votePromises", () -> PromiseDeals.proposeVotes(context, partners)))
+                .or(() -> timed("trade.avoidanceBribes", () -> AvoidanceBribes.propose(context, partners)))
                 .or(() -> wash(
                         context,
                         partners,
