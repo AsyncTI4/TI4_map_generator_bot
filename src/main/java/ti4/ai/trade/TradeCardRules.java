@@ -21,7 +21,6 @@ import ti4.ai.brain.AiMemory;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.PaymentRules;
-import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -332,8 +331,7 @@ public class TradeCardRules {
     }
 
     private static boolean couldWinWith(Game game, Player player, int tradeGoods) {
-        int points = SpendUnlock.pointDelta(game, player, tradeGoods);
-        return points > 0 && Standings.vp(player) + points >= Standings.goal(game);
+        return FriendlyTrade.couldWinWith(game, player, tradeGoods);
     }
 
     private static boolean holdsOwnAgreement(Player seat) {

@@ -81,6 +81,7 @@ class OwnTurnDeals {
                 .or(() -> timed("trade.extortion", () -> Extortion.propose(context, partners)))
                 .or(() -> timed("trade.promises", () -> PromiseDeals.proposeOwnTurn(context, partners)))
                 .or(() -> timed("trade.wash", () -> wash(context, partners, partner -> true)))
+                .or(() -> timed("trade.friendlyFlip", () -> FriendlyTrade.offerFlip(context, partners)))
                 .or(() -> timed(
                         "trade.noteProposals",
                         () -> TradeCardRules.holdsUnplayedTrade(context.game(), context.seat())

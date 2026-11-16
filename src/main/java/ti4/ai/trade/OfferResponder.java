@@ -112,6 +112,7 @@ class OfferResponder {
             return Verdict.honoured();
         }
         if (acceptsAgentOrFacilitation(context, offerer, deal)) return Verdict.accepted();
+        if (FriendlyTrade.acceptsFlip(context, offerer, deal)) return Verdict.accepted();
         if (DebtRules.owedCollection(context, offerer, deal)) return collection(context, offerer, deal);
         if (DebtRules.repays(context, offerer, deal) && TradeValue.commitmentOk(context, offerer, deal)) {
             return Verdict.accepted();

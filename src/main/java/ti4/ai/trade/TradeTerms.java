@@ -28,6 +28,7 @@ public class TradeTerms {
     private static final String LEADER = "leads";
     private static final String UNPAID = "unpaid debts";
     private static final String WOULD_SCORE = "it would let them score";
+    private static final String COULD_WIN = "it could let them win";
     private static final String NOT_OFFERED_FALLBACK = "no terms";
     private static final String ENTRIES = ",";
     private static final String VALUE = "=";
@@ -45,15 +46,18 @@ public class TradeTerms {
                 || exclusionReason(game, holder, follower, trust).isPresent()) {
             return Optional.empty();
         }
-        return Optional.of(fee(holder, follower, trust));
+        return Optional.of(fee(game, holder, follower, trust));
     }
 
     public static Optional<String> exclusionReason(Game game, Player holder, Player follower, double trust) {
         if (Stinginess.nearWin(game, follower)) return Optional.of(NEAR_WIN);
+        int payout = follower.getCommoditiesTotal() - fee(game, holder, follower, trust);
+        if (FriendlyTrade.chargesOneLess(game, holder, follower, trust)) {
+            return FriendlyTrade.couldWinWith(game, follower, payout) ? Optional.of(COULD_WIN) : Optional.empty();
+        }
         double rivalry = Stinginess.rivalry(game, holder, follower);
         if (rivalry >= LEADS) return Optional.of(LEADER);
         if (trust < Trust.FREE_FOLLOW) return Optional.of(UNPAID);
-        int payout = follower.getCommoditiesTotal() - fee(holder, follower, trust);
         if (rivalry >= MAY_SCORE && payout > 0 && SpendUnlock.pointDelta(game, follower, payout) > 0) {
             return Optional.of(WOULD_SCORE);
         }
@@ -91,8 +95,10 @@ public class TradeTerms {
         return terms;
     }
 
-    static int fee(Player holder, Player follower, double trust) {
+    static int fee(Game game, Player holder, Player follower, double trust) {
         int stack = follower.getCommoditiesTotal();
+        if (FriendlyTrade.chargesOneLess(game, holder, follower, trust))
+            return Math.max(0, Math.min(LOW_FEE, stack - 1));
         boolean high = stack >= LARGE_STACK || Standings.vp(follower) > Standings.vp(holder) || trust < Trust.LOWER_FEE;
         return Math.max(0, Math.min(high ? HIGH_FEE : LOW_FEE, stack - 1));
     }
