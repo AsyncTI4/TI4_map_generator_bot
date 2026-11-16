@@ -442,6 +442,7 @@ public final class TIGLHelper {
                 .map(r -> roleIdToRank.get(r.getIdLong()))
                 .filter(Objects::nonNull)
                 .filter(r -> r.belongsToLadder(isFractured))
+                .filter(r -> r.getIndex() >= 0)
                 .sorted(Comparator.comparing(TIGLRank::getIndex))
                 .toList();
     }
