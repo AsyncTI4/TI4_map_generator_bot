@@ -130,9 +130,11 @@ public final class AgendaHelper {
                 if (p2.getDebtTokenCount(player.getColor()) >= 3 && player.getTg() >= 3) {
                     buttons.add(Buttons.green("sendTGTo_" + p2.getFaction() + "_tg3", "Send 3 Trade Goods"));
                 }
-                buttons.add(Buttons.blue("sendTGTo_" + p2.getFaction() + "_debt", "Erase 1 Debt"));
+                buttons.add(
+                        Buttons.blue("sendTGTo_" + p2.getFaction() + "_debt_" + player.getFaction(), "Erase 1 Debt"));
                 if (p2.getDebtTokenCount(player.getColor()) >= 3) {
-                    buttons.add(Buttons.blue("sendTGTo_" + p2.getFaction() + "_debt3", "Erase 3 Debt"));
+                    buttons.add(Buttons.blue(
+                            "sendTGTo_" + p2.getFaction() + "_debt3_" + player.getFaction(), "Erase 3 Debt"));
                 }
                 buttons.add(Buttons.DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -141,9 +143,17 @@ public final class AgendaHelper {
     }
 
     @ButtonHandler("sendTGTo_")
-    public static void erase1DebtTo(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
-        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String tgOrDebt = buttonID.split("_")[2];
+    public static void erase1DebtTo(Game game, String buttonID, ButtonInteractionEvent event, Player presser) {
+        String[] parts = buttonID.split("_");
+        Player p2 = game.getPlayerFromColorOrFaction(parts[1]);
+        Player player = presser;
+        if (parts.length > 3 && presser == p2) {
+            Player debtor = game.getPlayerFromColorOrFaction(parts[3]);
+            if (debtor != null) {
+                player = debtor;
+            }
+        }
+        String tgOrDebt = parts[2];
         int amount = tgOrDebt.endsWith("3") ? 3 : 1;
         tgOrDebt = tgOrDebt.replace("3", "");
         p2.clearDebt(player, amount);
