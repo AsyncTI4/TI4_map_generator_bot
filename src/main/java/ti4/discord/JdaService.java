@@ -39,7 +39,6 @@ import ti4.contest.replay.core.CombatContestSettings;
 import ti4.cron.AutoPingCron;
 import ti4.cron.BothelperDashboardCron;
 import ti4.cron.CardsInfoPinCleanupCron;
-import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.DiskUsageCron;
@@ -356,7 +355,6 @@ public class JdaService {
         }
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
-        CategoryCleanupCron.register();
         BothelperDashboardCron.register();
     }
 
