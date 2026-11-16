@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -996,17 +997,19 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    private static Set<String> getTilesAdjacentToGheminaLadyAndFlagship(Player player, Game game) {
+        Set<String> adjacentTiles = new LinkedHashSet<>();
+        for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
+                game, player, UnitType.Lady, UnitType.Flagship)) {
+            adjacentTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
+        }
+        return adjacentTiles;
+    }
+
     public static List<Button> getButtonsForGheminaLadyHero(Player player, Game game) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                game, player, UnitType.Lady, UnitType.Flagship);
-        Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
-                game, tilesWithBombard.getFirst().getPosition(), player, false);
-        for (Tile tile : tilesWithBombard) {
-            adjacentTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
-        }
-        for (String pos : adjacentTiles) {
+        for (String pos : getTilesAdjacentToGheminaLadyAndFlagship(player, game)) {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
@@ -1026,14 +1029,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getButtonsForGheminaLordHero(Player player, Game game) {
         String factionChecker = player.factionButtonChecker();
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tilesWithBombard = CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                game, player, UnitType.Lady, UnitType.Flagship);
-        Set<String> adjacentTiles = FoWHelper.getAdjacentTilesAndNotThisTile(
-                game, tilesWithBombard.getFirst().getPosition(), player, false);
-        for (Tile tile : tilesWithBombard) {
-            adjacentTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
-        }
-        for (String pos : adjacentTiles) {
+        for (String pos : getTilesAdjacentToGheminaLadyAndFlagship(player, game)) {
             Tile tile = game.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
