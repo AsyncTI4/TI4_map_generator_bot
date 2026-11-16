@@ -23,6 +23,7 @@ class ReadyForDice {
     static final long POLL_MILLIS = TimeUnit.SECONDS.toMillis(10);
     private static final String DECLARED = "declared";
     private static final String DECLARATION_TEXT = "no more abilities to resolve";
+    private static final String ROUND_HEADER = "Start of Combat Round #";
     private static final long AI_DELAY_MIN_MILLIS = TimeUnit.SECONDS.toMillis(3);
     private static final long AI_DELAY_SPREAD_MILLIS = TimeUnit.SECONDS.toMillis(7) + 1;
     private static final long HUMAN_DELAY_MIN_MILLIS = TimeUnit.SECONDS.toMillis(15);
@@ -49,7 +50,8 @@ class ReadyForDice {
         long startedAt = startedAt(prompts, rollPrompt.channelId());
         boolean onlyAi = opponents.stream().allMatch(AiSeats::isAiSeat);
         return Optional.of(new Round(
-                "ready|" + moment.position() + "@" + moment.holder() + "#" + moment.round(),
+                "ready|" + rollPrompt.channelId() + "|" + moment.position() + "@" + moment.holder() + "#"
+                        + moment.round(),
                 moment,
                 ready.get(),
                 "declare ready to throw dice",
@@ -63,7 +65,8 @@ class ReadyForDice {
         boolean onlyAi = opponents.stream().allMatch(AiSeats::isAiSeat);
         long startedAt = confirmation.prompt().createdAtMillis();
         return new Round(
-                "automation|" + moment.position() + "@" + moment.holder() + "#" + moment.round(),
+                "automation|" + confirmation.prompt().channelId() + "|" + moment.position() + "@" + moment.holder()
+                        + "#" + moment.round(),
                 moment,
                 confirmation,
                 "automate ground combat",
@@ -122,11 +125,21 @@ class ReadyForDice {
     }
 
     private static boolean opponentReady(List<AiPrompt> prompts, Player seat, Round round) {
+        long previousRoundRolled = newestRoundHeader(prompts, round.channelId());
         return prompts.stream()
                 .filter(prompt -> prompt.channelId().equals(round.channelId()))
-                .filter(prompt -> prompt.createdAtMillis() > round.startedAt())
+                .filter(prompt -> prompt.createdAtMillis() > previousRoundRolled)
                 .filter(ReadyForDice::isDeclaration)
                 .anyMatch(prompt -> Prompts.mentions(prompt, seat));
+    }
+
+    private static long newestRoundHeader(List<AiPrompt> prompts, String channelId) {
+        return prompts.stream()
+                .filter(prompt -> prompt.channelId().equals(channelId))
+                .filter(prompt -> prompt.content().contains(ROUND_HEADER))
+                .mapToLong(AiPrompt::createdAtMillis)
+                .max()
+                .orElse(0L);
     }
 
     private static long startedAt(List<AiPrompt> prompts, String channelId) {
