@@ -80,6 +80,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.On
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -1910,6 +1911,10 @@ public class StartCombatService {
         }
 
         if (isSpaceCombat) {
+            BeansMonumentHandler.addPlateauOfLengCombatButton(buttons, game, p1);
+            if (p2 != p1) {
+                BeansMonumentHandler.addPlateauOfLengCombatButton(buttons, game, p2);
+            }
             BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p1, p2, tile);
             BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p2, p1, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);
@@ -1919,6 +1924,10 @@ public class StartCombatService {
         }
 
         if (isGroundCombat) {
+            BeansMonumentHandler.addHearthHomeCombatButton(buttons, game, p1);
+            if (p2 != p1) {
+                BeansMonumentHandler.addHearthHomeCombatButton(buttons, game, p2);
+            }
             ChoirUnitHandler.addElegyCombatButton(buttons, game, p1, tile);
             ChoirUnitHandler.addElegyCombatButton(buttons, game, p2, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);

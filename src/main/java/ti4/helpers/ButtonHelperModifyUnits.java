@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -1518,12 +1519,14 @@ public final class ButtonHelperModifyUnits {
         ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
         MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
         MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
+        BeansMonumentHandler.checkSpaceMonumentBlockades(game, event);
         Tile tile = null;
         if (buttonID.contains("_")) {
             tile = game.getTileByPosition(buttonID.split("_")[1]);
         } else {
             tile = game.getTileByPosition(game.getActiveSystem());
         }
+        BeansMonumentHandler.offerValhavnMonumentPdsMove(game, player, tile);
         TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
             LoreService.showPlanetLore(player, game, unitHolder.getName(), LoreService.TRIGGER.MOVED);

@@ -83,6 +83,7 @@ import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonH
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -187,6 +188,7 @@ public final class ButtonHelperTacticalAction {
                     buttons);
         }
         Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        BeansMonumentHandler.offerMigoMonumentExplore(game, player);
         if (DeepUnitHandler.hasArbiterInSystem(player, activeTile)) {
             ButtonHelper.resolveFullFrontierExplore(game, player, activeTile, event);
         }
@@ -645,6 +647,7 @@ public final class ButtonHelperTacticalAction {
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
             MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
             MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
+            BeansMonumentHandler.checkSpaceMonumentBlockades(game, event);
         }
     }
 
@@ -807,6 +810,7 @@ public final class ButtonHelperTacticalAction {
         MorphaUnitHandler.clearCytoplasmicTransports(game);
         MorphaAbilityHandler.clearHydrosphericExtraction(game);
         HydromorphicCardHandler.clearTacticalActionEffects(game);
+        BeansMonumentHandler.clearNatauMonumentAnomaly(game);
         RefractureRulesService.clearTacticalState(game);
         GameEventDraft.clear(game);
 
@@ -1048,6 +1052,7 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (game.isMonumentsMode()) {
+            BeansMonumentHandler.offerNatauMonumentAnomaly(game, player, tile);
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {

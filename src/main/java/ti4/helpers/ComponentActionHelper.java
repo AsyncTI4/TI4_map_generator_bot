@@ -31,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.Tyr
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -618,6 +619,13 @@ public class ComponentActionHelper {
 
         // Monuments
         if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentReady(game, p1, "ta_monument")) {
+                compButtons.add(BeansMonumentHandler.getTaMonumentButton(p1));
+            }
+            if (MonumentsService.isMonumentReady(game, p1, "crystellum_monument")
+                    && p1.getNombox().getUnitCount(UnitType.Fighter, p1) >= 3) {
+                compButtons.add(BeansMonumentHandler.getCrystellumMonumentButton(p1));
+            }
             if (MonumentsService.isMonumentOnBoard(game, p1, "argent_monument")
                     && MonumentsService.isMonumentReady(game, p1, "argent_monument")) {
                 compButtons.add(MonumentsPoKButtonHandler.getPhoenixCauldronButton(p1));

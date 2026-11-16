@@ -46,6 +46,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morpha.MorphaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionUnitHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.commands.CommandHelper;
@@ -944,6 +945,7 @@ public class ActionCardHelper {
         MonumentsButtonHandler.gainKVDTradeGoods(game, player, actionCardTitle);
 
         if (actionCardIsCancelable) {
+            BeansMonumentHandler.offerNetrunnersMonumentCancellation(game, player, actionCardTitle);
             for (Player empy : game.getRealPlayers()) {
                 if (!empy.hasUnit("empyrean_mech")
                         || !ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)

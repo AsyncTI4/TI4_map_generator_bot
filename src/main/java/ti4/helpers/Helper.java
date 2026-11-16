@@ -74,6 +74,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -2548,6 +2549,7 @@ public final class Helper {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 productionValueTotal += getProductionValueOfUnitHolder(player, game, tile, uH);
             }
+            productionValueTotal += BeansMonumentHandler.getIronTideProductionBonus(player, tile);
             if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile)) {
                 productionValueTotal += 3;
             }
@@ -2791,6 +2793,8 @@ public final class Helper {
             cost = Math.max(0, cost - MigoHarvestHandler.getYellowHarvestProductionDiscount(game, player));
             cost = Math.max(0, cost - ThirtyKExploreHooks.productionDiscount(game, producedUnits));
             if (game.isMonumentsMode()) {
+                cost = Math.max(
+                        0, cost - BeansMonumentHandler.getIronTideProductionDiscount(game, player, producedUnits));
                 if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
                     Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");
 
@@ -2870,9 +2874,11 @@ public final class Helper {
             Tile tile,
             String warfareNOtherstuff,
             String placePrefix) {
+        BeansMonumentHandler.clearIronTideProduction(player);
         List<Button> veiledNetworkingButtons = XinTechHandler.getVeiledNetworkingStarProductionButtons(
                 game, player, tile, warfareNOtherstuff, placePrefix);
         if (!veiledNetworkingButtons.isEmpty()) {
+            BeansMonumentHandler.offerIronTideProduction(game, player, tile);
             return veiledNetworkingButtons;
         }
         List<Button> unitButtons = new ArrayList<>();
@@ -3337,6 +3343,7 @@ public final class Helper {
 
         MigoHarvestHandler.addYellowHarvestButton(unitButtons, game, player, tile);
         BloomBreakthroughHandler.addMycelialBridgesProductionButtons(event, unitButtons, game, player, tile);
+        BeansMonumentHandler.offerIronTideProduction(game, player, tile);
         return unitButtons;
     }
 
