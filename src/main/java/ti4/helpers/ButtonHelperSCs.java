@@ -1955,7 +1955,7 @@ public final class ButtonHelperSCs {
             key = "potentialBlockers";
             if (game.getStoredValue(key).contains(player.getFaction() + "*")) {
                 game.setStoredValue(key, game.getStoredValue(key).replace(player.getFaction() + "*", ""));
-                Helper.resolveQueue(game);
+                Helper.resolveQueueSavingFirst(game, "Imperial queue drawn after declining to follow");
             }
         }
         int scNum2 = scNum;
