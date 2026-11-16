@@ -7,6 +7,11 @@ import ti4.discord.JdaService;
 import ti4.logging.BotLogger;
 import ti4.spring.service.deploy.ActiveLeaseService;
 
+// TODO: Disabled 2026-11-16, register() is no longer called from JdaService.startBot. Until #6088 the
+// 6h-after-boot delay meant it almost never fired; its first fixed-time run deleted 56 PBD categories at
+// once, some still in use, because it trusts the cached getChannels(). EndGameService already deletes a
+// game's category when its last channels leave. Re-enable only with a check that no game still maps to
+// the category. Recover with /developer restore_game_categories.
 @UtilityClass
 public class CategoryCleanupCron {
 
