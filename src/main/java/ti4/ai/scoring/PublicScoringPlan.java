@@ -5,13 +5,25 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.SearchMemo;
+import ti4.ai.brain.StrategyCard;
 import ti4.game.Game;
 import ti4.game.Player;
 
 @UtilityClass
 class PublicScoringPlan {
 
+    private static final String WINNU_HERO = "winnuhero";
+
     private record Spend(int points, SpendCost cost) {}
+
+    static int slots(Game game, Player player) {
+        return ScoringReserve.scoringChances(game, player) + (imperialThroughWinnuHero(game, player) ? 1 : 0);
+    }
+
+    private static boolean imperialThroughWinnuHero(Game game, Player player) {
+        return player.hasLeaderUnlocked(WINNU_HERO)
+                && game.getSCList().stream().anyMatch(card -> StrategyCard.of(game, card) == StrategyCard.IMPERIAL);
+    }
 
     static int points(Game game, Player player, int slots) {
         if (slots <= 0) return 0;

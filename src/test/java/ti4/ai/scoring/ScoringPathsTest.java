@@ -86,6 +86,42 @@ class ScoringPathsTest extends BaseTi4Test {
                 .isEqualTo(3);
     }
 
+    private void giveWinnuHero(boolean unlocked) {
+        test.nekro.addLeader("winnuhero");
+        test.nekro.getLeader("winnuhero").orElseThrow().setLocked(!unlocked);
+    }
+
+    @Test
+    void unlockedWinnuHeroScoresASecondPublicThroughImperial() {
+        reveal("centralize_trade");
+        reveal("trade_routes");
+        test.nekro.setTg(15);
+        giveWinnuHero(true);
+        assertThat(ScoringPaths.readyPoints(test.game, test.nekro)).isEqualTo(3);
+        assertThat(ScoringStakes.pointsInReach(test.game, test.nekro, test.nekro))
+                .isEqualTo(3);
+    }
+
+    @Test
+    void lockedWinnuHeroAddsNoScoringSlot() {
+        reveal("centralize_trade");
+        reveal("trade_routes");
+        test.nekro.setTg(15);
+        giveWinnuHero(false);
+        assertThat(ScoringPaths.readyPoints(test.game, test.nekro)).isEqualTo(2);
+    }
+
+    @Test
+    void winnuHeroAddsNoScoringSlotWithoutImperialInTheGame() {
+        reveal("centralize_trade");
+        reveal("trade_routes");
+        test.nekro.setTg(15);
+        giveWinnuHero(true);
+        test.game.setScTradeGoods(
+                new java.util.LinkedHashMap<>(java.util.Map.of(1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0)));
+        assertThat(ScoringPaths.readyPoints(test.game, test.nekro)).isEqualTo(2);
+    }
+
     @Test
     void losingHomeBlocksAnOtherwiseAffordablePublic() {
         reveal("trade_routes");

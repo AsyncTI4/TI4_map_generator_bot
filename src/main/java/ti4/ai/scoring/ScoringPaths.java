@@ -26,13 +26,7 @@ public class ScoringPaths {
                     .filter(entry -> entry.getType() != EntryType.PO_1 && entry.getType() != EntryType.PO_2)
                     .mapToInt(ScoringPaths::points)
                     .sum();
-            int heroScores = player.getLeader("winnuhero")
-                            .filter(hero -> hero.isActive() && !hero.isExhausted())
-                            .isPresent()
-                    ? 1
-                    : 0;
-            return PublicScoringPlan.points(game, player, ScoringReserve.scoringChances(game, player) + heroScores)
-                    + otherPoints;
+            return PublicScoringPlan.points(game, player, PublicScoringPlan.slots(game, player)) + otherPoints;
         }
         return entries(game, player).stream()
                 .filter(entry -> entry.getState() == EntryState.QUALIFIES)

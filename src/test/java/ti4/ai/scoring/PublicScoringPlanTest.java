@@ -62,14 +62,14 @@ class PublicScoringPlanTest extends BaseTi4Test {
     }
 
     @Test
-    void preservesTheActiveWinnuHeroScoringWindow() {
+    void preservesTheUnlockedWinnuHeroScoringWindow() {
         reveal("develop", "centralize_trade", "trade_routes");
         test.nekro.addTech("cv2");
         test.nekro.addTech("dd2");
         test.nekro.setTg(15);
         test.nekro.addSC(8);
         test.nekro.addLeader("winnuhero");
-        test.nekro.getLeader("winnuhero").orElseThrow().setActive(true);
+        test.nekro.getLeader("winnuhero").orElseThrow().setLocked(false);
         assertThat(ScoringPaths.readyPoints(test.game, test.nekro)).isEqualTo(4);
     }
 

@@ -163,7 +163,7 @@ public class ScoringStakes {
 
     private static int publicPoints(Game game, Player player) {
         if (AiExperiments.enabled(DecidingSeat.orSelf(game, player), AiExperiments.Experiment.READY_PUBLIC_POINTS)) {
-            return PublicScoringPlan.points(game, player, ScoringReserve.scoringChances(game, player));
+            return PublicScoringPlan.points(game, player, PublicScoringPlan.slots(game, player));
         }
         List<String> scorable = ObjectivePolicy.scorablePublics(game, player);
         int chances = ScoringReserve.scoringChances(game, player);
