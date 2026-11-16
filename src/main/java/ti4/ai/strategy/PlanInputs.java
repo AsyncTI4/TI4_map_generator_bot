@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.Threats;
@@ -33,6 +34,7 @@ record PlanInputs(
 
     private static final int MAX_CACHED = 32;
     private static final ThreadLocal<Set<String>> COMPUTING = ThreadLocal.withInitial(HashSet::new);
+    private static final ThreadLocal<Boolean> RANKING_FREED = ThreadLocal.withInitial(() -> false);
     private static final Map<String, Cached> CACHE = new LinkedHashMap<>(16, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, Cached> eldest) {
@@ -121,8 +123,12 @@ record PlanInputs(
     }
 
     double lockExposure(Tile tile) {
-        return lockExposures.computeIfAbsent(
-                tile.getPosition(), position -> new DefenseOutlook(game, seat).lockCost(tile));
+        String position = tile.getPosition();
+        Double known = lockExposures.get(position);
+        if (known != null) return known;
+        double exposure = new DefenseOutlook(game, seat).lockCost(tile);
+        Double raced = lockExposures.putIfAbsent(position, exposure);
+        return raced != null ? raced : exposure;
     }
 
     double bestScore() {
@@ -131,7 +137,22 @@ record PlanInputs(
 
     List<TacticalPlan> rankedFreeing(String position) {
         if (planless) return List.of();
-        return freeing.computeIfAbsent(position, freed -> TacticalPlanner.rankedFreeing(game, seat, freed));
+        return rememberedFreeing(freeing, position, freed -> TacticalPlanner.rankedFreeing(game, seat, freed));
+    }
+
+    static List<TacticalPlan> rememberedFreeing(
+            Map<String, List<TacticalPlan>> freeing, String position, Function<String, List<TacticalPlan>> rank) {
+        List<TacticalPlan> known = freeing.get(position);
+        if (known != null) return known;
+        if (RANKING_FREED.get()) return List.of();
+        RANKING_FREED.set(true);
+        try {
+            List<TacticalPlan> ranked = rank.apply(position);
+            List<TacticalPlan> raced = freeing.putIfAbsent(position, ranked);
+            return raced != null ? raced : ranked;
+        } finally {
+            RANKING_FREED.set(false);
+        }
     }
 
     double unblockGain(String position) {
