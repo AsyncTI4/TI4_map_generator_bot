@@ -19,7 +19,7 @@ public class GameCategoryRestorePlanner {
 
     public static final int MAX_CHANNELS_PER_CATEGORY = 50;
 
-    private static final Pattern GAME_CHANNEL_NAME = Pattern.compile("^pbd(\\d+)(?:-.*)?$");
+    private static final Pattern GAME_CHANNEL_NAME = Pattern.compile("^pbd(\\d+)([a-z]*)(?:-.*)?$");
     private static final Pattern CATEGORY_NAME = Pattern.compile("^PBD #(\\d+)(?:-(\\d+))?(?:\\s.*)?$");
 
     public record CategoryRange(String name, int lower, int upper) {
@@ -43,6 +43,11 @@ public class GameCategoryRestorePlanner {
         } catch (NumberFormatException e) {
             return OptionalInt.empty();
         }
+    }
+
+    private static String rematchSuffix(String channelName) {
+        Matcher matcher = GAME_CHANNEL_NAME.matcher(channelName);
+        return matcher.matches() ? matcher.group(2) : "";
     }
 
     public static Optional<CategoryRange> parseCategory(String categoryName) {
@@ -106,6 +111,7 @@ public class GameCategoryRestorePlanner {
     public static <C> Comparator<C> channelOrder(Function<C, String> channelName) {
         return Comparator.<C>comparingInt(
                         channel -> gameNumber(channelName.apply(channel)).orElse(Integer.MAX_VALUE))
+                .thenComparing(channel -> rematchSuffix(channelName.apply(channel)))
                 .thenComparing(channel -> channelName.apply(channel).endsWith(Constants.ACTIONS_CHANNEL_SUFFIX))
                 .thenComparing(channelName);
     }
