@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.agenda.AgendaKnowledge;
 import ti4.ai.agenda.AgendaPeek;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -168,6 +169,11 @@ class PlannedPrimaries {
 
         Optional<AiDecision> press(AiTurnContext context) {
             CardMessages.markDone(context, AGENDA_PEEK + id);
+            if (keepOnTop) {
+                AgendaKnowledge.placedOnTop(context.game(), context.seat(), alias);
+            } else {
+                AgendaKnowledge.placedOnBottom(context.game(), context.seat(), alias);
+            }
             String handler = (keepOnTop ? TOP_AGENDA : BOTTOM_AGENDA) + id;
             String where = keepOnTop ? "top" : "bottom";
             return prompt.enabledHandler(handler)

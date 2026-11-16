@@ -50,6 +50,9 @@ class AgendaCardRulesTest extends BaseTi4Test {
         test.game.setSpeakerUserID(xxcha.getUserID());
         agenda(ARMS_REDUCTION, 0, 3, 0);
         test.game.setStoredValue("whensResolved", "Yes");
+        // These cases drive the queue and placement mechanics with an Imperial Rider on an even agenda; the hold value
+        // that keeps an Imperial Rider for a likely outcome (IMPERIAL_RIDER_HOLD) has its own case below.
+        AiExperiments.disable(nekro, Set.of(Experiment.IMPERIAL_RIDER_HOLD));
     }
 
     private void agenda(String info, int nekroVotes, int solVotes, int xxchaVotes) {
@@ -108,6 +111,19 @@ class AgendaCardRulesTest extends BaseTi4Test {
         assertThat(pressed(AgendaCardRules.queueRider(context(nekro, options)))).isEqualTo("queueAfter_ac_imp_rider");
     }
 
+    // Traces (aiselfplay528616 r2 #3, Incentive Program): Hacan put an Imperial Rider on For at 12% and lost the card.
+    // An Imperial Rider is a point: the seat holds it unless the outcome is likely (half a point held back), so the
+    // two in five chance above is no longer enough.
+    @Test
+    void keepsAnImperialRiderForALikelyOutcome() {
+        AiExperiments.disable(nekro, Set.of());
+        holds(nekro, IMPERIAL);
+        AiPrompt window = hidden("after", "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(AgendaCardRules.bestRider(context(nekro, window))).isEmpty();
+        assertThat(AgendaCardRules.imperialHoldValue(test.game, nekro)).isEqualTo(3.0);
+    }
+
     @Test
     void thePressingOfAfterOptionsWinsOverDecliningInTheBrain() {
         holds(nekro, IMPERIAL);
@@ -136,6 +152,31 @@ class AgendaCardRulesTest extends BaseTi4Test {
 
         assertThat(AgendaCardRules.bestRider(context(sol, window))).isEmpty();
         assertThat(AgendaCardRules.bestRider(context(nekro, window))).isPresent();
+    }
+
+    // Review: a seat that keeps its votes with a rider (Xxcha commander or Alliance) priced the rider with its own
+    // votes
+    // re-picked by the forecast while its own-vote term stayed on its planned ballot. The rider forecast now starts
+    // from
+    // the planned ballot: Sol, which elects itself to the Shard alone, sees its Trade Rider on itself win as surely as
+    // its ballot does, and gains the rider's trade goods.
+    @Test
+    void aSeatThatKeepsItsVotesPricesTheRiderOnItsPlannedBallot() {
+        test.place("01", "304");
+        sol.addPlanet("jord");
+        sol.addLeader("xxchacommander");
+        sol.unsafeGetLeader("xxchacommander").setLocked(false);
+        agenda(SHARD, 0, 3, 1);
+        holds(sol, "trade_rider");
+        AiPrompt window = hidden("after", "queueAnAfter", "declineToQueueAnAfter");
+        double planned =
+                ti4.ai.agenda.AgendaVoting.itsBallot(test.game, sol).forecast().chance("sol");
+
+        AgendaCardRules.Choice choice =
+                AgendaCardRules.bestRider(context(sol, window)).orElseThrow();
+        assertThat(choice.outcome()).isEqualTo("sol");
+        assertThat(choice.chance()).isGreaterThanOrEqualTo(planned - 1e-9);
+        assertThat(choice.gain()).isGreaterThan(4.0);
     }
 
     // The Galactic Threat prediction already queued is not overwritten by a rider.
@@ -173,7 +214,7 @@ class AgendaCardRulesTest extends BaseTi4Test {
         assertThat(PromisedVotes.forbidsRider(test.game, nekro)).isTrue();
         assertThat(AgendaCardRules.queueRider(context(nekro, window))).isEmpty();
 
-        AiExperiments.disable(nekro, Set.of(Experiment.PROMISE_DEALS));
+        AiExperiments.disable(nekro, Set.of(Experiment.PROMISE_DEALS, Experiment.IMPERIAL_RIDER_HOLD));
         assertThat(pressed(AgendaCardRules.queueRider(context(nekro, window)))).isEqualTo("queueAnAfter");
     }
 

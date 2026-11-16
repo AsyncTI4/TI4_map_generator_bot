@@ -1,6 +1,7 @@
 package ti4.ai.agenda;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,6 +89,24 @@ class PromisedVotesTest extends BaseTi4Test {
                 .contains(kept);
     }
 
+    // A deal struck at the seller's turn can come after it planned a smaller ballot for the same outcome: the ballot is
+    // rebuilt so it casts the votes it promised, not the fewer it planned.
+    @Test
+    void aBallotSmallerThanThePromiseIsRebuilt() {
+        AiTurnContext context = test.contextFor(sol, Set.of(), AiTestGame.NOW);
+        String key = "agendaBallot|test";
+        int castable = AgendaVoting.castableVotes(test.game, sol);
+        assertThat(castable).isGreaterThan(1);
+        AgendaVoting.Ballot planned = new AgendaVoting.Ballot("nekro", "", 1, false);
+        context.memory().put(key, planned.encode());
+
+        PromiseBook.save(test.game, votesFor(sol, test.nekro, "nekro").accepted(test.game));
+
+        AgendaVoting.Ballot kept = AgendaVoting.keepingPromise(context, key, planned);
+        assertThat(kept.outcome()).isEqualTo("nekro");
+        assertThat(kept.votes()).isEqualTo(Math.min(4, castable));
+    }
+
     // A seat that sold its votes, or offered them for sale, plays no rider on this agenda, since a rider would stop it
     // voting; a seat that was only asked to sell is free.
     @Test
@@ -159,9 +178,133 @@ class PromisedVotesTest extends BaseTi4Test {
         VoteDeals.Terms terms =
                 VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
 
-        assertThat(terms.votes()).isEqualTo(AgendaVoting.castableVotes(test.game, xxcha));
+        assertThat(terms.votes()).isBetween(1, AgendaVoting.castableVotes(test.game, xxcha));
         assertThat(terms.buyerGain()).isPositive();
         assertThat(terms.sellerCost()).isPositive();
+    }
+
+    // On a first agenda the deal names the fewest votes that still win the buyer the outcome: votes not cast stay for
+    // the second agenda. A viewer (here Nekro) without the expert value table sizes every deal at the whole stack: the
+    // seat that decides uses its own flags, not those of the buyer or seller.
+    @Test
+    void aFirstAgendaVoteDealBuysOnlyTheVotesItNeeds() {
+        test.place("14", "101");
+        test.place("20", "102");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        xxcha.addPlanet("vefutii");
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+        assertThat(castable).isGreaterThan(1);
+
+        assertThat(VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol")
+                        .orElseThrow()
+                        .votes())
+                .isLessThan(castable);
+
+        AiExperiments.disable(test.nekro, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        assertThat(VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol")
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(castable);
+    }
+
+    // Politics notes, "vote prices by agenda": on the last agenda of the phase unspent votes vanish, so the buyer buys
+    // the seller's whole stack for the same price as any part of it.
+    @Test
+    void aLastAgendaVoteDealBuysTheWholeStack() {
+        test.place("14", "101");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+        assertThat(AgendaRound.isFinalAgenda(test.game)).isTrue();
+
+        VoteDeals.Terms terms =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+
+        assertThat(terms.votes()).isEqualTo(castable);
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, castable)).isZero();
+    }
+
+    // A seller that would feed Nekro a technology by voting for its prediction counts that in its cost of the deal.
+    // The viewer runs without the expert value table so both deals name the same (whole) stack of votes.
+    @Test
+    void aVoteSaleOnNekrosPredictionCostsTheSellerTheGalacticThreat() {
+        AiExperiments.disable(test.nekro, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        test.game.setCurrentAgendaVote("sol", "black_" + GalacticThreatCost.RIDER);
+        VoteDeals.Terms withThreat =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+        double threat = GalacticThreatCost.ofBallot(test.game, xxcha, "sol", withThreat.votes());
+        assertThat(threat).isPositive();
+
+        AiExperiments.disable(xxcha, Set.of(Experiment.GALACTIC_THREAT_COST));
+        VoteDeals.Terms without =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+
+        assertThat(withThreat.sellerCost() - without.sellerCost()).isCloseTo(threat, within(1e-9));
+    }
+
+    // Votes sold on a first agenda are votes the seller no longer has for the second, priced like its own ballot
+    // (its kept-vote value, from the next agenda's stakes); on the last agenda they are free. Without the expert value
+    // table the seller does not price them.
+    @Test
+    void votesSoldBeforeTheLastAgendaCostTheSellerItsNextAgenda() {
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isZero();
+
+        test.game.setStoredValue("agendaCount", "1");
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5))
+                .isPositive()
+                .isCloseTo(5 * BallotPlanner.keptVote(test.game, xxcha), within(1e-9));
+
+        AiExperiments.disable(xxcha, Set.of(Experiment.AGENDA_VALUE_TABLE));
+        assertThat(VoteDeals.spentVotes(test.game, xxcha, 5)).isZero();
+    }
+
+    // A seller whose votes are not needed to win sells the fewest that still lock the outcome: on a first agenda Sol
+    // already wins, so Xxcha's deal names fewer votes than its whole stack. Xxcha holds its home planets too, since on
+    // a first agenda it keeps its smallest planet back and Wellon alone would leave nothing to sell.
+    @Test
+    void anUncontestedVoteSaleOnAFirstAgendaNamesFewerVotesThanTheStack() {
+        test.place("14", "101");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+        assertThat(castable).isGreaterThan(1);
+
+        VoteDeals.Terms terms =
+                VoteDeals.valued(test.game, test.nekro, xxcha, sol, "sol").orElseThrow();
+
+        assertThat(terms.votes()).isLessThan(castable);
+    }
+
+    // A binding promise casts the votes agreed, not the promiser's whole stack.
+    @Test
+    void aPromiseForFewerVotesCastsOnlyThose() {
+        Promise promise = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "nekro",
+                1,
+                2,
+                1,
+                60_000);
+        PromiseBook.save(test.game, promise.accepted(test.game));
+
+        AgendaVoting.Ballot ballot = AgendaVoting.plan(test.game, sol).orElseThrow();
+        assertThat(ballot.outcome()).isEqualTo("nekro");
+        assertThat(ballot.votes()).isEqualTo(1);
+        assertThat(PromisedVotes.promisedVotes(promise, 4)).isEqualTo(1);
+        assertThat(PromisedVotes.promisedVotes(votesFor(sol, test.nekro, "nekro"), 3))
+                .isEqualTo(3);
     }
 
     // Once a vote promise is accepted, everyone's forecast puts the promiser's votes on the promised outcome.
@@ -174,5 +317,140 @@ class PromisedVotesTest extends BaseTi4Test {
         assertThat(AgendaForecast.of(test.game, test.nekro).chance("xxcha")).isGreaterThan(before);
         assertThat(AgendaForecast.of(test.game, test.nekro).votesLeft(sol)).isZero();
         assertThat(VoteDeals.valued(test.game, test.nekro, sol, xxcha, "xxcha")).isEmpty();
+    }
+
+    // A promise is valued at the votes it names, since those are the votes the binding ballot casts; the seat that
+    // decides does not size the deal again. A promise for more votes than the seller can cast is held to its stack.
+    @Test
+    void aPromiseIsValuedAtTheVotesItNames() {
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        int castable = AgendaVoting.castableVotes(test.game, xxcha);
+
+        assertThat(VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", 1)
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(1);
+        assertThat(VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", 0)
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(castable);
+        assertThat(VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", castable + 5)
+                        .orElseThrow()
+                        .votes())
+                .isEqualTo(castable);
+    }
+
+    // Planets are exhausted whole, so a deal only names vote totals the seller's readied planets can make (plus the 3
+    // of a ready Predictive Intelligence), never one that would make it cast more than it promised. Predictive
+    // Intelligence adds to votes cast, so it is never sold on its own: 3 is a size only when planets make 3.
+    @Test
+    void aVoteDealOnlyNamesTotalsThePlanetsCanMake() {
+        test.place("14", "101");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        int most = AgendaVoting.castableVotes(test.game, xxcha);
+        java.util.List<Integer> planets = AgendaVoting.readiedPlanetVotes(test.game, xxcha);
+
+        assertThat(VoteDeals.saleSizes(test.game, xxcha, most)).isEqualTo(BallotPlanner.reachableTotals(planets, most));
+
+        xxcha.addTech("pi");
+        java.util.List<Integer> reachable = BallotPlanner.reachableTotals(planets, most);
+        java.util.List<Integer> withPredictive = VoteDeals.saleSizes(test.game, xxcha, most);
+        assertThat(withPredictive)
+                .allMatch(votes -> votes <= most)
+                .allMatch(votes ->
+                        reachable.contains(votes) || reachable.contains(votes - BallotPlanner.PREDICTIVE_VOTES));
+        if (!reachable.contains(BallotPlanner.PREDICTIVE_VOTES))
+            assertThat(withPredictive).doesNotContain(BallotPlanner.PREDICTIVE_VOTES);
+    }
+
+    // The buyer's forecast charges the Galactic Threat cost on the seller's ballot, not on its value of Nekro's
+    // predicted outcome, so the seller's cost of a deal is its change in outcome value plus the flat ballot cost, once.
+    @Test
+    void theGalacticThreatCostIsCountedOnceWhenTheBuyerValuesTheDeal() {
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"red\":5,\"black\":0}");
+        test.game.setCurrentAgendaVote("sol", "black_" + GalacticThreatCost.RIDER);
+        int votes = AgendaVoting.castableVotes(test.game, xxcha);
+        VoteDeals.Terms terms =
+                VoteDeals.valuedAt(test.game, sol, xxcha, sol, "sol", votes).orElseThrow();
+        AgendaForecast forecast = AgendaForecast.of(test.game, sol);
+        AgendaForecast withDeal = forecast.withVotes(xxcha, "sol", votes);
+        double flat = GalacticThreatCost.ofBallot(test.game, xxcha, "sol", votes)
+                + VoteDeals.spentVotes(test.game, sol, votes);
+        assertThat(GalacticThreatCost.ofBallot(test.game, xxcha, "sol", votes)).isPositive();
+
+        assertThat(terms.sellerCost())
+                .isCloseTo(forecast.expectedUtility(xxcha) - withDeal.expectedUtility(xxcha) + flat, within(1e-9));
+        assertThat(withDeal.chance("sol")).isGreaterThan(forecast.chance("sol"));
+        assertThat(forecast.ballotCost(xxcha, "sol")).isPositive();
+    }
+
+    // Rider extortion: "pay me and I will not vote against your outcome" (the user's note on traces-4b). The promiser
+    // abstains or votes the promised outcome, never another one.
+    private Promise notAgainst(Player promiser, Player promisee, String outcome) {
+        return Promise.offer(
+                test.game,
+                Promise.Term.NOT_AGAINST,
+                promiser,
+                promisee,
+                promiser,
+                PromisedVotes.agendaKey(test.game),
+                outcome,
+                0,
+                2,
+                1,
+                60_000);
+    }
+
+    @Test
+    void aSeatThatPromisedNotToVoteAgainstAnOutcomeAbstainsInsteadOfVotingAnother() {
+        assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))
+                .contains("sol");
+
+        PromiseBook.save(test.game, notAgainst(sol, xxcha, "xxcha").accepted(test.game));
+
+        assertThat(AgendaVoting.plan(test.game, sol)).isEmpty();
+        assertThat(AgendaForecast.of(test.game, test.nekro).votesLeft(sol)).isZero();
+    }
+
+    // The seat started its ballot for itself before the rider holder accepted: it switches to the promised outcome
+    // rather than break the promise.
+    @Test
+    void aBallotInProgressAgainstTheOutcomeIsRebuilt() {
+        AiTurnContext context = test.contextFor(sol, Set.of(), AiTestGame.NOW);
+        String key = "agendaBallot|test";
+        AgendaVoting.Ballot planned = AgendaVoting.plan(test.game, sol).orElseThrow();
+        context.memory().put(key, planned.encode());
+
+        PromiseBook.save(test.game, notAgainst(sol, xxcha, "xxcha").accepted(test.game));
+
+        assertThat(AgendaVoting.keepingPromise(context, key, planned).outcome()).isEqualTo("xxcha");
+    }
+
+    @Test
+    void votingAgainstTheOutcomeBreaksANotAgainstPromise() {
+        Promise promise = notAgainst(sol, xxcha, "xxcha").accepted(test.game);
+        assertThat(PromisedVotes.verdict(test.game, promise)).isEmpty();
+
+        test.game.setCurrentAgendaVote("sol", "blue_4");
+
+        assertThat(PromisedVotes.verdict(test.game, promise)).contains(Promise.Status.BROKEN);
+    }
+
+    // Abstaining leaves no trace in the votes, so the promise is kept once the agenda resolves, and owed only if the
+    // promised outcome won.
+    @Test
+    void aNotAgainstPromiseIsKeptAtResolutionAndOwedIfItsOutcomeWon() {
+        Promise promise = notAgainst(sol, xxcha, "xxcha").accepted(test.game);
+        test.game.setStoredValue("resolvedAgendaId", PromisedVotes.agendaKey(test.game));
+        test.game.setStoredValue("resolvedAgendaOutcome", "xxcha");
+
+        assertThat(PromisedVotes.verdict(test.game, promise)).contains(Promise.Status.KEPT);
+        assertThat(PromisedVotes.settlement(test.game, promise.with(Promise.Status.KEPT)))
+                .contains(Promise.Status.OWED);
+
+        test.game.setStoredValue("resolvedAgendaOutcome", "sol");
+        assertThat(PromisedVotes.settlement(test.game, promise.with(Promise.Status.KEPT)))
+                .isEmpty();
     }
 }

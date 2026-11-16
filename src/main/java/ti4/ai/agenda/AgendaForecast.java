@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.SplittableRandom;
 import java.util.function.ToDoubleFunction;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -25,10 +27,16 @@ public final class AgendaForecast {
     private static final double ABSTAINS_WHEN_INDIFFERENT = 0.3;
     private static final String ASSASSINATED = "AssassinatedReps";
     private static final String XXCHA_COMMANDER = "xxchacommander";
+    private static final String GALACTIC_THREAT = "galactic_threat";
+    private static final String SANCTION = "Sanction";
     private static final String AGENDA_PHASE = "agenda";
     private static final String VOTING_PHASE = "agendavoting";
     private static final String END_PHASE = "agendaend";
-    private static final AgendaForecast NONE = new AgendaForecast(null, new int[0], new int[0], List.of());
+    private static final String ABSTAIN_VOTE = "";
+    private static final int ABSTAIN = -1;
+    private static final double EVEN = 1e-9;
+    private static final AgendaForecast NONE =
+            new AgendaForecast(null, new int[0], new int[0], new int[0][0], new int[0][0], List.of());
 
     private record Rider(int owner, String title, int outcome, double payoff, double rivalStake) {}
 
@@ -40,21 +48,36 @@ public final class AgendaForecast {
             double[][] base,
             double[][] draws,
             int speaker,
-            boolean[] keepsVotesWithRider) {}
+            boolean[] keepsVotesWithRider,
+            int threatOwner,
+            double[] copyWorth,
+            double[][][] joinShift,
+            int joinOutcome,
+            boolean finalAgenda,
+            boolean ownVoteCounts,
+            double[][][] ownVoteTerms,
+            int evenTieOutcome) {}
 
-    private record Placed(int[] castByOutcome, int[] castByVoter, List<Rider> riders) {}
+    private record Placed(int[] castByOutcome, int[] castByVoter, int[][] castBy, List<Rider> riders) {}
 
     private final Frame frame;
     private final int[] votes;
     private final int[] cast;
+    private final int[][] castBy;
+    private final int[][] pending;
     private final List<Rider> riders;
     private double[][] utilities;
+    private double[][] ballotCosts;
     private Map<String, Double> chances;
+    private Map<String, Double> votedChances;
+    private Map<String, Double> threatWorths;
 
-    private AgendaForecast(Frame frame, int[] votes, int[] cast, List<Rider> riders) {
+    private AgendaForecast(Frame frame, int[] votes, int[] cast, int[][] castBy, int[][] pending, List<Rider> riders) {
         this.frame = frame;
         this.votes = votes;
         this.cast = cast;
+        this.castBy = castBy;
+        this.pending = pending;
         this.riders = riders;
     }
 
@@ -66,6 +89,7 @@ public final class AgendaForecast {
             if (outcomes.isEmpty() || voters.isEmpty()) return NONE;
             String agenda = AgendaPolicy.currentAgenda(game);
             Placed placed = readPlaced(game, viewer, voters, outcomes);
+            int threatOwner = threatOwner(voters);
             Frame frame = new Frame(
                     game,
                     viewer,
@@ -74,12 +98,25 @@ public final class AgendaForecast {
                     baseUtilities(game, viewer, voters, outcomes, agenda),
                     draws(game, viewer, voters.size()),
                     speakerIndex(game, voters),
-                    keepsVotesWithRider(game, voters));
+                    keepsVotesWithRider(game, voters),
+                    threatOwner,
+                    copyWorth(game, viewer, voters, threatOwner),
+                    joinShift(game, voters, outcomes, agenda),
+                    outcomes.indexOf(AgendaValueMath.FOR),
+                    AgendaRound.isFinalAgenda(game),
+                    AgendaValues.dependsOnOwnVote(agenda),
+                    ownVoteTerms(game, viewer, voters, outcomes, agenda),
+                    evenTieOutcome(viewer, outcomes, agenda));
             return PromisedVotes.placeAccepted(
                     game,
                     viewer,
                     new AgendaForecast(
-                            frame, remainingVotes(game, frame, placed), placed.castByOutcome(), placed.riders()));
+                            frame,
+                            remainingVotes(game, frame, placed),
+                            placed.castByOutcome(),
+                            placed.castBy(),
+                            new int[voters.size()][outcomes.size()],
+                            placed.riders()));
         }
     }
 
@@ -89,8 +126,20 @@ public final class AgendaForecast {
 
     public Map<String, Double> chances() {
         if (isEmpty()) return Map.of();
-        if (chances == null) chances = simulate();
+        if (chances == null) simulate();
         return chances;
+    }
+
+    public double votedChance(String outcome) {
+        if (isEmpty()) return 0;
+        if (votedChances == null) simulate();
+        return votedChances.getOrDefault(outcome, 0.0);
+    }
+
+    public double threatWorth(String outcome) {
+        if (isEmpty()) return 0;
+        if (threatWorths == null) simulate();
+        return threatWorths.getOrDefault(outcome, 0.0);
     }
 
     public java.util.Set<String> outcomes() {
@@ -120,6 +169,19 @@ public final class AgendaForecast {
                         rider.owner() != voter && RiderPayoff.isImperial(rider.title()) && rider.outcome() >= 0);
     }
 
+    public record PlacedRider(String outcome, double payoff) {}
+
+    public List<PlacedRider> ridersOf(Player owner) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(owner);
+        if (voter < 0) return List.of();
+        return riders.stream()
+                .filter(rider -> rider.owner() == voter
+                        && rider.outcome() >= 0
+                        && !rider.title().contains(SANCTION))
+                .map(rider -> new PlacedRider(frame.outcomes().get(rider.outcome()), rider.payoff()))
+                .toList();
+    }
+
     public Optional<String> riderOutcome(Player owner, String title) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(owner);
         return riders.stream()
@@ -134,13 +196,61 @@ public final class AgendaForecast {
         return voter < 0 || index < 0 ? 0 : utilities()[voter][index];
     }
 
+    public double tieBreakUtility(Player speaker, String outcome) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(speaker);
+        int index = isEmpty() ? -1 : frame.outcomes().indexOf(outcome);
+        if (voter < 0 || index < 0) return 0;
+        return utilities()[voter][index] + ownVoteTerm(voter, index, castBallot(voter));
+    }
+
+    public boolean breaksTieToward(Player speaker, String outcome, String other) {
+        double margin = tieBreakUtility(speaker, outcome) - tieBreakUtility(speaker, other);
+        if (Math.abs(margin) > EVEN) return margin > 0;
+        int even = isEmpty() ? ABSTAIN : frame.evenTieOutcome();
+        return even >= 0 && frame.outcomes().indexOf(outcome) == even;
+    }
+
     public int votesLeft(Player player) {
         int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
         return voter < 0 ? 0 : votes[voter];
     }
 
     public double expectedUtility(Player player) {
-        return expected(outcome -> utility(player, outcome));
+        return expected(outcome -> utility(player, outcome)) - threatPayoffCorrection(player);
+    }
+
+    public double expectedUtility(Player player, String ownVote) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        if (voter < 0) return expectedUtility(player);
+        int ballot = frame.outcomes().indexOf(ownVote);
+        return expected(outcome -> utility(player, outcome)
+                        + ownVoteTerm(voter, frame.outcomes().indexOf(outcome), ballot))
+                - threatPayoffCorrection(player);
+    }
+
+    public boolean keepsVotesWithRider(Player player) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        return voter >= 0 && frame.keepsVotesWithRider()[voter];
+    }
+
+    double ballotCost(Player player, String outcome) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        int index = isEmpty() ? -1 : frame.outcomes().indexOf(outcome);
+        return voter < 0 || index < 0 ? 0 : ballotCosts()[voter][index];
+    }
+
+    double threatPayoffCorrection(Player player) {
+        int voter = isEmpty() ? -1 : frame.voters().indexOf(player);
+        if (voter < 0) return 0;
+        return riders.stream()
+                .filter(rider -> rider.owner() == voter && rider.outcome() >= 0)
+                .filter(this::copiesFromVoters)
+                .mapToDouble(rider -> {
+                    String outcome = frame.outcomes().get(rider.outcome());
+                    double earned = Math.min(rider.payoff() * chance(outcome), threatWorth(outcome));
+                    return castCopy(rider.outcome()) * chance(outcome) - earned;
+                })
+                .sum();
     }
 
     public AgendaForecast withRider(Player owner, String title, String outcome) {
@@ -150,7 +260,7 @@ public final class AgendaForecast {
         more.add(rider(frame, voter, title, frame.outcomes().indexOf(outcome)));
         int[] remaining = votes.clone();
         if (!frame.keepsVotesWithRider()[voter]) remaining[voter] = 0;
-        return new AgendaForecast(frame, remaining, cast, more);
+        return new AgendaForecast(frame, remaining, cast, castBy, pending, more);
     }
 
     public AgendaForecast withVotes(Player seat, String outcome, int count) {
@@ -158,10 +268,26 @@ public final class AgendaForecast {
         if (voter < 0) return this;
         int[] remaining = votes.clone();
         remaining[voter] = 0;
-        int[] placed = cast.clone();
         int index = frame.outcomes().indexOf(outcome);
-        if (index >= 0) placed[index] += count;
-        return new AgendaForecast(frame, remaining, placed, riders);
+        int[][] by = copy(castBy);
+        int[][] hypothetical = copy(pending);
+        if (index >= 0) {
+            by[voter][index] += count;
+            hypothetical[voter][index] += count;
+        }
+        return new AgendaForecast(frame, remaining, cast, by, hypothetical, riders);
+    }
+
+    private static double[][] copyUtilities(double[][] table) {
+        double[][] copy = new double[table.length][];
+        for (int row = 0; row < copy.length; row++) copy[row] = table[row].clone();
+        return copy;
+    }
+
+    private static int[][] copy(int[][] table) {
+        int[][] copy = new int[table.length][];
+        for (int row = 0; row < copy.length; row++) copy[row] = table[row].clone();
+        return copy;
     }
 
     public AgendaForecast without(Player silenced) {
@@ -169,7 +295,7 @@ public final class AgendaForecast {
         if (voter < 0) return this;
         int[] remaining = votes.clone();
         remaining[voter] = 0;
-        return new AgendaForecast(frame, remaining, cast, riders);
+        return new AgendaForecast(frame, remaining, cast, castBy, pending, riders);
     }
 
     private static boolean applies(Game game) {
@@ -180,7 +306,10 @@ public final class AgendaForecast {
                 && game.getPhaseOfGame().toLowerCase().startsWith(AGENDA_PHASE);
     }
 
-    private static List<Player> votingOrder(Game game) {
+    static List<Player> votingOrder(Game game) {
+        List<Player> engineOrder = new ArrayList<>(AgendaHelper.getVotingOrder(game));
+        engineOrder.removeIf(player -> !game.getRealPlayers().contains(player));
+        if (!engineOrder.isEmpty()) return engineOrder;
         List<Player> order = new ArrayList<>(Helper.getSpeakerOrFullPriorityOrder(game));
         if (order.isEmpty()) order.addAll(game.getRealPlayers());
         order.removeIf(player -> !game.getRealPlayers().contains(player));
@@ -195,6 +324,62 @@ public final class AgendaForecast {
             keeps[voter] = game.playerHasLeaderUnlockedOrAlliance(voters.get(voter), XXCHA_COMMANDER);
         }
         return keeps;
+    }
+
+    private static int threatOwner(List<Player> voters) {
+        for (int voter = 0; voter < voters.size(); voter++) {
+            if (voters.get(voter).hasAbility(GALACTIC_THREAT)) return voter;
+        }
+        return -1;
+    }
+
+    private static double[] copyWorth(Game game, Player viewer, List<Player> voters, int threatOwner) {
+        double[] worth = new double[voters.size()];
+        if (threatOwner < 0 || !AiExperiments.enabled(viewer, Experiment.GALACTIC_THREAT_COST)) return worth;
+        Player nekro = voters.get(threatOwner);
+        for (int voter = 0; voter < worth.length; voter++) {
+            if (voter == threatOwner) continue;
+            worth[voter] =
+                    GalacticThreatCost.bestCopy(nekro, GalacticThreatCost.copyable(game, nekro, voters.get(voter)));
+        }
+        return worth;
+    }
+
+    private static double[][][] joinShift(Game game, List<Player> voters, List<String> outcomes, String agenda) {
+        if (!DirectiveValues.MUTINY.equals(agenda) || !outcomes.contains(AgendaValueMath.FOR)) return null;
+        double[][][] shift = new double[voters.size()][voters.size()][outcomes.size()];
+        for (int voter = 0; voter < voters.size(); voter++) {
+            for (int joiner = 0; joiner < voters.size(); joiner++) {
+                for (int outcome = 0; outcome < outcomes.size(); outcome++) {
+                    shift[voter][joiner][outcome] = DirectiveValues.mutinyForVoterJoins(
+                            game, voters.get(voter), voters.get(joiner), outcomes.get(outcome));
+                }
+            }
+        }
+        return shift;
+    }
+
+    private static double[][][] ownVoteTerms(
+            Game game, Player viewer, List<Player> voters, List<String> outcomes, String agenda) {
+        if (!AgendaValues.dependsOnOwnVote(agenda)) return null;
+        double[][][] terms = new double[voters.size()][outcomes.size()][outcomes.size() + 1];
+        for (int voter = 0; voter < voters.size(); voter++) {
+            Player player = voters.get(voter);
+            for (int winner = 0; winner < outcomes.size(); winner++) {
+                for (int ballot = 0; ballot <= outcomes.size(); ballot++) {
+                    String vote = ballot < outcomes.size() ? outcomes.get(ballot) : ABSTAIN_VOTE;
+                    terms[voter][winner][ballot] = AgendaValues.ownVoteAdjustment(
+                            game, player, player == viewer, agenda, outcomes.get(winner), vote);
+                }
+            }
+        }
+        return terms;
+    }
+
+    private static int evenTieOutcome(Player viewer, List<String> outcomes, String agenda) {
+        if (!AgendaValues.dependsOnOwnVote(agenda)) return ABSTAIN;
+        if (!AiExperiments.enabled(viewer, Experiment.AGENDA_ABSTAIN_CHOICE)) return ABSTAIN;
+        return outcomes.indexOf(AgendaValueMath.AGAINST);
     }
 
     private static int speakerIndex(Game game, List<Player> voters) {
@@ -227,6 +412,7 @@ public final class AgendaForecast {
     private static Placed readPlaced(Game game, Player viewer, List<Player> voters, List<String> outcomes) {
         int[] byOutcome = new int[outcomes.size()];
         int[] byVoter = new int[voters.size()];
+        int[][] by = new int[voters.size()][outcomes.size()];
         List<Rider> riders = new ArrayList<>();
         for (Map.Entry<String, String> entry : game.getCurrentAgendaVotes().entrySet()) {
             int outcome = outcomes.indexOf(entry.getKey());
@@ -239,13 +425,16 @@ public final class AgendaForecast {
                 if (voter < 0) continue;
                 if (NumberUtils.isDigits(what)) {
                     byVoter[voter] += Integer.parseInt(what);
-                    if (outcome >= 0) byOutcome[outcome] += Integer.parseInt(what);
+                    if (outcome >= 0) {
+                        byOutcome[outcome] += Integer.parseInt(what);
+                        by[voter][outcome] += Integer.parseInt(what);
+                    }
                 } else if (what.contains("Rider") || what.contains("Sanction")) {
                     riders.add(riderOf(game, viewer, voters, voter, what, outcome));
                 }
             }
         }
-        return new Placed(byOutcome, byVoter, riders);
+        return new Placed(byOutcome, byVoter, by, riders);
     }
 
     private static Rider riderOf(Game game, Player viewer, List<Player> voters, int voter, String title, int outcome) {
@@ -270,9 +459,19 @@ public final class AgendaForecast {
             Player player = frame.voters().get(voter);
             boolean done = isEnded(game) || voter < activeVoter;
             if (done || blocked(game, player, hasRider(placed, voter), frame.keepsVotesWithRider()[voter])) continue;
-            remaining[voter] = Math.max(0, snapshot.getOrDefault(player.getColor(), 0) - placed.castByVoter()[voter]);
+            int left = Math.max(0, snapshot.getOrDefault(player.getColor(), 0) - placed.castByVoter()[voter]);
+            remaining[voter] = Math.max(0, left - keptBack(game, frame.viewer(), player));
         }
         return remaining;
+    }
+
+    private static int keptBack(Game game, Player viewer, Player player) {
+        if (!AgendaRound.keepsAVoteBack(game)
+                || AgendaRound.underRepresentativeGovernment(game)
+                || !AiExperiments.enabled(viewer, Experiment.AGENDA_VALUE_TABLE)) {
+            return 0;
+        }
+        return BallotPlanner.reserve(AgendaVoting.readiedPlanetVotes(game, player));
     }
 
     private static boolean hasRider(Placed placed, int voter) {
@@ -305,9 +504,11 @@ public final class AgendaForecast {
             if (rider.outcome() < 0) continue;
             for (int voter = 0; voter < merged.length; voter++) {
                 if (voter == rider.owner()) {
-                    merged[voter][rider.outcome()] += rider.payoff();
+                    merged[voter][rider.outcome()] += ownRiderPayoff(rider);
                 } else if (RiderPayoff.isImperial(rider.title())) {
                     merged[voter][rider.outcome()] -= rider.rivalStake();
+                } else if (weighsRivalRiders()) {
+                    merged[voter][rider.outcome()] -= rivalRiderCost(voter, rider);
                 }
             }
         }
@@ -315,33 +516,340 @@ public final class AgendaForecast {
         return merged;
     }
 
-    private Map<String, Double> simulate() {
+    private boolean weighsRivalRiders() {
+        return AiExperiments.enabled(frame.viewer(), Experiment.RIVAL_RIDER_STAKES);
+    }
+
+    private double rivalRiderCost(int voter, Rider rider) {
+        if (rider.title().contains(SANCTION)) return 0;
+        double gain = copiesFromVoters(rider) ? copySeenBy(voter, rider.outcome()) : rider.payoff();
+        if (gain <= 0) return 0;
+        Player player = frame.voters().get(voter);
+        return gain
+                * AgendaValueMath.threatOfStake(rider.rivalStake())
+                / Math.max(1, AgendaValueMath.liveRivals(frame.game(), player).size());
+    }
+
+    private double copySeenBy(int seer, int outcome) {
+        boolean[] predictor = predictors(castBy.length);
+        double best = 0;
+        for (int voter = 0; voter < castBy.length; voter++) {
+            int votes = castBy[voter][outcome] - (voter == seer ? pending[voter][outcome] : 0);
+            if (!predictor[voter] && votes > 0) best = Math.max(best, frame.copyWorth()[voter]);
+        }
+        return best;
+    }
+
+    private boolean copiesFromVoters(Rider rider) {
+        return GalacticThreatCost.RIDER.equals(rider.title())
+                && AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST);
+    }
+
+    private double ownRiderPayoff(Rider rider) {
+        return copiesFromVoters(rider) ? castCopy(rider.outcome()) : rider.payoff();
+    }
+
+    private double castCopy(int outcome) {
+        boolean[] predictor = predictors(castBy.length);
+        double best = 0;
+        for (int voter = 0; voter < castBy.length; voter++) {
+            if (!predictor[voter] && castBy[voter][outcome] > 0) best = Math.max(best, frame.copyWorth()[voter]);
+        }
+        return best;
+    }
+
+    private double[][] ballotCosts() {
+        if (ballotCosts != null) return ballotCosts;
+        double[][] costs = new double[frame.voters().size()][frame.outcomes().size()];
+        for (Rider rider : riders) {
+            if (rider.outcome() < 0) continue;
+            for (int voter = 0; voter < costs.length; voter++) {
+                costs[voter][rider.outcome()] += threatDislike(voter, rider);
+            }
+        }
+        ballotCosts = costs;
+        return costs;
+    }
+
+    private double[] choiceRow(double[][] live, int voter) {
+        double[] cost = ballotCosts()[voter];
+        double[] row = live[voter].clone();
+        for (int outcome = 0; outcome < row.length; outcome++) row[outcome] -= cost[outcome];
+        return row;
+    }
+
+    private double threatDislike(int voter, Rider rider) {
+        if (!GalacticThreatCost.RIDER.equals(rider.title())) return 0;
+        Player player = frame.voters().get(voter);
+        if (player == frame.viewer() || !AiExperiments.enabled(frame.viewer(), Experiment.GALACTIC_THREAT_COST)) {
+            return 0;
+        }
+        String outcome = frame.outcomes().get(rider.outcome());
+        return GalacticThreatCost.cost(frame.game(), player, frame.voters().get(rider.owner()), outcome, outcome);
+    }
+
+    private void simulate() {
         double[][] utility = utilities();
         int voters = utility.length;
         int outcomes = frame.outcomes().size();
-        double[][] cumulative = new double[voters][];
-        boolean[] indifferent = new boolean[voters];
-        for (int voter = 0; voter < voters; voter++) {
-            indifferent[voter] = spread(utility[voter]) <= INDIFFERENT_SPREAD;
-            cumulative[voter] = cumulative(utility[voter]);
-        }
+        boolean heldBallots = AiExperiments.enabled(frame.viewer(), Experiment.AGENDA_HELD_BALLOTS);
+        boolean minimal = heldBallots && !frame.finalAgenda();
+        boolean shifting = heldBallots && frame.joinShift() != null;
+        boolean weighsAbstaining =
+                frame.ownVoteTerms() != null && AiExperiments.enabled(frame.viewer(), Experiment.AGENDA_ABSTAIN_CHOICE);
+        int lastVoter = voters - 1;
         int[] wins = new int[outcomes];
+        int[] votedWins = new int[outcomes];
+        double[] copied = new double[outcomes];
+        boolean[] predictor = predictors(voters);
+        int[] picks = new int[voters];
+        double[][] fixed = shifting ? null : choiceCumulatives(utility);
         for (double[] draw : frame.draws()) {
+            double[][] live = shifting ? copyUtilities(utility) : utility;
             int[] tally = cast.clone();
+            int[] predictorTally = predictorCast(predictor, outcomes);
+            pick(picks, live, draw, 0, fixed);
             for (int voter = 0; voter < voters; voter++) {
-                if (votes[voter] == 0) continue;
-                int pick = indifferent[voter]
-                        ? indifferentPick(draw[voter], outcomes)
-                        : softmaxPick(cumulative[voter], draw[voter]);
-                if (pick >= 0) tally[pick] += votes[voter];
+                for (int outcome = 0; outcome < outcomes; outcome++) tally[outcome] += pending[voter][outcome];
+                if (shifting && pending[voter][frame.joinOutcome()] > 0) joinFor(live, picks, draw, voter, 1);
+                if (weighsAbstaining && voter == lastVoter && votes[voter] > 0) {
+                    int ballot = answerTally(voter, tally, live, picks);
+                    if (picks[voter] == ABSTAIN) continue;
+                    tally[picks[voter]] += ballot;
+                    if (predictor[voter]) predictorTally[picks[voter]] += ballot;
+                    continue;
+                }
+                if (weighsAbstaining && votes[voter] > 0) {
+                    int unvoted = winnerWithout(voter, tally, live, picks);
+                    picks[voter] = pickOrAbstain(voter, tally, live, picks, unvoted, draw[voter]);
+                }
+                int pick = picks[voter];
+                if (pick < 0) continue;
+                boolean joins = shifting && pick == frame.joinOutcome();
+                if (joins) joinFor(live, picks, draw, voter, 1);
+                int ballot = minimal ? heldBallot(voter, pick, tally, picks, tieValues(live, picks)) : votes[voter];
+                if (joins && ballot == 0) joinFor(live, picks, draw, voter, -1);
+                if (ballot == 0) {
+                    picks[voter] = ABSTAIN;
+                    continue;
+                }
+                tally[pick] += ballot;
+                if (predictor[voter]) predictorTally[pick] += ballot;
             }
-            wins[winner(tally, utility[frame.speaker()])]++;
+            int winner = winner(tally, tieValues(live, picks));
+            wins[winner]++;
+            if (tally[winner] > predictorTally[winner]) votedWins[winner]++;
+            copied[winner] += bestCopyFromVoters(predictor, picks, winner);
         }
         Map<String, Double> result = new LinkedHashMap<>();
+        Map<String, Double> voted = new LinkedHashMap<>();
+        Map<String, Double> worth = new LinkedHashMap<>();
         for (int outcome = 0; outcome < outcomes; outcome++) {
             result.put(frame.outcomes().get(outcome), (double) wins[outcome] / SAMPLES);
+            voted.put(frame.outcomes().get(outcome), (double) votedWins[outcome] / SAMPLES);
+            worth.put(frame.outcomes().get(outcome), copied[outcome] / SAMPLES);
         }
-        return Collections.unmodifiableMap(result);
+        chances = Collections.unmodifiableMap(result);
+        votedChances = Collections.unmodifiableMap(voted);
+        threatWorths = Collections.unmodifiableMap(worth);
+    }
+
+    private double[][] choiceCumulatives(double[][] live) {
+        double[][] rows = new double[live.length][];
+        for (int voter = 0; voter < live.length; voter++) rows[voter] = choiceCumulative(live, voter);
+        return rows;
+    }
+
+    private void pick(int[] picks, double[][] live, double[] draw, int from, double[][] fixed) {
+        boolean abstainsWhenIndifferent = AiExperiments.enabled(frame.viewer(), Experiment.AGENDA_VALUE_TABLE);
+        int outcomes = frame.outcomes().size();
+        for (int voter = from; voter < picks.length; voter++) {
+            if (votes[voter] == 0) {
+                picks[voter] = ABSTAIN;
+                continue;
+            }
+            double[] cumulative = fixed != null ? fixed[voter] : choiceCumulative(live, voter);
+            if (cumulative == null) {
+                picks[voter] = abstainsWhenIndifferent ? ABSTAIN : indifferentPick(draw[voter], outcomes);
+            } else {
+                picks[voter] = softmaxPick(cumulative, draw[voter]);
+            }
+        }
+    }
+
+    private double[] choiceCumulative(double[][] live, int voter) {
+        double[] row = choiceRow(live, voter);
+        return spread(row) <= INDIFFERENT_SPREAD ? null : cumulative(row);
+    }
+
+    private int pickOrAbstain(int voter, int[] tally, double[][] live, int[] picks, int unvoted, double draw) {
+        double[] utility = live[voter];
+        double abstained = utility[unvoted] + ownVoteTerm(voter, unvoted, ABSTAIN);
+        double[] cost = ballotCosts()[voter];
+        double[] prices = new double[utility.length + 1];
+        for (int outcome = 0; outcome < utility.length; outcome++) {
+            int winner = winnerWith(voter, outcome, tally, live, picks);
+            prices[outcome] = utility[winner] + ownVoteTerm(voter, winner, outcome) - cost[outcome];
+        }
+        double best = Arrays.stream(prices, 0, utility.length).max().orElse(0);
+        if (best - abstained <= INDIFFERENT_SPREAD) return ABSTAIN;
+        prices[utility.length] = abstained;
+        int pick = softmaxPick(cumulative(prices), draw);
+        return pick == utility.length ? ABSTAIN : pick;
+    }
+
+    private int winnerWith(int voter, int ballot, int[] tally, double[][] live, int[] picks) {
+        int own = picks[voter];
+        picks[voter] = ballot;
+        int[] later = laterVotes(voter, picks);
+        int[] expected = tally.clone();
+        for (int outcome = 0; outcome < expected.length; outcome++) expected[outcome] += later[outcome];
+        expected[ballot] += votes[voter];
+        int winner = winner(expected, tieValues(live, picks));
+        picks[voter] = own;
+        return winner;
+    }
+
+    private int winnerWithout(int voter, int[] tally, double[][] live, int[] picks) {
+        int own = picks[voter];
+        picks[voter] = ABSTAIN;
+        int[] later = laterVotes(voter, picks);
+        int[] expected = tally.clone();
+        for (int outcome = 0; outcome < expected.length; outcome++) expected[outcome] += later[outcome];
+        int winner = winner(expected, tieValues(live, picks));
+        picks[voter] = own;
+        return winner;
+    }
+
+    private int answerTally(int voter, int[] tally, double[][] live, int[] picks) {
+        picks[voter] = ABSTAIN;
+        int winner = winner(tally, tieValues(live, picks));
+        double bestValue = live[voter][winner] + ownVoteTerm(voter, winner, ABSTAIN);
+        int bestPick = ABSTAIN;
+        int bestBallot = 0;
+        for (int outcome = 0; outcome < tally.length; outcome++) {
+            picks[voter] = outcome;
+            double[] tie = tieValues(live, picks);
+            int ballot = Math.min(votes[voter], Math.max(1, votesToWin(outcome, tally, tie)));
+            tally[outcome] += ballot;
+            winner = winner(tally, tie);
+            tally[outcome] -= ballot;
+            double value = live[voter][winner] + ownVoteTerm(voter, winner, outcome) - ballotCosts()[voter][outcome];
+            if (value > bestValue + EVEN) {
+                bestValue = value;
+                bestPick = outcome;
+                bestBallot = ballot;
+            }
+        }
+        picks[voter] = bestPick;
+        return bestBallot;
+    }
+
+    private int votesToWin(int outcome, int[] tally, double[] tie) {
+        int needed = 0;
+        for (int rival = 0; rival < tally.length; rival++) {
+            if (rival == outcome) continue;
+            int margin = winsTie(outcome, rival, tie) ? 0 : 1;
+            needed = Math.max(needed, tally[rival] + margin - tally[outcome]);
+        }
+        return needed;
+    }
+
+    private double[] tieValues(double[][] live, int[] picks) {
+        int speaker = frame.speaker();
+        if (frame.ownVoteTerms() == null) return live[speaker];
+        int ballot = picks[speaker] >= 0 ? picks[speaker] : castBallot(speaker);
+        double[] values = new double[live[speaker].length];
+        for (int outcome = 0; outcome < values.length; outcome++) {
+            values[outcome] = live[speaker][outcome] + ownVoteTerm(speaker, outcome, ballot);
+        }
+        return values;
+    }
+
+    private int castBallot(int voter) {
+        int ballot = ABSTAIN;
+        for (int outcome = 0; outcome < castBy[voter].length; outcome++) {
+            if (castBy[voter][outcome] > 0 && (ballot < 0 || castBy[voter][outcome] > castBy[voter][ballot])) {
+                ballot = outcome;
+            }
+        }
+        return ballot;
+    }
+
+    private double ownVoteTerm(int voter, int winner, int ballot) {
+        double[][][] terms = frame.ownVoteTerms();
+        if (terms == null) return 0;
+        return terms[voter][winner][ballot < 0 ? frame.outcomes().size() : ballot];
+    }
+
+    private void joinFor(double[][] live, int[] picks, double[] draw, int joiner, int sign) {
+        double[][][] shift = frame.joinShift();
+        for (int voter = 0; voter < live.length; voter++) {
+            for (int outcome = 0; outcome < live[voter].length; outcome++) {
+                live[voter][outcome] += sign * shift[voter][joiner][outcome];
+            }
+        }
+        pick(picks, live, draw, joiner + 1, null);
+    }
+
+    private int heldBallot(int voter, int pick, int[] tally, int[] picks, double[] speakerUtility) {
+        int[] later = laterVotes(voter, picks);
+        int needed = frame.ownVoteCounts() ? 1 : 0;
+        int alive = 0;
+        for (int rival = 0; rival < tally.length; rival++) {
+            if (rival == pick) continue;
+            int margin = winsTie(pick, rival, speakerUtility) ? 0 : 1;
+            needed = Math.max(needed, tally[rival] + later[rival] + margin - tally[pick]);
+            alive = Math.max(alive, tally[rival] + margin - tally[pick] - later[pick]);
+        }
+        if (needed <= votes[voter]) return needed;
+        return alive <= votes[voter] ? votes[voter] : 0;
+    }
+
+    private int[] laterVotes(int voter, int[] picks) {
+        int[] later = new int[frame.outcomes().size()];
+        for (int next = voter + 1; next < picks.length; next++) {
+            for (int outcome = 0; outcome < later.length; outcome++) later[outcome] += pending[next][outcome];
+            if (picks[next] >= 0) later[picks[next]] += votes[next];
+        }
+        return later;
+    }
+
+    private boolean winsTie(int outcome, int rival, double[] speakerUtility) {
+        if (Math.abs(speakerUtility[outcome] - speakerUtility[rival]) > EVEN) {
+            return speakerUtility[outcome] > speakerUtility[rival];
+        }
+        if (outcome == frame.evenTieOutcome() || rival == frame.evenTieOutcome()) {
+            return outcome == frame.evenTieOutcome();
+        }
+        return outcome < rival;
+    }
+
+    private double bestCopyFromVoters(boolean[] predictor, int[] picks, int winner) {
+        double best = 0;
+        for (int voter = 0; voter < picks.length; voter++) {
+            if (predictor[voter]) continue;
+            if (picks[voter] == winner || castBy[voter][winner] > 0) best = Math.max(best, frame.copyWorth()[voter]);
+        }
+        return best;
+    }
+
+    private boolean[] predictors(int voters) {
+        boolean[] predictor = new boolean[voters];
+        if (frame.threatOwner() >= 0) predictor[frame.threatOwner()] = true;
+        for (Rider rider : riders) {
+            if (GalacticThreatCost.RIDER.equals(rider.title())) predictor[rider.owner()] = true;
+        }
+        return predictor;
+    }
+
+    private int[] predictorCast(boolean[] predictor, int outcomes) {
+        int[] placed = new int[outcomes];
+        for (int voter = 0; voter < predictor.length; voter++) {
+            if (!predictor[voter]) continue;
+            for (int outcome = 0; outcome < outcomes; outcome++) placed[outcome] += castBy[voter][outcome];
+        }
+        return placed;
     }
 
     private static double spread(double[] utility) {
@@ -374,11 +882,11 @@ public final class AgendaForecast {
         return cumulative.length - 1;
     }
 
-    private static int winner(int[] tally, double[] speakerUtility) {
+    private int winner(int[] tally, double[] speakerUtility) {
         int best = 0;
         for (int outcome = 1; outcome < tally.length; outcome++) {
             boolean more = tally[outcome] > tally[best];
-            boolean tiedAndPreferred = tally[outcome] == tally[best] && speakerUtility[outcome] > speakerUtility[best];
+            boolean tiedAndPreferred = tally[outcome] == tally[best] && winsTie(outcome, best, speakerUtility);
             if (more || tiedAndPreferred) best = outcome;
         }
         return best;

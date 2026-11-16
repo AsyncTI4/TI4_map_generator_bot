@@ -8,6 +8,8 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -34,6 +36,10 @@ public class GalacticThreatRules {
     private static final String SILENCED_REPRESENTATIVES = "AssassinatedReps";
     private static final String DECLINED_AFTERS = "declinedAfters";
     private static final String QUEUE_WINDOW_PHASE = "agendawaiting";
+    private static final double VOTED_TIE_BREAK = 1e-3;
+    private static final int FEW_OUTCOMES = 2;
+    private static final double SURE_OF_VOTERS = 0.7;
+    private static final double SOME_VOTERS = 0.2;
 
     public static boolean holdsQueuedPrediction(Game game, Player seat) {
         return seat.hasAbility(ABILITY)
@@ -57,9 +63,22 @@ public class GalacticThreatRules {
         if (holdsQueuedPrediction(game, seat) && QUEUE_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
             return pressHidden(context, "lockAftersIn", "keep its prediction queued");
         }
-        if (PromisedVotes.forbidsRider(game, seat) || !worthPredicting(game, seat)) return Optional.empty();
+        if (!mayQueueNow(context) || PromisedVotes.forbidsRider(game, seat) || !worthPredicting(game, seat)) {
+            return Optional.empty();
+        }
         return pressHidden(context, QUEUE_ABILITY, "queue Galactic Threat")
                 .or(() -> pressHidden(context, "queueAnAfter", "look at its \"after\" options"));
+    }
+
+    private static boolean mayQueueNow(AiTurnContext context) {
+        Game game = context.game();
+        if (!QUEUE_WINDOW_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) return false;
+        if (AgendaQueue.passedOnAfters(game, context.seat())) return false;
+        return hiddenButton(context, QUEUE_ABILITY) || hiddenButton(context, "queueAnAfter");
+    }
+
+    private static boolean hiddenButton(AiTurnContext context, String handlerId) {
+        return pressHidden(context, handlerId, "").isPresent();
     }
 
     private static boolean silencedByPoliticalSecret(Game game, Player seat) {
@@ -83,10 +102,25 @@ public class GalacticThreatRules {
             if (other == seat) continue;
             if (!ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(seat, other, new ArrayList<>(), game)
                     .isEmpty()) {
-                return true;
+                return suitsThisAgenda(game, seat);
             }
         }
         return false;
+    }
+
+    static boolean suitsThisAgenda(Game game, Player seat) {
+        if (!AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING) || AgendaRound.isFinalAgenda(game)) {
+            return true;
+        }
+        boolean fewOutcomes = AgendaOutcomes.of(game).size() <= FEW_OUTCOMES;
+        AgendaForecast forecast = AgendaForecast.of(game, seat);
+        if (forecast.isEmpty()) return fewOutcomes;
+        double bar = fewOutcomes ? SOME_VOTERS : SURE_OF_VOTERS;
+        return forecast.outcomes().stream().anyMatch(outcome -> votedOncePredicted(forecast, seat, outcome) >= bar);
+    }
+
+    static double votedOncePredicted(AgendaForecast forecast, Player seat, String outcome) {
+        return forecast.withRider(seat, GalacticThreatCost.RIDER, outcome).votedChance(outcome);
     }
 
     private static Optional<AiDecision> predict(AiTurnContext context) {
@@ -103,8 +137,10 @@ public class GalacticThreatRules {
                     .toList();
             if (riders.isEmpty()) continue;
             AgendaForecast forecast = AgendaForecast.of(game, context.seat());
+            Comparator<PromptButton> byLikelihood =
+                    Comparator.comparingDouble(button -> likelihood(game, context.seat(), forecast, button));
             PromptButton choice = riders.stream()
-                    .max(Comparator.comparingDouble(button -> likelihood(game, context.seat(), forecast, button)))
+                    .max(byLikelihood.thenComparingDouble(button -> copyTieBreak(context.seat(), forecast, button)))
                     .orElseThrow();
             return Optional.of(AiDecision.press(prompt, choice, "predict the agenda's outcome"));
         }
@@ -122,7 +158,31 @@ public class GalacticThreatRules {
                     : forecast.expected(outcome -> owner.getPlanets().contains(outcome) ? 1 : 0);
         }
         String target = StringUtils.substringBefore(StringUtils.removeStart(id, RIDER_PREFIX), "_" + RIDER_SUFFIX);
-        return forecast.chance(StringUtils.substringAfter(target, ";"));
+        String outcome = StringUtils.substringAfter(target, ";");
+        if (!AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_COST)) return forecast.chance(outcome);
+        AgendaForecast predicted = AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING)
+                ? forecast.withRider(seat, GalacticThreatCost.RIDER, outcome)
+                : forecast;
+        if (AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_BY_VOTERS)) return predicted.votedChance(outcome);
+        return predicted.threatWorth(outcome) + VOTED_TIE_BREAK * predicted.votedChance(outcome);
+    }
+
+    private static double copyTieBreak(Player seat, AgendaForecast forecast, PromptButton rider) {
+        String id = rider.handlerId();
+        if (forecast.isEmpty()
+                || !id.startsWith(RIDER_PREFIX)
+                || !AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_COST)
+                || !AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_BY_VOTERS)) return 0;
+        String outcome = outcomeOf(id);
+        AgendaForecast predicted = AiExperiments.enabled(seat, Experiment.GALACTIC_THREAT_TIMING)
+                ? forecast.withRider(seat, GalacticThreatCost.RIDER, outcome)
+                : forecast;
+        return predicted.threatWorth(outcome);
+    }
+
+    private static String outcomeOf(String riderId) {
+        String target = StringUtils.substringBefore(StringUtils.removeStart(riderId, RIDER_PREFIX), "_" + RIDER_SUFFIX);
+        return StringUtils.substringAfter(target, ";");
     }
 
     private static double votesBasedLikelihood(Game game, Player seat, PromptButton rider) {

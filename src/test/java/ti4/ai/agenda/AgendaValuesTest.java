@@ -2,12 +2,17 @@ package ti4.ai.agenda;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.OptionalDouble;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -27,6 +32,7 @@ class AgendaValuesTest extends BaseTi4Test {
     private Player hacan;
     private Tile lodorTile;
 
+    // These tests pin the legacy formulas, so the expert value table (its own tests) is switched off here.
     // A simple three-seat table: Nekro and Sol at home, Hacan seated without anything on the board, Lodor (cultural,
     // with an alpha wormhole) beside Nekro's home and Mehar Xull (hazardous) somewhere unowned.
     @BeforeEach
@@ -42,6 +48,8 @@ class AgendaValuesTest extends BaseTi4Test {
         test.place("18", "000");
         test.solHomeBeside(lodorPosition);
         test.game.setSpeaker(sol);
+        for (Player seat : List.of(nekro, sol, hacan))
+            AiExperiments.disable(seat, EnumSet.of(Experiment.AGENDA_VALUE_TABLE));
     }
 
     private double value(Player voter, String agenda, String outcome, String ownVote) {
@@ -61,6 +69,20 @@ class AgendaValuesTest extends BaseTi4Test {
     // For/Against words, each seat, an owned and an unowned planet, a strategy card number and a law in play.
     @Test
     void everyOfficialAgendaHasAFiniteValue() {
+        assertEveryOfficialAgendaIsFinite(List.of(nekro));
+    }
+
+    // The same sweep with the expert value table switched back on (it is on by default in play), for every voter, so
+    // each group's values and the legacy fallbacks it leaves in place stay finite.
+    @Test
+    void everyOfficialAgendaHasAFiniteValueOnTheExpertTable() {
+        for (Player seat : List.of(nekro, sol, hacan)) seat.setStoredValue(AiExperiments.DISABLED_KEY, "");
+        assertThat(AiExperiments.enabled(nekro, Experiment.AGENDA_VALUE_TABLE)).isTrue();
+
+        assertEveryOfficialAgendaIsFinite(List.of(nekro, sol, hacan));
+    }
+
+    private void assertEveryOfficialAgendaIsFinite(List<Player> voters) {
         nekro.addPlanet(LODOR);
         test.game.getLaws().put("minister_war", 1);
         test.game.getLawsInfo().put("minister_war", sol.getFaction());
@@ -80,13 +102,15 @@ class AgendaValuesTest extends BaseTi4Test {
 
         List<String> agendas = officialAgendas();
         assertThat(agendas).hasSize(63);
-        for (String agenda : agendas) {
-            for (String outcome : outcomes) {
-                for (String ownVote : List.of("", "for", "against", outcome)) {
-                    assertThatCode(() -> assertThat(value(nekro, agenda, outcome, ownVote))
-                                    .isFinite())
-                            .as("%s / %s / %s", agenda, outcome, ownVote)
-                            .doesNotThrowAnyException();
+        for (Player voter : voters) {
+            for (String agenda : agendas) {
+                for (String outcome : outcomes) {
+                    for (String ownVote : List.of("", "for", "against", outcome)) {
+                        assertThatCode(() -> assertThat(value(voter, agenda, outcome, ownVote))
+                                        .isFinite())
+                                .as("%s: %s / %s / %s", voter.getFaction(), agenda, outcome, ownVote)
+                                .doesNotThrowAnyException();
+                    }
                 }
             }
         }
@@ -189,5 +213,72 @@ class AgendaValuesTest extends BaseTi4Test {
 
         assertThat(value(nekro, "abolishment", "minister_war", "")).isNegative();
         assertThat(value(sol, "abolishment", "minister_war", "")).isPositive();
+    }
+
+    // Point laws lose their point when discarded: the card says the holder loses the point if they lose the card.
+    @Test
+    void discardingAPointLawCostsItsHolderThePoint() {
+        test.game.addLaw("shard_of_the_throne", "nekro");
+        double point = ScoringStakes.scoreValue(test.game, nekro, 1);
+
+        assertThat(value(nekro, "abolishment", "shard_of_the_throne", "")).isCloseTo(-point, within(1e-9));
+        assertThat(value(sol, "abolishment", "shard_of_the_throne", "")).isPositive();
+        assertThat(value(nekro, "constitution", "for", "for")).isLessThanOrEqualTo(-point);
+    }
+
+    @Test
+    void miscountCountsAPointLawAtItsFullPoint() {
+        test.game.addLaw("crown_of_emphidia", "sol");
+
+        assertThat(value(nekro, "miscount", "crown_of_emphidia", "")).isPositive();
+        assertThat(value(sol, "miscount", "crown_of_emphidia", "")).isNegative();
+    }
+
+    // The legacy values judge other seats from public information only. Handing Sol a technology secret and swapping
+    // its cards for stronger ones must change neither how Nekro values Sol's gains nor how Nekro forecasts Sol's own
+    // vote (Sol's view as
+    // modelled by another seat, which cannot read Sol's cards).
+    @Test
+    void legacyValuesDoNotReadAnotherSeatsSecretsOrHand() {
+        sol.setTechs(new java.util.ArrayList<>(List.of("nm", "gd", "amd")));
+        for (int index = 1; index <= 3; index++) sol.setActionCard("examcard" + index, index);
+        List<String[]> cases = List.of(
+                new String[] {"artifact", "for"},
+                new String[] {"wormhole_research", "for"},
+                new String[] {"crisis", "3"},
+                new String[] {"crisis", "7"},
+                new String[] {"crisis", "8"},
+                new String[] {"grant_reallocation", "sol"},
+                new String[] {"secret", "sol"},
+                new String[] {"warrant", "sol"},
+                new String[] {"minister_policy", "sol"},
+                new String[] {"execution", "sol"});
+        List<Double> before = cases.stream()
+                .flatMap(c -> hiddenSafeValues(c[0], c[1]).stream())
+                .toList();
+
+        sol.setSecret("mlp");
+        for (int index = 1; index <= 3; index++) sol.removeActionCard(index);
+        sol.setActionCard("sabo1", 1);
+        sol.setActionCard("sabo2", 2);
+        sol.setActionCard("veto", 3);
+
+        List<Double> after = cases.stream()
+                .flatMap(c -> hiddenSafeValues(c[0], c[1]).stream())
+                .toList();
+        for (int index = 0; index < before.size(); index++) {
+            String[] agenda = cases.get(index / 2);
+            assertThat(after.get(index))
+                    .as("%s / %s (%s)", agenda[0], agenda[1], index % 2 == 0 ? "Nekro's view" : "Sol forecast")
+                    .isCloseTo(before.get(index), within(1e-9));
+        }
+    }
+
+    private List<Double> hiddenSafeValues(String agenda, String outcome) {
+        return List.of(
+                AgendaValues.of(test.game, nekro, true, false, agenda, outcome, outcome)
+                        .orElseThrow(),
+                AgendaValues.of(test.game, sol, false, false, agenda, outcome, outcome)
+                        .orElseThrow());
     }
 }

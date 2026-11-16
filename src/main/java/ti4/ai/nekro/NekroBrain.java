@@ -16,6 +16,7 @@ import ti4.ai.actioncards.SabotageRules;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.BoatFloat;
 import ti4.ai.agenda.GalacticThreatRules;
 import ti4.ai.agenda.RiderPayouts;
 import ti4.ai.agenda.ShenanigansRules;
@@ -306,10 +307,13 @@ public class NekroBrain implements FactionBrain {
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,
             PromissoryRules::queueAgendaNote,
+            BoatFloat::arrange,
             this::declineWhens,
             GalacticThreatRules::next,
             AgendaCardRules::riders,
             this::declineAfters,
+            TradeRules::payTheAnswerer,
+            TradeRules::holdVoteForDeals,
             AgendaVoting::next,
             this::abstainFromAgenda,
             this::breakAgendaTie,
@@ -475,11 +479,16 @@ public class NekroBrain implements FactionBrain {
     private Optional<AiDecision> declineWhens(AiTurnContext context) {
         if (context.game().getStoredValue("declinedWhens").contains(context.faction() + "_")) return Optional.empty();
         if (AgendaQueue.holdsQueuedWhen(context.game(), context.seat())) return Optional.empty();
+        Optional<AiDecision> bountyOffer = TradeRules.offerDiscardBounty(context);
+        if (bountyOffer.isPresent()) return bountyOffer;
         if (AgendaCardRules.holdsPlayedVeto(context)) return Optional.empty();
         Optional<AiDecision> veto = AgendaCardRules.queueVeto(context);
         if (veto.isPresent()) return veto;
         Optional<AiDecision> quash = QuashRules.queue(context);
         if (quash.isPresent()) return quash;
+        Optional<AiDecision> bounty =
+                AgendaCardRules.awaitVetoBounty(context).or(() -> QuashRules.awaitBounty(context));
+        if (bounty.isPresent()) return bounty;
         return firstHandler(context, "declineToQueueAWhen", "pass on playing a \"when\"");
     }
 
@@ -498,8 +507,10 @@ public class NekroBrain implements FactionBrain {
             Optional<PromptButton> abstain = prompt.firstEnabled(button -> button.isOwnedBy(context.faction())
                     && "resolveAgendaVote_0".equals(button.handlerId())
                     && !context.alreadyPressed(prompt, button));
-            if (abstain.isPresent())
+            if (abstain.isPresent()) {
+                AgendaVoting.markAbstained(context);
                 return Optional.of(AiDecision.press(prompt, abstain.get(), "abstain from the vote"));
+            }
         }
         return Optional.empty();
     }

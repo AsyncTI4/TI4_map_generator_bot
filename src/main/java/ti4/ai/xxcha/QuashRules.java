@@ -3,8 +3,11 @@ package ti4.ai.xxcha;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
+import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -20,6 +23,7 @@ public class QuashRules {
     private static final String ABILITY = "quash";
     private static final String QUEUE_QUASH = "queueWhen_ability_quash";
     private static final String OPEN_WHENS = "queueAWhen";
+    private static final double EXPERT_QUASH_MARGIN = 1.0;
 
     public static Optional<AiDecision> queue(AiTurnContext context) {
         Game game = context.game();
@@ -39,7 +43,31 @@ public class QuashRules {
     public static boolean worthQuashing(Game game, Player seat) {
         OptionalDouble loss = AgendaPolicy.expectedLoss(game, seat);
         if (loss.isEmpty()) return AgendaPolicy.worthDiscarding(game, seat);
-        return loss.getAsDouble() > CardFacade.strategyToken();
+        return loss.getAsDouble() > threshold(seat) || paidEnough(game, seat);
+    }
+
+    private static boolean paidEnough(Game game, Player seat) {
+        int bounty = DiscardBounties.quashBounty(game, seat);
+        if (bounty <= 0) return false;
+        OptionalDouble loss = AgendaPolicy.signedLoss(game, seat);
+        return loss.isPresent() && loss.getAsDouble() + bounty > threshold(seat);
+    }
+
+    public static int bountyNeeded(Player quasher, double quasherLoss) {
+        return Math.max(1, (int) Math.floor(threshold(quasher) - quasherLoss) + 1);
+    }
+
+    private static double threshold(Player seat) {
+        return CardFacade.strategyToken() + quashMargin(seat);
+    }
+
+    public static Optional<AiDecision> awaitBounty(AiTurnContext context) {
+        if (!canQuash(context.seat())) return Optional.empty();
+        return DiscardBounties.awaitOffers(context);
+    }
+
+    private static double quashMargin(Player seat) {
+        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE) ? EXPERT_QUASH_MARGIN : 0;
     }
 
     private static Optional<AiDecision> pressHidden(AiTurnContext context, String handlerId, String reason) {

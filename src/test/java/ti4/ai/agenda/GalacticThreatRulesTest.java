@@ -4,11 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.prompt;
 
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.game.Player;
+import ti4.game.Tile;
+import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 
 class GalacticThreatRulesTest extends BaseTi4Test {
@@ -68,10 +75,12 @@ class GalacticThreatRulesTest extends BaseTi4Test {
     }
 
     // With the agenda in view the prediction follows the forecast, which counts the votes a rider has already taken
-    // out of the election: Sol has the most votes at the start, but its own rider is on Xxcha.
+    // out of the election: Sol has the most votes at the start, but its own rider is on Xxcha. Sol is the speaker, so
+    // Xxcha cannot leave its election to a tie-break and must cast votes for it.
     @Test
     void predictsTheOutcomeTheForecastFavoursNotJustTheMostVotes() {
         test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setSpeakerUserID(test.sol.getUserID());
         test.game.setStoredValue("galacticThreatUsed", "Yes");
         test.game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");
@@ -125,5 +134,140 @@ class GalacticThreatRulesTest extends BaseTi4Test {
         AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
 
         assertThat(press(window)).isEqualTo("queueAnAfter");
+    }
+
+    private void openMinisterOfWar(String agendaCount) {
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.addSeat("200000000000000003", "hacan", "green");
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaCount", agendaCount);
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_minister_war");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"red\":6,\"green\":6,\"black\":0}");
+    }
+
+    // Traces-4b, Minister of War on the first agenda: four candidates and no seat sure to vote any of them. Nekro keeps
+    // Galactic Threat for the second agenda rather than spend it on a 14% guess.
+    @Test
+    void keepsGalacticThreatForTheSecondAgendaOnAnOpenElection() {
+        openMinisterOfWar("1");
+        AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isFalse();
+        assertThat(press(window)).isEmpty();
+    }
+
+    // Nekro uses Galactic Threat every agenda phase: unused on the first agenda, it goes on the second whatever it is.
+    @Test
+    void usesGalacticThreatOnTheSecondAgendaWhateverItIs() {
+        openMinisterOfWar("2");
+        AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(press(window)).isEqualTo("queueAnAfter");
+    }
+
+    private void firstAgendaSanctions() {
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.nekro.getUserID());
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Law_For/Against_7_sanctions");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"black\":0}");
+    }
+
+    // A For/Against agenda has two outcomes, so an unsure prediction is worth taking on the first agenda once some seat
+    // is likely to vote: Sol holds seven action cards and votes Against Executive Sanctions.
+    @Test
+    void usesGalacticThreatOnAFirstAgendaWithTwoOutcomes() {
+        firstAgendaSanctions();
+        int index = 1;
+        for (String card : List.of("sabo1", "sabo2", "sabo3", "sabo4", "veto", "veto2", "veto3"))
+            test.sol.setActionCard(card, index++);
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // Traces (aiselfplay528616 r1 #1, Economic Equality; aiselfplay753673 r3 #6, Executive Sanctions): Nekro predicted
+    // a
+    // first two-outcome agenda that nobody voted on, so the speaker's tie-break gave it nothing. With no likely voter
+    // even after the prediction is placed, it keeps Galactic Threat for the second agenda.
+    @Test
+    void keepsGalacticThreatOnAFirstTwoOutcomeAgendaNobodyWillVoteOn() {
+        firstAgendaSanctions();
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isFalse();
+
+        test.game.setStoredValue("agendaCount", "2");
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // CPU: outside the "after" window, with no queue button to press, Nekro builds no forecast for its timing.
+    @Test
+    void looksAtTheTimingOnlyWhenItCanQueue() {
+        openMinisterOfWar("2");
+        test.game.setPhaseOfGame("agendavoting");
+        AiPrompt window = prompt("window", PromptSource.AI_THREAD, NOW, "queueAnAfter", "declineToQueueAnAfter");
+
+        assertThat(press(window)).isEmpty();
+        test.game.setPhaseOfGame("agendawaiting");
+        assertThat(press()).isEmpty();
+        assertThat(press(window)).isEqualTo("queueAnAfter");
+        test.game.setStoredValue("declinedAfters", "nekro_");
+        assertThat(press(window)).isEmpty();
+    }
+
+    // Without the timing experiment Nekro predicts on the first agenda, as before.
+    @Test
+    void controlSeatPredictsOnTheFirstAgenda() {
+        openMinisterOfWar("1");
+        AiExperiments.disable(test.nekro, Set.of(Experiment.GALACTIC_THREAT_TIMING));
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // A first-agenda election that one seat is sure to carry with its own votes: Nekro predicts it right away.
+    @Test
+    void usesGalacticThreatOnAFirstAgendaElectionWithASureVoter() {
+        test.addSeat("200000000000000002", "xxcha", "red");
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_minister_war");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":12,\"red\":1,\"black\":0}");
+
+        assertThat(GalacticThreatRules.suitsThisAgenda(test.game, test.nekro)).isTrue();
+    }
+
+    // Ixthian Artifact as the last agenda, Sol (9 votes) For and Xxcha (4 votes, holding Mecatol Rex) Against. Only
+    // Xxcha
+    // has technologies Nekro lacks, so the expected copy is on Against. The prediction follows the likely voters (For);
+    // a seat without GALACTIC_THREAT_BY_VOTERS still ranks by the copy and predicts Against.
+    @Test
+    void predictsTheOutcomeMostLikelyToBeVotedRatherThanTheBestCopy() {
+        Player xxcha = test.addSeat("200000000000000002", "xxcha", "red");
+        test.sol.removeTech("gd");
+        Tile mecatol = test.place("18", "000");
+        xxcha.addPlanet("mr");
+        test.units(mecatol, "space", xxcha, UnitType.Cruiser, 3);
+        test.units(mecatol, "mr", xxcha, UnitType.Infantry, 2);
+        for (String tech : List.copyOf(test.sol.getTechs())) test.nekro.addTech(tech);
+        for (String tech : List.of("gd", "st", "hm", "sdn")) xxcha.addTech(tech);
+        test.game.setVp(10);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("galacticThreatUsed", "Yes");
+        test.game.setRound(2);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo("Directive_For/Against_7_artifact");
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":9,\"red\":4,\"black\":0}");
+        AiPrompt riders = prompt(
+                "riders",
+                PromptSource.PUBLIC,
+                NOW,
+                "FFCC_nekro_rider_fa;for_Galactic Threat Rider",
+                "FFCC_nekro_rider_fa;against_Galactic Threat Rider");
+
+        assertThat(press(riders)).isEqualTo("FFCC_nekro_rider_fa;for_Galactic Threat Rider");
+
+        AiExperiments.disable(test.nekro, Set.of(Experiment.GALACTIC_THREAT_BY_VOTERS));
+        assertThat(press(riders)).isEqualTo("FFCC_nekro_rider_fa;against_Galactic Threat Rider");
     }
 }

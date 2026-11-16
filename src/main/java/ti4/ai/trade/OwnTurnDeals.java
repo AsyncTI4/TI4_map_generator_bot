@@ -102,6 +102,8 @@ class OwnTurnDeals {
     }
 
     private static Optional<AiDecision> agenda(AiTurnContext context) {
+        Optional<AiDecision> bounty = timed("trade.discardBounty", () -> DiscardBountyDeals.offer(context));
+        if (bounty.isPresent()) return bounty;
         List<Player> partners = timed("trade.partners", () -> partners(context));
         if (partners.isEmpty()) return Optional.empty();
         String ours = context.faction();
@@ -116,6 +118,17 @@ class OwnTurnDeals {
                         partners,
                         partner -> AiSeats.isAiSeat(partner) && ours.compareTo(partner.getFaction()) < 0))
                 .or(() -> wash(context, partners, partner -> !AiSeats.isAiSeat(partner)));
+    }
+
+    static Optional<AiDecision> payTheAnswerer(AiTurnContext context) {
+        if (!TradeLegality.isAgendaPhase(context.game())) return Optional.empty();
+        return timed("trade.payTheAnswerer", () -> AnswererDeals.propose(context, () -> partners(context)))
+                .or(() -> AnswererDeals.awaitAnswer(context));
+    }
+
+    static Optional<AiDecision> holdVoteForDeals(AiTurnContext context) {
+        if (!TradeLegality.isAgendaPhase(context.game())) return Optional.empty();
+        return timed("trade.voteTurnDeals", () -> VoteTurnDeals.hold(context, () -> partners(context)));
     }
 
     private static boolean startOfOwnTurn(AiTurnContext context) {

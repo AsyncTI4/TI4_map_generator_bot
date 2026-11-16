@@ -110,6 +110,18 @@ final class SelfPlayEnvironment implements AutoCloseable {
     // Every strategy card an Overrule play picked, in order; the game closes each one when the seat's turn is over.
     final List<OverrulePick> overrulePicks = new ArrayList<>();
     volatile String lastDecisionReason = "";
+    // Hears every agenda tie-break press that landed but did not come from the speaker AI's own agenda logic (the
+    // referee, or a stalled seat's fallback); the running game points it at its AgendaTracker.
+    volatile java.util.function.Consumer<AgendaTracker.TieBreaker> agendaTieBroken = by -> {};
+    // The agenda trace hears every seat decision and every press that landed, apart from decisionListener, which a
+    // harness may replace.
+    volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> agendaDecisions = (context, decision) -> {};
+
+    interface PressHeard {
+        void heard(String faction, String customId, String outcome);
+    }
+
+    volatile PressHeard agendaPresses = (faction, customId, outcome) -> {};
     Supplier<Game> game = () -> null;
     // Sees every decision a seat makes, with the board it made it on; a harness sets it to follow what seats spend.
     volatile java.util.function.BiConsumer<AiTurnContext, AiDecision> decisionListener = (context, decision) -> {};
@@ -358,8 +370,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
                             .computeIfAbsent(seat.faction(), ignored -> new java.util.TreeMap<>())
                             .merge(family, 1, Integer::sum);
                 }
+                if (target.customId().contains(AGENDA_TIE_HANDLER))
+                    tieBreakerOf(Thread.currentThread().getStackTrace()).ifPresent(agendaTieBroken);
                 offered.filter(this::accepted).ifPresent(this::recordTrade);
                 overruled.ifPresent(this::recordOverrulePick);
+                agendaPresses.heard(
+                        seat.faction(), target.customId(), outcome.outcome().name());
             }
             record(seat.faction() + " pressed " + target.customId() + " -> " + outcome.outcome() + " ("
                     + outcome.detail() + ")");
@@ -480,6 +496,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 AiDecision decision = overridden(context, brain.decide(context));
                 if (log != null) log.decided(context, memoryBefore, decision);
                 decisionListener.accept(context, decision);
+                agendaDecisions.accept(context, decision);
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
                 countReason(decision);
@@ -691,6 +708,27 @@ final class SelfPlayEnvironment implements AutoCloseable {
     static final String TACTICAL_ACTION = "tactical action";
     static final String TRADE = "trade";
     static final String TRADE_PREFIX = "trade: ";
+
+    private static final String AGENDA_TIE_HANDLER = "resolveAgendaVote_outcomeTie";
+    private static final String TICK_RUNNER = "ti4.ai.runtime.AiTickRunner";
+
+    // Who pressed a tie-break, read from the call stack: AiTickRunner#referee is the referee, AiTickRunner#fallBack and
+    // #pressDelegated are a stalled seat's fallback, anything else is the AI's own agenda logic (no defect).
+    static Optional<AgendaTracker.TieBreaker> tieBreakerOf(StackTraceElement[] stack) {
+        for (StackTraceElement frame : stack) {
+            if (!TICK_RUNNER.equals(frame.getClassName())) continue;
+            switch (frame.getMethodName()) {
+                case "referee" -> {
+                    return Optional.of(AgendaTracker.TieBreaker.REFEREE);
+                }
+                case "fallBack", "pressDelegated" -> {
+                    return Optional.of(AgendaTracker.TieBreaker.FALLBACK);
+                }
+                default -> {}
+            }
+        }
+        return Optional.empty();
+    }
 
     static String handlerFamily(String customId) {
         String handler = customId.startsWith("FFCC_")

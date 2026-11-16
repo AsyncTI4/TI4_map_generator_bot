@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -198,9 +200,17 @@ public class ResearchPolicy {
 
     public static double freeResearchWorth(Game game, Player seat) {
         return bestResearchable(game, seat)
-                .map(tech -> TECH_TEMPO * researchValue(game, seat, tech)
-                        + ScoringStakes.scoreValue(game, seat, publicPointsCompletedBy(game, seat, tech)))
+                .map(tech -> worthWithPoints(game, seat, tech, researchValue(game, seat, tech)))
                 .orElse(0.0);
+    }
+
+    public static double freeResearchWorth(Game game, Player seat, boolean readsOwnHand) {
+        return readsOwnHand ? freeResearchWorth(game, seat) : publicResearchWorth(game, seat);
+    }
+
+    public static double worthWithPoints(Game game, Player seat, String alias, double researchValue) {
+        int points = publicPointsCompletedBy(game, seat, alias);
+        return TECH_TEMPO * (researchValue - OBJECTIVE_WEIGHT * points) + ScoringStakes.scoreValue(game, seat, points);
     }
 
     public static Optional<String> bestResearchable(Game game, Player seat) {
@@ -208,6 +218,65 @@ public class ResearchPolicy {
     }
 
     private static Optional<String> pickBestResearchable(Game game, Player seat) {
+        return best(game, seat, researchable(game, seat));
+    }
+
+    public static double publicResearchWorth(Game game, Player seat) {
+        return publicBestResearchable(game, seat)
+                .map(alias -> publicResearchWorth(game, seat, alias))
+                .orElse(0.0);
+    }
+
+    public static Optional<String> publicBestResearchable(Game game, Player seat) {
+        return researchable(game, seat).stream()
+                .filter(alias -> Mapper.getTech(alias) != null && !seat.hasTech(alias))
+                .max(Comparator.comparingDouble((String alias) -> publicResearchWorth(game, seat, alias))
+                        .thenComparing(Comparator.naturalOrder()));
+    }
+
+    private static double publicResearchWorth(Game game, Player seat, String alias) {
+        return TECH_TEMPO * baseValue(Mapper.getTech(alias))
+                + ScoringStakes.scoreValue(game, seat, publicPointsCompletedBy(game, seat, alias));
+    }
+
+    public record FreeTech(String alias, double tempo, int points, double pointValue) {}
+
+    public static Optional<FreeTech> bestFreeTech(
+            Game game, Player seat, boolean readsOwnHand, ToDoubleFunction<FreeTech> worth) {
+        return researchable(game, seat).stream()
+                .filter(alias -> Mapper.getTech(alias) != null && !seat.hasTech(alias))
+                .distinct()
+                .map(alias -> freeTech(game, seat, alias, readsOwnHand))
+                .max(Comparator.comparingDouble(worth).thenComparing(FreeTech::alias));
+    }
+
+    private static FreeTech freeTech(Game game, Player seat, String alias, boolean readsOwnHand) {
+        TechnologyModel tech = Mapper.getTech(alias);
+        double tempo = baseValue(tech);
+        int points = publicPointsCompletedBy(game, seat, alias)
+                + (readsOwnHand ? secretPointsCompletedBy(game, seat, tech) : 0);
+        return new FreeTech(alias, TECH_TEMPO * tempo, points, ScoringStakes.scoreValue(game, seat, points));
+    }
+
+    static int secretPointsCompletedBy(Game game, Player seat, TechnologyModel tech) {
+        return seat.getSecretsUnscored().keySet().stream().anyMatch(secret -> completes(game, seat, secret, tech))
+                ? 1
+                : 0;
+    }
+
+    private static boolean completes(Game game, Player seat, String objective, TechnologyModel tech) {
+        if (TechPath.follows(objective)) {
+            OptionalInt before = TechPath.researchesNeeded(game, seat, objective, null);
+            OptionalInt after = TechPath.researchesNeeded(game, seat, objective, tech);
+            return before.orElse(0) > 0 && after.isPresent() && after.getAsInt() == 0;
+        }
+        int threshold = ListPlayerInfoService.getObjectiveThreshold(objective, game);
+        return threshold > 0
+                && progress(game, objective, seat, null) < threshold
+                && progress(game, objective, seat, tech) >= threshold;
+    }
+
+    private static List<String> researchable(Game game, Player seat) {
         List<String> researchable = new ArrayList<>();
         for (TechnologyType type : TechnologyType.values()) {
             for (TechnologyModel tech :
@@ -215,7 +284,7 @@ public class ResearchPolicy {
                 researchable.add(tech.getAlias());
             }
         }
-        return best(game, seat, researchable);
+        return researchable;
     }
 
     public static double value(Game game, Player seat, String alias) {

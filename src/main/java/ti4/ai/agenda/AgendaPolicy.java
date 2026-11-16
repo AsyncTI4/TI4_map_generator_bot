@@ -9,6 +9,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.eval.BoardView;
 import ti4.ai.perception.PromptButton;
 import ti4.game.Game;
@@ -68,6 +70,7 @@ public class AgendaPolicy {
     private static final double FAVOURITE_CHANCE = 0.5;
     private static final double DISCARD_THRESHOLD = 5.0;
     private static final double VERY_BAD_LOSS = 3.5;
+    private static final double EXPERT_VERY_BAD_LOSS = 3.0;
     private static final String ELECT_PLAYER = "elect player";
     private static final Set<String> POINT_ELECTIONS = Set.of("censure", "shard_of_the_throne", "crown_of_emphidia");
 
@@ -97,11 +100,18 @@ public class AgendaPolicy {
 
     public static Optional<PromptButton> chooseOutcome(Game game, Player speaker, List<PromptButton> outcomes) {
         if (outcomes.isEmpty()) return Optional.empty();
+        if (BoatFloat.speakerHonoursAgainst(game, speaker)) {
+            Optional<PromptButton> against = outcomes.stream()
+                    .filter(button -> AgendaValueMath.AGAINST.equalsIgnoreCase(outcomeOf(button)))
+                    .findFirst();
+            if (against.isPresent()) return against;
+        }
         String agenda = currentAgenda(game);
         AgendaForecast forecast = AgendaForecast.of(game, speaker);
         if (!forecast.isEmpty()) {
             return outcomes.stream()
-                    .max(Comparator.comparingDouble(button -> forecast.utility(speaker, outcomeOf(button))));
+                    .reduce((best, next) ->
+                            forecast.breaksTieToward(speaker, outcomeOf(next), outcomeOf(best)) ? next : best);
         }
         return outcomes.stream()
                 .max(Comparator.comparingDouble(
@@ -137,7 +147,24 @@ public class AgendaPolicy {
     public static boolean veryBadFor(Game game, Player seat) {
         OptionalDouble loss = expectedLoss(game, seat);
         if (loss.isEmpty()) return worthDiscarding(game, seat);
-        return loss.getAsDouble() >= VERY_BAD_LOSS;
+        return loss.getAsDouble() >= veryBadLoss(seat);
+    }
+
+    public static boolean worthDiscardingFor(Game game, Player seat, int bounty) {
+        if (bounty <= 0) return false;
+        AgendaForecast forecast = AgendaVoting.forecastWithItsBallot(game, seat);
+        if (forecast.isEmpty()) return false;
+        return bounty - forecast.expectedUtility(seat) >= veryBadLoss(seat);
+    }
+
+    public static OptionalDouble signedLoss(Game game, Player seat) {
+        AgendaForecast forecast = AgendaVoting.forecastWithItsBallot(game, seat);
+        if (forecast.isEmpty()) return OptionalDouble.empty();
+        return OptionalDouble.of(-forecast.expectedUtility(seat));
+    }
+
+    private static double veryBadLoss(Player seat) {
+        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE) ? EXPERT_VERY_BAD_LOSS : VERY_BAD_LOSS;
     }
 
     public static OptionalDouble expectedLoss(Game game, Player seat) {

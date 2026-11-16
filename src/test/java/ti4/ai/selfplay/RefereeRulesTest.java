@@ -230,6 +230,18 @@ class RefereeRulesTest extends BaseTi4Test {
                 .isTrue();
     }
 
+    // The speaker AI breaks a tie itself (NekroBrain#breakAgendaTie); the referee only steps in once the tie has stood
+    // for ten minutes. The agenda harness counts the presses that land (SelfPlayEnvironment) as defects.
+    @Test
+    void breaksAnAgendaTieOnlyAfterTheSpeakerHadTenMinutes() {
+        String tie = "FFCC_sol_resolveAgendaVote_outcomeTie*_for";
+        AiPrompt fresh = prompt("fresh", PromptSource.PUBLIC, NOW - 599_000L, tie);
+        assertThat(next(fresh)).isEmpty();
+
+        AiPrompt settled = prompt("settled", PromptSource.PUBLIC, NOW - 600_000L, tie);
+        assertThat(next(settled).map(press -> press.button().customId())).contains(tie);
+    }
+
     private AiPrompt allHaveScoredPrompt() {
         ArgumentCaptor<List<Button>> posted = ArgumentCaptor.captor();
         try (MockedStatic<MessageHelper> messages = Mockito.mockStatic(MessageHelper.class)) {

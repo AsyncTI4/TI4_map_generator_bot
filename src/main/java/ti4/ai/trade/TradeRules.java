@@ -22,6 +22,7 @@ public class TradeRules {
             TradeCardRules.observe(context);
             HumanDealWatch.observe(context);
             PromiseDeals.observe(context);
+            DiscardBountyDeals.observe(context);
             return Optional.empty();
         }
     }
@@ -63,6 +64,25 @@ public class TradeRules {
     public static Optional<AiDecision> awaitExtortion(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         return Extortion.await(context);
+    }
+
+    public static Optional<AiDecision> payTheAnswerer(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return OwnTurnDeals.payTheAnswerer(context);
+    }
+
+    public static String explainPayTheAnswerer(Game game, Player payer) {
+        return AnswererDeals.explain(game, payer);
+    }
+
+    public static Optional<AiDecision> holdVoteForDeals(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return OwnTurnDeals.holdVoteForDeals(context);
+    }
+
+    public static Optional<AiDecision> offerDiscardBounty(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return DiscardBountyDeals.offer(context);
     }
 
     public static Optional<AiDecision> startDeals(AiTurnContext context) {

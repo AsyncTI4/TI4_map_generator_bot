@@ -12,7 +12,10 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
+import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.GalacticThreatCost;
 import ti4.ai.agenda.PromisedVotes;
+import ti4.ai.agenda.VoteDeals;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
@@ -86,6 +89,16 @@ class PromiseDealsTest extends BaseTi4Test {
         assertThat(PromiseDeals.sellerPrice(4.0, 0, test.sol, 10, 5)).contains(3);
         assertThat(PromiseDeals.sellerPrice(6.0, 4.8, test.sol, 10, 5)).isEmpty();
         assertThat(PromiseDeals.sellerPrice(1.2, 0, test.sol, 10, 5)).isEmpty();
+    }
+
+    // A vote sale never goes below the seller's cost plus its proposing margin: votes sell for 1 trade good only when
+    // the seller does not care how the agenda goes.
+    @Test
+    void votesNeverSellBelowTheSellersCost() {
+        assertThat(PromiseDeals.voteFloor(0)).isEqualTo(1);
+        assertThat(PromiseDeals.voteFloor(0.4)).isEqualTo(1);
+        assertThat(PromiseDeals.voteFloor(0.6)).isEqualTo(2);
+        assertThat(PromiseDeals.voteFloor(3.2)).isEqualTo(4);
     }
 
     // The buyer offers the least the seller would take (its cost plus the seller's margin, at least 1 trade good) and
@@ -476,11 +489,12 @@ class PromiseDealsTest extends BaseTi4Test {
                 .isEqualTo("FFCC_sol_" + PromiseDeals.ACCEPT_PREFIX + cheap.id());
     }
 
-    // Agenda phase: Xxcha (an AI, 4 points) holds the bigger bloc on Shard of the Throne. Sol (an AI) wants the point
-    // and offers to buy Xxcha's votes for itself, at the price Xxcha would ask; the offer uses up this agenda's
-    // transaction between them (LRR 94.6).
+    // Agenda phase: Xxcha (an AI, 4 points) holds the bigger bloc on Shard of the Throne. Sol (an AI) wants the point.
+    // Xxcha's 2 votes are worth about 8.3 TG to Sol and cost Xxcha about 6.6, so on the last agenda Xxcha takes no
+    // less than its floor of 8 (cost plus the 0.5 minimum). That leaves Sol under its own 0.5 minimum, so Sol makes no
+    // offer it knows would be refused (it used to offer 7). Sol's offers in ConditionalVoteDealsTest cover the post.
     @Test
-    void anAiOffersToBuyVotes() {
+    void anAiOffersOnlyAPriceTheSellerTakes() {
         AiTestGame test = AiTestGame.withSolAi();
         Player xxcha = test.addSeat(THIRD_AI_ID, "xxcha", "red");
         test.game.setVp(10);
@@ -497,18 +511,232 @@ class PromiseDealsTest extends BaseTi4Test {
         test.sol.setTg(10);
         AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, table());
 
-        AiDecision.Post post = (AiDecision.Post)
-                PromiseDeals.proposeVotes(context, List.of(xxcha)).orElseThrow();
+        VoteDeals.Terms terms = VoteDeals.valuedAt(test.game, test.sol, xxcha, test.sol, "sol", 2)
+                .orElseThrow();
+        int floor = PromiseDeals.voteFloor(terms.sellerCost(), terms.chance());
+        assertThat(terms.buyerGain() - floor).isLessThan(0.5);
 
-        Promise promise = PromiseBook.proposedBy(test.game, test.sol).getFirst();
-        assertThat(promise.term()).isEqualTo(Promise.Term.VOTE_FOR);
-        assertThat(promise.isPromiser(xxcha)).isTrue();
-        assertThat(promise.target()).isEqualTo("sol");
-        assertThat(post.buttons()).hasSize(2);
-        assertThat(TradeLegality.windowUsed(context, xxcha)).isTrue();
+        assertThat(PromiseDeals.proposeVotes(context, List.of(xxcha))).isEmpty();
+        assertThat(PromiseBook.proposedBy(test.game, test.sol)).isEmpty();
+    }
 
-        AiExperiments.disable(test.sol, Set.of(Experiment.PROMISE_DEALS));
-        assertThat(PromiseDeals.proposeVotes(test.contextFor(test.sol, Set.of(), NOW, table()), List.of(xxcha)))
-                .isEmpty();
+    // A seat that has started its ballot (pressed vote and stored the outcome it backs) can no longer change the
+    // outcome, only the number of votes, so it refuses even a generous offer for another outcome: accepting would
+    // break the promise. An offer for the outcome it already backs is still open to it.
+    @Test
+    void aSeatInTheMiddleOfItsBallotSellsNoVotesForAnotherOutcome() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.game.setVp(10);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo(SHARD);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"black\":0}");
+        test.isActive(test.sol, "agendawaiting");
+        test.nekro.setTg(40);
+        Promise generous = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "nekro",
+                4,
+                40,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, generous);
+        AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, offerPrompt(test.sol, generous));
+        assertThat(PromiseDeals.accepts(context, generous)).isTrue();
+
+        // The ballot AgendaVoting stores once the seat presses "vote": outcome, planet owner, votes, Predictive.
+        context.memory().put("agendaBallot|" + test.game.getCurrentAgendaInfo(), "sol~~4~false");
+
+        assertThat(PromiseDeals.accepts(context, generous)).isFalse();
+        assertThat(PromiseDeals.backedOutcome(context).test("sol")).isTrue();
+        assertThat(PromiseDeals.backedOutcome(context).test("nekro")).isFalse();
+    }
+
+    // Self-play trace: the speaker abstained (planning to pick the outcome by tie-break), then accepted a vote sale it
+    // could no longer cast, so the promise was never delivered and the buyer never paid. Once a seat has abstained on
+    // this agenda it sells no votes on it, even for the outcome it means to pick.
+    @Test
+    void aSeatThatAbstainedSellsNoVotesOnThatAgenda() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.game.setVp(10);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo(SHARD);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":4,\"black\":0}");
+        test.isActive(test.sol, "agendawaiting");
+        test.nekro.setTg(40);
+        Promise forSol = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "sol",
+                4,
+                40,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, forSol);
+        AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, offerPrompt(test.sol, forSol));
+        assertThat(PromiseDeals.accepts(context, forSol)).isTrue();
+
+        AgendaVoting.markAbstained(context);
+
+        assertThat(AgendaVoting.abstained(context)).isTrue();
+        assertThat(PromiseDeals.accepts(context, forSol)).isFalse();
+    }
+
+    // A seat that promised its votes to one outcome offers to buy votes only for that outcome: buying for another
+    // would mean it means to break its own promise.
+    @Test
+    void aSeatThatPromisedItsVotesBuysOnlyForThePromisedOutcome() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Player xxcha = test.addSeat(THIRD_AI_ID, "xxcha", "red");
+        test.game.setVp(10);
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.place("19", "310");
+        xxcha.addPlanet("wellon");
+        test.points(xxcha, 4);
+        test.game.setStoredValue("agendaCount", "2");
+        test.game.setCurrentAgendaInfo(SHARD);
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":2,\"red\":5,\"black\":0}");
+        test.isActive(test.sol, "agendawaiting");
+        test.sol.setTg(7);
+        Promise sold = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.nekro,
+                PromisedVotes.agendaKey(test.game),
+                "nekro",
+                2,
+                1,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, sold.accepted(test.game));
+        AiTurnContext context = test.contextFor(test.sol, Set.of(), NOW, table());
+
+        PromiseDeals.proposeVotes(context, List.of(xxcha));
+
+        assertThat(PromiseBook.proposedBy(test.game, test.sol)).allMatch(promise -> "nekro".equals(promise.target()));
+        assertThat(PromiseDeals.backedOutcome(context).test("sol")).isFalse();
+    }
+
+    // Traces-4b, Executive Sanctions: Hacan offered Nekro its 1 vote for For at 4 TG, after Nekro predicted For, and
+    // Nekro took it. A vote toward its Galactic Threat prediction is worth at most 2 TG to Nekro.
+    private static Promise threatVoteOffer(AiTestGame test, int price) {
+        test.game.setVp(10);
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Law_For/Against_7_sanctions");
+        test.game.setSpeakerUserID(test.sol.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":6,\"black\":0}");
+        test.game.setCurrentAgendaVote("for", "black_" + GalacticThreatCost.RIDER);
+        test.place("01", "304");
+        test.sol.addPlanet("jord");
+        test.place("19", "310");
+        test.sol.addPlanet("wellon");
+        test.sol.addTech("gd");
+        test.isActive(test.nekro, "agendawaiting");
+        test.nekro.setTg(10);
+        Promise promise = Promise.offer(
+                test.game,
+                Promise.Term.VOTE_FOR,
+                test.sol,
+                test.nekro,
+                test.sol,
+                PromisedVotes.agendaKey(test.game),
+                "for",
+                1,
+                price,
+                NOW,
+                NOW + 60_000);
+        PromiseBook.save(test.game, promise);
+        return promise;
+    }
+
+    @Test
+    void nekroPaysNoMoreThanTwoTradeGoodsForAVoteTowardItsPrediction() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Promise dear = threatVoteOffer(test, 4);
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, "for"))
+                .isEqualTo(PromiseDeals.PREDICTION_VOTE_PRICE_CAP);
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, "against")).isZero();
+
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, dear));
+        assertThat(PromiseDeals.accepts(context, dear)).isFalse();
+    }
+
+    @Test
+    void nekroTakesATwoTradeGoodVoteTowardItsPrediction() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Promise fair = threatVoteOffer(test, 2);
+
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, fair));
+        assertThat(PromiseDeals.accepts(context, fair)).isTrue();
+    }
+
+    @Test
+    void controlSeatHasNoPredictionPriceCap() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Promise dear = threatVoteOffer(test, 4);
+        AiExperiments.disable(test.nekro, Set.of(Experiment.AGENDA_VALUE_TABLE));
+
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, "for")).isZero();
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, dear));
+        assertThat(PromiseDeals.accepts(context, dear)).isTrue();
+    }
+
+    // The 2 TG cap is a budget for the predicted outcome, not a per-deal limit: once Nekro owes 2 TG toward For on this
+    // agenda (an accepted vote deal with another seat), it takes no further vote toward For at any price.
+    @Test
+    void thePredictionCapIsABudgetForTheWholeAgenda() {
+        AiTestGame test = AiTestGame.withSolAi();
+        Player xxcha = test.addSeat("200000000000000002", "xxcha", "red");
+        Promise second = threatVoteOffer(test, 1);
+        Promise first = Promise.offer(
+                        test.game,
+                        Promise.Term.VOTE_FOR,
+                        xxcha,
+                        test.nekro,
+                        test.nekro,
+                        PromisedVotes.agendaKey(test.game),
+                        "for",
+                        1,
+                        2,
+                        NOW,
+                        NOW + 60_000)
+                .accepted(test.game);
+        PromiseBook.save(test.game, first);
+
+        assertThat(PromiseDeals.promisedToward(test.game, test.nekro, "for", ""))
+                .isEqualTo(2);
+        AiTurnContext context = test.contextFor(test.nekro, Set.of(), NOW, offerPrompt(test.nekro, second));
+        assertThat(PromiseDeals.accepts(context, second)).isFalse();
+    }
+
+    // Flag discipline: a seller's own asking cap follows its own experiment flag, not the buyer's.
+    @Test
+    void theSellersCapFollowsTheSellersFlag() {
+        AiTestGame test = AiTestGame.withSolAi();
+        threatVoteOffer(test, 2);
+        AiExperiments.disable(test.sol, Set.of(Experiment.AGENDA_VALUE_TABLE));
+
+        assertThat(PromiseDeals.predictionCap(test.game, test.sol, test.nekro, "for"))
+                .isZero();
+        assertThat(PromiseDeals.predictionCap(test.game, test.nekro, test.nekro, "for"))
+                .isEqualTo(PromiseDeals.PREDICTION_VOTE_PRICE_CAP);
     }
 }

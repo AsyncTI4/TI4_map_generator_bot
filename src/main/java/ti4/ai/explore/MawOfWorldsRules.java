@@ -2,6 +2,9 @@ package ti4.ai.explore;
 
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.agenda.AgendaPrior;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -40,6 +43,9 @@ public class MawOfWorldsRules {
 
     private static double votesGivenUp(Game game, Player seat) {
         Integer influence = Helper.getPlayerInfluenceAvailable(seat, game);
-        return INFLUENCE_VOTE_VALUE * (influence == null ? 0 : influence);
+        double perInfluence = AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)
+                ? Math.max(INFLUENCE_VOTE_VALUE, AgendaPrior.phaseVoteValue(game, seat))
+                : INFLUENCE_VOTE_VALUE;
+        return perInfluence * (influence == null ? 0 : influence);
     }
 }

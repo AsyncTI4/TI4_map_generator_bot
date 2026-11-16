@@ -27,8 +27,10 @@ public record Promise(
 
     public enum Term {
         VOTE_FOR,
+        NOT_AGAINST,
         NO_ATTACK,
-        STAY_OUT
+        STAY_OUT,
+        DISCARD_AGENDA
     }
 
     public enum Status {
@@ -38,9 +40,13 @@ public record Promise(
         EXPIRED,
         KEPT,
         BROKEN,
-        VOID
+        VOID,
+        OWED,
+        PAID,
+        UNPAID
     }
 
+    public static final long OWED_GRACE_MILLIS = 15 * 60_000L;
     private static final String FIELD = "|";
     private static final String POSITIONS = "+";
     private static final int FIELDS = 15;
@@ -88,6 +94,25 @@ public record Promise(
                 guarded, held);
     }
 
+    public Promise owing(long dueAt) {
+        return new Promise(
+                id,
+                term,
+                promiser,
+                promisee,
+                proposer,
+                round,
+                agenda,
+                target,
+                votes,
+                price,
+                Status.OWED,
+                offeredAt,
+                dueAt,
+                guarded,
+                held);
+    }
+
     public Promise withGuarded(List<String> positions) {
         return new Promise(
                 id, term, promiser, promisee, proposer, round, agenda, target, votes, price, status, offeredAt,
@@ -102,7 +127,7 @@ public record Promise(
         Player by = game.getPlayerFromColorOrFaction(promiser);
         Player to = game.getPlayerFromColorOrFaction(promisee);
         List<String> watched = by == null || to == null ? List.of() : watchedPositions(game, by, to);
-        List<String> own = by == null || to == null || term == Term.VOTE_FOR ? List.of() : presence(game, by, to);
+        List<String> own = by == null || to == null || !territorial() ? List.of() : presence(game, by, to);
         return new Promise(
                 id,
                 term,
@@ -121,9 +146,22 @@ public record Promise(
                 own);
     }
 
+    public static Promise owed(
+            Game game, Term term, Player promiser, Player promisee, String agenda, String target, int price, long now) {
+        return offer(game, term, promiser, promisee, promisee, agenda, target, 0, price, now, now)
+                .owing(now + OWED_GRACE_MILLIS);
+    }
+
+    public boolean aboutVotes() {
+        return term == Term.VOTE_FOR || term == Term.NOT_AGAINST;
+    }
+
+    public boolean territorial() {
+        return term == Term.NO_ATTACK || term == Term.STAY_OUT;
+    }
+
     public boolean binds() {
-        return status == Status.ACCEPTED
-                || (status == Status.OFFERED && proposer.equals(promiser) && term != Term.VOTE_FOR);
+        return status == Status.ACCEPTED || (status == Status.OFFERED && proposer.equals(promiser) && territorial());
     }
 
     public boolean open() {
@@ -145,7 +183,7 @@ public record Promise(
     public boolean forbidsActivating(Game game, Tile tile) {
         if (tile == null) return false;
         return switch (term) {
-            case VOTE_FOR -> false;
+            case VOTE_FOR, NOT_AGAINST, DISCARD_AGENDA -> false;
             case STAY_OUT -> target.equals(tile.getPosition());
             case NO_ATTACK -> {
                 Player victim = game.getPlayerFromColorOrFaction(promisee);
@@ -164,7 +202,7 @@ public record Promise(
 
     private List<String> watchedPositions(Game game, Player by, Player to) {
         return switch (term) {
-            case VOTE_FOR -> List.of();
+            case VOTE_FOR, NOT_AGAINST, DISCARD_AGENDA -> List.of();
             case STAY_OUT -> {
                 Tile tile = game.getTileByPosition(target);
                 yield tile == null || tile.hasPlayerCC(by) ? List.of() : List.of(target);

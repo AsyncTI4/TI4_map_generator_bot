@@ -7,11 +7,14 @@ import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.agenda.AgendaClock;
 import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
 import ti4.ai.agenda.AgendaVoting;
+import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.agenda.RiderPayoff;
 import ti4.ai.brain.AiDecision;
@@ -19,6 +22,7 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.ScoringStakes;
 import ti4.game.Game;
 import ti4.game.GameStats;
 import ti4.game.Player;
@@ -53,7 +57,11 @@ public class AgendaCardRules {
     private static final String SEPARATOR = "_";
     private static final long GIVE_UP_MILLIS = 5 * 60_000L;
 
-    record Choice(String alias, String title, String outcome, double gain) {}
+    static final double IMPERIAL_HOLD_SHARE = 0.5;
+
+    record Choice(String alias, String title, String outcome, double gain, double chance) {}
+
+    private record Baseline(double value, String keptVote, AgendaForecast riderBase) {}
 
     private record Entry(String alias, int playsBefore) {
 
@@ -131,9 +139,25 @@ public class AgendaCardRules {
                 .sorted()
                 .filter(alias -> AgendaCards.VETO_TITLE.equals(SabotageWindow.title(alias)))
                 .findFirst();
-        if (veto.isEmpty() || !AgendaPolicy.veryBadFor(game, seat)) return Optional.empty();
+        if (veto.isEmpty() || !worthVetoing(game, seat)) return Optional.empty();
         return pressHidden(context, QUEUE_WHEN_PREFIX + veto.get(), "queue Veto")
                 .or(() -> pressHidden(context, OPEN_WHENS, "look at its when options to play Veto"));
+    }
+
+    public static boolean worthVetoing(Game game, Player seat) {
+        return AgendaPolicy.veryBadFor(game, seat)
+                || AgendaPolicy.worthDiscardingFor(game, seat, DiscardBounties.vetoBounty(game, seat));
+    }
+
+    public static boolean holdsVeto(Player seat) {
+        return seat.getActionCards().keySet().stream()
+                .anyMatch(alias -> AgendaCards.VETO_TITLE.equals(SabotageWindow.title(alias)));
+    }
+
+    public static Optional<AiDecision> awaitVetoBounty(AiTurnContext context) {
+        Player seat = context.seat();
+        if (!holdsVeto(seat) || !ActionCardRules.mayPlayNow(context.game(), seat)) return Optional.empty();
+        return DiscardBounties.awaitOffers(context);
     }
 
     public static Optional<AiDecision> queueRider(AiTurnContext context) {
@@ -171,23 +195,64 @@ public class AgendaCardRules {
         if (riders.isEmpty()) return Optional.empty();
         AgendaForecast untouched = AgendaForecast.of(game, seat);
         if (untouched.isEmpty()) return Optional.empty();
-        double current = AgendaVoting.forecastWithItsBallot(game, seat).expectedUtility(seat);
+        Baseline current = baseline(game, seat, untouched);
         return riders.stream()
                 .map(alias -> bestOutcome(untouched, current, seat, alias))
                 .flatMap(Optional::stream)
-                .filter(choice -> choice.gain() >= ActionCardPrior.keepPrior(choice.alias()))
+                .filter(choice -> choice.gain() >= holdValue(game, seat, choice))
+                .filter(choice -> collectsEnough(game, seat, choice))
                 .max(Comparator.comparingDouble(Choice::gain));
     }
 
-    private static Optional<Choice> bestOutcome(AgendaForecast untouched, double current, Player seat, String alias) {
+    static double holdValue(Game game, Player seat, Choice choice) {
+        double prior = ActionCardPrior.keepPrior(choice.alias());
+        if (!holdsImperialForAPoint(seat, choice)) return prior;
+        return Math.max(prior, imperialHoldValue(game, seat));
+    }
+
+    private static boolean collectsEnough(Game game, Player seat, Choice choice) {
+        if (!holdsImperialForAPoint(seat, choice)) return true;
+        return choice.chance() * RiderPayoff.of(game, seat, RiderPayoff.IMPERIAL) >= imperialHoldValue(game, seat);
+    }
+
+    private static boolean holdsImperialForAPoint(Player seat, Choice choice) {
+        return RiderPayoff.isImperial(choice.title())
+                && AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)
+                && AiExperiments.enabled(seat, Experiment.IMPERIAL_RIDER_HOLD);
+    }
+
+    static double imperialHoldValue(Game game, Player seat) {
+        return IMPERIAL_HOLD_SHARE * ScoringStakes.scoreValue(game, seat, 1);
+    }
+
+    private static Optional<Choice> bestOutcome(AgendaForecast untouched, Baseline current, Player seat, String alias) {
         String title = SabotageWindow.title(alias);
         return untouched.outcomes().stream()
-                .map(outcome -> new Choice(alias, title, outcome, gain(untouched, current, seat, title, outcome)))
+                .map(outcome -> choice(untouched, current, seat, alias, title, outcome))
                 .max(Comparator.comparingDouble(Choice::gain));
     }
 
-    private static double gain(AgendaForecast untouched, double current, Player seat, String title, String outcome) {
-        return untouched.withRider(seat, title, outcome).expectedUtility(seat) - current;
+    private static Choice choice(
+            AgendaForecast untouched, Baseline current, Player seat, String alias, String title, String outcome) {
+        AgendaForecast ridden = current.riderBase().withRider(seat, title, outcome);
+        return new Choice(
+                alias,
+                title,
+                outcome,
+                ridden.expectedUtility(seat, current.keptVote()) - current.value(),
+                ridden.chance(outcome));
+    }
+
+    private static double gain(AgendaForecast untouched, Baseline current, Player seat, String title, String outcome) {
+        return current.riderBase().withRider(seat, title, outcome).expectedUtility(seat, current.keptVote())
+                - current.value();
+    }
+
+    private static Baseline baseline(Game game, Player seat, AgendaForecast untouched) {
+        AgendaVoting.PlannedBallot planned = AgendaVoting.itsBallot(game, seat);
+        boolean keepsVotes = untouched.keepsVotesWithRider(seat);
+        String keptVote = keepsVotes ? planned.outcome() : "";
+        return new Baseline(planned.value(seat), keptVote, keepsVotes ? planned.forecast() : untouched);
     }
 
     private static Optional<AiDecision> abandonQueuedRider(AiTurnContext context) {
@@ -235,7 +300,7 @@ public class AgendaCardRules {
         Player seat = context.seat();
         AgendaForecast untouched = AgendaForecast.of(game, seat);
         if (untouched.isEmpty()) return options.getFirst();
-        double current = AgendaVoting.forecastWithItsBallot(game, seat).expectedUtility(seat);
+        Baseline current = baseline(game, seat, untouched);
         ToDoubleFunction<String> gain = outcome -> gain(untouched, current, seat, title, outcome);
         return options.stream()
                 .max(Comparator.comparingDouble(button -> outcomesOf(game, button).stream()

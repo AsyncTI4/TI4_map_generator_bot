@@ -2,10 +2,13 @@ package ti4.ai.agenda;
 
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.actioncards.ActionCardPrior;
 import ti4.ai.actioncards.DrawnCardValue;
 import ti4.ai.scoring.ScoringStakes;
 import ti4.ai.scoring.SpendUnlock;
+import ti4.ai.strategy.CardValueScale;
 import ti4.ai.strategy.CommandTokenValue;
 import ti4.ai.strategy.ResearchPolicy;
 import ti4.ai.strategy.SpeakerTokenValue;
@@ -29,7 +32,9 @@ public class RiderPayoff {
     private static final double OTHER_RIDER = 2 * ActionCardPrior.AVERAGE_CARD;
 
     public static double of(Game game, Player viewer, Player owner, String rider) {
+        if (GalacticThreatCost.RIDER.equals(rider)) return galacticThreat(game, viewer, owner);
         if (owner != viewer && NEEDS_THE_HAND.contains(rider)) return OTHER_RIDER;
+        if (owner != viewer && POLITICS.equals(rider)) return rivalPolitics(game, owner);
         return of(game, owner, rider);
     }
 
@@ -41,11 +46,33 @@ public class RiderPayoff {
             case POLITICS -> DrawnCardValue.of(game, player, POLITICS_CARDS) + SpeakerTokenValue.of(game, player);
             case TECHNOLOGY ->
                 StrategyCardRules.cannotResearch(player)
-                        ? CommandTokenValue.tactic(game, player, LEADERSHIP_TOKENS)
+                        ? leadershipTokens(game, player)
                         : ResearchPolicy.freeResearchWorth(game, player);
-            case LEADERSHIP -> CommandTokenValue.tactic(game, player, LEADERSHIP_TOKENS);
+            case LEADERSHIP -> leadershipTokens(game, player);
+            case GalacticThreatCost.RIDER -> galacticThreat(game, player, player);
             default -> OTHER_RIDER;
         };
+    }
+
+    private static double rivalPolitics(Game game, Player owner) {
+        return POLITICS_CARDS * ActionCardPrior.AVERAGE_CARD + SpeakerTokenValue.of(game, owner);
+    }
+
+    static double leadershipTokens(Game game, Player player) {
+        if (AiExperiments.enabled(player, Experiment.AGENDA_VALUE_TABLE)) {
+            return LEADERSHIP_TOKENS * CardValueScale.HELD_TOKEN;
+        }
+        return CommandTokenValue.tactic(game, player, LEADERSHIP_TOKENS);
+    }
+
+    public static double galacticThreat(Game game, Player viewer, Player nekro) {
+        if (!AiExperiments.enabled(viewer, Experiment.GALACTIC_THREAT_COST)) return OTHER_RIDER;
+        return game.getRealPlayers().stream()
+                .filter(voter -> voter != nekro)
+                .mapToDouble(
+                        voter -> GalacticThreatCost.bestCopy(nekro, GalacticThreatCost.copyable(game, nekro, voter)))
+                .max()
+                .orElse(0);
     }
 
     public static boolean isImperial(String rider) {

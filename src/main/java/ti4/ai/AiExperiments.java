@@ -25,7 +25,20 @@ public class AiExperiments {
         SPEAKER_SALE,
         WIN_BREAK_DENIAL,
         ATTACK_MEMORY,
-        PROMISE_DEALS
+        PROMISE_DEALS,
+        AGENDA_VALUE_TABLE,
+        GALACTIC_THREAT_COST,
+        AGENDA_HELD_BALLOTS,
+        CONDITIONAL_VOTE_DEALS,
+        DISCARD_BOUNTIES,
+        AGENDA_ABSTAIN_CHOICE,
+        GALACTIC_THREAT_TIMING,
+        RIVAL_RIDER_STAKES,
+        RIDER_EXTORTION,
+        IMPERIAL_RIDER_HOLD,
+        GALACTIC_THREAT_BY_VOTERS,
+        PAY_THE_ANSWERER,
+        BOAT_FLOAT
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

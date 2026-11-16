@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
+import ti4.ai.agenda.AgendaKnowledge;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -74,8 +75,10 @@ final class Determinizer {
     }
 
     private static void shuffleHiddenDecks(Game game, Player seat, Random random) {
+        List<String> knownAgendas = AgendaKnowledge.knownTop(game, seat);
         game.shuffleDecks();
         game.shuffleAgendas();
+        keepOnTop(game.getAgendas(), knownAgendas);
         shuffleUnseen(
                 game.getPublicObjectives1Peekable(),
                 game.getPublicObjectives1(),
@@ -88,6 +91,13 @@ final class Determinizer {
                 game.getPublicObjectives2Peeked(),
                 seat,
                 random);
+    }
+
+    // The agenda cards the seat legally knows (Politics placements, M'aban) stay where it knows them to be.
+    private static void keepOnTop(List<String> agendas, List<String> known) {
+        if (agendas == null || known.isEmpty()) return;
+        agendas.removeAll(known);
+        agendas.addAll(0, known);
     }
 
     // Reveals take the peekable list first and then the deck, so the two are one hidden order. An objective the seat

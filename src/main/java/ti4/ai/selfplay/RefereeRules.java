@@ -40,6 +40,7 @@ public class RefereeRules {
 
     private static final String CURRENT_WINNER_LABEL = "Resolve with Current Winner";
     private static final long AGENDA_RESOLUTION_MIN_AGE_MILLIS = 60_000L;
+    private static final long TIE_BREAK_MIN_AGE_MILLIS = 10 * 60_000L;
     private static final List<Step> STEPS = List.of(
             new Step("deal2SOToAll"::equals, "deal the starting secret objectives"),
             new Step("startOfGameObjReveal"::equals, "reveal the first objectives"),
@@ -54,7 +55,11 @@ public class RefereeRules {
                     "resolve the agenda",
                     CURRENT_WINNER_LABEL,
                     AGENDA_RESOLUTION_MIN_AGE_MILLIS),
-            new Step(id -> id.startsWith("resolveAgendaVote_outcomeTie"), "break the agenda tie"),
+            new Step(
+                    id -> id.startsWith("resolveAgendaVote_outcomeTie"),
+                    "break the agenda tie",
+                    "",
+                    TIE_BREAK_MIN_AGE_MILLIS),
             new Step("proceed_to_strategy"::equals, "move on to the strategy phase"));
 
     public static boolean trackExhausted(Game game) {

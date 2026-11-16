@@ -1,0 +1,50 @@
+package ti4.ai.agenda;
+
+import java.util.List;
+import java.util.OptionalDouble;
+import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
+import ti4.game.Game;
+import ti4.game.Player;
+
+@UtilityClass
+class CovertValues {
+
+    static final String COVERT = "covert";
+
+    @Nullable
+    static Double valueOf(AgendaView view, String agenda, String outcome, String ownVote) {
+        if (!COVERT.equals(agenda)) return null;
+        List<String> candidates = view.readsHandOf(speaker(view.game()))
+                ? AgendaKnowledge.covertCard(view.game(), view.voter(), announcedTarget(view.game()))
+                        .map(List::of)
+                        .orElseGet(() -> possibleAgendas(view.game()))
+                : possibleAgendas(view.game());
+        OptionalDouble average = candidates.stream()
+                .map(candidate ->
+                        AgendaValues.of(view.game(), view.voter(), view.ownView(), true, candidate, outcome, ownVote))
+                .filter(OptionalDouble::isPresent)
+                .mapToDouble(OptionalDouble::getAsDouble)
+                .average();
+        return average.isPresent() ? average.getAsDouble() : null;
+    }
+
+    static String announcedTarget(Game game) {
+        String[] parts = StringUtils.split(game.getCurrentAgendaInfo(), "_");
+        return parts != null && parts.length > 1 ? parts[1] : "";
+    }
+
+    static List<String> possibleAgendas(Game game) {
+        String target = announcedTarget(game);
+        if (target.isBlank()) return List.of();
+        return AgendaPrior.remainingDeck(game).stream()
+                .filter(alias -> AgendaKnowledge.hasTarget(alias, target))
+                .toList();
+    }
+
+    @Nullable
+    private static Player speaker(Game game) {
+        return game.getPlayer(game.getSpeakerUserID());
+    }
+}

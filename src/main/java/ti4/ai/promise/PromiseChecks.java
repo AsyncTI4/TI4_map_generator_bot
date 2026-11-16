@@ -18,7 +18,7 @@ public class PromiseChecks {
     private static final List<String> AFTER_ACTION_PHASES = List.of("status", "agenda");
 
     public static Optional<Promise.Status> territorial(Game game, Promise promise) {
-        if (promise.status() != Promise.Status.ACCEPTED || promise.term() == Promise.Term.VOTE_FOR) {
+        if (promise.status() != Promise.Status.ACCEPTED || promise.aboutVotes()) {
             return Optional.empty();
         }
         if (!promise.thisRound(game)) return Optional.of(Promise.Status.KEPT);

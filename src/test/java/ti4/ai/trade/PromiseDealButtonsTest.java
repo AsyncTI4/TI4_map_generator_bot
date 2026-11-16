@@ -138,4 +138,50 @@ class PromiseDealButtonsTest extends BaseTi4Test {
 
         assertThat(transfers).isEmpty();
     }
+
+    // Agenda phase: Sol accepts Nekro's conditional offer of 2 trade goods for Sol's votes for Nekro. Nothing changes
+    // hands on accepting; the promise is recorded and paid after the agenda, only if it resolves for Nekro.
+    @Test
+    void acceptingAConditionalVoteDealPaysNothingYet() {
+        game.setPhaseOfGame("agendawaiting");
+        test.nekro.setTg(2);
+        game.setCurrentAgendaInfo("Law_Elect Player_7_shard_of_the_throne");
+        Promise votes = Promise.offer(
+                game,
+                Promise.Term.VOTE_FOR,
+                sol,
+                test.nekro,
+                test.nekro,
+                ti4.ai.agenda.PromisedVotes.agendaKey(game),
+                "nekro",
+                0,
+                2,
+                10,
+                600_000);
+        PromiseBook.save(game, votes);
+
+        PromiseDealButtons.accept(event, game, sol, PromiseDeals.ACCEPT_PREFIX + votes.id());
+
+        assertThat(transfers).isEmpty();
+        assertThat(PromiseBook.find(game, votes.id()).orElseThrow().status()).isEqualTo(Promise.Status.ACCEPTED);
+    }
+
+    // Sol owes Nekro 2 trade goods for a deal that went through: pressing its pay button moves them (the stand-in
+    // transaction takes 2 from Sol) and closes the
+    // debt. Only the seat that owes can pay, and only once.
+    @Test
+    void payingWhatIsOwedMovesTheTradeGoodsOnce() {
+        game.setPhaseOfGame("agendawaiting");
+        Promise owed = Promise.owed(game, Promise.Term.DISCARD_AGENDA, test.nekro, sol, "minister_war", "Veto", 2, 20);
+        PromiseBook.save(game, owed);
+
+        PromiseDealButtons.pay(event, game, test.nekro, PromiseDeals.PAY_PREFIX + owed.id());
+        assertThat(sol.getTg()).isEqualTo(3);
+
+        PromiseDealButtons.pay(event, game, sol, PromiseDeals.PAY_PREFIX + owed.id());
+        PromiseDealButtons.pay(event, game, sol, PromiseDeals.PAY_PREFIX + owed.id());
+
+        assertThat(sol.getTg()).isEqualTo(1);
+        assertThat(PromiseBook.find(game, owed.id()).orElseThrow().status()).isEqualTo(Promise.Status.PAID);
+    }
 }
