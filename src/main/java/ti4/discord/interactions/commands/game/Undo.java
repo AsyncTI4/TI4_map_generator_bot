@@ -68,6 +68,10 @@ class Undo extends GameStateSubcommand {
         }
         targetUndoIndex--;
 
-        GameManager.undo(game, targetUndoIndex);
+        if (GameManager.undo(game, targetUndoIndex) == null) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Undo failed - that save no longer exists. Pick an entry from the current autocomplete list.");
+        }
     }
 }
