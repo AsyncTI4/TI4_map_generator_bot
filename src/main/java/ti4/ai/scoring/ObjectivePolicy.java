@@ -40,8 +40,11 @@ public class ObjectivePolicy {
     }
 
     public static List<String> scorablePublics(Game game, Player seat) {
+        return scorablePublics(game, seat, Wallet.of(game, seat));
+    }
+
+    public static List<String> scorablePublics(Game game, Player seat, Wallet wallet) {
         if (!Helper.canPlayerScorePOs(game, seat)) return List.of();
-        Wallet wallet = Wallet.of(game, seat);
         return game.getRevealedPublicObjectives().keySet().stream()
                 .filter(id -> qualifies(game, seat, wallet, id))
                 .toList();

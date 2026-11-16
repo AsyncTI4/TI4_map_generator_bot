@@ -55,7 +55,11 @@ final class SelfPlayGame {
         STALLED,
         LOOPED,
         LIMIT,
-        LOST_GAME
+        LOST_GAME;
+
+        boolean finished() {
+            return this == VICTORY_POINTS || this == OBJECTIVES_EXHAUSTED;
+        }
     }
 
     record Outcome(
