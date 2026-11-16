@@ -181,7 +181,7 @@ public class PlayHeroService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentation()
-                            + ", this Ghemina hero cannot be played because there are no valid planets adjacent to your Lady or flagship.");
+                            + ", this Ghemina hero cannot be played because there are no valid planets adjacent to your flagship.");
             return;
         }
 
