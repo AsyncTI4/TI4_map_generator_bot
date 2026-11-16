@@ -785,13 +785,16 @@ public class CreateGameService {
             return false;
         }
 
-        var userSettings = UserSettingsManager.get(event.getUser().getId());
-        if (userSettings.isLockedFromCreatingGames()) {
-            return true;
+        return UserSettingsManager.get(event.getUser().getId()).isLockedFromCreatingGames();
+    }
+
+    public static void lockFromCreatingGames(GenericInteractionCreateEvent event) {
+        if (CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
+            return;
         }
+        var userSettings = UserSettingsManager.get(event.getUser().getId());
         userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
         UserSettingsManager.save(userSettings);
-        return false;
     }
 
     public static boolean isGameCreationAllowed() {
