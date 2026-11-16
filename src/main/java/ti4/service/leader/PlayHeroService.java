@@ -139,6 +139,16 @@ public class PlayHeroService {
         }
     }
 
+    private static boolean hasNoGheminaHeroTargets(Game game, Player player, Leader playerLeader) {
+        return switch (playerLeader.getId()) {
+            case "gheminaherolady" ->
+                ButtonHelperHeroes.getButtonsForGheminaLadyHero(player, game).isEmpty();
+            case "gheminaherolord" ->
+                ButtonHelperHeroes.getButtonsForGheminaLordHero(player, game).isEmpty();
+            default -> false;
+        };
+    }
+
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
         if ("morphahero".equals(playerLeader.getId())
                 && !"resolve".equals(player.getStoredValue("morphaHeroPending"))) {
@@ -164,6 +174,14 @@ public class PlayHeroService {
                                     .map(LeaderModel::getName)
                                     .orElse("Meteorime")
                             + "_ because fewer than 3 relics remain.");
+            return;
+        }
+
+        if (hasNoGheminaHeroTargets(game, player, playerLeader)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation()
+                            + ", this Ghemina hero cannot be played because there are no valid planets adjacent to your Lady or flagship.");
             return;
         }
 
