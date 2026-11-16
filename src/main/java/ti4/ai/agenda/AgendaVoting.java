@@ -125,6 +125,13 @@ public class AgendaVoting {
     private static Ballot keepingOutOfTheVote(AiTurnContext context, String key, Ballot planned) {
         Game game = context.game();
         Player seat = context.seat();
+        if (PromisedVotes.avoided(game, seat)
+                .filter(planned.outcome()::equalsIgnoreCase)
+                .isPresent()) {
+            Ballot replanned = plan(game, seat).orElse(new Ballot("", "", 0));
+            context.memory().put(key, replanned.encode());
+            return replanned;
+        }
         if (PromisedVotes.keepsOutOfTheVote(game, seat, planned.outcome())) return planned;
         Optional<Promise> restraint = PromisedVotes.restraint(game, seat);
         if (restraint.isEmpty()) return planned;

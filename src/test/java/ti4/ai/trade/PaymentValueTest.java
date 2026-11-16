@@ -36,16 +36,18 @@ class PaymentValueTest extends BaseTi4Test {
     }
 
     // With no trade goods, debt fills the gap: each token is worth less than a trade good to the receiver, so it
-    // takes more tokens than trade goods.
+    // takes more tokens than trade goods. A need of 2 would take 3 tokens, over the table-wide limit of 2 owed.
     @Test
     void debtFillsTheGap() {
-        PromisePayment payment = PaymentValue.cheapestCovering(test.game, payer, receiver, 2.0, 0)
+        PromisePayment payment = PaymentValue.cheapestCovering(test.game, payer, receiver, 1.5, 0)
                 .orElseThrow();
 
         assertThat(payment.tradeGoods()).isZero();
-        assertThat(payment.debt()).isGreaterThanOrEqualTo(3);
+        assertThat(payment.debt()).isEqualTo(2);
         assertThat(PaymentValue.receivedAsPayerSees(test.game, payer, receiver, payment))
-                .isGreaterThanOrEqualTo(2.0);
+                .isGreaterThanOrEqualTo(1.5);
+        assertThat(PaymentValue.cheapestCovering(test.game, payer, receiver, 2.0, 0))
+                .isEmpty();
     }
 
     // The payer spends what trade goods it has and pays the rest in debt.
@@ -61,7 +63,7 @@ class PaymentValueTest extends BaseTi4Test {
     // With no debt room left, a promissory note the payer holds pays instead, if it covers the need.
     @Test
     void aNoteWhenThereIsNoDebtRoom() {
-        receiver.addDebtTokens(payer.getColor(), DebtRules.DEBT_CAP);
+        receiver.addDebtTokens(payer.getColor(), DebtRules.TABLE_DEBT_LIMIT);
         payer.setPromissoryNote(payer.getColor() + "_cf");
 
         assertThat(PaymentValue.cheapestCovering(test.game, payer, receiver, 0.3, 0))

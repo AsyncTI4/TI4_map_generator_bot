@@ -1128,6 +1128,16 @@ to build one by hand:
     it left behind.
   - `-Dai.trading=false` switches trading off: it rejects every offer, follows Trade only for free from another AI,
     and as Trade holder lets everyone follow for free.
+  - **BOAT_FLOAT personality** (`AiPersonality`, off by default; stored value `aiPersonality=BOAT_FLOAT` on a seat, or
+    `-Dai.personality.boatfloat=all` / a comma list of factions for self-play). A more trade-friendly seat. With a player
+    in good relations (trust 0.8 or more, so every AI seat and a human with no unpaid bills or broken promises, and no
+    grudge from attacks) it flips that player's commodities for free when only one side has commodities: it accepts
+    their commodities for at most as many of its trade goods, and on its own turn, holding no commodities, offers that
+    flip once a round. As Trade holder it charges such a follower X-1 whatever their commodity value, and does not
+    exclude them for leading or for a point the payout would unlock. Both stop when the trade goods could let the
+    player win (`FriendlyTrade.couldWinWith`); a follower close to winning is still excluded.
+  - **Debt across the table.** No AI deal may leave one player owing 3 or more debt in total (tokens held by every
+    other seat plus debt promised in unpaid deals); `DebtRules.room` is the single gate.
   - **Self-play statistics.** Every accepted offer is logged (round, parties, items). The report lists per seat its
     commodities, debts, offers sent, accepted, rescinded and countered, the trade goods and commodities that moved, and
     Trade settlements accepted out of sent, followed by `TRADE_INVARIANT` lines. A batch prints the trades per game,

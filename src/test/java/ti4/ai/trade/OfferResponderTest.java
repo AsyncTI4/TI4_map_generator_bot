@@ -435,21 +435,26 @@ class OfferResponderTest extends BaseTi4Test {
         assertThat(OfferBuilder.active(context(table))).isFalse();
     }
 
-    // Three commodities for three of Nekro's debt clears the margin (0.6 - 0.1 x 0.9 = 0.51) and is accepted from a
-    // clean slate. When Sol already holds 2 of Nekro's debt it would take Nekro to 5, so Nekro counters with the most
-    // it may still owe: 3 commodities for 2 debt.
+    // The table-wide debt limit (user, 2026-11-15): no player may owe 3 or more in total. Three commodities for two
+    // of Nekro's debt is accepted from a clean slate; three for three would make 3 owed, so Nekro counters with the
+    // most it may owe: 3 commodities for 2 debt. When Sol already holds 1 of Nekro's debt, only 1 more fits, and 3
+    // commodities for 1 debt is no deal Sol would take, so Nekro turns the loan down.
     @Test
     void countersALoanThatWouldPassTheDebtCap() {
+        String[] fair = {"sendingsol_receivingnekro_Comms_3", "sendingnekro_receivingsol_SendDebt_2"};
         String[] loan = {"sendingsol_receivingnekro_Comms_3", "sendingnekro_receivingsol_SendDebt_3"};
         TradeTable clean = table(false);
-        assertThat(pressed(answer(clean, offer(clean, "loan", 1, loan)))).isEqualTo("acceptOffer_blue_1");
+        assertThat(pressed(answer(clean, offer(clean, "fair", 1, fair)))).isEqualTo("acceptOffer_blue_1");
 
-        TradeTable owing = table(false);
-        owing.sol.addDebtTokens("black", 2);
-        assertThat(pressed(answer(owing, offer(owing, "loan", 1, loan)))).isEqualTo("resetOffer_blue");
-        assertThat(counterTarget(owing)
+        TradeTable over = table(false);
+        assertThat(pressed(answer(over, offer(over, "loan", 1, loan)))).isEqualTo("resetOffer_blue");
+        assertThat(counterTarget(over)
                         .sameAs(deal("sendingsol_receivingnekro_Comms_3", "sendingnekro_receivingsol_SendDebt_2")))
                 .isTrue();
+
+        TradeTable owing = table(false);
+        owing.sol.addDebtTokens("black", 1);
+        assertThat(pressed(answer(owing, offer(owing, "loan", 1, loan)))).isEqualTo("rejectOffer_blue");
     }
 
     // Honouring an AI Trade holder's fee doesn't override the cap either: 2 debt on top of the 3 Nekro already owes

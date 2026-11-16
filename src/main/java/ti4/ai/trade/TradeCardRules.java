@@ -21,7 +21,6 @@ import ti4.ai.brain.AiMemory;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.scoring.PaymentRules;
-import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -244,8 +243,17 @@ public class TradeCardRules {
         String theirs = follower.getFaction();
         String ours = holder.getFaction();
         boolean paysInTradeGoods = legal && follower.getTg() >= fee;
-        ItemType type = paysInTradeGoods ? ItemType.TRADE_GOODS : ItemType.SEND_DEBT;
-        return Optional.of(new Settlement(Deal.EMPTY.adjust(theirs, ours, type, fee), Purpose.SETTLEMENT_FEE));
+        if (paysInTradeGoods) {
+            return Optional.of(
+                    new Settlement(Deal.EMPTY.adjust(theirs, ours, ItemType.TRADE_GOODS, fee), Purpose.SETTLEMENT_FEE));
+        }
+        int debt = Math.min(fee, DebtRules.room(follower, holder));
+        if (debt < 1) {
+            mark(context, follower, NOTHING);
+            return Optional.empty();
+        }
+        return Optional.of(
+                new Settlement(Deal.EMPTY.adjust(theirs, ours, ItemType.SEND_DEBT, debt), Purpose.SETTLEMENT_FEE));
     }
 
     private static Optional<Settlement> evenWash(
@@ -315,7 +323,7 @@ public class TradeCardRules {
         if (fee.isEmpty()) return false;
         int stack = seat.getCommoditiesTotal();
         boolean legal = TradeLegality.canTransact(game, holder, seat);
-        if (!legal && holder.getDebtTokenCount(seat.getColor()) + fee.get() > DebtRules.DEBT_CAP) return false;
+        if (!legal && fee.get() > DebtRules.room(seat, holder)) return false;
         if (couldWinWith(game, holder, stack)) return false;
         double ownCommodity = ComponentValues.ownCommodity(game, seat, holder);
         if (legal) return stack - fee.get() - ownCommodity * seat.getCommodities() >= MIN_FOLLOW_VALUE;
@@ -323,8 +331,7 @@ public class TradeCardRules {
     }
 
     private static boolean couldWinWith(Game game, Player player, int tradeGoods) {
-        int points = SpendUnlock.pointDelta(game, player, tradeGoods);
-        return points > 0 && Standings.vp(player) + points >= Standings.goal(game);
+        return FriendlyTrade.couldWinWith(game, player, tradeGoods);
     }
 
     private static boolean holdsOwnAgreement(Player seat) {

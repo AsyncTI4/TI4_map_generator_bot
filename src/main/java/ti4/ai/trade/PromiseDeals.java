@@ -232,6 +232,7 @@ class PromiseDeals {
                     case DISCARD_AGENDA -> "for discarding the agenda with " + promise.target();
                     case NOT_AGAINST ->
                         "for not voting against **" + outcomeName(game, promise.target()) + "**, which won";
+                    case NOT_FOR -> "for not voting for **" + outcomeName(game, promise.target()) + "**, which lost";
                     default -> "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
                 };
         return payer.getRepresentationUnfogged() + " owes " + payee.getFactionEmojiOrColor() + " "
@@ -306,6 +307,14 @@ class PromiseDeals {
                 .sum();
     }
 
+    static int promisedDebt(Game game, Player payer, String exceptId) {
+        return PromiseBook.all(game).stream()
+                .filter(promise -> promise.isPromisee(payer) && !promise.id().equals(exceptId))
+                .filter(promise -> stillToPay(game, promise))
+                .mapToInt(promise -> PromisePayment.of(game, promise).debt())
+                .sum();
+    }
+
     private static boolean stillToPay(Game game, Promise promise) {
         if (promise.status() == Promise.Status.OWED) return true;
         if (!paysOnResolution(game, promise) || !PromisedVotes.onThisAgenda(game, promise)) return false;
@@ -358,6 +367,7 @@ class PromiseDeals {
                 || billPending(game, seat, proposer)) {
             return false;
         }
+        if (overTheTableDebtLimit(game, promise, promisee, promiser)) return false;
         double margin = TradeValue.margin(proposer);
         if (promise.isPromiser(seat)) return sells(context, promise, promisee, margin);
         if (promise.aboutVotes()
@@ -368,6 +378,11 @@ class PromiseDeals {
         double gain = Trust.of(context, promiser) * protection(game, seat, promiser, promise);
         int spendable = seat.getTg() - promisedTradeGoods(game, seat, promise.id());
         return spendable >= promise.price() && gain - paid >= margin;
+    }
+
+    private static boolean overTheTableDebtLimit(Game game, Promise promise, Player payer, Player payee) {
+        int debt = PromisePayment.of(game, promise).debt();
+        return debt > 0 && debt > DebtRules.room(payer, payee, promise.id());
     }
 
     private static double payChance(Game game, Player viewer, Player seller, Promise promise) {
@@ -387,6 +402,7 @@ class PromiseDeals {
         Game game = context.game();
         Player seat = context.seat();
         if (promise.term() == Promise.Term.NOT_AGAINST) return AnswererDeals.accepts(context, promise, buyer, margin);
+        if (promise.term() == Promise.Term.NOT_FOR) return AvoidanceBribes.accepts(context, promise, buyer, margin);
         boolean votes = promise.term() == Promise.Term.VOTE_FOR;
         if (votes
                 && (votesCommittedElsewhere(context) || !backedOutcome(context).test(promise.target()))) {
@@ -780,7 +796,7 @@ class PromiseDeals {
                 .noneMatch(promise -> PromiseBook.between(promise, seat, partner));
     }
 
-    private static boolean sellingVotes(Game game, Player seller) {
+    static boolean sellingVotes(Game game, Player seller) {
         return PromiseBook.all(game).stream()
                 .filter(promise -> PromisedVotes.onThisAgenda(game, promise))
                 .filter(promise -> promise.open() || promise.status() == Promise.Status.ACCEPTED)
@@ -793,9 +809,7 @@ class PromiseDeals {
         Optional<String> channel = channelId(context);
         if (channel.isEmpty()) return Optional.empty();
         Player partner = proposal.promiser() == seat ? proposal.promisee() : proposal.promiser();
-        String agenda = proposal.term() == Promise.Term.VOTE_FOR || proposal.term() == Promise.Term.NOT_AGAINST
-                ? PromisedVotes.agendaKey(game)
-                : "";
+        String agenda = proposal.term().aboutVotes() ? PromisedVotes.agendaKey(game) : "";
         Promise promise = Promise.offer(
                 game,
                 proposal.term(),
@@ -836,6 +850,10 @@ class PromiseDeals {
 
     private static String paymentTerms(Game game, Promise promise) {
         if (!paysOnResolution(game, promise)) return "The payment changes hands when you accept.";
+        if (promise.term() == Promise.Term.NOT_FOR) {
+            return "Nothing is paid now: the payment changes hands after the agenda, and only if **"
+                    + outcomeName(game, promise.target()) + "** does not win.";
+        }
         return "Nothing is paid now: the payment changes hands after the agenda, and only if it resolves for **"
                 + outcomeName(game, promise.target()) + "**.";
     }
@@ -857,6 +875,9 @@ class PromiseDeals {
             case NOT_AGAINST ->
                 "not vote against **" + outcomeName(game, promise.target()) + "** on this agenda ("
                         + (promiserSpeaks ? "it abstains or votes" : "you abstain or vote") + " for it)";
+            case NOT_FOR ->
+                "not vote for **" + outcomeName(game, promise.target()) + "** on this agenda ("
+                        + (promiserSpeaks ? "it abstains or votes" : "you abstain or vote") + " for anything else)";
             case NO_ATTACK ->
                 "not attack " + (promiserSpeaks ? "your" : "its") + " units or planets this round (no combat or"
                         + " invasion against them, and no activation of a system that holds them)";

@@ -143,6 +143,11 @@ class AnswererDeals {
 
     private static Optional<PromiseDeals.Proposal> proposal(
             Game game, Player payer, Player answerer, Stake stake, double trust) {
+        return proposal(game, payer, answerer, stake, trust, Promise.Term.NOT_AGAINST);
+    }
+
+    static Optional<PromiseDeals.Proposal> proposal(
+            Game game, Player payer, Player answerer, Stake stake, double trust, Promise.Term term) {
         double value = trust * stake.payerGain();
         double cost = stake.answererCost();
         double chance = stake.chance();
@@ -151,12 +156,12 @@ class AnswererDeals {
                         value, cost, answerer, spendable, 0, 0, chance)
                 .map(least -> generousShare(least, mostWorthPaying(value, chance, spendable)))
                 .map(price -> new PromiseDeals.Proposal(
-                        Promise.Term.NOT_AGAINST, answerer, payer, stake.outcome(), 0, price, value - chance * price));
+                        term, answerer, payer, stake.outcome(), 0, price, value - chance * price));
         if (inTradeGoods.isPresent() || chance < PromiseDeals.MIN_PAY_CHANCE) return inTradeGoods;
         double needed = (cost + PromiseDeals.partnerMinimum(answerer)) / chance;
         return PaymentValue.cheapestCovering(game, payer, answerer, needed, spendable)
                 .map(payment -> new PromiseDeals.Proposal(
-                        Promise.Term.NOT_AGAINST,
+                        term,
                         answerer,
                         payer,
                         stake.outcome(),

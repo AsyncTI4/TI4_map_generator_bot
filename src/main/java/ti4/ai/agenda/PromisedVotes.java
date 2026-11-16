@@ -48,6 +48,7 @@ public class PromisedVotes {
         Player promiser = game.getPlayerFromColorOrFaction(promise.promiser());
         if (promiser == null) return Optional.of(Promise.Status.VOID);
         if (promise.term() == Promise.Term.NOT_AGAINST) return notAgainstVerdict(game, promise, promiser);
+        if (promise.term() == Promise.Term.NOT_FOR) return notForVerdict(game, promise, promiser);
         if (!onThisAgenda(game, promise)) return Optional.of(afterTheAgenda(game, promise, promiser));
         if (AgendaSwing.backedAnotherOutcome(game, promiser, promise.target())) {
             return Optional.of(Promise.Status.BROKEN);
@@ -68,6 +69,33 @@ public class PromisedVotes {
             return Optional.of(Promise.Status.BROKEN);
         }
         return resolvedOutcome(game, promise).map(resolved -> Promise.Status.KEPT);
+    }
+
+    private static Optional<Promise.Status> notForVerdict(Game game, Promise promise, Player promiser) {
+        if (!onThisAgenda(game, promise)) {
+            boolean votedTheTarget = AgendaHistory.of(game, promise.round(), promise.agenda())
+                    .filter(AgendaHistory.Entry::resolved)
+                    .filter(entry -> entry.outcome().equalsIgnoreCase(promise.target()))
+                    .filter(entry ->
+                            entry.votedForOutcome(promiser.getColor()) || entry.votedForOutcome(promiser.getFaction()))
+                    .isPresent();
+            if (votedTheTarget) return Optional.of(Promise.Status.BROKEN);
+            return Optional.of(
+                    resolvedOutcome(game, promise).isPresent() ? Promise.Status.KEPT : Promise.Status.EXPIRED);
+        }
+        if (AgendaSwing.votedFor(game, promiser)
+                .filter(promise.target()::equalsIgnoreCase)
+                .isPresent()) {
+            return Optional.of(Promise.Status.BROKEN);
+        }
+        return resolvedOutcome(game, promise).map(resolved -> Promise.Status.KEPT);
+    }
+
+    public static Optional<String> avoided(Game game, Player seat) {
+        return PromiseBook.bindingOn(game, seat).stream()
+                .filter(promise -> promise.term() == Promise.Term.NOT_FOR && onThisAgenda(game, promise))
+                .map(Promise::target)
+                .findFirst();
     }
 
     public static boolean keepsOutOfTheVote(Game game, Player seat, String outcome) {
@@ -105,6 +133,11 @@ public class PromisedVotes {
     public static Optional<Promise.Status> settlement(Game game, Promise promise) {
         if (!promise.aboutVotes() || promise.status() != Promise.Status.KEPT) {
             return Optional.empty();
+        }
+        if (promise.term() == Promise.Term.NOT_FOR) {
+            return resolvedOutcome(game, promise)
+                    .filter(outcome -> !promise.target().equalsIgnoreCase(outcome))
+                    .map(ignored -> Promise.Status.OWED);
         }
         return resolvedOutcome(game, promise)
                 .filter(promise.target()::equalsIgnoreCase)

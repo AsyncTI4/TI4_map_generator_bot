@@ -215,6 +215,7 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
                         if (inActionPhase(current) && cardsRecordedForRound[0] < round) {
                             cardsRecordedForRound[0] = round;
                             recordCards(current, cards);
+                            if (KEEP_TOP) selfPlay.force(current, RoundTwoSelfPlayTest::stackAgendas);
                         }
                         if (round > LAST_ROUND) return true;
                         if (!inAgendaPhase(current) || PLAY_AGENDA) return false;
@@ -354,6 +355,10 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
             .map(String::trim)
             .filter(id -> !id.isEmpty())
             .toList();
+
+    // -Dai.selfplay.roundtwo.keeptop=true stacks the topagendas again at the start of every action phase, after any
+    // Politics peek has moved them to the bottom, so the trace still sees them revealed.
+    private static final boolean KEEP_TOP = Boolean.getBoolean("ai.selfplay.roundtwo.keeptop");
 
     private static void stackAgendas(Game game) {
         List<String> deck = game.getAgendas();

@@ -129,6 +129,7 @@ class TradeValue {
         return partner.getTg() >= tradeGoods
                 && partner.getCommodities() + partner.getTg() - tradeGoods >= commodities
                 && deal.total(faction, ItemType.CLEAR_DEBT) <= partner.getDebtTokenCount(seat.getColor())
+                && deal.total(faction, ItemType.SEND_DEBT) <= DebtRules.room(partner, seat)
                 && fragmentsHeld(partner, deal);
     }
 

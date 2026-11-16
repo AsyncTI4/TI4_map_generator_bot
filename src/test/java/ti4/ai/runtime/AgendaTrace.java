@@ -125,6 +125,9 @@ final class AgendaTrace {
     private final Map<String, Map<String, BallotProbe.Explanation>> ballots = new HashMap<>();
     private final Map<String, Set<String>> seenBallotReasons = new HashMap<>();
     private final Map<String, Map<String, String>> answererNotes = new HashMap<>();
+    // Each unvoted seat's avoidance-bribe view, taken at every other seat's ballot (Public Execution, Colonial
+    // Redistribution): what it dreads and whether it would pay the seat about to vote.
+    private final Map<String, Map<String, List<String>>> avoidanceNotes = new HashMap<>();
     private final Map<String, List<Press>> presses = new HashMap<>();
     private final Supplier<List<SelfPlayEnvironment.TradeRecord>> ledger;
 
@@ -165,10 +168,22 @@ final class AgendaTrace {
         String faction = context.faction();
         BallotProbe.Explanation explanation = null;
         String answererNote = null;
+        Map<String, String> avoidance = new LinkedHashMap<>();
         if (kind == Kind.BALLOT && needsBallot(info, faction)) {
+            for (Player payer : game.getRealPlayers()) {
+                try {
+                    TradeRules.explainAvoidanceBribeAt(game, payer, context.seat())
+                            .ifPresent(note -> avoidance.put(payer.getFaction(), note));
+                } catch (RuntimeException e) {
+                    avoidance.remove(payer.getFaction());
+                }
+            }
             try {
                 explanation = BallotProbe.explain(game, context.seat()).orElse(null);
-                answererNote = TradeRules.explainPayTheAnswerer(game, context.seat());
+                answererNote = TradeRules.explainPayTheAnswerer(game, context.seat())
+                        + TradeRules.explainAvoidanceBribe(game, context.seat())
+                                .map(note -> "; AVOIDANCE BRIBE: " + note)
+                                .orElse("");
             } catch (RuntimeException e) {
                 explanation = null;
             }
@@ -178,6 +193,10 @@ final class AgendaTrace {
         synchronized (this) {
             if (explanation != null)
                 ballots.computeIfAbsent(info, key -> new LinkedHashMap<>()).putIfAbsent(faction, explanation);
+            avoidance.forEach((payer, note) -> avoidanceNotes
+                    .computeIfAbsent(info, key -> new LinkedHashMap<>())
+                    .computeIfAbsent(payer, key -> new ArrayList<>())
+                    .add("at " + StringUtils.capitalize(faction) + "'s ballot: " + note));
             if (answererNote != null)
                 answererNotes
                         .computeIfAbsent(info, key -> new LinkedHashMap<>())
@@ -321,6 +340,17 @@ final class AgendaTrace {
                         promise.target(),
                         promise.promisee(),
                         promise.price(),
+                        promise.proposer(),
+                        promise.status());
+            case NOT_FOR ->
+                String.format(
+                        "[%s promises %s not to vote for %s, %s pays %d TG if %s loses; proposed by %s; %s]",
+                        promise.promiser(),
+                        promise.promisee(),
+                        promise.target(),
+                        promise.promisee(),
+                        promise.price(),
+                        promise.target(),
                         promise.proposer(),
                         promise.status());
             case DISCARD_AGENDA ->
@@ -594,8 +624,16 @@ final class AgendaTrace {
             synchronized (AgendaTrace.this) {
                 heard = events.getOrDefault(info, List.of());
                 explained = ballots.getOrDefault(info, Map.of());
-                answerers = answererNotes.getOrDefault(info, Map.of());
+                answerers = new HashMap<>(answererNotes.getOrDefault(info, Map.of()));
                 answererNotes.remove(info);
+                Map<String, List<String>> avoided = avoidanceNotes.getOrDefault(info, Map.of());
+                avoidanceNotes.remove(info);
+                avoided.forEach((payer, notes) -> answerers.merge(
+                        payer,
+                        notes.stream()
+                                .map(note -> System.lineSeparator() + "    - avoidance bribe " + note)
+                                .collect(java.util.stream.Collectors.joining()),
+                        String::concat));
                 events.remove(info);
                 ballots.remove(info);
                 seenBallotReasons.remove(info);
