@@ -100,6 +100,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final ExpeditionTracker expeditions = new ExpeditionTracker();
     final PromissoryTracker promissory = new PromissoryTracker();
     final LeaderTracker leaders = new LeaderTracker();
+    final FactionComponentTracker factionComponents = new FactionComponentTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -361,6 +362,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     seat.faction(),
                     target.customId(),
                     outcome.outcome().name());
+            factionComponents.pressed(
+                    currentRound(),
+                    seat.faction(),
+                    target.customId(),
+                    outcome.outcome().name());
             if (target.customId().contains("purgeHacanHero")) noteHeroBuild(seat.faction());
             if (outcome.pressed()) {
                 String family = handlerFamily(target.customId());
@@ -500,8 +506,10 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
                 countReason(decision);
-                if (decision instanceof AiDecision.Press leaderPress)
+                if (decision instanceof AiDecision.Press leaderPress) {
                     leaders.decided(context.game().getRound(), context.faction(), leaderPress.reason());
+                    factionComponents.decided(context.game().getRound(), context.faction(), leaderPress.reason());
+                }
                 noteOffer(context.faction(), decision);
                 rememberReason(decision);
                 countRoundAction(decision, context.game().getRound());

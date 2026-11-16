@@ -49,6 +49,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         ti4.ai.trace.TimingReport.reset();
         ti4.ai.brain.TickMemo.resetVerification();
         ti4.ai.trace.ShadowCheck.reset();
+        FactionComponentTracker.BATCH.clear();
         long batchStart = System.nanoTime();
         List<SelfPlayGame.Outcome> played = playAll(games, threads);
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
@@ -90,6 +91,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         printTempo(outcomes);
         if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get());
         AgendaTracker.report(outcomes);
+        FactionComponentTracker.printBatch();
 
         String reports = String.join(
                 System.lineSeparator() + System.lineSeparator(),
@@ -1167,6 +1169,24 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     // -Dai.selfplay.factions=sol,jolnar,xxcha,yin,nekro,sardakk seats those factions instead of the six built-out
     // default factions (AiSettings.DEFAULT_FACTIONS).
+    // -Dai.selfplay.factionpool=a,b,...,i seats six of the pool in each game, the window moving three factions on
+    // from one game to the next, so a batch spreads every faction of a pool larger than the table over its games.
+    private static List<String> factions(int slot) {
+        String pool = System.getProperty("ai.selfplay.factionpool", "");
+        if (pool.isBlank()) return factions();
+        List<String> factions = List.of(pool.split(",")).stream()
+                .map(String::trim)
+                .filter(faction -> !faction.isEmpty())
+                .toList();
+        int seats = Math.min(SEATS_FROM_POOL, factions.size());
+        List<String> seated = new ArrayList<>();
+        for (int i = 0; i < seats; i++) seated.add(factions.get((slot * POOL_STEP + i) % factions.size()));
+        return seated;
+    }
+
+    private static final int SEATS_FROM_POOL = 6;
+    private static final int POOL_STEP = 3;
+
     private static List<String> factions() {
         String chosen = System.getProperty("ai.selfplay.factions", "");
         if (chosen.isBlank()) return FACTIONS;
@@ -1237,10 +1257,13 @@ class AiSelfPlayTest extends BaseTi4Test {
                             : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
             SelfPlayGame game = new SelfPlayGame(env, name, slot);
             try {
-                game.setUp(factions());
+                game.setUp(factions(slot));
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);
                 System.out.println(outcome.report());
                 env.leaders.lines().forEach(line -> System.out.println("LEADERS " + game.name + " " + line));
+                FactionComponentTracker.Summary components = env.factionComponents.summary(game.name);
+                FactionComponentTracker.BATCH.add(components);
+                components.lines().forEach(line -> System.out.println("FACTIONUSE " + game.name + " " + line));
                 // Every channel and thread in this game's fake Discord must be its own; anything else means a call was
                 // routed to the wrong game while several games ran at once.
                 List<String> foreign = env.discord.channels().stream()
