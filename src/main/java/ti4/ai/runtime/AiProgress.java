@@ -1,5 +1,7 @@
 package ti4.ai.runtime;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -40,15 +42,17 @@ class AiProgress {
                 List.copyOf(seat.getTransactionItems()));
     }
 
-    private static int unitPositions(Game game, Player seat) {
-        int hash = 0;
+    private static List<String> unitPositions(Game game, Player seat) {
+        List<String> positions = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder holder : tile.getUnitHolders().values()) {
                 for (UnitKey key : holder.getUnitKeysForPlayer(seat)) {
-                    hash += Objects.hash(tile.getPosition(), holder.getName(), key, holder.getUnitCount(key));
+                    positions.add(
+                            tile.getPosition() + "|" + holder.getName() + "|" + key + "=" + holder.getUnitCount(key));
                 }
             }
         }
-        return hash;
+        Collections.sort(positions);
+        return positions;
     }
 }

@@ -58,6 +58,20 @@ class AiProgressTest extends BaseTi4Test {
         assertThat(AiProgress.fingerprint(test.game, test.nekro)).isNotEqualTo(before);
     }
 
+    // Landing 2 of 4 infantry on a planet that already holds 2 keeps both holders' keys. The fingerprint used to add
+    // up a hash that is linear in the count, so -2 in space and +2 on the planet cancelled out: 25 landings in a
+    // 48-game batch were read as no progress after two presses and cut short with Done Landing Troops.
+    @Test
+    void changesWhenUnitsMoveBetweenHoldersThatKeepUnits() {
+        test.units(home, "space", test.nekro, UnitType.Infantry, 4);
+        int before = AiProgress.fingerprint(test.game, test.nekro);
+
+        home.removeUnit("space", Units.getUnitKey(UnitType.Infantry, "black"), 2);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+
+        assertThat(AiProgress.fingerprint(test.game, test.nekro)).isNotEqualTo(before);
+    }
+
     @Test
     void changesWhenUnitsMoveToAnotherSystem() {
         Tile lodor = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));

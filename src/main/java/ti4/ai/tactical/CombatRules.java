@@ -2,6 +2,7 @@ package ti4.ai.tactical;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -102,9 +103,28 @@ public class CombatRules {
 
     public static boolean awaitsSeat(Game game, Player seat, List<AiPrompt> prompts, AiPrompt prompt) {
         if (prompt.source() != PromptSource.COMBAT_THREAD) return false;
-        return prompt.enabledButtons().stream()
-                .anyMatch(button -> button.isOwnedBy(seat.getFaction())
-                        || (isRoundRoll(button) && rollAllowed(game, seat, prompts, button) != RollTiming.NOT_NOW));
+        List<PromptButton> enabled = prompt.enabledButtons();
+        boolean rollDue = enabled.stream()
+                .anyMatch(button ->
+                        isRoundRoll(button) && rollAllowed(game, seat, prompts, button) != RollTiming.NOT_NOW);
+        if (rollDue) return true;
+        return enabled.stream().anyMatch(button -> button.isOwnedBy(seat.getFaction()))
+                && combatLive(game, seat, enabled);
+    }
+
+    private static boolean combatLive(Game game, Player seat, List<PromptButton> buttons) {
+        Optional<PromptButton> roll =
+                buttons.stream().filter(CombatRules::isRoundRoll).findFirst();
+        if (roll.isPresent()) return combatOf(game, seat, roll.get()).isPresent();
+        return buttons.stream()
+                .map(CombatRules::positionOf)
+                .map(game::getTileByPosition)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .map(tile -> tile.getUnitHolders().values().stream()
+                        .anyMatch(holder -> participates(seat, tile, holder)
+                                && !opponentsOn(game, seat, tile, holder).isEmpty()))
+                .orElse(true);
     }
 
     public static boolean isRollFor(Game game, Player seat, List<AiPrompt> prompts, PromptButton button) {
