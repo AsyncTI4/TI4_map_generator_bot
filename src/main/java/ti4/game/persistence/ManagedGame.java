@@ -165,6 +165,11 @@ public class ManagedGame {
         return player != null && playerToStatus.get(player).isRealOrEliminated();
     }
 
+    public boolean isRealPlayer(String userId) {
+        ManagedPlayer player = getPlayer(userId);
+        return player != null && playerToStatus.get(player) == Status.REAL;
+    }
+
     boolean matches(Game game) {
         return name.equals(game.getName())
                 && lastModifiedDate == game.getLastModifiedDate()
