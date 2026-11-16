@@ -28,8 +28,16 @@ final class AbSummary {
             double controlPoints,
             double treatmentWinShare) {
 
+        GameResult {
+            if (!finished(ending)) treatmentWinShare = Double.NaN;
+        }
+
         double difference() {
             return treatmentPoints - controlPoints;
+        }
+
+        boolean completed() {
+            return finished(ending);
         }
     }
 
@@ -86,24 +94,29 @@ final class AbSummary {
             pairs.computeIfAbsent(game.seed(), seed -> new ArrayList<>()).add(game);
         List<Double> pairDifferences = new ArrayList<>();
         List<Double> pairWinShares = new ArrayList<>();
+        List<GameResult> completedResults = new ArrayList<>();
         for (List<GameResult> pair : pairs.values()) {
-            if (pair.size() != 2) continue;
+            if (!completedPair(pair)) continue;
+            completedResults.addAll(pair);
             pairDifferences.add((pair.get(0).difference() + pair.get(1).difference()) / 2);
             pairWinShares.add((pair.get(0).treatmentWinShare() + pair.get(1).treatmentWinShare()) / 2);
         }
         System.out.printf(
-                "A/B %s: %d games, %d complete pairs; treatment minus control victory points %s; treatment win share"
+                "A/B unfinished games: %d; their pairs are excluded from paired estimates%n",
+                results.stream().filter(game -> !game.completed()).count());
+        System.out.printf(
+                "A/B %s: %d finished games in %d complete pairs; treatment minus control victory points %s; treatment win share"
                         + " %s (null 0.500); treatment %.2f vs control %.2f average points%n",
                 experiments.isEmpty() ? "none (A/A)" : experiments,
-                results.size(),
+                completedResults.size(),
                 pairDifferences.size(),
                 meanAndError(pairDifferences),
                 meanAndError(pairWinShares, 0.5),
-                results.stream()
+                completedResults.stream()
                         .mapToDouble(GameResult::treatmentPoints)
                         .average()
                         .orElse(0),
-                results.stream()
+                completedResults.stream()
                         .mapToDouble(GameResult::controlPoints)
                         .average()
                         .orElse(0));
@@ -111,6 +124,14 @@ final class AbSummary {
 
     static String meanAndError(List<Double> values) {
         return meanAndError(values, 0);
+    }
+
+    static boolean completedPair(List<GameResult> pair) {
+        return pair.size() == 2 && pair.stream().allMatch(GameResult::completed);
+    }
+
+    private static boolean finished(String ending) {
+        return SelfPlayGame.Ending.valueOf(ending).finished();
     }
 
     // t is measured against the null hypothesis: 0 for the point difference, 0.5 for the win share.

@@ -4,10 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
@@ -29,8 +27,6 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = AiSettings.DEFAULT_FACTIONS;
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
-    private static final Set<SelfPlayGame.Ending> FINISHED =
-            EnumSet.of(SelfPlayGame.Ending.VICTORY_POINTS, SelfPlayGame.Ending.OBJECTIVES_EXHAUSTED);
 
     @Test
     void sixAiSeatsPlayTheirFirstRound() throws Exception {
@@ -71,7 +67,7 @@ class AiSelfPlayTest extends BaseTi4Test {
             totalPoints += outcome.totalVictoryPoints();
             finalRounds += outcome.round();
             outcomes.add(outcome);
-            if (!FINISHED.contains(outcome.ending())) unfinished.add(outcome);
+            if (!outcome.ending().finished()) unfinished.add(outcome);
         }
         // The batch summary is the measure of the AI's strength: the leader's victory points, the table's total and how
         // early the games finish.
