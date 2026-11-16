@@ -1915,6 +1915,10 @@ public class StartCombatService {
             if (p2 != p1) {
                 BeansMonumentHandler.addPlateauOfLengCombatButton(buttons, game, p2);
             }
+            BeansMonumentHandler.addEtherAnchorCombatButton(buttons, game, p1, tile);
+            if (p2 != p1) {
+                BeansMonumentHandler.addEtherAnchorCombatButton(buttons, game, p2, tile);
+            }
             BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p1, p2, tile);
             BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p2, p1, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);

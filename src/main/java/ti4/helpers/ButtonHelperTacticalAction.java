@@ -1053,6 +1053,7 @@ public final class ButtonHelperTacticalAction {
         }
         if (game.isMonumentsMode()) {
             BeansMonumentHandler.offerNatauMonumentAnomaly(game, player, tile);
+            BeansMonumentHandler.offerValhavnMonumentPdsMove(game, player, tile);
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {

@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
-import ti4.discord.interactions.commands.tokens.AddTokenCommand;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -39,6 +39,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.game.MonumentsService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
@@ -66,7 +67,7 @@ public class BeansMonumentHandler {
     private static final String NATAU_IGNORED_ANOMALY_PLAYER = "natauMonumentIgnoredAnomalyPlayer";
     private static final String MOVE_VALHAVN_MONUMENT_PDS = "moveValhavnMonumentPds_";
     private static final String USE_MIGO_MONUMENT_EXPLORE = "useMigoMonumentExplore_";
-    private static final String PLACE_DEEP_MONUMENT_FRONTIER = "placeDeepMonumentFrontier_";
+    private static final String REPAIR_DEEP_MONUMENT_DEEP = "repairDeepMonumentDeep_";
     private static final String USE_BLOOM_MONUMENT = "useBloomMonument";
     private static final String SELECT_BLOOM_MONUMENT_PLAYER = "selectBloomMonumentPlayer_";
     private static final String SELECT_BLOOM_MONUMENT_PLANET = "selectBloomMonumentPlanet_";
@@ -109,8 +110,22 @@ public class BeansMonumentHandler {
         }
     }
 
-    public static void offerValhavnMonumentPdsMove(Game game, Player player, Tile committedTile) {
-        List<Button> buttons = getValhavnMonumentPdsMoveButtons(game, player, committedTile);
+    public static void addEtherAnchorCombatButton(List<Button> buttons, Game game, Player player, Tile tile) {
+        UnitKey deepKey = DeepUnitHandler.getUnitKey(player);
+        if (tile == null
+                || !MonumentsService.isMonumentReady(game, player, "deep_monument")
+                || MonumentsService.getMonumentTile(game, player, "deep_monument") != tile
+                || tile.getSpaceUnitHolder().getDamagedUnitCount(deepKey) < 1) {
+            return;
+        }
+        buttons.add(Buttons.gray(
+                player.factionButtonChecker() + REPAIR_DEEP_MONUMENT_DEEP + tile.getPosition(),
+                "Repair The Deep (End of Combat)",
+                FactionEmojis.deep));
+    }
+
+    public static void offerValhavnMonumentPdsMove(Game game, Player player, Tile activatedTile) {
+        List<Button> buttons = getValhavnMonumentPdsMoveButtons(game, player, activatedTile);
         if (buttons.isEmpty()) {
             return;
         }
@@ -119,6 +134,15 @@ public class BeansMonumentHandler {
                 player.getRepresentationNoPing()
                         + ", you may move 1 PDS from an adjacent planet onto _Himinbjörg_'s planet.",
                 NewStuffHelper.buttonPagination(buttons, player.factionButtonChecker() + MOVE_VALHAVN_MONUMENT_PDS, 0));
+    }
+
+    public static boolean isValhavnMonumentPlanet(Game game, Player player, String planetName) {
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "valhavn_monument");
+        Planet planet = game.getUnitHolderFromPlanet(planetName);
+        return monumentTile != null
+                && planet != null
+                && monumentTile.getPlanetUnitHolders().contains(planet)
+                && planet.getUnitCount(UnitType.Monument, player) > 0;
     }
 
     public static void offerMigoMonumentExplore(Game game, Player player) {
@@ -133,23 +157,6 @@ public class BeansMonumentHandler {
                 player.getRepresentationNoPing()
                         + ", you may exhaust _The Cyst_ and remove 1 infantry from a planet you control in the active system to explore it.",
                 buttons);
-    }
-
-    public static void offerDeepMonumentFrontierOnPass(Game game, Player player) {
-        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "deep_monument");
-        if (!canPlaceDeepMonumentFrontier(game, player, monumentTile)) {
-            return;
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", you may place a frontier token in _Ether Anchor_'s system.",
-                List.of(
-                        Buttons.green(
-                                player.factionButtonChecker()
-                                        + PLACE_DEEP_MONUMENT_FRONTIER
-                                        + monumentTile.getPosition(),
-                                "Place Frontier Token"),
-                        Buttons.DECLINE_DELETE_BUTTONS));
     }
 
     public static void clearIronTideProduction(Player player) {
@@ -305,8 +312,7 @@ public class BeansMonumentHandler {
                 player,
                 "deep_monument",
                 PLACE_DEEP_MONUMENT,
-                tile -> FoWHelper.playerHasActualShipsInSystem(player, tile)
-                        && tile.getPlanetUnitHolders().isEmpty());
+                tile -> DeepUnitHandler.getUnitTile(game, player) == tile);
     }
 
     @ButtonHandler(PLACE_DREAM_MONUMENT)
@@ -330,8 +336,7 @@ public class BeansMonumentHandler {
                 buttonID,
                 "deep_monument",
                 PLACE_DEEP_MONUMENT,
-                tile -> FoWHelper.playerHasActualShipsInSystem(player, tile)
-                        && tile.getPlanetUnitHolders().isEmpty());
+                tile -> DeepUnitHandler.getUnitTile(game, player) == tile);
     }
 
     @ButtonHandler(USE_TA_MONUMENT)
@@ -546,8 +551,8 @@ public class BeansMonumentHandler {
     public static void moveValhavnMonumentPds(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] payload =
                 buttonID.substring(MOVE_VALHAVN_MONUMENT_PDS.length()).split("\\|", 3);
-        Tile committedTile = payload.length == 3 ? game.getTileByPosition(payload[2]) : null;
-        List<Button> buttons = getValhavnMonumentPdsMoveButtons(game, player, committedTile);
+        Tile activatedTile = payload.length == 3 ? game.getTileByPosition(payload[2]) : null;
+        List<Button> buttons = getValhavnMonumentPdsMoveButtons(game, player, activatedTile);
         String message = player.getRepresentationNoPing()
                 + ", you may move 1 PDS from an adjacent planet onto _Himinbjörg_'s planet.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
@@ -568,7 +573,7 @@ public class BeansMonumentHandler {
         Tile sourceTile = game.getTileFromPlanet(payload[0]);
         Tile monumentTile = MonumentsService.getMonumentTile(game, player, "valhavn_monument");
         if (!isEligibleValhavnMonumentPdsMove(
-                game, player, monumentTile, sourceTile, sourcePlanet, monumentPlanet, committedTile)) {
+                game, player, monumentTile, sourceTile, sourcePlanet, monumentPlanet, activatedTile)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -588,6 +593,91 @@ public class BeansMonumentHandler {
                             + Helper.getPlanetRepresentation(monumentPlanet.getName(), game) + " with _Himinbjörg_.");
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler(REPAIR_DEEP_MONUMENT_DEEP)
+    public static void repairDeepMonumentDeep(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Tile tile = game.getTileByPosition(buttonID.substring(REPAIR_DEEP_MONUMENT_DEEP.length()));
+        UnitKey deepKey = DeepUnitHandler.getUnitKey(player);
+        if (tile == null
+                || MonumentsService.getMonumentTile(game, player, "deep_monument") != tile
+                || tile.getSpaceUnitHolder().getDamagedUnitCount(deepKey) < 1
+                || !MonumentsService.exhaustMonument(game, player, "deep_monument")) {
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+            return;
+        }
+        tile.getSpaceUnitHolder().removeDamagedUnit(deepKey, 1);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationNoPing() + " repaired _The Deep_ with _Ether Anchor_.");
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+    }
+
+    public static void moveEtherAnchorWithTheDeep(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            Tile sourceTile,
+            Tile destinationTile,
+            String destinationHolder,
+            List<RemovedUnit> movedUnits) {
+        if (player == null
+                || sourceTile == null
+                || destinationTile == null
+                || sourceTile == destinationTile
+                || !Constants.SPACE.equals(destinationHolder)
+                || movedUnits.stream().noneMatch(unit -> unit.unitKey().unitType() == UnitType.Deep)) {
+            return;
+        }
+        moveEtherAnchor(event, game, player, sourceTile, destinationTile);
+    }
+
+    private static void moveEtherAnchor(
+            GenericInteractionCreateEvent event, Game game, Player player, Tile sourceTile, Tile destinationTile) {
+        if (MonumentsService.getMonumentTile(game, player, "deep_monument") != sourceTile) {
+            return;
+        }
+        UnitKey monumentKey = sourceTile.getSpaceUnitHolder().getUnitKeys().stream()
+                .filter(unit -> player.unitBelongsToPlayer(unit) && unit.unitType() == UnitType.Monument)
+                .findFirst()
+                .orElse(null);
+        if (monumentKey == null) {
+            return;
+        }
+        List<RemovedUnit> removed =
+                RemoveUnitService.removeUnit(event, sourceTile, game, new ParsedUnit(monumentKey, 1, Constants.SPACE));
+        AddUnitService.addUnits(
+                event,
+                game,
+                removed.stream()
+                        .map(unit -> unit.onUnitHolder(destinationTile.getSpaceUnitHolder()))
+                        .toList());
+    }
+
+    public static void moveEtherAnchorWithTheDeep(
+            GenericInteractionCreateEvent event, Game game, Player player, Tile destinationTile) {
+        if (player == null || destinationTile == null) {
+            return;
+        }
+        for (Map.Entry<String, Map<UnitKey, List<Integer>>> entry :
+                game.getTacticalActionDisplacement().entrySet()) {
+            if (entry.getValue().entrySet().stream()
+                    .noneMatch(unit -> player.unitBelongsToPlayer(unit.getKey())
+                            && unit.getKey().unitType() == UnitType.Deep
+                            && unit.getValue().stream()
+                                            .mapToInt(Integer::intValue)
+                                            .sum()
+                                    > 0)) {
+                continue;
+            }
+            int separator = entry.getKey().indexOf('-');
+            if (separator < 1 || !Constants.SPACE.equals(entry.getKey().substring(separator + 1))) {
+                continue;
+            }
+            Tile sourceTile = game.getTileByPosition(entry.getKey().substring(0, separator));
+            moveEtherAnchor(event, game, player, sourceTile, destinationTile);
+            return;
+        }
     }
 
     @ButtonHandler(USE_MIGO_MONUMENT_EXPLORE)
@@ -843,21 +933,6 @@ public class BeansMonumentHandler {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler(PLACE_DEEP_MONUMENT_FRONTIER)
-    public static void placeDeepMonumentFrontier(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Tile monumentTile = game.getTileByPosition(buttonID.substring(PLACE_DEEP_MONUMENT_FRONTIER.length()));
-        if (!canPlaceDeepMonumentFrontier(game, player, monumentTile)) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        AddTokenCommand.addToken(event, monumentTile, Constants.FRONTIER, game);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getRepresentationNoPing() + " placed a frontier token in _Ether Anchor_'s system.");
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler(PLACE_PLATEAU_OF_LENG_SHIP)
     public static void placePlateauOfLengShip(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!"pending".equals(game.getStoredValue(DREAM_STATE + player.getFaction()))) {
@@ -1052,18 +1127,17 @@ public class BeansMonumentHandler {
                 .toList();
     }
 
-    private static List<Button> getValhavnMonumentPdsMoveButtons(Game game, Player player, Tile committedTile) {
+    private static List<Button> getValhavnMonumentPdsMoveButtons(Game game, Player player, Tile activatedTile) {
         Tile monumentTile = MonumentsService.getMonumentTile(game, player, "valhavn_monument");
         Planet monumentPlanet = getValhavnMonumentPlanet(monumentTile, player);
         if (monumentTile == null
                 || monumentPlanet == null
-                || committedTile == null
+                || activatedTile == null
                 || !MonumentsService.isMonumentOnBoard(game, player, "valhavn_monument")
                 || !Adjacency.of(game, player)
                         .forEffects()
-                        .withSelf()
                         .from(monumentTile.getPosition())
-                        .contains(committedTile.getPosition())) {
+                        .contains(activatedTile.getPosition())) {
             return List.of();
         }
         return game.getTileMap().values().stream()
@@ -1075,7 +1149,7 @@ public class BeansMonumentHandler {
                 .filter(planet -> planet.getUnitCount(UnitType.Pds, player) > 0)
                 .map(planet -> Buttons.green(
                         player.factionButtonChecker() + MOVE_VALHAVN_MONUMENT_PDS + planet.getName() + "|"
-                                + monumentPlanet.getName() + "|" + committedTile.getPosition(),
+                                + monumentPlanet.getName() + "|" + activatedTile.getPosition(),
                         "Move PDS From " + Helper.getPlanetRepresentation(planet.getName(), game)))
                 .toList();
     }
@@ -1296,13 +1370,6 @@ public class BeansMonumentHandler {
                 && MonumentsService.isInOrAdjacentToMonumentSystem(game, player, "migo_monument", activeTile);
     }
 
-    private static boolean canPlaceDeepMonumentFrontier(Game game, Player player, Tile monumentTile) {
-        return monumentTile != null
-                && monumentTile == MonumentsService.getMonumentTile(game, player, "deep_monument")
-                && MonumentsService.isMonumentOnBoard(game, player, "deep_monument")
-                && !monumentTile.getSpaceUnitHolder().getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER));
-    }
-
     private static boolean isEligibleValhavnMonumentPdsMove(
             Game game,
             Player player,
@@ -1310,21 +1377,20 @@ public class BeansMonumentHandler {
             Tile sourceTile,
             Planet sourcePlanet,
             Planet monumentPlanet,
-            Tile committedTile) {
+            Tile activatedTile) {
         return monumentTile != null
                 && sourceTile != null
                 && sourcePlanet != null
                 && monumentPlanet != null
-                && committedTile != null
+                && activatedTile != null
                 && MonumentsService.isMonumentOnBoard(game, player, "valhavn_monument")
                 && monumentTile.getPlanetUnitHolders().contains(monumentPlanet)
                 && monumentPlanet.getUnitCount(UnitType.Monument, player) > 0
                 && sourcePlanet.getUnitCount(UnitType.Pds, player) > 0
                 && Adjacency.of(game, player)
                         .forEffects()
-                        .withSelf()
                         .from(monumentTile.getPosition())
-                        .contains(committedTile.getPosition())
+                        .contains(activatedTile.getPosition())
                 && Adjacency.of(game, player)
                         .forEffects()
                         .from(monumentTile.getPosition())
