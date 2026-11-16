@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.Getter;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.service.franken.FrankenDraftMode;
 import tools.jackson.databind.JsonNode;
 
 @Getter
@@ -37,10 +36,7 @@ class AuctionDraftSettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        if (!(parent instanceof FrankenSettings settings)
-                || !FrankenDraftMode.AUCTION
-                        .toString()
-                        .equals(settings.getDraftMode().getValue())) {
+        if (!(parent instanceof FrankenSettings settings) || !settings.isAuctionMode()) {
             return List.of();
         }
         return List.of(startingVotes, startingBans, startingMulligans, extraComponents);

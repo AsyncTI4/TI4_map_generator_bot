@@ -23,9 +23,12 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.draft.AuctionFrankenDrazDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.draft.FrankenDrazDraft;
+import ti4.draft.items.FactionDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -108,10 +111,18 @@ public class AuctionFrankenDraftService {
         set(game, "nominator", player.getFaction());
         set(game, "phase", "review");
         ButtonHelper.deleteMessage(event);
-        if (number(game, playerKey("bans", player)) == 0 && number(game, playerKey("mulligans", player)) == 0) {
-            MessageHelper.sendMessageToChannel(
-                    auctionLogChannel(game),
-                    player.getRepresentationNoPing() + " has no bans or mulligans remaining, so the pool is kept.");
+        if (category == DraftCategory.DRAFTORDER
+                || (number(game, playerKey("bans", player)) == 0
+                        && number(game, playerKey("mulligans", player)) == 0)) {
+            if (category == DraftCategory.DRAFTORDER) {
+                MessageHelper.sendMessageToChannel(
+                        auctionLogChannel(game),
+                        "Table positions cannot be banned or mulliganed, so the pool is kept.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        auctionLogChannel(game),
+                        player.getRepresentationNoPing() + " has no bans or mulligans remaining, so the pool is kept.");
+            }
             beginBidding(game);
             return;
         }
@@ -121,6 +132,7 @@ public class AuctionFrankenDraftService {
     public void review(
             Game game, Player player, ButtonInteractionEvent event, int nomination, String action, String alias) {
         if (!isCurrent(game, "review", nomination)) return;
+        if (category(game) == DraftCategory.DRAFTORDER) return;
         if ("ban".equals(action)) {
             if (number(game, playerKey("bans", player)) < 1 || !pool(game).contains(alias)) return;
             DraftItem item = DraftItem.generateFromAlias(alias);
@@ -187,7 +199,7 @@ public class AuctionFrankenDraftService {
         set(game, playerKey("bids", player), "0,0,0");
         addToList(game, "locked", player.getFaction());
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Your bids are locked at 0 / 0 / 0.");
+        MessageHelper.sendEphemeralMessageToEventChannel(event, "Your bids are locked at 0 / 0 / 0.");
         sendBidSubmissionStatus(game);
         if (locked(game).containsAll(playerIds(game))) resolveBids(game);
     }
@@ -214,6 +226,10 @@ public class AuctionFrankenDraftService {
     }
 
     public void showDraftedComponents(Game game, Player player, ButtonInteractionEvent event) {
+        if (event.getMessageChannel().equals(player.getCardsInfoThread())) {
+            sendCurrentDraftedComponents(player);
+            return;
+        }
         ThreadChannel thread = draftedComponentsThread(game);
         if (thread == null && event.getMessageChannel() instanceof ThreadChannel eventThread) thread = eventThread;
         if (thread == null) return;
@@ -245,7 +261,7 @@ public class AuctionFrankenDraftService {
     }
 
     private void respondToBidSubmission(ModalInteractionEvent event, String message) {
-        MessageHelper.sendMessageToEventChannel(event, message);
+        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public void pick(Game game, Player player, ButtonInteractionEvent event, int nomination, String alias) {
@@ -331,6 +347,7 @@ public class AuctionFrankenDraftService {
             set(game, playerKey("auto", player), "false");
         }
         int nomination = currentNomination(game);
+        sendPoolToActionsChannel(game);
         replaceAuctionCardsInfoForPlayers(game, () -> sendBiddingPrompts(game, nomination));
     }
 
@@ -366,6 +383,7 @@ public class AuctionFrankenDraftService {
                     player.getCardsInfoThread(),
                     "Optionally rank components for auto-pick, in preference order.",
                     rankButtons(game, player, nomination));
+            sendDraftedComponentsButton(player);
         }
     }
 
@@ -461,14 +479,12 @@ public class AuctionFrankenDraftService {
         String rankedPick =
                 rankings.stream().filter(pool(game)::contains).findFirst().orElse(null);
         if (rankedPick != null) {
-            completePick(game, picker, rankedPick);
-            advancePick(game, null);
+            completeAutomaticPickAndAdvance(game, picker, rankedPick);
             return;
         }
         if ("true".equals(value(game, playerKey("auto", picker))) && !pool(game).isEmpty()) {
-            completePick(game, picker, pool(game).get((int)
+            completeAutomaticPickAndAdvance(game, picker, pool(game).get((int)
                     (Math.random() * pool(game).size())));
-            advancePick(game, null);
             return;
         }
         sendComponentDisplays(picker.getCardsInfoThread(), game, picker, pool(game));
@@ -487,6 +503,12 @@ public class AuctionFrankenDraftService {
                         + number(game, "price." + picker.getFaction()) + " votes\n-# Remaining votes: "
                         + number(game, playerKey("votes", picker)),
                 buttons);
+        sendDraftedComponentsButton(picker);
+    }
+
+    private void completeAutomaticPickAndAdvance(Game game, Player picker, String alias) {
+        completePick(game, picker, alias);
+        replaceAuctionCardsInfo(picker, () -> advancePick(game, null));
     }
 
     private void finishNomination(Game game, GenericInteractionCreateEvent event) {
@@ -510,6 +532,9 @@ public class AuctionFrankenDraftService {
                     List.of(
                             Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)"),
                             Buttons.green("startFrankenMantisBuild", "Mantis Build Slices")));
+            if (game.getActiveBagDraft() instanceof AuctionFrankenDrazDraft) {
+                FrankenDrazDraft.expandFactionPackages(game);
+            }
             FrankenDraftBagService.applyDraftBags(event, game);
             return;
         }
@@ -544,8 +569,9 @@ public class AuctionFrankenDraftService {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getPing() + ", you have " + number(game, playerKey("votes", player)) + " votes remaining.");
+            sendDraftedComponentsButton(player);
         }
-        List<net.dv8tion.jda.api.components.buttons.Button> buttons = auctionCategories().stream()
+        List<net.dv8tion.jda.api.components.buttons.Button> buttons = auctionCategories(game).stream()
                 .filter(category -> canNominate(game, category))
                 .map(category -> Buttons.green(
                         nominator.factionButtonChecker() + ACTION_PREFIX + ";nominate;" + nomination + ";"
@@ -591,6 +617,7 @@ public class AuctionFrankenDraftService {
                         + number(game, playerKey("mulligans", nominator)),
                 buttons);
         sendComponentDisplays(nominator.getCardsInfoThread(), game, nominator, pool(game));
+        sendDraftedComponentsButton(nominator);
     }
 
     private String poolDescription(Game game) {
@@ -728,8 +755,59 @@ public class AuctionFrankenDraftService {
         for (String alias : aliases) {
             DraftItem item = DraftItem.generateFromAlias(alias);
             builder.append(Container.of(item.getTextDisplays(game, player, true)));
+            if (item instanceof FactionDraftItem) {
+                builder.append(Buttons.gray(
+                        player.factionButtonChecker() + "frankenFactionComponents;" + item.getItemId(),
+                        "Show Components",
+                        item.getItemEmoji()));
+            }
         }
         builder.send();
+    }
+
+    private void sendDraftedComponentsButton(Player player) {
+        MessageHelper.sendMessageToChannelWithButton(
+                player.getCardsInfoThread(),
+                "View the components you have drafted so far.",
+                Buttons.gray(
+                        player.factionButtonChecker() + ACTION_PREFIX + ";showDrafted", "Show Drafted Components"));
+    }
+
+    private void sendCurrentDraftedComponents(Player player) {
+        List<DraftItem> drafted = player.getDraftHand().Contents;
+        if (drafted.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You have not drafted any components yet.");
+            return;
+        }
+        String prefix = "__Your Drafted Components__\n";
+        StringBuilder message = new StringBuilder(prefix);
+        for (DraftItem item : drafted) {
+            String summary = draftedComponentSummary(player.getGame(), item) + "\n";
+            if (message.length() + summary.length() > 1900 && message.length() > prefix.length()) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message.toString());
+                message = new StringBuilder("__Your Drafted Components (continued)__\n");
+            }
+            message.append(summary);
+        }
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message.toString());
+    }
+
+    private void sendPoolToActionsChannel(Game game) {
+        MessageChannel channel = auctionLogChannel(game);
+        String prefix = "__Auction Pool__\n";
+        StringBuilder message = new StringBuilder(prefix);
+        for (String alias : pool(game)) {
+            DraftItem item = DraftItem.generateFromAlias(alias);
+            String line = "> " + item.getItemEmoji() + " " + item.getShortDescription() + "\n";
+            if (message.length() + line.length() > 1900 && message.length() > prefix.length()) {
+                MessageHelper.sendMessageToChannel(channel, message.toString());
+                message = new StringBuilder("__Auction Pool (continued)__\n");
+            }
+            message.append(line);
+        }
+        if (message.length() > prefix.length()) {
+            MessageHelper.sendMessageToChannel(channel, message.toString());
+        }
     }
 
     private ThreadChannel draftedComponentsThread(Game game) {
@@ -823,6 +901,8 @@ public class AuctionFrankenDraftService {
                         messages -> {
                             messages.stream()
                                     .filter(message -> message.getAuthor().isBot())
+                                    .filter(message ->
+                                            !message.getContentRaw().equals(game.getPing() + " Drafted Components"))
                                     .forEach(message ->
                                             message.delete().queue(Consumers.nop(), BotLogger::catchRestError));
                             postDraftedComponentsLedger(game, thread);
@@ -909,8 +989,7 @@ public class AuctionFrankenDraftService {
     }
 
     private List<DraftItem> drawPool(Game game, DraftCategory category, int amount, Set<String> excluded) {
-        List<DraftItem> candidates =
-                new ArrayList<>(FrankenDraft.getDraftableItems(game).getOrDefault(category, List.of()));
+        List<DraftItem> candidates = new ArrayList<>(draftableItems(game, category));
         Set<String> unavailable = new LinkedHashSet<>(list(game, "removed"));
         unavailable.addAll(excluded);
         unavailable.addAll(list(game, "setAside"));
@@ -932,7 +1011,7 @@ public class AuctionFrankenDraftService {
     }
 
     private boolean allNominationsComplete(Game game) {
-        return auctionCategories().stream().allMatch(category -> remainingNominations(game, category) == 0);
+        return auctionCategories(game).stream().allMatch(category -> remainingNominations(game, category) == 0);
     }
 
     private int remainingNominations(Game game, DraftCategory category) {
@@ -959,7 +1038,7 @@ public class AuctionFrankenDraftService {
     }
 
     private void snapshotCategoryLimits(Game game) {
-        for (DraftCategory category : auctionCategories()) {
+        for (DraftCategory category : auctionCategories(game)) {
             set(game, "limit." + category.name(), String.valueOf(FrankenDraft.getItemLimitForCategory(category, game)));
         }
     }
@@ -983,8 +1062,24 @@ public class AuctionFrankenDraftService {
                 DraftCategory.STARTINGTECH);
     }
 
+    private List<DraftCategory> auctionCategories(Game game) {
+        if (game.getActiveBagDraft() instanceof AuctionFrankenDrazDraft) {
+            return List.of(
+                    DraftCategory.FACTION, DraftCategory.BLUETILE, DraftCategory.REDTILE, DraftCategory.DRAFTORDER);
+        }
+        return auctionCategories();
+    }
+
+    private List<DraftItem> draftableItems(Game game, DraftCategory category) {
+        if (game.getActiveBagDraft() instanceof AuctionFrankenDrazDraft && category == DraftCategory.FACTION) {
+            return FactionDraftItem.buildAllDraftableItems(FrankenDrazDraft.getDraftableFactionsForGame(game));
+        }
+        return FrankenDraft.getDraftableItems(game).getOrDefault(category, List.of());
+    }
+
     private String categoryLabel(DraftCategory category) {
         return switch (category) {
+            case FACTION -> "Factions";
             case ABILITY -> "Faction Abilities";
             case TECH -> "Faction Techs";
             case BREAKTHROUGH -> "Breakthroughs";
@@ -1000,6 +1095,7 @@ public class AuctionFrankenDraftService {
             case PN -> "Promissory Notes";
             case STARTINGFLEET -> "Starting Fleets";
             case STARTINGTECH -> "Starting Techs";
+            case DRAFTORDER -> "Draft Order";
             default -> category.name();
         };
     }
