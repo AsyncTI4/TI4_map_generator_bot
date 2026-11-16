@@ -275,6 +275,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     }
 
     public void sendPostDraftComponentButtons(Player player) {
+        expandFactionPackages(player.getGame());
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 "Choose a drafted component category to view. Additional components are added automatically. Optional Swaps will appear in their respective categories when expanded.\n\nHome systems and starting fleet adds/swaps must be handled manually, however the mantis/random map build will give you buttons to select your hs and starting fleet. Category buttons are present for your convenience.",
@@ -295,23 +296,72 @@ public class FrankenDrazDraft extends FrankenDraft {
         if (components.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(), "## " + item.getTitle(player.getGame()) + " Components\nNone.");
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
             return;
         }
 
         List<Color> accents = FrankenDraftBagService.getAccents();
-        MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
-        builder.append("## " + item.getTitle(player.getGame()) + " Components");
+        List<Container> previewContainers = new ArrayList<>();
         for (DraftItem component : components) {
-            for (Container container : buildFactionComponentContainers(component, player, accents.getFirst())) {
-                builder.append(container);
-            }
+            previewContainers.addAll(buildFactionComponentContainers(component, player, accents.getFirst()));
             Collections.rotate(accents, -1);
         }
-        builder.send();
-        MessageHelper.sendEphemeralMessageToEventChannel(
-                event, "Sent " + item.getShortDescription() + " components to your cards info thread.");
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(), "## " + item.getTitle(player.getGame()) + " Components");
+        List<List<Container>> previewBatches = partitionFactionComponentContainers(previewContainers);
+        for (List<Container> previewBatch : previewBatches) {
+            MessageV2Builder builder = new MessageV2Builder(player.getCardsInfoThread());
+            previewBatch.forEach(builder::append);
+            builder.send();
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                "Please close this viewer when you are finished.",
+                List.of(Buttons.red(
+                        player.factionButtonChecker()
+                                + "frankenDrazCloseFactionComponents;"
+                                + (previewBatches.size() + 1),
+                        "Done")));
+    }
+
+    @ButtonHandler(value = "frankenDrazCloseFactionComponents", save = false)
+    private static void closeFactionComponents(ButtonInteractionEvent event, Player player, String buttonID) {
+        String[] buttonParts = buttonID.split(";", 2);
+        if (buttonParts.length != 2) {
+            return;
+        }
+
+        int messageCount;
+        try {
+            messageCount = Integer.parseInt(buttonParts[1]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        if (messageCount < 1 || messageCount > 100) {
+            return;
+        }
+        int[] remainingMessages = {messageCount};
+        event.getMessage()
+                .getChannel()
+                .getHistoryBefore(event.getMessage(), 100)
+                .queue(
+                        messageHistory -> {
+                            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                            List<Message> previewMessages = new ArrayList<>();
+                            for (Message message : messageHistory.getRetrievedHistory()) {
+                                if (!message.getAuthor().isBot()) continue;
+                                if (remainingMessages[0]-- == 0) break;
+                                previewMessages.add(message);
+                            }
+                            if (previewMessages.size() > 1
+                                    && event.getMessageChannel() instanceof ThreadChannel threadChannel) {
+                                threadChannel.purgeMessages(previewMessages);
+                            } else {
+                                for (Message previewMessage : previewMessages) {
+                                    previewMessage.delete().queue(Consumers.nop(), BotLogger::catchRestError);
+                                }
+                            }
+                        },
+                        BotLogger::catchRestError);
     }
 
     public static void sendFactionComponentCards(GenericInteractionCreateEvent event, String faction) {
@@ -334,7 +384,7 @@ public class FrankenDrazDraft extends FrankenDraft {
         builder.send();
     }
 
-    @ButtonHandler(value = "frankenDrazCategory", save = false)
+    @ButtonHandler("frankenDrazCategory")
     private static void showFrankenDrazCategory(ButtonInteractionEvent event, Player player, String buttonID) {
         if (player.getGame().getActiveBagDraft() instanceof FrankenDrazDraft frankenDrazDraft) {
             DraftCategory category = DraftCategory.valueOf(buttonID.split(";")[1]);
@@ -347,6 +397,7 @@ public class FrankenDrazDraft extends FrankenDraft {
             return;
         }
 
+        expandFactionPackages(player.getGame());
         ThreadChannel cardsInfoThread = player.getCardsInfoThread();
         List<Container> containers = buildPostDraftCategoryContainers(player, category);
         if (containers.isEmpty()) {
@@ -562,6 +613,32 @@ public class FrankenDrazDraft extends FrankenDraft {
             containers.add(Container.of(current).withAccentColor(accent));
         }
         return containers;
+    }
+
+    private static List<List<Container>> partitionFactionComponentContainers(List<Container> previewContainers) {
+        List<List<Container>> batches = new ArrayList<>();
+        List<Container> batch = new ArrayList<>();
+        int componentCount = 0;
+        int characterCount = 0;
+        for (Container container : previewContainers) {
+            int nextComponentCount = MessageV2Builder.CountComponents(container);
+            int nextCharacterCount = MessageV2Builder.CountCharacters(container);
+            if (!batch.isEmpty()
+                    && (componentCount + nextComponentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
+                            || characterCount + nextCharacterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2)) {
+                batches.add(batch);
+                batch = new ArrayList<>();
+                componentCount = 0;
+                characterCount = 0;
+            }
+            batch.add(container);
+            componentCount += nextComponentCount;
+            characterCount += nextCharacterCount;
+        }
+        if (!batch.isEmpty()) {
+            batches.add(batch);
+        }
+        return batches;
     }
 
     private static boolean isManualSetupCategory(DraftCategory category) {

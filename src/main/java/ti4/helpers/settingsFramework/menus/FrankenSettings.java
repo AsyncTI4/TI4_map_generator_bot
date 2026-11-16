@@ -145,7 +145,7 @@ public class FrankenSettings extends SettingsMenu {
     @Override
     protected List<SettingsMenu> categories() {
         List<SettingsMenu> categories = new ArrayList<>(List.of(homebrewSettings, deckSettings, draftLimitSettings));
-        if (FrankenDraftMode.AUCTION.toString().equals(draftMode.getValue())) categories.add(auctionDraftSettings);
+        if (isAuctionMode()) categories.add(auctionDraftSettings);
         if (isFrankendrazMode()) {
             categories.add(factionPrioritySettings);
         }
@@ -218,7 +218,7 @@ public class FrankenSettings extends SettingsMenu {
         MonumentsService.applyMonuments(game);
         applyBanSettings();
         applyPriorityFactionSettings();
-        if (FrankenDraftMode.AUCTION.toString().equals(draftMode.getValue())) {
+        if (isAuctionMode()) {
             AuctionFrankenDraftService.configure(
                     game,
                     auctionDraftSettings.getStartingVotes().getVal(),
@@ -325,7 +325,13 @@ public class FrankenSettings extends SettingsMenu {
     }
 
     boolean isFrankendrazMode() {
-        return FrankenDraftMode.FRANKENDRAZ.toString().equals(draftMode.getValue());
+        return FrankenDraftMode.FRANKENDRAZ.toString().equals(draftMode.getValue())
+                || FrankenDraftMode.AUCTIONDRAZ.toString().equals(draftMode.getValue());
+    }
+
+    boolean isAuctionMode() {
+        return FrankenDraftMode.AUCTION.toString().equals(draftMode.getValue())
+                || FrankenDraftMode.AUCTIONDRAZ.toString().equals(draftMode.getValue());
     }
 
     boolean isEffectiveDiscordantStarsEnabled() {

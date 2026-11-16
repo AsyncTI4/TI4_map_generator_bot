@@ -8,6 +8,7 @@ public enum FrankenDraftMode {
     POWEREDOVERDRAFT("powered_overdraft", "Combines powered and overdraft modes."),
     FRANKENDRAZ(
             "frankendraz", "Draft faction packages, then build from their components using powered franken limits."),
+    AUCTIONDRAZ("auction_draz", "Privately bid on nominated FrankenDraz factions, tiles, and draft order."),
     TWILIGHTSFALL("twilights_fall", "Used for Thunder's Edge Twilights Fall Franken Draft"),
     INAUGURALSPLICE("inaugural_splice", "Used for Thunder's Edge Twilights Fall RAW Draft"),
     AUCTION("auction", "Privately bid on nominated Franken components.");
