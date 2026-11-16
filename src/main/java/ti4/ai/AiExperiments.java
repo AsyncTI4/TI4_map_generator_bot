@@ -15,6 +15,7 @@ public class AiExperiments {
     public static final String DISABLED_KEY = "aiExperimentsOff";
 
     public enum Experiment {
+        READY_PUBLIC_POINTS,
         WIN_THREAT_FEASIBLE,
         WIN_AWARE_POINTS,
         AGENDA_SABOTAGE,

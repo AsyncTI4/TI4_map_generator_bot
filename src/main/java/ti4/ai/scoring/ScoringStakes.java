@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.SearchMemo;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.secrets.SecretOdds;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -160,6 +162,9 @@ public class ScoringStakes {
     }
 
     private static int publicPoints(Game game, Player player) {
+        if (AiExperiments.enabled(DecidingSeat.orSelf(game, player), AiExperiments.Experiment.READY_PUBLIC_POINTS)) {
+            return PublicScoringPlan.points(game, player, ScoringReserve.scoringChances(game, player));
+        }
         List<String> scorable = ObjectivePolicy.scorablePublics(game, player);
         int chances = ScoringReserve.scoringChances(game, player);
         return scorable.stream()
