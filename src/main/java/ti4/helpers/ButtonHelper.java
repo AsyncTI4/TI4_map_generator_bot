@@ -7665,13 +7665,15 @@ public class ButtonHelper {
             String unit = part.split("_")[2];
             List<Die> resultRolls = DiceHelper.rollDice(hitOn, numDice);
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            UnitModel unitModel = player.getUnitByBaseType(unit);
+            int dieCount = Math.max(1, unitModel.getCombatDieCount());
             String unitRoll = CombatMessageHelper.displayUnitRoll(
-                    player.getUnitByBaseType(unit),
+                    unitModel,
                     hitOn,
                     0,
-                    numDice / player.getUnitByBaseType(unit).getCombatDieCount(),
-                    player.getUnitByBaseType(unit).getCombatDieCount(),
-                    numDice % player.getUnitByBaseType(unit).getCombatDieCount(),
+                    numDice / dieCount,
+                    dieCount,
+                    numDice % dieCount,
                     resultRolls,
                     hitRolls,
                     "space");
@@ -7698,13 +7700,15 @@ public class ButtonHelper {
             String unit = part.split("_")[2];
             List<Die> resultRolls = DiceHelper.rollDice(hitOn, numDice);
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            UnitModel unitModel = player.getUnitByBaseType(unit);
+            int dieCount = Math.max(1, unitModel.getCombatDieCount());
             String unitRoll = CombatMessageHelper.displayUnitRoll(
-                    player.getUnitByBaseType(unit),
+                    unitModel,
                     hitOn,
                     0,
-                    numDice / player.getUnitByBaseType(unit).getCombatDieCount(),
-                    player.getUnitByBaseType(unit).getCombatDieCount(),
-                    numDice % player.getUnitByBaseType(unit).getCombatDieCount(),
+                    numDice / dieCount,
+                    dieCount,
+                    numDice % dieCount,
                     resultRolls,
                     hitRolls,
                     "space");
