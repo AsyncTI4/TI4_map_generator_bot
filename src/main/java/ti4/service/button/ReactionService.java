@@ -240,16 +240,27 @@ public class ReactionService {
         Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
         String msg2 =
                 "All players have indicated \"No Sabotage\"" + (acToReact.find() ? " to " + acToReact.group(1) : "");
-        if (gameMessage != null) {
+        boolean actionPhase = game.getPhaseOfGame().contains("action");
+        if (!actionPhase) {
+            msg2 = game.getPing() + ", a" + msg2.substring(1);
+        } else if (gameMessage != null) {
             String factionToPing = gameMessage.factionsThatReacted().getFirst();
             Player playerToPing = game.getPlayerFromColorOrFaction(factionToPing);
             if (playerToPing != null) {
-                boolean ping = !game.getPhaseOfGame().contains("action") || game.getActivePlayer() == playerToPing;
-                String msg3 = playerToPing.getRepresentation(true, ping) + ", a" + msg2.substring(1);
+                Player activePlayer = game.getActivePlayer();
+                boolean pingActivePlayer = activePlayer != null && activePlayer != playerToPing;
                 if (game.isFowMode()) {
+                    String msg3 = playerToPing.getRepresentation(true, true) + ", a" + msg2.substring(1);
                     MessageHelper.sendMessageToChannel(playerToPing.getPrivateChannel(), msg3);
+                    if (pingActivePlayer) {
+                        MessageHelper.sendMessageToChannel(
+                                activePlayer.getPrivateChannel(),
+                                activePlayer.getRepresentation(true, true) + ", a" + msg2.substring(1));
+                    }
                 } else {
-                    msg2 = msg3;
+                    String pings = playerToPing.getRepresentation(true, true)
+                            + (pingActivePlayer ? " " + activePlayer.getRepresentation(true, true) : "");
+                    msg2 = pings + ", a" + msg2.substring(1);
                 }
             }
         }
