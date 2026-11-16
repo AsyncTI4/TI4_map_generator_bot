@@ -290,7 +290,6 @@ public class ValhavnAbilityHandler {
                 || !player.hasAbility(REAVE)
                 || !player.hasAbility(BLOODLUST)
                 || !game.getStoredValue(getUsedKey(player)).isEmpty()
-                || !game.getStoredValue(getBloodlustUsedKey(player)).isEmpty()
                 || player.hasPlanet(planetName)) {
             ButtonHelper.deleteMessage(event);
             return;
