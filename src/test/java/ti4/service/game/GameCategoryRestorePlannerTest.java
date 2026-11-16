@@ -18,6 +18,9 @@ class GameCategoryRestorePlannerTest {
         assertThat(GameCategoryRestorePlanner.gameNumber("pbd30801-the-fun-name"))
                 .hasValue(30_801);
         assertThat(GameCategoryRestorePlanner.gameNumber("pbd30801")).hasValue(30_801);
+        assertThat(GameCategoryRestorePlanner.gameNumber("pbd23536c-actions")).hasValue(23_536);
+        assertThat(GameCategoryRestorePlanner.gameNumber("pbd24323d-habs-win-it-all"))
+                .hasValue(24_323);
         assertThat(GameCategoryRestorePlanner.gameNumber("pbd-general")).isEmpty();
         assertThat(GameCategoryRestorePlanner.gameNumber("fow123-actions")).isEmpty();
     }
@@ -55,6 +58,20 @@ class GameCategoryRestorePlannerTest {
                                 true,
                                 List.of("pbd30801-fun", "pbd30801-actions", "pbd30803-fun", "pbd30803-actions")),
                         new Placement<>("PBD #30815-30819", true, List.of("pbd30815-actions")));
+    }
+
+    @Test
+    void placesRematchesInTheOriginalGamesCategoryAfterIt() {
+        // Rematches keep the original number with a letter suffix, e.g. pbd23536c.
+        List<String> orphans = List.of("pbd23536c-actions", "pbd23536-actions", "pbd23536c-redshift", "pbd23536-fun");
+
+        List<Placement<String>> plan = GameCategoryRestorePlanner.plan(orphans, NAME, List.of(), 5);
+
+        assertThat(plan)
+                .containsExactly(new Placement<>(
+                        "PBD #23535-23539",
+                        true,
+                        List.of("pbd23536-fun", "pbd23536-actions", "pbd23536c-redshift", "pbd23536c-actions")));
     }
 
     @Test
