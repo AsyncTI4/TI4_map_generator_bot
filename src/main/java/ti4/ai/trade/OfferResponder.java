@@ -73,6 +73,7 @@ class OfferResponder {
                 continue;
             }
             if (waitsFor(context, offerer.get())) continue;
+            FriendlyTrade.observeOffer(context, offerer.get(), deal);
             Verdict verdict = verdict(context, offerer.get(), deal);
             if (OfferRejections.answering(context, offerer.get())) {
                 boolean taken = verdict.kind() == Kind.ACCEPT;

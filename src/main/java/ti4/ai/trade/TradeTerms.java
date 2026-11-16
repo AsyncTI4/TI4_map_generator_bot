@@ -64,6 +64,10 @@ public class TradeTerms {
         return Optional.empty();
     }
 
+    static boolean isWinExclusion(String reason) {
+        return NEAR_WIN.equals(reason) || COULD_WIN.equals(reason);
+    }
+
     public static boolean mastersOfTrade(Player follower) {
         return follower.hasAbility(MASTERS_OF_TRADE);
     }

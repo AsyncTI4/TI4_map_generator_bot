@@ -1135,7 +1135,11 @@ to build one by hand:
     their commodities for at most as many of its trade goods, and on its own turn, holding no commodities, offers that
     flip once a round. As Trade holder it charges such a follower X-1 whatever their commodity value, and does not
     exclude them for leading or for a point the payout would unlock. Both stop when the trade goods could let the
-    player win (`FriendlyTrade.couldWinWith`); a follower close to winning is still excluded.
+    player win (`FriendlyTrade.couldWinWith`); a follower close to winning is still excluded. Reciprocity: a player
+    who doesn't float back is dropped for the rest of the game (stored value `aiBoatFloatSnubs` on the seat). That is
+    an AI Trade holder whose terms for this seat are worse than X-1 (or exclude it for anything but a win), a Trade
+    bill above X-1 after following, or any offer of fewer trade goods than the commodities it asks of this seat.
+    A declined free flip doesn't count. So BOAT_FLOAT seats float each other and stop floating seats that charge them.
   - **Debt across the table.** No AI deal may leave one player owing 3 or more debt in total (tokens held by every
     other seat plus debt promised in unpaid deals); `DebtRules.room` is the single gate.
   - **Self-play statistics.** Every accepted offer is logged (round, parties, items). The report lists per seat its
