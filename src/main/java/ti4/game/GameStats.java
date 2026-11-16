@@ -26,6 +26,15 @@ public class GameStats {
     @Setter
     private List<ActionCardPlay> actionCardPlays = new ArrayList<>();
 
+    @Getter
+    @Setter
+    private List<ActionCardTarget> actionCardTargets = new ArrayList<>();
+
+    public void recordAcTarget(String acName, Player player, Player target) {
+        if (player == null || target == null || player == target) return;
+        actionCardTargets.add(new ActionCardTarget(acName, getTrackedPlayerId(player), getTrackedPlayerId(target)));
+    }
+
     public void recordAcPlay(String acName, Player player) {
         actionCardPlays.add(new ActionCardPlay(acName, getTrackedPlayerId(player)));
     }
@@ -200,6 +209,25 @@ public class GameStats {
 
         void setTarget(String target) {
             this.target = target;
+        }
+    }
+
+    @EqualsAndHashCode
+    @Getter
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ActionCardTarget {
+        private String actionCard;
+        private String playerId;
+        private String targetId;
+
+        // Needed for Jackson
+        public ActionCardTarget() {}
+
+        ActionCardTarget(String actionCard, String playerId, String targetId) {
+            this.actionCard = actionCard;
+            this.playerId = playerId;
+            this.targetId = targetId;
         }
     }
 }

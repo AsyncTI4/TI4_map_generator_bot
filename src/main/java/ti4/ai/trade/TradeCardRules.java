@@ -116,7 +116,7 @@ public class TradeCardRules {
         Player seat = context.seat();
         int gain = seat.getCommoditiesTotal() - seat.getCommodities();
         if (TradeTerms.mastersOfTrade(seat)) return gain >= 1 ? FollowChoice.FREE : FollowChoice.DECLINE;
-        if (holder != null && AiSeats.isAiSeat(holder)) observeTerms(game, seat, holder);
+        if (holder != null && AiSeats.isAiSeat(holder)) observeTerms(context, holder);
         if (holder == null || gain < 1 || !holdsOwnAgreement(seat)) return FollowChoice.DECLINE;
         if (AiSeats.isAiSeat(holder)) {
             return worthFollowingFree(game, seat, holder, gain) ? FollowChoice.FREE : FollowChoice.DECLINE;
@@ -319,12 +319,15 @@ public class TradeCardRules {
         context.memory().put(settledKey(context.game(), follower), outcome);
     }
 
-    private static void observeTerms(Game game, Player seat, Player holder) {
+    private static void observeTerms(AiTurnContext context, Player holder) {
+        Game game = context.game();
+        Player seat = context.seat();
         FriendlyTrade.observeTradeTerms(
-                seat,
+                context,
                 holder,
                 TradeTerms.feeFor(game, holder, seat, AI_TRUST),
-                TradeTerms.exclusionReason(game, holder, seat, AI_TRUST));
+                TradeTerms.exclusionReason(game, holder, seat, AI_TRUST),
+                TradeTerms.standardFee(holder, seat, AI_TRUST));
     }
 
     private static boolean worthFollowingFree(Game game, Player seat, Player holder, int gain) {

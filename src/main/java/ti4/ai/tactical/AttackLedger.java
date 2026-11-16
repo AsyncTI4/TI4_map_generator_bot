@@ -16,6 +16,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiGameWrites;
+import ti4.ai.Hostility;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
@@ -111,7 +112,7 @@ public class AttackLedger {
         return total;
     }
 
-    static double betrayalGrudge(Game game, Player holder, Player attacker) {
+    public static double betrayalGrudge(Game game, Player holder, Player attacker) {
         double total = 0;
         for (Promise promise : PromiseBook.brokenAgainst(game, holder)) {
             if (promise.isPromiser(attacker)) total += promise.price() * decay(game.getRound() - promise.round());
@@ -137,13 +138,21 @@ public class AttackLedger {
             for (Attack attack : attacks(game)) {
                 if (decay(game.getRound() - attack.round()) > 0) ledger.put(attack.key(), attack);
             }
+            List<Loss> fresh = new ArrayList<>();
             if (last != null && last.ledger().equals(stored)) {
-                diff(game, last.board(), now).forEach(attack -> ledger.merge(attack.key(), attack, AttackLedger::sum));
+                for (Loss loss : diff(game, last.board(), now)) {
+                    fresh.add(loss);
+                    ledger.merge(loss.attack().key(), loss.attack(), AttackLedger::sum);
+                }
             }
             String updated = encodeLedger(ledger.values());
             PICTURES.put(key, new Picture(now, updated));
             if (!updated.equals(stored)) {
-                AiGameWrites.persist(game, SAVE_REASON, latest -> latest.setStoredValue(LEDGER_KEY, updated));
+                AiGameWrites.persist(game, SAVE_REASON, latest -> {
+                    latest.setStoredValue(LEDGER_KEY, updated);
+                    fresh.forEach(loss -> Hostility.add(
+                            latest, loss.attack().attacker(), loss.attack().victim(), loss.hostility()));
+                });
             }
         }
     }
@@ -171,8 +180,10 @@ public class AttackLedger {
     // TODO: losses outside combat (agendas, fleet supply, off-turn Direct Hit/Plague) and planets changing hands
     // without an invasion count as attacks; production in the same window hides losses (died is board-wide net), and an
     // active player's combat losses can be charged to a player sharing a tile it moved out of.
-    private static List<Attack> diff(Game game, Board before, Board after) {
-        List<Attack> found = new ArrayList<>();
+    private record Loss(Attack attack, double hostility) {}
+
+    private static List<Loss> diff(Game game, Board before, Board after) {
+        List<Loss> found = new ArrayList<>();
         Player active = game.getActivePlayer();
         for (Player victim : game.getRealPlayers()) {
             found.addAll(unitLosses(game, victim, active, before, after));
@@ -185,14 +196,16 @@ public class AttackLedger {
             Tile tile = game.getTileFromPlanet(planet);
             if (victim == null || attacker == null || tile == null) return;
             if (!(tile.getUnitHolders().get(planet) instanceof Planet held)) return;
-            double damage = BoardView.planetValue(held) * Grievance.location(game, tile, victim);
-            found.add(new Attack(game.getRound(), attacker.getFaction(), victim.getFaction(), damage));
+            double value = BoardView.planetValue(held);
+            double damage = value * Grievance.location(game, tile, victim);
+            found.add(new Loss(
+                    new Attack(game.getRound(), attacker.getFaction(), victim.getFaction(), damage),
+                    value * Hostility.location(game, tile, victim)));
         });
         return found;
     }
 
-    private static List<Attack> unitLosses(
-            Game game, Player victim, @Nullable Player active, Board before, Board after) {
+    private static List<Loss> unitLosses(Game game, Player victim, @Nullable Player active, Board before, Board after) {
         String faction = victim.getFaction();
         Map<String, Double> drops = new HashMap<>();
         double ownLosses = 0;
@@ -208,13 +221,16 @@ public class AttackLedger {
         double dropped =
                 drops.values().stream().mapToDouble(Double::doubleValue).sum();
         double share = Math.min(1, died / dropped);
-        List<Attack> found = new ArrayList<>();
+        List<Loss> found = new ArrayList<>();
         drops.forEach((position, drop) -> {
             Tile tile = game.getTileByPosition(position);
             Player attacker = attackerAt(game, position, victim, active, before, after);
             if (tile == null || attacker == null) return;
-            double damage = drop * share * ValueScale.RESOURCE * Grievance.location(game, tile, victim);
-            found.add(new Attack(game.getRound(), attacker.getFaction(), faction, damage));
+            double lost = drop * share * ValueScale.RESOURCE;
+            double damage = lost * Grievance.location(game, tile, victim);
+            found.add(new Loss(
+                    new Attack(game.getRound(), attacker.getFaction(), faction, damage),
+                    lost * Hostility.location(game, tile, victim)));
         });
         return found;
     }

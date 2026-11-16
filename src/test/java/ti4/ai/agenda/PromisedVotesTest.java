@@ -376,6 +376,7 @@ class PromisedVotesTest extends BaseTi4Test {
         AgendaForecast forecast = AgendaForecast.of(test.game, sol);
         AgendaForecast withDeal = forecast.withVotes(xxcha, "sol", votes);
         double flat = GalacticThreatCost.ofBallot(test.game, xxcha, "sol", votes)
+                + VoteAnger.ofBallot(test.game, xxcha, forecast, "sol", votes)
                 + VoteDeals.spentVotes(test.game, sol, votes);
         assertThat(GalacticThreatCost.ofBallot(test.game, xxcha, "sol", votes)).isPositive();
 

@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import ti4.ai.Hostility;
 import ti4.ai.actioncards.ActionCardResponses;
 import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.actioncards.ActionCardValue;
@@ -201,6 +202,7 @@ public class NekroBrain implements FactionBrain {
 
     private final List<BrainRule> rules = List.of(
             AttackLedger::observe,
+            Hostility::observe,
             ActionSecretRules::observe,
             PromissoryRules::observe,
             TradeRules::observe,
