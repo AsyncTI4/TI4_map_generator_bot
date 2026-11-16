@@ -3,6 +3,7 @@ package ti4.service.unit;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -43,6 +44,7 @@ public class MoveUnitService {
         List<RemovedUnit> toAdd =
                 removed.stream().map(r -> r.onUnitHolder(dest, uhDest)).toList();
         AddUnitService.addUnits(event, dest, game, color, toAdd);
+        BeansMonumentHandler.moveEtherAnchorWithTheDeep(event, game, player, tile, dest, uhDest, removed);
 
         // Moving Aurelion briefly removes its attached station card; retain its prior exhausted state.
         if (player != null

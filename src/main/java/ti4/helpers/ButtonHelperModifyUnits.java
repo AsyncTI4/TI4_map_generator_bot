@@ -1526,7 +1526,6 @@ public final class ButtonHelperModifyUnits {
         } else {
             tile = game.getTileByPosition(game.getActiveSystem());
         }
-        BeansMonumentHandler.offerValhavnMonumentPdsMove(game, player, tile);
         TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
             LoreService.showPlanetLore(player, game, unitHolder.getName(), LoreService.TRIGGER.MOVED);

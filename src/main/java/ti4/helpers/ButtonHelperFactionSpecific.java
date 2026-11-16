@@ -37,6 +37,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
@@ -79,6 +80,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.KnownCardsService;
 import ti4.service.info.KnownCardsService.KnownCardType;
@@ -2987,6 +2989,16 @@ public final class ButtonHelperFactionSpecific {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "pharadnInf2Revive_" + planet, Helper.getPlanetName(planet)));
         }
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "valhavn_monument");
+        if (monumentTile != null) {
+            for (Planet planet : monumentTile.getPlanetUnitHolders()) {
+                String prefix = player.factionButtonChecker() + "pharadnInf2Revive_" + planet.getName();
+                if (BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet.getName())
+                        && buttons.stream().noneMatch(button -> prefix.equals(button.getCustomId()))) {
+                    buttons.add(Buttons.green(prefix, Helper.getPlanetName(planet.getName())));
+                }
+            }
+        }
         return buttons;
     }
 
@@ -3289,7 +3301,8 @@ public final class ButtonHelperFactionSpecific {
         UnitHolder planetHolder = game.getUnitHolderFromPlanet(planet);
         if (!player.hasTech("dsqhetinf")
                 || planetHolder == null
-                || planetHolder.getUnitCount(UnitType.Spacedock, player) == 0) {
+                || (planetHolder.getUnitCount(UnitType.Spacedock, player) == 0
+                        && !BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet))) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Commando II can only be revived on a planet containing your space dock.");

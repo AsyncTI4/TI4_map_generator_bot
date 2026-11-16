@@ -81,7 +81,7 @@
         ],
         "isStructure": true,
         "isMonument": true,
-        "ability": "When another player produces units in an adjacent system, that player may choose to give you 1 trade good to apply +1 to their total PRODUCTION value and reduce the combined cost of the produced units by 2."
+        "ability": "When another player uses PRODUCTION in an adjacent system, that player may choose to give you 1 trade good to apply +1 to their total PRODUCTION value and reduce the combined cost of the produced units by 2."
     },
     {
         "id": "netrunners_monument",
@@ -130,10 +130,9 @@
         ],
         "spaceCannonDieCount": 1,
         "spaceCannonHitsOn": 5,
-        "planetaryShield": true,
         "isStructure": true,
         "isMonument": true,
-        "ability": "After you commit ground forces to a planet in or adjacent to this system, you may move 1 of your PDS units from a planet adjacent to this system onto this unit’s planet."
+        "ability": "When you activate a system adjacent to this unit’s system, you may move 1 of your PDS from a planet adjacent to this system onto this unit’s planet. Your infantry may be placed onto this unit’s planet when resolving their text ability."
     },
     {
         "id": "migo_monument",
@@ -166,7 +165,7 @@
         "isStructure": true,
         "isMonument": true,
         "isPlanetOnly": false,
-        "ability": "This unit is placed in the space area of a system containing your ships and no planets. If it is blockaded, it is destroyed. After you pass, you may place a frontier token in this unit’s system."
+        "ability": "This unit is placed in the The Deep unit’s system. When The Deep unit moves, this unit moves with it. If this unit is blockaded, destroy it. After a space combat in this unit’s system, you may exhaust this card to repair The Deep."
     },
     {
         "id": "bloom_monument",
