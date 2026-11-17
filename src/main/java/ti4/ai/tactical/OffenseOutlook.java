@@ -538,11 +538,12 @@ final class OffenseOutlook {
         double denialGrievance = scoringDenial * Grievance.scoringDenial(standings.leadOverField(opponent));
         double grievance = (estimate.theirExpectedLoss() + heldPlanetValue) * sensitivity + denialGrievance;
         double relief = Grievance.relief(standings.winThreat(opponent), standings.winThreat(seat), ownObjective / VP);
-        double nearTerm = ANGER_SHARE * grievance * retaliation(strike, estimate) * relief;
+        double fear = TacticalStrength.angerWeight(game, seat, opponent);
+        double nearTerm = ANGER_SHARE * grievance * retaliation(strike, estimate) * relief * fear;
         if (!remembersAttacks()) return nearTerm;
         double ledgerGrievance =
                 (ValueScale.RESOURCE * estimate.theirExpectedLoss() + heldPlanetValue) * sensitivity + denialGrievance;
-        return Math.max(nearTerm, relief * lastingAnger(strike, estimate, ledgerGrievance));
+        return Math.max(nearTerm, relief * fear * lastingAnger(strike, estimate, ledgerGrievance));
     }
 
     private boolean alreadyHostile(Player opponent) {

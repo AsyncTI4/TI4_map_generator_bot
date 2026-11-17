@@ -60,6 +60,38 @@ class DiscardBountyDeals {
         return Optional.of(new AiDecision.Post(channel.get(), offerText(game, seat, bounty), List.of()));
     }
 
+    static Optional<AiDecision> offerDeadlyPlot(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (!DiscardBounties.active(seat) || !DiscardBounties.deadlyPlotWindow(game)) return Optional.empty();
+        String agenda = PromisedVotes.agendaKey(game);
+        if (agenda.isBlank() || AgendaCardRules.holdsDeadlyPlot(seat)) return Optional.empty();
+        if (DiscardBounties.postedOnThisAgenda(game, seat)
+                .filter(bounty -> bounty.deadlyPlot() > 0)
+                .isPresent()) {
+            return Optional.empty();
+        }
+        double loss = DiscardBounties.lossFromWinner(game, seat);
+        int most = DiscardBounties.mostOffered(PromiseDeals.spendableTradeGoods(game, seat), loss);
+        int offered = remaining(game, seat, most, DiscardBounties.DEADLY_PLOT_CAP, Bounty::deadlyPlot);
+        if (offered < 1) return Optional.empty();
+        Optional<String> channel = PromiseDeals.channelId(context);
+        if (channel.isEmpty()) return Optional.empty();
+        Bounty bounty = new Bounty(
+                game.getRound(),
+                agenda,
+                seat.getFaction(),
+                0,
+                0,
+                game.getGameStats().getActionCardPlays().size(),
+                "",
+                -1,
+                DiscardBounties.Status.OPEN,
+                offered);
+        DiscardBounties.persist(game, bounty);
+        return Optional.of(new AiDecision.Post(channel.get(), offerText(game, seat, bounty), List.of()));
+    }
+
     static void observe(AiTurnContext context) {
         Game game = context.game();
         Player seat = context.seat();
@@ -78,7 +110,7 @@ class DiscardBountyDeals {
         Game game = context.game();
         Player payer = context.seat();
         if (bounty.agenda().equals(PromisedVotes.agendaKey(game))) {
-            if (VOTING_PHASE.equalsIgnoreCase(game.getPhaseOfGame())) {
+            if (VOTING_PHASE.equalsIgnoreCase(game.getPhaseOfGame()) && bounty.deadlyPlot() <= 0) {
                 DiscardBounties.persist(game, bounty.with(DiscardBounties.Status.LAPSED));
             }
             return;
@@ -88,7 +120,9 @@ class DiscardBountyDeals {
         boolean quashed = fate.filter(AgendaHistory.Entry::quashed).isPresent();
         Optional<Claim> claim = resolved
                 ? Optional.empty()
-                : quashed ? quashClaim(game, payer, bounty) : vetoClaim(game, payer, bounty);
+                : quashed
+                        ? quashClaim(game, payer, bounty)
+                        : vetoClaim(game, payer, bounty).or(() -> deadlyPlotClaim(game, payer, bounty));
         if (claim.isEmpty()) {
             DiscardBounties.persist(game, bounty.with(DiscardBounties.Status.LAPSED));
             return;
@@ -110,17 +144,25 @@ class DiscardBountyDeals {
     private record Claim(Player holder, String card, int amount) {}
 
     private static Optional<Claim> vetoClaim(Game game, Player payer, Bounty bounty) {
-        if (bounty.veto() <= 0) return Optional.empty();
+        return cardClaim(game, payer, bounty, VETO_TITLE, bounty.veto());
+    }
+
+    private static Optional<Claim> deadlyPlotClaim(Game game, Player payer, Bounty bounty) {
+        return cardClaim(game, payer, bounty, DiscardBounties.DEADLY_PLOT, bounty.deadlyPlot());
+    }
+
+    private static Optional<Claim> cardClaim(Game game, Player payer, Bounty bounty, String title, int amount) {
+        if (amount <= 0) return Optional.empty();
         List<GameStats.ActionCardPlay> plays = game.getGameStats().getActionCardPlays();
         for (int index = Math.max(0, bounty.plays()); index < plays.size(); index++) {
             GameStats.ActionCardPlay play = plays.get(index);
-            if (!VETO_TITLE.equals(play.getActionCard()) || play.isCanceled()) continue;
+            if (!title.equals(play.getActionCard()) || play.isCanceled()) continue;
             Optional<Player> holder = game.getRealPlayers().stream()
                     .filter(player -> player != payer)
                     .filter(player -> play.getPlayerId() != null
                             && play.getPlayerId().equals(GameStats.getTrackedPlayerId(player)))
                     .findFirst();
-            if (holder.isPresent()) return Optional.of(new Claim(holder.get(), VETO_TITLE, bounty.veto()));
+            if (holder.isPresent()) return Optional.of(new Claim(holder.get(), title, amount));
         }
         return Optional.empty();
     }
@@ -160,6 +202,11 @@ class DiscardBountyDeals {
         StringBuilder text = new StringBuilder(name + " would rather this agenda never resolved.");
         if (bounty.veto() > 0) {
             text.append(" It pays ").append(bounty.veto()).append(" trade goods to whoever plays _Veto_ on it.");
+        }
+        if (bounty.deadlyPlot() > 0) {
+            text.append(" It pays ")
+                    .append(bounty.deadlyPlot())
+                    .append(" trade goods to whoever plays _Deadly Plot_ on it.");
         }
         Player quasher = game.getPlayerFromColorOrFaction(bounty.quasher());
         if (bounty.quash() > 0 && quasher != null) {

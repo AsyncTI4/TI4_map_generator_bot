@@ -1172,6 +1172,20 @@ to build one by hand:
       it, ignored under 0.05 TG. It applies in the ballot planner and in the price of selling votes; players in bad
       relations, within 2 points of the goal, or 2 or more points clear of the field cost nothing (experiment
       `VOTE_ANGER`). Neither makes the AI hurt anyone blindly; it only stops holding back.
+  - **Tactical strength** (`ti4.ai.tactical.TacticalStrength`, experiment `STRENGTH_WEIGHTED_ANGER`). Each AI rates
+    itself from what it knows and every rival from public information: the cost of their units on the board (ships
+    and ground forces), +1 Assault Cannon, +2 X-89, +1 PDS II, a per-faction bonus (`FactionStrength`, empty until
+    the user defines it for the current and WIP factions), and the hand: 0.5 per mean or combat card in its own hand,
+    0.2 per card in a rival's (unseen), and 0.2 per card in its own hand too when it is not the seat deciding (a simulated rival plan never reads the hidden hand). The anger cost of attacking a rival or voting against it is multiplied by
+    (rival strength + 1) / (own strength + 1), kept within 0.25 to 2: a strong rival or a weak seat avoids anger, a
+    weak rival or a strong seat cares less.
+    - **Open:** modify the ratings by what can actually reach the other player, according to the defensive planner
+      (`IncomingForces`): units that cannot reach the rival (or the seat) should count less toward the strength
+      that weighs anger between them.
+    - **Open:** widen what defines tactical strength (for example flagships and war suns by ability, mechs, leaders,
+      faction technologies, promissory notes held, how close the player is to winning, and known cards).
+    - **Open:** a tendency not to anger too many players at once: today each angered player is priced alone, so the
+      AI can anger several rivals in one round without any extra cost.
   - **Friendly trade** (`FriendlyTrade`), with a player in good relations. It flips that player's commodities for free
     when only one side has commodities: it accepts their commodities for at most as many of its trade goods, and on
     its own turn, holding no commodities, offers that flip once a round. As Trade holder it charges such a follower X-1

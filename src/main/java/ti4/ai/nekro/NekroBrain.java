@@ -322,6 +322,7 @@ public class NekroBrain implements FactionBrain {
             AgendaVoting::next,
             this::abstainFromAgenda,
             this::breakAgendaTie,
+            TradeRules::offerDeadlyPlotBounty,
             ShenanigansRules::react,
             TradeRules::payDebtInAgenda,
             SpeakerSale::declare,

@@ -20,6 +20,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
+import ti4.ai.promise.PromisePayment;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
@@ -189,6 +190,38 @@ class AvoidanceBribesTest extends BaseTi4Test {
         AiPrompt table = AiTestGame.prompt("table", PromptSource.PUBLIC, NOW, "FFCC_xxcha_vote");
 
         assertThat(AvoidanceBribes.propose(test.contextFor(sol, Set.of(), NOW, table), List.of(xxcha, hacan)))
+                .isEmpty();
+    }
+
+    private Promise postedOffer(long now) {
+        AiPrompt table = AiTestGame.prompt("table", PromptSource.PUBLIC, now, "FFCC_xxcha_vote");
+        AvoidanceBribes.propose(test.contextFor(sol, Set.of(), now, table), List.of(xxcha))
+                .orElseThrow();
+        return PromiseBook.proposedBy(test.game, sol).stream()
+                .filter(Promise::open)
+                .findFirst()
+                .orElseThrow();
+    }
+
+    // The user's ask (2026-11-16): a declined deal gets one better offer. Xxcha turns Sol's price down, so Sol comes
+    // back once with at least 1 more (Sol already offered all 6 of its trade goods, so it adds 1 debt); a second
+    // decline
+    // ends the talks on this agenda.
+    @Test
+    void aDeclinedBribeGetsOneBetterOffer() {
+        Promise first = postedOffer(NOW);
+        PromiseBook.save(test.game, first.with(Promise.Status.DECLINED));
+
+        Promise second = postedOffer(NOW + 1000);
+        assertThat(second.id()).isNotEqualTo(first.id());
+        assertThat(PromisePayment.of(test.game, second).tradeGoods()
+                        + PromisePayment.of(test.game, second).debt())
+                .isGreaterThan(PromisePayment.of(test.game, first).tradeGoods()
+                        + PromisePayment.of(test.game, first).debt());
+
+        PromiseBook.save(test.game, second.with(Promise.Status.DECLINED));
+        AiPrompt table = AiTestGame.prompt("table", PromptSource.PUBLIC, NOW + 2000, "FFCC_xxcha_vote");
+        assertThat(AvoidanceBribes.propose(test.contextFor(sol, Set.of(), NOW + 2000, table), List.of(xxcha)))
                 .isEmpty();
     }
 }

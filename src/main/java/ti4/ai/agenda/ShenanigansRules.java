@@ -59,7 +59,13 @@ public class ShenanigansRules {
     private static Optional<AiDecision> playInstead(AiTurnContext context, PromptButton button) {
         String title = CARD_OF_LABEL.get(button.label());
         if (title == null || !experimenting(context)) return Optional.empty();
-        return ShenaniganCards.playIfWorthIt(context, title);
+        Optional<AiDecision> play = ShenaniganCards.playIfWorthIt(context, title);
+        if (play.isPresent() || !AgendaSwing.DEADLY_PLOT.equals(title) || !holdsDeadlyPlot(context)) return play;
+        return DiscardBounties.awaitDeadlyPlotOffers(context);
+    }
+
+    private static boolean holdsDeadlyPlot(AiTurnContext context) {
+        return ti4.ai.actioncards.AgendaCardRules.holdsDeadlyPlot(context.seat());
     }
 
     private static boolean playingInstead(AiTurnContext context, PromptButton button) {

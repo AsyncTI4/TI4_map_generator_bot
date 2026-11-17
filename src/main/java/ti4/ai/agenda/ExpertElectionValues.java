@@ -68,13 +68,16 @@ class ExpertElectionValues {
     private static final double WARRANT_PER_SECRET = 2;
     private static final double WARRANT_EASY_REVEALED = 1;
     private static final double WARRANT_ACTION_REVEALED = 1;
-    private static final double EXECUTION_SILENCED = 1;
+    static final double EXECUTION_SILENCED = 1;
+    static final double EXECUTED_SPEAKER = 4;
+    static final double LATE_SPEAKER_BONUS = 2;
+    static final int LATE_SPEAKER_ROUND = 3;
     static final double COMMITTEE_KNOWN_ELECTION = 2;
     private static final double GOOD_ELECTION = 2;
     private static final String COMMITTEE = "committee";
     private static final String ELECT_PLAYER = "Elect Player";
-    private static final double EXECUTION_TARGET_BONUS = 1.5;
-    private static final Set<String> EXECUTION_TARGETS = Set.of(YSSARIL, RAL_NEL);
+    static final double YSSARIL_UNSEEN_HAND = 1.5;
+    static final double RAL_NEL_UNSEEN_HAND = 1.25;
 
     @Nullable
     static Double valueOf(AgendaView view, String agenda, String outcome, String ownVote) {
@@ -222,6 +225,20 @@ class ExpertElectionValues {
                         .orElse(false));
     }
 
+    private static double executedHandWorth(AgendaView view, Player holder) {
+        double hand = handWorth(view, holder);
+        if (view.readsHandOf(holder)) return hand;
+        return hand * unseenHandFactor(holder);
+    }
+
+    private static double unseenHandFactor(Player holder) {
+        return switch (holder.getFaction()) {
+            case YSSARIL -> YSSARIL_UNSEEN_HAND;
+            case RAL_NEL -> RAL_NEL_UNSEEN_HAND;
+            default -> 1;
+        };
+    }
+
     private static double handWorth(AgendaView view, Player holder) {
         if (!view.readsHandOf(holder)) return holder.getAcCount() * ActionCardPrior.AVERAGE_CARD;
         return holder.getActionCards().keySet().stream()
@@ -241,10 +258,13 @@ class ExpertElectionValues {
 
     private static double executionLoss(AgendaView view, Player elected) {
         Game game = view.game();
-        double speaker = elected.isSpeaker() ? SpeakerTokenValue.ofHolding(game, elected) : 0;
+        double speaker = elected.isSpeaker() ? executedSpeakerLoss(game) : 0;
         double silenced = AgendaRound.isFinalAgenda(game) ? 0 : EXECUTION_SILENCED;
-        double target = EXECUTION_TARGETS.contains(elected.getFaction()) ? EXECUTION_TARGET_BONUS : 0;
-        return handWorth(view, elected) + speaker + silenced + target;
+        return executedHandWorth(view, elected) + speaker + silenced;
+    }
+
+    static double executedSpeakerLoss(Game game) {
+        return game.getRound() >= LATE_SPEAKER_ROUND ? EXECUTED_SPEAKER + LATE_SPEAKER_BONUS : EXECUTED_SPEAKER;
     }
 
     private static double speakerOrderShift(Game game, Player voter, Player elected) {
