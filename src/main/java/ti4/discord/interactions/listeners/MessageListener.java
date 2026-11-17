@@ -243,9 +243,7 @@ class MessageListener extends ListenerAdapter {
         if (!message.getAttachments().isEmpty() && !(event.getChannel() instanceof ThreadChannel)) {
             Member member = event.getMember();
             ManagedPlayer managedPlayer = GameManager.getManagedPlayer(member.getId());
-            int ongoingAmount = UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer);
-            int completedGames = UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer);
-            if (ongoingAmount + completedGames < 1) {
+            if (!UserGameInfoService.hasSeatInAnUnabandonedGame(managedPlayer)) {
                 BanCleanupService.banSpamAccount(event, event.getAuthor());
                 return true;
             }

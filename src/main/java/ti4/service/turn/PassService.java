@@ -17,7 +17,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veryd
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.RefractureLegendaryButtonHandler;
-import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
@@ -59,7 +58,6 @@ public class PassService {
         ChoirAbilityHandler.syncMorbidHarmony(player);
         player.setPassed(true);
         XyrixPromissoryHandler.placeFrontierTokenOnPass(game, player);
-        BeansMonumentHandler.offerDeepMonumentFrontierOnPass(game, player);
         MigoAbilityHandler.offerCerebralArchiveResearch(game, player);
         ThirtyKSecretHooks.onPassed(game, player);
         GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, true));

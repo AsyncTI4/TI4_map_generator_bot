@@ -70,7 +70,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
@@ -124,7 +123,6 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
-import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.agent.modules.ArgentAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
@@ -241,18 +239,28 @@ public final class Helper {
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
     }
 
-    public static void resolveQueue(Game game) {
+    public static void resolveQueueSavingFirst(Game game, String saveReason) {
+        QueuedSecretDraws draws = resolveQueue(game);
+        if (draws.hasDraws()) {
+            GameManager.save(game, saveReason);
+        }
+        draws.announce();
+    }
+
+    public static QueuedSecretDraws resolveQueue(Game game) {
+        QueuedSecretDraws draws = new QueuedSecretDraws(game);
         if (MegagameGroupService.isActive(game) && !game.getPhaseOfGame().contains("agenda")) {
             for (Player groupImperialHolder : MegagameImperialQueue.imperialHolders(game)) {
-                resolveQueueFrom(game, groupImperialHolder);
+                resolveQueueFrom(game, groupImperialHolder, draws);
             }
-            return;
+            return draws;
         }
         Player imperialHolder = getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
-        resolveQueueFrom(game, imperialHolder);
+        resolveQueueFrom(game, imperialHolder, draws);
+        return draws;
     }
 
     private static boolean hasQueuedDrawsAmong(Game game, List<Player> players, String queueKey) {
@@ -263,8 +271,7 @@ public final class Helper {
         return players.stream().anyMatch(p -> queue.contains(p.getFaction() + "*"));
     }
 
-    private static void resolveQueueFrom(Game game, Player imperialHolder) {
-        // String key = "factionsThatAreNotDiscardingSOs";
+    private static void resolveQueueFrom(Game game, Player imperialHolder, QueuedSecretDraws draws) {
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         if (game.getStoredValue(key2).length() < 2) {
@@ -273,37 +280,18 @@ public final class Helper {
 
         List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         for (Player player : players) {
-            String message =
-                    player.getRepresentationNoPing() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(), player.getRepresentation() + " you drew your queued secret.");
                 game.drawSecretObjective(player.getUserID());
-                if (player.hasAbility("plausible_deniability")) {
+                boolean plausibleDeniability = player.hasAbility("plausible_deniability");
+                if (plausibleDeniability) {
                     game.drawSecretObjective(player.getUserID());
-                    message += " Drew a second secret objective due to **Plausible Deniability**.";
                 }
-                if (player.hasAbility("multitasking")) {
-                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
-                }
-                if (player.hasUnlockedBreakthrough("lunariumbt")) {
-                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
-                }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFowMode()) {
-                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
-                }
+                draws.addDraw(player, plausibleDeniability);
             }
             if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && hasQueuedDrawsAmong(game, players, key2)) {
-                if (!game.isFowMode()) {
-                    message = player.getRepresentationUnfogged()
-                            + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
-                }
+                draws.addBlocker(player);
                 break;
             }
         }

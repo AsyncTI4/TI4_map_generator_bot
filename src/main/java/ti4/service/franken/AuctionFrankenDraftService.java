@@ -99,7 +99,7 @@ public class AuctionFrankenDraftService {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "That category cannot be nominated again.");
             return;
         }
-        List<DraftItem> pool = drawPool(game, category, getPoolSize(game), Set.of());
+        List<DraftItem> pool = drawPool(game, category, getPoolSize(game, category), Set.of());
         if (pool.isEmpty()) {
             MessageHelper.sendEphemeralMessageToEventChannel(
                     event, "There are not enough eligible components in that category.");
@@ -1059,7 +1059,8 @@ public class AuctionFrankenDraftService {
                 DraftCategory.HOMESYSTEM,
                 DraftCategory.PN,
                 DraftCategory.STARTINGFLEET,
-                DraftCategory.STARTINGTECH);
+                DraftCategory.STARTINGTECH,
+                DraftCategory.DRAFTORDER);
     }
 
     private List<DraftCategory> auctionCategories(Game game) {
@@ -1113,7 +1114,10 @@ public class AuctionFrankenDraftService {
         return DraftCategory.valueOf(value(game, "category"));
     }
 
-    private int getPoolSize(Game game) {
+    private int getPoolSize(Game game, DraftCategory category) {
+        if (category == DraftCategory.DRAFTORDER) {
+            return players(game).size();
+        }
         return Math.min(23, players(game).size() + getSetting(game, "extra", EXTRA_COMPONENTS));
     }
 

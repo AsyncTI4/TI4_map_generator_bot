@@ -20,6 +20,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcan
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.*;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -210,6 +211,7 @@ public class TacticalActionService {
 
         TkHelperStarflare.onTacticalMove(game, tile);
         RefractureRulesService.recordCharonShipMovement(game, game.getActivePlayer(), tile);
+        BeansMonumentHandler.moveEtherAnchorWithTheDeep(event, game, game.getActivePlayer(), tile);
 
         return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, tile);
     }

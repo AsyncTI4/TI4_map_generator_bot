@@ -24,8 +24,9 @@ public class AuctionFrankenDraft extends FrankenDraft {
                     HOMESYSTEM,
                     PN,
                     STARTINGFLEET,
-                    STARTINGTECH -> 1;
-            case DRAFTORDER, FACTION, UNIT, PLOT, MAHACTKING, MONUMENT -> 0;
+                    STARTINGTECH,
+                    DRAFTORDER -> 1;
+            case FACTION, UNIT, PLOT, MAHACTKING, MONUMENT -> 0;
         };
     }
 

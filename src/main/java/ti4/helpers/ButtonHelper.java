@@ -97,6 +97,7 @@ import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandl
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -641,6 +642,7 @@ public class ButtonHelper {
         Tile tile = game.getTileFromPlanet(planet);
         UnitHolder planetHolder = game.getUnitHolderFromPlanet(planet);
         if (player.hasTech("dsqhetinf")
+                && !BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet)
                 && (planetHolder == null || planetHolder.getUnitCount(UnitType.Spacedock, player) == 0)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -775,6 +777,7 @@ public class ButtonHelper {
                 }
             }
         }
+        addValhavnMonumentInfantryRevivalButtons(buttons, game, player, infCount);
         if (player.ownsUnit("cymiae_infantry2") || player.ownsUnit("tf-yinclone")) {
             buttons = new ArrayList<>();
             for (String planet : player.getPlanets()) {
@@ -784,6 +787,7 @@ public class ButtonHelper {
                             "Place 1 Infantry On " + Helper.getPlanetRepresentation(planet, game)));
                 }
             }
+            addValhavnMonumentInfantryRevivalButtons(buttons, game, player, 1);
         }
         if (player.hasTech("dsqhetinf")) {
             buttons = new ArrayList<>();
@@ -800,8 +804,31 @@ public class ButtonHelper {
                     }
                 }
             }
+            addValhavnMonumentInfantryRevivalButtons(buttons, game, player, infCount);
         }
         return buttons;
+    }
+
+    private static void addValhavnMonumentInfantryRevivalButtons(
+            List<Button> buttons, Game game, Player player, int infantryCount) {
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "valhavn_monument");
+        if (monumentTile == null) {
+            return;
+        }
+        for (Planet planet : monumentTile.getPlanetUnitHolders()) {
+            if (!BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet.getName())) {
+                continue;
+            }
+            String prefix = player.factionButtonChecker() + "statusInfRevival_" + planet.getName() + "_";
+            if (buttons.stream().anyMatch(button -> button.getCustomId().startsWith(prefix))) {
+                continue;
+            }
+            String suffix = " Infantry on " + Helper.getPlanetRepresentation(planet.getName(), game);
+            buttons.add(Buttons.green(prefix + "1", "Place 1" + suffix));
+            if (infantryCount > 1) {
+                buttons.add(Buttons.green(prefix + infantryCount, "Place " + infantryCount + suffix));
+            }
+        }
     }
 
     public static List<Button> getExhaustButtonsWithTG(Game game, Player player) {

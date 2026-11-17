@@ -62,7 +62,9 @@ public class FastScFollowCron {
                 changed = handleFastScFollowMode(game, afterSave::add);
             }
             changed |= FowAutoDeclineService.resolveDue(
-                    game, FastScFollowCron::handleSecretObjectiveDrawOrder, afterSave::add);
+                    game,
+                    (declined, player) -> handleSecretObjectiveDrawOrder(declined, player, afterSave::add),
+                    afterSave::add);
             if (changed) {
                 GameManager.save(
                         game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
@@ -140,7 +142,7 @@ public class FastScFollowCron {
                     StrategyCardModel scModel =
                             game.getStrategyCardModelByInitiative(sc).orElse(null);
                     if (scModel != null && scModel.usesAutomationForSCID("pok8imperial")) {
-                        handleSecretObjectiveDrawOrder(game, player);
+                        handleSecretObjectiveDrawOrder(game, player, afterSave);
                     }
                 }
             }
@@ -167,7 +169,7 @@ public class FastScFollowCron {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
     }
 
-    private static void handleSecretObjectiveDrawOrder(Game game, Player player) {
+    private static void handleSecretObjectiveDrawOrder(Game game, Player player, Consumer<Runnable> afterSave) {
         String key = "factionsThatAreNotDiscardingSOs";
         if (!game.getStoredValue(key).contains(player.getFaction() + "*")) {
             game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
@@ -181,7 +183,7 @@ public class FastScFollowCron {
         String key3 = "potentialBlockers";
         if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
             game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-            Helper.resolveQueue(game);
+            afterSave.accept(Helper.resolveQueue(game)::announce);
         }
     }
 }

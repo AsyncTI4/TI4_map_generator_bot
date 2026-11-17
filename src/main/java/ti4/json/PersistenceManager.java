@@ -2,8 +2,13 @@ package ti4.json;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
+import ti4.game.persistence.PosixFileSystemUtility;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import tools.jackson.core.type.TypeReference;
@@ -34,7 +39,27 @@ public class PersistenceManager {
         if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
             throw new IOException("Failed to create directories: " + parentDir.getAbsolutePath());
         }
-        jsonMapper.writerWithDefaultPrettyPrinter().writeValue(file, object);
+        writeAtomically(file.toPath(), object);
+    }
+
+    private static void writeAtomically(Path target, Object object) throws IOException {
+        Path temporaryFile = Files.createTempFile(
+                target.toAbsolutePath().getParent(), target.getFileName().toString(), ".tmp");
+        try {
+            jsonMapper.writerWithDefaultPrettyPrinter().writeValue(temporaryFile.toFile(), object);
+            PosixFileSystemUtility.setPermissionsIfPosix(temporaryFile);
+            moveIntoPlace(temporaryFile, target);
+        } finally {
+            Files.deleteIfExists(temporaryFile);
+        }
+    }
+
+    private static void moveIntoPlace(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     public static <T> T readObjectFromJsonFile(String fileName, Class<T> clazz) throws IOException {
