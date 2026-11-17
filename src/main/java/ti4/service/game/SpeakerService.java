@@ -14,6 +14,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.megagame.MegagameGroupService;
 
 @UtilityClass
 public class SpeakerService {
@@ -22,6 +23,10 @@ public class SpeakerService {
         String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
         faction = faction.replace("assignSpeaker_", "");
         Player newSpeaker = game.getPlayerFromColorOrFaction(faction);
+        if (MegagameGroupService.isActive(game) && MegagameGroupService.groupOf(game, newSpeaker) != null) {
+            assignGroupSpeaker(event, player, newSpeaker, game);
+            return;
+        }
         if (newSpeaker.isSpeaker()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "That player is already speaker.");
             return;
@@ -50,6 +55,22 @@ public class SpeakerService {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
         }
+    }
+
+    private static void assignGroupSpeaker(
+            ButtonInteractionEvent event, Player politicsHolder, Player newSpeaker, Game game) {
+        String group = MegagameGroupService.groupOf(game, newSpeaker);
+        if (MegagameGroupService.isGroupSpeaker(game, newSpeaker)) {
+            MessageHelper.sendMessageToChannel(
+                    politicsHolder.getCorrectChannel(), "That player is already the speaker of their group.");
+            return;
+        }
+        MegagameGroupService.setGroupSpeaker(game, group, newSpeaker);
+        String message = MiscEmojis.SpeakerToken + " The " + MegagameGroupService.label(group)
+                + " speaker token has been assigned to " + newSpeaker.getRepresentation(false, true) + ".";
+        MessageHelper.sendMessageToChannel(politicsHolder.getCorrectChannel(), message);
+        ButtonHelper.sendMessageToRightStratThread(politicsHolder, game, message, "politics");
+        ButtonHelper.deleteMessage(event);
     }
 
     private static List<Button> getTyrannusAssignTyrantButtons(Game game, Player politicsHolder) {

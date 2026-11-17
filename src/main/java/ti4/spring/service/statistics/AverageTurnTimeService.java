@@ -124,7 +124,8 @@ public class AverageTurnTimeService {
         for (PlayerEntity player : players) {
             if (player.getTotalNumberOfTurns() == 0) continue;
             statsMap.computeIfAbsent(
-                            player.getUser(), user -> new UserAverageTurnTimeAccumulator(user.getId(), user.getName()))
+                            player.getStatsUser(),
+                            user -> new UserAverageTurnTimeAccumulator(user.getId(), user.getName()))
                     .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
         }
 

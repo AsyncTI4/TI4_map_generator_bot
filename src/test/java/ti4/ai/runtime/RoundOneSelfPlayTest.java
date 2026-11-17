@@ -415,12 +415,11 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
         Territory territory = Territory.of(game, seat);
         Map<String, Double> weights = new HashMap<>();
         for (Tile tile : game.getTileMap().values()) {
-            double weight =
-                    switch (territory.zone(tile)) {
-                        case LANE, SLICE -> 1.0;
-                        case BORDER -> 0.5;
-                        default -> 0;
-                    };
+            double weight = switch (territory.zone(tile)) {
+                case LANE, SLICE -> 1.0;
+                case BORDER -> 0.5;
+                default -> 0;
+            };
             if (weight == 0) continue;
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 if (BoardView.controller(game, planet.getName()) != null || BoardView.hasCustodians(planet)) continue;

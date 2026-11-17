@@ -8,11 +8,15 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.UydaiUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.planet.NiflheimLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.planet.RefractureLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.game.Game;
@@ -51,12 +55,16 @@ public class PassService {
         }
         UydaiUnitHandler.offerDeathCommandosPlacement(event, game, player);
 
+        ChoirAbilityHandler.syncMorbidHarmony(player);
         player.setPassed(true);
+        XyrixPromissoryHandler.placeFrontierTokenOnPass(game, player);
+        MigoAbilityHandler.offerCerebralArchiveResearch(game, player);
         ThirtyKSecretHooks.onPassed(game, player);
         GameEventService.commit(game, GameEventType.TURN, player, TurnActionLog.turnPayload(game, true));
         ButtonHelperFactionSpecific.offerDeathBinding(game, player);
         SarcosaHeroHandler.offerPassAbility(game, player);
         NiflheimLegendaryButtonHandler.offerHvergelmirsHaze(event, game, player);
+        RefractureLegendaryButtonHandler.offerLekythoi(game, player);
         VerydithAbilitiesHandler.getMandateButtons(event, player, game);
         RevenantArcanumAgent.offerAfterPass(game, player);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {

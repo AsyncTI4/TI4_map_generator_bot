@@ -38,7 +38,7 @@ final class NucleusStep implements TileStepPainter {
         Tile tile = layer.tile();
         MapTemplateTile mapTile = templateTile(game, tile);
 
-        TileArtwork.draw(game, layer);
+        TileArtwork.draw(scene, layer);
         Graphics2D g = layer.g();
         List<Integer> nucleusNumbers = mapTile.getNucleusNumbers();
         boolean inNucleus = nucleusNumbers != null && !nucleusNumbers.isEmpty();

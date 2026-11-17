@@ -56,6 +56,31 @@ class GameUndoServiceTest extends BaseTi4Test {
         }
     }
 
+    @Test
+    void undoToStaleIndexBeyondLatestSaveLeavesGameUntouched() throws IOException {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            writeSaves(harness, 5);
+
+            assertThat(GameUndoService.undo(harness.load(), 5)).isNull();
+
+            assertThat(latestCommand(harness)).isEqualTo("save 5");
+            assertThat(GameUndoNameService.getSortedUndoNumbers(harness.getGameName()))
+                    .containsExactly(1, 2, 3, 4, 5);
+        }
+    }
+
+    @Test
+    void undoAcrossMissingSaveLeavesGameUntouched() throws IOException {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            writeSaves(harness, 5);
+            Files.delete(harness.buildUndoPath(3));
+
+            assertThat(GameUndoService.undo(harness.load(), 2)).isNull();
+
+            assertThat(latestCommand(harness)).isEqualTo("save 5");
+        }
+    }
+
     // Writes FoW game saves 1..count, each tagged with "save N" as its latest_command so the restored
     // file can be identified after an undo.
     private static void writeSaves(TestGameHarness harness, int count) throws IOException {

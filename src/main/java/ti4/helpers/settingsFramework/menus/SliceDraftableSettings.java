@@ -156,14 +156,13 @@ public class SliceDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
-                    case "presetSlices" -> setPresetSlices(event);
-                    case "nucleusPresetSlicesAndMap~MDL" -> getNucleusPresetSlicesAndMapFromUser(event);
-                    case "nucleusPresetSlicesAndMap" -> setNucleusPresetSlicesAndMapFromEvent(event);
-                    default -> getCurrentModeSettings().handleSpecialButtonAction(event, action);
-                };
+        String error = switch (action) {
+            case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
+            case "presetSlices" -> setPresetSlices(event);
+            case "nucleusPresetSlicesAndMap~MDL" -> getNucleusPresetSlicesAndMapFromUser(event);
+            case "nucleusPresetSlicesAndMap" -> setNucleusPresetSlicesAndMapFromEvent(event);
+            default -> getCurrentModeSettings().handleSpecialButtonAction(event, action);
+        };
 
         if (action.startsWith("changeTemplate_") && event instanceof StringSelectInteractionEvent sEvent) {
             afterChangeMapTemplateHandler(sEvent);

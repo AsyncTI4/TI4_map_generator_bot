@@ -1,7 +1,6 @@
 package ti4.discord.interactions.commands.game;
 
 import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -19,10 +18,9 @@ import ti4.model.MapPositionMapper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.FogGameSummaryService;
 import ti4.service.game.GameSummaryService;
 import ti4.service.game.ModernGameInfoService;
-import ti4.service.option.FOWOptionService;
-import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.users.UserSettingsManager;
 
 class Info extends GameStateSubcommand {
@@ -282,14 +280,9 @@ class Info extends GameStateSubcommand {
         if (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
             sb.append("Spin Mode: ").append(game.getSpinMode()).append('\n');
         if (game.isFowMode()) {
-            sb.append("FoW Options:");
-            for (Map.Entry<FOWOption, Boolean> entry : game.getFowOptions().entrySet()) {
-                sb.append(' ')
-                        .append(entry.getKey().getTitle())
-                        .append(":")
-                        .append(FOWOptionService.valueRepresentation(entry.getValue()));
-            }
-            sb.append('\n');
+            sb.append("FoW Options: ")
+                    .append(FogGameSummaryService.enabledOptionsLine(game))
+                    .append('\n');
         }
 
         if (!privateGame && !hidesMap) {

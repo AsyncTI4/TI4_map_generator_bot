@@ -58,47 +58,26 @@
         "source": "other"
     },
     {
-        "id": "custom_eronous_whepsilon",
-        "imagePath": "token_custom_eronous_whepsilon.png",
-        "spaceOrPlanet": "space",
-        "wormholes": [
-            "EPSILON"
-        ],
-        "source": "eronous"
-    },
-    {
-        "id": "custom_eronous_wheta",
-        "imagePath": "token_custom_eronous_wheta.png",
-        "spaceOrPlanet": "space",
-        "wormholes": [
-            "ETA"
-        ],
-        "source": "eronous"
-    },
-    {
-        "id": "custom_eronous_whiota",
+        "id": "whiota",
         "imagePath": "token_custom_eronous_whiota.png",
         "spaceOrPlanet": "space",
+        "aliasList": [
+            "custom_eronous_whiota"
+        ],
         "wormholes": [
             "IOTA"
         ],
         "source": "eronous"
     },
     {
-        "id": "custom_eronous_whtheta",
+        "id": "whtheta",
         "imagePath": "token_custom_eronous_whtheta.png",
         "spaceOrPlanet": "space",
+        "aliasList": [
+            "custom_eronous_whtheta"
+        ],
         "wormholes": [
             "THETA"
-        ],
-        "source": "eronous"
-    },
-    {
-        "id": "custom_eronous_whzeta",
-        "imagePath": "token_custom_eronous_whzeta.png",
-        "spaceOrPlanet": "space",
-        "wormholes": [
-            "ZETA"
         ],
         "source": "eronous"
     },
@@ -198,6 +177,9 @@
             "token_whepsilon.png"
         ],
         "spaceOrPlanet": "space",
+        "aliasList": [
+            "custom_eronous_whepsilon"
+        ],
         "wormholes": [
             "EPSILON"
         ],
@@ -210,6 +192,9 @@
             "token_wheta.png"
         ],
         "spaceOrPlanet": "space",
+        "aliasList": [
+            "custom_eronous_wheta"
+        ],
         "wormholes": [
             "ETA"
         ],
@@ -270,6 +255,9 @@
             "token_whzeta.png"
         ],
         "spaceOrPlanet": "space",
+        "aliasList": [
+            "custom_eronous_whzeta"
+        ],
         "wormholes": [
             "ZETA"
         ],
@@ -481,9 +469,12 @@
         "source": "other"
     },
     {
-        "id": "sigma_lamdba_wormhole",
+        "id": "whlambda",
         "imagePath": "token_sigma_lambda.png",
         "spaceOrPlanet": "space",
+        "aliasList": [
+            "sigma_lamdba_wormhole"
+        ],
         "wormholes": [
             "LAMBDA"
         ],

@@ -16,7 +16,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "When you perform the primary effect of a strategy card, you may place this card face up in your play area: Perform the secondary effect of that strategy card without spending a command token. At the start of the status phase, return this card to the Verydith player."
+        "text": "When you resolve the primary ability of a strategy card: You may place this card face up in your play area. Resolve the secondary ability of that strategy card without spending a command token. At the start of the status phase: Return this card to the Verydith player."
     },
     {
         "alias": "thpnveylor",
@@ -25,7 +25,7 @@
         "color": "",
         "playArea": false,
         "source": "theodisi",
-        "text": "ACTION: Discard up to 1 action card and draw that many action cards + 1. At the start of the status phase, return this card to the Veylor player."
+        "text": "ACTION: Discard up to 1 action card. Then, draw 1 more action card than you discarded. At the start of the status phase: Return this card to the Veylor player."
     },
     {
         "alias": "thpnmyrri",
@@ -36,7 +36,7 @@
         "playImmediately": false,
         "attachment": "factoryleasei",
         "source": "theodisi",
-        "text": "At the end of your turn, attach this card to an industrial planet you conrol: That planet gains PRODUCTION equal to the number of planets in that system."
+        "text": "At the end of your turn: Attach this card to an industrial planet you control. That planet gains PRODUCTION equal to the number of planets in its system + 1."
     },
     {
         "alias": "thpnmyrrh",
@@ -47,7 +47,7 @@
         "playImmediately": false,
         "attachment": "factoryleaseh",
         "source": "theodisi",
-        "text": "At the end of your turn, attach this card to a hazardous planet you control: That planet gains PRODUCTION equal to its resource value."
+        "text": "At the end of your turn: Attach this card to a hazardous planet you control. That planet gains PRODUCTION equal to its resource value."
     },
     {
         "alias": "thpnmyrrc",
@@ -58,18 +58,18 @@
         "playImmediately": false,
         "attachment": "factoryleasec",
         "source": "theodisi",
-        "text": "At the end of your turn, attach this card to a cultural planet you control: That planet gains PRODUCTION equal to its influence value."
+        "text": "At the end of your turn: Attach this card to a cultural planet you control. That planet gains PRODUCTION equal to its influence value."
     },
     {
         "alias": "thpnkairn",
-        "name": "Archaeological Outpost",
+        "name": "Archaeologist Outpost",
         "faction": "kairn",
         "color": "",
         "playArea": true,
         "playImmediately": false,
         "attachment": "kairnoutpost",
         "source": "theodisi",
-        "text": "ACTION: Attach this card to 1 non-home planet. When a player activates this planet's system, explore it."
+        "text": "ACTION: Attach this card to 1 non-home planet. When a player activates this planet's system: Explore this planet."
     },
     {
         "alias": "thpnkryxos",
@@ -87,27 +87,27 @@
         "color": "",
         "playArea": false,
         "source": "theodisi",
-        "text": "At the start of the strategy phase: Research 1 non-unit upgrade, non-faction technology the Arcanum player does not own. If you do, the Arcanum player may spend 1 command token from their strategy pool to gain that technology. Then, return this card to the Arcanum player."
+        "text": "At the start of the strategy phase: Research 1 non-unit upgrade, non-faction technology. Then, the Arcanum player may spend 1 command token from their strategy pool to gain that technology. Then, return this card to the Arcanum player."
     },
     {
         "alias": "thpnxytheris",
-        "name": "Swarm Spawn",
+        "name": "Royal Blessing",
         "faction": "xytheris",
         "color": "",
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "When you roll dice for a unit ability: Apply +2 to those results. Then, return this promissory note to the Xytheris player.",
+        "text": "When you roll dice for a unit ability: Apply +2 to the results of those rolls. Then, return this card to the Xytheris player.",
         "notes": "Play this BEFORE the affected unit ability roll."
     },
     {
         "alias": "thpnoblivion",
-        "name": "Shard of Nothingness",
+        "name": "Oblivion Genesis",
         "faction": "oblivion",
         "color": "",
         "playArea": false,
         "source": "theodisi",
-        "text": "ACTION: Draw 3 unused red-backed tiles. Choose 1 and place it adjacent to 2 systems. If it contains no planets, place a frontier token in that system. Then, purge this card and the unchosen tiles."
+        "text": "ACTION: Draw 3 unused red-backed system tiles. Choose 1 and purge the others. Place that tile on the edge of the game board, adjacent to 2 systems, and place a frontier token in that system if it contains no planets. Then, purge this card."
     },
     {
         "alias": "thpnrevenant",
@@ -117,7 +117,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "ACTION: Place this card face up in your play area and purge 1 random unused Revenant Pantheon card and gain the agent listed on that card. At the start of the status phase return this card to the Revenant player."
+        "text": "ACTION: Place this card face up in your play area, purge 1 random unused Revenant Pantheon card, and gain the agent listed on that card. At the start of the status phase: Return this card to the Revenant player."
     },
     {
         "alias": "thpnthrones",
@@ -126,7 +126,7 @@
         "color": "",
         "playArea": false,
         "source": "theodisi",
-        "text": "ACTION: Place an unused throne planet into your home system and gain control of it. Then, purge this promissory note."
+        "text": "ACTION: Place 1 unused throne planet in your home system and gain control of it. Then, purge this card."
     },
     {
         "alias": "thpnaeterna",
@@ -136,7 +136,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "At the start of a round of combat, place this card face up in your play area: Each time a fighter is destroyed during this combat roll a dice, for each result greater than 5 place that fighter on this card. At the start of your next turn place each fighter in systems that contain your ships. Then, return this card to the Aeterna player.",
+        "text": "At the start of a round of combat: Place this card face up in your play area. Each time a fighter is destroyed during this combat: Roll 1 die; for each result greater than 5, place that fighter on this card. At the start of your next turn: Place each fighter in systems that contain your ships, then return this card to the Aeterna player.",
         "notes": "There is no way to see how many fighters are in stasis at the moment. You'll have to keep track/make a note of it yourself."
     },
     {
@@ -146,7 +146,7 @@
         "color": "",
         "playArea": false,
         "source": "theodisi",
-        "text": "At the start of space combat select 1 of your ground forces in that system: That unit participates in combat as if it were a ship and you may treat them as Galvanized until the end of the combat. Return this card to the Ponthous player at the end of that combat.",
+        "text": "At the start of space combat: Select 1 of your ground forces in that system. That unit participates in combat as if it were a ship, and you may treat it as galvanized until the end of the combat. Return this card to the Ponthous player at the end of that combat.",
         "notes": "Bot can't detect end of space combat, so it is returned either when another combat starts or end of turn/tactical action."
     },
     {
@@ -158,7 +158,7 @@
         "playImmediately": false,
         "source": "theodisi",
         "notes": "This is not automated. Use the cancel hits button during combat.",
-        "text": "Before you assign hits to your ships during a space combat, place this card face up in your play area. Cancel up to 2 hits. At the start of the Iron Keep player's turn, return this card to the Iron Keep player."
+        "text": "Before you assign hits to your ships during a space combat: Place this card face up in your play area. Cancel up to 2 hits. At the start of the Iron Keep player's turn: Return this card to the Iron Keep player."
     },
     {
         "alias": "thpnscrapyard",
@@ -167,7 +167,7 @@
         "color": "",
         "playArea": false,
         "source": "theodisi",
-        "text": "When you gain this card, gain 1 unused \"Custom Rig\" card, then purge this card."
+        "text": "When you gain this card: Gain 1 unused \"Custom Rig\" card, then purge this card."
     },
     {
         "alias": "thpnstoneborn",
@@ -177,7 +177,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "ACTION: Place this face up in your play area. Gain your breakthrough or unlock your commander. Return this card to the Stoneborn Stratum player at the end of the status phase."
+        "text": "ACTION: Place this card face up in your play area. Gain your breakthrough or unlock your commander. Return this card to the Stoneborn Stratum player at the end of the status phase."
     },
     {
         "alias": "thpnmorpha",
@@ -187,7 +187,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "At the start of your turn, you may place this card face up in your play area and draw 2 random hydromorphic cards, then shuffle 1 back into the deck. At the end of the status phase, return this card to the Morpha player."
+        "text": "At the start of your turn: You may place this card face up in your play area and draw 2 random Hydromorphic cards, then shuffle 1 back into the deck. At the end of the status phase: Return this card to the Morpha player."
     },
     {
         "alias": "thpnthurviali",
@@ -197,6 +197,6 @@
         "playArea": true,
         "playImmediately": false,
         "source": "theodisi",
-        "text": "ACTION: Place this card face up in your play area and place 1 structure from your reinforcements onto a planet you control. Return this card to the Thurviali player at the end of the status phase."
+        "text": "ACTION: Place this card face up in your play area and place 1 structure from your reinforcements on a planet you control. Return this card to the Thurviali player at the end of the status phase."
     }
 ]

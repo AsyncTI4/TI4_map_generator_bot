@@ -205,16 +205,39 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed fancyEmbed() {
-        EmbedBuilder eb = new EmbedBuilder();
+        return fancyEmbeds().getFirst();
+    }
 
-        // TITLE - [FactionEmoji] Sardakk N'orr [SourceEmoji]
-        eb.setTitle(getFactionEmoji() + " " + getFactionNameWithSourceEmoji());
+    public List<MessageEmbed> fancyEmbeds() {
+        List<FancyEmbedField> fields = getFancyEmbedFields();
+        List<MessageEmbed> embeds = new ArrayList<>();
+        EmbedBuilder builder = newFancyEmbedBuilder(false);
+        int embedLength = getFancyEmbedBaseLength(false);
+        int fieldCount = 0;
+        for (FancyEmbedField field : fields) {
+            List<String> values = splitFancyEmbedFieldValue(field.value());
+            for (int index = 0; index < values.size(); index++) {
+                String name = index == 0
+                        ? StringUtils.abbreviate(field.name(), 256)
+                        : getContinuedFancyEmbedFieldName(field.name(), index);
+                String value = values.get(index);
+                if (fieldCount == 25 || embedLength + name.length() + value.length() > 6000) {
+                    embeds.add(builder.build());
+                    builder = newFancyEmbedBuilder(true);
+                    embedLength = getFancyEmbedBaseLength(true);
+                    fieldCount = 0;
+                }
+                builder.addField(name, value, field.inline());
+                embedLength += name.length() + value.length();
+                fieldCount++;
+            }
+        }
+        embeds.add(builder.build());
+        return embeds;
+    }
 
-        // DESCRIPTION - <Commodity><Commodity><Commodity>
-        eb.setDescription("\n" + MiscEmojis.comm(commodities));
-
-        // FIELDS
-        // Abilities
+    private List<FancyEmbedField> getFancyEmbedFields() {
+        List<FancyEmbedField> fields = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         for (String id : getAbilities()) {
             AbilityModel model = Mapper.getAbility(id);
@@ -231,7 +254,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append('\n');
         }
         if (!sb.isEmpty()) {
-            eb.addField("__Abilities:__", sb.toString(), false);
+            fields.add(new FancyEmbedField("__Abilities:__", sb.toString(), false));
         }
 
         // Faction Tech
@@ -242,7 +265,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append("\n> ").append(model.getText()).append('\n');
         }
         if (!sb.isEmpty()) {
-            eb.addField("__Faction Technologies__", sb.toString(), false);
+            fields.add(new FancyEmbedField("__Faction Technologies__", sb.toString(), false));
         }
 
         // Special Units
@@ -256,36 +279,69 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append('\n');
         }
         if (!sb.isEmpty()) {
-            eb.addField("__Units__", sb.toString(), false);
+            fields.add(new FancyEmbedField("__Units__", sb.toString(), false));
         }
 
         // Promissory Notes
-        sb = new StringBuilder();
         for (String id : getPromissoryNotes()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
-            sb.append(model.getName()).append('\n');
-        }
-        if (!sb.isEmpty()) {
-            eb.addField("__Promissory Notes__", sb.toString(), false);
+            if (model == null) continue;
+            fields.add(new FancyEmbedField(
+                    "__Promissory Note__ _" + model.getName() + "_",
+                    "> " + model.getText().replace("\n", "\n> "),
+                    false));
         }
 
         // Leaders
-        sb = new StringBuilder();
         for (String id : getLeaders()) {
             LeaderModel model = Mapper.getLeader(id);
-            sb.append(model.getLeaderEmoji())
-                    .append(' ')
-                    .append(model.getName())
-                    .append('\n');
+            if (model == null) continue;
+            sb = new StringBuilder();
+            if (!StringUtils.isBlank(model.getAbilityWindow())) {
+                sb.append("> **").append(model.getAbilityWindow()).append("**\n");
+            }
+            if (!StringUtils.isBlank(model.getAbilityText())) {
+                sb.append("> ")
+                        .append(model.getAbilityText().replace("\n", "\n> "))
+                        .append('\n');
+            }
+            if (sb.isEmpty()) {
+                sb.append("> No ability text.");
+            }
+            fields.add(new FancyEmbedField(
+                    "__" + model.getLeaderEmoji() + " " + model.getName() + ", the " + getShortName() + " "
+                            + model.getType()
+                            + "__",
+                    sb.toString(),
+                    false));
         }
-        if (!sb.isEmpty()) {
-            eb.addField("__Leaders__", sb.toString(), false);
+
+        sb = new StringBuilder();
+        TileModel homeSystemTile = TileHelper.getTileById(homeSystem);
+        sb.append("**").append(homeSystem).append("**");
+        if (homeSystemTile != null && !StringUtils.isBlank(homeSystemTile.getName())) {
+            sb.append(" — ").append(homeSystemTile.getName());
         }
+        for (String planetId : getHomePlanets()) {
+            PlanetModel planet = Mapper.getPlanet(planetId);
+            if (planet == null) continue;
+            sb.append("\n> **")
+                    .append(planet.getName())
+                    .append("** (")
+                    .append(planet.getResources())
+                    .append("/")
+                    .append(planet.getInfluence())
+                    .append(")");
+            if (!planet.getPlanetTypes().isEmpty()) {
+                sb.append(" — ").append(planet.getPlanetTypes());
+            }
+        }
+        fields.add(new FancyEmbedField("__Home System__", sb.toString(), false));
 
         sb = new StringBuilder();
         sb.append(Helper.getUnitListEmojis(startingFleet)).append('\n');
         if (!startingFleet.isEmpty()) {
-            eb.addField("__Starting Fleet__", sb.toString(), false);
+            fields.add(new FancyEmbedField("__Starting Fleet__", sb.toString(), false));
         }
 
         sb = new StringBuilder();
@@ -310,11 +366,50 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             sb.append("Choose 2 non-faction technologies owned by other players.");
         }
         if (!sb.isEmpty()) {
-            eb.addField("__Starting Tech__", sb.toString(), false);
+            fields.add(new FancyEmbedField("__Starting Tech__", sb.toString(), false));
         }
 
-        return eb.build();
+        return fields;
     }
+
+    private EmbedBuilder newFancyEmbedBuilder(boolean continued) {
+        String title = getFactionEmoji() + " " + getFactionNameWithSourceEmoji();
+        if (continued) {
+            title = StringUtils.abbreviate(title, 242) + " (continued)";
+        }
+        return new EmbedBuilder().setTitle(title).setDescription("\n" + MiscEmojis.comm(commodities));
+    }
+
+    private int getFancyEmbedBaseLength(boolean continued) {
+        int titleLength = (getFactionEmoji() + " " + getFactionNameWithSourceEmoji()).length();
+        if (continued) {
+            titleLength = StringUtils.abbreviate(getFactionEmoji() + " " + getFactionNameWithSourceEmoji(), 242)
+                            .length()
+                    + " (continued)".length();
+        }
+        return titleLength + ("\n" + MiscEmojis.comm(commodities)).length();
+    }
+
+    private static List<String> splitFancyEmbedFieldValue(String value) {
+        List<String> values = new ArrayList<>();
+        while (value.length() > 1024) {
+            int splitIndex = value.lastIndexOf('\n', 1024);
+            if (splitIndex <= 0) {
+                splitIndex = 1024;
+            }
+            values.add(value.substring(0, splitIndex));
+            value = value.substring(splitIndex).stripLeading();
+        }
+        values.add(value);
+        return values;
+    }
+
+    private static String getContinuedFancyEmbedFieldName(String name, int index) {
+        String suffix = " (continued " + (index + 1) + ")";
+        return StringUtils.abbreviate(name, 256 - suffix.length()) + suffix;
+    }
+
+    private record FancyEmbedField(String name, String value, boolean inline) {}
 
     @Override
     public boolean search(String searchString) {

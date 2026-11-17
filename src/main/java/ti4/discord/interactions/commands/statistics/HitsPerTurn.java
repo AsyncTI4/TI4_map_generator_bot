@@ -14,10 +14,9 @@ class HitsPerTurn extends Subcommand {
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)")
                 .setRequiredRange(1, 500));
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.MINIMUM_NUMBER_OF_TURNS,
-                        "Minimum number of turns to show (Default = 100)")
-                .setRequiredRange(0, 100_000));
+                OptionType.INTEGER,
+                Constants.MINIMUM_NUMBER_OF_TURNS,
+                "Minimum number of turns to show (Default = 100)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "ascending",

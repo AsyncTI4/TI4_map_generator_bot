@@ -10,7 +10,8 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 public class BothelperDashboardCron {
 
     public static void register() {
-        CronManager.scheduleOnce(BothelperDashboardCron.class, BothelperDashboardCron::run, 30, TimeUnit.SECONDS);
+        CronManager.scheduleOnceAfterLeaseAcquired(
+                BothelperDashboardCron.class, BothelperDashboardCron::run, 30, TimeUnit.SECONDS);
     }
 
     private static void run() {

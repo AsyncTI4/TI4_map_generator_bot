@@ -25,6 +25,7 @@ public class ColorChangeHelper {
 
     public static boolean isColorAllowedForPlayer(String color, String userID, Game game) {
         String colorID = Mapper.getColorID(color);
+        if (colorID == null) return true;
         return switch (colorID) {
             // Riftset is exclusive to eronous always
             case "ero" -> Constants.eronousId.equals(userID);

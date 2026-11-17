@@ -107,13 +107,12 @@ public class OrbitalDropRules {
         List<AiPrompt> fresh = Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> prompt.createdAtMillis() >= flow.get().since() - CLOCK_SKEW_MILLIS)
                 .toList();
-        Optional<AiDecision> step =
-                switch (flow.get().stage()) {
-                    case MENU -> openAbility(context, fresh, flow.get());
-                    case PLANET -> choosePlanet(context, fresh, flow.get());
-                    case FOLLOW_UP -> followUp(context, fresh, flow.get());
-                    case DONE -> Optional.empty();
-                };
+        Optional<AiDecision> step = switch (flow.get().stage()) {
+            case MENU -> openAbility(context, fresh, flow.get());
+            case PLANET -> choosePlanet(context, fresh, flow.get());
+            case FOLLOW_UP -> followUp(context, fresh, flow.get());
+            case DONE -> Optional.empty();
+        };
         if (step.isPresent()) return step;
         if (flow.get().stage() == Stage.FOLLOW_UP && turnCanEnd(context, fresh)) {
             remember(context, flow.get().at(Stage.DONE, context.now()));

@@ -141,14 +141,13 @@ public class KryxosLeadersHandler {
         }
 
         for (char prerequisite : tech.getRequirements().orElse("").toLowerCase().toCharArray()) {
-            String techType =
-                    switch (prerequisite) {
-                        case 'b' -> TechnologyModel.TechnologyType.PROPULSION.toString();
-                        case 'g' -> TechnologyModel.TechnologyType.BIOTIC.toString();
-                        case 'y' -> TechnologyModel.TechnologyType.CYBERNETIC.toString();
-                        case 'r' -> TechnologyModel.TechnologyType.WARFARE.toString();
-                        default -> "";
-                    };
+            String techType = switch (prerequisite) {
+                case 'b' -> TechnologyModel.TechnologyType.PROPULSION.toString();
+                case 'g' -> TechnologyModel.TechnologyType.BIOTIC.toString();
+                case 'y' -> TechnologyModel.TechnologyType.CYBERNETIC.toString();
+                case 'r' -> TechnologyModel.TechnologyType.WARFARE.toString();
+                default -> "";
+            };
             if (techType.isEmpty()) {
                 continue;
             }

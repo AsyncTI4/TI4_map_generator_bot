@@ -223,13 +223,12 @@ public class NekroLeaderRules {
                 .filter(prompt -> prompt.isHidden()
                         && prompt.createdAtMillis() >= step.get().since() - CLOCK_SKEW_MILLIS)
                 .toList();
-        Optional<AiDecision> next =
-                switch (step.get().stage()) {
-                    case MENU -> playHero(context, fresh, step.get());
-                    case LEADER -> choosePlanet(context, fresh, step.get());
-                    case PLANET -> chooseTechnology(context, fresh, step.get());
-                    case DONE -> Optional.empty();
-                };
+        Optional<AiDecision> next = switch (step.get().stage()) {
+            case MENU -> playHero(context, fresh, step.get());
+            case LEADER -> choosePlanet(context, fresh, step.get());
+            case PLANET -> chooseTechnology(context, fresh, step.get());
+            case DONE -> Optional.empty();
+        };
         if (next.isPresent()) return next;
         long until = step.get().since() + STEP_WAIT_MILLIS;
         if (context.now() < until) return Optional.of(new AiDecision.Wait(until, "UNIT.DSGN.FLAYESH"));

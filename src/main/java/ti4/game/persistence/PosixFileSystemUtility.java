@@ -11,14 +11,14 @@ import lombok.experimental.UtilityClass;
 import ti4.logging.BotLogger;
 
 @UtilityClass
-class PosixFileSystemUtility {
+public class PosixFileSystemUtility {
 
     private static final Set<PosixFilePermission> FILE_PERMISSIONS =
             PosixFilePermissions.fromString("rw-rw-r--"); // 0664
     private static final boolean isPosix =
             FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
-    static void setPermissionsIfPosix(Path path) {
+    public static void setPermissionsIfPosix(Path path) {
         if (!isPosix) return;
         try {
             Files.setPosixFilePermissions(path, FILE_PERMISSIONS);

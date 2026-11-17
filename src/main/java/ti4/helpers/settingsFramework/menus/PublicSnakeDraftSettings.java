@@ -89,11 +89,10 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "setOrder" -> initialSetOrderButtons(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "setOrder" -> initialSetOrderButtons(event);
+            default -> null;
+        };
 
         if (action.startsWith("orderFor_")) {
             proceedSettingOrder(event, action);

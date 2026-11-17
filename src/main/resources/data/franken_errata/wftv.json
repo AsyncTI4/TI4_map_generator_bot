@@ -61,14 +61,45 @@
         "source": "wftv"
     },
     {
+        "itemCategory": "TECH",
+        "itemId": "bazephcr",
+        "optionalSwaps": ["COMMANDER:zephyrioncommander"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "zephyrioncommander",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "phantom_energy",
-        "optionalSwaps": ["FLAGSHIP:tyris_flagship"],
+        "additionalComponents": ["ABILITY:arrow_of_time"],
+        "optionalSwaps": ["FLAGSHIP:tyris_flagship", "AGENT:tyrisagent"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "arrow_of_time",
+        "undraftable": true,
         "source": "wftv"
     },
     {
         "itemCategory": "FLAGSHIP",
         "itemId": "tyris_flagship",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "tyriscommander",
+        "optionalSwaps": ["MECH:tyris_mech"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "tyris_mech",
         "undraftable": true,
         "source": "wftv"
     },
@@ -109,6 +140,19 @@
         "itemCategory": "ABILITY",
         "itemId": "strategic_fluidity",
         "additionalComponents": ["ABILITY:detachment"],
+        "optionalSwaps": ["COMMANDER:onyxxacommander"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "onyxxacommander",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "baxanws",
+        "optionalSwaps": ["FLAGSHIP:xan_flagship"],
         "source": "wftv"
     },
     {

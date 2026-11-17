@@ -16,6 +16,7 @@ import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -159,8 +160,8 @@ public class ThirtyKRelicHooks {
 
     private static boolean neighbourOfNeighbourOnTurn(Game game, Player holder, Player other) {
         if (!holder.hasRelic(ThirtyKRelics.DEEP_NETWORKS) || game.getActivePlayer() != holder) return false;
-        return holder.getNeighbouringPlayers(false).stream()
-                .anyMatch(neighbour -> neighbour.getNeighbouringPlayers(false).contains(other));
+        return holder.getNeighbouringPlayers(true).stream()
+                .anyMatch(neighbour -> neighbour.getNeighbouringPlayers(true).contains(other));
     }
 
     public static void rememberChronoStasis(Game game, Player owner, String planet) {
@@ -253,7 +254,7 @@ public class ThirtyKRelicHooks {
     }
 
     private static boolean hasUnitsInOrAdjacent(Game game, Player player, Tile tile) {
-        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true).stream()
+        return Adjacency.of(game, player).forEffects().withSelf().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(t -> t != null && FoWHelper.playerHasUnitsInSystem(player, t));
     }

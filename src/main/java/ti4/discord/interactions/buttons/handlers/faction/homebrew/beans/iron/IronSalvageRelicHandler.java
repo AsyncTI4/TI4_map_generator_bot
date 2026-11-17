@@ -21,6 +21,7 @@ import ti4.helpers.CombatMessageHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
@@ -255,7 +256,7 @@ public class IronSalvageRelicHandler {
 
     private static boolean hasDestroyerAfb(Game game, Player player, Tile combatTile) {
         return combatTile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, player) > 0
-                || FoWHelper.getAdjacentTiles(game, combatTile.getPosition(), player, false, false).stream()
+                || Adjacency.of(game, player).forEffects().into(combatTile.getPosition()).stream()
                         .map(game::getTileByPosition)
                         .filter(java.util.Objects::nonNull)
                         .anyMatch(tile -> tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, player) > 0);
@@ -285,7 +286,9 @@ public class IronSalvageRelicHandler {
         String sourcePosition = positions[1];
         Tile source = game.getTileByPosition(sourcePosition);
         if (destination == null || source == null) return;
-        if (!FoWHelper.getAdjacentTilesAndNotThisTile(game, destination.getPosition(), player, false)
+        if (!Adjacency.of(game, player)
+                .forMovement()
+                .into(destination.getPosition())
                 .contains(sourcePosition)) return;
         if (source.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1) return;
         List<RemovedUnit> removed = RemoveUnitService.removeUnit(
@@ -500,7 +503,7 @@ public class IronSalvageRelicHandler {
     private static boolean canUseCruiserSalvage(Game game, Player player, Tile destination) {
         return player.hasRelic("salvage_cruiser")
                 && destination.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) > 0
-                && FoWHelper.getAdjacentTilesAndNotThisTile(game, destination.getPosition(), player, false).stream()
+                && Adjacency.of(game, player).forMovement().into(destination.getPosition()).stream()
                         .map(game::getTileByPosition)
                         .filter(java.util.Objects::nonNull)
                         .anyMatch(tile -> tile.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) > 0);
@@ -520,8 +523,7 @@ public class IronSalvageRelicHandler {
     private static void editCruiserMovePrompt(
             ButtonInteractionEvent event, Game game, Player player, Tile destination) {
         List<Button> buttons = new ArrayList<>();
-        for (String position :
-                FoWHelper.getAdjacentTilesAndNotThisTile(game, destination.getPosition(), player, false)) {
+        for (String position : Adjacency.of(game, player).forMovement().into(destination.getPosition())) {
             Tile source = game.getTileByPosition(position);
             if (source == null || source.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1) continue;
             buttons.add(Buttons.green(

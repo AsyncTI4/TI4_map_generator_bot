@@ -68,7 +68,7 @@
             "BIOTIC",
             "WARFARE"
         ],
-        "text": "After you win a space combat in or adjacent to your opponent's home system, draw an unused agent, if able. Attach it to this card or purge it and exhaust your opponent's agent. Treat agents attached to this card as if you owned them.",
+        "text": "After you destroy the last of another player’s ships in a system that is in or adjacent to that player’s home system, draw an unused agent. Attach it to this card, or purge it and exhaust 1 of that player’s agents. Treat agents attached to this card as if you owned them.",
         "source": "wftv"
     },
     {

@@ -33,11 +33,10 @@ public class HumanAiDealRunner {
             balances.put(player.getFaction(), new int[] {player.getCommodities(), player.getTg()});
         }
         for (HumanAiDeal.Step step : deal.steps()) {
-            Optional<String> failure =
-                    switch (step) {
-                        case HumanAiDeal.Step.ExhaustLeader exhaust -> checkExhaust(game, ai, exhaust, balances);
-                        case HumanAiDeal.Step.Transfer transfer -> checkTransfer(game, transfer, balances);
-                    };
+            Optional<String> failure = switch (step) {
+                case HumanAiDeal.Step.ExhaustLeader exhaust -> checkExhaust(game, ai, exhaust, balances);
+                case HumanAiDeal.Step.Transfer transfer -> checkTransfer(game, transfer, balances);
+            };
             if (failure.isPresent()) return failure;
         }
         return Optional.empty();

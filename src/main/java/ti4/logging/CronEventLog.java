@@ -7,17 +7,17 @@ final class CronEventLog extends AbstractEventLog {
     }
 
     @Override
-    public String getChannelName() {
+    String getChannelName() {
         return "bot-log";
     }
 
     @Override
-    public String getThreadName() {
+    String getThreadName() {
         return "cron-log";
     }
 
     @Override
-    public String getMessagePrefix() {
+    String getMessagePrefix() {
         return "";
     }
 }

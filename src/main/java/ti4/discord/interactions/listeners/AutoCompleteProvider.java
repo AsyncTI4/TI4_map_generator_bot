@@ -30,6 +30,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.search.FindService;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.discord.interactions.commands.uncategorized.ServerPromoteCommand;
+import ti4.discord.interactions.commands.user.SetFowFilter;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -89,7 +90,9 @@ import ti4.service.statistics.PlayerStatTypes;
 import ti4.service.statistics.game.GameStatTypes;
 import ti4.service.testbed.TestBedAutoComplete;
 import ti4.service.testbed.TestBedService;
+import ti4.service.tournament.TournamentAccess;
 import ti4.settings.GlobalSettings;
+import ti4.spring.service.tournament.TournamentService;
 
 @UtilityClass
 class AutoCompleteProvider {
@@ -121,6 +124,7 @@ class AutoCompleteProvider {
                 case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN2 -> resolvePlotAutoComplete(event, optionName);
                 case "testbed" -> resolveTestBedAutoComplete(event, optionName);
+                case "tournament" -> resolveTournamentAutoComplete(event);
             }
             if (event.isAcknowledged()) return;
         }
@@ -394,8 +398,7 @@ class AutoCompleteProvider {
             }
             case Constants.FOG_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
+                List<Command.Choice> options = mapTo25ChoicesThatContain(SetFowFilter.filterLabels(), enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.PRIMARY_TILE_DIRECTION -> {
@@ -700,6 +703,7 @@ class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FrankenDraftMode> modes = new ArrayList<>(Arrays.asList(FrankenDraftMode.values()));
                 List<Command.Choice> options = modes.stream()
+                        .filter(mode -> mode != FrankenDraftMode.AUCTION)
                         .filter(mode -> mode.search(enteredValue))
                         .limit(25)
                         .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
@@ -1007,7 +1011,10 @@ class AutoCompleteProvider {
                 try {
                     Player player = CommandHelper.getPlayerFromGame(
                             game, event.getMember(), event.getUser().getId());
-                    if (player != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
+                    if (player != null
+                            && (Constants.ABILITY_REMOVE.equals(subcommandName)
+                                    || Constants.ABILITY_READY.equals(subcommandName)
+                                    || Constants.ABILITY_EXHAUST.equals(subcommandName))) {
                         for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
                         }
@@ -1493,13 +1500,31 @@ class AutoCompleteProvider {
 
     private static void resolveFindAutoComplete(
             @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String optionName) {
-        List<Command.Choice> options =
-                switch (optionName) {
-                    case Constants.SEARCH_TYPE -> FindService.autoCompleteType(event);
-                    case Constants.SOURCE -> FindService.autoCompleteSource(event);
-                    default -> Collections.emptyList();
-                };
+        List<Command.Choice> options = switch (optionName) {
+            case Constants.SEARCH_TYPE -> FindService.autoCompleteType(event);
+            case Constants.SOURCE -> FindService.autoCompleteSource(event);
+            default -> Collections.emptyList();
+        };
         event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static void resolveTournamentAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event) {
+        if (TournamentService.isUnavailable() || !TournamentAccess.isTournamentAdmin(event.getMember())) {
+            event.replyChoices(List.of()).queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
+        String typed = event.getFocusedOption().getValue().toLowerCase();
+        List<Command.Choice> choices = TournamentService.getBean().listActive().stream()
+                .map(tournament -> new Command.Choice(
+                        StringUtils.left(
+                                "#" + tournament.getId() + " · " + tournament.displayName() + " ("
+                                        + tournament.getStatus().name().toLowerCase() + ")",
+                                100),
+                        String.valueOf(tournament.getId())))
+                .filter(choice -> choice.getName().toLowerCase().contains(typed))
+                .limit(25)
+                .toList();
+        event.replyChoices(choices).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveTestBedAutoComplete(

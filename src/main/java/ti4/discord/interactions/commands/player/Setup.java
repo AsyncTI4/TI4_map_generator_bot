@@ -44,7 +44,9 @@ class Setup extends GameStateSubcommand {
         faction = AliasHandler.resolveFaction(faction);
         if (!Mapper.isValidFaction(faction)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactionIDs());
+                    event,
+                    "Faction `" + faction
+                            + "` is not valid. Most likely, discord auto-complete failed you. Try again, it normally doesnt fail twice in a row. ");
             return;
         }
 

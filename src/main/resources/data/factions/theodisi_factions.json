@@ -3,8 +3,8 @@
         "alias": "ardentia",
         "factionName": "The Slavers of Ardentia",
         "homeSystem": "th1",
-        "startingFleet": "1 cr, 2 dd, 5 ff, 2 inf w, 1 inf a, 1 sd w, 1 pds a",
-        "commodities": 3,
+        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 3 inf w, 1 inf a, 1 sd w, 1 pds a",
+        "commodities": 2,
         "factionTech": [
             "thardentiar",
             "thardentiag"
@@ -49,17 +49,16 @@
         "alias": "verydith",
         "factionName": "The Concord of Verydith",
         "homeSystem": "th2",
-        "startingFleet": "1 cv, 1 cr, 1 dn, 3 ff, 2 inf v, 1 inf g, 1 inf o, 1 sd v",
+        "startingFleet": "1 cv, 1 cr, 1 dn, 3 ff, 1 inf v, 1 inf g, 1 inf o, 1 sd v",
         "commodities": 3,
         "factionTech": [
             "thverydithg",
             "thverydithy"
         ],
-        "startingTechOptions": [
+        "startingTech": [
             "td",
             "bs"
         ],
-        "startingTechAmount": 1,
         "homePlanets": [
             "verydith",
             "graveth",
@@ -97,7 +96,7 @@
         "factionName": "The Synod of Veylor",
         "homeSystem": "th3",
         "startingFleet": "2 cv, 1 cr, 3 ff, 1 inf v, 2 inf c, 1 sd c",
-        "commodities": 3,
+        "commodities": 4,
         "factionTech": [
             "thveylory",
             "thveylorg"
@@ -247,7 +246,6 @@
             "cullspire"
         ],
         "abilities": [
-            "battle_tested_designs",
             "evolved_warforms",
             "testing_yard"
         ],
@@ -366,8 +364,8 @@
         "alias": "oblivion",
         "factionName": "The Covenant of Oblivion",
         "homeSystem": "th9",
-        "startingFleet": "2 cv, 1 dn, 1 ff, 2 inf n, 2 inf v, 1 sd n",
-        "commodities": 2,
+        "startingFleet": "2 cv, 1 dd, 2 ff, 2 inf n, 2 inf v, 1 sd n",
+        "commodities": 3,
         "factionTech": [
             "thoblivionr",
             "thobliviong"
@@ -411,8 +409,8 @@
         "alias": "revenant",
         "factionName": "The Revenant Glory",
         "homeSystem": "th10",
-        "startingFleet": "1 cv, 2 cr, 5 ff, 2 inf h, 1 inf t, 1 sd h",
-        "commodities": 4,
+        "startingFleet": "1 dn, 1 cv, 1 cr, 3 ff, 1 inf h, 1 inf t, 1 mf h, 1 sd h",
+        "commodities": 2,
         "factionTech": [
             "threvenanty",
             "threvenantr"
@@ -454,8 +452,8 @@
         "alias": "thrones",
         "factionName": "The Thrones of Ruin",
         "homeSystem": "th11",
-        "startingFleet": "1 dn, 1 cv, 5 ff, 1 mf r, 2 inf r, 1 sd r",
-        "commodities": 3,
+        "startingFleet": "1 dn, 1 cv, 4 ff, 2 mf r, 1 inf r, 1 sd r",
+        "commodities": 2,
         "factionTech": [
             "ththronesr",
             "ththronesb"
@@ -581,9 +579,9 @@
     },
     {
         "alias": "vanguard",
-        "factionName": "The Iron Keep Vanguard",
+        "factionName": "The Iron Keep Vanguards",
         "homeSystem": "th14",
-        "startingFleet": "2 dn, 1 dd, 3 ff, 4 inf ironkeep, 1 sd ironkeep, 1 pds ironkeep",
+        "startingFleet": "1 dn, 1 cv, 1 dd, 3 ff, 2 inf ironkeep, 1 mf ironkeep, 1 sd ironkeep, 1 pds ironkeep",
         "commodities": 3,
         "factionTech": [
             "thvanguardr",
@@ -728,6 +726,7 @@
         ],
         "abilities": [
             "hydromorphic",
+            "fluid_transfer",
             "hydrospheric_extraction"
         ],
         "leaders": [

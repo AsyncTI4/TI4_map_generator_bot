@@ -16,12 +16,16 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.edict.EdictPhaseHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.arborec.ArborecButtonHandlers;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
@@ -39,6 +43,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanHeroHandler;
@@ -134,6 +139,16 @@ public class PlayHeroService {
         }
     }
 
+    private static boolean hasNoGheminaHeroTargets(Game game, Player player, Leader playerLeader) {
+        return switch (playerLeader.getId()) {
+            case "gheminaherolady" ->
+                ButtonHelperHeroes.getButtonsForGheminaLadyHero(player, game).isEmpty();
+            case "gheminaherolord" ->
+                ButtonHelperHeroes.getButtonsForGheminaLordHero(player, game).isEmpty();
+            default -> false;
+        };
+    }
+
     public static void playHero(GenericInteractionCreateEvent event, Game game, Player player, Leader playerLeader) {
         if ("morphahero".equals(playerLeader.getId())
                 && !"resolve".equals(player.getStoredValue("morphaHeroPending"))) {
@@ -159,6 +174,14 @@ public class PlayHeroService {
                                     .map(LeaderModel::getName)
                                     .orElse("Meteorime")
                             + "_ because fewer than 3 relics remain.");
+            return;
+        }
+
+        if (hasNoGheminaHeroTargets(game, player, playerLeader)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentation()
+                            + ", this Ghemina hero cannot be played because there are no valid planets adjacent to your flagship.");
             return;
         }
 
@@ -237,6 +260,7 @@ public class PlayHeroService {
         }
 
         switch (playerLeader.getId()) {
+            case "deephero" -> DeepLeadersHandler.resolveHero(event, game, player);
             case "stonebornherodormant" -> StonebornLeadersHandler.drawThreeRelicsAndOfferOne(game, player);
             case "stonebornherounleashed" -> {
                 MessageHelper.sendMessageToChannel(
@@ -312,6 +336,8 @@ public class PlayHeroService {
             }
             case "vyserixhero" -> VyserixLeaderHandler.offerHeroAttachmentButtons(event, game, player);
             case "xinhero" -> XinHeroHandler.startXinHero(game, player);
+            case "veylorhero" -> VeylorLeadersHandler.startVeylorHero(game, player);
+            case "xyrixhero" -> XyrixLeadersHandler.startHero(game, player);
             case "onyxxahero" -> OnyxxaLeaderHandler.postHeroMoveShipButtons(game, player);
             case "xanhero" -> XanHeroHandler.postInitialButtons(game, player);
             case "ashenhero" -> AshenLeadersHandler.postHeroButtons(event, game, player);
@@ -320,6 +346,8 @@ public class PlayHeroService {
             case "ironhero" -> IronLeadersHandler.startAdmiralThalenHero(game, player);
             case "netrunnershero" -> NetrunnersLeadersHandler.startNetrunnersHero(game, player);
             case "tahero" -> TaLeadersHandler.postHeroButtons(game, player, event);
+            case "migohero" -> MigoLeadersHandler.startMigoHero(event, game, player);
+            case "bloomhero" -> BloomLeadersHandler.startFungalBloom(event, game, player);
             case "tyrishero" ->
                 game.setStoredValue("tyrisHeroRound" + game.getRound() + "_" + player.getFaction(), "true");
             case "mirvedahero" -> {
@@ -757,7 +785,7 @@ public class PlayHeroService {
             }
             case "naazhero" -> {
                 RelicHelper.drawRelicAndNotify(player, event, game);
-                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
+                List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, showFlavourText)

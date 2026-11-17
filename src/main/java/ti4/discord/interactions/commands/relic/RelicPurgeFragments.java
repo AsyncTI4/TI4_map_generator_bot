@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
@@ -35,10 +36,9 @@ class RelicPurgeFragments extends GameStateSubcommand {
                         .setAutoComplete(true)
                         .setRequired(true),
                 new OptionData(
-                                OptionType.INTEGER,
-                                Constants.COUNT,
-                                "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery).")
-                        .setRequiredRange(1, 20),
+                        OptionType.INTEGER,
+                        Constants.COUNT,
+                        "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."),
                 new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"),
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
@@ -190,6 +190,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
             message.append(" relic fragments.");
         }
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
+        BeansRelicHandler.offerOuroborosFragments(game, activePlayer, fragmentsToPurge);
         StonebornAbilityHandler.offerFragmentumTokenPlacement(game, activePlayer, event, fragmentsToPurge);
         StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, activePlayer);
         MessageHelper.sendMessageToEventChannel(event, message.toString());

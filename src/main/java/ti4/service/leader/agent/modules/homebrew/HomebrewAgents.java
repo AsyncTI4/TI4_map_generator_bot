@@ -5,8 +5,12 @@ import java.util.stream.Stream;
 import ti4.service.leader.agent.AgentCatalog;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.modules.homebrew.beans.AshenAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.BloomAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.ChoirAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.DeepAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.DreamAgent;
+import ti4.service.leader.agent.modules.homebrew.beans.MigoAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NatauAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.NetrunnersAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.ValhavnAgent;
@@ -16,6 +20,7 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
@@ -99,6 +104,8 @@ public final class HomebrewAgents implements AgentCatalog {
                             new AtokeraAgent(),
                             new EdynBrAgent(),
                             new CrystellumAgent(),
+                            new ChoirAgent(),
+                            new DeepAgent(),
                             new ThronesAgent(),
                             new PonthousAgent(),
                             new ScrapyardAgent(),
@@ -106,8 +113,11 @@ public final class HomebrewAgents implements AgentCatalog {
                             new GolgiAgent(),
                             new HopeOfTheCosmosAgent(),
                             new AshenAgent(),
+                            new BloomAgent(),
+                            new MigoAgent(),
                             new NetrunnersAgent(),
                             new ValhavnAgent(),
+                            new XyrixAgent(),
                             new EdynAgent(),
                             new LanefirAgent(),
                             new VerydithAgent(),

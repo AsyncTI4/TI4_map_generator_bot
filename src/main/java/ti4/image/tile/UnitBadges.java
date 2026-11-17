@@ -68,11 +68,10 @@ final class UnitBadges {
     }
 
     static void drawBulkCount(Graphics2D g, UnitKey unitKey, int count, ImagePosition imagePos) {
-        boolean blackText =
-                switch (Mapper.getColor(unitKey.colorID()).getTextColor()) {
-                    case "black" -> true;
-                    default -> false;
-                };
+        boolean blackText = switch (Mapper.getColor(unitKey.colorID()).getTextColor()) {
+            case "black" -> true;
+            default -> false;
+        };
         Color color = blackText ? Color.BLACK : Color.WHITE;
         Color outline = blackText ? Color.WHITE : Color.BLACK;
         g.setFont(count > 9 ? Fonts.ti(28) : Fonts.ti(24));

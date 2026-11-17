@@ -353,31 +353,28 @@ public class TechRules {
                 .filter(prompt -> !prompt.isHidden())
                 .toList();
         Game game = context.game();
-        Optional<Match> next =
-                switch (state) {
-                    case "" -> Prompts.unowned(turn, PARASITE_START::equals);
-                    case PARASITE_VICTIM ->
-                        bestButton(
-                                turn,
-                                button -> button.isOwnedBy(context.faction())
-                                        && button.handlerId().startsWith(PARASITE_VICTIM_PREFIX),
-                                button -> leaderScore(
-                                        game, StringUtils.removeStart(button.handlerId(), PARASITE_VICTIM_PREFIX)));
-                    case PARASITE_UNIT ->
-                        bestButton(
-                                turn,
-                                button ->
-                                        button.isUnowned() && button.handlerId().startsWith(PARASITE_RESOLVE_PREFIX),
-                                TechRules::parasiteTargetScore);
-                    default -> Optional.empty();
-                };
+        Optional<Match> next = switch (state) {
+            case "" -> Prompts.unowned(turn, PARASITE_START::equals);
+            case PARASITE_VICTIM ->
+                bestButton(
+                        turn,
+                        button -> button.isOwnedBy(context.faction())
+                                && button.handlerId().startsWith(PARASITE_VICTIM_PREFIX),
+                        button ->
+                                leaderScore(game, StringUtils.removeStart(button.handlerId(), PARASITE_VICTIM_PREFIX)));
+            case PARASITE_UNIT ->
+                bestButton(
+                        turn,
+                        button -> button.isUnowned() && button.handlerId().startsWith(PARASITE_RESOLVE_PREFIX),
+                        TechRules::parasiteTargetScore);
+            default -> Optional.empty();
+        };
         if (next.isEmpty()) return Optional.empty();
-        String following =
-                switch (state) {
-                    case "" -> PARASITE_VICTIM;
-                    case PARASITE_VICTIM -> PARASITE_UNIT;
-                    default -> PARASITE_DONE;
-                };
+        String following = switch (state) {
+            case "" -> PARASITE_VICTIM;
+            case PARASITE_VICTIM -> PARASITE_UNIT;
+            default -> PARASITE_DONE;
+        };
         context.memory().put(key, following);
         return Optional.of(next.get().press("destroy an enemy infantry with Neural Parasite"));
     }

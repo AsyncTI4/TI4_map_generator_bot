@@ -28,7 +28,7 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
                 .map(player -> {
                     int rank = calculatePlayerRank(player.isWinner(), game.getVictoryPointGoal(), player.getScore());
                     return new MatchmakingPlayer(
-                            player.getUser().getId(), player.getUser().getName(), rank);
+                            player.getStatsUser().getId(), player.getStatsUser().getName(), rank);
                 })
                 .toList();
         long endedDate = game.getEndedEpochMilliseconds();

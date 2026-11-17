@@ -301,16 +301,14 @@ final class AgendaTrace {
             if (parts.length < 4) continue;
             String from = StringUtils.removeStart(parts[0], "sending");
             String to = StringUtils.removeStart(parts[1], "receiving");
-            String what =
-                    switch (parts[2]) {
-                        case "TGs" -> parts[3] + " TG";
-                        case "Comms" -> parts[3] + " comm";
-                        case "ACs" -> parts[3].startsWith("generic") ? parts[3].substring(7) + " AC" : "AC#" + parts[3];
-                        case "PNs" -> "PN " + parts[3];
-                        case "details" ->
-                            "note \"" + StringUtils.abbreviate(parts[3].replace("fin777", " "), 120) + "\"";
-                        default -> parts[2] + " " + parts[3];
-                    };
+            String what = switch (parts[2]) {
+                case "TGs" -> parts[3] + " TG";
+                case "Comms" -> parts[3] + " comm";
+                case "ACs" -> parts[3].startsWith("generic") ? parts[3].substring(7) + " AC" : "AC#" + parts[3];
+                case "PNs" -> "PN " + parts[3];
+                case "details" -> "note \"" + StringUtils.abbreviate(parts[3].replace("fin777", " "), 120) + "\"";
+                default -> parts[2] + " " + parts[3];
+            };
             bySide.computeIfAbsent(from + " gives " + to, key -> new ArrayList<>())
                     .add(what);
         }

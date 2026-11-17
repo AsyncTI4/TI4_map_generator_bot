@@ -227,14 +227,12 @@ class PromiseDeals {
     }
 
     static String billText(Game game, Player payer, Player payee, Promise promise) {
-        String reason =
-                switch (promise.term()) {
-                    case DISCARD_AGENDA -> "for discarding the agenda with " + promise.target();
-                    case NOT_AGAINST ->
-                        "for not voting against **" + outcomeName(game, promise.target()) + "**, which won";
-                    case NOT_FOR -> "for not voting for **" + outcomeName(game, promise.target()) + "**, which lost";
-                    default -> "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
-                };
+        String reason = switch (promise.term()) {
+            case DISCARD_AGENDA -> "for discarding the agenda with " + promise.target();
+            case NOT_AGAINST -> "for not voting against **" + outcomeName(game, promise.target()) + "**, which won";
+            case NOT_FOR -> "for not voting for **" + outcomeName(game, promise.target()) + "**, which lost";
+            default -> "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
+        };
         return payer.getRepresentationUnfogged() + " owes " + payee.getFactionEmojiOrColor() + " "
                 + PromisePayment.of(game, promise).describe() + " " + reason + ".";
     }

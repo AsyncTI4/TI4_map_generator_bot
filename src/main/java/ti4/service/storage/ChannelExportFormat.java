@@ -20,4 +20,11 @@ public enum ChannelExportFormat {
                 .findFirst()
                 .orElse(JSON);
     }
+
+    public static ChannelExportFormat fromExporterName(@Nullable String exporterName) {
+        return Arrays.stream(values())
+                .filter(format -> format.exporterName.equalsIgnoreCase(exporterName))
+                .findFirst()
+                .orElse(JSON);
+    }
 }

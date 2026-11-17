@@ -274,6 +274,9 @@ public class AgentLifecycle {
         if (message.route() == Message.Route.CARDS_INFO_THREAD) {
             return recipient.getCardsInfoThread();
         }
+        if (message.route() == Message.Route.CORRECT_CHANNEL) {
+            return recipient.getCorrectChannel();
+        }
         if (message.route() == Message.Route.EVERYONE && pressedInPrivateThread(pressedButton)) {
             return recipient.getCorrectChannel();
         }

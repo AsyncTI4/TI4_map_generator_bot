@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -40,6 +41,7 @@ class RelicDrawSpecific extends GameStateSubcommand {
         allRelics.remove(relicID);
         Player player = getPlayer();
         player.addRelic(relicID);
+        BeansRelicHandler.onRelicGained(game, player, relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
         String message = player.getFactionEmoji() + " drew _" + relicModel.getName() + "_ from the relic deck";
         if (forced) {

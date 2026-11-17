@@ -1,0 +1,12 @@
+[
+    {
+        "alias": "relics_megagame",
+        "name": "Megagame relics",
+        "type": "relic",
+        "description": "Relics ruled for megagames",
+        "cardIDs": [
+            "megagame_voiceofarvid"
+        ],
+        "source": "other"
+    }
+]

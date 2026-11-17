@@ -12,6 +12,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.Dr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.oblivion.OblivionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithBreakthroughHandler;
@@ -63,6 +64,7 @@ public class TeHelperBreakthroughs {
             case "ardentiabt" -> ArdentiaBreakthroughHandler.startSubjugate(event, game, player);
             case "verydithbt" -> VerydithBreakthroughHandler.verydithBTExhaust(event, game, player);
             case "scrapyardbt" -> ScrapyardBreakthroughHandler.resolveCompactorAction(event, game, player);
+            case "oblivionbt" -> OblivionBreakthroughHandler.startCosmicManifestations(event, game, player);
             case "stonebornbt", "stonebornbtunleashed" ->
                 StonebornBreakthroughHandler.startRefragment(event, game, player, breakthroughID);
             default -> {

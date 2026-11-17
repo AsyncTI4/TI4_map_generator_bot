@@ -16,6 +16,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyIds;
@@ -46,7 +47,7 @@ public class VoidTetherService {
     public boolean meetsCriteria(Game game, Player player, Tile activeSystem) {
         if (!player.hasUnlockedBreakthrough("empyreanbt")) return false;
 
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true);
+        Set<String> adjTiles = Adjacency.of(game, player).withSelf().into(activeSystem.getPosition());
         for (String pos : adjTiles) {
             Tile t = game.getTileByPosition(pos);
             if (FoWHelper.playerHasUnitsInSystem(player, t)) {
@@ -204,6 +205,133 @@ public class VoidTetherService {
                     tetherRep(),
                     getVoidTetherBetweenText(game, player, position, direction));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            BorderAnomalyHolder placed = findTether(game, position, direction);
+            if (placed == null || !placed.isEnforced(game)) {
+                ButtonHelper.deleteMessage(event);
+                return;
+            }
+            List<Button> buttons = List.of(
+                    Buttons.gray(
+                            player.factionButtonChecker() + "voidTetherAccess_" + position + "_" + direction,
+                            "Allow Players Through"),
+                    Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    "Other players treat those systems as not adjacent unless you allow them through.",
+                    buttons);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    private List<Button> getAccessButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (BorderAnomalyHolder border : getTethersOnMap(game)) {
+            if (!border.isEnforced(game)) continue;
+            String id = player.factionButtonChecker() + "voidTetherAccess_" + border.getTile() + "_"
+                    + border.getDirection();
+            buttons.add(
+                    Buttons.gray(id, "Access " + border.getTile() + " (" + directionStr(border.getDirection()) + ")"));
+        }
+        return buttons;
+    }
+
+    public boolean hasEnforcedTether(Game game) {
+        return getTethersOnMap(game).stream().anyMatch(border -> border.isEnforced(game));
+    }
+
+    @ButtonHandler("voidTetherAccessMenu")
+    private void voidTetherAccessMenu(ButtonInteractionEvent event, Game game, Player player) {
+        List<Button> buttons = getAccessButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "You have no enforced Void Tether tokens on the map.");
+            return;
+        }
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Choose a " + tetherRep() + " token to open or close.", buttons);
+    }
+
+    private BorderAnomalyHolder findTether(Game game, String position, int direction) {
+        return getTethersOnMap(game).stream()
+                .filter(border -> position.equals(border.getTile()) && border.getDirection() == direction)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void postAccessButtons(Game game, Player player, BorderAnomalyHolder tether) throws Exception {
+        String suffix = tether.getTile() + "_" + tether.getDirection() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (Player other : game.getRealPlayersExcludingThis(player)) {
+            String label = other.getFactionNameOrColor();
+            if (tether.isAllowed(other.getColor())) {
+                buttons.add(Buttons.red(
+                        player.factionButtonChecker() + "voidTetherRevoke_" + suffix + other.getColor(),
+                        "Revoke " + label));
+            } else {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + "voidTetherAllow_" + suffix + other.getColor(),
+                        "Allow " + label));
+            }
+        }
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        String message = "Choose who may treat "
+                + getVoidTetherBetweenText(game, player, tether.getTile(), tether.getDirection())
+                + " as adjacent. Allowances end when this " + tetherRep() + " token is moved or removed.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    @ButtonHandler("voidTetherAccess_")
+    private void voidTetherAccess(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "voidTetherAccess_" + RegexHelper.posRegex(game, "pos") + "_" + RegexHelper.intRegex("dir");
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            BorderAnomalyHolder tether = findTether(game, matcher.group("pos"), Integer.parseInt(matcher.group("dir")));
+            if (tether == null) {
+                MessageHelper.sendEphemeralMessageToEventChannel(event, "That Void Tether token is no longer there.");
+                return;
+            }
+            postAccessButtons(game, player, tether);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    @ButtonHandler("voidTetherAllow_")
+    private void voidTetherAllow(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        changeAccess(event, game, player, buttonID, "voidTetherAllow_", true);
+    }
+
+    @ButtonHandler("voidTetherRevoke_")
+    private void voidTetherRevoke(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        changeAccess(event, game, player, buttonID, "voidTetherRevoke_", false);
+    }
+
+    private void changeAccess(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID, String prefix, boolean allow) {
+        String regex = prefix + RegexHelper.posRegex(game, "pos") + "_" + RegexHelper.intRegex("dir") + "_"
+                + RegexHelper.colorRegex(game, "color");
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            BorderAnomalyHolder tether = findTether(game, matcher.group("pos"), Integer.parseInt(matcher.group("dir")));
+            Player other = game.getPlayerFromColorOrFaction(matcher.group("color"));
+            if (tether == null || other == null) {
+                MessageHelper.sendEphemeralMessageToEventChannel(event, "That Void Tether token is no longer there.");
+                return;
+            }
+            if (allow) {
+                tether.allow(other.getColor());
+            } else {
+                tether.revoke(other.getColor());
+            }
+            String verb = allow ? "allowed" : "no longer allows";
+            String between = getVoidTetherBetweenText(game, player, tether.getTile(), tether.getDirection());
+            String otherName = game.isFowMode() ? other.getFactionNameOrColor() : other.getRepresentation();
+            String holderMessage = player.getRepresentationNoPing() + " " + verb + " " + otherName + " through the "
+                    + tetherRep() + " between " + between + ".";
+            String otherMessage = other.getRepresentation() + ", "
+                    + FoWHelper.identityOrColorIfCanSeeStats(game, player, other, player.getRepresentationNoPing())
+                    + " " + verb + " you through the " + tetherRep() + " between "
+                    + getVoidTetherBetweenText(game, other, tether.getTile(), tether.getDirection()) + ".";
+            FoWHelper.notifyPlayerAndAffectedInFog(game, player, holderMessage, other, otherMessage);
+            postAccessButtons(game, player, tether);
             ButtonHelper.deleteMessage(event);
         });
     }

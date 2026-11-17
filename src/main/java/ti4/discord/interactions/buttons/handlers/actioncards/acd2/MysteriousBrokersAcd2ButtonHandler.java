@@ -79,7 +79,7 @@ class MysteriousBrokersAcd2ButtonHandler {
     }
 
     private static int neighborsNotPassed(Player player) {
-        return (int) player.getNeighbouringPlayers(true).stream()
+        return (int) player.getAbilityNeighbours().stream()
                 .filter(p2 -> !p2.isPassed())
                 .count();
     }

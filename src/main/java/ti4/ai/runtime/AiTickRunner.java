@@ -275,16 +275,15 @@ class AiTickRunner {
 
     private static void debugLog(SeatTick tick, AiDecision decision) {
         if (!AiDebugLog.isOn(tick.game())) return;
-        String text =
-                switch (decision) {
-                    case AiDecision.Press press -> describe(press) + " on \"" + promptText(press.prompt()) + "\"";
-                    case AiDecision.Unsure unsure -> describe(unsure) + " on \"" + promptText(unsure.prompt()) + "\"";
-                    case AiDecision.Wait wait -> "wait (" + wait.reason() + ")";
-                    case AiDecision.Announce announce -> "announce \"" + announce.text() + "\"";
-                    case AiDecision.Propose ignored -> "propose a deal";
-                    case AiDecision.Post post -> "post \"" + post.text() + "\"";
-                    case AiDecision.Idle ignored -> null;
-                };
+        String text = switch (decision) {
+            case AiDecision.Press press -> describe(press) + " on \"" + promptText(press.prompt()) + "\"";
+            case AiDecision.Unsure unsure -> describe(unsure) + " on \"" + promptText(unsure.prompt()) + "\"";
+            case AiDecision.Wait wait -> "wait (" + wait.reason() + ")";
+            case AiDecision.Announce announce -> "announce \"" + announce.text() + "\"";
+            case AiDecision.Propose ignored -> "propose a deal";
+            case AiDecision.Post post -> "post \"" + post.text() + "\"";
+            case AiDecision.Idle ignored -> null;
+        };
         if (text != null) AiDebugLog.log(tick.game(), tick.seat(), text);
     }
 

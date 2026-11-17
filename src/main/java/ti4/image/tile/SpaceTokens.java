@@ -30,6 +30,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
+import ti4.model.TokenModel;
 import ti4.model.WormholeModel.Wormhole;
 
 final class SpaceTokens {
@@ -69,23 +70,30 @@ final class SpaceTokens {
         int index = 0;
         for (String tokenID : drawOrder.tokens()) {
             WormholeTokenMerge.Merged merged = drawOrder.merged().get(tokenID);
-            String tokenPath = merged != null ? tokenID : ImageResources.tokenOrAttachment(tokenID);
+            TokenModel oneWayToken = Mapper.getOneWayWormholeToken(tokenID);
+            String tokenPath =
+                    merged != null || oneWayToken != null ? tokenID : ImageResources.tokenOrAttachment(tokenID);
+            if (tokenPath == null) {
+                BotLogger.warning(new LogOrigin(game), "Could not parse token file for: " + tokenID);
+                continue;
+            }
             if (game.isLiberationC4Mode()) {
                 tokenPath = tokenPath.replace("token_creuss", "token_crimsoncreuss");
                 tokenPath = tokenPath.replace("token_crimsoncreussepsilon", "token_creussepsilon");
             }
             String tokenName = Mapper.getTokenKey(tokenID);
-
-            if (tokenPath == null) {
-                BotLogger.warning(new LogOrigin(game), "Could not parse token file for: " + tokenID);
-                continue;
-            }
             if (game.isCptiExploreMode() && tokenPath.toLowerCase().contains("token_frontier")) {
                 tokenPath = tokenPath.replace("token_frontier", "token_frontier_cpti");
             }
 
-            BufferedImage tokenImage = merged != null ? merged.image() : ImageHelper.read(tokenPath);
-            if (tokenImage == null) return;
+            BufferedImage tokenImage = merged != null
+                    ? merged.image()
+                    : oneWayToken != null ? OneWayWormholeIcon.image(oneWayToken) : ImageHelper.read(tokenPath);
+            if (tokenImage == null) continue;
+            TokenModel tokenModel = Mapper.getToken(tokenID);
+            if (Constants.TOKEN_PLANETS.contains(tokenName) && tokenModel != null && tokenModel.getScale() != null) {
+                tokenImage = ImageHelper.scale(tokenImage, tokenModel.getScale().floatValue());
+            }
 
             if (Constants.TOKEN_PLANETS.contains(tokenName)) {
                 Point tokenCenter = TokenPlanetPlacement.getTokenPlanetCenterOfImage(tile, tokenName);

@@ -43,6 +43,7 @@ public class DraftSpec {
     public DraftSpec(Game game) {
         this.game = game;
         playerIDs = new ArrayList<>(game.getPlayerIDs());
+        playerIDs.remove("572698679618568193"); // Dicecord
         bannedFactions = new ArrayList<>();
         priorityFactions = new ArrayList<>();
 
@@ -55,6 +56,12 @@ public class DraftSpec {
         tileSources.add(Source.ComponentSource.codex3);
         tileSources.add(Source.ComponentSource.codex4);
         factionSources = new ArrayList<>(tileSources);
+        String oldFactions = game.getStoredValue("oldFactions");
+        for (String faction : oldFactions.split("_")) {
+            if (faction != null && !faction.isEmpty()) {
+                bannedFactions.add(oldFactions);
+            }
+        }
     }
 
     public static DraftSpec createFromMiltySettings(MiltySettings settings) {

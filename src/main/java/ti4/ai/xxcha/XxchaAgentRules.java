@@ -130,13 +130,12 @@ public class XxchaAgentRules {
         List<AiPrompt> fresh = Prompts.newestFirst(context.prompts()).stream()
                 .filter(prompt -> prompt.createdAtMillis() >= flow.get().since() - CLOCK_SKEW_MILLIS)
                 .toList();
-        Optional<AiDecision> step =
-                switch (flow.get().stage()) {
-                    case MENU -> openAgent(context, fresh, flow.get());
-                    case LEADER -> chooseUser(context, fresh, flow.get());
-                    case USER -> chooseExhaustedPlanet(context, fresh, flow.get());
-                    case DONE -> Optional.empty();
-                };
+        Optional<AiDecision> step = switch (flow.get().stage()) {
+            case MENU -> openAgent(context, fresh, flow.get());
+            case LEADER -> chooseUser(context, fresh, flow.get());
+            case USER -> chooseExhaustedPlanet(context, fresh, flow.get());
+            case DONE -> Optional.empty();
+        };
         if (step.isPresent()) return step;
         long until = flow.get().since() + STEP_WAIT_MILLIS;
         if (context.now() < until) return Optional.of(new AiDecision.Wait(until, "Ggrocuto Rinn"));

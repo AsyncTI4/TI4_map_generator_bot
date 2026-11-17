@@ -6,9 +6,9 @@
         "faction": "diaspora",
         "synergy": [
             "BIOTIC",
-            "CYBERNETIC"
+            "WARFARE"
         ],
-        "text": "After 1 or more units uses its PRODUCTION ability, you may return 3 captured infantry on that planet to ready that planet.",
+        "text": "When you gain this card, you may research 1 unit upgrade technology with a green prerequisite, if able.\nWhen a technology would place 1 or more ground forces, you may place that unit on any planet you control.",
         "source": "gamma"
     },
     {
@@ -128,7 +128,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
-        "text": "If you have the Space Dock II technology, flip this card and place it on top of Space Dock II.\nForgeworld [Combat 6; PRODUCTION X, PLANETARY SHIELD, SUSTAIN DAMAGE] This unit is treated as both a structure and a ground force.This unit's PRODUCTION value is equal to 6 more than the resource or influence value of this planet.Up to 6 fighters in this system do not count against your ships' capacity.",
+        "text": "If you have the Space Dock II technology, flip this card and place it on top of Space Dock II.\nTerrafoundry [Combat 6; PRODUCTION X, PLANETARY SHIELD, SUSTAIN DAMAGE] This unit is treated as both a structure and a ground force.This unit's PRODUCTION value is equal to 6 more than the resource or influence value of this planet.Up to 6 fighters in this system do not count against your ships' capacity.",
         "source": "gamma"
     },
     {

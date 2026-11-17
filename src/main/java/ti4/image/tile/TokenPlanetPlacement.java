@@ -175,6 +175,9 @@ final class TokenPlanetPlacement {
 
         String tokenPath = token == null ? Mapper.getTokenID(tokenID) : token.getImagePath();
         BufferedImage tokenImage = ImageHelper.read(tokenPath == null ? null : ImageResources.attachment(tokenPath));
+        if (tokenImage != null && token != null && token.getScale() != null) {
+            tokenImage = ImageHelper.scale(tokenImage, token.getScale().floatValue());
+        }
         Integer imageX = null;
         Integer imageY = null;
         if (tokenImage != null) {

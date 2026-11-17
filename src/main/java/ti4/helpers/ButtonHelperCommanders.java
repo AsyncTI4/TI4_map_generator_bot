@@ -27,6 +27,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -36,6 +37,7 @@ import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.agenda.LookAgendaService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -686,6 +688,12 @@ public class ButtonHelperCommanders {
 
     public static void resolveMuaatCommanderCheck(
             Player player, Game game, GenericInteractionCreateEvent event, String reason) {
+
+        if (reason != null
+                && reason.contains("followed")
+                && IsPlayerElectedService.isPlayerElected(game, player, "tk-endorse")) {
+            return;
+        }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander") || player.hasTech("tf-stellargenesis")) {
             switch (ButtonHelperAbilities.resolveOptionalTgGainMode(player, game)) {
                 case FOW_OPT_IN -> {
@@ -1081,7 +1089,8 @@ public class ButtonHelperCommanders {
             String planetId = planetReal.getName();
             String planetName = Helper.getPlanetName(planetId);
 
-            for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true, true)) {
+            for (String pos2 :
+                    Adjacency.of(game, player).forMovement().withSelf().into(tile.getPosition())) {
                 Tile tile2 = game.getTileByPosition(pos2);
                 if (CommandCounterHelper.hasCC(event, player.getColor(), tile2)
                         && !game.isDominusOrb()

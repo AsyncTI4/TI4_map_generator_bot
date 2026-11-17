@@ -1,23 +1,24 @@
 [
     {
         "alias": "diaspora",
-        "factionName": "Diaspora Arborec",
+        "factionName": "The Dirzuga Diaspora",
         "homeSystem": "05",
-        "startingFleet": "3 cr, 2 inf n, 1 mech n, 2 pds n",
+        "startingFleet": "1 cr, 1 cv, 1 dd , 1 mech n, 1 pds n, 1 sd n, 2 fighters",
         "commodities": 3,
         "factionTech": [
             "ggdiag",
             "ggdiacr"
         ],
         "startingTech": [
-            "dxa"
+            "dxa",
+            "sar"
         ],
         "homePlanets": [
             "nestphar"
         ],
         "abilities": [
-            "fruiting_bodies",
-            "megaflora",
+            "cortage",
+            "blighted",
             "dizurga_emissaries"
         ],
         "leaders": [

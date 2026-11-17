@@ -51,7 +51,13 @@ public final class KjalengardAgent extends UntargetedAgent {
             return AgentOutcome.of(gloryMove);
         }
         int oldCommodities = activePlayer.getCommodities();
-        ButtonHelperStats.gainComms(use.event(), game, activePlayer, activePlayer.getNeighbourCount(), false, true);
+        ButtonHelperStats.gainComms(
+                use.event(),
+                game,
+                activePlayer,
+                activePlayer.getAbilityNeighbours().size(),
+                false,
+                true);
         return AgentOutcome.of(
                 Message.plain(
                         activePlayer,

@@ -105,17 +105,17 @@ class LogOriginTest {
         }
 
         @Override
-        public String getChannelName() {
+        String getChannelName() {
             return "channelName";
         }
 
         @Override
-        public String getThreadName() {
+        String getThreadName() {
             return "threadName";
         }
 
         @Override
-        public String getMessagePrefix() {
+        String getMessagePrefix() {
             return "messagePrefix";
         }
     }

@@ -27,6 +27,7 @@ import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentUse;
+import ti4.service.megagame.MegagameGroupService;
 
 public final class MahactAgent extends AgentModule<Integer> {
 
@@ -129,8 +130,9 @@ public final class MahactAgent extends AgentModule<Integer> {
             return;
         }
         Player constructionPlayer = player;
+        int construction = MegagameGroupService.groupCardFor(game, player, CONSTRUCTION);
         for (Player p2 : game.getRealPlayers()) {
-            if (p2.getSCs().contains(CONSTRUCTION)) {
+            if (p2.getSCs().contains(construction)) {
                 constructionPlayer = p2;
             }
         }

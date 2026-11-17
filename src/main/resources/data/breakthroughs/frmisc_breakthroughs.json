@@ -1,0 +1,14 @@
+[
+    {
+        "alias": "xyrixbt",
+        "name": "Virtual Vampirism",
+        "shortName": "Virtual\nVampirism",
+        "faction": "xyrix",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "When you perform the secondary ability of another player's strategy card, draw one action card then purge one action card from your hand.\n\nWhen you resolve a strategic action, you may exhaust this card to add one purged action card to your hand.",
+        "source": "frmisc"
+    }
+]

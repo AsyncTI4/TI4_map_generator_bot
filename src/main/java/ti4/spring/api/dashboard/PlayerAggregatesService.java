@@ -20,12 +20,12 @@ import org.springframework.stereotype.Service;
 import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
-import ti4.service.persistence.DatabasePersistenceGate;
 import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor

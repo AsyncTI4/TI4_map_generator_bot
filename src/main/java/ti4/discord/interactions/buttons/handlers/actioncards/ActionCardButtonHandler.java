@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.EscapeClauseActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -93,7 +94,8 @@ class ActionCardButtonHandler {
             return;
         }
 
-        if ("ac".equalsIgnoreCase(type) && SabotageService.wasWindowCanceled(game, event.getMessageId())) {
+        if (("ac".equalsIgnoreCase(type) || "netrunners".equalsIgnoreCase(type))
+                && SabotageService.wasWindowCanceled(game, event.getMessageId())) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", _" + acName
@@ -175,10 +177,24 @@ class ActionCardButtonHandler {
                         player.getRepresentation()
                                 + ", you clicked the _Sabotage_ action card button but did not have one in hand.");
             }
+        } else if ("netrunners".equalsIgnoreCase(type)) {
+            if (targetPlayer == null
+                    || !BeansMonumentHandler.resolveNetrunnersMonumentCancellation(game, player, targetPlayer)) {
+                sendReact = false;
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationNoPing() + ", _Ghost Protocol_ can no longer cancel that action card.");
+            } else {
+                message += "_Ghost Protocol_! The relevant control token was returned from the Hacker Man pool.";
+                ButtonHelper.deleteMessage(event);
+            }
         }
 
         if (sendReact) {
             recordCanceled(game, player, targetPlayer, acName, type);
+            if (targetPlayer != null) {
+                ActionCardPingButtonHandler.forgetPingedPlanet(game, targetPlayer);
+            }
             if (game.getGameStats().markLatestPlayCanceled(acName)) {
                 SabotageService.undoEffectsOfCanceledCard(game, targetPlayer, acName);
                 if (acName.contains("Rider") || acName.contains("Sanction")) {

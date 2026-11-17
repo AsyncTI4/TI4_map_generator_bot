@@ -96,6 +96,13 @@ class GameUndoService {
                 BotLogger.error(new LogOrigin(gameToUndo), "Game file for " + gameName + " doesn't exist!");
                 return null;
             }
+            if (!undoFilesExist(gameName, undoIndex, latestUndoIndex)) {
+                BotLogger.warning(
+                        new LogOrigin(gameToUndo),
+                        "Cannot undo " + gameName + " to save " + undoIndex + ", latest save is " + latestUndoIndex
+                                + ": a required undo file is missing.");
+                return null;
+            }
             Game savedButtonsGame = null;
             if (undoIndex != latestUndoIndex - 1) {
                 replaceGameFileWithUndo(gameName, undoIndex + 1, currentGameFile.toPath());
@@ -123,6 +130,15 @@ class GameUndoService {
             BotLogger.error(new LogOrigin(gameToUndo), "Error trying to undo: " + gameName, e);
             return null;
         }
+    }
+
+    private static boolean undoFilesExist(String gameName, int undoIndex, int latestUndoIndex) {
+        if (!undoFileExists(gameName, undoIndex)) return false;
+        return undoIndex == latestUndoIndex - 1 || undoFileExists(gameName, undoIndex + 1);
+    }
+
+    private static boolean undoFileExists(String gameName, int undoIndex) {
+        return Files.exists(Storage.getGameUndo(gameName, getUndoFileName(gameName, undoIndex)));
     }
 
     private static void sendAnyChangedCardsInfo(Game game, Game loadedGame) {

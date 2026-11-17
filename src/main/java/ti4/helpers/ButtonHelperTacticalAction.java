@@ -20,11 +20,17 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.Retrofitti
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TacticalRetreatLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaUnitHandler;
@@ -35,6 +41,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -76,6 +83,7 @@ import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonH
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -128,6 +136,8 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantVerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ScrapyardAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
+import ti4.service.map.RefractureRulesService;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.relic.AlluringThroneService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.tactical.movement.RealityFieldImpactorService;
@@ -177,6 +187,11 @@ public final class ButtonHelperTacticalAction {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you may exhaust _Petra Unleashed_ to explore 1 planet you control.",
                     buttons);
+        }
+        Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        BeansMonumentHandler.offerMigoMonumentExplore(game, player);
+        if (DeepUnitHandler.hasArbiterInSystem(player, activeTile)) {
+            ButtonHelper.resolveFullFrontierExplore(game, player, activeTile, event);
         }
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             if (player.hasUnit("lunarium_carrier2")) {
@@ -382,11 +397,13 @@ public final class ButtonHelperTacticalAction {
         game.setStoredValue(TACTICAL_ACTION_LOGGED, "yes");
         SarcosaHeroHandler.completeNeutralTacticalAction(game, player);
         BlueReverieArtifactRelicHandler.clearUnknownArtifactMoveRestriction(game);
+        DeepBreakthroughHandler.clearEventHorizon(game, player);
     }
 
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         endOfTacticalActionThings(player, game, event);
+        XyrixTechHandler.clearCrepuscularCopy(game);
 
         if (SarcosaHeroHandler.consumeNeutralTacticalActionContinuation(game, player)) {
             ButtonHelper.deleteMessage(event);
@@ -421,6 +438,10 @@ public final class ButtonHelperTacticalAction {
         String message3 = "You have "
                 + Helper.getProductionValue(player, game, game.getTileByPosition(pos), false)
                 + " PRODUCTION value in this system.\n";
+        String fleetSummary = ButtonHelper.fleetAndCapacitySummary(player, game, game.getTileByPosition(pos));
+        if (!fleetSummary.isEmpty()) {
+            message3 += fleetSummary + "\n";
+        }
         if (player.hasUnit("myrr_dreadnought") || player.hasUnit("myrr_dreadnought2")) {
             message3 += MyrrUnitsHandler.getReplicatorProductionReminder(player, game.getTileByPosition(pos));
         }
@@ -572,7 +593,8 @@ public final class ButtonHelperTacticalAction {
                     "vyserix",
                     "myrr",
                     "oblivion",
-                    "thrones");
+                    "thrones",
+                    "deep");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
@@ -626,6 +648,7 @@ public final class ButtonHelperTacticalAction {
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
             MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
             MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
+            BeansMonumentHandler.checkSpaceMonumentBlockades(game, event);
         }
     }
 
@@ -643,6 +666,10 @@ public final class ButtonHelperTacticalAction {
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
             for (Player playerWithPds : playersWithPds2) {
+                if (playerWithPds.isDummy() || playerWithPds.isNpc()) {
+                    offerDummySpaceCannonOffence(player, playerWithPds, tile, title);
+                    continue;
+                }
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
@@ -655,6 +682,19 @@ public final class ButtonHelperTacticalAction {
         } else {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
         }
+    }
+
+    private static void offerDummySpaceCannonOffence(Player activePlayer, Player dummy, Tile tile, String title) {
+        String rollId = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        List<Button> buttons = List.of(
+                StartCombatService.rollForDummyButton(dummy, rollId, "Roll SPACE CANNON Offence"),
+                Buttons.DECLINE_DELETE_BUTTONS);
+        String owner = dummy.isNeutral() ? "The neutral units have" : "A dummy player has";
+        MessageHelper.sendMessageToChannelWithButtons(
+                activePlayer.getCorrectChannel(),
+                title + owner + " SPACE CANNON coverage in " + tile.getRepresentation() + " (" + tile.getPosition()
+                        + "). Use the button to roll for them:",
+                buttons);
     }
 
     @ButtonHandler("useSafeHarbor")
@@ -710,6 +750,7 @@ public final class ButtonHelperTacticalAction {
 
     public static void resetStoredValuesForTacticalAction(Game game) {
         ValhavnAbilityHandler.clearBloodlustActionUse(game);
+        MigoTechHandler.clearLaghMetalAttractorsMovementBonus(game);
         VanguardUnitHandler.clearBulwarkSustain(game);
         VanguardBreakthroughHandler.clearTrainingDummiesState(game);
         game.setNaaluAgent(false);
@@ -770,6 +811,8 @@ public final class ButtonHelperTacticalAction {
         MorphaUnitHandler.clearCytoplasmicTransports(game);
         MorphaAbilityHandler.clearHydrosphericExtraction(game);
         HydromorphicCardHandler.clearTacticalActionEffects(game);
+        BeansMonumentHandler.clearNatauMonumentAnomaly(game);
+        RefractureRulesService.clearTacticalState(game);
         GameEventDraft.clear(game);
 
         game.getTacticalActionDisplacement().clear();
@@ -922,9 +965,32 @@ public final class ButtonHelperTacticalAction {
         }
         game.setActiveSystem(pos);
         SpaceCannonOffenceWindow.open(game);
+        XyrixTechHandler.offerCrepuscularCopy(game, player, tile);
+        BloomAbilityHandler.snapshotCoexistingPlanetsAtAction(game);
+        MigoHarvestHandler.offerBlueHarvest(game, player);
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
+        FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        if (RefractureRulesService.canUseFenrir(game, player)) {
+            MessageHelper.sendMessageToChannelWithButton(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", you may exhaust _Homotopic Engines_.",
+                    Buttons.green(
+                            player.factionButtonChecker() + "planetAbilityExhaust_fenrir",
+                            "Use Homotopic Engines",
+                            PlanetEmojis.getPlanetEmojiOrNull("fenrir")));
+        }
+        if (ButtonHelper.isLawInPlay(game, "lightspeedregulations")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", _Light Speed Regulations_ is in play. Technologies that increase move values have no effect.");
+        }
+        BloomLeadersHandler.offerCommander(game, player, tile);
+        DeepUnitHandler.offerDrown(game, player, tile);
+        DeepBreakthroughHandler.offerEventHorizon(game, player);
+        MigoTechHandler.offerLaghMetalAttractors(game, player, tile);
         NatauBreakthroughHandler.offerTetherOnActivation(game, player, tile);
         BlueReverieTechHelper.offerNetworkedConstructors(game, tile);
         BlueReverieArtifactRelicHandler.offerUnknownArtifact(game, player);
@@ -973,7 +1039,23 @@ public final class ButtonHelperTacticalAction {
                         buttons);
             }
         }
+        for (Player deepPlayer : game.getRealPlayers()) {
+            if (player != deepPlayer
+                    && game.playerHasLeaderUnlockedOrAlliance(deepPlayer, "deepcommander")
+                    && FoWHelper.playerHasShipsInSystem(deepPlayer, tile)
+                    && tile.getPlanetUnitHolders().isEmpty()) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.addAll(ButtonHelper.getExhaustButtonsWithTG(game, player, "inf"));
+                buttons.add(Buttons.DONE_EXHAUSTING_PLANETS_SPIT_IT_OUT);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", you must spend 1 influence to activate this system.",
+                        buttons);
+            }
+        }
         if (game.isMonumentsMode()) {
+            BeansMonumentHandler.offerNatauMonumentAnomaly(game, player, tile);
+            BeansMonumentHandler.offerValhavnMonumentPdsMove(game, player, tile);
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {
@@ -1065,7 +1147,7 @@ public final class ButtonHelperTacticalAction {
         }
         for (Player consulateOwner : game.getRealPlayers()) {
             if (consulateOwner.ownsUnit("kaltrim_pds")
-                    && consulateOwner.isNeighboursWith(player)
+                    && consulateOwner.getAbilityNeighbours().contains(player)
                     && KaltrimUnitHandler.canDeployConsulate(consulateOwner, game)) {
                 KaltrimUnitHandler.offerConsulateDeploy(consulateOwner, player, game);
             }
@@ -1251,7 +1333,6 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (!game.isL1Hero()) {
-            // All players get to use Magen
             Tile activeSystem = tile;
 
             for (Player archive : game.getRealPlayers()) {
@@ -1404,10 +1485,13 @@ public final class ButtonHelperTacticalAction {
         if (!game.isFowMode()) {
             MessageHelper.sendEphemeralFileInResponseToButtonPressComplete(file, event);
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.",
-                systemButtons);
+        String moveFromMessage =
+                player.getRepresentationNoPing() + ", please choose the first system you wish to move from.";
+        String activeSystemFleetSummary = ButtonHelper.fleetAndCapacitySummary(player, game, tile);
+        if (!activeSystemFleetSummary.isEmpty()) {
+            moveFromMessage += "\n-# Active system: " + activeSystemFleetSummary;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), moveFromMessage, systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {
@@ -1431,44 +1515,46 @@ public final class ButtonHelperTacticalAction {
             VoidTetherService.postInitialButtons(game, player, tile);
         }
 
-        if (!game.isFowMode()) {
-            if (!game.isL1Hero()) {
-                ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);
-                Tile activeSystem = tile;
-                for (Player magenPlayer : game.getPlayers().values()) {
-                    boolean has =
-                            activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
-                    if (magenPlayer.hasAbility("byssus")) {
-                        for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
-                            if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
-                                has = true;
-                            }
-                        }
-                    }
-                    for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
-                        for (String token : p.getTokenList()) {
-                            if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
-                                has = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!has || !magenPlayer.hasTech("md")) continue;
-                    TeHelperTechs.resolveMagen(game, magenPlayer, activeSystem, false);
-                }
-
-                for (Player btb : game.getRealPlayers()) {
-                    if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
-                    if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
-                            .contains(activeSystem)) continue;
-                    TeHelperTechs.resolveMagen(game, btb, activeSystem, true);
-                }
-            }
+        if (!game.isFowMode() && !game.isL1Hero()) {
+            ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);
+        }
+        if (!game.isL1Hero()) {
+            resolveMagenOnActivation(game, tile);
         }
         game.removeStoredValue("crucibleBoost");
         game.removeStoredValue("flankspeedBoost");
         game.removeStoredValue("baldrickGDboost");
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void resolveMagenOnActivation(Game game, Tile activeSystem) {
+        for (Player magenPlayer : game.getPlayers().values()) {
+            boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
+            if (magenPlayer.hasAbility("byssus")) {
+                for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                    if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
+                        has = true;
+                    }
+                }
+            }
+            for (UnitHolder p : activeSystem.getPlanetUnitHolders()) {
+                for (String token : p.getTokenList()) {
+                    if (magenPlayer.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                        has = true;
+                        break;
+                    }
+                }
+            }
+            if (!has || !magenPlayer.hasTech("md")) continue;
+            TeHelperTechs.resolveMagen(game, magenPlayer, activeSystem, false);
+        }
+
+        for (Player btb : game.getRealPlayers()) {
+            if (!btb.ownsUnit("tk-blacktrenchbulwark")) continue;
+            if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, btb, UnitType.Pds)
+                    .contains(activeSystem)) continue;
+            TeHelperTechs.resolveMagen(game, btb, activeSystem, true);
+        }
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {
@@ -1489,7 +1575,6 @@ public final class ButtonHelperTacticalAction {
         }
 
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
-
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();

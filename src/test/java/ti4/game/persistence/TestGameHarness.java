@@ -30,25 +30,46 @@ public final class TestGameHarness implements AutoCloseable {
 
     public static TestGameHarness fromSourceGame(String sourceGameName) {
         String uniqueGameName = generateUniqueGameName();
+        writeGameFile(sourceGameName, uniqueGameName);
+        return new TestGameHarness(uniqueGameName);
+    }
+
+    private static void writeGameFile(String sourceGameName, String gameName) {
         Path sourcePath = Storage.getGamePath(sourceGameName + Constants.TXT);
-        Path targetPath = Storage.getGamePath(uniqueGameName + Constants.TXT);
+        Path targetPath = Storage.getGamePath(gameName + Constants.TXT);
 
         try {
             List<String> gameFileLines = Files.readAllLines(sourcePath);
             if (gameFileLines.size() <= GAME_NAME_LINE_INDEX) {
                 throw new IllegalStateException("Test map is missing the expected game name line: " + sourcePath);
             }
-            gameFileLines.set(GAME_NAME_LINE_INDEX, uniqueGameName);
+            gameFileLines.set(GAME_NAME_LINE_INDEX, gameName);
             Files.write(targetPath, gameFileLines);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to create test game from resource map: " + sourcePath, e);
         }
+    }
 
-        return new TestGameHarness(uniqueGameName);
+    /** Rewrites a readable game file, undoing {@link #corruptGameFile()}. */
+    public void restoreGameFile() {
+        writeGameFile(DEFAULT_SOURCE_GAME_NAME, gameName);
     }
 
     public Game load() {
         return GameLoadService.load(gameName);
+    }
+
+    public Path getGameFilePath() {
+        return Storage.getGamePath(gameName + Constants.TXT);
+    }
+
+    /** Overwrites the game file with a truncated save that the loader cannot parse. */
+    public void corruptGameFile() {
+        try {
+            Files.writeString(getGameFilePath(), "truncated-owner-id\n");
+        } catch (IOException e) {
+            throw new UncheckedIOException("Unable to corrupt test game file for: " + gameName, e);
+        }
     }
 
     public Path buildUndoPath(int undoIndex) {

@@ -143,12 +143,11 @@ public final class GroundCampaign {
 
     public Eta eta(String secret, boolean carrierTwo, boolean diodes) {
         return etas.computeIfAbsent(secret + "#" + carrierTwo + "#" + diodes, key -> {
-            int rounds =
-                    switch (secret) {
-                        case OCCUPY_THE_FRINGE -> fringe ? fringeRounds(carrierTwo, diodes) : 0;
-                        case MECHANIZE_THE_MILITARY -> mechanize ? mechanizeRounds(carrierTwo, diodes) : 0;
-                        default -> 0;
-                    };
+            int rounds = switch (secret) {
+                case OCCUPY_THE_FRINGE -> fringe ? fringeRounds(carrierTwo, diodes) : 0;
+                case MECHANIZE_THE_MILITARY -> mechanize ? mechanizeRounds(carrierTwo, diodes) : 0;
+                default -> 0;
+            };
             return new Eta(rounds, roundsLeft());
         });
     }

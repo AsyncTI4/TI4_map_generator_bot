@@ -12,6 +12,7 @@
 - [Adding Homebrew Content](#adding-homebrew-content)
 - [Testing your Changes](#testing-your-changes)
   - [VSCode Test](#vscode-test)
+  - [Database Tests](#database-tests)
 - [Helpful Tips for Debugging](#helpful-tips-for-debugging)
 
 # Getting the Code
@@ -268,6 +269,20 @@ To run Java tests in VSCode - make sure you add a test configuration your .vscod
     }
 ]
 ```
+
+## Database Tests
+
+Tests named `*DatabaseTest` run against a real PostgreSQL and are skipped unless `TI4_TEST_POSTGRES_URL` is set. CI provides an isolated database with throwaway credentials. Locally, start the dedicated test container, separate from the development database:
+
+```bash
+docker compose -f docker-compose.test.yml up -d --wait
+TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:55432/tibot_ci_test mvn test -Dtest='*DatabaseTest'
+docker compose -f docker-compose.test.yml down
+```
+
+The container stores its data in memory; stopping it discards the test data. Database tests must extend `ti4.test.PostgresDatabaseTest`. Before Spring initializes Hibernate, this shared setup requires the exact database and user `tibot_ci_test`, rejects URL parameters and embedded credentials, and verifies the connected database and that the role has no administrative privileges. Other database names, including `tibot`, fail before any connection is opened. Reserve `tibot_ci_test` exclusively for tests; never create it in production.
+
+`TI4_TEST_POSTGRES_USER` and `TI4_TEST_POSTGRES_PASSWORD` both default to the throwaway value `tibot_ci_test`. Never supply production credentials. The dedicated container creates an unprivileged role that owns only the test database, and removes public access to its maintenance databases. Production credentials and production database access must never be added to the PR workflow.
 
 # Helpful Tips for Debugging
 

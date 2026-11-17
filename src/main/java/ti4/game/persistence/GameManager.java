@@ -1,28 +1,25 @@
 package ti4.game.persistence;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.JdaService;
-import ti4.executors.ExecutorServiceManager;
 import ti4.game.Game;
-import ti4.game.Player;
+import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.service.fow.LoreService;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
@@ -39,52 +36,79 @@ public class GameManager {
     private static final CountDownLatch warmupFinishedLatch = new CountDownLatch(1);
     private static final int WAIT_FOR_WARMUP_TIMEOUT_SECONDS = 40;
 
+    public static void preloadManagedGames() {
+        ManagedGamePreload.start();
+    }
+
+    public static void buildPreloadedManagedGames() {
+        ManagedGamePreload.buildManagedGames();
+    }
+
+    public static boolean isPreloadFinished() {
+        return ManagedGamePreload.isFinished();
+    }
+
     public static void warmup() {
-        if (!warmupStarted.compareAndSet(false, true)) {
-            return;
-        }
+        if (!warmupStarted.compareAndSet(false, true)) return;
+        ManagedGameWarmup.start();
+    }
 
-        try {
-            gameNames.addAll(GameLoadService.loadGameNames());
-            resetLatestPbdNumberFrom(0);
-            gameNamesLoadedLatch.countDown();
-            BotLogger.info("LOADED " + gameNames.size() + " GAME NAMES");
-        } catch (Exception e) {
-            BotLogger.critical("Failed to warmup due to error while loading game names. Shutting down.", e);
-            JdaService.shutdown();
-        }
+    static void registerGameNames(Collection<String> loadedGameNames) {
+        gameNames.addAll(loadedGameNames);
+        resetLatestPbdNumberFrom(0);
+        gameNamesLoadedLatch.countDown();
+    }
 
-        JdaService.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.customStatus("Ready to play"));
+    static void finishWarmup() {
+        warmupFinishedLatch.countDown();
+    }
 
-        ExecutorServiceManager.runAsync("GameManager warmup", () -> {
-            try {
-                BotLogger.info("STARTED BUILDING MANAGED GAMES");
-                try (ExecutorService executorService =
-                        Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2)) {
-                    gameNames.forEach(name -> executorService.submit(() -> getManagedGame(name)));
-                }
-                warmupFinishedLatch.countDown();
-                BotLogger.info("FINISHED BUILDING MANAGED GAMES");
-                if (JdaService.jda != null) {
-                    JdaService.updatePresence();
-                }
-            } catch (Exception e) {
-                BotLogger.critical("Failed during GameManager warmup. Shutting down.", e);
-                JdaService.shutdown();
-            }
-        });
+    static ManagedGame buildManagedGameIfAbsent(String gameName, Supplier<ManagedGame> newManagedGame) {
+        return gameNameToManagedGame.computeIfAbsent(gameName, _ -> newManagedGame.get());
+    }
+
+    static void discardManagedGame(String gameName, ManagedGame managedGame) {
+        ManagedGame remaining = gameNameToManagedGame.computeIfPresent(
+                gameName, (_, current) -> current == managedGame ? null : current);
+        if (remaining != null) return;
+        managedGame.getPlayers().forEach(player -> player.removeGame(gameName, managedGame));
     }
 
     @Nullable
     static Game get(String gameName) {
+        ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
         Game game = GameLoadService.load(gameName);
-        if (game == null) {
-            handleManagedGameRemoval(gameName);
+        if (game != null) return game;
+        if (gameFileExists(gameName)) {
+            handleCorruptGame(gameName, cachedManagedGame);
+        } else {
+            handleMissingGame(gameName);
         }
-        return game;
+        return null;
     }
 
-    private static void handleManagedGameRemoval(String gameName) {
+    public static boolean isCorrupt(String gameName) {
+        return GameLoadService.isKnownUnreadable(gameName);
+    }
+
+    private static boolean gameFileExists(String gameName) {
+        return Storage.getGameFile(gameName + Constants.TXT).exists();
+    }
+
+    private static void handleCorruptGame(String gameName, ManagedGame managedGame) {
+        if (managedGame == null) return;
+        gameNameToManagedGame.computeIfPresent(gameName, (_, current) -> {
+            if (current != managedGame) return current;
+            managedGame.getPlayers().forEach(player -> player.removeGame(gameName));
+            return null;
+        });
+    }
+
+    private static void handleMissingGame(String gameName) {
+        unregisterGameAndQueueDatabaseDelete(gameName);
+    }
+
+    private static void unregisterGameAndQueueDatabaseDelete(String gameName) {
         gameNames.remove(gameName);
         var managedGame = gameNameToManagedGame.remove(gameName);
         if (managedGame != null) {
@@ -108,12 +132,11 @@ public class GameManager {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
-        // TODO: Queued after the file write lock is released, so two concurrent saves of one game can reach the
-        // database out of order and leave the older state until the next save or the nightly reconciliation.
-        GameDatabaseSyncPipeline.queueSync(game);
+        ManagedGameState managedGameState = ManagedGameState.of(game);
+        GameDatabaseSyncPipeline.queueSync(game, managedGameState);
 
         gameNames.add(game.getName());
-        replaceManagedGame(game);
+        replaceManagedGame(managedGameState);
 
         boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
                 .map(ManagedGame::isActive)
@@ -128,7 +151,7 @@ public class GameManager {
         if (!GameSaveService.delete(gameName)) {
             return false;
         }
-        handleManagedGameRemoval(gameName);
+        unregisterGameAndQueueDatabaseDelete(gameName);
         return true;
     }
 
@@ -140,23 +163,24 @@ public class GameManager {
     }
 
     private static Game handleUndo(Game undo) {
-        handleMissingMatchingManagedGame(undo);
-        GameDatabaseSyncPipeline.queueSync(undo);
+        if (undo == null) return null;
+        ManagedGameState managedGameState = ManagedGameState.of(undo);
+        handleMissingMatchingManagedGame(undo, managedGameState);
+        GameDatabaseSyncPipeline.queueSync(undo, managedGameState);
         return undo;
     }
 
-    private static void handleMissingMatchingManagedGame(Game game) {
-        if (game == null) return;
+    private static void handleMissingMatchingManagedGame(Game game, ManagedGameState managedGameState) {
         var managedGame = gameNameToManagedGame.get(game.getName());
         if (managedGame == null || !managedGame.matches(game)) {
             gameNames.add(game.getName());
-            replaceManagedGame(game);
+            replaceManagedGame(managedGameState);
         }
     }
 
-    private static void replaceManagedGame(Game game) {
-        gameNameToManagedGame.compute(game.getName(), (_, previousManagedGame) -> {
-            ManagedGame managedGame = new ManagedGame(game);
+    static void replaceManagedGame(ManagedGameState managedGameState) {
+        gameNameToManagedGame.compute(managedGameState.name(), (_, previousManagedGame) -> {
+            ManagedGame managedGame = new ManagedGame(managedGameState);
             if (previousManagedGame != null) {
                 removeGameFromDepartedPlayers(previousManagedGame, managedGame);
             }
@@ -180,16 +204,22 @@ public class GameManager {
     @Nullable
     public static Game reload(String gameName) {
         waitFor(gameNamesLoadedLatch);
+        ManagedGame cachedManagedGame = gameNameToManagedGame.get(gameName);
         Game game = GameLoadService.load(gameName);
         if (game == null) {
             game = GameUndoService.loadUndoForMissingGame(gameName);
         }
         if (game == null) {
-            handleManagedGameRemoval(gameName);
+            if (gameFileExists(gameName)) {
+                handleCorruptGame(gameName, cachedManagedGame);
+            } else {
+                handleMissingGame(gameName);
+            }
             return null;
         }
-        handleMissingMatchingManagedGame(game);
-        GameDatabaseSyncPipeline.queueSync(game);
+        ManagedGameState managedGameState = ManagedGameState.of(game);
+        handleMissingMatchingManagedGame(game, managedGameState);
+        GameDatabaseSyncPipeline.queueSync(game, managedGameState);
         return game;
     }
 
@@ -224,6 +254,11 @@ public class GameManager {
         });
     }
 
+    @Nullable
+    static ManagedGame peekManagedGame(String gameName) {
+        return gameNameToManagedGame.get(gameName);
+    }
+
     public static boolean isWarmupFinished() {
         return warmupFinishedLatch.getCount() == 0;
     }
@@ -243,12 +278,12 @@ public class GameManager {
         return Set.copyOf(userIdToManagedPlayer.values());
     }
 
-    static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
-        return userIdToManagedPlayer.compute(player.getUserID(), (_, existing) -> {
+    static ManagedPlayer addOrMergePlayer(ManagedGame game, ManagedGameState.Participant participant) {
+        return userIdToManagedPlayer.compute(participant.userId(), (_, existing) -> {
             if (existing == null) {
-                return new ManagedPlayer(game, player);
+                return new ManagedPlayer(game, participant.userId(), participant.userName());
             }
-            existing.addOrReplaceGame(game, player);
+            existing.addOrReplaceGame(game, participant.userId());
             return existing;
         });
     }

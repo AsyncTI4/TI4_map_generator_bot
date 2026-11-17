@@ -133,6 +133,7 @@ public class CreateFoWGameService {
 
         ButtonHelper.deleteMessage(event);
         executeCreateFoWGame(guild, gameName, gameSillyName, gm, members, event.getChannel());
+        CreateGameService.lockFromCreatingGames(event);
     }
 
     public static void executeCreateFoWGame(

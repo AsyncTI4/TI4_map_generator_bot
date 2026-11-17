@@ -20,8 +20,14 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.WarGamesBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RelitigateLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnLeadershandler;
@@ -90,6 +96,8 @@ import ti4.service.info.ListTurnOrderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.map.PlayerAreaWarningService;
 import ti4.service.map.SpinService;
+import ti4.service.megagame.MegagameGroupService;
+import ti4.service.megagame.MegagameStrategyPhaseService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
@@ -148,6 +156,8 @@ public class StartPhaseService {
             }
             case "statusScoring" -> {
                 StatusHelper.announceStatusPhase(game);
+                BloomPromissoryHandler.returnStarterCultureAtStatusStart(event, game);
+                DeepPromissoryHandler.returnDarkMatterAtStatusStart(event, game);
                 NetrunnersPromissoryHandler.returnSharedNetworkAccess(game);
                 StatusHelper.beginScoring(event, game, event.getMessageChannel());
                 StatusHelper.handleStatusPhaseMiddle(game);
@@ -290,6 +300,9 @@ public class StartPhaseService {
             round++;
             game.setRound(round);
             GameEventService.commit(game, GameEventType.ROUND_STARTED, null, Map.of("round", round));
+            if (MegagameGroupService.isActive(game)) {
+                MegagameStrategyPhaseService.startRound(game);
+            }
         }
         if (game.getRound() == 1 && !game.isFowMode()) {
             Helper.setOrder(game);
@@ -635,6 +648,11 @@ public class StartPhaseService {
         String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
+        BeansRelicHandler.addHamitsTreasureTradeGoodsAtStrategyPhaseStart(game);
+        BeansRelicHandler.offerTheSilenceAtStrategyPhaseStart(game);
+        for (Player player : game.getRealPlayers()) {
+            XyrixLeadersHandler.offerHeroAtStrategyPhaseStart(game, player);
+        }
         if (game.getRound() == 1) {
             GameStartedRecorder.recordOnce(game);
         }
@@ -673,7 +691,9 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        if (firstSCPicker.isNpc()) {
+        if (MegagameGroupService.isActive(game)) {
+            MegagameStrategyPhaseService.pingFirstPickers(game, pickSCMsg);
+        } else if (firstSCPicker.isNpc()) {
             PickStrategyCardService.checkForQueuedSCPick(null, firstSCPicker, game, "");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
@@ -683,6 +703,7 @@ public class StartPhaseService {
         }
 
         for (Player player2 : game.getRealPlayers()) {
+            TheodisiAgendaResolver.resolveMinisterFools(game, player2);
             if (player2.hasAbility("hydromorphic")) {
                 HydromorphicHelper.draw(game, player2, 2);
                 ActionCardHelper.drawActionCards(player2, 2);
@@ -696,7 +717,7 @@ public class StartPhaseService {
                         player2.getRepresentationUnfogged() + ", reminder that this is the window to play _Summit_.");
             }
             if (player2.hasAbility("underhanded_maneuver")
-                    && !player2.getNeighbouringPlayers(true).isEmpty()) {
+                    && !player2.getAbilityNeighbours().isEmpty()) {
                 ArvaxiAbilityHandler.offerUndHandManeuver(player2);
             }
             for (String pn : player2.getPromissoryNotes().keySet()) {
@@ -906,21 +927,6 @@ public class StartPhaseService {
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", a reminder that this is the window to play _Ancient Burial Sites_.");
-        }
-
-        if (player.getPlayableActionCards().contains("amendment")) {
-            List<Button> amendmentButtons = new ArrayList<>();
-            amendmentButtons.add(Buttons.green(
-                    player.factionButtonChecker() + "resolveAmendmentStep1",
-                    "Resolve Amendment",
-                    CardEmojis.ActionCard));
-            amendmentButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged()
-                            + ", a reminder that this is the window to play _Amendment_."
-                            + " Use the buttons to start the process.",
-                    amendmentButtons);
         }
 
         for (String pn : player.getPromissoryNotes().keySet()) {
@@ -1275,6 +1281,9 @@ public class StartPhaseService {
         playPreassignedGiftOfPrescience(event, game);
         LoreService.showPhaseLore(game, "action"); // before setPhaseOfGame: END lore reads the old phase
         game.setPhaseOfGame("action");
+        for (Player player : game.getRealPlayers()) {
+            XyrixTomeHandler.offerEndOfStrategyTome(game, player);
+        }
         TurnActionLog.drain(game);
         for (Player player : game.getRealPlayers()) {
             MonumentsBRButtonHandler.offerArmageddonProject(game, player);
@@ -1298,6 +1307,8 @@ public class StartPhaseService {
         }
 
         List<Player> actionPhaseTurnOrder = game.getActionPhaseTurnOrder();
+        TheodisiAgendaResolver.grantUnchosenTradeStrategyCard(game);
+        actionPhaseTurnOrder = game.getActionPhaseTurnOrder();
         if (actionPhaseTurnOrder.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Unable to start Action Phase: no turn order set.");
@@ -1398,7 +1409,8 @@ public class StartPhaseService {
                     if (sc <= 0
                             || p2.getSCs().contains(sc)
                             || game.getStrategyCardModelByInitiative(sc).get().usesAutomationForSCID("pok5trade")
-                            || (!game.isFowMode() && !scPickedList.contains(sc))) {
+                            || (!game.isFowMode() && !scPickedList.contains(sc))
+                            || !MegagameGroupService.allowsCard(game, p2, sc)) {
                         continue;
                     }
                     List<Button> scButtons = new ArrayList<>();

@@ -34,7 +34,7 @@ public class CombatReplayPromotionScoreBackfillCron {
     private static final AtomicBoolean HAS_RUN = new AtomicBoolean(false);
 
     public static void register() {
-        CronManager.scheduleOnce(
+        CronManager.scheduleOnceAfterLeaseAcquired(
                 CombatReplayPromotionScoreBackfillCron.class,
                 CombatReplayPromotionScoreBackfillCron::runBackfill,
                 0,

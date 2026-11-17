@@ -26,15 +26,14 @@ import ti4.service.combat.StartCombatService;
 class SystemInfo extends GameStateSubcommand {
 
     SystemInfo() {
-        super(Constants.SYSTEM_INFO, "Info for system (all units)", true, true);
+        super(Constants.SYSTEM_INFO, "Info for system (all units)", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(
-                        OptionType.INTEGER,
-                        Constants.EXTRA_RINGS,
-                        "Show additional rings around the selected system for context (Max 2)")
-                .setRequiredRange(0, 2));
+                OptionType.INTEGER,
+                Constants.EXTRA_RINGS,
+                "Show additional rings around the selected system for context (Max 2)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.JUST_UNITS, "True to just get unit information."));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setAutoComplete(true));
@@ -88,15 +87,15 @@ class SystemInfo extends GameStateSubcommand {
             int context) {
 
         if (game.isFowMode()
-                && !ogPlayer.isGM()
-                && !FoWHelper.getTilePositionsToShow(game, ogPlayer).contains(tile.getPosition())) {
+                && (ogPlayer == null || !ogPlayer.isGM())
+                && (ogPlayer == null
+                        || !FoWHelper.getTilePositionsToShow(game, ogPlayer).contains(tile.getPosition()))) {
             MessageHelper.sendMessageToChannel(channel, "You have no visibility to " + tile.getPosition() + ".");
             return;
         }
 
         FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition());
-        MessageHelper.sendMessageToChannel(
-                channel, ButtonHelper.getTileSummaryMessage(game, justUnits, tile, ogPlayer, event));
+        MessageHelper.sendMessageToChannel(channel, ButtonHelper.getTileSummaryMessage(game, justUnits, tile, event));
         MessageHelper.sendMessageWithFile(channel, systemWithContext, tile.getRepresentationForButtons(), false);
         if (game.isFowMode()) {
             return;

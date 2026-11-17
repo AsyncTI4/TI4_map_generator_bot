@@ -10,6 +10,7 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.map.SpinService;
 
@@ -93,13 +94,17 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
+                Constants.ONE_WAY_ADJACENCY,
+                "One-way links count one way for everything, not just movement (always on in fog)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
                 Constants.INJECT_RULES_LINKS,
                 "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(
                         OptionType.INTEGER,
                         Constants.FAST_SC_FOLLOW,
                         "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off")
-                .setRequiredRange(0, 720));
+                .setRequiredRange(0, 240));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.UNIT_SOURCE,
@@ -178,7 +183,15 @@ class CustomizationOptions extends GameStateSubcommand {
         if (showB != null) game.setShowBubbles(showB);
 
         Boolean transMethod = event.getOption(Constants.TRANSACTION_METHOD, null, OptionMapping::getAsBoolean);
-        if (transMethod != null) game.setNewTransactionMethod(transMethod);
+        if (transMethod != null) {
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        "Fog games use the fog option New transactions instead: `/fow fow_options`, Game flow tab.");
+            } else {
+                game.setNewTransactionMethod(transMethod);
+            }
+        }
 
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null) game.setShowGears(showG);
@@ -199,6 +212,15 @@ class CustomizationOptions extends GameStateSubcommand {
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null) game.setHomebrew(homebrew);
+
+        Boolean oneWayAdjacency = event.getOption(Constants.ONE_WAY_ADJACENCY, null, OptionMapping::getAsBoolean);
+        if (oneWayAdjacency != null) {
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Fog games always use one-way adjacency.");
+            } else {
+                game.setOneWayAdjacency(oneWayAdjacency);
+            }
+        }
 
         Boolean injectRules = event.getOption(Constants.INJECT_RULES_LINKS, null, OptionMapping::getAsBoolean);
         if (injectRules != null) game.setInjectRulesLinks(injectRules);

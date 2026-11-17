@@ -168,7 +168,7 @@ public class SilverFlameService {
             if (owner == null) continue;
 
             int quantity = entry.getValue();
-            owner.setUnitCap(key.asyncID(), player.getUnitCap(key.asyncID()) - quantity);
+            owner.setUnitCap(key.asyncID(), owner.getUnitCap(key.asyncID()) - quantity);
             purgedUnitList
                     .append("\n> ")
                     .append(owner.fogSafeEmoji())
@@ -204,7 +204,6 @@ public class SilverFlameService {
         String planetTileName = AliasHandler.resolveTile("silver_flame");
         Tile tile = new Tile(planetTileName, homeSystem.getPosition());
         AddTileService.addTile(game, tile);
-        FractureService.enterPlayOrExplain(null, game, player, null);
         ButtonHelper.deleteAllButtons(event);
 
         if (controlsAPlanet && player.getSecretsUnscored().containsKey("bam")) {

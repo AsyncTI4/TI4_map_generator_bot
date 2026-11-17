@@ -267,6 +267,18 @@ public enum LeaderEmojis implements TI4Emoji {
     ValhavnAgent,
     ValhavnCommander,
     ValhavnHero,
+    MigoAgent,
+    MigoCommander,
+    MigoHero,
+    DeepAgent,
+    DeepCommander,
+    DeepHero,
+    BloomAgent,
+    BloomCommander,
+    BloomHero,
+    ChoirAgent,
+    ChoirCommander,
+    ChoirHero,
 
     // Lost Legacies (Theodisi)
     ArdentiaAgent,
@@ -343,6 +355,11 @@ public enum LeaderEmojis implements TI4Emoji {
     ThurvialiAgent,
     ThurvialiCommander,
     ThurvialiHero,
+
+    // Franken Misc
+    XyrixAgent,
+    XyrixCommander,
+    XyrixHero,
 
     // Generic
     Agent,

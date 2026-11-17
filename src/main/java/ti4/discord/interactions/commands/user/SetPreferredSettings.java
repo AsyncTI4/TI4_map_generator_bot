@@ -7,10 +7,14 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.discord.interactions.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.model.HyperlaneStyle;
 import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettingsManager;
 
 class SetPreferredSettings extends Subcommand {
+
+    private static final String CUSTOM_HYPERLANE_STYLE = "custom_hyperlane_style";
+    private static final String GAME_DEFAULT = "GAME_DEFAULT";
 
     public SetPreferredSettings() {
         super("set_preferred_settings", "Set your preferred settings to various questions");
@@ -39,7 +43,7 @@ class SetPreferredSettings extends Subcommand {
                         OptionType.INTEGER,
                         "sabo_decline_median",
                         "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off.")
-                .setRequiredRange(0, 720));
+                .setRequiredRange(0, 240));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "auto_respond_no_secrets",
@@ -54,6 +58,15 @@ class SetPreferredSettings extends Subcommand {
             refreshMapStyle.addChoice(style.getLabel(), style.getValue());
         }
         addOptions(refreshMapStyle);
+        OptionData hyperlaneStyle = new OptionData(
+                OptionType.STRING,
+                CUSTOM_HYPERLANE_STYLE,
+                "How one-way custom hyperlanes look on maps drawn just for you (fog)");
+        hyperlaneStyle.addChoice("Game default", GAME_DEFAULT);
+        for (HyperlaneStyle style : HyperlaneStyle.values()) {
+            hyperlaneStyle.addChoice(style.getLabel(), style.name());
+        }
+        addOptions(hyperlaneStyle);
     }
 
     @Override
@@ -107,6 +120,12 @@ class SetPreferredSettings extends Subcommand {
         String refreshMapStyle = event.getOption("refresh_map_style", null, OptionMapping::getAsString);
         if (refreshMapStyle != null) {
             RefreshMapStyle.fromValue(refreshMapStyle).ifPresent(userSettings::setRefreshMapStyle);
+        }
+
+        String hyperlaneStyle = event.getOption(CUSTOM_HYPERLANE_STYLE, null, OptionMapping::getAsString);
+        if (hyperlaneStyle != null) {
+            userSettings.setCustomHyperlaneStyle(
+                    HyperlaneStyle.fromName(hyperlaneStyle).orElse(null));
         }
 
         Integer sabo = event.getOption("sabo_decline_median", null, OptionMapping::getAsInt);

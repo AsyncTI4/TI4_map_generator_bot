@@ -99,11 +99,10 @@ public class CombatReplaySideBetPayoutService {
     }
 
     private int boundedDynamicPayout(CombatSideBetType betType, int payout) {
-        int minimumPayout =
-                switch (betType) {
-                    case ROUND_ONE_WHIFF -> 20;
-                    default -> 1;
-                };
+        int minimumPayout = switch (betType) {
+            case ROUND_ONE_WHIFF -> 20;
+            default -> 1;
+        };
         return Math.clamp(minimumPayout, payout, maxDynamicPayout());
     }
 

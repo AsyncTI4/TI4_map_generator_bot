@@ -14,10 +14,14 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.EmergencyA
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRequisitionLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.myrr.MyrrBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantTechHandler;
@@ -97,20 +101,6 @@ class DeleteButtonsButtonHandler {
                 boolean cyber = false;
                 boolean malevolency = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
-                if (netGain > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "ardentiacommander")) {
-                    int commsBefore = player.getCommodities();
-                    player.gainCommodities(netGain);
-                    int commsGained = player.getCommodities() - commsBefore;
-
-                    if (commsGained > 0) {
-                        MessageHelper.sendMessageToChannel(
-                                game.getActionsChannel(),
-                                player.getRepresentation()
-                                        + " gained "
-                                        + commsGained
-                                        + " commodities due to _High Marshall Serisi_.");
-                    }
-                }
                 finalCCs += ". You gained a net total of " + StringHelper.pluralize(netGain, "command token");
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
@@ -143,6 +133,10 @@ class DeleteButtonsButtonHandler {
                         if (player.hasTech("tf-inheritancesystems")) {
                             properGain += 1;
                             reasons += (properGain == 3 ? "" : ", ") + "_Inheritance Systems_";
+                        }
+                        if (game.playerHasLeaderUnlockedOrAlliance(player, "ardentiacommander")) {
+                            properGain += 1;
+                            reasons += (properGain == 3 ? "" : ", ") + "_Serisi Sithis_, the Ardentia Commander";
                         }
                         if (malevolency) {
                             properGain -= 1;
@@ -228,7 +222,9 @@ class DeleteButtonsButtonHandler {
                     && !game.getStoredValue("amalgAmount").isEmpty()) {
                 editedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             }
-            ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+            if (!"Done Producing Units".equalsIgnoreCase(buttonLabel)) {
+                ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+            }
             if ("skarnathBuild".equalsIgnoreCase(buttonID)) {
                 ThronesThroneHandler.clearSkarnathDiscount(game, player);
             }
@@ -271,12 +267,26 @@ class DeleteButtonsButtonHandler {
                 cost = ThurvialiLeadersHandler.applyThurvialiHeroProductionDiscount(game, player, cost);
                 cost = IronLeadersHandler.applyShipwrightKastelProductionDiscount(game, player, cost);
                 cost = IronBreakthroughHandler.applyHyperstaticRelayProductionDiscount(game, player, cost);
+                cost = MigoHarvestHandler.applyYellowHarvestProductionDiscount(game, player, cost);
                 cost = ThirtyKRelicHooks.applyProductionDiscount(player, cost);
                 Map<String, Integer> unitsMap = new HashMap<>();
                 for (Map.Entry<String, Integer> entry :
                         player.getCurrentProducedUnits().entrySet()) {
                     String unitId = entry.getKey().split("_")[0];
                     unitsMap.merge(unitId, entry.getValue(), Integer::sum);
+                }
+                Player productionPlayer = player;
+                if (unitsMap.isEmpty()) {
+                    ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
+                } else {
+                    ButtonHelper.sendMessageToRightStratThread(
+                            player,
+                            game,
+                            editedMessage,
+                            buttonID,
+                            null,
+                            productionSummary -> DeepTechHandler.offerItLooksBack(
+                                    game, productionPlayer, productionSummary.getJumpUrl()));
                 }
                 // Only tactical-action builds belong to the tactical draft; the draft is game-global, so an
                 // unscoped stage would swallow other players' warfare/construction builds into the active
@@ -396,6 +406,7 @@ class DeleteButtonsButtonHandler {
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(RohDhnaAgent.button(player));
                 }
+                ChoirTechHandler.addTombResonancePaymentButtons(buttons, game, player, tile);
                 if (player.hasLeaderUnlocked("hacanhero")
                         && !"muaatagent".equalsIgnoreCase(buttonID)
                         && !"arboHeroBuild".equalsIgnoreCase(buttonID)
@@ -471,6 +482,7 @@ class DeleteButtonsButtonHandler {
             RevenantTechHandler.clearLazarusProduction(game, player);
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
+            MyrrAbilitiesHandler.resolveEchoOfTheAnvil(player);
             EmergencyAppropriationsLLButtonHandler.clear(game, player);
             PriorityRequisitionLLButtonHandler.clear(game, player);
             SharedResourcesLLButtonHandler.clear(game, player);
@@ -497,6 +509,7 @@ class DeleteButtonsButtonHandler {
             ArcanumBreakthroughHandler.clearPowerWordWishProductionContext(game, player, buttonID);
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
+            ChoirTechHandler.clearTombResonanceProductionContext(game, player);
             if (player.hasAbility("amalgamation")) {
                 game.removeStoredValue("amalgAmount");
             }

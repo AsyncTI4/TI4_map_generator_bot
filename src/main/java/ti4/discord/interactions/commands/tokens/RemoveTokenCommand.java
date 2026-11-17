@@ -50,9 +50,8 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
                 game.clearPlanetsCache();
             } else {
                 tokenID = Mapper.getTokenID(tokenName);
-                tokenPath = ImageResources.tokenOrAttachment(tokenID);
 
-                if (tokenPath == null) {
+                if (!ImageResources.hasTokenImage(tokenID)) {
                     MessageHelper.replyToMessage(event, "Token: " + tokenName + " is not valid");
                     return;
                 }
