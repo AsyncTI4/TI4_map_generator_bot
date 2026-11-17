@@ -31,7 +31,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.service.info.ListPlayerInfoService;
 
 @UtilityClass
-class StructurePolicy {
+public class StructurePolicy {
 
     static final String PDS = "pds";
     static final String SPACE_DOCK = "spacedock";
@@ -62,7 +62,7 @@ class StructurePolicy {
         return seat.getSecretsUnscored().keySet().stream().anyMatch(STRUCTURE_OBJECTIVES::contains);
     }
 
-    static boolean nearsStructureObjective(Game game, Player seat) {
+    public static boolean nearsStructureObjective(Game game, Player seat) {
         return structureShortfall(game, seat) <= NEXT_ROUND_SHORT || nearsPerimeter(game, seat);
     }
 
@@ -138,7 +138,7 @@ class StructurePolicy {
         return shortfall;
     }
 
-    static Optional<String> pds(Game game, Player seat) {
+    public static Optional<String> pds(Game game, Player seat) {
         return underCap(game, seat, "pds") ? Optional.of(PDS) : Optional.empty();
     }
 
@@ -167,7 +167,7 @@ class StructurePolicy {
             .thenComparingInt(DockRank::mass)
             .thenComparing(USUAL_DOCK);
 
-    static Optional<String> planetFor(Game game, Player seat, String unit, Collection<String> candidates) {
+    public static Optional<String> planetFor(Game game, Player seat, String unit, Collection<String> candidates) {
         List<Planet> planets = candidates.stream()
                 .map(name -> game.getPlanetsInfo().get(name))
                 .filter(planet -> planet != null && seat.getPlanets().contains(planet.getName()))

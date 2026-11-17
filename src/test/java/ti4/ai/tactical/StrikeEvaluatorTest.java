@@ -368,4 +368,23 @@ class StrikeEvaluatorTest extends BaseTi4Test {
                 .findFirst()
                 .orElseThrow();
     }
+
+    // Sardakk's hero skips the space combat: one carrier against three dreadnoughts never wins in space, but with the
+    // combat skipped the infantry land, and the carrier is priced as lost.
+    @Test
+    void skippingTheSpaceCombatLandsPastALostFleetAndLosesTheShips() {
+        owns(sardakk(), target, "space", UnitType.Dreadnought, 3);
+        owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
+        StrikeEstimate fought = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 4);
+
+        StrikeEstimate skipped = SkippedSpaceCombat.assuming(
+                nekro(), () -> estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Infantry, 4));
+
+        assertThat(fought.spaceWin()).isLessThan(0.5);
+        assertThat(skipped.spaceWin()).isEqualTo(1.0);
+        assertThat(skipped.spaceCombat()).isFalse();
+        assertThat(skipped.landings()).containsKey("lodor");
+        assertThat(skipped.ourExpectedLoss())
+                .isGreaterThanOrEqualTo(StrikeEvaluator.shipCost(nekro(), java.util.Map.of(UnitType.Carrier, 1)));
+    }
 }

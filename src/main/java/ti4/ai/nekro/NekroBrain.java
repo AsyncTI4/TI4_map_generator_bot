@@ -101,6 +101,7 @@ import ti4.ai.winnu.StartingTechRules;
 import ti4.ai.xxcha.PeaceAccordsRules;
 import ti4.ai.xxcha.QuashRules;
 import ti4.ai.xxcha.XxchaAgentRules;
+import ti4.ai.xxcha.XxekirGromRules;
 import ti4.ai.yin.BrotherMilorRules;
 import ti4.ai.yin.BrotherOmarRules;
 import ti4.ai.yin.DannelRules;
@@ -149,6 +150,7 @@ public class NekroBrain implements FactionBrain {
             "nekroAgentRes_",
             XxchaAgentRules.USER_PREFIX,
             XxchaAgentRules.READY_PREFIX,
+            XxekirGromRules.UNIT_PREFIX,
             PromissoryRules.GREYFIRE_TARGET,
             DannelRules.TARGET_PREFIX,
             DannelRules.COMBAT_PREFIX,
@@ -254,6 +256,7 @@ public class NekroBrain implements FactionBrain {
             StrategyCardRules::buildWithConstruction,
             BellumGloriosumRules::next,
             XxchaAgentRules::next,
+            XxekirGromRules::next,
             NorrSupremacyRules::next,
             ReclaimerRules::next,
             DarktalonTreillaRules::next,
@@ -655,6 +658,8 @@ public class NekroBrain implements FactionBrain {
         if (winnuHero.isPresent()) return winnuHero;
         Optional<AiDecision> gateFolding = LazaxGateFolding.insteadOfTacticalAction(context, thisTurn);
         if (gateFolding.isPresent()) return gateFolding;
+        Optional<AiDecision> xxchaHero = XxekirGromRules.insteadOfTacticalAction(context, thisTurn);
+        if (xxchaHero.isPresent()) return xxchaHero;
         Optional<AiDecision> xxchaStall = XxchaAgentRules.insteadOfTacticalAction(context, thisTurn);
         if (xxchaStall.isPresent()) return xxchaStall;
         Optional<AiDecision> solHero = SolHeroRules.insteadOfTacticalAction(context, thisTurn);
@@ -663,6 +668,7 @@ public class NekroBrain implements FactionBrain {
         if (yinHero.isPresent()) return yinHero;
         Optional<AiDecision> orbitalDrop = OrbitalDropRules.insteadOfTacticalAction(context, thisTurn);
         if (orbitalDrop.isPresent()) return orbitalDrop;
+        SardakkHeroRules.planTacticalAction(context);
         Optional<AiDecision> tactical = TacticalRules.start(context);
         if (tactical.isPresent()) return tactical;
         for (AiPrompt prompt : thisTurn) {
@@ -685,6 +691,10 @@ public class NekroBrain implements FactionBrain {
         if (relicBeforePassing.isPresent()) return relicBeforePassing;
         Optional<AiDecision> expeditionBeforePassing = ExpeditionRules.beforePassing(context, thisTurn);
         if (expeditionBeforePassing.isPresent()) return expeditionBeforePassing;
+        Optional<AiDecision> letnevStall = DarktalonTreillaRules.beforePassing(context, thisTurn);
+        if (letnevStall.isPresent()) return letnevStall;
+        Optional<AiDecision> xxchaHeroBeforePassing = XxekirGromRules.beforePassing(context, thisTurn);
+        if (xxchaHeroBeforePassing.isPresent()) return xxchaHeroBeforePassing;
         Optional<AiDecision> xxchaAgent = XxchaAgentRules.beforePassing(context, thisTurn);
         if (xxchaAgent.isPresent()) return xxchaAgent;
         Optional<AiDecision> solHeroBeforePassing = SolHeroRules.beforePassing(context, thisTurn);

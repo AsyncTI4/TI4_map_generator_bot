@@ -59,9 +59,10 @@ Nekro and Franken copies work too (`ti4.ai.sol`):
 - Evelyn Delouis (`SolAgentRules`) is used at the start of a round of a ground combat the seat fights in, when the
   extra die on its best ground force moves the win chance times the stake by at least 0.2; never for other
   players' combats. Claire Gibson (`SolCommanderRules`) places her free infantry before the seat's first roll.
-- Jace X, 4th Air Legion (`SolHeroRules`) is played from round 3 on when the seat has a tactical token and freeing
-  every command token on the board makes its best tactical plan worth at least three quarters of a point and at least
-  3 more than its two best plans now.
+- Jace X, 4th Air Legion (`SolHeroRules`) is played when the seat has a tactical token and freeing every command
+  token on the board brings at least a point its current plans do not (`FreedPlays`): an objective or secret, the
+  custodians or Imperial point on Mecatol Rex, Styx, or denying a rival close to winning (its home system, or Mecatol
+  from the Imperial holder).
 - _Bellum Gloriosum_ (`BellumGloriosumRules`): after its normal build is paid, the seat takes the free build for each
   ship with capacity it produced: defending infantry, spare infantry up to four, then fighters up to its room, paid
   from what the reserve leaves.
@@ -173,8 +174,11 @@ decided before the next die is rolled:
   demilitarized zones, Mallice, or planets with enemy structures and no enemy ground forces; Mecatol Rex under the
   custodians only when their 6 influence is payable, which it then pays), each planet worth its landing win chance
   without space cannon times its value, objective progress, denial of a rival's objective, the Mecatol hold value and
-  a point for the custodians. It plays the hero as a component action when that spread, less half a point for keeping
-  the hero (nothing in the last round), beats the best tactical plan, or instead of passing. It walks the hero's buttons
+  a point for the custodians; Styx's point and an unclaimed relic on a Fracture planet; and a point on Mecatol Rex
+  with Imperial or Overrule in hand (a quarter more with Fleet Logistics). Neutral defenders count, and on its point
+  landings it plans one Indoctrination conversion each (into a mech while one is in reinforcements) as far as its
+  influence allows. It plays the hero as a component action when that spread, less a quarter point for keeping the
+  hero (nothing in the last round or when a landing takes a point), beats the best tactical plan, or instead of passing. It walks the hero's buttons
   once per planet, starts each ground combat the bot asks about, and holds its turn (up to 15 minutes) until those
   combats end.
 - The Van Hauge (`VanHauge`, `CombatOdds.Force.detonating`): when the side holding it is wiped out the other side loses
@@ -332,6 +336,10 @@ to build one by hand:
       planet worth a victory point or more (an objective or secret it would score, a custodians/Mecatol hold, an
       enemy home planet, denying a rival's score), and not fighting is worth more than the fleet's replacement cost
       beyond the expected fight losses plus half a point for the card. It then lands everything on that planet.
+      Before each tactical action the planner also ranks every plan with the space combat skipped
+      (`SkippedSpaceCombat`: only the ground combat must be won and every ship in the system is lost); when that plan
+      is worth a point after the ships and beats the best plan without the hero by half a point, the seat takes it and
+      presses the hero in that system;
   - playing component action cards and _Forward Supply Base_, valued by what they score and by human play statistics,
     and answering cards that target it (below);
   - playing the promissory notes other players gave it, and respecting its own notes played against it (below);
@@ -945,11 +953,17 @@ to build one by hand:
       for its best plan with the fleet limit lifted. It plays the hero (component action, then the hero button) when
       that plan is an attack that stacks more non-fighter ships than the real limit and beats the best real plan by 4 or
       more. The hero is not played because it is unlocked, and the lifted limit then lets the next tactical action
-      field the stack.
+      field the stack. Before passing it is played as a stall while a rival can still win this round.
     - _Rear Admiral Farran_ (`RearAdmiralFarranRules`): the commander's trade good prompt is taken when it names the
       seat. _L4 Disruptors_ (`L4Disruptors`): the planets' space cannon is left out of the landing in invasion planning
       (`StrikeEvaluator`) and of the invasion threat against the seat's own planets (`DefenseOutlook`); the cannon still
       fires at the arriving ships.
+    - _Xxekir Grom_ (Xxcha, Thunder's Edge, `XxekirGromRules`): treated like Diplomacy: it readies planets to spend, so it
+      is played as a component action when the four exhausted planets it readies pay for a public objective (also just
+      before passing), or mid-round while spending is still ahead and those planets are worth 4 TG or more. Each of the four
+      placements is a mech while one is in reinforcements (a PDS first when a structure objective is near) on the
+      exhausted planet worth most to ready (`ReadyingValue`) and to defend (`GroundDrops`); PDS go where
+      `StructurePolicy` puts them.
     - Not handled: _War Funding_ (the bot only prints the holder's rerolled dice and leaves the rerolled hits and the
       opponent's reroll to its players, so there is nothing an AI can press safely), the movement half of Gravleash
       Maneuvers, and playing the hero for a production overflow.

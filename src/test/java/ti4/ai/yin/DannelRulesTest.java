@@ -22,7 +22,8 @@ import ti4.testUtils.BaseTi4Test;
 // Dannel of the Tenth commits up to 3 infantry from reinforcements to non-home planets, with no space cannon, and is
 // then purged. The seat spreads the 3 infantry over the planets where win chance x stake adds up most (planet value,
 // objective progress, denial, Mecatol), and plays the hero when that beats its tactical plan by more than keeping the
-// hero (half a point, nothing in the last round). Planets of other players' home systems are never offered.
+// hero (a quarter point, nothing in the last round or when a landing takes a point). Planets of other players' home
+// systems are never offered.
 class DannelRulesTest extends BaseTi4Test {
 
     private YinTestBoard board;
@@ -61,8 +62,32 @@ class DannelRulesTest extends BaseTi4Test {
     }
 
     @Test
-    void keepingTheHeroCostsHalfAPointUntilTheLastRound() {
-        assertThat(DannelPlan.holdValue(board.test.game)).isEqualTo(DannelPlan.HERO_VALUE);
+    void keepingTheHeroCostsAQuarterPointUntilTheLastRound() {
+        assertThat(DannelPlan.holdValue(board.test.game, false)).isEqualTo(DannelPlan.HERO_VALUE);
+    }
+
+    @Test
+    void aLandingThatTakesAPointIsNeverHeldBack() {
+        // Styx, or Mecatol Rex with Imperial in hand: the hero goes out the turn it can take the point.
+        assertThat(DannelPlan.holdValue(board.test.game, true)).isZero();
+    }
+
+    @Test
+    void imperialOrOverruleMakesMecatolWorthAPoint() {
+        assertThat(DannelPlan.imperialPoint(board.test.game, board.yin)).isZero();
+
+        board.yin.addSC(8);
+
+        assertThat(DannelPlan.imperialPoint(board.test.game, board.yin)).isEqualTo(DannelPlan.VP);
+    }
+
+    @Test
+    void fleetLogisticsScoresImperialRightAfterTakingMecatol() {
+        board.yin.addSC(8);
+        board.yin.addTech(DannelPlan.FLEET_LOGISTICS);
+
+        assertThat(DannelPlan.imperialPoint(board.test.game, board.yin))
+                .isEqualTo(DannelPlan.VP + DannelPlan.FLEET_LOGISTICS_BONUS);
     }
 
     @Test
