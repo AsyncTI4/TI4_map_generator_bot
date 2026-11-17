@@ -519,8 +519,7 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannel(
                     channel,
                     "The bot could not create the combat thread for " + tile.getRepresentationForButtons(game, player1)
-                            + ". Please wait 5 minutes, then use `/game undo` to revert the game to before this error"
-                            + " and try again.");
+                            + ". Please wait 5 minutes, then use `/combat start_combat` to start the combat.");
         }
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
