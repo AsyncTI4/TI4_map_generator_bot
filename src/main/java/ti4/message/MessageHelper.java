@@ -399,12 +399,20 @@ public class MessageHelper {
             BotLogger.error("FileUpload null");
             return;
         }
-        channel.sendFiles(fileUpload)
-                .queue(
-                        onSuccess,
-                        error -> BotLogger.error(
-                                getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error),
-                                error));
+        channel.sendFiles(fileUpload).queue(onSuccess, error -> {
+            BotLogger.error(getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error), error);
+            if (isSocketTimeout(error)) {
+                sendMessageToChannel(channel, DISCORD_TIMEOUT_UNDO_ADVICE);
+            }
+        });
+    }
+
+    private static final String DISCORD_TIMEOUT_UNDO_ADVICE =
+            "Discord timed out while the bot was posting here, so something may be missing. Please wait 5 minutes,"
+                    + " then use `/game undo` to revert the game to before this error and try again.";
+
+    private static boolean isSocketTimeout(Throwable error) {
+        return error instanceof ErrorResponseException && error.getCause() instanceof SocketTimeoutException;
     }
 
     public static void sendEphemeralFileInResponseToButtonPress(
@@ -905,9 +913,7 @@ public class MessageHelper {
                                         queuePosition);
                                 return;
                             }
-                            boolean shouldRetry = error instanceof ErrorResponseException
-                                    && error.getCause() instanceof SocketTimeoutException
-                                    && remainingAttempts > 0;
+                            boolean shouldRetry = isSocketTimeout(error) && remainingAttempts > 0;
                             if (shouldRetry) {
                                 BotLogger.warning(
                                         getRestActionFailureMessage(
