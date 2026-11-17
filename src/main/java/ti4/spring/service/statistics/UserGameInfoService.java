@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntity;
@@ -110,6 +111,7 @@ public class UserGameInfoService {
                     stats.replacedOngoing++;
                 } else {
                     stats.ongoingGames++;
+                    if (player.isEliminated()) stats.eliminatedOngoing++;
                 }
                 continue;
             }
@@ -157,6 +159,11 @@ public class UserGameInfoService {
                         .append(stats.replacedCompleted == 1 ? " other)" : " others)");
             }
             sb.append(". `").append(stats.ongoingGames).append("` Ongoing");
+            if (stats.eliminatedOngoing > 0) {
+                sb.append(" (")
+                        .append(StringHelper.pluralize(stats.eliminatedOngoing, "elimination"))
+                        .append(')');
+            }
             if (stats.replacedOngoing > 0) {
                 sb.append(" (replaced in ")
                         .append(stats.replacedOngoing)
@@ -238,6 +245,7 @@ public class UserGameInfoService {
         private int ongoingGames;
         private int replacedCompleted;
         private int replacedOngoing;
+        private int eliminatedOngoing;
         private int wins;
         private final List<Integer> completedGameDays = new ArrayList<>();
 
