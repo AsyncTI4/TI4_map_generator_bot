@@ -19,7 +19,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.TacticalRules;
@@ -36,7 +36,7 @@ class MasterPlanCardTest extends BaseTi4Test {
     private static final int HAND_INDEX = 412;
     private static final String FIRST_TARGET = "105";
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
     private AiTestGame test;
     private MockedStatic<GameMessageManager> messages;
 

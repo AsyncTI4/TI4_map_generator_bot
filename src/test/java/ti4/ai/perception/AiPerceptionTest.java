@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import org.junit.jupiter.api.Test;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.testUtils.BaseTi4Test;
 
@@ -42,7 +42,7 @@ class AiPerceptionTest extends BaseTi4Test {
     // windows must let it see them.
     @Test
     void seesItsIntegratedEconomyOfferAndExplorationCards() {
-        Set<String> windows = new NekroBrain().publicWindowHandlerPrefixes();
+        Set<String> windows = new StandardBrain().publicWindowHandlerPrefixes();
 
         assertThat(AiPerception.isRelevant(
                         PromptSource.PUBLIC, buttons("integratedBuild_lodor", "deleteButtons"), "nekro", windows))
@@ -56,7 +56,7 @@ class AiPerceptionTest extends BaseTi4Test {
     // unowned buttons in the main channel.
     @Test
     void seesTheUnownedPromptsOfTheHacanComponents() {
-        Set<String> windows = new NekroBrain().publicWindowHandlerPrefixes();
+        Set<String> windows = new StandardBrain().publicWindowHandlerPrefixes();
 
         for (String handler : List.of(
                 "productionBiomes_sol",
@@ -74,7 +74,7 @@ class AiPerceptionTest extends BaseTi4Test {
     // in the main channel.
     @Test
     void seesTheUnownedPromptsOfSolsComponents() {
-        Set<String> windows = new NekroBrain().publicWindowHandlerPrefixes();
+        Set<String> windows = new StandardBrain().publicWindowHandlerPrefixes();
 
         for (String handler : List.of("orbitalMechDrop_jord", "finishComponentAction_spitItOut", "solBtBuild_301_8")) {
             assertThat(AiPerception.isRelevant(PromptSource.PUBLIC, buttons(handler), "sol", windows))

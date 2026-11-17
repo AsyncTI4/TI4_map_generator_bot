@@ -562,7 +562,7 @@ flowchart TD
 - **Role:** scope switch.
 - **Purpose:** know which seat's brain is running, so that only that seat's own hidden cards are read and only while it
   is not being imagined.
-- **Invoked when:** `NekroBrain.decide` wraps every decision in `DecidingSeat.of(context.seat(), ...)`. Read by
+- **Invoked when:** `StandardBrain.decide` wraps every decision in `DecidingSeat.of(context.seat(), ...)`. Read by
   `knowsHandOf` in `SecretOdds`, `WinOdds`, `WinRace.ownSecret`, `DenialMap.of`, `ImperialUses.secretChance`,
   `TacticalStrength.own`; `orSelf` in `ScoringPaths`, `ScoringStakes`, `ImperialUses.viewer`, `AttackLedger.remembers`,
   `PromiseBook.active`, `ExpertElectionValues`.
@@ -716,12 +716,12 @@ built from the turn key, the action key or the message id, so each step is press
 #### TechRules
 
 - **Role:** decides and executes.
-- **Invoked when:** from [NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java), whose `firstRuleDecision` returns
+- **Invoked when:** from [StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java), whose `firstRuleDecision` returns
   the first rule in its ordered list that yields a decision. In that list, in order: `reviveInfantry`,
   (`EntropicScarRules.next`), `placeSpinnerInfantry`, (`YinSpinnerRules.afterOtherProduction`), `placeSelfAssemblyMech`,
   (`IconoclastRules.deploy`), `placeMagenInfantry`, (`MatriarchRules.returnFighters`), `continueProductionBiomes`,
   (`DatahubRules.next`, `SlingRelayRules.next`, `TransitDiodesRules.next`), `nullificationField`, `neuralParasite`,
-  `salvageOperations`. From `NekroBrain.takeTurn` (the active seat's action phase): `endOfTurn` after the second-action
+  `salvageOperations`. From `StandardBrain.takeTurn` (the active seat's action phase): `endOfTurn` after the second-action
   check and `ExpeditionRules.endOfTurn`, before `SecretRedrawRules`/`LegendaryRules` end-of-turn steps and the
   `turnEnd`/`endOfTurnAbilities` buttons; `insteadOfTacticalAction` after the action-card alternative and before
   Mathis Mathinus / Lazax Gate Folding / hero alternatives and the tactical action; `beforePassing` after the other
@@ -775,7 +775,7 @@ built from the turn key, the action key or the message id, so each step is press
     then presses an unowned `psychoExhaust_<planet>` for a spare planet. The spare set is recomputed each call, so an
     exhausted planet drops out and the next call presses another one.
 - **Fallbacks:** each method returns `Optional.empty()` when its tech, button or memory state is absent, so the next
-  rule in `NekroBrain` runs.
+  rule in `StandardBrain` runs.
 - **Tested:** `TechRulesTest` (Bio-Stims with/without a spent tech-skip planet, expedition tie-breaks, Magen,
   Psychoarchaeology, Production Biomes before passing / instead of an action / keeping the token for a follow /
   never giving to the leader / private-thread menu, Nullification Field cases, Neural Parasite, Salvage Operations,
@@ -784,7 +784,7 @@ built from the turn key, the action key or the message id, so each step is press
 #### EntropicScarRules
 
 - **Role:** decides and executes.
-- **Invoked when:** `NekroBrain`'s rule list, right after `TechRules.reviveInfantry`.
+- **Invoked when:** `StandardBrain`'s rule list, right after `TechRules.reviveInfantry`.
 - **Algorithm:** only in phase `statusscoring` or `statushomework` and only while the seat has ships in a scar
   (`tile.isScar()` or an Aurelion unit in the tile's space area). Newest prompt first; on a prompt offering owned
   `entropicScar_<tech>` buttons for technologies the seat lacks: among those not already pressed and worth it, press
@@ -858,7 +858,7 @@ by" column names the evaluator and the decider that uses it.
 
 #### Production Biomes: before passing versus instead of a tactical action
 
-- **Trigger:** `NekroBrain.takeTurn` calls `TechRules.insteadOfTacticalAction` before the tactical action, and
+- **Trigger:** `StandardBrain.takeTurn` calls `TechRules.insteadOfTacticalAction` before the tactical action, and
   `TechRules.beforePassing` just before it passes.
 - **Common gate:** `pm` ready, not used this turn, and a spare strategy token (`strategicCC ≥ 1 + tokens wanted for
   follows`, and `strategicCC + tacticalCC − 1 ≥` the tokens `ScoringReserve` keeps).
@@ -895,7 +895,7 @@ by" column names the evaluator and the decider that uses it.
 
 #### Bio-Stims: when nothing is readied
 
-- **Trigger:** end of the seat's turn in `NekroBrain.takeTurn`.
+- **Trigger:** end of the seat's turn in `StandardBrain.takeTurn`.
 - **Deliberate inaction:** with Bio-Stims ready but no exhausted planet that has a technology specialty and no
   exhausted Sling Relay in a contested endurance race, the rule returns empty and the turn ends normally
   (`TechRulesTest.leavesBioStimsAloneWithoutASpentTechSkipPlanet`).
@@ -1091,7 +1091,7 @@ None. No class in `ti4.ai.eval` or `ti4.ai.tech` draws random numbers; ties reso
   Operations records each message id; `EntropicScarRules` and `openProductionBiomes` filter out buttons
   `context.alreadyPressed`. A second call after the step was recorded returns empty
   (`TechRulesTest.takesTheSalvageOperationsTradeGoodAndSkipsTheRebuild`, `EntropicScarRulesTest.doesNotPressTheSameButtonTwice`).
-- **Expected button absent:** every method returns `Optional.empty()`, so `NekroBrain` tries the next rule; nothing is
+- **Expected button absent:** every method returns `Optional.empty()`, so `StandardBrain` tries the next rule; nothing is
   retried here. The memory state stays as it was, so the flow resumes when the button appears on a later tick (for
   example Production Biomes' `exhaustTech_pm` in the private thread, `TechRulesTest.findsTheProductionBiomesMenuInThePrivateThread`).
 - **Unparseable button ids:** revival amount defaults to 1; a Neural Parasite label without a numeric count is scored with
@@ -1183,7 +1183,7 @@ Each item cites the code evidence. "Inferred" marks a consequence read from the 
 - No rule in `ti4.ai` presses a button for Chaos Mapping or Wormhole Generator (a search for their ids `cm` / `wg`
   finds only research priors and an unrelated explore card), nor for faction technologies with an action or choice
   not listed above. Some technologies do have rules outside this scope: Transit Diodes (`td`, `absol_td`,
-  `TransitDiodesRules`), Quantum Datahub Node (`qdn`, `DatahubRules`), both in `NekroBrain`'s rule list, and
+  `TransitDiodesRules`), Quantum Datahub Node (`qdn`, `DatahubRules`), both in `StandardBrain`'s rule list, and
   Instinct Training (`it`, `ti4.ai.actioncards.InstinctTraining`, used by `SabotagePolicy`/`SabotageRules` to cancel
   an action card with a strategy token).
 
@@ -1266,16 +1266,16 @@ Found by grepping `Class.method` usages and mapping each to its enclosing method
 - **FactionStrength**: `TacticalStrength.rate`.
 - **FlagshipRating**: `ProductionPlanner.planSurplusShips/presenceShip/shipWorth`, `AllianceValue.nomadBonus`.
 - **MechRating**: `ExpertMechAgendaValues.articlesStake/homeMechGain/mechDowngrades`.
-- **DecidingSeat**: `NekroBrain.decide` (`of`); readers `SecretOdds`, `WinOdds`, `WinRace`, `DenialMap`, `ImperialUses`,
+- **DecidingSeat**: `StandardBrain.decide` (`of`); readers `SecretOdds`, `WinOdds`, `WinRace`, `DenialMap`, `ImperialUses`,
   `TacticalStrength`, `ScoringPaths`, `ScoringStakes`, `AttackLedger`, `PromiseBook`, `ExpertElectionValues`.
 - **ImaginedTurn**: `EnemyIntent.ranked/attackWorth`, `TradeValue.predictedFor` (`of`); `Standings.ownGrudge`
   (`underway`); `TacticalPlanner.candidate` (`imagines`); 24 call sites of `unscoredSecrets` / `actionCards`.
-- **TechRules**: `NekroBrain` rule list (`reviveInfantry`, `placeSpinnerInfantry`, `placeSelfAssemblyMech`,
+- **TechRules**: `StandardBrain` rule list (`reviveInfantry`, `placeSpinnerInfantry`, `placeSelfAssemblyMech`,
   `placeMagenInfantry`, `continueProductionBiomes`, `nullificationField`, `neuralParasite`, `salvageOperations`),
-  `NekroBrain.takeTurn` (`endOfTurn`, `insteadOfTacticalAction`, `beforePassing`), `TacticalRules.placeUnits` (planned units placed,
+  `StandardBrain.takeTurn` (`endOfTurn`, `insteadOfTacticalAction`, `beforePassing`), `TacticalRules.placeUnits` (planned units placed,
   before "done building": `startYinSpinner`, `startSelfAssembly`), `YinSpinnerRules` (`startYinSpinner`); `BIOMES_TARGET` in
-  `NekroBrain.PUBLIC_WINDOW_PREFIXES` so unowned recipient buttons are visible to the AI.
-- **EntropicScarRules**: `NekroBrain` rule list (`next`).
+  `StandardBrain.PUBLIC_WINDOW_PREFIXES` so unowned recipient buttons are visible to the AI.
+- **EntropicScarRules**: `StandardBrain` rule list (`next`).
 
 ### Calls from the scope to outside classes
 

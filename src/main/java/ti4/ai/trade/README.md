@@ -9,7 +9,7 @@ the scale of [ValueScale](/src/main/java/ti4/ai/eval/ValueScale.java) (`TRADE_GO
 (returns a choice), **evaluates** (scores options for a decider), **informs** (computes facts or state), **executes**
 (presses buttons, posts messages or changes the game).
 
-All rules are reached from the single brain [NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java), whose `rules`
+All rules are reached from the single brain [StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java), whose `rules`
 list is evaluated in order every tick; the first rule that returns a decision wins. The trade entries sit in this
 order (other rules omitted):
 
@@ -35,8 +35,8 @@ all own-turn deals (and the wait for an extortion answer) run before the tactica
 - **Role:** informs (dispatch only).
 - **Purpose:** the only public entry for the brain into `ti4.ai.trade`; almost every class behind it is
   package-private.
-- **Invoked when:** method references in `NekroBrain.rules` (list above); `TradeRules.offerDiscardBounty` from
-  `NekroBrain.declineWhens`; `noteGiveCost` from `ActionCardResponses.giveCost` and `MindsieveFollow`;
+- **Invoked when:** method references in `StandardBrain.rules` (list above); `TradeRules.offerDiscardBounty` from
+  `StandardBrain.declineWhens`; `noteGiveCost` from `ActionCardResponses.giveCost` and `MindsieveFollow`;
   `canTransact`/`ownTurnReplyMillis` from `SpeakerSale`; the Carth methods from `CarthAgentRules`.
 - **Algorithm:** every brain rule entry except `answerOffers` (and `observe`, and `carthTarget`) returns empty when
   `AiSettings.isTradingEnabled()` is false (system property `ai.trading`, default `true`). `answerOffers` always runs
@@ -679,7 +679,7 @@ past the cap every counter branch becomes Reject.
   phase, pick the dreaded outcome (≥ 10% likely and ≥ 2 TG worse than the average of the others), and pay a voter
   whose best ballot is that outcome not to vote for it (`NOT_FOR`); ≤ 2 an agenda.
 - [DiscardBountyDeals](/src/main/java/ti4/ai/trade/DiscardBountyDeals.java): in the "when" window
-  (`NekroBrain.declineWhens` and the agenda branch of `OwnTurnDeals`) post a public offer of TG to whoever plays Veto
+  (`StandardBrain.declineWhens` and the agenda branch of `OwnTurnDeals`) post a public offer of TG to whoever plays Veto
   and/or to the Quash player; in the Deadly Plot window a Deadly Plot bounty; nothing is paid unless the card is
   played. `observe` then turns a claim (card play found in `GameStats.getActionCardPlays` after the bounty, or the
   agenda quashed) into an `OWED` `DISCARD_AGENDA` promise to bill.
@@ -739,7 +739,7 @@ past the cap every counter branch becomes Reject.
 ### ti4.ai.promissory: PromissoryRules and its parts
 
 - **Role:** decides and executes (plays notes the AI holds).
-- [PromissoryRules](/src/main/java/ti4/ai/promissory/PromissoryRules.java): facade wired into `NekroBrain`.
+- [PromissoryRules](/src/main/java/ti4/ai/promissory/PromissoryRules.java): facade wired into `StandardBrain`.
 - [NoteHand](/src/main/java/ti4/ai/promissory/NoteHand.java): remembers every visible `resolvePNPlay_<note>` button;
   presses the visible or remembered one; otherwise presses `refreshPNInfo` or `cardsInfo` once per turn and scope,
   then waits up to 20 s (poll 3 s).
@@ -1349,9 +1349,9 @@ There are no `TODO`/`FIXME` comments and no WIP flags in `ti4.ai.trade`, `ti4.ai
 
 | Caller | Calls |
 | --- | --- |
-| `NekroBrain.rules` | `TradeRules.observe`, `rescindStale`, `answerOffers`, `askWhatTheyWant`, `answerPromises`, `payTheAnswerer`, `holdVoteForDeals`, `offerDeadlyPlotBounty`, `payDebtInAgenda`, `continueDraft`, `settleTrade`, `carthDeal`, `carthPreWash`, `startDeals`, `awaitExtortion`; `PromissoryRules.observe`, `continuePlay`, `answerOffers`, `playCeasefire`, `playCombatNotes`, `queueAgendaNote`, `holdForCeasefire` |
-| `NekroBrain.declineWhens` | `TradeRules.offerDiscardBounty` |
-| `NekroBrain` (turn actions) | `ConvoysRules.insteadOfTacticalAction`, `ConvoysRules.beforePassing` |
+| `StandardBrain.rules` | `TradeRules.observe`, `rescindStale`, `answerOffers`, `askWhatTheyWant`, `answerPromises`, `payTheAnswerer`, `holdVoteForDeals`, `offerDeadlyPlotBounty`, `payDebtInAgenda`, `continueDraft`, `settleTrade`, `carthDeal`, `carthPreWash`, `startDeals`, `awaitExtortion`; `PromissoryRules.observe`, `continuePlay`, `answerOffers`, `playCeasefire`, `playCombatNotes`, `queueAgendaNote`, `holdForCeasefire` |
+| `StandardBrain.declineWhens` | `TradeRules.offerDiscardBounty` |
+| `StandardBrain` (turn actions) | `ConvoysRules.insteadOfTacticalAction`, `ConvoysRules.beforePassing` |
 | `StrategyCardRules.play` / Trade primary / `followTrade` | `TradeCardRules.recordPlay`, `announce` (only with trading on), `followChoice`, `followPressed`; `TradeTerms.mastersOfTrade` (trading off: free follow for an AI holder or as Hacan) |
 | `CarthAgentRules.start`, `chooseTarget`, `otherTarget` | `TradeRules.humanDealPending`, `carthProposal`, `rememberCarthTarget`, `rememberedCarthTarget`, `carthTarget` |
 | `SpeakerSale.offer`, `awaitSellerPick` | `TradeRules.canTransact`, `ownTurnReplyMillis` |
@@ -1364,7 +1364,7 @@ There are no `TODO`/`FIXME` comments and no WIP flags in `ti4.ai.trade`, `ti4.ai
 | `TacticalRules` | `CeasefireRules.blocksMovement` |
 | `TradedSecretPoint` | `PlayAreaNotes.returnsAnyOnActivating`, `pointsReturnedOnActivating` |
 | `MindsieveFollow` | `NoteGiving.isThroneOrAlliance` |
-| `NekroBrain` (window prefixes) | `PromissoryRules.GREYFIRE_TARGET` |
+| `StandardBrain` (window prefixes) | `PromissoryRules.GREYFIRE_TARGET` |
 | `AgendaExamTest`, `AgendaTrace` (tests only) | `TradeRules.explainPayTheAnswerer`, `explainAvoidanceBribe`, `explainAvoidanceBribeAt` |
 | `ActionSecretRules` | `PlayAreaNotes.heldAtActionStart` |
 | `ExtortionPlans.promisedFear` | `PromiseBook.bindingFor` |

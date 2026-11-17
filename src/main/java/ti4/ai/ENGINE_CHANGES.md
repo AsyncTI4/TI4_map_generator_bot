@@ -35,11 +35,11 @@ flowchart TD
     H3 -->|"open(game)"| W
     W -.->|"stored value spaceCannonOffenceResolved"| SV[("game stored values")]
     SV -.->|"resolvedBy(game, pos)"| SCW["SpaceCannonWait.next / pending"]
-    TICK -->|"NekroBrain.decide -> TacticalRules.continueAction"| SCW
+    TICK -->|"StandardBrain.decide -> TacticalRules.continueAction"| SCW
     REN["MapRenderPipeline.snapshotOf"] -->|"GameSnapshots.copy"| WS["GameSaveService.writeSnapshot<br/>(no stamp)"]
 ```
 
-`NekroBrain` is the single rules brain `FactionBrainRegistry` hands every AI seat, so this path covers every faction.
+`StandardBrain` is the single rules brain `FactionBrainRegistry` hands every AI seat, so this path covers every faction.
 The `ManagedGame` stamp the poll reads is replaced only when the `ManagedGame` is rebuilt on a save or undo; renders
 never moved it.
 
@@ -474,7 +474,7 @@ correlations from human games pasted on 2026-10-18.
 #### Waiting for SPACE CANNON OFFENSE before continuing a tactical action
 
 - **Trigger:** an AI seat's tactical action reaches the point after movement: it owns one of `landUnits_`,
-  `doneLanding_`, `tacticalActionBuild_` or `doneWithTacticalAction`. `NekroBrain` calls `TacticalRules.continueAction`,
+  `doneLanding_`, `tacticalActionBuild_` or `doneWithTacticalAction`. `StandardBrain` calls `TacticalRules.continueAction`,
   which calls `SpaceCannonWait.next` before continuing.
 - **Responsible components:** `SpaceCannonOffenceWindow` (engine, records) and `SpaceCannonWait` (AI, decides).
 - **Choices:** wait, continue the action, or declare itself unsure.

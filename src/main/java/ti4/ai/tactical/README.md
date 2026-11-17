@@ -90,7 +90,7 @@ Flank Speed plans, adjust them for promises, extortion and Fracture marches, and
 command-token budget.
 
 **Invoked when (verified callers):**
-- `TacticalPlanner.best(game, seat, hints)` ← `TacticalRules.start` ← `NekroBrain.takeTurn` (own turn, action
+- `TacticalPlanner.best(game, seat, hints)` ← `TacticalRules.start` ← `StandardBrain.takeTurn` (own turn, action
   phase, after the "instead of a tactical action" options). `StrategyCardRules` (Thunder's Edge Warfare primary) also
   calls `TacticalRules.start` for the system picker, but it has remembered the plan from
   `PlannedPrimaries.warfareTarget` first, so `start` reuses that plan instead of calling `best`.
@@ -106,7 +106,7 @@ command-token budget.
   `rankedFreeingEveryToken` ← `FreedPlays.gain`.
 - `TacticalPlanner.forTarget` ← `TacticalRules.plan` (system already active but no remembered plan) and
   `TacticalRules.bestOffered` (picker fallback).
-- `TacticalPlanner.bestForWarfare` ← `NekroBrain.warfareBeforeFollowUp` (with Fleet Logistics, plays Thunder's Edge
+- `TacticalPlanner.bestForWarfare` ← `StandardBrain.warfareBeforeFollowUp` (with Fleet Logistics, plays Thunder's Edge
   Warfare first when its best token-free plan is an ATTACK), `CardTiming`, `PlannedPrimaries`; `forWarfareTarget` ←
   `PlannedPrimaries`. `StrategyCardRules` reaches both through `PlannedPrimaries.warfareTarget` (Thunder's Edge
   Warfare: a tactical action without placing a token; with no plan it announces `WarfareIdle` and finishes).
@@ -130,7 +130,7 @@ others.
 5. Opening holds: `holdForWarfareBuild` then `holdForGravityDrive` (see "Opening holds" below) may return a plan.
 6. `stallsWithAStrategyCard`: when a Gravity Drive is expected (`OpeningHold.awaitsGravityDrive`), the top plan does
    not keep a transport at home, and the seat holds an unplayed strategy card, return empty so that
-   `NekroBrain.takeTurn` falls through to playing the strategy card.
+   `StandardBrain.takeTurn` falls through to playing the strategy card.
 7. `withinTokenBudget(all, tactic − reservedTokens)`: keep plans with score ≥ `MIN_SCORE` = 1.0; also keep
    non-PRODUCE plans below 1.0 when the spare tokens exceed the number of distinct targets that have a plan ≥ 1.0.
    Effect: a 0.3–1.0 plan is executed only when no plan reaches 1.0 and at least one tactic token beyond the reserve
@@ -782,7 +782,7 @@ reachable within `move` (×1) or `2 × move` (×0.4), excluding the tile itself 
   contested race). `actionValue` and `cardActionValue` return 0 when no other player is still acting;
   `cardActionValue` also returns 0 when `Endurance.savesCardsForLater` (the seat holds the Endurance race uncontested).
   Used by 15 files outside this class to add the stall worth of a non-tactical action (see section 7).
-- `StallPlans.enduranceStall` ← `TacticalRules.stall` ← `NekroBrain.takeTurn` just before passing: when the stall bonus
+- `StallPlans.enduranceStall` ← `TacticalRules.stall` ← `StandardBrain.takeTurn` just before passing: when the stall bonus
   > 0 and `hasTokensForAnAction`, activate the best enemy-free activatable tile the picker offers, preferring home
   (rank 3) over a system with own planets or ships (rank 2); never a system with neither; ties go to the lexically
   smallest position string (`max` over `thenComparing(position, reverseOrder())`). Plan: POSITION, no moves,
@@ -810,7 +810,7 @@ Gravity Drive. `bonusFor` sums matching hints; added in `bestFor` and `stagePlan
   (credibility added to plan scores), `aiExtortionPayers` (with whether the payer could win this round). `honoured`
   makes a plan off limits; `fearOf` lowers enemy fear (0 for a spared tile, 0.5 after payment; AI promisers 0, human
   promisers 0.5).
-- **AttackLedger** (`ATTACK_MEMORY`): `observe` (in `NekroBrain` observers) diffs a board snapshot each tick (unit cost
+- **AttackLedger** (`ATTACK_MEMORY`): `observe` (in `StandardBrain` observers) diffs a board snapshot each tick (unit cost
   per tile per faction, planet owners) and records losses as attacks (damage × `Grievance.location`), persisted in
   `aiAttackLedger` (a game stored value, written through `AiGameWrites.persist`, which also adds each fresh loss to
   `Hostility`); unit losses are converted at 0.8 per resource; grudge decays ×0.5 per round, forgotten after 3; plus
@@ -821,7 +821,7 @@ Gravity Drive. `bonusFor` sums matching hints; added in `bestFor` and `stagePlan
 - **TacticalStrength** (`STRENGTH_WEIGHTED_ANGER`): strength = plastic cost + action cards (0.2 each unseen, 0.5 per
   harsh card when the hand is visible) + Assault Cannon 1, X-89 2, PDS II 1 + `FactionStrength.bonus`; anger weight =
   clamp((other + 1) / (own + 1), 0.25, 2).
-- **SlayIntent**: `announce` (in `NekroBrain.takeTurn`, after continuing an in-progress action and finishing pending
+- **SlayIntent**: `announce` (in `StandardBrain.takeTurn`, after continuing an in-progress action and finishing pending
   strategy-card follows) posts "We must slay …" when `WinRace.winnersBefore` is non-empty and that set of factions
   differs from the one already declared this round (not in Fog of War); `DefenseOutlook.temper` treats an AI that
   declared it hunts the seat as aggressive (1.2) and one hunting others as passive (0.8).
@@ -863,7 +863,7 @@ Gravity Drive. `bonusFor` sums matching hints; added in `bestFor` and `stagePlan
 
 **Purpose:** turn the remembered plan into button presses on the bot's own prompts, one press per tick.
 
-**Invoked when:** `NekroBrain.takeTurn`: `TacticalRules.inProgress(context)` → `continueAction`; otherwise
+**Invoked when:** `StandardBrain.takeTurn`: `TacticalRules.inProgress(context)` → `continueAction`; otherwise
 `secondAction`, `pickingSystem` → `start`, the main `start` call, and `stall` before passing. Also
 `StrategyCardRules` (Warfare), `BellumGloriosumRules`, `PlannedPrimaries`, `IntegratedEconomyRules`
 (`placeUnits`/`payForUnits`).
@@ -926,8 +926,8 @@ flowchart TD
 ### Combat and production
 
 Scope: the combat and production half of [ti4.ai.tactical](/src/main/java/ti4/ai/tactical). Every AI seat runs the
-same brain, [NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java) (`FactionBrainRegistry` maps both the `nekro`
-and `standard` brain ids to one `NekroBrain` instance). `NekroBrain.decide` walks an ordered list of rules and returns
+same brain, [StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java) (`FactionBrainRegistry` maps both the `nekro`
+and `standard` brain ids to one `StandardBrain` instance). `StandardBrain.decide` walks an ordered list of rules and returns
 the first `AiDecision` any rule produces (`Press`, `Wait`, `Unsure`, `Idle`, ...). The combat and production
 components below are either such rules (they return `Optional<AiDecision>`) or helpers those rules and the tactical
 planner call.
@@ -948,7 +948,7 @@ Magen Defense Grid, ground-combat automation, combat technologies, anti-fighter 
 stand-in, and the round roll with its timing.
 
 **Invoked when:** every tick of an AI seat, through the rule
-`context -> CombatRules.next(context, NekroBrain::atRoundStart)` in `NekroBrain.rules`. Earlier rules in that list
+`context -> CombatRules.next(context, StandardBrain::atRoundStart)` in `StandardBrain.rules`. Earlier rules in that list
 that also touch combat run first: `SardakkHeroRules::next`, `SardakkCommanderRules::next`, `ForesightRules::next`,
 `CombatCardRules::hold`, `CombatCardRules::afterSpaceCannon`, `CombatCardRules::cancelHits`, `SolCommanderRules::next`,
 `BrotherMilorRules::next`, `IndoctrinationRules::next`, `DevotionRules::next`, `ViscountUnlennSale::answer` /
@@ -960,7 +960,7 @@ timing is not `NOT_NOW` passes, so space cannon, anti-fighter barrage and bombar
 faction and card rules.
 
 **Inputs:** `AiTurnContext` (game, seat, prompts it can see, seat memory, `now`), a `CombatCardHook`
-(`NekroBrain.atRoundStart` = `SolAgentRules.atRoundStart`, then `CombatCardRules.atRoundStart`, then
+(`StandardBrain.atRoundStart` = `SolAgentRules.atRoundStart`, then `CombatCardRules.atRoundStart`, then
 `LetnevCombatRules.atRoundStart`), the engine's stored round counter `combatRoundTracker<faction><position><holder>`.
 
 **Outputs / decisions:** one `AiDecision` or empty. Hidden prompts are skipped; prompts are processed newest first
@@ -1778,7 +1778,7 @@ flowchart TD
 
 **Purpose:** get back within fleet pool and capacity when the engine offers the removal buttons.
 
-**Invoked when:** `NekroBrain` rule `FleetSupplyRules::removeExcessShips`; `OPEN_PREFIX` is in the brain's public
+**Invoked when:** `StandardBrain` rule `FleetSupplyRules::removeExcessShips`; `OPEN_PREFIX` is in the brain's public
 window prefixes.
 
 **Algorithm:** (1) While the engine's `latestAssignHits` type is `remove`, press the cheapest owned single-unit
@@ -1811,7 +1811,7 @@ ship (`emptyHaulerPenalty`); `loneHaulerPenalty` applies it only when every movi
 
 **Purpose:** Integrated Economy (`ie`): after gaining control of a planet, build up to its resources there.
 
-**Invoked when:** `NekroBrain` rule `IntegratedEconomyRules::next`.
+**Invoked when:** `StandardBrain` rule `IntegratedEconomyRules::next`.
 
 **Algorithm:** only with the technology. A remembered plan is continued first. For an unowned `integratedBuild_<planet>`
 offer in a visible prompt mentioning the seat, for a planet the seat controls, once per message (`integratedOffer|<messageId>`
@@ -1830,8 +1830,8 @@ such button exists, nothing is pressed and the offer is not answered again); oth
 
 **Purpose:** Sling Relay (`sr`): produce one ship at a space dock as an action.
 
-**Invoked when:** `NekroBrain.takeTurn` -> `SlingRelayRules.insteadOfTacticalAction` (before the tactical action);
-`TechRules.beforePassing` -> `SlingRelayRules.start`; `NekroBrain` rule `SlingRelayRules::next` for the button steps.
+**Invoked when:** `StandardBrain.takeTurn` -> `SlingRelayRules.insteadOfTacticalAction` (before the tactical action);
+`TechRules.beforePassing` -> `SlingRelayRules.start`; `StandardBrain` rule `SlingRelayRules::next` for the button steps.
 
 **Algorithm:** options = `ProductionPlanner.oneShipOptions` at every tile with the seat's space dock (resources =
 `spendableResources`).
@@ -1856,8 +1856,8 @@ such button exists, nothing is pressed and the offer is not answered again); oth
 **Purpose:** Transit Diodes (`td`, `absol_td`): move up to 4 ground forces to planets for _Mechanize the Military_ or
 _Occupy the Fringe_.
 
-**Invoked when:** `NekroBrain.takeTurn` -> `TransitDiodesRules.start` (when no action has been taken this turn);
-`NekroBrain` rule `TransitDiodesRules::next` for the steps; `GroundCampaign` reads `readyDiodes` and `MOVED_UNITS`.
+**Invoked when:** `StandardBrain.takeTurn` -> `TransitDiodesRules.start` (when no action has been taken this turn);
+`StandardBrain` rule `TransitDiodesRules::next` for the steps; `GroundCampaign` reads `readyDiodes` and `MOVED_UNITS`.
 
 **Algorithm:** `plan`: mechanize transfers (spare mechs from `TacticalPlanner.spareMechs` to bare `mtmTargets`, at most
 min(4, bare targets)) and occupy transfers (spare infantry from `TacticalPlanner.spareGround`, leaving one on each
@@ -1879,7 +1879,7 @@ button is in this turn's prompts.
 
 **Purpose:** Nekro's Technological Singularity: copy a technology after destroying an enemy unit.
 
-**Invoked when:** `NekroBrain` rule `SingularityRules::next`.
+**Invoked when:** `StandardBrain` rule `SingularityRules::next`.
 
 **Algorithm:** a hidden `nekroStealTech_<victim>` reminder created this turn: the first sight records the victim's
 units on the board (`singularityBaseline|<messageId>`); when the count drops below it (a unit destroyed, not one that
@@ -1898,7 +1898,7 @@ in the current combat at the active system x stake).
 
 | Scenario | Trigger | Handled by | Choices considered | How it chooses | Outcome / fallback |
 | --- | --- | --- | --- | --- | --- |
-| Start of own action turn | `NekroBrain.takeTurn`, no action in progress, no "instead of a tactical action" option fired | `TacticalRules.start` → `TacticalPlanner.best` | one best plan per activatable system and kind, stage and Flank Speed plans | highest score after reserve, holds and token budget | presses `tacticalAction`; empty plan → nothing, the brain plays a strategy card or later passes |
+| Start of own action turn | `StandardBrain.takeTurn`, no action in progress, no "instead of a tactical action" option fired | `TacticalRules.start` → `TacticalPlanner.best` | one best plan per activatable system and kind, stage and Flank Speed plans | highest score after reserve, holds and token budget | presses `tacticalAction`; empty plan → nothing, the brain plays a strategy card or later passes |
 | No tactic token | tactic CC = 0 | `TacticalPlanner.bestAffordable` | none | early return | empty; brain moves on |
 | Token reserve for a spend objective | `ScoringReserve.of(...).tokens() > 0` | `bestAffordable`, `withinTokenBudget` | all plans | if the reserve still fits, budget = tactic − reserve; else only plans worth more than the reserved objective | may return empty to keep tokens (test `dropsTheTokenReserveWhenAnotherSeatWinsFirst`) |
 | Best plan is PRODUCE at a system that still has ships to move out | top is PRODUCE and a second action is affordable | `bestAffordable` | non-PRODUCE plans moving out of that system | first such plan by score | moves out first, produces on a later action |
@@ -1931,7 +1931,7 @@ in the current combat at the active system x stake).
 
 ##### Choosing a tactical action at the start of a turn
 
-- **Trigger:** `NekroBrain.takeTurn` when the seat is active in the action phase and no tactical action is in progress,
+- **Trigger:** `StandardBrain.takeTurn` when the seat is active in the action phase and no tactical action is in progress,
   after strategy-card follow-ups, `SlayIntent.announce`, primaries, Master Plan, second actions, end-of-turn handlers,
   and a list of "instead of a tactical action" options (Transit Diodes, heroes, Sling Relay, relics, Convoys, a
   planned strategy card, action cards, technologies, …). Each of those options compares itself against
@@ -2781,9 +2781,9 @@ Each item cites the code that shows it.
 
 | Caller | Calls |
 | --- | --- |
-| `NekroBrain.takeTurn` | `TacticalRules.inProgress`, `continueAction`, `secondAction`, `pickingSystem`, `start`, `actionTaken`, `stall`; `SlayIntent.announce`; `TacticalPlanner.bestForWarfare` (in `warfareBeforeFollowUp`) |
-| `NekroBrain` observers | `AttackLedger.observe` |
-| `NekroBrain.secondActionIsWorthIt` / `secondStrategicAction` | `TacticalRules.anotherActionButton`, `secondActionStarted`, `secondTacticalActionIsWorthIt`, `mayTakeAnotherAction`, `firstActionConcluded`, `markSecondAction` |
+| `StandardBrain.takeTurn` | `TacticalRules.inProgress`, `continueAction`, `secondAction`, `pickingSystem`, `start`, `actionTaken`, `stall`; `SlayIntent.announce`; `TacticalPlanner.bestForWarfare` (in `warfareBeforeFollowUp`) |
+| `StandardBrain` observers | `AttackLedger.observe` |
+| `StandardBrain.secondActionIsWorthIt` / `secondStrategicAction` | `TacticalRules.anotherActionButton`, `secondActionStarted`, `secondTacticalActionIsWorthIt`, `mayTakeAnotherAction`, `firstActionConcluded`, `markSecondAction` |
 | `StrategyCardRules` | `TacticalRules.remember`, `pickingSystem`, `start`, `activatedThisTurn`, `payForUnits`, `placeUnits`; `TacticalPlanner.worthProducingAt`; `IdleTradeGoods.surplus`; `PeaceAccords.bestValue` |
 | `PlannedPrimaries` | `TacticalPlanner.bestForWarfare`, `forWarfareTarget`, `MIN_SCORE`; `new DefenseOutlook`; `TacticalRules.payForUnits`, `placeUnits` |
 | `PlanInputs` | `TacticalPlanner.ranked`, `rankedFreeing`, `bestScore`; `new DefenseOutlook` |
@@ -2830,9 +2830,9 @@ Each item cites the code that shows it.
 
 | Caller | Calls |
 | --- | --- |
-| `NekroBrain.rules` | `CombatRules.next(context, NekroBrain::atRoundStart)`, `FleetSupplyRules::removeExcessShips`, `IntegratedEconomyRules::next`, `SingularityRules::next`, `SlingRelayRules::next`, `TransitDiodesRules::next` |
-| `NekroBrain.takeTurn` | `TransitDiodesRules.start`, `SlingRelayRules.insteadOfTacticalAction` |
-| `NekroBrain.atRoundStart` (hook) | `SolAgentRules.atRoundStart`, `CombatCardRules.atRoundStart`, `LetnevCombatRules.atRoundStart` |
+| `StandardBrain.rules` | `CombatRules.next(context, StandardBrain::atRoundStart)`, `FleetSupplyRules::removeExcessShips`, `IntegratedEconomyRules::next`, `SingularityRules::next`, `SlingRelayRules::next`, `TransitDiodesRules::next` |
+| `StandardBrain.takeTurn` | `TransitDiodesRules.start`, `SlingRelayRules.insteadOfTacticalAction` |
+| `StandardBrain.atRoundStart` (hook) | `SolAgentRules.atRoundStart`, `CombatCardRules.atRoundStart`, `LetnevCombatRules.atRoundStart` |
 | `TechRules.beforePassing` | `SlingRelayRules.start` |
 | `TacticalRules.continueAction` / `landing` / `build` / `payForUnits` | `SpaceCannonWait.next`, `BombardmentRules.beforeLanding`, `ProductionPlanner.freeBuild` / `plan` / `warMachinePlan` / `reserve` / `aidaDiscount`, `PaymentPlanner.keepingReserve` / `choosePlanet` / `describe` |
 | `AiStallDetector` | `CombatRules.awaitsSeat` |

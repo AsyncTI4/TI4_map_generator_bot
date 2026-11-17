@@ -57,8 +57,8 @@ user id can never take this form; the uniqueness check is only against known pla
 - `WIP_FACTIONS` = naalu, winnu, yin. This constant is read by no production code; only `AiGameSupportTest` reads it.
   WIP factions are kept out of default picks only because `DEFAULT_FACTIONS` does not list them.
 - `MAX_SEATS = 8` real players.
-- `brainFor(faction)` returns `"nekro"` for Nekro and `"standard"` for every other faction; `FactionBrainRegistry`
-  maps both ids to the same `NekroBrain` instance.
+- `brainFor(faction)` returns `"standard"` for every faction; `FactionBrainRegistry` maps it, and `"nekro"` from
+  seats saved before the rename, to the same `StandardBrain` instance.
 - `seatName(faction)` = the faction model's short name (or the alias) + `" AI"`.
 
 **Where the kill switch is checked:** `AiGameSupport.refusalReason` (no new seats), `AiGameLauncher.launch` (no
@@ -216,7 +216,7 @@ home tile placed on an empty position, and that flags survive until the last AI 
 
 | Key | Content | Default when missing/invalid |
 | --- | --- | --- |
-| `aiBrain` | brain id (`nekro` or `standard`) | `""` (no brain found -> seat never decides) |
+| `aiBrain` | brain id (`standard`; `nekro` on older saves) | `""` (no brain found -> seat never decides) |
 | `aiAggBase` | ordinal of `AggressionLevel` | 2 (`OPPORTUNIST`); out-of-range ordinals are clamped to 0..4 |
 | `aiAggMode` | `DYNAMIC` or `LOCKED` | `DYNAMIC` |
 | `aiPaused` | `RUNNING`, `MANUAL` or `AUTO` | `RUNNING` |
@@ -867,9 +867,9 @@ per tick.
 | `MAX_REPEATED_FALLBACKS` | 5 (stop on the 6th) per `reason@activePlayer@turnStart` | `fallBack` |
 | `MAX_DELEGATIONS_PER_ROUND` | 30 per seat | `fallBack` |
 | `MAX_GAME_DELEGATIONS_PER_ROUND` | 60 per game | `fallBack` |
-| `MAX_ACTIONS_PER_HOUR` | 150 successful presses per seat in a sliding hour (600 at fast pace in self-play) | `mayActOnItsOwn`, referee gate |
+| `RUNAWAY_PRESS_CAP_PER_HOUR` | 150 successful presses per seat in a sliding hour (600 at fast pace in self-play) | `mayActOnItsOwn`, referee gate |
 | Health | 3 failures / 10 min per game; 10 / 10 min across games | `isHealthy` |
-| `MIN_GAP_BETWEEN_ACTIONS` | 1.5 s per game | `tickGame` |
+| `CHANNEL_FLOOD_GAP` | 1.5 s per game (0 at fast pace in self-play, via `channelFloodGap`) | `tickGame` |
 | `REFEREE_DELAY` | 20 s (10 s fast) | `RefereeRules.next`, referee gate |
 | Agenda resolution age | 60 s | `RefereeRules` |
 | Tie-break age | 10 min | `RefereeRules` |
@@ -971,8 +971,8 @@ explicit guards, unused fields and missing handlers.
 - **Aggression has no effect.** `AiProfile.baseLevel` and `mode` are drawn and stored but no production code reads
   them (grep for `baseLevel`, `AggressionLevel`, `AggressionMode` outside `ti4.ai.profile` finds only tests).
   `PauseState.AUTO` is never written. `AiProfile.clear` is unused in production.
-- **One brain for every faction.** `AiSettings.brainFor` returns `nekro` or `standard`, and `FactionBrainRegistry`
-  maps both to the same `NekroBrain`; the brain id does not select different code.
+- **One brain for every faction.** `AiSettings.brainFor` returns `standard`, and `FactionBrainRegistry` maps it and the
+  older `nekro` id to the same `StandardBrain`; the brain id does not select different code.
 - **WIP factions are only a list.** `AiSettings.WIP_FACTIONS` (naalu, winnu, yin) is read only by a test. They are
   offered as `/ai add` choices without any warning, and `/ai play` may give one to the human. They are excluded from
   defaults, `/ai watch` and `/ai play` opponents only because `DEFAULT_FACTIONS` omits them. L1Z1X and Jol-Nar are also

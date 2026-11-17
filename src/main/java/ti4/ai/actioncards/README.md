@@ -33,7 +33,7 @@ _Confounding Legal Text_ and _Deadly Plot_; used by the `ActionCardRules` play s
 `AiActionCards.inWindow` and `componentCards` (`CardRecovery`),
 `AiActionCards.usable` (test `StallCardPlansTest`), `AiActionCards.isComponentCard` (`ti4.ai.endurance.StallCount`),
 `AiActionCards.isSabotage` (`ti4.ai.trade.TradeActionCards`, `SabotagePolicy`, `ActionCardValue`),
-`AiActionCards.targetPrefixes` (via `ActionCardRules.targetPrefixes` into `NekroBrain.WINDOW_PREFIXES`, the set of
+`AiActionCards.targetPrefixes` (via `ActionCardRules.targetPrefixes` into `StandardBrain.WINDOW_PREFIXES`, the set of
 unowned public button prefixes the AI's perception keeps).
 
 **Inputs:** a card alias from the seat's hand.
@@ -154,7 +154,7 @@ stats describe one deck (`action_cards_te`); other decks' cards without a stats 
   `ti4.ai.expedition.KindPricing`, `ti4.ai.explore.CodexFlow`, `ti4.ai.trade.TradeActionCards`.
 - `discardOrder`: `HandPressure.forcedDiscard`, `ti4.ai.agenda.ExpertLawValues`, `ti4.ai.expedition.KindPricing`,
   `ti4.ai.trade.TradeActionCards`.
-- `worstDiscard`: `NekroBrain.discardExcessActionCards` (hand limit, prefix `AC_DISCARD`),
+- `worstDiscard`: `StandardBrain.discardExcessActionCards` (hand limit, prefix `AC_DISCARD`),
   `ti4.ai.expedition.ExpeditionRules`, `ti4.ai.nekro.NekroLeaderRules` (agent cost), `ti4.ai.secrets.SecretCostRules`.
 - `spareCard` / `hasSpareCard`: `ti4.ai.trade.CardSales`, `NekroLeaderRules`, `DrawnCardValue.malleonWantsACard`.
 
@@ -238,14 +238,14 @@ is `BEFORE_PASSING`, `acCount ≥ ACLimit` and the alias is the first of `discar
 
 **Role:** decides (whether to start a play now) and executes (the multi-step play).
 
-**Purpose:** the entry points `NekroBrain` calls for every non-combat, non-agenda card play, and the state machine
+**Purpose:** the entry points `StandardBrain` calls for every non-combat, non-agenda card play, and the state machine
 that carries a play from its first press to its last target button across many ticks.
 
-**Invoked when (verified in `NekroBrain`):**
+**Invoked when (verified in `StandardBrain`):**
 - Rule list, in this order: `ActionCardRules::continuePlay`, `::afterActivation`, `::flankSpeed`,
   `::presetSummit` (after the leader rules, before `PromissoryRules::continuePlay`), and much later
   `ActionCardRules::holdOwnTurn` (just before `PromissoryRules::holdForCeasefire` and `takeTurn`).
-- Inside `NekroBrain.takeTurn`: `ActionCardRules.masterPlan(context, secondActionIsWorthIt(...))` after a primary
+- Inside `StandardBrain.takeTurn`: `ActionCardRules.masterPlan(context, secondActionIsWorthIt(...))` after a primary
   has resolved and before the second action; `ActionCardRules.insteadOfTacticalAction` after
   `StrategyCardTurn.playIfDue` and before `TechRules.insteadOfTacticalAction` and `TacticalRules.start`;
   `ActionCardRules.playBeforePassing` after no tactical action and no strategic action remain, before the other
@@ -281,7 +281,7 @@ that carries a play from its first press to its last target button across many t
   empty, `TacticalRules.activatedThisTurn`, turn key unused, `mayPlay`, holds a Flank Speed
   (`MoveBoost.flankSpeedCard`), and the remembered tactical plan targets the active system and
   `TacticalPlanner.needsFlankSpeed` (some non-fighter ship cannot reach the target without the extra move).
-- `masterPlan`: `secondActionIsWorthIt` from `NekroBrain`, key `acPlay|plan:<turnKey>` unused, not legacy,
+- `masterPlan`: `secondActionIsWorthIt` from `StandardBrain`, key `acPlay|plan:<turnKey>` unused, not legacy,
   `mayPlay`, not Spy Network → the alphabetically first held `AFTER_ACTION` card (Master Plan).
 - `presetSummit`: holds `summit`, `mayPlay`, no active Summit play remembered; if stored value `Summit` already
   contains the faction it only records a `PRESET` play; else requires
@@ -413,7 +413,7 @@ flowchart TD
 
 **Purpose:** answer every Sabotage window of another player's card, with a delay that does not depend on the hand.
 
-**Invoked when:** `NekroBrain` rules `SabotageRules::answerWindowsAimedAtSeat`, `SabotageRules::followUp`,
+**Invoked when:** `StandardBrain` rules `SabotageRules::answerWindowsAimedAtSeat`, `SabotageRules::followUp`,
 `SabotageRules::answerWindows`, in that order, after `ActionCardResponses::respond` and before the combat and turn
 rules.
 
@@ -431,7 +431,7 @@ Instinct Training button `sabotage_xxcha_<title>_<faction>`, or `no_sabotage`.
   `factionsThatReacted`, or the window has no registry entry). `readyAt = createdAt + passDelay`; before that →
   `Wait(readyAt)`. Then `cancelChoice` (skipped when Instinct Training was already spent on this window) or press
   `no_sabotage`. Windows are answered newest first and the first window still inside its delay returns its `Wait`,
-  so an older window whose delay has passed is answered only after the newer one. Because `NekroBrain` takes the
+  so an older window whose delay has passed is answered only after the newer one. Because `StandardBrain` takes the
   first rule that returns a decision, this `Wait` also holds every rule listed after the Sabotage rules (combat,
   agenda voting, the seat's own turn) until the delay expires.
 - `passDelay`: `seed = messageId.hashCode() ^ (int) profile.seed()` (`AiProfile.seed` is a non-negative random long
@@ -676,8 +676,8 @@ only 22 planets).
 
 **Role:** decide and execute.
 
-**Invoked when:** `NekroBrain.declineWhens` → `AgendaCardRules.holdsPlayedVeto`, `queueVeto`, `awaitVetoBounty`;
-`NekroBrain.declineAfters` → `holdsUnplacedRider`, `queueRider`; rule `AgendaCardRules::riders` (before
+**Invoked when:** `StandardBrain.declineWhens` → `AgendaCardRules.holdsPlayedVeto`, `queueVeto`, `awaitVetoBounty`;
+`StandardBrain.declineAfters` → `holdsUnplacedRider`, `queueRider`; rule `AgendaCardRules::riders` (before
 `declineAfters`); `ti4.ai.runtime.AiStallDetector` → `vetoPlayedAndPending`; `ti4.ai.trade.DiscardBountyDeals` →
 `holdsVeto`, `holdsDeadlyPlot`; `ti4.ai.trade.PromiseDeals` → `holdsUnplacedRider`; `ti4.ai.agenda.ShenanigansRules.react`
 → `ShenaniganCards.playIfWorthIt`, `playing`.
@@ -718,7 +718,7 @@ only 22 planets).
 
 **Role:** decide and execute.
 
-**Invoked when:** `NekroBrain.atRoundStart` (passed to `CombatRules.next`) → `CombatCardRules.atRoundStart`
+**Invoked when:** `StandardBrain.atRoundStart` (passed to `CombatRules.next`) → `CombatCardRules.atRoundStart`
 (after `SolAgentRules`, before `LetnevCombatRules`); rules `CombatCardRules::hold`, `::afterSpaceCannon`,
 `::cancelHits`; `CombatRules` space cannon press → `CombatCardRules.watchSpaceCannon`.
 
@@ -829,15 +829,15 @@ title, so the cancel checks still apply.
 
 | Scenario | Trigger | Handled by | Choices considered | How it chooses | Outcome / fallback |
 | --- | --- | --- | --- | --- | --- |
-| Component card instead of a tactical action | Own turn, action phase, nothing earlier in `NekroBrain.takeTurn` acted | `ActionCardRules.insteadOfTacticalAction` | every held `ECONOMY` / `COMPONENT_ACTION` card with a plan | plan ≥ hand-pressure share × keep prior; max margin (value − prior); then tactical plan score ≥ card value blocks it unless urgent | presses `ac_play_from_hand<index>`; if the hand message is out of view, asks for it once (20 s), then opens the component action menu |
+| Component card instead of a tactical action | Own turn, action phase, nothing earlier in `StandardBrain.takeTurn` acted | `ActionCardRules.insteadOfTacticalAction` | every held `ECONOMY` / `COMPONENT_ACTION` card with a plan | plan ≥ hand-pressure share × keep prior; max margin (value − prior); then tactical plan score ≥ card value blocks it unless urgent | presses `ac_play_from_hand<index>`; if the hand message is out of view, asks for it once (20 s), then opens the component action menu |
 | Component card before passing | Own turn, no tactical or strategic action left | `ActionCardRules.playBeforePassing` | same set at `BEFORE_PASSING` (Overrule reserve may lift, Pirate setup value 0, Strategize may buy Leadership) | same filter and margin, no tactical comparison; at full hand the card it would discard has threshold 0 | play, or fall through to the other before-passing rules and pass |
 | Nothing worth playing | Same triggers, every plan below its threshold | same | — | filter empties the list | no play; card stays at its keep value |
 | Last player acting | Every other player has passed | evaluators via `Stall.cardActionValue` | — | stall drops to 0 | weak cards no longer clear the bar (`keepsACardThatIsNotWorthPlayingOnceEveryOtherPlayerHasPassed`) |
 | Spy Network hold | Seat holds _Form a Spy Network_ and ≤ 5 cards | `ActionCardRules.mayPlayNow` / `keepsSpyNetworkCards` | — | gate | no card plays (turn, reaction, combat, agenda); Sabotage, Flank Speed and the Summit pre-play still run (they check `mayPlay` only) |
-| Censured / over the limit / passed vs Transparasteel | state | `ActionCardRules.mayPlay` | — | gate | no plays and no Sabotage card; the Instinct Training token is not gated by `mayPlay`; over the limit `NekroBrain.discardExcessActionCards` discards first |
+| Censured / over the limit / passed vs Transparasteel | state | `ActionCardRules.mayPlay` | — | gate | no plays and no Sabotage card; the Instinct Training token is not gated by `mayPlay`; over the limit `StandardBrain.discardExcessActionCards` discards first |
 | Another player activates a system with the seat's units | Non-active seat, active system set | `ActionCardRules.afterActivation` | Forward Supply Base, Counterstroke | best margin among the two whose activation test holds | one play per activation key |
 | Flank Speed | Active seat activated the system its remembered plan targets and the plan needs one more move | `ActionCardRules.flankSpeed` | the alphabetically first Flank Speed copy | `TacticalPlanner.needsFlankSpeed` | play; the planner already charged 1.5 for the card |
-| Master Plan | First action concluded and the bot offers another action | `ActionCardRules.masterPlan` (from `NekroBrain.takeTurn`) | first held `AFTER_ACTION` card | `NekroBrain.secondActionIsWorthIt` | play, then `TacticalRules.allowAnotherAction` |
+| Master Plan | First action concluded and the bot offers another action | `ActionCardRules.masterPlan` (from `StandardBrain.takeTurn`) | first held `AFTER_ACTION` card | `StandardBrain.secondActionIsWorthIt` | play, then `TacticalRules.allowAnotherAction` |
 | Summit drawn | Hidden `resolvePreassignment_Summit` button visible | `ActionCardRules.presetSummit` | — | needs ≥1 token gain within reinforcements | pre-play; later gains up to 2 tokens |
 | War Machine at production | Tactical production step with a boosted plan | `TacticalRules.warMachine` → `ProductionCards.playWarMachine` | — | `ProductionPlanner.warMachinePlan` (outside scope) | play, wait while pending, then build with or without the boost |
 | Sabotage window of another player's card | Public prompt with `no_sabotage` | `SabotageRules.answerWindows` / `answerWindowsAimedAtSeat` | Sabotage card, Instinct Training token, pass | `SabotagePolicy.choose`: value ≥ marginal keep (card) or ≥ token cost (token); token preferred when cheaper than the card's keep | press after the seeded delay; scrolled-out windows are rebuilt |
@@ -848,14 +848,14 @@ title, so the cancel checks still apply.
 | Extreme Duress on the seat | seat-owned `concedeToED_` this turn | `ActionCardResponses.extremeDuress` | concede, give in and play a strategy card | gives in when an unplayed strategy card is available and no action taken yet | press, then plays the strategy card |
 | Combat round start | `CombatRules` reaches the seat's round roll | `CombatCardRules.atRoundStart` | Direct Hit; Emergency Repairs, Morale Boost, Fighter Prototype, Skilled Retreat | swing > 0 and swing ≥ prior; else Morale Boost for loss chance in [0.2, 0.8]; else Skilled Retreat vs a secret | one play per round key; roll waits while the play is active |
 | Hits to assign | public prompt with seat-owned assign button and cancel button | `CombatCardRules.cancelHits` → `HitCancelCards` | Shields Holding, Maneuvering Jets | thresholds per canceller | play, then press the cancel button once per planned hit |
-| Agenda "when" | phase `agendawaiting`, whens open | `NekroBrain.declineWhens` → `AgendaCardRules.queueVeto` | Veto | `AgendaPolicy.veryBadFor` or worth discarding with the bounty | queue; else wait for a bounty offer; else decline whens |
-| Agenda "after" | same phase | `NekroBrain.declineAfters` → `AgendaCardRules.queueRider` | five riders × forecast outcomes | max gain with gain ≥ hold value | queue, lock in, place; else decline afters |
+| Agenda "when" | phase `agendawaiting`, whens open | `StandardBrain.declineWhens` → `AgendaCardRules.queueVeto` | Veto | `AgendaPolicy.veryBadFor` or worth discarding with the bounty | queue; else wait for a bounty offer; else decline whens |
+| Agenda "after" | same phase | `StandardBrain.declineAfters` → `AgendaCardRules.queueRider` | five riders × forecast outcomes | max gain with gain ≥ hold value | queue, lock in, place; else decline afters |
 | Agenda shenanigans | phase `agendaEnd`, bot confirmation buttons | `ShenanigansRules.react` → `ShenaniganCards.playIfWorthIt` | Confounding Legal Text, Deadly Plot | legal and gain ≥ prior | play and resolve by hand; else press the "No ..." confirmation after a seeded 5–24 s delay |
-| Hand limit at status / any time over the limit | `ButtonHelper.isPlayerOverLimit` | `NekroBrain.discardExcessActionCards` → `ActionCardValue.worstDiscard` | hand | discard order (keep, prior, play value, alias) | press the first available discard button |
+| Hand limit at status / any time over the limit | `ButtonHelper.isPlayerOverLimit` | `StandardBrain.discardExcessActionCards` → `ActionCardValue.worstDiscard` | hand | discard order (keep, prior, play value, alias) | press the first available discard button |
 
 #### Component card versus tactical action
 
-- **Trigger:** `NekroBrain.takeTurn` on the seat's own turn, before its first action, after the earlier
+- **Trigger:** `StandardBrain.takeTurn` on the seat's own turn, before its first action, after the earlier
   instead-of-tactical rules in `takeTurn` (Transit Diodes, Darktalon Treilla, Warfare first, Sling Relay, relics,
   convoys, the planned strategy card) returned nothing.
 - **Component:** `ActionCardRules.insteadOfTacticalAction` → `ActionCardValue.bestNewComponentPlay` (IN_TURN).
@@ -885,8 +885,8 @@ title, so the cancel checks still apply.
   Overrule); token option when `cancelValue ≥ token cost`; token wins when cheaper than the card's keep.
 - **Constraints:** not in Fog of War, not for a legacy seat, never the seat's own card, never a card that cannot be
   sabotaged, never under Shameix's Bane, card option needs `ActionCardRules.mayPlay`.
-- **Interactions:** the ordering in `NekroBrain` puts `answerWindowsAimedAtSeat` before `answerWindows` and both
-  before combat, agenda voting and the turn; `NekroBrain` takes the first rule that returns a decision, so the `Wait`
+- **Interactions:** the ordering in `StandardBrain` puts `answerWindowsAimedAtSeat` before `answerWindows` and both
+  before combat, agenda voting and the turn; `StandardBrain` takes the first rule that returns a decision, so the `Wait`
   returned by `answer` holds every later rule until the delay expires (rules listed earlier, such as
   `ActionCardRules.continuePlay`, still run).
 - **Why similar situations differ:** a _Parley_ from an even-standing player (1.44) is cancelled by a seat with a
@@ -912,7 +912,7 @@ title, so the cancel checks still apply.
 
 #### Combat round start
 
-- **Trigger:** `CombatRules.next(context, NekroBrain::atRoundStart)` calls the hook just before the seat's round
+- **Trigger:** `CombatRules.next(context, StandardBrain::atRoundStart)` calls the hook just before the seat's round
   roll (conditions of that call are in `CombatRules`, outside this scope).
 - **Order:** `DirectHitRules.atRoundStart` (only from round 1, for ships whose damage grew since the last snapshot),
   then the best-margin card, then Morale Boost on close odds, then Skilled Retreat against a secret.
@@ -1296,7 +1296,7 @@ window is exactly "Action" is registered, except the explicitly deferred Exchang
 - **Legacy switch:** `AiSettings.usesLegacyActionCards` reads the seat stored value `aiLegacyActionCards`; in this
   branch only test code (`SelfPlayGame.markLegacySeats`, unit tests) sets it.
 - **Sabotage windows hold the seat:** the `Wait` from `SabotageRules.answer` (5–14 s, or 10–39 min while a human has
-  not answered) stops every `NekroBrain` rule listed after the Sabotage rules, including the seat's own turn and agenda
+  not answered) stops every `StandardBrain` rule listed after the Sabotage rules, including the seat's own turn and agenda
   voting. Windows are answered newest first, so an older window already past its delay waits for a newer one's delay.
 - **Homebrew alias in an official class:** `CombatCards.MORALE_BOOSTS` lists `morale_boost_ds` (Discordant Stars)
   next to `mb1`..`mb4`.
@@ -1321,12 +1321,12 @@ window is exactly "Action" is registered, except the explicitly deferred Exchang
 
 | Caller | Calls |
 | --- | --- |
-| `ti4.ai.nekro.NekroBrain` rule list | `ActionCardRules.continuePlay`, `afterActivation`, `flankSpeed`, `presetSummit`, `holdOwnTurn`; `ActionCardResponses.respond`; `SabotageRules.answerWindowsAimedAtSeat`, `followUp`, `answerWindows`; `CombatCardRules.hold`, `afterSpaceCannon`, `cancelHits`; `AgendaCardRules.riders` |
-| `NekroBrain.takeTurn` | `ActionCardRules.masterPlan`, `insteadOfTacticalAction`, `playBeforePassing` |
-| `NekroBrain.atRoundStart` (hook passed to `CombatRules.next`) | `CombatCardRules.atRoundStart` |
-| `NekroBrain.declineWhens` / `declineAfters` | `AgendaCardRules.holdsPlayedVeto`, `queueVeto`, `awaitVetoBounty`, `holdsUnplacedRider`, `queueRider` |
-| `NekroBrain.discardExcessActionCards` | `ActionCardValue.worstDiscard` |
-| `NekroBrain.WINDOW_PREFIXES` | `ActionCardRules.targetPrefixes` |
+| `ti4.ai.brain.StandardBrain` rule list | `ActionCardRules.continuePlay`, `afterActivation`, `flankSpeed`, `presetSummit`, `holdOwnTurn`; `ActionCardResponses.respond`; `SabotageRules.answerWindowsAimedAtSeat`, `followUp`, `answerWindows`; `CombatCardRules.hold`, `afterSpaceCannon`, `cancelHits`; `AgendaCardRules.riders` |
+| `StandardBrain.takeTurn` | `ActionCardRules.masterPlan`, `insteadOfTacticalAction`, `playBeforePassing` |
+| `StandardBrain.atRoundStart` (hook passed to `CombatRules.next`) | `CombatCardRules.atRoundStart` |
+| `StandardBrain.declineWhens` / `declineAfters` | `AgendaCardRules.holdsPlayedVeto`, `queueVeto`, `awaitVetoBounty`, `holdsUnplacedRider`, `queueRider` |
+| `StandardBrain.discardExcessActionCards` | `ActionCardValue.worstDiscard` |
+| `StandardBrain.WINDOW_PREFIXES` | `ActionCardRules.targetPrefixes` |
 | `ti4.ai.tactical.CombatRules` | `CombatCardRules.watchSpaceCannon` |
 | `ti4.ai.tactical.TacticalRules` | `ProductionCards.holdsWarMachine`, `warMachine`, `playWarMachine` |
 | `ti4.ai.agenda.ShenanigansRules` | `ShenaniganCards.playIfWorthIt`, `playing`; `AgendaCardRules.holdsDeadlyPlot` |

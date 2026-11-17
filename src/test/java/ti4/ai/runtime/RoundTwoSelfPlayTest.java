@@ -130,7 +130,11 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
         List<SelfPlayGame.Outcome> outcomes =
                 results.stream().map(GameResult::outcome).toList();
         if (PLAY_AGENDA) AgendaTracker.report(outcomes);
-        if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get());
+        if (SelfPlayGame.AB.isPresent())
+            AbSummary.print(
+                    outcomes,
+                    SelfPlayGame.AB.get(),
+                    ending -> ending == SelfPlayGame.Ending.STOP_CONDITION || ending.finished());
     }
 
     private static final AtomicInteger COMMANDER_PULLS = new AtomicInteger();

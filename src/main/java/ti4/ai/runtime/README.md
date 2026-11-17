@@ -130,8 +130,8 @@ flowchart TD
     Vp -- yes --> Stop["stop (self-play: 🏁 once)"]
     Vp -- no --> Deleg{"delegated press queued?"}
     Deleg -- yes --> PD["pressDelegated<br/>then markDirty(+2.5 s)"]
-    Deleg -- no --> Gap{"under 1.5 s since last action?"}
-    Gap -- yes --> Hold["markDirty(lastAction + 1.5 s)"]
+    Deleg -- no --> Gap{"under the flood gap since last action?<br/>(1.5 s; 0 at fast pace)"}
+    Gap -- yes --> Hold["markDirty(lastAction + gap)"]
     Gap -- no --> Read["AiPerception.read"]
     Discord[("Discord history:<br/>seat threads, main channel,<br/>strategy and combat threads")] -.-> Read
     Read --> Track{"self-play, track exhausted<br/>and end-game button offered?"}
@@ -235,7 +235,8 @@ flowchart TD
   7. Victory: if `game.getVp() > 0 && game.getHighestScore() >= game.getVp()`, return without acting. In self-play
      the 🏁 notice is posted once (`markGameOverAnnounced`). This stops AI seats in human games too, silently.
   8. A queued delegated press: `pressDelegated`, `markDirty(now + 2.5 s)`, return (one per tick).
-  9. Pacing: if `now - lastActionAt < 1.5 s` (`MIN_GAP_BETWEEN_ACTIONS`), `markDirty(lastActionAt + 1.5 s)`, return.
+  9. Pacing: if `now - lastActionAt < AiSettings.channelFloodGap(game)` (`CHANNEL_FLOOD_GAP` = 1.5 s, or 0 at self-play
+     fast pace), `markDirty(lastActionAt + gap)`, return.
   10. `AiPerception.read(game, seats)` once for all seats (timed as `ai.perceive`).
   11. Referee prompts: main-channel prompts with an enabled referee step button or the "most points" end-game button.
       In self-play, if the public objective track is exhausted (`RefereeRules.trackExhausted`) and an end-game button
@@ -249,7 +250,7 @@ flowchart TD
   - `profile = AiProfile.of(seat)`; `brain = FactionBrainRegistry.forBrainId(profile.brainId())`;
     `prompts = snapshot.promptsFor(seat, brain.publicWindowHandlerPrefixes())`.
   - `canAct = brain present && !profile.isPaused() && AiSettings.isEnabled() && isHealthy(lane, now) &&
-    actionsInLastHour < maxActionsPerHour(game)` (150, or 600 at fast pace).
+    actionsInLastHour < runawayPressCapPerHour(game)` (150, or 600 at fast pace).
   - `canAct`: `AiSeatService.ensureTradePreferences(seatId)` (turns off auto debt clearance once per process), then
     `decide(tick, brain, new AiTurnContext(game, seat, profile, prompts, pressedKeys, memory, now))`. Otherwise
     `AiDecision.idle()`.
@@ -335,7 +336,7 @@ flowchart TD
     CanAct -- no --> IdleD["decision = Idle"]
     CanAct -- yes --> Held{"thinking held<br/>(abort, same fingerprint, under 5 min)?"}
     Held -- yes --> IdleD
-    Held -- no --> Decide["NekroBrain.decide:<br/>first non-empty of 144 rules"]
+    Held -- no --> Decide["StandardBrain.decide:<br/>first non-empty of 144 rules"]
     Ctx[("AiTurnContext: game, seat, profile,<br/>prompts, pressedKeys, AiMemory, now")] -.-> Decide
     Decide -- "ThinkingAborted / StackOverflowError" --> Cut["cutShort: hold, warn,<br/>THINKING_ABORTED record"]
     Cut --> IdleD
@@ -410,7 +411,7 @@ flowchart TD
      (`sc_no_follow_N` prompts).
   5. Any prompt for which `CombatRules.awaitsSeat` holds: "a combat".
   6. Round <= 1, not extra-secret mode, more than one unscored secret, and only custom public objectives revealed
-     (`NekroBrain.noRealObjectiveRevealed`): "discarding a starting secret objective" (private `discardSecret_` prompts).
+     (`StandardBrain.noRealObjectiveRevealed`): "discarding a starting secret objective" (private `discardSecret_` prompts).
   7. An agenda "when"/"after" decline button in the seat's thread while the seat has not passed on that window, unless
      it holds a queued when/after or a played Veto is pending (`AgendaQueue`, `AgendaCardRules`).
   - `describe` joins the descriptions with ", "; that string is the stall identity in `AiSeatState.stallAge`.
@@ -503,18 +504,18 @@ flowchart TD
   messages without buttons kept, table talk, Leadership rider line, rejection notices) and
   `AiCombatThreadSelectionTest` (opponent gone, newest thread per matchup, simultaneous combats).
 
-### FactionBrain, FactionBrainRegistry and NekroBrain
+### FactionBrain, FactionBrainRegistry and StandardBrain
 
 - **Role:** decides.
 - **Purpose:** `FactionBrain` is the decision interface: `id()`, `publicWindowHandlerPrefixes()` (which unowned public
   buttons perception passes to the seat), and `decide(AiTurnContext) -> AiDecision`.
-- **Registry:** [FactionBrainRegistry](/src/main/java/ti4/ai/brain/FactionBrainRegistry.java) maps `"nekro"` and
-  `"standard"` to **the same** `NekroBrain` instance. `AiSettings.brainFor(faction)` writes `"nekro"` for the Nekro
-  faction and `"standard"` for every other faction into the seat's `aiBrain` stored value when the seat is added
+- **Registry:** [FactionBrainRegistry](/src/main/java/ti4/ai/brain/FactionBrainRegistry.java) maps `"standard"`
+  (`StandardBrain.ID`) and `"nekro"` (the id of seats saved before the rename) to **the same** `StandardBrain` instance.
+  `AiSettings.brainFor(faction)` writes `"standard"` for every faction into the seat's `aiBrain` stored value when the seat is added
   (`AiSeatService.addSeat` via `AiProfile.createHidden`). A brain id not in the map (for example a blank stored value)
   gives no brain: the seat never decides and only reaches the stall/hand-over path.
 - **Invoked when:** only from `AiTickRunner.decide`.
-- **Algorithm (`NekroBrain.decide`):** `DecidingSeat.of(seat, …)` sets a thread-local "who is deciding" (used by
+- **Algorithm (`StandardBrain.decide`):** `DecidingSeat.of(seat, …)` sets a thread-local "who is deciding" (used by
   evaluators to know whose hand is visible), then `firstRuleDecision` walks the rule list in order. Each rule is a
   `BrainRule` (`Function<AiTurnContext, Optional<AiDecision>>`), timed with `Thinking.measure("rule.<name>")`. The first
   rule that returns a present `Optional` decides; `TimingReport.decidedBy(name)` records it. If none does, `Idle`.
@@ -531,7 +532,7 @@ flowchart TD
   (not paused, kill switch on, healthy, under its hourly cap, thinking not held), whether or not it then acts. They do
   not run for seats after the one that acted, nor for seats that may not choose. Some of them save the game through
   `AiGameWrites.persist`.
-- **Rules written in `NekroBrain` itself:**
+- **Rules written in `StandardBrain` itself:**
   - `finishCommandTokenGain` (6): in `statusHomework`, on a private `increase_tactic_cc` prompt with a "Done
     Redistributing" button: press the pool from `CommandTokenPolicy.poolToGrow` while the net gain is below
     `statusPhaseGainWithinReinforcements`; otherwise move a surplus token (`poolToRedistributeFrom`); otherwise press
@@ -565,7 +566,7 @@ flowchart TD
   - `startStatusHomework` (142): `statusHomework`: press `redistributeCCButtons` on the newest public message that also
     has `pass_on_abilities`; once the reaction is stored and the gain target is met, press `pass_on_abilities`
     ("ready") unless either button was already pressed.
-- **Window prefixes:** `NekroBrain.WINDOW_PREFIXES` = the `PUBLIC_WINDOW_PREFIXES` set (strategy card decline, public and
+- **Window prefixes:** `StandardBrain.WINDOW_PREFIXES` = the `PUBLIC_WINDOW_PREFIXES` set (strategy card decline, public and
   secret scoring, status homework, when/after declines, `no_sabotage`, `combatRoll_`, system pickers, payment
   `spend_`/`reduceTG_`, `getTech_`, agenda outcome and vote prefixes, exploration and relic choices, several faction
   component prefixes) plus `ActionCardRules.targetPrefixes()`.
@@ -573,7 +574,7 @@ flowchart TD
 - **Limitations:** one rule list for every faction (faction rules key on abilities, leaders or units inside each rule);
   an exception inside any rule aborts the whole decision for that seat and tick (logged, treated as `Idle`).
 
-The registered rule list, in priority order (`NekroBrain.rules`; `NekroBrain::x` is `this::x` in the source):
+The registered rule list, in priority order (`StandardBrain.rules`; `StandardBrain::x` is `this::x` in the source):
 
 | # | Rule |
 | --- | --- |
@@ -582,7 +583,7 @@ The registered rule list, in priority order (`NekroBrain.rules`; `NekroBrain::x`
 | 3 | `ActionSecretRules::observe` |
 | 4 | `PromissoryRules::observe` |
 | 5 | `TradeRules::observe` |
-| 6 | `NekroBrain::finishCommandTokenGain` |
+| 6 | `StandardBrain::finishCommandTokenGain` |
 | 7 | `StrategyCardRules::exhaustAiDevelopmentForResearch` |
 | 8 | `StrategyCardRules::exhaustProphetsTearsForResearch` |
 | 9 | `BrotherOmarRules::returnInfantry` |
@@ -650,10 +651,10 @@ The registered rule list, in priority order (`NekroBrain.rules`; `NekroBrain::x`
 | 71 | `ActionCardRules::flankSpeed` |
 | 72 | `ActionCardRules::presetSummit` |
 | 73 | `PromissoryRules::continuePlay` |
-| 74 | `NekroBrain::queueProveEndurance` |
+| 74 | `StandardBrain::queueProveEndurance` |
 | 75 | `SecretRedrawRules::discardForRedraw` |
-| 76 | `NekroBrain::discardExcessSecret` |
-| 77 | `NekroBrain::discardExcessActionCards` |
+| 76 | `StandardBrain::discardExcessSecret` |
+| 77 | `StandardBrain::discardExcessActionCards` |
 | 78 | `TradeRules::rescindStale` |
 | 79 | `TradeRules::answerOffers` |
 | 80 | `TradeRules::askWhatTheyWant` |
@@ -682,25 +683,25 @@ The registered rule list, in priority order (`NekroBrain.rules`; `NekroBrain::x`
 | 103 | `ViscountUnlennSale::holdRoll` |
 | 104 | `ViscountUnlennSale::offer` |
 | 105 | `MatriarchRules::continueHits` |
-| 106 | `context -> CombatRules.next(context, NekroBrain::atRoundStart)` |
+| 106 | `context -> CombatRules.next(context, StandardBrain::atRoundStart)` |
 | 107 | `ActionSecretRules::next` |
 | 108 | `SecretRules::scoreAgendaSecret` |
 | 109 | `PromissoryRules::queueAgendaNote` |
 | 110 | `BoatFloat::arrange` |
-| 111 | `NekroBrain::declineWhens` |
+| 111 | `StandardBrain::declineWhens` |
 | 112 | `GalacticThreatRules::next` |
 | 113 | `AgendaCardRules::riders` |
-| 114 | `NekroBrain::declineAfters` |
+| 114 | `StandardBrain::declineAfters` |
 | 115 | `TradeRules::payTheAnswerer` |
 | 116 | `TradeRules::holdVoteForDeals` |
 | 117 | `AgendaVoting::next` |
-| 118 | `NekroBrain::abstainFromAgenda` |
-| 119 | `NekroBrain::breakAgendaTie` |
+| 118 | `StandardBrain::abstainFromAgenda` |
+| 119 | `StandardBrain::breakAgendaTie` |
 | 120 | `TradeRules::offerDeadlyPlotBounty` |
 | 121 | `ShenanigansRules::react` |
 | 122 | `TradeRules::payDebtInAgenda` |
 | 123 | `SpeakerSale::declare` |
-| 124 | `NekroBrain::pickStrategyCard` |
+| 124 | `StandardBrain::pickStrategyCard` |
 | 125 | `NekroLeaderRules::startAgent` |
 | 126 | `CarthAgentRules::start` |
 | 127 | `NekroLeaderRules::startHero` |
@@ -713,18 +714,18 @@ The registered rule list, in priority order (`NekroBrain.rules`; `NekroBrain::x`
 | 134 | `TradeRules::startDeals` |
 | 135 | `TradeRules::awaitExtortion` |
 | 136 | `DannelRules::holdTurn` |
-| 137 | `NekroBrain::takeTurn` |
+| 137 | `StandardBrain::takeTurn` |
 | 138 | `StrategyCardRules::follow` |
-| 139 | `NekroBrain::declineStrategyCardFollow` |
-| 140 | `NekroBrain::scorePublicObjective` |
+| 139 | `StandardBrain::declineStrategyCardFollow` |
+| 140 | `StandardBrain::scorePublicObjective` |
 | 141 | `SecretRules::scoreStatusSecret` |
-| 142 | `NekroBrain::startStatusHomework` |
+| 142 | `StandardBrain::startStatusHomework` |
 | 143 | `StrategyCardRules::awaitSecondaries` |
 | 144 | `StrategyCardRules::awaitFollowTurn` |
 
 Rule 106 is the only lambda; it calls `CombatRules.next` with a round-start hook that tries
 `SolAgentRules.atRoundStart`, then `CombatCardRules.atRoundStart`, then `LetnevCombatRules.atRoundStart`. Rule
-descriptions for the classes outside `NekroBrain` belong to their own packages' documentation.
+descriptions for the classes outside `StandardBrain` belong to their own packages' documentation.
 
 ### BrainRule and AiDecision
 
@@ -895,7 +896,7 @@ descriptions for the classes outside `NekroBrain` belong to their own packages' 
 | --- | --- | --- |
 | `POLL_PERIOD` | 3 s | cron period of `AiRuntime.poll` |
 | `DEBOUNCE` | 2.5 s | delay after a seen save or an action |
-| `MIN_GAP_BETWEEN_ACTIONS` | 1.5 s | minimum time between two AI actions in a game |
+| `CHANNEL_FLOOD_GAP` | 1.5 s | minimum time between two AI actions in a game; `channelFloodGap(game)` returns 0 at self-play fast pace |
 | `WATCHDOG_PERIOD` | 1 min | forced tick of a non-dormant game |
 | `DORMANT_AFTER` | 1 day | no watchdog or referee wake after this long without a save |
 | `STALL_THRESHOLD` | 3 min (1 min fast pace) | stall before a hand-over |
@@ -907,7 +908,7 @@ descriptions for the classes outside `NekroBrain` belong to their own packages' 
 | `ABORT_STORM_LIMIT` | 3 | consecutive aborts on every seat before one error |
 | `RECENT_ABORT` | 10 min | window for naming a recent abort in a "stuck" record |
 | `MAX_ATTEMPTS_PER_PROMPT` | 2 | presses of the same button on the same progress fingerprint |
-| `MAX_ACTIONS_PER_HOUR` | 150 (600 fast pace) | per seat, counts presses only |
+| `RUNAWAY_PRESS_CAP_PER_HOUR` | 150 (600 fast pace) | per seat, counts presses only |
 | `MAX_DELEGATIONS_PER_ROUND` / `MAX_GAME_DELEGATIONS_PER_ROUND` | 30 / 60 | hand-over ceilings |
 | `MAX_REPEATED_FALLBACKS` | 5 | loop guard |
 | `HISTORY_SIZE` / `COMBAT_HISTORY_SIZE` | 50 / 100 | messages read per channel |
@@ -1007,12 +1008,12 @@ performs at most one action for the whole game.
 | Bot restarted | first poll with a ready process | `AiRuntime.discover` | which games to watch | every non-ended game with an AI seat id | lanes registered 2.5 s ahead; retried every 60 s on error; all lane memory starts empty |
 | Several AI seats can act | one tick | `AiTickRunner.tickGame`, `AiLane.rotation` | each seat's decision | seats in seating order starting after the last actor; first seat that acts wins | seats after the acting one are not asked this tick; non-acting results of earlier seats only contribute a wake time |
 | A seat is eliminated | `AiSeats.isActiveAiSeat` false (eliminated, or no longer a real player) | `AiTickRunner.tickGame` | | | the seat is no longer asked; `AiLane.retainSeats` drops its lane state; with no active AI seat left the lane is forgotten |
-| A seat's own turn, action phase | the seat is the active player | `NekroBrain.takeTurn` (rule 137) | continue an action, end turn, component actions, tactical action, strategic action, pre-pass plays, pass | fixed order (below) | `Press`, `Wait`, `Unsure`, `Announce`, or no decision (later rules, then `Idle`) |
-| Strategy phase pick | active player in `strategy` | `NekroBrain.pickStrategyCard` (rule 124) | owned `scPick_` buttons | Checks and Balances plan, else `StrategyCardRanking.ranked(...).getFirst()` | press the card |
-| Another player's strategy card | a played card the seat neither holds nor followed | `StrategyCardRules.follow`, `NekroBrain.declineStrategyCardFollow`, `StrategyCardRules.awaitFollowTurn` (rules 138, 139, 144) | follow, decline, wait | rules in that order | press or `Wait` |
-| Status phase scoring | phase `statusScoring` and the seat's PO/SO stored value empty | `NekroBrain.scorePublicObjective`, `SecretRules.scoreStatusSecret` (140, 141) | scorable public objectives, "no scoring" | `ObjectivePolicy.bestScorablePublic`, else no scoring | press |
-| Status phase command tokens | phase `statusHomework` | `NekroBrain.finishCommandTokenGain` (6), `startStatusHomework` (142) | token pools, Done, ready | gain to `statusPhaseGainWithinReinforcements`, then redistribute surplus, then Done; then ready | press |
-| Agenda "when"/"after" | decline buttons in the seat's thread | `NekroBrain.declineWhens` (111), `declineAfters` (114) and the agenda rules between them | bounty offer, Veto, Quash, rider, decline | first that applies | press, `Post` or `Wait` |
+| A seat's own turn, action phase | the seat is the active player | `StandardBrain.takeTurn` (rule 137) | continue an action, end turn, component actions, tactical action, strategic action, pre-pass plays, pass | fixed order (below) | `Press`, `Wait`, `Unsure`, `Announce`, or no decision (later rules, then `Idle`) |
+| Strategy phase pick | active player in `strategy` | `StandardBrain.pickStrategyCard` (rule 124) | owned `scPick_` buttons | Checks and Balances plan, else `StrategyCardRanking.ranked(...).getFirst()` | press the card |
+| Another player's strategy card | a played card the seat neither holds nor followed | `StrategyCardRules.follow`, `StandardBrain.declineStrategyCardFollow`, `StrategyCardRules.awaitFollowTurn` (rules 138, 139, 144) | follow, decline, wait | rules in that order | press or `Wait` |
+| Status phase scoring | phase `statusScoring` and the seat's PO/SO stored value empty | `StandardBrain.scorePublicObjective`, `SecretRules.scoreStatusSecret` (140, 141) | scorable public objectives, "no scoring" | `ObjectivePolicy.bestScorablePublic`, else no scoring | press |
+| Status phase command tokens | phase `statusHomework` | `StandardBrain.finishCommandTokenGain` (6), `startStatusHomework` (142) | token pools, Done, ready | gain to `statusPhaseGainWithinReinforcements`, then redistribute surplus, then Done; then ready | press |
+| Agenda "when"/"after" | decline buttons in the seat's thread | `StandardBrain.declineWhens` (111), `declineAfters` (114) and the agenda rules between them | bounty offer, Veto, Quash, rider, decline | first that applies | press, `Post` or `Wait` |
 | A rule returns `Wait` | rule holds for a timing window | `AiTickRunner.runSeat` | none | the rule's `untilMillis` | lane woken at that time; no stall timer runs (see below) |
 | No rule applies and nothing is waited on | `Idle`, `AiStallDetector` finds no reason | `AiTickRunner.handleIdle` | none | | seat does nothing; lane waits for a save or the watchdog |
 | No rule applies but the game waits on the seat | `Idle` and at least one wait reason | `handleIdle` | the newest unpressed prompt tied to a reason | stall age >= 3 min (1 min fast) | hand-over (`TIMEOUT`); see [stall timeout](#stall-timeout-and-hand-over) |
@@ -1026,7 +1027,7 @@ performs at most one action for the whole game.
 | Seat paused | `aiPaused` not `RUNNING` (`/ai pause` writes `MANUAL` through `AiSeatService.setPaused`, which also calls `AiRuntime.clearStall`) | `runSeat`, `handleIdle` | | | no decisions, stall cleared, no hand-over unless `/ai delegate`; also blocks the self-play referee for the whole game |
 | `/ai resume` | command (`AiResume`) | `AiRuntime.register` | | | lane re-armed 2.5 s later |
 | Kill switch off | `AI_PLAYERS_ENABLED` false | `mayActOnItsOwn` | | | no decisions and no referee; stall hand-over to the table still happens (see below) |
-| Hourly cap reached | 150 presses in the last hour (600 fast) | `underActionCap` | | | as kill switch, for that seat |
+| Hourly cap reached | 150 presses in the last hour (600 fast) | `underRunawayPressCap` | | | as kill switch, for that seat |
 | Thinking cut short | `ThinkingAborted` or `StackOverflowError` in `brain.decide` | `AiTickRunner.cutShort` | | | `THINKING_ABORTED` fallback record, warning once per round, held for 5 min or until the fingerprint changes; seat goes on to `handleIdle` |
 | A rule throws | `RuntimeException` | `AiTickRunner.decide` | | | error logged, `Idle`; retried every tick |
 | `/game undo` | newest undo number decreases | `AiLane.forgetAfterUndo` | | | seats forget pressed keys, attempts, memory, delegated prompts, stall and loop guard |
@@ -1044,7 +1045,7 @@ performs at most one action for the whole game.
 - **Responsible component:** `AiRuntime`, `AiLane`.
 - **Selection logic:** a lane is due when its `dueAt` is set and passed. `dueAt` is set by: a seen save (`now + 2.5 s`),
   the watchdog (`now`), `register` (`now + 2.5 s`), a delegated press or `/ai delegate` (`now`), the end of a tick that
-  acted (`now + 2.5 s`), a pacing hold (`lastActionAt + 1.5 s`), a process-not-ready hold (`now + 30 s`), the earliest
+  acted (`now + 2.5 s`), a pacing hold (`lastActionAt + 1.5 s`, none at fast pace), a process-not-ready hold (`now + 30 s`), the earliest
   `Wait.untilMillis` or remaining stall time across seats, and in self-play the referee delay (`now + 20 s` or `10 s`).
   The earliest wanted time wins.
 - **Interactions:** an AI press saves the game, so the next poll also sees a new `lastModifiedDate`; both arm the lane
@@ -1056,7 +1057,7 @@ performs at most one action for the whole game.
 
 #### Own turn in the action phase
 
-- **Trigger:** rule 137 `NekroBrain.takeTurn`, reached only when none of rules 1 to 136 returned a decision.
+- **Trigger:** rule 137 `StandardBrain.takeTurn`, reached only when none of rules 1 to 136 returned a decision.
 - **Choices and order** (first present result wins; a step marked "return" returns its result even when empty):
   1. A tactical action in progress (`TacticalRules.inProgress`): `TacticalRules.continueAction` (return).
   2. Strategy card follows still pending (`StrategyCardRules.followsPending`): follow, decline or wait for the follow
@@ -1214,7 +1215,7 @@ performs at most one action for the whole game.
 
 #### Unsure on a public prompt in a game with humans
 
-- **Trigger:** `NekroBrain.decide` (via `FactionBrainRegistry`) returns `AiDecision.Unsure(prompt, reason)`.
+- **Trigger:** `StandardBrain.decide` (via `FactionBrainRegistry`) returns `AiDecision.Unsure(prompt, reason)`.
 - **Responsible component:** `AiTickRunner.runSeat` -> `fallBack` -> `AiConfusionService.delegate`.
 - **Choices:** the buttons of the **live** message (re-fetched), not the perceived copy: enabled, with a custom id, not
   opening a modal, and passing `delegable`: unowned or owned by this seat's faction, `combatRoll_` only when it is this
@@ -1291,7 +1292,7 @@ performs at most one action for the whole game.
 
 ### What kind of decision procedure this is
 
-The core is a polling, single-action-per-tick rule engine. `NekroBrain.decide` evaluates an ordered list of 144
+The core is a polling, single-action-per-tick rule engine. `StandardBrain.decide` evaluates an ordered list of 144
 `BrainRule`s and returns the first non-empty result ([components](#factionbrain-factionbrainregistry-and-nekrobrain)).
 There is no scoring between rules, no search over sequences of presses, no simulation of the game, and no learning in
 the core packages. Valuation (trade-good scales, win odds, plan scores) happens inside individual rules and evaluators
@@ -1308,7 +1309,7 @@ no production code runs rollouts.
 
 ### Priority orderings
 
-- **Rule order:** `NekroBrain.rules` list order (table in components). Rules 1 to 5 are observers that never decide.
+- **Rule order:** `StandardBrain.rules` list order (table in components). Rules 1 to 5 are observers that never decide.
 - **Within `takeTurn`:** the fixed chain in [scenarios](#own-turn-in-the-action-phase).
 - **Seat order:** `AiLane.rotation`: `Game.getPlayers()` insertion order, starting after the seat that acted last;
   first seat whose result is "acted" ends the tick.
@@ -1369,7 +1370,7 @@ repeat at least twice, and prints `prefix > (unit) xN`.
 | --- | --- |
 | Poll | every 3 s, first after 60 s |
 | Delay after a seen save or an action | 2.5 s |
-| Minimum gap between AI actions | 1.5 s |
+| Minimum gap between AI actions | 1.5 s (0 at self-play fast pace) |
 | Watchdog | 60 s, only for games saved within 1 day |
 | Process-not-ready retry | 30 s |
 | Discovery retry | 60 s |
@@ -1501,7 +1502,7 @@ code.
 
 - **Game modes and factions:** `AiGameSupport` refuses unsupported modes and factions, and every new seat while the
   kill switch (`AI_PLAYERS_ENABLED`) is off; the full list is in section 10.2.
-- **Brains:** one implementation. `FactionBrainRegistry` maps both `nekro` and `standard` to the same `NekroBrain`;
+- **Brains:** one implementation. `FactionBrainRegistry` maps both `nekro` and `standard` to the same `StandardBrain`;
   faction behaviour lives inside individual rules.
 - **Inputs the AI cannot operate:** buttons that open a modal (`~MDL`), select menus and modals in general (perception
   reads only `Button` components), slash commands, and anything not offered as a button in the last 50 messages of a
@@ -1509,7 +1510,7 @@ code.
   15 minutes old.
 - **Seats per game:** `AiSettings.MAX_SEATS = 8` real players.
 - **Modes refused at seat creation but still branched on:** `AiGameSupport` refuses Extra secret and Omega Phase
-  games, yet `AiStallDetector`, `NekroBrain.discardExcessSecret` and `RefereeRules.trackExhausted` still read
+  games, yet `AiStallDetector`, `StandardBrain.discardExcessSecret` and `RefereeRules.trackExhausted` still read
   `isExtraSecretMode` / `isOmegaPhaseMode`; those branches only matter if the mode is switched on after the seats were
   added.
 
@@ -1601,7 +1602,7 @@ The core never branches on Fog of War. Fog safety rests on `AiGameSupport` refus
 | `AiGameSupport` | `AiSettings.MAX_SEATS`, `AiSeats.hasAiSeat` |
 | `TestBedService` (engine) | `AiSeats.isAiSeat` (skips AI seats when choosing a non-developer) |
 | `SlashCommandManager` (engine) | registers the `/ai` command (the only other engine file importing `ti4.ai`) |
-| `NekroBrain` (rules list) | `Hostility.observe` (rule 2); `FactionBrain`, `BrainRule`, `AiDecision`, `AiTurnContext`, `StrategyCard` |
+| `StandardBrain` (rules list) | `Hostility.observe` (rule 2); `FactionBrain`, `BrainRule`, `AiDecision`, `AiTurnContext`, `StrategyCard` |
 | 197 other files in `ti4.ai` | `AiTurnContext`; 110 use `Prompts`, 114 call `.memory()` |
 | `TacticalPlanner`, `WinOdds`, `WinRace`, `ScoringReserve`, `DenialMap`, `PlanetTake`, `StyxTake`, `eval.Adjacency`, `CombatModifiers` | `DecisionMemo.remember` |
 | `ImaginedTurn.of`, `FragmentDeals`, `MilitarySupportDeals`, `NoteDeals`, `TechnologyRequest` | `SearchMemo.open`; 9 more classes call `SearchMemo.remember` |
@@ -1624,12 +1625,12 @@ The core never branches on Fog of War. Fog safety rests on `AiGameSupport` refus
 | --- | --- |
 | `AiRuntime` | `CronManager.schedulePeriodically`; `GameManager.getManagedGames`, `getManagedGame`, `isValid`; `ActiveLeaseService.shouldHandleCurrentProcessInteraction`, `shouldCurrentProcessRunScheduledWork`; `CircuitBreaker.isOpen`; `AsyncTI4DiscordBot.isUnstable`; `JdaService.isReadyToReceiveCommands` |
 | `AiTickRunner` | `AiProfile.of`; `AiSeatService.ensureTradePreferences`; `GameUndoNameService.getSortedUndoNumbers`; `AiConfusionService.notice`, `delegate`, `safeDefault`, `selfPlayChoice`, `stalledChoice`, `neverDelegated`, `announceStuck`, `announceLoop`, `announcePrivateChoice`, `announceSelfPlayChoice`, `resolve`; `RedistributionGuard.pressRestoringTokens`; `FallbackLog.capture`, `record`; `RefereeRules.anyStep`, `endsGame`, `trackExhausted`, `offersGameEnd`, `stateFingerprint`, `next`; `CombatRules.isRollFor`; `HumanAiDealMessage.post`; `MessageHelper.sendMessageToChannelWithButtons` |
-| `AiStallDetector` | `TacticalRules.isSystemPicker`; `CombatRules.awaitsSeat`; `NekroBrain.noRealObjectiveRevealed`; `AgendaQueue.passedOnWhens`, `passedOnAfters`, `holdsQueuedWhen`, `holdsQueuedAfter`; `AgendaCardRules.vetoPlayedAndPending` |
+| `AiStallDetector` | `TacticalRules.isSystemPicker`; `CombatRules.awaitsSeat`; `StandardBrain.noRealObjectiveRevealed`; `AgendaQueue.passedOnWhens`, `passedOnAfters`, `holdsQueuedWhen`, `holdsQueuedAfter`; `AgendaCardRules.vetoPlayedAndPending` |
 | `AiLane`, `AiGameState` | `SecondaryQueue`, `AttackLedger`, `SlayIntent`, `FractureMarch` (forget / snapshot / restore) |
 | `AiPerception` | `ButtonHelper.getRightStratThread`, `getStratName`, `getPlayersWithShipsInTheSystem`, `getPlayersWithUnitsOnAPlanet`; `NeutralCombat.watches`; `ComponentIdEnvelope.decode` (via `PromptButton.of`) |
 | `AiActuator` | `TestBedPress.standInEvent`, `TestBedPress.Recorder`, `TestBedPress.Repost`; `ButtonProcessor.processNow` |
-| `FactionBrainRegistry` | `NekroBrain` |
-| `NekroBrain.decide` | `DecidingSeat.of` and the 144 rules |
+| `FactionBrainRegistry` | `StandardBrain` |
+| `StandardBrain.decide` | `DecidingSeat.of` and the 144 rules |
 | `Hostility` | `Territory.of`, `BoardView.count`, `FoWHelper.playerHasActualShipsInSystem`, `GameStats.getActionCardTargets`, `getActionCardPlays`, `getTrackedPlayerId`; `AiGameWrites.persist` |
 | `AiGameWrites` | `ExecutionLockManager.lock` / `unlock`, `GameManager.save` |
 | `AiDebugLog` | `ThreadGetter.getThreadInChannel`, `DiscordThreadUtility.fitThreadName`, `MessageHelper.sendMessageToChannel` |

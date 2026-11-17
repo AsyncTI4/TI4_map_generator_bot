@@ -6,11 +6,11 @@ Part of the [AI player architecture docs](/src/main/java/ti4/ai/README.md): a li
 
 Scope: [ti4.ai.scoring](/src/main/java/ti4/ai/scoring) (23 classes) and [ti4.ai.secrets](/src/main/java/ti4/ai/secrets) (16 classes).
 Most of these classes are static utilities that other packages call. Only a few decide or press buttons directly from
-the brain's rule list in [NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java):
+the brain's rule list in [StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java):
 `PaymentRules::pay`, `SecretCostRules::pay`, `ActionSecretRules::observe`, `SecretRedrawRules::discardForRedraw`,
 `ActionSecretRules::next`, `SecretRules::scoreAgendaSecret` and `SecretRules::scoreStatusSecret`. Public objective scoring
-is decided in `NekroBrain.scorePublicObjective` and in the Imperial primary (`StrategyCardRules.imperial`), both of which
-call into this scope. `NekroBrain.decide` runs the rules in list order and returns the first decision (`firstRuleDecision`),
+is decided in `StandardBrain.scorePublicObjective` and in the Imperial primary (`StrategyCardRules.imperial`), both of which
+call into this scope. `StandardBrain.decide` runs the rules in list order and returns the first decision (`firstRuleDecision`),
 so the list order is the priority order.
 
 Unit conventions used throughout: "points" are victory points; "TG units" are trade goods. `ObjectiveValue` prices a flat
@@ -30,7 +30,7 @@ Solid arrows are calls or decisions; dotted arrows are data handed over through 
 payment that some spend objectives require.
 
 **Invoked when:**
-- Status phase: `NekroBrain.scorePublicObjective`, when the phase is `statusScoring` and the engine stored value
+- Status phase: `StandardBrain.scorePublicObjective`, when the phase is `statusScoring` and the engine stored value
   `<faction>round<N>PO` is empty. It looks at the newest non-hidden prompt that has an enabled `po_no_scoring` button and
   passes that prompt's enabled `po_scoring_*` buttons.
 - Action phase, Imperial primary: `StrategyCardRules.imperial`, on this turn's prompt with the seat's own `po_scoring_*`
@@ -72,7 +72,7 @@ cannot score publics (`Helper.canPlayerScorePOs` false) or no button maps to an 
 **Effect on the game:** presses `po_scoring_<n>` (scores the objective in the engine); for planet-paid objectives, the
 following ticks exhaust exactly the planned planets via `PaymentRules.pay`.
 
-**Fallbacks:** `NekroBrain.scorePublicObjective` presses `po_no_scoring` when no choice is returned. The Imperial path
+**Fallbacks:** `StandardBrain.scorePublicObjective` presses `po_no_scoring` when no choice is returned. The Imperial path
 marks the step done and moves on to the Imperial point or secret draw.
 
 **Limitations:**
@@ -93,9 +93,9 @@ picks `expand_borders`.
 
 ```mermaid
 flowchart TD
-    DEC["NekroBrain.decide<br/>(first rule that returns a decision)"] --> PAYR["PaymentRules.pay<br/>(10th rule)"]
+    DEC["StandardBrain.decide<br/>(first rule that returns a decision)"] --> PAYR["PaymentRules.pay<br/>(10th rule)"]
     DEC --> COSTR["SecretCostRules.pay<br/>(11th rule)"]
-    DEC --> SPO["NekroBrain.scorePublicObjective"]
+    DEC --> SPO["StandardBrain.scorePublicObjective"]
     DEC --> SSS["SecretRules.scoreStatusSecret"]
     SPO -->|"statusScoring and PO stored value empty"| BSP["ObjectivePolicy.bestScorablePublic"]
     BSP -->|"choice found"| SAE["ScoringRules.scoreAndExpectPayment"]
@@ -190,7 +190,7 @@ trade goods, least valuable covering planets, a planet never paying twice, Mirro
 **Purpose:** after a press that opens an engine payment prompt (exhaust buttons plus "Done Exhausting Planets"), press
 the planned planets, then single trade goods, then Done.
 
-**Invoked when:** `PaymentRules::pay` is the 10th rule in `NekroBrain.rules`, so it runs on every tick before almost every
+**Invoked when:** `PaymentRules::pay` is the 10th rule in `StandardBrain.rules`, so it runs on every tick before almost every
 other decision. Payments are registered by `ScoringRules` (`expectWhenScored`); 17 other files use `PaymentRules`
 (13 of them call `PaymentRules.expect`; they cover strategy cards, tactical actions, action cards, explorations,
 expeditions, trade, and Yin, Sol and Letnev abilities).
@@ -569,7 +569,7 @@ points.
 
 **Role:** decides.
 
-**Invoked when:** `SecretRules::scoreStatusSecret` is the fourth rule from the end of `NekroBrain.rules`, directly after
+**Invoked when:** `SecretRules::scoreStatusSecret` is the fourth rule from the end of `StandardBrain.rules`, directly after
 `this::scorePublicObjective`; `SecretRules::scoreAgendaSecret` follows `ActionSecretRules::next` in the middle of the list.
 
 **Algorithm (`scoreStatusSecret`):**
@@ -592,7 +592,7 @@ secret in hand order that `SecretScoring` can act on); no limit on how many over
 
 **Tested by:** [SecretRulesTest](/src/test/java/ti4/ai/secrets/SecretRulesTest.java) (no agenda secret in the status
 phase; Dictate Policy in the agenda phase; Drive the Debate only at `agendaEnd`; asks for score buttons when none are
-visible) and `NekroBrainTest.declinesPublicThenSecretScoringWhenNothingQualifies`.
+visible) and `StandardBrainTest.declinesPublicThenSecretScoringWhenNothingQualifies`.
 
 ---
 
@@ -608,7 +608,7 @@ for this (secret, round, phase), return `AiDecision.Wait` until 60 s after it. O
 `cardsInfo` if that was already pressed, on a hidden prompt, and store the request time. Returns empty when the secret is
 no longer in hand or no such button exists.
 
-**Effect on the brain:** the `Wait` is a decision, so `NekroBrain.decide` stops at the rule that returned it. When it
+**Effect on the brain:** the `Wait` is a decision, so `StandardBrain.decide` stops at the rule that returned it. When it
 comes from `ActionSecretRules::next` in the action phase, every later rule (including `this::takeTurn`) is skipped until
 the buttons appear or 60 s pass; from `SecretRules::scoreAgendaSecret`, agenda voting and the other later agenda rules
 are held the same way.
@@ -647,7 +647,7 @@ are held the same way.
 expeditions, `KindPricing`) and whether a hand is weak. The same class picks which status secret to score
 (`bestScorableStatusSecret`), but that choice does not use the keep value.
 
-**Invoked when:** `lowestValueSecret` by `NekroBrain.discardExcessSecret`, `SecretRedrawRules.discardForRedraw`,
+**Invoked when:** `lowestValueSecret` by `StandardBrain.discardExcessSecret`, `SecretRedrawRules.discardForRedraw`,
 `ExpeditionRules`, `KindPricing`; `keepValue` by `SecretDraws`, `ExpertCardValues`,
 `ExpertElectionValues`, `KindPricing`; `bestScorableStatusSecret` by `SecretRules` and `WinRace`.
 
@@ -739,7 +739,7 @@ by `SecretCards` (Impersonation), `AgendaValueMath`, `CardValue` (Derelict Vesse
 
 **Role:** decides and executes.
 
-**Invoked when:** `SecretRedrawRules.endOfTurn` from `NekroBrain.takeTurn` (after the turn's action, before ending the
+**Invoked when:** `SecretRedrawRules.endOfTurn` from `StandardBrain.takeTurn` (after the turn's action, before ending the
 turn, and again before passing); `SecretRedrawRules::discardForRedraw` is a rule.
 
 **Algorithm:** once per round (memory `secretRedraw|<round>`): if `SecretDraws.worthRedrawing` and this turn shows an owned
@@ -790,7 +790,7 @@ done. If that button never appears the round's record stays `pending`: `discardF
 **Limitations:** cannon, heavy-cannon and bombardment watches are tied to the turn key they were armed on and are
 dropped on a later turn; combat watches stay open until one side leaves, but their open list is kept per round
 (`combatWatchOpen|<round>`), so a combat still open when the round changes is forgotten. Prove Endurance is not
-handled here (`NekroBrain.queueProveEndurance` presses `autoProveEndurance_yes`). The `bam` list
+handled here (`StandardBrain.queueProveEndurance` presses `autoProveEndurance_yes`). The `bam` list
 (`homePlanetsHeld|<faction>`) is written only on action-phase ticks while the seat holds `bam` and has no round in its
 key, so a home-system planet lost between two such ticks (for example in the agenda phase) is queued as
 `bam` at the next action-phase tick; the first tick only stores the list.
@@ -882,9 +882,9 @@ remaining deck (0.3 if the deck is empty) x the seat's squared-influence share; 
 
 | Scenario | Trigger | Handled by | Choices considered | How it chooses | Outcome / fallback |
 | --- | --- | --- | --- | --- | --- |
-| Status phase, one or more publics qualify | phase `statusScoring`, `<faction>round<N>PO` empty, a public prompt with `po_no_scoring` | `NekroBrain.scorePublicObjective` -> `ObjectivePolicy.bestScorablePublic` | the prompt's enabled `po_scoring_*` buttons whose objective qualifies | most VP, then fewest trade goods + tokens, then (status phase) a spend objective | presses the button; planet-paid spend objectives register a payment |
-| Status phase, no public qualifies | same | `NekroBrain.scorePublicObjective` | none | n/a | presses `po_no_scoring` |
-| Engine already marked the public step | `<faction>round<N>PO` non-empty (scored, or "None" set by the engine) | `NekroBrain.scorePublicObjective` | none | n/a | does nothing (rule returns empty) |
+| Status phase, one or more publics qualify | phase `statusScoring`, `<faction>round<N>PO` empty, a public prompt with `po_no_scoring` | `StandardBrain.scorePublicObjective` -> `ObjectivePolicy.bestScorablePublic` | the prompt's enabled `po_scoring_*` buttons whose objective qualifies | most VP, then fewest trade goods + tokens, then (status phase) a spend objective | presses the button; planet-paid spend objectives register a payment |
+| Status phase, no public qualifies | same | `StandardBrain.scorePublicObjective` | none | n/a | presses `po_no_scoring` |
+| Engine already marked the public step | `<faction>round<N>PO` non-empty (scored, or "None" set by the engine) | `StandardBrain.scorePublicObjective` | none | n/a | does nothing (rule returns empty) |
 | Spend objective payment | after `ScoringRules.scoreAndExpectPayment` for `monument`, `sway_council`, `golden_age`, `manipulate_law`, `amass_wealth`, `vast_reserves` | `PaymentRules.pay` | the planned planets, then single trade goods | planets in planned order, then `reduceTG_1_*` until the planned remainder | presses "Done Exhausting Planets"; waits while no matching prompt |
 | Status phase, one status secret qualifies | phase `statusScoring`, `<faction>round<N>SO` empty or `None` | `SecretRules.scoreStatusSecret` | unscored status secrets meeting the engine threshold | scoring order losable < ordinary < costly, then id | presses `so_score_hand_<i>` |
 | Status phase, several status secrets qualify | same | `SecretValue.bestScorableStatusSecret` | all ready status secrets | the one whose board condition can be lost first; costly ones last | the others wait for later status phases (and are valued lower by congestion) |
@@ -900,8 +900,8 @@ remaining deck (0.3 if the deck is empty) x the seat's squared-influence share; 
 | Lost a home-system planet | seat held `bam` and a planet in any home system left its planets | `ActionSecretRules.watchHomePlanets` | `bam` | set difference against the stored list | queues `bam` |
 | Imperial primary | own Imperial played, `StrategyCardRules.imperial` | `ObjectivePolicy.bestScorablePublic`, then the card's Mecatol / secret buttons | own `po_scoring_*` buttons | most VP, fewest trade goods + tokens, then a free objective | scores; then `score_imperial` if Mecatol Rex held, else `sc_draw_so` if not all secrets scored |
 | Imperial secondary | another seat plays Imperial | `StrategyCardRules.followImperial` | follow or not | spare strategy token and `SecretDraws.worthDrawing` | presses `sc_draw_so`, else does not follow |
-| Starting secrets | round <= 1, no real public revealed, not extra-secret mode, 2 secrets held | `NekroBrain.discardExcessSecret` | the held secrets | lowest `SecretValue.keepValue` (with opening tempo), then id | presses `discardSecret_<i>`; opens `get_so_discard_buttons` if no discard button is shown |
-| Draw leaves the hand over the limit | unscored > max - scored | `NekroBrain.discardExcessSecret` | held secrets | lowest keep value | discards it |
+| Starting secrets | round <= 1, no real public revealed, not extra-secret mode, 2 secrets held | `StandardBrain.discardExcessSecret` | the held secrets | lowest `SecretValue.keepValue` (with opening tempo), then id | presses `discardSecret_<i>`; opens `get_so_discard_buttons` if no discard button is shown |
+| Draw leaves the hand over the limit | unscored > max - scored | `StandardBrain.discardExcessSecret` | held secrets | lowest keep value | discards it |
 | Full hand of strong secrets | weakest keep value >= 0.75 | `SecretDraws.worthDrawing` false | follow Imperial, Strategize, exploration value | n/a | does not follow Imperial for a secret; draw value capped at 0.3 |
 | Mecatol Rex redraw | end of own turn or before passing; owned `planetAbilityExhaust_mrte`/`_mc` button this turn | `SecretRedrawRules.endOfTurn` / `discardForRedraw` | exhaust or not; which secret to discard | `worthRedrawing` (weak hand and positive swap gain); lowest keep value | once per round |
 | Action phase reserve for a spend objective | any spend decision calling `ScoringReserve.of` / `planAfterReserve` | `ScoringReserve.reserved` | revealed unscored spend objectives | affordable now: most VP then fewest trade goods + tokens; else projected with expected trade goods / Diplomacy | spends that break the reserve are re-planned or refused |
@@ -913,10 +913,10 @@ remaining deck (0.3 if the deck is empty) x the seat's squared-influence share; 
 
 #### Status phase: which public objective is scored
 
-- **Trigger:** `NekroBrain.decide` reaches `this::scorePublicObjective` while the phase is `statusScoring` and
+- **Trigger:** `StandardBrain.decide` reaches `this::scorePublicObjective` while the phase is `statusScoring` and
   `<faction>round<N>PO` is empty. Earlier rules (payments, secret costs, combat, agenda...) take priority; in the status
   phase they normally return nothing.
-- **Responsible component:** `NekroBrain.scorePublicObjective` (outside scope) selects the prompt: the newest non-hidden
+- **Responsible component:** `StandardBrain.scorePublicObjective` (outside scope) selects the prompt: the newest non-hidden
   prompt with an enabled `po_no_scoring` button. `ObjectivePolicy.bestScorablePublic` chooses.
 - **Choices:** only buttons on that prompt whose handler id ends in the number of a revealed public objective. The engine
   decides which buttons exist.
@@ -952,13 +952,13 @@ remaining deck (0.3 if the deck is empty) x the seat's squared-influence share; 
 
 #### Secret objectives at setup and at each draw
 
-- **Setup:** `NekroBrain.allowedUnscoredSecrets` returns 1 in round <= 1 while no real public objective is revealed (the
-  custodians custom objective does not count, per `NekroBrainTest.stillDiscardsAStartingSecretWhenCustodiansIsRevealed`)
+- **Setup:** `StandardBrain.allowedUnscoredSecrets` returns 1 in round <= 1 while no real public objective is revealed (the
+  custodians custom objective does not count, per `StandardBrainTest.stillDiscardsAStartingSecretWhenCustodiansIsRevealed`)
   and the game is not in extra-secret mode. `discardExcessSecret` discards `SecretValue.lowestValueSecret`. In round 1
   `keepValue` adds `openingTempo` (the observed share of players who completed the secret in the opening, x board
   feasibility), so `te` (Threaten Enemies, opening 0.66) is kept over `dyp` (Demonstrate Your Power, opening 0.03) in round 1,
   while from round 2 on the same two can rank the other way. Tested by
-  `SecretValueTest.keepsASecretThatIsScoredEarlyWhenChoosingAtTheStart` and `NekroBrainTest.discardsDownToOneSecretAtTheStartOfTheGame`.
+  `SecretValueTest.keepsASecretThatIsScoredEarlyWhenChoosingAtTheStart` and `StandardBrainTest.discardsDownToOneSecretAtTheStartOfTheGame`.
 - **Draw decisions:** Imperial secondary, Strategize's Imperial secondary, and the valuation of Imperial, Overrule and
   explorations call `SecretDraws.worthDrawing`: draw while there is room, or with a full hand whose weakest keep value is
   below 0.75. The Imperial primary (`StrategyCardRules.imperial`) draws whenever the seat does not hold Mecatol Rex and has
@@ -1195,7 +1195,7 @@ roundsBeforeEnd = max(0, min(ceil(goal/2) - round, ceil((goal - 4 - leaderVP) / 
 
 - **Scoring button for an objective the AI does not recognise.** `ObjectivePolicy.objectiveFor` drops a `po_scoring_*`
   button whose suffix is not numeric or matches no revealed objective number; `qualifies` drops ids without a
-  `PublicObjectiveModel` or with an engine threshold <= 0. If nothing is left, `NekroBrain.scorePublicObjective` presses
+  `PublicObjectiveModel` or with an engine threshold <= 0. If nothing is left, `StandardBrain.scorePublicObjective` presses
   `po_no_scoring`, even when the engine would have accepted the score.
 - **Seat cannot score publics.** `Helper.canPlayerScorePOs` false (for example not controlling its home planets, NPC, the
   `incomprehensible` ability, a Deep seat off the board, Mobile Command without its flagship on the board):
@@ -1205,7 +1205,7 @@ roundsBeforeEnd = max(0, min(ceil(goal/2) - round, ceil((goal - 4 - leaderVP) / 
   already pressed, stores the request time and returns `Wait` until 60 s after it. When both buttons were already pressed
   on the visible prompts and the wait is over, it returns empty; in the status phase `scoreStatusSecret` then presses
   `so_no_scoring` (unless the engine stored `None`), giving up the secret for this round.
-- **Discard buttons missing after a draw.** `NekroBrain.discardExcessSecret` presses `get_so_discard_buttons` once to open
+- **Discard buttons missing after a draw.** `StandardBrain.discardExcessSecret` presses `get_so_discard_buttons` once to open
   them.
 - **Secret left the hand.** `SecretScoring.score` returns empty when the secret id has no hand index;
   `ActionSecretRules.scorePending` skips queue entries for secrets no longer held.
@@ -1292,7 +1292,7 @@ from explicit guards, hard-coded sets and missing handlers in the code.
   require one token too many.
 - **Action secrets are scored only from watched events.** `ActionSecretRules` covers combat secrets (`dtgs`, `dts`,
   `baf`, `fwp`, `btv`, `uf`, `sar`, `dyp`), `ttfd` via space cannon watches, `dtgs` via space cannon, `mew` via bombardment,
-  `bam` via home planet loss. `pe` (Prove Endurance) relies on the engine's auto-score button (`NekroBrain.queueProveEndurance`).
+  `bam` via home planet loss. `pe` (Prove Endurance) relies on the engine's auto-score button (`StandardBrain.queueProveEndurance`).
   Any other way of meeting these conditions (for example a ship destroyed by an action card outside a watched combat) is
   missed unless it changes the watched counts within the same turn key.
 - **Watches are per turn.** Cannon, heavy-cannon and bombardment watches are dropped when the turn key changes, so a result
@@ -1303,7 +1303,7 @@ from explicit guards, hard-coded sets and missing handlers in the code.
 - **Agenda secrets:** only `dp` and `dtd` are recognised in `SecretRules.agendaSecretMet`.
 - **Become a Martyr outside the action phase.** The `bam` watch compares against a home-planet list kept across phases
   and rounds, so a loss outside the action phase is queued at the next action-phase tick (see section 4).
-- **Waiting blocks later rules.** A `Wait` from `SecretScoring` (up to 60 s per request) stops `NekroBrain.decide` at
+- **Waiting blocks later rules.** A `Wait` from `SecretScoring` (up to 60 s per request) stops `StandardBrain.decide` at
   that rule, so an action secret waiting for its buttons holds the seat's own turn.
 - **Unused public methods.** `ObjectiveOdds.atLeastTwoByStatus`, `extraPointsWithImperial` and `imperialWinSwing` are
   called only from tests.
@@ -1350,10 +1350,10 @@ from explicit guards, hard-coded sets and missing handlers in the code.
 
 | Caller | Calls |
 | --- | --- |
-| `NekroBrain.rules` (rule list) | `ActionSecretRules.observe`, `PaymentRules.pay`, `SecretCostRules.pay`, `SecretRedrawRules.discardForRedraw`, `ActionSecretRules.next`, `SecretRules.scoreAgendaSecret`, `SecretRules.scoreStatusSecret` |
-| `NekroBrain.scorePublicObjective` | `ObjectivePolicy.bestScorablePublic`, `ScoringRules.scoreAndExpectPayment` |
-| `NekroBrain.takeTurn` | `SecretRedrawRules.endOfTurn` (after the action and again before passing) |
-| `NekroBrain.discardExcessSecret` | `SecretValue.lowestValueSecret` |
+| `StandardBrain.rules` (rule list) | `ActionSecretRules.observe`, `PaymentRules.pay`, `SecretCostRules.pay`, `SecretRedrawRules.discardForRedraw`, `ActionSecretRules.next`, `SecretRules.scoreAgendaSecret`, `SecretRules.scoreStatusSecret` |
+| `StandardBrain.scorePublicObjective` | `ObjectivePolicy.bestScorablePublic`, `ScoringRules.scoreAndExpectPayment` |
+| `StandardBrain.takeTurn` | `SecretRedrawRules.endOfTurn` (after the action and again before passing) |
+| `StandardBrain.discardExcessSecret` | `SecretValue.lowestValueSecret` |
 | `StrategyCardRules.imperial` | `ObjectivePolicy.bestScorablePublic`, `ObjectivePolicy.scorablePublics`, `ScoringRules.scoreAndExpectPayment` |
 | `StrategyCardRules.wantsToFollow`, `followImperial`, `secondaryValue`, `startSecondary` | `SecretDraws.worthDrawing`, `SecretDrawValue.of` |
 | `CombatRules` | `ActionSecretRules.watchSpaceCannon` |
@@ -1391,7 +1391,7 @@ from explicit guards, hard-coded sets and missing handlers in the code.
 - `Footprint`: FreedPlays, IncomingForces, LegendaryOutlook, NeutralUnitCards, PresenceReach, ProductionPlanner, SeatCover,
   SystemTargetCards, TacticalPlanner.
 - `SecretOdds`: ExpertCardValues, ExpertElectionValues, ImperialUses, Standings, ThroneSale.
-- `SecretValue`: ExpeditionRules, ExpertCardValues, ExpertElectionValues, KindPricing, NekroBrain, ScarToken, TechPath,
+- `SecretValue`: ExpeditionRules, ExpertCardValues, ExpertElectionValues, KindPricing, StandardBrain, ScarToken, TechPath,
   TechRoutes.
 - `SecretDraws`: ExploreValues, ImperialUses, MecatolStake, OverruleChoice, StrategyCardRules. `SecretDrawValue`:
   AgendaValueMath, CardValue, ElectionValues, ExploreValues, ImperialUses, OverruleChoice, SecretCards, StrategyCardRules.

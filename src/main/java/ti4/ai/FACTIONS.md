@@ -25,22 +25,22 @@ Common vocabulary used below:
 
 ### How faction behaviour is plugged in
 
-#### FactionBrainRegistry / NekroBrain (the one shared brain)
+#### FactionBrainRegistry / StandardBrain (the one shared brain)
 
 - **Role:** decides (dispatcher).
-- **Purpose:** the only `FactionBrain` implementation. Despite the name, [NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java)
+- **Purpose:** the only `FactionBrain` implementation. Despite the name, [StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java)
   is the brain of every AI seat, whatever its faction.
 - **Invoked when:** every seat tick. `AiTickRunner.runSeat` reads `AiProfile.brainId()` and calls
-  `FactionBrainRegistry.forBrainId`; the registry maps both `"nekro"` and `"standard"` to the same `NekroBrain` instance
-  ([FactionBrainRegistry](/src/main/java/ti4/ai/brain/FactionBrainRegistry.java)). `AiSettings.brainFor(faction)` returns
-  `"nekro"` for Nekro and `"standard"` for every other faction (used by `AiSeatService` when the seat is created), so the
-  id differs but the object is identical. `AiTickRunner.decide` then calls `NekroBrain.decide` inside the thinking
+  `FactionBrainRegistry.forBrainId`; the registry maps `"standard"` (`StandardBrain.ID`), and `"nekro"` for seats saved before the brain was renamed, to the
+  same `StandardBrain` instance ([FactionBrainRegistry](/src/main/java/ti4/ai/brain/FactionBrainRegistry.java)).
+  `AiSettings.brainFor(faction)` returns `"standard"` for every faction (used by `AiSeatService` when the seat is
+  created). `AiTickRunner.decide` then calls `StandardBrain.decide` inside the thinking
   budget (`AiSettings.thinkingLimits()`), catching `ThinkingAborted`, `StackOverflowError` and `RuntimeException`.
 - **Inputs:** `AiTurnContext` (game, seat, profile, visible prompts, already-pressed keys, memory, now).
 - **Outputs / decisions:** the first non-empty result of an ordered list of 144 rules
-  (`NekroBrain.firstRuleDecision`), or `AiDecision.idle()` when none answers.
+  (`StandardBrain.firstRuleDecision`), or `AiDecision.idle()` when none answers.
 - **Algorithm:**
-  1. `NekroBrain.decide` wraps the evaluation in `DecidingSeat.of(seat, ...)` and iterates `namedRules` in list order,
+  1. `StandardBrain.decide` wraps the evaluation in `DecidingSeat.of(seat, ...)` and iterates `namedRules` in list order,
      timing each with `Thinking.measure` and recording the winner with `TimingReport.decidedBy`.
   2. Faction rules are **not** selected by faction id. Every faction rule is in the list for every seat and gates itself
      on the component the seat holds: `Player.hasAbility` (Propagation, Devotion, Indoctrination, Orbital Drop, Foresight,
@@ -70,11 +70,11 @@ Common vocabulary used below:
      `ViscountUnlennSale::offer`, `MatriarchRules::continueHits`, then the combat rule, then (agenda)
      `QuashRules` inside `declineWhens`, then `NekroLeaderRules::startAgent`, `CarthAgentRules::start`,
      `NekroLeaderRules::startHero`, `DannelRules::holdTurn`, `takeTurn`.
-  4. Faction hooks inside other rules: `NekroBrain.atRoundStart` (passed to `CombatRules.next`) chains
+  4. Faction hooks inside other rules: `StandardBrain.atRoundStart` (passed to `CombatRules.next`) chains
      `SolAgentRules.atRoundStart`, `CombatCardRules.atRoundStart`, `LetnevCombatRules.atRoundStart`, so the Sol agent is
-     asked before combat cards and the Letnev rules after them. `NekroBrain.takeTurn` calls the "instead of a tactical
+     asked before combat cards and the Letnev rules after them. `StandardBrain.takeTurn` calls the "instead of a tactical
      action" and "before passing" hooks of the heroes and component actions (see the `takeTurn` component below).
-     `NekroBrain.declineWhens` calls `QuashRules.queue` after the Veto check and `QuashRules.awaitBounty`.
+     `StandardBrain.declineWhens` calls `QuashRules.queue` after the Veto check and `QuashRules.awaitBounty`.
   5. `PUBLIC_WINDOW_PREFIXES` lists unowned button prefixes the perception layer must show this seat even though they
      carry no owner, including faction ones: `nekroAgentRes_`, `XxchaAgentRules.USER_PREFIX`/`READY_PREFIX`,
      `XxekirGromRules.UNIT_PREFIX`, `DannelRules.TARGET_PREFIX`/`COMBAT_PREFIX`, `BrotherOmarRules.STEP_ONE`/
@@ -88,7 +88,7 @@ Common vocabulary used below:
      prefixes. Combat-thread prompts and prompts in the seat's own thread are always shown, and strategy-card threads
      are filtered by ownership only. So a faction rule whose unowned button appears in the actions channel, with no owned
      button beside it, never sees that prompt unless its prefix is in the set.
-  6. Other rules defined inside `NekroBrain` itself (not faction rules, listed so they are not mistaken for gaps):
+  6. Other rules defined inside `StandardBrain` itself (not faction rules, listed so they are not mistaken for gaps):
      `finishCommandTokenGain` (status phase: on the hidden `increase_tactic_cc` prompt, grows pools until the gain
      target, then moves a surplus token, then presses "Done Redistributing"), `startStatusHomework` /
      `readyOnTheHomeworkMessage` (presses `redistributeCCButtons`, then the ready button once the gain is done),
@@ -102,10 +102,10 @@ Common vocabulary used below:
 - **Fallbacks:** when no rule answers, `AiDecision.idle()`; `AiTickRunner.handleIdle` then applies the runtime fallback
   (outside scope).
 - **Limitations:** a rule earlier in the list that returns a `Wait` blocks every later rule for that tick (several faction
-  flows wait up to 60 s for the bot's next prompt, see section 8). The name `NekroBrain` and the `"nekro"` id are historical;
+  flows wait up to 60 s for the bot's next prompt, see section 8). The name `StandardBrain` and the `"nekro"` id are historical;
   there are no per-faction brains.
 
-#### NekroBrain.takeTurn (own action-phase turn, faction hook order)
+#### StandardBrain.takeTurn (own action-phase turn, faction hook order)
 
 - **Role:** decides.
 - **Purpose:** the action-phase turn of the active seat; this is where heroes and faction component actions compete
@@ -145,13 +145,13 @@ Solid arrows are calls or "ask next" in rule order; dotted arrows are data read.
 ```mermaid
 flowchart TD
     RUN["AiTickRunner.runSeat"] --> REG["FactionBrainRegistry.forBrainId<br/>(nekro and standard)"]
-    REG --> NB["NekroBrain.decide"]
-    NB --> FR["NekroBrain.firstRuleDecision<br/>first non-empty rule wins"]
+    REG --> NB["StandardBrain.decide"]
+    NB --> FR["StandardBrain.firstRuleDecision<br/>first non-empty rule wins"]
     FR --> EARLY["early rules: BrotherOmarRules.returnInfantry,<br/>payments,<br/>NekroLeaderRules.payAgentCost"]
     EARLY --> FLOWS["continuations: XxchaAgentRules.next,<br/>DannelRules.next, OrbitalDropRules.next,<br/>SolHeroRules.next, MathisMathinusRules.next ..."]
     FLOWS --> CBT["combat follow-ups: SardakkHeroRules.next,<br/>ForesightRules.next, IndoctrinationRules.next,<br/>DevotionRules.next, ViscountUnlennSale"]
     CBT --> CR["CombatRules.next"]
-    CR --> HOOK["NekroBrain.atRoundStart<br/>(via ReadyForDice.decide or roundStartCard)"]
+    CR --> HOOK["StandardBrain.atRoundStart<br/>(via ReadyForDice.decide or roundStartCard)"]
     HOOK --> SA["SolAgentRules.atRoundStart"]
     HOOK --> CC["CombatCardRules.atRoundStart"]
     HOOK --> LC["LetnevCombatRules.atRoundStart"]
@@ -160,7 +160,7 @@ flowchart TD
     LC --> DR["DunlainReaperRules"]
     CR --> AGD["agenda rules<br/>declineWhens calls QuashRules.queue"]
     AGD --> STARTERS["NekroLeaderRules.startAgent,<br/>CarthAgentRules.start,<br/>NekroLeaderRules.startHero,<br/>DannelRules.holdTurn"]
-    STARTERS --> TT["NekroBrain.takeTurn"]
+    STARTERS --> TT["StandardBrain.takeTurn"]
     TT --> TRO["TroAgentRules.afterTacticalAction"]
     TT --> INSTEAD["instead of a tactical action:<br/>Darktalon, Mathis, Lazax, Xxekir,<br/>Xxcha agent, Jace X, Dannel, Orbital Drop"]
     TT --> SHV["SardakkHeroRules.planTacticalAction"]
@@ -177,7 +177,7 @@ flowchart TD
 - **Role:** informs (pool targets) and is used by deciders that press the token buttons.
 - **Purpose:** single place that says which command-token pool a gained token goes to, which pool to give one up from,
   and how many tokens a gain may take. Used by every faction, not only Nekro.
-- **Invoked when:** `NekroBrain.finishCommandTokenGain` and `NekroBrain.readyOnTheHomeworkMessage` (status phase);
+- **Invoked when:** `StandardBrain.finishCommandTokenGain` and `StandardBrain.readyOnTheHomeworkMessage` (status phase);
   `NekroRules.gainTokens` (Propagation, N'orr Supremacy, `RiderPayouts`); `NorrSupremacyRules.gainToken`
   (`gainWithinReinforcements`); `NekroLeaderRules.pay` (giving up a token);
   outside scope `StrategyCardRules` (Leadership), `WarfareTokens` (Thunder's Edge Warfare redistribution),
@@ -281,16 +281,15 @@ flowchart TD
     `nekroAgentCost|<messageId>`). Records the action-card count at first sight; it counts as paid when the stored state is
     `paid`, the hand shrank, or `netGainSoFar < 0`.
   - Unpaid: when an action card can be spared, presses the lowest-value discard (`ActionCardValue.worstDiscard`) in a
-    hidden prompt ending " use buttons to discard" created since the token prompt; if that prompt is not there yet, waits
+    hidden prompt ending with `NekroAgent.DISCARD_PROMPT` (", please choose the action card to discard.") created since the
+    token prompt; if that prompt is not there yet, waits
     up to 60 s from the token prompt. Otherwise presses the first `CommandTokenPolicy.poolsToShrink` pool that has an
     enabled `decrease_*` button; with neither, it tries the same discard prompt again even without a spare card. Then
     presses its "Done Losing" button, which it also does when nothing could be paid.
-  - **Prompt text mismatch (likely defect):** the engine's agent module
-    ([NekroAgent](/src/main/java/ti4/service/leader/agent/modules/NekroAgent.java)) now posts the discard prompt as
-    "<player>, please choose the action card to discard.", which does not end with " use buttons to discard". As the code
-    reads, the AI never finds the discard prompt in a live game: it waits 60 s, then loses a command token (or, with no
-    `decrease_*` button, presses "Done Losing" unpaid). `NekroLeaderRulesTest` builds its discard prompt with the old
-    text, so it does not catch this.
+  - The rule and [NekroAgent](/src/main/java/ti4/service/leader/agent/modules/NekroAgent.java) share the prompt text
+    through `NekroAgent.DISCARD_PROMPT`, and `NekroLeaderRulesTest` builds its prompt from it. Until 2026-11-17 the
+    rule looked for the pre-module text " use buttons to discard", so in live games it always waited 60 s and lost a
+    token instead of discarding.
 - **Hero (`startHero` → `continueHero`):**
   - Start conditions: `nekrohero` unlocked, own action-phase turn, no action taken, not started this turn, no
     `turnEnd`/`endOfTurnAbilities` button this turn, an unpressed `componentAction` button, and a best target worth ≥ 3.0.
@@ -393,7 +392,7 @@ Assimilators), `FlagshipRating`/`MechRating` entries, `CombatRules` (`nekro_flag
 #### DannelPlan + DannelRules (Yin hero, Dannel of the Tenth)
 
 - **Role:** evaluates (`DannelPlan`), decides (`DannelRules`).
-- **Invoked when:** `NekroBrain.takeTurn` → `DannelRules.insteadOfTacticalAction` / `DannelRules.beforePassing`; rules
+- **Invoked when:** `StandardBrain.takeTurn` → `DannelRules.insteadOfTacticalAction` / `DannelRules.beforePassing`; rules
   `DannelRules::next` and `DannelRules::holdTurn`.
 - **Algorithm (`DannelPlan.best`):**
   - Needs `yinhero` unlocked. Budget = `min(3, infantry in reinforcements)` (3 when the cap is unknown).
@@ -424,7 +423,7 @@ Every step is a separate tick; the flow state lives in the seat memory under `da
 
 ```mermaid
 sequenceDiagram
-    participant TT as NekroBrain.takeTurn
+    participant TT as StandardBrain.takeTurn
     participant DR as DannelRules
     participant DP as DannelPlan
     participant MEM as AiMemory
@@ -467,7 +466,7 @@ sequenceDiagram
 #### LetnevCombatRules (round-start chain)
 
 - **Role:** decides (dispatcher).
-- **Invoked when:** `CombatRules.next(context, NekroBrain::atRoundStart)` calls the hook at the start of a combat round
+- **Invoked when:** `CombatRules.next(context, StandardBrain::atRoundStart)` calls the hook at the start of a combat round
   in the active system with both sides on the same round and no hits pending, on three paths: `ReadyForDice.decide`
   before the seat declares it is ready for dice (after its decision delay), `CombatRules.roundStartCard` just before it
   presses the roll button after the grace period (not while ground automation is under way), and the ground-combat
@@ -591,7 +590,7 @@ sequenceDiagram
 
 #### SolAgentRules (Evelyn Delouis), SolCommanderRules (Claire Gibson), SolHeroRules (Jace X), BellumGloriosumRules
 
-- **SolAgentRules** (decides): round-start hook (first in `NekroBrain.atRoundStart`) for ground combats only, while
+- **SolAgentRules** (decides): round-start hook (first in `StandardBrain.atRoundStart`) for ground combats only, while
   `solagent` is unexhausted. Once per (position, planet, round): the seat must have ground forces there and an enemy
   must too; uses it when `CombatForecast.extraDie(...).worthSpending()` = win without < 0.95 and win with ≥ 0.05; then
   presses the owned `getAgentSelection_solagent` and records `started~now`. Until 30 s pass, `atRoundStart` returns a
@@ -757,7 +756,7 @@ sequenceDiagram
 ### Xxcha Kingdom (`ti4.ai.xxcha`)
 
 - **QuashRules** (decides, ability `quash`): `canQuash` = ability + ≥ 1 strategy token. `queue` (from
-  `NekroBrain.declineWhens` after Veto): no queued "when" of its own and the when window open; `worthQuashing` =
+  `StandardBrain.declineWhens` after Veto): no queued "when" of its own and the when window open; `worthQuashing` =
   `AgendaPolicy.expectedLoss > threshold` or a quash bounty that lifts `signedLoss + bounty` over the threshold; without a
   forecast `AgendaPolicy.worthDiscarding`. threshold = `CardFacade.strategyToken()` + 1.0 when the seat's
   `AGENDA_VALUE_TABLE` experiment is on, else + 0. Presses hidden `queueWhen_ability_quash`, else opens `queueAWhen`.
@@ -820,7 +819,7 @@ sequenceDiagram
 
 `AiSettings.FACTION_NAMES` lists `l1z1x` and `jolnar`, so `/ai add` offers them and `AiGameSupport.refusalReason`
 accepts them; neither is in `DEFAULT_FACTIONS` (`nekro, sardakk, hacan, letnev, sol, xxcha`) or `WIP_FACTIONS`
-(`naalu, winnu, yin`). They run the same `NekroBrain` rule list with no rule that gates on their abilities, leaders,
+(`naalu, winnu, yin`). They run the same `StandardBrain` rule list with no rule that gates on their abilities, leaders,
 flagship or mech. What the AI does know about them is in shared tables outside scope: `FlagshipRating`, `MechRating`,
 `AllianceValue`, `FactionAggression` (both listed), `ExpertLawValues` (`l1z1x` likes Conscription), `ExpertElectionValues`/
 `ExpertDirectiveValues` (`jolnar`), and `CommandTokenPolicy.statusPhaseGain`, which counts L1Z1X's Cybernetic
@@ -834,8 +833,8 @@ Analytical or their leaders.
 
 | Scenario | Trigger | Handled by | Choices considered | How it chooses | Outcome / fallback |
 | --- | --- | --- | --- | --- | --- |
-| Any faction picks its brain | Seat tick | `FactionBrainRegistry.forBrainId` | `"nekro"` or `"standard"` | both map to the same `NekroBrain` | one rule list for all factions |
-| Status phase command tokens | `statusHomework` phase, hidden `increase_tactic_cc` prompt | `NekroBrain.finishCommandTokenGain`, `CommandTokenPolicy` | grow a pool, move a surplus token, finish | first unmet priority level; surplus from fleet, strategy, tactic over `ideal` | presses "Done Redistributing" when balanced |
+| Any faction picks its brain | Seat tick | `FactionBrainRegistry.forBrainId` | `"standard"` (or `"nekro"` on older saves) | both map to the same `StandardBrain` | one rule list for all factions |
+| Status phase command tokens | `statusHomework` phase, hidden `increase_tactic_cc` prompt | `StandardBrain.finishCommandTokenGain`, `CommandTokenPolicy` | grow a pool, move a surplus token, finish | first unmet priority level; surplus from fleet, strategy, tactic over `ideal` | presses "Done Redistributing" when balanced |
 | Propagation tokens (Nekro) | Prompt text "because of **Propagation**, you instead gain N command tokens" naming the seat | `NekroRules.propagationTokens` | which pool, when to stop | `poolToGrow` until `min(N, room)` | Done Gaining; target remembered across prompt rewrites |
 | Nekro Acidos card draw | Visible prompt naming "Nekro Acidos" and the seat | `NekroRules.commanderDraw` | draw or not | always draws | none |
 | Dacxive Animators | Owned `dacxive_*` button | `NekroRules.dacxiveAnimators` | press or not | always presses the first | none |
@@ -909,9 +908,8 @@ Analytical or their leaders.
   rules for that tick.
 - **Outcome / fallback:** after 60 s without a discard prompt it loses a token; with no usable token button it looks for
   the discard prompt once more; then presses "Done Losing", paid or not.
-- **Likely defect:** the engine's agent module now titles the discard prompt "<player>, please choose the action card to
-  discard.", while `NekroLeaderRules` looks for a prompt ending " use buttons to discard". As the code reads, the card
-  payment is never made in a live game; the seat waits 60 s and pays with a token.
+- **Prompt text:** the rule matches the engine's discard prompt through the shared `NekroAgent.DISCARD_PROMPT`, so the
+  60 s wait only covers the token prompt arriving before the thread message.
 
 #### Yin hero landing sequence
 
@@ -967,7 +965,7 @@ Analytical or their leaders.
 
 ### Overall structure
 
-- **No per-faction brain, no search.** One ordered rule list (`NekroBrain.rules`) is evaluated top to bottom every tick;
+- **No per-faction brain, no search.** One ordered rule list (`StandardBrain.rules`) is evaluated top to bottom every tick;
   the first rule that returns a decision wins. Faction rules gate on components the seat holds (ability, leader, unit,
   technology, breakthrough, note), never on the faction name.
 - **No randomness in scope.** No class in the nine packages draws a random number. Ties are broken by explicit
@@ -1110,7 +1108,7 @@ obvious from the code; `redistributionAlwaysSettles` in
 | Component | Waits for | Timeout | On timeout |
 | --- | --- | --- | --- |
 | `NekroLeaderRules.chooseAgentTarget` | Nekro Malleon target prompt | 60 s from start | marks `done`, returns empty |
-| `NekroLeaderRules.pay` | hidden discard prompt ending " use buttons to discard" | 60 s from the token prompt | loses a token instead; with no usable `decrease_*` button presses "Done Losing" unpaid. The engine's current prompt text does not match, so in live games this timeout is the normal path (see section 10) |
+| `NekroLeaderRules.pay` | hidden discard prompt ending with `NekroAgent.DISCARD_PROMPT` | 60 s from the token prompt | loses a token instead; with no usable `decrease_*` button presses "Done Losing" unpaid |
 | `NekroLeaderRules.continueHero` | next hero button | 60 s per stage | stage DONE |
 | `BrotherMilorRules.continueFlow` | owner / placement button | 30 s per stage | flow removed |
 | `BrotherOmarRules.returnInfantry` | step-one / removal buttons | 10 min from `expect` | memory removed |
@@ -1245,12 +1243,9 @@ missing handlers and approximations visible in the code.
 
 ### Possible defects found while reading (not confirmed by running)
 
-- **Nekro Malleon card payment never matches the engine prompt.** `NekroLeaderRules.discardFor` looks for a hidden
-  prompt whose text ends with " use buttons to discard". Since the agent-module migration, the engine's
-  [NekroAgent](/src/main/java/ti4/service/leader/agent/modules/NekroAgent.java) posts the discard prompt in the
-  cards info thread as "<player>, please choose the action card to discard.". So the AI waits 60 s on every payment and
-  then loses a command token; with no usable `decrease_*` button it presses "Done Losing" without paying.
-  `NekroLeaderRulesTest` builds the prompt with the old text, so the test still passes.
+- **Nekro Malleon from the cards info thread (unverified).** If the seat starts the agent from the copy of its button in
+  the cards info thread, the token prompt is posted there too and is hidden; `payAgentCost` skips hidden token prompts,
+  so the cost would not be paid. Not tested.
 - **Lazax Gate Folding exhaust step has no timeout.** After opening the component-action menu, `LazaxGateFolding.next`
   returns empty until `exhaustTech_lgf` shows; if it never shows, the turn key stays `menu` and nothing finishes the flow
   (it does not block other rules).
@@ -1278,15 +1273,15 @@ missing handlers and approximations visible in the code.
 
 | Caller | Calls |
 | --- | --- |
-| `AiTickRunner.runSeat` | `FactionBrainRegistry.forBrainId` → `NekroBrain.publicWindowHandlerPrefixes`, `NekroBrain.decide` (via `AiTickRunner.decide`) |
-| `FactionBrainRegistry` | constructs the single `NekroBrain` |
-| `AiSeatService` | `AiSettings.brainFor` (`"nekro"` / `"standard"`) |
-| `AiStallDetector` | `NekroBrain.noRealObjectiveRevealed` |
+| `AiTickRunner.runSeat` | `FactionBrainRegistry.forBrainId` → `StandardBrain.publicWindowHandlerPrefixes`, `StandardBrain.decide` (via `AiTickRunner.decide`) |
+| `FactionBrainRegistry` | constructs the single `StandardBrain` |
+| `AiSeatService` | `AiSettings.brainFor` (`"standard"`) |
+| `AiStallDetector` | `StandardBrain.noRealObjectiveRevealed` |
 | `ActionCardRules`, `AiActionCards`, `EconomyTargets`, `ExploreGains`, `TokenGainRules`, `LegendaryRules`, `StrategyCardRules`, `WarfareTokens`, `RedistributionGuard` | `CommandTokenPolicy.gainWithinReinforcements` / `netGainSoFar` / `poolToGrow` / `midRoundSurplus` / `poolToRefill` / `Pool` |
 | `RiderPayouts` | `NekroRules.gainTokens` |
 | `DrawnCardValue` | `NekroLeaderRules.ownsReadyAgent` |
-| `CombatRules.next` (hook, via `ReadyForDice.decide` and `CombatRules.roundStartCard`) | `NekroBrain.atRoundStart` → `SolAgentRules.atRoundStart`, `CombatCardRules.atRoundStart` (outside scope), `LetnevCombatRules.atRoundStart` |
-| `AiPerception.Snapshot.promptsFor` | `NekroBrain.publicWindowHandlerPrefixes` result (filters main-channel prompts only) |
+| `CombatRules.next` (hook, via `ReadyForDice.decide` and `CombatRules.roundStartCard`) | `StandardBrain.atRoundStart` → `SolAgentRules.atRoundStart`, `CombatCardRules.atRoundStart` (outside scope), `LetnevCombatRules.atRoundStart` |
+| `AiPerception.Snapshot.promptsFor` | `StandardBrain.publicWindowHandlerPrefixes` result (filters main-channel prompts only) |
 | `NorrSupremacyRules` (in scope) | `CommandTokenPolicy.gainWithinReinforcements`, `NekroRules.gainTokens` |
 | `CombatRules.assignHits` | `MatriarchRules.assignHitsByHand` |
 | `TacticalRules` (landing step) | `MatriarchRules.commitFighters` |

@@ -111,7 +111,7 @@ class-path scan finds the AI's own `@ButtonHandler`s. Neither of these needs an 
   faction of `DEFAULT_FACTIONS` (Nekro, Sardakk, Hacan, Letnev, Sol, Xxcha). Naalu, Winnu and Yin are listed as
   work in progress (`WIP_FACTIONS`). No production code reads that list. They are kept out of default picks only
   because `DEFAULT_FACTIONS` leaves them out. Every faction uses the same brain. `FactionBrainRegistry` maps the brain
-  ids `nekro` and `standard` to one `NekroBrain` instance. Faction behaviour comes from rules that check for a
+  ids `nekro` and `standard` to one `StandardBrain` instance. Faction behaviour comes from rules that check for a
   specific ability, leader, unit or technology.
 - **Game modes.** [AiGameSupport](/src/main/java/ti4/ai/seat/AiGameSupport.java) refuses to add a seat in these cases:
   - the kill switch is off;
@@ -139,7 +139,7 @@ class-path scan finds the AI's own `@ButtonHandler`s. Neither of these needs an 
 
 ### Design in brief
 
-- **One ordered rule list.** A seat's decision is [NekroBrain.decide](/src/main/java/ti4/ai/nekro/NekroBrain.java). It
+- **One ordered rule list.** A seat's decision is [StandardBrain.decide](/src/main/java/ti4/ai/brain/StandardBrain.java). It
   walks 144 rules in a fixed order and returns the first decision any rule produces. The first five rules only
   observe. The list order is the only priority between rules: there is no scoring across rules. The valuing happens
   inside each rule. Rules call shared planners and evaluators that put a value on options in trade goods (TG). Each
@@ -164,8 +164,10 @@ class-path scan finds the AI's own `@ButtonHandler`s. Neither of these needs an 
   watchdog also ticks every non-dormant game once a minute. A tick lets the seats decide in rotation and does at
   most one thing.
 - **Guarded.** Several limits keep a seat from looping or flooding a game:
-  - a minimum gap of 1.5 s between AI actions;
-  - at most 150 presses per seat per hour (600 at self-play fast pace);
+  - a minimum gap of 1.5 s between AI actions (`CHANNEL_FLOOD_GAP`, none at self-play fast pace), so a misbehaving
+    seat cannot flood a channel;
+  - at most 150 presses per seat per hour (`RUNAWAY_PRESS_CAP_PER_HOUR`, 600 at self-play fast pace), a backstop for a
+    loop that the progress-based guards miss;
   - at most 2 presses of the same button on an unchanged game state;
   - a health check on failed presses;
   - a 20-second thinking budget checked at span entry;
@@ -217,7 +219,7 @@ Ownership is narrow:
 | [`ti4.ai.runtime`](/src/main/java/ti4/ai/runtime/) | decides (when and what to carry out) | Polls games, keeps per-game and per-seat runtime state, runs a tick, applies the guards, routes each decision to the actuator, the fallback or a message, and detects stalls | `AiRuntime`, `AiRuntimeLifecycle`, `AiLane`, `AiSeatState`, `AiTickRunner`, `AiStallDetector`, `AiProgress` |
 | [`ti4.ai.perception`](/src/main/java/ti4/ai/perception/) | informs | Reads the seat's thread, the actions channel, strategy threads and the 2 newest relevant combat threads per seat, then filters the prompts per seat | `AiPerception`, `AiPrompt`, `PromptButton` |
 | [`ti4.ai.brain`](/src/main/java/ti4/ai/brain/) | informs (types, memory, caches) | Brain interface and registry, decision variants, turn context, per-seat memory, per-decision, per-tick and per-search caches, prompt helpers | `FactionBrain`, `FactionBrainRegistry`, `AiDecision`, `AiTurnContext`, `AiMemory`, `DecisionMemo`, `TickMemo`, `SearchMemo`, `Prompts` |
-| [`ti4.ai.nekro`](/src/main/java/ti4/ai/nekro/) | decides | The single rule list every AI seat runs. Also holds the rules written inline (strategy card pick, own turn, scoring, homework, when/after declines, tie break), Nekro faction rules and command token policy | `NekroBrain`, `NekroRules`, `NekroLeaderRules`, `CommandTokenPolicy` |
+| [`ti4.ai.nekro`](/src/main/java/ti4/ai/nekro/) | decides | The single rule list every AI seat runs. Also holds the rules written inline (strategy card pick, own turn, scoring, homework, when/after declines, tie break), Nekro faction rules and command token policy | `StandardBrain`, `NekroRules`, `NekroLeaderRules`, `CommandTokenPolicy` |
 | [`ti4.ai.actuation`](/src/main/java/ti4/ai/actuation/) | executes | Presses a real button as the seat with a stand-in event, and classifies the result | `AiActuator`, `AiActor`, `SyncMessage`, `Proxies` |
 | [`ti4.ai.fallback`](/src/main/java/ti4/ai/fallback/) | decides and executes | Hands blocking choices to the table, picks private safe defaults, records fallbacks | `AiConfusionService`, `DelegationChoice`, `DelegatedPress`, `FallbackLog`, `RedistributionGuard` |
 | [`ti4.ai.selfplay`](/src/main/java/ti4/ai/selfplay/) | decides | Sets up `/ai watch` (all AI), `/ai play` (one human chair) and harness games. `RefereeRules` chooses which "any player" phase button to press in all-AI games; `AiTickRunner.referee` presses it | `SelfPlaySetup`, `RefereeRules` |
@@ -254,7 +256,7 @@ flowchart TD
     Seat["AiSeatService<br/>add, remove, pause"]
     SPS["SelfPlaySetup<br/>/ai watch, /ai play"]
     Perc["AiPerception.read<br/>Snapshot.promptsFor"]
-    Brain["FactionBrainRegistry -><br/>NekroBrain.decide<br/>(144 ordered rules)"]
+    Brain["FactionBrainRegistry -><br/>StandardBrain.decide<br/>(144 ordered rules)"]
     Rules["Rule packages<br/>tactical, strategy, scoring, secrets,<br/>trade, agenda, actioncards, explore,<br/>tech, factions"]
     Eval["Shared evaluators<br/>eval, scoring, tactical planners"]
     Act["AiActuator.press<br/>stand-in event"]
@@ -379,7 +381,7 @@ Other entry points schedule a lane outside the save check:
    self-play it posts 🏁 once.
 5. **Delegated press.** If a table choice is queued, the tick presses it for the seat (`pressDelegated`), re-arms
    2.5 s later and stops. Only one delegated press runs per tick.
-6. **Pacing.** If less than 1.5 s has passed since the lane's last AI press, the tick re-arms at that mark and
+6. **Pacing.** Except at self-play fast pace, if less than 1.5 s has passed since the lane's last AI press, the tick re-arms at that mark and
    stops. The mark is set by `pressAsSeat` and `pressDelegated`. Posting a message (`Announce`, `Propose`, `Post`) does
    not set it.
 7. **Perceive.** `AiPerception.read(game, seats)` runs once for every seat. It does blocking reads of Discord
@@ -411,10 +413,10 @@ Other entry points schedule a lane outside the save check:
    that the seat's user setting for automatic debt clearance is off (`AiSeatService.ensureTradePreferences`).
 3. **Decide.** `decide` skips the brain and returns `Idle` while thinking is held. Thinking is held after an abort
    on the same progress fingerprint, for up to 5 min. Otherwise `decide` opens a `Thinking` session and a
-   `DecisionMemo` scope, then calls `NekroBrain.decide`. The `Thinking` limits are checked each time a rule or
+   `DecisionMemo` scope, then calls `StandardBrain.decide`. The `Thinking` limits are checked each time a rule or
    evaluator enters a named span (`Thinking.enter`): 20 s budget (system property `ai.thinking.budget.seconds`), at
    most 200,000 entries of one span name, at most 8 nested re-entries of one span, and at most 60 nested spans.
-   - `NekroBrain.decide` walks the 144 rules and returns the first decision a rule produces, or `Idle`.
+   - `StandardBrain.decide` walks the 144 rules and returns the first decision a rule produces, or `Idle`.
    - A `ThinkingAborted` or `StackOverflowError` cuts the decision short. The seat holds thinking at this fingerprint,
      a `THINKING_ABORTED` fallback record is written, and the decision is `Idle`.
    - Any other `RuntimeException` is logged and the decision is `Idle`.
@@ -520,7 +522,7 @@ itself.
 | --- | --- |
 | Poll period / first poll | 3 s / 60 s |
 | Re-arm after a seen save or an action | 2.5 s |
-| Minimum gap between AI actions in a game | 1.5 s |
+| Minimum gap between AI actions in a game (`channelFloodGap`) | 1.5 s; 0 at self-play fast pace |
 | Watchdog (games saved within a day) | 60 s |
 | Process not ready | retry in 30 s |
 | Thinking budget (checked at span entry) | 20 s |
@@ -565,8 +567,8 @@ flowchart TD
     Vp -- no --> Deleg{"delegated press queued?"}
     Deleg -- yes --> PD["pressDelegated via AiActuator"]
     PD --> Rearm["markDirty: now + 2.5 s"]
-    Deleg -- no --> Gap{"under 1.5 s since<br/>last AI press?"}
-    Gap -- yes --> Hold["markDirty: last press + 1.5 s"]
+    Deleg -- no --> Gap{"under the flood gap since<br/>last AI press?<br/>(1.5 s; 0 at fast pace)"}
+    Gap -- yes --> Hold["markDirty: last press + gap"]
     Gap -- no --> Perceive["AiPerception.read"]
     Perceive --> Track{"self-play, track exhausted<br/>and end-game button?"}
     Track -- yes --> Over
@@ -575,7 +577,7 @@ flowchart TD
     CanAct -- no --> IdleD["decision = Idle"]
     CanAct -- yes --> HeldT{"thinking held?"}
     HeldT -- yes --> IdleD
-    HeldT -- no --> Decide["NekroBrain.decide:<br/>first rule with a decision"]
+    HeldT -- no --> Decide["StandardBrain.decide:<br/>first rule with a decision"]
     Decide -- "aborted or exception" --> IdleD
     Decide --> Kind{"decision"}
     Kind -- Press --> Tries{"2 attempts on<br/>this state already?"}
@@ -648,7 +650,7 @@ sequenceDiagram
     participant G as GameManager
     participant P as AiPerception
     participant D as Discord
-    participant B as NekroBrain
+    participant B as StandardBrain
     participant A as AiActuator
     participant E as ButtonProcessor
     C->>R: poll()
@@ -693,10 +695,12 @@ diagrams sit next to the class they draw.
 
 #### Delegation: one list, first decision wins
 
-Every AI seat runs the same brain, [NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java).
-`FactionBrainRegistry` maps the brain ids `nekro` and `standard` to one instance.
+Every AI seat runs the same brain, [StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java).
+New seats get the brain id `standard`; `FactionBrainRegistry` also maps `nekro`, the id seats were saved with before
+the brain was renamed from `NekroBrain`, to the same instance. Faction behavior lives in rules that check for an
+ability, leader, unit or breakthrough, so a Nekro or Franken player that copies an ability gets its rules too.
 
-`NekroBrain.decide` does three things:
+`StandardBrain.decide` does three things:
 
 1. It sets the thread-local [DecidingSeat](/src/main/java/ti4/ai/eval/DecidingSeat.java), so evaluators know whose
    hand they may see.
@@ -716,13 +720,13 @@ The list order encodes the priorities:
 | Positions | What they do | Examples |
 | --- | --- | --- |
 | 1-5 | Observers, which always return empty | `AttackLedger.observe`, `Hostility.observe`, `ActionSecretRules.observe`, `PromissoryRules.observe`, `TradeRules.observe` |
-| 6-73 | Prompts that must be finished first: the status-phase token placement (6), pending payments and costs, continuing multi-step components, technology, relic, exploration and strategy-card follow-up steps, leaders, action card and note continuations | `NekroBrain.finishCommandTokenGain`, `PaymentRules.pay`, `RelicActionRules.next`, `ExplorationRules.next`, `StrategyCardRules.chooseTechnology`, `SolAgentRules.chooseTarget`, `ActionCardRules.continuePlay` |
-| 74-110 | Prove Endurance queueing, secret redraw and hand limits, then answering others: trade offers, action card responses, Sabotage windows, Ceasefire, combat cards and combat, action-phase secrets, agenda secrets and notes | `NekroBrain.queueProveEndurance`, `NekroBrain.discardExcessActionCards`, `TradeRules.answerOffers`, `SabotageRules.answerWindows`, `CombatRules.next`, `ActionSecretRules.next` |
-| 111-122 | The agenda phase | `NekroBrain.declineWhens`, `AgendaCardRules.riders`, `AgendaVoting.next`, `NekroBrain.breakAgendaTie`, `TradeRules.offerDeadlyPlotBounty`, `ShenanigansRules.react` |
-| 123-124 | The strategy phase: a speaker-token seller names the card it wants, then the pick | `SpeakerSale.declare`, `NekroBrain.pickStrategyCard` |
+| 6-73 | Prompts that must be finished first: the status-phase token placement (6), pending payments and costs, continuing multi-step components, technology, relic, exploration and strategy-card follow-up steps, leaders, action card and note continuations | `StandardBrain.finishCommandTokenGain`, `PaymentRules.pay`, `RelicActionRules.next`, `ExplorationRules.next`, `StrategyCardRules.chooseTechnology`, `SolAgentRules.chooseTarget`, `ActionCardRules.continuePlay` |
+| 74-110 | Prove Endurance queueing, secret redraw and hand limits, then answering others: trade offers, action card responses, Sabotage windows, Ceasefire, combat cards and combat, action-phase secrets, agenda secrets and notes | `StandardBrain.queueProveEndurance`, `StandardBrain.discardExcessActionCards`, `TradeRules.answerOffers`, `SabotageRules.answerWindows`, `CombatRules.next`, `ActionSecretRules.next` |
+| 111-122 | The agenda phase | `StandardBrain.declineWhens`, `AgendaCardRules.riders`, `AgendaVoting.next`, `StandardBrain.breakAgendaTie`, `TradeRules.offerDeadlyPlotBounty`, `ShenanigansRules.react` |
+| 123-124 | The strategy phase: a speaker-token seller names the card it wants, then the pick | `SpeakerSale.declare`, `StandardBrain.pickStrategyCard` |
 | 125-136 | Turn starters and holds that run before the own turn: agents and heroes, then `Wait`s that hold the turn for a Ceasefire, a card, a deal or Dannel | `NekroLeaderRules.startAgent`, `ActionCardRules.holdOwnTurn`, `PromissoryRules.holdForCeasefire`, `TradeRules.startDeals`, `DannelRules.holdTurn` |
-| 137 | The own action phase turn | `NekroBrain.takeTurn` |
-| 138-144 | Follows, declines, status scoring, homework, and waits for secondaries | `StrategyCardRules.follow`, `NekroBrain.scorePublicObjective`, `SecretRules.scoreStatusSecret`, `NekroBrain.startStatusHomework` |
+| 137 | The own action phase turn | `StandardBrain.takeTurn` |
+| 138-144 | Follows, declines, status scoring, homework, and waits for secondaries | `StrategyCardRules.follow`, `StandardBrain.scorePublicObjective`, `SecretRules.scoreStatusSecret`, `StandardBrain.startStatusHomework` |
 
 Most rules gate themselves on phase, active player and prompt handler ids. In practice only the rules for the current
 window produce a result. Faction rules gate on the component (ability, leader, unit or technology), not on the faction
@@ -733,7 +737,7 @@ returning a `Wait`. Examples are `ActionCardRules.holdOwnTurn` (128), `DannelRul
 
 The list is not the only path into a rule class. Three rules are coordinators that call other rule classes directly.
 
-- **`NekroBrain.takeTurn` (137) orchestrates the own turn.** In a fixed chain, it calls:
+- **`StandardBrain.takeTurn` (137) orchestrates the own turn.** In a fixed chain, it calls:
   - `TacticalRules` (`inProgress`, `continueAction`, `pickingSystem`, `start`, `secondAction`, `stall`);
   - `StrategyCardRules` (`followsPending`, `resolvePrimary`, `awaitingSecondaries`, `play`);
   - `SlayIntent.announce`, `TroAgentRules.afterTacticalAction`, `ActionCardRules.masterPlan`, and end-of-turn
@@ -747,9 +751,9 @@ The list is not the only path into a rule class. Three rules are coordinators th
   tactical plan; see "Shared evaluators" below. Two early exits return empty on purpose so that later rules run:
   while the seat's played card still awaits secondaries (`StrategyCardRules.awaitingSecondaries`, so rule 143 can
   `Wait`), and once the tactical action is taken but nothing in the chain applies (`TacticalRules.actionTaken`).
-- **`NekroBrain.pickStrategyCard` (124)** calls `StrategyCardRanking.ranked`, `ChecksAndBalances.plan` and
+- **`StandardBrain.pickStrategyCard` (124)** calls `StrategyCardRanking.ranked`, `ChecksAndBalances.plan` and
   `SpeakerSale` (`awaitSellerPick`, `withoutPromisedCard`). It writes the chosen plan with `CardPlanMemory.write`.
-- **`NekroBrain.scorePublicObjective` (140)** calls `ObjectivePolicy.bestScorablePublic` and
+- **`StandardBrain.scorePublicObjective` (140)** calls `ObjectivePolicy.bestScorablePublic` and
   `ScoringRules.scoreAndExpectPayment`. For objectives that open a planet payment prompt, the latter leaves an
   expectation (`PaymentRules.expectWhenScored`) that rule 10 (`PaymentRules.pay`) uses on a later tick.
 
@@ -757,14 +761,14 @@ Rule classes also call each other's planners. For example:
 
 - `StrategyCardRules` drives Warfare and Construction builds through `TacticalRules.start`, `payForUnits` and
   `placeUnits`, `TacticalPlanner.worthProducingAt`, and the card plan in `PlannedPrimaries`.
-  `TacticalPlanner.bestForWarfare` is called by `NekroBrain.warfareBeforeFollowUp`, `CardTiming` and
+  `TacticalPlanner.bestForWarfare` is called by `StandardBrain.warfareBeforeFollowUp`, `CardTiming` and
   `PlannedPrimaries`.
 - `TacticalRules` calls `ProductionPlanner`, `PaymentPlanner`, `SpaceCannonWait` and `BombardmentRules`.
 - `TacticalPlanner.produce` also calls `ProductionPlanner`.
 
 A calling rule never overrides another rule's result after the fact. The only override is order: an earlier rule's
 decision means a later rule is never asked. A few rules return empty on purpose to leave a window to later rules.
-For example, `NekroBrain.declineWhens` returns nothing while the seat holds a played Veto, so `AgendaCardRules` can
+For example, `StandardBrain.declineWhens` returns nothing while the seat holds a played Veto, so `AgendaCardRules` can
 act.
 
 #### Shared evaluators
@@ -798,8 +802,8 @@ The specialized rules share evaluators instead of re-deriving values:
 | `TickMemo` | One tick, all seats | `IncomingForces`, `TacticalStrength` | The same, across the seats of that tick |
 | `SearchMemo` | One imagined turn or deal search. Scopes are opened by `ImaginedTurn.of`, `FragmentDeals`, `MilitarySupportDeals`, `NoteDeals` and `TechnologyRequest` | `remember` in `ScoringStakes`, `ScoringPaths`, `PublicScoringPlan`, `SpendUnlock`, `ResearchPolicy`, `AgendaPrior` and several trade classes. Outside an open scope it falls back to `DecisionMemo` | The same scope |
 | Game stored values written through `AiGameWrites.persist` | In the save, rolled back by undo | `Hostility` (`aiHostility`), `AttackLedger`, `Relations` (`aiRelations`), `PromiseBook` (`aiPromises`), `HumanAiDealStore`, `DiscardBounties`, `SpeakerPromise`, `Extortion`, `BoatFloat` | `Relations.hostility` reads `Hostility.amount`. `OffenseOutlook` (tactical) and `VoteAnger` (agenda) read `Relations.bad`. `TacticalPlanner` reads `PromiseBook` |
-| Static per-game maps | Until `AiRuntime.forget` clears them through `AiGameState.forget`. `SecondaryQueue` and `AttackLedger` are also cleared on undo. When the poll drops a lane because its game ended or vanished, it removes only the lane, not these maps | `SecondaryQueue` (strategy follows), `SlayIntent`, `FractureMarch`, `AttackLedger` pictures | `NekroBrain.declineStrategyCardFollow` and `StrategyCardRules` read `SecondaryQueue`. `DefenseOutlook` reads `SlayIntent.hunts` |
-| `DecidingSeat` (thread-local) | One `NekroBrain.decide` call | `NekroBrain.decide` | `SecretOdds`, `WinOdds`, `WinRace`, `DenialMap`, `ScoringStakes`, `TacticalStrength`, `PromiseBook`, `AttackLedger`, ... |
+| Static per-game maps | Until `AiRuntime.forget` clears them through `AiGameState.forget`. `SecondaryQueue` and `AttackLedger` are also cleared on undo. When the poll drops a lane because its game ended or vanished, it removes only the lane, not these maps | `SecondaryQueue` (strategy follows), `SlayIntent`, `FractureMarch`, `AttackLedger` pictures | `StandardBrain.declineStrategyCardFollow` and `StrategyCardRules` read `SecondaryQueue`. `DefenseOutlook` reads `SlayIntent.hunts` |
+| `DecidingSeat` (thread-local) | One `StandardBrain.decide` call | `StandardBrain.decide` | `SecretOdds`, `WinOdds`, `WinRace`, `DenialMap`, `ScoringStakes`, `TacticalStrength`, `PromiseBook`, `AttackLedger`, ... |
 | `AiExperiments` flags | Process property `ai.experiments.off`, or seat stored value `aiExperimentsOff` | Tests and operators | 50 production files. Every flag is on by default |
 
 #### How the observers feed later rules
@@ -825,13 +829,13 @@ later seats in the same tick see the changed `Game`.
 
 ```mermaid
 flowchart LR
-    TR["AiTickRunner.decide"] --> NB["NekroBrain.decide<br/>first rule with a decision"]
+    TR["AiTickRunner.decide"] --> NB["StandardBrain.decide<br/>first rule with a decision"]
     NB --> OBS["Observers 1-5<br/>AttackLedger, Hostility,<br/>ActionSecretRules, PromissoryRules, TradeRules"]
     NB --> EARLY["Follow-up and response rules<br/>PaymentRules, CombatRules, SabotageRules,<br/>TradeRules.answerOffers, ..."]
     NB --> AG["Agenda rules<br/>AgendaVoting, AgendaCardRules,<br/>ShenanigansRules"]
-    NB --> PICK["NekroBrain.pickStrategyCard"]
-    NB --> TURN["NekroBrain.takeTurn"]
-    NB --> SCORE["NekroBrain.scorePublicObjective,<br/>SecretRules.scoreStatusSecret"]
+    NB --> PICK["StandardBrain.pickStrategyCard"]
+    NB --> TURN["StandardBrain.takeTurn"]
+    NB --> SCORE["StandardBrain.scorePublicObjective,<br/>SecretRules.scoreStatusSecret"]
     PICK --> SCR["StrategyCardRanking.ranked"]
     TURN --> TRU["TacticalRules"]
     TURN --> SCRU["StrategyCardRules"]
@@ -883,7 +887,7 @@ Notes on the diagram:
 
 - `SV -.-> DO` stands for `OffenseOutlook` reading `Relations.bad`, which is built from `Hostility.amount` and the
   stored relation levels. `DefenseOutlook` reads attack grudges through `Standings.angerRatio`.
-- `SQ -.-> NB` is `NekroBrain.declineStrategyCardFollow` checking `SecondaryQueue.blockerFor`.
+- `SQ -.-> NB` is `StandardBrain.declineStrategyCardFollow` checking `SecondaryQueue.blockerFor`.
 - `EARLY --> TV` is `TradeRules.answerOffers` reaching `TradeValue.of` through `OfferResponder`.
 - `DO -.-> DM` is `DefenseOutlook` building `IncomingForces`, which caches in `TickMemo`.
 
@@ -924,7 +928,7 @@ There are four signals:
 
 - **The phase string.** `game.getPhaseOfGame()` gives `strategy`, `action`, `statusScoring`, `statusHomework`, the
   agenda phases (`agendawaiting`, `agendaVoting`, `agendaEnd`), and `playerSetup` / `miltydraft` at setup. Rules
-  compare it case-insensitively. For example, `NekroBrain.pickStrategyCard` requires `strategy` and `takeTurn`
+  compare it case-insensitively. For example, `StandardBrain.pickStrategyCard` requires `strategy` and `takeTurn`
   requires `action`.
 - **Whose turn it is.** `AiTurnContext.isActivePlayer` and the turn start (`lastActivePlayerChange`) tell a seat
   whether it is its turn.
@@ -972,7 +976,7 @@ How those steps get pressed depends on the game:
   [RefereeRules](/src/main/java/ti4/ai/selfplay/RefereeRules.java) refers to `deal2SOToAll`, `startOfGameObjReveal`,
   `reveal_stage_…`, `startStrategyPhase`, `flip_agenda` or `proceed_to_strategy`, and none presses "Resolve with
   Current Winner". The humans press them. They are also not stall reasons, so the AI never hands them over either.
-  Two agenda steps are exceptions: an AI speaker breaks a tie itself with `NekroBrain.breakAgendaTie` (rule 119), and
+  Two agenda steps are exceptions: an AI speaker breaks a tie itself with `StandardBrain.breakAgendaTie` (rule 119), and
   `ShenanigansRules` may press an `agendaResolution_` button to elect itself with Confounding Legal Text.
 - **Self-play (all seats AI).** `RefereeRules.next` picks one of these steps and `AiTickRunner.referee` presses it,
   only when no seat acted in the tick and under these conditions:
@@ -1013,7 +1017,7 @@ How those steps get pressed depends on the game:
   - It registers the game with the runtime.
 
   From then on the seat answers its own setup prompts with ordinary rules. `StartingTechRules.choose` (rule 44) picks
-  starting technologies, `NekroBrain.discardExcessSecret` (rule 76) discards down to one secret in round 1, and
+  starting technologies, `StandardBrain.discardExcessSecret` (rule 76) discards down to one secret in round 1, and
   `PaymentRules` and the rest handle the other prompts.
 - **Self-play and `/ai play`.** `SelfPlaySetup` (for `/ai watch`, `/ai play` and the harness) creates the game for 3
   to 6 seats, lays out the Thunder Dreaming map and adds an AI seat for every chair with `AiSeatService.addSeat`,
@@ -1025,7 +1029,7 @@ How those steps get pressed depends on the game:
 
 #### Strategy phase (`strategy`)
 
-- `NekroBrain.pickStrategyCard` (rule 124) acts when the seat is the active player. In order:
+- `StandardBrain.pickStrategyCard` (rule 124) acts when the seat is the active player. In order:
   1. It hands over a Checks and Balances card if one is planned.
   2. If it bought the speaker token, it waits (`SpeakerSale.awaitSellerPick`, a `Wait`) until the seller has named
      the card it wants.
@@ -1041,7 +1045,7 @@ How those steps get pressed depends on the game:
 
 #### Action phase (`action`)
 
-- **On the seat's own turn**, `NekroBrain.takeTurn` (rule 137) runs a fixed chain:
+- **On the seat's own turn**, `StandardBrain.takeTurn` (rule 137) runs a fixed chain:
   1. continue a tactical action in progress;
   2. finish pending follows;
   3. announce a planned attack (`SlayIntent.announce`);
@@ -1066,7 +1070,7 @@ How those steps get pressed depends on the game:
 #### Status phase (`statusScoring`, then `statusHomework`)
 
 - **Scoring.**
-  - `NekroBrain.scorePublicObjective` (rule 140) scores the best public objective it can afford
+  - `StandardBrain.scorePublicObjective` (rule 140) scores the best public objective it can afford
     (`ObjectivePolicy.bestScorablePublic`), or presses "no scoring". It acts only while `<faction>round<N>PO` is
     empty.
   - `SecretRules.scoreStatusSecret` (rule 141) does the same for secrets.
@@ -1074,8 +1078,8 @@ How those steps get pressed depends on the game:
 - **Objective reveal.** Once everyone has scored, the engine offers the reveal buttons. Humans press them in mixed
   games, and the referee in self-play. The reveal starts the homework.
 - **Homework.**
-  - `NekroBrain.startStatusHomework` (rule 142) opens the command-token redistribution on the homework message.
-  - `NekroBrain.finishCommandTokenGain` (rule 6) places the gained tokens by `CommandTokenPolicy` priorities and
+  - `StandardBrain.startStatusHomework` (rule 142) opens the command-token redistribution on the homework message.
+  - `StandardBrain.finishCommandTokenGain` (rule 6) places the gained tokens by `CommandTokenPolicy` priorities and
     presses Done.
   - `startStatusHomework` then presses "ready" once the reaction is stored.
   - Other status prompts are handled by the follow-up rules: readying, hand limits (rules 76 and 77) and secret
@@ -1086,17 +1090,17 @@ How those steps get pressed depends on the game:
 
 - **When and after windows (`agendawaiting`).**
   - `PromissoryRules.queueAgendaNote` (rule 109) and `BoatFloat.arrange` (rule 110) act first.
-  - `NekroBrain.declineWhens` (rule 111) queues Veto or Quash or offers bounties, else declines the "when" window.
+  - `StandardBrain.declineWhens` (rule 111) queues Veto or Quash or offers bounties, else declines the "when" window.
   - `GalacticThreatRules` (112) and `AgendaCardRules.riders` (113) run next.
-  - `NekroBrain.declineAfters` (114) queues a rider or declines the "after" window.
+  - `StandardBrain.declineAfters` (114) queues a rider or declines the "after" window.
   - `SecretRules.scoreAgendaSecret` (rule 108) runs before all of them.
 - **Voting (`agendaVoting`).**
   - Trade rules first: `TradeRules.payTheAnswerer` (115) and `TradeRules.holdVoteForDeals` (116) may pay or hold the
     vote for a deal.
   - `AgendaVoting.next` (117) casts the planned ballot, using `BallotPlanner` and `AgendaForecast`, when the seat is
     the active voter.
-  - Otherwise `NekroBrain.abstainFromAgenda` (118) abstains.
-  - `NekroBrain.breakAgendaTie` (119) breaks a tie when the seat is speaker and the active player, before the phase
+  - Otherwise `StandardBrain.abstainFromAgenda` (118) abstains.
+  - `StandardBrain.breakAgendaTie` (119) breaks a tie when the seat is speaker and the active player, before the phase
     reaches `agendaEnd`. The engine makes the speaker active and sends the tie buttons only on a tie. This rule acts
     in mixed games too. In self-play, the referee presses a tie button that is at least 10 minutes old if no seat
     did.
@@ -1129,7 +1133,7 @@ flowchart TD
 ```
 
 Legend: solid arrows (`-->`) are phase transitions, with who presses the step that causes them. Dotted arrows (`-.->`)
-are the conditions the runtime reads to stop acting. Rule numbers are positions in `NekroBrain`'s rule list.
+are the conditions the runtime reads to stop acting. Rule numbers are positions in `StandardBrain`'s rule list.
 
 The agenda sub-phases are set by `AgendaHelper.revealAgenda` (`agendawaiting`), `AgendaHelper.startTheVoting`
 (`agendaVoting`, called from `AgendaWhensAftersHelper` once every player has passed on "after"s) and
@@ -1150,7 +1154,7 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Bot restarted | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiRuntime.discover` |
 |  | Several AI seats can act | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiTickRunner.tickGame`, `AiLane.rotation` |
 |  | A seat is eliminated | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiTickRunner.tickGame`, `AiSeats.isActiveAiSeat` |
-|  | A seat's own turn, action phase | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `NekroBrain.takeTurn` (rule 137) |
+|  | A seat's own turn, action phase | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `StandardBrain.takeTurn` (rule 137) |
 |  | A rule returns `Wait` | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiTickRunner.runSeat` |
 |  | No rule applies and nothing is waited on | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiTickRunner.handleIdle` |
 |  | No rule applies but the game waits on the seat | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `handleIdle` |
@@ -1164,7 +1168,7 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Seat paused | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `runSeat`, `handleIdle` |
 |  | `/ai resume` | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiRuntime.register` |
 |  | Kill switch off | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `mayActOnItsOwn` |
-|  | Hourly cap reached | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `underActionCap` |
+|  | Hourly cap reached | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `underRunawayPressCap` |
 |  | Thinking cut short | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiTickRunner.cutShort` |
 |  | A rule throws | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiTickRunner.decide` |
 |  | `/game undo` | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `AiLane.forgetAfterUndo` |
@@ -1213,13 +1217,13 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | `/ai play` | [Seats, commands, fallback and self-play setup](/src/main/java/ti4/ai/seat/README.md) | `AiPlay` -> `AiGameLauncher` -> `SelfPlaySetup` |
 |  | `/ai fallbacks` | [Seats, commands, fallback and self-play setup](/src/main/java/ti4/ai/seat/README.md) | `AiFallbacks` |
 |  | Any faction picks its brain | [Faction packages](/src/main/java/ti4/ai/FACTIONS.md) | `FactionBrainRegistry.forBrainId` |
-| **Setup and strategy phase** | Strategy phase pick | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `NekroBrain.pickStrategyCard` (rule 124) |
-|  | Pick a strategy card | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `NekroBrain.pickStrategyCard` → `StrategyCardRanking.ranked` |
+| **Setup and strategy phase** | Strategy phase pick | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `StandardBrain.pickStrategyCard` (rule 124) |
+|  | Pick a strategy card | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StandardBrain.pickStrategyCard` → `StrategyCardRanking.ranked` |
 |  | Pick under *Checks and Balances* | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `ChecksAndBalances.plan`, then `recipient` |
 |  | Buyer of a speaker sale picks | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `SpeakerSale.awaitSellerPick`, `withoutPromisedCard` |
 |  | Seller declares its card | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `SpeakerSale.declare` |
 |  | Winnu starting technology | [Faction packages](/src/main/java/ti4/ai/FACTIONS.md) | `StartingTechRules` |
-|  | Starting secrets | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `NekroBrain.discardExcessSecret` |
+|  | Starting secrets | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `StandardBrain.discardExcessSecret` |
 | **Action phase: tactical actions and movement** | Start of own action turn | [Tactical planning](/src/main/java/ti4/ai/tactical/README.md) | `TacticalRules.start` → `TacticalPlanner.best` |
 |  | No tactic token | [Tactical planning](/src/main/java/ti4/ai/tactical/README.md) | `TacticalPlanner.bestAffordable` |
 |  | Token reserve for a spend objective | [Tactical planning](/src/main/java/ti4/ai/tactical/README.md) | `bestAffordable`, `withinTokenBudget` |
@@ -1285,11 +1289,11 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Technological Singularity | [Combat and production](/src/main/java/ti4/ai/tactical/README.md) | `SingularityRules` |
 |  | Combat round start | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `CombatCardRules.atRoundStart` |
 |  | Hits to assign | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `CombatCardRules.cancelHits` → `HitCancelCards` |
-| **Action phase: strategy cards, action cards, technologies, exploration and faction abilities** | Another player's strategy card | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `StrategyCardRules.follow`, `NekroBrain.declineStrategyCardFollow`, `StrategyCardRules.awaitFollowTurn` (rules 138, 139, 144) |
+| **Action phase: strategy cards, action cards, technologies, exploration and faction abilities** | Another player's strategy card | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `StrategyCardRules.follow`, `StandardBrain.declineStrategyCardFollow`, `StrategyCardRules.awaitFollowTurn` (rules 138, 139, 144) |
 |  | Play a card now or later | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StrategyCardTurn.playIfDue` → `CardTiming.of` |
-|  | Thunder's Edge Warfare for an attack | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `NekroBrain.warfareBeforeFollowUp` (before `playIfDue`) |
-|  | Fallback card play | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `NekroBrain.takeTurn` loop |
-|  | Second strategic action | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `NekroBrain.secondStrategicAction` |
+|  | Thunder's Edge Warfare for an attack | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StandardBrain.warfareBeforeFollowUp` (before `playIfDue`) |
+|  | Fallback card play | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StandardBrain.takeTurn` loop |
+|  | Second strategic action | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StandardBrain.secondStrategicAction` |
 |  | Imperial primary | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StrategyCardRules.imperial` |
 |  | Technology primary | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StrategyCardRules.technology` → `chooseTechnology` |
 |  | Leadership primary | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StrategyCardRules.leadership`, `gainTokens` |
@@ -1302,7 +1306,7 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Trade primary | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | Engine (`TradeStrategyCardService.doPrimary` runs on play), then `StrategyCardRules.trade` |
 |  | Follow a played card | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `StrategyCardRules.follow` |
 |  | Wait to follow | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `awaitFollowTurn`, `SecondaryQueue.blockerFor` |
-|  | Holder waits for secondaries | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `awaitSecondaries` / `NekroBrain.takeTurn` |
+|  | Holder waits for secondaries | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `awaitSecondaries` / `StandardBrain.takeTurn` |
 |  | Busy paying | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `busyPaying`, `waitsToFollow` |
 |  | Round-1 Gravity Drive opening | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `CardTiming.opensTheRound`, `OpeningHold`, `StrategyCardReplanner` |
 |  | Round-1 Construction vs. moving out | [Strategy cards and technology research](/src/main/java/ti4/ai/strategy/README.md) | `CardTiming.movesOutBeforeConstruction` |
@@ -1320,7 +1324,7 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Censured / over the limit / passed vs Transparasteel | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `ActionCardRules.mayPlay` |
 |  | Another player activates a system with the seat's units | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `ActionCardRules.afterActivation` |
 |  | Flank Speed | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `ActionCardRules.flankSpeed` |
-|  | Master Plan | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `ActionCardRules.masterPlan` (from `NekroBrain.takeTurn`) |
+|  | Master Plan | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `ActionCardRules.masterPlan` (from `StandardBrain.takeTurn`) |
 |  | Summit drawn | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `ActionCardRules.presetSummit` |
 |  | War Machine at production | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `TacticalRules.warMachine` → `ProductionCards.playWarMachine` |
 |  | Sabotage window of another player's card | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `SabotageRules.answerWindows` / `answerWindowsAimedAtSeat` |
@@ -1423,7 +1427,7 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Lost a home-system planet | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `ActionSecretRules.watchHomePlanets` |
 |  | Imperial primary | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `ObjectivePolicy.bestScorablePublic`, then the card's Mecatol / secret buttons |
 |  | Imperial secondary | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `StrategyCardRules.followImperial` |
-|  | Draw leaves the hand over the limit | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `NekroBrain.discardExcessSecret` |
+|  | Draw leaves the hand over the limit | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `StandardBrain.discardExcessSecret` |
 |  | Full hand of strong secrets | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretDraws.worthDrawing` false |
 |  | Mecatol Rex redraw | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretRedrawRules.endOfTurn` / `discardForRedraw` |
 |  | Action phase reserve for a spend objective | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `ScoringReserve.reserved` |
@@ -1432,14 +1436,14 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Action secret: pursue or be patient | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `ActionSecretTiming.pursueNow` |
 |  | Rival might win | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `WinOdds`, `WinRace`, `ScoringStakes.contender` |
 |  | Desperation | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | none |
-| **Status phase** | Status phase scoring | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `NekroBrain.scorePublicObjective`, `SecretRules.scoreStatusSecret` (140, 141) |
-|  | Status phase command tokens | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `NekroBrain.finishCommandTokenGain` (6), `startStatusHomework` (142) |
-|  | Hand limit at status / any time over the limit | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `NekroBrain.discardExcessActionCards` → `ActionCardValue.worstDiscard` |
+| **Status phase** | Status phase scoring | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `StandardBrain.scorePublicObjective`, `SecretRules.scoreStatusSecret` (140, 141) |
+|  | Status phase command tokens | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `StandardBrain.finishCommandTokenGain` (6), `startStatusHomework` (142) |
+|  | Hand limit at status / any time over the limit | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `StandardBrain.discardExcessActionCards` → `ActionCardValue.worstDiscard` |
 |  | Entropic Scar technology | [Shared valuation and technology automation](/src/main/java/ti4/ai/eval/README.md) | `EntropicScarRules.next` |
-|  | Status phase command tokens | [Faction packages](/src/main/java/ti4/ai/FACTIONS.md) | `NekroBrain.finishCommandTokenGain`, `CommandTokenPolicy` |
-|  | Status phase, one or more publics qualify | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `NekroBrain.scorePublicObjective` -> `ObjectivePolicy.bestScorablePublic` |
-|  | Status phase, no public qualifies | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `NekroBrain.scorePublicObjective` |
-|  | Engine already marked the public step | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `NekroBrain.scorePublicObjective` |
+|  | Status phase command tokens | [Faction packages](/src/main/java/ti4/ai/FACTIONS.md) | `StandardBrain.finishCommandTokenGain`, `CommandTokenPolicy` |
+|  | Status phase, one or more publics qualify | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `StandardBrain.scorePublicObjective` -> `ObjectivePolicy.bestScorablePublic` |
+|  | Status phase, no public qualifies | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `StandardBrain.scorePublicObjective` |
+|  | Engine already marked the public step | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `StandardBrain.scorePublicObjective` |
 |  | Spend objective payment | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `PaymentRules.pay` |
 |  | Status phase, one status secret qualifies | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretRules.scoreStatusSecret` |
 |  | Status phase, several status secrets qualify | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretValue.bestScorableStatusSecret` |
@@ -1447,13 +1451,13 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Engine auto-opted the seat out of secrets | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretRules.scoreStatusSecret` |
 |  | Score buttons not on screen | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretScoring.score` |
 |  | Form a Spy Network / Destroy Heretical Works cost | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretCostRules.pay` |
-| **Agenda phase** | Agenda "when"/"after" | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `NekroBrain.declineWhens` (111), `declineAfters` (114) and the agenda rules between them |
-|  | Agenda "when" | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `NekroBrain.declineWhens` → `AgendaCardRules.queueVeto` |
-|  | Agenda "after" | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `NekroBrain.declineAfters` → `AgendaCardRules.queueRider` |
+| **Agenda phase** | Agenda "when"/"after" | [Core runtime, brain, perception and actuation](/src/main/java/ti4/ai/runtime/README.md) | `StandardBrain.declineWhens` (111), `declineAfters` (114) and the agenda rules between them |
+|  | Agenda "when" | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `StandardBrain.declineWhens` → `AgendaCardRules.queueVeto` |
+|  | Agenda "after" | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `StandardBrain.declineAfters` → `AgendaCardRules.queueRider` |
 |  | Agenda shenanigans | [Action cards](/src/main/java/ti4/ai/actioncards/README.md) | `ShenanigansRules.react` → `ShenaniganCards.playIfWorthIt` |
 |  | Agenda phase secrets | [Scoring and secret objectives](/src/main/java/ti4/ai/scoring/README.md) | `SecretRules.scoreAgendaSecret` |
 |  | Own turn to vote, the outcome matters | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `AgendaVoting.next` → `plan` → `BallotPlanner.choose` |
-|  | Own turn to vote, nothing at stake | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `BallotPlanner.choose` returns empty → `NekroBrain.abstainFromAgenda` |
+|  | Own turn to vote, nothing at stake | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `BallotPlanner.choose` returns empty → `StandardBrain.abstainFromAgenda` |
 |  | Final agenda of the phase | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `BallotPlanner.allIn` (unless the agenda depends on the own vote) |
 |  | First agenda, last planet | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `BallotPlanner` (expert) / `planetToExhaust` (legacy) |
 |  | No forecast available | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `BallotPlanner.withoutForecast` |
@@ -1465,7 +1469,7 @@ with triggers, choices, selection logic and fallbacks, are in the subsystem sect
 |  | Bound by a vote promise | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `AgendaVoting.plan` / `keepingPromise` |
 |  | `NOT_FOR` / `NOT_AGAINST` promise | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `BallotPlanner` (outcome removed) / `AgendaVoting.plan` filter / `keepingOutOfTheVote` |
 |  | Boat float on Articles of War | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `BoatFloat.arrange` → `AgendaVoting.plan` → `AgendaPolicy.chooseOutcome` |
-|  | Speaker breaks a tie | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `NekroBrain.breakAgendaTie` → `AgendaPolicy.chooseOutcome` |
+|  | Speaker breaks a tie | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `StandardBrain.breakAgendaTie` → `AgendaPolicy.chooseOutcome` |
 |  | Speaker picks the owner of tied planets | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `AgendaPolicy.choosePlanetOwner` |
 |  | Gila the Silvertongue TG votes | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `GilaVotes` via `AgendaVoting.spendTradeGoods` |
 |  | Predictive Intelligence | [Agenda phase](/src/main/java/ti4/ai/agenda/README.md) | `AgendaVoting.spendPlanets` |
@@ -1593,11 +1597,11 @@ objective at stake, objective odds times 8.0 per point, and agenda outcome chanc
 
 Ranking happens at three levels, and only the lowest one compares numbers.
 
-1. **Between rules: fixed order.** `NekroBrain.decide` takes the first of its 144 rules that returns a decision.
+1. **Between rules: fixed order.** `StandardBrain.decide` takes the first of its 144 rules that returns a decision.
    Whether a follow-up payment, a combat roll, a trade answer or the own turn comes first is set by list position,
    not by value. Rules are written to act only in their own window, so the order rarely has to choose between two
    live options. When it does, the earlier rule wins.
-2. **Within the own turn: a fixed chain with value gates.** `NekroBrain.takeTurn` asks for options in a fixed order:
+2. **Within the own turn: a fixed chain with value gates.** `StandardBrain.takeTurn` asks for options in a fixed order:
    - continue an action;
    - pending follows;
    - an attack announcement (`SlayIntent`);
@@ -1753,7 +1757,7 @@ The sections below follow each kind of data.
 - **Filtered per seat.** `Snapshot.promptsFor(seat, prefixes)` keeps:
   - every kept prompt of the seat's own thread (prompts with buttons, and rejection notices);
   - main-channel prompts with a button owned by the seat, an unowned button whose handler id starts with one of
-    `NekroBrain`'s public window prefixes (plus the action card target prefixes), or AI table talk. Other buttonless
+    `StandardBrain`'s public window prefixes (plus the action card target prefixes), or AI table talk. Other buttonless
     main-channel messages, such as the Leadership payout line kept above, are dropped here;
   - strategy-thread prompts with a button owned by the seat;
   - every prompt of the 2 newest combat threads that involve the seat.
@@ -1830,7 +1834,7 @@ flowchart LR
     Tick["AiTickRunner.tickGame"]
     Perc["AiPerception.read<br/>promptsFor"]
     Ctx["AiTurnContext<br/>game, seat, profile, prompts,<br/>pressedKeys, memory, now"]
-    Brain["NekroBrain.decide<br/>rules and planners"]
+    Brain["StandardBrain.decide<br/>rules and planners"]
     Seat[("AiSeatState<br/>pressedKeys, attempts,<br/>AiMemory, stall")]
     Act["AiActuator.press"]
     BP["ButtonProcessor.processNow<br/>engine handler"]
@@ -1875,30 +1879,30 @@ calls callee, and this is what passes between them".
 | `CronManager` (shared scheduler) | `AiRuntime.poll`, every 3 s | each lane's last seen `ManagedGame.lastModifiedDate`; a changed save marks the lane due 2.5 s later |
 | `AiRuntime` worker | `AiTickRunner.tick(lane, now)` | one due lane; the tick does at most one thing for the whole game |
 | `AiTickRunner.tickGame` | `AiPerception.read` | a snapshot of `AiPrompt`s and `PromptButton`s from the seat's cards info thread, the actions channel, strategy card threads and combat threads |
-| `AiTickRunner.runSeat` | `FactionBrainRegistry.forBrainId` → `NekroBrain.decide` | in: `AiTurnContext` (game, seat, prompts, memory); out: one `AiDecision` (`Press`, `Wait`, `Unsure`, `Announce`, `Post`, `Propose`) or none (`Idle`) |
-| `NekroBrain.decide` | the 144 `BrainRule`s, in order | `Optional<AiDecision>`; the first present result ends the decision |
-| `NekroBrain.takeTurn` | `TacticalRules.start` / `continueAction` → `TacticalPlanner.best` | the chosen `TacticalPlan`, then one press per tick while the action runs |
+| `AiTickRunner.runSeat` | `FactionBrainRegistry.forBrainId` → `StandardBrain.decide` | in: `AiTurnContext` (game, seat, prompts, memory); out: one `AiDecision` (`Press`, `Wait`, `Unsure`, `Announce`, `Post`, `Propose`) or none (`Idle`) |
+| `StandardBrain.decide` | the 144 `BrainRule`s, in order | `Optional<AiDecision>`; the first present result ends the decision |
+| `StandardBrain.takeTurn` | `TacticalRules.start` / `continueAction` → `TacticalPlanner.best` | the chosen `TacticalPlan`, then one press per tick while the action runs |
 | `TacticalPlanner` | `StrikeEvaluator`, `OffenseOutlook`, `DefenseOutlook`, `CannonExposure`, `CombatOdds`, `BattleMath` | strike estimates, exact win probabilities, expected losses and defense cost, in TG |
 | `DefenseOutlook` | `EnemyIntent` → `ImaginedTurn.of` → `TacticalPlanner` from the enemy's seat | the enemy's ranked plans, with its unscored secrets and action cards masked |
 | `TacticalRules` (landing, build, payment) | `SpaceCannonWait`, `BombardmentRules`, `ProductionPlanner`, `PaymentPlanner`, `ExplorationRules.explore` | waits for space cannon offense, bombardment targets, a build plan, the planets and TG to spend, exploration choices |
-| `NekroBrain` rules | `CombatRules.next`, with the `atRoundStart` hook → `SolAgentRules`, `CombatCardRules`, `LetnevCombatRules` | roll, hit assignment, combat card and retreat presses |
-| `NekroBrain.pickStrategyCard` | `StrategyCardRanking.ranked` | the ranked `scPick_` buttons; the first is pressed |
+| `StandardBrain` rules | `CombatRules.next`, with the `atRoundStart` hook → `SolAgentRules`, `CombatCardRules`, `LetnevCombatRules` | roll, hit assignment, combat card and retreat presses |
+| `StandardBrain.pickStrategyCard` | `StrategyCardRanking.ranked` | the ranked `scPick_` buttons; the first is pressed |
 | `StrategyCardRules` | `TacticalRules`, `TacticalPlanner.worthProducingAt`, `ObjectivePolicy`, `SecretDraws` | primary and secondary choices (builds, Imperial scoring, secret draws) |
-| `NekroBrain.scorePublicObjective`, `StrategyCardRules.imperial` | `ObjectivePolicy.bestScorablePublic`, `ScoringRules.scoreAndExpectPayment` | the objective to score and the payment it will ask for |
+| `StandardBrain.scorePublicObjective`, `StrategyCardRules.imperial` | `ObjectivePolicy.bestScorablePublic`, `ScoringRules.scoreAndExpectPayment` | the objective to score and the payment it will ask for |
 | 17 deciders (production, research, cards, leaders, trade) | `PaymentRules.expect` / `isPending` / `wasPaid` | the payment a press is expected to open, so the next tick pays it |
-| `NekroBrain` rules | `TradeRules` (`observe`, `answerOffers`, `settleTrade`, ...) | verdicts on incoming offers, new offers and counter-offers (`Post`, `Propose`) |
+| `StandardBrain` rules | `TradeRules` (`observe`, `answerOffers`, `settleTrade`, ...) | verdicts on incoming offers, new offers and counter-offers (`Post`, `Propose`) |
 | `AiTickRunner` | `HumanAiDealMessage.post` | an AI deal offered to a human, with accept and deny buttons |
 | `HumanAiDealButtons`, `SpeakerSaleButtons`, `ViscountUnlennSaleButtons`, `PromiseDealButtons` | `HumanAiDealRunner.run` → `TransactionHelper.acceptTransactionOffer` | the items of an accepted deal, transferred by the engine |
-| `NekroBrain` rules | `AgendaVoting.next`, `GalacticThreatRules.next`, `BoatFloat.arrange` | the ballot (outcome and vote count), Galactic Threat presses, Articles of War floats |
+| `StandardBrain` rules | `AgendaVoting.next`, `GalacticThreatRules.next`, `BoatFloat.arrange` | the ballot (outcome and vote count), Galactic Threat presses, Articles of War floats |
 | `AgendaVoting` | `AgendaForecast.of` (with `AgendaHelper.getVotingOrder`), `BallotPlanner.choose` | the other voters' predicted votes, outcome chances, and the seat's best ballot |
 | `AgendaCardRules`, `ShenaniganCards`, `SabotagePolicy` | `AgendaForecast`, `AgendaSwing`, `AgendaPolicy` | whether a Veto, Deadly Plot, rider or Sabotage changes the agenda's result |
-| `NekroBrain` rules and `takeTurn` | `ActionCardRules`, `SabotageRules`, `ActionCardResponses` | card plays (instead of a tactical action, before passing, in windows) and Sabotage answers |
-| `NekroBrain` rules and `takeTurn` | `ExplorationRules`, `RelicActionRules`, `ExpeditionRules`, `LegendaryRules`, `AvernusRules` | exploration choices, relic, expedition and legendary actions |
+| `StandardBrain` rules and `takeTurn` | `ActionCardRules`, `SabotageRules`, `ActionCardResponses` | card plays (instead of a tactical action, before passing, in windows) and Sabotage answers |
+| `StandardBrain` rules and `takeTurn` | `ExplorationRules`, `RelicActionRules`, `ExpeditionRules`, `LegendaryRules`, `AvernusRules` | exploration choices, relic, expedition and legendary actions |
 | `TacticalPlanner.Context.exploreValue` | `ExploreDeck.expectedValueOfPlanet`, `ExploreOutlook` | the expected value of exploring a planet, added to plan scores |
 | Most evaluators | `ValueScale`, `ScoringStakes.scoreValue` (40 call sites), `ObjectiveValue` | values on the common TG scale; a victory point is 8 TG in `ObjectiveValue` and 6 to 12 TG in `ScoringStakes.scoreValue` |
 | `TacticalPlanner`, `WinOdds`, `WinRace`, `ScoringReserve`, `DenialMap` | `DecisionMemo.remember`; `ImaginedTurn.of` and deal searches → `SearchMemo` | values cached for one decision or one search |
 | `AiTickRunner.handlePress` | `AiActuator.press` → `TestBedPress.standInEvent` → `ButtonProcessor.processNow` | a stand-in button event for the seat; back: `PRESSED`, `STALE`, `REJECTED`, `HANDLER_FAILED` or `ERROR` |
-| `AiTickRunner.handleIdle` | `AiStallDetector.waitReasons` (with `TacticalRules.isSystemPicker`, `CombatRules.awaitsSeat`, `AgendaQueue`, `AgendaCardRules.vetoPlayedAndPending`, `NekroBrain.noRealObjectiveRevealed`) | the reasons the game waits on the seat, and so the stall age |
+| `AiTickRunner.handleIdle` | `AiStallDetector.waitReasons` (with `TacticalRules.isSystemPicker`, `CombatRules.awaitsSeat`, `AgendaQueue`, `AgendaCardRules.vetoPlayedAndPending`, `StandardBrain.noRealObjectiveRevealed`) | the reasons the game waits on the seat, and so the stall age |
 | `AiTickRunner.fallBack` | `AiConfusionService.delegate` / `safeDefault` / `selfPlayChoice` / `stalledChoice`; `FallbackLog.record` | an `aiSeatPick_` message in the actions channel, or a declining option pressed; a fallback record in `AiLogStore` |
 | `AiSeatPickButtonHandler.pick` | `AiRuntime.enqueueDelegatedPress` → `AiTickRunner.pressDelegated` | the chooser's pick, pressed as the seat on the next tick |
 | `AttackLedger`, `Relations`, `BoatFloat`, `DiscardBounties`, `HumanAiDealStore`, `PromiseBook`, `SpeakerPromise`, `Extortion` | `AiGameWrites.persist` | AI ledgers saved as game stored values under the game lock |
@@ -2042,7 +2046,7 @@ These points were read from the code but not confirmed by running it or by a tes
   card"). The code only shows that the delay is a hash of message or game data XORed with `aiSeed`.
 - "Unit losses are valued at the unit's resource cost, not converted by 0.8" (algorithms table). Several tactical
   evaluators use `UnitModel.getCost()` directly; not every evaluator was checked.
-- `NekroBrain.declineWhens` returning empty while a played Veto is held lets a later rule act on it; which later
+- `StandardBrain.declineWhens` returning empty while a played Veto is held lets a later rule act on it; which later
   rule handles the held Veto was not traced.
 - The poll drops the lane of an ended or deleted game with `LANES.remove` only, without `AiGameState.forget`, so the
   static per-game maps for that game stay in memory until restart. Read from code; impact not measured.
@@ -2063,10 +2067,10 @@ These points were read from the code but not confirmed by running it or by a tes
   player of the game; if the routing passes `null`, such a presser gets "This choice is no longer valid." even though
   `mayChooseFor` would allow them.
 - `NeutralCombat.watches` (which neutral combats a seat reads), and, in this core-runtime pass, the internal
-  conditions of the 130 rules that are method references to classes outside `NekroBrain` (and `CombatRules.next`
+  conditions of the 130 rules that are method references to classes outside `StandardBrain` (and `CombatRules.next`
   behind rule 106). Those rules were read in their own subsystem passes, whose results are in sections 4 and 5.
 - `ComponentIdEnvelope` "spoofed faction" semantics beyond what `PromptButton.of` uses.
-- The exact `BrainRule` name the JVM gives the lambda (rule 106): the format is `NekroBrain.lambda$<…>$<n>` (a lambda in
+- The exact `BrainRule` name the JVM gives the lambda (rule 106): the format is `StandardBrain.lambda$<…>$<n>` (a lambda in
   a field initializer is normally compiled as `lambda$new$<n>`), the exact string was not observed.
 
 #### Seats, commands, fallback and self-play setup
@@ -2162,8 +2166,7 @@ These points were read from the code but not confirmed by running it or by a tes
 
 #### Strategy cards and technology research
 
-- **Construction primary, second structure.** After the first structure step returns empty (for example, no unit), `resolvePrimary` reports the primary resolved for that tick. The second structure step runs only on a later tick, when `resolvePrimary` is called again. Whether `NekroBrain.takeTurn` can end the turn in between, when no secondaries are outstanding, was not traced.
-- **PoK Warfare's "+1 command token".** The engine does not grant it automatically: after the removal, `ButtonHelper.resolveRemovingYourCC` posts a `redistributeCCButtons_deleteThisMessage` button ("Redistribute & Gain Command Tokens"). `removeTokenWithWarfare` marks Warfare finished without pressing it, and a search of `ti4.ai` found `redistributeCCButtons` pressed only by `NekroBrain.startStatusHomework`/`readyOnTheHomeworkMessage` (status phase) and by `WarfareTokens` (Thunder's Edge Warfare). So the AI appears to forgo the PoK Warfare token. This was not confirmed in a running game.
+- **Construction primary, second structure.** After the first structure step returns empty (for example, no unit), `resolvePrimary` reports the primary resolved for that tick. The second structure step runs only on a later tick, when `resolvePrimary` is called again. Whether `StandardBrain.takeTurn` can end the turn in between, when no secondaries are outstanding, was not traced.
 - **Trade primary (resolved).** The engine resolves it on play: `PlayStrategyCardService` calls `TradeStrategyCardService.doPrimary` when the card uses the `pok5trade` automation. What `doPrimary` grants was not read.
 - **The source of the static tables** (`PickPrior` counts, `ResearchPrior` counts, the `GENERIC_VALUE` and `FACTION_VALUE` tables) is not documented in code.
 - **`AiMemory` persistence** (step flags and requests) is outside this package and was not checked.
@@ -2200,7 +2203,7 @@ These points were read from the code but not confirmed by running it or by a tes
   its last vote there. Whether that is intended was not checked with the author.
 - **Resolved: the 0-vote confirm.** `AgendaHelper.proceedToFinalizingVote` builds the confirm as
   `factionButtonChecker + "resolveAgendaVote_" + votes`, so a 0-vote confirm has the same id as Abstain and
-  `NekroBrain.abstainFromAgenda` presses it. No test covers that last press
+  `StandardBrain.abstainFromAgenda` presses it. No test covers that last press
   (`castsNoVotesWhenTheOutcomesAreOfferedDirectly` stops at `proceedToFinalizingVote`).
 - **Partly resolved: Representative Government.** The `agendaStartVoteCounts` snapshot is written from
   `AgendaHelper.getVoteTotal`, which sets the count to 1 while `rep_govt` is in play and `executiveOrder` is empty,
@@ -2261,7 +2264,7 @@ These points were read from the code but not confirmed by running it or by a tes
   and `SupplyLines` were not read in full; their outputs are described only by how this scope uses them.
 - `AiTurnContext.alreadyPressed` and `Prompts.newestFirst` were not read; their behaviour is taken from the names and the
   way the code uses them.
-- `NekroBrain.allowedUnscoredSecrets` assumes `game.getRound() <= 1` at setup; not checked what round number the engine
+- `StandardBrain.allowedUnscoredSecrets` assumes `game.getRound() <= 1` at setup; not checked what round number the engine
   uses before round 1 starts.
 - Which homebrew secrets `homebrewSecretThreshold` gives a positive threshold was not checked.
 - `StatusHelper` sets `<faction>round<N>SO` to `None` when its own count of scorable secrets is 0 and the player holds no
@@ -2293,8 +2296,8 @@ These points were read from the code but not confirmed by running it or by a tes
   `EnigmaticDeviceRules.chooseType` and `ExpeditionRules.discardCards`, not read.
 - `CardValue` `dv` uses `seat.getGame()` instead of `site.game()`; whether these can differ during planning on a game
   copy was not checked.
-- `FactionBrainRegistry` maps both brain ids `nekro` and `standard` to the same `NekroBrain` instance, so these rules
-  run for every AI seat using either id; how a seat's brain id is assigned was not read.
+- `FactionBrainRegistry` maps both brain ids `standard` and `nekro` (older saves) to the same `StandardBrain` instance,
+  and `AiSettings.brainFor` gives every new seat `standard`, so these rules run for every AI seat.
 - `ButtonHelperTacticalAction` posts the Crown of Emphidia exploration offer; at which point of the tactical action
   (and so whether `ExplorationRules.next` or `TacticalRules.continueAction` answers its follow-up) was not traced.
 
@@ -2314,9 +2317,6 @@ These points were read from the code but not confirmed by running it or by a tes
   for L1Z1X and Jol-Nar) was not traced.
 - `Technological Singularity` gating: `CombatForces` and `OffenseOutlook` test the string `technological_singularity`
   (an ability id), which suggests ability gating rather than faction gating, but `SingularityRules` itself was not read.
-- The Nekro Malleon discard-prompt mismatch (section 10) was found by comparing `NekroLeaderRules.DISCARD_PROMPT_ENDING`
-  with the text in `NekroAgent.resolveFor`; `AgentLifecycle` sends the addressee's name followed by that text, so the
-  message ends with "to discard." It was not reproduced in a live game.
 - `GroundDrops.drops` ("planets the seat controls, alliance mode included") and `StrategyTokenCost.canSpare` internals
   are outside scope and were only skimmed.
 - Tests: method names of every test class in the nine test packages were listed; only
@@ -2348,7 +2348,6 @@ These points were read from the code but not confirmed by running it or by a tes
 - Whether the hourly action cap (150 per seat) ever holds the referee back in harness games (`AiTickRunner.referee` returns false while any seat is over it) was not measured.
 - Whether `TrajectoryReplayTest` passes today: the replay does not restore the seeded `Random`, `AiSeatState` beyond pressed keys and memory, or the `TickMemo` scope; a brain decision that reads any of these could replay differently. Not run.
 - Whether `DeterminismSelfPlayTest` and `EnvironmentSnapshotTest` pass on this head: not run.
-- The production `AiTickRunner.RECENT_FAILURES` interaction across parallel games (section 10) is inferred from the code; no failing run was observed.
 - Unverified: that an unseeded full game's referee runs up to a minute late once the virtual clock is a day ahead of the wall-clock `lastModifiedDate` (section 5, referee fallback). Inferred from `AiTickRunner.tickGame` and `GameSaveService.writeGame`; not measured.
 - Unverified: whether the games `RoundOneSelfPlayTest` and `RoundTwoSelfPlayTest` leave registered in `GameManager` affect tests that run later in the same JVM.
 - Not checked line by line: the per-tracker columns of the tracker table in section 4 (MecatolTracker, ExpeditionTracker, LeaderTracker, FactionComponentTracker, ObjectiveTracker and its per-secret trackers, RelicTracker, ScoringDiagnostic) beyond the call sites and system properties.

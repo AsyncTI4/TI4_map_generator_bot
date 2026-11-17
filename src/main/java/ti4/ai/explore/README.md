@@ -19,25 +19,25 @@ Common mechanics used by every component below:
 - `context.alreadyPressed(prompt, button)` is the guard against pressing the same button twice; most rules filter on it.
 - Multi-step flows keep their state in `context.memory()` under a key suffixed with `context.turnKey()`
   (active player id + time of the last active-player change), so the state expires when the turn passes.
-- All entry points return `Optional<AiDecision>`. An empty result lets the next rule in `NekroBrain`'s list run.
+- All entry points return `Optional<AiDecision>`. An empty result lets the next rule in `StandardBrain`'s list run.
   `AiDecision.press` presses a button; `AiDecision.Wait(until, reason)` holds the seat until a time.
 
 ---
 
 ### Diagram: Where the brain calls into these packages
 
-Solid arrows are calls made in `NekroBrain` / `TacticalRules`; dotted arrows are values read by a decider.
+Solid arrows are calls made in `StandardBrain` / `TacticalRules`; dotted arrows are values read by a decider.
 
 ```mermaid
 flowchart TD
-    BR["NekroBrain.firstRuleDecision<br/>(rules in list order)"] --> RAR["RelicActionRules.next"]
+    BR["StandardBrain.firstRuleDecision<br/>(rules in list order)"] --> RAR["RelicActionRules.next"]
     BR --> CROWN["CrownOfEmphidiaRules.scorePoint"]
     BR --> MAW["MawOfWorldsRules.purge"]
     BR --> LRN["LegendaryRules.next"]
     BR --> AVN["AvernusRules.next"]
     BR --> EXN["ExpeditionRules.next"]
     BR --> EXPL["ExplorationRules.next"]
-    BR --> TT["NekroBrain.takeTurn"]
+    BR --> TT["StandardBrain.takeTurn"]
 
     EXPL -->|"tactical action in progress"| SCAN["explore: Scanlink offers only"]
     EXPL -->|"otherwise"| ALL["explore: all offers"]
@@ -84,7 +84,7 @@ flowchart TD
 then delegates exploration-card follow-ups to `CardRules`, `FreelancersRules` and `TokenGainRules`.
 
 **Invoked when:**
-- `ExplorationRules.next` is a `BrainRule` in `NekroBrain.rules` (after `IntegratedEconomyRules::next`, before
+- `ExplorationRules.next` is a `BrainRule` in `StandardBrain.rules` (after `IntegratedEconomyRules::next`, before
   `StrategyCardRules::chooseTechnology`), so it runs on every decision tick of every AI seat until an earlier rule
   answers.
 - `ExplorationRules.explore(context, prompts)` is called directly by `TacticalRules.continueAction` with
@@ -389,16 +389,16 @@ the target. When the `poolToGrow` button is not in the prompt it presses Done at
 **Role:** decides (dispatcher); `ComponentFlow` informs (state and the tactical comparison).
 
 **Invoked when:**
-- `RelicActionRules.insteadOfTacticalAction` from `NekroBrain.takeTurn` after `SlingRelayRules.insteadOfTacticalAction`
+- `RelicActionRules.insteadOfTacticalAction` from `StandardBrain.takeTurn` after `SlingRelayRules.insteadOfTacticalAction`
   and before `ConvoysRules.insteadOfTacticalAction` (no action taken yet this turn).
-- `RelicActionRules.beforePassing` from `NekroBrain.takeTurn` after `LazaxGateFolding.beforePassing`, before
+- `RelicActionRules.beforePassing` from `StandardBrain.takeTurn` after `LazaxGateFolding.beforePassing`, before
   `ExpeditionRules.beforePassing`.
 - `RelicActionRules.next` as a `BrainRule`, directly after the three payment rules (`PaymentRules::pay`,
   `SecretCostRules::pay`, `NekroLeaderRules::payAgentCost`).
 - `RelicActionRules.stallsAvailable` from `StallCount` (Prove Endurance): 1 for a ready Enigmatic Device + 1 when
   `FragmentRules.canMakeRelic`.
 - Its prefix constants (`codexCardPick_`, `nanoforgePlanet_`, `jrResolution_`, `jrStructure_`, `probeStep2_`) are in
-  `NekroBrain.PUBLIC_WINDOW_PREFIXES` so the AI sees those unowned buttons.
+  `StandardBrain.PUBLIC_WINDOW_PREFIXES` so the AI sees those unowned buttons.
 
 **Algorithm:** `insteadOfTacticalAction` and `beforePassing` try `FragmentRules`, then `EnigmaticDeviceRules`, then
 `RelicFlows`; the first that returns a decision wins (no value comparison between the three). `next` tries
@@ -507,14 +507,14 @@ Converter).
 **Role:** decides and executes the claim flow.
 
 **Invoked when:**
-- `ExpeditionRules.endOfTurn` from `NekroBrain.takeTurn` after the second-action checks and before `TechRules.endOfTurn`.
+- `ExpeditionRules.endOfTurn` from `StandardBrain.takeTurn` after the second-action checks and before `TechRules.endOfTurn`.
   If the newest unpressed owned `expeditionInfoAndButtons` sits in a prompt that also has `passForRound` (the passing
   menu, which the engine builds by appending the end-of-turn abilities), it delegates to `beforePassing`.
-- `ExpeditionRules.beforePassing` from `NekroBrain.takeTurn` after `RelicActionRules.beforePassing`.
+- `ExpeditionRules.beforePassing` from `StandardBrain.takeTurn` after `RelicActionRules.beforePassing`.
 - `ExpeditionRules.next` as a `BrainRule`: `FractureRules.roll`, `FractureRules.placeIngress`, `ThundersEdgeRules.next`,
   then the claim flow.
 - `ExpeditionRules.paidThisTurn` from `TechRules.bestTechSkipPlanet` (Bio-Stims tie-break).
-- `TILE_PREFIX` (`placeThundersEdge_`) is in `NekroBrain.PUBLIC_WINDOW_PREFIXES`.
+- `TILE_PREFIX` (`placeThundersEdge_`) is in `StandardBrain.PUBLIC_WINDOW_PREFIXES`.
 
 **Algorithm:**
 1. `open`: nothing when a flow key exists this turn (one expedition per turn). The menu is the unpressed owned
@@ -714,7 +714,7 @@ seat): best `SiteScore.thundersEdge`; start: owned `placeThundersEdge`.
 
 **Role:** decides (`LegendaryRules`), evaluates (`LegendaryOutlook`).
 
-**Invoked when:** `LegendaryRules.endOfTurn` from `NekroBrain.takeTurn` (after `SecretRedrawRules.endOfTurn`, before the
+**Invoked when:** `LegendaryRules.endOfTurn` from `StandardBrain.takeTurn` (after `SecretRedrawRules.endOfTurn`, before the
 brain presses `turnEnd` / `endOfTurnAbilities`), `LegendaryRules.beforePassing` (late in the passing sequence, before
 `AvernusRules.beforePassing`), `LegendaryRules.next` as a `BrainRule`. The ability buttons
 `planetAbilityExhaust_<planet>` appear inside the engine's end-of-turn or passing menu, which the brain opens by
@@ -870,7 +870,7 @@ that the test map needs the boost.
 
 #### Relic component action mid-turn versus before passing
 
-- **Trigger.** `NekroBrain.takeTurn` with no action taken; later in the same method the before-passing sequence.
+- **Trigger.** `StandardBrain.takeTurn` with no action taken; later in the same method the before-passing sequence.
 - **Mid-turn** (`insteadOfTacticalAction`): fragments are used only when the tactical plan's score is below
   `RelicValue.draw` x 0.3 + `Stall.value`; the Enigmatic Device when below its net + `Stall.value`; other relics when
   below net + 1.5. If there is no tactical plan at all, the comparison passes and the component action is taken.
@@ -1184,9 +1184,9 @@ missing handlers and approximations visible in the code.
 
 | Caller | Calls |
 | --- | --- |
-| `NekroBrain.rules` (`BrainRule` list) | `RelicActionRules.next`, `CrownOfEmphidiaRules.scorePoint`, `MawOfWorldsRules.purge`, `LegendaryRules.next`, `AvernusRules.next`, `ExpeditionRules.next`, `ExplorationRules.next` |
-| `NekroBrain.takeTurn` | `ExpeditionRules.endOfTurn`, `LegendaryRules.endOfTurn`, `RelicActionRules.insteadOfTacticalAction`, `RelicActionRules.beforePassing`, `ExpeditionRules.beforePassing`, `LegendaryRules.beforePassing`, `AvernusRules.beforePassing` |
-| `NekroBrain.PUBLIC_WINDOW_PREFIXES` | `RelicActionRules.CODEX_PICK / NANOFORGE_PLANET / JR_CHOICE / JR_STRUCTURE / CIRCLET_TARGET`, `ExpeditionRules.TILE_PREFIX`, `LegendaryRules.MALLICE_PREFIX / EMELPAR_PREFIX`, `AvernusRules.TILE_PREFIX`, plus literal exploration handlers (`resolveVolatile`, `freelancersBuild_`, `decline_explore`, `addIonStorm_`, `crownofemphidiaexplore`, ...) |
+| `StandardBrain.rules` (`BrainRule` list) | `RelicActionRules.next`, `CrownOfEmphidiaRules.scorePoint`, `MawOfWorldsRules.purge`, `LegendaryRules.next`, `AvernusRules.next`, `ExpeditionRules.next`, `ExplorationRules.next` |
+| `StandardBrain.takeTurn` | `ExpeditionRules.endOfTurn`, `LegendaryRules.endOfTurn`, `RelicActionRules.insteadOfTacticalAction`, `RelicActionRules.beforePassing`, `ExpeditionRules.beforePassing`, `LegendaryRules.beforePassing`, `AvernusRules.beforePassing` |
+| `StandardBrain.PUBLIC_WINDOW_PREFIXES` | `RelicActionRules.CODEX_PICK / NANOFORGE_PLANET / JR_CHOICE / JR_STRUCTURE / CIRCLET_TARGET`, `ExpeditionRules.TILE_PREFIX`, `LegendaryRules.MALLICE_PREFIX / EMELPAR_PREFIX`, `AvernusRules.TILE_PREFIX`, plus literal exploration handlers (`resolveVolatile`, `freelancersBuild_`, `decline_explore`, `addIonStorm_`, `crownofemphidiaexplore`, ...) |
 | `TacticalRules.continueAction` | `ExplorationRules.explore` |
 | `TacticalRules.movement` | `TempestaRules.boost` |
 | `TacticalPlanner.Context.exploreValue` | `ExploreDeck.expectedValueOfPlanet`, `ExploreSite.landing`, `new ExploreOutlook` |

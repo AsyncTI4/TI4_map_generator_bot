@@ -328,9 +328,9 @@ public class StrategyCardRules {
                 .filter(button -> button.isOwnedBy(context.faction())
                         && button.handlerId().startsWith(REMOVE_TOKEN_PREFIX))
                 .toList();
-        if (!removals.isEmpty() && !CardMessages.done(context, "warfareRemoved")) {
+        if (CardMessages.done(context, "warfareRemoved")) return gainTheRemovedToken(context);
+        if (!removals.isEmpty()) {
             CardMessages.markDone(context, "warfareRemoved");
-            CardMessages.markDone(context, WARFARE_FINISHED);
             List<String> offered = removals.stream()
                     .map(StrategyCardRules::positionOf)
                     .distinct()
@@ -349,6 +349,12 @@ public class StrategyCardRules {
         }
         CardMessages.markDone(context, WARFARE_FINISHED);
         return Optional.empty();
+    }
+
+    private static Optional<AiDecision> gainTheRemovedToken(AiTurnContext context) {
+        Optional<AiDecision> gain = WarfareTokens.gainAndRebalance(context);
+        if (WarfareTokens.finished(context)) CardMessages.markDone(context, WARFARE_FINISHED);
+        return gain;
     }
 
     private static String positionOf(PromptButton removeButton) {

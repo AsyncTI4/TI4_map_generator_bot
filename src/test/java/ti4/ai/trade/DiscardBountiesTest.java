@@ -123,7 +123,7 @@ class DiscardBountiesTest extends BaseTi4Test {
         AiPrompt whens = AiTestGame.prompt(
                 "whens", PromptSource.AI_THREAD, NOW, "queueAWhen", "declineToQueueAWhen", "explainQueue");
 
-        AiDecision decision = new ti4.ai.nekro.NekroBrain().decide(context(sol, whens, table()));
+        AiDecision decision = new ti4.ai.brain.StandardBrain().decide(context(sol, whens, table()));
 
         assertThat(decision).isInstanceOf(AiDecision.Post.class);
         Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();

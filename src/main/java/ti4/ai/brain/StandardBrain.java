@@ -1,4 +1,4 @@
-package ti4.ai.nekro;
+package ti4.ai.brain;
 
 import java.util.Comparator;
 import java.util.List;
@@ -21,11 +21,6 @@ import ti4.ai.agenda.BoatFloat;
 import ti4.ai.agenda.GalacticThreatRules;
 import ti4.ai.agenda.RiderPayouts;
 import ti4.ai.agenda.ShenanigansRules;
-import ti4.ai.brain.AiDecision;
-import ti4.ai.brain.AiTurnContext;
-import ti4.ai.brain.BrainRule;
-import ti4.ai.brain.FactionBrain;
-import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.expedition.ExpeditionRules;
 import ti4.ai.explore.CrownOfEmphidiaRules;
@@ -46,6 +41,9 @@ import ti4.ai.naalu.IconoclastRules;
 import ti4.ai.naalu.MatriarchRules;
 import ti4.ai.naalu.OracleRules;
 import ti4.ai.naalu.ZeuAgentRules;
+import ti4.ai.nekro.CommandTokenPolicy;
+import ti4.ai.nekro.NekroLeaderRules;
+import ti4.ai.nekro.NekroRules;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
 import ti4.ai.promissory.ConvoysRules;
@@ -113,7 +111,9 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 
-public class NekroBrain implements FactionBrain {
+public class StandardBrain implements FactionBrain {
+
+    public static final String ID = "standard";
 
     private static final String OPEN_SECRET_DISCARDS = "get_so_discard_buttons";
     private static final String REDISTRIBUTE = "redistributeCCButtons";
@@ -308,7 +308,7 @@ public class NekroBrain implements FactionBrain {
             ViscountUnlennSale::holdRoll,
             ViscountUnlennSale::offer,
             MatriarchRules::continueHits,
-            context -> CombatRules.next(context, NekroBrain::atRoundStart),
+            context -> CombatRules.next(context, StandardBrain::atRoundStart),
             ActionSecretRules::next,
             SecretRules::scoreAgendaSecret,
             PromissoryRules::queueAgendaNote,
@@ -352,7 +352,7 @@ public class NekroBrain implements FactionBrain {
 
     @Override
     public String id() {
-        return "nekro";
+        return ID;
     }
 
     @Override
@@ -392,7 +392,7 @@ public class NekroBrain implements FactionBrain {
         for (AiPrompt prompt : newestFirst(context.prompts())) {
             if (!prompt.isHidden()
                     || !prompt.hasHandlerPrefix("increase_tactic_cc")
-                    || prompt.firstEnabled(NekroBrain::isDoneRedistributing).isEmpty()) {
+                    || prompt.firstEnabled(StandardBrain::isDoneRedistributing).isEmpty()) {
                 continue;
             }
             int gained = CommandTokenPolicy.netGainSoFar(game, seat);
@@ -407,7 +407,7 @@ public class NekroBrain implements FactionBrain {
                 return Optional.of(
                         AiDecision.press(prompt, surplus.get(), "move a surplus command token to where it is needed"));
             }
-            return prompt.firstEnabled(NekroBrain::isDoneRedistributing)
+            return prompt.firstEnabled(StandardBrain::isDoneRedistributing)
                     .map(button -> AiDecision.press(prompt, button, "finish gaining command tokens"));
         }
         return Optional.empty();

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
@@ -21,7 +21,7 @@ import ti4.testUtils.BaseTi4Test;
 // The Sol rules are wired into the shared brain: they decide the turn, and they answer their own prompts.
 class SolBrainTest extends BaseTi4Test {
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
     private AiTestGame test;
     private Player sol;
     private Tile home;

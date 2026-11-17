@@ -135,8 +135,8 @@ seeds through `RandomHelper.current()` for seat ids and profile seeds.
    the strategy token's cost, and needs a spare token; `TechRulesTest` shows it letting a lone-destroyer attack stand
    and nullifying moves that complete an objective or hit ships holding a presence objective.
 5. AI_PLAYER.md: "technologies it does not use: Transit Diodes, Chaos Mapping, Instinct Training, Quantum Datahub
-   Node, ...". `NekroBrain`'s rule list includes `TransitDiodesRules::next` (`td`, `absol_td`) and `DatahubRules::next`
-   (`qdn`), and `NekroBrain.takeTurn` calls `TransitDiodesRules.start`. Instinct Training (`it`) is used too:
+   Node, ...". `StandardBrain`'s rule list includes `TransitDiodesRules::next` (`td`, `absol_td`) and `DatahubRules::next`
+   (`qdn`), and `StandardBrain.takeTurn` calls `TransitDiodesRules.start`. Instinct Training (`it`) is used too:
    `ti4.ai.actioncards.InstinctTraining.available` offers it to `SabotagePolicy` as a way to cancel an action card for
    a strategy token, and `SabotageRules` records the use.
 6. AI_PLAYER.md, Psychoarchaeology: matches, but omits that planets planned for an expedition
@@ -251,7 +251,7 @@ point enabler; Sling Relay's 1.5 stall and 1.0 for an objective ship.
 ### Trading, deals, promises and promissory notes
 
 1. AI_PLAYER.md "Promissory notes": "it never plays _Trade Convoys_". `ConvoysRules` plays it: `insteadOfTacticalAction`
-   and `beforePassing` are called from `NekroBrain`, and `ConvoysRules.next` presses `componentActionRes_pn_<note>`.
+   and `beforePassing` are called from `StandardBrain`, and `ConvoysRules.next` presses `componentActionRes_pn_<note>`.
 2. AI_PLAYER.md "_Alliance_ (`AllianceValue`): … rated per faction (Keleres 3, Jol-Nar 2.5, Hacan, Xxcha, Sol and Nekro
    2, others 0.5 to 1.5), half while locked … Its own costs 0.3". Code: `AllianceValue.ROWS` has (early, late, locked
    penalty) rows, e.g. Keleres (1, 1, −1), Jol-Nar (1, 1, 0), Hacan (1, 0, −1), Xxcha (1, 0, −1), Sol (1, 1, −1), Nekro
@@ -400,7 +400,7 @@ relations personality starts and ±1 per round; trust start 0.8 and its loss on 
    win first unless `WinRace.winsWithReserve` holds.
 4. AI_PLAYER.md, Action phase list: "_Become a Martyr_ and _Prove Endurance_" are listed among secrets judged when a combat
    ends. `bam` is judged from home planet loss (`watchHomePlanets`), not combat end; `pe` is not handled in
-   `ActionSecretRules` at all (it relies on `NekroBrain.queueProveEndurance` pressing `autoProveEndurance_yes`).
+   `ActionSecretRules` at all (it relies on `StandardBrain.queueProveEndurance` pressing `autoProveEndurance_yes`).
 5. AI_PLAYER.md, Keeping secrets: "A secret it can score right now is worth a flat 2.0, and a status secret is halved when
    other scorable ones already fill the rounds left." A congested ready secret is not 2.0 halved (1.0): it is
    1.0 x phase value (+ opening tempo) x 0.5 = 0.5 in rounds after the first.

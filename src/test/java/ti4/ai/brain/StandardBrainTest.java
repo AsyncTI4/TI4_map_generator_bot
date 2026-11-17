@@ -1,4 +1,4 @@
-package ti4.ai.nekro;
+package ti4.ai.brain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -15,9 +15,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
-import ti4.ai.brain.AiDecision;
-import ti4.ai.brain.AiMemory;
-import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.perception.PromptButton;
@@ -35,12 +32,12 @@ import ti4.message.GameMessageType;
 import ti4.model.Mapper;
 import ti4.testUtils.BaseTi4Test;
 
-class NekroBrainTest extends BaseTi4Test {
+class StandardBrainTest extends BaseTi4Test {
 
     private static final long NOW = 1_800_000_000_000L;
     private static final String AI_ID = "7100000123456789";
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
     private final AiMemory memory = new AiMemory();
     private Game game;
     private Player nekro;

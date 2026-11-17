@@ -1689,7 +1689,8 @@ to build one by hand:
   "Thinking" section in its report.
 - **Guards.**
   - At most 2 attempts per prompt and state (staged movement and unit positions count as progress).
-  - At least 1.5 s between actions in a game, and at most 150 actions an hour per seat.
+  - At least 1.5 s between actions in a game (none at fast pace in self-play), and at most 150 actions an hour per seat
+    (600 at fast pace).
   - Delegation caps per seat and per game each round.
   - A loop guard: when a seat falls back on the same unsure choice 6 times in one turn without pressing anything
     itself in between, it stops choosing on its own and posts one 🔁 notice (`/ai delegate` still hands the choice

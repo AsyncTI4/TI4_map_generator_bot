@@ -6,14 +6,14 @@ Part of the [AI player architecture docs](/src/main/java/ti4/ai/README.md): a li
 
 The package holds 66 files (9,399 lines, 8,364 non-blank). Every file is new in this branch: `origin/master` has no `src/main/java/ti4/ai` directory. All values are in trade-good units (TG). The base constants come from outside the package: [ValueScale](/src/main/java/ti4/ai/eval/ValueScale.java) (`TRADE_GOOD` 1.0, `RESOURCE` 0.8, `INFLUENCE` 0.8, `COMMODITY` 0.8) and `ObjectiveValue.VICTORY_POINT_VALUE` 8.0.
 
-The only brain that drives this package is [NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java), the single `FactionBrain` implementation. It runs for every AI seat, not only for Nekro. Its rule list calls the package at these points, in this order:
+The only brain that drives this package is [StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java), the single `FactionBrain` implementation. It runs for every AI seat, not only for Nekro. Its rule list calls the package at these points, in this order:
 
 - `StrategyCardRules::exhaustAiDevelopmentForResearch` and `StrategyCardRules::exhaustProphetsTearsForResearch`, early in the list.
 - `StrategyCardRules::chooseTechnology`, `::gainTokens`, `::placeStructure`, `::readyPlanets`, `::buildWithWarfare` and `::buildWithConstruction`. These are the follow-up steps.
 - `SpeakerSale::answer` and `SpeakerSale::declare`.
-- `NekroBrain.pickStrategyCard`, for the strategy phase.
-- `NekroBrain.takeTurn`, for the action phase. It calls `StrategyCardRules.followsPending`, `resolvePrimary`, `awaitingSecondaries` and `StrategyCardTurn.playIfDue`, and has its own fallback play. Before `playIfDue` it also runs `NekroBrain.warfareBeforeFollowUp`: a seat with Fleet Logistics whose `TacticalPlanner.bestForWarfare` plan is an ATTACK plays its unplayed Thunder's Edge Warfare at once, without asking `CardTiming`.
-- `StrategyCardRules::follow`, `NekroBrain.declineStrategyCardFollow`, `StrategyCardRules::awaitSecondaries` and `::awaitFollowTurn`.
+- `StandardBrain.pickStrategyCard`, for the strategy phase.
+- `StandardBrain.takeTurn`, for the action phase. It calls `StrategyCardRules.followsPending`, `resolvePrimary`, `awaitingSecondaries` and `StrategyCardTurn.playIfDue`, and has its own fallback play. Before `playIfDue` it also runs `StandardBrain.warfareBeforeFollowUp`: a seat with Fleet Logistics whose `TacticalPlanner.bestForWarfare` plan is an ATTACK plays its unplayed Thunder's Edge Warfare at once, without asking `CardTiming`.
+- `StrategyCardRules::follow`, `StandardBrain.declineStrategyCardFollow`, `StrategyCardRules::awaitSecondaries` and `::awaitFollowTurn`.
 
 Role key: **decides** = returns a choice or button press; **evaluates** = scores options for a decider; **informs** = computes facts; **executes** = presses the buttons of a multi-step engine flow.
 
@@ -25,7 +25,7 @@ Both diagrams use the same arrows. Solid arrows are calls or decisions. Dotted a
 
 - **Role:** evaluates and decides. It ranks the offered `scPick_` buttons, and the caller takes the first.
 - **Purpose:** to value each strategy card the seat could pick in the strategy phase.
-- **Invoked when:** `NekroBrain.pickStrategyCard`, while the seat is active and the phase is `strategy`. That calls `StrategyCardRanking.ranked(game, seat, picks)`, takes `ranked.getFirst()`, writes `CardPlanMemory.write(best.plan())`, records `StrategyCardPickLog.record` and presses the button. Other callers:
+- **Invoked when:** `StandardBrain.pickStrategyCard`, while the seat is active and the phase is `strategy`. That calls `StrategyCardRanking.ranked(game, seat, picks)`, takes `ranked.getFirst()`, writes `CardPlanMemory.write(best.plan())`, records `StrategyCardPickLog.record` and presses the button. Other callers:
   - `CardScoring` uses `StrategyCardRanking.value`.
   - `DatahubRules` (Hacan) uses `baseValue` and `pickPlan`.
   - `SpeakerSale.wantedCard` uses `pickValue`.
@@ -36,7 +36,7 @@ Both diagrams use the same arrows. Solid arrows are calls or decisions. Dotted a
   - `imperialDenial` takes the later pickers: players after the seat in `PickStrategyCardService.getSCPickOrder` who still have card slots.
     - With the `IMPERIAL_POINTS` experiment on (the default, see `AiExperiments.enabled`), it is the maximum over later pickers of `ImperialDenial.rivalStake`. It applies only when the seat itself gains point tempo from Imperial (`ImperialUses.gainsPointTempo`). Otherwise it is 0.
     - With the experiment off, it is `0.5 × 8 × (1 if the rival has ≥ goal − 2 VP, else 0.5)` for the best later picker holding Mecatol Rex.
-  - `imperialScoresNow` (used by `NekroBrain.worthPlayingNow`) is true when the seat holds Mecatol Rex or has any scorable public.
+  - `imperialScoresNow` (used by `StandardBrain.worthPlayingNow`) is true when the seat holds Mecatol Rex or has any scorable public.
 - **Depends on:** `StrategyCardPlanner`, `PickPrior`, `InitiativeRace`, `ImperialUses`, `ImperialDenial`, `GravleashPlan` (`ti4.ai.tactical` or elsewhere), and `PickStrategyCardService` (engine).
 - **Effect on the game:** chooses which strategy card the AI presses.
 - **Fallbacks:** buttons whose initiative cannot be parsed are dropped. An empty list leads `pickStrategyCard` to look at the next prompt, or to return empty.
@@ -47,7 +47,7 @@ Both diagrams use the same arrows. Solid arrows are calls or decisions. Dotted a
 
 ```mermaid
 flowchart TD
-    PSC["NekroBrain.pickStrategyCard<br/>(active seat, strategy phase)"] --> GIVE{"pending Checks and Balances<br/>hand-over?"}
+    PSC["StandardBrain.pickStrategyCard<br/>(active seat, strategy phase)"] --> GIVE{"pending Checks and Balances<br/>hand-over?"}
     GIVE -- yes --> CBR["ChecksAndBalances.recipient<br/>press checksNBalancesPt2_"]
     GIVE -- no --> WAITP{"SpeakerSale.awaitSellerPick<br/>buyer must wait?"}
     WAITP -- yes --> W1["Wait until seller declares<br/>or reply window ends"]
@@ -206,12 +206,12 @@ Every `*Uses` class is an evaluator called from `StrategyCardPlanner.evaluate`. 
   - It writes `SetupHint`s:
     - Warfare whose main use is double build (both versions) or build-then-move (PoK), while home holds no own token: a `PRODUCE` hint at home with value 0.5 × main.
     - A Gravity Drive hold: when home holds no token, the seat has a strategy token, `OpeningNeeds.wantsTechnologySoon`, and some other plan ≥ `TacticalPlanner.MIN_SCORE` (1.0) exists: `PRODUCE` and `DEFEND` hints at home with value −gain. This discourages activating home before Gravity Drive.
-  - `CardPlanMemory.write` is also called by `NekroBrain` at the pick and by `DatahubRules`.
+  - `CardPlanMemory.write` is also called by `StandardBrain` at the pick and by `DatahubRules`.
 
 ### CardTiming and StrategyCardTurn (when to play a held card)
 
 - **Role:** decides between `NOW` and `FALLBACK`.
-- **Invoked when:** `NekroBrain.takeTurn` → `StrategyCardTurn.playIfDue`. That is after the tactical-in-progress, follows-pending, primary-resolution, second-action, end-of-turn and several faction "instead of tactical action" checks (Transit Diodes, Darktalon Treilla, the Fleet Logistics Warfare attack, Sling Relay, relic actions, Convoys), and before the action-card, technology and hero "instead of tactical action" rules and `TacticalRules.start`. `StrategyCardTurn.dueNow` is also used by `NekroBrain.worthPlayingNow`, for second strategic actions and for Master Plan.
+- **Invoked when:** `StandardBrain.takeTurn` → `StrategyCardTurn.playIfDue`. That is after the tactical-in-progress, follows-pending, primary-resolution, second-action, end-of-turn and several faction "instead of tactical action" checks (Transit Diodes, Darktalon Treilla, the Fleet Logistics Warfare attack, Sling Relay, relic actions, Convoys), and before the action-card, technology and hero "instead of tactical action" rules and `TacticalRules.start`. `StrategyCardTurn.dueNow` is also used by `StandardBrain.worthPlayingNow`, for second strategic actions and for Master Plan.
 - **Algorithm (`StrategyCardTurn.playIfDue`):**
   1. It acts only in the `action` phase.
   2. If memory holds `technologyRequested|round` (another seat paid for an early Technology through the trade package's `TechnologyRequest`) and no hold is active, it plays Technology now.
@@ -243,7 +243,7 @@ Every `*Uses` class is an evaluator called from `StrategyCardPlanner.evaluate`. 
      - A plan with no benefits at all: `FALLBACK`.
      - Otherwise `NOW` also when any expedition benefit in the plan (Trade, Politics or Diplomacy), main or not, is ≥ 0.5 (`claimsExpedition`). This check is never reached for Warfare or for Imperial yielding to Overrule.
      - Every other main use is `FALLBACK`. That covers Politics speaker or cards, all Trade uses except expedition, the Imperial secret, the Construction objective and Leadership expedition or endurance.
-- **Fallback path:** `NekroBrain.takeTurn` plays any unplayed held card (except Imperial yielding to Overrule) only after `TacticalRules.start` returns nothing. It picks the first matching `strategicAction_` button in prompt order.
+- **Fallback path:** `StandardBrain.takeTurn` plays any unplayed held card (except Imperial yielding to Overrule) only after `TacticalRules.start` returns nothing. It picks the first matching `strategicAction_` button in prompt order.
 - **Evidence:**
   - [LeadershipTimingTest](/src/test/java/ti4/ai/strategy/LeadershipTimingTest.java) asserts that Leadership becomes due when the wanted follows outnumber the strategy tokens, and not due with enough tokens.
   - [TechnologyTimingTest](/src/test/java/ti4/ai/strategy/TechnologyTimingTest.java) asserts that Technology is played once no planet is left, held while one is, played early to deny a rival who cannot follow yet, and held for a payer.
@@ -267,9 +267,9 @@ Every `*Uses` class is an evaluator called from `StrategyCardPlanner.evaluate`. 
 - **Role:** executes, with deciding sub-steps.
 - **Purpose:** to drive each card's primary and follow through engine buttons, and to remember multi-step requests in `AiMemory`.
 - **Invoked when:**
-  - `StrategyCardRules.play` is called from `NekroBrain`, `ActionCardResponses` and `SabotageRules`. It records `scPlayed|turnKey`, marks the primary open in `SecondaryQueue` and, for Trade, calls `TradeCardRules.recordPlay`.
+  - `StrategyCardRules.play` is called from `StandardBrain`, `ActionCardResponses` and `SabotageRules`. It records `scPlayed|turnKey`, marks the primary open in `SecondaryQueue` and, for Trade, calls `TradeCardRules.recordPlay`.
   - `beginOverruledPrimary` is called from `OverruleCard` and `MathisMathinusRules`.
-  - `resolvePrimary` is called from `NekroBrain.takeTurn` and dispatches per card.
+  - `resolvePrimary` is called from `StandardBrain.takeTurn` and dispatches per card.
 - **Shared mechanics:**
   - A pending step is a payment (`PaymentRules.pendingSince`) or a research, structure, readying or token-gain request. A pending step makes the primary wait up to 60 s (`PRIMARY_WAIT_MILLIS`), after which `giveUpPendingSteps` forgets them.
   - Requests are stored as `prefix + round = since|value` and expire after 15 min.
@@ -285,7 +285,7 @@ Every `*Uses` class is an evaluator called from `StrategyCardPlanner.evaluate`. 
   - **Construction:** `PlannedPrimaries.produceWithConstruction` comes first (Thunder's Edge only). While that production is open (stored less than 60 s ago and its "done producing" button not yet pressed), the primary returns `Wait`. Then two structure steps: `StructurePolicy.primaryFirst`, then the second structure. The second is `StructurePolicy.pds` on PoK, and `bestSecondary` or a PDS on Thunder's Edge.
   - **Diplomacy:** `PlannedPrimaries.lockWithDiplomacy` (PoK card only). Then `diploRefresh2` with the readying plan from `DiplomacyUses.readyingChoice`. It skips the press when nothing is exhausted and Peace Accords offers no claim.
   - **Warfare:**
-    - PoK: presses `primaryOfWarfare`, then takes back the token chosen by `WarfareUses.bestTokenToRemove` (through `PlannedPrimaries.tokenToRemove`), and marks Warfare finished. The engine then posts a "Redistribute & Gain Command Tokens" button (`redistributeCCButtons_deleteThisMessage`); no rule in this package presses it (see [Not verified](/src/main/java/ti4/ai/README.md#1015-not-verified)).
+    - PoK: presses `primaryOfWarfare`, then takes back the token chosen by `WarfareUses.bestTokenToRemove` (through `PlannedPrimaries.tokenToRemove`). The engine only moves that token to reinforcements and posts a "Redistribute & Gain Command Tokens" button (`redistributeCCButtons_deleteThisMessage`); the AI presses it and `WarfareTokens.gainAndRebalance` gains the token (LRR 99.1) into `CommandTokenPolicy.poolToGrow`, moves any mid-round surplus, presses Done and marks Warfare finished.
     - Thunder's Edge: `PlannedPrimaries.warfareTarget`. With no target it announces `WarfareIdle` and finishes. Otherwise it presses `primaryOfTeWarfare`, runs `WarfareTokens.rebalance`, presses `beginTacticalTeWarfare` and hands the action to `TacticalRules`.
   - **Trade:** the engine resolves the primary itself when the card is played (`PlayStrategyCardService` calls `TradeStrategyCardService.doPrimary` for the `pok5trade` automation), so the AI only announces, once. With trading enabled, `TradeCardRules.announce` sends the X−k terms (deal logic in `ti4.ai.trade`). Otherwise it announces free follows.
 - **Follows (`follow`):**
@@ -309,7 +309,7 @@ Every `*Uses` class is an evaluator called from `StrategyCardPlanner.evaluate`. 
   - `saved` = other seats' cards that are better ranked, not yet played (or played while the seat still waits), and wanted by the seat.
   - It requires `strategicCC − saved − scar ≥ 1` and `strategicCC + tacticalCC − 1 − saved − scar ≥ ScoringReserve.tokens`.
   - With Scepter or Mindsieve cover, the "− 1" is dropped and the first test is ≥ 0.
-- **Follow-up steps (rules in `NekroBrain`):**
+- **Follow-up steps (rules in `StandardBrain`):**
   - `chooseTechnology`: reads the `getTech_<alias>` buttons and picks `ResearchPolicy.best`.
     - It applies `PrerequisiteSkips` (it may arm AI Development or Prophet's Tears, or expect Brother Omar).
     - It plans the payment after the reserve, falling back to any payment.
@@ -326,7 +326,7 @@ Every `*Uses` class is an evaluator called from `StrategyCardPlanner.evaluate`. 
 
 ```mermaid
 flowchart TD
-    TT["NekroBrain.takeTurn"] --> FP{"StrategyCardRules.followsPending?"}
+    TT["StandardBrain.takeTurn"] --> FP{"StrategyCardRules.followsPending?"}
     FP -- yes --> FOL["StrategyCardRules.follow<br/>then declineStrategyCardFollow<br/>then awaitFollowTurn"]
     FP -- no --> RP["StrategyCardRules.resolvePrimary"]
     RP -- "step returned" --> STEP["press next primary button<br/>or Wait (60 s cap)"]
@@ -583,7 +583,7 @@ flowchart TD
 - `OverruleChoice.option` values playing *Overrule* on an unplayed Imperial or Technology card.
   - Imperial: `scoreValue(overrulePlay.points) + secret + 0.5`.
   - Technology: `plan.value + 0.16`.
-- `overrulesOwnImperialFirst` is true in the late game when the seat holds Overrule (not in Fog of War), may play it now, holds unplayed Imperial, and overrule points are ≥ 1. It makes Imperial `FALLBACK`, and `NekroBrain` skips Imperial in its fallback plays.
+- `overrulesOwnImperialFirst` is true in the late game when the seat holds Overrule (not in Fog of War), may play it now, holds unplayed Imperial, and overrule points are ≥ 1. It makes Imperial `FALLBACK`, and `StandardBrain` skips Imperial in its fallback plays.
 - `MecatolCash.points` = 0 when the seat already holds Mecatol Rex. Otherwise it is 1 for the seat's own unplayed Imperial + 1 when it could play Overrule late in the game while any Imperial card is still unplayed. It is used by `TacticalPlanner`, `FreedPlays` and `OffenseOutlook`.
 
 ### WarfareTokens and WarfareIdle
@@ -617,14 +617,14 @@ flowchart TD
 
 | Scenario | Trigger | Handled by | Choices considered | How it chooses | Outcome / fallback |
 | --- | --- | --- | --- | --- | --- |
-| Pick a strategy card | Strategy phase, AI active, its own `scPick_` buttons | `NekroBrain.pickStrategyCard` → `StrategyCardRanking.ranked` | Every offered card | Highest of plan value + pick prior + Gravleash bonus + Imperial denial + TG on card + initiative race; ties go to the lower initiative | Presses the best card and stores its `CardPlan`; with no parseable buttons it does nothing |
+| Pick a strategy card | Strategy phase, AI active, its own `scPick_` buttons | `StandardBrain.pickStrategyCard` → `StrategyCardRanking.ranked` | Every offered card | Highest of plan value + pick prior + Gravleash bonus + Imperial denial + TG on card + initiative race; ties go to the lower initiative | Presses the best card and stores its `CardPlan`; with no parseable buttons it does nothing |
 | Pick under *Checks and Balances* | The `checks`/`absol_checks` law is in play | `ChecksAndBalances.plan`, then `recipient` | Offered cards × eligible recipients | Leader ahead: give the card it values least. Otherwise give the trailer the card it values most (± 0.5 × TG) | Presses the card, then the `checksNBalancesPt2_` recipient button |
 | Buyer of a speaker sale picks | Next strategy phase, accepted promise | `SpeakerSale.awaitSellerPick`, `withoutPromisedCard` | All picks except the seller's declared card | Waits for the declaration (up to the seller's reply window), then ranks the rest | The promised card is removed; if that removes every option, the full list is kept |
 | Seller declares its card | Accepted promise, strategy phase, not yet declared | `SpeakerSale.declare` | Unpicked cards | Max `StrategyCardRanking.pickValue`; ties go to the lower initiative (`max` with a reversed initiative comparator) | Posts the declaration in the seller's channel |
 | Play a card now or later | Action phase turn, card held and unplayed | `StrategyCardTurn.playIfDue` → `CardTiming.of` | Each held card's re-planned main benefit | Ordered checks (see the CardTiming entry in section 4) | `NOW` presses `strategicAction_<n>`; `FALLBACK` waits for the end of the turn's tactical options |
-| Thunder's Edge Warfare for an attack | Action turn, seat has Fleet Logistics, unplayed Thunder's Edge Warfare, and `TacticalPlanner.bestForWarfare` is an ATTACK plan | `NekroBrain.warfareBeforeFollowUp` (before `playIfDue`) | — | No `CardTiming` check | Plays Warfare at once |
-| Fallback card play | `TacticalRules.start` returned nothing this turn | `NekroBrain.takeTurn` loop | Every unplayed owned `strategicAction_` button | The first one found in prompt order, skipping Imperial when Overrule goes first | Plays it; with none left it passes |
-| Second strategic action | A "Do another action" option, first action concluded | `NekroBrain.secondStrategicAction` | Unplayed cards | `worthPlayingNow` = `dueNow`, or Imperial with a scorable public / Mecatol Rex | Plays the card or does nothing |
+| Thunder's Edge Warfare for an attack | Action turn, seat has Fleet Logistics, unplayed Thunder's Edge Warfare, and `TacticalPlanner.bestForWarfare` is an ATTACK plan | `StandardBrain.warfareBeforeFollowUp` (before `playIfDue`) | — | No `CardTiming` check | Plays Warfare at once |
+| Fallback card play | `TacticalRules.start` returned nothing this turn | `StandardBrain.takeTurn` loop | Every unplayed owned `strategicAction_` button | The first one found in prompt order, skipping Imperial when Overrule goes first | Plays it; with none left it passes |
+| Second strategic action | A "Do another action" option, first action concluded | `StandardBrain.secondStrategicAction` | Unplayed cards | `worthPlayingNow` = `dueNow`, or Imperial with a scorable public / Mecatol Rex | Plays the card or does nothing |
 | Imperial primary | Imperial played | `StrategyCardRules.imperial` | Scorable publics; Mecatol point; secret | `ObjectivePolicy.bestScorablePublic`, then the point if it controls Mecatol Rex, else a secret while secrets scored < max | Score, then point or secret |
 | Technology primary | Technology played | `StrategyCardRules.technology` → `chooseTechnology` | Researchable techs offered as `getTech_` | `ResearchPolicy.best` (value + plan bonus); the second tech only if the best researchable is worth ≥ 4.0 (≥ 2.4 when idle trade goods cover the 6) and 6 resources are affordable after the reserve | Researches 1 or 2 techs; a Propagation seat gains tokens |
 | Leadership primary | Leadership played | `StrategyCardRules.leadership`, `gainTokens` | 3 free tokens + 0–3 bought | `TokenPurchase.best` (most tokens affordable while keeping the reserves) | Gains into the pools from `CommandTokenPolicy.poolToGrow` |
@@ -637,7 +637,7 @@ flowchart TD
 | Trade primary | Trade played | Engine (`TradeStrategyCardService.doPrimary` runs on play), then `StrategyCardRules.trade` | — | — | Announces the terms (trading on) or free follows (trading off) |
 | Follow a played card | Another seat's card played, the seat's turn in the follow order | `StrategyCardRules.follow` | All unfollowed played cards | Follow rank order; per-card value tests; spare-token test | Presses the secondary; otherwise `declineStrategyCardFollow` presses `sc_no_follow_` |
 | Wait to follow | An earlier follower or the primary is still open | `awaitFollowTurn`, `SecondaryQueue.blockerFor` | — | — | `Wait(now + 10 s)`; pings the blocking human once |
-| Holder waits for secondaries | The AI played the card | `awaitSecondaries` / `NekroBrain.takeTurn` | — | — | Does not end its turn until all followers have answered (stale after 10 min) |
+| Holder waits for secondaries | The AI played the card | `awaitSecondaries` / `StandardBrain.takeTurn` | — | — | Does not end its turn until all followers have answered (stale after 10 min) |
 | Busy paying | A payment, token gain or research request within 90 s | `busyPaying`, `waitsToFollow` | — | — | Leadership/Technology/Warfare/Diplomacy follows are not decided yet; not declined either |
 | Round-1 Gravity Drive opening | Round 1, Gravity Drive best and has an opening gain | `CardTiming.opensTheRound`, `OpeningHold`, `StrategyCardReplanner` | Play Technology now; hold home unactivated | The `OpeningOutlook` gain > 0 | Technology `NOW`; home `PRODUCE`/`DEFEND` hints negative |
 | Round-1 Construction vs. moving out | Thunder's Edge Construction with an opening gain | `CardTiming.movesOutBeforeConstruction` | Produce first vs. move first | The `OpeningOutlook.bestProduction` order | Move first → Construction `FALLBACK` |
@@ -650,7 +650,7 @@ flowchart TD
 
 #### Picking a strategy card
 
-- **Trigger:** `NekroBrain.pickStrategyCard`, in the `strategy` phase while the AI is the active player.
+- **Trigger:** `StandardBrain.pickStrategyCard`, in the `strategy` phase while the AI is the active player.
 - **Order of checks:**
   1. A pending *Checks and Balances* hand-over (`giveAwayStrategyCard`).
   2. A pending speaker-sale wait (`awaitSellerPick`).
@@ -670,7 +670,7 @@ flowchart TD
 
 #### Deciding when to play a held card
 
-- **Responsible:** `StrategyCardTurn.playIfDue` (before `TacticalRules.start`), and the `NekroBrain.takeTurn` fallback loop (after it).
+- **Responsible:** `StrategyCardTurn.playIfDue` (before `TacticalRules.start`), and the `StandardBrain.takeTurn` fallback loop (after it).
 - **Deliberate waiting:**
   - Politics, Trade and the Imperial secret are never `NOW` by main use. They wait until no tactical action is worth taking, unless Trade or Politics has an expedition use ≥ 0.5, or Trade has a round-1 `OPENING_EXPANSION` benefit (its 3 trade goods fund a Gravity Drive follow).
   - For a researching seat, Technology after round 2 is always `FALLBACK`, except for the Gravity Drive opening (round 1 only) or a paid request. A Propagation seat's Technology is `NOW` only with 0 tactic tokens and a ranked plan.
@@ -694,7 +694,7 @@ flowchart TD
   - Leadership: buy tokens with influence.
 - **Selection:** cards are tried in follow-rank order. The first card whose test passes is followed in this tick. The others are handled on later ticks.
 - **Constraints:** `hasSpareStrategyToken` keeps one token per better-ranked card that another seat still holds and the seat wants to follow. It also keeps the scoring reserve's tokens and the Entropic Scar token.
-- **Outcome:** a press, recorded with `SecondaryQueue.followStarted`. If no test passes, `NekroBrain.declineStrategyCardFollow` presses `sc_no_follow_<n>`, but only when the seat is not blocked and not `waitsToFollow`.
+- **Outcome:** a press, recorded with `SecondaryQueue.followStarted`. If no test passes, `StandardBrain.declineStrategyCardFollow` presses `sc_no_follow_<n>`, but only when the seat is not blocked and not `waitsToFollow`.
 - **Fallback:** the Scepter of Emelpar or Acquiescence is used in place of the token when it is ready. The Mindsieve note is used for Naalu.
 
 #### Speaker sale during Politics
@@ -902,7 +902,7 @@ There is no learned opponent model. Rivals are modelled explicitly in these plac
 
 - The holder does not end its turn while any follower has not answered. A human is pinged once per card (`SecondaryQueue.humanToPing`).
 - A follower does not act before the players ahead of it in follow order. The first follower never waits for later ones.
-- In `NekroBrain.takeTurn`, a pending follow (`followsPending`) is resolved before the seat's own action.
+- In `StandardBrain.takeTurn`, a pending follow (`followsPending`) is resolved before the seat's own action.
 - Construction, Politics, Trade and the other `FALLBACK` cards are held until no tactical action is left.
 - The buyer of a speaker sale waits for the seller's declaration.
 
@@ -961,7 +961,7 @@ Each item cites the code that shows it.
 
 ### Behavioural gaps visible in the code
 
-- **The fallback play order is not valued.** When no tactical action is left, `NekroBrain.takeTurn` plays the first unplayed `strategicAction_` button in prompt order, not the best-valued card.
+- **The fallback play order is not valued.** When no tactical action is left, `StandardBrain.takeTurn` plays the first unplayed `strategicAction_` button in prompt order, not the best-valued card.
 - **Politics and Trade are never `NOW` by their main use.** `CardTiming.dueNow` returns false for every Politics and Trade use. They are `NOW` only through an expedition benefit ≥ 0.5 or, for Trade in round 1, an `OPENING_EXPANSION` benefit > 0 (`OpeningOutlook.gravityDriveGainFromTrade`). Otherwise they are played only after tactical actions run out.
 - **Technology after round 2** is always `FALLBACK` (`TechnologyTiming.playsNow` returns false for round > 2), unless another seat paid for an early Technology through `technologyRequested`.
 - **A research request can be lost.** `StrategyCardRules.chooseTechnology` removes the research request before checking that `ResearchPolicy.best` and a payment exist. If either is missing it presses nothing, and nothing re-arms the request. The engine's research prompt then stays unanswered by the AI.
@@ -970,8 +970,7 @@ Each item cites the code that shows it.
 - **The Imperial primary** draws a secret whenever `getSoScored() < getMaxSOCount()`, without the `SecretDraws.worthDrawing` test that the follow and the plan use.
 - **The Diplomacy lock** is pressed even when no system is threatened. It falls back to `DiplomacyUses.bestLockTarget`, the highest lock exposure.
 - **`ChecksAndBalances`** values cards for the recipient with the AI's own `baseValue` formulas applied to the recipient's state.
-- **PoK Warfare's token gain may be skipped.** After the AI takes back a token, the engine posts a "Redistribute & Gain Command Tokens" button (`redistributeCCButtons_deleteThisMessage`, from `ButtonHelper.resolveRemovingYourCC`). `removeTokenWithWarfare` marks Warfare finished without pressing it, and the only `NekroBrain` rules that press `redistributeCCButtons` run in the `statusHomework` phase. Yet `WarfareUses` values PoK Warfare with a `WARFARE_TOKEN` benefit. Whether another path gains the token was not found (see [Not verified](/src/main/java/ti4/ai/README.md#1015-not-verified)).
-- **Fleet Logistics Warfare bypasses `CardTiming`.** `NekroBrain.warfareBeforeFollowUp` plays Thunder's Edge Warfare whenever the seat has Fleet Logistics and its best Warfare plan is an ATTACK, before `StrategyCardTurn.playIfDue` is consulted.
+- **Fleet Logistics Warfare bypasses `CardTiming`.** `StandardBrain.warfareBeforeFollowUp` plays Thunder's Edge Warfare whenever the seat has Fleet Logistics and its best Warfare plan is an ATTACK, before `StrategyCardTurn.playIfDue` is consulted.
 
 ## Cross-references
 
@@ -979,7 +978,7 @@ Each item cites the code that shows it.
 
 | Caller | Strategy methods it calls |
 | --- | --- |
-| `NekroBrain` (rule list and `takeTurn`/`pickStrategyCard`) | `StrategyCardRules.exhaustAiDevelopmentForResearch`, `exhaustProphetsTearsForResearch`, `chooseTechnology`, `gainTokens`, `placeStructure`, `readyPlanets`, `buildWithWarfare`, `buildWithConstruction`, `follow`, `awaitSecondaries`, `awaitFollowTurn`, `followsPending`, `resolvePrimary`, `awaitingSecondaries`, `play`, `waitsToFollow`, `isThundersEdgeWarfare`; `StrategyCardTurn.playIfDue`, `dueNow`; `StrategyCardRanking.ranked`, `initiative`, `imperialScoresNow`; `CardPlanMemory.write`; `StrategyCardPickLog.record`; `SpeakerSale.answer`, `declare`, `awaitSellerPick`, `withoutPromisedCard`; `ChecksAndBalances.inPlay`, `plan`, `recipient`; `SecondaryQueue.blockerFor`; `OverruleChoice.overrulesOwnImperialFirst` |
+| `StandardBrain` (rule list and `takeTurn`/`pickStrategyCard`) | `StrategyCardRules.exhaustAiDevelopmentForResearch`, `exhaustProphetsTearsForResearch`, `chooseTechnology`, `gainTokens`, `placeStructure`, `readyPlanets`, `buildWithWarfare`, `buildWithConstruction`, `follow`, `awaitSecondaries`, `awaitFollowTurn`, `followsPending`, `resolvePrimary`, `awaitingSecondaries`, `play`, `waitsToFollow`, `isThundersEdgeWarfare`; `StrategyCardTurn.playIfDue`, `dueNow`; `StrategyCardRanking.ranked`, `initiative`, `imperialScoresNow`; `CardPlanMemory.write`; `StrategyCardPickLog.record`; `SpeakerSale.answer`, `declare`, `awaitSellerPick`, `withoutPromisedCard`; `ChecksAndBalances.inPlay`, `plan`, `recipient`; `SecondaryQueue.blockerFor`; `OverruleChoice.overrulesOwnImperialFirst` |
 | `ti4.ai.nekro.NekroLeaderRules` | `CopiedTechPolicy.best`, `CopiedTechPolicy.value` |
 | `ti4.ai.nekro.CommandTokenPolicy` | `TokenPlan.of` (action phase only), `TechPath.researchesNeeded`, `TechPath.reachable`, `TechPath.ADAPT_NEW_STRATEGIES` |
 | `ti4.ai.trade.TechnologyRequest` | `TechnologyTiming.deniable`, `earlyCost`, `holdCost`, `holdPayment`, `grantHold`, `heldKey`, `followsNow`, `followsLaterAfterPaying`, `followSurplus`, `holdsUnplayed`, `LAST_DEAL_ROUND`; `OpeningNeeds.wantsTechnologySoon`, `technologyHolder`, `canFollowTechnologyAfterPaying`, `technologyRequestedKey` |

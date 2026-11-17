@@ -5,15 +5,15 @@ Part of the [AI player architecture docs](/src/main/java/ti4/ai/README.md): a li
 ## Components and responsibilities
 
 The package holds 43 classes, about 7,500 lines. Every AI seat runs the same rule list,
-[NekroBrain](/src/main/java/ti4/ai/nekro/NekroBrain.java). `FactionBrainRegistry` maps both brain ids `nekro` and
-`standard` to one `NekroBrain` instance. The rule list is ordered, and the first rule that returns a decision wins
+[StandardBrain](/src/main/java/ti4/ai/brain/StandardBrain.java). `FactionBrainRegistry` maps the brain id `standard` (and
+`nekro`, from older saves) to one `StandardBrain` instance. The rule list is ordered, and the first rule that returns a decision wins
 the tick. These are the agenda-phase rules, in list order:
 
 `RiderPayouts::technology`, `RiderPayouts::leadership` (early in the list), then ...
-`SecretRules::scoreAgendaSecret`, `PromissoryRules::queueAgendaNote`, `BoatFloat::arrange`, `NekroBrain.declineWhens`
-(bounties, Veto, Quash), `GalacticThreatRules::next`, `AgendaCardRules::riders`, `NekroBrain.declineAfters`,
-`TradeRules::payTheAnswerer`, `TradeRules::holdVoteForDeals`, `AgendaVoting::next`, `NekroBrain.abstainFromAgenda`,
-`NekroBrain.breakAgendaTie`, `TradeRules::offerDeadlyPlotBounty`, `ShenanigansRules::react`,
+`SecretRules::scoreAgendaSecret`, `PromissoryRules::queueAgendaNote`, `BoatFloat::arrange`, `StandardBrain.declineWhens`
+(bounties, Veto, Quash), `GalacticThreatRules::next`, `AgendaCardRules::riders`, `StandardBrain.declineAfters`,
+`TradeRules::payTheAnswerer`, `TradeRules::holdVoteForDeals`, `AgendaVoting::next`, `StandardBrain.abstainFromAgenda`,
+`StandardBrain.breakAgendaTie`, `TradeRules::offerDeadlyPlotBounty`, `ShenanigansRules::react`,
 `TradeRules::payDebtInAgenda`.
 
 Most AI behaviour is gated by experiment flags in [AiExperiments](/src/main/java/ti4/ai/AiExperiments.java). The
@@ -533,7 +533,7 @@ is. The grid branch reaches a final agenda only for agendas whose value depends 
 **Purpose:** casts the seat's vote through the bot's voting buttons, and keeps the ballot in seat memory across
 ticks.
 
-**Invoked when:** `NekroBrain` rule `AgendaVoting::next`, every tick. It acts only when the phase is
+**Invoked when:** `StandardBrain` rule `AgendaVoting::next`, every tick. It acts only when the phase is
 `agendaVoting` and the seat is the active player.
 
 **Inputs:** `AiTurnContext` (prompts since the turn start (`Prompts.thisTurn`), seat memory, clock).
@@ -552,7 +552,7 @@ The Abstain button is `resolveAgendaVote_0`.
 **Algorithm (`next`):**
 
 1. If the seat's own unpressed `vote` button is in this turn's prompts: `plan`.
-   - Empty plan → return nothing, so the next rule, `NekroBrain.abstainFromAgenda`, presses `resolveAgendaVote_0`.
+   - Empty plan → return nothing, so the next rule, `StandardBrain.abstainFromAgenda`, presses `resolveAgendaVote_0`.
    - Otherwise store the `Ballot(outcome, planetOwner, votes, predictive)` under `agendaBallot|<agendaInfo>` with
      the press time, and press `vote`.
 2. Otherwise read the stored ballot and re-check promises (`keepingPromise`, `keepingOutOfTheVote`):
@@ -622,7 +622,7 @@ flowchart TD
     Gate -- yes --> VoteBtn{"own unpressed<br/>vote button?"}
     VoteBtn -- yes --> Plan["AgendaVoting.plan"]
     Plan --> HasBallot{"ballot planned?"}
-    HasBallot -- no --> Abstain["no decision:<br/>NekroBrain.abstainFromAgenda<br/>presses resolveAgendaVote_0"]
+    HasBallot -- no --> Abstain["no decision:<br/>StandardBrain.abstainFromAgenda<br/>presses resolveAgendaVote_0"]
     HasBallot -- yes --> Store["store ballot in seat memory,<br/>press vote"]
     VoteBtn -- no --> Stored{"stored ballot?"}
     Stored -- yes --> Promise["keepingPromise /<br/>keepingOutOfTheVote<br/>(replan if a promise is broken)"]
@@ -667,7 +667,7 @@ Tested by `AgendaVotingTest.gilaSpendsJustEnoughTradeGoodsToSwingAPoint` and `gi
 
 **Invoked when:**
 
-- `NekroBrain.breakAgendaTie` (`chooseOutcome`, `choosePlanetOwner`): the seat is the speaker, it is active, the
+- `StandardBrain.breakAgendaTie` (`chooseOutcome`, `choosePlanetOwner`): the seat is the speaker, it is active, the
   phase is not `agendaEnd`, and the prompts this turn carry `resolveAgendaVote_outcomeTie*` or
   `tiedPlanets_resolveAgendaVote_outcomeTie*` buttons.
 - `AgendaCardRules.worthVetoing` (`veryBadFor`, `worthDiscardingFor`).
@@ -722,7 +722,7 @@ Tested by `AgendaVotingTest.gilaSpendsJustEnoughTradeGoodsToSwingAPoint` and `gi
   older than `seenAt` − 5 s and no older than `lastAgendaReactTime` − 5 s. A reveal time more than 60 s in the
   future is ignored.
 - `AgendaQueue` reads the engine's queue stored values: `whenWindowOpen` (phase `agendawaiting` and `whensResolved`
-  empty), `holdsQueuedWhen/After`, `passedOnWhens/Afters`, `queuedWhen/After`. Callers: `NekroBrain`, `AgendaNotes`,
+  empty), `holdsQueuedWhen/After`, `passedOnWhens/Afters`, `queuedWhen/After`. Callers: `StandardBrain`, `AgendaNotes`,
   `AiStallDetector`, `QuashRules`, `DiscardBountyDeals`, `PromiseDeals`, `AgendaCardRules`, and in scope
   `GalacticThreatRules` (`passedOnAfters`) and `DiscardBounties` (`whenWindowOpen`).
 - `AgendaView`: the hand-reading switch described under AgendaValues.
@@ -788,14 +788,14 @@ Tested by `AgendaVotingTest.gilaSpendsJustEnoughTradeGoodsToSwingAPoint` and `gi
   2.4.
 - Unknown titles = 2.4.
 
-`RiderPayouts` (executes), NekroBrain rules:
+`RiderPayouts` (executes), StandardBrain rules:
 
 - `technology`: on a recent (≤ 30 min) public message naming the Technology Rider and mentioning the seat, press the
   unowned `acquireATech`. Skipped when the seat cannot research.
 - `leadership`: on the "Use buttons to gain command tokens" message within 10 s after a Leadership Rider payout
   announcement that mentions the seat, gain up to min(3, room in reinforcements) tokens through `NekroRules.gainTokens`.
-  The target and baseline are remembered per message. Suspected defect: the announcement is a buttonless main-channel
-  line that `Snapshot.promptsFor` drops, so `announcedBefore` is always false in a live game (section 10.8).
+  The target and baseline are remembered per message. The announcement has no buttons; `AiPerception.isLeadershipRiderPayout`
+  lets it through `Snapshot.promptsFor` (`LeadershipRiderPerceptionTest` reads both real messages through perception).
 
 Riders are decided outside this package, in `AgendaCardRules` (see section 7 and section 5):
 
@@ -810,7 +810,7 @@ Riders are decided outside this package, in `AgendaCardRules` (see section 7 and
 
 **Role:** `GalacticThreatRules` decides and executes. `GalacticThreatCost` evaluates.
 
-**Invoked when:** `NekroBrain` rule `GalacticThreatRules::next`, for a seat with the `galactic_threat` ability in
+**Invoked when:** `StandardBrain` rule `GalacticThreatRules::next`, for a seat with the `galactic_threat` ability in
 any `agenda*` phase.
 
 **Algorithm (`next`), in order:**
@@ -917,7 +917,7 @@ information only.
 **Purpose:** the Articles of War "boat float". Every voter but one casts 1 vote For. The largest voter ties them
 with Against. The speaker breaks the tie Against. Each For voter receives 3 TG and pays the Against voter 1.
 
-**Invoked when:** `NekroBrain` rule `BoatFloat::arrange`. It always returns no decision. Its effect is a state write.
+**Invoked when:** `StandardBrain` rule `BoatFloat::arrange`. It always returns no decision. Its effect is a state write.
 
 **Algorithm:**
 
@@ -999,7 +999,7 @@ Plot.
 **Purpose:** answers the bot's end-of-agenda "No Deadly Plot / No Bribery / Refuse Confounding (Confusing) Legal
 Text" reaction buttons.
 
-**Invoked when:** `NekroBrain` rule `ShenanigansRules::react`, in phase `agendaEnd`, outside fog.
+**Invoked when:** `StandardBrain` rule `ShenanigansRules::react`, in phase `agendaEnd`, outside fog.
 
 **Algorithm:**
 
@@ -1028,12 +1028,12 @@ Phases in the order the bot uses them:
 - `agendaVoting`: voters act in turn.
 - `agendaEnd`: the winner is announced and the shenanigans reactions run.
 
-Every rule below is one entry in the `NekroBrain` rule list. The first rule that returns a decision wins the tick.
+Every rule below is one entry in the `StandardBrain` rule list. The first rule that returns a decision wins the tick.
 
 | Scenario | Trigger | Handled by | Choices considered | How it chooses | Outcome / fallback |
 | --- | --- | --- | --- | --- | --- |
 | Own turn to vote, the outcome matters | Phase `agendaVoting`, seat active, own unpressed `vote` button | `AgendaVoting.next` → `plan` → `BallotPlanner.choose` | Every outcome × every planet subset-sum total (+3 Predictive Intelligence) | Forecast expected value − Galactic Threat cost − vote anger − kept-vote price; floor abstain + 0.5; fewest votes within 0.3 of the best | Presses `vote`, the outcome, planets, then confirm |
-| Own turn to vote, nothing at stake | Same, but no option beats abstaining by 0.5 (1e-6 on the final agenda) | `BallotPlanner.choose` returns empty → `NekroBrain.abstainFromAgenda` | Abstain | Empty plan | Presses `resolveAgendaVote_0` and marks itself abstained |
+| Own turn to vote, nothing at stake | Same, but no option beats abstaining by 0.5 (1e-6 on the final agenda) | `BallotPlanner.choose` returns empty → `StandardBrain.abstainFromAgenda` | Abstain | Empty plan | Presses `resolveAgendaVote_0` and marks itself abstained |
 | Final agenda of the phase | `agendaCount` ≥ 2 | `BallotPlanner.allIn` (unless the agenda depends on the own vote) | All votes on each outcome (+PI) | Max worth, ties broken by liking | All votes cast. No vote is kept back, and keptVote = 0 |
 | First agenda, last planet | Not final, Mutiny not in the discards | `BallotPlanner` (expert) / `planetToExhaust` (legacy) | Spending the smallest planet costs `LAST_VOTE` 0.5 | Penalty in the value; legacy never exhausts the last planet | Usually keeps the planet for the second agenda |
 | No forecast available | Fog of War, Hidden Agenda or Omega Phase modes | `BallotPlanner.withoutForecast` | Each outcome | `AgendaUtility` − Galactic Threat cost | All castable votes (the last planet is always kept back on a first agenda) when preference ≥ 8 or final agenda, else ⌈half⌉. Abstains only if every value is equal and ≤ 1e-6 |
@@ -1045,7 +1045,7 @@ Every rule below is one entry in the `NekroBrain` rule list. The first rule that
 | Bound by a vote promise | Accepted `VOTE_FOR` on this agenda | `AgendaVoting.plan` / `keepingPromise` | The promised target | Promise first | min(promised, castable) votes; replans if the stored ballot breaks the promise |
 | `NOT_FOR` / `NOT_AGAINST` promise | Binding promise of that term | `BallotPlanner` (outcome removed) / `AgendaVoting.plan` filter / `keepingOutOfTheVote` | — | The avoided outcome is excluded; restraint allows only abstain or the target | At the `vote` press, a planner pick other than the target gives no ballot (abstain). A stored ballot that breaks the restraint is replanned, or falls back to 1 vote on the target |
 | Boat float on Articles of War | AI speaker, all-AI table, every law gain ≤ 2 TG | `BoatFloat.arrange` → `AgendaVoting.plan` → `AgendaPolicy.chooseOutcome` | Fixed plan | Members For ×1, the largest voter Against ×N, speaker breaks the tie Against | Promises at 1 TG each |
-| Speaker breaks a tie | Speaker, active, tie buttons (not in `agendaEnd`) | `NekroBrain.breakAgendaTie` → `AgendaPolicy.chooseOutcome` | The tied outcomes | Forecast `tieBreakUtility`; even → Against (own-vote agendas); else the first button | Presses the tie button |
+| Speaker breaks a tie | Speaker, active, tie buttons (not in `agendaEnd`) | `StandardBrain.breakAgendaTie` → `AgendaPolicy.chooseOutcome` | The tied outcomes | Forecast `tieBreakUtility`; even → Against (own-vote agendas); else the first button | Presses the tie button |
 | Speaker picks the owner of tied planets | `tiedPlanets_` buttons | `AgendaPolicy.choosePlanetOwner` | The owners | Self (good law) / most-VP rival (bad law) / most planets | Presses the owner, then the tie choice |
 | Gila the Silvertongue TG votes | Hacan commander, planets spent | `GilaVotes` via `AgendaVoting.spendTradeGoods` | 0..spendable TG | Max (EU gain − TG), needs ≥ 0.5 | One press per TG |
 | Predictive Intelligence | PI ready, the ballot is predictive | `AgendaVoting.spendPlanets` | Use or keep | The `BallotPlanner` option with +3 votes − 0.5 × P(lose) | Pressed only once a planet vote is spent or castable |
@@ -1147,7 +1147,7 @@ Leadership), its after slot is empty, it may play cards, and no promise forbids 
 
 #### Discarding the agenda: Veto, Quash, Deadly Plot and bounties
 
-**When window (`agendawaiting`, `whensResolved` empty).** `NekroBrain.declineWhens` returns nothing if the seat is
+**When window (`agendawaiting`, `whensResolved` empty).** `StandardBrain.declineWhens` returns nothing if the seat is
 already in `declinedWhens` or holds a queued "when". Otherwise it runs in order:
 
 1. `TradeRules.offerDiscardBounty`. A payer with expected loss ≥ 2 posts a bounty: Veto share up to 3 TG unless it
@@ -1316,9 +1316,9 @@ votes      = keep if final or (best − worst) ≥ 8 else ⌈keep/2⌉
 - **Button steps per tick** (`AgendaVoting.next`): `vote` → confirm → planet spending (PI, planet, Gila TG,
   finish) → outcome.
 - **Planet choice** (`planetToExhaust`): the smallest planet with votes ≥ needed, else the largest.
-- **When window** (`NekroBrain.declineWhens`): own bounty offer → played Veto pending → queue Veto → queue Quash →
+- **When window** (`StandardBrain.declineWhens`): own bounty offer → played Veto pending → queue Veto → queue Quash →
   wait for a bounty → pass.
-- **After window** (`NekroBrain` order): Galactic Threat (`GalacticThreatRules.next`) → riders
+- **After window** (`StandardBrain` order): Galactic Threat (`GalacticThreatRules.next`) → riders
   (`AgendaCardRules.riders`) → pass (`declineAfters`, which also queues riders).
 - **Speaker tie:** boat float Against → forecast tie utility (+own-vote term) → `evenTieOutcome` → first button.
   Without a forecast: max `AgendaUtility`.
@@ -1381,7 +1381,7 @@ votes      = keep if final or (best − worst) ≥ 8 else ⌈keep/2⌉
 - **Planned outcome not offered as a button.** `AgendaVoting.chooseOutcome` resets the stored ballot to 0 votes and
   presses any offered outcome button. The engine's `proceedToFinalizingVote` posts the confirm as
   `<factionButtonChecker>resolveAgendaVote_<votes>`, so a 0-vote total gives the same owned id as Abstain, which
-  `NekroBrain.abstainFromAgenda` presses. `AgendaVotingTest.castsNoVotesWhenTheOutcomesAreOfferedDirectly` covers
+  `StandardBrain.abstainFromAgenda` presses. `AgendaVotingTest.castsNoVotesWhenTheOutcomesAreOfferedDirectly` covers
   the steps up to `proceedToFinalizingVote` only.
 - **Planet agenda where its own planets lack the trait.** They are filtered out of the outcomes, so it may not vote at
   all. Tested by `AgendaVotingTest.votesOnlyForPlanetsWithTheRequiredTrait`.
@@ -1538,12 +1538,9 @@ limitations below come from explicit guards, missing handlers and modelling choi
 
 ### Known weaknesses
 
-- **Leadership Rider payout never fires (suspected bug).** `RiderPayouts.leadership` presses the gain-token buttons
-  only when `announcedBefore` finds the engine's buttonless line "resolve _Leadership Rider_ by using the button"
-  (sent by `AgendaHelper` just before the button message) in `context.prompts()`. `AiPerception.kept` keeps that
-  line at read time, but `Snapshot.promptsFor` adds a main-channel prompt only when its buttons are relevant or it is
-  AI table talk (`AiPrompt.isTableTalk` needs the table-talk prefix), so the line never reaches the rule and the rule
-  never presses. `RiderPayoutsTest` builds its prompt list by hand and so passes. Not confirmed by running a game.
+- **Leadership Rider payout needs its announcement in recent history.** The gate looks for the buttonless announcement
+  among the last `AiSettings.HISTORY_SIZE` main-channel messages; if the seat first looks after it has scrolled out, the
+  gain is not pressed. (Until 2026-11-17 perception dropped the announcement altogether, so the payout never fired.)
 
 - **`NOT_FOR` promises read as votes for the avoided outcome (suspected bug).** `PromisedVotes.placeAccepted`
   removes a `NOT_AGAINST` promiser and sends every other accepted vote promise through `withVotes` on its target.
@@ -1577,7 +1574,7 @@ limitations below come from explicit guards, missing handlers and modelling choi
 
 | Caller | Calls |
 | --- | --- |
-| `NekroBrain` (rule list and helpers) | `BoatFloat.arrange`, `GalacticThreatRules.next`, `AgendaVoting.next`, `AgendaVoting.markAbstained`, `AgendaPolicy.isTieOutcome` / `chooseOutcome` / `isTiedPlanetOwner` / `choosePlanetOwner`, `AgendaQueue.holdsQueuedWhen` / `holdsQueuedAfter`, `RiderPayouts.technology` / `leadership`, `ShenanigansRules.react` |
+| `StandardBrain` (rule list and helpers) | `BoatFloat.arrange`, `GalacticThreatRules.next`, `AgendaVoting.next`, `AgendaVoting.markAbstained`, `AgendaPolicy.isTieOutcome` / `chooseOutcome` / `isTiedPlanetOwner` / `choosePlanetOwner`, `AgendaQueue.holdsQueuedWhen` / `holdsQueuedAfter`, `RiderPayouts.technology` / `leadership`, `ShenanigansRules.react` |
 | `AgendaCardRules` (actioncards) | `AgendaClock.seenAt` / `isInThisAgenda`, `AgendaForecast.of` / `withRider` / `expectedUtility` / `keepsVotesWithRider` / `chance`, `AgendaVoting.itsBallot`, `AgendaPolicy.veryBadFor` / `worthDiscardingFor`, `DiscardBounties.vetoBounty` / `awaitOffers`, `AgendaQueue`, `PromisedVotes.forbidsRider`, `RiderPayoff` constants / `of` / `isImperial`, `AgendaSwing.DEADLY_PLOT` |
 | `ShenaniganCards`, `EarlyDeadlyPlot`, `SabotagePolicy` (actioncards) | `AgendaSwing.forViewer` / `currentWinner` / `isElectable` / `backedAnotherOutcome` / `changesTheAgenda`, `AgendaRound.isFinalAgenda`, `AgendaPoints.gainers`, `AgendaForecast.of` / `utility`, `DiscardBounties.deadlyPlotBounty`, `ShenanigansRules.isShenanigansButton`, `AgendaClock` |
 | `CardScoring` | `AgendaForecast.riderOutcome` / `chance`, `AgendaPolicy.wouldElectToAPoint` |
