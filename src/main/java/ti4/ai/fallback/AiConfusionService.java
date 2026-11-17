@@ -41,6 +41,7 @@ public class AiConfusionService {
             List.of("cancelSpaceHits_", "cancelPdsOffenseHits_", "cancelGroundHits_", "cancelAFBHits_");
     private static final String RING_TILE = "ringTile_";
     private static final String PASS_FOR_ROUND = "passForRound";
+    private static final String PASSING_ABILITIES = "passingAbilities";
     private static final String TURN_END = "turnEnd";
     private static final List<String> VOTE_PREFIXES =
             List.of("outcome_", "planetOutcomes_", "exhaustForVotes_", "resolveAgendaVote_", "proceedToFinalizingVote");
@@ -113,7 +114,8 @@ public class AiConfusionService {
     }
 
     private static boolean passesRound(PromptButton button) {
-        return button.handlerId().startsWith(PASS_FOR_ROUND);
+        return button.handlerId().startsWith(PASS_FOR_ROUND)
+                || button.handlerId().startsWith(PASSING_ABILITIES);
     }
 
     private static boolean endsTurn(PromptButton button) {
