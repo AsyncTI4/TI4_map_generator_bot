@@ -239,13 +239,18 @@ class AgendaVotingTest extends BaseTi4Test {
     // it,
     // the election is worth a point. Hacan leads on points and Xxcha, the rival, puts its votes on the leader, so only
     // Sol's votes can stop that.
+    // The user's Public Execution values (2026-11-16) make the speaker's own execution cost 4 TG for the token and
+    // 1 TG for its votes, more than Drive the Debate is worth here, so the vote-spending tests elect Sol to Minister of
+    // War instead; the plain-execution case sets Public Execution itself.
+    private static final String EXECUTION = "Directive_Elect Player_7_execution";
+
     private void driveTheDebateElection(int solVotes, int rivalVotes) {
         Player leader = test.addSeat("200000000000000003", "hacan", "green");
         test.addSeat("200000000000000002", "xxcha", "red");
         test.game.scorePublicObjective(leader.getUserID(), test.game.addCustomPO("Test points", 2));
         test.game.setPhaseOfGame("agendawaiting");
         test.game.setSpeakerUserID(sol.getUserID());
-        test.game.setCurrentAgendaInfo("Directive_Elect Player_7_execution");
+        test.game.setCurrentAgendaInfo("Law_Elect Player_7_minister_war");
         test.game.setStoredValue(
                 "agendaStartVoteCounts",
                 "{\"blue\":" + solVotes + ",\"red\":" + rivalVotes + ",\"green\":0,\"black\":0}");
@@ -356,6 +361,7 @@ class AgendaVotingTest extends BaseTi4Test {
     @Test
     void neverElectsItselfToExecutionDirectiveWithoutDriveTheDebate() {
         driveTheDebateElection(everythingSolHas(), 2);
+        test.game.setCurrentAgendaInfo(EXECUTION);
         sol.removeSecret(sol.getSecretsUnscored().get("dtd"));
 
         assertThat(AgendaVoting.plan(test.game, sol).map(AgendaVoting.Ballot::outcome))

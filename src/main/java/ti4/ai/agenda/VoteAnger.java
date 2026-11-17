@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.tactical.TacticalStrength;
 import ti4.ai.trade.Relations;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -21,9 +22,13 @@ class VoteAnger {
 
     static double ofBallot(Game game, Player voter, AgendaForecast forecast, String outcome, int votes) {
         if (votes <= 0 || outcome.isEmpty() || !AiExperiments.enabled(voter, Experiment.VOTE_ANGER)) return 0;
+        Map<String, Double> weights = new HashMap<>();
+        for (Player other : game.getRealPlayers()) {
+            if (other != voter) weights.put(other.getFaction(), TacticalStrength.angerWeight(game, voter, other));
+        }
         Map<String, Double> angers = new HashMap<>();
         for (String alternative : forecast.outcomes())
-            angers.put(alternative, anger(game, voter, forecast, alternative));
+            angers.put(alternative, anger(game, voter, forecast, alternative, weights));
         double without = forecast.expected(alternative -> angers.getOrDefault(alternative, 0.0));
         double with = forecast.withVotes(voter, outcome, votes)
                 .expected(alternative -> angers.getOrDefault(alternative, 0.0));
@@ -31,7 +36,7 @@ class VoteAnger {
         return added < MIN_ANGER ? 0 : added;
     }
 
-    static double anger(Game game, Player voter, AgendaForecast forecast, String outcome) {
+    static double anger(Game game, Player voter, AgendaForecast forecast, String outcome, Map<String, Double> weights) {
         List<Player> others = game.getRealPlayers().stream()
                 .filter(other -> !other.getFaction().equals(voter.getFaction()))
                 .toList();
@@ -42,9 +47,10 @@ class VoteAnger {
         return others.stream()
                 .filter(other -> !Relations.bad(game, voter, other))
                 .filter(other -> !mustBeStopped(game, other))
-                .mapToDouble(other -> harm(forecast, other, outcome) - tableHarm)
-                .filter(singledOut -> singledOut >= MIN_HARM)
-                .map(singledOut -> ANGER_SHARE * singledOut)
+                .filter(other -> harm(forecast, other, outcome) - tableHarm >= MIN_HARM)
+                .mapToDouble(other -> ANGER_SHARE
+                        * (harm(forecast, other, outcome) - tableHarm)
+                        * weights.getOrDefault(other.getFaction(), 1.0))
                 .sum();
     }
 

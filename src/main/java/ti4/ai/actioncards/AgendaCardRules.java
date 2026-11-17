@@ -13,6 +13,7 @@ import ti4.ai.agenda.AgendaClock;
 import ti4.ai.agenda.AgendaForecast;
 import ti4.ai.agenda.AgendaPolicy;
 import ti4.ai.agenda.AgendaQueue;
+import ti4.ai.agenda.AgendaSwing;
 import ti4.ai.agenda.AgendaVoting;
 import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.agenda.PromisedVotes;
@@ -147,6 +148,11 @@ public class AgendaCardRules {
     public static boolean worthVetoing(Game game, Player seat) {
         return AgendaPolicy.veryBadFor(game, seat)
                 || AgendaPolicy.worthDiscardingFor(game, seat, DiscardBounties.vetoBounty(game, seat));
+    }
+
+    public static boolean holdsDeadlyPlot(Player seat) {
+        return seat.getActionCards().keySet().stream()
+                .anyMatch(alias -> AgendaSwing.DEADLY_PLOT.equals(SabotageWindow.title(alias)));
     }
 
     public static boolean holdsVeto(Player seat) {

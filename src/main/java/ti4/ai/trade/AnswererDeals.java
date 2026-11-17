@@ -45,7 +45,8 @@ class AnswererDeals {
         if (BoatFloat.active(game).isPresent()) return Optional.empty();
         if (!VoteDeals.aboutToVote(game, payer) || offeredThisAgenda(game, payer)) return Optional.empty();
         String considered = CONSIDERED_KEY + game.getCurrentAgendaInfo() + "|" + game.getPhaseOfGame() + "|"
-                + game.getActivePlayerID() + "|" + payer.getTg() + "|" + game.getCurrentAgendaVotes();
+                + game.getActivePlayerID() + "|" + payer.getTg() + "|" + game.getCurrentAgendaVotes() + "|"
+                + declinedThisAgenda(game, payer);
         if (context.memory().has(considered)) return Optional.empty();
         context.memory().put(considered, "1");
         Predicate<String> backed = PromiseDeals.backedOutcome(context);
@@ -225,8 +226,19 @@ class AnswererDeals {
     }
 
     private static boolean offeredThisAgenda(Game game, Player payer) {
+        return !Reoffer.mayDeal(answererOffers(game, payer));
+    }
+
+    private static long declinedThisAgenda(Game game, Player payer) {
+        return answererOffers(game, payer).stream()
+                .filter(promise -> promise.status() == Promise.Status.DECLINED)
+                .count();
+    }
+
+    private static java.util.List<Promise> answererOffers(Game game, Player payer) {
         return PromiseBook.proposedBy(game, payer).stream()
                 .filter(promise -> promise.term() == Promise.Term.NOT_AGAINST && promise.isPromisee(payer))
-                .anyMatch(promise -> PromisedVotes.onThisAgenda(game, promise));
+                .filter(promise -> PromisedVotes.onThisAgenda(game, promise))
+                .toList();
     }
 }

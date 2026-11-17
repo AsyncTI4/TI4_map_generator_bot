@@ -44,7 +44,7 @@ class AvoidanceBribes {
         Player payer = context.seat();
         if (!applies(game, payer) || offeredThisAgenda(game, payer) >= MAX_PER_AGENDA) return Optional.empty();
         String considered = CONSIDERED_KEY + game.getCurrentAgendaInfo() + "|" + game.getActivePlayerID() + "|"
-                + payer.getTg() + "|" + game.getCurrentAgendaVotes();
+                + payer.getTg() + "|" + game.getCurrentAgendaVotes() + "|" + declinedThisAgenda(game, payer);
         if (context.memory().has(considered)) return Optional.empty();
         context.memory().put(considered, "1");
         AgendaForecast forecast = AgendaForecast.of(game, payer);
@@ -206,9 +206,19 @@ class AvoidanceBribes {
     }
 
     private static long offeredThisAgenda(Game game, Player payer) {
+        return bribesThisAgenda(game, payer).stream()
+                .filter(promise -> promise.status() != Promise.Status.DECLINED)
+                .count();
+    }
+
+    private static long declinedThisAgenda(Game game, Player payer) {
+        return bribesThisAgenda(game, payer).size() - offeredThisAgenda(game, payer);
+    }
+
+    private static List<Promise> bribesThisAgenda(Game game, Player payer) {
         return PromiseBook.proposedBy(game, payer).stream()
                 .filter(promise -> promise.term() == Promise.Term.NOT_FOR && promise.isPromisee(payer))
                 .filter(promise -> PromisedVotes.onThisAgenda(game, promise))
-                .count();
+                .toList();
     }
 }
