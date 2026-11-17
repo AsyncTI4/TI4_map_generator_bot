@@ -516,6 +516,10 @@ public class StartCombatService {
                     cannonCover);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to create combat thread for game: " + game.getName(), e);
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "The bot could not create the combat thread for " + tile.getRepresentationForButtons(game, player1)
+                            + ". Please wait 5 minutes, then use `/combat start_combat` to start the combat.");
         }
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
