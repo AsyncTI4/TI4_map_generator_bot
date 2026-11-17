@@ -59,7 +59,6 @@ class DirectiveValues {
     private static final String VOTE_SEPARATOR = ";";
     private static final int ONE_TOKEN = 1;
     private static final int CLANDESTINE_TOKENS = 2;
-    private static final int SPARE_FLEET_POOL = 3;
     private static final double MECH_WORTH = 2.0;
     private static final double INFANTRY_WORTH = 0.4;
 
@@ -318,15 +317,11 @@ class DirectiveValues {
 
     private static double sheetTokenLoss(Player player, int tokens) {
         int onSheet = player.getTacticalCC() + player.getFleetCC() + player.getStrategicCC();
-        int cheap = Math.min(tokens, Math.max(0, player.getFleetCC() - SPARE_FLEET_POOL));
-        int costly = Math.max(0, Math.min(tokens, onSheet) - cheap);
-        return cheap * CardValueScale.TOKEN_FLOOR + costly * CardValueScale.HELD_TOKEN;
+        return Math.min(tokens, onSheet) * CardValueScale.HELD_TOKEN;
     }
 
     private static double fleetTokenLoss(Player player) {
-        int fleet = player.getFleetCC();
-        if (fleet <= 0) return 0;
-        return fleet > SPARE_FLEET_POOL ? CardValueScale.TOKEN_FLOOR : CardValueScale.HELD_TOKEN;
+        return player.getFleetCC() > 0 ? CardValueScale.HELD_TOKEN : 0;
     }
 
     static double rearmamentAgreement(Game game, Player voter, String outcome) {

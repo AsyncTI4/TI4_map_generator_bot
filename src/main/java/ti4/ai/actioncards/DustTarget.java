@@ -3,6 +3,7 @@ package ti4.ai.actioncards;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.scoring.Desperation;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.strategy.CardValueScale;
 import ti4.ai.tactical.CannonWipeRules;
@@ -19,7 +20,7 @@ class DustTarget {
     private static final double NEIGHBOUR_LANE_COST = 0.4;
     private static final double OWN_SYSTEM_LANE_COST = 0.4;
     private static final double MECATOL_COST = 3.0;
-    private static final double ACTION_COST = CardValueScale.TOKEN_FLOOR;
+    private static final double ACTION_COST = CardValueScale.HELD_TOKEN;
 
     static double value(Game game, Player seat, Tile tile) {
         if (!CannonWipeRules.held(seat) || !CannonWipeRules.NEUTRAL_SHIPS_COUNT || hasOwnDock(seat, tile)) {
@@ -27,13 +28,23 @@ class DustTarget {
         }
         double kill = CannonWipeRules.chanceToKillOneShip(game, seat, tile);
         int raids = Math.min(MAX_RAIDS, GameHorizon.roundsLeft(game));
-        double scoring = ObjectiveValue.VICTORY_POINT_VALUE * (1 - Math.pow(1 - kill, raids));
-        double costs = raids * CardValueScale.TOKEN_FLOOR
+        double scoring = ObjectiveValue.VICTORY_POINT_VALUE
+                * Desperation.actionSecretFactor(game, seat)
+                * (1 - Math.pow(1 - kill, raids));
+        double costs = expectedRaids(kill, raids) * CardValueScale.HELD_TOKEN
                 + ActionCardPrior.AVERAGE_CARD
                 + ACTION_COST
                 + laneCost(game, seat, tile);
         double net = scoring - costs;
         return net > 0 ? net : Double.NEGATIVE_INFINITY;
+    }
+
+    private static double expectedRaids(double kill, int raids) {
+        double expected = 0;
+        for (int raid = 0; raid < raids; raid++) {
+            expected += Math.pow(1 - kill, raid);
+        }
+        return expected;
     }
 
     private static boolean hasOwnDock(Player seat, Tile tile) {

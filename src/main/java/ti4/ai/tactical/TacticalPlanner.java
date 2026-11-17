@@ -44,6 +44,7 @@ import ti4.ai.letnev.GravleashPlan;
 import ti4.ai.promise.PromiseBook;
 import ti4.ai.promissory.PlayAreaNotes;
 import ti4.ai.sardakk.CommanderReach;
+import ti4.ai.scoring.Desperation;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.ObjectiveValue;
@@ -1382,7 +1383,7 @@ public class TacticalPlanner {
                         * ObjectiveValue.VICTORY_POINT_VALUE
                         * secretChance
                 + chance * (target.isNeutral() ? 0 : BoardView.shipCost(BoardView.space(tile), target));
-        if (score < Math.max(MIN_SCORE, CardValueScale.TOKEN_FLOOR)) return Optional.empty();
+        if (score < Math.max(MIN_SCORE, CardValueScale.HELD_TOKEN)) return Optional.empty();
         return Optional.of(new TacticalPlan(Kind.RAID, tile.getPosition(), List.of(), Map.of(), score));
     }
 
@@ -2651,8 +2652,9 @@ public class TacticalPlanner {
     }
 
     private static double secretShare(Game game, Player seat, String secret) {
-        if (WHOLE_POINT_SECRETS.contains(secret)) return 1.0;
-        return ActionSecretTiming.pursueNow(game, seat, secret) ? 1.0 : PATIENT_SHARE;
+        double desperation = Desperation.actionSecretFactor(game, seat);
+        if (WHOLE_POINT_SECRETS.contains(secret)) return desperation;
+        return ActionSecretTiming.pursueNow(game, seat, secret) ? desperation : PATIENT_SHARE;
     }
 
     private static SecretSlot barrageSlot(

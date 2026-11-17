@@ -69,18 +69,18 @@ class MindsieveFollowTest extends BaseTi4Test {
                 .map(AiTestGame::pressedId);
     }
 
-    // With two strategy tokens left a token is worth 1 trade good, as much as the gift: the note goes instead.
+    // A strategy token is worth a held command token (2.4), more than the gift (1.0): the note goes instead.
     @Test
     void givesTheCheapestNoteInsteadOfAToken() {
         assertThat(giveFirst()).hasValue(GIFT);
     }
 
-    // With three tokens a token is cheap (0.75) and the gift (1.0) costs more: it pays with a token.
+    // With three tokens a surplus token still costs 1.8, more than the gift.
     @Test
-    void keepsItsNotesWhenTokensArePlentiful() {
+    void givesTheGiftEvenWhenTokensArePlentiful() {
         test.nekro.setStrategicCC(3);
 
-        assertThat(giveFirst()).isEmpty();
+        assertThat(giveFirst()).hasValue(GIFT);
     }
 
     @Test
@@ -90,12 +90,12 @@ class MindsieveFollowTest extends BaseTi4Test {
         assertThat(giveFirst()).isEmpty();
     }
 
-    // A note in its play area cannot be given.
+    // A note in its play area cannot be given; the agreement, which also costs less than a token, goes instead.
     @Test
     void neverGivesANoteFromItsPlayArea() {
         test.nekro.addPromissoryNoteToPlayArea("gift");
 
-        assertThat(giveFirst()).isEmpty();
+        assertThat(giveFirst()).hasValue(AGREEMENT);
     }
 
     // Wired into following: the note is sent first, then the secondary is resolved as usual.

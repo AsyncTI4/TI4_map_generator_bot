@@ -47,11 +47,10 @@ public class ResearchPolicy {
 
     private static final String BEST_RESEARCHABLE_MEMO = "research.bestResearchable";
     public static final double WORTH_PAYING_FOR = 4.0;
-    public static final double WORTH_FOLLOWING_FOR = 3.0;
+    public static final double TECH_TEMPO = 1.4;
+    public static final double WORTH_FOLLOWING_FOR =
+            (ValueScale.RESOURCE * StrategyCardRules.FOLLOW_TECH_COST + CardValueScale.STRATEGY_TOKEN) / TECH_TEMPO;
     public static final double IDLE_WORTH_SHARE = 0.6;
-    public static final double TECH_TEMPO =
-            (ValueScale.RESOURCE * StrategyCardRules.FOLLOW_TECH_COST + CardValueScale.STRATEGY_TOKEN)
-                    / WORTH_FOLLOWING_FOR;
     private static final String DARK_ENERGY_TAP = "det";
     private static final double FRONTIER_EXPLORES_PER_ROUND = 0.3;
     private static final Set<Territory.Zone> FRONTIER_ZONES =

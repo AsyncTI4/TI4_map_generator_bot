@@ -214,8 +214,7 @@ class ElectionValues {
     }
 
     private static double standardizedFleet(int fleet) {
-        if (fleet < STANDARD_FLEET) return (STANDARD_FLEET - fleet) * CardValueScale.HELD_TOKEN;
-        return (STANDARD_FLEET - fleet) * CardValueScale.TOKEN_FLOOR;
+        return (STANDARD_FLEET - fleet) * CardValueScale.HELD_TOKEN;
     }
 
     static double covertLegislation(Game game, Player voter, String outcome) {

@@ -24,6 +24,8 @@ public class QuashRules {
     private static final String QUEUE_QUASH = "queueWhen_ability_quash";
     private static final String OPEN_WHENS = "queueAWhen";
     private static final double EXPERT_QUASH_MARGIN = 1.0;
+    private static final double MARGIN_PER_STRATEGY_TOKEN = 1.0 / 3;
+    private static final double MIN_QUASH_MARGIN = -1.0;
 
     public static Optional<AiDecision> queue(AiTurnContext context) {
         Game game = context.game();
@@ -67,7 +69,8 @@ public class QuashRules {
     }
 
     private static double quashMargin(Player seat) {
-        return AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE) ? EXPERT_QUASH_MARGIN : 0;
+        if (!AiExperiments.enabled(seat, Experiment.AGENDA_VALUE_TABLE)) return 0;
+        return Math.max(MIN_QUASH_MARGIN, EXPERT_QUASH_MARGIN - MARGIN_PER_STRATEGY_TOKEN * seat.getStrategicCC());
     }
 
     private static Optional<AiDecision> pressHidden(AiTurnContext context, String handlerId, String reason) {

@@ -13,6 +13,7 @@ import java.util.function.ToIntFunction;
 import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.secrets.SecretPhase;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -59,6 +60,9 @@ public final class ObjectiveValue {
     private final Map<String, Set<String>> systemSets = new HashMap<>();
     private final Map<StakeKey, Double> stakes = new HashMap<>();
     private Boolean winAware;
+    private Boolean publicDesperate;
+    private Boolean statusSecretDesperate;
+    private Boolean actionSecretDesperate;
     private List<ReadyPublic> readyPublics;
 
     public ObjectiveValue(Game game, Player seat) {
@@ -132,7 +136,7 @@ public final class ObjectiveValue {
 
     private double gainOf(Target target, Footprint after) {
         int then = progress(target.id(), after);
-        return then == NOT_MODELLED ? 0 : targetGain(target, then);
+        return then == NOT_MODELLED ? 0 : targetGain(target, then, desperation(target));
     }
 
     public double gainOf(String id, Footprint after) {
@@ -148,7 +152,7 @@ public final class ObjectiveValue {
         }
         double total = 0;
         for (Target target : targets) {
-            if (target.id().equals(id)) total += targetGain(target, progress);
+            if (target.id().equals(id)) total += targetGain(target, progress, desperation(target));
         }
         return total;
     }
@@ -160,8 +164,41 @@ public final class ObjectiveValue {
         return winAware;
     }
 
+    private double desperation(Target target) {
+        if (!seat.equals(decider)) return 1.0;
+        if (!target.secret()) return publicDesperate() ? Desperation.FACTOR : 1.0;
+        return switch (SecretPhase.of(target.id())) {
+            case STATUS -> statusSecretDesperate() ? Desperation.FACTOR : 1.0;
+            case ACTION -> actionSecretDesperate() ? Desperation.FACTOR : 1.0;
+            default -> 1.0;
+        };
+    }
+
+    private boolean publicDesperate() {
+        if (publicDesperate == null)
+            publicDesperate = Desperation.forPublic(seat, !readyPublics().isEmpty());
+        return publicDesperate;
+    }
+
+    private boolean statusSecretDesperate() {
+        if (statusSecretDesperate == null) {
+            boolean ready = targets.stream()
+                    .anyMatch(target -> target.secret()
+                            && target.before() >= target.threshold()
+                            && SecretPhase.of(target.id()) == SecretPhase.STATUS);
+            statusSecretDesperate = Desperation.forStatusSecretSetup(game, seat, ready);
+        }
+        return statusSecretDesperate;
+    }
+
+    private boolean actionSecretDesperate() {
+        if (actionSecretDesperate == null) actionSecretDesperate = Desperation.forActionSecrets(game, seat);
+        return actionSecretDesperate;
+    }
+
     private double winAwareGain(List<Target> chosen, ToIntFunction<Target> progressAfter, int pointsReturned) {
         double total = 0;
+        double desperation = 1.0;
         int newSecretPoints = 0;
         int brokenSecretPoints = 0;
         List<Target> completed = new ArrayList<>();
@@ -180,8 +217,10 @@ public final class ObjectiveValue {
                 total += partialGain(target, now, then);
             } else if (target.secret()) {
                 newSecretPoints += target.points();
+                desperation = Math.max(desperation, desperation(target));
             } else {
                 completed.add(target);
+                desperation = Math.max(desperation, desperation(target));
             }
         }
         if (completed.isEmpty() && broken.isEmpty() && newSecretPoints == 0 && brokenSecretPoints == 0) {
@@ -202,7 +241,7 @@ public final class ObjectiveValue {
         int base = before.scoredPoints() + readySecretPoints() - pointsReturned;
         int leftoverPoints = after.leftoverPoints() - before.leftoverPoints() + secrets.leftoverDelta();
         double leftover = VICTORY_POINT_VALUE * PARTIAL_SHARE * leftoverPoints;
-        return total + leftover + pointPrice(base, scoredDelta, flatPoints);
+        return total + leftover + pointPrice(base, scoredDelta, flatPoints, desperation);
     }
 
     private static SecretScoring secretScoring(int readyBefore, int newSecretPoints, int brokenSecretPoints) {
@@ -213,14 +252,14 @@ public final class ObjectiveValue {
         return new SecretScoring(scoredAfter - scoredBefore, leftoverDelta);
     }
 
-    private double pointPrice(int base, int scoredDelta, int flatPoints) {
+    private double pointPrice(int base, int scoredDelta, int flatPoints, double desperation) {
         if (scoredDelta == 0 && flatPoints == 0) return 0;
         double stake = stakes.computeIfAbsent(
                 new StakeKey(base, scoredDelta),
                 key -> ScoringStakes.scoreValue(game, seat, key.base() + key.delta())
                         - ScoringStakes.scoreValue(game, seat, Math.max(0, key.base())));
         double flat = VICTORY_POINT_VALUE * flatPoints;
-        if (flatPoints > 0) return Math.max(flat, stake);
+        if (flatPoints > 0) return Math.max(desperation * flat, stake);
         if (flatPoints < 0) return Math.min(flat, stake);
         return stake;
     }
@@ -294,12 +333,12 @@ public final class ObjectiveValue {
                         && target.before() < target.threshold());
     }
 
-    private static double targetGain(Target target, int then) {
+    private static double targetGain(Target target, int then, double desperation) {
         int now = target.before();
         if (then == now) return 0;
         double points = VICTORY_POINT_VALUE * target.points();
         if (now >= target.threshold()) return then < target.threshold() ? -points : 0;
-        return then >= target.threshold() ? points : partialGain(target, now, then);
+        return then >= target.threshold() ? desperation * points : partialGain(target, now, then);
     }
 
     public int completedPoints(Footprint after) {
@@ -347,7 +386,7 @@ public final class ObjectiveValue {
             int now = target.before();
             if (!objectives.contains(target.id()) || now >= target.threshold()) continue;
             total += now + 1 >= target.threshold()
-                    ? VICTORY_POINT_VALUE * target.points()
+                    ? desperation(target) * VICTORY_POINT_VALUE * target.points()
                     : partialGain(target, now, now + 1);
         }
         return total;

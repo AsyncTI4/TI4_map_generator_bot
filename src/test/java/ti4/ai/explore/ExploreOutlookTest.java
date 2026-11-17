@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.within;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
-import ti4.ai.eval.BoardView;
 import ti4.ai.eval.ValueScale;
+import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
 import ti4.model.MapPositionMapper;
@@ -70,7 +70,7 @@ class ExploreOutlookTest extends BaseTi4Test {
         return outlook().expansionNeed(site.getUnitHolderFromPlanet("tequran"));
     }
 
-    // Half the value of the best planet left to claim (Lodor, 3.2) is the price of an infantry that is needed to take
+    // The delay cost of the best planet left to claim (Lodor) is the price of an infantry that is needed to take
     // it, but only if a ship of the seat can reach it: without ships nothing can.
     @Test
     void anInfantryIsNeededOnlyForAPlanetAShipCanReach() {
@@ -78,7 +78,10 @@ class ExploreOutlookTest extends BaseTi4Test {
         assertThat(need()).isZero();
 
         carrierAtSite();
-        assertThat(need()).isCloseTo(0.5 * ValueScale.spendable(3, 1), within(EXACT));
+        assertThat(need())
+                .isCloseTo(
+                        ExpansionOutlook.delayedClaimCost(test.game, test.game.getUnitHolderFromPlanet("lodor")),
+                        within(EXACT));
     }
 
     // A transport that can pick up other ground forces (here at home) leaves the infantry free.
@@ -149,10 +152,10 @@ class ExploreOutlookTest extends BaseTi4Test {
         carrierAtSite();
         Tile twoPlanets = test.place("29", besideSite());
         double value = twoPlanets.getPlanetUnitHolders().stream()
-                .mapToDouble(BoardView::planetValue)
+                .mapToDouble(planet -> ExpansionOutlook.delayedClaimCost(test.game, planet))
                 .sum();
 
-        assertThat(need()).isCloseTo(ExploreValues.EXPANSION_SHARE * value, within(EXACT));
+        assertThat(need()).isCloseTo(value, within(EXACT));
     }
 
     // With a second infantry the larger planet is still taken, and only the smaller one is left unmet.
@@ -162,11 +165,11 @@ class ExploreOutlookTest extends BaseTi4Test {
         test.units(site, "tequran", test.nekro, UnitType.Infantry, 1);
         Tile twoPlanets = test.place("29", besideSite());
         double smaller = twoPlanets.getPlanetUnitHolders().stream()
-                .mapToDouble(BoardView::planetValue)
+                .mapToDouble(planet -> ExpansionOutlook.delayedClaimCost(test.game, planet))
                 .min()
                 .orElseThrow();
 
-        assertThat(need()).isCloseTo(ExploreValues.EXPANSION_SHARE * smaller, within(EXACT));
+        assertThat(need()).isCloseTo(smaller, within(EXACT));
     }
 
     // Each activation takes a command token, so a seat without tactic tokens claims nothing next round either.
@@ -236,5 +239,20 @@ class ExploreOutlookTest extends BaseTi4Test {
 
         test.nekro.setTg(2);
         assertThat(outlook().canFundFreelancers()).isTrue();
+    }
+
+    // Delaying a claim costs the planet's better of resources and influence (Lodor, 3/1: 3), and half as much again in
+    // rounds 1 and 2, when every planet claimed early pays out for the rest of the game.
+    @Test
+    void aDelayedClaimCostsTheBetterValueAndMoreInTheFirstTwoRounds() {
+        test.place("26", besideSite());
+        Planet lodor = test.game.getUnitHolderFromPlanet("lodor");
+
+        test.game.setRound(2);
+        assertThat(ExpansionOutlook.delayedClaimCost(test.game, lodor))
+                .isCloseTo(1.5 * 3 * ValueScale.RESOURCE, within(EXACT));
+        test.game.setRound(3);
+        assertThat(ExpansionOutlook.delayedClaimCost(test.game, lodor))
+                .isCloseTo(3 * ValueScale.RESOURCE, within(EXACT));
     }
 }

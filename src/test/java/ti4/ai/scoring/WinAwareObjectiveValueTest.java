@@ -28,6 +28,7 @@ class WinAwareObjectiveValueTest extends BaseTi4Test {
         test = new AiTestGame();
         test.game.setPhaseOfGame("action");
         test.game.setVp(10);
+        AiExperiments.disable(test.nekro, EnumSet.of(AiExperiments.Experiment.DESPERATION));
         home = test.nekroHome();
         neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
     }
@@ -39,7 +40,9 @@ class WinAwareObjectiveValueTest extends BaseTi4Test {
     }
 
     private void disableExperiment() {
-        AiExperiments.disable(test.nekro, EnumSet.of(AiExperiments.Experiment.WIN_AWARE_POINTS));
+        AiExperiments.disable(
+                test.nekro,
+                EnumSet.of(AiExperiments.Experiment.WIN_AWARE_POINTS, AiExperiments.Experiment.DESPERATION));
     }
 
     // Four destroyers at home and a cruiser beside it: bringing the cruiser home completes Raise a Fleet.

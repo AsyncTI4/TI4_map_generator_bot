@@ -21,6 +21,7 @@ import ti4.ai.brain.StrategyCard;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.secrets.SecretDrawValue;
+import ti4.ai.strategy.CardFacade;
 import ti4.ai.strategy.StrategyCardRules;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageManager;
@@ -85,7 +86,9 @@ class StrategizeCardTest extends BaseTi4Test {
 
         assertThat(plan.target()).isEqualTo("IMPERIAL");
         assertThat(plan.value())
-                .isCloseTo(SecretDrawValue.of(table.game, table.nekro) - 1.0 + table.stall(), within(EXACT));
+                .isCloseTo(
+                        SecretDrawValue.of(table.game, table.nekro) - CardFacade.strategyToken() + table.stall(),
+                        within(EXACT));
     }
 
     // Another player will play their Imperial this round, and following it draws the same secret for the same token,

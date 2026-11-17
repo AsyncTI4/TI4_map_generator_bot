@@ -1335,9 +1335,7 @@ public class StrategyCardRules {
     private static Optional<Double> diplomacyFollowValue(Game game, Player seat) {
         double readying = DiplomacyUse.bestToFollow(game, seat)
                 .filter(choice -> DiplomacyUse.readyingWorthFollowing(game, seat))
-                .map(choice -> choice.unlocksScore()
-                        ? CardValueScale.SPEND_UNLOCK_SHARE * CardValueScale.VICTORY_POINT
-                        : CardValueScale.READY_SHARE * choice.use())
+                .map(choice -> DiplomacyUse.readyingValue(game, seat, choice))
                 .orElse(0.0);
         double claim = DiplomacyUse.claimsWorthFollowing(game, seat)
                 ? CardValueScale.PEACE_ACCORDS_SHARE * PeaceAccords.bestValue(game, seat)

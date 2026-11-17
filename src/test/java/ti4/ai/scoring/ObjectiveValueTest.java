@@ -3,11 +3,13 @@ package ti4.ai.scoring;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
 import ti4.ai.AiTestGame;
 import ti4.ai.eval.BoardView;
 import ti4.ai.tactical.ProductionPlanner;
@@ -31,6 +33,8 @@ class ObjectiveValueTest extends BaseTi4Test {
     void setUp() {
         test = new AiTestGame();
         test.game.setPhaseOfGame("action");
+        // These cases measure a point's base value; DESPERATION is checked on its own below.
+        AiExperiments.disable(test.nekro, EnumSet.of(AiExperiments.Experiment.DESPERATION));
         home = test.nekroHome();
         neighbour = AiTestGame.neighbourOf(AiTestGame.HOME);
     }
@@ -110,6 +114,23 @@ class ObjectiveValueTest extends BaseTi4Test {
                 .after(AiTestGame.HOME, List.of(new Footprint.Move(neighbour, UnitType.Cruiser, 1)), List.of());
 
         assertThat(publicOnly.gain(joined)).isEqualTo(ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
+    // With no public objective ready to score, the seat is desperate for one: completing Raise a Fleet is worth half
+    // a point more.
+    @Test
+    void aSeatWithNoReadyPublicIsDesperateToCompleteOne() {
+        AiExperiments.disable(test.nekro, EnumSet.noneOf(AiExperiments.Experiment.class));
+        reveal("raise_fleet");
+        test.units(home, "space", test.nekro, UnitType.Destroyer, 4);
+        Tile staging = test.place(EMPTY_SYSTEM, neighbour);
+        test.units(staging, "space", test.nekro, UnitType.Cruiser, 1);
+        ObjectiveValue value = new ObjectiveValue(test.game, test.nekro);
+
+        Footprint joined = value.before()
+                .after(AiTestGame.HOME, List.of(new Footprint.Move(neighbour, UnitType.Cruiser, 1)), List.of());
+
+        assertThat(value.gain(joined)).isEqualTo(Desperation.FACTOR * ObjectiveValue.VICTORY_POINT_VALUE);
     }
 
     // Reaching the threshold is worth a full victory point.

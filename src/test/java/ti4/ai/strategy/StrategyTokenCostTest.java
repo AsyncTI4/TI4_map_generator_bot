@@ -26,11 +26,11 @@ class StrategyTokenCostTest extends BaseTi4Test {
         return StrategyTokenCost.toSpend(test.game, test.nekro).orElseThrow();
     }
 
-    // A token is worth a resource on the card scale; the last one costs more because the seat then cannot follow
-    // a strategy card, and a surplus one costs less.
+    // A token is worth a held command token; a surplus one costs less. The last one costs no more than any other:
+    // the seat plans its follows over the round instead.
     @Test
-    void aTokenCostsMoreTheScarcerTheStrategyPoolIs() {
-        assertThat(cost(1)).isCloseTo(1.5 * CardFacade.strategyToken(), within(EXACT));
+    void aSurplusTokenCostsLessAndTheLastCostsTheSame() {
+        assertThat(cost(1)).isCloseTo(CardFacade.strategyToken(), within(EXACT));
         assertThat(cost(2)).isCloseTo(CardFacade.strategyToken(), within(EXACT));
         assertThat(cost(3)).isCloseTo(0.75 * CardFacade.strategyToken(), within(EXACT));
         assertThat(cost(5)).isCloseTo(0.75 * CardFacade.strategyToken(), within(EXACT));

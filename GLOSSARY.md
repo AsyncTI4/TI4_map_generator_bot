@@ -480,13 +480,21 @@ _Avoid_: Pact, treaty
 How close a Player is to winning as an AI seat reads it from public information: the chance the points the Player can still score this round (objectives it can complete, Imperial, taking Mecatol Rex from its holder) reach the goal. Denying points to a Player matters more as their win threat rises.
 _Avoid_: Kingmaker risk
 
+**Desperation**:
+Taking a long shot at a point a Player cannot afford to miss: a public objective in the coming status phase when none is ready, a status-phase secret objective from round 3, and every action-phase secret objective once the game is late or a rival can win this round. A desperate AI seat counts such a point at one and a half times its usual value, so a quarter chance at it can be worth a command token.
+_Avoid_: Hail Mary
+
 **Pop**:
-To play a Strategy card's primary ability, as in "popping Trade".
+To use a Strategy card: take the strategic action that resolves its primary ability, as in "popping Trade" or "Diplomacy was popped". Other Players then decide whether to follow it.
 _Avoid_: Cast, fire
+
+**Flip**:
+To ready or exhaust a planet, as in "Diplomacy flips two planets" or "flip Mecatol to pay for the tech". Also used for washing Commodities, as in "I'll flip your commodities".
+_Avoid_: Refresh, tap
 
 **Wash**:
 To convert another Player's refreshed Commodities into Trade goods, usually as a favor requested of the Trade card's holder.
-_Avoid_: Launder, flip
+_Avoid_: Launder
 
 **X-1 / X-2**:
 The outcome of the standard Trade deal: the Trade holder washes a Player's Commodities and keeps one Trade good as payment, leaving that Player one short of their maximum. X-2 is the same deal with a charge of two.
