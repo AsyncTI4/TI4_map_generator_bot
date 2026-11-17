@@ -268,6 +268,7 @@ public class VoteDeals {
         double sellerCost = withoutDeal.expectedUtility(seller, outlook.plannedVote(seller))
                 - withDeal.expectedUtility(seller, outcome)
                 + (planned > 0 ? 0 : GalacticThreatCost.ofBallot(game, seller, outcome, votes))
+                + (planned > 0 ? 0 : VoteAnger.ofBallot(game, seller, withoutDeal, outcome, votes))
                 + spentVotes(game, outlook.viewer, Math.max(0, votes - planned));
         return new Terms(outcome, votes, buyerGain, sellerCost, withDeal.chance(outcome));
     }

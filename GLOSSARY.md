@@ -519,6 +519,10 @@ _Avoid_: Cancel card
 Players cooperating on a vote or deal so that all of them come out ahead ("a rising tide floats all boats"). The classic case is Articles of War: every Player but one puts 1 vote on For, the last Player votes Against with enough votes to tie, the Speaker breaks the tie for Against, and each Player who voted For receives 3 Trade goods and gives the Against Player 1 of them.
 _Avoid_: Collusion, kingmaking
 
+**Relations**:
+How friendly an AI seat is toward another Player, at most max (2) and with no floor (forever war). Good relations (1 or more) unlock friendly trade: free commodity flips and X-1 on Trade. The AI's personality (STOOGE, FLOATER, NEUTRAL, WARRIOR, WARLORD) sets the starting level; floating the seat raises it, while charging a seat that floats you, and every TG of value a Player has cost the seat (attacks, planets taken, ships parked in its slice or over its docks, mean action cards, fees above boat-float terms), lowers it.
+_Avoid_: Friendship, diplomacy score
+
 **Gum**:
 To park a fighter or other small ship in a System to block opponents from moving through it.
 _Avoid_: Clog, blocker

@@ -1128,18 +1128,43 @@ to build one by hand:
     it left behind.
   - `-Dai.trading=false` switches trading off: it rejects every offer, follows Trade only for free from another AI,
     and as Trade holder lets everyone follow for free.
-  - **BOAT_FLOAT personality** (`AiPersonality`, off by default; stored value `aiPersonality=BOAT_FLOAT` on a seat, or
-    `-Dai.personality.boatfloat=all` / a comma list of factions for self-play). A more trade-friendly seat. With a player
-    in good relations (trust 0.8 or more, so every AI seat and a human with no unpaid bills or broken promises, and no
-    grudge from attacks) it flips that player's commodities for free when only one side has commodities: it accepts
-    their commodities for at most as many of its trade goods, and on its own turn, holding no commodities, offers that
-    flip once a round. As Trade holder it charges such a follower X-1 whatever their commodity value, and does not
-    exclude them for leading or for a point the payout would unlock. Both stop when the trade goods could let the
-    player win (`FriendlyTrade.couldWinWith`); a follower close to winning is still excluded. Reciprocity: a player
-    who doesn't float back is dropped for the rest of the game (stored value `aiBoatFloatSnubs` on the seat). That is
-    an AI Trade holder whose terms for this seat are worse than X-1 (or exclude it for anything but a win), a Trade
-    bill above X-1 after following, or any offer of fewer trade goods than the commodities it asks of this seat.
-    A declined free flip doesn't count. So BOAT_FLOAT seats float each other and stop floating seats that charge them.
+  - **Relations and personality** (`Relations`, `AiPersonality`). Each AI seat holds a relations level with every
+    other player, at most 2 (max) and with no floor, so relations can sink without end (forever war); 1 or more is
+    good relations, -1 or less bad. Its personality sets where every player starts:
+    STOOGE 2, FLOATER 1, NEUTRAL 0 (the default), WARRIOR -1, WARLORD -2. Set it with the stored value
+    `aiPersonality=FLOATER` on a seat, or for self-play `-Dai.personality=FLOATER` (every seat) or
+    `-Dai.personality=sol=FLOATER,hacan=WARLORD`. Hostility (`Hostility`, game stored value `aiHostility`) is
+    the TG value a player has cost this seat this game, next to a player who never attacked or took planets and
+    only boat floated; every 2 TG lowers relations by 1, for the rest of the game. It counts every attack and planet taken, undefended ones included: ship cost lost (in TG)
+    and planet value, x3 in the victim's home system and x1.5 in its slice. Each round, ships parked in the victim's
+    slice cost 1 TG, over its home 3 TG, and over its undefended space dock 2 TG; a system costs the largest that
+    applies, not the sum. Each mean "choose a player" card resolved on the victim costs 2 TG (Spy, Seize Artifact,
+    Uprising, Signal Jamming, Reactor Meltdown, Plague, Cripple Defenses, Unstable Planet, Insubordination,
+    Assassinate Representative), read from `GameStats.actionCardTargets`, which those cards'
+    resolve steps fill. Sabotage of the victim's card costs 1 TG; combat cards don't count. Trade counts what was charged above boat-float terms: Trade terms above X-1 (or an
+    exclusion other than a win) and a fee for flipping this seat's commodities. A fresh betrayal (broken promise or speaker sale) and trust under 0.8
+    (a human with unpaid bills or broken promises) lower the level by 1 each. Shifts are stored on the seat
+    (`aiRelations`), at most one up and one down per partner per round, never lifting the level above 2:
+    - **Up 1** when the partner floats this seat: it pays full trade goods for this seat's commodities, or as AI Trade
+      holder offers it a lower fee than the standard terms (X-1 on a stack of 4 or more).
+    - **Down 1**, only while in good relations, when the partner doesn't float back. That means its Trade terms are
+      worse than X-1 or exclude this seat for anything but a win, or it bills above X-1 after this seat follows its
+      Trade, or it offers fewer trade goods than the commodities it asks for. A declined free flip doesn't count.
+    - **Bad relations (-1 or less) drop the anger cost of hurting that player** (`Relations.bad`, which ignores
+      trust). Attacks: `OffenseOutlook.anger` is 0 against such a player (experiment `RELATIONS_ANGER`). Agenda
+      votes: `VoteAnger` gives each outcome an anger of 0.15 × how far it singles out each other player (their harm,
+      the mean of their utility over the other outcomes minus their utility for this one, less the table's average
+      harm; 1 TG or more counts). A ballot pays only the anger it adds: expected anger with the ballot minus without
+      it, ignored under 0.05 TG. It applies in the ballot planner and in the price of selling votes; players in bad
+      relations, within 2 points of the goal, or 2 or more points clear of the field cost nothing (experiment
+      `VOTE_ANGER`). Neither makes the AI hurt anyone blindly; it only stops holding back.
+  - **Friendly trade** (`FriendlyTrade`), with a player in good relations. It flips that player's commodities for free
+    when only one side has commodities: it accepts their commodities for at most as many of its trade goods, and on
+    its own turn, holding no commodities, offers that flip once a round. As Trade holder it charges such a follower X-1
+    whatever their commodity value, and does not exclude them for leading or for a point the payout would unlock. Both
+    stop when the trade goods could let the player win (`FriendlyTrade.couldWinWith`); a follower close to winning is
+    still excluded. So FLOATER seats float each other, a NEUTRAL seat joins in once someone floats it, and charging a
+    FLOATER ends its float until the partner floats it again; a STOOGE forgives one charge.
   - **Debt across the table.** No AI deal may leave one player owing 3 or more debt in total (tokens held by every
     other seat plus debt promised in unpaid deals); `DebtRules.room` is the single gate.
   - **Self-play statistics.** Every accepted offer is logged (round, parties, items). The report lists per seat its

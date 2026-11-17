@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FactionAggression;
@@ -25,6 +27,7 @@ import ti4.ai.strategy.CopiedTechPolicy;
 import ti4.ai.strategy.MecatolCash;
 import ti4.ai.tactical.IncomingForces.Exclusion;
 import ti4.ai.tactical.IncomingForces.Horizon;
+import ti4.ai.trade.Relations;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -530,7 +533,7 @@ final class OffenseOutlook {
     private double anger(
             Strike strike, StrikeEstimate estimate, double heldPlanetValue, double scoringDenial, double ownObjective) {
         Player opponent = strike.opponent();
-        if (opponent.isNeutral()) return 0;
+        if (opponent.isNeutral() || alreadyHostile(opponent)) return 0;
         double sensitivity = angerSensitivity(strike.target(), opponent);
         double denialGrievance = scoringDenial * Grievance.scoringDenial(standings.leadOverField(opponent));
         double grievance = (estimate.theirExpectedLoss() + heldPlanetValue) * sensitivity + denialGrievance;
@@ -540,6 +543,10 @@ final class OffenseOutlook {
         double ledgerGrievance =
                 (ValueScale.RESOURCE * estimate.theirExpectedLoss() + heldPlanetValue) * sensitivity + denialGrievance;
         return Math.max(nearTerm, relief * lastingAnger(strike, estimate, ledgerGrievance));
+    }
+
+    private boolean alreadyHostile(Player opponent) {
+        return AiExperiments.enabled(seat, Experiment.RELATIONS_ANGER) && Relations.bad(game, seat, opponent);
     }
 
     private boolean remembersAttacks() {

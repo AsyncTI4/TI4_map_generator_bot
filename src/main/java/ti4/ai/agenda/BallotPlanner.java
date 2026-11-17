@@ -62,7 +62,8 @@ class BallotPlanner {
         List<Integer> totals = reachableTotals(planetVotes, cap);
         boolean predictive = AgendaVoting.plansPredictive(seat);
         ToDoubleFunction<Option> worth = option -> expectedValue(game, seat, agenda, forecast, option)
-                - GalacticThreatCost.ofBallot(game, seat, option.outcome(), option.votes());
+                - GalacticThreatCost.ofBallot(game, seat, option.outcome(), option.votes())
+                - VoteAnger.ofBallot(game, seat, forecast, option.outcome(), option.votes());
         double abstain = expectedValue(game, seat, agenda, forecast, new Option(ABSTAIN, 0, 0));
         if (finalAgenda && !AgendaValues.dependsOnOwnVote(agenda)) {
             return allIn(forecast, seat, outcomes, cap, predictive, worth, abstain);

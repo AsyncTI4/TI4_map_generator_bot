@@ -1,12 +1,12 @@
 package ti4.ai.trade;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import lombok.experimental.UtilityClass;
-import ti4.ai.AiGameWrites;
-import ti4.ai.AiPersonality;
+import ti4.ai.AiSeats;
+import ti4.ai.Hostility;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.scoring.SpendUnlock;
@@ -17,41 +17,61 @@ import ti4.game.Player;
 class FriendlyTrade {
 
     private static final String FLIP_OFFERED_KEY = "friendlyFlipOffered|";
-    static final String SNUBS_KEY = "aiBoatFloatSnubs";
-    private static final String SNUB_SEPARATOR = ",";
-    private static final String SNUB_REASON = "AI BOAT_FLOAT stops floating a player who charged it";
     private static final int FRIENDLY_FEE = 1;
+    private static final String HOSTILE_TERMS_KEY = "hostileTerms|";
+    private static final String HOSTILE_OFFER_KEY = "hostileOffer|";
 
     static boolean applies(Game game, Player seat, Player partner, double trust) {
-        return AiPersonality.isBoatFloat(seat)
-                && goodRelations(game, seat, partner, trust)
-                && !snubbedBy(seat, partner);
+        return Relations.good(game, seat, partner, trust);
     }
 
-    static boolean snubbedBy(Player seat, Player partner) {
-        return snubs(seat).contains(partner.getFaction());
-    }
-
-    static void observeTradeTerms(Player seat, Player holder, Optional<Integer> fee, Optional<String> exclusion) {
-        if (!AiPersonality.isBoatFloat(seat)) return;
-        boolean fairExclusion = exclusion.filter(FriendlyTrade::fairExclusion).isPresent();
+    static void observeTradeTerms(
+            AiTurnContext context, Player holder, Optional<Integer> fee, Optional<String> exclusion, int standardFee) {
+        Player seat = context.seat();
+        chargeForTerms(context, holder, fee, exclusion);
+        if (fee.isPresent() && fee.get() < standardFee) {
+            Relations.improve(context, holder);
+            return;
+        }
+        if (!applies(context.game(), seat, holder, Trust.of(context, holder))) return;
+        boolean fairExclusion = exclusion.filter(TradeTerms::isWinExclusion).isPresent();
         if (fee.isEmpty() && fairExclusion) return;
-        if (fee.isEmpty() || fee.get() > friendlyFee(seat.getCommoditiesTotal())) snub(seat, holder);
+        if (fee.isEmpty() || fee.get() > friendlyFee(seat.getCommoditiesTotal())) Relations.worsen(context, holder);
     }
 
     static void observeOffer(AiTurnContext context, Player offerer, Deal deal) {
         Player seat = context.seat();
-        if (!AiPersonality.isBoatFloat(seat)) return;
-        int charged = chargedForOurCommodities(seat, offerer, deal);
-        if (charged < 1) return;
+        OptionalInt charged = chargedForOurCommodities(seat, offerer, deal);
+        if (charged.isEmpty()) return;
+        if (charged.getAsInt() <= 0) {
+            Relations.improve(context, offerer);
+            return;
+        }
         int ourCommodities = deal.total(seat.getFaction(), ItemType.COMMODITIES);
         boolean tradeSettlement = TradeCardRules.followsTradeOf(context.game(), seat, offerer);
         int allowed = tradeSettlement ? friendlyFee(Math.max(ourCommodities, seat.getCommoditiesTotal())) : 0;
-        if (charged > allowed) snub(seat, offerer);
+        int excess = charged.getAsInt() - allowed;
+        if (excess <= 0) return;
+        boolean termsCounted = tradeSettlement && AiSeats.isAiSeat(offerer);
+        if (!termsCounted) chargeOnce(context, offerer, HOSTILE_OFFER_KEY + deal.fingerprint(), excess);
+        if (applies(context.game(), seat, offerer, Trust.of(context, offerer))) Relations.worsen(context, offerer);
     }
 
-    static boolean goodRelations(Game game, Player seat, Player partner, double trust) {
-        return trust >= Trust.LOWER_FEE && Stinginess.grudgeTenths(game, seat, partner) == 0;
+    private static void chargeForTerms(
+            AiTurnContext context, Player holder, Optional<Integer> fee, Optional<String> exclusion) {
+        int friendly = friendlyFee(context.seat().getCommoditiesTotal());
+        boolean fairExclusion = exclusion.filter(TradeTerms::isWinExclusion).isPresent();
+        double lost = fee.map(charged -> (double) Math.max(0, charged - friendly))
+                .orElse(fairExclusion ? 0.0 : context.seat().getCommoditiesTotal() - friendly);
+        chargeOnce(context, holder, HOSTILE_TERMS_KEY + context.game().getRound(), lost);
+    }
+
+    private static void chargeOnce(AiTurnContext context, Player offender, String event, double tradeGoods) {
+        if (tradeGoods <= 0) return;
+        String key = event + "|" + offender.getFaction();
+        if (context.memory().has(key)) return;
+        context.memory().put(key, "1");
+        Hostility.charge(context.game(), offender, context.seat(), tradeGoods);
     }
 
     static boolean couldWinWith(Game game, Player player, int tradeGoods) {
@@ -73,7 +93,7 @@ class FriendlyTrade {
     static Optional<AiDecision> offerFlip(AiTurnContext context, List<Player> partners) {
         Game game = context.game();
         Player seat = context.seat();
-        if (!AiPersonality.isBoatFloat(seat) || TradeBudget.freeCommodities(context) > 0) return Optional.empty();
+        if (TradeBudget.freeCommodities(context) > 0) return Optional.empty();
         String ours = seat.getFaction();
         return partners.stream()
                 .filter(partner -> partner.getCommodities() >= 1)
@@ -103,51 +123,32 @@ class FriendlyTrade {
         return applies(game, holder, follower, trust);
     }
 
-    private static boolean fairExclusion(String reason) {
-        return TradeTerms.isWinExclusion(reason);
-    }
-
     private static int friendlyFee(int stack) {
         return Math.max(0, Math.min(FRIENDLY_FEE, stack - 1));
     }
 
-    private static int chargedForOurCommodities(Player seat, Player partner, Deal deal) {
+    private static OptionalInt chargedForOurCommodities(Player seat, Player partner, Deal deal) {
         String ours = seat.getFaction();
         String theirs = partner.getFaction();
         boolean onlyTradeGoodsIn = deal.items().stream()
                 .filter(item -> item.isFrom(theirs))
                 .allMatch(item -> item.type() == ItemType.TRADE_GOODS);
-        if (!onlyTradeGoodsIn) return 0;
+        if (!onlyTradeGoodsIn) return OptionalInt.empty();
         boolean onlyCommoditiesOut = deal.items().stream()
                 .filter(item -> item.isFrom(ours))
                 .allMatch(item -> item.type() == ItemType.COMMODITIES);
         int tradeGoodsIn = deal.total(theirs, ItemType.TRADE_GOODS);
-        if (onlyCommoditiesOut) return deal.total(ours, ItemType.COMMODITIES) - tradeGoodsIn;
+        int commoditiesOut = deal.total(ours, ItemType.COMMODITIES);
+        if (onlyCommoditiesOut && commoditiesOut >= 1) return OptionalInt.of(commoditiesOut - tradeGoodsIn);
         boolean onlyFeeOut = tradeGoodsIn == 0
                 && deal.items().stream()
                         .filter(item -> item.isFrom(ours))
                         .allMatch(item -> item.type() == ItemType.TRADE_GOODS || item.type() == ItemType.SEND_DEBT);
-        if (!onlyFeeOut || !TradeCardRules.followsTradeOf(seat.getGame(), seat, partner)) return 0;
-        return deal.total(ours, ItemType.TRADE_GOODS) + deal.total(ours, ItemType.SEND_DEBT);
-    }
-
-    private static List<String> snubs(Player seat) {
-        return Arrays.stream(seat.getStoredValue(SNUBS_KEY).split(SNUB_SEPARATOR))
-                .map(String::trim)
-                .filter(faction -> !faction.isEmpty())
-                .toList();
-    }
-
-    private static void snub(Player seat, Player partner) {
-        if (snubbedBy(seat, partner)) return;
-        String ours = seat.getFaction();
-        String theirs = partner.getFaction();
-        AiGameWrites.persist(seat.getGame(), SNUB_REASON, latest -> {
-            Player recorder = latest.getPlayerFromColorOrFaction(ours);
-            if (recorder == null || snubs(recorder).contains(theirs)) return;
-            String stored = recorder.getStoredValue(SNUBS_KEY);
-            recorder.setStoredValue(SNUBS_KEY, stored.isBlank() ? theirs : stored + SNUB_SEPARATOR + theirs);
-        });
+        int feeOut = deal.total(ours, ItemType.TRADE_GOODS) + deal.total(ours, ItemType.SEND_DEBT);
+        if (!onlyFeeOut || feeOut < 1 || !TradeCardRules.followsTradeOf(seat.getGame(), seat, partner)) {
+            return OptionalInt.empty();
+        }
+        return OptionalInt.of(feeOut);
     }
 
     private record Flip(Player partner, Deal deal, int amount) {}
