@@ -73,13 +73,16 @@ class FractureSelfPlayTest extends BaseTi4Test {
     private record Played(Attack scenario, SelfPlayGame.Outcome outcome) {}
 
     // The neutral dice are real, and a fleet that lands a handful of infantry can lose the battle on them (about one
-    // game in ten for the Cocytus fleet). A scenario whose fleet died in the Fracture says nothing about the planning,
-    // so it is played again on a fresh game; only a fleet that survives, or never attacks, is judged.
+    // game in ten for the Cocytus fleet). A scenario whose fleet died in the Fracture, or whose ships survived but
+    // whose
+    // ground forces all died on the planet, says nothing about the planning, so it is played again on a fresh game;
+    // only an attack that still has troops to take the planet with, or never happens, is judged. Before ground forces
+    // counted, a lost landing with the ships still in the Fracture ran on to the tick limit (seed 1725792552).
     private static final long CLOCK_START = 1_790_000_000_000L;
 
     private static Played play(Supplier<Attack> scenarios) throws Exception {
         Played played = playOnce(scenarios.get(), 0);
-        for (int attempt = 1; attempt < ATTEMPTS && played.scenario().fleetLost; attempt++) {
+        for (int attempt = 1; attempt < ATTEMPTS && played.scenario().attackLost; attempt++) {
             played = playOnce(scenarios.get(), attempt);
         }
         return played;
@@ -120,7 +123,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
         private int pointsBefore;
         private int relicsBefore;
         boolean taken;
-        boolean fleetLost;
+        boolean attackLost;
         private int waitingForRelic;
         String lastSeen = "not started";
         int pointsGained;
@@ -153,12 +156,16 @@ class FractureSelfPlayTest extends BaseTi4Test {
             }
             Player seat = game.getPlayerFromColorOrFaction(attacker);
             Player holder = game.getPlayerThatControlsPlanet(planet);
-            lastSeen = "attacker " + attacker + ", holder " + (holder == null ? "nobody" : holder.getFaction())
+            lastSeen = "attacker " + attacker + ", ground forces in the Fracture "
+                    + hasGroundForcesInTheFracture(game, seat)
+                    + ", holder " + (holder == null ? "nobody" : holder.getFaction())
                     + ", neutral units left " + neutralUnitsRemain(game) + ", relics "
                     + (seat.getRelics().size() - relicsBefore) + ", round " + game.getRound();
             if (holder != seat || neutralUnitsRemain(game)) {
-                fleetLost = arrangedRound > 0 && !hasUnitsInTheFracture(game, seat) && isNoUnitInTransit(game);
-                return fleetLost;
+                attackLost = arrangedRound > 0
+                        && isNoUnitInTransit(game)
+                        && (!hasUnitsInTheFracture(game, seat) || !hasGroundForcesInTheFracture(game, seat));
+                return attackLost;
             }
             taken = true;
             round = game.getRound();
@@ -170,6 +177,14 @@ class FractureSelfPlayTest extends BaseTi4Test {
         // Shard of the Throne gives its holder a point on top of the one the planet scores.
         private int relicPoints(Player seat) {
             return seat.getRelics().contains(SHARD_OF_THE_THRONE) ? 1 : 0;
+        }
+
+        private boolean hasGroundForcesInTheFracture(Game game, Player seat) {
+            return FRACTURE_POSITIONS.stream()
+                    .map(game::getTileByPosition)
+                    .flatMap(tile -> tile.getUnitHolders().values().stream())
+                    .flatMap(holder -> holder.getUnitKeysForPlayer(seat).stream())
+                    .anyMatch(key -> key.unitType() == UnitType.Infantry || key.unitType() == UnitType.Mech);
         }
 
         private boolean hasUnitsInTheFracture(Game game, Player seat) {
