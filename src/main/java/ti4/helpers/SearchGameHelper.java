@@ -187,8 +187,11 @@ public class SearchGameHelper {
             boolean pingGame,
             String msg) {
 
+        Predicate<ManagedGame> notEliminated =
+                ignoreSpectate ? game -> game.isRealPlayer(game.getSeatUserId(user.getId())) : game -> true;
         var filteredManagedGames = filterAndSort(
-                gameFilter(user.getId(), onlyMyTurn, includeEndedGames, ignoreSpectate, ignoreAborted, false));
+                gameFilter(user.getId(), onlyMyTurn, includeEndedGames, ignoreSpectate, ignoreAborted, false)
+                        .and(notEliminated));
 
         for (var managedGame : filteredManagedGames) {
             if (managedGame.getTableTalkChannel() != null) {
@@ -245,8 +248,7 @@ public class SearchGameHelper {
 
     private static Predicate<ManagedGame> participationFilter(String userId, boolean ignoreSpectate) {
         return ignoreSpectate
-                ? game -> game.getRealPlayers().stream()
-                        .anyMatch(player -> player.getId().equals(game.getSeatUserId(userId)))
+                ? game -> game.isRealOrEliminatedPlayer(game.getSeatUserId(userId))
                 : game -> game.getPlayers().stream()
                         .anyMatch(player -> player.getId().equals(game.getSeatUserId(userId)));
     }
@@ -262,6 +264,20 @@ public class SearchGameHelper {
     }
 
     private static String getPlayerMapListRepresentation(
+            Game game,
+            Player player,
+            String gameChannelLink,
+            boolean showAverageTurnTime,
+            boolean showSecondaries,
+            boolean showGameModes) {
+        if (player.isEliminated() && !game.isHasEnded()) {
+            return "~~" + gameLine(game, player, gameChannelLink, showAverageTurnTime, false, showGameModes) + "~~";
+        }
+        String line = gameLine(game, player, gameChannelLink, showAverageTurnTime, showSecondaries, showGameModes);
+        return player.isEliminated() ? line + " 💀" : line;
+    }
+
+    private static String gameLine(
             Game game,
             Player player,
             String gameChannelLink,

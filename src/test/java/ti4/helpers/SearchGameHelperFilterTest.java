@@ -42,6 +42,20 @@ class SearchGameHelperFilterTest {
                 .isFalse();
     }
 
+    // ignoreSpectate keeps eliminated seats so /search my_games can list them crossed out.
+    @Test
+    void ignoringSpectatorsStillFindsEliminatedSeats() {
+        ManagedGame game = game(false, false);
+        when(game.isRealOrEliminatedPlayer(USER)).thenReturn(true);
+
+        assertThat(SearchGameHelper.gameFilter(USER, false, false, true, false, false)
+                        .test(game))
+                .isTrue();
+        assertThat(SearchGameHelper.gameFilter("stranger", false, false, true, false, false)
+                        .test(game))
+                .isFalse();
+    }
+
     private static ManagedGame game(boolean fog, boolean ended) {
         ManagedPlayer player = mock(ManagedPlayer.class);
         when(player.getId()).thenReturn(USER);
