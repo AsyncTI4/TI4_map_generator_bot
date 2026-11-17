@@ -2652,7 +2652,7 @@ public class TacticalPlanner {
     }
 
     private static double secretShare(Game game, Player seat, String secret) {
-        double desperation = Desperation.actionSecretFactor(game, seat, secret);
+        double desperation = Desperation.actionSecretFactor(game, seat);
         if (WHOLE_POINT_SECRETS.contains(secret)) return desperation;
         return ActionSecretTiming.pursueNow(game, seat, secret) ? desperation : PATIENT_SHARE;
     }

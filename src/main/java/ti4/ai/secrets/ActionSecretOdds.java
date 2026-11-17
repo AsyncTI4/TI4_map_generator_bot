@@ -43,8 +43,7 @@ public class ActionSecretOdds {
             BRAVE_THE_VOID, VOID_EVIDENCED,
             UNVEIL_FLAGSHIP, FLAGSHIP_EVIDENCED);
     private static final double OTHER_SECRET = 0.05;
-    public static final double NO_TARGET = 0.03;
-    private static final double MARTYR_UNPRESSED = NO_TARGET;
+    private static final double MARTYR_UNPRESSED = 0.03;
     private static final double MARTYR_HOME_THREATENED = 0.20;
     private static final double MARTYR_RAID_HELD = 0.30;
     private static final double DUST_TARGET_IN_RANGE = 0.30;
@@ -60,18 +59,10 @@ public class ActionSecretOdds {
             case FIGHT_WITH_PRECISION -> hasOnBoard(game, seat, "dd") ? 0.13 : 0.06;
             case BETRAY_A_FRIEND -> holdsAnotherPlayersNote(game, seat) ? 0.125 : 0.05;
             case DARKEN_THE_SKIES -> hasShipsBesideAnotherHome(game, seat) ? 0.11 : 0.05;
-            case DESTROY_THEIR_GREATEST_SHIP -> enemyHeavyShipsExist(game, seat) ? 0.10 : NO_TARGET;
+            case DESTROY_THEIR_GREATEST_SHIP -> enemyHeavyShipsExist(game, seat) ? 0.10 : 0.03;
             case TURN_THEIR_FLEETS_TO_DUST -> turnTheirFleetsToDust(game, seat);
             case BECOME_A_MARTYR -> becomeAMartyr(game, seat);
             default -> OTHER_SECRET;
-        };
-    }
-
-    public static boolean noTargetThisRound(Game game, Player seat, String secretId) {
-        return switch (secretId) {
-            case DESTROY_THEIR_GREATEST_SHIP, TURN_THEIR_FLEETS_TO_DUST, BECOME_A_MARTYR ->
-                perRound(game, seat, secretId) <= NO_TARGET;
-            default -> false;
         };
     }
 
@@ -117,7 +108,7 @@ public class ActionSecretOdds {
 
     private static double turnTheirFleetsToDust(Game game, Player seat) {
         if (CannonWipeRules.hasCoveredTarget(game, seat)) return DUST_TARGET_IN_RANGE;
-        return hasOnBoard(game, seat, "pds") ? 0.085 : NO_TARGET;
+        return hasOnBoard(game, seat, "pds") ? 0.085 : 0.03;
     }
 
     private static double becomeAMartyr(Game game, Player seat) {

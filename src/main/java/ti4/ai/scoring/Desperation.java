@@ -5,7 +5,6 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.eval.GameHorizon;
-import ti4.ai.secrets.ActionSecretOdds;
 import ti4.game.Game;
 import ti4.game.Player;
 
@@ -27,28 +26,18 @@ public class Desperation {
     public static boolean forPublic(Game game, Player seat, boolean publicReady) {
         return AiExperiments.enabled(seat, Experiment.DESPERATION_PUBLIC)
                 && !publicReady
-                && scoringRound(game) >= PUBLIC_ROUND
-                && canStillAct(game, seat);
+                && scoringRound(game) >= PUBLIC_ROUND;
     }
 
     public static boolean forStatusSecretSetup(Game game, Player seat, boolean statusSecretReady) {
         return AiExperiments.enabled(seat, Experiment.DESPERATION_STATUS_SECRET)
                 && !statusSecretReady
-                && scoringRound(game) >= STATUS_SECRET_ROUND
-                && canStillAct(game, seat);
+                && scoringRound(game) >= STATUS_SECRET_ROUND;
     }
 
     public static boolean forActionSecrets(Game game, Player seat) {
         return AiExperiments.enabled(seat, Experiment.DESPERATION_ACTION_SECRET)
                 && (scoringRound(game) >= GameHorizon.lateRound(game) || aRivalCanWin(game, seat));
-    }
-
-    public static boolean forActionSecret(Game game, Player seat, String secretId) {
-        return forActionSecrets(game, seat) && !ActionSecretOdds.noTargetThisRound(game, seat, secretId);
-    }
-
-    public static double actionSecretFactor(Game game, Player seat, String secretId) {
-        return forActionSecret(game, seat, secretId) ? factor(game, seat) : 1.0;
     }
 
     public static double actionSecretFactor(Game game, Player seat) {
@@ -59,14 +48,6 @@ public class Desperation {
         String phase = game.getPhaseOfGame();
         boolean scoredThisRound = phase != null && AFTER_THIS_ROUNDS_SCORING.contains(phase.toLowerCase());
         return scoredThisRound ? game.getRound() + 1 : game.getRound();
-    }
-
-    static boolean canStillAct(Game game, Player seat) {
-        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) return true;
-        if (seat.isPassed()) return false;
-        return seat.equals(game.getActivePlayer())
-                || seat.getTacticalCC() > 0
-                || seat.getSCs().stream().anyMatch(card -> !game.getPlayedSCs().contains(card));
     }
 
     static boolean fallenBehind(Game game, Player seat) {

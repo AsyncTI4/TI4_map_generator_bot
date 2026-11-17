@@ -172,10 +172,7 @@ public final class ObjectiveValue {
         if (!target.secret()) return publicDesperate() ? desperationFactor() : 1.0;
         return switch (SecretPhase.of(target.id())) {
             case STATUS -> statusSecretDesperate() ? desperationFactor() : 1.0;
-            case ACTION ->
-                actionSecretDesperate() && Desperation.forActionSecret(game, seat, target.id())
-                        ? desperationFactor()
-                        : 1.0;
+            case ACTION -> actionSecretDesperate() ? desperationFactor() : 1.0;
             default -> 1.0;
         };
     }

@@ -13,8 +13,8 @@ import ti4.testUtils.BaseTi4Test;
 
 // A seat is desperate for a point it must not miss: a public objective from round 2, a status secret from round 3,
 // and every action secret from round 5 or once a rival can win this round. Desperation weighs a point 1.2x, or 1.5x
-// when a rival is 2+ points ahead or can win this round. It cools once the seat is in position to score that kind,
-// once it can no longer act this round, and for an action secret with no target on the board.
+// when a rival is 2+ points ahead or can win this round. Public and status secret desperation stop once the seat
+// is in position to score that kind this status phase.
 class DesperationTest extends BaseTi4Test {
 
     private AiTestGame test;
@@ -60,10 +60,10 @@ class DesperationTest extends BaseTi4Test {
     @Test
     void chasesEveryActionSecretFromRoundFive() {
         test.game.setRound(4);
-        assertThat(Desperation.actionSecretFactor(test.game, test.nekro, "fwp")).isEqualTo(1.0);
+        assertThat(Desperation.actionSecretFactor(test.game, test.nekro)).isEqualTo(1.0);
 
         test.game.setRound(5);
-        assertThat(Desperation.actionSecretFactor(test.game, test.nekro, "fwp")).isEqualTo(Desperation.FACTOR);
+        assertThat(Desperation.actionSecretFactor(test.game, test.nekro)).isEqualTo(Desperation.FACTOR);
     }
 
     @Test
@@ -88,64 +88,6 @@ class DesperationTest extends BaseTi4Test {
         test.points(test.sol, Desperation.POINTS_BEHIND);
         assertThat(Desperation.factor(test.game, test.nekro)).isEqualTo(Desperation.BEHIND_FACTOR);
         assertThat(Desperation.factor(test.game, test.sol)).isEqualTo(Desperation.FACTOR);
-    }
-
-    // A passed seat can no longer complete a public or set up a status secret this round, but it can still score an
-    // action secret on another player's turn (Turn Their Fleets to Dust from defensive space cannon).
-    @Test
-    void coolsOnceTheSeatHasPassed() {
-        test.game.setRound(5);
-        test.game.setPhaseOfGame("action");
-        test.nekro.setTacticalCC(2);
-        assertThat(Desperation.forPublic(test.game, test.nekro, false)).isTrue();
-
-        test.nekro.setPassed(true);
-
-        assertThat(Desperation.forPublic(test.game, test.nekro, false)).isFalse();
-        assertThat(Desperation.forStatusSecretSetup(test.game, test.nekro, false))
-                .isFalse();
-        assertThat(Desperation.forActionSecrets(test.game, test.nekro)).isTrue();
-    }
-
-    // Activating a system spends the last tactic token first; the moves, invasion and explores that follow are still
-    // part of that action.
-    @Test
-    void staysDesperateThroughItsOwnLastAction() {
-        test.game.setRound(5);
-        test.game.setPhaseOfGame("action");
-        test.nekro.setTacticalCC(0);
-        assertThat(Desperation.forPublic(test.game, test.nekro, false)).isFalse();
-
-        test.game.setActivePlayerID(test.nekro.getUserID());
-
-        assertThat(Desperation.forPublic(test.game, test.nekro, false)).isTrue();
-    }
-
-    // Without a tactic token the seat can still complete an objective with its unplayed strategy card's primary.
-    @Test
-    void coolsWithoutATacticTokenOrAnUnplayedStrategyCard() {
-        test.game.setRound(5);
-        test.game.setPhaseOfGame("action");
-        test.nekro.setTacticalCC(0);
-        test.nekro.addSC(6);
-        assertThat(Desperation.forPublic(test.game, test.nekro, false)).isTrue();
-
-        test.game.setSCPlayed(6, true);
-
-        assertThat(Desperation.forPublic(test.game, test.nekro, false)).isFalse();
-    }
-
-    // Destroy Their Greatest Ship needs a rival flagship or war sun on the board; with none, chasing it now cannot
-    // score this round, so it is not chased just because the game is late.
-    @Test
-    void doesNotChaseAnActionSecretWithNoTargetOnTheBoard() {
-        test.game.setRound(5);
-        test.nekro.setSecret("dtgs");
-
-        assertThat(Desperation.forActionSecrets(test.game, test.nekro)).isTrue();
-        assertThat(Desperation.forActionSecret(test.game, test.nekro, "dtgs")).isFalse();
-        assertThat(Desperation.actionSecretFactor(test.game, test.nekro, "dtgs"))
-                .isEqualTo(1.0);
     }
 
     @Test
