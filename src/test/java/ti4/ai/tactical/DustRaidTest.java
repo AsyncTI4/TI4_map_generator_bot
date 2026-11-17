@@ -78,15 +78,16 @@ class DustRaidTest extends BaseTi4Test {
         assertThat(raid()).isEmpty();
     }
 
-    // From round 5 the seat is desperate to score its action secrets this round, so the point counts half as much
-    // again: a quarter chance is worth 3.0, over a token.
+    // From round 5 the seat is desperate to score its action secrets this round. Two points behind a rival, this
+    // round's raid counts half as much again: a quarter chance is worth 3.0, over a token.
     @Test
-    void raidsAtAQuarterChanceWhenDesperateForItsActionSecrets() {
+    void raidsAtAQuarterChanceWhenDesperateAndBehind() {
         test.game.setRound(5);
+        test.points(test.sol, Desperation.POINTS_BEHIND);
         Tile quann = quannWithOurPds(2);
         test.units(quann, "space", neutral, UnitType.Destroyer, 2);
 
-        assertThat(raid().orElseThrow().score()).isCloseTo(VP * 0.25 * Desperation.FACTOR, within(EXACT));
+        assertThat(raid().orElseThrow().score()).isCloseTo(VP * 0.25 * Desperation.BEHIND_FACTOR, within(EXACT));
     }
 
     @Test

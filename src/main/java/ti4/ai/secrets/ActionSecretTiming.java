@@ -20,7 +20,7 @@ public class ActionSecretTiming {
         return NEVER_SAVED.contains(secretId)
                 || !AiSettings.isSecretHoldEnabled()
                 || GameHorizon.endInSight(game)
-                || Desperation.forActionSecrets(game, seat)
+                || Desperation.forActionSecret(game, seat, secretId)
                 || holdsAStandingDustTarget(game, seat, secretId)
                 || worriedAboutTheBoard(game, seat, secretId);
     }

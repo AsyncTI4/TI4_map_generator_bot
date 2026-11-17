@@ -28,9 +28,10 @@ class DustTarget {
         }
         double kill = CannonWipeRules.chanceToKillOneShip(game, seat, tile);
         int raids = Math.min(MAX_RAIDS, GameHorizon.roundsLeft(game));
-        double scoring = ObjectiveValue.VICTORY_POINT_VALUE
-                * Desperation.actionSecretFactor(game, seat)
-                * (1 - Math.pow(1 - kill, raids));
+        if (raids <= 0) return Double.NEGATIVE_INFINITY;
+        double desperation = Desperation.actionSecretFactor(game, seat);
+        double laterRaids = 1 - Math.pow(1 - kill, raids - 1);
+        double scoring = ObjectiveValue.VICTORY_POINT_VALUE * (desperation * kill + (1 - kill) * laterRaids);
         double costs = expectedRaids(kill, raids) * CardValueScale.HELD_TOKEN
                 + ActionCardPrior.AVERAGE_CARD
                 + ACTION_COST

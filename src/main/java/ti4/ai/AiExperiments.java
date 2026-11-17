@@ -41,7 +41,9 @@ public class AiExperiments {
         PAY_THE_ANSWERER,
         BOAT_FLOAT,
         AVOIDANCE_BRIBES,
-        DESPERATION
+        DESPERATION_PUBLIC,
+        DESPERATION_STATUS_SECRET,
+        DESPERATION_ACTION_SECRET
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

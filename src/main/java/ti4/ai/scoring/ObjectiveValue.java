@@ -12,8 +12,10 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.secrets.SecretPhase;
+import ti4.ai.secrets.SecretValue;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -63,6 +65,7 @@ public final class ObjectiveValue {
     private Boolean publicDesperate;
     private Boolean statusSecretDesperate;
     private Boolean actionSecretDesperate;
+    private Double desperationFactor;
     private List<ReadyPublic> readyPublics;
 
     public ObjectiveValue(Game game, Player seat) {
@@ -165,27 +168,36 @@ public final class ObjectiveValue {
     }
 
     private double desperation(Target target) {
-        if (!seat.equals(decider)) return 1.0;
-        if (!target.secret()) return publicDesperate() ? Desperation.FACTOR : 1.0;
+        if (!seat.equals(decider) || !seat.equals(DecidingSeat.orSelf(game, decider))) return 1.0;
+        if (!target.secret()) return publicDesperate() ? desperationFactor() : 1.0;
         return switch (SecretPhase.of(target.id())) {
-            case STATUS -> statusSecretDesperate() ? Desperation.FACTOR : 1.0;
-            case ACTION -> actionSecretDesperate() ? Desperation.FACTOR : 1.0;
+            case STATUS -> statusSecretDesperate() ? desperationFactor() : 1.0;
+            case ACTION ->
+                actionSecretDesperate() && Desperation.forActionSecret(game, seat, target.id())
+                        ? desperationFactor()
+                        : 1.0;
             default -> 1.0;
         };
     }
 
+    private double desperationFactor() {
+        if (desperationFactor == null) desperationFactor = Desperation.factor(game, seat);
+        return desperationFactor;
+    }
+
     private boolean publicDesperate() {
         if (publicDesperate == null)
-            publicDesperate = Desperation.forPublic(seat, !readyPublics().isEmpty());
+            publicDesperate = Desperation.forPublic(game, seat, !readyPublics().isEmpty());
         return publicDesperate;
     }
 
     private boolean statusSecretDesperate() {
         if (statusSecretDesperate == null) {
             boolean ready = targets.stream()
-                    .anyMatch(target -> target.secret()
-                            && target.before() >= target.threshold()
-                            && SecretPhase.of(target.id()) == SecretPhase.STATUS);
+                            .anyMatch(target -> target.secret()
+                                    && target.before() >= target.threshold()
+                                    && SecretPhase.of(target.id()) == SecretPhase.STATUS)
+                    || SecretValue.bestScorableStatusSecret(game, seat).isPresent();
             statusSecretDesperate = Desperation.forStatusSecretSetup(game, seat, ready);
         }
         return statusSecretDesperate;

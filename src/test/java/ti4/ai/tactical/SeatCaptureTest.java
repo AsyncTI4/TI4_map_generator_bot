@@ -37,7 +37,12 @@ class SeatCaptureTest extends BaseTi4Test {
         rex = board.test.place("18", MECATOL);
         sardakk().addPlanet("mr");
         board.test.units(rex, "mr", sardakk(), UnitType.Infantry, 1);
-        AiExperiments.disable(nekro(), EnumSet.of(AiExperiments.Experiment.DESPERATION));
+        AiExperiments.disable(
+                nekro(),
+                EnumSet.of(
+                        AiExperiments.Experiment.DESPERATION_PUBLIC,
+                        AiExperiments.Experiment.DESPERATION_STATUS_SECRET,
+                        AiExperiments.Experiment.DESPERATION_ACTION_SECRET));
     }
 
     private Player nekro() {
