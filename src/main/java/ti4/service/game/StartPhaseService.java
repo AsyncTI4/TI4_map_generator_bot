@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -1081,16 +1083,18 @@ public class StartPhaseService {
             buttons.add(yssarilPolicy);
         }
 
-        MessageCreateData messageObject = new MessageCreateBuilder()
-                .addContent(message2)
-                .addComponents(ActionRow.of(buttons))
-                .build();
-
-        game.getMainGameChannel()
-                .sendMessage(messageObject)
-                .queue(message -> GameMessageManager.replace(
-                        game.getName(),
-                        new GameMessage(message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate())));
+        Consumer<Message> trackStatusEnd = message -> GameMessageManager.replace(
+                game.getName(),
+                new GameMessage(message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
+        if (MegagameGroupService.hasTagOutsideFog(game)) {
+            MessageHelper.splitAndSentWithAction(message2, game.getMainGameChannel(), buttons, trackStatusEnd);
+        } else {
+            MessageCreateData messageObject = new MessageCreateBuilder()
+                    .addContent(message2)
+                    .addComponents(ActionRow.of(buttons))
+                    .build();
+            game.getMainGameChannel().sendMessage(messageObject).queue(trackStatusEnd);
+        }
 
         for (Player player : game.getRealPlayers()) {
             if (!player.getAllianceMembers().isEmpty()) {
