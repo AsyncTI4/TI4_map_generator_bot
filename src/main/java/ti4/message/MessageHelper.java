@@ -821,6 +821,7 @@ public class MessageHelper {
                     + MAX_MESSAGES_PER_SEND + ".");
         }
         List<MessageCreateData> cappedMessages = capMessageCount(messageCreateDataList);
+        boolean backlogAware = BacklogTimeouts.appliesTo(channel);
         int lastPosition = cappedMessages.size() - 1;
         for (int queuePosition = 0; queuePosition <= lastPosition; queuePosition++) {
             MessageCreateData messageCreateData = cappedMessages.get(queuePosition);
@@ -831,10 +832,17 @@ public class MessageHelper {
                         null,
                         "Failed to send intermediate message",
                         remainingAttempts,
-                        queuePosition);
+                        queuePosition,
+                        backlogAware);
             } else {
                 sendMessageWithRetry(
-                        channel, messageCreateData, successAction, errorHeader, remainingAttempts, queuePosition);
+                        channel,
+                        messageCreateData,
+                        successAction,
+                        errorHeader,
+                        remainingAttempts,
+                        queuePosition,
+                        backlogAware);
             }
         }
     }
@@ -865,16 +873,53 @@ public class MessageHelper {
             Consumer<Message> successAction,
             String errorHeader,
             int remainingAttempts,
-            int queuePosition) {
+            int queuePosition,
+            boolean backlogAware) {
+        long timeoutSeconds = backlogAware
+                ? BacklogTimeouts.timeoutSeconds(BacklogTimeouts.reserve(channel.getId()))
+                : sendTimeoutSecondsForQueuePosition(queuePosition);
+        try {
+            queueMessageWithRetry(
+                    channel,
+                    messageCreateData,
+                    successAction,
+                    errorHeader,
+                    remainingAttempts,
+                    queuePosition,
+                    backlogAware,
+                    timeoutSeconds);
+        } catch (RuntimeException e) {
+            releaseBacklogSlot(channel, backlogAware);
+            throw e;
+        }
+    }
+
+    private static void releaseBacklogSlot(MessageChannel channel, boolean backlogAware) {
+        if (backlogAware) {
+            BacklogTimeouts.release(channel.getId());
+        }
+    }
+
+    private static void queueMessageWithRetry(
+            MessageChannel channel,
+            MessageCreateData messageCreateData,
+            Consumer<Message> successAction,
+            String errorHeader,
+            int remainingAttempts,
+            int queuePosition,
+            boolean backlogAware,
+            long timeoutSeconds) {
         channel.sendMessage(messageCreateData)
-                .timeout(sendTimeoutSecondsForQueuePosition(queuePosition), TimeUnit.SECONDS)
+                .timeout(timeoutSeconds, TimeUnit.SECONDS)
                 .queue(
                         message -> {
+                            releaseBacklogSlot(channel, backlogAware);
                             if (successAction != null) {
                                 successAction.accept(message);
                             }
                         },
                         error -> {
+                            releaseBacklogSlot(channel, backlogAware);
                             if (isIgnorableError(error)) {
                                 return;
                             }
@@ -902,7 +947,8 @@ public class MessageHelper {
                                         successAction,
                                         errorHeader,
                                         remainingAttempts,
-                                        queuePosition);
+                                        queuePosition,
+                                        backlogAware);
                                 return;
                             }
                             boolean shouldRetry = error instanceof ErrorResponseException
@@ -919,7 +965,8 @@ public class MessageHelper {
                                         successAction,
                                         errorHeader,
                                         remainingAttempts - 1,
-                                        queuePosition);
+                                        queuePosition,
+                                        backlogAware);
                             } else {
                                 BotLogger.error(
                                         getRestActionFailureMessage(channel, errorHeader, messageCreateData, error),

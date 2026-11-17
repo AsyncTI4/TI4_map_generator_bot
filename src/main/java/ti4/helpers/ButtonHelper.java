@@ -1550,7 +1550,7 @@ public class ButtonHelper {
 
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
-        if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+        if (hasDrawnStatusACs(game, player)) {
             if (event != null) {
                 ReactionService.addReaction(
                         event,
@@ -1562,6 +1562,30 @@ public class ButtonHelper {
             }
             return;
         }
+        announceAndDrawStatusACs(
+                game, player, msg -> ReactionService.addReaction(event, game, player, true, false, msg));
+    }
+
+    @Nullable
+    public static String drawStatusACsForSummary(Game game, Player player) {
+        if (hasDrawnStatusACs(game, player)) {
+            return null;
+        }
+        StringBuilder line = new StringBuilder();
+        announceAndDrawStatusACs(
+                game,
+                player,
+                msg -> line.append(player.getRepresentation(false, false))
+                        .append(' ')
+                        .append(msg));
+        return line.toString();
+    }
+
+    private static boolean hasDrawnStatusACs(Game game, Player player) {
+        return game.getCurrentACDrawStatusInfo().contains(player.getFaction());
+    }
+
+    private static void announceAndDrawStatusACs(Game game, Player player, Consumer<String> announce) {
         List<String> modifiers = new ArrayList<>();
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
@@ -1600,7 +1624,7 @@ public class ButtonHelper {
             msg += " The following modifiers have been accounted for:\n> ";
             msg += String.join("\n> ", modifiers);
         }
-        ReactionService.addReaction(event, game, player, true, false, msg);
+        announce.accept(msg);
         ActionCardHelper.drawActionCardsSilent(player, amount);
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {

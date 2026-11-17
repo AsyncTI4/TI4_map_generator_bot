@@ -33,6 +33,7 @@ import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
 import ti4.service.map.SpinService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
@@ -105,9 +106,7 @@ public class StatusCleanupService {
 
         game.setCurrentACDrawStatusInfo("");
         if (!game.isFowMode() || FoWHelper.isFogQol01(game)) {
-            for (Player p : game.getActionPhaseTurnOrder()) {
-                ButtonHelper.drawStatusACs(game, p, null);
-            }
+            drawStatusActionCards(game);
         }
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
@@ -214,6 +213,25 @@ public class StatusCleanupService {
                         + ", reminder to draw and reveal 1 heist objective if you have not done so already.";
                 MessageHelper.sendMessageToChannel(mentak.getCardsInfoThread(), msg);
             }
+        }
+    }
+
+    private static void drawStatusActionCards(Game game) {
+        if (!MegagameGroupService.hasTagOutsideFog(game)) {
+            for (Player p : game.getActionPhaseTurnOrder()) {
+                ButtonHelper.drawStatusACs(game, p, null);
+            }
+            return;
+        }
+        List<String> drawLines = new ArrayList<>();
+        for (Player p : game.getActionPhaseTurnOrder()) {
+            String line = ButtonHelper.drawStatusACsForSummary(game, p);
+            if (line != null) {
+                drawLines.add(line);
+            }
+        }
+        if (!drawLines.isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), String.join("\n", drawLines));
         }
     }
 
