@@ -80,6 +80,10 @@ class StrikeEvaluator {
 
     private static StrikeEstimate estimate(
             Game game, Player seat, Strike strike, boolean openingFire, boolean cannonRisk) {
+        if (SkippedSpaceCombat.assumedFor(seat)
+                && !strike.target().getPlanetUnitHolders().isEmpty()) {
+            return skippingSpaceCombat(game, seat, strike);
+        }
         Tile target = strike.target();
         Player opponent = strike.opponent();
         UnitHolder space = BoardView.space(target);
@@ -500,6 +504,28 @@ class StrikeEvaluator {
 
     private static double unitCost(Player player, UnitType type) {
         return BoardView.model(player, type).map(UnitModel::getCost).orElse(0f);
+    }
+
+    private static StrikeEstimate skippingSpaceCombat(Game game, Player seat, Strike strike) {
+        Space skipped = new Space(1, 0, 0, 0, 0, 0);
+        Ground ground = ground(game, seat, strike, skipped, strike.ships(), Map.of());
+        double shipsReturned = shipCost(seat, strike.ships())
+                + shipCost(seat, BoardView.ships(BoardView.space(strike.target()), seat));
+        return new StrikeEstimate(
+                1,
+                false,
+                false,
+                ground.fought(),
+                ground.landings(),
+                ground.wins(),
+                ground.sent(),
+                shipsReturned + ground.ourLoss() + shipCost(seat, ground.dropped()),
+                shipsReturned,
+                ground.theirLoss(),
+                0,
+                1 - ground.noKill(),
+                1,
+                Map.of());
     }
 
     static StrikeEstimate afterSpaceWon(Game game, Player seat, Strike strike, double spaceWin) {

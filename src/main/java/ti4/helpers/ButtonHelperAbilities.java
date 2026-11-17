@@ -2597,7 +2597,7 @@ public final class ButtonHelperAbilities {
                             && !planetsChecked.contains(planet2)) {
 
                         String factionEmoji = Mapper.getFaction("neutral").getFactionEmoji();
-                        Player p2 = game.getPlanetOwner(planet);
+                        Player p2 = game.getPlanetOwner(planet2);
                         if (p2 != null) {
                             factionEmoji = p2.getFactionEmoji();
                         }

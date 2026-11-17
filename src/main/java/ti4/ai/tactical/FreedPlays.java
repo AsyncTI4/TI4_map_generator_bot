@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.FracturePrize;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
@@ -22,6 +23,7 @@ public class FreedPlays {
     private static final int SECRETS_PER_ROUND = 1;
     private static final int CUSTODIANS_POINT = 1;
     private static final int OBJECTIVE_DENIAL_POINT = 1;
+    private static final int STYX_POINT = 1;
 
     public record Gain(double points, boolean winsGame, boolean stopsLeader) {
 
@@ -76,7 +78,8 @@ public class FreedPlays {
 
         private Play appraise(TacticalPlan plan) {
             int own = Math.min(completedObjectives(plan), ScoringReserve.scoringChances(game, seat) + SECRETS_PER_ROUND)
-                    + mecatolPoints(plan);
+                    + mecatolPoints(plan)
+                    + styxPoint(plan);
             Denial denial = denial(plan);
             boolean wins = own > 0 && seat.getTotalVictoryPoints() + own >= game.getVp();
             return new Play(own + denial.points(), wins, denial.stopsLeader(), plan.score());
@@ -97,6 +100,16 @@ public class FreedPlays {
             if (mecatol.isEmpty()) return 0;
             int custodians = BoardView.hasCustodians(mecatol.get()) ? CUSTODIANS_POINT : 0;
             return custodians + MecatolCash.points(game, seat);
+        }
+
+        private int styxPoint(TacticalPlan plan) {
+            boolean takesStyx = plan.landings().keySet().stream()
+                    .map(game::getUnitHolderFromPlanet)
+                    .filter(Planet.class::isInstance)
+                    .map(Planet.class::cast)
+                    .anyMatch(planet ->
+                            FracturePrize.isStyx(planet) && !seat.getPlanets().contains(planet.getName()));
+            return takesStyx ? STYX_POINT : 0;
         }
 
         private Optional<Planet> landedMecatol(TacticalPlan plan) {

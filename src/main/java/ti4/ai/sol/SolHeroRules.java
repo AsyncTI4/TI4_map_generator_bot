@@ -8,7 +8,6 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
-import ti4.ai.eval.GameHorizon;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.FreedPlays;
 import ti4.ai.tactical.TacticalRules;
@@ -19,7 +18,6 @@ import ti4.game.Player;
 public class SolHeroRules {
 
     static final String HERO = "solhero";
-    static final int FINAL_ROUNDS_LEFT = 1;
     static final double MIN_DECISIVE_POINTS = 1.0;
     private static final String HERO_BUTTON = "componentActionRes_leader_" + HERO;
     private static final String COMPONENT_ACTION = "componentAction";
@@ -68,13 +66,7 @@ public class SolHeroRules {
         if (!seat.hasLeaderUnlocked(HERO) || !canStart(context)) return false;
         if (seat.getTacticalCC() < 1) return false;
         if (game.getTileMap().values().stream().noneMatch(tile -> tile.hasPlayerCC(seat))) return false;
-        FreedPlays.Gain gain = FreedPlays.gain(game, seat);
-        if (gain.points() < MIN_DECISIVE_POINTS) return false;
-        return isFinalRound(game) || gain.winsGame() || gain.stopsLeader();
-    }
-
-    static boolean isFinalRound(Game game) {
-        return GameHorizon.roundsLeft(game) <= FINAL_ROUNDS_LEFT;
+        return FreedPlays.gain(game, seat).points() >= MIN_DECISIVE_POINTS;
     }
 
     private static boolean canStart(AiTurnContext context) {

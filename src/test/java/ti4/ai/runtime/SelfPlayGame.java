@@ -478,6 +478,7 @@ final class SelfPlayGame {
             agendas.observe(game, now);
             relics.observe(game);
             env.leaders.observe(game);
+            env.factionComponents.observe(game, env.discord);
             if (fracture.due(game)) force(game, fracture::enter);
             if (relicsDue(game)) {
                 relicsHandedOut = true;

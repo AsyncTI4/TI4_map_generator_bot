@@ -127,16 +127,15 @@ class SolHeroRulesTest extends BaseTi4Test {
         assertThat(SolHeroRules.next(context(componentMenu()))).isEmpty();
     }
 
-    // The same locked-down fleet in an ordinary mid-game spot is not worth the hero: it can wait for the tokens to
-    // come off on their own.
+    // Any point the freed tokens bring is worth the hero, mid-game too: here the custodians point on Mecatol Rex.
     @Test
-    void keepsTheHeroInAnOrdinaryMidGameSpotEvenWithTheFleetPinned() {
+    void playsTheHeroMidGameForThePointItsOwnTokenBlocks() {
         mecatolWaitsForTheTaking();
         fleetIsPinnedByItsOwnToken();
         test.points(test.nekro, 3);
 
         assertThat(FreedPlays.gain(test.game, sol).points()).isGreaterThanOrEqualTo(1);
-        assertThat(instead()).isEmpty();
+        assertThat(pressed(instead())).isEqualTo("FFCC_sol_componentAction");
     }
 
     @Test
