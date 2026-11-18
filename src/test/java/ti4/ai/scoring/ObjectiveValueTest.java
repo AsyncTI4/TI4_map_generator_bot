@@ -127,6 +127,7 @@ class ObjectiveValueTest extends BaseTi4Test {
     @Test
     void aSeatWithNoReadyPublicIsDesperateToCompleteOne() {
         AiExperiments.disable(test.nekro, EnumSet.noneOf(AiExperiments.Experiment.class));
+        AiExperiments.enable(test.nekro, EnumSet.of(AiExperiments.Experiment.DESPERATION_PUBLIC));
         test.game.setRound(2);
         reveal("raise_fleet");
         test.units(home, "space", test.nekro, UnitType.Destroyer, 4);

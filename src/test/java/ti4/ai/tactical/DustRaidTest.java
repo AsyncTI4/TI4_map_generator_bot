@@ -3,11 +3,14 @@ package ti4.ai.tactical;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiTestGame;
 import ti4.ai.scoring.Desperation;
 import ti4.ai.scoring.ObjectiveValue;
@@ -78,10 +81,11 @@ class DustRaidTest extends BaseTi4Test {
         assertThat(raid()).isEmpty();
     }
 
-    // From round 5 the seat is desperate to score its action secrets this round. Two points behind a rival, this
-    // round's raid counts half as much again: a quarter chance is worth 3.0, over a token.
+    // With action secret desperation switched on, from round 5 the seat is desperate to score its action secrets this
+    // round. Two points behind a rival, this round's raid counts half as much again: a quarter chance is worth 3.0.
     @Test
     void raidsAtAQuarterChanceWhenDesperateAndBehind() {
+        AiExperiments.enable(test.nekro, EnumSet.of(Experiment.DESPERATION_ACTION_SECRET));
         test.game.setRound(5);
         test.points(test.sol, Desperation.POINTS_BEHIND);
         Tile quann = quannWithOurPds(2);
