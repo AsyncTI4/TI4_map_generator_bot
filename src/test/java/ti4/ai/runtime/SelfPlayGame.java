@@ -203,6 +203,7 @@ final class SelfPlayGame {
     private final List<Map<String, Double>> stateAtRoundStart = new ArrayList<>();
     private int recordedRound;
     private long wallStart = System.nanoTime();
+    private TurnDurations turnDurations;
     private final int slot;
     // Every random draw the game thread makes (dice, decks, seat ids, AI profile seeds) comes from this seed, so a game
     // replays from -Dai.selfplay.seed=<printed seed> with its slot. Without the property each batch picks a base seed.
@@ -251,6 +252,7 @@ final class SelfPlayGame {
         this.slot = slot;
         this.seed = seed;
         this.fracture = new FractureTracker(FRACTURE_SEED * 1009L + slot);
+        this.turnDurations = new TurnDurations(name);
     }
 
     Game setUp(List<String> factions) throws Exception {
@@ -488,6 +490,7 @@ final class SelfPlayGame {
             logFleets(game);
             logResearchPlans(game);
             closeOverrulePicks(game, false);
+            turnDurations.observe(game, now);
             ti4.ai.trace.TimingReport.recordOutside("harness.observe", System.nanoTime() - observeStart);
             if (stopWhen.test(game)) return outcome(Ending.STOP_CONDITION, game, ticks);
             if (AiTickRunner.reachedVictoryPoints(game)) return outcome(Ending.VICTORY_POINTS, game, ticks);
@@ -508,10 +511,12 @@ final class SelfPlayGame {
             }
             if (lane.watchdogDue(now, AiSettings.WATCHDOG_PERIOD.toMillis())) lane.markDirty(now);
             if (lane.isDue(now) && lane.tryStart()) {
+                long tickStart = System.nanoTime();
                 try {
                     AiTickRunner.tick(lane, now);
                 } finally {
                     lane.finish();
+                    turnDurations.ticked(System.nanoTime() - tickStart);
                 }
                 ticks++;
                 recordHands(game);
@@ -788,7 +793,16 @@ final class SelfPlayGame {
                 + game.getActivePlayerID();
     }
 
+    private void printTurnDurations() {
+        List<TurnDurations.Turn> turns = turnDurations.finish(env.now());
+        synchronized (System.out) {
+            turns.forEach(turn -> System.out.println(turn.line()));
+            TurnDurations.summary(turns).forEach(System.out::println);
+        }
+    }
+
     private Outcome outcome(Ending ending, Game game, int ticks) {
+        printTurnDurations();
         if (env.trajectory != null) env.trajectory.finish(ending.name(), seed, game);
         return new Outcome(
                 ending,
