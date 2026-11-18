@@ -1157,7 +1157,10 @@ final class SelfPlayGame {
         appendTail(report, "Fake Discord callback failures", env.discord.callbackFailures(), 15);
         appendTail(report, "Unsupported JDA calls (distinct)", distinct(env.discord.unsupportedCalls()), 30);
         if (!env.idleOnTurn.isEmpty()) appendTail(report, "Idle on its turn", env.idleOnTurn, 200);
-        if (!env.watched.isEmpty()) appendTail(report, "Watched trace", env.watched, 400);
+        if (!env.watched.isEmpty()) {
+            appendTail(report, "Watched trace", env.watched, 400);
+            report.append("Full watched trace: ").append(writeWatchedTrace()).append('\n');
+        }
         if (SelfPlayEnvironment.WATCH != null) {
             appendTail(
                     report,
@@ -1219,6 +1222,21 @@ final class SelfPlayGame {
 
     private static List<String> distinct(List<String> lines) {
         return lines.stream().distinct().toList();
+    }
+
+    // The report keeps only the tail of the watched trace; the whole game's trace goes to a file beside the build
+    // output.
+    private String writeWatchedTrace() {
+        java.nio.file.Path file = java.nio.file.Path.of("target", "selfplay-watched", name + ".log");
+        try {
+            java.nio.file.Files.createDirectories(file.getParent());
+            synchronized (env) {
+                java.nio.file.Files.write(file, env.watched);
+            }
+            return file.toAbsolutePath().toString();
+        } catch (java.io.IOException e) {
+            return "not written (" + e.getMessage() + ")";
+        }
     }
 
     private static void appendTail(StringBuilder report, String title, List<String> lines, int count) {

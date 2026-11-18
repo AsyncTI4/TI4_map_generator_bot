@@ -283,10 +283,6 @@ public class CombatRules {
         String type = context.game().getStoredValue(context.faction() + LATEST_ASSIGN_HITS);
         if (!ASSAULT_CANNON_HITS.equals(type)) return Optional.empty();
         for (AiPrompt prompt : prompts) {
-            List<PromptButton> losses = prompt.enabledButtons().stream()
-                    .filter(button -> button.isOwnedBy(context.faction()) && isSingleUnitLoss(button))
-                    .toList();
-            if (losses.isEmpty()) continue;
             String key = "assaultCannonLoss|" + prompt.messageId();
             if (context.memory().has(key)) {
                 Optional<PromptButton> done =
@@ -294,6 +290,10 @@ public class CombatRules {
                 if (done.isEmpty()) continue;
                 return Optional.of(AiDecision.press(prompt, done.get(), "finish the Assault Cannon loss"));
             }
+            List<PromptButton> losses = prompt.enabledButtons().stream()
+                    .filter(button -> button.isOwnedBy(context.faction()) && isSingleUnitLoss(button))
+                    .toList();
+            if (losses.isEmpty()) continue;
             PromptButton cheapest = losses.stream()
                     .min(Comparator.comparingDouble(button -> lossCost(context.seat(), button)))
                     .orElseThrow();
