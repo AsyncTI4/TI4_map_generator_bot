@@ -525,6 +525,7 @@ public class AuctionFrankenDraftService {
         if (allNominationsComplete(game)) {
             set(game, "phase", "complete");
             MessageHelper.sendMessageToChannel(auctionChannel(game), "Auction Draft is complete.");
+            sendFinalDraftedComponentsSummary(game);
             MessageHelper.sendMessageToChannel(
                     auctionLogChannel(game),
                     game.getPing()
@@ -790,6 +791,29 @@ public class AuctionFrankenDraftService {
             message.append(summary);
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message.toString());
+    }
+
+    private void sendFinalDraftedComponentsSummary(Game game) {
+        for (Player player : players(game)) {
+            if (player.getDraftHand() == null || player.getDraftHand().Contents.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(), "__Final Drafted Components__\nYou did not draft any components.");
+                continue;
+            }
+            List<DraftItem> drafted = player.getDraftHand().Contents;
+            MessageChannel channel = player.getCardsInfoThread();
+            String prefix = "__Final Drafted Components__\n";
+            StringBuilder message = new StringBuilder(prefix);
+            for (DraftItem item : drafted) {
+                String summary = draftedComponentSummary(game, item) + "\n";
+                if (message.length() + summary.length() > 1900 && message.length() > prefix.length()) {
+                    MessageHelper.sendMessageToChannel(channel, message.toString());
+                    message = new StringBuilder("__Final Drafted Components (continued)__\n");
+                }
+                message.append(summary);
+            }
+            MessageHelper.sendMessageToChannel(channel, message.toString());
+        }
     }
 
     private void sendPoolToActionsChannel(Game game) {

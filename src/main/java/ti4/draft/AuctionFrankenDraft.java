@@ -32,7 +32,7 @@ public class AuctionFrankenDraft extends FrankenDraft {
 
     @Override
     public int getKeptItemLimitForCategory(DraftCategory category) {
-        return getItemLimitForCategory(category);
+        return FrankenDraft.getItemLimitForCategory(category, getOwner());
     }
 
     @Override
