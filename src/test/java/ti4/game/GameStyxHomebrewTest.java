@@ -56,4 +56,15 @@ class GameStyxHomebrewTest extends BaseTi4Test {
 
         assertThat(game.hasHomebrew()).isFalse();
     }
+
+    @Test
+    void aTwilightsFallGameWhereAPlayerHoldsStyxIsNotHomebrew() {
+        // Twilight's Fall turns Thunder's Edge off, but Styx is still part of the official board.
+        Game game = prophecyOfKingsGame();
+        game.setTwilightsFallMode(true);
+        game.getRealAndEliminatedPlayers().getFirst().addPlanet("styx");
+
+        assertThat(game.isThundersEdge()).isFalse();
+        assertThat(game.hasHomebrew()).isFalse();
+    }
 }
