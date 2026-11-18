@@ -17,12 +17,15 @@ import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AdministrativeExemptionLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
 import ti4.discord.interactions.buttons.handlers.commandcounter.CommandCounterButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -36,6 +39,7 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
 import ti4.logging.BotLogger;
@@ -55,6 +59,8 @@ import ti4.service.game.MonumentsService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
+import ti4.service.megagame.MegagameFollowGuard;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.strategycard.StrategyCardMessageService;
@@ -145,6 +151,13 @@ public final class ButtonHelperSCs {
         boolean singleDock = !model.usesAutomationForSCID("te6warfare");
 
         Tile tile = player.getHomeSystemTile();
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you have no home system to produce units in, so you cannot use the **Warfare** secondary.");
+            return;
+        }
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
         int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
 
@@ -184,6 +197,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("diploRefresh2")
     public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
@@ -193,7 +209,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("diplomacy").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "diplomacy");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("noctis").orElse(null);
@@ -270,6 +286,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("nekroFollowTech")
     public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -278,7 +297,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("technology").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "technology");
         }
 
         if (!used
@@ -361,7 +380,7 @@ public final class ButtonHelperSCs {
     @ButtonHandler("score_imperial")
     public static void scoreImperial(Game game, Player player, ButtonInteractionEvent event) {
         if (player == null || game == null) return;
-        if (!player.controlsMecatol(true)) {
+        if (!player.controlsMecatol(true) && !TheodisiAgendaResolver.hasSeatOfPower(game, player)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Only the player who controls Mecatol Rex may score the **Imperial** victory point.");
@@ -378,6 +397,9 @@ public final class ButtonHelperSCs {
     @ButtonHandler("sc_trade_follow")
     @ButtonHandler("sc_follow_trade")
     public static void followTrade(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         boolean used = addUsedSCPlayer(event.getMessageId(), game, player);
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -386,7 +408,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "trade");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("amicus").orElse(null);
@@ -419,6 +441,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_draw_so")
     public static void scDrawSO(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
@@ -429,7 +454,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("imperial").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "imperial");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("aeterna").orElse(null);
@@ -486,9 +511,7 @@ public final class ButtonHelperSCs {
                 if (!game.isFowMode()) {
                     message += "\n" + player2.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on.";
-                    if (player2.getSecretsScored().size()
-                                    + player2.getSecretsUnscored().size()
-                            >= player2.getMaxSOCount()) {
+                    if (player2.getSecretsCountedTowardLimit() >= player2.getMaxSOCount()) {
                         message +=
                                 " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
                     }
@@ -508,6 +531,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_refresh")
     public static void refresh(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         resolveRefresh(game, player, event);
     }
 
@@ -522,7 +548,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "trade");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("amicus").orElse(null);
@@ -552,6 +578,22 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player, "has replenished commodities.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
+        BloomStrainHandler.resolveRhizomaticActive(player, game);
+        ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
+        ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
+        return true;
+    }
+
+    @ButtonHandler("non_sc_refresh")
+    private static boolean resolveNonTradeRefresh(Game game, Player player, ButtonInteractionEvent event) {
+        int initComm = player.getCommodities();
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentationNoPing() + "has replenished commodities.");
+        ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
+        ButtonHelperAgents.cabalAgentInitiation(game, player);
+        BloomStrainHandler.resolveRhizomaticActive(player, game);
         ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
         ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
         return true;
@@ -559,6 +601,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_refresh_and_wash")
     public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         resolveRefreshAndWash(game, player, event);
     }
 
@@ -599,7 +644,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "trade");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("amicus").orElse(null);
@@ -683,6 +728,7 @@ public final class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player, "replenishing and washing.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
+        BloomStrainHandler.resolveRhizomaticActive(player, game);
         ButtonHelperStats.afterGainCommsChecks(game, player, commoditiesTotal);
         if (commoditiesTotal > 0) {
             ButtonHelperStats.offerBountyBrokerageAfterTradeWash(game, player);
@@ -1030,6 +1076,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("warfareBuild")
     public static void warfareBuild(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         List<Button> buttons;
         boolean used = addUsedSCPlayer(messageID, game, player);
@@ -1040,7 +1089,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("warfare").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "warfare");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("calamitas").orElse(null);
@@ -1082,6 +1131,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("construction_")
     public static void construction(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player);
         StrategyCardModel scModel = null;
@@ -1110,7 +1162,7 @@ public final class ButtonHelperSCs {
                     .orElse(null);
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("construction").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "construction");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("civitas").orElse(null);
@@ -1196,6 +1248,45 @@ public final class ButtonHelperSCs {
                             player.getRepresentationNoPing()
                                     + ", choose a planet adjacent to your or neutral units on which to place _Raider Stronghold_.",
                             buttons);
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("dream_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "dream_monument"))) {
+                    List<Button> buttons = BeansMonumentHandler.getDreamMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event, "There is no system containing your ships in which to place _Plateau of Leng_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Plateau of Leng_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeDreamMonument_", 0));
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("deep_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "deep_monument"))) {
+                    List<Button> buttons = BeansMonumentHandler.getDeepMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event,
+                                "There is no system containing your ships and no planets in which to place _Ether Anchor_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Ether Anchor_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeDeepMonument_", 0));
                     return;
                 }
                 if (game.isMonumentsMode()
@@ -1417,9 +1508,10 @@ public final class ButtonHelperSCs {
         return planets;
     }
 
+    // TODO: counts with the placing player's vision rules (e.g. Creuss links alpha/beta); should it be board adjacency?
     public static int getNearbyEmbassyCount(Game game, Tile tile, Player player) {
         int embassy = 0;
-        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+        for (String pos : Adjacency.of(game, player).forVision().withSelf().from(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);
             for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
                 for (String token : uH.getTokenList()) {
@@ -1433,8 +1525,9 @@ public final class ButtonHelperSCs {
     }
 
     public static void updateEmbassies(Game game, Player player, Tile tile) {
+        // TODO: every nearby embassy gets this tile's count; should each count around its own tile?
         int count = getNearbyEmbassyCount(game, tile, player);
-        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+        for (String pos : Adjacency.of(game, player).forVision().withSelf().from(tile.getPosition())) {
             Tile tile2 = game.getTileByPosition(pos);
             for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
                 Set<String> tokens = new HashSet<>(uH.getTokenList());
@@ -1525,6 +1618,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("leadershipGenerateCCButtons")
     public static void leadershipButtons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok1leadership")) {
@@ -1538,7 +1634,7 @@ public final class ButtonHelperSCs {
             game.setStoredValue("resetSpend", "yes");
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("leadership").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "leadership");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByInitiative(1).get();
@@ -1658,6 +1754,131 @@ public final class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("alexandria_follow_")
+    public static void offerAlexandriaFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        int scNum = parseStrategyCardNumber(buttonID);
+        if (!player.hasPlanet("alexandria")
+                || player.getExhaustedPlanetsAbilities().contains("alexandria")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Iterative Indexing is not ready to use.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        player.exhaustPlanetAbility("alexandria");
+        String pendingKey = "alexandriaFollowPending_" + player.getFaction();
+        String promptId = event.getMessageId();
+        game.setStoredValue(pendingKey, promptId + "_" + scNum);
+        List<Button> buttons = new ArrayList<>();
+        if (player.getTacticalCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_tactic",
+                    "Spend from Tactic Pool"));
+        }
+        if (player.getFleetCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_fleet",
+                    "Spend from Fleet Pool"));
+        }
+        if (player.getStrategicCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_strategy",
+                    "Spend from Strategy Pool"));
+        }
+        if (buttons.isEmpty()) {
+            game.removeStoredValue(pendingKey);
+            player.refreshPlanet("alexandria");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have a command token to spend.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose the pool from which to spend a command token to follow **"
+                        + Helper.getSCName(scNum, game) + "**.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("alexandriaFollowSpend_")
+    public static void resolveAlexandriaFollow(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("alexandriaFollowSpend_", "").split("_", 3);
+        if (parts.length != 3) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        int scNum = parseStrategyCardNumber(parts[1]);
+        String pendingKey = "alexandriaFollowPending_" + player.getFaction();
+        if (!(parts[0] + "_" + scNum).equals(game.getStoredValue(pendingKey))
+                || !player.hasPlanet("alexandria")
+                || !player.getExhaustedPlanetsAbilities().contains("alexandria")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "That Iterative Indexing follow is no longer available.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!spendAlexandriaCommandToken(player, parts[2])) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You do not have a command token in that pool to spend.");
+            return;
+        }
+        game.removeStoredValue(pendingKey);
+        if (!player.getFollowedSCs().contains(scNum)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+        }
+        player.addFollowedSC(scNum, event);
+        if ("strategy".equals(parts[2])) {
+            VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player, scNum);
+            TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
+            if (player.hasAbility("strategic_fluidity")) {
+                OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
+            }
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                    player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");
+        }
+        MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scNum);
+        MessageHelper.sendMessageToChannel(
+                channel,
+                player.getRepresentationUnfogged()
+                        + " exhausted _Iterative Indexing_ and spent 1 command token from their " + parts[2]
+                        + " pool to follow " + Helper.getSCName(scNum, game) + ".");
+        if (game.isFowMode()) {
+            reactToStrategyCardMessage(game, player, scNum, null);
+        } else {
+            reactToFollowedStrategyCard(game, player, channel);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static int parseStrategyCardNumber(String value) {
+        try {
+            return Integer.parseInt(StringUtils.substringAfterLast(value, "_"));
+        } catch (NumberFormatException e) {
+            return Integer.parseInt(value);
+        }
+    }
+
+    private static boolean spendAlexandriaCommandToken(Player player, String pool) {
+        return switch (pool) {
+            case "tactic" -> {
+                if (player.getTacticalCC() < 1) yield false;
+                player.setTacticalCC(player.getTacticalCC() - 1);
+                yield true;
+            }
+            case "fleet" -> {
+                if (player.getFleetCC() < 1) yield false;
+                player.setFleetCC(player.getFleetCC() - 1);
+                yield true;
+            }
+            case "strategy" -> {
+                if (player.getStrategicCC() < 1) yield false;
+                player.setStrategicCC(player.getStrategicCC() - 1);
+                yield true;
+            }
+            default -> false;
+        };
+    }
+
     public static void reactToFollowedStrategyCard(Game game, Player player, MessageChannel channel) {
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 
@@ -1696,6 +1917,9 @@ public final class ButtonHelperSCs {
                 setStatus = false;
             }
         }
+        if (setStatus && MegagameFollowGuard.refusesCard(event, game, player, scNum)) {
+            return;
+        }
         if (setStatus) {
             player.addFollowedSC(scNum, event, false);
             suffix = " **" + Helper.getSCName(scNum, game) + "**";
@@ -1731,7 +1955,7 @@ public final class ButtonHelperSCs {
             key = "potentialBlockers";
             if (game.getStoredValue(key).contains(player.getFaction() + "*")) {
                 game.setStoredValue(key, game.getStoredValue(key).replace(player.getFaction() + "*", ""));
-                Helper.resolveQueue(game);
+                Helper.resolveQueueSavingFirst(game, "Imperial queue drawn after declining to follow");
             }
         }
         int scNum2 = scNum;
@@ -1739,8 +1963,7 @@ public final class ButtonHelperSCs {
                         game.getName(), GameMessageType.STRATEGY_FOLLOW, game.getRound() + "_" + scNum2)
                 .orElse(null);
         if (gameMessage != null) {
-            ThreadChannel chan = ButtonHelper.getRightStratThread(
-                    game, ButtonHelper.getStratName(ButtonHelper.getStratName(scNum2), game));
+            ThreadChannel chan = ButtonHelper.getStratThreadForSc(game, scNum2);
             if (chan != null) {
                 String followSummary = PlayStrategyCardService.getSCFollowSummary(game, scNum2, true);
                 chan.retrieveMessageById(gameMessage.messageId())
@@ -1764,6 +1987,9 @@ public final class ButtonHelperSCs {
             } catch (NumberFormatException e2) {
                 setStatus = false;
             }
+        }
+        if (setStatus && MegagameFollowGuard.refusesCard(event, game, player, scNum)) {
+            return;
         }
         if (player != null
                 && player.getSCs().contains(scNum)
@@ -1828,6 +2054,15 @@ public final class ButtonHelperSCs {
             return msgStart + " You are elected for _Endorse_, so you do not spend a token.";
         }
 
+        StrategyCardModel strategyCard = scNum == -1
+                ? null
+                : game.getStrategyCardModelByInitiative(scNum).orElse(null);
+        if (ButtonHelper.isLawInPlay(game, "freemarketcapitalism")
+                && strategyCard != null
+                && strategyCard.usesAutomationForSCID("pok5trade")) {
+            return msgStart + " No command token was spent due to _Free Market Capitalism_.";
+        }
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "netrunnerscommander") && scNum == 7) {
             return msgStart + " No command token was spent due to **Tek Mir-un**, the Net-Runners commander.";
         }
@@ -1841,7 +2076,8 @@ public final class ButtonHelperSCs {
 
         strategicCC--;
         player.setStrategicCC(strategicCC);
-        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player);
+        VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player, scNum);
+        TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
         if (scNum != -1 && player.hasAbility("strategic_fluidity")) {
             OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
         }
@@ -1850,6 +2086,9 @@ public final class ButtonHelperSCs {
 
     @ButtonHandler("sc_ac_draw")
     public static void scACDraw(Game game, Player player, ButtonInteractionEvent event) {
+        if (MegagameFollowGuard.refusesPressOnOtherGroupsCard(event, game, player)) {
+            return;
+        }
         String messageID = event.getMessageId();
         boolean used2 = addUsedSCPlayer(messageID + "ac", game, player);
         if (used2) {
@@ -1863,7 +2102,7 @@ public final class ButtonHelperSCs {
             }
         }
         if (scModel == null) {
-            scModel = game.getStrategyCardModelByName("politics").orElse(null);
+            scModel = MegagameGroupService.strategyCardByName(game, player, "politics");
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("Tyrannus").orElse(null);

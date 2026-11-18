@@ -1,0 +1,10 @@
+{
+  "name": "fog-settings-2p",
+  "description": "Plain fog game for the options panel and presets: you are Sol and the GM, Hacan is a virtual seat, no fog options on.",
+  "fog": true,
+  "you": { "faction": "sol", "home": "301" },
+  "seats": [
+    { "faction": "hacan", "home": "310" }
+  ],
+  "defaults": { "tg": 2 }
+}

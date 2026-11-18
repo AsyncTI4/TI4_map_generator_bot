@@ -223,4 +223,13 @@ class DarktalonTreillaRulesTest extends BaseTi4Test {
                         .sum())
                 .isEqualTo(5);
     }
+
+    // Before passing, the hero is a stall while a rival can still win this round; at the start of the game nobody can.
+    @Test
+    void keepsTheHeroAsAStallWhileNoRivalCanWinThisRound() {
+        AiTurnContext context = test.context(turnMenu());
+
+        assertThat(DarktalonTreillaRules.beforePassing(context, Prompts.thisTurn(context)))
+                .isEmpty();
+    }
 }

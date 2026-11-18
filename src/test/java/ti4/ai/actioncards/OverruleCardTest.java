@@ -16,8 +16,8 @@ import org.mockito.Mockito;
 import ti4.ai.AiTestGame;
 import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.brain.AiDecision;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.brain.StrategyCard;
-import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.ObjectivePolicy;
@@ -532,7 +532,7 @@ class OverruleCardTest extends BaseTi4Test {
         AiPrompt turn = turnStart();
         assertThat(StrategyCardTurn.playIfDue(table.test.context(turn), List.of(turn)))
                 .isEmpty();
-        assertThat(AiTestGame.pressedId(new NekroBrain().decide(table.test.contextAt(SETTLED, turn, hand()))))
+        assertThat(AiTestGame.pressedId(new StandardBrain().decide(table.test.contextAt(SETTLED, turn, hand()))))
                 .isEqualTo("ac_play_from_hand_" + HAND_INDEX);
     }
 

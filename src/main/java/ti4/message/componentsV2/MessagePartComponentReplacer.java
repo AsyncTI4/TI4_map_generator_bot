@@ -92,19 +92,18 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
             return null;
         }
 
-        List<? extends Component> children =
-                switch (curComponent) {
-                    case ActionRow actionRow -> actionRow.getComponents();
-                    case Container container -> container.getComponents();
-                    case Section section -> section.getContentComponents();
-                    case Label label -> {
-                        label.getChild();
-                        yield List.of(label.getChild());
-                    }
-                    default ->
-                        throw new IllegalArgumentException("Unknown IReplaceable component type: "
-                                + curComponent.getClass().getName());
-                };
+        List<? extends Component> children = switch (curComponent) {
+            case ActionRow actionRow -> actionRow.getComponents();
+            case Container container -> container.getComponents();
+            case Section section -> section.getContentComponents();
+            case Label label -> {
+                label.getChild();
+                yield List.of(label.getChild());
+            }
+            default ->
+                throw new IllegalArgumentException("Unknown IReplaceable component type: "
+                        + curComponent.getClass().getName());
+        };
 
         if (children.isEmpty()) {
             return null;

@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.actioncards;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
@@ -18,6 +19,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.logging.BotLogger;
@@ -39,6 +41,7 @@ public class ActionCardPingButtonHandler {
     private static final String ROUTE_NON_PUBLIC = "local";
 
     private static final String PING_KEY_PREFIX = "acPingCard";
+    private static final String PINGED_PLANET_KEY_PREFIX = "acPingPlanet";
     private static final Pattern LEADING_DIGITS = Pattern.compile("^(\\d+)");
 
     private static final String PLANET_EMOJI = "🪐";
@@ -48,6 +51,7 @@ public class ActionCardPingButtonHandler {
     private static final int MAX_TITLE_LENGTH_IN_BUTTON_ID = 30;
 
     public static void sendPingPrompt(Player player, String actionCardMessageId, String actionCardTitle) {
+        forgetPingedPlanet(player.getGame(), player);
         String base = player.factionButtonChecker() + Constants.AC_PING_PICK;
         String titleForButtonId = StringUtils.truncate(actionCardTitle, MAX_TITLE_LENGTH_IN_BUTTON_ID);
         String suffix = "_" + actionCardMessageId + "_" + titleForButtonId;
@@ -59,11 +63,17 @@ public class ActionCardPingButtonHandler {
         sendPrivately(
                 player,
                 player.getRepresentationUnfogged() + ", ping a target for _" + actionCardTitle + "_?\n"
-                        + "> " + PLANET_EMOJI + " any planet, including your own.\n"
+                        + "> " + PLANET_EMOJI + " " + planetScope(player.getGame(), titleForButtonId) + "\n"
                         + "> " + SYSTEM_EMOJI + " any system.\n"
                         + "> " + PLAYER_EMOJI + " any other player.\n"
                         + "> Anything else: pick _No Target_ and use `/fow announce` instead.",
                 buttons);
+    }
+
+    private static String planetScope(Game game, String cardTitle) {
+        return ButtonHelperActionCards.singlePlanetTargetSpec(game, cardTitle).isPresent()
+                ? "a planet this card can target."
+                : "any planet, including your own.";
     }
 
     @ButtonHandler(Constants.AC_PING_PICK)
@@ -76,7 +86,7 @@ public class ActionCardPingButtonHandler {
         String actionCardMessageId = payload[1];
         String token = flowToken(actionCardMessageId);
         switch (type) {
-            case PLANET -> offerPlanetChoices(game, player, token);
+            case PLANET -> offerPlanetChoices(game, player, token, payload[2]);
             case SYSTEM -> offerSystemChoices(game, player, token);
             case PLAYER -> offerPlayerChoices(game, player, token);
             default -> {
@@ -102,15 +112,48 @@ public class ActionCardPingButtonHandler {
         String ownPrefix = PING_KEY_PREFIX + player.getFaction() + "_";
         List<String> stale = new ArrayList<>();
         for (var entry : game.getStoredValueMap().entrySet()) {
-            if (!entry.getKey().startsWith(ownPrefix)) {
-                continue;
-            }
-            String round = StringUtils.substringBefore(entry.getValue(), "|");
-            if (StringUtils.isNumeric(round) && Integer.parseInt(round) < game.getRound()) {
+            if (entry.getKey().startsWith(ownPrefix) && isFromEarlierRound(game, entry.getValue())) {
                 stale.add(entry.getKey());
             }
         }
+        if (isFromEarlierRound(game, game.getStoredValue(pingedPlanetKey(player)))) {
+            stale.add(pingedPlanetKey(player));
+        }
         stale.forEach(game::removeStoredValue);
+    }
+
+    private static boolean isFromEarlierRound(Game game, String storedValue) {
+        String round = StringUtils.substringBefore(storedValue, "|");
+        return StringUtils.isNumeric(round) && Integer.parseInt(round) < game.getRound();
+    }
+
+    private static String pingedPlanetKey(Player player) {
+        return PINGED_PLANET_KEY_PREFIX + player.getFaction();
+    }
+
+    private static void rememberPingedPlanet(Game game, Player player, String cardTitle, String planetId) {
+        if (StringUtils.isBlank(cardTitle)) {
+            return;
+        }
+        game.setStoredValue(pingedPlanetKey(player), game.getRound() + "|" + cardTitle + "|" + planetId);
+    }
+
+    public static Optional<String> consumePingedPlanet(Game game, Player player, String cardTitle) {
+        if (!game.isFowMode()) {
+            return Optional.empty();
+        }
+        String[] stored = game.getStoredValue(pingedPlanetKey(player)).split("\\|", 3);
+        if (stored.length < 3
+                || !String.valueOf(game.getRound()).equals(stored[0])
+                || !stored[1].equals(StringUtils.truncate(cardTitle, MAX_TITLE_LENGTH_IN_BUTTON_ID))) {
+            return Optional.empty();
+        }
+        forgetPingedPlanet(game, player);
+        return Optional.of(stored[2]);
+    }
+
+    static void forgetPingedPlanet(Game game, Player player) {
+        game.removeStoredValue(pingedPlanetKey(player));
     }
 
     private static String peekCardTitle(Game game, Player player, String token) {
@@ -131,13 +174,16 @@ public class ActionCardPingButtonHandler {
         channel.addReactionById(actionCardMessageId, pingEmoji(type)).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    private static PlanetTargetSpec planetSpec(Player player, String token) {
-        return PlanetTargetSpec.of(player.factionButtonChecker() + Constants.AC_PING_PLANET + "_" + token);
+    private static PlanetTargetSpec planetSpec(Game game, Player player, String token, String cardTitle) {
+        String buttonPrefix = player.factionButtonChecker() + Constants.AC_PING_PLANET + "_" + token;
+        return ButtonHelperActionCards.singlePlanetTargetSpec(game, cardTitle)
+                .map(cardSpec -> cardSpec.withButtonPrefix(buttonPrefix))
+                .orElseGet(() -> PlanetTargetSpec.of(buttonPrefix));
     }
 
-    private static void offerPlanetChoices(Game game, Player player, String token) {
-        List<Button> buttons =
-                PlanetTargetService.targetButtons(game, player, planetSpec(player, token), new ArrayList<>());
+    private static void offerPlanetChoices(Game game, Player player, String token, String cardTitle) {
+        List<Button> buttons = PlanetTargetService.targetButtons(
+                game, player, planetSpec(game, player, token, cardTitle), new ArrayList<>());
         sendPrivately(player, player.getRepresentationUnfogged() + ", choose the planet you're pinging.", buttons);
     }
 
@@ -145,7 +191,8 @@ public class ActionCardPingButtonHandler {
     public static void resolvePlanet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String payload = buttonID.substring(Constants.AC_PING_PLANET.length() + 1);
         String token = tokenFrom(payload);
-        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, planetSpec(player, token))) {
+        PlanetTargetSpec spec = planetSpec(game, player, token, peekCardTitle(game, player, token));
+        if (PlanetTargetService.handlePlanetPage(event, game, player, buttonID, spec)) {
             return;
         }
         String planetId = payload.substring(token.length() + 1);
@@ -225,7 +272,7 @@ public class ActionCardPingButtonHandler {
                 : "tell only the players who can currently see the targeted system";
     }
 
-    @ButtonHandler(value = Constants.AC_PING_ROUTE, save = false)
+    @ButtonHandler(Constants.AC_PING_ROUTE)
     public static void resolveRoute(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] parts = buttonID.substring(Constants.AC_PING_ROUTE.length()).split("_", 4);
         if (parts.length < 4) {
@@ -237,14 +284,16 @@ public class ActionCardPingButtonHandler {
         String targetKey = parts[3];
 
         String cardTitle = peekCardTitle(game, player, token);
-        boolean sent =
-                switch (type) {
-                    case PLANET -> pingPlanetTarget(game, player, targetKey, isPublic, cardTitle);
-                    case SYSTEM -> pingSystemTarget(game, player, targetKey, isPublic, cardTitle);
-                    case PLAYER -> pingPlayerTarget(game, player, targetKey, isPublic, cardTitle);
-                    default -> false;
-                };
+        boolean sent = switch (type) {
+            case PLANET -> pingPlanetTarget(game, player, targetKey, isPublic, cardTitle);
+            case SYSTEM -> pingSystemTarget(game, player, targetKey, isPublic, cardTitle);
+            case PLAYER -> pingPlayerTarget(game, player, targetKey, isPublic, cardTitle);
+            default -> false;
+        };
         if (sent) {
+            if (PLANET.equals(type)) {
+                rememberPingedPlanet(game, player, cardTitle, targetKey);
+            }
             ButtonHelper.deleteMessage(event);
         } else {
             PlanetTargetService.fizzle(event, player);

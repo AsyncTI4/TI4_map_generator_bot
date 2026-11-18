@@ -28,6 +28,8 @@ import ti4.model.Mapper;
 import ti4.model.TileModel;
 import ti4.service.fow.LoreService.LoreEntry;
 import ti4.service.map.CustomHyperlaneService;
+import ti4.service.map.HyperlaneBridges;
+import ti4.service.map.HyperlanePortals;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -452,6 +454,19 @@ class LoreServiceTest extends BaseTi4Test {
                     .get(Constants.SPACE)
                     .getTokenList()
                     .contains("token_gravityrift.png"));
+        }
+
+        @Test
+        void oneWayWormholeTokenIsPlacedAndRemovedByItsId() {
+            // Generated tokens have no image file; lore must still resolve the id to the stored file name,
+            // and planet lore puts them in space, the only holder that draws their ring.
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!token whalpha_in"), systemTile, "mr", true);
+            var tokens = systemTile.getUnitHolders().get(Constants.SPACE).getTokenList();
+            assertTrue(tokens.contains("token_oneway_whalpha_in.png"));
+            assertFalse(systemTile.getUnitHolders().get("mr").getTokenList().contains("token_oneway_whalpha_in.png"));
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!removetoken whalpha_in"), systemTile, "mr", true);
+            assertFalse(tokens.contains("token_oneway_whalpha_in.png"));
         }
 
         @Test
@@ -2640,6 +2655,49 @@ class LoreServiceTest extends BaseTi4Test {
             assertEquals(CustomHyperlaneService.encodeMatrix(SIDES_1_4), storedEncoded());
         }
 
+        // Portals: set from the Export form or the modal form, removed again; rotation turns them with the lanes.
+        @Test
+        void setAndRemovePortals() {
+            CustomHyperlaneService.insertData(
+                    game, "000", "1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!setportals 000 0A1B>"), systemTile, Constants.SPACE, true);
+            assertEquals("0=A, 1=B>", HyperlanePortals.describe(HyperlanePortals.slotsOf(game, "000")));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000"), systemTile, Constants.SPACE, true);
+            assertEquals("0=A, 2=B>", HyperlanePortals.describe(HyperlanePortals.slotsOf(game, "000")));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!spor 000 C,3=D<"), systemTile, Constants.SPACE, true);
+            assertEquals("0=C, 3=D<", HyperlanePortals.describe(HyperlanePortals.slotsOf(game, "000")));
+
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!removeportals 000"), systemTile, Constants.SPACE, true);
+            assertTrue(HyperlanePortals.slotsOf(game, "000").isEmpty());
+            assertFalse(LoreEffects.validateEffects(entry("!setportals 000 9Z"), game)
+                    .isEmpty());
+        }
+
+        // Bridges: set from the Export form on a system, removed again; a crossing matrix is refused by validation.
+        @Test
+        void setAndRemoveBridge() {
+            game.setTile(new Tile("19", "101"));
+            String northToSouth = CustomHyperlaneService.encodeMatrix(
+                    "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!setbridge 101 " + northToSouth), systemTile, Constants.SPACE, true);
+            assertEquals(Set.of(0, 3), HyperlaneBridges.laneSides(game, "101"));
+
+            LoreEffects.applyLoreEffectsForTest(player, game, entry("!rbr 101"), systemTile, Constants.SPACE, true);
+            assertTrue(HyperlaneBridges.laneSides(game, "101").isEmpty());
+
+            String crossing = CustomHyperlaneService.encodeMatrix(
+                    "0,0,0,1,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0");
+            assertFalse(LoreEffects.validateEffects(entry("!setbridge 101 " + crossing), game)
+                    .isEmpty());
+        }
+
         @Test
         void sixStepsIsAFullTurnNoOp() {
             LoreEffects.applyLoreEffectsForTest(
@@ -2662,6 +2720,33 @@ class LoreServiceTest extends BaseTi4Test {
             LoreEffects.applyLoreEffectsForTest(
                     player, game, entry("!sethyperlane 000 " + encoded), systemTile, Constants.SPACE, true);
             assertEquals(encoded, storedEncoded());
+        }
+
+        // One-way lanes are stored as an asymmetric matrix. Both effects work on the stored form, so they must
+        // not mirror it back into a two-way lane.
+        private static final String ONE_WAY_0_TO_3 =
+                "0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+        private static final String ONE_WAY_1_TO_4 =
+                "0,0,0,0,0,0;0,0,0,0,1,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0";
+
+        @Test
+        void rotateKeepsAOneWayLaneOneWay() {
+            CustomHyperlaneService.insertStoredData(game, "000", ONE_WAY_0_TO_3);
+            LoreEffects.applyLoreEffectsForTest(
+                    player, game, entry("!rotatehyperlane 000"), systemTile, Constants.SPACE, true);
+            assertEquals(ONE_WAY_1_TO_4, game.getCustomHyperlaneData().get("000"));
+        }
+
+        @Test
+        void sethyperlaneKeepsAOneWayLaneOneWay() {
+            LoreEffects.applyLoreEffectsForTest(
+                    player,
+                    game,
+                    entry("!sethyperlane 000 " + CustomHyperlaneService.encodeMatrix(ONE_WAY_0_TO_3)),
+                    systemTile,
+                    Constants.SPACE,
+                    true);
+            assertEquals(ONE_WAY_0_TO_3, game.getCustomHyperlaneData().get("000"));
         }
 
         @Test

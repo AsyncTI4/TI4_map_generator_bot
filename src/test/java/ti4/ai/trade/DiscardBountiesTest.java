@@ -123,7 +123,7 @@ class DiscardBountiesTest extends BaseTi4Test {
         AiPrompt whens = AiTestGame.prompt(
                 "whens", PromptSource.AI_THREAD, NOW, "queueAWhen", "declineToQueueAWhen", "explainQueue");
 
-        AiDecision decision = new ti4.ai.nekro.NekroBrain().decide(context(sol, whens, table()));
+        AiDecision decision = new ti4.ai.brain.StandardBrain().decide(context(sol, whens, table()));
 
         assertThat(decision).isInstanceOf(AiDecision.Post.class);
         Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
@@ -320,5 +320,74 @@ class DiscardBountiesTest extends BaseTi4Test {
 
         assertThat(DiscardBounties.all(test.game)).containsExactly(bounty);
         assertThat(List.of(DiscardBounties.Status.values())).contains(bounty.status());
+    }
+
+    // ---- Deadly Plot bounties (the user's agenda-politics list, 2026-11-16)
+    // ------------------------------------------
+
+    // Xxcha's 6 votes carried For, so Sol loses about 7 TG once it resolves. In the window after voting, where
+    // Deadly Plot is played, Sol offers up to the 3 TG cap to whoever plays it; once per agenda.
+    @Test
+    void aLoserOffersADeadlyPlotBountyAfterVoting() {
+        sol.setTg(14);
+        test.game.setCurrentAgendaVote("for", "red_6");
+        test.game.setPhaseOfGame("agendaEnd");
+        assertThat(DiscardBounties.lossFromWinner(test.game, sol)).isGreaterThan(DiscardBounties.MIN_LOSS);
+
+        AiDecision.Post post = (AiDecision.Post)
+                DiscardBountyDeals.offerDeadlyPlot(context(sol, table())).orElseThrow();
+
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.deadlyPlot()).isEqualTo(DiscardBounties.DEADLY_PLOT_CAP);
+        assertThat(post.text()).contains("_Deadly Plot_");
+        assertThat(DiscardBountyDeals.offerDeadlyPlot(context(sol, table()))).isEmpty();
+        assertThat(DiscardBounties.deadlyPlotBounty(test.game, nekro)).isEqualTo(DiscardBounties.DEADLY_PLOT_CAP);
+    }
+
+    // Before voting ends it is not Deadly Plot's window, so no such bounty is posted.
+    @Test
+    void noDeadlyPlotBountyBeforeTheVotesAreIn() {
+        sol.setTg(14);
+        test.game.setPhaseOfGame("agendaVoting");
+        assertThat(DiscardBountyDeals.offerDeadlyPlot(context(sol, table()))).isEmpty();
+    }
+
+    // Nekro played Deadly Plot and the agenda was discarded: Sol owes Nekro the bounty.
+    @Test
+    void aPlayedDeadlyPlotIsPaid() {
+        Bounty offered = new Bounty(
+                test.game.getRound(),
+                PromisedVotes.agendaKey(test.game),
+                sol.getFaction(),
+                0,
+                0,
+                test.game.getGameStats().getActionCardPlays().size(),
+                "",
+                -1,
+                DiscardBounties.Status.OPEN,
+                3);
+        DiscardBounties.save(test.game, offered);
+        test.game.setPhaseOfGame("agendaVoting");
+        DiscardBountyDeals.observe(context(sol));
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.OPEN);
+
+        test.game.getGameStats().recordAcPlay(DiscardBounties.DEADLY_PLOT, nekro);
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+        DiscardBountyDeals.observe(context(sol));
+
+        Promise owed = PromiseBook.all(test.game).getFirst();
+        assertThat(owed.term()).isEqualTo(Promise.Term.DISCARD_AGENDA);
+        assertThat(owed.isPromiser(nekro)).isTrue();
+        assertThat(owed.target()).isEqualTo(DiscardBounties.DEADLY_PLOT);
+        assertThat(owed.price()).isEqualTo(3);
+    }
+
+    // Old saves wrote 9 fields; they still read, with no Deadly Plot bounty.
+    @Test
+    void oldBountyRecordsStillRead() {
+        test.game.setStoredValue("aiDiscardBounties", "2|economic_equality|sol|3|5|0|xxcha|2|OPEN");
+        Bounty old = DiscardBounties.all(test.game).getFirst();
+        assertThat(old.veto()).isEqualTo(3);
+        assertThat(old.deadlyPlot()).isZero();
     }
 }

@@ -361,6 +361,16 @@ class AttackMemoryTest extends BaseTi4Test {
             return this;
         }
 
+        RexRaid attackedBySardakk() {
+            ti4.ai.Hostility.add(board.test.game, "sardakk", "nekro", 2.0);
+            return this;
+        }
+
+        RexRaid withoutRelations() {
+            AiExperiments.disable(board.test.nekro, EnumSet.of(Experiment.RELATIONS_ANGER));
+            return this;
+        }
+
         RexRaid grudge(double damage) {
             entry(board.test.game, board.test.game.getRound(), board.sardakk, board.test.nekro, damage);
             entry(board.test.game, board.test.game.getRound(), board.test.nekro, board.sardakk, damage);
@@ -403,9 +413,22 @@ class AttackMemoryTest extends BaseTi4Test {
                         new RexRaid().strongNeighbour().control().anger());
         assertThat(new RexRaid().weakAndFar().anger())
                 .isGreaterThanOrEqualTo(new RexRaid().weakAndFar().control().anger());
-        assertThat(new RexRaid().strongNeighbour().grudge(8).anger())
+        assertThat(new RexRaid().strongNeighbour().grudge(8).withoutRelations().anger())
                 .isGreaterThanOrEqualTo(
                         new RexRaid().strongNeighbour().grudge(8).control().anger());
+    }
+
+    // The user's rule (2026-11-16): bad relations drop the anger cost. Sardakk attacked Nekro earlier, so a neutral
+    // Nekro is at -1 with Sardakk and no longer prices Sardakk's anger at being raided.
+    @Test
+    void badRelationsDropTheConquestAnger() {
+        assertThat(new RexRaid()
+                        .strongNeighbour()
+                        .attackedBySardakk()
+                        .withoutRelations()
+                        .anger())
+                .isPositive();
+        assertThat(new RexRaid().strongNeighbour().attackedBySardakk().anger()).isZero();
     }
 
     // Sardakk's fleet waits beside Nekro's home. After Nekro took a VP's worth from Sardakk, Nekro expects Sardakk to

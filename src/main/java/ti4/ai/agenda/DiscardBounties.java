@@ -22,15 +22,19 @@ public class DiscardBounties {
 
     public static final String VETO = "Veto";
     public static final String QUASH = "Quash";
+    public static final String DEADLY_PLOT = AgendaSwing.DEADLY_PLOT;
     public static final int VETO_CAP = 3;
     public static final int QUASH_CAP = 5;
+    public static final int DEADLY_PLOT_CAP = 3;
     public static final double MIN_LOSS = 2.0;
     public static final double OFFER_MARGIN = 0.5;
     static final String KEY = "aiDiscardBounties";
     private static final long WAIT_MILLIS = 90_000L;
     private static final String RECORDS = ";";
     private static final String FIELD = "|";
-    private static final int FIELDS = 9;
+    private static final int OLD_FIELDS = 9;
+    private static final int FIELDS = 10;
+    private static final String END_PHASE = "agendaEnd";
     private static final String SAVE_REASON = "AI discard bounty";
 
     public enum Status {
@@ -48,10 +52,24 @@ public class DiscardBounties {
             int plays,
             String quasher,
             int quashTokens,
-            Status status) {
+            Status status,
+            int deadlyPlot) {
+
+        public Bounty(
+                int round,
+                String agenda,
+                String payer,
+                int veto,
+                int quash,
+                int plays,
+                String quasher,
+                int quashTokens,
+                Status status) {
+            this(round, agenda, payer, veto, quash, plays, quasher, quashTokens, status, 0);
+        }
 
         public Bounty with(Status next) {
-            return new Bounty(round, agenda, payer, veto, quash, plays, quasher, quashTokens, next);
+            return new Bounty(round, agenda, payer, veto, quash, plays, quasher, quashTokens, next, deadlyPlot);
         }
 
         public boolean postedBy(Player player) {
@@ -73,12 +91,13 @@ public class DiscardBounties {
                     String.valueOf(plays),
                     quasher,
                     String.valueOf(quashTokens),
-                    status.name());
+                    status.name(),
+                    String.valueOf(deadlyPlot));
         }
 
         static Optional<Bounty> decode(String encoded) {
             String[] fields = StringUtils.splitPreserveAllTokens(encoded, FIELD);
-            if (fields == null || fields.length != FIELDS) return Optional.empty();
+            if (fields == null || (fields.length != FIELDS && fields.length != OLD_FIELDS)) return Optional.empty();
             try {
                 return Optional.of(new Bounty(
                         Integer.parseInt(fields[0]),
@@ -89,7 +108,8 @@ public class DiscardBounties {
                         Integer.parseInt(fields[5]),
                         fields[6],
                         Integer.parseInt(fields[7]),
-                        Status.valueOf(fields[8])));
+                        Status.valueOf(fields[8]),
+                        fields.length == FIELDS ? Integer.parseInt(fields[9]) : 0));
             } catch (IllegalArgumentException e) {
                 return Optional.empty();
             }
@@ -153,6 +173,39 @@ public class DiscardBounties {
 
     public static int quashBounty(Game game, Player holder) {
         return pooled(game, holder, Bounty::quash, QUASH_CAP);
+    }
+
+    public static int deadlyPlotBounty(Game game, Player holder) {
+        return pooled(game, holder, Bounty::deadlyPlot, DEADLY_PLOT_CAP);
+    }
+
+    public static boolean deadlyPlotWindow(Game game) {
+        return END_PHASE.equalsIgnoreCase(game.getPhaseOfGame());
+    }
+
+    public static double lossFromWinner(Game game, Player payer) {
+        AgendaForecast forecast = AgendaForecast.of(game, payer);
+        Optional<String> winner = forecast.mostLikely();
+        if (forecast.isEmpty() || winner.isEmpty()) return 0;
+        return Math.max(0, -forecast.utility(payer, winner.get()));
+    }
+
+    public static Optional<AiDecision> awaitDeadlyPlotOffers(AiTurnContext context) {
+        Game game = context.game();
+        Player holder = context.seat();
+        if (!active(holder) || !AiSettings.isTradingEnabled() || !deadlyPlotWindow(game)) return Optional.empty();
+        long until = AgendaClock.seenAt(context) + WAIT_MILLIS;
+        if (context.now() >= until || !somePayerMayOfferForDeadlyPlot(game, holder)) return Optional.empty();
+        return Optional.of(new AiDecision.Wait(until, "wait for a bounty to Deadly Plot the agenda"));
+    }
+
+    private static boolean somePayerMayOfferForDeadlyPlot(Game game, Player holder) {
+        return game.getRealPlayers().stream()
+                .filter(payer -> payer != holder && AiSeats.isAiSeat(payer) && active(payer))
+                .filter(payer -> postedOnThisAgenda(game, payer)
+                        .filter(bounty -> bounty.deadlyPlot() > 0)
+                        .isEmpty())
+                .anyMatch(payer -> mostOffered(payer.getTg(), lossFromWinner(game, payer)) >= 1);
     }
 
     private static int pooled(Game game, Player holder, ToIntFunction<Bounty> amount, int cap) {

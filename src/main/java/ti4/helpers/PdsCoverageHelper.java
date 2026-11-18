@@ -14,10 +14,20 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.model.UnitModel;
 
 public final class PdsCoverageHelper {
+
+    private static boolean isTakenOverFromNeutral(
+            Game game, Player player, UnitHolder unitHolder, Units.UnitKey unitKey) {
+        Player active = game.getActivePlayer();
+        return player.isNeutral()
+                && active != null
+                && active != player
+                && SarcosaBreakthroughHandler.canControlNeutralStructure(game, active, unitHolder, unitKey);
+    }
 
     /**
      * Calculate PDS coverage for a specific tile, returning comprehensive coverage data per faction.
@@ -35,7 +45,7 @@ public final class PdsCoverageHelper {
         String tilePos = tile.getPosition();
         Map<String, List<Integer>> pdsDiceByPlayer = new HashMap<>();
 
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealPlayersNNeutral()) {
             List<Integer> diceCount = new ArrayList<>();
             List<Integer> diceCountMirveda = new ArrayList<>();
             int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
@@ -53,7 +63,7 @@ public final class PdsCoverageHelper {
             }
 
             // Check adjacent tiles for PDS coverage
-            for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {
+            for (String adjTilePos : Adjacency.of(game, player).withSelf().into(tilePos)) {
                 Tile adjTile = game.getTileByPosition(adjTilePos);
                 if (adjTile == null) {
                     continue;
@@ -86,10 +96,11 @@ public final class PdsCoverageHelper {
                                 game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                         boolean graveholdControlled = SarcosaBreakthroughHandler.canControlNeutralStructure(
                                 game, player, unitHolder, unitKey);
-                        boolean borrowed =
-                                ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitKey)
-                                        || graveholdControlled;
-                        if (unitOwner != player && !borrowed) {
+                        boolean borrowed = ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(
+                                        game, player, unitHolder, unitKey)
+                                || graveholdControlled;
+                        if ((unitOwner != player && !borrowed)
+                                || isTakenOverFromNeutral(game, player, unitHolder, unitKey)) {
                             continue;
                         }
 

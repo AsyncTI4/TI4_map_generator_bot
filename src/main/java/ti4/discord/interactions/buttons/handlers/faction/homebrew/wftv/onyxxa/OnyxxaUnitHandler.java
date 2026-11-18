@@ -12,8 +12,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.FactionEmojis;
 
@@ -29,7 +29,7 @@ public class OnyxxaUnitHandler {
         if (tile == null) {
             return false;
         }
-        return FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true).stream()
+        return Adjacency.of(game, player).forEffects().withSelf().into(tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(nearbyTile -> ButtonHelper.doesPlayerHaveFSHere("onyxxa_flagship", player, nearbyTile));
     }

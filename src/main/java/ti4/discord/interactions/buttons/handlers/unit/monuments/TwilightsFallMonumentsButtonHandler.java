@@ -149,12 +149,11 @@ public class TwilightsFallMonumentsButtonHandler {
     @ButtonHandler("selectBlueTfMonumentCapacity_")
     public static void selectBlueTfMonumentCapacity(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        UnitType unitType =
-                switch (buttonID.replace("selectBlueTfMonumentCapacity_", "")) {
-                    case "Cruiser", "ca" -> UnitType.Cruiser;
-                    case "Destroyer", "dd" -> UnitType.Destroyer;
-                    default -> null;
-                };
+        UnitType unitType = switch (buttonID.replace("selectBlueTfMonumentCapacity_", "")) {
+            case "Cruiser", "ca" -> UnitType.Cruiser;
+            case "Destroyer", "dd" -> UnitType.Destroyer;
+            default -> null;
+        };
         if (unitType == null) {
             return;
         }

@@ -5,13 +5,18 @@ import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Service;
 import ti4.discord.JdaService;
-import ti4.service.persistence.DatabasePersistenceGate;
+import ti4.game.persistence.DatabasePersistenceGate;
+import ti4.spring.context.SpringContext;
 
 @AllArgsConstructor
 @Service
 public class TourneyWinnerService {
 
     private TournamentWinnerRepository tournamentWinnerRepository;
+
+    public static TourneyWinnerService getBean() {
+        return SpringContext.getBean(TourneyWinnerService.class);
+    }
 
     public boolean exists(String userId) {
         if (DatabasePersistenceGate.isDisabled()) return false;

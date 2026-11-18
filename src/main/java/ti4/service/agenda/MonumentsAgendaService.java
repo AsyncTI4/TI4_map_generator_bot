@@ -43,7 +43,7 @@ public class MonumentsAgendaService {
             return;
         }
 
-        String objectiveName = "Cathedral Of Ixth (" + player.getFaction() + ")";
+        String objectiveName = game.customPONameFor(player, "Cathedral Of Ixth");
         if (!game.getCustomPublicVP().containsKey(objectiveName)) {
             game.addCustomPO(objectiveName, 1);
         }
@@ -75,7 +75,7 @@ public class MonumentsAgendaService {
             return;
         }
 
-        String objectiveName = "Cathedral Of Ixth (" + player.getFaction() + ")";
+        String objectiveName = game.customPONameFor(player, "Cathedral Of Ixth");
         if (game.getCustomPublicVP().containsKey(objectiveName)
                 && game.unscorePublicObjective(player.getUserID(), objectiveName)) {
             MessageHelper.sendMessageToChannel(

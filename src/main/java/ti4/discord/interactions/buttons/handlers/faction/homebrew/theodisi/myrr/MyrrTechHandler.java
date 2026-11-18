@@ -266,13 +266,12 @@ public class MyrrTechHandler {
             count = 2;
             unit = unit.substring(1);
         }
-        String unitAlias =
-                switch (unit) {
-                    case "ff" -> "fighter";
-                    case "gf" -> "infantry";
-                    case "mf" -> "mech";
-                    default -> unit;
-                };
+        String unitAlias = switch (unit) {
+            case "ff" -> "fighter";
+            case "gf" -> "infantry";
+            case "mf" -> "mech";
+            default -> unit;
+        };
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitAlias), player.getColorID());
         if (unitKey == null) {
             return null;

@@ -31,7 +31,12 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PrecisionT
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
 import ti4.discord.interactions.buttons.handlers.faction.base.yin.YinImpulseCoreButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomStrainHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamAbilitiesHandler;
@@ -48,6 +53,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Uy
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaPromissoryHandler;
@@ -74,6 +80,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.On
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -98,6 +105,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKSecretHooks;
@@ -450,6 +458,7 @@ public class StartCombatService {
         }
 
         TextChannel textChannel = (TextChannel) channel;
+        List<Player> cannonCover = spaceCannonCover(game, player1, tile, spaceOrGround);
 
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
@@ -464,7 +473,8 @@ public class StartCombatService {
                         spaceOrGround,
                         null,
                         unitHolderName,
-                        firstCombatThread);
+                        firstCombatThread,
+                        cannonCover);
                 CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
                 CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
                 return;
@@ -476,8 +486,8 @@ public class StartCombatService {
             CommanderUnlockCheckService.checkPlayer(player2, "winnu");
         }
 
-        int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
+        FileUpload systemWithContext =
+                SystemContextImage.upload(game, event, pdsImageContext(game, cannonCover), tile.getPosition(), player1);
 
         // Create the thread
         String finalThreadName = threadName;
@@ -502,9 +512,14 @@ public class StartCombatService {
                     spaceOrGround,
                     systemWithContext,
                     unitHolderName,
-                    firstCombatThread);
+                    firstCombatThread,
+                    cannonCover);
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to create combat thread for game: " + game.getName(), e);
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "The bot could not create the combat thread for " + tile.getRepresentationForButtons(game, player1)
+                            + ". Please wait 5 minutes, then use `/combat start_combat` to start the combat.");
         }
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
@@ -532,7 +547,8 @@ public class StartCombatService {
             String spaceOrGround,
             FileUpload file,
             String unitHolderName,
-            boolean firstCombatThread) {
+            boolean firstCombatThread,
+            List<Player> cannonCover) {
         StringBuilder message = new StringBuilder();
         message.append(player1.getRepresentationUnfogged());
         if (!game.isFowMode()) message.append(player2.getRepresentation());
@@ -544,12 +560,10 @@ public class StartCombatService {
         if (isSpaceCombat) message.append(getSpaceCombatIntroMessage());
         if (isGroundCombat) message.append(getGroundCombatIntroMessage());
 
-        // PDS2 Context
-        int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        if (threadChannel.getName().toLowerCase().contains("benediction")) {
-            context = 0;
-        }
         if (file == null) {
+            int context = threadChannel.getName().toLowerCase().contains("benediction")
+                    ? 0
+                    : pdsImageContext(game, cannonCover);
             file = SystemContextImage.upload(game, event, context, tile.getPosition(), player1);
         }
 
@@ -565,12 +579,12 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     ButtonHelper.getCombatTileSummaryMessage(
-                            game, tile, player1, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
+                            game, tile, event, spaceOrGround, unitHolderName, List.of(player1, player2)));
         }
 
         // Space Cannon Offense
         if (isSpaceCombat && !threadChannel.getName().toLowerCase().contains("benediction")) {
-            sendSpaceCannonButtonsToThread(threadChannel, game, player1, tile);
+            sendSpaceCannonButtonsToThread(threadChannel, game, player1, tile, cannonCover);
         }
 
         // Start of Space Combat Buttons
@@ -735,6 +749,18 @@ public class StartCombatService {
                             threadChannel,
                             player2.getRepresentation()
                                     + ", a reminder that your opponent has 2 _Vacuole_ in this system, and so you (and all other players) cannot play action cards during this combat.");
+                }
+                if (ButtonHelper.doesPlayerHaveFSHere("migo_flagship", player2, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player1.getRepresentation()
+                                    + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
+                }
+                if (ButtonHelper.doesPlayerHaveFSHere("migo_flagship", player1, tile)) {
+                    MessageHelper.sendMessageToChannel(
+                            threadChannel,
+                            player2.getRepresentation()
+                                    + ", a reminder that your opponent has _The Whisper_ in this system, and so they get to choose 1 non-unit upgrade technology for you to treat as blank for this combat.");
                 }
             }
         }
@@ -1022,8 +1048,17 @@ public class StartCombatService {
 
     public static void sendSpaceCannonButtonsToThread(
             MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
+        sendSpaceCannonButtonsToThread(
+                threadChannel,
+                game,
+                activePlayer,
+                tile,
+                ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition()));
+    }
+
+    private static void sendSpaceCannonButtonsToThread(
+            MessageChannel threadChannel, Game game, Player activePlayer, Tile tile, List<Player> playersWithPds2) {
         StringBuilder pdsMessage = new StringBuilder();
-        List<Player> playersWithPds2 = ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition());
         if (tile.isScar(game)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
@@ -1044,7 +1079,7 @@ public class StartCombatService {
                         .append('\n');
             }
         }
-        List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile);
+        List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile, playersWithPds2);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
         MonumentsDSButtonHandler.sendPerditionArrayReminder(threadChannel, game, tile, activePlayer);
         if (!game.isFowMode()) {
@@ -1630,14 +1665,26 @@ public class StartCombatService {
     }
 
     public static List<Button> getSpaceCannonButtons(Game game, Player activePlayer, Tile tile) {
+        if (game.isFowMode()) return getSpaceCannonButtons(game, activePlayer, tile, List.of());
+        return getSpaceCannonButtons(
+                game, activePlayer, tile, ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition()));
+    }
+
+    private static List<Button> getSpaceCannonButtons(
+            Game game, Player activePlayer, Tile tile, List<Player> shooters) {
         List<Button> spaceCannonButtons = new ArrayList<>();
-        spaceCannonButtons.add(Buttons.gray(
-                "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll SPACE CANNON Offence"));
+        String rollId = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        spaceCannonButtons.add(Buttons.gray(rollId, "Roll SPACE CANNON Offence"));
         if (game.isFowMode()) return spaceCannonButtons;
+        for (Player shooter : shooters) {
+            if (shooter != activePlayer && (shooter.isDummy() || shooter.isNpc())) {
+                spaceCannonButtons.add(rollForDummyButton(shooter, rollId, "Roll SPACE CANNON Offence"));
+            }
+        }
         spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
 
         // Add Graviton Laser System button if applicable
-        for (Player playerWithPds : ButtonHelper.getPlayersWithPds2Cover(activePlayer, game, tile.getPosition())) {
+        for (Player playerWithPds : shooters) {
             if (playerWithPds.hasTechReady("gls")) { // Graviton Laser Systems
                 spaceCannonButtons.add(
                         Buttons.gray("exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
@@ -1648,6 +1695,7 @@ public class StartCombatService {
     }
 
     private static boolean hasCendos(Player player, Tile tile) {
+        if (!player.hasUnit("tk-cendos")) return false;
         int nonFighterShips = 0;
         boolean hasDestroyer = false;
         for (UnitKey unit : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player)) {
@@ -1655,11 +1703,11 @@ public class StartCombatService {
             if (unit.unitType() == UnitType.Destroyer) {
                 hasDestroyer = true;
             }
-            if (model.isNonFighterShip()) {
+            if (model != null && model.isNonFighterShip()) {
                 nonFighterShips += tile.getSpaceUnitHolder().getUnitCount(unit);
             }
         }
-        return player.hasUnit("tk-cendos") && hasDestroyer && nonFighterShips >= 3;
+        return hasDestroyer && nonFighterShips >= 3;
     }
 
     private static List<Button> getStartOfSpaceCombatButtons(Game game, Player p1, Player p2, Tile tile) {
@@ -1793,20 +1841,19 @@ public class StartCombatService {
         return buttons;
     }
 
-    /**
-     * # of extra rings to show around the tile image
-     *
-     * @return 0 if no PDS2 nearby, 1 if PDS2 is nearby
-     */
-    private static int getTileImageContextForPDS2(Game game, Player player1, Tile tile, String spaceOrGround) {
-        if (game.isFowMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
-            return 0;
-        }
-        if (!ButtonHelper.getPlayersWithPds2Cover(player1, game, tile.getPosition())
-                .isEmpty()) {
-            return 1;
-        }
-        return 0;
+    public static Button rollForDummyButton(Player dummy, String rollButtonId, String label) {
+        String suffix = dummy.isNeutral() ? " For Neutral" : " For Dummy";
+        return Buttons.gray(dummy.dummyPlayerSpoof() + rollButtonId, label + suffix)
+                .withEmoji(Emoji.fromFormatted(dummy.fogSafeEmoji()));
+    }
+
+    private static List<Player> spaceCannonCover(Game game, Player player1, Tile tile, String spaceOrGround) {
+        if (!"space".equalsIgnoreCase(spaceOrGround)) return List.of();
+        return ButtonHelper.getPlayersWithPds2Cover(player1, game, tile.getPosition());
+    }
+
+    private static int pdsImageContext(Game game, List<Player> cannonCover) {
+        return game.isFowMode() || cannonCover.isEmpty() ? 0 : 1;
     }
 
     private static void sendGeneralCombatButtonsToThread(
@@ -1868,19 +1915,45 @@ public class StartCombatService {
         }
 
         if (isSpaceCombat) {
+            BeansMonumentHandler.addPlateauOfLengCombatButton(buttons, game, p1);
+            if (p2 != p1) {
+                BeansMonumentHandler.addPlateauOfLengCombatButton(buttons, game, p2);
+            }
+            BeansMonumentHandler.addEtherAnchorCombatButton(buttons, game, p1, tile);
+            if (p2 != p1) {
+                BeansMonumentHandler.addEtherAnchorCombatButton(buttons, game, p2, tile);
+            }
+            BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p1, p2, tile);
+            BeansRelicHandler.addAshenHourglassCombatButton(buttons, game, p2, p1, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p1, p2, tile);
             WhiteTfUnitHandler.addFlagshipButton(buttons, game, p2, p1, tile);
+            ChoirTechHandler.addOblivionsEchoCombatButton(buttons, game, p1, p2, tile);
+            ChoirTechHandler.addOblivionsEchoCombatButton(buttons, game, p2, p1, tile);
         }
 
         if (isGroundCombat) {
+            BeansMonumentHandler.addHearthHomeCombatButton(buttons, game, p1);
+            if (p2 != p1) {
+                BeansMonumentHandler.addHearthHomeCombatButton(buttons, game, p2);
+            }
+            ChoirUnitHandler.addElegyCombatButton(buttons, game, p1, tile);
+            ChoirUnitHandler.addElegyCombatButton(buttons, game, p2, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p1, tile);
             CrystellumUnitHandler.addRefractumDeployButton(buttons, p2, tile);
+            if (combatHolder instanceof Planet planet) {
+                BloomStrainHandler.addCarnivorousActiveButton(buttons, game, p1, planet, tile);
+                if (p2 != p1) {
+                    BloomStrainHandler.addCarnivorousActiveButton(buttons, game, p2, planet, tile);
+                }
+            }
             XinUnitHandler.addSentinelRepairButton(buttons, p1, tile, combatHolder);
             XinUnitHandler.addSentinelRepairButton(buttons, p2, tile, combatHolder);
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p1, tile);
             BlueReverieTechHelper.addAtmanWeaveSuppressorsButton(buttons, p2, tile);
         }
         if (isGroundCombat) {
+            XyrixUnitHandler.addScholarsCombatButton(buttons, p1, tile);
+            XyrixUnitHandler.addScholarsCombatButton(buttons, p2, tile);
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p1);
             ThurvialiBreakthroughHandler.addNeurograftingReadyButtons(buttons, p2);
         }
@@ -1941,6 +2014,8 @@ public class StartCombatService {
         OblivionTechHandler.addOblivionCannonButton(buttons, game, p2, p1, tile, isSpaceCombat);
         RevenantLeadersHandler.addRevKryxosHeroButton(buttons, game, p1, p2, tile, isSpaceCombat);
         RevenantLeadersHandler.addRevKryxosHeroButton(buttons, game, p2, p1, tile, isSpaceCombat);
+        ChoirLeadersHandler.addFuneralProcessionButton(buttons, game, p1, p2, tile, isSpaceCombat);
+        ChoirLeadersHandler.addFuneralProcessionButton(buttons, game, p2, p1, tile, isSpaceCombat);
         checkAndAddIncomprehensibleFormButton(game, p1, p2, isSpaceCombat, tile, buttons);
 
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
@@ -2083,12 +2158,14 @@ public class StartCombatService {
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
                 buttons.add(ExhaustOnlyAgents.THUNDARIAN.button(agentHolder));
             }
+            // TODO: Franken: with two flagships, should every flagship tile count here, not only getFirst()?
             List<Tile> flagshipTile =
                     CheckUnitContainmentService.getTilesContainingPlayersUnits(game, agentHolder, UnitType.Flagship);
-            if (agentHolder.hasUnit("empyrean_flagship")
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnit("empyrean_flagship")
                     && !flagshipTile.isEmpty()
-                    && FoWHelper.getAdjacentTiles(game, pos, agentHolder, false, true)
-                            .contains(flagshipTile.getFirst().getPosition())) {
+                    && Adjacency.of(game, agentHolder)
+                            .isAdjacent(flagshipTile.getFirst().getPosition(), pos)) {
                 buttons.add(Buttons.gray(
                         factionChecker + "empyreanFlagshipAbilityStep1_" + pos,
                         "Use Empyrean Flagship Ability",
@@ -2979,10 +3056,13 @@ public class StartCombatService {
                     }
                     if (CombatRollService.checkIfUnitsOfType(
                             nonActive, game, null, tile, unitH.getName(), CombatRollType.SpaceCannonDefence)) {
-                        Player target = nonActive == p1 ? p2 : p1;
-                        buttons.add(Buttons.gray(
-                                "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",
-                                "Roll SPACE CANNON Defence for " + nameOfHolder));
+                        String rollId =
+                                "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence";
+                        String label = "Roll SPACE CANNON Defence for " + nameOfHolder;
+                        buttons.add(
+                                nonActive.isDummy() || nonActive.isNpc()
+                                        ? rollForDummyButton(nonActive, rollId, label)
+                                        : Buttons.gray(rollId, label));
                     }
                 }
             }

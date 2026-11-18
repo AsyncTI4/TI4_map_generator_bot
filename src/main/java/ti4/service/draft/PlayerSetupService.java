@@ -16,7 +16,12 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.DeepReachesStartingTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.luminous.opa.OpaAbilitiesHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesStartingTechsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
@@ -26,12 +31,14 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thron
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.game.Game;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -95,6 +102,14 @@ public class PlayerSetupService {
                     return;
                 }
             }
+        }
+
+        if (color != null && !ColorChangeHelper.isColorAllowedForPlayer(color, player)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Setup Warning - Color " + color + " is reserved for its creator."
+                            + " So, we will give you a different color...");
+            color = null;
         }
 
         if (player.isRealPlayer() && player.getSo() > 0) {
@@ -225,6 +240,9 @@ public class PlayerSetupService {
 
         // STARTING UNITS
         addUnits(factionModel, tile, color, event);
+        if (player.hasAbility("origin_unknown")) {
+            DeepUnitHandler.setup(game, player, tile, event);
+        }
 
         // STARTING TECH
         List<String> startingTech = factionModel.getStartingTech();
@@ -403,6 +421,9 @@ public class PlayerSetupService {
                     player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
                     buttons);
         }
+        if (player.hasAbility("tomebound_tutelage")) {
+            XyrixTomeHandler.initialize(player);
+        }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
@@ -560,7 +581,7 @@ public class PlayerSetupService {
             player.addRelic("waxing_moonphase");
             player.addRelic("waning_moonphase");
             player.addRelic("new_moonphase");
-            player.addRelic("lunar_eclipse_moonphase");
+            player.addRelic("half_moonphase");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " added the 5 _Moon Phase_ cards to their play area.");
@@ -585,6 +606,19 @@ public class PlayerSetupService {
                             + ", please choose which side you want your starting balance token to be on.",
                     ButtonHelper.getBalanceButtons(player));
         }
+        if (player.hasAbility("harvest")) {
+            Tile tileHs = player.getHomeSystemTile();
+            for (Planet planet : tileHs.getPlanetUnitHolders()) {
+                if (planet.getTechSpecialities().isEmpty()) {
+                    continue;
+                }
+                MigoAbilityHandler.onPlanetGained(player, planet.getName());
+            }
+        }
+        if (player.hasAbility("morbid_harmony")) {
+            ChoirAbilityHandler.syncMorbidHarmony(player);
+        }
+        BloomAbilityHandler.syncCoexistingAbilities(game, player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
 
         if (!game.isFowMode()) {

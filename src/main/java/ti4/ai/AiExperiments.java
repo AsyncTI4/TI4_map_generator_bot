@@ -43,7 +43,10 @@ public class AiExperiments {
         AVOIDANCE_BRIBES,
         DESPERATION_PUBLIC,
         DESPERATION_STATUS_SECRET,
-        DESPERATION_ACTION_SECRET
+        DESPERATION_ACTION_SECRET,
+        RELATIONS_ANGER,
+        VOTE_ANGER,
+        STRENGTH_WEIGHTED_ANGER
     }
 
     public static final String OFF_PROPERTY = "ai.experiments.off";

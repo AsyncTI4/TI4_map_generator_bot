@@ -16,7 +16,7 @@ class SetPersonalPingInterval extends Subcommand {
                         "hours",
                         "The number of hours between turn reminder pings. Set to 0 to disable your personal preference",
                         true)
-                .setRequiredRange(0, 720));
+                .setRequiredRange(0, 240));
     }
 
     @Override

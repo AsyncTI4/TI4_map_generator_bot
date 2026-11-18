@@ -16,6 +16,7 @@ public class BorderAnomalyModel implements ModelInterface {
     private String imagePath;
     private ComponentSource source;
     private Rules rules = new Rules();
+    private boolean wholeHex;
     private AutomationStatus automation;
     private String automationNotes;
 
@@ -28,6 +29,8 @@ public class BorderAnomalyModel implements ModelInterface {
     public static class Adjacency {
         private boolean blocksIn;
         private boolean blocksOut;
+        private String exemptHolderOf;
+        private boolean oneWayAdjacencyOnly;
     }
 
     @Override
@@ -52,6 +55,25 @@ public class BorderAnomalyModel implements ModelInterface {
         return rules != null
                 && rules.getAdjacency() != null
                 && rules.getAdjacency().isBlocksOut();
+    }
+
+    @JsonIgnore
+    public String getExemptHolderOf() {
+        return rules == null || rules.getAdjacency() == null
+                ? null
+                : rules.getAdjacency().getExemptHolderOf();
+    }
+
+    @JsonIgnore
+    public boolean isOneWayAdjacencyOnly() {
+        return rules != null
+                && rules.getAdjacency() != null
+                && rules.getAdjacency().isOneWayAdjacencyOnly();
+    }
+
+    @JsonIgnore
+    public boolean isOneWay() {
+        return blocksAdjacencyIn() != blocksAdjacencyOut();
     }
 
     @JsonIgnore

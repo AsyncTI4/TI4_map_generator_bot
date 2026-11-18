@@ -9,6 +9,7 @@ import ti4.service.tactical.postmovement.KhraskCommanderButton;
 import ti4.service.tactical.postmovement.KolleccMonumentButton;
 import ti4.service.tactical.postmovement.MirvedaCommanderButton;
 import ti4.service.tactical.postmovement.MoveAvernusButton;
+import ti4.service.tactical.postmovement.MoveCharonButton;
 import ti4.service.tactical.postmovement.MoveIllustrionButton;
 import ti4.service.tactical.postmovement.MuaatHeroButton;
 import ti4.service.tactical.postmovement.NightbloomBuildButton;
@@ -45,6 +46,7 @@ public final class PostMovementAbilityButtons {
             new TnelisBrDeployButton(),
             new ZelianAgentButton(),
             new MoveAvernusButton(),
+            new MoveCharonButton(),
             new MoveIllustrionButton(),
             new MuaatHeroButton(),
             new NightbloomBuildButton(),

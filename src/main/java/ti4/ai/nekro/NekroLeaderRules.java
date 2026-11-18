@@ -24,6 +24,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.agent.modules.NekroAgent;
 import ti4.service.tech.ListTechService;
 
 @UtilityClass
@@ -37,7 +38,6 @@ public class NekroLeaderRules {
     private static final String AGENT_DONE = "done";
     private static final String COST_KEY = "nekroAgentCost|";
     private static final String COST_PAID = "paid";
-    private static final String DISCARD_PROMPT_ENDING = " use buttons to discard";
     private static final String LOSE_TOKENS_TEXT = "Use buttons to lose tokens.";
     private static final String DONE_LOSING = "Done Losing";
     private static final String DECREASE_PREFIX = "decrease_";
@@ -176,7 +176,7 @@ public class NekroLeaderRules {
         long since = tokens.createdAtMillis() - CLOCK_SKEW_MILLIS;
         for (AiPrompt prompt : Prompts.newestFirst(context.prompts())) {
             if (!prompt.isHidden() || prompt.createdAtMillis() < since) continue;
-            if (!prompt.content().endsWith(DISCARD_PROMPT_ENDING)) continue;
+            if (!prompt.content().endsWith(NekroAgent.DISCARD_PROMPT)) continue;
             Optional<PromptButton> discard = ActionCardValue.worstDiscard(
                     context.game(),
                     context.seat(),
@@ -223,13 +223,12 @@ public class NekroLeaderRules {
                 .filter(prompt -> prompt.isHidden()
                         && prompt.createdAtMillis() >= step.get().since() - CLOCK_SKEW_MILLIS)
                 .toList();
-        Optional<AiDecision> next =
-                switch (step.get().stage()) {
-                    case MENU -> playHero(context, fresh, step.get());
-                    case LEADER -> choosePlanet(context, fresh, step.get());
-                    case PLANET -> chooseTechnology(context, fresh, step.get());
-                    case DONE -> Optional.empty();
-                };
+        Optional<AiDecision> next = switch (step.get().stage()) {
+            case MENU -> playHero(context, fresh, step.get());
+            case LEADER -> choosePlanet(context, fresh, step.get());
+            case PLANET -> chooseTechnology(context, fresh, step.get());
+            case DONE -> Optional.empty();
+        };
         if (next.isPresent()) return next;
         long until = step.get().since() + STEP_WAIT_MILLIS;
         if (context.now() < until) return Optional.of(new AiDecision.Wait(until, "UNIT.DSGN.FLAYESH"));

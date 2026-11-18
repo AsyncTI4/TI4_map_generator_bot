@@ -381,7 +381,8 @@ public class TacticalPlanner {
                 context.hints,
                 context.tokenFree,
                 FleetLimit.ships(context.seat),
-                MoveBoost.extra(context.seat));
+                MoveBoost.extra(context.seat),
+                SkippedSpaceCombat.assumedFaction());
     }
 
     private static List<TacticalPlan> rankedCandidates(Context context, Predicate<Tile> activatable) {

@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.Objects;
@@ -19,16 +20,35 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "player", uniqueConstraints = @UniqueConstraint(columnNames = {"game_name", "user_id"}))
+@Table(
+        name = "player",
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_player_game_playing_user",
+                        columnNames = {"game_name", "playing_user_id"}))
 public class PlayerEntity {
 
+    static final String ID_SEQUENCE = "player_id_seq";
+    static final int ID_ALLOCATION_SIZE = 50;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = ID_SEQUENCE)
+    @SequenceGenerator(name = ID_SEQUENCE, sequenceName = ID_SEQUENCE, allocationSize = ID_ALLOCATION_SIZE)
     private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    private UserEntity statsUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playing_user_id")
+    private UserEntity playingUser;
+
+    @Column(name = "is_playing", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean playing = true;
+
+    @Column(name = "is_npc", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean npc;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_name", nullable = false)

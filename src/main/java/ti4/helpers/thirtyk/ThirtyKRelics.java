@@ -344,9 +344,10 @@ public class ThirtyKRelics {
     }
 
     public static List<Player> spyReportTargets(Game game, Player player) {
+        Set<Player> neighbours = player.getAbilityNeighbours();
         return game.getRealPlayers().stream()
                 .filter(p -> p != player
-                        && !player.isNeighboursWith(p)
+                        && !neighbours.contains(p)
                         && !p.getActionCards().isEmpty())
                 .toList();
     }

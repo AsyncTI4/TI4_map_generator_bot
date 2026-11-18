@@ -125,6 +125,13 @@ class TradeLegality {
         context.memory().put(windowKey(context.game(), partner), String.valueOf(context.now()));
     }
 
+    static void releaseWindow(AiTurnContext context, Player partner, long usedAt) {
+        String key = windowKey(context.game(), partner);
+        if (context.memory().get(key).filter(String.valueOf(usedAt)::equals).isPresent()) {
+            context.memory().remove(key);
+        }
+    }
+
     private static String windowKey(Game game, Player partner) {
         return WINDOW_KEY + window(game) + SEPARATOR + partner.getFaction();
     }

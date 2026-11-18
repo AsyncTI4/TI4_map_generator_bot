@@ -10,6 +10,7 @@ import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.agenda.AgendaClock;
 import ti4.ai.agenda.AgendaRound;
 import ti4.ai.agenda.AgendaSwing;
+import ti4.ai.agenda.DiscardBounties;
 import ti4.ai.agenda.ShenanigansRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -71,7 +72,7 @@ public class ShenaniganCards {
     }
 
     private static double gainOf(Game game, Player seat, String title) {
-        double swing = AgendaSwing.forViewer(game, seat, title, seat);
+        double swing = AgendaSwing.forViewer(game, seat, title, seat) + bountyFor(game, seat, title);
         if (!EarlyDeadlyPlot.applies(game, seat, title)) return swing;
         return swing - EarlyDeadlyPlot.lostSecondAgendaVotes(game, seat);
     }
@@ -93,8 +94,12 @@ public class ShenaniganCards {
         };
     }
 
+    private static double bountyFor(Game game, Player seat, String title) {
+        return AgendaSwing.DEADLY_PLOT.equals(title) ? DiscardBounties.deadlyPlotBounty(game, seat) : 0;
+    }
+
     private static boolean mayDeadlyPlotNow(Game game, Player seat, String winner) {
-        if (AgendaRound.isFinalAgenda(game)) return true;
+        if (AgendaRound.isFinalAgenda(game) || DiscardBounties.deadlyPlotBounty(game, seat) > 0) return true;
         return EarlyDeadlyPlot.applies(game, seat, AgendaSwing.DEADLY_PLOT)
                 && EarlyDeadlyPlot.worthDiscarding(game, seat, winner);
     }

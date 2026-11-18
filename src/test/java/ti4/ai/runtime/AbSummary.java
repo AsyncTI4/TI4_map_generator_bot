@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import ti4.ai.AiExperiments;
 
 // The result of a mixed-brain A/B batch (-Dai.selfplay.ab=...). In each game half of the seats play with the
@@ -26,22 +27,19 @@ final class AbSummary {
             int round,
             double treatmentPoints,
             double controlPoints,
-            double treatmentWinShare) {
+            double treatmentWinShare,
+            boolean completed) {
 
         GameResult {
-            if (!finished(ending)) treatmentWinShare = Double.NaN;
+            if (!completed) treatmentWinShare = Double.NaN;
         }
 
         double difference() {
             return treatmentPoints - controlPoints;
         }
-
-        boolean completed() {
-            return finished(ending);
-        }
     }
 
-    static GameResult result(SelfPlayGame.Outcome outcome) {
+    static GameResult result(SelfPlayGame.Outcome outcome, Predicate<SelfPlayGame.Ending> complete) {
         Map<String, Integer> points = outcome.victoryPoints();
         Set<String> control = outcome.controlSeats();
         int best = points.values().stream().mapToInt(Integer::intValue).max().orElse(0);
@@ -72,11 +70,22 @@ final class AbSummary {
                 outcome.round(),
                 treatmentSeats == 0 ? 0 : treatmentSum / treatmentSeats,
                 controlSeats == 0 ? 0 : controlSum / controlSeats,
-                winners == 0 ? 0.5 : (double) treatmentWinners / winners);
+                winners == 0 ? 0.5 : (double) treatmentWinners / winners,
+                complete.test(outcome.ending()));
     }
 
+    // Full games count only when they ended by the rules (Ending.finished); a batch that stops after a fixed number
+    // of rounds passes its own test, so its round-limited endings still give paired estimates.
     static void print(List<SelfPlayGame.Outcome> outcomes, Set<AiExperiments.Experiment> experiments) {
-        List<GameResult> results = outcomes.stream().map(AbSummary::result).toList();
+        print(outcomes, experiments, SelfPlayGame.Ending::finished);
+    }
+
+    static void print(
+            List<SelfPlayGame.Outcome> outcomes,
+            Set<AiExperiments.Experiment> experiments,
+            Predicate<SelfPlayGame.Ending> complete) {
+        List<GameResult> results =
+                outcomes.stream().map(outcome -> result(outcome, complete)).toList();
         for (GameResult game : results) {
             System.out.printf(
                     "ABGAME slot=%d seed=%d ending=%s round=%d treatment=%.3f control=%.3f diff=%.3f winshare=%.3f%n",
@@ -128,10 +137,6 @@ final class AbSummary {
 
     static boolean completedPair(List<GameResult> pair) {
         return pair.size() == 2 && pair.stream().allMatch(GameResult::completed);
-    }
-
-    private static boolean finished(String ending) {
-        return SelfPlayGame.Ending.valueOf(ending).finished();
     }
 
     // t is measured against the null hypothesis: 0 for the point difference, 0.5 for the win share.

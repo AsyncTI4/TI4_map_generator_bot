@@ -26,7 +26,7 @@ public class UserEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "statsUser", fetch = FetchType.LAZY)
     private List<PlayerEntity> players;
 
     public UserEntity(String id, String name) {

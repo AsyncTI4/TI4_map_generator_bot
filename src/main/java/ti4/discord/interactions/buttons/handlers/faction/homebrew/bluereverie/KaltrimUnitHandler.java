@@ -445,7 +445,7 @@ public class KaltrimUnitHandler {
         if (target == null
                 || target == player
                 || !player.ownsUnit("kaltrim_pds")
-                || !player.isNeighboursWith(target)
+                || !player.getAbilityNeighbours().contains(target)
                 || !canDeployConsulate(player, game)) {
             ButtonHelper.deleteMessage(event);
             return;

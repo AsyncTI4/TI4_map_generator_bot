@@ -9,6 +9,8 @@ import java.util.Map;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.draft.AuctionFrankenDraft;
+import ti4.draft.AuctionFrankenDrazDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
 import ti4.draft.FrankenDrazDraft;
@@ -108,6 +110,13 @@ class FrankenDraftLimitSettings extends SettingsMenu {
         if (!"setAllZero".equals(action)) return null;
         for (FrankenLimitSetting setting : limitSettings) {
             if (setting.isDisabled()) continue;
+            if (parentSettings.isFrankendrazMode() && setting.category == DraftCategory.FACTION) {
+                if (setting.getVal() == 0) {
+                    setting.setVal(defaultLimit(DraftCategory.FACTION));
+                    setting.persist();
+                }
+                continue;
+            }
             setting.setVal(0);
             setting.persist();
         }
@@ -160,6 +169,8 @@ class FrankenDraftLimitSettings extends SettingsMenu {
             case FRANKENDRAZ -> new FrankenDrazDraft(game).getItemLimitForCategory(category);
             case TWILIGHTSFALL -> new TwilightsFallFrankenDraft(game).getItemLimitForCategory(category);
             case INAUGURALSPLICE -> new InauguralSpliceFrankenDraft(game).getItemLimitForCategory(category);
+            case AUCTION -> new AuctionFrankenDraft(game).getItemLimitForCategory(category);
+            case AUCTIONDRAZ -> new AuctionFrankenDrazDraft(game).getItemLimitForCategory(category);
         };
     }
 

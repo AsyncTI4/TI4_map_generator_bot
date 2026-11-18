@@ -44,12 +44,12 @@ import ti4.executors.CircuitBreaker;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.game.persistence.GameDatabaseSyncPipeline;
 import ti4.helpers.Storage;
 import ti4.image.map.MapRenderPipeline;
 import ti4.logging.BotLogger;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.model.metadata.TechSummariesMetadataManager;
-import ti4.service.persistence.GameDatabaseSyncPipeline;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
@@ -102,6 +102,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     final ExpeditionTracker expeditions = new ExpeditionTracker();
     final PromissoryTracker promissory = new PromissoryTracker();
     final LeaderTracker leaders = new LeaderTracker();
+    final FactionComponentTracker factionComponents = new FactionComponentTracker();
     // Trading: every accepted offer (read from the offerer's items just before the Accept press), the presses each seat
     // made by handler family, and the Trade settlements each holder sent and had accepted.
     final List<TradeRecord> tradeLedger = new ArrayList<>();
@@ -363,6 +364,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     seat.faction(),
                     target.customId(),
                     outcome.outcome().name());
+            factionComponents.pressed(
+                    currentRound(),
+                    seat.faction(),
+                    target.customId(),
+                    outcome.outcome().name());
             if (target.customId().contains("purgeHacanHero")) noteHeroBuild(seat.faction());
             if (outcome.pressed()) {
                 String family = handlerFamily(target.customId());
@@ -512,8 +518,10 @@ final class SelfPlayEnvironment implements AutoCloseable {
                     record(context.faction() + " decided " + describe(decision));
                 else if (idlesOnItsWatchedTurn(context)) recordIdleOnTurn(IdleDiagnosis.describe(context));
                 countReason(decision);
-                if (decision instanceof AiDecision.Press leaderPress)
+                if (decision instanceof AiDecision.Press leaderPress) {
                     leaders.decided(context.game().getRound(), context.faction(), leaderPress.reason());
+                    factionComponents.decided(context.game().getRound(), context.faction(), leaderPress.reason());
+                }
                 noteOffer(context.faction(), decision);
                 rememberReason(decision);
                 countRoundAction(decision, context.game().getRound());
@@ -531,12 +539,11 @@ final class SelfPlayEnvironment implements AutoCloseable {
     // Reasons are grouped by their wording without system positions or other numbers, so the report shows how often
     // the AI chose each kind of decision (for example how many tactical actions were expansions).
     private void countReason(AiDecision decision) {
-        String reason =
-                switch (decision) {
-                    case AiDecision.Press press -> press.reason();
-                    case AiDecision.Unsure unsure -> "UNSURE: " + unsure.reason();
-                    default -> null;
-                };
+        String reason = switch (decision) {
+            case AiDecision.Press press -> press.reason();
+            case AiDecision.Unsure unsure -> "UNSURE: " + unsure.reason();
+            default -> null;
+        };
         if (reason == null) return;
         String kind = reason.replaceAll("\\d+", "#").replaceAll("\\s+#\\S*", "").trim();
         synchronized (decisionReasons) {
@@ -637,14 +644,13 @@ final class SelfPlayEnvironment implements AutoCloseable {
         Territory.Zone zone = target == null
                 ? Territory.Zone.NEUTRAL
                 : Territory.of(game, context.seat()).zone(target);
-        String area =
-                switch (zone) {
-                    case HOME, LANE, SLICE -> EXPAND_OWN_AREA;
-                    case BORDER -> EXPAND_BORDER;
-                    case FOREIGN, OTHER_HOME -> EXPAND_ANOTHERS_AREA;
-                    case MECATOL -> EXPAND_MECATOL;
-                    case NEUTRAL -> EXPAND_ELSEWHERE;
-                };
+        String area = switch (zone) {
+            case HOME, LANE, SLICE -> EXPAND_OWN_AREA;
+            case BORDER -> EXPAND_BORDER;
+            case FOREIGN, OTHER_HOME -> EXPAND_ANOTHERS_AREA;
+            case MECATOL -> EXPAND_MECATOL;
+            case NEUTRAL -> EXPAND_ELSEWHERE;
+        };
         return area + " " + roundBand(game.getRound());
     }
 
@@ -695,13 +701,12 @@ final class SelfPlayEnvironment implements AutoCloseable {
     static final String PLAN_PREFIX = "plan: ";
 
     private void rememberReason(AiDecision decision) {
-        String reason =
-                switch (decision) {
-                    case AiDecision.Press press -> press.reason();
-                    case AiDecision.Unsure unsure -> unsure.reason();
-                    case AiDecision.Wait wait -> wait.reason();
-                    default -> null;
-                };
+        String reason = switch (decision) {
+            case AiDecision.Press press -> press.reason();
+            case AiDecision.Unsure unsure -> unsure.reason();
+            case AiDecision.Wait wait -> wait.reason();
+            default -> null;
+        };
         if (reason != null) lastDecisionReason = reason;
     }
 

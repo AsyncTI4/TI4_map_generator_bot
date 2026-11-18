@@ -717,28 +717,27 @@ public final class ObjectiveValue {
         }
         for (Tile tile : game.getTileMap().values()) {
             String position = tile.getPosition();
-            boolean member =
-                    switch (setName) {
-                        case "mecatolAdjacent" -> mecatolAdjacent.contains(position);
-                        case "noPlanets" -> tile.getPlanetUnitHolders().isEmpty();
-                        case "edge" -> tile != home && tile.isEdgeOfBoard(game);
-                        case "history" ->
-                            tile.isMecatol(game) || tile.isAnomaly(game, seat) || ButtonHelper.isTileLegendary(tile);
-                        case "anomalyAdjacent" ->
-                            FoWHelper.getAdjacentTiles(game, position, seat, false, false).stream()
-                                    .filter(next -> !next.equals(position))
-                                    .map(game::getTileByPosition)
-                                    .anyMatch(next -> next != null && next.isAnomaly(game, seat));
-                        case "otherHomeAdjacent" -> otherHomeAdjacent.contains(position);
-                        case "supremacy" -> tile.isMecatol(game) || (tile != home && tile.isHomeSystem(game));
-                        case "nexus" ->
-                            tile.getPlanetUnitHolders().stream()
-                                    .anyMatch(planet -> planet.getName().contains("mallice"));
-                        case "alpha" -> FoWHelper.doesTileHaveAlpha(game, position);
-                        case "beta" -> FoWHelper.doesTileHaveBeta(game, position);
-                        case "otherDock" -> hasAnotherPlayersDock(tile);
-                        default -> false;
-                    };
+            boolean member = switch (setName) {
+                case "mecatolAdjacent" -> mecatolAdjacent.contains(position);
+                case "noPlanets" -> tile.getPlanetUnitHolders().isEmpty();
+                case "edge" -> tile != home && tile.isEdgeOfBoard(game);
+                case "history" ->
+                    tile.isMecatol(game) || tile.isAnomaly(game, seat) || ButtonHelper.isTileLegendary(tile);
+                case "anomalyAdjacent" ->
+                    FoWHelper.getAdjacentTiles(game, position, seat, false, false).stream()
+                            .filter(next -> !next.equals(position))
+                            .map(game::getTileByPosition)
+                            .anyMatch(next -> next != null && next.isAnomaly(game, seat));
+                case "otherHomeAdjacent" -> otherHomeAdjacent.contains(position);
+                case "supremacy" -> tile.isMecatol(game) || (tile != home && tile.isHomeSystem(game));
+                case "nexus" ->
+                    tile.getPlanetUnitHolders().stream()
+                            .anyMatch(planet -> planet.getName().contains("mallice"));
+                case "alpha" -> FoWHelper.doesTileHaveAlpha(game, position);
+                case "beta" -> FoWHelper.doesTileHaveBeta(game, position);
+                case "otherDock" -> hasAnotherPlayersDock(tile);
+                default -> false;
+            };
             if (member) positions.add(position);
         }
         return positions;

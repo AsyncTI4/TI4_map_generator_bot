@@ -1,0 +1,203 @@
+[
+    {
+        "id": "ta_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Exchange",
+        "subtitle": "Ta Monument",
+        "source": "monuments",
+        "faction": "ta",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "ACTION: Exhaust this card and remove 1 attachment from a non-home planet you control in or adjacent to this system and attach it to another non-home planet you control in or adjacent to this system that does not already have one."
+    },
+    {
+        "id": "ashen_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Hearth-Home",
+        "subtitle": "Ashen Monument",
+        "source": "monuments",
+        "faction": "ashen",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When 1 or more of your infantry is destroyed during ground combat in a system in or adjacent to this unit’s planet, you may place up to 1 of those infantry on a planet in this unit’s system."
+    },
+    {
+        "id": "crystellum_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Glassway",
+        "subtitle": "Crystellum Monument",
+        "source": "monuments",
+        "faction": "crystellum",
+        "eligiblePlanetTypes": [
+            "CULTURAL",
+            "INDUSTRIAL"
+        ],
+        "ineligiblePlanetTypes": [
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "ACTION: Exhaust this card and return 3 captured fighters from your faction sheet to the supply to ready 1 planet you control in or adjacent to this system."
+    },
+    {
+        "id": "dream_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Plateau of Leng",
+        "subtitle": "Dreaming Monument",
+        "source": "monuments",
+        "faction": "dream",
+        "eligiblePlanetTypes": [
+            "EMPTY"
+        ],
+        "isPlanetOnly": false,
+        "isStructure": true,
+        "isMonument": true,
+        "productionValue": 1,
+        "ability": "This unit is placed in the space area of a system containing your ships. If this unit is blockaded, it is destroyed. After 1 or more of your ships in an adjacent system are destroyed, you may exhaust this card to place that ship in this unit’s system."
+    },
+    {
+        "id": "iron_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Breaker's Yard",
+        "subtitle": "Iron Monument",
+        "source": "monuments",
+        "faction": "iron",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL",
+            "CULTURAL"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When another player uses PRODUCTION in an adjacent system, that player may choose to give you 1 trade good to apply +1 to their total PRODUCTION value and reduce the combined cost of the produced units by 2."
+    },
+    {
+        "id": "netrunners_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Ghost Protocol",
+        "subtitle": "Net-Runners Monument",
+        "source": "monuments",
+        "faction": "netrunners",
+        "eligiblePlanetTypes": [
+            "INDUSTRIAL",
+            "LEGENDARY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When another player plays an action card during a combat in or adjacent to this system, you may exhaust this card and return 1 of that player's control tokens from your faction sheet to their reinforcements to cancel that action card."
+    },
+    {
+        "id": "natau_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Amaluun's Blessing",
+        "subtitle": "Natau Monument",
+        "source": "monuments",
+        "faction": "natau",
+        "eligiblePlanetTypes": [
+            "CULTURAL",
+            "INDUSTRIAL",
+            "HAZARDOUS"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "After another player activates a non-home system containing an anomaly in or adjacent to this system, that player may give you 1 trade good to ignore the effects of that anomaly during this tactical action."
+    },
+    {
+        "id": "valhavn_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Himinbjörg",
+        "subtitle": "Valhavn Monument",
+        "source": "monuments",
+        "faction": "valhavn",
+        "eligiblePlanetTypes": [
+            "CULTURAL",
+            "HAZARDOUS"
+        ],
+        "spaceCannonDieCount": 1,
+        "spaceCannonHitsOn": 5,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When you activate a system adjacent to this unit’s system, you may move 1 of your PDS from a planet adjacent to this system onto this unit’s planet. Your infantry may be placed onto this unit’s planet when resolving their text ability."
+    },
+    {
+        "id": "migo_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "The Cyst",
+        "subtitle": "Mi-Go Monument",
+        "source": "monuments",
+        "faction": "migo",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "TECH_SPECIALTY"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the end of your tactical action in this or an adjacent system, you may exhaust this card and remove 1 of your infantry from a planet you control in the active system to explore that planet."
+    },
+    {
+        "id": "deep_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Ether Anchor",
+        "subtitle": "Deep Monument",
+        "source": "monuments",
+        "faction": "deep",
+        "eligiblePlanetTypes": [
+            "EMPTY"
+        ],
+        "productionValue": 1,
+        "isStructure": true,
+        "isMonument": true,
+        "isPlanetOnly": false,
+        "ability": "This unit is placed in the The Deep unit’s system. When The Deep unit moves, this unit moves with it. If this unit is blockaded, destroy it. After a space combat in this unit’s system, you may exhaust this card to repair The Deep."
+    },
+    {
+        "id": "bloom_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Symbiote",
+        "subtitle": "J'nahfa Monument",
+        "source": "monuments",
+        "faction": "bloom",
+        "eligiblePlanetTypes": [
+            "CULTURAL",
+            "INDUSTRIAL",
+            "HAZARDOUS"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "After another player exhausts a planet containing your coexisting ground forces in or adjacent to this system, you may exhaust this card; that player may ready that planet. If they do, place 1 infantry from your reinforcements into coexistence on that planet."
+    },
+    {
+        "id": "choir_monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Silent Soliloquy",
+        "subtitle": "Ossyra Monument",
+        "source": "monuments",
+        "faction": "choir",
+        "eligiblePlanetTypes": [
+            "CULTURAL",
+            "HAZARDOUS"
+        ],
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "At the end of another player's tactical action in an adjacent system, you may exhaust this card. That player may repair 1 of their damaged ships in the active system. If they do, you may damage or repair 1 of your ships in this system."
+    }
+]

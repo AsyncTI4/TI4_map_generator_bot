@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
@@ -111,7 +111,7 @@ class QuashRulesTest extends BaseTi4Test {
 
     @Test
     void theBrainQuashesBeforePassingOnWhens() {
-        assertThat(AiTestGame.pressedId(new NekroBrain().decide(test.context(whenOffer()))))
+        assertThat(AiTestGame.pressedId(new StandardBrain().decide(test.context(whenOffer()))))
                 .isEqualTo("queueAWhen");
     }
 
@@ -119,7 +119,7 @@ class QuashRulesTest extends BaseTi4Test {
     void theBrainPassesOnWhensWhenTheAgendaIsHarmless() {
         test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":0,\"red\":4,\"black\":0}");
 
-        assertThat(AiTestGame.pressedId(new NekroBrain().decide(test.context(whenOffer()))))
+        assertThat(AiTestGame.pressedId(new StandardBrain().decide(test.context(whenOffer()))))
                 .isEqualTo("declineToQueueAWhen");
     }
 }

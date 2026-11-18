@@ -227,14 +227,12 @@ class PromiseDeals {
     }
 
     static String billText(Game game, Player payer, Player payee, Promise promise) {
-        String reason =
-                switch (promise.term()) {
-                    case DISCARD_AGENDA -> "for discarding the agenda with " + promise.target();
-                    case NOT_AGAINST ->
-                        "for not voting against **" + outcomeName(game, promise.target()) + "**, which won";
-                    case NOT_FOR -> "for not voting for **" + outcomeName(game, promise.target()) + "**, which lost";
-                    default -> "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
-                };
+        String reason = switch (promise.term()) {
+            case DISCARD_AGENDA -> "for discarding the agenda with " + promise.target();
+            case NOT_AGAINST -> "for not voting against **" + outcomeName(game, promise.target()) + "**, which won";
+            case NOT_FOR -> "for not voting for **" + outcomeName(game, promise.target()) + "**, which lost";
+            default -> "for its votes on **" + outcomeName(game, promise.target()) + "**, which won";
+        };
         return payer.getRepresentationUnfogged() + " owes " + payee.getFactionEmojiOrColor() + " "
                 + PromisePayment.of(game, promise).describe() + " " + reason + ".";
     }
@@ -250,6 +248,7 @@ class PromiseDeals {
         Player seat = context.seat();
         if (!active(seat)) return;
         Game game = context.game();
+        Reoffer.freeDeclinedWindows(context);
         for (Promise promise : PromiseBook.all(game)) {
             Optional<Promise.Status> status = settled(context, promise);
             if (status.isPresent()) {
@@ -780,20 +779,23 @@ class PromiseDeals {
 
     private static long proposedThisScope(Game game, Player seat, boolean votes) {
         return PromiseBook.proposedBy(game, seat).stream()
+                .filter(promise -> promise.status() != Promise.Status.DECLINED)
                 .filter(promise -> votes ? PromisedVotes.onThisAgenda(game, promise) : promise.territorial())
                 .count();
     }
 
     private static boolean noTerritorialDealYet(Game game, Player seat, Player partner) {
-        return PromiseBook.all(game).stream()
+        return Reoffer.mayDeal(PromiseBook.all(game).stream()
                 .filter(promise -> promise.thisRound(game) && promise.territorial())
-                .noneMatch(promise -> PromiseBook.between(promise, seat, partner));
+                .filter(promise -> PromiseBook.between(promise, seat, partner))
+                .toList());
     }
 
     static boolean noVoteDealYet(Game game, Player seat, Player partner) {
-        return PromiseBook.all(game).stream()
+        return Reoffer.mayDeal(PromiseBook.all(game).stream()
                 .filter(promise -> PromisedVotes.onThisAgenda(game, promise))
-                .noneMatch(promise -> PromiseBook.between(promise, seat, partner));
+                .filter(promise -> PromiseBook.between(promise, seat, partner))
+                .toList());
     }
 
     static boolean sellingVotes(Game game, Player seller) {
@@ -803,9 +805,12 @@ class PromiseDeals {
                 .anyMatch(promise -> promise.isPromiser(seller));
     }
 
-    private static Optional<AiDecision> post(AiTurnContext context, Proposal proposal) {
+    private static Optional<AiDecision> post(AiTurnContext context, Proposal offered) {
         Game game = context.game();
         Player seat = context.seat();
+        Optional<Proposal> better = Reoffer.improved(game, seat, offered);
+        if (better.isEmpty()) return Optional.empty();
+        Proposal proposal = better.get();
         Optional<String> channel = channelId(context);
         if (channel.isEmpty()) return Optional.empty();
         Player partner = proposal.promiser() == seat ? proposal.promisee() : proposal.promiser();

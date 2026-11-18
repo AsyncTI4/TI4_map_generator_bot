@@ -92,7 +92,10 @@ record Objective(
     }
 
     public Boolean isMultiScoring(Game game) {
-        return Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || game.isFowMode();
+        return Constants.CUSTODIAN.equals(key)
+                || Constants.IMPERIAL_RIDER.equals(key)
+                || Constants.SOVEREIGN_CROWN.equals(key)
+                || game.isFowMode();
     }
 
     private static Map<String, String> getCustomObjectives(Game game) {

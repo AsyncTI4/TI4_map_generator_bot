@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.discord.interactions.commands.ParentCommand;
 import ti4.discord.interactions.commands.Subcommand;
+import ti4.game.persistence.DatabasePersistenceGate;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.service.persistence.DatabasePersistenceGate;
 
 public class StatisticsCommand2 implements ParentCommand {
 

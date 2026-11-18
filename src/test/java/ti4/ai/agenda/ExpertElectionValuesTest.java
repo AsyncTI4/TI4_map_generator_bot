@@ -283,14 +283,23 @@ class ExpertElectionValuesTest extends BaseTi4Test {
         assertThat(hacan.isSpeaker()).isFalse();
     }
 
+    // The user's values (2026-11-16): a player who has not seen their hands values Yssaril's action cards 50% higher
+    // and Ral Nel's 25% higher, so with equal hands they are better targets; with no cards there is nothing extra.
     @Test
     void yssarilAndRalNelAreBetterExecutionTargets() {
         Player yssaril = seat("300000000000000003", ExpertElectionValues.YSSARIL, "yellow");
         Player ralnel = seat("300000000000000004", ExpertElectionValues.RAL_NEL, "green");
         Player hacan = seat("300000000000000005", "hacan", "red");
+        double emptyHanded = value(nekro, "execution", hacan.getFaction(), true);
+        assertThat(value(nekro, "execution", yssaril.getFaction(), true)).isCloseTo(emptyHanded, within(EPS));
+
+        for (Player rival : java.util.List.of(yssaril, ralnel, hacan)) {
+            for (int card = 1; card <= 3; card++) rival.setActionCard("hidden" + card + rival.getColor(), card);
+        }
         double plain = value(nekro, "execution", hacan.getFaction(), true);
-        assertThat(value(nekro, "execution", yssaril.getFaction(), true)).isGreaterThan(plain);
-        assertThat(value(nekro, "execution", ralnel.getFaction(), true)).isGreaterThan(plain);
+        double ralNel = value(nekro, "execution", ralnel.getFaction(), true);
+        assertThat(ralNel).isGreaterThan(plain);
+        assertThat(value(nekro, "execution", yssaril.getFaction(), true)).isGreaterThan(ralNel);
     }
 
     // The threat weighting alone makes the points leader the preferred target among otherwise equal rivals.
@@ -305,7 +314,7 @@ class ExpertElectionValuesTest extends BaseTi4Test {
     }
 
     // Public Execution of the speaker also passes the speaker token to the left, so the speaker's own loss is its
-    // hand plus what holding the token is worth to it, not its hand alone.
+    // hand plus the user's 4 TG for the token (6 TG from round 3), not its hand alone.
     @Test
     void theSpeakersOwnExecutionAlsoCostsItTheSpeakerToken() {
         nekro.setActionCard("sabo1");
@@ -313,7 +322,29 @@ class ExpertElectionValuesTest extends BaseTi4Test {
         test.game.setSpeaker(nekro);
         double asSpeaker = -ownValue(nekro, "execution");
 
-        assertThat(asSpeaker - asRival).isCloseTo(SpeakerTokenValue.ofHolding(test.game, nekro), within(EPS));
-        assertThat(asSpeaker - asRival).isGreaterThan(1);
+        assertThat(asSpeaker - asRival).isCloseTo(ExpertElectionValues.executedSpeakerLoss(test.game), within(EPS));
+    }
+
+    // The user's values (2026-11-16): being executed costs 1 TG for the votes lost (none on the final agenda), 4 TG
+    // for losing the speaker token (6 TG from round 3), and the hand at what each card is worth.
+    @Test
+    void anExecutedSpeakerLosesTokenVotesAndHand() {
+        test.game.setSpeaker(nekro);
+        test.game.setRound(2);
+        assertThat(-ownValue(nekro, "execution"))
+                .isCloseTo(
+                        ExpertElectionValues.EXECUTED_SPEAKER + ExpertElectionValues.EXECUTION_SILENCED, within(EPS));
+
+        test.game.setRound(3);
+        assertThat(-ownValue(nekro, "execution"))
+                .isCloseTo(
+                        ExpertElectionValues.EXECUTED_SPEAKER
+                                + ExpertElectionValues.LATE_SPEAKER_BONUS
+                                + ExpertElectionValues.EXECUTION_SILENCED,
+                        within(EPS));
+
+        double emptyHanded = -ownValue(nekro, "execution");
+        nekro.setActionCard("sabo1");
+        assertThat(-ownValue(nekro, "execution")).isGreaterThan(emptyHanded);
     }
 }

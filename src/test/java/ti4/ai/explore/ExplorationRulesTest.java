@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.nekro.CommandTokenPolicy;
-import ti4.ai.nekro.NekroBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.TacticalRules;
@@ -183,7 +183,7 @@ class ExplorationRulesTest extends BaseTi4Test {
     // The whole brain answers the offer, and sees the unowned buttons the cards use.
     @Test
     void theBrainAnswersExplorationPromptsAndSeesTheirButtons() {
-        NekroBrain brain = new NekroBrain();
+        StandardBrain brain = new StandardBrain();
         AiDecision decision = brain.decide(test.context(offer("filler", "tequran", "hazardous")));
         assertThat(pressedId(decision)).isEqualTo("FFCC_nekro_movedNExplored_filler_tequran_hazardous");
 

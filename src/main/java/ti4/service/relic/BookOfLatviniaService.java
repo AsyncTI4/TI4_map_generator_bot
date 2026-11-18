@@ -12,6 +12,7 @@ import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.megagame.MegagameGroupService;
 
 public final class BookOfLatviniaService {
 
@@ -39,6 +40,11 @@ public final class BookOfLatviniaService {
     }
 
     private static void stealSpeakerToken(Game game, Player player) {
+        String group = MegagameGroupService.isActive(game) ? MegagameGroupService.groupOf(game, player) : null;
+        if (group != null) {
+            stealGroupSpeakerToken(game, player, group);
+            return;
+        }
         Player prevSpeaker = game.getSpeaker();
         game.setSpeaker(player);
 
@@ -51,6 +57,16 @@ public final class BookOfLatviniaService {
                     player.getCorrectChannel(),
                     player.getRepresentation() + " you have gained the speaker token. " + MiscEmojis.SpeakerToken);
         }
+    }
+
+    private static void stealGroupSpeakerToken(Game game, Player player, String group) {
+        Player prevSpeaker = MegagameGroupService.groupSpeaker(game, group);
+        MegagameGroupService.setGroupSpeaker(game, group, player);
+        String msg = player.getRepresentation() + " took the " + MegagameGroupService.label(group)
+                + " speaker token with the _Book of Latvinia_"
+                + (prevSpeaker == null ? "" : " from " + prevSpeaker.getRepresentation()) + ". "
+                + MiscEmojis.SpeakerToken;
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
     private static void scoreBookOfLatviniaPoint(ButtonInteractionEvent event, Game game, Player player) {

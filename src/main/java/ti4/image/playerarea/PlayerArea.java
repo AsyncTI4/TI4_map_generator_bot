@@ -21,6 +21,7 @@ final class PlayerArea {
 
     static boolean isSkipped(PlayerAreaContext ctx, Player player) {
         return (player.isDummy() && player.isNpc())
+                || ctx.excludes(player)
                 || ctx.hidesStatsOf(player)
                 || ("neutral".equals(player.getFaction()) && player.isDummy());
     }

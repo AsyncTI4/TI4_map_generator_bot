@@ -29,7 +29,7 @@ class TimingReportTest {
     void theReportRanksSpansAndDecidingRulesAndCountsDecisionsOverTheLiveLimit() {
         TimingReport.decidedBy("TradeRules.answerOffers");
         TimingReport.recordDecision(profile(30 * SECOND, span("tactical.best", 20 * SECOND)), 25 * SECOND, "press");
-        TimingReport.decidedBy("NekroBrain.takeTurn");
+        TimingReport.decidedBy("StandardBrain.takeTurn");
         TimingReport.recordDecision(profile(5 * MILLI, span("cards.keepValue", 4 * MILLI)), 5 * MILLI, "idle");
         TimingReport.recordOutside("ai.load", 40 * MILLI);
 

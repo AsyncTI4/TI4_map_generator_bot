@@ -898,13 +898,15 @@ public class MonumentsTEButtonHandler {
         if (!game.isMonumentsMode()) {
             return;
         }
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
         for (Player owner : game.getRealPlayers()) {
             Tile tile = MonumentsService.getMonumentTile(game, owner, "bastion_monument");
             if (tile == null
                     || FoWHelper.playerHasActualShipsInSystem(owner, tile)
                     || game.getRealPlayers().stream()
-                            .noneMatch(
-                                    other -> other != owner && FoWHelper.playerHasActualShipsInSystem(other, tile))) {
+                                    .noneMatch(other ->
+                                            other != owner && FoWHelper.playerHasActualShipsInSystem(other, tile))
+                            && (neutral == null || !FoWHelper.playerHasActualShipsInSystem(neutral, tile))) {
                 continue;
             }
             DestroyUnitService.destroyUnits(event, tile, game, owner.getColor(), "1 monument", false);

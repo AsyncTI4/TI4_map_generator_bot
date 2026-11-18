@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SequencedMap;
 import lombok.experimental.UtilityClass;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.trace.ThinkingLimits;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -24,7 +25,7 @@ public class AiSettings {
     public static final int MAX_SEATS = 8;
     public static final Duration POLL_PERIOD = Duration.ofSeconds(3);
     public static final Duration DEBOUNCE = Duration.ofMillis(2500);
-    public static final Duration MIN_GAP_BETWEEN_ACTIONS = Duration.ofMillis(1500);
+    public static final Duration CHANNEL_FLOOD_GAP = Duration.ofMillis(1500);
     public static final Duration WATCHDOG_PERIOD = Duration.ofMinutes(1);
     public static final Duration DORMANT_AFTER = Duration.ofDays(1);
     public static final Duration STALL_THRESHOLD = Duration.ofMinutes(3);
@@ -40,7 +41,7 @@ public class AiSettings {
     public static final int THINKING_CALL_CAP = 200_000;
     public static final String THINKING_BUDGET_PROPERTY = "ai.thinking.budget.seconds";
     public static final int MAX_ATTEMPTS_PER_PROMPT = 2;
-    public static final int MAX_ACTIONS_PER_HOUR = 150;
+    public static final int RUNAWAY_PRESS_CAP_PER_HOUR = 150;
     public static final int MAX_DELEGATIONS_PER_ROUND = 30;
     public static final int MAX_GAME_DELEGATIONS_PER_ROUND = 60;
     public static final int MAX_REPEATED_FALLBACKS = 5;
@@ -55,7 +56,7 @@ public class AiSettings {
     public static final String SECRET_HOLD_PROPERTY = "ai.secrets.hold";
     private static final Duration FAST_REFEREE_DELAY = Duration.ofSeconds(10);
     private static final Duration FAST_STALL_THRESHOLD = Duration.ofMinutes(1);
-    private static final int FAST_MAX_ACTIONS_PER_HOUR = 600;
+    private static final int FAST_RUNAWAY_PRESS_CAP_PER_HOUR = 600;
 
     private static SequencedMap<String, String> factionNames() {
         SequencedMap<String, String> names = new LinkedHashMap<>();
@@ -127,8 +128,12 @@ public class AiSettings {
         return isFastPace(game) ? FAST_STALL_THRESHOLD : STALL_THRESHOLD;
     }
 
-    public static int maxActionsPerHour(Game game) {
-        return isFastPace(game) ? FAST_MAX_ACTIONS_PER_HOUR : MAX_ACTIONS_PER_HOUR;
+    public static int runawayPressCapPerHour(Game game) {
+        return isFastPace(game) ? FAST_RUNAWAY_PRESS_CAP_PER_HOUR : RUNAWAY_PRESS_CAP_PER_HOUR;
+    }
+
+    public static Duration channelFloodGap(Game game) {
+        return isFastPace(game) ? Duration.ZERO : CHANNEL_FLOOD_GAP;
     }
 
     public static boolean isSupportedFaction(String faction) {
@@ -142,6 +147,6 @@ public class AiSettings {
     }
 
     public static String brainFor(String faction) {
-        return NEKRO.equals(faction) ? NEKRO : "standard";
+        return StandardBrain.ID;
     }
 }

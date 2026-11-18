@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.listeners.context.ButtonContext;
@@ -42,7 +44,8 @@ public final class AgendaWhensAftersHelper {
     static void offerEveryonePrepassOnShenanigans(Game game) {
         if (game.islandMode()) return;
         for (Player player : game.getRealPlayers()) {
-            if (playerDoesNotHaveShenanigans(player)) {
+            int result = ThreadLocalRandom.current().nextInt(0, 6);
+            if (playerDoesNotHaveShenanigans(player) && result != 5) {
                 String part2 = player.getFaction();
                 if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {
                     part2 = game.getStoredValue("Pass On Shenanigans") + "_" + player.getFaction();
@@ -223,6 +226,9 @@ public final class AgendaWhensAftersHelper {
         if (player.hasRelic("culturalartifact")) {
             names.add("Cultural Artifact");
         }
+        if (player.hasRelic("handoftheemperor")) {
+            names.add("Hand of the Emperor");
+        }
         return names;
     }
 
@@ -265,6 +271,9 @@ public final class AgendaWhensAftersHelper {
         Button culturalArtifactButton = BlueReverieArtifactRelicHandler.getCulturalArtifactButton(player);
         if (culturalArtifactButton != null) {
             buttons.add(culturalArtifactButton);
+        }
+        if (player.hasRelic("handoftheemperor")) {
+            buttons.add(Buttons.red("queueWhen_relic_handoftheemperor", "Hand of the Emperor"));
         }
         return buttons;
     }
@@ -390,7 +399,9 @@ public final class AgendaWhensAftersHelper {
         if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
             names.add("Atokera Commander Ability");
         }
-
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "choircommander")) {
+            names.add("Keyn of the Hollow Commander");
+        }
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");
         }
@@ -450,7 +461,9 @@ public final class AgendaWhensAftersHelper {
         if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
             buttons.add(Buttons.red("queueAfter_leader_Atokera Commander", "Atokera Commander Ability"));
         }
-
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "choircommander")) {
+            buttons.add(Buttons.red("queueAfter_leader_Keyn of the Hollow Commander", "Use Keyn of the Hollow"));
+        }
         if (player.hasLeaderUnlocked("keleresheroodlynn")) {
             buttons.add(Buttons.red("queueAfter_leader_Keleres Xxcha Hero", "Keleres Hero"));
         }
@@ -578,8 +591,12 @@ public final class AgendaWhensAftersHelper {
                                 resolveWhenQueue(event, game);
                                 offerEveryoneWhensQueue(game);
                             }
-                            case "relic" ->
+                            case "relic" -> {
+                                if (BeansRelicHandler.resolveHandOfEmperor(event, game, player, when)) {
+                                    return;
+                                }
                                 BlueReverieArtifactRelicHandler.resolveCulturalArtifact(event, game, player);
+                            }
                         }
                     }
                     return;
@@ -723,6 +740,9 @@ public final class AgendaWhensAftersHelper {
                                     }
                                     riderButtons = AgendaRiderHelper.getAgendaButtons(
                                             "Keleres Xxcha Hero", game, player.factionButtonChecker());
+                                } else if (after.toLowerCase().contains("keyn of the hollow")) {
+                                    riderButtons = AgendaRiderHelper.getAgendaButtons(
+                                            "Keyn of the Hollow Commander", game, player.factionButtonChecker());
                                 } else if (after.toLowerCase().contains("envoy")) {
                                     riderButtons = AgendaRiderHelper.getAgendaButtons(
                                             after, game, player.factionButtonChecker());
@@ -965,14 +985,16 @@ public final class AgendaWhensAftersHelper {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         offerPreVote(player);
         resolveAfterQueue(event, game);
-        String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
-                + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
-                + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
-        buttons = new ArrayList<>();
+        if (!game.getStoredValue("Pass On Shenanigans").contains(player.getFaction())) {
+            String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
+                    + " Agenda shenanigans are the action cards _Bribery_, _Confusing Legal Text_, _Confounding Legal Text_, and _Deadly Plot_."
+                    + " Feel free not to pre-pass, this is simply an optional way to resolve agendas faster.";
+            buttons = new ArrayList<>();
 
-        buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
-        buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+            buttons.add(Buttons.green("resolvePreassignment_Pass On Shenanigans", "Pre-Pass"));
+            buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
     }
 
     private static boolean playerDoesNotHaveShenanigans(Player player) {

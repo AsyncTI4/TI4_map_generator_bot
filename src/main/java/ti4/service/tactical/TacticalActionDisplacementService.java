@@ -22,6 +22,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.model.UnitModel;
+import ti4.service.objectives.fog.FogSecretHooks;
 import ti4.service.regex.RegexService;
 import ti4.spring.service.gameevent.GameEventDraft;
 
@@ -194,6 +195,7 @@ public class TacticalActionDisplacementService {
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
         removeEmptyDisplacement(game.getTacticalActionDisplacement());
+        FogSecretHooks.onUnitsMovedIn(game, game.getActivePlayer(), tile, game.getTacticalActionDisplacement());
         GameEventDraft.stageMovement(game, tile.getPosition(), game.getTacticalActionDisplacement());
         for (Entry<String, Map<UnitKey, List<Integer>>> e :
                 game.getTacticalActionDisplacement().entrySet()) {

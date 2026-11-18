@@ -5,13 +5,11 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
@@ -149,32 +147,10 @@ public class GameMessageService {
         }
     }
 
-    @Deprecated(forRemoval = true, since = "2026-10")
-    public int importMissing(Map<String, List<GameMessage>> messagesByGame) {
-        int imported = 0;
-        for (Map.Entry<String, List<GameMessage>> game : messagesByGame.entrySet()) {
-            imported += writeGameAndGet(game.getKey(), () -> importMissing(game.getKey(), game.getValue()));
-        }
-        return imported;
-    }
-
     static boolean isStale(GameMessage message, int playerCount, long staleBefore) {
         boolean everyoneReacted =
                 playerCount > 0 && message.factionsThatReacted().size() >= playerCount;
         return everyoneReacted || message.gameSaveTime() <= staleBefore;
-    }
-
-    private int importMissing(String gameName, List<GameMessage> messages) {
-        Set<String> knownMessageIds = new HashSet<>();
-        load(gameName).forEach(message -> knownMessageIds.add(message.getMessageId()));
-        int imported = 0;
-        for (GameMessage message : messages) {
-            if (knownMessageIds.add(message.messageId())) {
-                repository.save(GameMessageEntity.from(gameName, message));
-                imported++;
-            }
-        }
-        return imported;
     }
 
     private int removeStale(String gameName, int playerCount, long staleBefore) {

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -77,6 +78,8 @@ class GameSaveService {
         Path gameSavePath = Storage.getGamePath(game.getName() + Constants.TXT);
         Path gameSaveDirectory = gameSavePath.getParent();
         Path temporarySavePath = null;
+        String previousRevision = game.getRevisionKey();
+        game.setRevisionKey(UUID.randomUUID().toString());
         try {
             temporarySavePath = Files.createTempFile(gameSaveDirectory, game.getName(), ".tmp");
 
@@ -86,6 +89,7 @@ class GameSaveService {
 
             Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
+            game.setRevisionKey(previousRevision);
             BotLogger.critical(new LogOrigin(game), "Could not save map: " + game.getName(), e);
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(), "Failed to save the game during the last command.");
@@ -150,6 +154,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(GAMEINFO);
+        writer.write(System.lineSeparator());
+        writer.write(REVISION_KEY + " " + Objects.requireNonNullElse(game.getRevisionKey(), ""));
         writer.write(System.lineSeparator());
         // game information
         writer.write(Constants.LATEST_COMMAND + " " + game.getLatestCommand());
@@ -482,6 +488,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_GEARS + " " + game.isShowGears());
         writer.write(System.lineSeparator());
+        writer.write(Constants.ONE_WAY_ADJACENCY + " " + game.isOneWayAdjacency());
+        writer.write(System.lineSeparator());
         writer.write(Constants.WORMHOLE_TOKEN_MERGE + " " + game.getWormholeTokenMergeFrom());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_BANNERS + " " + game.isShowBanners());
@@ -538,6 +546,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.LOST_LEGACIES_TILES + " " + game.isLostLegaciesTiles());
         writer.write(System.lineSeparator());
+        writer.write(Constants.REFRACTURE_MODE + " " + game.isRefractureMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.VERBOSITY + " " + game.getOutputVerbosity());
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + game.isTestBetaFeaturesMode());
@@ -585,6 +595,8 @@ class GameSaveService {
         writer.write(Constants.WILD_WILD_GALAXY_MODE + " " + game.isWildWildGalaxyMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.FEAST_OR_FAMINE_MODE + " " + game.isFeastOrFamineMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SECRETS_ONLY_MODE + " " + game.isSecretsOnlyMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.COSMIC_PHENOMENAE_MODE + " " + game.isCosmicPhenomenaeMode());
         writer.write(System.lineSeparator());
@@ -919,6 +931,11 @@ class GameSaveService {
 
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getHydromorphicCards(), writer, Constants.HYDROMORPHIC_CARDS);
+            writeCards(player.getTomeCards(), writer, Constants.TOME_CARDS);
+            writer.write(Constants.TOME_CARD_IN_PLAY + " " + player.getTomeCardInPlay());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TOME_CARDS_INITIALIZED + " " + player.isTomeCardsInitialized());
+            writer.write(System.lineSeparator());
             writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
 

@@ -103,6 +103,11 @@ public class TradeTerms {
         int stack = follower.getCommoditiesTotal();
         if (FriendlyTrade.chargesOneLess(game, holder, follower, trust))
             return Math.max(0, Math.min(LOW_FEE, stack - 1));
+        return standardFee(holder, follower, trust);
+    }
+
+    static int standardFee(Player holder, Player follower, double trust) {
+        int stack = follower.getCommoditiesTotal();
         boolean high = stack >= LARGE_STACK || Standings.vp(follower) > Standings.vp(holder) || trust < Trust.LOWER_FEE;
         return Math.max(0, Math.min(high ? HIGH_FEE : LOW_FEE, stack - 1));
     }

@@ -133,7 +133,8 @@
         "title": "Voice of the Veil",
         "abilityName": "The Unveiling - From Darkness, Truth",
         "abilityWindow": "ACTION:",
-        "abilityText": "Place this card face up in your play area. During the status phase of this round, you may score any number of your unscored status phase secret objectives that you satisfy the requirements for. At the end of the status phase, purge this card. ",
+        "abilityText": "Place this card face up in your play area. During the status phase of this round, when you score a secret objective, you may score another secret objective. At the end of the status phase, purge this card.",
+        "notes": "The Lunarium commander's effect happens only after you are done scoring all secret objectives for the status phase, so the drawn secret cannot also be scored this status phase.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "wftv"
     },
@@ -269,7 +270,7 @@
         "name": "Monturak Homotol",
         "title": "Apex Predator",
         "abilityName": "Death Warrant - Blood in the Water",
-        "abilityWindow": "After you destroy a unit with a bounty token on its unit space during combat:",
+        "abilityWindow": "After you destroy a unit with a bounty token on its unit space:",
         "abilityText": "You may purge this card. If you do, if it was a flagship or War Sun, gain 1 victory point; otherwise, place all units of that type from your reinforcements in systems that contain 1 or more of your ships.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "wftv"

@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.model.Mapper;
+import ti4.service.megagame.MegagameGroupService;
 
 @UtilityClass
 public class TestBedResetService {
@@ -69,6 +70,8 @@ public class TestBedResetService {
         game.setRelics(new ArrayList<>(Mapper.getDeck(game.getRelicDeckID()).getNewShuffledDeck()));
         removeLaws(game);
         unrevealObjectives(game);
+        MegagameGroupService.clearGroupState(game);
+        game.getTags().removeIf(MegagameGroupService.SC_GROUPS_TAG::equalsIgnoreCase);
     }
 
     private static void removeLaws(Game game) {

@@ -47,7 +47,7 @@ public class ButtonContext extends ListenerContext {
         if (!shouldSave) {
             return;
         }
-        if (game != null) {
+        if (game != null && player != null) {
             ButtonHelper.saveButtons(getEvent(), game, player);
         }
         super.save();

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiSettings;
 import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.brain.AiDecision;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
@@ -76,7 +76,7 @@ class CombatCardPlumbingTest extends BaseTi4Test {
         table.game.setStoredValue("combatRoundTrackersol" + position + "space", "1");
         store(Stage.WINDOW);
 
-        assertThat(new NekroBrain().decide(table.test.context(roll()))).isInstanceOf(AiDecision.Wait.class);
+        assertThat(new StandardBrain().decide(table.test.context(roll()))).isInstanceOf(AiDecision.Wait.class);
     }
 
     @Test

@@ -13,6 +13,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.model.UnitModel;
 
 // TODO: 30k explores and relics that place units do not check reinforcement limits.
@@ -24,9 +25,18 @@ public class ThirtyKExploreSupport {
     }
 
     public static List<Tile> tilesInOrAdjacent(Game game, Player player, Tile tile) {
+        if (tile == null) return new ArrayList<>();
+        return existingTiles(game, FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true));
+    }
+
+    public static List<Tile> tilesInOrReaching(Game game, Player player, Tile tile) {
+        if (tile == null) return new ArrayList<>();
+        return existingTiles(
+                game, Adjacency.of(game, player).forEffects().withSelf().into(tile.getPosition()));
+    }
+
+    private static List<Tile> existingTiles(Game game, Set<String> positions) {
         List<Tile> tiles = new ArrayList<>();
-        if (tile == null) return tiles;
-        Set<String> positions = FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true);
         for (String position : positions) {
             Tile adjacent = game.getTileByPosition(position);
             if (adjacent != null) tiles.add(adjacent);

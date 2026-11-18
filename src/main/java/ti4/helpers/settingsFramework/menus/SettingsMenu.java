@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -163,9 +164,13 @@ public abstract class SettingsMenu {
     }
 
     public void postMessageAndButtons(GenericInteractionCreateEvent event) {
+        postMessageAndButtons(event.getMessageChannel());
+    }
+
+    public void postMessageAndButtons(MessageChannel channel) {
         String newSummary = menuSummaryString(null);
         List<Button> buttons = getPaginatedButtons(0);
-        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, this::setMessageId);
+        MessageHelper.splitAndSentWithAction(newSummary, channel, buttons, this::setMessageId);
     }
 
     public void parseButtonInput(ButtonInteractionEvent event) {

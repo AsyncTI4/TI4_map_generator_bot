@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -26,20 +25,20 @@ import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfigu
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import ti4.message.GameMessage;
 import ti4.message.GameMessageType;
+import ti4.test.PostgresDatabaseTest;
 
-// Runs against a real Postgres, e.g. a throwaway database in a local container:
-//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:5432/tibot_test
-// Skipped when the variable is unset (CI has no database).
+// Runs against a real Postgres. CI provides one (the postgres service in .github/workflows/run-tests.yml).
+// Locally, use docker-compose.test.yml; the shared setup rejects unsafe database names and roles:
+//   TI4_TEST_POSTGRES_URL=jdbc:postgresql://localhost:55432/tibot_ci_test
+// Skipped when the variable is unset.
 @EnabledIfEnvironmentVariable(named = "TI4_TEST_POSTGRES_URL", matches = ".+")
 @SpringBootTest(
         classes = GameMessageServiceDatabaseTest.TestConfig.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = "spring.jpa.hibernate.ddl-auto=create-drop")
-class GameMessageServiceDatabaseTest {
+class GameMessageServiceDatabaseTest extends PostgresDatabaseTest {
 
     private static final String GAME = "pbd1000";
 
@@ -48,13 +47,6 @@ class GameMessageServiceDatabaseTest {
 
     @Autowired
     private GameMessageEntityRepository repository;
-
-    @DynamicPropertySource
-    static void datasource(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> System.getenv("TI4_TEST_POSTGRES_URL"));
-        registry.add("spring.datasource.username", () -> envOrDefault("TI4_TEST_POSTGRES_USER", "tibot"));
-        registry.add("spring.datasource.password", () -> envOrDefault("TI4_TEST_POSTGRES_PASSWORD", ""));
-    }
 
     @BeforeEach
     void clearTable() {
@@ -192,27 +184,6 @@ class GameMessageServiceDatabaseTest {
         assertThat(turns.get(GAME)).extracting(GameMessage::messageId).containsExactly("m1");
     }
 
-    @Test
-    void importMissingMergesWithoutDuplicatesAndIsSafeToRepeat() {
-        // A press may already have written a message before the startup import runs.
-        service.add(GAME, new GameMessage("m1", GameMessageType.TURN, 10L));
-        LinkedHashSet<String> reacted = new LinkedHashSet<>(List.of("argent"));
-        Map<String, List<GameMessage>> legacy = Map.of(
-                GAME,
-                List.of(
-                        new GameMessage("m1", GameMessageType.TURN, 10L),
-                        new GameMessage("m2", GameMessageType.ACTION_CARD, reacted, 20L)),
-                "pbd2000",
-                List.of(new GameMessage("m3", GameMessageType.STRATEGY_CARD, 30L, "4::8")));
-
-        assertThat(service.importMissing(legacy)).isEqualTo(2);
-        assertThat(service.importMissing(legacy)).isZero();
-        assertThat(service.getOne(GAME, "m2").orElseThrow().factionsThatReacted())
-                .containsExactly("argent");
-        assertThat(service.getOne("pbd2000", GameMessageType.STRATEGY_CARD, "4::8"))
-                .isPresent();
-    }
-
     private static void runConcurrently(int threads, IntConsumer work) throws InterruptedException {
         CountDownLatch start = new CountDownLatch(1);
         List<Future<?>> results = new ArrayList<>();
@@ -230,11 +201,6 @@ class GameMessageServiceDatabaseTest {
             assertThat(executor.awaitTermination(30, TimeUnit.SECONDS)).isTrue();
         }
         assertThat(results).allSatisfy(result -> assertThat(result).succeedsWithin(Duration.ZERO));
-    }
-
-    private static String envOrDefault(String name, String fallback) {
-        String value = System.getenv(name);
-        return value == null ? fallback : value;
     }
 
     @Configuration

@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.core.CombatReplayChannels;
 import ti4.contest.replay.entities.CombatCandidateEntity;
@@ -64,6 +65,7 @@ public class CombatReplayLeaderboardService {
     private final CombatReplayLeaderboardEntryRepository leaderboardEntryRepository;
     private final CombatReplaySideBetService sideBetService;
     private final CombatDoubleOrBustService doubleOrBustService;
+    private final TransactionTemplate transactionTemplate;
 
     public void lockPredictionsAtReplayStart(
             Game game, CombatReplayContestEntity replayContest, CombatCandidateEntity candidate) {
@@ -276,6 +278,11 @@ public class CombatReplayLeaderboardService {
     }
 
     private synchronized ScoredContestResult scoreReplayContest(
+            CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
+        return transactionTemplate.execute(_ -> scoreReplayContestInTransaction(candidate, replayContest));
+    }
+
+    private ScoredContestResult scoreReplayContestInTransaction(
             CombatCandidateEntity candidate, CombatReplayContestEntity replayContest) {
         CombatReplayPredictionEntity lockedPrediction = replayPredictionRepository
                 .findByContestId(replayContest.getId())

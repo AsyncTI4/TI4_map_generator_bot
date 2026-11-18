@@ -216,12 +216,11 @@ class MapRenderGoldenHarness extends BaseTi4Test {
     private static RenderedCanvas produce(Game game, Spec spec) throws Exception {
         List<Player> players = game.getRealPlayers();
         GenericInteractionCreateEvent event = eventFor(spec.viewer(), players);
-        Player explicitViewer =
-                switch (spec.viewer()) {
-                    case FOG_SECOND -> players.get(1);
-                    case EXPLICIT_FIRST -> players.getFirst();
-                    default -> null;
-                };
+        Player explicitViewer = switch (spec.viewer()) {
+            case FOG_SECOND -> players.get(1);
+            case EXPLICIT_FIRST -> players.getFirst();
+            default -> null;
+        };
         long start = System.nanoTime();
         return switch (spec.kind()) {
             case MAP -> renderCanvas(new RenderRequest(game, spec.displayType(), event, spec.segment()));

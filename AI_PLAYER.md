@@ -59,9 +59,10 @@ Nekro and Franken copies work too (`ti4.ai.sol`):
 - Evelyn Delouis (`SolAgentRules`) is used at the start of a round of a ground combat the seat fights in, when the
   extra die on its best ground force moves the win chance times the stake by at least 0.2; never for other
   players' combats. Claire Gibson (`SolCommanderRules`) places her free infantry before the seat's first roll.
-- Jace X, 4th Air Legion (`SolHeroRules`) is played from round 3 on when the seat has a tactical token and freeing
-  every command token on the board makes its best tactical plan worth at least three quarters of a point and at least
-  3 more than its two best plans now.
+- Jace X, 4th Air Legion (`SolHeroRules`) is played when the seat has a tactical token and freeing every command
+  token on the board brings at least a point its current plans do not (`FreedPlays`): an objective or secret, the
+  custodians or Imperial point on Mecatol Rex, Styx, or denying a rival close to winning (its home system, or Mecatol
+  from the Imperial holder).
 - _Bellum Gloriosum_ (`BellumGloriosumRules`): after its normal build is paid, the seat takes the free build for each
   ship with capacity it produced: defending infantry, spare infantry up to four, then fighters up to its room, paid
   from what the reserve leaves.
@@ -173,8 +174,11 @@ decided before the next die is rolled:
   demilitarized zones, Mallice, or planets with enemy structures and no enemy ground forces; Mecatol Rex under the
   custodians only when their 6 influence is payable, which it then pays), each planet worth its landing win chance
   without space cannon times its value, objective progress, denial of a rival's objective, the Mecatol hold value and
-  a point for the custodians. It plays the hero as a component action when that spread, less half a point for keeping
-  the hero (nothing in the last round), beats the best tactical plan, or instead of passing. It walks the hero's buttons
+  a point for the custodians; Styx's point and an unclaimed relic on a Fracture planet; and a point on Mecatol Rex
+  with Imperial or Overrule in hand (a quarter more with Fleet Logistics). Neutral defenders count, and on its point
+  landings it plans one Indoctrination conversion each (into a mech while one is in reinforcements) as far as its
+  influence allows. It plays the hero as a component action when that spread, less a quarter point for keeping the
+  hero (nothing in the last round or when a landing takes a point), beats the best tactical plan, or instead of passing. It walks the hero's buttons
   once per planet, starts each ground combat the bot asks about, and holds its turn (up to 15 minutes) until those
   combats end.
 - The Van Hauge (`VanHauge`, `CombatOdds.Force.detonating`): when the side holding it is wiped out the other side loses
@@ -332,6 +336,10 @@ to build one by hand:
       planet worth a victory point or more (an objective or secret it would score, a custodians/Mecatol hold, an
       enemy home planet, denying a rival's score), and not fighting is worth more than the fleet's replacement cost
       beyond the expected fight losses plus half a point for the card. It then lands everything on that planet.
+      Before each tactical action the planner also ranks every plan with the space combat skipped
+      (`SkippedSpaceCombat`: only the ground combat must be won and every ship in the system is lost); when that plan
+      is worth a point after the ships and beats the best plan without the hero by half a point, the seat takes it and
+      presses the hero in that system;
   - playing component action cards and _Forward Supply Base_, valued by what they score and by human play statistics,
     and answering cards that target it (below);
   - playing the promissory notes other players gave it, and respecting its own notes played against it (below);
@@ -945,11 +953,17 @@ to build one by hand:
       for its best plan with the fleet limit lifted. It plays the hero (component action, then the hero button) when
       that plan is an attack that stacks more non-fighter ships than the real limit and beats the best real plan by 4 or
       more. The hero is not played because it is unlocked, and the lifted limit then lets the next tactical action
-      field the stack.
+      field the stack. Before passing it is played as a stall while a rival can still win this round.
     - _Rear Admiral Farran_ (`RearAdmiralFarranRules`): the commander's trade good prompt is taken when it names the
       seat. _L4 Disruptors_ (`L4Disruptors`): the planets' space cannon is left out of the landing in invasion planning
       (`StrikeEvaluator`) and of the invasion threat against the seat's own planets (`DefenseOutlook`); the cannon still
       fires at the arriving ships.
+    - _Xxekir Grom_ (Xxcha, Thunder's Edge, `XxekirGromRules`): treated like Diplomacy: it readies planets to spend, so it
+      is played as a component action when the four exhausted planets it readies pay for a public objective (also just
+      before passing), or mid-round while spending is still ahead and those planets are worth 4 TG or more. Each of the four
+      placements is a mech while one is in reinforcements (a PDS first when a structure objective is near) on the
+      exhausted planet worth most to ready (`ReadyingValue`) and to defend (`GroundDrops`); PDS go where
+      `StructurePolicy` puts them.
     - Not handled: _War Funding_ (the bot only prints the holder's rerolled dice and leaves the rerolled hits and the
       opponent's reroll to its players, so there is nothing an AI can press safely), the movement half of Gravleash
       Maneuvers, and playing the hero for a production overflow.
@@ -1128,18 +1142,57 @@ to build one by hand:
     it left behind.
   - `-Dai.trading=false` switches trading off: it rejects every offer, follows Trade only for free from another AI,
     and as Trade holder lets everyone follow for free.
-  - **BOAT_FLOAT personality** (`AiPersonality`, off by default; stored value `aiPersonality=BOAT_FLOAT` on a seat, or
-    `-Dai.personality.boatfloat=all` / a comma list of factions for self-play). A more trade-friendly seat. With a player
-    in good relations (trust 0.8 or more, so every AI seat and a human with no unpaid bills or broken promises, and no
-    grudge from attacks) it flips that player's commodities for free when only one side has commodities: it accepts
-    their commodities for at most as many of its trade goods, and on its own turn, holding no commodities, offers that
-    flip once a round. As Trade holder it charges such a follower X-1 whatever their commodity value, and does not
-    exclude them for leading or for a point the payout would unlock. Both stop when the trade goods could let the
-    player win (`FriendlyTrade.couldWinWith`); a follower close to winning is still excluded. Reciprocity: a player
-    who doesn't float back is dropped for the rest of the game (stored value `aiBoatFloatSnubs` on the seat). That is
-    an AI Trade holder whose terms for this seat are worse than X-1 (or exclude it for anything but a win), a Trade
-    bill above X-1 after following, or any offer of fewer trade goods than the commodities it asks of this seat.
-    A declined free flip doesn't count. So BOAT_FLOAT seats float each other and stop floating seats that charge them.
+  - **Relations and personality** (`Relations`, `AiPersonality`). Each AI seat holds a relations level with every
+    other player, at most 2 (max) and with no floor, so relations can sink without end (forever war); 1 or more is
+    good relations, -1 or less bad. Its personality sets where every player starts:
+    STOOGE 2, FLOATER 1, NEUTRAL 0 (the default), WARRIOR -1, WARLORD -2. Set it with the stored value
+    `aiPersonality=FLOATER` on a seat, or for self-play `-Dai.personality=FLOATER` (every seat) or
+    `-Dai.personality=sol=FLOATER,hacan=WARLORD`. Hostility (`Hostility`, game stored value `aiHostility`) is
+    the TG value a player has cost this seat this game, next to a player who never attacked or took planets and
+    only boat floated; every 2 TG lowers relations by 1, for the rest of the game. It counts every attack and planet taken, undefended ones included: ship cost lost (in TG)
+    and planet value, x3 in the victim's home system and x1.5 in its slice. Each round, ships parked in the victim's
+    slice cost 1 TG, over its home 3 TG, and over its undefended space dock 2 TG; a system costs the largest that
+    applies, not the sum. Each mean "choose a player" card resolved on the victim costs 2 TG (Spy, Seize Artifact,
+    Uprising, Signal Jamming, Reactor Meltdown, Plague, Cripple Defenses, Unstable Planet, Insubordination,
+    Assassinate Representative), read from `GameStats.actionCardTargets`, which those cards'
+    resolve steps fill. Sabotage of the victim's card costs 1 TG; combat cards don't count. Trade counts what was charged above boat-float terms: Trade terms above X-1 (or an
+    exclusion other than a win) and a fee for flipping this seat's commodities. A fresh betrayal (broken promise or speaker sale) and trust under 0.8
+    (a human with unpaid bills or broken promises) lower the level by 1 each. Shifts are stored on the seat
+    (`aiRelations`), at most one up and one down per partner per round, never lifting the level above 2:
+    - **Up 1** when the partner floats this seat: it pays full trade goods for this seat's commodities, or as AI Trade
+      holder offers it a lower fee than the standard terms (X-1 on a stack of 4 or more).
+    - **Down 1**, only while in good relations, when the partner doesn't float back. That means its Trade terms are
+      worse than X-1 or exclude this seat for anything but a win, or it bills above X-1 after this seat follows its
+      Trade, or it offers fewer trade goods than the commodities it asks for. A declined free flip doesn't count.
+    - **Bad relations (-1 or less) drop the anger cost of hurting that player** (`Relations.bad`, which ignores
+      trust). Attacks: `OffenseOutlook.anger` is 0 against such a player (experiment `RELATIONS_ANGER`). Agenda
+      votes: `VoteAnger` gives each outcome an anger of 0.15 × how far it singles out each other player (their harm,
+      the mean of their utility over the other outcomes minus their utility for this one, less the table's average
+      harm; 1 TG or more counts). A ballot pays only the anger it adds: expected anger with the ballot minus without
+      it, ignored under 0.05 TG. It applies in the ballot planner and in the price of selling votes; players in bad
+      relations, within 2 points of the goal, or 2 or more points clear of the field cost nothing (experiment
+      `VOTE_ANGER`). Neither makes the AI hurt anyone blindly; it only stops holding back.
+  - **Tactical strength** (`ti4.ai.tactical.TacticalStrength`, experiment `STRENGTH_WEIGHTED_ANGER`). Each AI rates
+    itself from what it knows and every rival from public information: the cost of their units on the board (ships
+    and ground forces), +1 Assault Cannon, +2 X-89, +1 PDS II, a per-faction bonus (`FactionStrength`, empty until
+    the user defines it for the current and WIP factions), and the hand: 0.5 per mean or combat card in its own hand,
+    0.2 per card in a rival's (unseen), and 0.2 per card in its own hand too when it is not the seat deciding (a simulated rival plan never reads the hidden hand). The anger cost of attacking a rival or voting against it is multiplied by
+    (rival strength + 1) / (own strength + 1), kept within 0.25 to 2: a strong rival or a weak seat avoids anger, a
+    weak rival or a strong seat cares less.
+    - **Open:** modify the ratings by what can actually reach the other player, according to the defensive planner
+      (`IncomingForces`): units that cannot reach the rival (or the seat) should count less toward the strength
+      that weighs anger between them.
+    - **Open:** widen what defines tactical strength (for example flagships and war suns by ability, mechs, leaders,
+      faction technologies, promissory notes held, how close the player is to winning, and known cards).
+    - **Open:** a tendency not to anger too many players at once: today each angered player is priced alone, so the
+      AI can anger several rivals in one round without any extra cost.
+  - **Friendly trade** (`FriendlyTrade`), with a player in good relations. It flips that player's commodities for free
+    when only one side has commodities: it accepts their commodities for at most as many of its trade goods, and on
+    its own turn, holding no commodities, offers that flip once a round. As Trade holder it charges such a follower X-1
+    whatever their commodity value, and does not exclude them for leading or for a point the payout would unlock. Both
+    stop when the trade goods could let the player win (`FriendlyTrade.couldWinWith`); a follower close to winning is
+    still excluded. So FLOATER seats float each other, a NEUTRAL seat joins in once someone floats it, and charging a
+    FLOATER ends its float until the partner floats it again; a STOOGE forgives one charge.
   - **Debt across the table.** No AI deal may leave one player owing 3 or more debt in total (tokens held by every
     other seat plus debt promised in unpaid deals); `DebtRules.room` is the single gate.
   - **Self-play statistics.** Every accepted offer is logged (round, parties, items). The report lists per seat its
@@ -1636,7 +1689,8 @@ to build one by hand:
   "Thinking" section in its report.
 - **Guards.**
   - At most 2 attempts per prompt and state (staged movement and unit positions count as progress).
-  - At least 1.5 s between actions in a game, and at most 150 actions an hour per seat.
+  - At least 1.5 s between actions in a game (none at fast pace in self-play), and at most 150 actions an hour per seat
+    (600 at fast pace).
   - Delegation caps per seat and per game each round.
   - A loop guard: when a seat falls back on the same unsure choice 6 times in one turn without pressing anything
     itself in between, it stops choosing on its own and posts one 🔁 notice (`/ai delegate` still hands the choice

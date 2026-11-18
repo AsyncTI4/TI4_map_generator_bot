@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.eq;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -27,6 +29,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.persistence.TestGameHarness;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.message.MessageHelper;
@@ -515,6 +518,97 @@ class ActionCardPingButtonHandlerTest extends BaseTi4Test {
                 mh.verify(() -> MessageHelper.sendMessageToChannel(
                         eq(mainChannel), argThat(msg -> msg.contains("_" + longTitle + "_"))));
             }
+        }
+    }
+
+    // ---- pinged planet: an announced planet is the target the card resolves on ------------------
+
+    private static void pingPlanetForCard(Game game, Player actor, String cardTitle, String planetId) {
+        try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+            ActionCardPingButtonHandler.pickType(game, actor, Constants.AC_PING_PICK + "planet_31415926_" + cardTitle);
+            ActionCardPingButtonHandler.resolveRoute(
+                    mock(ButtonInteractionEvent.class, RETURNS_DEEP_STUBS),
+                    game,
+                    actor,
+                    Constants.AC_PING_ROUTE + "public_planet_31415926_" + planetId);
+        }
+    }
+
+    private record EnemyPlanetCase(Player actor, Player victim, String planetId) {}
+
+    private static EnemyPlanetCase findKnownEnemyPlanet(Game game) {
+        for (Player actor : game.getRealPlayers()) {
+            Set<String> known = PlanetTargetService.knownPlanetIds(game, actor, null);
+            for (Player victim : game.getRealPlayers()) {
+                if (victim == actor) continue;
+                for (String planetId : victim.getPlanets()) {
+                    if (known.contains(planetId) && game.getTileFromPlanet(planetId) != null) {
+                        return new EnemyPlanetCase(actor, victim, planetId);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Test
+    void pingedPlanet_resolvesOnValidTargetFizzlesOnInvalidAndIsClearedAfterUse() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            giveMainChannel(game);
+            EnemyPlanetCase c = findKnownEnemyPlanet(game);
+            assertThat(c)
+                    .as("an actor must know a planet another player controls")
+                    .isNotNull();
+            c.victim().refreshPlanet(c.planetId());
+            TextChannel actorChannel = givePrivateChannel(c.actor());
+            givePrivateChannel(c.victim());
+            ButtonInteractionEvent event = mock(ButtonInteractionEvent.class, RETURNS_DEEP_STUBS);
+
+            pingPlanetForCard(game, c.actor(), "Reparations", c.planetId());
+            // Another card's resolution must not pick up this ping.
+            assertThat(ActionCardPingButtonHandler.consumePingedPlanet(game, c.actor(), "Plague"))
+                    .isEmpty();
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+                ButtonHelperActionCards.resolveReparationsStep1(c.actor(), game, event);
+            }
+            assertThat(c.victim().getExhaustedPlanets()).contains(c.planetId());
+            assertThat(ActionCardPingButtonHandler.consumePingedPlanet(game, c.actor(), "Reparations"))
+                    .as("consumed by the resolution")
+                    .isEmpty();
+
+            // Unstable Planet excludes your own planets, so announcing one fizzles instead of re-offering the list.
+            pingPlanetForCard(
+                    game, c.actor(), "Unstable Planet", c.actor().getPlanets().getFirst());
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+                ButtonHelperActionCards.resolveUnstableStep1(c.actor(), game, event);
+                mh.verify(() -> MessageHelper.sendMessageToChannel(
+                        eq(actorChannel),
+                        argThat(msg ->
+                                PlanetTargetService.messagePool().stream().anyMatch(msg::contains))));
+                mh.verify(() -> MessageHelper.sendMessageToChannelWithButtons(any(), any(), anyList()), never());
+            }
+        }
+    }
+
+    @Test
+    void pingedPlanet_isForgottenWhenTheNextActionCardIsPlayed() {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            game.setFowMode(true);
+            giveMainChannel(game);
+            Player actor = game.getRealPlayers().getFirst();
+            givePrivateChannel(actor);
+
+            pingPlanetForCard(game, actor, "Plague", actor.getPlanets().getFirst());
+            assertThat(game.getStoredValue("acPingPlanet" + actor.getFaction())).isNotEmpty();
+            // A second copy of the same card played later must not inherit the earlier announcement.
+            try (MockedStatic<MessageHelper> mh = mockStatic(MessageHelper.class)) {
+                ActionCardPingButtonHandler.sendPingPrompt(actor, "123456789", "Plague");
+            }
+            assertThat(ActionCardPingButtonHandler.consumePingedPlanet(game, actor, "Plague"))
+                    .isEmpty();
         }
     }
 

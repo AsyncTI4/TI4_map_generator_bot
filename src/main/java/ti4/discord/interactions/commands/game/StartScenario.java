@@ -266,7 +266,7 @@ public class StartScenario extends GameStateSubcommand {
     private static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
         game.setLiberationC4Mode(true);
         var factions = List.of("ghost", "xxcha", "sol", "naaz", "nekro", "nomad");
-        if (game.getRealPlayers().isEmpty()) {
+        if (game.getRealPlayers().isEmpty() || game.getTileByPosition("000") == null) {
             AddTileListService.addTileListToMap(
                     game,
                     "{c41} 21 35 77 63 48 70 68 60 47 76 25 66 30 72 27 26 22 75 1 74 67 8 62 79 14 31 29 53 41 34 17 65 45 57 64 49",
@@ -305,14 +305,24 @@ public class StartScenario extends GameStateSubcommand {
             nekro.addTech("nekroc4y");
             nekro.addTech("nekroc4r");
             nekro.setFleetCC(4);
-            AddUnitService.addUnits(event, center, game, nekro.getColor(), "2 dread, 2 carriers, 4 ff, 4 inf o");
+            if (center == null) {
+                MessageHelper.sendMessageToEventChannel(
+                        event, "The center tile is missing, so Nekro's starting fleet was not placed.");
+            } else {
+                AddUnitService.addUnits(event, center, game, nekro.getColor(), "2 dread, 2 carriers, 4 ff, 4 inf o");
+            }
             nekro.refreshPlanet("ordinianc4");
         }
 
         Player ghost = game.getPlayerFromColorOrFaction("ghost");
         Tile gate = game.getTileByPosition("313");
         if (ghost != null) {
-            AddUnitService.addUnits(event, gate, game, ghost.getColor(), "1 cruiser, 1 carrier, 2 inf");
+            if (gate == null) {
+                MessageHelper.sendMessageToEventChannel(
+                        event, "The Creuss gate tile is missing, so Creuss' starting fleet was not placed.");
+            } else {
+                AddUnitService.addUnits(event, gate, game, ghost.getColor(), "1 cruiser, 1 carrier, 2 inf");
+            }
             ghost.removeLeader("ghostagent");
             ghost.removeLeader("ghostcommander");
             ghost.removeLeader("ghosthero");

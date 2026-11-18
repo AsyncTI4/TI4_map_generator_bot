@@ -328,9 +328,9 @@ public class StrategyCardRules {
                 .filter(button -> button.isOwnedBy(context.faction())
                         && button.handlerId().startsWith(REMOVE_TOKEN_PREFIX))
                 .toList();
-        if (!removals.isEmpty() && !CardMessages.done(context, "warfareRemoved")) {
+        if (CardMessages.done(context, "warfareRemoved")) return gainTheRemovedToken(context);
+        if (!removals.isEmpty()) {
             CardMessages.markDone(context, "warfareRemoved");
-            CardMessages.markDone(context, WARFARE_FINISHED);
             List<String> offered = removals.stream()
                     .map(StrategyCardRules::positionOf)
                     .distinct()
@@ -349,6 +349,12 @@ public class StrategyCardRules {
         }
         CardMessages.markDone(context, WARFARE_FINISHED);
         return Optional.empty();
+    }
+
+    private static Optional<AiDecision> gainTheRemovedToken(AiTurnContext context) {
+        Optional<AiDecision> gain = WarfareTokens.gainAndRebalance(context);
+        if (WarfareTokens.finished(context)) CardMessages.markDone(context, WARFARE_FINISHED);
+        return gain;
     }
 
     private static String positionOf(PromptButton removeButton) {
@@ -391,20 +397,17 @@ public class StrategyCardRules {
             Optional<AiPrompt> card = CardMessages.cardMessage(context, initiative);
             if (card.isEmpty()) continue;
             Map<String, String> before = context.memory().snapshot();
-            Optional<AiDecision> decision =
-                    switch (StrategyCard.of(game, initiative)) {
-                        case IMPERIAL -> followImperial(context, card.get());
-                        case TECHNOLOGY ->
-                            busyPaying(context) ? Optional.empty() : followTechnology(context, card.get());
-                        case DIPLOMACY -> busyPaying(context) ? Optional.empty() : followDiplomacy(context, card.get());
-                        case WARFARE -> busyPaying(context) ? Optional.empty() : followWarfare(context, card.get());
-                        case CONSTRUCTION -> followConstruction(context, card.get());
-                        case POLITICS -> followPolitics(context, card.get());
-                        case TRADE -> followTrade(context, card.get(), initiative);
-                        case LEADERSHIP ->
-                            busyPaying(context) ? Optional.empty() : followLeadership(context, card.get());
-                        default -> Optional.empty();
-                    };
+            Optional<AiDecision> decision = switch (StrategyCard.of(game, initiative)) {
+                case IMPERIAL -> followImperial(context, card.get());
+                case TECHNOLOGY -> busyPaying(context) ? Optional.empty() : followTechnology(context, card.get());
+                case DIPLOMACY -> busyPaying(context) ? Optional.empty() : followDiplomacy(context, card.get());
+                case WARFARE -> busyPaying(context) ? Optional.empty() : followWarfare(context, card.get());
+                case CONSTRUCTION -> followConstruction(context, card.get());
+                case POLITICS -> followPolitics(context, card.get());
+                case TRADE -> followTrade(context, card.get(), initiative);
+                case LEADERSHIP -> busyPaying(context) ? Optional.empty() : followLeadership(context, card.get());
+                default -> Optional.empty();
+            };
             if (decision.isPresent()) {
                 Optional<AiDecision> scepter = ScepterFollow.exhaustFirst(context, initiative, decision.get());
                 if (scepter.isPresent()) {
@@ -651,21 +654,20 @@ public class StrategyCardRules {
                     context, card, TRADE_REFRESH_BUTTON, "follow Trade for free to replenish commodities");
         }
         FollowChoice choice = TradeCardRules.followChoice(context, holder);
-        Optional<AiDecision> press =
-                switch (choice) {
-                    case FREE ->
-                        CardMessages.pressOnce(
-                                context, card, TRADE_REFRESH_BUTTON, "follow Trade for free to replenish commodities");
-                    case TOKEN ->
-                        hasSpareStrategyToken(context, StrategyCard.TRADE)
-                                ? CardMessages.pressOnce(
-                                        context,
-                                        card,
-                                        TRADE_TOKEN_BUTTON,
-                                        "follow Trade with a strategy token to replenish commodities")
-                                : Optional.empty();
-                    case DECLINE -> Optional.empty();
-                };
+        Optional<AiDecision> press = switch (choice) {
+            case FREE ->
+                CardMessages.pressOnce(
+                        context, card, TRADE_REFRESH_BUTTON, "follow Trade for free to replenish commodities");
+            case TOKEN ->
+                hasSpareStrategyToken(context, StrategyCard.TRADE)
+                        ? CardMessages.pressOnce(
+                                context,
+                                card,
+                                TRADE_TOKEN_BUTTON,
+                                "follow Trade with a strategy token to replenish commodities")
+                        : Optional.empty();
+            case DECLINE -> Optional.empty();
+        };
         press.ifPresent(ignored -> TradeCardRules.followPressed(context, holder, choice));
         return press;
     }

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.testUtils.BaseTi4Test;
@@ -52,7 +52,7 @@ class StartingTechRulesTest extends BaseTi4Test {
     // The brain picks it too, with no turn of its own: setup happens before the game starts.
     @Test
     void theBrainPicksItBeforeTheGameStarts() {
-        AiDecision decision = new NekroBrain().decide(context(options));
+        AiDecision decision = new StandardBrain().decide(context(options));
 
         assertThat(AiTestGame.pressedId(decision)).startsWith(PREFIX).endsWith(SUFFIX);
     }

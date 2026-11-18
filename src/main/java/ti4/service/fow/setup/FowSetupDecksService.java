@@ -34,9 +34,9 @@ final class FowSetupDecksService {
 
     private FowSetupDecksService() {}
 
-    private record DeckSlot(String constantKey, String label, DeckModel.DeckType type) {}
+    record DeckSlot(String constantKey, String label, DeckModel.DeckType type) {}
 
-    private static final List<DeckSlot> DECK_SLOTS = List.of(
+    static final List<DeckSlot> DECK_SLOTS = List.of(
             new DeckSlot(Constants.AC_DECK, "Action Card", DeckModel.DeckType.ACTION_CARD),
             new DeckSlot(Constants.SO_DECK, "Secret Objective", DeckModel.DeckType.SECRET_OBJECTIVE),
             new DeckSlot(Constants.STAGE_1_PUBLIC_DECK, "Stage 1 Public", DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE),
@@ -82,7 +82,7 @@ final class FowSetupDecksService {
         buttons.add(Buttons.blue("fowSetupDeckConfigImportExplain", "Import Deck-editor Config (URL)"));
     }
 
-    private static String currentDeckId(Game game, String deckType) {
+    static String currentDeckId(Game game, String deckType) {
         return switch (deckType) {
             case Constants.AC_DECK -> game.getAcDeckID();
             case Constants.SO_DECK -> game.getSoDeckID();
@@ -97,7 +97,7 @@ final class FowSetupDecksService {
         };
     }
 
-    private static DeckSlot slotFor(String constantKey) {
+    static DeckSlot slotFor(String constantKey) {
         return DECK_SLOTS.stream()
                 .filter(slot -> slot.constantKey().equals(constantKey))
                 .findFirst()
@@ -113,28 +113,32 @@ final class FowSetupDecksService {
         DeckSlot slot = slotFor(slotKey);
         if (slot == null) return;
 
-        List<DeckModel> options = Mapper.getDecks().values().stream()
-                .filter(deck -> deck.getType() == slot.type())
-                .sorted(Comparator.comparing(DeckModel::getName))
-                .toList();
-        if (options.isEmpty()) {
+        List<SelectOption> selectOptions = deckOptions(slot);
+        if (selectOptions.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No decks of that type are defined.");
             return;
-        }
-        List<SelectOption> selectOptions = new ArrayList<>();
-        for (DeckModel deck : options) {
-            SelectOption option = SelectOption.of(StringUtils.left(deck.getName(), 100), deck.getAlias());
-            if (StringUtils.isNotBlank(deck.getDescription())) {
-                option = option.withDescription(
-                        StringUtils.left(deck.getDescription().replace('\n', ' '), 100));
-            }
-            selectOptions.add(option);
         }
         MessageHelper.sendPagedSelectMenus(
                 event.getMessageChannel(),
                 "fowSetupDeckSelect_" + slotKey,
                 selectOptions,
                 "Pick a " + slot.label() + " deck:");
+    }
+
+    static List<SelectOption> deckOptions(DeckSlot slot) {
+        List<SelectOption> selectOptions = new ArrayList<>();
+        Mapper.getDecks().values().stream()
+                .filter(deck -> deck.getType() == slot.type())
+                .sorted(Comparator.comparing(DeckModel::getName))
+                .forEach(deck -> {
+                    SelectOption option = SelectOption.of(StringUtils.left(deck.getName(), 100), deck.getAlias());
+                    if (StringUtils.isNotBlank(deck.getDescription())) {
+                        option = option.withDescription(
+                                StringUtils.left(deck.getDescription().replace('\n', ' '), 100));
+                    }
+                    selectOptions.add(option);
+                });
+        return selectOptions;
     }
 
     @SelectionHandler("fowSetupDeckSelect_")
@@ -160,20 +164,24 @@ final class FowSetupDecksService {
     @ButtonHandler("fowSetupDeckPickSC")
     static void openStrategyCardSetSelect(ButtonInteractionEvent event, Game game) {
         if (!FowSetupWizardService.requireGM(event, game)) return;
-        List<StrategyCardSetModel> options = Mapper.getStrategyCardSets().values().stream()
-                .sorted(Comparator.comparing(StrategyCardSetModel::getName))
-                .toList();
-        List<SelectOption> selectOptions = new ArrayList<>();
-        for (StrategyCardSetModel scSet : options) {
-            SelectOption option = SelectOption.of(StringUtils.left(scSet.getName(), 100), scSet.getAlias());
-            if (scSet.getDescription().filter(StringUtils::isNotBlank).isPresent()) {
-                option = option.withDescription(
-                        StringUtils.left(scSet.getDescription().get().replace('\n', ' '), 100));
-            }
-            selectOptions.add(option);
-        }
+        List<SelectOption> selectOptions = strategyCardSetOptions();
         MessageHelper.sendPagedSelectMenus(
                 event.getMessageChannel(), "fowSetupDeckSelectSC", selectOptions, "Pick a Strategy Card Set:");
+    }
+
+    static List<SelectOption> strategyCardSetOptions() {
+        List<SelectOption> selectOptions = new ArrayList<>();
+        Mapper.getStrategyCardSets().values().stream()
+                .sorted(Comparator.comparing(StrategyCardSetModel::getName))
+                .forEach(scSet -> {
+                    SelectOption option = SelectOption.of(StringUtils.left(scSet.getName(), 100), scSet.getAlias());
+                    if (scSet.getDescription().filter(StringUtils::isNotBlank).isPresent()) {
+                        option = option.withDescription(
+                                StringUtils.left(scSet.getDescription().get().replace('\n', ' '), 100));
+                    }
+                    selectOptions.add(option);
+                });
+        return selectOptions;
     }
 
     @SelectionHandler("fowSetupDeckSelectSC")

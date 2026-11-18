@@ -1,7 +1,6 @@
 package ti4.cron;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockType;
 import ti4.game.Game;
@@ -16,11 +15,8 @@ import ti4.spring.service.deploy.ActiveLeaseService;
 @UtilityClass
 public class CardsInfoPinCleanupCron {
 
-    private static final long MANUAL_ONLY_DELAY_DAYS = Long.MAX_VALUE;
-
     public static void register() {
-        CronManager.scheduleOnce(
-                CardsInfoPinCleanupCron.class, CardsInfoPinCleanupCron::cleanup, MANUAL_ONLY_DELAY_DAYS, TimeUnit.DAYS);
+        CronManager.registerManualOnly(CardsInfoPinCleanupCron.class, CardsInfoPinCleanupCron::cleanup);
     }
 
     private static void cleanup() {

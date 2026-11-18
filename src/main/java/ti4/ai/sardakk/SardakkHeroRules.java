@@ -16,6 +16,7 @@ import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatForecast.SpaceOutlook;
+import ti4.ai.tactical.SkippedSpaceCombat;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner;
@@ -38,6 +39,8 @@ public class SardakkHeroRules {
     private static final String HERO = "sardakkhero";
     private static final String HERO_BUTTON = "purgeSardakkHero";
     private static final int CUSTODIANS_COST = 6;
+    private static final String PLANNED = "sardakkHeroPlan|";
+    private static final String NO_TARGET = "none";
 
     record Case(double spaceWin, double fleetCost, double fightLoss, double landingWin, double stake) {
 
@@ -55,6 +58,36 @@ public class SardakkHeroRules {
 
     record Target(Planet planet, Case outlook, Map<UnitType, Integer> landing) {}
 
+    public static void planTacticalAction(AiTurnContext context) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (!seat.hasLeaderUnlocked(HERO) || !context.isActivePlayer()) return;
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame()) || TacticalRules.inProgress(context)) return;
+        if (TacticalRules.actionTaken(context) || context.memory().has(PLANNED + context.turnKey())) return;
+        context.memory().put(PLANNED + context.turnKey(), NO_TARGET);
+        Optional<TacticalPlan> withHero = SkippedSpaceCombat.assuming(seat, () -> TacticalPlanner.best(game, seat))
+                .filter(plan -> plan.kind() == Kind.ATTACK && !plan.landings().isEmpty());
+        if (withHero.isEmpty()) return;
+        double without = TacticalRules.rememberedPlan(context)
+                .or(() -> TacticalPlanner.best(game, seat))
+                .map(TacticalPlan::score)
+                .orElse(0.0);
+        if (!heroPlanWorthIt(withHero.get().score(), without)) return;
+        TacticalRules.remember(context, withHero.get());
+        context.memory().put(PLANNED + context.turnKey(), withHero.get().target());
+    }
+
+    static boolean heroPlanWorthIt(double withHero, double without) {
+        return withHero >= MIN_STAKE && withHero - Math.max(0, without) >= HERO_VALUE;
+    }
+
+    private static boolean plannedHere(AiTurnContext context, Tile tile) {
+        return context.memory()
+                .get(PLANNED + context.turnKey())
+                .filter(tile.getPosition()::equals)
+                .isPresent();
+    }
+
     public static Optional<AiDecision> next(AiTurnContext context) {
         Game game = context.game();
         Player seat = context.seat();
@@ -69,7 +102,8 @@ public class SardakkHeroRules {
         if (space.isEmpty()) return Optional.empty();
         double fleetCost = BoardView.shipCost(BoardView.space(tile), seat);
         Optional<Target> target = bestTarget(context, tile, space.get(), fleetCost);
-        if (target.isEmpty() || !target.get().outlook().worthPlaying()) return Optional.empty();
+        if (target.isEmpty()) return Optional.empty();
+        if (!plannedHere(context, tile) && !target.get().outlook().worthPlaying()) return Optional.empty();
         TacticalRules.remember(context, landingPlan(context, tile, target.get()));
         return Optional.of(button.get()
                 .press("skip the space combat with Sh'val and take "

@@ -93,6 +93,11 @@ public class TradeRules {
         return DiscardBountyDeals.offer(context);
     }
 
+    public static Optional<AiDecision> offerDeadlyPlotBounty(AiTurnContext context) {
+        if (!AiSettings.isTradingEnabled()) return Optional.empty();
+        return DiscardBountyDeals.offerDeadlyPlot(context);
+    }
+
     public static Optional<AiDecision> startDeals(AiTurnContext context) {
         if (!AiSettings.isTradingEnabled()) return Optional.empty();
         return OwnTurnDeals.start(context);

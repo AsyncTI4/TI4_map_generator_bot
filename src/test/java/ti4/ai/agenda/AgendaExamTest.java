@@ -105,6 +105,13 @@ class AgendaExamTest extends BaseTi4Test {
     }
 
     /** A hand of {@code count} made-up cards, valued at the average card when another seat looks at it. */
+    // A hand of two combat cards, so the speaker rates its own tactical strength about level with rivals holding
+    // three unseen cards, and the strength weighting of anger leaves the target choice alone.
+    private void armedHand(Player player) {
+        player.setActionCard("dh1", 41);
+        player.setActionCard("plague", 42);
+    }
+
     private void anonymousHand(Player player, int count) {
         for (int index = 1; index <= count; index++)
             player.setActionCard("examcard" + index + player.getColor(), index);
@@ -280,17 +287,23 @@ class AgendaExamTest extends BaseTi4Test {
             Player hacan = seat(FOURTH_ID, "hacan", "green");
             Player yssaril = seat(FIFTH_ID, "yssaril", "yellow");
             for (Player rival : List.of(nekro, xxcha, hacan, yssaril)) anonymousHand(rival, 3);
+            armedHand(sol);
             test.game.setSpeakerUserID(sol.getUserID());
             reveal(EXECUTION, "blue", 3, "red", 3, "green", 3, "yellow", 3, "black", 0);
 
             assertThat(ballot(sol, 3)).contains("yssaril");
         }
 
+        // The user's values (2026-11-16): an unseen Ral Nel hand is worth 25% more. With equal hands that margin is
+        // only about 0.03 TG for Sol, less than Ral Nel's extra anger at being executed, so here Ral Nel holds 5 cards
+        // to the others' 3 and is the clear target.
         @Test
         void executesRalNelWhenTheSpeakerIsItself() {
             Player hacan = seat(FOURTH_ID, "hacan", "green");
             Player ralnel = seat(FIFTH_ID, "ralnel", "yellow");
-            for (Player rival : List.of(nekro, xxcha, hacan, ralnel)) anonymousHand(rival, 3);
+            for (Player rival : List.of(nekro, xxcha, hacan)) anonymousHand(rival, 3);
+            anonymousHand(ralnel, 5);
+            armedHand(sol);
             test.game.setSpeakerUserID(sol.getUserID());
             reveal(EXECUTION, "blue", 3, "red", 3, "green", 3, "yellow", 3, "black", 0);
 

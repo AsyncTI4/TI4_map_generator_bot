@@ -232,7 +232,8 @@ public class ThirtyKActionCardHooks {
         if (!ThirtyKCards.inUse(game)) return;
         if (fragments == null || fragments.isEmpty()) return;
         List<Player> holders = holdersOf(game, PRESERVATION_ACT).stream()
-                .filter(holder -> holder != purger && !holder.isNeighboursWith(purger))
+                .filter(holder ->
+                        holder != purger && !holder.getAbilityNeighbours().contains(purger))
                 .toList();
         if (holders.isEmpty()) return;
         ThirtyKAcState.setPurgedFragments(game, purger, fragments);

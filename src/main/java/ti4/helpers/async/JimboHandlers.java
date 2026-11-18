@@ -21,6 +21,7 @@ import ti4.model.MapPositionMapper;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
+import ti4.service.map.TileBoundData;
 
 // Jazz's Interactive Map Builder
 public final class JimboHandlers {
@@ -52,8 +53,9 @@ public final class JimboHandlers {
             message += "\n> - Border anomalies are a homebrew feature that can make it harder to move around the map";
         } else if (buttonID.startsWith(JimboConst.transformAction)) {
             menu = JimboConst.transformAction;
-            message +=
-                    "\n> Shift the map in any direction, or rotate the map centered on 000. (Hyperlanes will be rotated along with the map).";
+            message += "\n"
+                    + "> Shift the map in any direction, or rotate the map centered on 000. (Hyperlanes will be"
+                    + " rotated along with the map).";
         } else if (buttonID.startsWith(JimboConst.metaAction)) {
             menu = JimboConst.metaAction;
             message += " Add symmetry or export the map template for later use";
@@ -72,7 +74,11 @@ public final class JimboHandlers {
 
     public static void postMainMenu(GenericInteractionCreateEvent event, Game game) {
         ButtonHelper.deleteMessage(event);
-        menu(null, event.getMessageChannel(), game, JimboConst.mainPage);
+        sendMainMenu(event.getMessageChannel(), game);
+    }
+
+    public static void sendMainMenu(MessageChannel channel, Game game) {
+        menu(null, channel, game, JimboConst.mainPage);
     }
 
     // Completed
@@ -82,13 +88,15 @@ public final class JimboHandlers {
         boolean symmetrical = false;
         String msg = "Choose a type of tile to add:";
         msg += "\n> Special tiles include mecatol, mallice, and several other tiles of a similar nature";
-        msg +=
-                "\n> Draft tiles are plain colored tiles used in map templates to mark where a player would place drafted tiles";
+        msg += "\n"
+                + "> Draft tiles are plain colored tiles used in map templates to mark where a player would place"
+                + " drafted tiles";
         if (symmetrical) {
-            msg +=
-                    "\n> - You have symmetry turned on. Green, blue, and red tiles will become random, and hyperlanes will rotate or flip accordingly.";
-            msg +=
-                    " Available \"draft tile\" colors will be heavily restricted while symmetry is turned on, and symmetrically-placed tiles will pull from the restricted portion of the list.";
+            msg += "\n"
+                    + "> - You have symmetry turned on. Green, blue, and red tiles will become random, and"
+                    + " hyperlanes will rotate or flip accordingly.";
+            msg += " Available \"draft tile\" colors will be heavily restricted while symmetry is turned on, and"
+                    + " symmetrically-placed tiles will pull from the restricted portion of the list.";
         }
         List<Button> buttons = List.of(
                 JimboButtons.MAIN_PAGE,
@@ -162,6 +170,7 @@ public final class JimboHandlers {
         } else if ((matcher = Pattern.compile(regexPt5).matcher(buttonID)).matches()) {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
             String pos = matcher.group("pos");
+            TileBoundData.clear(game, pos);
             AddTileService.addTile(game, new Tile(model.getAlias(), pos));
 
             String msg = model.getName() + " (" + model.getAlias() + ") has been placed in location " + pos + ".";
@@ -227,6 +236,7 @@ public final class JimboHandlers {
                 t2.setPosition(pos1);
                 game.setTile(t2);
             }
+            TileBoundData.move(game, pos1, pos2, true);
             String msg = "Successfully swapped the tiles at positions [] and []";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             postMainMenu(event, game);
@@ -263,6 +273,7 @@ public final class JimboHandlers {
             TileModel model = game.getTileByPosition(pos).getTileModel();
             String msg = "Removed tile " + model.getName() + " (" + model.getAlias() + ") from position " + pos + ":";
             game.removeTile(pos);
+            TileBoundData.clear(game, pos);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
             // DONE

@@ -14,8 +14,10 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.json.JsonMapperManager;
+import ti4.service.map.HyperlaneStyleService;
 import ti4.website.model.WebBorderAnomalies;
 import ti4.website.model.WebCardPool;
+import ti4.website.model.WebCustomHyperlanes;
 import ti4.website.model.WebExpeditions;
 import ti4.website.model.WebGameState;
 import ti4.website.model.WebLaw;
@@ -140,6 +142,13 @@ public class GameWebDataService {
                                 && !webBorderAnomalies.getBorderAnomalies().isEmpty()
                         ? webBorderAnomalies.getBorderAnomalies()
                         : null);
+        Map<String, String> customHyperlanes = WebCustomHyperlanes.fromGame(game);
+        webData.put("customHyperlanes", customHyperlanes.isEmpty() ? null : customHyperlanes);
+        webData.put(
+                "customHyperlaneStyle",
+                customHyperlanes.isEmpty()
+                        ? null
+                        : HyperlaneStyleService.gameDefault(game).name());
         webData.put("isTwilightsFallMode", game.isTwilightsFallMode());
         return webData;
     }

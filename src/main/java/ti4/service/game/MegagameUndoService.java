@@ -7,13 +7,13 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.routing.ComponentIdEnvelope;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.message.MessageHelper;
+import ti4.service.megagame.MegagameGmAccess;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.testbed.TestBedService;
 
@@ -22,8 +22,6 @@ public class MegagameUndoService {
 
     public static final String MEGAGAME_TAG = "megagame";
     public static final String STRICT_UNDO_TAG = "megagame-strict-undo";
-    private static final String GM_ROLE_NAME = "pbd100three GM";
-    private static final List<String> UNDO_ROLE_NAMES = List.of(GM_ROLE_NAME, "bothelper");
     private static final String BUTTON_MARKER = " pressed button: ";
     private static final String SLASH_MARKER = " used: ";
     private static final List<String> TURN_ENDING_BUTTONS = List.of("turnEnd", "endTurn", "passForRound");
@@ -43,9 +41,7 @@ public class MegagameUndoService {
     }
 
     private static boolean hasUndoRole(Member member) {
-        return member != null
-                && member.getRoles().stream()
-                        .anyMatch(role -> UNDO_ROLE_NAMES.stream().anyMatch(role.getName()::equalsIgnoreCase));
+        return MegagameGmAccess.hasGmRole(member);
     }
 
     public static void pingGmsForUndo(GenericInteractionCreateEvent event, Game game) {
@@ -57,8 +53,9 @@ public class MegagameUndoService {
     }
 
     static String undoRequestMessage(Guild guild, String requester, String latestCommand) {
-        return gmMention(guild) + " Undo has been disabled please wait for a GM to handle your request.\n"
-                + "-# Requested by " + requester + ". Latest action: " + latestCommand;
+        return MegagameGmAccess.gmMention(guild)
+                + " Undo has been disabled please wait for a GM to handle your request.\n" + "-# Requested by "
+                + requester + ". Latest action: " + latestCommand;
     }
 
     static boolean isProtectedStep(Game game) {
@@ -99,16 +96,6 @@ public class MegagameUndoService {
                 .map(id -> ComponentIdEnvelope.decode(id).handlerId())
                 .filter(id -> !StringUtils.containsIgnoreCase(id, "primary"))
                 .collect(Collectors.toSet());
-    }
-
-    private static String gmMention(Guild guild) {
-        if (guild == null) {
-            return "@" + GM_ROLE_NAME;
-        }
-        return guild.getRolesByName(GM_ROLE_NAME, true).stream()
-                .findFirst()
-                .map(Role::getAsMention)
-                .orElse("@" + GM_ROLE_NAME);
     }
 
     private static boolean hasTag(Game game, String tag) {

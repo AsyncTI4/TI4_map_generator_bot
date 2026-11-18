@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.PaymentRules;
@@ -111,7 +111,8 @@ class EnigmaticDeviceRulesTest extends BaseTi4Test {
                         List.of("Gain 1 Tactic Token", "Done Gaining Command Tokens", "Exhaust Planets")),
                 "because of **Propagation**, you instead gain 3 command tokens");
         test.game.setStoredValue("originalCCsFornekro", test.nekro.getCCRepresentation());
-        assertThat(pressedId(new NekroBrain().decide(test.context(tokens)))).isEqualTo("FFCC_nekro_nekroTechExhaust");
+        assertThat(pressedId(new StandardBrain().decide(test.context(tokens))))
+                .isEqualTo("FFCC_nekro_nekroTechExhaust");
         assertThat(PaymentRules.isPending(test.context())).isTrue();
 
         AiPrompt payment = prompt(

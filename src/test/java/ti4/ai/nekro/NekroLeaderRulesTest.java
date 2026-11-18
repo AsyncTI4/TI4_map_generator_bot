@@ -15,6 +15,7 @@ import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
+import ti4.service.leader.agent.modules.NekroAgent;
 import ti4.testUtils.BaseTi4Test;
 
 class NekroLeaderRulesTest extends BaseTi4Test {
@@ -77,7 +78,7 @@ class NekroLeaderRulesTest extends BaseTi4Test {
     private AiPrompt discardPrompt() {
         AiPrompt discard =
                 prompt("discard", PromptSource.AI_THREAD, NOW, "ac_discard_from_hand_1", "ac_discard_from_hand_2");
-        return AiTestGame.withContent(discard, test.nekro.getRepresentationUnfogged() + " use buttons to discard");
+        return AiTestGame.withContent(discard, test.nekro.getRepresentationUnfogged() + NekroAgent.DISCARD_PROMPT);
     }
 
     private AiPrompt loseTokens(String content) {

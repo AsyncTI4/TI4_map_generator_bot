@@ -14,7 +14,7 @@ import ti4.ai.AiTestGame;
 import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.promise.Promise;
@@ -29,7 +29,7 @@ class AgendaCardRulesTest extends BaseTi4Test {
     private static final String SHARD = "Law_Elect Player_7_shard_of_the_throne";
     private static final String IMPERIAL = "imp_rider";
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
     private AiTestGame test;
     private Player nekro;
     private Player sol;

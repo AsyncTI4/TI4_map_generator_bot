@@ -155,6 +155,15 @@ A Sigma planet attachment that gives its System an alpha and a beta wormhole and
 **Lambda wormhole**:
 A Sigma wormhole carried by the three lambda wormhole tokens. Lambda wormholes only connect to each other.
 
+**Rat race wormhole**:
+A wormhole on a rat race token (`whratalpha` to `whratkappa`). It is its own type: an alpha rat wormhole only connects to alpha rat wormholes, never to a plain alpha. Laws and abilities that name alpha or beta do not affect it.
+
+**Rat nest**:
+The rat race border anomaly `ratnest`: one hex-sized frame that sits on all six borders of a System. Its effect is not automated; players apply it themselves.
+
+**Entry-only / exit-only wormhole**:
+A one-way wormhole token (`whalpha_in`, `whalpha_out`, …), drawn with a green (IN) or red (OUT) arrow ring. Units can leave a system through an entry-only wormhole and arrive through an exit-only one, never the other way; two entry-only (or two exit-only) wormholes never connect. Movement always follows the direction; everything else only with One-way adjacency on.
+
 **Wormhole nexus**:
 The extra System where alpha, beta and gamma wormholes converge, which starts with only its gamma wormhole and becomes active when a unit enters it or Mallice is controlled.
 
@@ -176,8 +185,21 @@ An Anomaly that adds +1 to the move of ships leaving or passing through it, each
 **Border anomaly**:
 An anomaly attached to a System's edge rather than its interior.
 
+**Void Tether**:
+The Empyrean breakthrough's Border anomaly token. Enforced only with One-way adjacency on (always in fog): it blocks the shared edge between its two Systems for everyone except the breakthrough's holder and the colours they allow through. Other links between the two Systems (wormholes, custom links, …) still connect them.
+
 **Hyperlane**:
 A Tile that is not a System, whose drawn lanes make the Systems at their ends adjacent.
+
+**One-way hyperlane**:
+A lane on a custom Hyperlane (`hl` tile) that units can follow in one direction only; a GM types `2` for it in the 6×6 matrix (`1` = two-way). Drawn amber in the game's or the viewer's hyperlane style. Fog options: "Hide unseen hyperlanes" shows only lanes a Player's vision runs along; "One-way lane hints" adds a faint glow where a visible one-way lane leads into a System.
+
+**Hyperlane bridge**:
+A lane matrix a GM gives a System (`/map custom_hyperlanes` → More → Add Bridge, hyperlane format, no roundabouts, one lane per side, no crossing). Its lanes pass straight through the System to the tiles at their far ends (LRR 44.1); the System does not border the tiles across those edges and its units cannot use those lanes. Lanes arriving at other sides end in the System as usual. Drawn as a trail along the System's rim. In Fog of War a hidden bridge lane between two seen Systems shows as a Spatial Tear (drawn only).
+
+**Hyperlane portal**:
+A lettered token (A–Z) a GM puts on a roundabout or empty custom Hyperlane (`/map custom_hyperlanes` → More → Portals, up to 7 per tile, the first in the centre). Units on the ring can jump to every other Hyperlane with the same letter and carry on along its spokes; it costs no movement, like any Hyperlane. A portal can be two-way, entry-only (`>`) or exit-only (`<`). An empty Hyperlane with two letters links their networks.
+_Avoid_: Wormhole gate
 
 **Frontier token**:
 A marker placed in each System without planets that can be explored for a reward.
@@ -292,6 +314,21 @@ _Avoid_: FoW (acceptable in code and chat), hidden-information mode
 
 **Light fog**:
 A milder Fog of War in which Players see more of the Map than under full Fog of War.
+_Avoid_: Fog Lite (the old name of the Beginner fog preset)
+
+**FoW+**:
+A stricter Fog of War setting that forces several fog options, swaps in its own explore deck and limits activation to Systems a Player can see, plus a blind activation for the rest.
+_Avoid_: Fog Plus Mode, fowplus
+
+**Fog preset**:
+A named set of fog option values (Standard, Fog+, Normal, Beginner) that the GM applies in one click. Applying one gives the same result whatever was set before; GM tools, map layout and rules options are only changed by a preset that turns them on.
+
+**SC group (megagame)**:
+In a megagame, one of several columns (Alpha, Beta, Gamma, …) that Players are split into. Each group picks, plays and follows only its own Strategy cards, whose initiative ends in the group's digit (12 is Leadership of group Beta). Groups shift one column at the start of each Strategy phase. Turned on per game with the tag `megagame_sc_groups` and managed with `/megagame`.
+_Avoid_: team, galaxy (both mean other things)
+
+**Group speaker**:
+The Speaker token of one SC group. It sets that group's pick order and secondary order, and is what Politics and the _Book of Latvinia_ hand out. The last group's speaker is the game's Speaker for agendas and Speaker-order effects.
 
 **Absol**:
 A homebrew content mode that substitutes revised cards, technologies and leaders.
@@ -308,15 +345,44 @@ Prophecy of Kings, the first Twilight Imperium 4th Edition expansion, whose cont
 **TE**:
 Thunder's Edge, the Twilight Imperium 4th Edition expansion that follows PoK and adds Breakthroughs, Expeditions and the Fracture; statistics filters name it `te`.
 
+**Fog secret objectives**:
+32 homebrew secret objectives for Fog of War, played with the `secret_objectives_pok_fog` deck (PoK plus the 32). They reward scouting, hiding and watching; the bot checks status ones and offers a score button for action and agenda ones.
+_Avoid_: FoW SOs, vision secrets
+
+**Secrets Only**:
+A Fog of War homebrew mode (weird game setup) with no public objectives: Players race to 10 victory points with secret objectives. Each holds up to 4 unscored, keeps 2 of 4 at setup and 1 of 2 each status phase; scored ones go back into the deck, and no one scores the same one twice.
+_Avoid_: SO-only, secret race
+
+**Secret objective offer**:
+In Secrets Only, the cards a Player is shown to keep some from (2 of 4 at setup, 1 of 2 each status phase). Offered cards leave the deck until the Player picks; the rest are shuffled back.
+
 **Alliance mode**:
 A team mode in which Players are paired and share some benefits.
 
 **Community mode**:
 A mode where a Game is played by a community role rather than individually assigned Players.
 
+**One-way adjacency**:
+A Game setting for one-way links (gravity-wave borders, one-way custom adjacencies, one-way wormholes, one-way hyperlanes). When off, the default outside Fog of War, a one-way link only limits movement and counts as Adjacency both ways for everything else. When on, and always in Fog of War, the side that acts needs the link: a PDS fires only along it, and a Player sees only where they could move.
+_Avoid_: Directional mode
+
 **TIGL**:
 The Twilight Imperium Global Ladder, whose competitive Games report results and move Players through ranks.
 _Avoid_: Ladder game
+
+**Tournament pool**:
+One round of a tournament run with `/tournament`: its sign-up posts, seated Players, Waitlist, groups and the Games created from them. Each round, such as Prelims or Semifinals, is its own pool, and several pools can run at once.
+_Avoid_: Tournament queue, matchmaking queue
+
+**Waitlist**:
+Players who signed up after a Tournament pool reached its target size. When a seated Player withdraws, the first Player on the Waitlist takes their seat and group.
+
+**Setup game**:
+A private Game holding the setup for every Game of a Tournament pool: expansion, homebrew, decks, removed cards and draft settings. The organizer sits in it with bot setup seats up to the players per game, and every new Game of the round copies its settings, never its seating or drafted factions.
+_Avoid_: Template game
+
+**Tourney Mod**:
+The Discord role that, with Admin and any role added through `/tournament roles`, may run tournaments: create Tournament pools, edit their panel and create their Games.
 
 ### Combat
 
@@ -374,6 +440,14 @@ _Avoid_: Mod, admin
 
 **Testbed**:
 A developer-only harness for driving a Game through scripted actions on a development bot.
+
+**Panel**:
+A single Components V2 message that the bot edits in place as it is used, with tabs, on/off switches and select menus instead of a trail of button messages. `/fow fow_options` and the FoW setup panel are panels.
+_Avoid_: Menu message, button wall
+
+**FoW setup panel**:
+The panel version of the FoW setup wizard, opened with `/fow setup` (and `/fow setup_beta`, kept for further development) and by the setup button posted when a FoW game is created. The older button wizard is still available as `/fow setup_old`. Both share the same saved wizard state.
+_Avoid_: Wizard v2
 
 ### Rules concepts
 
@@ -463,6 +537,18 @@ _Avoid_: Seating order
 The relationship between Systems that touch, share a wormhole type or are joined by hyperlane lines, governing movement.
 _Avoid_: Neighbors (that names Players with pieces in or next to each other's Systems)
 
+**Outbound / inbound adjacency**:
+The two directions of a one-way link: the Systems a System reaches (outbound, `Adjacency.from`) and the Systems that reach it (inbound, `Adjacency.into`). On two-way maps they are the same. The side that acts needs outbound access: a PDS covers a System its own System reaches, and ships score "adjacent to X" when their System reaches X.
+_Avoid_: Forward/backward adjacency
+
+**Either-way adjacency**:
+Outbound and inbound together (`Adjacency.either`), used only for communication such as Transactions and fog whispers.
+_Avoid_: Mutual adjacency (that would need both directions)
+
+**Ability neighbors**:
+The Neighbors an ability, card or objective that says "neighbor" counts for the Player who uses it (`Player.getAbilityNeighbours`): with One-way adjacency on, the Players their Systems reach; otherwise the same as Neighbors.
+_Avoid_: Direct neighbors
+
 **Elimination**:
 A Player's removal from the Game when they control no Planets, have no ground forces on the Map and own no unit with Production.
 
@@ -526,6 +612,10 @@ _Avoid_: Cancel card
 **Boat float**:
 Players cooperating on a vote or deal so that all of them come out ahead ("a rising tide floats all boats"). The classic case is Articles of War: every Player but one puts 1 vote on For, the last Player votes Against with enough votes to tie, the Speaker breaks the tie for Against, and each Player who voted For receives 3 Trade goods and gives the Against Player 1 of them.
 _Avoid_: Collusion, kingmaking
+
+**Relations**:
+How friendly an AI seat is toward another Player, at most max (2) and with no floor (forever war). Good relations (1 or more) unlock friendly trade: free commodity flips and X-1 on Trade. The AI's personality (STOOGE, FLOATER, NEUTRAL, WARRIOR, WARLORD) sets the starting level; floating the seat raises it, while charging a seat that floats you, and every TG of value a Player has cost the seat (attacks, planets taken, ships parked in its slice or over its docks, mean action cards, fees above boat-float terms), lowers it.
+_Avoid_: Friendship, diplomacy score
 
 **Gum**:
 To park a fighter or other small ship in a System to block opponents from moving through it.

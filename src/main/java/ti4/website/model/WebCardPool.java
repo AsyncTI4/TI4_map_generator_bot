@@ -54,6 +54,15 @@ public class WebCardPool {
     // Techs in game
     private List<String> technologyDeck;
 
+    private List<String> abilitySpliceDeck;
+    private Integer abilitySpliceFullDeckSize;
+    private List<String> unitSpliceDeck;
+    private Integer unitSpliceFullDeckSize;
+    private List<String> genomeSpliceDeck;
+    private Integer genomeSpliceFullDeckSize;
+    private List<String> paradigmSpliceDeck;
+    private Integer paradigmSpliceFullDeckSize;
+
     public static WebCardPool fromGame(Game game) {
         WebCardPool cardPool = new WebCardPool();
 
@@ -106,7 +115,23 @@ public class WebCardPool {
 
         cardPool.technologyDeck = sortedCopy(game.getTechnologyDeck());
 
+        if (game.isTwilightsFallMode()) {
+            cardPool.abilitySpliceDeck = sortedCopy(game.getAbilitySpliceDeck(true));
+            cardPool.abilitySpliceFullDeckSize = fullDeckSize(game.getAbilitySpliceDeckID());
+            cardPool.unitSpliceDeck = sortedCopy(game.getUnitSpliceDeck(true));
+            cardPool.unitSpliceFullDeckSize = fullDeckSize(game.getUnitSpliceDeckID());
+            cardPool.genomeSpliceDeck = sortedCopy(game.getGenomeSpliceDeck(true));
+            cardPool.genomeSpliceFullDeckSize = fullDeckSize(game.getGenomeSpliceDeckID());
+            cardPool.paradigmSpliceDeck = sortedCopy(game.getParadigmSpliceDeck(true));
+            cardPool.paradigmSpliceFullDeckSize = fullDeckSize(game.getParadigmSpliceDeckID());
+        }
+
         return cardPool;
+    }
+
+    private static Integer fullDeckSize(String deckID) {
+        DeckModel deck = Mapper.getDeck(deckID);
+        return deck == null ? null : deck.getCardCount();
     }
 
     // Sorted to conceal true deck order while keeping the payload deterministic,

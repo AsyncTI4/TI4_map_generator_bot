@@ -66,7 +66,8 @@ public class AiPerception {
             }
             for (AiPrompt prompt : main) {
                 if (isRelevant(PromptSource.PUBLIC, prompt.buttons(), faction, publicWindowPrefixes)
-                        || prompt.isTableTalk()) {
+                        || prompt.isTableTalk()
+                        || isLeadershipRiderPayout(prompt)) {
                     prompts.add(prompt);
                 }
             }
@@ -162,6 +163,13 @@ public class AiPerception {
 
     static boolean isRelevantInPrivateThread(AiPrompt prompt, String faction, Set<String> prefixes) {
         return isRelevant(PromptSource.AI_THREAD, prompt.buttons(), faction, prefixes) || isRejectionNotice(prompt);
+    }
+
+    public static boolean isLeadershipRiderPayout(AiPrompt prompt) {
+        return prompt.source() == PromptSource.PUBLIC
+                && prompt.buttons().isEmpty()
+                && prompt.content() != null
+                && prompt.content().contains(LEADERSHIP_RIDER_PAYOUT);
     }
 
     public static boolean isRejectionNotice(AiPrompt prompt) {

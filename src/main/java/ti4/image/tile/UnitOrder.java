@@ -20,6 +20,7 @@ final class UnitOrder {
             UnitType.Monument,
             UnitType.PlenaryOrbital,
             UnitType.Flagship,
+            UnitType.Deep,
             UnitType.Dreadnought,
             UnitType.Carrier,
             UnitType.Cruiser,

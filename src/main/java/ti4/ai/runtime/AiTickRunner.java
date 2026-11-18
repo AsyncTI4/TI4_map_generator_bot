@@ -7,6 +7,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.LongSupplier;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -68,6 +69,7 @@ class AiTickRunner {
     private static final int GAME_FAILURE_LIMIT = 3;
     private static final int GLOBAL_FAILURE_LIMIT = 10;
     private static final Deque<Long> RECENT_FAILURES = new ArrayDeque<>();
+    static LongSupplier wallClock = System::currentTimeMillis;
     private static final int RECENT_DECISIONS_RECORDED = 5;
     private static final String UNSURE = "UNSURE";
     private static final String NO_PROGRESS = "NO_PROGRESS";
@@ -156,8 +158,9 @@ class AiTickRunner {
             lane.markDirty(now + AiSettings.DEBOUNCE.toMillis());
             return;
         }
-        if (now - lane.lastActionAt() < AiSettings.MIN_GAP_BETWEEN_ACTIONS.toMillis()) {
-            lane.markDirty(lane.lastActionAt() + AiSettings.MIN_GAP_BETWEEN_ACTIONS.toMillis());
+        long floodGap = AiSettings.channelFloodGap(game).toMillis();
+        if (now - lane.lastActionAt() < floodGap) {
+            lane.markDirty(lane.lastActionAt() + floodGap);
             return;
         }
 
@@ -275,16 +278,15 @@ class AiTickRunner {
 
     private static void debugLog(SeatTick tick, AiDecision decision) {
         if (!AiDebugLog.isOn(tick.game())) return;
-        String text =
-                switch (decision) {
-                    case AiDecision.Press press -> describe(press) + " on \"" + promptText(press.prompt()) + "\"";
-                    case AiDecision.Unsure unsure -> describe(unsure) + " on \"" + promptText(unsure.prompt()) + "\"";
-                    case AiDecision.Wait wait -> "wait (" + wait.reason() + ")";
-                    case AiDecision.Announce announce -> "announce \"" + announce.text() + "\"";
-                    case AiDecision.Propose ignored -> "propose a deal";
-                    case AiDecision.Post post -> "post \"" + post.text() + "\"";
-                    case AiDecision.Idle ignored -> null;
-                };
+        String text = switch (decision) {
+            case AiDecision.Press press -> describe(press) + " on \"" + promptText(press.prompt()) + "\"";
+            case AiDecision.Unsure unsure -> describe(unsure) + " on \"" + promptText(unsure.prompt()) + "\"";
+            case AiDecision.Wait wait -> "wait (" + wait.reason() + ")";
+            case AiDecision.Announce announce -> "announce \"" + announce.text() + "\"";
+            case AiDecision.Propose ignored -> "propose a deal";
+            case AiDecision.Post post -> "post \"" + post.text() + "\"";
+            case AiDecision.Idle ignored -> null;
+        };
         if (text != null) AiDebugLog.log(tick.game(), tick.seat(), text);
     }
 
@@ -303,11 +305,11 @@ class AiTickRunner {
     private static boolean mayActOnItsOwn(SeatTick tick) {
         return AiSettings.isEnabled()
                 && isHealthy(tick.lane(), tick.now())
-                && underActionCap(tick.game(), tick.state(), tick.now());
+                && underRunawayPressCap(tick.game(), tick.state(), tick.now());
     }
 
-    private static boolean underActionCap(Game game, AiSeatState state, long now) {
-        return state.actionsInLastHour(now) < AiSettings.maxActionsPerHour(game);
+    private static boolean underRunawayPressCap(Game game, AiSeatState state, long now) {
+        return state.actionsInLastHour(now) < AiSettings.runawayPressCapPerHour(game);
     }
 
     static AiDecision decide(SeatTick tick, FactionBrain brain, AiTurnContext context) {
@@ -679,7 +681,7 @@ class AiTickRunner {
         if (now - lane.lastActionAt() < AiSettings.refereeDelay(game).toMillis()) return false;
         boolean seatHeldBack = seats.stream()
                 .anyMatch(seat ->
-                        AiProfile.of(seat).isPaused() || !underActionCap(game, lane.seat(seat.getUserID()), now));
+                        AiProfile.of(seat).isPaused() || !underRunawayPressCap(game, lane.seat(seat.getUserID()), now));
         if (seatHeldBack) return false;
         int state = RefereeRules.stateFingerprint(game);
         Optional<RefereePress> press =
@@ -760,11 +762,12 @@ class AiTickRunner {
         return new PressTarget(prompt.channelId(), prompt.messageId(), button.customId());
     }
 
-    private static void recordFailure(AiLane lane, long now) {
+    static void recordFailure(AiLane lane, long now) {
         lane.recordFailure(now);
+        long wallNow = wallClock.getAsLong();
         synchronized (RECENT_FAILURES) {
-            RECENT_FAILURES.addLast(now);
-            prune(now);
+            RECENT_FAILURES.addLast(wallNow);
+            prune(wallNow);
             if (RECENT_FAILURES.size() == GLOBAL_FAILURE_LIMIT) {
                 BotLogger.warning(
                         "AI players stopped acting on their own in every game after repeated button" + " failures.");
@@ -772,11 +775,17 @@ class AiTickRunner {
         }
     }
 
-    private static boolean isHealthy(AiLane lane, long now) {
+    static boolean isHealthy(AiLane lane, long now) {
         if (lane.recentFailures(now) >= GAME_FAILURE_LIMIT) return false;
         synchronized (RECENT_FAILURES) {
-            prune(now);
+            prune(wallClock.getAsLong());
             return RECENT_FAILURES.size() < GLOBAL_FAILURE_LIMIT;
+        }
+    }
+
+    static void clearRecentFailures() {
+        synchronized (RECENT_FAILURES) {
+            RECENT_FAILURES.clear();
         }
     }
 

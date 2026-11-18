@@ -7,11 +7,11 @@ abstract class AbstractEventLog {
     private final LogOrigin source;
     private final String message;
 
-    public abstract String getChannelName();
+    abstract String getChannelName();
 
-    public abstract String getThreadName();
+    abstract String getThreadName();
 
-    public abstract String getMessagePrefix();
+    abstract String getMessagePrefix();
 
     String getLogString() {
         StringBuilder log = new StringBuilder();

@@ -5,6 +5,6 @@
     "aliases": ["tradestation2"],
     "resources": 0,
     "influence": 0,
-    "planetTypes": ["SPACESTATION", "FAKE"],
+    "planetTypes": ["SPACESTATION"],
     "source": "blue_reverie"
 }

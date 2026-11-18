@@ -8,10 +8,14 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.BelkoseaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
@@ -24,6 +28,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BRLightrailOrdnanceRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -40,6 +45,7 @@ import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -64,6 +70,7 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.BelkoseaAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
@@ -80,6 +87,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
+import ti4.service.map.RefractureRulesService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -94,6 +102,7 @@ public class CardsInfoService {
     public static void sendCardsInfo(Game game, Player player) {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         ActionCardHelper.sendActionCardInfo(game, player);
+        XyrixTomeHandler.sendTomeInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, """
@@ -109,8 +118,39 @@ public class CardsInfoService {
         if (playerCardsInfoThread == null) return;
 
         List<Button> buttons = new ArrayList<>();
+        if (player.hasReadyBreakthrough("choirbt")) {
+            buttons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
+        }
+        Button lyraOfTheCryptButton = ChoirLeadersHandler.getLyraOfTheCryptCardsInfoButton(player);
+        if (lyraOfTheCryptButton != null) {
+            buttons.add(lyraOfTheCryptButton);
+        }
+        if (RefractureRulesService.canUseExperiment(game, player)) {
+            buttons.add(Buttons.gray(
+                    player.factionButtonChecker() + "refractureExperimentStart",
+                    "Use Experiment",
+                    MiscEmojis.LegendaryPlanet));
+        }
+        Button tomeCardsButton = XyrixTomeHandler.getTomeCardsInfoButton(game, player);
+        if (tomeCardsButton != null) {
+            buttons.add(tomeCardsButton);
+        }
+        Button hamitsTreasureButton = BeansRelicHandler.getHamitsTreasureCardsInfoButton(game, player);
+        if (hamitsTreasureButton != null) {
+            buttons.add(hamitsTreasureButton);
+        }
+        Button ouroborosFragmentsButton = BeansRelicHandler.getOuroborosFragmentsCardsInfoButton(player);
+        if (ouroborosFragmentsButton != null) {
+            buttons.add(ouroborosFragmentsButton);
+        }
         if (MonumentsService.isMonumentReady(game, player, "mentak_monument")) {
             buttons.add(MonumentsButtonHandler.getMentakMonumentButton(player));
+        }
+        if (MonumentsService.isMonumentReady(game, player, "bloom_monument")) {
+            buttons.add(BeansMonumentHandler.getBloomMonumentButton(player));
+        }
+        if (MonumentsService.isMonumentReady(game, player, "choir_monument")) {
+            buttons.add(BeansMonumentHandler.getChoirMonumentButton(player));
         }
         if (MonumentsService.isMonumentOnBoard(game, player, "lanefir_monument")
                 && game.getStoredValue("lanefirMonumentUsed_" + player.getFaction())
@@ -164,6 +204,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("atokeraagent")) {
             buttons.add(AtokeraAgent.button(player));
         }
+        if (player.hasUnexhaustedLeader(XyrixAgent.ID)) {
+            buttons.add(XyrixAgent.cardsInfoButton(player));
+        }
         if (player.hasUnexhaustedLeader("kairnagent")) {
             buttons.add(KairnAgent.cardsInfoButton(player));
         }
@@ -215,6 +258,9 @@ public class CardsInfoService {
         if (player.hasAbility("intrigue")) {
             buttons.add(Buttons.blue("startIntrigueCard", "Pay For Intrigue Card", FactionEmojis.xin));
         }
+        if (game.getRealPlayers().stream().anyMatch(p -> p.hasAbility("intrigue"))) {
+            buttons.add(Buttons.blue("viewAvailableIntrigues", "View Available Intrigues", FactionEmojis.xin));
+        }
         if (player.hasRelicReady("superweaponavailyn")) {
             String factionChecker = player.factionButtonChecker();
             buttons.add(Buttons.gray(
@@ -252,6 +298,9 @@ public class CardsInfoService {
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
+        }
+        if (IsPlayerElectedService.isPlayerElected(game, player, "ministercontrol")) {
+            buttons.add(Buttons.gray("theodisiMinisterControl", "Discard Minister of Control", CardEmojis.Agenda));
         }
         if (!game.isFowMode()
                         && game.getPlayers().values().stream()
@@ -353,6 +402,9 @@ public class CardsInfoService {
         }
         if (player.hasUnlockedBreakthrough("yssarilbt")) {
             buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
+        }
+        if (player.hasUnlockedBreakthrough("empyreanbt") && VoidTetherService.hasEnforcedTether(game)) {
+            buttons.add(Buttons.gray("voidTetherAccessMenu", "Void Tether Access", FactionEmojis.Empyrean));
         }
         if (player.hasAbility("pillage") && !game.isTwilightsFallMode()) {
             if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
@@ -640,7 +692,7 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
-        if (KnownCardsService.isEnabled(game)) {
+        if (!KnownCardsService.getKnownCardHandEmbeds(game, player).isEmpty()) {
             buttons.add(Buttons.gray("showKnownCardHands", "Show Known Card Hands", CardEmojis.ActionCard));
         }
         RiftSetModeService.addCapturedUnitsButton(buttons, game);

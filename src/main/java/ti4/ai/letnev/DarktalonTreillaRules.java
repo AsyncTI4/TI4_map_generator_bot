@@ -12,6 +12,8 @@ import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
 import ti4.ai.perception.AiPrompt;
+import ti4.ai.scoring.WinRace;
+import ti4.ai.tactical.Stall;
 import ti4.ai.tactical.TacticalPlan;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.ai.tactical.TacticalPlanner;
@@ -54,6 +56,21 @@ public class DarktalonTreillaRules {
                 ? "play Darktalon Treilla to send its whole fleet at Mecatol Rex"
                 : "play Darktalon Treilla to lift its fleet supply for a bigger attack";
         return Optional.of(menu.get().press(reason));
+    }
+
+    public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
+        if (!canAct(context) || !Stall.othersStillActing(context.game(), context.seat())) return Optional.empty();
+        if (!rivalCanWinThisRound(context.game(), context.seat())) return Optional.empty();
+        Optional<Match> menu = Prompts.owned(thisTurn, context.faction(), COMPONENT_ACTION::equals)
+                .filter(match -> !context.alreadyPressed(match.prompt(), match.button()));
+        if (menu.isEmpty()) return Optional.empty();
+        remember(context, MENU);
+        return Optional.of(menu.get().press("play Darktalon Treilla as a stall while a rival can win this round"));
+    }
+
+    static boolean rivalCanWinThisRound(Game game, Player seat) {
+        return game.getRealPlayers().stream()
+                .anyMatch(other -> other != seat && WinRace.canWinThisRound(game, seat, other));
     }
 
     public static Optional<AiDecision> next(AiTurnContext context) {
@@ -111,6 +128,10 @@ public class DarktalonTreillaRules {
     }
 
     private static boolean canStart(AiTurnContext context) {
+        return canAct(context) && !context.memory().has(CHECKED + FIELD + context.turnKey());
+    }
+
+    private static boolean canAct(AiTurnContext context) {
         Player seat = context.seat();
         Game game = context.game();
         return ready(seat)
@@ -119,7 +140,6 @@ public class DarktalonTreillaRules {
                 && "action".equalsIgnoreCase(game.getPhaseOfGame())
                 && !TacticalRules.inProgress(game, seat)
                 && !TacticalRules.actionTaken(context)
-                && !context.memory().has(CHECKED + FIELD + context.turnKey())
                 && current(context).isEmpty();
     }
 

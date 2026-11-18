@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "be9",
+    "name": "Yuggoth - Mi-Go",
+    "aliases": [
+        "be9",
+        "migo",
+        "yuggoth"
+    ],
+    "imagePath": "be9_migohs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "yuggoth"
+    ],
+    "source": "beans"
+}

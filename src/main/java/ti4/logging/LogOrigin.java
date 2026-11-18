@@ -2,6 +2,7 @@ package ti4.logging;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -17,12 +18,13 @@ import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 
-@Getter
 public class LogOrigin {
 
+    @Getter(AccessLevel.PACKAGE)
     @Nullable
     private final String eventString;
 
+    @Getter(AccessLevel.PACKAGE)
     @Nullable
     private final String gameInfo;
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
@@ -158,13 +159,15 @@ public class NucleusImageGeneratorService {
         return summaryEmojis;
     }
 
-    private Map<String, MiltyDraftSlice> getSeatToNucleusTiles(
-            MapTemplateModel mapTemplate, Map<String, Tile> gameTileMap) {
+    Map<String, MiltyDraftSlice> getSeatToNucleusTiles(MapTemplateModel mapTemplate, Map<String, Tile> gameTileMap) {
         Map<String, MiltyDraftSlice> seatToNucleusTiles = new HashMap<>();
         for (int i = 1; i <= mapTemplate.getNucleusSliceCount(); ++i) {
             int playerNum = i;
 
             MapTemplateTile sliceSeat = getSeatTileForPlayer(mapTemplate, playerNum);
+            if (sliceSeat == null) {
+                continue;
+            }
             String sliceSeatPos = sliceSeat.getPos();
 
             Predicate<MapTemplateTile> nucleusSliceFilter =
@@ -172,7 +175,10 @@ public class NucleusImageGeneratorService {
             List<MiltyDraftTile> nucleusSliceTiles = mapTemplate.getTemplateTiles().stream()
                     .filter(nucleusSliceFilter)
                     .map(MapTemplateTile::getPos)
-                    .map(pos -> gameTileMap.get(pos).getTileID())
+                    .map(gameTileMap::get)
+                    .filter(Objects::nonNull)
+                    .map(Tile::getTileID)
+                    .filter(Objects::nonNull)
                     .map(DraftTileManager::findTile)
                     .toList();
             MiltyDraftSlice pseudoSlice = new MiltyDraftSlice();

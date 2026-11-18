@@ -24,6 +24,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.message.MessageHelper;
 import ti4.model.AttachmentModel;
 import ti4.model.Mapper;
@@ -162,7 +163,10 @@ public class ThirtyKSecretHooks {
     private static boolean isAtOrNextToMecatol(Game game, Player player, Tile tile) {
         Tile mecatol = game.getMecatolTile();
         if (mecatol == null) return false;
-        return FoWHelper.getAdjacentTiles(game, mecatol.getPosition(), player, false, true)
+        return Adjacency.of(game, player)
+                .forEffects()
+                .withSelf()
+                .into(mecatol.getPosition())
                 .contains(tile.getPosition());
     }
 
@@ -327,7 +331,7 @@ public class ThirtyKSecretHooks {
 
     private static boolean hasShipsAdjacentTo(Game game, Player player, Tile center) {
         if (center == null) return false;
-        return FoWHelper.getAdjacentTiles(game, center.getPosition(), player, false, false).stream()
+        return Adjacency.of(game, player).forEffects().into(center.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .anyMatch(tile -> tile != null && FoWHelper.playerHasShipsInSystem(player, tile));
     }

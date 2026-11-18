@@ -86,6 +86,12 @@ public final class ImageResources {
     }
 
     @Nullable
+    public static String strategyCardIcon(int initiative) {
+        if (initiative < 1 || initiative > 8) return null;
+        return find("emojis/cards/", "SC" + initiative + ".png");
+    }
+
+    @Nullable
     public static String general(String name) {
         return find("general/", name);
     }
@@ -156,6 +162,10 @@ public final class ImageResources {
     public static String attachment(String name) {
         String attachment = find("attachment_token/", name);
         return attachment != null ? attachment : token(name);
+    }
+
+    public static boolean hasTokenImage(String tokenFileName) {
+        return Mapper.getOneWayWormholeToken(tokenFileName) != null || tokenOrAttachment(tokenFileName) != null;
     }
 
     @Nullable

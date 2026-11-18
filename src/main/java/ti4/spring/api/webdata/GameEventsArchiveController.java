@@ -5,10 +5,12 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import ti4.spring.service.gameevent.GameEventArchiveService;
 
 @RequiredArgsConstructor
@@ -21,16 +23,23 @@ public class GameEventsArchiveController {
     private final GameEventArchiveService gameEventArchiveService;
 
     @GetMapping("/events")
-    public void getEvents(@RequestParam(defaultValue = "0") long since, HttpServletResponse response)
+    public void getEvents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int limit,
+            HttpServletResponse response)
             throws IOException {
-        long sinceEpochMillis = Math.max(since, 0);
+        if (page < 0 || limit < 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "page must be nonnegative and limit must be positive");
+        }
+        int pageSize = Math.min(limit, GameEventArchiveService.MAX_PAGE_SIZE);
         response.setContentType(ZIP_CONTENT_TYPE);
         response.setHeader(
                 HttpHeaders.CONTENT_DISPOSITION,
                 ContentDisposition.attachment()
-                        .filename("game-events-since-" + sinceEpochMillis + ".zip")
+                        .filename("completed-games-page-" + page + ".zip")
                         .build()
                         .toString());
-        gameEventArchiveService.writeEventsSinceAsZip(response.getOutputStream(), sinceEpochMillis);
+        gameEventArchiveService.writeCompletedGamesAsZip(response.getOutputStream(), page, pageSize);
     }
 }

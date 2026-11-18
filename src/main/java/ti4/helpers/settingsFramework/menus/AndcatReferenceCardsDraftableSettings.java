@@ -118,12 +118,11 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error =
-                switch (action) {
-                    case "presetPackages~MDL" -> getPresetPackagesFromUser(event);
-                    case "presetPackages" -> setPresetPackages(event);
-                    default -> null;
-                };
+        String error = switch (action) {
+            case "presetPackages~MDL" -> getPresetPackagesFromUser(event);
+            case "presetPackages" -> setPresetPackages(event);
+            default -> null;
+        };
 
         return (error == null ? "success" : error);
     }

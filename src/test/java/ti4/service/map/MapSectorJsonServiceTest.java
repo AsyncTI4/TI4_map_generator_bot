@@ -15,10 +15,12 @@ import ti4.discord.JdaService;
 import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.image.map.MapSegment;
+import ti4.json.JsonMapperManager;
 import ti4.model.GalaxyNames;
 import ti4.model.SegmentNames;
 import ti4.service.map.MapJsonIOService.MapDataIO;
 import ti4.service.map.MapJsonIOService.SectorIO;
+import ti4.service.map.MapJsonIOService.SectorListIO;
 import ti4.service.map.MapJsonIOService.TileIO;
 import ti4.testUtils.BaseTi4Test;
 
@@ -59,6 +61,20 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
         sector.setType(type);
         sector.setDistance(distance);
         sector.setName(name);
+        return sector;
+    }
+
+    private SectorListIO listed(String name, String type, String centre, Integer distance, String... positions) {
+        SectorListIO sector = new SectorListIO();
+        sector.setName(name);
+        sector.setType(type);
+        sector.setCentre(centre);
+        sector.setDistance(distance);
+        sector.setPositions(List.of(positions));
+        if (data.getSectors() == null) {
+            data.setSectors(new ArrayList<>());
+        }
+        data.getSectors().add(sector);
         return sector;
     }
 
@@ -315,6 +331,247 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
         MapSectorJsonService.importSectors(game, data, errors);
         assertThat(errors).isEmpty();
 
+        StringBuilder reimportErrors = new StringBuilder();
+        Game reimported = reimport(export(), reimportErrors);
+
+        assertThat(reimportErrors).isEmpty();
+        assertThat(describe(reimported)).isEqualTo(describe(game));
+        assertThat(GalaxyNames.name(reimported, "a")).isEqualTo("andromeda");
+        assertThat(MapSegment.gap(reimported)).isEqualTo(MapSegment.gap(game));
+    }
+
+    @Test
+    void listOnlyImportCreatesACircleAClusterAndAShape() {
+        place("000");
+        place("101");
+        place("401");
+        place("402");
+        place("201");
+        listed("core", "manual_circle", "000", 1, "000", "101");
+        listed("rim", "cluster", "401", 0, "401", "402");
+        listed("wedge", null, null, null, "201", "202", "306");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(errors).isEmpty();
+        assertThat(segmentNamed("core").kind()).isEqualTo(MapSegment.Kind.CIRCLE);
+        assertThat(segmentNamed("core").radius()).isEqualTo(1);
+        assertThat(segmentNamed("rim").kind()).isEqualTo(MapSegment.Kind.CLUSTER);
+        assertThat(segmentNamed("rim").positions()).containsExactlyInAnyOrder("401", "402");
+        // A shape keeps empty positions (202, 306), as a circle does.
+        assertThat(segmentNamed("wedge").kind()).isEqualTo(MapSegment.Kind.SHAPE);
+        assertThat(segmentNamed("wedge").positions()).containsExactlyInAnyOrder("201", "202", "306");
+    }
+
+    // Files from the map builder carry a circle both in the list and on its centre system.
+    @Test
+    void listEntryWinsOverAPerTileEntryWithTheSameName() {
+        place("000").setSector(sector("manual_circle", 0, "core"));
+        place("101");
+        listed("core", "manual_circle", "000", 1, "000", "101");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(MapSegment.stored(game)).hasSize(1);
+        assertThat(segmentNamed("core").radius()).isEqualTo(1);
+        assertThat(errors).isEmpty();
+    }
+
+    // The per-tile form cannot carry either sector: 000 has no system, and both share that centre.
+    @Test
+    void circlesOnAnEmptySharedCentreSurviveExportAndImport() {
+        place("101");
+        MapSegment.put(game, new MapSegment("hollow", "000", 1));
+        MapSegment.put(game, new MapSegment("dot", "000", 0));
+
+        MapDataIO exported = export();
+        StringBuilder reimportErrors = new StringBuilder();
+        Game reimported = reimport(exported, reimportErrors);
+
+        assertThat(exported.getSectors().stream().map(SectorListIO::getCentre)).containsOnly("000");
+        assertThat(reimportErrors).isEmpty();
+        assertThat(describe(reimported)).isEqualTo(describe(game));
+    }
+
+    @Test
+    void automaticListEntryNamesItsClusterWhenNoSystemDoes() {
+        place("401");
+        place("402");
+        listed("orion", "automatic", null, null, "401", "402");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(MapSegment.isAutoSectors(game)).isTrue();
+        assertThat(segmentNamed("orion").positions()).containsExactlyInAnyOrder("401", "402");
+        assertThat(errors).isEmpty();
+    }
+
+    // A clean export lists every automatic sector; a map with more than 20 must still re-import without errors.
+    @Test
+    void listedAutomaticNamesStopAtThePinCapWithoutErrors() {
+        List<String> separate = new ArrayList<>();
+        for (int index = 1; index <= 23; index += 2) {
+            separate.add(String.format("4%02d", index));
+        }
+        for (int index = 1; index <= 17; index += 2) {
+            separate.add(String.format("6%02d", index));
+        }
+        for (int index = 0; index < separate.size(); index++) {
+            place(separate.get(index));
+            listed("sector-" + index, "automatic", null, null, separate.get(index));
+        }
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(errors).isEmpty();
+        assertThat(MapSegment.all(game).stream().map(MapSegment::name))
+                .contains("sector-0", "sector-19")
+                .doesNotContain("sector-20");
+    }
+
+    @Test
+    void perTileAutomaticNameWinsOverTheList() {
+        place("401").setSector(sector("automatic", 0, "far-reach"));
+        place("402");
+        listed("orion", "automatic", null, null, "401", "402");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(segmentNamed("far-reach").positions()).containsExactlyInAnyOrder("401", "402");
+        assertThat(MapSegment.find(game, "orion")).isEmpty();
+    }
+
+    // Unrenamed automatic names come from a hash of the game name, so only the list keeps them across games.
+    @Test
+    void unrenamedAutomaticSectorKeepsItsNameThroughExportAndImport() {
+        place("401").setSector(sector("automatic", 0, null));
+        place("402");
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        StringBuilder reimportErrors = new StringBuilder();
+        Game reimported = reimport(export(), reimportErrors);
+
+        assertThat(reimportErrors).isEmpty();
+        assertThat(describe(reimported)).isEqualTo(describe(game));
+    }
+
+    @Test
+    void manualListEntryWithoutACentreBecomesAShape() {
+        place("401");
+        listed("rim", "manual_circle", null, 1, "401", "402");
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(segmentNamed("rim").kind()).isEqualTo(MapSegment.Kind.SHAPE);
+        assertThat(segmentNamed("rim").positions()).containsExactlyInAnyOrder("401", "402");
+        assertThat(errors.toString()).contains("imported as a fixed shape");
+    }
+
+    @Test
+    void segmentCapCountsShapes() {
+        for (int i = 1; i <= MapSegment.MAX_SEGMENTS; i++) {
+            listed("shape-" + i, null, null, null, String.format("4%02d", i));
+        }
+        listed("one-too-many", "manual_circle", "000", 0);
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(MapSegment.stored(game)).hasSize(MapSegment.MAX_SEGMENTS);
+        assertThat(MapSegment.find(game, "one-too-many")).isEmpty();
+        assertThat(errors.toString()).contains("maximum of " + MapSegment.MAX_SEGMENTS);
+    }
+
+    // Sector part of a real map builder export (hex-Custom-async-ti-hyperlink buildSectorExport, 2026-11-05):
+    // a circle and a cluster on tiles (also written per tile), a circle on an empty hex, and a painted shape.
+    private static final String MAP_BUILDER_EXPORT = """
+            { "mapInfo": [
+                { "position": "000", "tileID": "19", "sector": { "type": "manual_circle", "distance": 1, "name": "core" } },
+                { "position": "101", "tileID": "19" }, { "position": "102", "tileID": "19" },
+                { "position": "103", "tileID": "19" }, { "position": "104", "tileID": "19" },
+                { "position": "105", "tileID": "19" }, { "position": "106", "tileID": "19" },
+                { "position": "310", "tileID": "19", "sector": { "type": "manual_auto", "distance": 0, "name": "rim" } },
+                { "position": "311", "tileID": "19" }, { "position": "301", "tileID": "19" },
+                { "position": "302", "tileID": "19" }, { "position": "401", "tileID": "19" },
+                { "position": "402", "tileID": "19" } ],
+              "sectors": [
+                { "name": "core", "positions": ["000","101","102","103","104","105","106"],
+                  "type": "manual_circle", "centre": "000", "distance": 1 },
+                { "name": "rim", "positions": ["310","311"], "type": "manual_auto", "centre": "310", "distance": 0 },
+                { "name": "void-dot", "positions": ["415"], "type": "manual_circle", "centre": "415", "distance": 0 },
+                { "name": "wedge", "positions": ["201","202","301","302"] } ] }
+            """;
+
+    private static final List<String> MAP_BUILDER_SECTORS = List.of(
+            "core|CIRCLE|[000, 101, 102, 103, 104, 105, 106]",
+            "rim|CLUSTER|[310, 311]",
+            "void-dot|CIRCLE|[415]",
+            "wedge|SHAPE|[201, 202, 301, 302]");
+
+    private void loadMapBuilderExport() {
+        data = JsonMapperManager.basic().readValue(MAP_BUILDER_EXPORT, MapDataIO.class);
+        data.getMapInfo().forEach(tile -> game.setTile(new Tile(tile.getTileID(), tile.getPosition())));
+    }
+
+    @Test
+    void mapBuilderExportImportsEverySectorOnceAndExportsTheSameList() {
+        loadMapBuilderExport();
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(errors).isEmpty();
+        assertThat(describe(game)).containsExactlyElementsOf(MAP_BUILDER_SECTORS);
+        assertThat(export().getSectors().stream().map(MapSectorJsonServiceTest::listedForm))
+                .containsExactlyInAnyOrderElementsOf(data.getSectors().stream()
+                        .map(MapSectorJsonServiceTest::listedForm)
+                        .toList());
+    }
+
+    // Normal games: the same file imports its tiles and keeps the sectors with one warning, as per-tile sectors did.
+    @Test
+    void mapBuilderExportInANormalGameStoresSectorsWithOneWarning() {
+        game.setFowMode(false);
+        loadMapBuilderExport();
+
+        MapSectorJsonService.importSectors(game, data, errors);
+
+        assertThat(describe(game)).containsExactlyElementsOf(MAP_BUILDER_SECTORS);
+        assertThat(errors.toString().lines())
+                .containsExactly(
+                        "- sectors: map sectors are only used in Fog of War games; they were stored but have no effect in this game.");
+    }
+
+    // The whole /map import_json path: tiles placed through AddTileService, then sectors, in fog and normal games.
+    @Test
+    void mapBuilderExportGoesThroughTheFullImportInFogAndNormalGames() {
+        for (boolean fog : new boolean[] {true, false}) {
+            Game imported = new Game();
+            imported.setName("sector-json-full-import");
+            imported.setFowMode(fog);
+
+            MapJsonIOService.importMapFromJson(imported, MAP_BUILDER_EXPORT, null);
+
+            assertThat(imported.getTileMap()).hasSize(13);
+            assertThat(describe(imported)).containsExactlyElementsOf(MAP_BUILDER_SECTORS);
+        }
+    }
+
+    @Test
+    void normalGameWithoutSectorsExportsNoSectorFields() {
+        game.setFowMode(false);
+        place("000");
+        place("101");
+
+        String json = MapJsonIOService.exportMapAsJson(null, game, false, false, false);
+
+        assertThat(json).doesNotContain("sector").doesNotContain("galaxies");
+    }
+
+    private static String listedForm(SectorListIO sector) {
+        return sector.getName() + "|" + sector.getType() + "|" + sector.getCentre() + "|" + sector.getDistance() + "|"
+                + sector.getPositions();
+    }
+
+    private MapDataIO export() {
         MapDataIO exported = new MapDataIO();
         exported.setMapInfo(game.getTileMap().values().stream()
                 .map(tile -> {
@@ -325,18 +582,16 @@ class MapSectorJsonServiceTest extends BaseTi4Test {
                 })
                 .collect(Collectors.toCollection(ArrayList::new)));
         MapSectorJsonService.exportSectors(game, exported);
+        return exported;
+    }
 
+    private Game reimport(MapDataIO exported, StringBuilder reimportErrors) {
         Game reimported = new Game();
         reimported.setName("sector-json-reimport");
         reimported.setFowMode(true);
         game.getTileMap().values().forEach(tile -> reimported.setTile(new Tile(tile.getTileID(), tile.getPosition())));
-        StringBuilder reimportErrors = new StringBuilder();
         MapSectorJsonService.importSectors(reimported, exported, reimportErrors);
-
-        assertThat(reimportErrors).isEmpty();
-        assertThat(describe(reimported)).isEqualTo(describe(game));
-        assertThat(GalaxyNames.name(reimported, "a")).isEqualTo("andromeda");
-        assertThat(MapSegment.gap(reimported)).isEqualTo(MapSegment.gap(game));
+        return reimported;
     }
 
     private static List<String> describe(Game game) {

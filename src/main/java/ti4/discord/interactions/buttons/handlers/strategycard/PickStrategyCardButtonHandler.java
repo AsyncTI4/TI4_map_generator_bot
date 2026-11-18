@@ -25,6 +25,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.player.PlayerStatsService;
 import ti4.service.strategycard.PickStrategyCardService;
 
@@ -234,8 +235,9 @@ public class PickStrategyCardButtonHandler {
         if (minNumOfSCs == maxSCsPerPlayer) {
             return buttons;
         }
+        boolean scGroups = MegagameGroupService.isActive(game);
         for (Player p2 : activePlayers) {
-            if (p2 == player) {
+            if (p2 == player || (scGroups && !MegagameGroupService.sameGroup(game, p2, scPicked))) {
                 continue;
             }
             if (p2.getSCs().size() < maxSCsPerPlayer) {

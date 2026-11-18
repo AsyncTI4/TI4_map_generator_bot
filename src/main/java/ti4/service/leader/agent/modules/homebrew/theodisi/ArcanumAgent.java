@@ -1,5 +1,6 @@
 package ti4.service.leader.agent.modules.homebrew.theodisi;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,13 +16,14 @@ import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.agent.AgentLifecycle;
 import ti4.service.leader.agent.AgentModule;
 import ti4.service.leader.agent.AgentOutcome;
 import ti4.service.leader.agent.AgentOutcome.Message;
 import ti4.service.leader.agent.AgentUse;
-import ti4.service.tech.PlayerTechService;
+import ti4.service.tech.ListTechService;
 
 public final class ArcanumAgent extends AgentModule<ArcanumAgent.TechSwap> {
 
@@ -30,7 +32,6 @@ public final class ArcanumAgent extends AgentModule<ArcanumAgent.TechSwap> {
     private static final String USE_ON_OTHER = "arcanumVeylaUseOnOther";
     private static final String CHOOSE_TARGET = "arcanumVeylaTarget_";
     private static final String SELECT_RETURN_TECH = "arcanumVeylaReturnTech_";
-    private static final String GAIN_TECH = "arcanumVeylaGainTech_";
     private static final String SEPARATOR = "|";
     private static final String SETUP_PHASE = "setup";
     private static final int BUTTONS_PER_MESSAGE = 25;
@@ -153,37 +154,6 @@ public final class ArcanumAgent extends AgentModule<ArcanumAgent.TechSwap> {
         }
     }
 
-    @ButtonHandler(GAIN_TECH)
-    static void gainTech(ButtonInteractionEvent event, Game game, Player target, String buttonID) {
-        String[] payload = buttonID.substring(GAIN_TECH.length()).split("\\|", 3);
-        if (payload.length != 3 || !Objects.equals(target.getFaction(), payload[0])) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        String returnedTechId = payload[1];
-        String selectedTechId = payload[2];
-        List<Button> replacementButtons = replacementButtons(game, target, returnedTechId);
-        String message = target.getRepresentation()
-                + ", choose a non-unit-upgrade technology to gain from _Veyla, the Arcanum agent_.";
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event,
-                event.getMessageChannel(),
-                replacementButtons,
-                message,
-                gainTechPrefix(target, returnedTechId),
-                buttonID)) {
-            return;
-        }
-        if (!game.getTechnologyDeck().contains(selectedTechId)
-                || replacementButtons.stream()
-                        .noneMatch(button -> button.getCustomId().endsWith(SEPARATOR + selectedTechId))) {
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
-        PlayerTechService.addTech(event, game, target, selectedTechId);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @Override
     public Optional<TechSwap> decode(Game game, Player user, String payload) {
         String[] parts = StringUtils.split(payload, SEPARATOR);
@@ -207,7 +177,7 @@ public final class ArcanumAgent extends AgentModule<ArcanumAgent.TechSwap> {
         if (tech.isFactionTech()
                 || tech.isUnitUpgrade()
                 || !swap.target().hasTech(tech.getAlias())
-                || replacementButtons(game, swap.target(), tech.getAlias()).isEmpty()) {
+                || replacementTechs(game, swap.target(), tech).isEmpty()) {
             return Optional.of(tech.getName() + " cannot be returned for Veyla Biphos");
         }
         return Optional.empty();
@@ -218,18 +188,13 @@ public final class ArcanumAgent extends AgentModule<ArcanumAgent.TechSwap> {
         Player target = use.payload().target();
         TechnologyModel returnedTech = use.payload().returnedTech();
         String returnedTechId = returnedTech.getAlias();
-        List<Button> replacementButtons = replacementButtons(use.game(), target, returnedTechId);
         target.removeTech(returnedTechId);
+        List<TechnologyModel> replacementTechs = replacementTechs(use.game(), target, returnedTech);
         return AgentOutcome.of(Message.addressedTo(
                 target,
                 ", " + use.agentNameFor(target) + " returned " + returnedTech.getNameRepresentation()
-                        + " to the technology deck. Choose a non-unit-upgrade technology with at most "
-                        + maximumRequirements(returnedTech) + " prerequisites to gain.",
-                firstPage(replacementButtons, gainTechPrefix(target, returnedTechId))));
-    }
-
-    private static int maximumRequirements(TechnologyModel returnedTech) {
-        return returnedTech.getRequirements().orElse("").length() + 1;
+                        + " to the technology deck. Research a technology of a different color.",
+                ListTechService.getTechButtons(new ArrayList<>(replacementTechs), target, "free")));
     }
 
     private static List<Button> firstPage(List<Button> buttons, String prefix) {
@@ -240,30 +205,15 @@ public final class ArcanumAgent extends AgentModule<ArcanumAgent.TechSwap> {
         return target.factionButtonChecker() + SELECT_RETURN_TECH + holder.getFaction() + SEPARATOR;
     }
 
-    private static String gainTechPrefix(Player target, String returnedTechId) {
-        return target.factionButtonChecker() + GAIN_TECH + target.getFaction() + SEPARATOR + returnedTechId + SEPARATOR;
-    }
-
-    static List<Button> replacementButtons(Game game, Player target, String returnedTechId) {
-        TechnologyModel returnedTech = Mapper.getTech(returnedTechId);
+    static List<TechnologyModel> replacementTechs(Game game, Player target, TechnologyModel returnedTech) {
         if (game == null || target == null || returnedTech == null) {
             return List.of();
         }
-        int maximumRequirements = maximumRequirements(returnedTech);
-        return game.getTechnologyDeck().stream()
-                .map(Mapper::getTech)
-                .filter(Objects::nonNull)
-                .filter(tech -> !tech.isUnitUpgrade())
-                .filter(tech -> !tech.isFactionTech()
-                        || tech.getFaction()
-                                .filter(faction -> faction.equalsIgnoreCase(target.getFaction()))
-                                .isPresent())
-                .filter(tech -> !target.hasTech(tech.getAlias()))
-                .filter(tech -> tech.getRequirements().orElse("").length() <= maximumRequirements)
-                .map(tech -> Buttons.green(
-                        gainTechPrefix(target, returnedTechId) + tech.getAlias(),
-                        tech.getName(),
-                        tech.getCondensedReqsEmojis(true)))
+        return TechnologyType.mainFour.stream()
+                .filter(type -> !returnedTech.getTypes().contains(type))
+                .flatMap(type -> ListTechService.getAllTechOfAType(game, type.toString(), target, false, true).stream())
+                .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
+                .distinct()
                 .toList();
     }
 
@@ -276,8 +226,7 @@ public final class ArcanumAgent extends AgentModule<ArcanumAgent.TechSwap> {
                 .filter(Objects::nonNull)
                 .filter(tech -> !tech.isFactionTech())
                 .filter(tech -> !tech.isUnitUpgrade())
-                .filter(tech ->
-                        !replacementButtons(game, target, tech.getAlias()).isEmpty())
+                .filter(tech -> !replacementTechs(game, target, tech).isEmpty())
                 .map(tech -> Buttons.green(
                         returnTechPrefix(holder, target) + tech.getAlias(),
                         "Return " + tech.getName(),

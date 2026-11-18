@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Player;
@@ -353,7 +353,7 @@ class PromissoryRulesTest extends BaseTi4Test {
     }
 
     // A note already waiting in the queue is not queued a second time, and the rule does not hold the seat: a queued
-    // seat that waited here would never answer a Sabotage window (see NekroBrainTest).
+    // seat that waited here would never answer a Sabotage window (see StandardBrainTest).
     @Test
     void neitherQueuesAgainNorHoldsWhileANoteIsQueued() {
         electionRevealed(6);
@@ -407,7 +407,7 @@ class PromissoryRulesTest extends BaseTi4Test {
         electionRevealed(6);
         aiHolds(test.sol, "blue_ps");
 
-        assertThat(AiTestGame.pressedId(new NekroBrain().decide(test.context(whenOffer()))))
+        assertThat(AiTestGame.pressedId(new StandardBrain().decide(test.context(whenOffer()))))
                 .isEqualTo("queueAWhen");
     }
 }

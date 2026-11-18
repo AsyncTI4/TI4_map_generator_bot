@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.model.MapPositionMapper;
@@ -92,7 +92,7 @@ class PeaceAccordsRulesTest extends BaseTi4Test {
 
     @Test
     void theBrainAnswersTheOffer() {
-        assertThat(AiTestGame.pressedId(new NekroBrain().decide(test.context(offer(NOW, "fria", "abyz")))))
+        assertThat(AiTestGame.pressedId(new StandardBrain().decide(test.context(offer(NOW, "fria", "abyz")))))
                 .isEqualTo("FFCC_nekro_peaceAccords_abyz");
     }
 }

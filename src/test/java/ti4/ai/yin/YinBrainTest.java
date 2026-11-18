@@ -8,7 +8,7 @@ import static ti4.ai.yin.YinTestBoard.SPACE;
 
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.helpers.Units.UnitType;
@@ -18,7 +18,7 @@ import ti4.testUtils.BaseTi4Test;
 // start-of-combat and after-round abilities come before the dice.
 class YinBrainTest extends BaseTi4Test {
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
 
     @Test
     void theUnownedYinFollowUpsArePublicWindows() {

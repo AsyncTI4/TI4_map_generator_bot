@@ -23,6 +23,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
 
@@ -164,6 +165,12 @@ public class PlayerStatsService {
             if (scNumber == 9 && !RiftSetModeService.canPickSacrifice(player, game)) {
                 return false;
             }
+        }
+        if (MegagameGroupService.isActive(game) && !MegagameGroupService.sameGroup(game, player, scNumber)) {
+            MessageHelper.sendMessageToChannel(
+                    (MessageChannel) event.getChannel(),
+                    game.getSCName(scNumber) + " (" + scNumber + ") belongs to another strategy card group.");
+            return false;
         }
 
         player.addSC(scNumber);

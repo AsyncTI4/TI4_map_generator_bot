@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -45,6 +46,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AncientMap
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExtensionRefitLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
@@ -53,6 +55,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morph
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
@@ -121,6 +124,7 @@ import ti4.service.info.KnownCardsService;
 import ti4.service.info.KnownCardsService.KnownCardType;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.objectives.SecretObjectiveDeckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.spring.service.gameevent.GameEventService;
 import ti4.spring.service.gameevent.GameEventType;
@@ -1050,6 +1054,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Prophecy of Kings", isProphecyOfKings());
         gameModes.put("Thunder's Edge", isThundersEdge());
         gameModes.put("Twilight's Fall", isTwilightsFallMode());
+        gameModes.put("Refracture", isRefractureMode());
 
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
@@ -1071,6 +1076,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         gameModes.put("Muaat Mania", isMuaatManiaMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
         gameModes.put("Feast or Famine", isFeastOrFamineMode());
+        gameModes.put("Secrets Only", isSecretsOnlyMode());
         gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
@@ -1558,6 +1564,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 && !"twilights_fall_sc".equals(getScSetID());
     }
 
+    public boolean usesOneWayAdjacency() {
+        return isFowMode() || isOneWayAdjacency();
+    }
+
     public void resetThalnosUnits() {
         thalnosUnits = new HashMap<>();
     }
@@ -1581,6 +1591,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         ExtensionRefitLLButtonHandler.clearExtensionRefit(this);
+        BeansMonumentHandler.clearMonumentActions(this);
         AncientMapsLLButtonHandler.clearAncientMaps(this);
         MirrorShieldingLLButtonHandler.clearMirrorShielding(this);
         RaisedMoraleLLButtonHandler.clearRaisedMorale(this);
@@ -1590,6 +1601,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
         TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(this);
+        BeansRelicHandler.clearAshenHourglassTargets(this);
         setStoredValue("factionsInCombat", "");
         setTemporaryPingDisable(false);
         // reset timers for ping and stats
@@ -2077,6 +2089,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
             if (!Constants.CUSTODIAN.equals(id)
                     && !Constants.IMPERIAL_RIDER.equals(id)
+                    && !Constants.SOVEREIGN_CROWN.equals(id)
                     && scoredPlayerList.contains(userID)) {
                 return false;
             }
@@ -2148,6 +2161,63 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             return true;
         }
         return false;
+    }
+
+    public String customPONameFor(Player player, String label) {
+        if (!isFowMode()) {
+            return label + " (" + player.getFaction() + ")";
+        }
+        anonymizeIdentifiedCustomPOs(player, label);
+        removeUnscoredNeutralCustomPOs(label);
+        return neutralCustomPONames(label).stream()
+                .filter(name -> customPOScorers(name).contains(player.getUserID()))
+                .findFirst()
+                .orElseGet(() -> nextNeutralCustomPOName(label));
+    }
+
+    private void anonymizeIdentifiedCustomPOs(Player player, String label) {
+        for (String identity : new String[] {player.getFaction(), player.getColor()}) {
+            if (identity != null) {
+                renameCustomPO(label + " (" + identity + ")", nextNeutralCustomPOName(label));
+            }
+        }
+    }
+
+    private void removeUnscoredNeutralCustomPOs(String label) {
+        neutralCustomPONames(label).stream()
+                .filter(name -> customPOScorers(name).isEmpty())
+                .forEach(this::removeCustomPO);
+    }
+
+    private List<String> neutralCustomPONames(String label) {
+        Pattern numbered = Pattern.compile(Pattern.quote(label) + " \\d+");
+        return customPublicVP.keySet().stream()
+                .filter(name -> name.equals(label) || numbered.matcher(name).matches())
+                .sorted(Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder()))
+                .toList();
+    }
+
+    private String nextNeutralCustomPOName(String label) {
+        String name = label;
+        for (int number = 2; customPublicVP.containsKey(name); number++) {
+            name = label + " " + number;
+        }
+        return name;
+    }
+
+    private List<String> customPOScorers(String name) {
+        return scoredPublicObjectives.getOrDefault(name, List.of());
+    }
+
+    private void renameCustomPO(String oldName, String newName) {
+        if (!customPublicVP.containsKey(oldName) || customPublicVP.containsKey(newName)) {
+            return;
+        }
+        int vp = customPublicVP.get(oldName);
+        List<String> scorers = new ArrayList<>(scoredPublicObjectives.getOrDefault(oldName, List.of()));
+        removeCustomPO(oldName);
+        Integer poIndex = addCustomPO(newName, vp);
+        scorers.forEach(userID -> scorePublicObjective(userID, poIndex));
     }
 
     public boolean addSOToGame(String id) {
@@ -2517,6 +2587,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 }
             }
         }
+        if ("ministerthrone".equalsIgnoreCase(id)) {
+            String planetName = getStoredValue("theodisiMinisterThronePlanet");
+            Planet planet = getUnitHolderFromPlanet(planetName);
+            if (planet != null) planet.removeToken("attachment_ministerthrone.png");
+            removeStoredValue("theodisiMinisterThronePlanet");
+        }
 
         laws.remove(id);
         lawsInfo.remove(id);
@@ -2543,6 +2619,11 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             removeSearchWarrant(id);
         } else if ("censure".equalsIgnoreCase(id)) {
             removePoliticalCensure();
+        } else if ("ministerthrone".equalsIgnoreCase(id)) {
+            String planetName = getStoredValue("theodisiMinisterThronePlanet");
+            Planet planet = getUnitHolderFromPlanet(planetName);
+            if (planet != null) planet.removeToken("attachment_ministerthrone.png");
+            removeStoredValue("theodisiMinisterThronePlanet");
         }
 
         laws.remove(id);
@@ -3226,7 +3307,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public static void checkSOLimit(Player player) {
-        if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()
+        if (player.getSecretsCountedTowardLimit() > player.getMaxSOCount()
                 && !player.getSecretsUnscored().isEmpty()) {
             String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
                     + player.getMaxSOCount()
@@ -3253,6 +3334,12 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         String id = getSecretObjectives().getFirst();
         Player player = getPlayer(userID);
+        if (isSecretsOnlyMode() && player != null) {
+            id = nextSecretObjectiveScorableBy(player);
+            if (id == null) {
+                return null;
+            }
+        }
 
         if (isErwansGambitMode() && "mentak".equalsIgnoreCase(player.getFaction())) {
             List<SecretObjectiveModel> heistObbies =
@@ -3286,6 +3373,14 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
             checkSOLimit(player);
         }
         return id;
+    }
+
+    @Nullable
+    public String nextSecretObjectiveScorableBy(Player player) {
+        return getSecretObjectives().stream()
+                .filter(soID -> !player.getSecretsScored().containsKey(soID))
+                .findFirst()
+                .orElse(null);
     }
 
     @Nullable
@@ -3397,6 +3492,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 MorphaUnitHandler.recordCytoplasmicTransportDiscards(this, player, 1);
             }
             CommanderUnlockCheckService.checkAllPlayersInGame(this, "morpha");
+            CommanderUnlockCheckService.checkPlayer(player, "xyrix");
             return true;
         }
         return false;
@@ -3436,6 +3532,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             }
             setPurgedActionCard(acID, played);
+            if (played) {
+                CommanderUnlockCheckService.checkPlayer(player, "xyrix");
+            }
             return true;
         }
         return false;
@@ -3543,14 +3642,32 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 break;
             }
         }
-        if (!soID.isEmpty()) {
-            player.removeSecret(soIDNumber);
-            KnownCardsService.recordCardLeftHandPublicly(
-                    this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
-            player.setSecretScored(soID);
-            return true;
+        if (soID.isEmpty()) {
+            return false;
         }
-        return false;
+        String scoredID = soID.replace("extra1", "").replace("extra2", "");
+        if (isSecretsOnlyMode() && player.getSecretsScored().containsKey(scoredID)) {
+            return false;
+        }
+        player.removeSecret(soIDNumber);
+        KnownCardsService.recordCardLeftHandPublicly(
+                this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
+        player.setSecretScored(soID);
+        if (isSecretsOnlyMode()) {
+            returnSecretObjectiveToDeck(scoredID);
+        }
+        return true;
+    }
+
+    private void returnSecretObjectiveToDeck(String soID) {
+        if (isSecretsOnlyMode()) {
+            SecretObjectiveDeckService.shuffleIntoDeck(this, List.of(soID));
+            return;
+        }
+        if (!getSecretObjectives().contains(soID)) {
+            getSecretObjectives().add(soID);
+        }
+        Collections.shuffle(getSecretObjectives(), RandomHelper.current());
     }
 
     public boolean unscoreSecretObjective(String userID, Integer soIDNumber) {
@@ -3568,6 +3685,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
+            if (isSecretsOnlyMode()) {
+                removeSOFromGame(soID);
+            }
             player.setSecret(soID);
             KnownCardsService.recordCardShownToAll(
                     this, player, KnownCardType.SECRET_OBJECTIVE, KnownCardsService.secretObjectiveName(soID));
@@ -3591,8 +3711,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
         if (!soID.isEmpty()) {
             player.removeSecretScored(soIDNumber);
-            getSecretObjectives().add(soID);
-            Collections.shuffle(getSecretObjectives(), RandomHelper.current());
+            returnSecretObjectiveToDeck(soID);
             return true;
         }
         return false;
@@ -3614,6 +3733,10 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         if (!soID.isEmpty()) {
             player.removeSecret(soIDNumber);
             if (Mapper.getSecretObjective(soID).getSource() == ComponentSource.erwans_gambit) {
+                return true;
+            }
+            if (isSecretsOnlyMode()) {
+                SecretObjectiveDeckService.shuffleIntoDeck(this, List.of(soID));
                 return true;
             }
             getSecretObjectives().add(soID);
@@ -4403,6 +4526,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         planets.put("fabricatestation", new Planet("fabricatestation", new Point(0, 0)));
         planets.put("seraphdatacenter", new Planet("seraphdatacenter", new Point(0, 0)));
         planets.put("mobilemountain", new Planet("mobilemountain", new Point(0, 0)));
+        planets.put("thedeep", new Planet("thedeep", new Point(0, 0)));
+        planets.put("thedeepascended", new Planet("thedeepascended", new Point(0, 0)));
         planets.put("gedustation", new Planet("gedustation", new Point(0, 0)));
         planets.put("tradestation1", new Planet("tradestation1", new Point(0, 0)));
         planets.put("tradestation2", new Planet("tradestation2", new Point(0, 0)));
@@ -5222,6 +5347,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isBlueReverieMode()
                 || isUnchartedSpaceStuff()
                 || isLostLegaciesTiles()
+                || isRefractureMode()
                 || isFrankenGame()
                 || isMiltyModMode()
                 || isThundersEdgeDemo()
@@ -5235,6 +5361,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 || isCosmicConvergenceMode()
                 || isLiberationC4Mode()
                 || isErwansGambitMode()
+                || isSecretsOnlyMode()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()

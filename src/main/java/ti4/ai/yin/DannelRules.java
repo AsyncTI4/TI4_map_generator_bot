@@ -132,45 +132,35 @@ public class DannelRules {
         Optional<AiDecision> combat = startCombat(context, flow.get(), sinceStart);
         if (combat.isPresent() || flow.get().stage() == Stage.DONE) return combat;
         List<AiPrompt> fresh = since(context, flow.get().since());
-        Optional<AiDecision> step =
-                switch (flow.get().stage()) {
-                    case MENU ->
-                        owned(context, fresh, HERO_BUTTON)
-                                .map(match -> advance(
-                                        context,
-                                        flow.get().at(Stage.HERO, context.now()),
-                                        match,
-                                        "play Dannel of the Tenth"));
-                    case HERO ->
-                        owned(context, sinceStart, START)
-                                .map(match -> advance(
-                                        context,
-                                        flow.get().at(Stage.TARGET, context.now()),
-                                        match,
-                                        "invade with the Yin hero"));
-                    case TARGET ->
-                        Prompts.unowned(
-                                        fresh,
-                                        (TARGET_PREFIX + flow.get().current().owner())::equals)
-                                .map(match -> advance(
-                                        context,
-                                        flow.get().at(Stage.PLANET, context.now()),
-                                        match,
-                                        "pick the owner of "
-                                                + flow.get().current().planet()));
-                    case PLANET ->
-                        owned(
-                                        context,
-                                        fresh,
-                                        PLANET_PREFIX + flow.get().current().planet())
-                                .map(match -> advance(
-                                        context,
-                                        flow.get().at(Stage.COUNT, context.now()),
-                                        match,
-                                        "invade " + flow.get().current().planet()));
-                    case COUNT -> landInfantry(context, flow.get(), fresh);
-                    case DONE -> Optional.empty();
-                };
+        Optional<AiDecision> step = switch (flow.get().stage()) {
+            case MENU ->
+                owned(context, fresh, HERO_BUTTON)
+                        .map(match -> advance(
+                                context, flow.get().at(Stage.HERO, context.now()), match, "play Dannel of the Tenth"));
+            case HERO ->
+                owned(context, sinceStart, START)
+                        .map(match -> advance(
+                                context,
+                                flow.get().at(Stage.TARGET, context.now()),
+                                match,
+                                "invade with the Yin hero"));
+            case TARGET ->
+                Prompts.unowned(fresh, (TARGET_PREFIX + flow.get().current().owner())::equals)
+                        .map(match -> advance(
+                                context,
+                                flow.get().at(Stage.PLANET, context.now()),
+                                match,
+                                "pick the owner of " + flow.get().current().planet()));
+            case PLANET ->
+                owned(context, fresh, PLANET_PREFIX + flow.get().current().planet())
+                        .map(match -> advance(
+                                context,
+                                flow.get().at(Stage.COUNT, context.now()),
+                                match,
+                                "invade " + flow.get().current().planet()));
+            case COUNT -> landInfantry(context, flow.get(), fresh);
+            case DONE -> Optional.empty();
+        };
         if (step.isPresent()) return step;
         long until = flow.get().since() + STEP_WAIT_MILLIS;
         if (context.now() < until) return Optional.of(new AiDecision.Wait(until, "Dannel of the Tenth"));

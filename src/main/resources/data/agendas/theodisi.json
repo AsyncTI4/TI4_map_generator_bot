@@ -1,0 +1,192 @@
+[
+    {
+        "alias": "districtredraw",
+        "name": "District Redraw",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player that voted \"Against\" draws 2 action cards.",
+        "text2": "Against: Each player that voted \"For\" gains 1 command token.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "reappropriation",
+        "name": "Emergency Reappropriation",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player discards all of their action cards. Then, they draw action cards until they have 5 action cards in their hand.",
+        "text2": "",
+        "source": "theodisi"
+    },
+    {
+        "alias": "peacesummit",
+        "name": "Peace Summit",
+        "type": "Directive",
+        "target": "Elect Non-Home Planet",
+        "text1": "The player that controls the elected planet places 3 infantry from their reinforcements on that planet. Each player that does not control the elected planet may place 1 infantry from their reinforcements into coexistence on that planet, if able.",
+        "text2": "",
+        "source": "theodisi"
+    },
+    {
+        "alias": "pirateuprising",
+        "name": "Pirate Uprising",
+        "type": "Directive",
+        "target": "Elect System In The Fracture",
+        "text1": "After this agenda is revealed, if The Fracture is not in play, the speaker brings it into play.",
+        "text2": "Destroy all non-neutral units in the elected system. Then, place 1 neutral war sun and 6 neutral fighters in its space area and 1 neutral mech on each planet in that system.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "culturalredistribution",
+        "name": "Cultural Redistribution",
+        "type": "Directive",
+        "target": "Elect Relic",
+        "text1": "When this agenda is revealed, if there are no relics in any player's play area, discard this card. The player that owns the elected relic gives it to a player with the fewest victory points.",
+        "text2": "",
+        "source": "theodisi"
+    },
+    {
+        "alias": "ministercontrol",
+        "name": "Minister of Control",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. At any time, the owner of this card may discard it to gain 3 command tokens.",
+        "text2": "",
+        "mapText": "At any time, the owner of this card may discard it to gain 3 command tokens.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "ministerrelations",
+        "name": "Minister of Relations",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. After the owner of this card spends a command token to resolve the secondary ability of another player's strategy card, they may exhaust this card to place 1 infantry from their reinforcements into coexistence on a planet controlled by that other player.",
+        "text2": "",
+        "mapText": "When they spend a strategy token to resolve a secondary, they may exhaust this card to place 1 infantry into coexistence on one of their planets.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "ministerthrone",
+        "name": "Minister of the Throne",
+        "type": "Law",
+        "target": "Elect Non-Home, Non-Legendary Planet",
+        "text1": "Attach this card to the elected planet's card. That planet is a legendary planet. Its controller gains the \"Seat of Power\" legendary planet ability card. If this law is discarded, return that ability card to the game box.",
+        "text2": "\n**Seat of Power**: When you resolve the primary ability of the Imperial strategy card, you may treat control of the planet with the \"Minister of the Throne\" attachment as control of Mecatol Rex. You may exhaust this card at the end of your turn to draw 1 secret objective and discard 1 secret objective.",
+        "mapText": "Gains legendary planet mini-Mecatol.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "ministerfools",
+        "name": "Minister of Fools",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. At the start of each strategy phase, the owner of this card rolls 1 die:\n\n1: Return 1 command token from your command sheet to your reinforcements.\n2–4: Draw 1 action card.\n5–7: Gain 1 command token.\n8–10: Research 1 technology.",
+        "text2": "",
+        "mapText": "Roll a die each strategy phase to either lose a CC on a 1 or gain something on anything else.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "darkinvasion",
+        "name": "Dark Invasion",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: If The Fracture is not in play, the speaker brings it into play. Each player's home system is treated as containing an ingress token.",
+        "text2": "Against: Each player destroys 3 of their non-fighter ships in their home system, if able.",
+        "mapText": "Players may treat their home systems as containing an ingress.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "fleetpoolingenforcement",
+        "name": "Fleet Pooling Enforcement",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player produces fighters, they may produce 3 fighters for their cost instead of 2.",
+        "text2": "Against: Each player destroys half of their fighters in each system, rounded up. Then, each player gains trade goods equal to the number of their fighters that were destroyed.",
+        "mapText": "Player produce fighters at 3(x1) instead of 2(x1).",
+        "source": "theodisi"
+    },
+    {
+        "alias": "lightspeedregulations",
+        "name": "Light Speed Regulations",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Technologies that increase the move value of units have no effect during each player's tactical actions.",
+        "text2": "Against: Each player destroys 3 of their non-fighter ships that have a move value of 2 or more.",
+        "mapText": "Gravity Drive and other move increasing techs have no effect.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "freemarketcapitalism",
+        "name": "Free Market Capitalism",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players do not spend command tokens to resolve the secondary ability of the Trade strategy card. At the end of each strategy phase, if the Trade strategy card was not chosen, the player to the speaker's right gains it as an additional strategy card.",
+        "text2": "Against: Each player returns all of their trade goods to the supply. Then, each player gains 3 trade goods.",
+        "mapText": "Free Trade follows for all. Trade is an extra SC if not picked.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "legislativeanarchy",
+        "name": "Legislative Anarchy",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player that voted \"Against\" chooses and destroys 1 unit belonging to another player in a system adjacent to a system that contains 1 or more of the choosing player's units.",
+        "text2": "Against: Each player that voted \"For\" chooses and destroys 1 unit belonging to another player in a system adjacent to a system that contains 1 or more of the choosing player's units.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "reelectioncampaign",
+        "name": "Re-election Campaign",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player that voted \"For\" places the ships and ground forces listed in their starting units from their reinforcements in their home system, if that system contains no other player's ships.",
+        "text2": "Against: Each player that voted \"Against\" may place 2 structures from their reinforcements on planets they control.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "falseprophets",
+        "name": "False Prophets",
+        "type": "Directive",
+        "target": "Elect Leader Type",
+        "text1": "Each player draws 1 random faction reference card with an unused leader of the elected type. They gain 1 unused leader of that type from that faction; if \"Commander\" was elected, they gain that faction's alliance card instead.",
+        "text2": "",
+        "source": "theodisi"
+    },
+    {
+        "alias": "opensourcerobotics",
+        "name": "Open Source Robotics",
+        "type": "Law",
+        "target": "Elect Unit Type",
+        "text1": "Draw faction reference cards until you draw one with a faction-specific unit of the elected type whose faction is not in the game. Each player's units of that type gain that unit's abilities and ability text. If that faction-specific unit has a unit upgrade, use its highest-level upgrade instead.",
+        "text2": "",
+        "mapText": "Not sure, I think people gain a normal unit? If they draw a card with an elected unit thats just normal, nothing happens I guess.",
+        "source": "theodisi"
+    },
+    {
+        "alias": "explorationcharter",
+        "name": "Exploration Charter",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player draws 1 unused blue-backed system tile. They may place that tile on the edge of the game board so that it is adjacent to 2 other systems.",
+        "text2": "",
+        "source": "theodisi"
+    },
+    {
+        "alias": "privateequity",
+        "name": "Private Equity",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Draw 1 random unused faction reference card and place it on this card. Increase each player's base commodity value by that faction's printed commodity value.",
+        "text2": "Against: Draw 1 random unused faction reference card. Each player gains trade goods equal to that faction's printed commodity value.",
+        "mapText": "Comm value is increased by the drawn factions comm value",
+        "source": "theodisi"
+    },
+    {
+        "alias": "acculturation",
+        "name": "Acculturation",
+        "type": "Directive",
+        "target": "For/Against (When this agenda is revealed, draw 1 random unused faction reference card.)",
+        "text1": "For: Each player may place each non-structure unit in that faction's starting units from their reinforcements in systems containing their ships, if able.",
+        "text2": "Against: Each player may research each of that faction's starting technologies, if able.",
+        "source": "theodisi"
+    }
+]

@@ -20,7 +20,6 @@ class ShowPNToAll extends GameStateSubcommand {
                         OptionType.INTEGER,
                         Constants.PROMISSORY_NOTE_ID,
                         "Promissory note ID, which is found between ()")
-                .setRequiredRange(0, 999)
                 .setRequired(true));
     }
 

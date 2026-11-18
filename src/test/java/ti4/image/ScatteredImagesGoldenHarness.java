@@ -375,12 +375,11 @@ class ScatteredImagesGoldenHarness extends BaseTi4Test {
         draft.append("&d:FactionDraftable|").append(BASE_FACTIONS);
         draft.append("&d:SpeakerOrderDraftable|").append(players);
         draft.append("&d:SeatDraftable|").append(players);
-        int picked =
-                switch (variant) {
-                    case "full" -> players;
-                    case "partial" -> Math.max(1, players / 2);
-                    default -> 0;
-                };
+        int picked = switch (variant) {
+            case "full" -> players;
+            case "partial" -> Math.max(1, players / 2);
+            default -> 0;
+        };
         for (int i = 0; i < picked; i++) {
             draft.append("&pp:u").append(i).append("|Seat|seat").append(players - i);
             draft.append("&pp:u").append(i).append("|SpeakerOrder|pick").append(i + 1);

@@ -378,8 +378,8 @@ final class SelfPlayGame {
     }
 
     // The control half of an A/B pair: seats 0, 2, 4 in the even game of the pair and 1, 3, 5 in the odd one.
-    // -Dai.selfplay.ab.personality=BOAT_FLOAT gives the treatment half that personality (the control half stays
-    // STANDARD).
+    // -Dai.selfplay.ab.personality=FLOATER gives the treatment half that personality (the control half stays
+    // NEUTRAL).
     static final String AB_PERSONALITY = System.getProperty("ai.selfplay.ab.personality", "");
 
     private void markControlSeats(Game game) {
@@ -390,12 +390,12 @@ final class SelfPlayGame {
                 if (!AB_PERSONALITY.isBlank()) {
                     ti4.ai.AiPersonality.set(
                             seats.get(index),
-                            ti4.ai.AiPersonality.valueOf(AB_PERSONALITY.trim().toUpperCase()));
+                            ti4.ai.AiPersonality.parse(AB_PERSONALITY).orElseThrow());
                 }
                 continue;
             }
             ti4.ai.AiExperiments.disable(seats.get(index), AB.get());
-            ti4.ai.AiPersonality.set(seats.get(index), ti4.ai.AiPersonality.STANDARD);
+            ti4.ai.AiPersonality.set(seats.get(index), ti4.ai.AiPersonality.NEUTRAL);
             controlSeats.add(seats.get(index).getFaction());
         }
     }
@@ -404,8 +404,8 @@ final class SelfPlayGame {
         if (game == null || AB_PERSONALITY.isBlank()) return;
         String seats = game.getRealPlayers().stream()
                 .map(player -> player.getFaction() + "=" + ti4.ai.AiPersonality.of(player) + " vp="
-                        + player.getTotalVictoryPoints() + " tg=" + player.getTg() + " snubs=["
-                        + player.getStoredValue("aiBoatFloatSnubs") + "]")
+                        + player.getTotalVictoryPoints() + " tg=" + player.getTg() + " relations=["
+                        + player.getStoredValue("aiRelations") + "]")
                 .collect(java.util.stream.Collectors.joining("; "));
         System.out.printf("PERSONALITY slot=%d seed=%d %s%n", slot, seed, seats);
     }
@@ -480,6 +480,7 @@ final class SelfPlayGame {
             agendas.observe(game, now);
             relics.observe(game);
             env.leaders.observe(game);
+            env.factionComponents.observe(game, env.discord);
             if (fracture.due(game)) force(game, fracture::enter);
             if (relicsDue(game)) {
                 relicsHandedOut = true;

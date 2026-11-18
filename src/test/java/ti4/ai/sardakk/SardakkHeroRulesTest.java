@@ -191,4 +191,18 @@ class SardakkHeroRulesTest extends BaseTi4Test {
         assertThat(mecatolStake).isGreaterThan(SardakkHeroRules.VP);
         assertThat(homeStake).isGreaterThanOrEqualTo(SardakkHeroRules.ENEMY_HOME_VALUE);
     }
+
+    // The planner weighs every tactical action again as if Sh'val skipped its space combat (only the ground combat must
+    // be won, every ship in the system is lost). The hero plan is taken when it is worth a point after those ships and
+    // beats the best plan without the hero by more than the hero is worth keeping.
+    @Test
+    void takesTheHeroPlanOnlyWhenItIsWorthAPointAndBeatsThePlanWithoutIt() {
+        double point = SardakkHeroRules.VP;
+
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point, 0)).isTrue();
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point - 1, 0)).isFalse();
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point, point)).isFalse();
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point + SardakkHeroRules.HERO_VALUE, point))
+                .isTrue();
+    }
 }

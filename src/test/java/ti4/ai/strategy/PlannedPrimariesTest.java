@@ -77,6 +77,77 @@ class PlannedPrimariesTest extends BaseTi4Test {
         assertThat(resolve(card, removals)).isEqualTo("FFCC_nekro_removeCCFromBoard_warfare_" + stranded.getPosition());
     }
 
+    // PoK Warfare takes a command token off the board and gives it back into a pool (LRR 99.1). The engine only moves
+    // the token to reinforcements and posts a redistribute button; the token is gained only by pressing a Gain button
+    // there. The AI used to stop after the removal and lose the token.
+    @Test
+    void gainsTheTokenPoKWarfareTookBack() {
+        test.game.setStrategyCardSet("pok");
+        String ccId = Mapper.getCCID(test.nekro.getColor());
+        home.addCC(ccId);
+        test.nekro.setTacticalCC(3);
+        test.nekro.setFleetCC(3);
+        test.nekro.setStrategicCC(2);
+        changed();
+        AiPrompt card = prompt("warfare", PromptSource.PUBLIC, NOW, "sc_no_follow_6", "primaryOfWarfare");
+        play(card, 6);
+        assertThat(resolve(card)).isEqualTo("primaryOfWarfare");
+
+        AiPrompt removals =
+                prompt("removals", PromptSource.PUBLIC, NOW, "FFCC_nekro_removeCCFromBoard_warfare_" + AiTestGame.HOME);
+        assertThat(resolve(card, removals)).isEqualTo("FFCC_nekro_removeCCFromBoard_warfare_" + AiTestGame.HOME);
+        home.removeCC(ccId);
+        changed();
+
+        AiPrompt redistribute =
+                prompt("redistribute", PromptSource.PUBLIC, NOW, "FFCC_nekro_redistributeCCButtons_deleteThisMessage");
+        assertThat(resolve(card, redistribute)).isEqualTo("FFCC_nekro_redistributeCCButtons_deleteThisMessage");
+
+        test.game.setStoredValue("originalCCsFornekro", test.nekro.getCCRepresentation());
+        AiPrompt tokens = prompt(
+                "tokens",
+                PromptSource.AI_THREAD,
+                NOW + 10,
+                List.of(
+                        "FFCC_nekro_increase_tactic_cc",
+                        "FFCC_nekro_increase_fleet_cc",
+                        "FFCC_nekro_increase_strategy_cc",
+                        "FFCC_nekro_decrease_tactic_cc",
+                        "FFCC_nekro_decrease_fleet_cc",
+                        "FFCC_nekro_decrease_strategy_cc",
+                        "FFCC_nekro_deleteButtons"),
+                List.of(
+                        "Gain 1 Tactic Token",
+                        "Gain 1 Fleet Token",
+                        "Gain 1 Strategy Token",
+                        "Lose 1 Tactic Token",
+                        "Lose 1 Fleet Token",
+                        "Lose 1 Strategy Token",
+                        "Done Redistributing Command Tokens"));
+        int before = test.nekro.getTacticalCC() + test.nekro.getFleetCC() + test.nekro.getStrategicCC();
+        String pressed = resolve(card, redistribute, tokens);
+        assertThat(pressed).startsWith("FFCC_nekro_increase_");
+        applyTokenButton(pressed);
+        changed();
+        // After the gain the AI may also move tokens its round plan has no use for; apply each press like the engine.
+        for (int step = 0; step < 12 && !"FFCC_nekro_deleteButtons".equals(pressed); step++) {
+            pressed = resolve(card, redistribute, tokens);
+            applyTokenButton(pressed);
+            changed();
+        }
+        assertThat(pressed).isEqualTo("FFCC_nekro_deleteButtons");
+        assertThat(test.nekro.getTacticalCC() + test.nekro.getFleetCC() + test.nekro.getStrategicCC())
+                .isEqualTo(before + 1);
+        assertThat(resolve(card, redistribute)).isEqualTo("nothing");
+    }
+
+    private void applyTokenButton(String handler) {
+        int step = handler.contains("_increase_") ? 1 : handler.contains("_decrease_") ? -1 : 0;
+        if (handler.endsWith("_tactic_cc")) test.nekro.setTacticalCC(test.nekro.getTacticalCC() + step);
+        if (handler.endsWith("_fleet_cc")) test.nekro.setFleetCC(test.nekro.getFleetCC() + step);
+        if (handler.endsWith("_strategy_cc")) test.nekro.setStrategicCC(test.nekro.getStrategicCC() + step);
+    }
+
     private static String beyond(String position) {
         return MapPositionMapper.getAdjacentTilePositions(position).stream()
                 .filter(candidate -> !"x".equals(candidate) && !AiTestGame.HOME.equals(candidate))

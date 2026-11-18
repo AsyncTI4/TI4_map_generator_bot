@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.game.Tile;
@@ -28,7 +28,7 @@ class DiplomacyTimingTest extends BaseTi4Test {
     private static final String TACTICAL_BUTTON = "FFCC_nekro_tacticalAction";
     private static final String PASS_BUTTON = "FFCC_nekro_passForRound";
 
-    private final NekroBrain brain = new NekroBrain();
+    private final StandardBrain brain = new StandardBrain();
     private AiTestGame test;
     private Tile home;
     private long modified = 1;

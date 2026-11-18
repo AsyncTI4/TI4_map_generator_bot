@@ -238,6 +238,14 @@
         "data": []
     },
     {
+        "source": "secrets_only",
+        "name": "Secrets Only",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Secrets Only",
+        "data": []
+    },
+    {
         "source": "muaat_mania",
         "name": "Muaat Mania",
         "canal": "community",
@@ -399,5 +407,13 @@
         "subcanal": "lil homebrew",
         "credits": "Jason",
         "description": "Jason's TI4 Content Laboratories: the 30k card set and the JMSC big-map card set"
+    },
+    {
+        "source": "frmisc",
+        "name": "Misc Franken",
+        "canal": "community",
+        "subcanal": "lil homebrew",
+        "credits": "Community",
+        "description": "A collection of small factions and components meant only for franken."
     }
 ]

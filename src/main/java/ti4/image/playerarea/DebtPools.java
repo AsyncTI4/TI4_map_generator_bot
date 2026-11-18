@@ -45,12 +45,13 @@ final class DebtPools {
             if (pool.getValue().values().stream().noneMatch(i -> i > 0)) {
                 continue;
             }
-            x = drawPool(ctx, pool, x, y);
+            x = drawPool(ctx, player, pool, x, y);
         }
         return x + (startX == x ? 0 : 20);
     }
 
-    private static int drawPool(PlayerAreaContext ctx, Entry<String, Map<String, Integer>> pool, int x, int y) {
+    private static int drawPool(
+            PlayerAreaContext ctx, Player player, Entry<String, Map<String, Integer>> pool, int x, int y) {
         Game game = ctx.game();
         Graphics2D g2 = ctx.g2();
         String bankSource = game.getDebtPoolIcon(pool.getKey());
@@ -80,7 +81,8 @@ final class DebtPools {
             if (controlID.contains("null")) {
                 continue;
             }
-            int tokenDeltaX = drawTokenRow(ctx, debtToken.getKey(), controlID, numTokens, x + deltaX, y + tokenDeltaY);
+            int tokenDeltaX =
+                    drawTokenRow(ctx, player, debtToken.getKey(), controlID, numTokens, x + deltaX, y + tokenDeltaY);
 
             tokenDeltaY += 29;
             maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
@@ -97,7 +99,7 @@ final class DebtPools {
     }
 
     private static int drawTokenRow(
-            PlayerAreaContext ctx, String debtColor, String controlID, int numTokens, int x, int y) {
+            PlayerAreaContext ctx, Player player, String debtColor, String controlID, int numTokens, int x, int y) {
         Game game = ctx.game();
         Graphics2D g2 = ctx.g2();
         Player debtPlayer =
@@ -107,7 +109,7 @@ final class DebtPools {
             overflow = numTokens - 10;
             numTokens = 10;
         }
-        boolean hideFactionIcon = debtPlayer != null && ctx.hidesStatsOf(debtPlayer);
+        boolean hideFactionIcon = debtPlayer != null && ctx.hidesStatsInArea(player, debtPlayer);
 
         float scale = 0.60f;
         BufferedImage controlTokenImage = ImageHelper.readScaled(ImageResources.commandToken(controlID), scale);

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ti4.model.HyperlaneStyle;
 
 @Data
 @NoArgsConstructor // needed for JsonMapper
@@ -26,12 +27,15 @@ public class UserSettings {
     private int gameLimit;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
+    private Integer utcOffsetMinutes;
+    private List<String> playTimeParts;
     private boolean hasIndicatedStatPreferences;
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
     private boolean fogMapOnTurnStart;
     private RefreshMapStyle refreshMapStyle = RefreshMapStyle.COMBINED;
+    private HyperlaneStyle customHyperlaneStyle;
     private String activeHours;
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
@@ -136,7 +140,10 @@ public class UserSettings {
     }
 
     public static String summarizeActiveHours(String activity) {
-        Set<Integer> hotHours = getHotHours(activity);
+        return summarizeHours(getHotHours(activity));
+    }
+
+    public static String summarizeHours(Set<Integer> hotHours) {
         if (hotHours.isEmpty()) {
             return null;
         }

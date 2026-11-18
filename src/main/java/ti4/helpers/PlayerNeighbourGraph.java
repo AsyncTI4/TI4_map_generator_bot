@@ -10,6 +10,7 @@ import java.util.Set;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.service.fow.FOWPlusService;
 
 public final class PlayerNeighbourGraph {
@@ -47,9 +48,13 @@ public final class PlayerNeighbourGraph {
         if (cached != null) return cached;
 
         Set<Player> neighbours = new HashSet<>();
+        Adjacency ownRules = game.usesOneWayAdjacency()
+                ? Adjacency.of(game, player).forEffects().withSelf()
+                : null;
         for (Tile tile : occupiedTilesOf(player)) {
             if (neighbours.size() == realPlayers.size()) break;
-            neighbours.addAll(playersAdjacentTo(tile.getPosition()));
+            String position = tile.getPosition();
+            neighbours.addAll(ownRules == null ? playersAdjacentTo(position) : playersReachedBy(ownRules, position));
         }
         neighbours.remove(player);
         Set<Player> ordered = inRealPlayerOrder(neighbours);
@@ -83,9 +88,22 @@ public final class PlayerNeighbourGraph {
         return players;
     }
 
+    private Set<Player> playersReachedBy(Adjacency ownRules, String position) {
+        Set<String> reached = ownRules.from(position);
+        Set<Player> players = new HashSet<>();
+        for (Player candidate : realPlayers) {
+            if (isInAnyOf(candidate, reached)
+                    || candidate.hasAbility("quantum_entanglement")
+                            && isInAnyOf(candidate, extraWormholeAdjacencies(position, candidate))) {
+                players.add(candidate);
+            }
+        }
+        return players;
+    }
+
     private Set<String> extraWormholeAdjacencies(String position, Player player) {
         if (!travelBanInPlay && !player.hasAbility("quantum_entanglement")) return Set.of();
-        return FoWHelper.getWormholeAdjacencies(game, position, player, true);
+        return FoWHelper.getWormholeAdjacencies(game, position, player);
     }
 
     private boolean isInAnyOf(Player player, Set<String> positions) {

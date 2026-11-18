@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "matchmaking_queue_party")
-public class MatchmakingQueueParty {
+class MatchmakingQueueParty {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
