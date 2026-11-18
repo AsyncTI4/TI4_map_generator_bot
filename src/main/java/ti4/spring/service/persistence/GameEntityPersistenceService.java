@@ -59,6 +59,10 @@ public class GameEntityPersistenceService {
         return true;
     }
 
+    public List<String> findTwilightsFallGameNamesWithThundersEdge() {
+        return gameEntityRepository.findTwilightsFallGameNamesWithThundersEdge();
+    }
+
     @Transactional
     public void delete(String gameName) {
         deleteGameRows(gameName);
