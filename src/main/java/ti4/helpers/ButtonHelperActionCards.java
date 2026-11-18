@@ -668,22 +668,68 @@ public final class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    static final String LIE_IN_WAIT_WINDOW = "lieInWaitWindow";
+    static final String LIE_IN_WAIT_REMINDED = "lieInWaitReminded";
+
     public static void lieInWaitCheck(Player p1, Player p2, Game game) {
+        if (p1 == null || p2 == null || p1 == p2) {
+            return;
+        }
         for (Player p3 : game.getRealPlayers()) {
-            if (p3 == p1 || p3 == p2) {
+            if (p3 == p1 || p3 == p2 || !p3.getPlayableActionCards().contains("lieinwait")) {
                 continue;
             }
-            if (p3.getPlayableActionCards().contains("lieinwait")) {
-                Set<Player> neighbours = p3.getAbilityNeighbours();
-                if (neighbours.contains(p1) && neighbours.contains(p2)) {
-                    MessageHelper.sendMessageToChannel(
-                            p3.getCardsInfoThread(),
-                            p3.getRepresentation()
-                                    + " this is a reminder that you have _Lie In Wait_, and two of your neighbors just resolved a transaction. The two neighbors are "
-                                    + p1.getRepresentationNoPing() + " and " + p2.getRepresentationNoPing() + ".");
-                }
+            Set<Player> neighbours = p3.getAbilityNeighbours();
+            if (!neighbours.contains(p1) || !neighbours.contains(p2)) {
+                continue;
             }
+            if (!recordLieInWaitReminder(game, p3, p1, p2)) {
+                continue;
+            }
+            MessageHelper.sendMessageToChannel(
+                    p3.getCardsInfoThread(),
+                    p3.getRepresentation()
+                            + " this is a reminder that you have _Lie In Wait_, and two of your neighbors just resolved a transaction. The two neighbors are "
+                            + FoWHelper.identityOrColorIfCanSeeStats(game, p1, p3, p1.getRepresentationNoPing())
+                            + " and "
+                            + FoWHelper.identityOrColorIfCanSeeStats(game, p2, p3, p2.getRepresentationNoPing())
+                            + ".");
         }
+    }
+
+    static boolean recordLieInWaitReminder(Game game, Player holder, Player p1, Player p2) {
+        String window = lieInWaitWindow(game);
+        if (!window.equals(game.getStoredValue(LIE_IN_WAIT_WINDOW))) {
+            game.setStoredValue(LIE_IN_WAIT_WINDOW, window);
+            game.removeStoredValue(LIE_IN_WAIT_REMINDED);
+        }
+        String reminder = lieInWaitReminderKey(holder, p1, p2);
+        Set<String> reminded = new HashSet<>();
+        String stored = game.getStoredValue(LIE_IN_WAIT_REMINDED);
+        if (!stored.isEmpty()) {
+            reminded.addAll(Arrays.asList(stored.split(",")));
+        }
+        if (!reminded.add(reminder)) {
+            return false;
+        }
+        game.setStoredValue(LIE_IN_WAIT_REMINDED, String.join(",", reminded));
+        return true;
+    }
+
+    private static String lieInWaitWindow(Game game) {
+        return game.getRound() + "|" + game.getPhaseOfGame() + "|" + game.getActivePlayerID() + "|"
+                + game.getCurrentAgendaInfo();
+    }
+
+    private static String lieInWaitReminderKey(Player holder, Player p1, Player p2) {
+        String first = p1.getFaction();
+        String second = p2.getFaction();
+        if (first.compareTo(second) > 0) {
+            String swap = first;
+            first = second;
+            second = swap;
+        }
+        return holder.getFaction() + ":" + first + "+" + second;
     }
 
     @ButtonHandler("courageousStarter")

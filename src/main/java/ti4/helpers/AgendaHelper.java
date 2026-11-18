@@ -163,6 +163,9 @@ public final class AgendaHelper {
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(player, game);
         }
+        if ("tg".equalsIgnoreCase(tgOrDebt) || "comm".equalsIgnoreCase(tgOrDebt)) {
+            ButtonHelperActionCards.lieInWaitCheck(player, p2, game);
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (p2.getDebtTokenCount(player.getColor()) < 1) {
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

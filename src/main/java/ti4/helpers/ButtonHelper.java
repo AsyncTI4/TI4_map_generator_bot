@@ -6437,6 +6437,7 @@ public class ButtonHelper {
                 return;
             }
             msg += "trade good to " + tradeHolder.getRepresentation() + ".";
+            ButtonHelperActionCards.lieInWaitCheck(player, tradeHolder, game);
         } else {
             SendDebtService.sendDebt(player, tradeHolder, 1);
             msg += "debt token to " + tradeHolder.getRepresentation() + ", for their \"Debt Account\" pool.";

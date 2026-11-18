@@ -3147,6 +3147,7 @@ public class TransactionHelper {
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
+        ButtonHelperActionCards.lieInWaitCheck(player, player2, game);
         if (player2 != null) clearEntanglement(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }

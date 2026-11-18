@@ -10,6 +10,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -90,7 +91,8 @@ class SendPN extends GameStateSubcommand {
         }
 
         Player pnOwner = game.getPNOwner(id);
-        if (player.getPromissoryNotesInPlayArea().contains(id)) {
+        boolean returningFromPlayArea = player.getPromissoryNotesInPlayArea().contains(id);
+        if (returningFromPlayArea) {
             if (!targetPlayer.equals(pnOwner)) {
                 MessageHelper.sendMessageToEventChannel(
                         event, "Promissory notes in play area may only be sent to the owner of the promissory note.");
@@ -100,6 +102,9 @@ class SendPN extends GameStateSubcommand {
         ButtonHelperAbilities.pillageCheck(player, game);
         player.removePromissoryNote(id);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
+        if (!returningFromPlayArea) {
+            ButtonHelperActionCards.lieInWaitCheck(player, targetPlayer, game);
+        }
         targetPlayer.setPromissoryNote(id);
         if ("thpnscrapyard".equals(id)) {
             ScrapyardPromissoryHandler.offerUnusedCustomRigs(game, targetPlayer);

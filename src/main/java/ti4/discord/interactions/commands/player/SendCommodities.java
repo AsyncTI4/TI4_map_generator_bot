@@ -9,6 +9,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -94,5 +95,6 @@ class SendCommodities extends GameStateSubcommand {
             FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, commString, null);
         }
         TransactionHelper.checkTransactionLegality(game, player, targetPlayer);
+        ButtonHelperActionCards.lieInWaitCheck(player, targetPlayer, game);
     }
 }

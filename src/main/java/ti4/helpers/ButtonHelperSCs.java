@@ -706,6 +706,9 @@ public final class ButtonHelperSCs {
             }
             if (p2.getSCs().contains(tradeInitiative)) {
                 TransactionHelper.checkTransactionLegality(game, player, p2);
+                if (commoditiesTotal > 0) {
+                    ButtonHelperActionCards.lieInWaitCheck(player, p2, game);
+                }
             }
         }
 

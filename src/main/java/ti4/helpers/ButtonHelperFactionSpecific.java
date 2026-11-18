@@ -3556,6 +3556,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            ButtonHelperActionCards.lieInWaitCheck(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(
@@ -3632,6 +3633,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            ButtonHelperActionCards.lieInWaitCheck(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(

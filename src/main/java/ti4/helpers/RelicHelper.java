@@ -373,6 +373,7 @@ public class RelicHelper {
             FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
         }
         TransactionHelper.checkTransactionLegality(game, sender, receiver);
+        ButtonHelperActionCards.lieInWaitCheck(sender, receiver, game);
         CommanderUnlockCheckService.checkPlayer(receiver, "kollecc");
     }
 

@@ -9,6 +9,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.StringHelper;
@@ -82,5 +83,6 @@ class SendTG extends GameStateSubcommand {
             FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, tgString, null);
         }
         TransactionHelper.checkTransactionLegality(game, player, targetPlayer);
+        ButtonHelperActionCards.lieInWaitCheck(player, targetPlayer, game);
     }
 }
