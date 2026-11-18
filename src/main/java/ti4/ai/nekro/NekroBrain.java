@@ -603,7 +603,10 @@ public class NekroBrain implements FactionBrain {
             return Optional.empty();
         }
         if (TacticalRules.inProgress(context)) return TacticalRules.continueAction(context);
-        if (StrategyCardRules.followsPending(context)) return finishFollowsFirst(context);
+        if (StrategyCardRules.followsPending(context)) {
+            Optional<AiDecision> follows = finishFollowsFirst(context);
+            if (follows.isPresent() || StrategyCardRules.busyPaying(context)) return follows;
+        }
         Optional<AiDecision> slay = SlayIntent.announce(context);
         if (slay.isPresent()) return slay;
         Optional<AiDecision> primary = StrategyCardRules.resolvePrimary(context);

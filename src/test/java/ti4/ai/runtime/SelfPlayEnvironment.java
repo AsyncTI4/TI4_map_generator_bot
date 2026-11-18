@@ -90,6 +90,8 @@ final class SelfPlayEnvironment implements AutoCloseable {
             .map(java.util.regex.Pattern::compile)
             .orElse(null);
     final List<String> watched = new ArrayList<>();
+    // Each change in a watched seat's idle-on-its-turn diagnosis, kept whole so the watched-trace tail cannot drop it.
+    final List<String> idleOnTurn = new ArrayList<>();
     final Map<String, Integer> pressOutcomes = new HashMap<>();
     final Map<String, Integer> pressedHandlers = new java.util.TreeMap<>();
     final Map<String, Integer> decisionReasons = new java.util.TreeMap<>();
@@ -468,6 +470,15 @@ final class SelfPlayEnvironment implements AutoCloseable {
         return ((Optional<FactionBrain>) result).map(this::recording);
     }
 
+    // A watched seat that does nothing on its own action-phase turn is the shape of a turn stall; the diagnosis says
+    // which early exit of its turn logic held it.
+    private static boolean idlesOnItsWatchedTurn(AiTurnContext context) {
+        return WATCH != null
+                && WATCH.matcher(context.faction()).find()
+                && context.isActivePlayer()
+                && "action".equalsIgnoreCase(context.game().getPhaseOfGame());
+    }
+
     private AiDecision overridden(AiTurnContext context, AiDecision decision) {
         java.util.function.BiFunction<AiTurnContext, AiDecision, AiDecision> override = decisionOverride;
         if (override == null) return decision;
@@ -499,6 +510,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 agendaDecisions.accept(context, decision);
                 if (!(decision instanceof AiDecision.Idle))
                     record(context.faction() + " decided " + describe(decision));
+                else if (idlesOnItsWatchedTurn(context)) recordIdleOnTurn(IdleDiagnosis.describe(context));
                 countReason(decision);
                 if (decision instanceof AiDecision.Press leaderPress)
                     leaders.decided(context.game().getRound(), context.faction(), leaderPress.reason());
@@ -753,6 +765,13 @@ final class SelfPlayEnvironment implements AutoCloseable {
 
     private String lastTraceLine = "";
     private int repeats;
+
+    synchronized void recordIdleOnTurn(String diagnosis) {
+        String stamped =
+                String.format("[t+%ds] round %d %s", (clock.get() - startOfGame) / 1000, currentRound(), diagnosis);
+        if (idleOnTurn.isEmpty() || !idleOnTurn.getLast().endsWith(diagnosis)) idleOnTurn.add(stamped);
+        record(diagnosis);
+    }
 
     synchronized void record(String line) {
         if (WATCH != null && WATCH.matcher(line).find()) {

@@ -670,7 +670,7 @@ public class StrategyCardRules {
         return press;
     }
 
-    private static boolean busyPaying(AiTurnContext context) {
+    public static boolean busyPaying(AiTurnContext context) {
         return java.util.stream.Stream.of(
                         PaymentRules.pendingSince(context),
                         tokenGain(context).map(TokenGain::since),

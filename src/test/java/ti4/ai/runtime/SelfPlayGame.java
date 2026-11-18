@@ -1155,6 +1155,7 @@ final class SelfPlayGame {
         appendTail(report, "Fake Discord action failures", env.discord.actionFailures(), 15);
         appendTail(report, "Fake Discord callback failures", env.discord.callbackFailures(), 15);
         appendTail(report, "Unsupported JDA calls (distinct)", distinct(env.discord.unsupportedCalls()), 30);
+        if (!env.idleOnTurn.isEmpty()) appendTail(report, "Idle on its turn", env.idleOnTurn, 200);
         if (!env.watched.isEmpty()) appendTail(report, "Watched trace", env.watched, 400);
         if (SelfPlayEnvironment.WATCH != null) {
             appendTail(
