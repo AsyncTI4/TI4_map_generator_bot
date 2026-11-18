@@ -7,7 +7,7 @@ import static ti4.ai.AiTestGame.prompt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiTestGame;
-import ti4.ai.nekro.NekroBrain;
+import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.testUtils.BaseTi4Test;
@@ -43,7 +43,7 @@ class ImperialDrawDiscardTest extends BaseTi4Test {
         AiPrompt info = prompt("info", PromptSource.AI_THREAD, NOW, "get_so_score_buttons", "get_so_discard_buttons");
 
         assertThat(test.nekro.getSecretsUnscored()).hasSize(2);
-        assertThat(AiTestGame.pressedId(new NekroBrain().decide(test.context(endTurn, info))))
+        assertThat(AiTestGame.pressedId(new StandardBrain().decide(test.context(endTurn, info))))
                 .isEqualTo("get_so_discard_buttons");
     }
 
@@ -63,7 +63,7 @@ class ImperialDrawDiscardTest extends BaseTi4Test {
         AiPrompt card =
                 prompt("imperial", PromptSource.PUBLIC, NOW - 60_000, "sc_follow_8", "sc_no_follow_8", "sc_draw_so");
 
-        assertThat(new NekroBrain().decide(test.context(endTurn, card)))
+        assertThat(new StandardBrain().decide(test.context(endTurn, card)))
                 .isNotInstanceOf(ti4.ai.brain.AiDecision.Idle.class);
     }
 
@@ -88,7 +88,7 @@ class ImperialDrawDiscardTest extends BaseTi4Test {
         java.util.Set<String> pressed =
                 java.util.Set.of("imperial|sc_follow_8", "imperial|sc_no_follow_8", "imperial|sc_draw_so");
 
-        assertThat(new NekroBrain().decide(test.context(pressed, turn, card)))
+        assertThat(new StandardBrain().decide(test.context(pressed, turn, card)))
                 .isNotInstanceOf(ti4.ai.brain.AiDecision.Idle.class);
     }
 }
