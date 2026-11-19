@@ -74,21 +74,8 @@ public class ArcanumPrimordialTechHandler {
     private static final String PLANE_SHIFT_SYSTEM = "planeShiftSystem";
 
     // Forbidden Knowledge
-    public static boolean hasFourTechsMatchingPrimordial(Player player) {
-        return player != null
-                && PRIMORDIAL_TECHS.stream()
-                        .filter(player::hasTech)
-                        .anyMatch(primordialTech -> hasFourTechsMatchingPrimordial(player, primordialTech));
-    }
-
     public static boolean isPrimordialTechnology(String tech) {
         return tech != null && PRIMORDIAL_TECHS.contains(AliasHandler.resolveTech(tech));
-    }
-
-    public static boolean hasFourTechsMatchingPrimordial(Player player, String primordialTech) {
-        return player != null
-                && player.hasTech(AliasHandler.resolveTech(primordialTech))
-                && canGainPrimordialTechnology(player, primordialTech);
     }
 
     public static boolean canGainPrimordialTechnology(Player player, String primordialTech) {
@@ -121,8 +108,7 @@ public class ArcanumPrimordialTechHandler {
         if (game == null
                 || player == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
@@ -191,8 +177,7 @@ public class ArcanumPrimordialTechHandler {
         if (game == null
                 || player == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -218,8 +203,7 @@ public class ArcanumPrimordialTechHandler {
         if (player == null
                 || game == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
 
@@ -247,8 +231,7 @@ public class ArcanumPrimordialTechHandler {
         if (player == null
                 || game == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -264,8 +247,7 @@ public class ArcanumPrimordialTechHandler {
         if (game == null
                 || player == null
                 || !player.hasTech(MIRACLE)
-                || !player.getExhaustedTechs().contains(MIRACLE)
-                || !hasFourTechsMatchingPrimordial(player, MIRACLE)) {
+                || !player.getExhaustedTechs().contains(MIRACLE)) {
             return;
         }
 
@@ -418,7 +400,6 @@ public class ArcanumPrimordialTechHandler {
                 && player != null
                 && player == game.getActivePlayer()
                 && player.hasTechReady(PLANE_SHIFT)
-                && hasFourTechsMatchingPrimordial(player, PLANE_SHIFT)
                 && game.getTileMap().values().stream().anyMatch(ArcanumPrimordialTechHandler::isPlaneShiftSystem);
     }
 
@@ -427,8 +408,7 @@ public class ArcanumPrimordialTechHandler {
                 || player == null
                 || player != game.getActivePlayer()
                 || !player.hasTech(PLANE_SHIFT)
-                || !player.getExhaustedTechs().contains(PLANE_SHIFT)
-                || !hasFourTechsMatchingPrimordial(player, PLANE_SHIFT)) {
+                || !player.getExhaustedTechs().contains(PLANE_SHIFT)) {
             return;
         }
 
@@ -458,8 +438,7 @@ public class ArcanumPrimordialTechHandler {
                 || player != game.getActivePlayer()
                 || !player.hasTech(PLANE_SHIFT)
                 || !player.getExhaustedTechs().contains(PLANE_SHIFT)
-                || !player.getFaction().equalsIgnoreCase(game.getStoredValue(PLANE_SHIFT_PENDING))
-                || !hasFourTechsMatchingPrimordial(player, PLANE_SHIFT)) {
+                || !player.getFaction().equalsIgnoreCase(game.getStoredValue(PLANE_SHIFT_PENDING))) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -541,8 +520,7 @@ public class ArcanumPrimordialTechHandler {
                 || opponent == null
                 || tile == null
                 || combatHolder == null
-                || !player.hasTech(DISINTEGRATE)
-                || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
+                || !player.hasTech(DISINTEGRATE)) {
             return List.of();
         }
 
@@ -562,7 +540,7 @@ public class ArcanumPrimordialTechHandler {
     @ButtonHandler(DISINTEGRATE_HIT)
     public static void produceDisintegrateHit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DisintegrateCombat combat = getDisintegrateCombat(game, player, buttonID, DISINTEGRATE_HIT);
-        if (combat == null || !player.hasTech(DISINTEGRATE) || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
+        if (combat == null || !player.hasTech(DISINTEGRATE)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -606,9 +584,7 @@ public class ArcanumPrimordialTechHandler {
     public static void exhaustDisintegrateToDestroyUnit(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         DisintegrateCombat combat = getDisintegrateCombat(game, player, buttonID, DISINTEGRATE_DESTROY);
-        if (combat == null
-                || !player.hasTechReady(DISINTEGRATE)
-                || !hasFourTechsMatchingPrimordial(player, DISINTEGRATE)) {
+        if (combat == null || !player.hasTechReady(DISINTEGRATE)) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
@@ -669,7 +645,6 @@ public class ArcanumPrimordialTechHandler {
                 || holder == null
                 || techOwner == null
                 || !techOwner.hasTech(DISINTEGRATE)
-                || !hasFourTechsMatchingPrimordial(techOwner, DISINTEGRATE)
                 || unitType == null
                 || state == null
                 || !isDisintegrateCombat(game, techOwner, player, tile, holder)) {
