@@ -450,6 +450,15 @@ public class UnitModelValueInjectionService {
         }
         if (player.hasRelic("salvage_flagship") && unit.getUnitType() == UnitType.Flagship) {
             integers.moveValue(1);
+            if (unit.getSpaceCannonDieCount() < 1) {
+                integers.spaceCannonDieCount(1, true).spaceCannonHitsOn(6, true);
+            }
+            if (unit.getBombardDieCount() < 1) {
+                integers.bombardDieCount(1, true).bombardHitsOn(6, true);
+            }
+            if (unit.getAfbDieCount() < 1) {
+                integers.afbDieCount(1, true).afbHitsOn(6, true);
+            }
         }
         if (player.hasRelic("salvage_dreadnought") && unit.getUnitType() == UnitType.Dreadnought) {
             integers.capacityValue(1);
@@ -458,7 +467,7 @@ public class UnitModelValueInjectionService {
             integers.combatHitsOn(-1);
         }
         if (player.hasRelic("salvage_cruiser") && unit.getUnitType() == UnitType.Cruiser) {
-            integers.capacityValue(1).spaceCannonDieCount(1).spaceCannonHitsOn(8, true);
+            floats.cost(-1);
         }
         if (player.hasRelic("salvage_destroyer") && unit.getUnitType() == UnitType.Destroyer) {
             integers.combatHitsOn(-1);

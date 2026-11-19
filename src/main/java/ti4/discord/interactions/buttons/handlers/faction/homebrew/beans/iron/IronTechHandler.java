@@ -11,7 +11,6 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.unit.AddUnitService;
@@ -29,8 +28,7 @@ public class IronTechHandler {
         List<Button> buttons = new ArrayList<>();
 
         for (Tile tile : game.getTileMap().values()) {
-            if (Helper.getProductionValue(player, game, tile, false) < 1 || !hasModularFleetShip(player, tile))
-                continue;
+            if (!hasModularFleetShip(player, tile)) continue;
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + SELECT_MODULAR_FLEET_SYSTEM + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player),
@@ -47,7 +45,8 @@ public class IronTechHandler {
         buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", choose a system for _Modular Fleet_.",
+                player.getRepresentationNoPing()
+                        + ", choose a system containing a non-fighter ship for _Modular Fleet_.",
                 buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -117,7 +116,8 @@ public class IronTechHandler {
         buttons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + ", choose the replacement ship. You will spend the cost difference.",
+                player.getRepresentationNoPing()
+                        + ", choose the replacement ship. You will spend half the cost difference.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -134,11 +134,16 @@ public class IronTechHandler {
         Tile tile = game.getTileByPosition(payload[0]);
         UnitModel sourceShip = player.getUnitFromAsyncID(payload[1]);
         UnitModel replacementShip = player.getUnitFromAsyncID(payload[2]);
-        if (tile == null || sourceShip == null || replacementShip == null) {
+        if (tile == null
+                || sourceShip == null
+                || replacementShip == null
+                || !hasShip(tile, player, sourceShip)
+                || !replacementShip.isNonFighterShip()
+                || replacementShip.getCost() <= sourceShip.getCost()) {
             return;
         }
 
-        float costDifference = replacementShip.getCost() - sourceShip.getCost();
+        int costDifference = (int) Math.ceil((replacementShip.getCost() - sourceShip.getCost()) / 2.0);
         List<Button> paymentButtons = new ArrayList<>(ButtonHelper.getExhaustButtonsWithTG(game, player, "res"));
 
         paymentButtons.add(Buttons.red(
@@ -178,7 +183,12 @@ public class IronTechHandler {
         Tile tile = game.getTileByPosition(payload[0]);
         UnitModel sourceShip = player.getUnitFromAsyncID(payload[1]);
         UnitModel replacementShip = player.getUnitFromAsyncID(payload[2]);
-        if (tile == null || sourceShip == null || replacementShip == null) {
+        if (tile == null
+                || sourceShip == null
+                || replacementShip == null
+                || !hasShip(tile, player, sourceShip)
+                || !replacementShip.isNonFighterShip()
+                || replacementShip.getCost() <= sourceShip.getCost()) {
             return;
         }
 
@@ -200,5 +210,9 @@ public class IronTechHandler {
         return tile.getSpaceUnitHolder().getUnitKeysForPlayer(player).stream()
                 .map(player::getUnitFromUnitKey)
                 .anyMatch(unit -> unit != null && unit.isNonFighterShip());
+    }
+
+    private static boolean hasShip(Tile tile, Player player, UnitModel ship) {
+        return ship.isNonFighterShip() && tile.getSpaceUnitHolder().getUnitCount(ship.getUnitType(), player) > 0;
     }
 }

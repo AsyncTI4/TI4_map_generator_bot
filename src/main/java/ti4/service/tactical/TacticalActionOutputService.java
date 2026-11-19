@@ -370,7 +370,7 @@ public class TacticalActionOutputService {
                                     : bifrostBridgeIgnoresAnomalies
                                             ? " (ignores gravity-rift effects due to _Bifrost Bridge_)"
                                             : carrierIgnoresAnomalies
-                                                    ? " (this carrier ignores gravity-rift effects due to _Quantum Translocation_)"
+                                                    ? " (this carrier ignores gravity-rift effects due to its Salvage card)"
                                                     : chainedIgnoresAnomalies
                                                             ? " (this flagship ignores gravity-rift effects due to _The Chained_)"
                                                             : " (this flagship ignores gravity-rift effects due to _Alluring Throne_)");
@@ -490,10 +490,6 @@ public class TacticalActionOutputService {
         }
         if (model.getIsShip() && HydromorphicCardHandler.hasRiptideRush(game, player)) {
             baseMoveValue++;
-        }
-        if (model.getUnitType() == UnitType.Dreadnought
-                && IronSalvageRelicHandler.hasDreadnoughtMoveBonus(game, player)) {
-            baseMoveValue += 2;
         }
         if (skipBonus) return baseMoveValue;
 

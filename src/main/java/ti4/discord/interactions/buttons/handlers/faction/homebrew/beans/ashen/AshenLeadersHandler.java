@@ -24,6 +24,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.Units;
+import ti4.helpers.adjacency.Adjacency;
 import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -36,13 +37,14 @@ public class AshenLeadersHandler {
 
     private static final String COMMANDER_ID = "ashencommander";
     private static final String HERO_TARGET_SYSTEM_PREFIX = "ashenHeroTargetSystem_";
+    private static final String HERO_BOMBARDMENT_PREFIX = "ashenHeroBombardment_";
 
     public static void postHeroButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         if (event == null || game == null || player == null) {
             return;
         }
 
-        List<Tile> targetTiles = getHeroTargetTiles(game);
+        List<Tile> targetTiles = getHeroTargetTiles(game, player);
         if (targetTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -64,7 +66,7 @@ public class AshenLeadersHandler {
     @ButtonHandler(HERO_TARGET_SYSTEM_PREFIX)
     public static void resolveHeroTargetSystem(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        List<Tile> targetTiles = getHeroTargetTiles(game);
+        List<Tile> targetTiles = getHeroTargetTiles(game, player);
         String message = player.getRepresentationUnfogged()
                 + ", choose a system for _Asera, the Ashen hero_. Each of your units with BOMBARDMENT will roll "
                 + "separately against each planet in that system.";
@@ -98,19 +100,28 @@ public class AshenLeadersHandler {
                 player.getRepresentation() + " is resolving _Asera, the Ashen hero_ against "
                         + targetTile.getRepresentationForButtons(game, player) + ".");
         AshenUnitHandler.clearFlagshipBombardmentContexts(game);
-        for (Planet targetPlanet : targetTile.getPlanetUnitHolders()) {
-            game.setStoredValue(
-                    "assignedBombardment" + player.getFaction(),
-                    JsonMapperManager.basic()
-                            .writeValueAsString(
-                                    buildHeroBombardmentAssignments(player, bombardmentTile, targetPlanet.getName())));
-            game.setStoredValue("bombardmentTarget" + player.getFaction(), targetPlanet.getName());
-            CombatRollService.secondHalfOfCombatRoll(
-                    player, game, event, bombardmentTile, "space", CombatRollType.bombardment, false);
+        game.setStoredValue(getHeroBombardmentKey(player), "true");
+        try {
+            for (Planet targetPlanet : targetTile.getPlanetUnitHolders()) {
+                game.setStoredValue(
+                        "assignedBombardment" + player.getFaction(),
+                        JsonMapperManager.basic()
+                                .writeValueAsString(buildHeroBombardmentAssignments(
+                                        player, bombardmentTile, targetPlanet.getName())));
+                game.setStoredValue("bombardmentTarget" + player.getFaction(), targetPlanet.getName());
+                CombatRollService.secondHalfOfCombatRoll(
+                        player, game, event, bombardmentTile, "space", CombatRollType.bombardment, false);
+            }
+        } finally {
+            game.removeStoredValue(getHeroBombardmentKey(player));
+            game.removeStoredValue("assignedBombardment" + player.getFaction());
+            game.removeStoredValue("bombardmentTarget" + player.getFaction());
         }
-        game.removeStoredValue("assignedBombardment" + player.getFaction());
-        game.removeStoredValue("bombardmentTarget" + player.getFaction());
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static boolean isHeroBombardmentResolving(Game game, Player player) {
+        return game != null && player != null && "true".equals(game.getStoredValue(getHeroBombardmentKey(player)));
     }
 
     public static void offerCommanderBombardmentButtons(
@@ -122,7 +133,7 @@ public class AshenLeadersHandler {
             return;
         }
 
-        int displayedHits = player.hasTech("x89c4") ? hits / 2 : hits;
+        int displayedHits = player.hasTech("x89c4") && !isHeroBombardmentResolving(game, player) ? hits / 2 : hits;
         List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true).stream()
                 .filter(button -> !"deleteButtons".equals(button.getCustomId()))
                 .toList();
@@ -135,11 +146,25 @@ public class AshenLeadersHandler {
         }
     }
 
-    private static List<Tile> getHeroTargetTiles(Game game) {
+    private static List<Tile> getHeroTargetTiles(Game game, Player owner) {
         return game.getTileMap().values().stream()
                 .filter(tile -> !tile.getPlanetUnitHolders().isEmpty())
+                .filter(tile -> !tile.isHomeSystem(game))
+                .filter(target -> game.getTileMap().values().stream()
+                        .filter(source -> Adjacency.of(game, owner)
+                                .forEffects()
+                                .from(source.getPosition())
+                                .contains(target.getPosition()))
+                        .flatMap(source -> source.getSpaceUnitHolder().getUnitKeys().stream())
+                        .filter(owner::unitBelongsToPlayer)
+                        .map(owner::getUnitFromUnitKey)
+                        .anyMatch(unit -> unit != null && unit.getBombardDieCount() > 0))
                 .sorted(Comparator.comparing(Tile::getPosition))
                 .toList();
+    }
+
+    private static String getHeroBombardmentKey(Player player) {
+        return HERO_BOMBARDMENT_PREFIX + player.getFaction();
     }
 
     private static List<Button> getHeroTargetButtons(Player player, Game game, List<Tile> targetTiles) {

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.netrunners.NetrunnersPromissoryHandler;
@@ -363,6 +364,12 @@ public class ListTechService {
                 if (player.getNomboxTile().getSpaceUnitHolder().getUnitCount(uk) <= 0) continue;
                 if (unit.startsWith(uk.unitType().getValue())) return true;
             }
+        }
+        if (player.hasAbility("trade_secrets")
+                && tech.isUnitUpgrade()
+                && IronSalvageRelicHandler.hasSalvageForUnitUpgrade(
+                        player, tech.getBaseUpgrade().orElse(""))) {
+            return true;
         }
         Set<TechnologyType> synergies = player.getSynergies();
         for (TechnologyType synergy : synergies) {

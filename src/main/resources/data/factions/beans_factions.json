@@ -49,23 +49,16 @@
         "alias": "crystellum",
         "factionName": "The Crystellum",
         "homeSystem": "be2",
-        "startingFleet": "1 cv, 1 dn, 1 cr, 6 ff, 2 inf p, 2 inf s, sd p",
-        "commodities": 2,
+        "startingFleet": "1 cv, 1 dn, 4 ff, 1 inf p, 2 inf s, sd p",
+        "commodities": 3,
         "factionTech": [
             "becrystrd",
             "becrysta"
         ],
-        "startingTechOptions": [
-            "nm",
-            "pa",
+        "startingTech": [
             "amd",
-            "det",
-            "st",
-            "sdn",
-            "ps",
-            "aida"
+            "st"
         ],
-        "startingTechAmount": 1,
         "homePlanets": [
             "prisma",
             "spire"
@@ -154,7 +147,6 @@
         ],
         "startingTechOptions": [
             "sar",
-            "st",
             "sr"
         ],
         "startingTechAmount": 1,
