@@ -26,6 +26,7 @@ public class GameEventType {
     public static final String STATUS_SCORING = "STATUS_SCORING";
     public static final String PUBLIC_OBJECTIVE_REVEALED = "PUBLIC_OBJECTIVE_REVEALED";
     public static final String AGENDA_REVEALED = "AGENDA_REVEALED";
+    public static final String AGENDA_VOTE_CAST = "AGENDA_VOTE_CAST";
     public static final String AGENDA_RESOLVED = "AGENDA_RESOLVED";
     public static final String TRANSACTION = "TRANSACTION";
     public static final String GAME_ENDED = "GAME_ENDED";

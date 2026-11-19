@@ -5414,6 +5414,7 @@ public final class ButtonHelperFactionSpecific {
                         + ").");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
         AgendaHistory.recordQuashed(game, defaultString(AgendaHelper.getCurrentAgendaId(game)));
+        AgendaEvents.discarded(game, player, AgendaHelper.getCurrentAgendaId(game), AgendaEvents.QUASH);
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {
