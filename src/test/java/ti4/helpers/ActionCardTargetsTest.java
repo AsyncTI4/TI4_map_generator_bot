@@ -18,6 +18,8 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.spring.service.gameevent.GameEventDraft;
+import ti4.spring.service.gameevent.GameSubEvent;
 import ti4.testUtils.BaseTi4Test;
 
 // Action card targets record who aimed a card at whom. Cards resolved through a "choose a player" button record the
@@ -114,6 +116,30 @@ class ActionCardTargetsTest extends BaseTi4Test {
     void aCardWithoutACombatOpponentRecordsNothingWhenPlayed() {
         ActionCardTargets.recordOnPlay(game, hacan, Mapper.getActionCard("spy"));
 
+        assertThat(targets()).isEmpty();
+    }
+
+    // During a tactical action the target goes into the action's draft, so it lands in the TACTICAL_ACTION event.
+    @Test
+    void aTargetDuringATacticalActionIsStagedAsASubEvent() {
+        GameEventDraft.open(game);
+
+        ActionCardTargets.record(game, "Plague", sol, hacan);
+
+        assertThat(GameEventDraft.drain(game))
+                .containsExactly(new GameSubEvent.ActionCardTargeted("sol", "Plague", "hacan"));
+        assertThat(targets())
+                .singleElement()
+                .satisfies(target -> assertThat(target.getTargetId()).isEqualTo(hacan.getUserID()));
+    }
+
+    @Test
+    void aCardAimedAtItsOwnPlayerRecordsNothing() {
+        GameEventDraft.open(game);
+
+        ActionCardTargets.record(game, "Plague", sol, sol);
+
+        assertThat(GameEventDraft.drain(game)).isEmpty();
         assertThat(targets()).isEmpty();
     }
 

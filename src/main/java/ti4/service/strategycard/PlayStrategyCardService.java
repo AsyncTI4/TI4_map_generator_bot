@@ -32,6 +32,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardTargets;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
@@ -135,7 +136,7 @@ public class PlayStrategyCardService {
                         continue;
                     }
                     ActionCardHelper.playAC(event, game, p2, "coup", game.getMainGameChannel());
-                    game.getGameStats().recordAcTarget("Coup d'Etat", p2, player);
+                    ActionCardTargets.record(game, "Coup d'Etat", p2, player);
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
                     String message =

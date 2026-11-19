@@ -96,6 +96,8 @@ import ti4.service.testbed.TestBedService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.spring.service.gameevent.GameEventService;
+import ti4.spring.service.gameevent.GameEventType;
 import tools.jackson.core.type.TypeReference;
 
 @UtilityClass
@@ -2796,6 +2798,20 @@ public final class AgendaHelper {
         return buttons;
     }
 
+    static void recordAgendaRevealed(
+            Game game, String agendaId, String agendaName, int agendaNumber, boolean fromBottom, boolean duringAction) {
+        GameEventService.commit(
+                game,
+                GameEventType.AGENDA_REVEALED,
+                null,
+                Map.of(
+                        "agendaId", agendaId,
+                        "agendaName", agendaName,
+                        "agendaNumber", agendaNumber,
+                        "fromBottom", fromBottom,
+                        "duringAction", duringAction));
+    }
+
     public static void revealAgenda(
             GenericInteractionCreateEvent event, boolean revealFromBottom, Game game, MessageChannel channel) {
         if (game.getMainGameChannel() != null) {
@@ -2980,6 +2996,7 @@ public final class AgendaHelper {
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + ", an agenda has been revealed.";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
+        recordAgendaRevealed(game, agendaID, agendaName, aCount, revealFromBottom, action);
         if (TheodisiAgendaResolver.onAgendaRevealed(game, event, agendaID)) {
             revealAgenda(event, revealFromBottom, game, channel);
             return;
