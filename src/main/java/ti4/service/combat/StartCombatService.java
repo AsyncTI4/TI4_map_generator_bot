@@ -1809,13 +1809,11 @@ public class StartCombatService {
         }
 
         // Arcanum Disintegrate
-        if (p1.hasTech("tharcanumpmr")
-                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p1, "tharcanumpmr")) {
+        if (p1.hasTech("tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p1, p2, tile, tile.getSpaceUnitHolder()));
         }
-        if (p2.hasTech("tharcanumpmr")
-                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p2, "tharcanumpmr")) {
+        if (p2.hasTech("tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p2, p1, tile, tile.getSpaceUnitHolder()));
         }
