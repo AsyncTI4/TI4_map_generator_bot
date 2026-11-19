@@ -83,6 +83,7 @@ public class DiscordWebhook {
         json.put("username", username);
         json.put("avatar_url", avatarUrl);
         json.put("tts", tts);
+        json.put("allowed_mentions", allowedMentionsWithoutEveryone());
 
         if (!embeds.isEmpty()) {
             List<JSONObject> embedObjects = new ArrayList<>();
@@ -172,6 +173,12 @@ public class DiscordWebhook {
 
         connection.getInputStream().close(); // I'm not sure why but it doesn't work without getting the InputStream
         connection.disconnect();
+    }
+
+    private static JSONObject allowedMentionsWithoutEveryone() {
+        JSONObject allowedMentions = new JSONObject();
+        allowedMentions.put("parse", new String[] {JSONObject.quote("users"), JSONObject.quote("roles")});
+        return allowedMentions;
     }
 
     public static class EmbedObject {

@@ -49,6 +49,7 @@ import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.card.TransactionGenerator;
 import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
+import ti4.message.MentionGuard;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
@@ -876,7 +877,7 @@ public class TransactionHelper {
                         if (viewer != null || (hidePrivateCardText && game.isLimitedWhispersMode())) {
                             trans.append("[REDACTED]");
                         } else {
-                            trans.append(furtherDetail.replace("fin777", " "));
+                            trans.append(MentionGuard.withoutAnyMentions(furtherDetail.replace("fin777", " ")));
                         }
                     }
                     default -> trans.append(" some odd thing: `").append(item).append('`');
@@ -1633,7 +1634,7 @@ public class TransactionHelper {
     @ModalHandler("finishDealDetails_")
     public static void finishDealDetails(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
-        String thoughts = mapping.getAsString();
+        String thoughts = MentionGuard.withoutAnyMentions(mapping.getAsString());
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         if (opposing == null) return;
         player.addTransactionItem("sending" + player.getFaction() + "_receiving" + opposing.getFaction() + "_details_"
@@ -1664,7 +1665,7 @@ public class TransactionHelper {
     @ModalHandler("finishDealDetailsInvert_")
     public static void finishDealDetailsInvert(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
-        String thoughts = mapping.getAsString();
+        String thoughts = MentionGuard.withoutAnyMentions(mapping.getAsString());
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         if (opposing == null) return;
         player.addTransactionItem("sending" + opposing.getFaction() + "_receiving" + player.getFaction() + "_details_"
