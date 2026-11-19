@@ -14,7 +14,6 @@ import ti4.ai.perception.AiPrompt;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
-import ti4.helpers.ButtonHelper;
 import ti4.service.combat.SpaceCannonOffenceWindow;
 
 @UtilityClass
@@ -48,7 +47,7 @@ class SpaceCannonWait {
     static List<Player> pending(Game game, Player seat, Tile tile) {
         if (game.isL1Hero() || tile.isScar(game) || !BoardView.hasOwnShips(seat, tile)) return List.of();
         Set<String> resolved = SpaceCannonOffenceWindow.resolvedBy(game, tile.getPosition());
-        return ButtonHelper.getPlayersWithPds2Cover(seat, game, tile.getPosition()).stream()
+        return OffenceCover.of(game, seat, tile.getPosition()).stream()
                 .filter(covering -> covering != seat)
                 .filter(covering -> !seat.getAllianceMembers().contains(covering.getFaction()))
                 .filter(covering -> !resolved.contains(covering.getFaction()))

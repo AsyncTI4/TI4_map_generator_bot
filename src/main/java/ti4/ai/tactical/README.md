@@ -1159,7 +1159,14 @@ activated and filled by `declinePDS_` and by `combatRoll_..._spacecannonoffence`
 or `doneWithTacticalAction` exists) and the engine posted `combatRoll_<pos>_space_spacecannonoffence` for the tile
 this turn. The engine lists covering players before the units move in, so moving into the locked Wormhole Nexus
 (which flips it and opens its wormholes) shows cover on the board that the engine never offered; without that prompt
-there is nothing to wait for. Pending = players with PDS cover of the tile (`getPlayersWithPds2Cover`) other
+there is nothing to wait for. That flip happens only at the end of the Movement step (LRR 100.2a), after Space Cannon
+Offense, so `OffenceCover.of` answers who covers the system: `getPlayersWithPds2Cover`, except when the active
+player's `currentActionSummary` shows the tile was activated as the locked Nexus (`82a` / `82ah`) and it is now flipped;
+then it copies the game (`GameSnapshots.copy`), puts the locked side back and asks the same question there, falling back
+to the plain check if the copy fails. `CombatRules.spaceCannonOffence` uses it too, so an AI defender does not fire
+from beside an alpha or beta wormhole at a Nexus that was locked that action
+([OffenceCoverTest](/src/test/java/ti4/ai/tactical/OffenceCoverTest.java)). Pending = players with PDS cover of the
+tile (`OffenceCover.of`) other
 than the seat and its alliance members, not yet resolved, and not when `game.isL1Hero()`, the tile is an Entropic
 Scar, or the seat has no ships there. The first tick stores `spaceCannonExpectedSince|<actionKey>`; it waits
 `AI_GRACE_MILLIS` = 60 s if every pending player is an AI seat, `HUMAN_GRACE_MILLIS` = 10 min otherwise; after that it

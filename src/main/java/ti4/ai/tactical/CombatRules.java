@@ -196,8 +196,7 @@ public class CombatRules {
                 String key = spaceCannonWindow(game, active, turnStart, position);
                 if (context.memory().has(key)) continue;
                 if (attacking && !position.equals(game.getActiveSystem())) continue;
-                if (!ButtonHelper.getPlayersWithPds2Cover(active, game, position)
-                        .contains(context.seat())) continue;
+                if (!OffenceCover.of(game, active, position).contains(context.seat())) continue;
                 if (!attacking && !BoardView.hasOwnShips(active, game.getTileByPosition(position))) {
                     context.memory().put(key, "declined");
                     Optional<PromptButton> decline =
