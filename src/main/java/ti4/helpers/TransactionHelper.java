@@ -53,6 +53,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -498,7 +499,7 @@ public class TransactionHelper {
         p1.clearTransactionItemsWithPlayer(p2);
         clearEntanglement(game, p1, p2);
         if (!debtOnly) {
-            ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
+            LieInWaitService.check(p1, p2, game);
             if (!hasOptedOutOfOwnTransactionPillage(game, p1) && !hasOptedOutOfOwnTransactionPillage(game, p2)) {
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
@@ -3150,6 +3151,7 @@ public class TransactionHelper {
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
+        LieInWaitService.check(player, player2, game);
         if (player2 != null) clearEntanglement(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }

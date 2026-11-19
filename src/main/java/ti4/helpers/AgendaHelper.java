@@ -74,6 +74,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -173,6 +174,9 @@ public final class AgendaHelper {
                     + " to " + p2.getRepresentation(false, false) + ".\n" + msg;
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(player, game);
+        }
+        if ("tg".equalsIgnoreCase(tgOrDebt) || "comm".equalsIgnoreCase(tgOrDebt)) {
+            LieInWaitService.check(player, p2, game);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (p2.getDebtTokenCount(player.getColor()) < 1) {

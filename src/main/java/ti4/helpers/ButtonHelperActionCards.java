@@ -668,24 +668,6 @@ public final class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void lieInWaitCheck(Player p1, Player p2, Game game) {
-        for (Player p3 : game.getRealPlayers()) {
-            if (p3 == p1 || p3 == p2) {
-                continue;
-            }
-            if (p3.getPlayableActionCards().contains("lieinwait")) {
-                Set<Player> neighbours = p3.getAbilityNeighbours();
-                if (neighbours.contains(p1) && neighbours.contains(p2)) {
-                    MessageHelper.sendMessageToChannel(
-                            p3.getCardsInfoThread(),
-                            p3.getRepresentation()
-                                    + " this is a reminder that you have _Lie In Wait_, and two of your neighbors just resolved a transaction. The two neighbors are "
-                                    + p1.getRepresentationNoPing() + " and " + p2.getRepresentationNoPing() + ".");
-                }
-            }
-        }
-    }
-
     @ButtonHandler("courageousStarter")
     public static void resolveCourageousStarter(Player player, Game game, ButtonInteractionEvent event) {
         boolean nekro = ButtonHelper.doesPlayerHaveFSHere(

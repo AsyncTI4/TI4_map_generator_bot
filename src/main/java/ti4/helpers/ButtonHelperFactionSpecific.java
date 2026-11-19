@@ -67,6 +67,7 @@ import ti4.model.UnitModel;
 import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -3630,6 +3631,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            LieInWaitService.check(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(
@@ -3706,6 +3708,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            LieInWaitService.check(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(

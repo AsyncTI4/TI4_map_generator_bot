@@ -16,6 +16,7 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.transaction.SendDebtService;
@@ -90,7 +91,8 @@ class SendPN extends GameStateSubcommand {
         }
 
         Player pnOwner = game.getPNOwner(id);
-        if (player.getPromissoryNotesInPlayArea().contains(id)) {
+        boolean returningFromPlayArea = player.getPromissoryNotesInPlayArea().contains(id);
+        if (returningFromPlayArea) {
             if (!targetPlayer.equals(pnOwner)) {
                 MessageHelper.sendMessageToEventChannel(
                         event, "Promissory notes in play area may only be sent to the owner of the promissory note.");
@@ -100,6 +102,9 @@ class SendPN extends GameStateSubcommand {
         ButtonHelperAbilities.pillageCheck(player, game);
         player.removePromissoryNote(id);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
+        if (!returningFromPlayArea) {
+            LieInWaitService.check(player, targetPlayer, game);
+        }
         targetPlayer.setPromissoryNote(id);
         if ("thpnscrapyard".equals(id)) {
             ScrapyardPromissoryHandler.offerUnusedCustomRigs(game, targetPlayer);
