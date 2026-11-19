@@ -63,7 +63,31 @@ class SpaceCannonWaitTest extends BaseTi4Test {
     }
 
     private AiDecision continueAt(long now) {
-        return TacticalRules.continueAction(test.contextAt(now, conclude)).orElseThrow();
+        return TacticalRules.continueAction(test.contextAt(now, conclude, offenceWindow()))
+                .orElseThrow();
+    }
+
+    // What the engine posts in the active player's channel when it opens the window after movement.
+    private AiPrompt offenceWindow() {
+        return prompt(
+                "window",
+                PromptSource.PUBLIC,
+                NOW,
+                "combatRoll_" + target + "_space_spacecannonoffence",
+                "declinePDS_" + activated.getTileID());
+    }
+
+    // The engine lists covering players before the units move in (TacticalActionService.executeCoreFinishMovement).
+    // Moving into the locked Wormhole Nexus flips it, which opens its wormholes, so afterwards the board shows cover
+    // the engine never offered. In game aiab9700b Sol waited a minute for an Xxcha shot that had no button and fell
+    // back. Without the engine's offence prompt there is nothing to wait for.
+    @Test
+    void doesNotWaitWhenTheEngineOpenedNoWindow() {
+        coveringSeat(XXCHA_AI_ID);
+
+        Optional<AiDecision> decision = TacticalRules.continueAction(test.contextAt(NOW, conclude));
+
+        assertThat(pressedId(decision.orElseThrow())).isEqualTo(CONCLUDE);
     }
 
     @Test

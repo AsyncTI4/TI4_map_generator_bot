@@ -1156,7 +1156,10 @@ cannon offense at the seat's ships in the active system have neither fired nor d
 activated and filled by `declinePDS_` and by `combatRoll_..._spacecannonoffence` presses).
 
 **Algorithm:** applies only once movement is finished (an owned `landUnits_`, `doneLanding_`, `tacticalActionBuild_`
-or `doneWithTacticalAction` exists). Pending = players with PDS cover of the tile (`getPlayersWithPds2Cover`) other
+or `doneWithTacticalAction` exists) and the engine posted `combatRoll_<pos>_space_spacecannonoffence` for the tile
+this turn. The engine lists covering players before the units move in, so moving into the locked Wormhole Nexus
+(which flips it and opens its wormholes) shows cover on the board that the engine never offered; without that prompt
+there is nothing to wait for. Pending = players with PDS cover of the tile (`getPlayersWithPds2Cover`) other
 than the seat and its alliance members, not yet resolved, and not when `game.isL1Hero()`, the tile is an Entropic
 Scar, or the seat has no ships there. The first tick stores `spaceCannonExpectedSince|<actionKey>`; it waits
 `AI_GRACE_MILLIS` = 60 s if every pending player is an AI seat, `HUMAN_GRACE_MILLIS` = 10 min otherwise; after that it
@@ -2507,7 +2510,7 @@ variant uses `ScoringReserve.planAfterReserve`. Trade goods are pressed only aft
 | Unit button for a planned move missing | `unitView` | tries 2 then 1; if none matches, the origin is marked exhausted (`exhaustedOrigin|…`) and `doneWithOneSystem_` is pressed; the rest of that origin's moves are skipped |
 | Damaged or galvanised unit buttons | `matchesTail` | accepts `dmg`, `glv`, `dmg_glv` segments before the colour |
 | Ceasefire | `holdPosition` | presses `doneWithOneSystem_`, or `resetTacticalMovement` if units were staged, then concludes with nothing moved |
-| Other players' space cannon pending | `SpaceCannonWait.next` | only once movement is over (a landing, build or conclude button is shown) and the seat has ships in the system; skipped under the L1Z1X hero flag and in a Scar; alliance partners and players who already resolved (`SpaceCannonOffenceWindow.resolvedBy`) are not waited for; `Wait` 60 s (all pending are AI) or 10 min (a human); then `Unsure` on the first owned prompt |
+| Other players' space cannon pending | `SpaceCannonWait.next` | only once movement is over (a landing, build or conclude button is shown), the engine posted the offence roll for the system this turn, and the seat has ships in the system; skipped under the L1Z1X hero flag and in a Scar; alliance partners and players who already resolved (`SpaceCannonOffenceWindow.resolvedBy`) are not waited for; `Wait` 60 s (all pending are AI) or 10 min (a human); then `Unsure` on the first owned prompt |
 | Own and enemy ships share the system, no combat thread | `waitForCombat` | `Wait` until 90 s after first noticed; then `Unsure` ("its units share a system with another player's units"). The start time (`combatExpectedSince|<actionKey>`) is kept for the whole action, so a later wait in the same action without a combat thread (for example for ground combat after the space combat) becomes `Unsure` at once |
 | Tempesta move boost | `TempestaRules.boost` | tried on the movement prompt before any unit is picked |
 | Production finished | `placeUnits` | after the planned orders, Yin Spinner and Self-Assembly prompts (`TechRules`) are handled before `done building` |

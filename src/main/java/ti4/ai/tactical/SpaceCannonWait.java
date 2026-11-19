@@ -28,6 +28,7 @@ class SpaceCannonWait {
 
     static Optional<AiDecision> next(AiTurnContext context, List<AiPrompt> turn, Tile tile) {
         if (!movementFinished(context, turn)) return Optional.empty();
+        if (!offenceWindowPosted(turn, tile)) return Optional.empty();
         List<Player> pending = pending(context.game(), context.seat(), tile);
         if (pending.isEmpty()) return Optional.empty();
         String key = EXPECTED_KEY + TacticalRules.actionKey(context);
@@ -52,6 +53,13 @@ class SpaceCannonWait {
                 .filter(covering -> !seat.getAllianceMembers().contains(covering.getFaction()))
                 .filter(covering -> !resolved.contains(covering.getFaction()))
                 .toList();
+    }
+
+    private static boolean offenceWindowPosted(List<AiPrompt> turn, Tile tile) {
+        String roll = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        return turn.stream()
+                .flatMap(prompt -> prompt.buttons().stream())
+                .anyMatch(button -> roll.equals(button.handlerId()));
     }
 
     private static boolean movementFinished(AiTurnContext context, List<AiPrompt> turn) {
