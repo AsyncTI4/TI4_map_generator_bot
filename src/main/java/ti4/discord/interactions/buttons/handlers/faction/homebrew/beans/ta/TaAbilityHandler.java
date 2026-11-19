@@ -200,7 +200,7 @@ public class TaAbilityHandler {
                 tile,
                 parts[2],
                 player.getRepresentationNoPing() + " resolved _" + explore.getName()
-                        + " with **Perfect Architecture**.",
+                        + "_ with **Perfect Architecture**.",
                 player,
                 game);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "tacommander")) {
