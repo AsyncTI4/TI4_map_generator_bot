@@ -125,6 +125,7 @@ public abstract class BagDraft {
                 if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
                     List<DraftItem> draftableItems = new ArrayList<>(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);
+                    BagDraftEventRecorder.recordPicks(owner, p, draftableItems, "AUTO");
                     clearBagChannel(p);
                     p.getCurrentDraftBag().Contents.removeAll(draftableItems);
                     setPlayerReadyToPass(p, true);

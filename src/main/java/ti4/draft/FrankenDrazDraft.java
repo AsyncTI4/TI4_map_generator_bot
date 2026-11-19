@@ -239,6 +239,7 @@ public class FrankenDrazDraft extends FrankenDraft {
     }
 
     public static void expandFactionPackages(Game game) {
+        BagDraftEventRecorder.recordEnded(game);
         for (Player player : game.getRealPlayers()) {
             DraftBag hand = player.getDraftHand();
             Map<String, DraftItem> expanded = new LinkedHashMap<>();

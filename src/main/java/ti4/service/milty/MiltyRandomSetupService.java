@@ -167,6 +167,7 @@ public class MiltyRandomSetupService {
 
         String sliceError = createSlices(event, draftManager, specs, trueRandomGalaxy);
         if (sliceError == null) {
+            MiltyDraftEventRecorder.recordStarted(game, draftManager);
             assignRandomPicks(draftManager, specs);
             presetRandomKeleresFlavorIfNeeded(draftManager, game);
             MessageHelper.sendMessageToChannel(
