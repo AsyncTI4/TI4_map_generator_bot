@@ -15,6 +15,7 @@
     "legendaryAbilityName": "The Nucleus",
     "legendaryAbilityText": "ACTION: Exhaust this card to use the Embers of Muaat's **STAR FORGE** faction ability without spending a command token.",
     "legendaryAbilityFlavourText": "Gashlai energy/matter conversion has many uses.",
+    "flavourText": "*The first artificial world of this galactic age.*",
     "planetLayout": {
         "unitHolderName": "avernus",
         "resourcesLocation": "BottomLeft",

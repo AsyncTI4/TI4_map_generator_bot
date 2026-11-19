@@ -4,11 +4,11 @@
         "initiative": 1,
         "name": "Lux",
         "primaryTexts": [
-            "Gain 3 command tokens",
-            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+            "Gain 3 command tokens.",
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent."
         ],
         "secondaryTexts": [
-            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent."
         ],
         "imageFileName": "tf1",
         "colourHexCode": "#ec1c24",
@@ -20,7 +20,7 @@
         "initiative": 2,
         "name": "Noctis",
         "primaryTexts": [
-            "Initiate a genome splice",
+            "Initiate a genome splice.",
             "Ready up to 2 planets."
         ],
         "secondaryTexts": [
@@ -35,7 +35,7 @@
         "initiative": 3,
         "name": "Tyrannus",
         "primaryTexts": [
-            "Choose a player other than the speaker. That player gains the speaker token",
+            "Choose a player other than the speaker. That player gains the speaker token.",
             "Choose a player other than the speaker or tyrant. That player gains the benediction token.",
             "Draw 2 action cards."
         ],
@@ -52,7 +52,7 @@
         "initiative": 4,
         "name": "Civitas",
         "primaryTexts": [
-            "Either place 1 structure on a planet you control, or use the PRODUCTION ability of 1 of your space docks.",
+            "Either place 1 structure on a planet you control or use the PRODUCTION ability of 1 of your space docks.",
             "Place 1 structure on a planet you control."
         ],
         "secondaryTexts": [
@@ -73,7 +73,7 @@
             "Choose any number of other players. Those players use the secondary ability of this strategy card without spending a command token."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool to replenish your commodities."
+            "Spend 1 token from your strategy pool to replenish commodities."
         ],
         "imageFileName": "tf5",
         "colourHexCode": "#00a99d",
@@ -89,7 +89,7 @@
             "Resolve the PRODUCTION abilities of your units in 1 system."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool. Then, you may either use the PRODUCTION abilities of the units in your home system or spend 4 resources to participate in the unit upgrade splice."
+            "Spend 1 token from your strategy pool and 4 resources to either participate in the unit upgrade splice or use the PRODUCTION abilities of the units in your home system."
         ],
         "imageFileName": "tf6",
         "colourHexCode": "#008ed4",
@@ -114,11 +114,11 @@
         "initiative": 8,
         "name": "Aeterna",
         "primaryTexts": [
-            "Immediately score 1 public objective if you fulfill its requirements; otherwise, draw 1 paradigm",
-            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective"
+            "Immediately score 1 public objective if you fulfill its requirements; otherwise, draw 1 paradigm.",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool to draw 1 secret objective or 1 paradigm"
+            "Spend 1 token from your strategy pool to draw 1 secret objective or 1 paradigm."
         ],
         "imageFileName": "tf8",
         "colourHexCode": "#752b90",

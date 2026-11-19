@@ -32,7 +32,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Reveal abilities equal to the number of players. The speaker chooses 1 of them for you to gain. Then you choose 1 ability for each other player to gain.",
+        "text1": "Reveal ability cards equal to the number of players. The speaker chooses 1 of them for you to gain. Then you choose 1 ability for each other player to gain.",
         "source": "twilights_fall"
     },
     {
@@ -41,7 +41,7 @@
         "category": "edict",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "Place any player's control marker on this card. That player cannot perform transactions during this game round. Discard this card at the end of the status phase. ",
+        "text1": "Place any player's control token on this card. That player cannot perform transactions during this game round. Discard this card at the end of the status phase. ",
         "source": "twilights_fall"
     },
     {
@@ -68,7 +68,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Either place 1 infantry on each planet you control or place 1 fighter from your reinforcements in each system that contains your ships",
+        "text1": "Either place 1 infantry on each planet you control or place 1 fighter in each system that contains your ships.",
         "source": "twilights_fall"
     },
     {
@@ -77,7 +77,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "You may discard any of your spliced cards. For each card you discard, draw 1 card of that type. Then you may allow any other players to do the same.",
+        "text1": "You may discard any of your spliced cards. For each card you discarded, draw 1 card of that type. Then, you may allow any other players to do the same.",
         "source": "twilights_fall"
     },
     {
@@ -86,7 +86,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Roll 1 die: \n10: Draw up to 2 spliced cards from any decks\n6-9: Each player draws 1 spliced card from any deck. \n1-5: Destroy each unit in the Mecatol Rex system, then each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their units in each of those systems.",
+        "text1": "Roll 1 die:\n1-5: Destroy each unit in the Mecatol Rex system, then each player destroys 3 of their units in each system adjacent to Mecatol Rex.\n6-9: Each player draws 1 spliced card from any deck.\n10: Draw up to 2 spliced cards from any decks.",
         "source": "twilights_fall"
     }
 ]

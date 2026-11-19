@@ -54,7 +54,7 @@
             "PROPULSION"
         ],
         "source": "pok",
-        "text": "After you perform a tactical action in a system that contains a frontier token, if you have 1 or more ships in that system, explore that token.\nYour ships can retreat into adjacent systems that do not contain other players' units, even if you do not have units or control planets in that system.",
+        "text": "After you perform a tactical action in a system that contains a frontier token, if you have 1 or more ships in that system, explore that token.\nYour ships can retreat into adjacent systems that do not contain other players' units even if you do not have units or control planets in that system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/dark_energy_tap.png?raw=true",
         "initials": "DET",
         "shortName": "Dark N.R.G. Tap"
@@ -67,7 +67,7 @@
         ],
         "requirements": "B",
         "source": "pok",
-        "text": "ACTION: Exhaust this card to produce 1 ship in any system that contains one of your space docks.",
+        "text": "ACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/sling_relay.png?raw=true",
         "initials": "SR"
     },
@@ -244,7 +244,7 @@
         ],
         "requirements": "RRR",
         "source": "base",
-        "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of their non-fighter ships.",
+        "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of his non-fighter ships.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/assault_cannon.png?raw=true",
         "initials": "AC"
     },
@@ -292,7 +292,7 @@
         ],
         "requirements": "Y",
         "source": "base",
-        "text": "You may exhaust this card before 1 or more of your units uses SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.",
+        "text": "You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/graviton_laser_system.png?raw=true",
         "initials": "GLS",
         "shortName": "Graviton Laser Sys."
@@ -329,7 +329,7 @@
             "CYBERNETIC"
         ],
         "source": "pok",
-        "text": "When you activate a system, you may explore 1 planet in that system which contains 1 or more of your units.",
+        "text": "When you activate a system, you may explore 1 planet in that system that contains 1 or more of your units.",
         "notes": "Dane has said you need to control the planet in order to explore it, and that you cannot sacrifice coexisting infantry to resolve a hazardous explore.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/scanlink_drone_network.png?raw=true",
         "initials": "SDN",
@@ -343,7 +343,7 @@
         ],
         "requirements": "Y",
         "source": "pok",
-        "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\nWhen you cast votes during the agenda phase, you may cast 3 additional votes; if you do, and the outcome you voted for is not resolved, exhaust this card.",
+        "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\nWhen you cast votes during the agenda phase, you may cast 3 additional votes. If you do, and the outcome you voted for is not resolved, exhaust this card.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/predictive_intelligence.png?raw=true",
         "initials": "PI",
         "shortName": "Predictive Intell'ce"
@@ -470,7 +470,7 @@
         "faction": "argent",
         "baseUpgrade": "dd2",
         "source": "pok",
-        "text": "Cost 1, Combat 7, Move 2, Capacity 1\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system.",
+        "text": "Cost 1, Combat 7, Move 2, Capacity 1\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/strike_wing_alpha_2.jpg?raw=true"
     },
     {
@@ -534,7 +534,7 @@
         "requirements": "BB",
         "faction": "empyrean",
         "source": "pok",
-        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action.",
+        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to move value of all of that player's ships during this tactical action.",
         "shortName": "Aether-\nstream",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/aetherstream.jpg?raw=true"
     },
@@ -599,7 +599,7 @@
         "faction": "naalu",
         "baseUpgrade": "ff2",
         "source": "base",
-        "text": "Cost 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nFighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
+        "text": "Cost 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/hybrid_crystal_fighter_2.jpg?raw=true"
     },
     {
@@ -624,7 +624,7 @@
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"X\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
+        "text": "When you gain another player's technology using 1 of your faction abilities, you may place the \"X\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/valefar_assimilator_x.jpg?raw=true"
     },
     {
@@ -778,7 +778,7 @@
         "faction": "saar",
         "baseUpgrade": "sd2",
         "source": "base",
-        "text": "Move 2, Capacity 5\nPRODUCTION 7.\nThis unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
+        "text": "Move 2, Capacity 5\nPRODUCTION 7.\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/floating_factory_2.jpg?raw=true"
     },
     {
@@ -932,7 +932,7 @@
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
+        "text": "When you gain another player's technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/valefar_assimilator_y.jpg?raw=true"
     },
     {
@@ -973,7 +973,7 @@
         "faction": "titans",
         "baseUpgrade": "pds2",
         "source": "pok",
-        "text": "Combat 6\nPLANETARY SHIELD, SPACE CANNON 5, SUSTAIN DAMAGE, PRODUCTION 1\nThis unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "text": "Combat 6\nPLANETARY SHIELD, SPACE CANNON 5, SUSTAIN DAMAGE, PRODUCTION 1\nThis unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/heltitan_2.jpg?raw=true"
     },
     {
@@ -1031,7 +1031,7 @@
     },
     {
         "alias": "yso",
-        "name": "Yin Spinner Omega",
+        "name": "Yin Spinner",
         "types": [
             "BIOTIC"
         ],
@@ -1051,7 +1051,7 @@
         "requirements": "YY",
         "faction": "yin",
         "source": "base",
-        "text": "At the start of a space combat, you may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit against your opponent's ships; that hit must be assigned by your opponent to 1 of their non-fighters ships if able.",
+        "text": "At the start of a space combat, you may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit against your opponent's ships; that hit must be assigned by your opponent to 1 of their non-fighter ships if able.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/impulse_core.jpg?raw=true"
     },
     {

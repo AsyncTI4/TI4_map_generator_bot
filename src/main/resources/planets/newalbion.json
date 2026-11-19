@@ -125,6 +125,6 @@
         "removeUnitCoordinate": true
     },
     "contrastColor": "orange",
-    "flavourText": "*Rare atmospheric composition and biochemistry support lifeforms unlike any others in the galaxy.*",
+    "flavourText": "*Rare atmospheric composition and biochemistry support lifeforms unlike any other in the galaxy.*",
     "source": "base"
 }

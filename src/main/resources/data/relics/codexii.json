@@ -10,7 +10,7 @@
     {
         "alias": "titanprototype",
         "name": "JR-XS455-O",
-        "text": "ACTION: Exhaust this agent and choose a player, that player may spend 3 resources to place a structure on a planet they control. If they do not, they gain 1 trade good.",
+        "text": "ACTION: Exhaust this agent and choose a player; that player may spend 3 resources to place a structure on a planet they control. If they do not, they gain 1 trade good.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/jrxs4550.jpg?raw=true",
         "source": "codex2",
         "shortName": "JR-\nXS455-O"
@@ -18,7 +18,7 @@
     {
         "alias": "nanoforge",
         "name": "Nano-Forge",
-        "text": "ACTION: Attach this card to a non-legendary, non-home planet you control, its resource and influence values are increased by 2 and it is a legendary planet. This action cannot be performed once attached.",
+        "text": "ACTION: Attach this card to a non-legendary, non-home planet you control; its resource and influence values are increased by 2 and it is a legendary planet. This action cannot be performed once attached.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/nanoforge.jpg?raw=true",
         "source": "codex2",
         "flavourText": "*Intended to bring prosperity, the forge was twisted into an instrument of war.*",

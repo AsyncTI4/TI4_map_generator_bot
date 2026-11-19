@@ -152,7 +152,7 @@ public class FractureService {
             if (spawnFracture(event, game, false)) spawnIngressTokens(event, game, player, bt);
         } else if ("cabalbt".equals(bt)) {
             String msg = player.getRepresentation(false, false)
-                    + " has _Al'Raith Ix Ianovar_ so The Fracture enters automatically"
+                    + " has _Al'raith Ix Ianovar_ so The Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             if (spawnFracture(event, game, false)) spawnIngressTokens(event, game, player, bt);

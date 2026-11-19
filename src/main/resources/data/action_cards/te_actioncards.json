@@ -22,7 +22,7 @@
         "alias": "puppetsonastring",
         "name": "Puppets on a String",
         "phase": "Action",
-        "window": "At the end of a player's turn, if you have passed",
+        "window": "At the end of any player's turn, if you have passed",
         "text": "Perform 1 action.",
         "flavorText": "A red light flashed as the pile that was once thought to be destroyed remains of UNIT_DSGN_ASTAROTH came once more to life. \"YOU THOUGHT. YOU BELIEVED YOUR VICTORY SECURE. BUT YOU WERE WRONG.\"",
         "source": "thunders_edge"
@@ -92,7 +92,7 @@
         "name": "Rescue",
         "phase": "Action",
         "window": "After another player moves ships into a system that contains your ships",
-        "text": "You may move 1 of your ships into the active system from any system that does not contain one of your command tokens.",
+        "text": "You may move 1 of your ships into the active system from any system that does not contain 1 of your command tokens.",
         "notes": "If the target ship has a capacity value, it may transport fighters and ground forces.",
         "flavorText": "\"Hold on...\" Tuck pleaded. \"We are coming. Hold on, please...\"",
         "source": "thunders_edge"
@@ -113,7 +113,7 @@
         "window": "Action",
         "text": "Ready 1 of your planets that has a technology specialty or choose 1 player to gain their breakthrough.",
         "notes": "This cannot be used to do nothing. It must either ready a planet or get someone their breakthrough.",
-        "flavorText": "Crocoan gently stroked the bloodied feathers of screeching cir-le-sh. Such a beautiful song. At last, he'd cracked the code. Soon, Goranthis would be filled with a chorus of such soulful music.",
+        "flavorText": "Crocoan gently stroked the bloodied feathers of the screeching cir-le-sh. Such a beautiful song. At last, he'd cracked the code. Soon, Goranthis would be filled with a chorus of such soulful music.",
         "source": "thunders_edge"
     },
     {
@@ -121,7 +121,7 @@
         "name": "Black Market Dealings",
         "phase": "Any",
         "window": "When you are negotiating a transaction",
-        "text": "You and the other player may include relics, action cards, and unscored secret objectives as part of the transaction. This card cannot be canceled.",
+        "text": "You and the other player can include relics, action cards, and unscored secret objectives as part of this transaction. This card cannot be canceled.",
         "flavorText": "A chill went up Riad's spine as the Empyrean extended a clawed hand, a small black box floating in their palm, sucking up all the light and life in the room.",
         "source": "thunders_edge"
     },
@@ -166,7 +166,7 @@
         "name": "Crash Landing",
         "phase": "Action",
         "window": "When your last ship in the active system is destroyed",
-        "text": "Place 1 of your ground forces from the space area of the active system onto a planet in that system other than Mecatol Rex; if the planet contains other players' units, place your ground force into coexistence.",
+        "text": "Place 1 of your ground forces from the space area of the active system onto a planet in that system other than Mecatol Rex; if the planet contains other players' units, place your ground forces into coexistence.",
         "flavorText": "The Long Fall spiraled toward the surface of the rocky planet. Living up to its name, Connor thought dryly.",
         "source": "thunders_edge"
     },
@@ -174,7 +174,7 @@
         "alias": "crisis",
         "name": "Crisis",
         "phase": "Action",
-        "window": "At the end of any players turn, if there are at least 2 players who have not passed",
+        "window": "At the end of any player's turn, if there are at least 2 players who have not passed",
         "text": "Skip the next player's turn.",
         "notes": "Pre-set this if possible. If not, please document in your `#cards-info` thread your intention of maybe using it. This will help resolve potential disputes regarding angle-shooting.",
         "flavorText": "4X41A \"Apollo\" shrieked in the skies over Ordinian. Blazing shards of metal and fire rained down upon the planet's surface - the remains of Nekro whose atoms were undergoing a rapid and violent disintegration.",
@@ -187,7 +187,7 @@
         "window": "Action",
         "text": "Perform the primary ability of a readied or unchosen strategy card.",
         "notes": "You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the primary ability. If you choose Trade, you cannot choose other players to resolve the secondary ability.",
-        "flavorText": "Treilla absentmindedly smiled a sickly sweet smile at the newly promoted commander. With any luck, he'd be dead or demoted within a day or two.",
+        "flavorText": "Treilla absentmindedly smiled at the audacity of the newly promoted commander. Making waves like this - he'd likely be dead or demoted within a day or two. Still, she found the posturing...amusing.",
         "source": "thunders_edge"
     }
 ]

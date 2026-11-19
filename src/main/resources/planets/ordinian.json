@@ -8,6 +8,7 @@
     "resources": 0,
     "influence": 0,
     "factionHomeworld": "bastion",
+    "flavourText": "*The Nekro Virus consumed this former Naaz-Rokha colony virtually down to its bedrock. Restoration efforts have only begun to restore its ravaged biosphere.*",
     "planetTypes": [
         "FACTION"
     ],

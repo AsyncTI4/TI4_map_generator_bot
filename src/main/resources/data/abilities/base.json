@@ -3,7 +3,7 @@
         "id": "mitosis",
         "name": "Mitosis",
         "faction": "arborec",
-        "permanentEffect": "Your space docks cannot produce infantry",
+        "permanentEffect": "Your space docks cannot produce infantry.",
         "window": "At the start of the status phase",
         "windowEffect": "Place 1 infantry from your reinforcements on any planet you control.",
         "source": "base"
@@ -95,7 +95,7 @@
         "id": "armada",
         "name": "Armada",
         "faction": "letnev",
-        "permanentEffect": "The maximum number of non-fighter ships you can have in each system is equal to 2 more than the number of tokens in your fleet pool",
+        "permanentEffect": "The maximum number of non-fighter ships you can have in each system is equal to 2 more than the number of tokens in your fleet pool.",
         "source": "base"
     },
     {
@@ -103,7 +103,7 @@
         "name": "Munitions Reserves",
         "faction": "letnev",
         "window": "At the start of each round of space combat",
-        "windowEffect": "You may spend 2 trade goods to re-roll any number of your dice during that combat round.",
+        "windowEffect": "You may spend 2 trade goods; you may reroll any number of your dice during that combat round.",
         "source": "base"
     },
     {
@@ -111,7 +111,7 @@
         "name": "Ambush",
         "faction": "mentak",
         "window": "At the start of a space combat",
-        "windowEffect": "You may roll 1 die for each of up to 2 of your cruisers or destroyers in the system. For each result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships.",
+        "windowEffect": "You may roll 1 die for each of up to 2 of your cruisers or destroyers in the system. For each result equal to or greater than that ship's combat value produce 1 hit; your opponent must assign it to 1 of their ships.",
         "source": "base"
     },
     {
@@ -119,14 +119,14 @@
         "name": "Pillage",
         "faction": "mentak",
         "window": "After 1 of your neighbors gains trade goods or resolves a transaction",
-        "windowEffect": "If they have 3 or more trade goods, you may take 1 of their trade goods or commodities.",
+        "windowEffect": "If that neighbor has 3 or more trade goods, you may take 1 of their trade goods or commodities.",
         "source": "base"
     },
     {
         "id": "gashlai_physiology",
         "name": "Gashlai Physiology",
         "faction": "muaat",
-        "permanentEffect": "Your ships can move through supernovas",
+        "permanentEffect": "Your ships can move through supernovas.",
         "source": "base"
     },
     {
@@ -296,7 +296,7 @@
         "name": "Stall Tactics",
         "faction": "yssaril",
         "window": "ACTION",
-        "windowEffect": "Discard 1 action card from your hand",
+        "windowEffect": "Discard 1 action card from your hand.",
         "source": "base"
     }
 ]
