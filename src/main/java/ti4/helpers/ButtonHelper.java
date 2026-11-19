@@ -149,7 +149,6 @@ import ti4.service.ShowGameService;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
 import ti4.service.actioncard.CorruptionTimingService;
-import ti4.service.actioncard.LieInWaitService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
@@ -6438,7 +6437,6 @@ public class ButtonHelper {
                 return;
             }
             msg += "trade good to " + tradeHolder.getRepresentation() + ".";
-            LieInWaitService.check(player, tradeHolder, game);
         } else {
             SendDebtService.sendDebt(player, tradeHolder, 1);
             msg += "debt token to " + tradeHolder.getRepresentation() + ", for their \"Debt Account\" pool.";

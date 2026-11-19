@@ -672,7 +672,6 @@ public final class ButtonHelperSCs {
                     p2.setTg(p2.getTg() + washedCommsPower);
                     p2.setCommodities(p2.getCommodities() - washedCommsPower);
                     ButtonHelperAbilities.pillageCheck(p2, game);
-                    LieInWaitService.check(player, p2, game);
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", " + washedCommsPower
@@ -682,7 +681,6 @@ public final class ButtonHelperSCs {
                     p2.setTg(p2.getTg() + p2.getCommodities());
                     p2.setCommodities(0);
                     ButtonHelperAbilities.pillageCheck(p2, game);
-                    LieInWaitService.check(player, p2, game);
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged()
@@ -707,9 +705,7 @@ public final class ButtonHelperSCs {
             }
             if (p2.getSCs().contains(tradeInitiative)) {
                 TransactionHelper.checkTransactionLegality(game, player, p2);
-                if (commoditiesTotal > 0) {
-                    LieInWaitService.check(player, p2, game);
-                }
+                LieInWaitService.check(player, p2, game);
             }
         }
 
