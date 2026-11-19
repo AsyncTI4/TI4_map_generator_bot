@@ -1330,7 +1330,7 @@ public final class ButtonHelperFactionSpecific {
     }
 
     // TODO: getPlaceUnitButtons resets produced units, so pressing this mid-build drops the unfinished main build's
-    // tally: those units stay on the board unpaid (an AI seat then re-placed them in a loop). Keep or restore the
+    // tally: those units stay on the board unpaid, and finishing the build places them again. Keep or restore the
     // tally.
     @ButtonHandler("solBtBuild_")
     public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
