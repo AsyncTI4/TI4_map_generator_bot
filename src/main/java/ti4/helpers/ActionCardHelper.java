@@ -907,7 +907,6 @@ public class ActionCardHelper {
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
-        ActionCardTargets.recordOnPlay(game, player, actionCard);
         if (isPlayedAsComponentAction(game, player, actionCard)) {
             TurnActionLog.recordComponent(game, "actionCard");
         }
@@ -919,6 +918,7 @@ public class ActionCardHelper {
                     player,
                     Map.of("cardId", acID, "cardName", actionCardTitle));
         }
+        ActionCardTargets.recordOnPlay(game, player, actionCard);
 
         boolean hasUnyieldingWill = player.hasTech("baarvag");
         boolean actionCardIsCancelable = isActionCardCancelable(actionCard) && !twinned && !hasUnyieldingWill;

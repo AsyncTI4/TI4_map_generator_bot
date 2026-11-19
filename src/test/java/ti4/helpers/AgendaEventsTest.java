@@ -52,7 +52,7 @@ class AgendaEventsTest extends BaseTi4Test {
                 .containsExactlyInAnyOrderEntriesOf(Map.of("outcome", "for", "votes", 5, "source", "vote"));
     }
 
-    // The vote button remembers the last outcome looked at, so an abstention can arrive with one attached.
+    // Casting 0 votes is abstaining, whatever outcome is passed in.
     @Test
     void zeroVotesIsAnAbstentionWithNoOutcome() {
         assertThat(AgendaEvents.voteCastPayload("for", 0, AgendaEvents.VOTE, false))
@@ -91,5 +91,69 @@ class AgendaEventsTest extends BaseTi4Test {
         sol.removePlanet("lodor");
 
         assertThat(AgendaHelper.cannotVoteReason(game, sol)).isEqualTo("no planet votes");
+        assertThat(AgendaHelper.getVoteTotal(sol, game)[0]).isZero();
+    }
+
+    // The cases below pin getVoteTotal to what it returned before its can't-vote checks moved into cannotVoteReason.
+
+    // Representative Government gives every player 1 vote, planets or not.
+    @Test
+    void representativeGovernmentGivesAPlanetlessPlayerOneVote() {
+        sol.removePlanet("lodor");
+        game.addLaw("rep_govt", null);
+
+        assertThat(AgendaHelper.cannotVoteReason(game, sol)).isNull();
+        assertThat(AgendaHelper.getVoteTotal(sol, game)[0]).isEqualTo(1);
+    }
+
+    @Test
+    void aRiderStillStopsVotingUnderRepresentativeGovernment() {
+        game.addLaw("rep_govt", null);
+        game.setCurrentAgendaVote("for", "sol_Politics Rider");
+
+        assertThat(AgendaHelper.getVoteTotal(sol, game)[0]).isZero();
+    }
+
+    // Executive Order suspends Representative Government, so planets count again.
+    @Test
+    void executiveOrderSuspendsRepresentativeGovernment() {
+        sol.removePlanet("lodor");
+        game.addLaw("rep_govt", null);
+        game.setStoredValue("executiveOrder", "sol");
+
+        assertThat(AgendaHelper.cannotVoteReason(game, sol)).isEqualTo("no planet votes");
+    }
+
+    @Test
+    void publicExecutionStopsVotingUnlessExecutiveOrderIsInEffect() {
+        game.setStoredValue("PublicExecution", "sol");
+        assertThat(AgendaHelper.cannotVoteReason(game, sol)).isEqualTo("public execution");
+
+        game.setStoredValue("executiveOrder", "sol");
+        assertThat(AgendaHelper.cannotVoteReason(game, sol)).isNull();
+    }
+
+    // Galactic Threat: Nekro cannot vote.
+    @Test
+    void nekroCannotVote() {
+        Player nekro = game.addPlayer("200000000000000002", "nekro");
+        nekro.setFaction("nekro");
+        nekro.setColor("red");
+        nekro.addPlanet("lodor");
+
+        assertThat(AgendaHelper.cannotVoteReason(game, nekro)).isEqualTo("galactic threat");
+        assertThat(AgendaHelper.getVoteTotal(nekro, game)[0]).isZero();
+    }
+
+    // The Xxcha commander lets a player vote despite a rider or an assassinated representative.
+    @Test
+    void theXxchaCommanderOverridesARiderAndAssassination() {
+        sol.addLeader("xxchacommander");
+        sol.getLeader("xxchacommander").orElseThrow().setLocked(false);
+        game.setCurrentAgendaVote("for", "sol_Politics Rider");
+        game.setStoredValue("AssassinatedReps", "sol");
+
+        assertThat(AgendaHelper.cannotVoteReason(game, sol)).isNull();
+        assertThat(AgendaHelper.getVoteTotal(sol, game)[0]).isPositive();
     }
 }

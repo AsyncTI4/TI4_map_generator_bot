@@ -19,11 +19,13 @@ public class AgendaEvents {
     static final String NO_SCORED_SECRETS = "no scored secrets";
     static final String HIDDEN_NO_LAWS = "hidden agenda had no laws in play";
     static final String HIDDEN_NO_SCORED_SECRETS = "hidden agenda had no scored secrets";
-    public static final String QUASH = "quash";
+    static final String QUASH = "quash";
     static final String VETO = "veto";
     static final String VOTE = "vote";
     static final String PRESET_ABSTENTION = "preset abstention";
     static final String NO_VOTES = "no votes";
+    static final String FORCED_ABSTENTION = "forced abstention";
+    static final String GENETIC_RECOMBINATION = "genetic recombination";
 
     static void revealed(Game game, String agendaId, int agendaNumber, boolean fromBottom, boolean duringAction) {
         GameEventService.commit(

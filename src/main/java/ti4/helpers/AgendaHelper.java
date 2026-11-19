@@ -314,6 +314,11 @@ public final class AgendaHelper {
 
     @ButtonHandler("resolveAgendaVote_")
     private static void resolvingAnAgendaVote(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        resolvingAnAgendaVote(buttonID, event, game, player, AgendaEvents.VOTE);
+    }
+
+    private static void resolvingAnAgendaVote(
+            String buttonID, ButtonInteractionEvent event, Game game, Player player, String voteSource) {
         boolean resolveTime = false;
         String winner = "";
         String votes = buttonID.substring(buttonID.lastIndexOf('_') + 1);
@@ -448,7 +453,7 @@ public final class AgendaHelper {
                             player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
                 }
             }
-            AgendaEvents.voteCast(game, player, winner, votes, AgendaEvents.VOTE);
+            AgendaEvents.voteCast(game, player, winner, votes, voteSource);
             AtokeraAgent.clearVotes(player, game);
 
             if (!game.isFowMode()) {
@@ -471,8 +476,12 @@ public final class AgendaHelper {
                 String skippedMessage =
                         nextInLine.getRepresentation(true, false) + ", you are being skipped because you cannot vote.";
                 String skipSource = skippedVoterSource(game, nextInLine);
-                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
-                        && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                boolean presetAbstention =
+                        game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction());
+                boolean abstentionHeld =
+                        presetAbstention && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (abstentionHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (presetAbstention && !abstentionHeld) {
                     skipSource = AgendaEvents.PRESET_ABSTENTION;
                     CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     skippedMessage = realIdentity2
@@ -482,7 +491,10 @@ public final class AgendaHelper {
                             game.getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (willPrevote && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                boolean prevoteHeld =
+                        willPrevote && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (prevoteHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (willPrevote && !prevoteHeld) {
                     skippedMessage = realIdentity2 + " had logged a pre-vote.";
                     votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
                     game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
@@ -824,8 +836,12 @@ public final class AgendaHelper {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
                         + ", you are being skipped because the bot thinks you can't vote.";
                 String skipSource = skippedVoterSource(game, nextInLine);
-                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
-                        && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                boolean presetAbstention =
+                        game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction());
+                boolean abstentionHeld =
+                        presetAbstention && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (abstentionHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (presetAbstention && !abstentionHeld) {
                     skipSource = AgendaEvents.PRESET_ABSTENTION;
                     skippedMessage = realIdentity
                             + ", you are being skipped because you told the bot you wanted to preset an abstention.";
@@ -834,7 +850,10 @@ public final class AgendaHelper {
                             game.getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (willPrevote && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                boolean prevoteHeld =
+                        willPrevote && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (prevoteHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (willPrevote && !prevoteHeld) {
                     skippedMessage = realIdentity + " had logged a pre-vote.";
                     String votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
                     game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
@@ -1531,17 +1550,11 @@ public final class AgendaHelper {
     public static int[] getVoteTotal(Player player, Game game) {
         int hasXxchaAlliance = game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") ? 1 : 0;
         int hasXxchaHero = player.hasLeaderUnlocked("xxchahero") ? 1 : 0;
-        int voteCount = representativeGovernmentInEffect(game) ? 1 : getTotalVoteCount(game, player);
+        int voteCount = isRepresentativeGovernmentInEffect(game) ? 1 : getTotalVoteCount(game, player);
         if (cannotVoteReason(game, player) != null) {
             voteCount = 0;
         }
         return new int[] {voteCount, hasXxchaHero, hasXxchaAlliance};
-    }
-
-    private static boolean representativeGovernmentInEffect(Game game) {
-        return game.getLaws() != null
-                && game.getLaws().containsKey("rep_govt")
-                && game.getStoredValue("executiveOrder").isEmpty();
     }
 
     static String cannotVoteReason(Game game, Player player) {
@@ -1557,7 +1570,7 @@ public final class AgendaHelper {
             }
             if (missedStellarAtomics(game, player)) return "stellar atomics";
         }
-        if (!representativeGovernmentInEffect(game) && getVoteCountFromPlanets(game, player) == 0) {
+        if (!isRepresentativeGovernmentInEffect(game) && getVoteCountFromPlanets(game, player) == 0) {
             return "no planet votes";
         }
         return null;
@@ -2907,7 +2920,9 @@ public final class AgendaHelper {
             String agendaName2 = agendaName;
             while (!notEmergency) {
                 if ("Emergency Session".equalsIgnoreCase(agendaName2)) {
-                    game.revealAgenda(revealFromBottom);
+                    String emergencySession = game.revealAgenda(revealFromBottom);
+                    AgendaEvents.discardedOnReveal(
+                            game, emergencySession, aCount, revealFromBottom, action, AgendaEvents.EMERGENCY_SESSION);
                     MessageHelper.sendMessageToChannel(
                             channel,
                             game.getPing()
@@ -3542,8 +3557,12 @@ public final class AgendaHelper {
     }
 
     @ButtonHandler("resolveVeto")
-    public static void resolveVeto(ButtonInteractionEvent event, Game game) {
-        AgendaEvents.discarded(game, null, getCurrentAgendaId(game), AgendaEvents.VETO);
+    public static void resolveVeto(ButtonInteractionEvent event, Game game, Player player) {
+        discardRevealedAgenda(event, game, player, AgendaEvents.VETO);
+    }
+
+    public static void discardRevealedAgenda(ButtonInteractionEvent event, Game game, Player player, String reason) {
+        AgendaEvents.discarded(game, player, getCurrentAgendaId(game), reason);
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {
@@ -3626,7 +3645,7 @@ public final class AgendaHelper {
                 game.getMainGameChannel(),
                 (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained by "
                         + player.getRepresentationNoPing() + ".");
-        resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
+        resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2, AgendaEvents.FORCED_ABSTENTION);
     }
 
     @ButtonHandler("eraseMyVote")

@@ -52,7 +52,7 @@ public class BlueReverieArtifactRelicHandler {
                 game.getMainGameChannel(),
                 player.getRepresentationNoPing()
                         + " discarded _Cultural Artifact_. The revealed agenda is discarded and a new agenda is being revealed.");
-        AgendaHelper.resolveVeto(event, game);
+        AgendaHelper.discardRevealedAgenda(event, game, player, "cultural artifact");
     }
 
     public static void addHazardousArtifactCombatButton(List<Button> buttons, Player player, String tilePosition) {
