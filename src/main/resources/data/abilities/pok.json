@@ -83,7 +83,7 @@
         "id": "imperia",
         "name": "Imperia",
         "faction": "mahact",
-        "permanentEffect": "While another player's command token is in your fleet pool, you can use the ability of that player's commander, if it's unlocked.",
+        "permanentEffect": "While another player's command token is in your fleet pool, you can use the ability of that player's commander, if it is unlocked.",
         "source": "pok"
     },
     {
@@ -129,7 +129,7 @@
         "id": "coalescence",
         "name": "Coalescence",
         "faction": "titans",
-        "permanentEffect": "If your flagship or your AWAKEN faction ability places units into the same space area or onto the same planet as another player's units, your units must participate in combat during the \"Space Combat\" or \"Ground Combat\" steps.",
+        "permanentEffect": "If your flagship or your AWAKEN faction ability places your units into the same space area or onto the same planet as another player's units, your units must participate in combat during the \"Space Combat\" or \"Ground Combat\" steps.",
         "source": "pok",
         "shortName": "Coale-\nscence"
     },

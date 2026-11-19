@@ -50,7 +50,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "At the start of each round of space combat: You may spend 2 trade goods; you may reroll any number of your dice during this combat round.",
+        "text": "At the start of each round of space combat: You may spend 2 trade goods; you may re-roll any number of your dice during that combat round.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-munitions.png?raw=true",
         "source": "twilights_fall",
         "faction": "letnev"
