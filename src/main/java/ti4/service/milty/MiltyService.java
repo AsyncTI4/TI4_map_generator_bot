@@ -22,6 +22,7 @@ import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -242,7 +243,7 @@ public class MiltyService {
     static void initDraftOrder(MiltyDraftManager draftManager, List<String> playerIDs, boolean staticOrder) {
         List<String> players = new ArrayList<>(playerIDs);
         if (!staticOrder) {
-            Collections.shuffle(players);
+            Collections.shuffle(players, RandomHelper.current());
         }
 
         List<String> playersReversed = new ArrayList<>(players);
@@ -270,8 +271,8 @@ public class MiltyService {
             Map<ComponentSource, int[]> constraints) {
         if (constraints == null || constraints.isEmpty()) {
             List<String> randomOrder = new ArrayList<>(firstFactions);
-            Collections.shuffle(randomOrder);
-            Collections.shuffle(factions);
+            Collections.shuffle(randomOrder, RandomHelper.current());
+            Collections.shuffle(factions, RandomHelper.current());
             randomOrder.addAll(factions);
             List<String> output = new ArrayList<>();
             int i = 0;
@@ -312,7 +313,7 @@ public class MiltyService {
                 unconstrained.add(f);
             }
         }
-        for (List<String> pool : bySource.values()) Collections.shuffle(pool);
+        for (List<String> pool : bySource.values()) Collections.shuffle(pool, RandomHelper.current());
 
         // Apply effective min/max per source
         List<String> guaranteed = new ArrayList<>();
@@ -329,9 +330,9 @@ public class MiltyService {
                 // beyond effectiveMax: excluded from pool
             }
         }
-        Collections.shuffle(unconstrained);
+        Collections.shuffle(unconstrained, RandomHelper.current());
         available.addAll(unconstrained);
-        Collections.shuffle(available);
+        Collections.shuffle(available, RandomHelper.current());
 
         // Fill: priority already in output, then guaranteed, then available up to factionCount
         for (String g : guaranteed) {

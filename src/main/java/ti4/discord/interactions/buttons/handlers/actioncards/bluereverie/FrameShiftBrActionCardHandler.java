@@ -41,7 +41,10 @@ public class FrameShiftBrActionCardHandler {
 
     public static boolean isActive(Game game, Player player) {
         String activeSystem = game.getActiveSystem();
-        return player != null && activeSystem != null && activeSystem.equals(game.getStoredValue(getStateKey(player)));
+        return player != null
+                && activeSystem != null
+                && !activeSystem.isEmpty()
+                && activeSystem.equals(game.getStoredValue(getStateKey(player)));
     }
 
     public static void clear(Game game) {

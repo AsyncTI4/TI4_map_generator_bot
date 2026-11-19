@@ -3,7 +3,6 @@ package ti4.discord.interactions.buttons.handlers.faction.base.yin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -32,7 +32,7 @@ class YinSpinnerButtonHandler {
         String message = "Use buttons to drop 2 infantry on a planet or with your ships.";
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-        int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 11);
+        int randomJokeChance = RandomHelper.current().nextInt(1, 11);
         if (randomJokeChance == 10) {
             File audioFile = ResourceHelper.getFile("voices/yin/", "YinSpin.mp3");
             if (audioFile.exists()) {

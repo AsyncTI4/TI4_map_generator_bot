@@ -18,7 +18,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -85,6 +84,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerNeighbourGraph;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
@@ -859,11 +859,19 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if ("cloaked_fleets".equalsIgnoreCase(ability) && getTechs().contains("tf-shroudoflith")) {
             return true;
         }
-        if (getTechs().contains("tf-" + ability.replace("_", ""))) {
+        if (hasTwilightsFallTechFor(ability)) {
             return true;
         }
 
         return DeepgloomService.playerHasAccessToAbility(this, ability);
+    }
+
+    private boolean hasTwilightsFallTechFor(String ability) {
+        List<String> techs = getTechs();
+        for (String tech : techs) {
+            if (tech.startsWith("tf-")) return techs.contains("tf-" + ability.replace("_", ""));
+        }
+        return false;
     }
 
     public boolean addExhaustedAbility(String ability) {
@@ -973,9 +981,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
             return;
         }
         Collection<Integer> values = getHydromorphicCardsRaw().values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         getHydromorphicCardsRaw().put(id, identifier);
     }
@@ -1025,9 +1033,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (getPlotCardsRaw().containsKey(id)) return;
 
         Collection<Integer> values = getPlotCardsRaw().values();
-        int identifier = ThreadLocalRandom.current().nextInt(100);
+        int identifier = RandomHelper.current().nextInt(100);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(100);
+            identifier = RandomHelper.current().nextInt(100);
         }
         getPlotCardsRaw().put(id, identifier);
     }
@@ -1269,9 +1277,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public void setActionCard(String id) {
         Set<Integer> values = getReservedActionCardIdentifiers();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         actionCards.put(id, identifier);
         if ("tf-stasis".equals(id)) {
@@ -1287,18 +1295,18 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public void setEvent(String id) {
         Collection<Integer> values = events.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         events.put(id, identifier);
     }
 
     public void setTrapCard(String id) {
         Collection<Integer> values = trapCards.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         trapCards.put(id, identifier);
     }
@@ -1336,9 +1344,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public void setPromissoryNote(String id) {
         Collection<Integer> values = promissoryNotes.values();
-        int identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
+        int identifier = RandomHelper.current().nextInt(values.size() < 80 ? 100 : 1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(values.size() < 80 ? 100 : 1000);
+            identifier = RandomHelper.current().nextInt(values.size() < 80 ? 100 : 1000);
         }
         promissoryNotes.put(id, identifier);
     }
@@ -1361,7 +1369,7 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         Set<Integer> values = getReservedActionCardIdentifiers();
         int identifier2 = identifier;
         while (values.contains(identifier2)) {
-            identifier2 = ThreadLocalRandom.current().nextInt(1000);
+            identifier2 = RandomHelper.current().nextInt(1000);
         }
         actionCards.put(id, identifier2);
     }
@@ -1445,9 +1453,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
         Collection<Integer> values = secrets.values();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         secrets.put(id, identifier);
     }
@@ -1503,9 +1511,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         List<Integer> allIDs = game.getPlayers().values().stream()
                 .flatMap(player -> player.secretsScored.values().stream())
                 .toList();
-        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        int identifier = RandomHelper.current().nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
+            identifier = RandomHelper.current().nextInt(1000);
         }
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");

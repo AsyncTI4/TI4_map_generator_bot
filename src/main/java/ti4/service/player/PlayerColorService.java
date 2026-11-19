@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.game.Player;
 import ti4.helpers.ColorChangeHelper;
+import ti4.helpers.RandomHelper;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.Mapper;
@@ -46,7 +47,7 @@ public class PlayerColorService {
         FactionModel factionModel = Mapper.getFaction(faction);
         if (factionModel == null) return null;
         List<String> preferredColors = new ArrayList<>(factionModel.getPreferredColours());
-        Collections.shuffle(preferredColors);
+        Collections.shuffle(preferredColors, RandomHelper.current());
         return preferredColors.stream()
                 .filter(color -> unusedColors.contains(Mapper.getColor(color)))
                 .filter(color -> !overlapsUsedCategories(Mapper.getColor(color), usedCategories))

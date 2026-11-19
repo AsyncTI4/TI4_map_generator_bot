@@ -1,6 +1,7 @@
 package ti4.service.tech;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -588,9 +589,9 @@ public class ListTechService {
             boolean deepwroughtbt,
             boolean hasToBeResearchable,
             boolean deepwroughthero) {
+        Set<String> technologyDeck = new HashSet<>(game.getTechnologyDeck());
         List<TechnologyModel> validTechs = Mapper.getTechs().values().stream()
-                .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))
-                .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
+                .filter(tech -> technologyDeck.contains(tech.getAlias()))
                 .filter(tech -> !(tech.getFaction().isPresent() && deepwroughtbt))
                 .filter(tech -> !(tech.getTypes().contains(TechnologyType.UNITUPGRADE) && deepwroughtbt))
                 .filter(tech -> tech.isType(techType)
@@ -601,6 +602,7 @@ public class ListTechService {
                         || "".equalsIgnoreCase(tech.getFaction().get())
                         || (deepwroughthero && player.hasTech(tech.getAlias()))
                         || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+                .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))
                 .toList();
 
         List<TechnologyModel> techs2 = new ArrayList<>();

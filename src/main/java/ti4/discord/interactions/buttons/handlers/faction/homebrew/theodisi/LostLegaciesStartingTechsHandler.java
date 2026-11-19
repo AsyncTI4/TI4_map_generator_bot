@@ -13,6 +13,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
@@ -234,7 +235,7 @@ public class LostLegaciesStartingTechsHandler {
 
     public static void gainRandomScrapyardStartTechs(Game game, Player player) {
         List<TechnologyModel> randomTechs = new ArrayList<>(eligibleTechnologies(game, player, 0));
-        Collections.shuffle(randomTechs);
+        Collections.shuffle(randomTechs, RandomHelper.current());
         randomTechs = randomTechs.stream().limit(3).toList();
 
         for (TechnologyModel tech : randomTechs) {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -13,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -209,8 +209,8 @@ public class MiltyRandomSetupService {
         for (int attempt = 0; attempt < TRUE_RANDOM_GALAXY_MAX_ATTEMPTS; attempt++) {
             List<MiltyDraftTile> blue = new ArrayList<>(draftManager.getBlue());
             List<MiltyDraftTile> red = new ArrayList<>(draftManager.getRed());
-            Collections.shuffle(blue);
-            Collections.shuffle(red);
+            Collections.shuffle(blue, RandomHelper.current());
+            Collections.shuffle(red, RandomHelper.current());
             draftManager.clearSlices();
 
             boolean success = true;
@@ -246,7 +246,7 @@ public class MiltyRandomSetupService {
     }
 
     private static MiltyDraftTile drawAgeOfExplorationTile(List<MiltyDraftTile> blue, List<MiltyDraftTile> red) {
-        boolean rollRed = ThreadLocalRandom.current().nextInt(1, 11) <= AGE_OF_EXPLORATION_RED_ROLL_MAX;
+        boolean rollRed = RandomHelper.current().nextInt(1, 11) <= AGE_OF_EXPLORATION_RED_ROLL_MAX;
         List<MiltyDraftTile> preferred = rollRed ? red : blue;
         List<MiltyDraftTile> fallback = rollRed ? blue : red;
         if (!preferred.isEmpty()) {
@@ -304,7 +304,7 @@ public class MiltyRandomSetupService {
         }
 
         List<RandomGalacticEvent> events = new ArrayList<>(RANDOM_GALACTIC_EVENTS);
-        Collections.shuffle(events);
+        Collections.shuffle(events, RandomHelper.current());
         List<RandomGalacticEvent> selected =
                 events.stream().limit(Math.min(randomEventCount, events.size())).toList();
         for (RandomGalacticEvent selectedEvent : selected) {
@@ -334,9 +334,9 @@ public class MiltyRandomSetupService {
         int fewestCatastrophes = Integer.MAX_VALUE;
 
         for (int attempt = 0; attempt < 200; attempt++) {
-            Collections.shuffle(slices);
-            Collections.shuffle(factions);
-            Collections.shuffle(positions);
+            Collections.shuffle(slices, RandomHelper.current());
+            Collections.shuffle(factions, RandomHelper.current());
+            Collections.shuffle(positions, RandomHelper.current());
 
             int catastrophes = countCatastrophes(specs, slices, factions, positions);
             if (catastrophes < fewestCatastrophes) {
@@ -404,7 +404,7 @@ public class MiltyRandomSetupService {
         if (valid.isEmpty()) {
             valid.addAll(List.of("mentak", "xxcha", "argent"));
         }
-        Collections.shuffle(valid);
+        Collections.shuffle(valid, RandomHelper.current());
         game.setStoredValue("keleresFlavorPreset", valid.getFirst());
     }
 

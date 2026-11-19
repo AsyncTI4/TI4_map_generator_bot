@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1330,6 +1329,9 @@ public final class ButtonHelperFactionSpecific {
                         + ", please use these buttons to put a Plot card into play with a control token from the faction whose secret you just scored.");
     }
 
+    // TODO: getPlaceUnitButtons resets produced units, so pressing this mid-build drops the unfinished main build's
+    // tally: those units stay on the board unpaid (an AI seat then re-placed them in a loop). Keep or restore the
+    // tally.
     @ButtonHandler("solBtBuild_")
     public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         player.addSpentThing(buttonID);
@@ -1728,7 +1730,7 @@ public final class ButtonHelperFactionSpecific {
             unitHolder.addDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+        int randomJokeChance = RandomHelper.current().nextInt(1, 6);
         if (randomJokeChance == 5) {
             File audioFile = ResourceHelper.getFile("voices/nomad/", "Cavalry.mp3");
             if (audioFile.exists()) {
@@ -5411,6 +5413,7 @@ public final class ButtonHelperFactionSpecific {
                         + " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1)
                         + ").");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
+        AgendaHistory.recordQuashed(game, defaultString(AgendaHelper.getCurrentAgendaId(game)));
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {

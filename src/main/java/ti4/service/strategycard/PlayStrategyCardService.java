@@ -40,6 +40,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.TeHelperTechs;
@@ -1328,7 +1329,7 @@ public class PlayStrategyCardService {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         List<Player> players = new ArrayList<>(game.getRealPlayers());
         if (game.isFowMode()) {
-            Collections.shuffle(players);
+            Collections.shuffle(players, RandomHelper.current());
         }
         String politicsGroup =
                 MegagameGroupService.isActive(game) ? MegagameGroupService.groupOf(game, politicsHolder) : null;

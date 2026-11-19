@@ -17,6 +17,7 @@ import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.ActionCardModel;
@@ -74,7 +75,7 @@ public class MonumentsService {
                 .toList();
         if (!actionCards.isEmpty()) {
             game.getActionCards().addAll(actionCards);
-            Collections.shuffle(game.getActionCards());
+            Collections.shuffle(game.getActionCards(), RandomHelper.current());
         }
 
         List<String> secretObjectives = Mapper.getSecretObjectives().values().stream()
@@ -84,7 +85,7 @@ public class MonumentsService {
                 .toList();
         if (!secretObjectives.isEmpty()) {
             game.getSecretObjectives().addAll(secretObjectives);
-            Collections.shuffle(game.getSecretObjectives());
+            Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
         }
 
         List<String> agendas = Mapper.getAgendas().values().stream()
@@ -94,7 +95,7 @@ public class MonumentsService {
                 .toList();
         if (!agendas.isEmpty()) {
             game.getAgendas().addAll(agendas);
-            Collections.shuffle(game.getAgendas());
+            Collections.shuffle(game.getAgendas(), RandomHelper.current());
         }
     }
 
@@ -113,7 +114,7 @@ public class MonumentsService {
                 .toList();
         if (!secretObjectives.isEmpty()) {
             game.getSecretObjectives().addAll(secretObjectives);
-            Collections.shuffle(game.getSecretObjectives());
+            Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
         }
     }
 

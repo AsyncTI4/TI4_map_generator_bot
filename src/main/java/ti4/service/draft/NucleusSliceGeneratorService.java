@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,6 +17,7 @@ import ti4.game.Planet;
 import ti4.game.Tile;
 import ti4.helpers.DistanceTool;
 import ti4.helpers.ListHelper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
@@ -188,10 +188,10 @@ public class NucleusSliceGeneratorService {
         numMapLegendaries = Math.min(numMapLegendaries, legendaryTiles.size());
         numNucleusLegendaries = Math.min(numNucleusLegendaries, numMapLegendaries);
 
-        Collections.shuffle(alphaTiles);
-        Collections.shuffle(betaTiles);
-        Collections.shuffle(legendaryTiles);
-        Collections.shuffle(nucleusTiles);
+        Collections.shuffle(alphaTiles, RandomHelper.current());
+        Collections.shuffle(betaTiles, RandomHelper.current());
+        Collections.shuffle(legendaryTiles, RandomHelper.current());
+        Collections.shuffle(nucleusTiles, RandomHelper.current());
 
         DistanceTool distanceTool = new DistanceTool(game);
 
@@ -213,7 +213,7 @@ public class NucleusSliceGeneratorService {
 
         List<MiltyDraftTile> availableTiles = new ArrayList<>(
                 tileManager.filterAll(tile -> allPlacedTiles.stream().noneMatch(pt -> pt.draftTile.equals(tile))));
-        Collections.shuffle(availableTiles);
+        Collections.shuffle(availableTiles, RandomHelper.current());
         List<MiltyDraftSlice> playerSlices = generatePlayerSlices(
                 tileManager,
                 numPlayerSlices,
@@ -231,7 +231,7 @@ public class NucleusSliceGeneratorService {
         // Remove wormholes and legendaries that weren't placed as required tiles
         availableTiles.removeIf(t -> t.isHasAlphaWH() || t.isHasBetaWH() || t.isLegendary());
 
-        Collections.shuffle(availableTiles);
+        Collections.shuffle(availableTiles, RandomHelper.current());
         Map<TierList, List<MiltyDraftTile>> tieredAvailableTiles =
                 tierTiles(tileManager, new ArrayList<>(availableTiles));
         List<List<MapTemplateTile>> coreSliceLocations = new ArrayList<>();
@@ -629,7 +629,7 @@ public class NucleusSliceGeneratorService {
                 BotLogger.warning("Mismatched slice location and tier list sizes in fillNucleus");
                 return false;
             }
-            Collections.shuffle(sliceTiers);
+            Collections.shuffle(sliceTiers, RandomHelper.current());
 
             // First, iterate through each location to see what already has something placed
             List<MapTemplateTile> unplacedLocations = new ArrayList<>();
@@ -752,7 +752,7 @@ public class NucleusSliceGeneratorService {
                     MiltyDraftTile chosenTile = null;
                     // Prefer tiles by suitability, but allow some randomness
                     for (MiltyDraftTile candidate : candidateTiles) {
-                        if (ThreadLocalRandom.current().nextFloat() > CORE_FILL_VOLATILITY) {
+                        if (RandomHelper.current().nextFloat() > CORE_FILL_VOLATILITY) {
                             chosenTile = candidate;
                             break;
                         }
@@ -788,12 +788,12 @@ public class NucleusSliceGeneratorService {
         List<List<TierList>> slicesAsTierLists = new ArrayList<>();
         for (int i = 0; i < numPlayerSlices; i++) {
             List<TierList> sliceTiers = getRandomTierPicks(sliceSize);
-            Collections.shuffle(sliceTiers);
+            Collections.shuffle(sliceTiers, RandomHelper.current());
             slicesAsTierLists.add(sliceTiers);
         }
 
         // Get a random selection of tiles to satisfy our required counts
-        Collections.shuffle(availableSystems);
+        Collections.shuffle(availableSystems, RandomHelper.current());
         List<MiltyDraftTile> alphaTiles =
                 ListHelper.removeByPredicate(availableSystems, MiltyDraftTile::isHasAlphaWH, numAlphas);
         List<MiltyDraftTile> betaTiles =
@@ -814,7 +814,7 @@ public class NucleusSliceGeneratorService {
         List<MiltyDraftTile> fillerTiles = new ArrayList<>(availableSystems);
         // Remove any leftover 'required' tile types
         fillerTiles.removeIf(t -> t.isHasAlphaWH() || t.isHasBetaWH() || t.isLegendary());
-        Collections.shuffle(fillerTiles);
+        Collections.shuffle(fillerTiles, RandomHelper.current());
         Map<TierList, List<MiltyDraftTile>> tieredFillerTiles = tierTiles(tileManager, fillerTiles);
 
         // Initialize slices
@@ -885,11 +885,11 @@ public class NucleusSliceGeneratorService {
         // Our success criteria is that we've placed all required tiles at this point.
         if (requiredTiles.isEmpty()) {
             int i = 0;
-            Collections.shuffle(slices);
+            Collections.shuffle(slices, RandomHelper.current());
             for (MiltyDraftSlice slice : slices) {
                 slice.setName(String.valueOf((char) ('A' + i)));
                 i++;
-                Collections.shuffle(slice.getTiles());
+                Collections.shuffle(slice.getTiles(), RandomHelper.current());
             }
 
             return slices;
@@ -951,7 +951,7 @@ public class NucleusSliceGeneratorService {
         // Other tiers go in shuffled, then come out shuffled. But since
         // we append red and anomaly tiers together, we need to shuffle them now.
         List<MiltyDraftTile> redTiles = new ArrayList<>(result.get(TierList.red));
-        Collections.shuffle(redTiles);
+        Collections.shuffle(redTiles, RandomHelper.current());
         result.put(TierList.red, redTiles);
 
         return result;
@@ -1022,8 +1022,8 @@ public class NucleusSliceGeneratorService {
             List<PlacedTile> candidate = new ArrayList<>();
             List<MapTemplateTile> locations = new LinkedList<>(availableLocations);
             List<MiltyDraftTile> systems = new LinkedList<>(availableSystems);
-            Collections.shuffle(locations);
-            Collections.shuffle(systems);
+            Collections.shuffle(locations, RandomHelper.current());
+            Collections.shuffle(systems, RandomHelper.current());
 
             for (int i = 0; i < numPicks; i++) {
                 MapTemplateTile location = locations.removeLast();

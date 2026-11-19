@@ -17,6 +17,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.adjacency.Adjacency;
 import ti4.image.io.ImageHelper;
 import ti4.image.io.ImageUploads;
@@ -99,7 +100,7 @@ public class RoundOneService {
         }
         if (game.isCulturalExchangeProgramMode()) {
             List<String> factions = new ArrayList<>(game.getRealFactions());
-            Collections.shuffle(factions);
+            Collections.shuffle(factions, RandomHelper.current());
             factions.remove("firmament");
             for (Player player : game.getRealPlayers()) {
                 if ("firmament".equalsIgnoreCase(player.getFaction())) {
@@ -148,7 +149,7 @@ public class RoundOneService {
 
             if (player.hasAbility("questing_prince")) {
                 List<Player> others = new ArrayList<>(game.getRealPlayersExcludingThis(player));
-                Collections.shuffle(others);
+                Collections.shuffle(others, RandomHelper.current());
                 Tile rex = game.getMecatolTile();
                 for (int i = 0; i < others.size(); i++) {
                     Player target = others.get(i);

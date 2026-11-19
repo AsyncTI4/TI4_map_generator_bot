@@ -131,6 +131,11 @@ class GameSaveService {
     }
 
     static void writeGame(Game game, Writer writer) throws IOException {
+        game.setLastModifiedDate(System.currentTimeMillis());
+        writeSnapshot(game, writer);
+    }
+
+    static void writeSnapshot(Game game, Writer writer) throws IOException {
         writer.write(game.getOwnerID());
         writer.write(System.lineSeparator());
         writer.write(game.getOwnerName());
@@ -410,9 +415,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
         writer.write(System.lineSeparator());
-        long time = System.currentTimeMillis();
-        game.setLastModifiedDate(time);
-        writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
+        writer.write(Constants.LAST_MODIFIED_DATE + " " + game.getLastModifiedDate());
         writer.write(System.lineSeparator());
         writer.write(Constants.ENDED_DATE + " " + game.getEndedDate());
         writer.write(System.lineSeparator());

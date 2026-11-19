@@ -12,6 +12,7 @@ import lombok.Data;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.service.info.ListPlayerInfoService;
@@ -171,7 +172,10 @@ public class WebObjectives {
             return null;
         }
 
-        String displayKey = revealed ? key : "UNREVEALED_" + String.format("%04d", (int) (Math.random() * 10_000));
+        String displayKey = revealed
+                ? key
+                : "UNREVEALED_"
+                        + String.format("%04d", (int) (RandomHelper.current().nextDouble() * 10_000));
         String name = revealed ? po.getName() : "UNREVEALED";
         int pointValue = po.getPoints();
 

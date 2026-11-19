@@ -5,18 +5,19 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -35,6 +36,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
+import ti4.discord.interactions.buttons.handlers.combat.SpaceCannonDefenceHitButtons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
@@ -99,6 +101,7 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -179,6 +182,16 @@ public class CombatRollService {
                     + " to decide whether to cancel hits and place mine tokens before assigning hits.";
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, assignmentMessage, buttons);
+    }
+
+    public void sendSpaceCannonDefenceHitAssignment(
+            Game game, Player player, Player opponent, Tile tile, Planet planet, int hits, MessageChannel channel) {
+        String message = opponent.getRepresentationNoPing() + ", assign the SPACE CANNON DEFENCE hit"
+                + (hits == 1 ? "" : "s") + "."
+                + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
+                        game, player, CombatRollType.SpaceCannonDefence);
+        MessageHelper.sendMessageToChannelWithButtons(
+                channel, message, SpaceCannonDefenceHitButtons.beforeACancel(opponent, tile, planet.getName(), hits));
     }
 
     public void sendGroundCombatHitAssignment(
@@ -320,7 +333,7 @@ public class CombatRollService {
         if (selectedUnit == null || sourceUnitHolder == null || targetPlayer == null) {
             return 0;
         }
-        Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits = new HashMap<>();
+        Map<Pair<UnitModel, UnitHolder>, Integer> selectedUnits = new LinkedHashMap<>();
         selectedUnits.put(new ImmutablePair<>(selectedUnit, sourceUnitHolder), 1);
         return secondHalfOfCombatRoll(
                 player,
@@ -487,7 +500,7 @@ public class CombatRollService {
                             player, entry.getKey().getRight(), entry.getKey().getLeft()));
         }
         if (selectedUnits != null) {
-            playerUnitsByQuantity = new HashMap<>(selectedUnits);
+            playerUnitsByQuantity = new LinkedHashMap<>(selectedUnits);
             if (rollType != CombatRollType.combatround) {
                 playerUnitsByQuantity
                         .entrySet()
@@ -567,7 +580,7 @@ public class CombatRollService {
             List<BombardmentAssignment> assignedUnits = JsonMapperManager.basic()
                     .readValue(
                             game.getStoredValue("assignedBombardment" + player.getFaction()), new TypeReference<>() {});
-            Map<String, Integer> remainingAssignedByAsyncId = new HashMap<>();
+            Map<String, Integer> remainingAssignedByAsyncId = new LinkedHashMap<>();
             for (BombardmentAssignment assignedUnit : assignedUnits) {
                 if (assignedUnit.planet().equals(bombardPlanet) && assignedUnit.sourceId() != null) {
                     String asyncId = assignedUnit.sourceId();
@@ -599,10 +612,10 @@ public class CombatRollService {
         if (ButtonHelper.isLawInPlay(game, "articles_war")) {
             if (playerUnitsByQuantity.keySet().stream()
                     .anyMatch(pair -> "naaz_mech_space".equals(pair.getLeft().getAlias()))) {
-                playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
+                playerUnitsByQuantity = new LinkedHashMap<>(playerUnitsByQuantity.entrySet().stream()
                         .filter(e ->
                                 !"naaz_mech_space".equals(e.getKey().getLeft().getAlias()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                        .collect(orderedToMap(Map.Entry::getKey, Map.Entry::getValue)));
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Skipping Z-Grav Eidolon (Naaz-Rokha mech) combat rolls due to _Articles of War_.");
@@ -610,10 +623,10 @@ public class CombatRollService {
             if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
                 if (playerUnitsByQuantity.keySet().stream()
                         .anyMatch(pair -> "xxcha_mech".equals(pair.getLeft().getAlias()))) {
-                    playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
+                    playerUnitsByQuantity = new LinkedHashMap<>(playerUnitsByQuantity.entrySet().stream()
                             .filter(e ->
                                     !"xxcha_mech".equals(e.getKey().getLeft().getAlias()))
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                            .collect(orderedToMap(Map.Entry::getKey, Map.Entry::getValue)));
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "Skipping Indomitus (Xxcha mech) SPACE CANNON rolls due to _Articles of War_.");
@@ -622,10 +635,10 @@ public class CombatRollService {
             if (rollType == CombatRollType.bombardment) {
                 if (playerUnitsByQuantity.keySet().stream()
                         .anyMatch(pair -> "l1z1x_mech".equals(pair.getLeft().getAlias()))) {
-                    playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
+                    playerUnitsByQuantity = new LinkedHashMap<>(playerUnitsByQuantity.entrySet().stream()
                             .filter(e ->
                                     !"l1z1x_mech".equals(e.getKey().getLeft().getAlias()))
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                            .collect(orderedToMap(Map.Entry::getKey, Map.Entry::getValue)));
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             "Skipping Annihilator (L1Z1X mech) BOMBARDMENT rolls due to _Articles of War_.");
@@ -635,7 +648,7 @@ public class CombatRollService {
 
         StringBuilder powerWordWishCombatNote = new StringBuilder();
         if (rollType == CombatRollType.combatround) {
-            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new HashMap<>();
+            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new LinkedHashMap<>();
             for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnitsByQuantity.entrySet()) {
                 UnitModel unit = entry.getKey().getLeft();
                 UnitHolder holder = entry.getKey().getRight();
@@ -665,7 +678,7 @@ public class CombatRollService {
 
         StringBuilder unitUpgradeRollNote = new StringBuilder();
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kryxoscommander")) {
-            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new HashMap<>();
+            Map<Pair<UnitModel, UnitHolder>, Integer> adjustedUnits = new LinkedHashMap<>();
 
             for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : playerUnitsByQuantity.entrySet()) {
                 UnitModel unit = entry.getKey().getLeft();
@@ -728,7 +741,7 @@ public class CombatRollService {
                 getUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
-        Map<UnitModel, Integer> playerUnitsFlat = new HashMap<>();
+        Map<UnitModel, Integer> playerUnitsFlat = new LinkedHashMap<>();
         playerUnitsByQuantity.forEach((k, v) -> playerUnitsFlat.merge(k.getLeft(), v, Integer::sum));
         List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(
                 player,
@@ -789,6 +802,8 @@ public class CombatRollService {
             }
         }
 
+        // TODO Bunker's -4 waits in the defender's new temp mods until the defender rolls, so it probably never
+        // reaches the attacker's bombardment.
         // Check for temp mods
         CombatTempModHelper.ensureValidTempMods(player, tileModel, combatOnHolder);
         CombatTempModHelper.initializeNewTempMods(player, tileModel, combatOnHolder);
@@ -1296,22 +1311,9 @@ public class CombatRollService {
         }
 
         if (rollType == CombatRollType.SpaceCannonDefence && h > 0 && opponent != player) {
-            if (player.hasTech("sfg") && combatOnHolder instanceof Planet planet) {
-                List<Button> buttons = List.of(
-                        Buttons.green(
-                                opponent.factionButtonChecker()
-                                        + AutoAssignGroundHitsButtonIds.format(planet.getName(), h),
-                                "Auto-assign Hit" + (h == 1 ? "" : "s")),
-                        Buttons.red(
-                                "getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat",
-                                "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel(),
-                        opponent.getRepresentationNoPing() + ", assign the SPACE CANNON DEFENCE hit"
-                                + (h == 1 ? "" : "s") + "."
-                                + BlueReverieTechHelper.getStasisFieldGeneratorsHitAssignmentReminder(
-                                        game, player, rollType),
-                        buttons);
+            if (combatOnHolder instanceof Planet planet) {
+                MessageChannel channel = game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel();
+                sendSpaceCannonDefenceHitAssignment(game, player, opponent, tile, planet, h, channel);
             }
             List<Button> stingOfTheHiveButtons = XytherisAbilityHandler.getStingOfTheHiveHitReplacementButtons(
                     game, player, tile, CombatRollType.SpaceCannonDefence, opponent, h);
@@ -1586,7 +1588,7 @@ public class CombatRollService {
             GenericInteractionCreateEvent event,
             Tile activeSystem,
             UnitHolder unitHolder) {
-        Map<Pair<UnitModel, UnitHolder>, Integer> playerUnits = new HashMap<>();
+        Map<Pair<UnitModel, UnitHolder>, Integer> playerUnits = new LinkedHashMap<>();
         playerUnitsFlat.forEach((model, count) -> playerUnits.put(new ImmutablePair<>(model, unitHolder), count));
         return rollForUnitsWithResult(
                         playerUnits,
@@ -1629,7 +1631,7 @@ public class CombatRollService {
         modAndExtraRolls.addAll(extraRolls);
         Set<NamedCombatModifierModel> set = new HashSet<>(modAndExtraRolls);
         List<NamedCombatModifierModel> uniqueList = new ArrayList<>(set);
-        Map<UnitModel, Integer> playerUnitsFlat = new HashMap<>();
+        Map<UnitModel, Integer> playerUnitsFlat = new LinkedHashMap<>();
         playerUnits.forEach((k, v) -> playerUnitsFlat.merge(k.getLeft(), v, Integer::sum));
         result += CombatMessageHelper.displayModifiers("With modifiers: \n", playerUnitsFlat, uniqueList);
         payloadBuilder.addModifierDisplays(
@@ -2852,7 +2854,7 @@ public class CombatRollService {
             List<UnitModel> playerUnits = new ArrayList<>(units.keySet());
             for (NamedCombatModifierModel namedModifier : namedModifiers) {
                 CombatModifierModel modifier = namedModifier.getModifier();
-                Map<String, Integer> effectiveValues = new HashMap<>();
+                Map<String, Integer> effectiveValues = new LinkedHashMap<>();
                 for (Map.Entry<UnitModel, Integer> unitEntry : units.entrySet()) {
                     UnitModel unit = unitEntry.getKey();
                     int effectiveValue = CombatModHelper.getCombinedModifierForUnit(
@@ -3046,7 +3048,7 @@ public class CombatRollService {
         Map<Pair<UnitModel, UnitHolder>, Integer> units =
                 unitsBeforeDisable(tile, unitHolder, player, event, roleType, game);
         if (roleType == CombatRollType.SpaceCannonOffence || roleType == CombatRollType.SpaceCannonDefence) {
-            units = new HashMap<>(units);
+            units = new LinkedHashMap<>(units);
             units.keySet().removeIf(entry -> DisableService.losesPdsAbilities(game, tile, player, entry.getLeft()));
         }
         return units;
@@ -3062,13 +3064,13 @@ public class CombatRollService {
         Planet unitHolderPlanet = unitHolder instanceof Planet p ? p : null;
         return switch (roleType) {
             case combatround -> {
-                Map<Pair<UnitModel, UnitHolder>, Integer> result = new HashMap<>();
+                Map<Pair<UnitModel, UnitHolder>, Integer> result = new LinkedHashMap<>();
                 getCombatRoundUnits(tile, unitHolder, player, event)
                         .forEach((model, count) -> result.put(new ImmutablePair<>(model, unitHolder), count));
                 yield result;
             }
             case SpaceCannonDefence -> {
-                Map<Pair<UnitModel, UnitHolder>, Integer> result = new HashMap<>();
+                Map<Pair<UnitModel, UnitHolder>, Integer> result = new LinkedHashMap<>();
                 getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event)
                         .forEach((model, count) -> result.put(new ImmutablePair<>(model, unitHolder), count));
                 yield result;
@@ -3086,7 +3088,7 @@ public class CombatRollService {
             GenericInteractionCreateEvent event,
             CombatRollType roleType,
             Game game) {
-        Map<UnitModel, Integer> result = new HashMap<>();
+        Map<UnitModel, Integer> result = new LinkedHashMap<>();
         getUnitsInCombatByHolder(tile, unitHolder, player, event, roleType, game)
                 .forEach((key, value) -> result.merge(key.getLeft(), value, Integer::sum));
         return result;
@@ -3109,10 +3111,10 @@ public class CombatRollService {
         String colorID = Mapper.getColorID(player.getColor());
         UnitHolder spaceHolder = tile.getUnitHolders().get("space");
 
-        Map<String, Integer> unitsByAsyncId = new HashMap<>();
-        Map<Pair<UnitModel, UnitHolder>, Integer> output = new HashMap<>();
+        Map<String, Integer> unitsByAsyncId = new LinkedHashMap<>();
+        Map<Pair<UnitModel, UnitHolder>, Integer> output = new LinkedHashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            Map<String, Integer> holderUnits = new HashMap<>();
+            Map<String, Integer> holderUnits = new LinkedHashMap<>();
             getUnitsOnHolderByAsyncId(colorID, holderUnits, unitHolder);
             holderUnits.forEach((k, v) -> unitsByAsyncId.merge(k, v, Integer::sum));
             for (var entry : holderUnits.entrySet()) {
@@ -3129,7 +3131,7 @@ public class CombatRollService {
                     .forEach((model, count) -> output.put(new ImmutablePair<>(model, spaceHolder), count));
         }
         addBestAdjacentSalvageDestroyerAfb(game, tile, player, output);
-        Map<UnitModel, Integer> flatOutput = new HashMap<>();
+        Map<UnitModel, Integer> flatOutput = new LinkedHashMap<>();
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
 
@@ -3167,7 +3169,7 @@ public class CombatRollService {
                         == bestAfbScore)
                 .toList();
         Pair<UnitModel, UnitHolder> selected =
-                bestCandidates.get(ThreadLocalRandom.current().nextInt(bestCandidates.size()));
+                bestCandidates.get(RandomHelper.current().nextInt(bestCandidates.size()));
         output.merge(selected, 1, Integer::sum);
     }
 
@@ -3175,7 +3177,7 @@ public class CombatRollService {
         return unitsByAsyncId.entrySet().stream()
                 .map(entry ->
                         new ImmutablePair<>(player.getPriorityUnitByAsyncID(entry.getKey(), null), entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                .collect(orderedToMap(Pair::getLeft, Pair::getRight));
     }
 
     private static void getUnitsOnHolderByAsyncId(
@@ -3231,19 +3233,18 @@ public class CombatRollService {
             Tile tile, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         UnitHolder spaceHolder = tile.getUnitHolders().get("space");
-        Map<String, Integer> unitsByAsyncId = new HashMap<>();
+        Map<String, Integer> unitsByAsyncId = new LinkedHashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             getUnitsOnHolderByAsyncId(colorID, unitsByAsyncId, unitHolder);
         }
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
-        Map<Pair<UnitModel, UnitHolder>, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
+        Map<Pair<UnitModel, UnitHolder>, Integer> output = new LinkedHashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount(player) > 0)
-                .collect(Collectors.toMap(
-                        entry -> new ImmutablePair<>(entry.getKey(), spaceHolder), Map.Entry::getValue)));
+                .collect(orderedToMap(entry -> new ImmutablePair<>(entry.getKey(), spaceHolder), Map.Entry::getValue)));
         XytherisAbilityHandler.getBestHiveEchoUnit(tile, player, CombatRollType.bombardment)
                 .ifPresent(unit -> output.putIfAbsent(unit, 1));
-        Map<UnitModel, Integer> flatOutput = new HashMap<>();
+        Map<UnitModel, Integer> flatOutput = new LinkedHashMap<>();
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
         if (player.getGame() != null && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "kaloracommander")) {
@@ -3257,9 +3258,9 @@ public class CombatRollService {
         Game game = player.getGame();
         String colorID = Mapper.getColorID(player.getColor());
 
-        Map<String, Integer> unitsByAsyncId = new HashMap<>();
+        Map<String, Integer> unitsByAsyncId = new LinkedHashMap<>();
         if (planet == null) {
-            return new HashMap<>();
+            return new LinkedHashMap<>();
         }
 
         Map<String, Integer> unitsOnHolderByAsyncId = planet.getUnitAsyncIdsOnHolder(colorID);
@@ -3274,7 +3275,7 @@ public class CombatRollService {
         Map<UnitModel, Integer> unitsOnPlanet = unitsByAsyncId.entrySet().stream()
                 .map(entry ->
                         new ImmutablePair<>(player.getPriorityUnitByAsyncID(entry.getKey(), null), entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                .collect(orderedToMap(Pair::getLeft, Pair::getRight));
 
         for (Map.Entry<UnitKey, Integer> unitEntry : planet.getUnits().entrySet()) {
             Player structureOwner =
@@ -3318,9 +3319,9 @@ public class CombatRollService {
             }
         }
 
-        Map<UnitModel, Integer> output = new HashMap<>(unitsOnPlanet.entrySet().stream()
+        Map<UnitModel, Integer> output = new LinkedHashMap<>(unitsOnPlanet.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player) > 0)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                .collect(orderedToMap(Map.Entry::getKey, Map.Entry::getValue)));
 
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -3332,12 +3333,12 @@ public class CombatRollService {
         String colorID = Mapper.getColorID(player.getColor());
         UnitHolder spaceHolder = tile.getUnitHolders().get("space");
 
-        Map<String, Integer> unitsByAsyncId = new HashMap<>();
-        Map<Pair<UnitModel, UnitHolder>, Integer> unitsOnTile = new HashMap<>();
+        Map<String, Integer> unitsByAsyncId = new LinkedHashMap<>();
+        Map<Pair<UnitModel, UnitHolder>, Integer> unitsOnTile = new LinkedHashMap<>();
 
         Collection<UnitHolder> unitHolders = tile.getUnitHolders().values();
         for (UnitHolder unitHolder : unitHolders) {
-            Map<String, Integer> holderUnits = new HashMap<>();
+            Map<String, Integer> holderUnits = new LinkedHashMap<>();
             getUnitsOnHolderByAsyncIdForSpaceCannon(colorID, holderUnits, unitHolder, player);
             holderUnits.forEach((k, v) -> unitsByAsyncId.merge(k, v, Integer::sum));
             for (var entry : holderUnits.entrySet()) {
@@ -3363,10 +3364,10 @@ public class CombatRollService {
             }
         }
 
-        Map<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
-        Map<Pair<UnitModel, UnitHolder>, Integer> unitsOnAdjacentTiles = new HashMap<>();
+        Map<String, Integer> adjacentUnitsByAsyncId = new LinkedHashMap<>();
+        Map<Pair<UnitModel, UnitHolder>, Integer> unitsOnAdjacentTiles = new LinkedHashMap<>();
         Set<String> sleipnirCoverage = ValhavnUnitHandler.getSleipnirPdsCoverageSystems(game, player, tile);
-        Set<String> adjTiles = Adjacency.of(game, player).into(tile.getPosition());
+        Set<String> adjTiles = new LinkedHashSet<>(Adjacency.of(game, player).into(tile.getPosition()));
         adjTiles.addAll(sleipnirCoverage);
         for (String adjacentTilePosition : adjTiles) {
             if (adjacentTilePosition.equals(tile.getPosition())) {
@@ -3381,7 +3382,7 @@ public class CombatRollService {
             Map<Pair<UnitModel, UnitHolder>, Integer> unitsFromTile =
                     sleipnirCoverage.contains(adjacentTilePosition) ? unitsOnTile : unitsOnAdjacentTiles;
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
-                Map<String, Integer> holderUnits = new HashMap<>();
+                Map<String, Integer> holderUnits = new LinkedHashMap<>();
                 getUnitsOnHolderByAsyncIdForSpaceCannon(colorID, holderUnits, unitHolder, player);
                 holderUnits.forEach((k, v) -> adjacentUnitsByAsyncId.merge(k, v, Integer::sum));
                 for (var entry : holderUnits.entrySet()) {
@@ -3521,13 +3522,13 @@ public class CombatRollService {
             }
         }
 
-        Map<Pair<UnitModel, UnitHolder>, Integer> output = new HashMap<>(unitsOnTile.entrySet().stream()
+        Map<Pair<UnitModel, UnitHolder>, Integer> output = new LinkedHashMap<>(unitsOnTile.entrySet().stream()
                 .filter(entry -> entry.getKey().getLeft() != null
                         && entry.getKey().getLeft().getSpaceCannonDieCount(player) > 0)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                .collect(orderedToMap(Map.Entry::getKey, Map.Entry::getValue)));
 
         Map<Pair<UnitModel, UnitHolder>, Integer> adjacentOutput =
-                new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
+                new LinkedHashMap<>(unitsOnAdjacentTiles.entrySet().stream()
                         .filter(entry -> entry.getKey().getLeft() != null
                                 && entry.getKey().getLeft().getSpaceCannonDieCount(player) > 0
                                 && (entry.getKey().getLeft().getDeepSpaceCannon(player)
@@ -3535,7 +3536,7 @@ public class CombatRollService {
                                         || "spacedock"
                                                 .equalsIgnoreCase(
                                                         entry.getKey().getLeft().getBaseType())))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                        .collect(orderedToMap(Map.Entry::getKey, Map.Entry::getValue)));
         int limit = 0;
         for (var entry : adjacentOutput.entrySet()) {
             if (entry.getKey().getLeft().getDeepSpaceCannon(player)) {
@@ -3554,7 +3555,7 @@ public class CombatRollService {
             output.put(new ImmutablePair<>(sigilCannon, spaceHolder), 1);
         }
 
-        Map<UnitModel, Integer> flatOutput = new HashMap<>();
+        Map<UnitModel, Integer> flatOutput = new LinkedHashMap<>();
         output.forEach((k, v) -> flatOutput.merge(k.getLeft(), v, Integer::sum));
         checkBadUnits(player, event, unitsByAsyncId, flatOutput);
 
@@ -3567,7 +3568,7 @@ public class CombatRollService {
     }
 
     public static Map<UnitModel, Integer> flattenUnitMap(Map<Pair<UnitModel, UnitHolder>, Integer> map) {
-        Map<UnitModel, Integer> result = new HashMap<>();
+        Map<UnitModel, Integer> result = new LinkedHashMap<>();
         map.forEach((k, v) -> result.merge(k.getLeft(), v, Integer::sum));
         return result;
     }
@@ -3577,7 +3578,7 @@ public class CombatRollService {
         if (!player.hasUnlockedBreakthrough("choirbt")) {
             return units;
         }
-        Map<Pair<UnitModel, UnitHolder>, Integer> splitUnits = new HashMap<>();
+        Map<Pair<UnitModel, UnitHolder>, Integer> splitUnits = new LinkedHashMap<>();
         for (Map.Entry<Pair<UnitModel, UnitHolder>, Integer> entry : units.entrySet()) {
             UnitModel unit = entry.getKey().getLeft();
             UnitHolder holder = entry.getKey().getRight();
@@ -3615,7 +3616,7 @@ public class CombatRollService {
         IdentityHashMap<Pair<UnitModel, UnitHolder>, Integer> countByIdentity = new IdentityHashMap<>();
         countByIdentity.putAll(playerUnits);
         Map<String, List<Pair<UnitModel, UnitHolder>>> modelKeys = new LinkedHashMap<>();
-        for (Pair<UnitModel, UnitHolder> key : countByIdentity.keySet()) {
+        for (Pair<UnitModel, UnitHolder> key : playerUnits.keySet()) {
             modelKeys
                     .computeIfAbsent(key.getLeft().getId(), k -> new ArrayList<>())
                     .add(key);
@@ -3691,5 +3692,16 @@ public class CombatRollService {
         if (!missing.isEmpty()) {
             CombatMessageHelper.displayMissingUnits(event, missing);
         }
+    }
+
+    private static <T, K, V> Collector<T, ?, Map<K, V>> orderedToMap(
+            Function<? super T, ? extends K> key, Function<? super T, ? extends V> value) {
+        return Collectors.toMap(
+                key,
+                value,
+                (first, second) -> {
+                    throw new IllegalStateException("Duplicate key");
+                },
+                LinkedHashMap::new);
     }
 }

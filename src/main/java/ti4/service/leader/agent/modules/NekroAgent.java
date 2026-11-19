@@ -15,6 +15,8 @@ import ti4.service.leader.agent.PlayerPickerAgent;
 
 public final class NekroAgent extends PlayerPickerAgent {
 
+    public static final String DISCARD_PROMPT = ", please choose the action card to discard.";
+
     static final String ID = "nekroagent";
     private static final int TRADE_GOODS_GAINED = 2;
 
@@ -40,10 +42,7 @@ public final class NekroAgent extends PlayerPickerAgent {
                         ", your trade goods increased by " + TRADE_GOODS_GAINED + " " + tradeGoods
                                 + ". Use buttons in your `#cards-info` thread to discard 1 action card,"
                                 + " or below to remove 1 command token."),
-                Message.addressedTo(
-                                target,
-                                ", please choose the action card to discard.",
-                                ActionCardHelper.getDiscardActionCardButtons(target, false))
+                Message.addressedTo(target, DISCARD_PROMPT, ActionCardHelper.getDiscardActionCardButtons(target, false))
                         .inCardsInfoThread(),
                 AgentPrompts.loseCommandTokens(game, target));
     }

@@ -25,6 +25,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
@@ -574,7 +575,7 @@ public final class DSHelperBreakthroughs {
         String action = buttonID.split("_")[1];
         if ("showSecret".equals(action)) {
             List<String> unscoredSOs = new ArrayList<>(p1.getSecretsUnscored().keySet());
-            Collections.shuffle(unscoredSOs);
+            Collections.shuffle(unscoredSOs, RandomHelper.current());
             String randomSOID = unscoredSOs.getFirst();
             SecretObjectiveModel so = Mapper.getSecretObjective(randomSOID);
             if (so != null) {
