@@ -227,20 +227,7 @@ class Replace extends GameStateSubcommand {
                         .queue(success -> accessMessage(privateChannel, newMember));
 
                 // Update Cards Info
-                ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
-                String newCardsInfoName = cardsInfo
-                        .getName()
-                        .replace(
-                                oldPlayerUserName.replace("/", ""),
-                                replacedPlayer.getUserName().replace("/", ""));
-                cardsInfo
-                        .getManager()
-                        .setName(DiscordThreadUtility.fitThreadName(newCardsInfoName))
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
-                if (oldMember != null) {
-                    cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
-                }
-                cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
+                handOverCardsInfoThread(replacedPlayer, oldPlayerUserName, oldMember, newMember);
 
                 // Update private threads
                 if (oldMember != null) {
@@ -321,6 +308,31 @@ class Replace extends GameStateSubcommand {
         if (draftManager.getOrchestrator() != null && draftManager.whatsStoppingDraftEnd() != null) {
             draftManager.getOrchestrator().sendDraftButtons(draftManager);
         }
+    }
+
+    private static void handOverCardsInfoThread(
+            Player replacedPlayer, String oldPlayerUserName, Member oldMember, Member newMember) {
+        ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
+        if (cardsInfo == null) {
+            return;
+        }
+        String newCardsInfoName = cardsInfo
+                .getName()
+                .replace(
+                        oldPlayerUserName.replace("/", ""),
+                        replacedPlayer.getUserName().replace("/", ""));
+        cardsInfo
+                .getManager()
+                .setArchived(false)
+                .setName(DiscordThreadUtility.fitThreadName(newCardsInfoName))
+                .queue(success -> swapThreadMember(cardsInfo, oldMember, newMember), BotLogger::catchRestError);
+    }
+
+    private static void swapThreadMember(ThreadChannel thread, Member oldMember, Member newMember) {
+        if (oldMember != null) {
+            thread.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+        thread.addThreadMember(newMember).queue(success -> accessMessage(thread, newMember), BotLogger::catchRestError);
     }
 
     private static void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
