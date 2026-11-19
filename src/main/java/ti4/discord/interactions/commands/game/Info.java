@@ -30,7 +30,8 @@ class Info extends GameStateSubcommand {
     public Info() {
         super(Constants.INFO, "Show game information", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, MODERN, "Readable embed layout (default false: classic text)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, MODERN, "Readable embed layout (default true; false: classic text)"));
     }
 
     @Override
@@ -39,7 +40,7 @@ class Info extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "This command cannot be used in private channel.");
             return;
         }
-        if (event.getOption(MODERN, false, OptionMapping::getAsBoolean)) {
+        if (event.getOption(MODERN, true, OptionMapping::getAsBoolean)) {
             sendModernGameInfo(getGame(), event);
             return;
         }
