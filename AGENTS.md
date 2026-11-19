@@ -119,6 +119,15 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   `public static MyService getBean() { return SpringContext.getBean(MyService.class); }`
   (see `SavedBotMessagesService.getBean()` or `GameMessageService.getBean()`). Use this for
   new code and when touching existing call sites.
+- **Draw game randomness from `RandomHelper.current()`.** Dice, deck shuffles, random picks
+  and every other random outcome go through
+  [RandomHelper](src/main/java/ti4/helpers/RandomHelper.java): `RandomHelper.current()`
+  (e.g. `Collections.shuffle(deck, RandomHelper.current())`, `RandomHelper.current().nextInt(1, 11)`),
+  `isOneInX` or `pickRandomFromList`. Never call `ThreadLocalRandom.current()`, `new Random()`
+  or `Math.random()`, or shuffle without a `Random`. A thread can be seeded so a game replays
+  the same; unseeded, `current()` is `ThreadLocalRandom`, so nothing changes in production.
+  Map rendering is the one exception: it uses `RenderRandom`. Move old call sites over when
+  you touch them.
 - **Agents, genomes and homebrew agents live apart.** Official agents are modules under
   `ti4.service.leader.agent.modules`. The agent core in `ti4.service.leader.agent` and those modules never name
   Twilight's Fall, genomes or homebrew. Genomes (Twilight's Fall and TK Nova) live in
