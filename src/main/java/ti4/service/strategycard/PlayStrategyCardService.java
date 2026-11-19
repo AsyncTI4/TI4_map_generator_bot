@@ -135,6 +135,7 @@ public class PlayStrategyCardService {
                         continue;
                     }
                     ActionCardHelper.playAC(event, game, p2, "coup", game.getMainGameChannel());
+                    game.getGameStats().recordAcTarget("Coup d'Etat", p2, player);
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
                     String message =

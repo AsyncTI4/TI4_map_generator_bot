@@ -907,6 +907,7 @@ public class ActionCardHelper {
             }
         }
         recordTrackedActionCardPlay(game, player, actionCardTitle);
+        ActionCardTargets.recordOnPlay(game, player, actionCard);
         if (isPlayedAsComponentAction(game, player, actionCard)) {
             TurnActionLog.recordComponent(game, "actionCard");
         }
