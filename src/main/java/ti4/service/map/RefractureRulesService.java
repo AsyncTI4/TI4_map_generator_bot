@@ -122,36 +122,15 @@ public class RefractureRulesService {
                 && tile.getUnitHolderFromPlanet(CHARON_PLANET) != null;
     }
 
-    public static void recordCharonShipMovement(Game game, Player player, Tile destination) {
-        Tile charonTile = game.getTileFromPlanet(CHARON_PLANET);
-        if (!game.isRefractureMode()
-                || charonTile == null
-                || destination.isHomeSystem(game)
-                || !player.getPlanets().contains(CHARON_PLANET)) {
-            return;
-        }
-        boolean movedShip = game.getTacticalActionDisplacement().entrySet().stream()
-                .filter(entry -> entry.getKey().startsWith(charonTile.getPosition() + "-"))
-                .flatMap(entry -> entry.getValue().keySet().stream())
-                .filter(player::unitBelongsToPlayer)
-                .map(player::getUnitFromUnitKey)
-                .filter(java.util.Objects::nonNull)
-                .anyMatch(unit -> unit.getIsShip());
-        if (movedShip) {
-            game.setStoredValue(CHARON_MOVEMENT_KEY + player.getFaction(), destination.getPosition());
-        }
-    }
-
     public static boolean canMoveCharonTo(Game game, Player player, Tile destination) {
+        Tile charonTile = game.getTileFromPlanet(CHARON_PLANET);
         return game.isRefractureMode()
                 && player.getPlanets().contains(CHARON_PLANET)
                 && destination != null
-                && destination.getPosition().equals(game.getActiveSystem())
-                && destination.getPosition().equals(game.getStoredValue(CHARON_MOVEMENT_KEY + player.getFaction()));
-    }
-
-    public static void consumeCharonMovement(Game game, Player player) {
-        game.removeStoredValue(CHARON_MOVEMENT_KEY + player.getFaction());
+                && charonTile != null
+                && charonTile != destination
+                && !destination.isHomeSystem(game)
+                && destination.getPosition().equals(game.getActiveSystem());
     }
 
     public static boolean canDoubleDemeterCapacity(Game game, Player player) {
