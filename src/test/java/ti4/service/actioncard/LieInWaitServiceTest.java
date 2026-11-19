@@ -87,6 +87,18 @@ class LieInWaitServiceTest extends BaseTi4Test {
     }
 
     @Test
+    void samePlayersLaterTurnInTheRound_startsAFreshWindow() {
+        // Deepwrought transacts with Saar on their first turn, then again on a later turn after
+        // everyone else has gone, so the active player matches but the turn does not.
+        deepwrought.setInRoundTurnCount(1);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
+        deepwrought.setInRoundTurnCount(2);
+
+        assertThat(LieInWaitService.recordReminder(game, titans, saar, deepwrought))
+                .isTrue();
+    }
+
+    @Test
     void nextAgenda_startsAFreshWindow() {
         // LRR 94.6: each agenda opens its own transaction with every other player.
         game.setPhaseOfGame("agendawaiting");

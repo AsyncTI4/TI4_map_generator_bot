@@ -63,7 +63,12 @@ public class LieInWaitService {
 
     private static String window(Game game) {
         return game.getRound() + "|" + game.getPhaseOfGame() + "|" + game.getActivePlayerID() + "|"
-                + game.getCurrentAgendaInfo();
+                + activePlayerTurn(game) + "|" + game.getCurrentAgendaInfo();
+    }
+
+    private static int activePlayerTurn(Game game) {
+        Player activePlayer = game.getActivePlayer();
+        return activePlayer == null ? 0 : activePlayer.getInRoundTurnCount();
     }
 
     private static String reminderKey(Player holder, Player p1, Player p2) {
