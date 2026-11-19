@@ -16,7 +16,7 @@
     {
         "alias": "salvage_dreadnought",
         "name": "Dreadnought",
-        "text": "At the start of space combat, you may choose 1 of your units of this type to roll 1 die. On a result equal to or greater than that unit's combat value, produce 1 hit.\n\nCapacity +1",
+        "text": "When you roll for this unit's BOMBARDMENT ability, apply +1 to its BOMBARDMENT value for each planet in this unit's system.\n\nCapacity +1",
         "isFakeRelic": true,
         "source": "beans"
     },

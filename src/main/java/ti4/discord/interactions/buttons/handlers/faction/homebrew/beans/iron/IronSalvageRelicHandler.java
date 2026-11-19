@@ -11,16 +11,10 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
-import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.CombatMessageHelper;
-import ti4.helpers.DiceHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
-import ti4.model.UnitModel;
-import ti4.service.combat.CombatRollService;
-import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.info.RelicInfoService;
@@ -31,7 +25,6 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
 public class IronSalvageRelicHandler {
     private static final String SALVAGE_COLLECTORS = "salvage_collectors";
     private static final String COLLECT = "ironCollectSalvage_";
-    private static final String USE_DREAD_COMBAT = "ironUseSalvageDreadCombat_";
     private static final String COLLECTED = "ironSalvageCollected_";
     private static final String COLLECTIBLE = "ironSalvageCollectible_";
     private static final Map<UnitType, String> SALVAGE_BY_UNIT = Map.of(
@@ -114,61 +107,6 @@ public class IronSalvageRelicHandler {
                         + Mapper.getRelic(relic).getNameRepresentation() + " with **Salvage Collectors**.");
         RelicInfoService.sendRelicInfo(player);
         ButtonHelper.deleteMessage(event);
-    }
-
-    public static void addDreadnoughtCombatButton(List<Button> buttons, Player player, Tile tile) {
-        if (!player.hasRelic("salvage_dreadnought")
-                || tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, player) < 1) return;
-        buttons.add(Buttons.blue(
-                player.factionButtonChecker() + USE_DREAD_COMBAT + tile.getPosition(),
-                "Use Dreadnought",
-                FactionEmojis.iron));
-    }
-
-    public static void offerDreadnoughtCombatButton(Game game, Player player, Tile tile) {
-        if (!game.isFowMode()
-                || !player.hasRelic("salvage_dreadnought")
-                || tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, player) < 1) return;
-        MessageHelper.sendMessageToChannelWithButton(
-                player.getCorrectChannel(),
-                player.getRepresentationNoPing() + ", you may use _Dreadnought_.",
-                Buttons.blue(
-                        player.factionButtonChecker() + USE_DREAD_COMBAT + tile.getPosition(),
-                        "Use Dreadnought",
-                        FactionEmojis.iron));
-    }
-
-    @ButtonHandler(USE_DREAD_COMBAT)
-    public static void useDreadnoughtCombat(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Tile tile = game.getTileByPosition(buttonID.substring(USE_DREAD_COMBAT.length()));
-        if (tile == null
-                || !player.hasRelic("salvage_dreadnought")
-                || tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, player) < 1) return;
-        UnitModel dreadnought = player.getUnitByType(UnitType.Dreadnought);
-        if (dreadnought == null) return;
-        int threshold = dreadnought.getCombatDieHitsOnForAbility(CombatRollType.combatround, player);
-        List<DiceHelper.Die> rolls = DiceHelper.rollDice(threshold, 1);
-        int hits = DiceHelper.countSuccesses(rolls);
-        MessageHelper.sendMessageToChannel(
-                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(),
-                CombatMessageHelper.displayCombatSummary(
-                                player, tile, tile.getSpaceUnitHolder(), CombatRollType.combatround)
-                        + "_Dreadnought_:\n"
-                        + CombatMessageHelper.displayUnitRoll(dreadnought, threshold, 0, 1, 1, 0, rolls, hits)
-                        + CombatMessageHelper.displayHitResults(hits));
-        if (hits > 0) {
-            Player opponent = getCombatOpponent(game, player);
-            if (opponent != null) {
-                CombatRollService.sendSpaceAssignHitsButtons(
-                        event,
-                        game,
-                        opponent,
-                        tile,
-                        hits,
-                        game.isFowMode() ? opponent.getCorrectChannel() : event.getMessageChannel());
-            }
-        }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static void clearCombatState(Game game) {
