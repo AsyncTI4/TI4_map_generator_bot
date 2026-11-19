@@ -21,6 +21,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.draft.BagDraft;
+import ti4.draft.BagDraftEventRecorder;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
@@ -350,6 +351,7 @@ public class FrankenButtonHandler {
                     return;
                 }
                 case "confirm_draft" -> {
+                    BagDraftEventRecorder.recordPicks(game, player, player.getDraftQueue().Contents, "CONFIRM");
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     draft.setPlayerReadyToPass(player, true);
