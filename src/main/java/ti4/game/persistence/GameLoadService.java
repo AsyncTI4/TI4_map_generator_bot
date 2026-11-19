@@ -57,6 +57,7 @@ import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.BacklogTimeouts;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
@@ -143,10 +144,12 @@ class GameLoadService {
 
     @Nullable
     static Game load(String gameName) {
-        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+        Game game = GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);
         });
+        BacklogTimeouts.track(game);
+        return game;
     }
 
     static boolean isKnownUnreadable(String gameName) {
@@ -1049,6 +1052,17 @@ class GameLoadService {
                                 hydromorphicCardInfo.nextToken(), Integer.parseInt(hydromorphicCardInfo.nextToken()));
                     }
                 }
+                case Constants.TOME_CARDS -> {
+                    StringTokenizer tomeCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (tomeCardToken.hasMoreTokens()) {
+                        StringTokenizer tomeCardInfo = new StringTokenizer(tomeCardToken.nextToken(), ",");
+                        player.setTomeCard(tomeCardInfo.nextToken(), Integer.parseInt(tomeCardInfo.nextToken()));
+                    }
+                }
+                case Constants.TOME_CARD_IN_PLAY ->
+                    player.setTomeCardInPlay(tokenizer.hasMoreTokens() ? tokenizer.nextToken() : "");
+                case Constants.TOME_CARDS_INITIALIZED ->
+                    player.setTomeCardsInitialized(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.EVENTS -> {
                     StringTokenizer eventToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (eventToken.hasMoreTokens()) {

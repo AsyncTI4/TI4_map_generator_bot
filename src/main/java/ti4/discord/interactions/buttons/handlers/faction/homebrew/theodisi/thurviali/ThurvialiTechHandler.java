@@ -47,14 +47,15 @@ public class ThurvialiTechHandler {
         sendRestructuringStructureButtons(game, player);
     }
 
-    public static boolean canUseCoexistingStructure(Game game, Player player, UnitHolder holder, UnitKey unitKey) {
+    public static boolean canUseStructureOnPlanetContainingUnits(
+            Game game, Player player, UnitHolder holder, UnitKey unitKey) {
         if (game == null
                 || player == null
                 || holder == null
                 || unitKey == null
                 || !player.hasTech(MUTUALISM)
                 || !(holder instanceof Planet)
-                || !game.getPlanetsPlayerIsCoexistingOn(player).contains(holder.getName())) {
+                || holder.getUnitKeysForPlayer(player).isEmpty()) {
             return false;
         }
         Player owner = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
@@ -81,7 +82,7 @@ public class ThurvialiTechHandler {
                     UnitKey unitKey = entry.getKey();
                     Player owner = game.getPlayerByColorID(unitKey.colorID()).orElse(null);
                     UnitModel unit = owner == null ? null : owner.getUnitFromUnitKey(unitKey);
-                    if (canUseCoexistingStructure(game, player, holder, unitKey)
+                    if (canUseStructureOnPlanetContainingUnits(game, player, holder, unitKey)
                             && unit != null
                             && unit.getSpaceCannonDieCount(player) > 0
                             && (sameTile
@@ -96,11 +97,13 @@ public class ThurvialiTechHandler {
     }
 
     public static void resolveMutualism(Game game, Player player) {
-        if (game == null || player == null || !player.hasTech(MUTUALISM)) {
+        if (game == null
+                || player == null
+                || !player.hasTech(MUTUALISM)
+                || !player.getExhaustedTechs().contains(MUTUALISM)) {
             return;
         }
         List<Button> buttons = game.getRealPlayers().stream()
-                .filter(target -> target != player)
                 .filter(target -> target.getUnitsOwned().stream()
                         .map(Mapper::getUnit)
                         .anyMatch(unit -> unit != null
@@ -127,7 +130,9 @@ public class ThurvialiTechHandler {
     @ButtonHandler(SELECT_MUTUALISM_PLAYER)
     public static void selectMutualismPlayer(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.substring(SELECT_MUTUALISM_PLAYER.length()));
-        if (target == null || target == player || !player.hasTech(MUTUALISM)) {
+        if (target == null
+                || !player.hasTech(MUTUALISM)
+                || !player.getExhaustedTechs().contains(MUTUALISM)) {
             ButtonHelper.deleteMessage(event);
             return;
         }
@@ -167,9 +172,9 @@ public class ThurvialiTechHandler {
                 ? player.getUnitsByAsyncID(payload[1]).stream().findFirst().orElse(null)
                 : null;
         if (owner == null
-                || owner == player
                 || unit == null
                 || !owner.hasTech(MUTUALISM)
+                || !owner.getExhaustedTechs().contains(MUTUALISM)
                 || !unit.getIsStructure()
                 || (unit.getUnitType() == UnitType.Monument && !game.isMonumentsMode())
                 || ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, unit.getAsyncId())
@@ -216,11 +221,11 @@ public class ThurvialiTechHandler {
         Tile tile = payload.length == 3 ? game.getTileFromPlanet(payload[2]) : null;
         Planet planet = tile == null ? null : tile.getUnitHolderFromPlanet(payload[2]);
         if (owner == null
-                || owner == player
                 || unit == null
                 || tile == null
                 || planet == null
                 || !owner.hasTech(MUTUALISM)
+                || !owner.getExhaustedTechs().contains(MUTUALISM)
                 || !owner.getPlanets().contains(payload[2])
                 || !unit.getIsStructure()
                 || (unit.getUnitType() == UnitType.Monument && !game.isMonumentsMode())

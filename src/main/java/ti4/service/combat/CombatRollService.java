@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MassHypnosisLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RiggedExplosivesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.combat.CancelGroundHitsButtonId;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
@@ -1293,12 +1294,12 @@ public class CombatRollService {
             }
         }
 
-        if ((!game.isFowMode() || isFoWPrivateChannelRoll(player, event))
+        boolean assignInOpponentChannel = isFoWPrivateChannelRoll(player, event) || isFoWDummyRoll(game, player);
+        if ((!game.isFowMode() || assignInOpponentChannel)
                 && rollType == CombatRollType.SpaceCannonOffence
                 && h > 0
                 && (opponent != player || targetPlayer != null)) {
-            MessageChannel channel =
-                    isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
+            MessageChannel channel = assignInOpponentChannel ? opponent.getCorrectChannel() : event.getMessageChannel();
             if (!ValhavnBreakthroughHandler.offerYggdrasilCannon(event, game, player, opponent, tile, h)
                     && !BlueReverieTechHelper.offerGravitonLaserSystemAfterSpaceCannon(
                             game, player, opponent, tile, h, event)) {
@@ -1581,6 +1582,10 @@ public class CombatRollService {
     }
 
     // This roll was made from fow private channel and not from a combat thread
+    private static boolean isFoWDummyRoll(Game game, Player player) {
+        return game.isFowMode() && (player.isDummy() || player.isNpc());
+    }
+
     private static boolean isFoWPrivateChannelRoll(Player player, GenericInteractionCreateEvent event) {
         return event.getMessageChannel().equals(player.getPrivateChannel());
     }
@@ -3009,6 +3014,16 @@ public class CombatRollService {
                     .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
+            } else {
+                if (unitHolders != null
+                        && unitHolders.getFirst() != null
+                        && unitHolders.getFirst() instanceof Planet planet) {
+                    String planetName = planet.getName();
+                    Player planetOwner = game.getPlanetOwner(planetName);
+                    if (opponents.contains(planetOwner)) {
+                        opponent = planetOwner;
+                    }
+                }
             }
             if (!game.getStoredValue("hiredGunsInPlay").isEmpty()) {
                 Player nokar = game.getPlayerFromColorOrFaction(
@@ -3097,6 +3112,9 @@ public class CombatRollService {
         String colorID = Mapper.getColorID(player.getColor());
         Map<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> output = CombatUnitSelectionHelper.collectCombatRoundUnits(tile, unitHolder, player);
+        output.entrySet()
+                .removeIf(entry -> BeansRelicHandler.isAshenHourglassUnitDisabled(
+                        player.getGame(), player, tile, entry.getKey().getBaseType()));
         checkBadUnits(player, event, unitsByAsyncId, output);
         return output;
     }
@@ -3282,7 +3300,7 @@ public class CombatRollService {
                     ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(
                             game, player, planet, unitEntry.getKey())
                     : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
-            if ((ThurvialiTechHandler.canUseCoexistingStructure(game, player, planet, unitEntry.getKey())
+            if ((ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(game, player, planet, unitEntry.getKey())
                             || graveholdControlled)
                     && structure != null) {
                 unitsOnPlanet.merge(structure, unitEntry.getValue(), Integer::sum);
@@ -3351,7 +3369,8 @@ public class CombatRollService {
                         ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(
                                 game, player, unitHolder, unitEntry.getKey())
                         : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
-                if ((ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitEntry.getKey())
+                if ((ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(
+                                        game, player, unitHolder, unitEntry.getKey())
                                 || graveholdControlled)
                         && structure != null) {
                     unitsOnTile.merge(new ImmutablePair<>(structure, unitHolder), unitEntry.getValue(), Integer::sum);
@@ -3396,7 +3415,8 @@ public class CombatRollService {
                             ? SarcosaBreakthroughHandler.getControlledNeutralStructureModel(
                                     game, player, unitHolder, unitEntry.getKey())
                             : structureOwner == null ? null : structureOwner.getUnitFromUnitKey(unitEntry.getKey());
-                    if ((ThurvialiTechHandler.canUseCoexistingStructure(game, player, unitHolder, unitEntry.getKey())
+                    if ((ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(
+                                            game, player, unitHolder, unitEntry.getKey())
                                     || graveholdControlled)
                             && structure != null) {
                         unitsFromTile.merge(

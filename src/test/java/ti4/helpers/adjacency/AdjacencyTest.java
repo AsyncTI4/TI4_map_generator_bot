@@ -191,6 +191,36 @@ class AdjacencyTest extends BaseTi4Test {
         assertThat(Adjacency.of(game, deep).forEffects().from(far)).doesNotContain(home);
     }
 
+    @Test
+    void xyrixFlagshipLinksItsSystemToSystemsWithOrAdjacentToItsShipsForMovementOnly() {
+        Player xyrix = game.addPlayer("xyrix-test", "xyrix-test");
+        xyrix.setFaction(game, "xyrix");
+        xyrix.setColor("gray");
+        xyrix.addOwnedUnitByID("xyrix_flagship");
+        xyrix.addOwnedUnitByID("cruiser");
+        String flagshipPosition = AdjacencyScenarios.positions(game).stream()
+                .filter(position -> !HOLDER.equals(position))
+                .filter(position -> !Adjacency.of(game).either(HOLDER).contains(position))
+                .findFirst()
+                .orElseThrow();
+        game.getTileByPosition(flagshipPosition)
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, xyrix.getColorID()), 1);
+        game.getTileByPosition(HOLDER)
+                .addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Cruiser, xyrix.getColorID()), 1);
+        String adjacentToCruiser = Adjacency.of(game, xyrix).forMovement().from(HOLDER).stream()
+                .filter(position -> !position.equals(flagshipPosition))
+                .filter(position ->
+                        !Adjacency.of(game).forEffects().from(flagshipPosition).contains(position))
+                .findFirst()
+                .orElseThrow();
+
+        Adjacency movement = Adjacency.of(game, xyrix).forMovement();
+        assertThat(movement.from(flagshipPosition)).contains(HOLDER, adjacentToCruiser);
+        assertThat(movement.from(adjacentToCruiser)).contains(flagshipPosition);
+        assertThat(Adjacency.of(game, xyrix).forEffects().from(flagshipPosition))
+                .doesNotContain(HOLDER, adjacentToCruiser);
+    }
+
     // The position itself only when asked; callers change the returned sets, so a query never hands out its cache.
     @Test
     void selfOnlyWhenAskedAndResultsAreCopies() {

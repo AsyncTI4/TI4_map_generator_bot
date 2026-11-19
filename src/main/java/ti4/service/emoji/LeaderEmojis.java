@@ -356,6 +356,11 @@ public enum LeaderEmojis implements TI4Emoji {
     ThurvialiCommander,
     ThurvialiHero,
 
+    // Franken Misc
+    XyrixAgent,
+    XyrixCommander,
+    XyrixHero,
+
     // Generic
     Agent,
     Commander,

@@ -1,0 +1,18 @@
+{
+    "tileBack": "green",
+    "id": "frmisc1",
+    "name": "Alexandria - Xyrix",
+    "aliases": [
+        "frmisc1",
+        "alexandria",
+        "xryix"
+    ],
+    "imagePath": "frmisc1_xyrixhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "isNebula": true,
+    "planets": [
+        "alexandria"
+    ],
+    "source": "frmisc"
+}

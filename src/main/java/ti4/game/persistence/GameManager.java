@@ -19,6 +19,7 @@ import ti4.game.Game;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
+import ti4.message.BacklogTimeouts;
 import ti4.service.fow.LoreService;
 import ti4.spring.websocket.GameWebStatePipeline;
 
@@ -132,6 +133,7 @@ public class GameManager {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
+        BacklogTimeouts.track(game);
         ManagedGameState managedGameState = ManagedGameState.of(game);
         GameDatabaseSyncPipeline.queueSync(game, managedGameState);
 

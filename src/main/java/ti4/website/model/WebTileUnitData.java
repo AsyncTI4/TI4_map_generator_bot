@@ -131,6 +131,7 @@ public final class WebTileUnitData {
         if (pdsCoverageDetailed != null && !pdsCoverageDetailed.isEmpty()) {
             Map<String, WebPdsCoverage> pdsCoverage = new HashMap<>();
             for (Map.Entry<String, PdsCoverage> entry : pdsCoverageDetailed.entrySet()) {
+                if ("neutral".equals(entry.getKey())) continue;
                 ti4.helpers.PdsCoverage detailed = entry.getValue();
                 pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.getCount(), detailed.getExpected()));
             }

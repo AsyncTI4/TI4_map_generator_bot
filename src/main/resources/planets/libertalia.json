@@ -1,0 +1,26 @@
+{
+    "id": "libertalia",
+    "name": "Libertalia",
+    "aliases": [
+        "libertalia"
+    ],
+    "resources": 2,
+    "influence": 2,
+    "planetTypes": [
+        "CULTURAL"
+    ],
+    "legendaryAbilityName": "River of Paradise",
+    "legendaryAbilityText": "You may exhaust this card at the end of your turn to choose 1 exhausted planet you control. Ready that planet and either repair each of your damaged mechs, or place 2 infantry on that planet.",
+    "legendaryAbilityFlavourText": "Long thought a myth, the pirate utopia of Libertalia has been sought after by many a mutineer for millenia.",
+    "planetLayout": {
+        "unitHolderName": "avernus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 80,
+            "y": 66
+        },
+        "planetRadius": 75,
+        "extraIcons": 1
+    },
+    "source": "beans"
+}

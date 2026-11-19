@@ -1,0 +1,58 @@
+[
+    {
+        "alias": "xyrix_administration",
+        "name": "Tome of Administration",
+        "firstRoundText": "Gain 2 command tokens and purge 1 command token from your reinforcements.",
+        "text": "Spend 1 command token and 1 influence to add 2 command tokens to your reinforcements.",
+        "source": "frmisc"
+    },
+    {
+        "alias": "xyrix_negotiation",
+        "name": "Tome of Negotiation",
+        "firstRoundText": "At the end of your turn, you may gain control of 1 unowned, non-Mecatol Rex planet adjacent to a planet you control and place 1 infantry on it.",
+        "text": "Place 1 command token from each other player's reinforcements in a system containing a non-home, non-Mecatol Rex planet you control.",
+        "source": "frmisc"
+    },
+    {
+        "alias": "xyrix_intrigue",
+        "name": "Tome of Intrigue",
+        "firstRoundText": "Draw 4 action cards, give 1 to another player, then discard 2 action cards.",
+        "text": "Discard up to 3 action cards and draw that many plus 1.",
+        "source": "frmisc"
+    },
+    {
+        "alias": "xyrix_industrialization",
+        "name": "Tome of Industrialization",
+        "firstRoundText": "Twice this round, when you would explore a planet, you may instead place 1 PDS on it.",
+        "text": "Exhaust 1 planet you control to place 1 structure on it, then place 1 PDS on a planet you control.",
+        "source": "frmisc"
+    },
+    {
+        "alias": "xyrix_mercantilism",
+        "name": "Tome of Mercantilism",
+        "firstRoundText": "This round, you may make transactions with players who are not your neighbor. Gain 2 trade goods.",
+        "text": "Increase your commodity value by 1 and gain 1 trade good for each neighbor you have. Each of your neighbors gains 1 trade good.",
+        "source": "frmisc"
+    },
+    {
+        "alias": "xyrix_enmity",
+        "name": "Tome of Enmity",
+        "firstRoundText": "Place up to 3 units with a combined cost of 3 or less in your home system or systems adjacent to it.",
+        "text": "Produce up to 4 units in systems containing your ships, reducing their combined cost by 2.",
+        "source": "frmisc"
+    },
+    {
+        "alias": "xyrix_experimentation",
+        "name": "Tome of Experimentation",
+        "firstRoundText": "Research 1 non-faction technology, then purge 1 technology you own.",
+        "text": "Spend 4 resources to research a technology whose color you own 3 other technologies in.",
+        "source": "frmisc"
+    },
+    {
+        "alias": "xyrix_victory",
+        "name": "Tome of Victory",
+        "firstRoundText": "Unlock your breakthrough and put the fracture into play.",
+        "text": "Draw 1 secret objective, then discard all but 1 of your secret objectives.",
+        "source": "frmisc"
+    }
+]

@@ -286,6 +286,8 @@ public class EndGameService {
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
         String gameEndText = getGameEndText(game);
+        // TODO: fog + archiveChannels deletes the fog category (incl. this channel) from 2s on, so split chunks
+        // here fail with 10003 Unknown Channel. Skip this echo when fog channels are being deleted.
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         TextChannel summaryChannel = getGameSummaryChannel(game);
         if (!game.isFowMode()) {

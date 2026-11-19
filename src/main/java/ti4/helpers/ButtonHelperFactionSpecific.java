@@ -37,6 +37,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Xi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.discord.interactions.routing.ModalHandler;
@@ -80,6 +81,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.PlanetTargetService;
 import ti4.service.fow.PlanetTargetService.PlanetTargetSpec;
+import ti4.service.game.MonumentsService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.KnownCardsService;
 import ti4.service.info.KnownCardsService.KnownCardType;
@@ -150,6 +152,65 @@ public final class ButtonHelperFactionSpecific {
                 player.getRepresentation()
                         + ", the bot doesnt know who was the active player when you chose to resolve the intrigue ability. Please tell it with these buttons.",
                 buttons);
+    }
+
+    @ButtonHandler("viewAvailableIntrigues")
+    public static void viewAvailableIntrigues(Game game, ButtonInteractionEvent event) {
+        if (game.getRealPlayers().stream().noneMatch(p -> p.hasAbility("intrigue"))) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        StringBuilder message = new StringBuilder("__Available Intrigues__");
+        appendIntrigue(
+                message, game, "Levy", "2 Steel", "The active player resolves PRODUCTION of 1 unit in any system.");
+        appendIntrigue(
+                message,
+                game,
+                "Intervention",
+                "3 Steel",
+                "The active player removes 1 of their command tokens from the game board.");
+        appendIntrigue(message, game, "Omen", "4 Steel", "The active player draws 3 action cards.");
+        appendIntrigue(
+                message,
+                game,
+                "Recruit",
+                "5 Steel",
+                "The active player moves up to 3 of their ground forces to adjacent systems.");
+        appendIntrigue(
+                message, game, "Gambit", "4 Steel, 3 Star", "The active player resolves the Warfare primary ability.");
+        appendIntrigue(
+                message,
+                game,
+                "Commission",
+                "2 Star",
+                "The active player gains 2 trade goods and replenishes their commodities.");
+        appendIntrigue(message, game, "Legislation", "3 Star", "The active player looks at the top 3 agenda cards.");
+        appendIntrigue(message, game, "Cosmos", "4 Star", "The active player researches 1 technology.");
+        appendIntrigue(
+                message,
+                game,
+                "Secure",
+                "5 Star",
+                "The active player receives 2 promissory notes from each of 3 neighboring players.");
+        appendIntrigue(
+                message,
+                game,
+                "Mandate",
+                "3 Steel, 4 Star",
+                "The active player draws either 1 relic or 1 secret objective.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+    }
+
+    private static void appendIntrigue(StringBuilder message, Game game, String name, String cost, String effect) {
+        if (!game.getStoredValue("intrigue" + name).isEmpty()) {
+            return;
+        }
+        message.append("\n- __")
+                .append(name)
+                .append("__ — Cost: ")
+                .append(cost)
+                .append(". Effect: ")
+                .append(effect);
     }
 
     @ButtonHandler("intrigueCardOn")
@@ -2929,6 +2990,16 @@ public final class ButtonHelperFactionSpecific {
             buttons.add(Buttons.green(
                     player.factionButtonChecker() + "pharadnInf2Revive_" + planet, Helper.getPlanetName(planet)));
         }
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "valhavn_monument");
+        if (monumentTile != null) {
+            for (Planet planet : monumentTile.getPlanetUnitHolders()) {
+                String prefix = player.factionButtonChecker() + "pharadnInf2Revive_" + planet.getName();
+                if (BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet.getName())
+                        && buttons.stream().noneMatch(button -> prefix.equals(button.getCustomId()))) {
+                    buttons.add(Buttons.green(prefix, Helper.getPlanetName(planet.getName())));
+                }
+            }
+        }
         return buttons;
     }
 
@@ -3066,7 +3137,7 @@ public final class ButtonHelperFactionSpecific {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    public static void checkForGeneticRecombination(Player voter, Game game) {
+    public static boolean checkForGeneticRecombination(Player voter, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == voter) {
                 continue;
@@ -3089,9 +3160,11 @@ public final class ButtonHelperFactionSpecific {
                         buttons.add(Buttons.red(prefix + "decline", "Remove Fleet Token"));
                         MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), msg, buttons);
                     }
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @ButtonHandler("geneticRecombination")
@@ -3229,7 +3302,8 @@ public final class ButtonHelperFactionSpecific {
         UnitHolder planetHolder = game.getUnitHolderFromPlanet(planet);
         if (!player.hasTech("dsqhetinf")
                 || planetHolder == null
-                || planetHolder.getUnitCount(UnitType.Spacedock, player) == 0) {
+                || (planetHolder.getUnitCount(UnitType.Spacedock, player) == 0
+                        && !BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet))) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Commando II can only be revived on a planet containing your space dock.");
@@ -4056,7 +4130,7 @@ public final class ButtonHelperFactionSpecific {
             }
             msg = msg.replace("infantrys", "infantry");
 
-            AddUnitService.addUnits(event, cabal.getNomboxTile(), game, color, amount + " " + unit.replace(" ", ""));
+            AddUnitService.addUnits(event, cabal.getNomboxTile(), game, color, amount + " " + unitP);
         }
         MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
     }

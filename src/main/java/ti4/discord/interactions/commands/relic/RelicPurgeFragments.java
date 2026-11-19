@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornLeadersHandler;
@@ -189,6 +190,7 @@ class RelicPurgeFragments extends GameStateSubcommand {
             message.append(" relic fragments.");
         }
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
+        BeansRelicHandler.offerOuroborosFragments(game, activePlayer, fragmentsToPurge);
         StonebornAbilityHandler.offerFragmentumTokenPlacement(game, activePlayer, event, fragmentsToPurge);
         StonebornLeadersHandler.resolveTempusAfterNonActionCardComponentPurge(game, activePlayer);
         MessageHelper.sendMessageToEventChannel(event, message.toString());

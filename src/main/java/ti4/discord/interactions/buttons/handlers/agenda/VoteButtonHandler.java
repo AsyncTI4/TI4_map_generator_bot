@@ -281,7 +281,7 @@ class VoteButtonHandler {
         }
     }
 
-    private static List<Button> getPlanetOutcomeButtons(Player planetOwner, Game game, String prefix, String rider) {
+    static List<Button> getPlanetOutcomeButtons(Player planetOwner, Game game, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(planetOwner.getPlanets());
         for (String planet : planets) {

@@ -27,6 +27,8 @@ public class UserSettings {
     private int gameLimit;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
+    private Integer utcOffsetMinutes;
+    private List<String> playTimeParts;
     private boolean hasIndicatedStatPreferences;
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
@@ -138,7 +140,10 @@ public class UserSettings {
     }
 
     public static String summarizeActiveHours(String activity) {
-        Set<Integer> hotHours = getHotHours(activity);
+        return summarizeHours(getHotHours(activity));
+    }
+
+    public static String summarizeHours(Set<Integer> hotHours) {
         if (hotHours.isEmpty()) {
             return null;
         }

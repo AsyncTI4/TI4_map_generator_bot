@@ -501,11 +501,10 @@ public class AgendaRiderHelper {
         List<Player> players = game.getRealPlayers();
         if (prefix.contains("solagent")
                 || prefix.contains("letnevagent")
+                || prefix.contains("bastionagent")
+                || prefix.contains("yinHero")
                 || prefix.contains("tknovahumanagent")
                 || prefix.contains("tknovaaristocraticagent")) {
-            players = game.getRealPlayersNNeutral();
-        }
-        if (prefix.contains("yinHero")) {
             players = game.getRealPlayersNNeutral();
         }
         for (Player player : players) {

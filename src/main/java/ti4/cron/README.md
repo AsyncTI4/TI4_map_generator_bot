@@ -103,7 +103,7 @@ Times marked ET are `America/New_York`.
 | [`DiskUsageCron`](DiskUsageCron.java) | 04:00 ET | Log a disk usage report, on its own virtual thread. |
 | [`GameMessageCleanupCron`](GameMessageCleanupCron.java) | 04:00 ET | Remove stale tracked game messages. |
 | [`WinningPathCron`](WinningPathCron.java) | 04:00 ET | Recompute the winning path statistics file. |
-| [`CategoryCleanupCron`](CategoryCleanupCron.java) | 05:00 ET | Delete empty `PBD #` categories. |
+| [`CategoryCleanupCron`](CategoryCleanupCron.java) | **Disabled** | Deleted empty `PBD #` categories. Turned off on 2026-11-16 after it deleted in-use categories; see the note in the class. |
 | [`UploadStatsCron`](UploadStatsCron.java) | 13:30 UTC | Upload all game statistics, ahead of an external 14:00 UTC pull. |
 | [`UploadRecentStatsCron`](UploadRecentStatsCron.java) | 13:45 UTC | Upload recent game statistics, ahead of the same pull. |
 

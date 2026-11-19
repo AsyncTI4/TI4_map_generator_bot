@@ -97,6 +97,9 @@ public class PlayerProperties {
     private final Map<String, Integer> plotCards = new LinkedHashMap<>();
     private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
     private final Map<String, Integer> hydromorphicCards = new LinkedHashMap<>();
+    private final Map<String, Integer> tomeCards = new LinkedHashMap<>();
+    private String tomeCardInPlay = "";
+    private boolean tomeCardsInitialized;
 
     // Stat tracking
     private int sarweenCounter;

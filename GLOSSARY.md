@@ -370,6 +370,20 @@ _Avoid_: Directional mode
 The Twilight Imperium Global Ladder, whose competitive Games report results and move Players through ranks.
 _Avoid_: Ladder game
 
+**Tournament pool**:
+One round of a tournament run with `/tournament`: its sign-up posts, seated Players, Waitlist, groups and the Games created from them. Each round, such as Prelims or Semifinals, is its own pool, and several pools can run at once.
+_Avoid_: Tournament queue, matchmaking queue
+
+**Waitlist**:
+Players who signed up after a Tournament pool reached its target size. When a seated Player withdraws, the first Player on the Waitlist takes their seat and group.
+
+**Setup game**:
+A private Game holding the setup for every Game of a Tournament pool: expansion, homebrew, decks, removed cards and draft settings. The organizer sits in it with bot setup seats up to the players per game, and every new Game of the round copies its settings, never its seating or drafted factions.
+_Avoid_: Template game
+
+**Tourney Mod**:
+The Discord role that, with Admin and any role added through `/tournament roles`, may run tournaments: create Tournament pools, edit their panel and create their Games.
+
 ### Combat
 
 **Combat**:
@@ -432,7 +446,7 @@ A single Components V2 message that the bot edits in place as it is used, with t
 _Avoid_: Menu message, button wall
 
 **FoW setup panel**:
-The panel version of the FoW setup wizard, opened with `/fow setup_beta` while it is tested next to the button wizard of `/fow setup`. Both share the same saved wizard state.
+The panel version of the FoW setup wizard, opened with `/fow setup` (and `/fow setup_beta`, kept for further development) and by the setup button posted when a FoW game is created. The older button wizard is still available as `/fow setup_old`. Both share the same saved wizard state.
 _Avoid_: Wizard v2
 
 ### Rules concepts

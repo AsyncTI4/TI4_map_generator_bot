@@ -47,6 +47,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.AncientMap
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.ExtensionRefitLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.MirrorShieldingLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.RaisedMoraleLLButtonHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosBreakthroughHandler;
@@ -55,6 +56,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.morph
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousTechHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
@@ -667,9 +669,24 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         activeDraft = draft;
     }
 
+    @Override
+    public void setThundersEdge(boolean thundersEdge) {
+        super.setThundersEdge(thundersEdge);
+        if (thundersEdge) {
+            super.setTwilightsFallMode(false);
+        }
+    }
+
+    @Override
+    public void setTwilightsFallMode(boolean twilightsFallMode) {
+        super.setTwilightsFallMode(twilightsFallMode);
+        if (twilightsFallMode) {
+            super.setThundersEdge(false);
+        }
+    }
+
     public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
         setTwilightsFallMode(true);
-        setThundersEdge(false);
 
         String agendaDeck = "agendas_twilights_fall";
         String relicDeck = "relics_pok_te";
@@ -1589,6 +1606,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         }
 
         ExtensionRefitLLButtonHandler.clearExtensionRefit(this);
+        BeansMonumentHandler.clearMonumentActions(this);
         AncientMapsLLButtonHandler.clearAncientMaps(this);
         MirrorShieldingLLButtonHandler.clearMirrorShielding(this);
         RaisedMoraleLLButtonHandler.clearRaisedMorale(this);
@@ -1598,6 +1616,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         PonthousTechHandler.clearThunderbirdProtocol(this);
         KryxosBreakthroughHandler.clearPrototypeInnovators(this);
         TwilightsFallMonumentsButtonHandler.clearYellowTfMonumentHitContexts(this);
+        BeansRelicHandler.clearAshenHourglassTargets(this);
         setStoredValue("factionsInCombat", "");
         setTemporaryPingDisable(false);
         // reset timers for ping and stats
@@ -3488,6 +3507,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                 MorphaUnitHandler.recordCytoplasmicTransportDiscards(this, player, 1);
             }
             CommanderUnlockCheckService.checkAllPlayersInGame(this, "morpha");
+            CommanderUnlockCheckService.checkPlayer(player, "xyrix");
             return true;
         }
         return false;
@@ -3527,6 +3547,9 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
                         this, player, KnownCardType.ACTION_CARD, KnownCardsService.actionCardName(acID));
             }
             setPurgedActionCard(acID, played);
+            if (played) {
+                CommanderUnlockCheckService.checkPlayer(player, "xyrix");
+            }
             return true;
         }
         return false;
@@ -5383,7 +5406,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private boolean isProphecyOfKingsGameWithStyx() {
-        return isProphecyOfKings() && !isThundersEdge() && includesStyx();
+        return isProphecyOfKings() && !isThundersEdge() && !isTwilightsFallMode() && includesStyx();
     }
 
     private boolean includesStyx() {

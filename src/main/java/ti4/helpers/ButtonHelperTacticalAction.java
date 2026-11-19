@@ -41,6 +41,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -82,6 +83,7 @@ import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonH
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -186,6 +188,7 @@ public final class ButtonHelperTacticalAction {
                     buttons);
         }
         Tile activeTile = game.getTileByPosition(game.getActiveSystem());
+        BeansMonumentHandler.offerMigoMonumentExplore(game, player);
         if (DeepUnitHandler.hasArbiterInSystem(player, activeTile)) {
             ButtonHelper.resolveFullFrontierExplore(game, player, activeTile, event);
         }
@@ -399,6 +402,7 @@ public final class ButtonHelperTacticalAction {
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         endOfTacticalActionThings(player, game, event);
+        XyrixTechHandler.clearCrepuscularCopy(game);
 
         if (SarcosaHeroHandler.consumeNeutralTacticalActionContinuation(game, player)) {
             ButtonHelper.deleteMessage(event);
@@ -643,6 +647,7 @@ public final class ButtonHelperTacticalAction {
             MyrrUnitsHandler.offerIronboundGuardianDeploy(event, game, player, tile);
             MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
             MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
+            BeansMonumentHandler.checkSpaceMonumentBlockades(game, event);
         }
     }
 
@@ -660,6 +665,10 @@ public final class ButtonHelperTacticalAction {
                                 + "Please resolve those before continuing, or float the window if irrelevant.");
             }
             for (Player playerWithPds : playersWithPds2) {
+                if (playerWithPds.isDummy() || playerWithPds.isNpc()) {
+                    offerDummySpaceCannonOffence(player, playerWithPds, tile, title);
+                    continue;
+                }
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 spaceCannonButtons.add(
                         Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
@@ -672,6 +681,19 @@ public final class ButtonHelperTacticalAction {
         } else {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
         }
+    }
+
+    private static void offerDummySpaceCannonOffence(Player activePlayer, Player dummy, Tile tile, String title) {
+        String rollId = "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence";
+        List<Button> buttons = List.of(
+                StartCombatService.rollForDummyButton(dummy, rollId, "Roll SPACE CANNON Offence"),
+                Buttons.DECLINE_DELETE_BUTTONS);
+        String owner = dummy.isNeutral() ? "The neutral units have" : "A dummy player has";
+        MessageHelper.sendMessageToChannelWithButtons(
+                activePlayer.getCorrectChannel(),
+                title + owner + " SPACE CANNON coverage in " + tile.getRepresentation() + " (" + tile.getPosition()
+                        + "). Use the button to roll for them:",
+                buttons);
     }
 
     @ButtonHandler("useSafeHarbor")
@@ -788,6 +810,7 @@ public final class ButtonHelperTacticalAction {
         MorphaUnitHandler.clearCytoplasmicTransports(game);
         MorphaAbilityHandler.clearHydrosphericExtraction(game);
         HydromorphicCardHandler.clearTacticalActionEffects(game);
+        BeansMonumentHandler.clearNatauMonumentAnomaly(game);
         RefractureRulesService.clearTacticalState(game);
         GameEventDraft.clear(game);
 
@@ -940,6 +963,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        XyrixTechHandler.offerCrepuscularCopy(game, player, tile);
         BloomAbilityHandler.snapshotCoexistingPlanetsAtAction(game);
         MigoHarvestHandler.offerBlueHarvest(game, player);
         IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
@@ -1028,6 +1052,8 @@ public final class ButtonHelperTacticalAction {
             }
         }
         if (game.isMonumentsMode()) {
+            BeansMonumentHandler.offerNatauMonumentAnomaly(game, player, tile);
+            BeansMonumentHandler.offerValhavnMonumentPdsMove(game, player, tile);
             for (Player monumentOwner : game.getRealPlayers()) {
                 if (MonumentsService.isMonumentOnBoard(game, monumentOwner, "creuss_monument")
                         && tile == MonumentsService.getMonumentTile(game, monumentOwner, "creuss_monument")) {

@@ -364,6 +364,10 @@ public class TestBedPresetService {
                 errors.add("preset: unknown tile `" + tileId + "` at `" + position + "` in `tiles`.");
             }
         });
+        preset.getNeutralUnits().keySet().stream()
+                .filter(position -> !MapPositionMapper.isTilePositionValid(position.toLowerCase()))
+                .forEach(position ->
+                        errors.add("preset: `neutralUnits` position `" + position + "` is not a tile position."));
         preset.getDecks().forEach((slot, deckId) -> {
             String problem = TestBedComponentService.deckProblem(slot, deckId);
             if (problem != null) errors.add("preset: " + problem);

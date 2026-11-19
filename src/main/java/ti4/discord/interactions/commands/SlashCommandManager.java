@@ -59,6 +59,7 @@ import ti4.discord.interactions.commands.tokens.AddTokenCommand;
 import ti4.discord.interactions.commands.tokens.RemoveAllCC;
 import ti4.discord.interactions.commands.tokens.RemoveCCCommand;
 import ti4.discord.interactions.commands.tokens.RemoveTokenCommand;
+import ti4.discord.interactions.commands.tournament.TournamentCommand;
 import ti4.discord.interactions.commands.transaction.TransactionCommand;
 import ti4.discord.interactions.commands.uncategorized.AllInfoCommand;
 import ti4.discord.interactions.commands.uncategorized.CardsInfoCommand;
@@ -127,6 +128,7 @@ public class SlashCommandManager {
                     new LeaderCommand(),
                     new HomebrewCommand(),
                     new MegagameCommand(),
+                    new TournamentCommand(),
                     new CombatCommand(),
                     new CustomCommand(),
                     new FOWCommand(),

@@ -57,6 +57,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.Mig
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kryxos.KryxosUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ponthous.PonthousAbilityHandler;
@@ -936,6 +937,30 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public Map<String, Integer> getHydromorphicCardsRaw() {
         return super.getHydromorphicCards();
+    }
+
+    public Map<String, Integer> getTomeCardsRaw() {
+        return super.getTomeCards();
+    }
+
+    public Map<String, Integer> getTomeCards() {
+        return MapUtils.unmodifiableMap(new LinkedHashMap<>(getTomeCardsRaw()));
+    }
+
+    public void setTomeCard(String id, Integer identifier) {
+        getTomeCardsRaw().put(id, identifier);
+    }
+
+    public String removeTomeCard(Integer identifier) {
+        String id = getTomeCardsRaw().entrySet().stream()
+                .filter(entry -> entry.getValue().equals(identifier))
+                .map(Entry::getKey)
+                .findFirst()
+                .orElse(null);
+        if (id != null) {
+            getTomeCardsRaw().remove(id);
+        }
+        return id;
     }
 
     @Override
@@ -2467,6 +2492,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         if (game != null) {
             BloomAbilityHandler.offerSporefall(game, this, sc);
             ThurvialiAbilityHandler.offerCelestialEnvoys(game, this, sc);
+            if (editSCFollow) {
+                XyrixBreakthroughHandler.resolveSecondaryOfAnotherPlayersStrategyCard(game, this, sc);
+            }
         }
         if (editSCFollow) {
             game.setStoredValue(

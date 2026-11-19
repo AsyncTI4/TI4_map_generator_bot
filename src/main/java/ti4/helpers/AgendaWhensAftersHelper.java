@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.AutoPingCron;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.commands.planet.PlanetExhaustAbility;
 import ti4.discord.interactions.listeners.context.ButtonContext;
@@ -225,6 +226,9 @@ public final class AgendaWhensAftersHelper {
         if (player.hasRelic("culturalartifact")) {
             names.add("Cultural Artifact");
         }
+        if (player.hasRelic("handoftheemperor")) {
+            names.add("Hand of the Emperor");
+        }
         return names;
     }
 
@@ -267,6 +271,9 @@ public final class AgendaWhensAftersHelper {
         Button culturalArtifactButton = BlueReverieArtifactRelicHandler.getCulturalArtifactButton(player);
         if (culturalArtifactButton != null) {
             buttons.add(culturalArtifactButton);
+        }
+        if (player.hasRelic("handoftheemperor")) {
+            buttons.add(Buttons.red("queueWhen_relic_handoftheemperor", "Hand of the Emperor"));
         }
         return buttons;
     }
@@ -584,8 +591,12 @@ public final class AgendaWhensAftersHelper {
                                 resolveWhenQueue(event, game);
                                 offerEveryoneWhensQueue(game);
                             }
-                            case "relic" ->
+                            case "relic" -> {
+                                if (BeansRelicHandler.resolveHandOfEmperor(event, game, player, when)) {
+                                    return;
+                                }
                                 BlueReverieArtifactRelicHandler.resolveCulturalArtifact(event, game, player);
+                            }
                         }
                     }
                     return;

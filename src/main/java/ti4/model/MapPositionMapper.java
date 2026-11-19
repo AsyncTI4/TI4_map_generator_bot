@@ -234,16 +234,19 @@ public final class MapPositionMapper {
     }
 
     private static Point minimumRefractureTranslation(Game game, List<Point> refractureTiles, List<Point> mapTiles) {
-        List<Point> candidates = new ArrayList<>(List.of(new Point()));
+        Set<Point> candidates = new HashSet<>(List.of(new Point()));
         for (Point refractureTile : refractureTiles) {
             for (Point mapTile : mapTiles) {
-                addRefractureTranslationCandidates(game, candidates, refractureTile, mapTile, REFRACTURE_SIDE_TILE_GAP);
+                List<Point> added = new ArrayList<>();
+                addRefractureTranslationCandidates(game, added, refractureTile, mapTile, REFRACTURE_SIDE_TILE_GAP);
+                candidates.addAll(added);
             }
         }
         return candidates.stream()
                 .filter(candidate -> isLayoutDirection(game, candidate))
+                .sorted(java.util.Comparator.comparingInt(candidate -> Math.abs(candidate.x) + Math.abs(candidate.y)))
                 .filter(candidate -> !tilesOverlap(refractureTiles, mapTiles, candidate))
-                .min(java.util.Comparator.comparingInt(candidate -> Math.abs(candidate.x) + Math.abs(candidate.y)))
+                .findFirst()
                 .orElseGet(Point::new);
     }
 

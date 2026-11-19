@@ -57,6 +57,7 @@ public class MegagameStrategyPhaseService {
         if (!pickers.isEmpty()) {
             game.updateActivePlayer(pickers.getFirst());
         }
+        MegagameScOverviewService.update(game, "Strategy phase started");
     }
 
     public static void afterPick(GenericInteractionCreateEvent event, Game game, Player player) {
@@ -73,6 +74,7 @@ public class MegagameStrategyPhaseService {
         }
         List<Player> stillPicking = currentPickers(game);
         if (stillPicking.isEmpty()) {
+            MegagameScOverviewService.update(game, "Strategy phase ended");
             StartPhaseService.startActionPhase(event, game);
             return;
         }

@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veyl
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -17,6 +18,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
+import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.UnlockLeaderService;
 
@@ -27,6 +30,8 @@ public class VeylorLeadersHandler {
     private static final String DONE = "doneVeylorCommander";
     private static final String GAIN_HERO_CC = "gainVeylorHeroCC_";
     private static final String CHOOSE_COMMANDER_SYSTEM = "veylorCommanderSelectSystem_";
+    private static final String SELECT_HERO_AGENDA = "selectVeylorHeroAgenda_";
+    private static final String HERO_NAME = "Speaker Gilbrand, the Veylor hero";
 
     // Commander
     public static Button offerVeylorCommanderUnlock(Player player) {
@@ -119,6 +124,90 @@ public class VeylorLeadersHandler {
         return isVeylorAgendaPhase(game)
                 && aCount == 3
                 && game.getRealPlayers().stream().anyMatch(player -> player.hasLeaderUnlocked("veylorhero"));
+    }
+
+    public static void startVeylorHero(Game game, Player player) {
+        List<Button> buttons = getHeroAgendaButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " has no discarded agendas to select for " + HERO_NAME + ".");
+            return;
+        }
+
+        String prefix = player.factionButtonChecker() + SELECT_HERO_AGENDA;
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + ", please choose a discarded agenda to vote on with " + HERO_NAME
+                        + ".",
+                NewStuffHelper.buttonPagination(buttons, prefix, 0));
+    }
+
+    @ButtonHandler(SELECT_HERO_AGENDA)
+    public static void selectVeylorHeroAgenda(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!"action".equalsIgnoreCase(game.getPhaseOfGame())
+                || !game.getStoredValue("executiveOrder").isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String prefix = player.factionButtonChecker() + SELECT_HERO_AGENDA;
+        List<Button> buttons = getHeroAgendaButtons(game, player);
+        if (NewStuffHelper.checkAndHandlePaginationChange(
+                event,
+                event.getMessageChannel(),
+                buttons,
+                player.getRepresentationNoPing() + ", please choose a discarded agenda to vote on with " + HERO_NAME
+                        + ".",
+                prefix,
+                buttonID)) {
+            return;
+        }
+
+        Integer uniqueId;
+        try {
+            uniqueId = Integer.valueOf(buttonID.substring(SELECT_HERO_AGENDA.length()));
+        } catch (NumberFormatException exception) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        String agendaId = game.getDiscardAgendas().entrySet().stream()
+                .filter(entry -> uniqueId.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+        if (agendaId == null || !game.putAgendaBackIntoDeckOnTop(uniqueId)) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        game.setStoredValue("executiveOrder", player.getFaction());
+        game.setStoredValue("oldSpeakerExecutiveOrder", game.getSpeakerUserID());
+        game.setPhaseOfGame("agenda");
+        game.setSpeaker(player);
+
+        AgendaModel agenda = Mapper.getAgenda(agendaId);
+        String selectedAgenda = "_" + (agenda == null ? agendaId : agenda.getName()) + "_";
+        String message = game.isFowMode()
+                ? game.getPing() + " " + selectedAgenda + " was selected with " + HERO_NAME + " for an immediate vote."
+                : game.getPing() + " " + player.getRepresentationNoPing() + " selected " + selectedAgenda + " with "
+                        + HERO_NAME + " and is temporarily the speaker for this vote.";
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
+        AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getHeroAgendaButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : game.getDiscardAgendas().entrySet()) {
+            AgendaModel agenda = Mapper.getAgenda(entry.getKey());
+            if (agenda != null) {
+                buttons.add(Buttons.green(
+                        player.factionButtonChecker() + SELECT_HERO_AGENDA + entry.getValue(), agenda.getName()));
+            }
+        }
+        return buttons;
     }
 
     public static void resolveVeylorHeroLosingVote(Game game, String winner) {

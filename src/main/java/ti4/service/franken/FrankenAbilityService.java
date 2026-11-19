@@ -10,6 +10,7 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrapyard.ScrapyardAbilitiesHandler;
@@ -176,6 +177,9 @@ public class FrankenAbilityService {
             }
             if ("origin_unknown".equalsIgnoreCase(abilityID)) {
                 DeepUnitHandler.offerFrankenSetup(player);
+            }
+            if ("tomebound_tutelage".equalsIgnoreCase(abilityID)) {
+                XyrixTomeHandler.initialize(player);
             }
         }
         MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());

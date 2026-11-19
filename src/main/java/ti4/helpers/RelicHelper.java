@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.tfbr.WhiteTfUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
@@ -64,6 +65,7 @@ public class RelicHelper {
         for (Player player : game.getPlayers().values()) {
             unavailableFragments.addAll(player.getFragments());
         }
+        unavailableFragments.addAll(BeansRelicHandler.getOuroborosFragmentsInPlay(game));
 
         return explorationDeck.getNewDeck().stream()
                 .filter(fragmentID -> !unavailableFragments.contains(fragmentID))
@@ -149,6 +151,7 @@ public class RelicHelper {
     public static void gainRelicAndNotify(
             Player player, GenericInteractionCreateEvent event, Game game, String relicID, String verb) {
         player.addRelic(relicID);
+        BeansRelicHandler.onRelicGained(game, player, relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
         String relicName = relicModel == null ? relicID : relicModel.getName();
         String message = player.getRepresentation() + " " + verb + " the _" + relicName + "_ relic.";

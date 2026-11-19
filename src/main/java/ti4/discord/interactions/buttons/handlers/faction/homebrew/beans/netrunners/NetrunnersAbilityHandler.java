@@ -30,6 +30,9 @@ public class NetrunnersAbilityHandler {
     private static final String PROXY_NETWORK_TARGET = "proxyNetworkTarget_";
 
     public static void resolveNeuralInstrumentsDebt(Player player, Game game, GenericInteractionCreateEvent event) {
+        if ("setup".equalsIgnoreCase(game.getPhaseOfGame())) {
+            return;
+        }
         for (Player p2 : game.getRealPlayers()) {
             if (p2 != player
                     && p2.hasAbility("neural_instruments")
@@ -70,7 +73,7 @@ public class NetrunnersAbilityHandler {
     @ButtonHandler("useProxyNetwork")
     public static void useProxyNetwork(ButtonInteractionEvent event, Game game, Player player) {
         ButtonHelper.deleteMessage(event);
-        offerProxyNetwork(game, player);
+        offerProxyNetworkTokenChoices(game, player);
     }
 
     public static boolean offerProxyNetwork(Game game, Player player) {
@@ -85,12 +88,38 @@ public class NetrunnersAbilityHandler {
         return true;
     }
 
+    private static void offerProxyNetworkTokenChoices(Game game, Player player) {
+        List<Button> buttons = getProxyNetworkTokenButtons(game, player);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationNoPing()
+                            + " has no eligible control token to return with **Proxy Network**.");
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + ", choose a control token to return with **Proxy Network**.",
+                buttons);
+    }
+
     private static List<Button> getResearchableFactionTechButtons(Player player) {
         List<TechnologyModel> techs = player.getNotResearchedFactionTechs().stream()
                 .map(Mapper::getTech)
                 .filter(tech -> tech != null && ListTechService.isTechResearchable(tech, player))
                 .toList();
         return ListTechService.getTechButtons(new ArrayList<>(techs), player);
+    }
+
+    private static List<Button> getProxyNetworkTokenButtons(Game game, Player player) {
+        return game.getRealPlayersExcludingThis(player).stream()
+                .filter(target -> player.getDebtTokenCount(target.getColor(), Constants.NETRUNNERS_DEBT_POOL) > 0)
+                .filter(target -> !getProxyNetworkTechButtons(player, target).isEmpty())
+                .map(target -> Buttons.gray(
+                        player.factionButtonChecker() + PROXY_NETWORK_TOKEN + target.getFaction(),
+                        "Return " + target.getFactionNameOrColor() + " Control Token",
+                        target.getFactionEmojiOrColor()))
+                .toList();
     }
 
     @ButtonHandler(PROXY_NETWORK_TOKEN)

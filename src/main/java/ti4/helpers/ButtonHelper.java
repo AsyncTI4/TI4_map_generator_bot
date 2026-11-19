@@ -56,6 +56,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
@@ -68,6 +69,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -94,6 +97,7 @@ import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandl
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -638,6 +642,7 @@ public class ButtonHelper {
         Tile tile = game.getTileFromPlanet(planet);
         UnitHolder planetHolder = game.getUnitHolderFromPlanet(planet);
         if (player.hasTech("dsqhetinf")
+                && !BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet)
                 && (planetHolder == null || planetHolder.getUnitCount(UnitType.Spacedock, player) == 0)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -772,6 +777,7 @@ public class ButtonHelper {
                 }
             }
         }
+        addValhavnMonumentInfantryRevivalButtons(buttons, game, player, infCount);
         if (player.ownsUnit("cymiae_infantry2") || player.ownsUnit("tf-yinclone")) {
             buttons = new ArrayList<>();
             for (String planet : player.getPlanets()) {
@@ -781,6 +787,7 @@ public class ButtonHelper {
                             "Place 1 Infantry On " + Helper.getPlanetRepresentation(planet, game)));
                 }
             }
+            addValhavnMonumentInfantryRevivalButtons(buttons, game, player, 1);
         }
         if (player.hasTech("dsqhetinf")) {
             buttons = new ArrayList<>();
@@ -797,8 +804,31 @@ public class ButtonHelper {
                     }
                 }
             }
+            addValhavnMonumentInfantryRevivalButtons(buttons, game, player, infCount);
         }
         return buttons;
+    }
+
+    private static void addValhavnMonumentInfantryRevivalButtons(
+            List<Button> buttons, Game game, Player player, int infantryCount) {
+        Tile monumentTile = MonumentsService.getMonumentTile(game, player, "valhavn_monument");
+        if (monumentTile == null) {
+            return;
+        }
+        for (Planet planet : monumentTile.getPlanetUnitHolders()) {
+            if (!BeansMonumentHandler.isValhavnMonumentPlanet(game, player, planet.getName())) {
+                continue;
+            }
+            String prefix = player.factionButtonChecker() + "statusInfRevival_" + planet.getName() + "_";
+            if (buttons.stream().anyMatch(button -> button.getCustomId().startsWith(prefix))) {
+                continue;
+            }
+            String suffix = " Infantry on " + Helper.getPlanetRepresentation(planet.getName(), game);
+            buttons.add(Buttons.green(prefix + "1", "Place 1" + suffix));
+            if (infantryCount > 1) {
+                buttons.add(Buttons.green(prefix + infantryCount, "Place " + infantryCount + suffix));
+            }
+        }
     }
 
     public static List<Button> getExhaustButtonsWithTG(Game game, Player player) {
@@ -821,6 +851,7 @@ public class ButtonHelper {
         if (player.getTg() > 2) {
             buttons.add(Buttons.red("reduceTG_3_" + whatIsItFor, "Spend 3 Trade Goods"));
         }
+        buttons.addAll(BeansRelicHandler.getHamitsTreasurePaymentButtons(game, player, whatIsItFor));
         if (KaltrimTechHandler.canSpendCapturedInfantry(player)) {
             buttons.add(KaltrimTechHandler.getSpendCapturedInfantryButton(player, whatIsItFor));
         }
@@ -1519,7 +1550,7 @@ public class ButtonHelper {
 
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
-        if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+        if (hasDrawnStatusACs(game, player)) {
             if (event != null) {
                 ReactionService.addReaction(
                         event,
@@ -1531,6 +1562,30 @@ public class ButtonHelper {
             }
             return;
         }
+        announceAndDrawStatusACs(
+                game, player, msg -> ReactionService.addReaction(event, game, player, true, false, msg));
+    }
+
+    @Nullable
+    public static String drawStatusACsForSummary(Game game, Player player) {
+        if (hasDrawnStatusACs(game, player)) {
+            return null;
+        }
+        StringBuilder line = new StringBuilder();
+        announceAndDrawStatusACs(
+                game,
+                player,
+                msg -> line.append(player.getRepresentation(false, false))
+                        .append(' ')
+                        .append(msg));
+        return line.toString();
+    }
+
+    private static boolean hasDrawnStatusACs(Game game, Player player) {
+        return game.getCurrentACDrawStatusInfo().contains(player.getFaction());
+    }
+
+    private static void announceAndDrawStatusACs(Game game, Player player, Consumer<String> announce) {
         List<String> modifiers = new ArrayList<>();
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
@@ -1569,7 +1624,7 @@ public class ButtonHelper {
             msg += " The following modifiers have been accounted for:\n> ";
             msg += String.join("\n> ", modifiers);
         }
-        ReactionService.addReaction(event, game, player, true, false, msg);
+        announce.accept(msg);
         ActionCardHelper.drawActionCardsSilent(player, amount);
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
@@ -2529,10 +2584,15 @@ public class ButtonHelper {
             return 999;
         }
         int limit = 7;
-        if (isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")
+                && !player.hasTech("frmiscxyrixg")
+                && isLawInPlay(game, "sanctions")
+                && !game.isAbsolMode()) {
             limit = 3;
         }
-        if (isLawInPlay(game, "absol_sanctions")) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")
+                && !player.hasTech("frmiscxyrixg")
+                && isLawInPlay(game, "absol_sanctions")) {
             limit = 3;
             if (game.getLawsInfo().get("absol_sanctions") != null
                     && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
@@ -2555,6 +2615,9 @@ public class ButtonHelper {
         }
         if (player.hasAbility("neurotropic_active")) {
             limit += 2;
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "xyrixcommander")) {
+            limit += 3;
         }
         return limit;
     }
@@ -3739,32 +3802,25 @@ public class ButtonHelper {
     }
 
     public static String getTileSummaryMessage(
-            Game game, boolean justUnits, Tile tile, Player ogPlayer, GenericInteractionCreateEvent event) {
-        return getTileSummaryMessage(game, justUnits, tile, ogPlayer, event, null);
+            Game game, boolean justUnits, Tile tile, GenericInteractionCreateEvent event) {
+        return getTileSummaryMessage(game, justUnits, tile, event, null);
     }
 
     public static String getCombatTileSummaryMessage(
             Game game,
             Tile tile,
-            Player ogPlayer,
             GenericInteractionCreateEvent event,
             String combatType,
             @Nullable String combatHolderName,
             List<Player> combatPlayers) {
         return getTileSummaryMessage(
-                game,
-                true,
-                tile,
-                ogPlayer,
-                event,
-                new CombatSummaryContext(combatType, combatHolderName, combatPlayers));
+                game, true, tile, event, new CombatSummaryContext(combatType, combatHolderName, combatPlayers));
     }
 
     private static String getTileSummaryMessage(
             Game game,
             boolean justUnits,
             Tile tile,
-            Player ogPlayer,
             GenericInteractionCreateEvent event,
             @Nullable CombatSummaryContext combatSummaryContext) {
         String tileName = ImageResources.tilePath(tile);
@@ -5183,6 +5239,10 @@ public class ButtonHelper {
         if (player.hasReadyBreakthrough("choirbt")) {
             endButtons.add(ChoirBreakthroughHandler.getCenotaphCircuitButton(game, player));
         }
+        Button tomeOfNegotiation = XyrixTomeHandler.getNegotiationEndTurnButton(game, player);
+        if (tomeOfNegotiation != null) {
+            endButtons.add(tomeOfNegotiation);
+        }
 
         if (RefractureRulesService.canUseExperiment(game, player)) {
             endButtons.add(Buttons.gray(
@@ -5227,7 +5287,8 @@ public class ButtonHelper {
                 "phantasm",
                 "eko", // Ixth
                 "lapidus",
-                "lloyd");
+                "lloyd",
+                "libertalia");
         for (String planet : implementedLegendaryPlanets) {
             String label = "Use " + Mapper.getPlanet(planet).getName() + " Ability";
 
@@ -6321,7 +6382,9 @@ public class ButtonHelper {
 
     public static void resolveFullFrontierExplore(
             Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
-        if (player.hasUnlockedBreakthrough("oblivionbt")) {
+        if (XyrixPromissoryHandler.offerAdditionalFrontierExplore(event, game, player, tile)) {
+            return;
+        } else if (player.hasUnlockedBreakthrough("oblivionbt")) {
             OblivionBreakthroughHandler.offerFrontierExplores(
                     event, game, player, tile, player.hasAbility("voidsailors") ? 3 : 2);
         } else if (player.hasAbility("voidsailors")) {
@@ -6644,6 +6707,7 @@ public class ButtonHelper {
                         + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
                 StonebornTechHandler.addDormantXenolithExploreButton(buttons, player, planetId, trait);
+                XyrixTomeHandler.addIndustrializationExploreButton(buttons, game, player, planetId);
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.factionButtonChecker() + "movedNExplored_" + source + planetId + "_"
                             + trait + "kolleccbt";
@@ -7652,20 +7716,22 @@ public class ButtonHelper {
             String unit = part.split("_")[2];
             List<Die> resultRolls = DiceHelper.rollDice(hitOn, numDice);
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            UnitModel unitModel = player.getUnitByBaseType(unit);
+            int dieCount = Math.max(1, unitModel.getCombatDieCount());
             String unitRoll = CombatMessageHelper.displayUnitRoll(
-                    player.getUnitByBaseType(unit),
+                    unitModel,
                     hitOn,
                     0,
-                    numDice / player.getUnitByBaseType(unit).getCombatDieCount(),
-                    player.getUnitByBaseType(unit).getCombatDieCount(),
-                    numDice % player.getUnitByBaseType(unit).getCombatDieCount(),
+                    numDice / dieCount,
+                    dieCount,
+                    numDice % dieCount,
                     resultRolls,
                     hitRolls,
                     "space");
             msg.append(unitRoll);
         }
         msg.append(
-                "\nHave your opponent assign hits with the assign hits button present underneath the combat picture, and reroll their dice (if desired) using the roll space combat button.");
+                "\nHave your opponent reroll their dice (if desired) using the roll space combat button, and assign hits (if any) with the assign hits button present underneath the combat picture.");
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
     }
 
@@ -7685,13 +7751,15 @@ public class ButtonHelper {
             String unit = part.split("_")[2];
             List<Die> resultRolls = DiceHelper.rollDice(hitOn, numDice);
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            UnitModel unitModel = player.getUnitByBaseType(unit);
+            int dieCount = Math.max(1, unitModel.getCombatDieCount());
             String unitRoll = CombatMessageHelper.displayUnitRoll(
-                    player.getUnitByBaseType(unit),
+                    unitModel,
                     hitOn,
                     0,
-                    numDice / player.getUnitByBaseType(unit).getCombatDieCount(),
-                    player.getUnitByBaseType(unit).getCombatDieCount(),
-                    numDice % player.getUnitByBaseType(unit).getCombatDieCount(),
+                    numDice / dieCount,
+                    dieCount,
+                    numDice % dieCount,
                     resultRolls,
                     hitRolls,
                     "space");

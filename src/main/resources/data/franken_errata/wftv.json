@@ -92,6 +92,18 @@
         "source": "wftv"
     },
     {
+        "itemCategory": "COMMANDER",
+        "itemId": "tyriscommander",
+        "optionalSwaps": ["MECH:tyris_mech"],
+        "source": "wftv"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "tyris_mech",
+        "undraftable": true,
+        "source": "wftv"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "expanding_minds",
         "additionalComponents": [

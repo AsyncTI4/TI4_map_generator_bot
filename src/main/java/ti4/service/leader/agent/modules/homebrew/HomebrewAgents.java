@@ -20,6 +20,7 @@ import ti4.service.leader.agent.modules.homebrew.bluereverie.EdynBrAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.KaltrimAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.QhetAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.XinAgent;
+import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.ArcanumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.GolgiAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.HazorusAgent;
@@ -116,6 +117,7 @@ public final class HomebrewAgents implements AgentCatalog {
                             new MigoAgent(),
                             new NetrunnersAgent(),
                             new ValhavnAgent(),
+                            new XyrixAgent(),
                             new EdynAgent(),
                             new LanefirAgent(),
                             new VerydithAgent(),

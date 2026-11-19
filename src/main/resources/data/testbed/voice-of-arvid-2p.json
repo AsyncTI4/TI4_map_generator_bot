@@ -1,0 +1,10 @@
+{
+  "name": "voice-of-arvid-2p",
+  "description": "Hacan holds The Voice of Arvid (megagame) from the megagame relic deck; the game starts in the action phase.",
+  "fog": false,
+  "you": { "faction": "hacan", "home": "301", "relics": ["megagame_voiceofarvid"] },
+  "seats": [ { "faction": "sol", "home": "310" } ],
+  "defaults": { "tg": 3, "ccs": "8/3/3" },
+  "decks": { "relic": "relics_megagame" },
+  "start": "action"
+}

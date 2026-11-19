@@ -80,6 +80,38 @@ class ManagedGameSeatTest extends BaseTi4Test {
         }
     }
 
+    @Test
+    void eliminatedSeatInARunningGameDoesNotCountTowardTheJoinLimit() {
+        String userId = uniqueName("eliminated-user");
+        Game ongoing = gameWithUserAndTwoOthers(userId);
+        // Elimination turns the seat into a dummy as well, as ButtonHelper does.
+        ongoing.getPlayer(userId).setEliminated(true);
+        ongoing.getPlayer(userId).setDummy(true);
+        Game completed = gameWithUserAndTwoOthers(userId);
+        completed.getPlayer(userId).setEliminated(true);
+        completed.getPlayer(userId).setDummy(true);
+        completed.setHasEnded(true);
+        completed.recordWinner(completed.getPlayers().values().stream()
+                .filter(player -> !player.getUserID().equals(userId))
+                .findFirst()
+                .orElseThrow());
+
+        ManagedGame managedOngoing = new ManagedGame(ongoing);
+        ManagedPlayer managedPlayer = new ManagedGame(completed).getPlayer(userId);
+
+        assertThat(managedOngoing.isRealPlayer(userId)).isFalse();
+        // The table still counts as a 3+ player game for the other seats.
+        assertThat(managedOngoing.countRealAndEliminatedPlayers()).isEqualTo(3);
+        assertThat(UserGameInfoService.countOngoingGamesThatAffectJoinLimit(managedPlayer))
+                .isZero();
+        // The LFG spam guard still treats a knocked-out player as someone who has played.
+        assertThat(UserGameInfoService.hasSeatInAnUnabandonedGame(new ManagedGame(ongoing).getPlayer(userId)))
+                .isTrue();
+        // Being knocked out of a game that finished still counts as completing it.
+        assertThat(UserGameInfoService.countCompletedGamesThatAffectJoinLimit(managedPlayer))
+                .isEqualTo(1);
+    }
+
     private static Game gameWithUserAndTwoOthers(String userId) {
         Game game = newGame();
         seat(game, 0, userId);

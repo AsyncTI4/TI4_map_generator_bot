@@ -35,6 +35,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylo
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -1518,6 +1519,7 @@ public final class ButtonHelperModifyUnits {
         ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
         MonumentsPoKButtonHandler.checkIfPanopticonIsBlockaded(game, event);
         MonumentsTEButtonHandler.checkSeraphDataCenterBlockade(event, game);
+        BeansMonumentHandler.checkSpaceMonumentBlockades(game, event);
         Tile tile = null;
         if (buttonID.contains("_")) {
             tile = game.getTileByPosition(buttonID.split("_")[1]);
@@ -2888,6 +2890,7 @@ public final class ButtonHelperModifyUnits {
         if ("warsun".equalsIgnoreCase(unitLong) && !willSkipBuild) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         } else if ("sd".equalsIgnoreCase(unitID)) {
+            CommanderUnlockCheckService.checkPlayer(player, "cabal");
             tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);

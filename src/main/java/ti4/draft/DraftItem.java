@@ -194,26 +194,41 @@ public abstract class DraftItem {
                 new ArrayList<>(getTextDisplaysWithoutLinkedComponents(game, player, showDescr, useAlternateText));
 
         if (hasAdditionalComponents() && (game == null || !game.isTwilightsFallMode())) {
-            List<String> adds = new ArrayList<>();
-            adds.add("**__Additional Added Components:__**");
-            for (DraftErrataModel i2 : Errata.getAdditionalComponents()) {
-                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
-                adds.add("> + " + item2.getTitle(game));
-            }
-            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), adds)));
+            textFields.addAll(getLinkedComponentTextDisplays(
+                    Errata.getAdditionalComponents(),
+                    "Additional Added Components",
+                    "+",
+                    game,
+                    player,
+                    useAlternateText));
         }
 
         List<DraftErrataModel> optionalSwaps = getAvailableOptionalSwaps(game);
         if (!optionalSwaps.isEmpty() && (game == null || !game.isTwilightsFallMode())) {
-            List<String> swaps = new ArrayList<>();
-            swaps.add("**__Optional Component Swaps:__**");
-            for (DraftErrataModel i2 : optionalSwaps) {
-                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
-                swaps.add("> ♻️ " + item2.getTitle(game));
-            }
-            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), swaps)));
+            textFields.addAll(getLinkedComponentTextDisplays(
+                    optionalSwaps, "Optional Component Swaps", "♻️", game, player, useAlternateText));
         }
         return textFields;
+    }
+
+    private List<TextDisplay> getLinkedComponentTextDisplays(
+            List<DraftErrataModel> linkedComponents,
+            String title,
+            String marker,
+            Game game,
+            Player player,
+            boolean useAlternateText) {
+        List<TextDisplay> textDisplays = new ArrayList<>(List.of(TextDisplay.of("**__" + title + ":__**")));
+        for (DraftErrataModel linkedComponent : linkedComponents) {
+            DraftItem item = generate(linkedComponent.getItemCategory(), linkedComponent.getItemId());
+            String description = item.getDisplayDescription(game, item.getLongDescriptionImpl(game), useAlternateText)
+                    .trim()
+                    .replace("\n> ", "\n")
+                    .replace("\n", "\n> ");
+            textDisplays.add(TextDisplay.of(
+                    "> " + marker + " " + item.getTitle(game) + System.lineSeparator() + "> " + description));
+        }
+        return textDisplays;
     }
 
     @JsonIgnore

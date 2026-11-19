@@ -11,13 +11,22 @@ import ti4.testUtils.BaseTi4Test;
 class MegagameGroupsImageTest extends BaseTi4Test {
 
     @Test
-    void rendersOneSpeakerAndOneFactionColumnPerGroupAndOneRowPerMember() {
+    void rendersOneColumnPerGroupAndOneRowPerMember() {
         Game game = MegagameGroupServiceTestFixtures.threeGroupsHoldingCards();
 
         BufferedImage image = MegagameGroupsImage.render(game);
 
-        // 3 groups x (170 speaker + 200 faction) wide, 120 header + 2 rows x 170 high
-        assertThat(image.getWidth()).isEqualTo(1110);
-        assertThat(image.getHeight()).isEqualTo(460);
+        // 3 groups x 260 wide, 70 title + 130 header + 2 rows x 190 high
+        assertThat(image.getWidth()).isEqualTo(780);
+        assertThat(image.getHeight()).isEqualTo(580);
+    }
+
+    @Test
+    void titleNamesRoundAndPhaseInWordsBecauseTheMapFontHasNoGreekLetters() {
+        Game game = MegagameGroupServiceTestFixtures.threeGroupsHoldingCards();
+        game.setRound(3);
+        game.setPhaseOfGame("action");
+
+        assertThat(MegagameGroupsView.of(game).title()).isEqualTo("Round 3  ·  Action phase");
     }
 }

@@ -70,6 +70,9 @@ public class TestBedApplyService {
         AddTileListService.finishSetup(game, event);
         Helper.setOrder(game);
         TestBedComponentService.applyGameState(game, preset, warnings);
+        if (!preset.getNeutralUnits().isEmpty()) {
+            placeUnits(game, game.getNeutral(), preset.getNeutralUnits(), event, warnings);
+        }
         for (SeatPlan plan : plans) {
             if (!plan.player().isRealPlayer()) continue;
             applyHand(game, plan.player(), plan.seat(), event, warnings);

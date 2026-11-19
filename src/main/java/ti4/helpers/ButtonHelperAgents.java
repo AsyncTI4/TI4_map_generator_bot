@@ -723,7 +723,7 @@ public final class ButtonHelperAgents {
             unitHName = "";
         }
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
+                player.getCorrectChannel(),
                 player.getFactionEmoji() + " removed 1 infantry from "
                         + ButtonHelper.getUnitHolderRep(unitHolder, tile, game) + " using "
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")

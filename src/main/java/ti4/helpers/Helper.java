@@ -46,6 +46,7 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.PriorityRe
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.SharedResourcesLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePreservationLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.explore.theodisi.LostLegciesExploreHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.bloom.BloomBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumLeadersHandler;
@@ -69,9 +70,10 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -121,7 +123,6 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.MonumentsService;
 import ti4.service.game.SetOrderService;
-import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.agent.modules.ArgentAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
@@ -238,18 +239,28 @@ public final class Helper {
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
     }
 
-    public static void resolveQueue(Game game) {
+    public static void resolveQueueSavingFirst(Game game, String saveReason) {
+        QueuedSecretDraws draws = resolveQueue(game);
+        if (draws.hasDraws()) {
+            GameManager.save(game, saveReason);
+        }
+        draws.announce();
+    }
+
+    public static QueuedSecretDraws resolveQueue(Game game) {
+        QueuedSecretDraws draws = new QueuedSecretDraws(game);
         if (MegagameGroupService.isActive(game) && !game.getPhaseOfGame().contains("agenda")) {
             for (Player groupImperialHolder : MegagameImperialQueue.imperialHolders(game)) {
-                resolveQueueFrom(game, groupImperialHolder);
+                resolveQueueFrom(game, groupImperialHolder, draws);
             }
-            return;
+            return draws;
         }
         Player imperialHolder = getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
-        resolveQueueFrom(game, imperialHolder);
+        resolveQueueFrom(game, imperialHolder, draws);
+        return draws;
     }
 
     private static boolean hasQueuedDrawsAmong(Game game, List<Player> players, String queueKey) {
@@ -260,8 +271,7 @@ public final class Helper {
         return players.stream().anyMatch(p -> queue.contains(p.getFaction() + "*"));
     }
 
-    private static void resolveQueueFrom(Game game, Player imperialHolder) {
-        // String key = "factionsThatAreNotDiscardingSOs";
+    private static void resolveQueueFrom(Game game, Player imperialHolder, QueuedSecretDraws draws) {
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         if (game.getStoredValue(key2).length() < 2) {
@@ -270,37 +280,18 @@ public final class Helper {
 
         List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         for (Player player : players) {
-            String message =
-                    player.getRepresentationNoPing() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(), player.getRepresentation() + " you drew your queued secret.");
                 game.drawSecretObjective(player.getUserID());
-                if (player.hasAbility("plausible_deniability")) {
+                boolean plausibleDeniability = player.hasAbility("plausible_deniability");
+                if (plausibleDeniability) {
                     game.drawSecretObjective(player.getUserID());
-                    message += " Drew a second secret objective due to **Plausible Deniability**.";
                 }
-                if (player.hasAbility("multitasking")) {
-                    LunariumAbilityHandler.offerFactionSheetCCButtons(game, player);
-                }
-                if (player.hasUnlockedBreakthrough("lunariumbt")) {
-                    LunariumBreakthroughHandler.offerDarkSideExploitationButtons(game, player);
-                }
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFowMode()) {
-                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
-                }
+                draws.addDraw(player, plausibleDeniability);
             }
             if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && hasQueuedDrawsAmong(game, players, key2)) {
-                if (!game.isFowMode()) {
-                    message = player.getRepresentationUnfogged()
-                            + " is the one the game is currently waiting on before advancing to the next player, with regards to queued **Imperial** follows.";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
-                }
+                draws.addBlocker(player);
                 break;
             }
         }
@@ -447,7 +438,11 @@ public final class Helper {
                     int soIndex = Integer.parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
                     SecretObjectiveHelper.scoreSO(event, game, player, soIndex, player.getCorrectChannel());
                     game.setStoredValue(key2b, game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
-                    game.setStoredValue(key3b, game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                    if (LunariumLeaderHandler.isHeroActive(player)) {
+                        LunariumLeaderHandler.offerDoneScoringSecretsButton(game, player);
+                    } else {
+                        game.setStoredValue(key3b, game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                    }
                 }
                 if (game.getHighestScore() + 1 > game.getVp()) {
                     return;
@@ -1427,7 +1422,9 @@ public final class Helper {
                 "res".equalsIgnoreCase(resOrInfOrBoth) && EmergencyAppropriationsLLButtonHandler.isActive(game, player);
         boolean countResourcesAsInfluence =
                 "inf".equalsIgnoreCase(resOrInfOrBoth) && WildlifePreservationLLButtonHandler.isActive(game, player);
-        int tg = player.getSpentTgsThisWindow();
+        int regularTradeGoods = player.getSpentTgsThisWindow();
+        int hamitsTreasureTradeGoods = BeansRelicHandler.getHamitsTreasureSpent(player);
+        int tg = regularTradeGoods + hamitsTreasureTradeGoods;
         int kaldurCapturedInfantry = KaltrimTechHandler.getCapturedInfantrySpent(player);
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
         boolean xxchaBt = player.hasUnlockedBreakthrough("xxchabt");
@@ -1521,6 +1518,7 @@ public final class Helper {
                     && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
                     && !thing.contains("arcanumRunebound")
+                    && !thing.contains("hamitstreasure_")
                     && !thing.contains("commander")
                     && !thing.contains("agent")
                     && !thing.contains("Agent")) {
@@ -1737,18 +1735,25 @@ public final class Helper {
         }
         res += tg + keleresAgent + kaldurCapturedInfantry;
         inf += tg + keleresAgent + kaldurCapturedInfantry;
-        if (tg > 0) {
+        if (regularTradeGoods > 0) {
             msg.append("> Spent ")
-                    .append(tg)
+                    .append(regularTradeGoods)
                     .append(" trade good")
-                    .append(tg == 1 ? "" : "s")
+                    .append(regularTradeGoods == 1 ? "" : "s")
                     .append(' ')
                     .append(MiscEmojis.getTGorNomadCoinEmoji(game))
                     .append(" (")
-                    .append(player.getTg() + tg)
+                    .append(player.getTg() + regularTradeGoods)
                     .append("->")
                     .append(player.getTg())
                     .append(") \n");
+        }
+        if (hamitsTreasureTradeGoods > 0) {
+            msg.append("> Spent ")
+                    .append(hamitsTreasureTradeGoods)
+                    .append(" trade good")
+                    .append(hamitsTreasureTradeGoods == 1 ? "" : "s")
+                    .append(" from _Hamit's Treasure_\n");
         }
         if (kaldurCapturedInfantry > 0) {
             msg.append("> Spent ")
@@ -1758,9 +1763,9 @@ public final class Helper {
                     .append(kaldurCapturedInfantry == 1 ? "" : "s")
                     .append(" with _Kaldur Arrest Field_\n");
         }
-        if (player.hasTech("mc") && tg + keleresAgent + kaldurCapturedInfantry > 0) {
-            res += tg + keleresAgent + kaldurCapturedInfantry;
-            inf += tg + keleresAgent + kaldurCapturedInfantry;
+        if (player.hasTech("mc") && regularTradeGoods + keleresAgent + kaldurCapturedInfantry > 0) {
+            res += regularTradeGoods + keleresAgent + kaldurCapturedInfantry;
+            inf += regularTradeGoods + keleresAgent + kaldurCapturedInfantry;
             msg.append("> Counted the trade goods twice due to _Mirror Computing_\n");
         }
 
@@ -2004,10 +2009,7 @@ public final class Helper {
             int neighborDiscount =
                     ThronesThroneHandler.getSkarnathDiscount(game, player, player.getCurrentProducedUnits());
             if (neighborDiscount > 0) {
-                msg.append("\n-")
-                        .append(neighborDiscount)
-                        .append(" from matching neighboring player")
-                        .append(neighborDiscount > 1 ? "s" : "");
+                msg.append("\n-").append(neighborDiscount).append(" from Throne of Envy");
             }
         }
         if (game.isMonumentsMode()) {
@@ -2183,7 +2185,8 @@ public final class Helper {
             } else {
                 boolean graveholdControlled =
                         SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
-                if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit) && !graveholdControlled) {
+                if (!ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(game, player, uH, unit)
+                        && !graveholdControlled) {
                     continue;
                 }
                 Player structureOwner = game.getPlayerByColorID(unit.colorID()).orElse(null);
@@ -2534,6 +2537,7 @@ public final class Helper {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 productionValueTotal += getProductionValueOfUnitHolder(player, game, tile, uH);
             }
+            productionValueTotal += BeansMonumentHandler.getIronTideProductionBonus(player, tile);
             if (TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile)) {
                 productionValueTotal += 3;
             }
@@ -2602,7 +2606,7 @@ public final class Helper {
                     } else {
                         boolean graveholdControlled =
                                 SarcosaBreakthroughHandler.canControlNeutralStructure(game, player, uH, unit);
-                        if (!ThurvialiTechHandler.canUseCoexistingStructure(game, player, uH, unit)
+                        if (!ThurvialiTechHandler.canUseStructureOnPlanetContainingUnits(game, player, uH, unit)
                                 && !graveholdControlled) {
                             continue;
                         }
@@ -2777,6 +2781,8 @@ public final class Helper {
             cost = Math.max(0, cost - MigoHarvestHandler.getYellowHarvestProductionDiscount(game, player));
             cost = Math.max(0, cost - ThirtyKExploreHooks.productionDiscount(game, producedUnits));
             if (game.isMonumentsMode()) {
+                cost = Math.max(
+                        0, cost - BeansMonumentHandler.getIronTideProductionDiscount(game, player, producedUnits));
                 if (MonumentsService.isMonumentOnBoard(game, player, "rohdhna_monument")) {
                     Tile monumentTile = MonumentsService.getMonumentTile(game, player, "rohdhna_monument");
 
@@ -2856,9 +2862,11 @@ public final class Helper {
             Tile tile,
             String warfareNOtherstuff,
             String placePrefix) {
+        BeansMonumentHandler.clearIronTideProduction(player);
         List<Button> veiledNetworkingButtons = XinTechHandler.getVeiledNetworkingStarProductionButtons(
                 game, player, tile, warfareNOtherstuff, placePrefix);
         if (!veiledNetworkingButtons.isEmpty()) {
+            BeansMonumentHandler.offerIronTideProduction(game, player, tile);
             return veiledNetworkingButtons;
         }
         List<Button> unitButtons = new ArrayList<>();
@@ -3323,6 +3331,7 @@ public final class Helper {
 
         MigoHarvestHandler.addYellowHarvestButton(unitButtons, game, player, tile);
         BloomBreakthroughHandler.addMycelialBridgesProductionButtons(event, unitButtons, game, player, tile);
+        BeansMonumentHandler.offerIronTideProduction(game, player, tile);
         return unitButtons;
     }
 

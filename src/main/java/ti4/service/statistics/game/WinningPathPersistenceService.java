@@ -11,6 +11,7 @@ import ti4.game.Game;
 import ti4.game.persistence.ConsumeGameUtility;
 import ti4.json.PersistenceManager;
 import ti4.logging.BotLogger;
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 
 @UtilityClass
@@ -57,7 +58,7 @@ public class WinningPathPersistenceService {
             Map<String, Map<String, Integer>> data =
                     PersistenceManager.readObjectFromJsonFile(WINNING_PATHS_FILE, new TypeReference<>() {});
             return data == null ? new HashMap<>() : data;
-        } catch (IOException e) {
+        } catch (IOException | JacksonException e) {
             BotLogger.error("Failed to read winning paths file", e);
             return new HashMap<>();
         }
@@ -66,7 +67,7 @@ public class WinningPathPersistenceService {
     private static void writeData(Map<String, Map<String, Integer>> data) {
         try {
             PersistenceManager.writeObjectToJsonFile(WINNING_PATHS_FILE, data);
-        } catch (IOException e) {
+        } catch (IOException | JacksonException e) {
             BotLogger.error("Failed to write winning paths file", e);
         }
     }

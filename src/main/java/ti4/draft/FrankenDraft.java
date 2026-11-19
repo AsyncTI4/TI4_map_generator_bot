@@ -222,6 +222,47 @@ public class FrankenDraft extends BagDraft {
 
     @Override
     public List<DraftBag> generateBags(Game game) {
+        Map<DraftCategory, List<DraftItem>> allDraftableItems = getDraftableItems(game);
+
+        List<DraftBag> bags = new ArrayList<>();
+
+        Map<DraftCategory, Integer> missingItems = new HashMap<>();
+        for (int i = 0; i < game.getRealPlayers().size(); i++) {
+            DraftBag bag = new DraftBag();
+
+            for (Map.Entry<DraftCategory, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
+                DraftCategory category = draftableCollection.getKey();
+                int categoryLimit = getItemLimitForCategory(category, game);
+                for (int j = 0; j < categoryLimit; j++) {
+                    if (!draftableCollection.getValue().isEmpty()) {
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
+                    } else {
+                        missingItems.compute(category, (c, x) -> x == null ? 1 : x + 1);
+                    }
+                }
+            }
+
+            if (!missingItems.isEmpty()) {
+                StringBuilder issue = new StringBuilder(
+                        game.getPing() + " an issue was encountered while building the franken draft.");
+                issue.append("\nOne or more bags are missing components.");
+                for (var e : missingItems.entrySet()) {
+                    issue.append("\n> ")
+                            .append(e.getKey().toString())
+                            .append(" is missing ")
+                            .append(e.getValue())
+                            .append(" components.");
+                }
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue.toString());
+                return null;
+            }
+            bags.add(bag);
+        }
+
+        return bags;
+    }
+
+    public static Map<DraftCategory, List<DraftItem>> getDraftableItems(Game game) {
         Map<DraftCategory, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
 
@@ -283,45 +324,7 @@ public class FrankenDraft extends BagDraft {
         allDraftableItems.put(DraftCategory.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
         allDraftableItems.put(DraftCategory.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
 
-        List<DraftBag> bags = new ArrayList<>();
-
-        Map<DraftCategory, Integer> missingItems = new HashMap<>();
-        for (int i = 0; i < game.getRealPlayers().size(); i++) {
-            DraftBag bag = new DraftBag();
-
-            // Walk through each type of draftable...
-            for (Map.Entry<DraftCategory, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
-                DraftCategory category = draftableCollection.getKey();
-                int categoryLimit = getItemLimitForCategory(category, game);
-                // ... and pull out the appropriate number of items from its collection...
-                for (int j = 0; j < categoryLimit; j++) {
-                    // ... and add it to the player's bag.
-                    if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().removeFirst());
-                    } else {
-                        missingItems.compute(category, (c, x) -> x == null ? 1 : x + 1);
-                    }
-                }
-            }
-
-            if (!missingItems.isEmpty()) {
-                StringBuilder issue = new StringBuilder(
-                        game.getPing() + " an issue was encountered while building the franken draft.");
-                issue.append("\nOne or more bags are missing components.");
-                for (var e : missingItems.entrySet()) {
-                    issue.append("\n> ")
-                            .append(e.getKey().toString())
-                            .append(" is missing ")
-                            .append(e.getValue())
-                            .append(" components.");
-                }
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue.toString());
-                return null;
-            }
-            bags.add(bag);
-        }
-
-        return bags;
+        return allDraftableItems;
     }
 
     protected static void initFrankenDraftTiles(MiltyDraftManager draftManager, Game game) {

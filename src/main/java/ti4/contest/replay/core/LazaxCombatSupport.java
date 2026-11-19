@@ -97,7 +97,7 @@ public class LazaxCombatSupport {
         FleetStrength attackerStrength = calculateFleetStrength(attacker, defender, tile, space);
         FleetStrength defenderStrength = calculateFleetStrength(defender, attacker, tile, space);
         String summary = extractSpaceOnlySummary(ButtonHelper.getCombatTileSummaryMessage(
-                game, tile, attacker, null, "space", Constants.SPACE, List.of(attacker, defender)));
+                game, tile, null, "space", Constants.SPACE, List.of(attacker, defender)));
         String activePlayerSummary = formatActivePlayerSummary(game);
         String openerText = formatReplayHeader(game, tile, attacker, defender, activePlayerSummary);
         String parentPostText = openerText + "\n\n" + summary;

@@ -15,7 +15,7 @@ class SetupWizard extends GameStateSubcommand {
         // etc.) via Game.setStoredValue on every call, not just the first. saveGame=false would both skip
         // persisting that (CommandGameState.postExecute only calls GameManager.save when saveGame=true)
         // and run this under a READ lock instead of WRITE, racing other mutations on the same game.
-        super("setup", "Open (or refresh) the FoW GM setup wizard", true, true);
+        super("setup_old", "Open (or refresh) the old step-by-step FoW GM setup wizard", true, true);
     }
 
     @Override

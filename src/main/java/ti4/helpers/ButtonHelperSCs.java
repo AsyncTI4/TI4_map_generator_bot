@@ -25,6 +25,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vangu
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsTEButtonHandler;
@@ -576,6 +577,21 @@ public final class ButtonHelperSCs {
         player.addFollowedSC(tradeInitiative, event);
         resolveBrTradeFollowBenefits(game, player, scModel, firstFollow);
         ReactionService.addReaction(event, game, player, "has replenished commodities.");
+        ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
+        ButtonHelperAgents.cabalAgentInitiation(game, player);
+        BloomStrainHandler.resolveRhizomaticActive(player, game);
+        ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommodities() - initComm);
+        ButtonHelperStats.offerBountyBrokerageAfterReplenish(game, player);
+        return true;
+    }
+
+    @ButtonHandler("non_sc_refresh")
+    private static boolean resolveNonTradeRefresh(Game game, Player player, ButtonInteractionEvent event) {
+        int initComm = player.getCommodities();
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), player.getRepresentationNoPing() + "has replenished commodities.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
         BloomStrainHandler.resolveRhizomaticActive(player, game);
@@ -1236,6 +1252,45 @@ public final class ButtonHelperSCs {
                 }
                 if (game.isMonumentsMode()
                         && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("dream_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "dream_monument"))) {
+                    List<Button> buttons = BeansMonumentHandler.getDreamMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event, "There is no system containing your ships in which to place _Plateau of Leng_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Plateau of Leng_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeDreamMonument_", 0));
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
+                        && (player.hasUnit("deep_monument")
+                                || MonumentsService.isMonumentOnBoard(game, player, "deep_monument"))) {
+                    List<Button> buttons = BeansMonumentHandler.getDeepMonumentPlacementButtons(game, player);
+                    if (buttons.isEmpty()) {
+                        MessageHelper.sendEphemeralMessageToEventChannel(
+                                event,
+                                "There is no system containing your ships and no planets in which to place _Ether Anchor_.");
+                        return;
+                    }
+                    String message = player.getRepresentationNoPing()
+                            + ", please choose the system in which to place _Ether Anchor_ in space for **Construction**.";
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event,
+                            message,
+                            NewStuffHelper.buttonPagination(
+                                    buttons, player.factionButtonChecker() + "placeDeepMonument_", 0));
+                    return;
+                }
+                if (game.isMonumentsMode()
+                        && "monument".equalsIgnoreCase(unit)
                         && (player.hasUnit("bastion_monument")
                                 || MonumentsService.isMonumentOnBoard(game, player, "bastion_monument"))) {
                     List<Button> buttons = MonumentsTEButtonHandler.getSDCPlacementButtons(game, player);
@@ -1699,6 +1754,131 @@ public final class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("alexandria_follow_")
+    public static void offerAlexandriaFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        int scNum = parseStrategyCardNumber(buttonID);
+        if (!player.hasPlanet("alexandria")
+                || player.getExhaustedPlanetsAbilities().contains("alexandria")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Iterative Indexing is not ready to use.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        player.exhaustPlanetAbility("alexandria");
+        String pendingKey = "alexandriaFollowPending_" + player.getFaction();
+        String promptId = event.getMessageId();
+        game.setStoredValue(pendingKey, promptId + "_" + scNum);
+        List<Button> buttons = new ArrayList<>();
+        if (player.getTacticalCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_tactic",
+                    "Spend from Tactic Pool"));
+        }
+        if (player.getFleetCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_fleet",
+                    "Spend from Fleet Pool"));
+        }
+        if (player.getStrategicCC() > 0) {
+            buttons.add(Buttons.green(
+                    player.factionButtonChecker() + "alexandriaFollowSpend_" + promptId + "_" + scNum + "_strategy",
+                    "Spend from Strategy Pool"));
+        }
+        if (buttons.isEmpty()) {
+            game.removeStoredValue(pendingKey);
+            player.refreshPlanet("alexandria");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have a command token to spend.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", choose the pool from which to spend a command token to follow **"
+                        + Helper.getSCName(scNum, game) + "**.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("alexandriaFollowSpend_")
+    public static void resolveAlexandriaFollow(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String[] parts = buttonID.replace("alexandriaFollowSpend_", "").split("_", 3);
+        if (parts.length != 3) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        int scNum = parseStrategyCardNumber(parts[1]);
+        String pendingKey = "alexandriaFollowPending_" + player.getFaction();
+        if (!(parts[0] + "_" + scNum).equals(game.getStoredValue(pendingKey))
+                || !player.hasPlanet("alexandria")
+                || !player.getExhaustedPlanetsAbilities().contains("alexandria")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "That Iterative Indexing follow is no longer available.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        if (!spendAlexandriaCommandToken(player, parts[2])) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "You do not have a command token in that pool to spend.");
+            return;
+        }
+        game.removeStoredValue(pendingKey);
+        if (!player.getFollowedSCs().contains(scNum)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+        }
+        player.addFollowedSC(scNum, event);
+        if ("strategy".equals(parts[2])) {
+            VanguardBreakthroughHandler.offerTrainingDummiesInfantry(game, player, scNum);
+            TheodisiAgendaResolver.offerMinisterRelations(game, player, scNum);
+            if (player.hasAbility("strategic_fluidity")) {
+                OnyxxaAbilityHandler.markFollowTokenPaid(game, player, scNum);
+            }
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                    player, game, event, "followed **" + Helper.getSCName(scNum, game) + "**");
+        }
+        MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scNum);
+        MessageHelper.sendMessageToChannel(
+                channel,
+                player.getRepresentationUnfogged()
+                        + " exhausted _Iterative Indexing_ and spent 1 command token from their " + parts[2]
+                        + " pool to follow " + Helper.getSCName(scNum, game) + ".");
+        if (game.isFowMode()) {
+            reactToStrategyCardMessage(game, player, scNum, null);
+        } else {
+            reactToFollowedStrategyCard(game, player, channel);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static int parseStrategyCardNumber(String value) {
+        try {
+            return Integer.parseInt(StringUtils.substringAfterLast(value, "_"));
+        } catch (NumberFormatException e) {
+            return Integer.parseInt(value);
+        }
+    }
+
+    private static boolean spendAlexandriaCommandToken(Player player, String pool) {
+        return switch (pool) {
+            case "tactic" -> {
+                if (player.getTacticalCC() < 1) yield false;
+                player.setTacticalCC(player.getTacticalCC() - 1);
+                yield true;
+            }
+            case "fleet" -> {
+                if (player.getFleetCC() < 1) yield false;
+                player.setFleetCC(player.getFleetCC() - 1);
+                yield true;
+            }
+            case "strategy" -> {
+                if (player.getStrategicCC() < 1) yield false;
+                player.setStrategicCC(player.getStrategicCC() - 1);
+                yield true;
+            }
+            default -> false;
+        };
+    }
+
     public static void reactToFollowedStrategyCard(Game game, Player player, MessageChannel channel) {
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
 
@@ -1775,7 +1955,7 @@ public final class ButtonHelperSCs {
             key = "potentialBlockers";
             if (game.getStoredValue(key).contains(player.getFaction() + "*")) {
                 game.setStoredValue(key, game.getStoredValue(key).replace(player.getFaction() + "*", ""));
-                Helper.resolveQueue(game);
+                Helper.resolveQueueSavingFirst(game, "Imperial queue drawn after declining to follow");
             }
         }
         int scNum2 = scNum;

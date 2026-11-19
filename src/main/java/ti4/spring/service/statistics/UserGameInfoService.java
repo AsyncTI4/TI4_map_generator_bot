@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import ti4.game.persistence.ManagedGame;
 import ti4.game.persistence.ManagedPlayer;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.context.SpringContext;
 import ti4.spring.service.persistence.GameEntity;
@@ -110,6 +111,7 @@ public class UserGameInfoService {
                     stats.replacedOngoing++;
                 } else {
                     stats.ongoingGames++;
+                    if (player.isEliminated()) stats.eliminatedOngoing++;
                 }
                 continue;
             }
@@ -157,6 +159,11 @@ public class UserGameInfoService {
                         .append(stats.replacedCompleted == 1 ? " other)" : " others)");
             }
             sb.append(". `").append(stats.ongoingGames).append("` Ongoing");
+            if (stats.eliminatedOngoing > 0) {
+                sb.append(" (")
+                        .append(StringHelper.pluralize(stats.eliminatedOngoing, "elimination"))
+                        .append(')');
+            }
             if (stats.replacedOngoing > 0) {
                 sb.append(" (replaced in ")
                         .append(stats.replacedOngoing)
@@ -186,7 +193,8 @@ public class UserGameInfoService {
         if (managedPlayer == null) return 0;
         return (int) managedPlayer.getGames().stream()
                 .filter(managedGame -> !managedGame.isHasEnded())
-                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .filter(isIn3PlusPlayerGame())
+                .filter(managedGame -> managedGame.isRealPlayer(managedPlayer.getId()))
                 .count();
     }
 
@@ -194,23 +202,28 @@ public class UserGameInfoService {
         if (managedPlayer == null) return 0;
         return (int) managedPlayer.getGames().stream()
                 .filter(managedGame -> managedGame.isHasEnded() && managedGame.isHasWinner())
-                .filter(isRealPlayerIn3PlusPlayerGame(managedPlayer))
+                .filter(isIn3PlusPlayerGame())
+                .filter(managedGame -> managedGame.isRealOrEliminatedPlayer(managedPlayer.getId()))
                 .count();
+    }
+
+    public static boolean hasSeatInAnUnabandonedGame(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return false;
+        return managedPlayer.getGames().stream()
+                .filter(managedGame -> !managedGame.isHasEnded() || managedGame.isHasWinner())
+                .filter(isIn3PlusPlayerGame())
+                .anyMatch(managedGame -> managedGame.isRealOrEliminatedPlayer(managedPlayer.getId()));
     }
 
     public static boolean isOverStandardGameLimit(ManagedPlayer managedPlayer) {
         if (managedPlayer == null) return false;
         int ongoingAmount = countOngoingGamesThatAffectJoinLimit(managedPlayer);
-        int completedGames = countCompletedGamesThatAffectJoinLimit(managedPlayer);
-        if (managedPlayer != null) {
-            var userSettings = UserSettingsManager.get(managedPlayer.getId());
-            String trackRecord = userSettings.getTrackRecord();
-            int droppedGames = 0;
-            droppedGames -= StringUtils.countMatches(trackRecord, "replaced");
-            droppedGames -= StringUtils.countMatches(trackRecord, "Dropped");
-            completedGames += droppedGames;
-        }
-        return ongoingAmount > completedGames + 2;
+        return ongoingAmount >= standardGameLimit(managedPlayer);
+    }
+
+    public static int standardGameLimit(ManagedPlayer managedPlayer) {
+        if (managedPlayer == null) return 3;
+        return countCompletedGamesThatAffectJoinLimit(managedPlayer) + 3 - countDroppedGames(managedPlayer.getId());
     }
 
     public static int countDroppedGames(String userId) {
@@ -218,9 +231,8 @@ public class UserGameInfoService {
         return StringUtils.countMatches(trackRecord, "replaced") + StringUtils.countMatches(trackRecord, "Dropped");
     }
 
-    private static Predicate<ManagedGame> isRealPlayerIn3PlusPlayerGame(ManagedPlayer managedPlayer) {
-        return managedGame -> managedGame.countRealAndEliminatedPlayers() >= 3
-                && managedGame.isRealOrEliminatedPlayer(managedPlayer.getId());
+    private static Predicate<ManagedGame> isIn3PlusPlayerGame() {
+        return managedGame -> managedGame.countRealAndEliminatedPlayers() >= 3;
     }
 
     public static UserGameInfoService get() {
@@ -233,6 +245,7 @@ public class UserGameInfoService {
         private int ongoingGames;
         private int replacedCompleted;
         private int replacedOngoing;
+        private int eliminatedOngoing;
         private int wins;
         private final List<Integer> completedGameDays = new ArrayList<>();
 

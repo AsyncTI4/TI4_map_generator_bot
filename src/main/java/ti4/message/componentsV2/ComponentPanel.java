@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.selections.SelectMenu;
 import net.dv8tion.jda.api.components.selections.SelectOption;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.components.separator.Separator;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -19,6 +24,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -30,6 +36,94 @@ public class ComponentPanel {
 
     public static final String ON = "✅";
     public static final String OFF = "🚫";
+    public static final int ACCENT = 0x5865F2;
+    public static final int WARNING_ACCENT = 0xF0B232;
+    public static final int MAX_NOTICE_LENGTH = 900;
+
+    public static List<MessageTopLevelComponent> compose(
+            String header, String notice, PanelView view, List<ActionRow> navigation) {
+        List<ContainerChildComponent> children = new ArrayList<>();
+        children.add(TextDisplay.of(header));
+        if (StringUtils.isNotBlank(notice)) {
+            children.add(TextDisplay.of(quote(StringUtils.abbreviate(notice.trim(), MAX_NOTICE_LENGTH))));
+        }
+        children.add(Separator.createDivider(Separator.Spacing.SMALL));
+        children.addAll(view.body());
+
+        List<MessageTopLevelComponent> components = new ArrayList<>();
+        components.add(Container.of(children).withAccentColor(view.warning() ? WARNING_ACCENT : ACCENT));
+        components.addAll(view.controls());
+        if (!view.hideNavigation()) {
+            components.addAll(navigation);
+        }
+        if (!fits(components) && StringUtils.isNotBlank(notice)) {
+            return compose(header, null, view, navigation);
+        }
+        return components;
+    }
+
+    public static String quote(String text) {
+        return "> " + text.replace("\n", "\n> ");
+    }
+
+    public static void tell(GenericInteractionCreateEvent event, String text) {
+        if (!(event instanceof IReplyCallback callback)) return;
+        String message = StringUtils.abbreviate(text, Message.MAX_CONTENT_LENGTH);
+        if (callback.isAcknowledged()) {
+            callback.getHook()
+                    .sendMessage(message)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
+        } else {
+            callback.reply(message).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+    }
+
+    public static Section settingRow(String name, String value, String hint, Button action) {
+        String text = "**" + name + ":** " + value + (StringUtils.isBlank(hint) ? "" : "\n-# " + hint);
+        return Section.of(action, TextDisplay.of(text));
+    }
+
+    public static ActionRow confirmRow(Button confirm, String cancelId) {
+        return ActionRow.of(confirm, Buttons.gray(cancelId, "Cancel"));
+    }
+
+    public static List<Button> pageButtons(
+            IntFunction<String> idOfPage, int page, int pageCount, String previousLabel, String nextLabel) {
+        List<Button> buttons = new ArrayList<>();
+        if (page > 0) buttons.add(Buttons.gray(idOfPage.apply(page - 1), previousLabel));
+        if (page < pageCount - 1) buttons.add(Buttons.gray(idOfPage.apply(page + 1), nextLabel));
+        return buttons;
+    }
+
+    public static boolean isPanelMessage(GenericInteractionCreateEvent event, String panelMessageId) {
+        Message message = messageOf(event);
+        return message != null && panelMessageId != null && message.getId().equals(panelMessageId);
+    }
+
+    public static void showOrRepost(
+            GenericInteractionCreateEvent event,
+            String panelMessageId,
+            Supplier<List<MessageTopLevelComponent>> build,
+            Runnable repost) {
+        if (!isPanelMessage(event, panelMessageId)) {
+            repost.run();
+            return;
+        }
+        show(event, build.get());
+    }
+
+    public static void repost(
+            MessageChannel target,
+            MessageChannel oldChannel,
+            String oldMessageId,
+            List<MessageTopLevelComponent> components,
+            Consumer<Message> onPosted) {
+        if (oldChannel != null && oldMessageId != null) {
+            oldChannel.deleteMessageById(oldMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+        post(target, components, onPosted);
+    }
 
     public static Section toggleSection(String title, String description, boolean on, Button accessory) {
         String text = "**" + title + "** " + (on ? ON : OFF) + "\n-# " + description;

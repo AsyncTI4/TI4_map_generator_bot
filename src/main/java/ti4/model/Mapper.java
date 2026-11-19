@@ -80,6 +80,7 @@ public class Mapper {
 
     private static volatile Map<String, GenericCardModel> genericCards = new HashMap<>();
     private static volatile Map<String, HydromorphicCardModel> hydromorphicCards = new HashMap<>();
+    private static volatile Map<String, TomeCardModel> tomeCards = new HashMap<>();
     private static volatile Map<String, LeaderModel> leaders = new HashMap<>();
     private static volatile Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
 
@@ -143,6 +144,7 @@ public class Mapper {
         explores = importJsonObjectsFromFolder("explores", ExploreModel.class);
         genericCards = importJsonObjectsFromFolder("genericcards", GenericCardModel.class);
         hydromorphicCards = importJsonObjectsFromFolder("hydromorphic_cards", HydromorphicCardModel.class);
+        tomeCards = importJsonObjectsFromFolder("tome_cards", TomeCardModel.class);
         leaders = importJsonObjectsFromFolder("leaders", LeaderModel.class);
         mapTemplates = importJsonObjectsFromFolder("map_templates", MapTemplateModel.class);
         promissoryNotes =
@@ -438,6 +440,14 @@ public class Mapper {
 
     public static HydromorphicCardModel getHydromorphicCard(String id) {
         return hydromorphicCards.get(id);
+    }
+
+    public static Map<String, TomeCardModel> getTomeCards() {
+        return new HashMap<>(tomeCards);
+    }
+
+    public static TomeCardModel getTomeCard(String id) {
+        return tomeCards.get(id);
     }
 
     public static List<String> getActionCardsSources(ComponentSource compSource) {

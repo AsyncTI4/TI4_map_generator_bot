@@ -26,6 +26,8 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 @UtilityClass
 public class RefractureLegendaryButtonHandler {
 
+    private static final String CHARON_PLANET = "charontoken";
+
     @ButtonHandler("refractureMaahesStart")
     static void startMaahes(ButtonInteractionEvent event, Player player, Game game) {
         if (!RefractureRulesService.canUseMaahes(game, player)) {
@@ -305,7 +307,7 @@ public class RefractureLegendaryButtonHandler {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "_Charon_ can no longer be assigned this hit.");
             return;
         }
-        player.exhaustPlanet("charon");
+        player.exhaustPlanet(CHARON_PLANET);
         List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, "spacecombat");
         MessageHelper.editMessageButtons(event, buttons);
         MessageHelper.sendMessageToChannel(
@@ -317,14 +319,14 @@ public class RefractureLegendaryButtonHandler {
     static void moveCharon(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String position = buttonID.replace("moveCharon_", "");
         Tile destination = game.getTileByPosition(position);
-        Tile origin = game.getTileFromPlanet("charon");
+        Tile origin = game.getTileFromPlanet(CHARON_PLANET);
         if (!RefractureRulesService.canMoveCharonTo(game, player, destination)
                 || origin == null
                 || origin == destination) {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "_Charon_ can no longer move there.");
             return;
         }
-        TokenPlanetService.moveTokenPlanet(game, player, destination, "charon");
+        TokenPlanetService.moveTokenPlanet(game, player, destination, CHARON_PLANET);
         RefractureRulesService.consumeCharonMovement(game, player);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }

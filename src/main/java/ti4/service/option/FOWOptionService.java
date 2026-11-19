@@ -13,12 +13,12 @@ import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
 import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.message.componentsV2.ComponentPanel;
+import ti4.message.componentsV2.PanelView;
 import ti4.service.fow.AnonymousCommsService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FogPreset;
@@ -222,7 +222,7 @@ public class FOWOptionService {
     }
 
     public static void offerFOWOptionButtons(Game game) {
-        post(GMService.getGMChannel(game), optionsPanel(game, FOWOptionCategory.COMMS));
+        ComponentPanel.post(GMService.getGMChannel(game), optionsPanel(game, FOWOptionCategory.COMMS));
     }
 
     public static List<FOWOption> optionsIn(FOWOptionCategory tab) {
@@ -232,11 +232,10 @@ public class FOWOptionService {
     }
 
     public static List<MessageTopLevelComponent> optionsPanel(Game game, FOWOptionCategory tab) {
-        List<ContainerChildComponent> body = new ArrayList<>();
-        body.add(TextDisplay.of(panelHeader(game, tab)));
-        body.addAll(optionSections(game, tab, OPTION_PREFIX));
-        return List.of(
-                Container.of(body), ActionRow.of(tabButtons(tab, TAB_PREFIX)), ActionRow.of(utilityButtons(game, tab)));
+        PanelView view = PanelView.of(optionSections(game, tab, OPTION_PREFIX), List.of());
+        List<ActionRow> navigation =
+                List.of(ActionRow.of(tabButtons(tab, TAB_PREFIX)), ActionRow.of(utilityButtons(game, tab)));
+        return ComponentPanel.compose(panelHeader(game, tab), null, view, navigation);
     }
 
     public static List<ContainerChildComponent> optionSections(Game game, FOWOptionCategory tab, String togglePrefix) {
@@ -353,18 +352,10 @@ public class FOWOptionService {
                 && FOWPlusService.FORCED_FOWPLUS_OPTIONS.stream().anyMatch(forced -> forced.getLeft() == option);
     }
 
-    private static void post(MessageChannel channel, List<MessageTopLevelComponent> components) {
-        ComponentPanel.post(channel, components);
-    }
-
-    private static void show(ButtonInteractionEvent event, List<MessageTopLevelComponent> components) {
-        ComponentPanel.show(event, components);
-    }
-
     @ButtonHandler(OPTION_PREFIX)
     public static void changeFOWOptions(ButtonInteractionEvent event, Game game, String buttonID) {
         FOWOption option = applyToggle(game, buttonID.substring(OPTION_PREFIX.length()));
-        show(event, optionsPanel(game, option.getCategory()));
+        ComponentPanel.show(event, optionsPanel(game, option.getCategory()));
     }
 
     public static FOWOption applyToggle(Game game, String toggle) {
@@ -379,36 +370,36 @@ public class FOWOptionService {
     @ButtonHandler(TAB_PREFIX)
     public static void changeFOWOptionsCategory(ButtonInteractionEvent event, Game game, String buttonID) {
         FOWOptionCategory tab = FOWOptionCategory.fromString(buttonID.substring(TAB_PREFIX.length()));
-        show(event, optionsPanel(game, tab));
+        ComponentPanel.show(event, optionsPanel(game, tab));
     }
 
     @ButtonHandler(value = PRESET_MENU, save = false)
     public static void showPresetMenu(ButtonInteractionEvent event, Game game) {
-        show(event, presetMenu(game));
+        ComponentPanel.show(event, presetMenu(game));
     }
 
     @ButtonHandler(value = PRESET_PREVIEW_PREFIX, save = false)
     public static void showPresetPreview(ButtonInteractionEvent event, Game game, String buttonID) {
         FogPreset preset = FogPreset.fromId(buttonID.substring(PRESET_PREVIEW_PREFIX.length()));
-        show(event, presetPreview(game, preset));
+        ComponentPanel.show(event, presetPreview(game, preset));
     }
 
     @ButtonHandler(PRESET_APPLY_PREFIX)
     public static void applyPreset(ButtonInteractionEvent event, Game game, String buttonID) {
         FogPreset preset = FogPreset.fromId(buttonID.substring(PRESET_APPLY_PREFIX.length()));
         FogPresetService.applyAndAnnounce(game, preset);
-        show(event, optionsPanel(game, FOWOptionCategory.COMMS));
+        ComponentPanel.show(event, optionsPanel(game, FOWOptionCategory.COMMS));
     }
 
     @ButtonHandler(value = FOWPLUS_MENU, save = false)
     public static void showFowPlusMenu(ButtonInteractionEvent event, Game game) {
-        show(event, fowPlusMenu(game));
+        ComponentPanel.show(event, fowPlusMenu(game));
     }
 
     @ButtonHandler(FOWPLUS_SET_PREFIX)
     public static void setFowPlus(ButtonInteractionEvent event, Game game, String buttonID) {
         FOWPlusService.setActive(game, Boolean.parseBoolean(buttonID.substring(FOWPLUS_SET_PREFIX.length())));
-        show(event, optionsPanel(game, FOWOptionCategory.COMMS));
+        ComponentPanel.show(event, optionsPanel(game, FOWOptionCategory.COMMS));
     }
 
     public static boolean isEnabled(Game game, FOWOption option) {

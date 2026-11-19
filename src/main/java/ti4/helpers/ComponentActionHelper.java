@@ -14,6 +14,7 @@ import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.BeansRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
@@ -30,6 +31,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.Tyr
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
+import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsPoKButtonHandler;
@@ -389,6 +391,9 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that relic.");
                 continue;
             }
+            if ("temporaldissidence".equals(relic)) {
+                continue;
+            }
             if ("quantum_entangler".equalsIgnoreCase(relic)
                     && (game.getAllRelics().size() < 3 || game.getRealPlayers().size() < 2)) {
                 continue;
@@ -614,6 +619,13 @@ public class ComponentActionHelper {
 
         // Monuments
         if (game.isMonumentsMode()) {
+            if (MonumentsService.isMonumentReady(game, p1, "ta_monument")) {
+                compButtons.add(BeansMonumentHandler.getTaMonumentButton(p1));
+            }
+            if (MonumentsService.isMonumentReady(game, p1, "crystellum_monument")
+                    && p1.getNombox().getUnitCount(UnitType.Fighter, p1) >= 3) {
+                compButtons.add(BeansMonumentHandler.getCrystellumMonumentButton(p1));
+            }
             if (MonumentsService.isMonumentOnBoard(game, p1, "argent_monument")
                     && MonumentsService.isMonumentReady(game, p1, "argent_monument")) {
                 compButtons.add(MonumentsPoKButtonHandler.getPhoenixCauldronButton(p1));
@@ -1508,6 +1520,8 @@ public class ComponentActionHelper {
                         + " If scoring one of your unscored secret objectives, just score it via the normal process after pressing the button.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
+            case "hamitstreasure" -> BeansRelicHandler.resolveHamitsTreasure(game, player, event);
+            case "ouroboros" -> BeansRelicHandler.resolveOuroboros(game, player, event);
             case "dynamiscore", "absol_dynamiscore" -> {
                 int oldTg = player.getTg();
                 if ("absol_dynamiscore".equals(relicID)) {

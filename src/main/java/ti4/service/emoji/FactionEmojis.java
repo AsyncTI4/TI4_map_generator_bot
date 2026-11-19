@@ -252,7 +252,8 @@ public enum FactionEmojis implements TI4Emoji {
     enclave,
     raven,
     syndicate,
-    terminator; // baldrick
+    terminator,
+    xyrix; // baldrick
 
     @Override
     public String toString() {
@@ -478,6 +479,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "arachnera" -> arachnera;
             case "psm" -> psm;
             case "opa" -> opa;
+
+            case "xyrix" -> xyrix;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

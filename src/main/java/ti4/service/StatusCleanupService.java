@@ -11,6 +11,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTechHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -28,7 +31,9 @@ import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.leader.agent.modules.homebrew.frmisc.XyrixAgent;
 import ti4.service.map.SpinService;
+import ti4.service.megagame.MegagameGroupService;
 import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
@@ -101,12 +106,15 @@ public class StatusCleanupService {
 
         game.setCurrentACDrawStatusInfo("");
         if (!game.isFowMode() || FoWHelper.isFogQol01(game)) {
-            for (Player p : game.getActionPhaseTurnOrder()) {
-                ButtonHelper.drawStatusACs(game, p, null);
-            }
+            drawStatusActionCards(game);
         }
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+
+            XyrixBreakthroughHandler.clearRoundState(player);
+            XyrixPromissoryHandler.clearPendingFrontierExplore(game, player);
+            XyrixTechHandler.clearRoundState(game, player);
+            XyrixAgent.clearPendingState(game, player);
 
             game.removeStoredValue("theodisiMinisterRelationsExhausted_" + player.getFaction());
             game.removeStoredValue("theodisiSeatOfPowerExhausted_" + player.getFaction());
@@ -205,6 +213,25 @@ public class StatusCleanupService {
                         + ", reminder to draw and reveal 1 heist objective if you have not done so already.";
                 MessageHelper.sendMessageToChannel(mentak.getCardsInfoThread(), msg);
             }
+        }
+    }
+
+    private static void drawStatusActionCards(Game game) {
+        if (!MegagameGroupService.hasTagOutsideFog(game)) {
+            for (Player p : game.getActionPhaseTurnOrder()) {
+                ButtonHelper.drawStatusACs(game, p, null);
+            }
+            return;
+        }
+        List<String> drawLines = new ArrayList<>();
+        for (Player p : game.getActionPhaseTurnOrder()) {
+            String line = ButtonHelper.drawStatusACsForSummary(game, p);
+            if (line != null) {
+                drawLines.add(line);
+            }
+        }
+        if (!drawLines.isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), String.join("\n", drawLines));
         }
     }
 
