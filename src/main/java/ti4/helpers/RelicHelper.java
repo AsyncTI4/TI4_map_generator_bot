@@ -32,6 +32,7 @@ import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -373,7 +374,7 @@ public class RelicHelper {
             FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
         }
         TransactionHelper.checkTransactionLegality(game, sender, receiver);
-        ButtonHelperActionCards.lieInWaitCheck(sender, receiver, game);
+        LieInWaitService.check(sender, receiver, game);
         CommanderUnlockCheckService.checkPlayer(receiver, "kollecc");
     }
 

@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.service.actioncard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +12,7 @@ import ti4.testUtils.BaseTi4Test;
  * Several buttons cover one transaction (Trade's Replenish & Wash plus Send 1 Trade Good, the quick wash, the
  * legacy Done button), so the Lie in Wait reminder records each holder/pair once per window and skips repeats.
  */
-class LieInWaitReminderTest extends BaseTi4Test {
+class LieInWaitServiceTest extends BaseTi4Test {
 
     private Game game;
     private Player titans;
@@ -40,49 +40,49 @@ class LieInWaitReminderTest extends BaseTi4Test {
 
     @Test
     void firstReminderForAPair_isRecorded() {
-        assertThat(ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought))
+        assertThat(LieInWaitService.recordReminder(game, titans, saar, deepwrought))
                 .isTrue();
     }
 
     @Test
     void secondButtonForTheSameTransaction_isSkipped() {
         // Replenish & Wash, then Send 1 Trade Good, for the same follower and Trade holder.
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
 
-        assertThat(ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought))
+        assertThat(LieInWaitService.recordReminder(game, titans, saar, deepwrought))
                 .isFalse();
     }
 
     @Test
     void pairOrderDoesNotMatter() {
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
 
-        assertThat(ButtonHelperActionCards.recordLieInWaitReminder(game, titans, deepwrought, saar))
+        assertThat(LieInWaitService.recordReminder(game, titans, deepwrought, saar))
                 .isFalse();
     }
 
     @Test
     void differentPair_isStillRecorded() {
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
 
-        assertThat(ButtonHelperActionCards.recordLieInWaitReminder(game, titans, l1z1x, deepwrought))
+        assertThat(LieInWaitService.recordReminder(game, titans, l1z1x, deepwrought))
                 .isTrue();
     }
 
     @Test
     void differentHolder_isStillRecorded() {
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
 
-        assertThat(ButtonHelperActionCards.recordLieInWaitReminder(game, l1z1x, saar, deepwrought))
+        assertThat(LieInWaitService.recordReminder(game, l1z1x, saar, deepwrought))
                 .isTrue();
     }
 
     @Test
     void nextPlayersTurn_startsAFreshWindow() {
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
         game.setActivePlayerID("titans-user");
 
-        assertThat(ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought))
+        assertThat(LieInWaitService.recordReminder(game, titans, saar, deepwrought))
                 .isTrue();
     }
 
@@ -91,20 +91,19 @@ class LieInWaitReminderTest extends BaseTi4Test {
         // LRR 94.6: each agenda opens its own transaction with every other player.
         game.setPhaseOfGame("agendawaiting");
         game.setCurrentAgendaInfo("Law_Player_1_minister_war");
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
         game.setCurrentAgendaInfo("Directive_ForAgainst_2_mutiny");
 
-        assertThat(ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought))
+        assertThat(LieInWaitService.recordReminder(game, titans, saar, deepwrought))
                 .isTrue();
     }
 
     @Test
     void newWindow_dropsOldReminders() {
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, saar, deepwrought);
+        LieInWaitService.recordReminder(game, titans, saar, deepwrought);
         game.setRound(5);
-        ButtonHelperActionCards.recordLieInWaitReminder(game, titans, l1z1x, deepwrought);
+        LieInWaitService.recordReminder(game, titans, l1z1x, deepwrought);
 
-        assertThat(game.getStoredValue(ButtonHelperActionCards.LIE_IN_WAIT_REMINDED))
-                .isEqualTo("titans:deepwrought+l1z1x");
+        assertThat(game.getStoredValue(LieInWaitService.REMINDED_KEY)).isEqualTo("titans:deepwrought+l1z1x");
     }
 }

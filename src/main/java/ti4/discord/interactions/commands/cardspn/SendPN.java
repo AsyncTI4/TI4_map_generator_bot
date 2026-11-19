@@ -10,13 +10,13 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.transaction.SendDebtService;
@@ -103,7 +103,7 @@ class SendPN extends GameStateSubcommand {
         player.removePromissoryNote(id);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
         if (!returningFromPlayArea) {
-            ButtonHelperActionCards.lieInWaitCheck(player, targetPlayer, game);
+            LieInWaitService.check(player, targetPlayer, game);
         }
         targetPlayer.setPromissoryNote(id);
         if ("thpnscrapyard".equals(id)) {
