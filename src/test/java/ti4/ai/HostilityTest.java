@@ -3,6 +3,7 @@ package ti4.ai;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.game.Tile;
 import ti4.helpers.Units.UnitType;
@@ -111,5 +112,20 @@ class HostilityTest extends BaseTi4Test {
 
         Hostility.record(test.game);
         assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isZero();
+    }
+
+    // The engine also records targets for combat cards, cards that help their target, and Sabotage (already counted
+    // from the card plays above). None of them is a mean card; only the Plague counts.
+    @Test
+    void onlyMeanCardTargetsCount() {
+        AiTestGame test = AiTestGame.withSolAi();
+        for (String card :
+                List.of("Direct Hit", "Intercept", "Salvage", "Forward Supply Base", "Brilliance", "Sabotage"))
+            test.game.getGameStats().recordAcTarget(card, test.sol, test.nekro);
+        test.game.getGameStats().recordAcTarget("Plague", test.sol, test.nekro);
+
+        Hostility.record(test.game);
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol))
+                .isCloseTo(Hostility.MEAN_CARD_COST, within(CLOSE));
     }
 }

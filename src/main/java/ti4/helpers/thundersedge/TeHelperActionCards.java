@@ -54,6 +54,7 @@ public class TeHelperActionCards {
     private static final String EXTREME_DURESS = "ExtremeDuress";
     private static final String CRISIS_TARGET = "Crisis Target";
     private static final String STASIS_TARGET = "Stasis Target";
+    public static final String LIE_IN_WAIT_SUFFIX = "_lieinwait";
     private static final Pattern DIGIT_PATTERN = Pattern.compile("\\d");
 
     public static void nop() {}
@@ -166,6 +167,7 @@ public class TeHelperActionCards {
             return;
         }
         game.removeStoredValue(EXTREME_DURESS);
+        game.getGameStats().recordAcTarget("Extreme Duress", player, target);
         sendExtremeDuressResolutionButtons(target, player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -190,6 +192,7 @@ public class TeHelperActionCards {
         }
         game.removeStoredValue(CRISIS_TARGET);
         ActionCardHelper.playAC(event, game, crisisPlayer, "crisis", game.getMainGameChannel());
+        game.getGameStats().recordAcTarget("Crisis", crisisPlayer, player);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(player.factionButtonChecker() + "turnEnd", "End Turn"));
         buttons.add(Buttons.green("crisisSabotaged_" + player.getColor(), "Delete These (If Crisis Was Sabo'd)"));
@@ -257,6 +260,7 @@ public class TeHelperActionCards {
         } finally {
             game.removeStoredValue(EXTREME_DURESS_AUTO_RESOLVING);
         }
+        game.getGameStats().recordAcTarget("Extreme Duress", duressPlayer, target);
         sendExtremeDuressResolutionButtons(target, duressPlayer);
     }
 
@@ -306,7 +310,7 @@ public class TeHelperActionCards {
                 continue;
             }
             buttons.add(FoWHelper.fogSafeTargetButton(
-                    player.factionButtonChecker() + "getACFrom_" + p2.getFaction(), "gray", p2));
+                    player.factionButtonChecker() + "getACFrom_" + p2.getFaction() + LIE_IN_WAIT_SUFFIX, "gray", p2));
         }
         String message = player.getRepresentationUnfogged()
                 + ", please tell the bot which two of your neighbors did the transaction.";
@@ -373,6 +377,7 @@ public class TeHelperActionCards {
     private static void exchangeProgramPart2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
 
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        game.getGameStats().recordAcTarget("Exchange Program", player, p2);
         List<Button> buttons = new ArrayList<>();
         if (game.isFowMode()) {
             buttons = PlanetTargetService.targetButtons(
@@ -575,6 +580,9 @@ public class TeHelperActionCards {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
             Tile tile = game.getTileFromPlanet(planet);
+            game.getRealPlayers().stream()
+                    .filter(owner -> owner.hasPlanet(planet))
+                    .forEach(owner -> game.getGameStats().recordAcTarget("Mercenary Contract", player, owner));
             resolvePiratesGeneric(event, game, player, tile, "2 inf " + planet);
             player.setTg(player.getTg() - 2);
             String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
@@ -789,6 +797,7 @@ public class TeHelperActionCards {
         String regex = "resolveBrillianceUnlock_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
+            game.getGameStats().recordAcTarget("Brilliance", player, p2);
             BreakthroughCommandHelper.unlockAllBreakthroughs(game, p2);
             ButtonHelper.deleteMessage(event);
         });

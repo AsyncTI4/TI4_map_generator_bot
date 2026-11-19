@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -259,6 +260,7 @@ public final class ButtonHelperActionCards {
             unit = unit.replace("damaged", "");
             damaged = true;
         }
+        game.getGameStats().recordAcTarget("Lucky Shot", player, p2);
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
         var parsedUnit = new ParsedUnit(unitKey);
         DestroyUnitService.destroyUnit(event, tile, game, parsedUnit, damaged);
@@ -333,6 +335,7 @@ public final class ButtonHelperActionCards {
             ButtonHelper.deleteMessage(event);
             return;
         }
+        game.getGameStats().recordAcTarget("Direct Hit", player, owner);
         DestroyUnitService.destroyUnit(
                 event, tile, game, new ParsedUnit(unitKey, 1, Constants.SPACE), isSpaceCombatUnderway(game, tile));
         ButtonHelper.checkFleetAndCapacity(owner, game, tile);
@@ -655,6 +658,7 @@ public final class ButtonHelperActionCards {
                     hacan.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
+        game.getGameStats().recordAcTarget("Forward Supply Base", hacan, player);
         FoWHelper.notifyPlayerAndAffectedInFog(
                 game,
                 player,
@@ -1636,6 +1640,7 @@ public final class ButtonHelperActionCards {
     public static void resolveDiplomaticPressureStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        game.getGameStats().recordAcTarget("Diplomatic Pressure", player, p2);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message = p2.getRepresentationUnfogged() + ", you are being forced to give a promissory note to "
                 + player.getFactionEmojiOrColor() + ". Please choose which promissory note you wish to send.";
@@ -1659,6 +1664,7 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("absStep2_")
     public static void resolveABSStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        game.getGameStats().recordAcTarget("Ancient Burial Sites", player, p2);
         for (String planet : p2.getPlanetsAllianceMode()) {
             Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getPlanetTypes().contains("cultural")) {
@@ -1679,6 +1685,7 @@ public final class ButtonHelperActionCards {
     @ButtonHandler("salvageStep2_")
     public static void resolveSalvageStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        game.getGameStats().recordAcTarget("Salvage", player, p2);
         int comm = p2.getCommodities();
         p2.setCommodities(0);
         player.setTg(player.getTg() + comm);
@@ -2533,6 +2540,7 @@ public final class ButtonHelperActionCards {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int exhaustCount = 0;
+        Set<Player> bombarded = new LinkedHashSet<>();
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             if (uH instanceof Planet) {
                 for (Player p2 : game.getRealPlayers()) {
@@ -2540,6 +2548,7 @@ public final class ButtonHelperActionCards {
                         continue;
                     }
                     if (p2.getPlanets().contains(uH.getName())) {
+                        bombarded.add(p2);
                         p2.exhaustPlanet(uH.getName());
                         MessageHelper.sendMessageToChannel(
                                 p2.getCorrectChannel(),
@@ -2550,6 +2559,7 @@ public final class ButtonHelperActionCards {
                 }
             }
         }
+        bombarded.forEach(p2 -> game.getGameStats().recordAcTarget("Tactical Bombardment", player, p2));
         ButtonHelper.deleteMessage(event);
         if (game.isFowMode() && exhaustCount == 0) {
             MessageHelper.sendMessageToChannel(
@@ -2974,6 +2984,7 @@ public final class ButtonHelperActionCards {
             PlanetTargetService.fizzle(event, player);
             return;
         }
+        game.getGameStats().recordAcTarget("Infiltrate", player, target.owner());
         ButtonHelperModifyUnits.infiltratePlanet(player, game, target.unitHolder(), event);
         ButtonHelper.deleteMessage(event);
     }
@@ -2993,6 +3004,7 @@ public final class ButtonHelperActionCards {
             return;
         }
         Player p2 = target.owner();
+        game.getGameStats().recordAcTarget("Reparations", player, p2);
         String planet = target.planetId();
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         p2.exhaustPlanet(planet);

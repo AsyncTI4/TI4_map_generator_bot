@@ -47,6 +47,23 @@ public class Hostility {
     private static final String FIELDS = "/";
     private static final String FORMAT = "%.2f";
     private static final String SABOTAGE = "Sabotage";
+    private static final Set<String> NOT_MEAN_TARGETS = Set.of(
+            SABOTAGE,
+            "Forward Supply Base",
+            "Brilliance",
+            "Exchange Program",
+            "Direct Hit",
+            "Courageous to the End",
+            "Intercept",
+            "Rout",
+            "Disable",
+            "Reflective Shielding",
+            "Waylay",
+            "Scramble Frequency",
+            "Experimental Battlestation",
+            "Parley",
+            "Salvage",
+            "Infiltrate");
 
     private record Cost(String offender, String victim, double tradeGoods) {}
 
@@ -166,6 +183,7 @@ public class Hostility {
         List<GameStats.ActionCardTarget> aimed = game.getGameStats().getActionCardTargets();
         List<Cost> found = new ArrayList<>();
         for (int index = Math.min(targets, aimed.size()); index < aimed.size(); index++) {
+            if (NOT_MEAN_TARGETS.contains(aimed.get(index).getActionCard())) continue;
             Player player = byTrackedId(game, aimed.get(index).getPlayerId());
             Player target = byTrackedId(game, aimed.get(index).getTargetId());
             if (player != null && target != null && player != target) {

@@ -101,6 +101,7 @@ public class PickStrategyCardButtonHandler {
                     if (pdValue.contains(p2.getFaction())
                             && p2.getPlayableActionCards().contains("disgrace")) {
                         ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
+                        game.getGameStats().recordAcTarget("Public Disgrace", p2, player);
                         game.setStoredValue("Public Disgrace", "");
                         String msg = player.getRepresentationUnfogged() + " picked "
                                 + game.getSCEmojiWordRepresentation(scpick) + ".";

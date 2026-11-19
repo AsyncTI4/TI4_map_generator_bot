@@ -169,6 +169,7 @@ class ActionCardButtonHandler {
             if (hasSabo) {
                 ActionCardHelper.playAC(event, game, player, saboID, game.getActionsChannel());
                 SabotageService.rememberCanceledWindow(game, event.getMessageId());
+                game.getGameStats().recordAcTarget("Sabotage", player, targetPlayer);
             } else {
                 message = "Tried to play a _Sabotage_ but found none in hand.";
                 sendReact = false;
