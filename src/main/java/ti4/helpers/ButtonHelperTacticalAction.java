@@ -27,7 +27,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.Dee
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.dream.DreamUnitsHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoTechHandler;
@@ -578,7 +577,6 @@ public final class ButtonHelperTacticalAction {
             MyrrAgent.offerAfterMove(game, player, tile);
         }
         if (unitsWereMoved) {
-            IronSalvageRelicHandler.offerCruiserSalvageAfterMovement(event, game, tile);
             CommanderUnlockCheckService.checkPlayer(
                     player,
                     "nivyn",
@@ -966,10 +964,10 @@ public final class ButtonHelperTacticalAction {
         XyrixTechHandler.offerCrepuscularCopy(game, player, tile);
         BloomAbilityHandler.snapshotCoexistingPlanetsAtAction(game);
         MigoHarvestHandler.offerBlueHarvest(game, player);
-        IronSalvageRelicHandler.offerTacticalActionSalvage(game, player);
         ThirtyKSecretHooks.onSystemActivated(game, player);
         FogSecretHooks.onSystemActivated(game, player);
         TacticalActionService.spendAndPlaceTokenIfNecessary(event, game, player, tile);
+        CrystellumTechHandler.offerResonanceDrive(player);
         if (RefractureRulesService.canUseFenrir(game, player)) {
             MessageHelper.sendMessageToChannelWithButton(
                     player.getCorrectChannel(),

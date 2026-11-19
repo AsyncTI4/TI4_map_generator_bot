@@ -28,10 +28,10 @@
         "types": [
             "PROPULSION"
         ],
-        "requirements": "BBB",
+        "requirements": "BB",
         "faction": "crystellum",
         "source": "beans",
-        "text": "During movement, you may exhaust this card and destroy 1 of your non-fighter ships on the board to apply +1 to the move value of a number of ships equal to the cost of the destroyed ship until the end of this tactical action."
+        "text": "After you activate a system, you may exhaust this card and destroy 1 of your non-fighter ships on the board to apply +1 to the move value of a number of ships equal to the cost of the destroyed ship until the end of this tactical action."
     },
     {
         "alias": "becrysta",
@@ -89,7 +89,7 @@
         "requirements": "Y",
         "faction": "iron",
         "source": "beans",
-        "text": "At the start of your turn, you may choose 1 of your non-fighter ships in a system that contains 1 or more of your units with PRODUCTION. Spend resources equal to the difference between that ship’s cost and the cost of another non-fighter ship in your reinforcements with a higher cost than the chosen ship to replace the chosen ship with that ship."
+        "text": "At the start of your turn, you may choose 1 of your non-fighter ships on the game board. Spend resources equal to half the difference between that ship’s cost and the cost of another non-fighter ship in your reinforcements with a higher cost than the chosen ship to replace the chosen ship with that ship."
     },
     {
         "alias": "betaqr",

@@ -17,7 +17,6 @@ import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.WildlifePr
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.ardentia.ArdentiaAbilityHandler;
@@ -265,7 +264,6 @@ class DeleteButtonsButtonHandler {
                 EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
                 int cost = Helper.calculateCostOfProducedUnits(player, game, true, false);
                 cost = ThurvialiLeadersHandler.applyThurvialiHeroProductionDiscount(game, player, cost);
-                cost = IronLeadersHandler.applyShipwrightKastelProductionDiscount(game, player, cost);
                 cost = IronBreakthroughHandler.applyHyperstaticRelayProductionDiscount(game, player, cost);
                 cost = MigoHarvestHandler.applyYellowHarvestProductionDiscount(game, player, cost);
                 cost = ThirtyKRelicHooks.applyProductionDiscount(player, cost);

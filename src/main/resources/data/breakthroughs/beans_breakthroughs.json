@@ -32,7 +32,7 @@
             "WARFARE",
             "PROPULSION"
         ],
-        "text": "ACTION: Exhaust this card to roll 1 of your units' BOMBARDMENT against a planet in an adjacent system. When you do, you may choose to cancel all of those hits to place infantry into coexistence on that planet up to the number of hits produced.",
+        "text": "ACTION: Exhaust this card to roll 1 of your units' BOMBARDMENT against a planet in an adjacent system. When you do, you may cancel all of those hits to place infantry into coexistence on that planet up to the number of hits produced.",
         "source": "beans"
     },
     {
@@ -41,10 +41,10 @@
         "shortName": "Hyperstatic\nRelays",
         "faction": "iron",
         "synergy": [
-            "WARFARE",
+            "CYBERNETIC",
             "BIOTIC"
         ],
-        "text": "ACTION: Exhaust this card to choose a system that contains 1 or more of your command tokens and your units; resolve those units' PRODUCTION abilities in that system. You may reduce the combined cost of the produced units by the number of your units with PRODUCTION in that system, up to a maximum of 3.",
+        "text": "ACTION: Exhaust this card to choose a system that contains 1 or more of your command tokens and your units; resolve 1 of those units' PRODUCTION abilities in that system. You may reduce the combined cost of the produced units by the number of your units with PRODUCTION in that system, up to a maximum of 3.",
         "source": "beans"
     },
     {
@@ -65,8 +65,7 @@
         "shortName": "Emotet",
         "faction": "netrunners",
         "synergy": [
-            "CYBERNETIC",
-            "WARFARE"
+            "NONE"
         ],
         "text": "ACTION: Exhaust this card to allow another player to spend 2 trade goods to research 1 non-faction technology. If they do, you may return that player's control token from your faction sheet to gain that technology and place 1 infantry into coexistence on a non-home planet they control.",
         "source": "beans"

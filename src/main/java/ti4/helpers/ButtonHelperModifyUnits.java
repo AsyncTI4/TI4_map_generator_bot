@@ -2886,7 +2886,7 @@ public final class ButtonHelperModifyUnits {
         CommanderUnlockCheckService.checkPlayer(
                 player, "saar", "mentak", "l1z1x", "argent", "naaz", "arborec", "titans");
         CommanderUnlockCheckService.checkPlayer(
-                player, "tnelis", "cymiae", "kyro", "ghemina", "rohdhna", "cheiran", "celdauri");
+                player, "tnelis", "cymiae", "kyro", "ghemina", "rohdhna", "cheiran", "celdauri", "iron");
         if ("warsun".equalsIgnoreCase(unitLong) && !willSkipBuild) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         } else if ("sd".equalsIgnoreCase(unitID)) {

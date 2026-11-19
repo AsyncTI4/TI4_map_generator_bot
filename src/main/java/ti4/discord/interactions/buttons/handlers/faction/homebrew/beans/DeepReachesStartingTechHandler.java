@@ -38,12 +38,12 @@ public class DeepReachesStartingTechHandler {
 
     public static void offerNetrunnersStartingTechs(Game game, Player player) {
         if (game.getStoredValue(REMAINING_TECHS + player.getFaction()).isEmpty()) {
-            game.setStoredValue(REMAINING_TECHS + player.getFaction(), "2");
+            game.setStoredValue(REMAINING_TECHS + player.getFaction(), "1");
         }
         MessageHelper.sendMessageToChannelWithButton(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing()
-                        + ", after other players have received their starting technologies, press this button to choose 2 non-faction technologies owned by other players.",
+                        + ", after other players have received their starting technologies, press this button to choose 1 non-faction technology owned by another player.",
                 Buttons.green(player.factionButtonChecker() + GET_TECHS, "Choose Net-Runners Starting Technologies"));
     }
 

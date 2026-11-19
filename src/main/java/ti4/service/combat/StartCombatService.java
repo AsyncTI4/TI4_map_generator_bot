@@ -1150,9 +1150,6 @@ public class StartCombatService {
             String msg = player.getRepresentation();
             IronPromissoryHandler.sendRetrofittingCombatButton(
                     game, player, otherPlayer, tile, "space".equalsIgnoreCase(type));
-            if (game.isFowMode()) {
-                IronSalvageRelicHandler.offerFlagshipCombatButton(game, player, tile);
-            }
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
                 buttons.add(Buttons.green("resolveSpyStep1", "Resolve Cymiae Flagship"));
                 buttons.add(Buttons.DELETE_BUTTONS);
@@ -1970,12 +1967,6 @@ public class StartCombatService {
         NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p1);
         if (!game.isFowMode() && p2 != p1) {
             NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p2);
-        }
-        if (!game.isFowMode()) {
-            IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p1, tile);
-            if (p2 != p1) {
-                IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p2, tile);
-            }
         }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(

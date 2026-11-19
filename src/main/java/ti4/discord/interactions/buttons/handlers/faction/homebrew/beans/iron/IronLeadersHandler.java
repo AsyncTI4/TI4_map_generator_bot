@@ -12,6 +12,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.message.MessageHelper;
@@ -19,10 +20,84 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class IronLeadersHandler {
     public static final String PRODUCTION_SYSTEM_PROMPT =
-            ", choose a system to produce 1 unit with _Shipwright Kastel_. Its cost is reduced by 1.";
+            ", choose a system to produce 1 unit with _Shipwright Kastel_.";
     private static final String SELECT_PRODUCTION_SYSTEM = "ironAgentProductionSystem_";
     private static final String SELECT_HERO_PRODUCTION_SYSTEM = "ironHeroProductionSystem_";
-    private static final String PRODUCTION_CONTEXT = "ironAgentProduction_";
+    private static final String AGENT_OWNER = "ironAgentOwner_";
+    private static final String SELECT_COPY_PRODUCTION_SYSTEM = "ironAgentCopyProductionSystem_";
+
+    public static void setShipwrightKastelOwner(Game game, Player owner, Player target) {
+        String ownerKey = AGENT_OWNER + target.getFaction();
+        if (owner == target) {
+            game.removeStoredValue(ownerKey);
+        } else {
+            game.setStoredValue(ownerKey, owner.getFaction());
+        }
+    }
+
+    private static void offerShipwrightKastelCopyProduction(Game game, Player target) {
+        String ownerKey = AGENT_OWNER + target.getFaction();
+        String ownerFaction = game.getStoredValue(ownerKey);
+        game.removeStoredValue(ownerKey);
+        Player owner = game.getPlayerFromColorOrFaction(ownerFaction);
+        if (owner == null) return;
+        List<Button> buttons = getShipwrightKastelCopySystemButtons(game, owner, target.getFaction());
+        if (buttons.isEmpty()) return;
+        MessageHelper.sendMessageToChannelWithButtons(
+                owner.getCorrectChannel(),
+                owner.getRepresentationNoPing() + ", " + target.getRepresentationNoPing()
+                        + " is producing 1 unit with _Shipwright Kastel_. You may produce the same unit in a system containing your ships for half its cost, rounded up.",
+                NewStuffHelper.paginateWithPinnedButtons(
+                        buttons,
+                        List.of(Buttons.DECLINE_DELETE_BUTTONS),
+                        owner.factionButtonChecker() + SELECT_COPY_PRODUCTION_SYSTEM + target.getFaction() + "|",
+                        24,
+                        0));
+    }
+
+    @ButtonHandler(SELECT_COPY_PRODUCTION_SYSTEM)
+    public static void selectShipwrightKastelCopyProductionSystem(
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] payload =
+                buttonID.substring(SELECT_COPY_PRODUCTION_SYSTEM.length()).split("\\|", 2);
+        if (payload.length == 2
+                && NewStuffHelper.checkAndHandlePaginationChange(
+                        event,
+                        event.getMessageChannel(),
+                        getShipwrightKastelCopySystemButtons(game, player, payload[0]),
+                        player.getRepresentationNoPing()
+                                + ", choose a system in which to produce with _Shipwright Kastel_...",
+                        player.factionButtonChecker() + SELECT_COPY_PRODUCTION_SYSTEM + payload[0] + "|",
+                        buttonID)) {
+            return;
+        }
+        Tile tile = payload.length == 2 ? game.getTileByPosition(payload[1]) : null;
+        if (tile == null || !FoWHelper.playerHasShipsInSystem(player, tile)) {
+            ButtonHelper.deleteTheOneButton(event);
+            return;
+        }
+        List<Button> buttons =
+                Helper.getPlaceUnitButtons(event, player, game, tile, "ironAgentCopy", "placeOneNDone_dontskip");
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing()
+                        + ", produce the same unit for half its cost, rounded up, with _Shipwright Kastel_.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static List<Button> getShipwrightKastelCopySystemButtons(Game game, Player player, String targetFaction) {
+        return game.getTileMap().values().stream()
+                .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
+                .map(tile -> Buttons.green(
+                        player.factionButtonChecker()
+                                + SELECT_COPY_PRODUCTION_SYSTEM
+                                + targetFaction
+                                + "|"
+                                + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)))
+                .toList();
+    }
 
     public static List<Button> agentProductionSystemButtons(Game game, Player target) {
         return NewStuffHelper.paginateWithPinnedButtons(
@@ -46,30 +121,22 @@ public class IronLeadersHandler {
 
         String position = buttonID.substring(SELECT_PRODUCTION_SYSTEM.length());
         Tile tile = game.getTileByPosition(position);
-        if (tile == null) {
+        if (tile == null || !hasProductionUnit(player, game, tile)) {
             ButtonHelper.deleteTheOneButton(event);
             return;
         }
 
-        game.setStoredValue(PRODUCTION_CONTEXT + player.getFaction(), position);
-        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "ironAgent", "place");
+        offerShipwrightKastelCopyProduction(game, player);
+        List<Button> buttons =
+                Helper.getPlaceUnitButtons(event, player, game, tile, "ironAgent", "placeOneNDone_dontskip");
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
                         + ", produce 1 unit in "
                         + tile.getRepresentationForButtons(game, player)
-                        + ". Its cost is reduced by 1 by _Shipwright Kastel_.",
+                        + " with _Shipwright Kastel_.",
                 buttons);
         ButtonHelper.deleteMessage(event);
-    }
-
-    public static int applyShipwrightKastelProductionDiscount(Game game, Player player, int cost) {
-        String key = PRODUCTION_CONTEXT + player.getFaction();
-        if (game.getStoredValue(key).isBlank()) {
-            return cost;
-        }
-        game.removeStoredValue(key);
-        return Math.max(0, cost - 1);
     }
 
     public static void startAdmiralThalenHero(Game game, Player player) {
