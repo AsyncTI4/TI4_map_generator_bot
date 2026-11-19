@@ -62,6 +62,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
@@ -1162,7 +1163,7 @@ public class StartPhaseService {
             boolean anyoneWantsNoSwaps = false;
             boolean anyoneWantsLimitedWhispers = false;
             int noWhispersCount = 0;
-            Collections.shuffle(randomPlayers);
+            Collections.shuffle(randomPlayers, RandomHelper.current());
             for (Player player : randomPlayers) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 if (!userSettings.isHasAnsweredSurvey()) {

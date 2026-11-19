@@ -25,6 +25,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -555,7 +556,7 @@ public class MantisMapBuildService {
         }
 
         // Draw and set a new tile as the "current drawn tile"
-        Collections.shuffle(availableTileIDs);
+        Collections.shuffle(availableTileIDs, RandomHelper.current());
         String selectedTileId = availableTileIDs.getFirst();
         mapBuildContext.persistDrawnTile().accept(selectedTileId);
         DraftCategory category = playerRemainingTiles.blueTileIds().contains(selectedTileId)

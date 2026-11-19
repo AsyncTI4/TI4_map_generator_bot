@@ -2,7 +2,6 @@ package ti4.service.leader.agent.modules;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +9,7 @@ import ti4.ResourceHelper;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.StringHelper;
 import ti4.message.MessageHelper;
 import ti4.service.leader.agent.AgentModule;
@@ -63,7 +63,7 @@ public final class ArtunoAgent extends AgentModule<Integer> {
 
     private static void tellAJokeSometimes(Player artuno) {
         MessageChannel channel = artuno.getCorrectChannel();
-        if (channel == null || ThreadLocalRandom.current().nextInt(1, JOKE_ODDS + 1) != JOKE_ODDS) {
+        if (channel == null || RandomHelper.current().nextInt(1, JOKE_ODDS + 1) != JOKE_ODDS) {
             return;
         }
         File audioFile = ResourceHelper.getFile("voices/nomad/", "Artuno.mp3");

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -19,6 +18,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
@@ -64,7 +64,7 @@ public class StonebornAbilityHandler {
             return null;
         }
 
-        String fragment = availableFragments.get(ThreadLocalRandom.current().nextInt(availableFragments.size()));
+        String fragment = availableFragments.get(RandomHelper.current().nextInt(availableFragments.size()));
         List<String> drawnFragments =
                 new ArrayList<>(List.of(game.getStoredValue(DRAWN_FRAGMENTS).split(",")));
         drawnFragments.removeIf(String::isEmpty);

@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import ti4.helpers.RandomHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileHelper;
 import ti4.model.TileModel;
@@ -151,7 +152,7 @@ final class JimboConst {
                 "Ogdun",
                 "Oy-Oy-Oy"));
         candidates.addAll(List.of("o-word", "o-backronym"));
-        Collections.shuffle(candidates);
+        Collections.shuffle(candidates, RandomHelper.current());
         return StringUtils.capitalize(candidates.getFirst());
     }
 

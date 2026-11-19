@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.model.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
@@ -42,7 +43,7 @@ public interface TwilightFallDeckFuncs {
                     allCards.add(tech.getID());
                 }
             }
-            Collections.shuffle(allCards);
+            Collections.shuffle(allCards, RandomHelper.current());
         }
         for (String card : allCards) {
             if (game.getStoredValue("bannedTechs").contains(card)) {

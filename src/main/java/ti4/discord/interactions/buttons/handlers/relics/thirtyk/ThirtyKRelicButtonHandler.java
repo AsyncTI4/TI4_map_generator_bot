@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thirtyk.ThirtyKRelicHooks;
@@ -265,7 +266,7 @@ class ThirtyKRelicButtonHandler {
         }
         if (!ThirtyKRelics.exhaustIfReady(game, player, event, ThirtyKRelics.SPY_REPORTS)) return;
         List<String> cards = new ArrayList<>(target.getActionCards().keySet());
-        Collections.shuffle(cards);
+        Collections.shuffle(cards, RandomHelper.current());
         List<String> shown = cards.subList(0, Math.min(2, cards.size()));
         String targetName =
                 FoWHelper.identityOrColorIfCanSeeStats(game, target, player, target.getRepresentationNoPing());

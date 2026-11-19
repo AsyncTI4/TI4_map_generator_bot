@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
@@ -17,7 +16,7 @@ public class ListHelper {
      */
     public <T> T randomPick(List<T> list) {
         if (list == null || list.isEmpty()) return null;
-        int randomIndex = ThreadLocalRandom.current().nextInt(list.size());
+        int randomIndex = RandomHelper.current().nextInt(list.size());
         return list.get(randomIndex);
     }
 

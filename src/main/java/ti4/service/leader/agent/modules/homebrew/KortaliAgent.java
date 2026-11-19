@@ -2,11 +2,11 @@ package ti4.service.leader.agent.modules.homebrew;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.model.ExploreModel;
 import ti4.model.Mapper;
 import ti4.service.emoji.FactionEmojis;
@@ -42,7 +42,7 @@ public final class KortaliAgent extends TargetedAgent {
         Player target = use.payload();
         Player kortali = use.user();
         List<String> fragments = target.getFragments();
-        String fragment = fragments.get(ThreadLocalRandom.current().nextInt(fragments.size()));
+        String fragment = fragments.get(RandomHelper.current().nextInt(fragments.size()));
         target.removeFragment(fragment);
         kortali.addFragment(fragment);
 

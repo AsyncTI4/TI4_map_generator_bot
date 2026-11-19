@@ -15,6 +15,7 @@ import ti4.game.Tile;
 import ti4.game.persistence.GameManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.MapTemplateHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.settingsFramework.menus.BaseGameMiniMiltySettings;
 import ti4.model.MapTemplateModel;
 import ti4.model.MapTemplateModel.MapTemplateTile;
@@ -107,8 +108,8 @@ public class BaseGameMiniMiltyService {
 
         List<MiltyDraftTile> blueTiles = new ArrayList<>(tileManager.getBlue());
         List<MiltyDraftTile> redTiles = new ArrayList<>(tileManager.getRed());
-        Collections.shuffle(blueTiles);
-        Collections.shuffle(redTiles);
+        Collections.shuffle(blueTiles, RandomHelper.current());
+        Collections.shuffle(redTiles, RandomHelper.current());
 
         Map<Integer, List<MiltyDraftTile>> tilesByPlayer = new HashMap<>();
         int bluePointer = 0;
@@ -152,13 +153,13 @@ public class BaseGameMiniMiltyService {
     private static List<MiltyDraftTile> buildSliceTiles(List<MiltyDraftTile> blueTiles, List<MiltyDraftTile> redTiles) {
         List<MiltyDraftTile> shuffledBlueTiles = new ArrayList<>(blueTiles);
         List<MiltyDraftTile> shuffledRedTiles = new ArrayList<>(redTiles);
-        Collections.shuffle(shuffledBlueTiles);
-        Collections.shuffle(shuffledRedTiles);
+        Collections.shuffle(shuffledBlueTiles, RandomHelper.current());
+        Collections.shuffle(shuffledRedTiles, RandomHelper.current());
 
         List<MiltyDraftTile> sliceTiles = new ArrayList<>(shuffledBlueTiles.size() + shuffledRedTiles.size());
         sliceTiles.addAll(shuffledBlueTiles);
         sliceTiles.addAll(shuffledRedTiles);
-        Collections.shuffle(sliceTiles);
+        Collections.shuffle(sliceTiles, RandomHelper.current());
         return sliceTiles;
     }
 

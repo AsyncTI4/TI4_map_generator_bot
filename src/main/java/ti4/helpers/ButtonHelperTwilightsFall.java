@@ -277,7 +277,7 @@ public final class ButtonHelperTwilightsFall {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            Collections.shuffle(slice);
+            Collections.shuffle(slice, RandomHelper.current());
             if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()
                     || slice.get(1).getTile().isAnomaly()) {
                 Collections.rotate(slice, 1);

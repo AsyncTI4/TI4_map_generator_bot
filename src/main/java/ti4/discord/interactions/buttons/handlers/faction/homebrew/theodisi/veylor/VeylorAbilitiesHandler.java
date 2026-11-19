@@ -16,6 +16,7 @@ import ti4.game.Player;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperStats;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.Mapper;
@@ -176,7 +177,7 @@ public class VeylorAbilitiesHandler {
             }
 
             List<String> agendaIds = new ArrayList<>(List.of(storedAgendas.split(",")));
-            Collections.shuffle(agendaIds);
+            Collections.shuffle(agendaIds, RandomHelper.current());
             List<String> agendasNotReturned = new ArrayList<>();
             for (String agendaId : agendaIds) {
                 Integer uniqueId = game.getSentAgendas().get(agendaId);

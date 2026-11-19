@@ -32,6 +32,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardTargets;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
@@ -40,6 +41,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.TeHelperTechs;
@@ -134,6 +136,7 @@ public class PlayStrategyCardService {
                         continue;
                     }
                     ActionCardHelper.playAC(event, game, p2, "coup", game.getMainGameChannel());
+                    ActionCardTargets.record(game, "Coup d'Etat", p2, player);
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
                     String message =
@@ -1328,7 +1331,7 @@ public class PlayStrategyCardService {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         List<Player> players = new ArrayList<>(game.getRealPlayers());
         if (game.isFowMode()) {
-            Collections.shuffle(players);
+            Collections.shuffle(players, RandomHelper.current());
         }
         String politicsGroup =
                 MegagameGroupService.isActive(game) ? MegagameGroupService.groupOf(game, politicsHolder) : null;

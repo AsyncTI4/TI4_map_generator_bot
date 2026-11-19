@@ -17,6 +17,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.discord.interactions.routing.ModalHandler;
 import ti4.game.Game;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
@@ -90,7 +91,7 @@ class AddTileListRandom extends GameStateSubcommand {
                     return;
                 }
 
-                Collections.shuffle(availableTiles);
+                Collections.shuffle(availableTiles, RandomHelper.current());
                 tileToken = availableTiles.getFirst().getId();
             }
             tilesToAdd.add((isCenter ? "{" : "") + tileToken + (isCenter ? "}" : ""));

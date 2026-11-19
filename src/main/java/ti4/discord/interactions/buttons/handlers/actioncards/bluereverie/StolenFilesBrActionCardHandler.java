@@ -11,6 +11,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
@@ -73,7 +74,7 @@ public class StolenFilesBrActionCardHandler {
         }
         player.removeSecret(identifier);
         game.getSecretObjectives().add(returnId);
-        Collections.shuffle(game.getSecretObjectives());
+        Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),

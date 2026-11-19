@@ -3,7 +3,6 @@ package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -17,6 +16,7 @@ import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.service.async.DieRollSequenceService;
 import ti4.service.emoji.ExploreEmojis;
@@ -167,7 +167,7 @@ class TombRaidersAcd2ButtonHandler {
         List<String> activities = new ArrayList<>();
         while (activities.size() < count) {
             List<String> shuffled = new ArrayList<>(ACTIVITIES);
-            Collections.shuffle(shuffled);
+            Collections.shuffle(shuffled, RandomHelper.current());
             activities.addAll(shuffled);
         }
         return activities.subList(0, count);
@@ -230,6 +230,6 @@ class TombRaidersAcd2ButtonHandler {
                         "\"They're digging in the wrong place!\" — Indiana Jones, _Raiders of the Lost Ark_",
                         "\"X never, ever marks the spot.\" — Indiana Jones, _Indiana Jones and the Last Crusade_",
                         "\"He chose... poorly.\" — Grail Knight, _Indiana Jones and the Last Crusade_");
-        return quips.get(ThreadLocalRandom.current().nextInt(quips.size()));
+        return quips.get(RandomHelper.current().nextInt(quips.size()));
     }
 }

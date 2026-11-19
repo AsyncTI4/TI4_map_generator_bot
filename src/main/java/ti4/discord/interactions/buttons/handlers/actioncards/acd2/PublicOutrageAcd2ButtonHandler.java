@@ -15,6 +15,7 @@ import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaRiderHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.info.KnownCardsService;
@@ -82,7 +83,7 @@ public class PublicOutrageAcd2ButtonHandler {
                 continue;
             }
             List<String> keys = new ArrayList<>(hand.keySet());
-            Collections.shuffle(keys);
+            Collections.shuffle(keys, RandomHelper.current());
             String acKey = keys.getFirst();
             int acNum = hand.get(acKey);
             String acName = Mapper.getActionCard(acKey).getName();
