@@ -55,6 +55,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
+import ti4.helpers.GameClock;
 import ti4.helpers.StringHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
@@ -108,7 +109,7 @@ class AiTickRunner {
     }
 
     static void tick(AiLane lane) {
-        tick(lane, System.currentTimeMillis());
+        tick(lane, GameClock.currentTimeMillis());
     }
 
     static void tick(AiLane lane, long now) {

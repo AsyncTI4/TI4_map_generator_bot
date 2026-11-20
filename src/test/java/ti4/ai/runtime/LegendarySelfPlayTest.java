@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -41,9 +40,8 @@ class LegendarySelfPlayTest extends BaseTi4Test {
     }
 
     private static SelfPlayGame.Outcome play(Handout scenario) throws Exception {
-        try (SelfPlayEnvironment env = new SelfPlayEnvironment(System.currentTimeMillis())) {
-            SelfPlayGame selfPlay = new SelfPlayGame(
-                    env, "ailegend" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
+        try (SelfPlayEnvironment env = new SelfPlayEnvironment(SelfPlayGame.CLOCK_START)) {
+            SelfPlayGame selfPlay = new SelfPlayGame(env, SelfPlayGame.seededName("ailegend", SelfPlayGame.BASE_SEED));
             scenario.attach(env, selfPlay);
             try {
                 selfPlay.setUp(FACTIONS);

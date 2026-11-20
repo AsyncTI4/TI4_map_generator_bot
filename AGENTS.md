@@ -135,6 +135,10 @@ A single action row can hold **either** up to 5 buttons **or** one select menu â
   the same; unseeded, `current()` is `ThreadLocalRandom`, so nothing changes in production.
   Map rendering is the one exception: it uses `RenderRandom`. Move old call sites over when
   you touch them.
+- **Read game time from `GameClock.currentTimeMillis()`** ([GameClock](src/main/java/ti4/helpers/GameClock.java))
+  when the time is stored in the game or decides what happens (save stamps, game creation, the AI's own time
+  windows). It is the wall clock unless a thread sets its own clock: self-play sets its virtual clock, so a seed
+  replays the same game however fast the machine runs. Logging and timing measurements can stay on the wall clock.
 - **Agents, genomes and homebrew agents live apart.** Official agents are modules under
   `ti4.service.leader.agent.modules`. The agent core in `ti4.service.leader.agent` and those modules never name
   Twilight's Fall, genomes or homebrew. Genomes (Twilight's Fall and TK Nova) live in

@@ -30,6 +30,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.GameClock;
 import ti4.logging.BotLogger;
 
 @UtilityClass
@@ -125,8 +126,8 @@ public class AiPerception {
         return snapshot;
     }
 
-    private static List<ThreadChannel> recentStrategyThreads(Game game) {
-        long cutoff = System.currentTimeMillis() - STRATEGY_THREAD_WINDOW_MILLIS;
+    static List<ThreadChannel> recentStrategyThreads(Game game) {
+        long cutoff = GameClock.currentTimeMillis() - STRATEGY_THREAD_WINDOW_MILLIS;
         try {
             return game.getPlayedSCs().stream()
                     .map(initiative -> ButtonHelper.getRightStratThread(game, ButtonHelper.getStratName(initiative)))

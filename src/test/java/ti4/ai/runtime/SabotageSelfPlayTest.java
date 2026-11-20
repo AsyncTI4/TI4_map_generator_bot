@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import ti4.game.Game;
@@ -40,9 +39,8 @@ class SabotageSelfPlayTest extends BaseTi4Test {
     }
 
     private static SelfPlayGame.Outcome play(ContenderPlaysOverrule scenario) throws Exception {
-        try (SelfPlayEnvironment env = new SelfPlayEnvironment(System.currentTimeMillis())) {
-            SelfPlayGame selfPlay =
-                    new SelfPlayGame(env, "aisabo" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
+        try (SelfPlayEnvironment env = new SelfPlayEnvironment(SelfPlayGame.CLOCK_START)) {
+            SelfPlayGame selfPlay = new SelfPlayGame(env, SelfPlayGame.seededName("aisabo", SelfPlayGame.BASE_SEED));
             scenario.attach(env, selfPlay);
             try {
                 selfPlay.setUp(FACTIONS);

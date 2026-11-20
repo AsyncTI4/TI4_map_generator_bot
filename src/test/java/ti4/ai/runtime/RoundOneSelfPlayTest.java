@@ -9,7 +9,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -134,7 +133,7 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
     }
 
     private static List<GameResult> playAll(int games, int threads) throws Exception {
-        long clockStart = System.currentTimeMillis();
+        long clockStart = SelfPlayGame.CLOCK_START;
         AtomicInteger names = new AtomicInteger();
         ExecutorService pool = Executors.newFixedThreadPool(
                 threads, task -> new Thread(task, "ai-round-one-" + names.incrementAndGet()));
@@ -154,8 +153,8 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
 
     private static GameResult playOne(long clockStart, int slot) throws Exception {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
-            SelfPlayGame selfPlay = new SelfPlayGame(
-                    env, "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000), slot);
+            SelfPlayGame selfPlay =
+                    new SelfPlayGame(env, SelfPlayGame.seededName("aiselfplay", SelfPlayGame.seedFor(slot)), slot);
             List<String> seating = new ArrayList<>(FACTIONS);
             java.util.Collections.rotate(seating, slot);
             Game game = selfPlay.setUp(seating);

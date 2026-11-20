@@ -76,6 +76,7 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.GameClock;
 import ti4.helpers.Helper;
 import ti4.helpers.HydromorphicHelper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -328,7 +329,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public Game() {
-        long currentTimeMillis = System.currentTimeMillis();
+        long currentTimeMillis = GameClock.currentTimeMillis();
         setCreationDate(Helper.getDateRepresentation(currentTimeMillis));
         setCreationDateTime(currentTimeMillis);
         setLastModifiedDate(currentTimeMillis);

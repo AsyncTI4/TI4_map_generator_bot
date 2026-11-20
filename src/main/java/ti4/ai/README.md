@@ -2348,7 +2348,7 @@ These points were read from the code but not confirmed by running it or by a tes
 - Whether the hourly action cap (150 per seat) ever holds the referee back in harness games (`AiTickRunner.referee` returns false while any seat is over it) was not measured.
 - Whether `TrajectoryReplayTest` passes today: the replay does not restore the seeded `Random`, `AiSeatState` beyond pressed keys and memory, or the `TickMemo` scope; a brain decision that reads any of these could replay differently. Not run.
 - Whether `DeterminismSelfPlayTest` and `EnvironmentSnapshotTest` pass on this head: not run.
-- Unverified: that an unseeded full game's referee runs up to a minute late once the virtual clock is a day ahead of the wall-clock `lastModifiedDate` (section 5, referee fallback). Inferred from `AiTickRunner.tickGame` and `GameSaveService.writeGame`; not measured.
+
 - Unverified: whether the games `RoundOneSelfPlayTest` and `RoundTwoSelfPlayTest` leave registered in `GameManager` affect tests that run later in the same JVM.
 - Not checked line by line: the per-tracker columns of the tracker table in section 4 (MecatolTracker, ExpeditionTracker, LeaderTracker, FactionComponentTracker, ObjectiveTracker and its per-secret trackers, RelicTracker, ScoringDiagnostic) beyond the call sites and system properties.
 

@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.zip.GZIPInputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -36,9 +35,8 @@ class TrajectoryReplayTest extends BaseTi4Test {
         String previous = System.getProperty(TrajectoryLog.PROPERTY);
         System.setProperty(TrajectoryLog.PROPERTY, folder.toString());
         System.setProperty(TrajectoryLog.SNAPSHOTS_PROPERTY, "true");
-        try (SelfPlayEnvironment env = new SelfPlayEnvironment(System.currentTimeMillis())) {
-            SelfPlayGame selfPlay =
-                    new SelfPlayGame(env, "aitraj" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
+        try (SelfPlayEnvironment env = new SelfPlayEnvironment(SelfPlayGame.CLOCK_START)) {
+            SelfPlayGame selfPlay = new SelfPlayGame(env, SelfPlayGame.seededName("aitraj", SelfPlayGame.BASE_SEED));
             try {
                 selfPlay.setUp(FACTIONS);
                 SelfPlayGame.Outcome outcome = selfPlay.run(game -> game.getRound() >= 2, VIRTUAL_DAY, MAX_TICKS);

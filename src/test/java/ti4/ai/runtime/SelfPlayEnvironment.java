@@ -163,6 +163,9 @@ final class SelfPlayEnvironment implements AutoCloseable {
 
     SelfPlayEnvironment(long startMillis) throws IOException {
         clock = new AtomicLong(startMillis);
+        // Game saves and the AI's own time checks read this thread's game clock; on the wall clock the same seed could
+        // play a different game depending on how fast the machine ran it.
+        ti4.helpers.GameClock.useForThisThread(clock::get);
         discord = new FakeDiscord(clock::get);
         storage = Files.createTempDirectory("ai-self-play");
         try {
@@ -824,6 +827,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
     public void close() {
         if (trajectory != null) trajectory.close();
         if (seeded) ti4.helpers.RandomHelper.unseedThisThread();
+        ti4.helpers.GameClock.useWallClockForThisThread();
         for (int i = mocks.size() - 1; i >= 0; i--) {
             try {
                 mocks.get(i).close();

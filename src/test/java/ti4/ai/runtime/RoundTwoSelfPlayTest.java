@@ -10,7 +10,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -158,7 +157,7 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
     }
 
     private static List<GameResult> playAll(int games, int threads) throws Exception {
-        long clockStart = System.currentTimeMillis();
+        long clockStart = SelfPlayGame.CLOCK_START;
         AtomicInteger names = new AtomicInteger();
         ExecutorService pool = Executors.newFixedThreadPool(
                 threads, task -> new Thread(task, "ai-round-two-" + names.incrementAndGet()));
@@ -180,7 +179,7 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
         try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
             String name = SelfPlayGame.AB.isPresent()
                     ? "aiab" + Math.floorMod(SelfPlayGame.seedFor(slot), 1_000_000L) + (slot % 2 == 0 ? "a" : "b")
-                    : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
+                    : SelfPlayGame.seededName("aiselfplay", SelfPlayGame.seedFor(slot));
             SelfPlayGame selfPlay = new SelfPlayGame(env, name, slot);
             List<String> seating = new ArrayList<>(FACTIONS);
             Collections.rotate(seating, SelfPlayGame.pairSlot(slot));

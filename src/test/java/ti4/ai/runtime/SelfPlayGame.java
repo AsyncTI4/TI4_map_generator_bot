@@ -208,6 +208,14 @@ final class SelfPlayGame {
     // Every random draw the game thread makes (dice, decks, seat ids, AI profile seeds) comes from this seed, so a game
     // replays from -Dai.selfplay.seed=<printed seed> with its slot. Without the property each batch picks a base seed.
     static final long BASE_SEED = Long.getLong("ai.selfplay.seed", System.nanoTime() & 0xFFFFFFFFL);
+    // Every game starts its virtual clock here and is named after its seed, so a printed seed replays the same game:
+    // game names and message times feed the AI.
+    static final long CLOCK_START = 1_790_000_000_000L;
+
+    static String seededName(String prefix, long seed) {
+        return prefix + Math.floorMod(seed, 1_000_000L);
+    }
+
     final long seed;
     private final java.util.Set<String> legacySeats = new java.util.LinkedHashSet<>();
     private final java.util.Set<String> heldCards = new java.util.LinkedHashSet<>();
