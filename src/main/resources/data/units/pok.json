@@ -67,7 +67,7 @@
         "planetaryShield": true,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: When you would use your Mitosis faction ability you may replace 1 of your infantry with 1 mech from your reinforcements instead.",
+        "ability": "DEPLOY: When you would use your Mitosis faction ability, you may replace 1 of your infantry with 1 mech from your reinforcements instead.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/mechs/letani_behemoth.jpg?raw=true"
     },
     {
@@ -312,7 +312,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This planet's card may be traded as part of a transaction; if you do, move all of your units from this planet to another planet you control.",
+        "ability": "This planet's planet card may be traded as part of a transaction; if you do, move all of your units from this planet to another planet you control.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/mechs/pride_of_kenara.jpg?raw=true"
     },
     {
@@ -449,7 +449,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD.\nAt the start of each space combat round, repair this ship.",
+        "ability": "Other players' units in this system lose PLANETARY SHIELD.\nAt the start of each space combat round, repair this ship.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/flagships/arc_secundus.png?raw=true"
     },
     {
@@ -552,7 +552,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's ships in this system cannot use SUSTAIN DAMAGE.",
+        "ability": "Other players' ships in this system cannot use SUSTAIN DAMAGE.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/flagships/fourth_moon.png?raw=true"
     },
     {
@@ -568,7 +568,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Other player's ground forces on this planet cannot use SUSTAIN DAMAGE.",
+        "ability": "Other players' ground forces on this planet cannot use SUSTAIN DAMAGE.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/mechs/moll_terminus.jpg?raw=true"
     },
     {
@@ -587,7 +587,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "ACTION: Spend 1 token from your strategy pool to place 1 cruiser in this system.",
+        "ability": "ACTION: Spend 1 token from your strategy pool to place 1 cruiser in this unit's system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/flagships/the_inferno.png?raw=true"
     },
     {
@@ -704,7 +704,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During an invasion in this system, you may commit fighters to planets as if they were ground forces. After combat, return those units to the space area.",
+        "ability": "During an invasion in this system, you may commit fighters to planets as if they were ground forces. When combat ends, return those units to the space area.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/flagships/matriarch.png?raw=true"
     },
     {
@@ -955,7 +955,7 @@
         "isStructure": true,
         "isPlanetOnly": false,
         "isSpaceOnly": true,
-        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
+        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/faction/floating_factory.jpg?raw=true"
     },
     {
@@ -973,7 +973,7 @@
         "isStructure": true,
         "isPlanetOnly": false,
         "isSpaceOnly": true,
-        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
+        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/floating_factory_2.jpg?raw=true"
     },
     {
@@ -989,7 +989,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you gain control of a planet, you may spend 1 trade good to place 1 mech on that planet",
+        "ability": "DEPLOY: After you gain control of a planet, you may spend 1 trade good to place 1 mech on that planet.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/mechs/scavenger_zeta.jpg?raw=true"
     },
     {
@@ -1032,7 +1032,7 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/exotrireme_2.jpg?raw=true"
     },
     {
@@ -1111,7 +1111,7 @@
         "id": "sol_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
-        "name": "Genesis ",
+        "name": "Genesis",
         "source": "base",
         "faction": "sol",
         "moveValue": 1,
@@ -1284,7 +1284,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/heltitan_2.jpg?raw=true"
     },
     {
@@ -1319,7 +1319,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After you resolve a tactical action where you gained control of this planet, you may place 1 PDS or 1 Space Dock from your reinforcements on this planet.",
+        "ability": "After you resolve a tactical action during which you gained control of this planet, you may place 1 PDS or 1 space dock from your reinforcements on this planet.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/pok/mechs/reclaimer.jpg?raw=true"
     },
     {

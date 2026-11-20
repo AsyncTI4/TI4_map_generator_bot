@@ -265,7 +265,9 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
             fieldContent += "\n-# [" + notes + "]";
         }
         eb.addField(fieldTitle, fieldContent, false);
-        if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
+        if (includeFlavourText && getFlavourText().isPresent()) {
+            eb.addField(" ", "*" + getFlavourText().get() + "*", false);
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

@@ -3,7 +3,7 @@
         "id": "raid_formation",
         "name": "Raid Formation",
         "faction": "argent",
-        "window": "When 1 or more of your units uses ANTI-FIGHTER BARRAGE",
+        "window": "When 1 or more of your units use ANTI-FIGHTER BARRAGE",
         "windowEffect": "for each hit produced in excess of your opponent's fighters, choose 1 of your opponent's ships that has SUSTAIN DAMAGE to become damaged.",
         "source": "pok"
     },
@@ -11,9 +11,9 @@
         "id": "zeal",
         "name": "Zeal",
         "faction": "argent",
-        "permanentEffect": "You always vote first during the agenda phase",
+        "permanentEffect": "You always vote first during the agenda phase.",
         "window": "When you cast at least 1 vote",
-        "windowEffect": "cast 1 additional vote for each player in the game including you.",
+        "windowEffect": "cast 1 additional vote for each player in the game, including you.",
         "source": "pok"
     },
     {
@@ -37,7 +37,7 @@
         "name": "Riftmeld",
         "faction": "cabal",
         "window": "When you research a unit upgrade technology",
-        "windowEffect": "You may return 1 captured unit of that type to ignore all of the technology's prerequisites.",
+        "windowEffect": "You may return 1 captured unit of that type to ignore all of that technology's prerequisites.",
         "source": "pok"
     },
     {
@@ -67,7 +67,7 @@
         "id": "edict",
         "name": "Edict",
         "faction": "mahact",
-        "permanentEffect": "Other player's tokens in your fleet pool increase your fleet limit but cannot be redistributed.",
+        "permanentEffect": "Other players' tokens in your fleet pool increase your fleet limit but cannot be redistributed.",
         "window": "When you win a combat",
         "windowEffect": "Place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens.",
         "source": "pok"
@@ -76,7 +76,7 @@
         "id": "hubris",
         "name": "Hubris",
         "faction": "mahact",
-        "permanentEffect": "During setup, purge your \"Alliance\" promissory note. Other players cannot give you their 'Alliance\" promissory note.",
+        "permanentEffect": "During setup, purge your \"Alliance\" promissory note. Other players cannot give you their \"Alliance\" promissory notes.",
         "source": "pok"
     },
     {
@@ -99,7 +99,7 @@
         "name": "Fabrication",
         "faction": "naaz",
         "window": "ACTION",
-        "windowEffect": "Either purge 2 of your relic fragments of the same type to gain 1 relic; or purge 1 of your relic fragments to gain 1 command token.",
+        "windowEffect": "Either purge 2 of your relic fragments of the same type to gain 1 relic or purge 1 of your relic fragments to gain 1 command token.",
         "source": "pok"
     },
     {
@@ -129,7 +129,7 @@
         "id": "coalescence",
         "name": "Coalescence",
         "faction": "titans",
-        "permanentEffect": "If your flagship or your AWAKEN faction ability places your units into the same space area or onto the same planet as another player's units, your units must participate in combat during \"Space Combat\" or \"Ground Combat\" steps.",
+        "permanentEffect": "If your flagship or your AWAKEN faction ability places your units into the same space area or onto the same planet as another player's units, your units must participate in combat during the \"Space Combat\" or \"Ground Combat\" steps.",
         "source": "pok",
         "shortName": "Coale-\nscence"
     },

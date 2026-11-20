@@ -16,7 +16,7 @@
         "playArea": false,
         "attachment": false,
         "source": "thunders_edge",
-        "text": "When you receive this card, if you are not the Firmament: The Firmament player may place 1 facedown plot card in their play area with your control token on it. Then, gain 2 command tokens, gain 2 trade goods, and purge this card."
+        "text": "When you receive this card, if you are not the Firmament: The Firmament may place 1 facedown plot card in their play area with your control token on it. Then, gain 2 command tokens, gain 2 trade goods, and purge this card."
     },
     {
         "alias": "malevolency",
@@ -26,7 +26,7 @@
         "playArea": false,
         "attachment": false,
         "source": "thunders_edge",
-        "text": "At the end of one of your tactical actions: Spend 1 influence to give this card to one of your neighbors; you can use this ability even if you are the Obsidian player.\nAt the end of the status phase, if you are not the Obsidian player, you must remove 1 command token from your fleet pool and return it to your reinforcements."
+        "text": "At the end of one of your tactical actions: Spend 1 influence to give this card to one of your neighbors; you can use this ability even if you are the Obsidian player.\nAt the end of the status phase, if you are not the Obsidian player, remove 1 command token from your fleet pool and return it to your reinforcements."
     },
     {
         "alias": "nanolink",
@@ -45,7 +45,7 @@
         "playImmediately": false,
         "attachment": false,
         "source": "thunders_edge",
-        "text": "ACTION: place this card face up in your play area, and place the sever token in a system that contains your units, wormholes in that system have no effect during movement. Remove the sever token and return this card to the Rebellion player at end of the status phase.",
+        "text": "ACTION: Place this card faceup in your play area and place the sever token in a system that contains your units; wormholes in that system have no effect during movement.\nRemove the sever token and return this card to the Rebellion player at the end of the status phase.",
         "notes": "This can be played in a system that has no wormholes."
     },
     {

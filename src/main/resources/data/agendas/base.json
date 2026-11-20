@@ -36,9 +36,9 @@
         "name": "Classified Document Leaks",
         "type": "Law",
         "target": "Elect Scored Secret Objective (When this agenda is revealed, if there are no scored secret objectives, discard this card and reveal another agenda from the top of the deck.)",
-        "text1": "The elected secret objective becomes a public objective - place it near the other public objectives in the common play area.",
+        "text1": "The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.",
         "text2": "",
-        "mapText": "The elected secret objective becomes a public objective. Place it near the other public objectives in the common play area.",
+        "mapText": "The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.",
         "source": "base"
     },
     {
@@ -46,7 +46,7 @@
         "name": "Colonial Redistribution",
         "type": "Directive",
         "target": "Elect Non-Home Planet Other Than Mecatol Rex",
-        "text1": "Destroy each unit on the elected planet. Then, the player who controls that planet chooses 1 player with the fewest victory points - that player may place 1 infantry from their reinforcements on that planet.",
+        "text1": "Destroy each unit on the elected planet. Then, the player who controls that planet chooses 1 player with the fewest victory points; that player may place 1 infantry from their reinforcements on that planet.",
         "text2": "",
         "source": "base"
     },
@@ -65,7 +65,7 @@
         "name": "Compensated Disarmament",
         "type": "Directive",
         "target": "Elect Planet",
-        "text1": "Destroy each ground force on the elected planet. For each unit that was destroyed, the player who control that planet gains 1 trade good.",
+        "text1": "Destroy each ground force on the elected planet; for each unit that was destroyed, the player who controls that planet gains 1 trade good.",
         "text2": "",
         "source": "base"
     },
@@ -151,7 +151,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.",
-        "text2": "Against: Draw and reveal 1 stage II public from the deck and place it near the public objectives.",
+        "text2": "Against: Draw and reveal 1 stage II public objective from the deck and place it near the public objectives.",
         "forEmoji": "Public1alt",
         "againstEmoji": "Public2alt",
         "source": "base"
@@ -211,9 +211,9 @@
         "name": "Minister of Peace",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. After a player activates a system that contains 1 or more of a different player's units, the owner of this card may discard this card - immediately end the active player's turn.",
+        "text1": "The elected player gains this card. After a player activates a system that contains 1 or more of a different player's units, the owner of this card may discard this card; immediately end the active player's turn.",
         "text2": "",
-        "mapText": "After a player activates a system that contains 1 or more of a different player's units, you may discard this card - immediately end the active player's turn.",
+        "mapText": "After a player activates a system that contains 1 or more of a different player's units, you may discard this card; immediately end the active player's turn.",
         "source": "base"
     },
     {
@@ -241,7 +241,7 @@
         "name": "Minister of War",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card may discard this card after performing an action to remove 1 of their command tokens from the game board and return it to their reinforcements - then they may perform 1 additional action.",
+        "text1": "The elected player gains this card. The owner of this card may discard this card after performing an action to remove 1 of their command tokens from the game board and return it to their reinforcements; then they may perform 1 additional action.",
         "text2": "",
         "mapText": "Discard this card after performing an action to remove 1 of your command tokens from the game board. Then, you may perform 1 additional action.",
         "source": "base"
@@ -411,7 +411,7 @@
         "name": "Representative Government (Base Game)",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase. Each player may cast 1 vote on each agenda instead.",
+        "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead.",
         "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
         "forEmoji": "🗳️",
         "againstEmoji": "ExhaustedPlanet",

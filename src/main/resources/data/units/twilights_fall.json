@@ -54,7 +54,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit and other units moving at the same time can move into and through supernovas."
+        "ability": "Other players' units in this system lose PLANETARY SHIELD. This unit and other units moving at the same time can move into and through supernovas."
     },
     {
         "id": "tf-universitywarsun",
@@ -77,7 +77,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD."
+        "ability": "Other players' units in this system lose PLANETARY SHIELD."
     },
     {
         "id": "tf-dragonfreed",
@@ -99,7 +99,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "While you own this card, you can only have 1 war sun. When this unit uses its BOMBARDMENT ability, it uses it against every planet in its system and each adjacent system, even yours, ignoring planetary shield."
+        "ability": "While you own this card, you can only have 1 war sun. When this unit uses BOMBARDMENT, it uses it against each planet in its system and each adjacent system, even yours, ignoring PLANETARY SHIELD."
     },
     {
         "id": "tf-dawncrusher",
@@ -327,7 +327,7 @@
         "canBeDirectHit": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON ability against ships that are in adjacent systems."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON ability against ships that are adjacent to this unit's system."
     },
     {
         "id": "tf-keepermatrix",
@@ -474,7 +474,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "Capture other players' infantry and fighters that are destroyed or removed in this unit's system or an adjacent system. At the start of your turn you may spend captured infantry or fighters to place equivalent units from your reinforcement in this system."
+        "ability": "Capture other players' infantry and fighters that are destroyed or removed in this unit's system or an adjacent system. At the start of your turn, you may spend captured infantry or fighters to place equivalent units from your reinforcements in this system."
     },
     {
         "id": "tf-hcf",
@@ -574,7 +574,7 @@
         "isStructure": true,
         "isPlanetOnly": false,
         "isSpaceOnly": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
+        "ability": "This unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
     },
     {
         "id": "tf-heliosentity",
@@ -629,7 +629,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship can transport any number of infantry and fighters, and they do not count against this ships capacity."
+        "ability": "This ship can transport any number of infantry and fighters and they do not count against this ship's capacity."
     },
     {
         "id": "blacktf_mech",
@@ -701,7 +701,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "DEPLOY: At the start of your turn, you may discard one of your abilities or genomes to place this unit from your reinforcement into a system that contains your ships."
+        "ability": "DEPLOY: At the start of your turn, you may discard 1 of your abilities or genomes to place this unit from your reinforcements into a system that contains your ships."
     },
     {
         "id": "redtf_mech",
@@ -754,7 +754,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "While this unit is in the space area, choose 1 unit in its system that has a capacity value to roll 1 additional die on its combat roll."
+        "ability": "While this unit is being transported, choose 1 unit in its system that has a capacity value to roll 1 additional die on its combat rolls."
     },
     {
         "id": "orangetf_flagship",
@@ -829,7 +829,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "This unit participates in space combat as if it were a ship. For each anomaly this unit is in or adjacent to, apply +1 to this units combat rolls."
+        "ability": "This unit participates in space combat as if it were a ship. For each anomaly this unit is in or adjacent to, apply +1 to this unit's combat rolls."
     },
     {
         "id": "yellowtf_flagship",
@@ -848,7 +848,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When you splice, gain 2 commodities or convert 2 of your commodities to trade goods."
+        "ability": "When you splice, gain 2 commodities or convert up to 2 of your commodities to trade goods."
     },
     {
         "id": "yellowtf_mech",
@@ -871,7 +871,7 @@
         "id": "pinktf_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
-        "name": "The Face of Janovet",
+        "name": "The Faces of Janovet",
         "source": "twilights_fall",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/pinktf_flagship.png?raw=true",
         "faction": "pinktf",
@@ -901,6 +901,6 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "At the end of a ground combat you won in which this unit participated, you may return this unit to your reinforcement to draw 1 unit upgrade technology."
+        "ability": "After you win a ground combat in which this unit participated, you may return this unit to your reinforcements to draw 1 unit upgrade."
     }
 ]

@@ -1,7 +1,7 @@
 {
     "id": "virapicsiii",
     "tileId": "103",
-    "name": "Vira Pics III",
+    "name": "Vira-Pics III",
     "aliases": [
         "vira",
         "virapics",
@@ -22,5 +22,6 @@
             "y": 149
         }
     },
+    "flavourText": "*The atmosphere on Vira-Pics III is so dense that no trace of the rugged civilization clinging to life on the planet's surface is visible from orbit.*",
     "source": "thunders_edge"
 }
