@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
@@ -975,6 +976,22 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     @Override
     public void setRound(int round) {
         super.setRound(Math.max(1, round));
+    }
+
+    public boolean hasStrategyPhaseStarted() {
+        if (getRound() > 1) {
+            return true;
+        }
+        String phase = getPhaseOfGame() == null ? "" : getPhaseOfGame().toLowerCase();
+        return Stream.of("strategy", "action", "status", "agenda").anyMatch(phase::startsWith);
+    }
+
+    public boolean isStillInSetup() {
+        return getRevealedPublicObjectives().size() < 3 && !hasStrategyPhaseStarted();
+    }
+
+    public boolean isSecretObjectiveScoringOpen() {
+        return getRevealedPublicObjectives().size() > 1 || hasStrategyPhaseStarted();
     }
 
     public boolean hasTiglIncompatibleMode() {
