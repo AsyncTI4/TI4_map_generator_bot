@@ -10,6 +10,7 @@ import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -59,7 +60,7 @@ class PeekAtSecretDeck extends GameStateSubcommand {
 
         boolean shuffle = event.getOption("shuffle", Boolean.FALSE, OptionMapping::getAsBoolean);
         if (shuffle) {
-            Collections.shuffle(game.getSecretObjectives());
+            Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
         }
     }
 

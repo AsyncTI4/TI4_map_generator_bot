@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.Getter;
 import ti4.service.emoji.DiceEmojis;
 
@@ -38,7 +37,7 @@ public final class DiceHelper {
 
         private static int nextResult() {
             Integer forced = FORCED_RESULTS.get().poll();
-            return forced != null ? forced : ThreadLocalRandom.current().nextInt(1, 11);
+            return forced != null ? forced : RandomHelper.current().nextInt(1, 11);
         }
 
         public String getGreenDieIfSuccessOrRedDieIfFailure() {

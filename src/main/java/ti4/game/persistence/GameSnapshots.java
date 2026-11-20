@@ -13,7 +13,7 @@ public final class GameSnapshots {
     public static Game copy(Game game) {
         StringWriter writer = new StringWriter();
         try {
-            GameSaveService.writeGame(game, writer);
+            GameSaveService.writeSnapshot(game, writer);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

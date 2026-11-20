@@ -3,7 +3,6 @@ package ti4.service.fow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
@@ -26,6 +25,7 @@ import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.RemoveCommandCounterService;
@@ -96,7 +96,7 @@ public class FogTokenRemovalService {
         List<Tile> ownerTokens = owner == null ? List.of() : ButtonHelper.getTilesWithYourCC(owner, game, event);
         Tile tile = ownerTokens.isEmpty()
                 ? null
-                : ownerTokens.get(ThreadLocalRandom.current().nextInt(ownerTokens.size()));
+                : ownerTokens.get(RandomHelper.current().nextInt(ownerTokens.size()));
         resolve(event, game, remover, parts[0], parts[1], tile, false);
         ButtonHelper.deleteMessage(event);
     }

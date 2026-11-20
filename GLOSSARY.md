@@ -84,7 +84,7 @@ A Faction-limited stock of goods that a Player cannot spend but that converts to
 _Avoid_: Refill
 
 **Transaction**:
-A voluntary exchange between two neighboring Players of Trade goods, Commodities, relic fragments and up to one promissory note each way, agreed before anything changes hands.
+A voluntary exchange between two neighboring Players of Trade goods, Commodities, relic fragments and up to one promissory note each way, agreed before anything changes hands. Transactions happen only in the action phase, on the active Player's turn with each of their neighbors (LRR 94.1), and in the agenda phase, once per agenda with any other Player (LRR 94.6). Never in the strategy or status phase.
 _Avoid_: Trade, deal
 
 **Deal**:
@@ -555,12 +555,16 @@ A Player's removal from the Game when they control no Planets, have no ground fo
 ### Table slang
 
 **Pop**:
-To play a Strategy card's primary ability, as in "popping Trade".
+To use a Strategy card: take the strategic action that resolves its primary ability, as in "popping Trade" or "Diplomacy was popped". Other Players then decide whether to follow it.
 _Avoid_: Cast, fire
+
+**Flip**:
+To ready or exhaust a planet, as in "Diplomacy flips two planets" or "flip Mecatol to pay for the tech". Also used for washing Commodities, as in "I'll flip your commodities".
+_Avoid_: Refresh, tap
 
 **Wash**:
 To convert another Player's refreshed Commodities into Trade goods, usually as a favor requested of the Trade card's holder.
-_Avoid_: Launder, flip
+_Avoid_: Launder
 
 **X-1 / X-2**:
 The outcome of the standard Trade deal: the Trade holder washes a Player's Commodities and keeps one Trade good as payment, leaving that Player one short of their maximum. X-2 is the same deal with a charge of two.
@@ -588,6 +592,10 @@ _Avoid_: Bonus points, extra VP
 **Sabo**:
 Shorthand for the Sabotage action card, which cancels another action card.
 _Avoid_: Cancel card
+
+**Boat float**:
+Players cooperating on a vote or deal so that all of them come out ahead ("a rising tide floats all boats"). The classic case is Articles of War: every Player but one puts 1 vote on For, the last Player votes Against with enough votes to tie, the Speaker breaks the tie for Against, and each Player who voted For receives 3 Trade goods and gives the Against Player 1 of them.
+_Avoid_: Collusion, kingmaking
 
 **Gum**:
 To park a fighter or other small ship in a System to block opponents from moving through it.

@@ -14,7 +14,7 @@
         "MR"
     ],
     "legendaryAbilityName": "The Galactic Council",
-    "legendaryAbilityText": "You may exhaust this card at the end of your turn and discard 1 secret objective to draw 1 secret objective.",
+    "legendaryAbilityText": "You may exhaust this card and discard 1 secret objective at the end of your turn to draw 1 secret objective.",
     "legendaryAbilityFlavourText": "Hic fiat opus galaxiae.",
     "planetLayout": {
         "unitHolderName": "mrte",

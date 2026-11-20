@@ -22,6 +22,7 @@ import ti4.discord.interactions.routing.SelectionHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -183,9 +184,9 @@ public class OPlusPlusCouncilService {
         }
         game.removeStoredValue(STATUS_MESSAGE_ID_KEY);
 
-        Collections.shuffle(finalStage1);
-        Collections.shuffle(finalStage2);
-        Collections.shuffle(finalSecrets);
+        Collections.shuffle(finalStage1, RandomHelper.current());
+        Collections.shuffle(finalStage2, RandomHelper.current());
+        Collections.shuffle(finalSecrets, RandomHelper.current());
         game.getPublicObjectives1().clear();
         game.getPublicObjectives1().addAll(finalStage1);
         game.getPublicObjectives1Peekable().clear();

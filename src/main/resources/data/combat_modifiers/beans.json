@@ -170,5 +170,19 @@
                 "alias": "choirbt"
             }
         ]
+    },
+    {
+        "alias": "salvage_bombardment_planet_number",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "number_of_planets_in_system",
+        "scope": "dn",
+        "forCombatAbility": "bombardment",
+        "related": [
+            {
+                "type": "relic",
+                "alias": "salvage_dreadnought"
+            }
+        ]
     }
 ]

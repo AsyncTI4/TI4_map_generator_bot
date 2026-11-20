@@ -167,7 +167,7 @@ public class OpaAbilitiesHandler {
                 .filter(tile -> homeTile == null || !tile.getPosition().equals(homeTile.getPosition()))
                 .filter(tile -> !tileHasAnyBrokenPlanet(tile))
                 .collect(Collectors.toCollection(ArrayList::new));
-        Collections.shuffle(eligibleAsteroidTiles);
+        Collections.shuffle(eligibleAsteroidTiles, RandomHelper.current());
 
         int placements = Math.min(BELTER_WAY_PLANETS.size(), eligibleAsteroidTiles.size());
         for (int i = 0; i < placements; i++) {

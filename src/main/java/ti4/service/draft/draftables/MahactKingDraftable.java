@@ -15,6 +15,7 @@ import ti4.draft.items.MahactKingDraftItem;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MahactKingDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
@@ -47,7 +48,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
         List<String> output = new ArrayList<>();
         for (Collection<String> factions : List.of(presetFactions, allFactions)) {
             List<String> randomOrder = new ArrayList<>(factions);
-            Collections.shuffle(randomOrder);
+            Collections.shuffle(randomOrder, RandomHelper.current());
             for (String f : randomOrder) {
                 if (output.size() == numFactions) {
                     break;

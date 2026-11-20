@@ -424,10 +424,6 @@ public class StartCombatService {
         VanguardLeadersHandler.clearCommanderState(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
-        if ("space".equalsIgnoreCase(spaceOrGround)) {
-            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player1, tile);
-            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player2, tile);
-        }
         String combatName2 = COMBAT_ROUND_TRACKER + player1.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
         combatName2 = COMBAT_ROUND_TRACKER + player2.getFaction() + tile.getPosition() + unitHolderName;
@@ -1811,13 +1807,11 @@ public class StartCombatService {
         }
 
         // Arcanum Disintegrate
-        if (p1.hasTech("tharcanumpmr")
-                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p1, "tharcanumpmr")) {
+        if (p1.hasTech("tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p1, p2, tile, tile.getSpaceUnitHolder()));
         }
-        if (p2.hasTech("tharcanumpmr")
-                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p2, "tharcanumpmr")) {
+        if (p2.hasTech("tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p2, p1, tile, tile.getSpaceUnitHolder()));
         }
@@ -1828,11 +1822,6 @@ public class StartCombatService {
         }
         if (p2.hasAbility("pieces_of_a_whole")) {
             CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p2, tile);
-        }
-
-        if (!game.isFowMode()) {
-            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p1, tile);
-            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p2, tile);
         }
 
         return buttons;

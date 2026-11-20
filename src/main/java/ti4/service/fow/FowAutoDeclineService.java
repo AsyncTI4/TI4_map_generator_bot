@@ -2,7 +2,6 @@ package ti4.service.fow;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
@@ -10,6 +9,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -34,7 +34,7 @@ public class FowAutoDeclineService {
                 System.currentTimeMillis(),
                 baseHours(game),
                 spreadHours(game),
-                ThreadLocalRandom.current().nextDouble());
+                RandomHelper.current().nextDouble());
         game.setStoredValue(KEY_PREFIX + sc + "_" + player.getFaction(), due + "_" + game.getRound());
     }
 

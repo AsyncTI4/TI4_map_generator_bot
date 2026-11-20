@@ -270,7 +270,7 @@ public final class BreakthroughCommandHelper {
                     // If there are other BTs to potentially roll, don't automatically spawn
                     if (FractureService.enterPlayOrExplain(null, game, player, bt.getID())) {
                         String msg = player.getRepresentation(false, false)
-                                + " has gained _Al'Raith Ix Ianovar_, and so The Fracture enters play automatically!"
+                                + " has gained _Al'raith Ix Ianovar_, and so The Fracture enters play automatically!"
                                 + " Ingress tokens will be placed in their position on the map, if there were no choices to be made.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
@@ -333,7 +333,7 @@ public final class BreakthroughCommandHelper {
         if ("cabalbt".equals(btID)) {
             rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.Cabal.asEmoji());
             message =
-                    "You can roll for other breakthroughs first and then spawn The Fracture with _Al'Raith Ix Ianovar_.";
+                    "You can roll for other breakthroughs first and then spawn The Fracture with _Al'raith Ix Ianovar_.";
         }
         if ("onyxxabt".equals(btID)) {
             rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.onyxxa.asEmoji());

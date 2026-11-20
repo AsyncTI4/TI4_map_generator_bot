@@ -91,12 +91,17 @@ public final class StringHelper {
 
     public static String unescape(String input) {
         if (input == null) return null;
+        if (!holdsEscapedText(input)) return input;
         String output = input;
         for (Entry<String, String> entry : ESCAPABLES.entrySet())
             output = output.replace(entry.getValue(), entry.getKey());
         output = output.replace("666fin", ":");
         output = output.replace("667fin", ",");
         return output.replace("\r", "");
+    }
+
+    private static boolean holdsEscapedText(String input) {
+        return input.indexOf('{') >= 0 || input.indexOf('\r') >= 0 || input.contains("fin");
     }
 
     public static String nextId(String id) {

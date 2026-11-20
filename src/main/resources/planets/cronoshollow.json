@@ -13,6 +13,7 @@
     "resources": 3,
     "influence": 0,
     "factionHomeworld": "obsidian",
+    "flavourText": "*The night sky is a deep black, unbroken by any star. During the day, the clouds are an unvarying gunmetal grey.*",
     "planetTypes": [
         "FACTION"
     ],

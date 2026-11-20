@@ -2,7 +2,6 @@ package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,6 +12,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.DiceHelper;
+import ti4.helpers.RandomHelper;
 import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -107,6 +107,6 @@ class ChainReactionAcd2ButtonHandler {
                         "\"Now witness the firepower of this fully armed and operational battle station!\" — Emperor Palpatine, _Star Wars: Return of the Jedi_");
             default -> List.of("\"Great shot, kid! That was one in a million!\" — Han Solo, _Star Wars: A New Hope_");
         };
-        return quips.get(ThreadLocalRandom.current().nextInt(quips.size()));
+        return quips.get(RandomHelper.current().nextInt(quips.size()));
     }
 }

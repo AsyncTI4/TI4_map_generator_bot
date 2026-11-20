@@ -11,6 +11,7 @@ public class GameEventType {
     public static final String TACTICAL_ACTION = "TACTICAL_ACTION";
     public static final String TURN = "TURN";
     public static final String CARD_PLAY_ACTION_CARD = "CARD_PLAY_ACTION_CARD";
+    public static final String ACTION_CARD_TARGETED = "ACTION_CARD_TARGETED";
     public static final String CARD_PLAY_PROMISSORY_NOTE = "CARD_PLAY_PROMISSORY_NOTE";
     public static final String CARD_PLAY_AGENT = "CARD_PLAY_AGENT";
     public static final String CARD_PLAY_HERO = "CARD_PLAY_HERO";
@@ -24,6 +25,8 @@ public class GameEventType {
     public static final String OBJECTIVE_SCORED = "OBJECTIVE_SCORED";
     public static final String STATUS_SCORING = "STATUS_SCORING";
     public static final String PUBLIC_OBJECTIVE_REVEALED = "PUBLIC_OBJECTIVE_REVEALED";
+    public static final String AGENDA_REVEALED = "AGENDA_REVEALED";
+    public static final String AGENDA_VOTE_CAST = "AGENDA_VOTE_CAST";
     public static final String AGENDA_RESOLVED = "AGENDA_RESOLVED";
     public static final String TRANSACTION = "TRANSACTION";
     public static final String GAME_ENDED = "GAME_ENDED";

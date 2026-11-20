@@ -112,6 +112,7 @@ import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.combat.CombatEventRecorder;
+import ti4.service.combat.SpaceCannonOffenceWindow;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -961,6 +962,7 @@ public final class ButtonHelperTacticalAction {
             return;
         }
         game.setActiveSystem(pos);
+        SpaceCannonOffenceWindow.open(game);
         XyrixTechHandler.offerCrepuscularCopy(game, player, tile);
         BloomAbilityHandler.snapshotCoexistingPlanetsAtAction(game);
         MigoHarvestHandler.offerBlueHarvest(game, player);

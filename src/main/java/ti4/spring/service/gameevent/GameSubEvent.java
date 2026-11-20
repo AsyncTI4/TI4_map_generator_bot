@@ -25,7 +25,8 @@ import java.util.Map;
     @JsonSubTypes.Type(value = GameSubEvent.CombatRoll.class, name = "COMBAT_ROLL"),
     @JsonSubTypes.Type(value = GameSubEvent.CombatOutcome.class, name = "COMBAT_OUTCOME"),
     @JsonSubTypes.Type(value = GameSubEvent.InvasionCommitted.class, name = "INVASION_COMMITTED"),
-    @JsonSubTypes.Type(value = GameSubEvent.CardCanceled.class, name = "CARD_CANCELED")
+    @JsonSubTypes.Type(value = GameSubEvent.CardCanceled.class, name = "CARD_CANCELED"),
+    @JsonSubTypes.Type(value = GameSubEvent.ActionCardTargeted.class, name = "ACTION_CARD_TARGETED")
 })
 public sealed interface GameSubEvent {
     record Combat(String kind, String tile, String planet, String vsFaction) implements GameSubEvent {}
@@ -84,4 +85,6 @@ public sealed interface GameSubEvent {
             implements GameSubEvent {}
 
     record CardCanceled(String faction, String cardName, String canceledBy, String method) implements GameSubEvent {}
+
+    record ActionCardTargeted(String faction, String cardName, String targetFaction) implements GameSubEvent {}
 }

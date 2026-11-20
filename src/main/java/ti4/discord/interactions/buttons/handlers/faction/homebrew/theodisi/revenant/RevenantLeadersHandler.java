@@ -26,6 +26,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -962,7 +963,7 @@ public class RevenantLeadersHandler {
                 return;
             }
 
-            Collections.shuffle(heroPool);
+            Collections.shuffle(heroPool, RandomHelper.current());
             drawnHeroes = new ArrayList<>(heroPool.subList(0, 3));
 
             game.setStoredValue(choicesKey, String.join(",", drawnHeroes));

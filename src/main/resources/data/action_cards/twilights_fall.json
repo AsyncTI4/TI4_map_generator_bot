@@ -4,7 +4,8 @@
         "name": "Transpose",
         "phase": "Action",
         "window": "Action",
-        "text": "Give 1 of your abilities to 1 of your neighbors, then take one of their abilities.",
+        "text": "Give 1 of your abilities to one of your neighbors, then take 1 of their abilities.",
+        "flavorText": "So accustomed had the Mahact become to their unending struggle, they had forgotten that power need not always be seized by force. From the lesser beings of the galaxy, Avarice Rex had seen that it could be bought, or even freely given. Was an effortless victory not, in fact, the truest display of power?",
         "source": "twilights_fall"
     },
     {
@@ -12,7 +13,8 @@
         "name": "Transpose",
         "phase": "Action",
         "window": "Action",
-        "text": "Give 1 of your abilities to 1 of your neighbors, then take one of their abilities.",
+        "text": "Give 1 of your abilities to one of your neighbors, then take 1 of their abilities.",
+        "flavorText": "Aelo An Goldos cared not whence the thralls came, or who they had once been, only that they served. The Dominus Orb ensured that.",
         "source": "twilights_fall"
     },
     {
@@ -20,7 +22,8 @@
         "name": "Mutate",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard 1 of your abilities and draw 1 random ability",
+        "text": "Discard 1 of your abilities, then draw 1 ability.",
+        "flavorText": "\"Very well,\" growled Vesh Nil Qor. \"When we meet again, I shall reduce your bodies to wizened and twisted husks. And you shall be fully aware to experience the horror of your fate.\"",
         "source": "twilights_fall"
     },
     {
@@ -28,7 +31,8 @@
         "name": "Mutate",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard 1 of your abilities and draw 1 random ability",
+        "text": "Discard 1 of your abilities, then draw 1 ability.",
+        "flavorText": "A Sickening Lurch knew that to move forward, they must leave something behind. That their so-called \"peers\" were aghast at their choice was of little consequence.",
         "source": "twilights_fall"
     },
     {
@@ -36,7 +40,8 @@
         "name": "Scarab",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose a spliced card you own; gain 2 trade goods for each card you own with a faction origin that matches that card",
+        "text": "Choose a spliced card you own; gain 2 trade goods for each card you own with a faction origin that matches that card.",
+        "flavorText": "A swarm of thrall-ships buzzed through the skies of Aior Dol Gorgos, bearing the tribute of a thousand worlds to the hungry maws of the assembler halls below.",
         "source": "twilights_fall"
     },
     {
@@ -44,14 +49,16 @@
         "name": "Genophage",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard 1 of your neighbor's genomes.",
+        "text": "Discard 1 of your neighbors' genomes.",
+        "flavorText": "\"You mean, after all this time,\" whispered Brother Omar in horror, \"the Greyfire...it was a Mahact test?\" \"Yes,\" lied the Herald of Thorns, \"And now, you have passed.\"",
         "notes": "\"Genome\" is what Twilight's Fall calls the agentesque splice cards.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-engineer",
         "name": "Engineer",
-        "phase": "Action",
+        "phase": "Any",
+        "flavorText": "\"It seems that Zel Tol Mosin did not intend his heir to receive his estate,\" rumbled Tyrolian the Gatekeeper, \"but instead, to provide a vessel for his mind.\"",
         "window": "When you draw cards for a splice that you initiated",
         "notes": "In Async, please play this before you initiate the splice.",
         "text": "Add 2 additional cards to the splice; after you choose your card, choose and discard 2 of the spliced cards before passing them to the next player.",
@@ -61,9 +68,10 @@
         "alias": "tf-manipulate",
         "name": "Manipulate",
         "phase": "Action",
-        "window": "After cards are drawn for a splice that you are not participating in",
+        "window": "After cards are drawn for a splice you are not participating in",
         "notes": "In Async, please queue this if possible.",
-        "text": "Take the spliced cards. Choose which card each participating player will take.",
+        "text": "Take the cards and choose which card each participating player will take.",
+        "flavorText": "The others had always thought Jae Mir Kan a mere courier. They failed to appreciate how much a message's reception depended on the manner of its delivery.",
         "source": "twilights_fall"
     },
     {
@@ -72,22 +80,25 @@
         "phase": "Action",
         "window": "Action",
         "text": "Initiate a splice of any type, including all players.",
+        "flavorText": "Strands of dormant genetic code, seeded by the Mahact amongst the galaxy's younger species during their fall long ago, made for a bountiful harvest upon their return.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-thieve",
         "name": "Thieve",
         "phase": "Action",
-        "window": "After a splice ends, if you did not participate",
-        "text": "Take all remaining cards.",
+        "window": "When a splice ends, if you did not participate",
+        "text": "Take all of the remaining spliced cards.",
+        "flavorText": "The other Mahact had dismissed the system as inferior, its inhabitants insulted even for enthrallment. That did not deter A Sickening Lurch from picking their bones clean.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-lash",
         "name": "Lash",
-        "phase": "Action",
+        "phase": "Any",
         "window": "When 1 of your units is destroyed",
         "text": "Destroy a unit in its system that has an equal or lower cost.",
+        "flavorText": "Even as Lakoe's Roots writhed and burned under the bombardment, thorny needles reached up to pluck one of the escorts from orbit and drag it into the firestorm below.",
         "source": "twilights_fall"
     },
     {
@@ -95,7 +106,8 @@
         "name": "Locust",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 infantry in a system adjacent to your units and roll 1 die. On a result of 3 or higher, destroy that infantry and choose an infantry in the same or an adjacent system to repeat the roll; for each new roll, choose an infantry owned by a different player than the previous infantry, if able.",
+        "text": "Choose 1 infantry in a system adjacent to your units and roll 1 die. On a result of a 3 or higher, destroy that infantry and choose an infantry in the same or an adjacent system to repeat the roll; for each new roll choose an infantry owned by a different player than the previous infantry, if able.",
+        "flavorText": "\"FEED.\" - Il Sai Lakoe",
         "source": "twilights_fall"
     },
     {
@@ -104,6 +116,7 @@
         "phase": "Action",
         "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
+        "flavorText": "Though outmassed by several orders of magnitude, the valiant destroyer's final salvo found its mark amidst the flagship's engine array, leaving the Arvicon Rex stranded deep in the gravity well.",
         "source": "twilights_fall"
     },
     {
@@ -112,6 +125,7 @@
         "phase": "Action",
         "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
+        "flavorText": "For a moment, the Starlancer strode on, heedless of the sting of a single silver missile. Then, the fires of its fusion heart erupted from the wound, consuming it from within.",
         "source": "twilights_fall"
     },
     {
@@ -119,7 +133,8 @@
         "name": "Command",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through or into asteroid fields during this movement.",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through and into asteroid fields during this movement.",
+        "flavorText": "Tizona slid from the Kuiper belt like a sword unsheathed, sweeping toward the inner system with her flotilla trailing in a glittering arc.",
         "source": "twilights_fall"
     },
     {
@@ -127,23 +142,26 @@
         "name": "Command",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through or into asteroid fields during this movement.",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through and into asteroid fields during this movement.",
+        "flavorText": "Il Na Viroset led the fleet in a deadly ballet above Perimeter, each delicate turn through the perpendicular orbital rings leaving the Winnu defenders flat-footed.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-shatter1",
         "name": "Shatter",
-        "phase": "Action",
-        "window": "When another player exhausts a genome or plays an action card other than \"Shatter\"",
+        "phase": "Any",
+        "window": "When a player exhausts a genome or plays an action card other than \"Shatter\"",
         "text": "That genome is exhausted without effect, or that action card is canceled.",
+        "flavorText": "\"No!\" gasped Zel Tol Mosin, the neural link to his thralls severed by one of the Saint's suspended blades. But now that his thralls had been freed, the outcome was, in fact, inevitable.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-shatter2",
         "name": "Shatter",
-        "phase": "Action",
-        "window": "When another player exhausts a genome or plays an action card other than \"Shatter\"",
+        "phase": "Any",
+        "window": "When a player exhausts a genome or plays an action card other than \"Shatter\"",
         "text": "That genome is exhausted without effect, or that action card is canceled.",
+        "flavorText": "\"No!\" Aur roared as the light enveloped them. \"It didn't...It wasn't...\" But even as they spoke, they became something changed. Something more.",
         "source": "twilights_fall"
     },
     {
@@ -152,6 +170,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Draw 1 card from any splice deck.",
+        "flavorText": "When they beheld the true infinity of possibility spread out before them, the Ruby Monarch did the unthinkable: they knelt. When they rose, they did so greater than ever before.",
         "source": "twilights_fall"
     },
     {
@@ -160,6 +179,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Move all units from the space area of any system into an adjacent system that contains a different player's ships. Space combat is resolved in that system; neither player can retreat or resolve abilities that would move their ships.",
+        "flavorText": "\"The light...it is so radiant...we...we are radiant. We are the light.\" - Airo Shir Aur",
         "source": "twilights_fall"
     },
     {
@@ -168,16 +188,18 @@
         "phase": "Action",
         "window": "Action",
         "notes": "This can be used as just a stall if the unit deck is empty.",
-        "text": "Choose 1 unit type other than a flagship; reveal cards from the unit upgrade deck until you reveal a card of that type, if able. Then, gain that card and shuffle the rest back into the unit upgrade deck.",
+        "text": "Choose 1 unit type other than flagship; reveal cards from the unit upgrade deck until you reveal a card of that type, if able. Then, gain that card and shuffle the rest back into the unit upgrade deck.",
+        "flavorText": "The warships lay in orbit around the Torali Pulsar, its searing rays tempering their impurities even as it shielded them from discovery.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-reverse",
         "name": "Reverse",
-        "phase": "Action",
+        "phase": "Any",
         "window": "When a splice begins",
         "notes": "In Async, please queue this if possible.",
         "text": "Reverse the order the spliced cards are passed.",
+        "flavorText": "Il Gacyn Klar had made extensive preparations to ensure that everything was in order. If that order happened to benefit her, well... what of it?",
         "source": "twilights_fall"
     },
     {
@@ -185,15 +207,17 @@
         "name": "Twinning",
         "phase": "Action",
         "window": "After another player resolves the component action of an action card",
-        "text": "Immediately resolve that action card.",
+        "text": "Immediately resolve that action card as if you had played it.",
+        "flavorText": "Even their mastery of the known sciences could only take the Mahact so far: true gene-sorcery was art, and each artist had a style all their own.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-meddle",
         "name": "Meddle",
-        "phase": "Action",
+        "phase": "Any",
         "window": "When any die is rolled",
         "text": "Add or subtract 1 from its result.",
+        "flavorText": "\"Are you certain?\" inquired Jae Mir Kan. \"You have accounted for every possible eventuality?\"",
         "source": "twilights_fall"
     },
     {
@@ -202,14 +226,16 @@
         "phase": "Action",
         "window": "Before hits are assigned to your units",
         "text": "Cancel up to 2 hits.",
+        "flavorText": "The Letnev gunnery crews studied their displays in frustration that quickly grew to panic. Each return constantly flickered between the many Faces of Janovet, and fire discipline collapsed as they struggled to prioritize their targets.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-meteor",
         "name": "Meteor",
-        "phase": "Action",
+        "phase": "Any",
         "window": "When you would remove ground forces due to insufficient capacity",
-        "text": "Commit those ground forces to a planet in that system instead; resolve an invasion on that planet using only those ground forces",
+        "text": "Commit those ground forces to a planet in that system instead; resolve an invasion on that planet using only those ground forces.",
+        "flavorText": "As her escape pod plummeted down the gravity well, Il Gacyn Klar repeated her liege's parting words with a sneer, \"Nothing personal.\"",
         "source": "twilights_fall"
     },
     {
@@ -218,6 +244,7 @@
         "phase": "Action",
         "window": "Before hits are assigned to your units",
         "text": "Cancel up to 2 hits.",
+        "flavorText": "The Crimson Legionnaires advanced relentlessly into the blistering crossfire, their rune-etched armor turning even the strikes of heavy weaponry aside.",
         "source": "twilights_fall"
     },
     {
@@ -225,7 +252,8 @@
         "name": "Feint",
         "phase": "Action",
         "window": "When you announce a retreat",
-        "text": "Immediately retreat; do not place a command token in that system.",
+        "text": "Your units immediately retreat to an eligible system; do not place a command token in that system.",
+        "flavorText": "Once the defenders had committed to an intercept course within the system's gravity well, the Saint of Swords twisted Tizona aside, striking for her true target.",
         "automationID": "skilled_retreat",
         "source": "twilights_fall"
     },
@@ -235,6 +263,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Resolve the PRODUCTION ability of 1 of your units; reduce the combined cost of the produced units by 3.",
+        "flavorText": "The Ruby Monarch paced the great assembly hall, imagining the blade they would wield. In their footsteps the sharp lines of a warship began to form, the machinery of the hall shaping matter to their whim.",
         "source": "twilights_fall"
     },
     {
@@ -243,6 +272,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Either remove any player's command token from the board, or place a command token from any player's reinforcements in a system that contains or is adjacent to one of your ships. ",
+        "flavorText": "Vesh Nil Qor looked up from his calibrations to the battle raging above Mecatol Rex. Once he fired the Synaptic Ordinator, nothing would ever be the same.",
         "source": "twilights_fall"
     },
     {
@@ -250,7 +280,8 @@
         "name": "Entangle",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "All systems that contain alpha wormholes, beta wormholes, gamma wormholes, and gravity rifts are adjacent for this movement.",
+        "text": "All systems that contain alpha wormholes, beta wormholes, gamma wormholes, and gravity rifts are adjacent during this movement.",
+        "flavorText": "When the Mahact first claimed dominion over \"every star in Ixth's sky,\" the galaxy had lain fifty-thousand light-years distant. The unleashed energies of the Acheron Gate have given that boast new meaning.",
         "source": "twilights_fall"
     },
     {
@@ -259,6 +290,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose and purge a relic. If the relic belonged to another player, that player gains 1 victory point; if it belonged to you, put The Fracture into play and place 1 additional ingress token in a system that contains your units.",
+        "flavorText": "Strength fading, his own blood pooling beneath his feet, Jace fired his final shot point blank into the Quantumcore. The galaxy screamed.",
         "source": "twilights_fall"
     },
     {
@@ -266,23 +298,26 @@
         "name": "Rise",
         "phase": "Action",
         "window": "Action",
-        "text": "Either place 1 infantry on each planet you control or place 1 fighter in each system that contains your ships or space docks.",
+        "text": "Either place 1 infantry on each planet you control or place 1 fighter from your reinforcements in each system that contains your ships or space docks and no other players' ships.",
+        "flavorText": "Stone and soil shook and fell as the mountains rose on limbs of living metal. Even when the tremors subsided, the world's inhabitants still trembled, for the Titans had heeded their masters' call.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-atomize",
         "name": "Atomize",
-        "phase": "Action",
+        "phase": "Any",
         "window": "When your flagship is destroyed",
-        "text": "Purge your flagship and destroy all units in its system",
+        "text": "Purge your flagship and destroy all other units in its system.",
+        "flavorText": "As the final act of their reign, Vertar Auran Oblis denied their usurpers any triumph, overloading the ruptured superliminal drives of the crippled Arvicon Rex. When the laws of physics finally reasserted themselves, no trace of either fleet remained.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-trine",
         "name": "Trine",
         "phase": "Action",
-        "window": "During the \"space cannon offense\" step of a tactical action",
-        "text": "Your units up 2 system away can use their SPACE CANNON abilities against units in the active system.",
+        "window": "During the \"SPACE CANNON OFFENSE\" step of a tactical action",
+        "text": "Your units up to 2 systems away can use their SPACE CANNON abilities against ships in the active system.",
+        "flavorText": "The Mahact had awaited the restoration of their Dominion for nearly thirty millennia. What was the matter of mere decades for the very stars to align in their favor?",
         "source": "twilights_fall"
     },
     {
@@ -291,6 +326,7 @@
         "phase": "Action",
         "window": "After another player commits units to land on a planet you control",
         "text": "Return the committed units to the space area; choose 1 of them to destroy.",
+        "flavorText": "\"Each of our voices speaks for all,\" declared El Nen Janovet. \"Is that so?\" Avarice Rex retorted, drawing back the cloth to reveal a shattered rose-gold mask alike to those that addressed him. \"Then I shall keep this as a reminder.\"",
         "source": "twilights_fall"
     },
     {
@@ -299,6 +335,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Place a command token from your tactic pool in any non-home system; choose and destroy 1 unit in that system.",
+        "flavorText": "At their masters' command, the Titans had once harnessed the energy of a singularity. Little was beyond their reach.",
         "source": "twilights_fall"
     },
     {
@@ -307,6 +344,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose a player; that player must give you 1 of their abilities.",
+        "flavorText": "The Ruby Monarch turned from the Eidolon salvaged in Cormund's shattered orbit to address its pair of captured pilots. \"Your union has proven more resilient than anticipated,\" they crackled, \"your species will make a fine addition to my collection.\"",
         "notes": "This action card is not affected by someone having bio-synthetic synergy.",
         "source": "twilights_fall"
     },
@@ -316,6 +354,7 @@
         "phase": "Action",
         "window": "At the start of another player's turn",
         "text": "Immediately end that player's turn.",
+        "flavorText": "\"I knew, then, that I could not defeat my enemies. But!\" The holographic entity that resembled Kor Noq Weer held up one finger. \"I could outlast them. In a way.\"",
         "source": "twilights_fall"
     },
     {
@@ -323,7 +362,8 @@
         "name": "Tartarus",
         "phase": "Strategy",
         "window": "At the start of the strategy phase",
-        "text": "Choose a strategy card: that card cannot be picked unless there is no other option.",
+        "text": "Choose a strategy card; that card cannot be picked unless there is no other option.",
+        "flavorText": "The bindings snapped tight, one after another, tethering the corrupted King's limbs to the earth. Roars of earsplitting rage echoed throughout the valley, but it remained immobilized. For a time, at least.",
         "source": "twilights_fall"
     },
     {
@@ -331,7 +371,8 @@
         "name": "Create",
         "phase": "Action",
         "window": "Action",
-        "text": "Draw 1 relic.",
+        "text": "Gain 1 relic.",
+        "flavorText": "Aelo An Goldos immersed themself in the act of creation, bending matter and energy alike to their will. No effort was spared, and no flaw tolerated, until they were satisfied at last. And then they began again.",
         "source": "twilights_fall"
     },
     {
@@ -340,6 +381,7 @@
         "phase": "Action",
         "window": "When a player activates a system that contains your units",
         "text": "Immediately perform an action, during which you are the active player.",
+        "flavorText": "\"It must be done,\" whispered the Thundarian, \"it is the only way.\"",
         "source": "twilights_fall"
     },
     {
@@ -348,6 +390,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose a supernova; each player destroys 3 of their units in that supernova and each adjacent system.",
+        "flavorText": "Airo Shir Aur basked in the glow as the star's death throes consumed their rivals. A fitting end for those who had dared cast a shadow across their radiance.",
         "notes": "This cannot be played if there is no supernovae on the game board. In such a case, consider getting table permission to purge this action card and draw a replacement.",
         "source": "twilights_fall"
     },
@@ -357,14 +400,16 @@
         "phase": "Action",
         "window": "After you activate a system",
         "text": "You may ignore the effects of anomalies during this movement.",
+        "flavorText": "Il Na Viroset soared the aether of the galactic core, riding the gravitational currents of the Great Heart of the Galaxy that no lesser being dared.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-meld",
         "name": "Meld",
-        "phase": "Action",
-        "window": "When any die is rolled",
-        "text": "Roll two dice instead, and add the results together (max 10)",
+        "phase": "Any",
+        "window": "When a die is rolled by any player",
+        "text": "Roll two dice instead, and add the results together (max 10).",
+        "flavorText": "\"How shall we handle this?\" mused El Nen Janovet, their many crowned masks tilted in thought. Each pondered myriad possibilities, yet all came to the same conclusion.",
         "source": "twilights_fall"
     },
     {
@@ -373,6 +418,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "For each trade good you have, either gain 1 commodity or convert 1 of your commodities to a trade good.",
+        "flavorText": "The hold of the Scintillia glittered with the riches of the galaxy, each treasure mirrored over and over again by faceted bulkheads that made the bays appear to stretch on forever. Yet it was never enough.",
         "source": "twilights_fall"
     },
     {
@@ -381,6 +427,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Draw 1 paradigm.",
+        "flavorText": "The Saint of Swords regarded the Shikrai who knelt beaten before her, valor and grace untarnished by broken talons and bloody feathers. \"What a noble thrall,\" she mused, lifting Trilossa Aun Mirik's beak with the point of her blade, \"If only you served a more worthy mistress.\"",
         "source": "twilights_fall"
     },
     {
@@ -388,23 +435,26 @@
         "name": "Cloak",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Your ships can move through systems that contain other players ships during this action, and SPACE CANNON cannot be used against them.",
+        "text": "Your ships can move through systems that contain other players' ships during this action, and SPACE CANNON cannot be used against them.",
+        "flavorText": "A Strangled Whisper passed through the picket ships without alarm, bringing A Sickening Lurch to its destination with none the wiser.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-converge",
         "name": "Converge",
         "phase": "Action",
-        "window": "Before you roll dice for space cannon",
-        "text": "Your hits must be applied to non-fighter ships during SPACE CANNON OFFENSE, or mechs during SPACE CANNON DEFENSE, if able",
+        "window": "Before you roll dice for SPACE CANNON",
+        "text": "Your hits must be applied to non-fighter ships during SPACE CANNON OFFENSE, or mechs during SPACE CANNON DEFENSE, if able.",
+        "flavorText": "\"Don't waste my time with their strike craft,\" sneered Zel Tol Mosin, as the Watchtower's floating defense arrays targeted the rebel fleet, \"find me their carriers!\"",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-divinity",
         "name": "Divinity",
-        "phase": "Action",
+        "phase": "Any",
         "window": "When 1 of your units would be destroyed",
         "text": "It is not destroyed instead.",
+        "flavorText": "The Airo Shir Rex emerged from the inferno unscathed, the corona a radiant halo about it, and all who beheld it were in awe.",
         "source": "twilights_fall"
     }
 ]

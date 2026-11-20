@@ -1,7 +1,6 @@
 package ti4.service.agenda;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
@@ -22,6 +21,7 @@ import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.DiceHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.MiscEmojis;
@@ -66,9 +66,9 @@ public class IxthianArtifactService {
     }
 
     private static int drumrollSeconds() {
-        int rand = 6 + ThreadLocalRandom.current().nextInt(6);
-        if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
-            rand += 8 + ThreadLocalRandom.current().nextInt(14);
+        int rand = 6 + RandomHelper.current().nextInt(6);
+        if (RandomHelper.current().nextInt(5) == 0) { // random chance for an extra long wait
+            rand += 8 + RandomHelper.current().nextInt(14);
         }
         return rand;
     }

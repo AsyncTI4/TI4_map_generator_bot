@@ -8,6 +8,7 @@
     "resources": 1,
     "influence": 2,
     "factionHomeworld": "bastion",
+    "flavourText": "*Hanging like a cathedral above Ordinian, the space station Revelation was constructed practically overnight to serve as the Last Bastion's military and economic hub.*",
     "planetTypes": [
         "SPACESTATION"
     ],

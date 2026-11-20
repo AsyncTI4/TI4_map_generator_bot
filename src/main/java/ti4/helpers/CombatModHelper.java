@@ -1059,6 +1059,8 @@ public class CombatModHelper {
                 }
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
+                case "number_of_planets_in_system" ->
+                    scalingCount = activeSystem.getPlanetUnitHolders().size();
                 case "galvanized_unit_count" ->
                     scalingCount =
                             getGalvanizedScalingCount(game, unitHolder, origUnit, player, activeSystem, rollType);

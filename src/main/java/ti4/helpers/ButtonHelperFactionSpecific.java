@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -67,6 +66,7 @@ import ti4.model.UnitModel;
 import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -1330,6 +1330,9 @@ public final class ButtonHelperFactionSpecific {
                         + ", please use these buttons to put a Plot card into play with a control token from the faction whose secret you just scored.");
     }
 
+    // TODO: getPlaceUnitButtons resets produced units, so pressing this mid-build drops the unfinished main build's
+    // tally: those units stay on the board unpaid, and finishing the build places them again. Keep or restore the
+    // tally.
     @ButtonHandler("solBtBuild_")
     public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         player.addSpentThing(buttonID);
@@ -1728,7 +1731,7 @@ public final class ButtonHelperFactionSpecific {
             unitHolder.addDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
+        int randomJokeChance = RandomHelper.current().nextInt(1, 6);
         if (randomJokeChance == 5) {
             File audioFile = ResourceHelper.getFile("voices/nomad/", "Cavalry.mp3");
             if (audioFile.exists()) {
@@ -3630,6 +3633,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            LieInWaitService.check(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(
@@ -3706,6 +3710,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            LieInWaitService.check(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(
@@ -5411,6 +5416,8 @@ public final class ButtonHelperFactionSpecific {
                         + " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1)
                         + ").");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
+        AgendaHistory.recordQuashed(game, defaultString(AgendaHelper.getCurrentAgendaId(game)));
+        AgendaEvents.discarded(game, player, AgendaHelper.getCurrentAgendaId(game), AgendaEvents.QUASH);
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {

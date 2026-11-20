@@ -14,7 +14,6 @@
     "aliases": [
         "alioprima",
         "alio_prima",
-        "alioprima",
         "ap",
         "aloprima",
         "alio",
@@ -125,6 +124,6 @@
         },
         "removeUnitCoordinate": true
     },
-    "flavourText": "*Wet planet covered in rivers, lakes and small seas but no oceans. Dry poles provide haven from constant floods. Numerous farms famous for luxury foodstuffs.*",
+    "flavourText": "*Wet planet covered in rivers, lakes, and small seas, but no oceans. Dry poles provide haven from constant floods. Numerous farms famous for luxury foodstuffs.*",
     "source": "pok"
 }

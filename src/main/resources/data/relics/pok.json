@@ -26,7 +26,7 @@
     {
         "alias": "shard",
         "name": "Shard of the Throne",
-        "text": "When you gain this card, gain 1 victory point, when you lose this card, lose 1 victory point. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains this card.",
+        "text": "When you gain this card, gain 1 victory point; when you lose this card, lose 1 victory point. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains this card.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/shard_of_the_throne.jpg?raw=true",
         "source": "pok",
         "flavourText": "*\"What power does a broken piece of the Throne of Emperors hold? To me, none. But to everyone else...\"*"
@@ -34,11 +34,11 @@
     {
         "alias": "stellarconverter",
         "name": "Stellar Converter",
-        "text": "ACTION: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card.",
+        "text": "ACTION: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT; destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card.",
         "notes": "You cannot explode a planet that you control.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/stellar_converter.jpg?raw=true",
         "source": "pok",
-        "flavourText": "*A power great enough to envelop a star, such that its energies might be concentrated… and scattered.*"
+        "flavourText": "*A power great enough to envelop a star, such that its energies might be concentrated...and scattered.*"
     },
     {
         "alias": "codex",
@@ -60,7 +60,7 @@
     {
         "alias": "thalnos",
         "name": "The Crown of Thalnos",
-        "text": "During each combat round, this card's owner may reroll any number of their dice, applying +1 to the results, any units that reroll dice but do not produce at least 1 hit are destroyed.",
+        "text": "During each combat round, this card's owner may reroll any number of their dice, applying +1 to the results; any units that reroll dice but do not produce at least 1 hit are destroyed.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/the_crown_of_thalnos.jpg?raw=true",
         "source": "pok",
         "flavourText": "*A cloud of satellites spewed from the dreadnought's hull, drifting into a halo around the vessel. The battle seemed to pause for one long moment, before the drones' weapons flared, unleashing beams of energy in all directions.*"

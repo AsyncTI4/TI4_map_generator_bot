@@ -327,7 +327,6 @@ public class RefractureLegendaryButtonHandler {
             return;
         }
         TokenPlanetService.moveTokenPlanet(game, player, destination, CHARON_PLANET);
-        RefractureRulesService.consumeCharonMovement(game, player);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 }

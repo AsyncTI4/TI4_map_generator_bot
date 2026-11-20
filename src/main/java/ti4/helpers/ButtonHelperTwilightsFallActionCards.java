@@ -1048,7 +1048,7 @@ public final class ButtonHelperTwilightsFallActionCards {
                     .toList());
         }
         List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
-        Collections.shuffle(redTilesToPullFrom);
+        Collections.shuffle(redTilesToPullFrom, RandomHelper.current());
 
         if (redTilesToPullFrom.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");

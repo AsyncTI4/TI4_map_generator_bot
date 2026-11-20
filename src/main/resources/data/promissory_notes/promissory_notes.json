@@ -18,7 +18,7 @@
     },
     {
         "alias": "ragh",
-        "name": "Raghs Call",
+        "name": "Ragh's Call",
         "faction": "saar",
         "playArea": false,
         "source": "base",
@@ -83,7 +83,7 @@
         "faction": "mahact",
         "playArea": false,
         "source": "pok",
-        "text": "At the start of the strategy phase: Choose 1 non-home system that contains your units, each other player who has a token on the Mahact player's command sheet places a token from their reinforcements in that system. Then, return this card to the Mahact player."
+        "text": "At the start of the strategy phase: Choose 1 non-home system that contains your units; each other player who has a token on the Mahact player's command sheet places a token from their reinforcements in that system. Then, return this card to the Mahact player."
     },
     {
         "alias": "pop",
@@ -101,7 +101,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "base",
-        "text": "At the end of the Strategy Phase: Place this card faceup in your play area and place the Naalu '0' token on your strategy card, you are the first in initiative order. The Naalu player cannot use their Telepathic faction ability during this game round. Return this card to the Naalu player at the end of the status phase."
+        "text": "At the end of the Strategy Phase: Place this card faceup in your play area and place the Naalu '0' token on your strategy card; you are the first in initiative order. The Naalu player cannot use their Telepathic faction ability during this game round. Return this card to the Naalu player at the end of the status phase."
     },
     {
         "alias": "bmf",
@@ -162,7 +162,7 @@
         "faction": "cabal",
         "playArea": false,
         "source": "pok",
-        "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player.",
+        "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement; apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player.",
         "notes": "This promissory note will only ever add +1 movement total, regardless of how many gravity rifts you pass through."
     },
     {

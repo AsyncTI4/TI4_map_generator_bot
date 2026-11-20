@@ -22,6 +22,7 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.RegexHelper;
 import ti4.logging.BotLogger;
+import ti4.message.MentionGuard;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.TI4Emoji;
 
@@ -84,6 +85,7 @@ public class RoundSummaryHelper {
     public static void storeEndOfRoundSummary(
             Game game, Player player, String roundNum, String thoughts, boolean append, MessageChannel eventChannel) {
         roundNum = NON_DIGIT.matcher(roundNum).replaceAll(""); // I only want the digits
+        thoughts = MentionGuard.withoutRoleOrMassMentions(thoughts);
         String roundKey = resolveRoundSummaryKey(player, roundNum);
         String previousThoughts = "";
         if (append && !game.getStoredValue(roundKey).isEmpty()) {

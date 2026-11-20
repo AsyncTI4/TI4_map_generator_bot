@@ -120,6 +120,6 @@
         },
         "removeUnitCoordinate": true
     },
-    "flavourText": "*The only inhabited world in a forgettable system. Few native resources and only rudimentary, often underdeveloped, industries.*",
+    "flavourText": "*The only inhabited world in a forgettable system. Few native resources and rudimentary, often underdeveloped, industries.*",
     "source": "base"
 }

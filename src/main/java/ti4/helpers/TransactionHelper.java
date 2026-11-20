@@ -49,10 +49,12 @@ import ti4.helpers.thirtyk.ThirtyKTransactions;
 import ti4.image.card.TransactionGenerator;
 import ti4.image.io.ImageUploads;
 import ti4.logging.BotLogger;
+import ti4.message.MentionGuard;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -346,7 +348,7 @@ public class TransactionHelper {
         };
     }
 
-    private static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
+    public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         GameEventService.commit(
                 game,
@@ -502,7 +504,7 @@ public class TransactionHelper {
         p1.clearTransactionItemsWithPlayer(p2);
         clearEntanglement(game, p1, p2);
         if (!debtOnly) {
-            ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
+            LieInWaitService.check(p1, p2, game);
             if (!hasOptedOutOfOwnTransactionPillage(game, p1) && !hasOptedOutOfOwnTransactionPillage(game, p2)) {
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
@@ -902,7 +904,7 @@ public class TransactionHelper {
                 if (viewer != null || (hidePrivateCardText && game.isLimitedWhispersMode())) {
                     trans.append("[REDACTED]");
                 } else {
-                    trans.append(furtherDetail.replace("fin777", " "));
+                    trans.append(MentionGuard.withoutAnyMentions(furtherDetail.replace("fin777", " ")));
                 }
             }
             default -> trans.append(" some odd thing: `").append(item).append('`');
@@ -1157,7 +1159,7 @@ public class TransactionHelper {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 
-        int result = ThreadLocalRandom.current().nextInt(0, nothingMessages.size());
+        int result = RandomHelper.current().nextInt(0, nothingMessages.size());
         try {
             return nothingMessages.get(result);
         } catch (Exception e) {
@@ -1650,7 +1652,7 @@ public class TransactionHelper {
     @ModalHandler("finishDealDetails_")
     public static void finishDealDetails(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
-        String thoughts = mapping.getAsString();
+        String thoughts = MentionGuard.withoutAnyMentions(mapping.getAsString());
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         if (opposing == null) return;
         player.addTransactionItem("sending" + player.getFaction() + "_receiving" + opposing.getFaction() + "_details_"
@@ -1681,7 +1683,7 @@ public class TransactionHelper {
     @ModalHandler("finishDealDetailsInvert_")
     public static void finishDealDetailsInvert(ModalInteractionEvent event, Game game, Player player, String modalID) {
         ModalMapping mapping = event.getValue("details");
-        String thoughts = mapping.getAsString();
+        String thoughts = MentionGuard.withoutAnyMentions(mapping.getAsString());
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         if (opposing == null) return;
         player.addTransactionItem("sending" + opposing.getFaction() + "_receiving" + player.getFaction() + "_details_"
@@ -1996,7 +1998,7 @@ public class TransactionHelper {
     }
 
     private static String getRandomPillageSource() {
-        int randomIndex = ThreadLocalRandom.current().nextInt(0, shadyOrganizations.size());
+        int randomIndex = RandomHelper.current().nextInt(0, shadyOrganizations.size());
         return shadyOrganizations.get(randomIndex);
     }
 
@@ -3168,6 +3170,7 @@ public class TransactionHelper {
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelperFactionSpecific.checkViabilityTradeConvoys(game, player, player2);
+        LieInWaitService.check(player, player2, game);
         if (player2 != null) clearEntanglement(game, player, player2);
         ButtonHelper.deleteMessage(event);
     }

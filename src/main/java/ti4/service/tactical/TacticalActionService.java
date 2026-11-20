@@ -50,7 +50,6 @@ import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.MercerAgent;
 import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
-import ti4.service.map.RefractureRulesService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -210,7 +209,6 @@ public class TacticalActionService {
         }
 
         TkHelperStarflare.onTacticalMove(game, tile);
-        RefractureRulesService.recordCharonShipMovement(game, game.getActivePlayer(), tile);
         BeansMonumentHandler.moveEtherAnchorWithTheDeep(event, game, game.getActivePlayer(), tile);
 
         return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, tile);
