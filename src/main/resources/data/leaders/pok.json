@@ -949,7 +949,7 @@
         "tfTitle": "",
         "abilityName": "Singularity Reactor: Changing the Ways",
         "abilityWindow": "ACTION:",
-        "abilityText": "Swap the positions of any 2 non-Fracture systems that contain wormholes or your units, other than the Creuss system, Ahk Creuxx system, or the Wormhole Nexus.",
+        "abilityText": "Swap the positions of any 2 non-Fracture systems that contain wormholes or your units, other than the Creuss system, Ahk Creuxx system, or the Wormhole Nexus. Then, purge this card.",
         "tfAbilityText": "Swap the positions of any 2 non-Fracture systems that contain wormholes or your units, other than the Creuss systems, Ahk Creuxx system, or the wormhole nexus. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "flavourText": "\"The Creuss have unsurpassed command of wormhole technology, true - but enough to warp the very bounds of space? Preposterous!\"",

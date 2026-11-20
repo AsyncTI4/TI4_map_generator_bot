@@ -19,7 +19,6 @@
         "types": [
             "BIOTIC"
         ],
-        "requirements": "null",
         "faction": "obsidian",
         "source": "franken",
         "text": "At the start of the status phase, destroy 1 of another player's units on a planet they control in or adjacent to a system that contains your infantry.\nThis technology cannot be researched.",
