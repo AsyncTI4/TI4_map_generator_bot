@@ -89,6 +89,13 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
     steps 5 and 7.
 - [ ] **4. Cheaper testing.** Paired continuations from snapshots with `decisionOverride`; randomized flags per seat.
   - Check: if the standard error is well above 0.08 VP at a one-round horizon, go back to whole-game A/B.
+  - Harness built 2026-11-20, not yet run: `ContinuationAbExperimentTest` (`-Dai.selfplay.continuation=true`,
+    `.flags=...`). Snapshots at the start of rounds 2-4, two arms per continuation seed with the treated half
+    swapped, common random numbers, one-round horizon; see the test README. Flags are switched through the seats'
+    stored values, so `decisionOverride` is not needed.
+  - With common random numbers an A/A run scores exactly 0, so the check reads the standard error of a real flag's
+    run; `crn=false` gives the unpaired noise.
+  - Next: run one flag with a known whole-game result (needs a yes), compare sign and standard error.
 - [ ] **5. One-round own-seat lookahead, logging only.** Imagine each top plan on a board copy and rank again. Needs
   fresh memo scopes: `DecisionMemo` keys carry no game and `Player.equals` compares only the user id.
   - Check: under 5% of activations change, or flipped decisions don't gain in step 4's test, means stop and skip 8-9.
