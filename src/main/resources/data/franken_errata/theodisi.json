@@ -283,10 +283,11 @@
         "source": "theodisi"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "trovantous",
-        "optionalSwaps": [
-            "MECH:stoneborn_mechdormant"
+        "itemCategory": "MECH",
+        "itemId": "stoneborn_mechdormant",
+        "additionalComponents": [
+            "ABILITY:fragmentum_unleashed",
+            "ABILITY:adaptive"
         ],
         "source": "theodisi"
     },
