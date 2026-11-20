@@ -86,6 +86,11 @@ class NekroLeaderRulesTest extends BaseTi4Test {
                 prompt("tokens", PromptSource.PUBLIC, NOW, LOSE_TOKEN_BUTTONS, LOSE_TOKEN_LABELS), content);
     }
 
+    private AiPrompt loseTokensInThread(String content) {
+        return AiTestGame.withContent(
+                prompt("threadTokens", PromptSource.AI_THREAD, NOW, LOSE_TOKEN_BUTTONS, LOSE_TOKEN_LABELS), content);
+    }
+
     private void holdActionCards(int count) {
         for (int card = 1; card <= count; card++) test.nekro.setActionCard("sabo" + card, card);
     }
@@ -260,5 +265,35 @@ class NekroLeaderRulesTest extends BaseTi4Test {
         test.units(wellon, "space", test.nekro, UnitType.Destroyer, 1);
 
         assertThat(NekroLeaderRules.startHero(test.context(turnPrompt()))).isEmpty();
+    }
+
+    // The cards info thread carries its own copy of the agent's button. Pressed there, the picker answers in the
+    // thread,
+    // and when Nekro names itself the engine sends the token prompt back to the channel the pick was pressed in, so
+    // the cost prompt is private too. The seat must still pay it, with the card it meant to give up.
+    @Test
+    void paysForTheAgentWhenItWasStartedFromTheCardsInfoThread() {
+        holdActionCards(2);
+        AiPrompt threadButton =
+                prompt("threadAgent", PromptSource.AI_THREAD, NOW, "FFCC_nekro_exhaustAgent_nekroagent");
+        assertThat(pressed(NekroLeaderRules.startAgent(test.context(threadButton))))
+                .isEqualTo("FFCC_nekro_exhaustAgent_nekroagent");
+        AiPrompt tokens = loseTokensInThread(test.nekro.getRepresentationUnfogged()
+                + ", your current command tokens are 3/3/2. Use buttons to lose tokens.");
+
+        assertThat(pressed(NekroLeaderRules.payAgentCost(test.context(discardPrompt(), tokens))))
+                .isEqualTo("ac_discard_from_hand_2");
+    }
+
+    // Other effects also ask the seat to lose tokens in its cards info thread. Without a Nekro Malleon use of its own
+    // this turn, the seat leaves such a prompt to the rule that owns it.
+    @Test
+    void leavesAPrivateTokenPromptAloneWithoutAnAgentUseOfItsOwn() {
+        holdActionCards(2);
+        AiPrompt tokens = loseTokensInThread(test.nekro.getRepresentationUnfogged()
+                + ", your current command tokens are 3/3/2. Use buttons to lose tokens.");
+
+        assertThat(NekroLeaderRules.payAgentCost(test.context(discardPrompt(), tokens)))
+                .isEmpty();
     }
 }

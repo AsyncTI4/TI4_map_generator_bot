@@ -1538,9 +1538,12 @@ limitations below come from explicit guards, missing handlers and modelling choi
 
 ### Known weaknesses
 
-- **Leadership Rider payout needs its announcement in recent history.** The gate looks for the buttonless announcement
-  among the last `AiSettings.HISTORY_SIZE` main-channel messages; if the seat first looks after it has scrolled out, the
-  gain is not pressed. (Until 2026-11-17 perception dropped the announcement altogether, so the payout never fired.)
+- **Leadership Rider payout.** The gate takes either the buttonless announcement (among the last
+  `AiSettings.HISTORY_SIZE` main-channel messages) or the seat's own Leadership Rider in the agenda's votes
+  (`AgendaCardRules.hasPlacedRider`, kept until the next agenda is revealed), so the gain is pressed even after the
+  announcement has scrolled out of view. A seat holding a Leadership Rider on the losing outcome would also take an
+  unrelated main-channel gain prompt in that agenda as the payout. (Until 2026-11-17 perception dropped the
+  announcement altogether, so the payout never fired.)
 
 - **`NOT_FOR` promises read as votes for the avoided outcome (suspected bug).** `PromisedVotes.placeAccepted`
   removes a `NOT_AGAINST` promiser and sends every other accepted vote promise through `withVotes` on its target.

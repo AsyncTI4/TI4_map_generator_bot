@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.actioncards.AgendaCardRules;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
@@ -83,7 +84,7 @@ public class RiderPayouts {
         String key = LEADERSHIP_KEY + prompt.messageId();
         Optional<LeadershipGain> remembered = context.memory().get(key).flatMap(LeadershipGain::decode);
         if (remembered.isPresent()) return remembered;
-        if (!prompt.content().contains(GAIN_TOKENS_TEXT) || !announcedBefore(context, prompt, prompts)) {
+        if (!prompt.content().contains(GAIN_TOKENS_TEXT) || !isLeadershipPayout(context, prompt, prompts)) {
             return Optional.empty();
         }
         Player seat = context.seat();
@@ -91,6 +92,11 @@ public class RiderPayouts {
         LeadershipGain gain = new LeadershipGain(Math.min(LEADERSHIP_TOKENS, room), totalTokens(seat));
         context.memory().put(key, gain.encode());
         return Optional.of(gain);
+    }
+
+    private static boolean isLeadershipPayout(AiTurnContext context, AiPrompt gainPrompt, List<AiPrompt> prompts) {
+        return announcedBefore(context, gainPrompt, prompts)
+                || AgendaCardRules.hasPlacedRider(context.game(), context.seat(), RiderPayoff.LEADERSHIP);
     }
 
     private static boolean announcedBefore(AiTurnContext context, AiPrompt gainPrompt, List<AiPrompt> prompts) {

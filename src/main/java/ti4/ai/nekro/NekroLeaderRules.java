@@ -120,7 +120,8 @@ public class NekroLeaderRules {
     public static Optional<AiDecision> payAgentCost(AiTurnContext context) {
         Player seat = context.seat();
         for (AiPrompt tokens : Prompts.newestFirst(context.prompts())) {
-            if (tokens.isHidden() || !losesTokens(context, tokens)) continue;
+            if (tokens.isHidden() && !followsOwnAgentUse(context, tokens)) continue;
+            if (!losesTokens(context, tokens)) continue;
             String key = COST_KEY + tokens.messageId();
             if (!context.memory().has(key)) context.memory().put(key, String.valueOf(seat.getAcCount()));
             String state = context.memory().get(key).orElse("");
@@ -144,6 +145,15 @@ public class NekroLeaderRules {
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean followsOwnAgentUse(AiTurnContext context, AiPrompt tokens) {
+        return context.memory()
+                .get(AGENT_KEY + context.turnKey())
+                .filter(StringUtils::isNumeric)
+                .map(Long::parseLong)
+                .filter(since -> tokens.createdAtMillis() >= since - CLOCK_SKEW_MILLIS)
+                .isPresent();
     }
 
     private static boolean losesTokens(AiTurnContext context, AiPrompt prompt) {

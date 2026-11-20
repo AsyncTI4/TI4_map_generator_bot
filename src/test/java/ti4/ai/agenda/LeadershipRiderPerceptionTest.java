@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiSettings;
 import ti4.ai.AiTestGame;
 import ti4.ai.brain.StandardBrain;
 import ti4.ai.perception.AiPerception;
@@ -78,6 +79,37 @@ class LeadershipRiderPerceptionTest extends BaseTi4Test {
         assertThat(prompts).anyMatch(AiPerception::isLeadershipRiderPayout);
         AiPrompt[] seen = prompts.toArray(AiPrompt[]::new);
         assertThat(RiderPayouts.leadership(test.contextFor(nekro, Set.of(), clock.get(), seen))
+                        .map(AiTestGame::pressedId))
+                .hasValueSatisfying(id -> assertThat(id).startsWith("FFCC_nekro_increase_"));
+    }
+
+    // The AI reads the last AiSettings.HISTORY_SIZE messages of the main channel. If enough other messages follow the
+    // payout before the seat looks, the buttonless announcement drops out of that window while the gain buttons are
+    // still in it. The seat's Leadership Rider, still listed in the agenda's votes until the next agenda is revealed,
+    // tells it the gain prompt is the payout.
+    @Test
+    void gainsTheTokensWhenTheAnnouncementHasScrolledOutOfTheHistoryRead() {
+        Player nekro = test.nekro;
+        test.game.setCurrentAgendaVote("for", "nekro_Leadership Rider");
+        actions.sendMessage(nekro.getRepresentationUnfogged()
+                        + " resolve _Leadership Rider_ by using the button to gain 3 command tokens.")
+                .complete();
+        clock.addAndGet(1000);
+        actions.sendMessage(nekro.getRepresentationUnfogged() + ", your current command tokens are "
+                        + nekro.getCCRepresentation() + ". Use buttons to gain command tokens.")
+                .setComponents(ActionRow.of(ButtonHelper.getGainCCButtons(nekro)))
+                .complete();
+        for (int message = 0; message < AiSettings.HISTORY_SIZE - 1; message++) {
+            clock.addAndGet(10);
+            actions.sendMessage("Agenda resolution line " + message).complete();
+        }
+
+        List<AiPrompt> prompts =
+                AiPerception.collect(test.game, nekro, new StandardBrain().publicWindowHandlerPrefixes());
+
+        assertThat(prompts).noneMatch(AiPerception::isLeadershipRiderPayout);
+        assertThat(RiderPayouts.leadership(
+                                test.contextFor(nekro, Set.of(), clock.get(), prompts.toArray(AiPrompt[]::new)))
                         .map(AiTestGame::pressedId))
                 .hasValueSatisfying(id -> assertThat(id).startsWith("FFCC_nekro_increase_"));
     }

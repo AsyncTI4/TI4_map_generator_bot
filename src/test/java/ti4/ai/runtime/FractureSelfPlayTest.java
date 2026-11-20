@@ -121,6 +121,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
         private SelfPlayGame selfPlay;
         private String attacker;
         private int pointsBefore;
+        private int secretPointsBefore;
         private int relicsBefore;
         boolean taken;
         boolean attackLost;
@@ -169,9 +170,16 @@ class FractureSelfPlayTest extends BaseTi4Test {
             }
             taken = true;
             round = game.getRound();
-            pointsGained = seat.getTotalVictoryPoints() - pointsBefore - relicPoints(seat);
+            pointsGained = seat.getTotalVictoryPoints() - pointsBefore - relicPoints(seat) - secretPointsScored(seat);
             relicsGained = seat.getRelics().size() - relicsBefore;
             return relicsGained > 0 || ++waitingForRelic > RELIC_PATIENCE_TICKS;
+        }
+
+        // The battle can also meet one of the attacker's secret objectives (seed 3750970024: Yin scored dyp while
+        // taking
+        // Styx); that point is not the planet's.
+        private int secretPointsScored(Player seat) {
+            return seat.getSecretVictoryPoints() - secretPointsBefore;
         }
 
         // Shard of the Throne gives its holder a point on top of the one the planet scores.
@@ -215,6 +223,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
             beside.addUnit("space", Units.getUnitKey(UnitType.Carrier, seat.getColor()), carriers);
             beside.addUnit("space", Units.getUnitKey(UnitType.Infantry, seat.getColor()), infantry);
             pointsBefore = seat.getTotalVictoryPoints();
+            secretPointsBefore = seat.getSecretVictoryPoints();
             relicsBefore = seat.getRelics().size();
             arrangedRound = game.getRound();
             if (flankSpeed) seat.setActionCard("fs1", 401);

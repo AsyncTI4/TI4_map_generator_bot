@@ -1243,9 +1243,10 @@ missing handlers and approximations visible in the code.
 
 ### Possible defects found while reading (not confirmed by running)
 
-- **Nekro Malleon from the cards info thread (unverified).** If the seat starts the agent from the copy of its button in
-  the cards info thread, the token prompt is posted there too and is hidden; `payAgentCost` skips hidden token prompts,
-  so the cost would not be paid. Not tested.
+- **Nekro Malleon from the cards info thread.** Started from the copy of its button in the cards info thread, the agent's
+  token prompt is posted there too. `payAgentCost` answers a private token prompt only when it follows the seat's own
+  Malleon use this turn (`NekroLeaderRulesTest.paysForTheAgentWhenItWasStartedFromTheCardsInfoThread`); until
+  2026-11-20 it skipped every private one and left the cost unpaid.
 - **Lazax Gate Folding exhaust step has no timeout.** After opening the component-action menu, `LazaxGateFolding.next`
   returns empty until `exhaustTech_lgf` shows; if it never shows, the turn key stays `menu` and nothing finishes the flow
   (it does not block other rules).
