@@ -456,7 +456,8 @@ public class WebPlayerArea {
                     .count();
             webPlayerArea.breachTokensReinf = Math.max(0, maxBreachTokens - totalBreaches);
 
-            webPlayerArea.hasSeverTokenReinf = PlayerAreaSupplies.severCount(game) == 0; // Check if sever token already in play
+            webPlayerArea.hasSeverTokenReinf =
+                    PlayerAreaSupplies.severCount(game) == 0; // Check if sever token already in play
         } else {
             webPlayerArea.breachTokensReinf = 0;
             webPlayerArea.hasSeverTokenReinf = false;
