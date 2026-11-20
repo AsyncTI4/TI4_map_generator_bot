@@ -21,6 +21,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.image.draw.FactionIcons;
 import ti4.model.Mapper;
+import ti4.service.map.PlayerAreaSupplies;
 
 @Data
 public class WebPlayerArea {
@@ -160,6 +161,7 @@ public class WebPlayerArea {
     private Integer sleeperTokensReinf;
     private List<String> ghostWormholesReinf;
     private Integer breachTokensReinf;
+    private boolean hasSeverTokenReinf;
     private Integer galvanizeTokensReinf;
 
     // Mahact faction-specific: edict "stolen" fleet supply
@@ -453,8 +455,11 @@ public class WebPlayerArea {
                             Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
                     .count();
             webPlayerArea.breachTokensReinf = Math.max(0, maxBreachTokens - totalBreaches);
+
+            webPlayerArea.hasSeverTokenReinf = PlayerAreaSupplies.severCount(game) == 0; // Check if sever token already in play
         } else {
             webPlayerArea.breachTokensReinf = 0;
+            webPlayerArea.hasSeverTokenReinf = false;
         }
 
         // Galvanize tokens (Bastion faction only)
