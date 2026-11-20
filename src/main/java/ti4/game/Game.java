@@ -1606,7 +1606,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     public void updateActivePlayer(Player player) {
-        Date newTime = new Date();
+        Date newTime = new Date(GameClock.currentTimeMillis());
         String factionsInCombat = getStoredValue("factionsInCombat");
         Player prevPlayer = getActivePlayer();
         String prevFaction =

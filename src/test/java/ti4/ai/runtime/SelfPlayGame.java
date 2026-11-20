@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +44,6 @@ final class SelfPlayGame {
     private static final int RELICS_PER_SEAT = Integer.getInteger("ai.selfplay.relics", 0);
     private static final long FRACTURE_SEED = Long.getLong("ai.selfplay.fractureseed", 7L);
     private static final String OWNER_ID = "300000000000000001";
-    private static final String AGENDA_FLIP_STAMP = "lastAgendaReactTime";
-    private static final long AGENDA_FLIP_AGE_MILLIS = 10 * 60 * 1000L;
 
     enum Ending {
         STOP_CONDITION,
@@ -197,7 +194,6 @@ final class SelfPlayGame {
     private final SelfPlayEnvironment env;
     final String name;
     private TextChannel actions;
-    private long issuedTurnStamp = -1;
     private final List<String> victoryPointsByRound = new ArrayList<>();
     private final List<Map<String, Integer>> pointsAfterRound = new ArrayList<>();
     private final List<Map<String, Double>> stateAtRoundStart = new ArrayList<>();
@@ -529,8 +525,6 @@ final class SelfPlayGame {
                 }
                 ticks++;
                 recordHands(game);
-                stampTurnStart(now);
-                ageAgendaFlipGuard();
             }
             env.advance(STEP_MILLIS);
         }
@@ -569,16 +563,10 @@ final class SelfPlayGame {
         return false;
     }
 
-    // Changes the game between ticks the way a test scenario needs, and saves it. A turn the change started counts as
-    // started now on the virtual clock, like a turn a press started, so its messages belong to it.
+    // Changes the game between ticks the way a test scenario needs, and saves it. A turn the change starts is stamped
+    // by the engine on the game clock, which is the virtual clock here, so its messages belong to it.
     void force(Game game, java.util.function.Consumer<Game> change) {
-        Date before = game.getLastActivePlayerChange();
         change.accept(game);
-        Date after = game.getLastActivePlayerChange();
-        if (after != null && !after.equals(before)) {
-            game.setLastActivePlayerChange(new Date(env.now()));
-            issuedTurnStamp = env.now();
-        }
         saveObserved(game, "AI self-play scenario");
     }
 
@@ -592,8 +580,7 @@ final class SelfPlayGame {
             AiGameState.Snapshot aiState,
             AiLane lane,
             long clock,
-            byte[] random,
-            long issuedTurnStamp) {}
+            byte[] random) {}
 
     Snapshot snapshot() {
         Game game = observed(GameManager.getManagedGame(name));
@@ -604,8 +591,7 @@ final class SelfPlayGame {
                 AiGameState.snapshot(name),
                 lane == null ? null : lane.copy(),
                 env.now(),
-                serialized(RandomHelper.current()),
-                issuedTurnStamp);
+                serialized(RandomHelper.current()));
     }
 
     void restore(Snapshot snapshot) {
@@ -619,7 +605,6 @@ final class SelfPlayGame {
         lane = snapshot.lane() == null ? null : snapshot.lane().copy();
         env.clock.set(snapshot.clock());
         RandomHelper.useForThisThread((java.util.Random) deserialized(snapshot.random()));
-        issuedTurnStamp = snapshot.issuedTurnStamp();
     }
 
     private static byte[] serialized(java.io.Serializable value) {
@@ -667,19 +652,6 @@ final class SelfPlayGame {
     // An interaction from the game's owner in the actions channel, for engine calls a scenario makes itself.
     GenericInteractionCreateEvent ownerEvent() {
         return setupEvent();
-    }
-
-    // The engine stamps a new turn with the wall clock; the AI compares it with message times from the virtual
-    // clock, so every turn change is re-stamped with the virtual time of the tick that caused it.
-    private void stampTurnStart(long tickTime) {
-        Game game = observed(GameManager.getManagedGame(name));
-        if (game == null) return;
-        Date changed = game.getLastActivePlayerChange();
-        long stamp = changed == null ? -1 : changed.getTime();
-        if (stamp == issuedTurnStamp) return;
-        game.setLastActivePlayerChange(new Date(tickTime));
-        issuedTurnStamp = tickTime;
-        saveObserved(game, "AI self-play clock");
     }
 
     // One line per round, taken when the next round starts, so the report shows how fast each seat scores.
@@ -778,23 +750,6 @@ final class SelfPlayGame {
                     + ", in play area " + player.getPromissoryNotesInPlayArea());
         }
         return lines;
-    }
-
-    // The engine refuses to flip an agenda within 6 wall-clock seconds of the previous flip. The referee waits 20
-    // seconds of game time, which the virtual clock covers in a few real milliseconds, so the stamp is aged here to
-    // keep the guard's meaning: in game time, the previous flip was long ago. The AI reads the same stamp against the
-    // virtual clock (has the reveal settled? was this prompt made in this agenda?), so it must never be ahead of
-    // that clock: a seeded batch starts its clock in September 2026, and a wall-clock stamp then looked a month in the
-    // future, so a Veto was never resolved and riders never placed (seeds 15 and 21 stalled in "agendawaiting").
-    private void ageAgendaFlipGuard() {
-        Game game = observed(GameManager.getManagedGame(name));
-        if (game == null) return;
-        String flippedAt = game.getStoredValue(AGENDA_FLIP_STAMP);
-        if (flippedAt.isEmpty() || !flippedAt.chars().allMatch(Character::isDigit)) return;
-        long aged = Math.min(env.now(), System.currentTimeMillis() - AGENDA_FLIP_AGE_MILLIS);
-        if (Long.parseLong(flippedAt) <= aged) return;
-        game.setStoredValue(AGENDA_FLIP_STAMP, String.valueOf(aged));
-        saveObserved(game, "AI self-play clock");
     }
 
     private static String progressOf(Game game, ManagedGame managed) {
