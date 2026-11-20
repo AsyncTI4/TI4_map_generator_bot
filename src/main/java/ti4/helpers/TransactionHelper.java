@@ -70,6 +70,7 @@ import ti4.service.info.LeaderInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.info.TechInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.megagame.MegagameTradeOverviewService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.relic.SendRelicService;
 import ti4.service.transaction.SendPromissoryService;
@@ -119,6 +120,8 @@ public class TransactionHelper {
     private static final int BLIND_SECRET_BUTTONS = 3;
     private static final String HIDDEN_PARTY = "Someone";
     private static final String BLACK_MARKET_MARKER = "_BMD_";
+    public static final String HIDDEN_AGENDA_REFUSAL =
+            ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
 
     record Shortfall(Player sender, String description) {}
 
@@ -352,6 +355,7 @@ public class TransactionHelper {
                 GameEventType.TRANSACTION,
                 p1,
                 Map.of("from", p1.getFaction(), "to", p2.getFaction(), "items", transactionItems));
+        MegagameTradeOverviewService.recordTrade(game, p1, p2);
         ThirtyKRelicHooks.onTransactionAccepted(game, p1, p2);
         ThirtyKActionCardHooks.onTransactionAccepted(game, p1, p2);
         List<Player> players = new ArrayList<>();
@@ -656,233 +660,11 @@ public class TransactionHelper {
                 if (!item.contains("sending" + player.getFaction())) {
                     continue;
                 }
-                trans.append("> - ");
                 sendingNothing = false;
-                String thingToTransact = item.split("_")[2];
-                String furtherDetail = item.replace(
-                        item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
-                int amountToTransact = 1;
-                boolean isGeneralized =
-                        List.of("PNs", "ACs", "SOs", "Hydromorphic").contains(thingToTransact)
-                                && furtherDetail.contains("generic");
-                boolean isSupermassiveFragment =
-                        "frags".equalsIgnoreCase(thingToTransact) && furtherDetail.startsWith("supermassive");
-                if (("frags".equalsIgnoreCase(thingToTransact) && !isSupermassiveFragment) || isGeneralized) {
-                    amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
-                    furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
+                String description = describeItem(game, player, item, hidePrivateCardText, viewer);
+                if (description != null) {
+                    trans.append("> - ").append(description).append('\n');
                 }
-                switch (thingToTransact) {
-                    case "TGs" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        if (amountToTransact > 4) {
-                            trans.append(amountToTransact).append(MiscEmojis.tg);
-                        } else {
-                            trans.append(MiscEmojis.tg(amountToTransact));
-                        }
-                    }
-                    case "Comms" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        if (amountToTransact > 4) {
-                            trans.append(amountToTransact).append(MiscEmojis.comm);
-                        } else {
-                            trans.append(MiscEmojis.comm(amountToTransact));
-                        }
-                    }
-                    case "SendDebt" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        trans.append("Send ")
-                                .append(amountToTransact)
-                                .append(" debt token")
-                                .append(amountToTransact == 1 ? "" : "s")
-                                .append(", for their \"Debt Account\" pool");
-                    }
-                    case "ClearDebt" -> {
-                        amountToTransact = Integer.parseInt(furtherDetail);
-                        trans.append("Clear ")
-                                .append(amountToTransact)
-                                .append(" debt token")
-                                .append(amountToTransact == 1 ? "" : "s")
-                                .append(", from their \"Debt Account\" pool");
-                    }
-                    case "shipOrders" ->
-                        trans.append(Mapper.getRelic(furtherDetail).getName()).append(FactionEmojis.axis);
-                    case "starCharts" ->
-                        trans.append(Mapper.getRelic(furtherDetail).getName()).append(SourceEmojis.DiscordantStars);
-                    case "ACs" -> {
-                        switch (furtherDetail) {
-                            case "generic" ->
-                                trans.append(amountToTransact)
-                                        .append(' ')
-                                        .append(CardEmojis.getACEmoji(game))
-                                        .append(" to be specified by player");
-                            default -> {
-                                int acNum = Integer.parseInt(furtherDetail);
-                                String acID = null;
-                                if (!player.getActionCards().containsValue(acNum)) {
-                                    acID = game.getDiscardActionCards().entrySet().stream()
-                                            .filter(entry -> entry.getValue().equals(acNum))
-                                            .filter(entry ->
-                                                    game.getDiscardACStatus().get(entry.getKey()) == ACStatus.morphabt)
-                                            .map(Map.Entry::getKey)
-                                            .findFirst()
-                                            .orElse(null);
-                                    if (acID == null) {
-                                        continue;
-                                    }
-                                }
-                                if (acID == null) {
-                                    for (Map.Entry<String, Integer> ac :
-                                            player.getActionCards().entrySet()) {
-                                        if (ac.getValue().equals(acNum)) {
-                                            acID = ac.getKey();
-                                        }
-                                    }
-                                }
-                                trans.append(CardEmojis.getACEmoji(game));
-                                if (!hidePrivateCardText) {
-                                    trans.append(" _")
-                                            .append(Mapper.getActionCard(acID).getName())
-                                            .append("_");
-                                }
-                            }
-                        }
-                    }
-                    case "Hydromorphic" -> {
-                        if ("generic".equals(furtherDetail)) {
-                            trans.append("Hydromorphic card to be specified by player");
-                        } else if (!hidePrivateCardText) {
-                            int cardNumber = Integer.parseInt(furtherDetail);
-                            String cardId = player.getHydromorphicCards().entrySet().stream()
-                                    .filter(entry -> entry.getValue().equals(cardNumber))
-                                    .map(Map.Entry::getKey)
-                                    .findFirst()
-                                    .orElse(null);
-                            trans.append(
-                                    cardId == null
-                                            ? "Hydromorphic card"
-                                            : Mapper.getHydromorphicCard(cardId).getName());
-                        } else {
-                            trans.append("Hydromorphic card");
-                        }
-                    }
-                    case "PNs" -> {
-                        switch (furtherDetail) {
-                            case "generic" -> {
-                                if (!hidePrivateCardText) {
-                                    trans.append(amountToTransact)
-                                            .append(' ')
-                                            .append(CardEmojis.PN)
-                                            .append(" to be specified by player");
-                                } else {
-                                    trans.append(CardEmojis.PN);
-                                }
-                            }
-                            default -> {
-                                String id = null;
-                                int pnIndex;
-                                try {
-                                    pnIndex = Integer.parseInt(furtherDetail);
-                                    for (Map.Entry<String, Integer> pn :
-                                            player.getPromissoryNotes().entrySet()) {
-                                        if (pn.getValue().equals(pnIndex)) {
-                                            id = pn.getKey();
-                                        }
-                                    }
-                                } catch (NumberFormatException e) {
-                                    id = furtherDetail.replace("fin9", "_");
-                                }
-                                trans.append(CardEmojis.PN);
-                                if (!hidePrivateCardText) {
-                                    if (Mapper.getPromissoryNote(id) != null) {
-                                        trans.append(' ')
-                                                .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
-                                                        .getColor()
-                                                        .orElse("")))
-                                                .append(" _")
-                                                .append(Mapper.getPromissoryNote(id)
-                                                        .getName())
-                                                .append("_");
-                                    } else {
-                                        trans.append(' ')
-                                                .append("null pn info for ")
-                                                .append(id);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    case "SOs" -> {
-                        switch (furtherDetail) {
-                            case "generic" ->
-                                trans.append(amountToTransact)
-                                        .append(' ')
-                                        .append(CardEmojis.SecretObjective)
-                                        .append(" to be specified by player");
-                            default -> {
-                                String soID = furtherDetail;
-                                if (!player.getSecretsUnscored().containsKey(soID)) continue;
-                                trans.append(CardEmojis.SecretObjective);
-                                if (!hidePrivateCardText)
-                                    trans.append(" _")
-                                            .append(Mapper.getSecretObjective(soID)
-                                                    .getName())
-                                            .append("_");
-                            }
-                        }
-                    }
-                    case "Frags" -> {
-                        if (isSupermassiveFragment) {
-                            var fragment = Mapper.getExplore(furtherDetail);
-                            trans.append(ExploreEmojis.getFragEmoji(fragment.getType()));
-                            if (!hidePrivateCardText) {
-                                trans.append(" _").append(fragment.getName()).append("_");
-                            }
-                        } else {
-                            trans.repeat(
-                                    ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
-                        }
-                    }
-                    case "Technology" ->
-                        trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
-                    case "EntanglementAgent", "EntanglementCommander" ->
-                        trans.append(Mapper.getLeader(furtherDetail).getName());
-                    case "EntanglementTechnology" ->
-                        trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
-                    case "MonumentUnits" -> {
-                        String[] unitDetails = furtherDetail.split("\\|", 4);
-                        Tile tile = unitDetails.length == 4 ? game.getTileByPosition(unitDetails[0]) : null;
-                        UnitKey unitKey = tile == null
-                                ? null
-                                : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player).stream()
-                                        .filter(key -> key.asyncID().equals(unitDetails[1]))
-                                        .findFirst()
-                                        .orElse(null);
-                        if (unitKey == null) {
-                            trans.append("Mowshir Freeport unit");
-                        } else {
-                            trans.append(unitKey.unitEmoji())
-                                    .append(' ')
-                                    .append(unitKey.humanReadableName())
-                                    .append(" in ")
-                                    .append(tile.getRepresentationForButtons(game, player));
-                        }
-                    }
-                    case "Planets", "AlliancePlanets", "dmz" ->
-                        trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
-                    case "Relics" ->
-                        trans.append(Mapper.getRelic(furtherDetail).getName()).append(ExploreEmojis.Relic);
-                    case "action" ->
-                        trans.append("An in-game ").append(furtherDetail).append(" action");
-                    case "details" -> {
-                        if (viewer != null || (hidePrivateCardText && game.isLimitedWhispersMode())) {
-                            trans.append("[REDACTED]");
-                        } else {
-                            trans.append(MentionGuard.withoutAnyMentions(furtherDetail.replace("fin777", " ")));
-                        }
-                    }
-                    default -> trans.append(" some odd thing: `").append(item).append('`');
-                }
-                trans.append('\n');
             }
             if (sendingNothing) {
                 String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
@@ -894,6 +676,239 @@ public class TransactionHelper {
             }
         }
 
+        return trans.toString();
+    }
+
+    public static List<String> describePublicContribution(Game game, List<String> transactionItems, Player sender) {
+        List<String> lines = new ArrayList<>();
+        for (String item : transactionItems) {
+            if (!item.contains("sending" + sender.getFaction())) continue;
+            String description = describeItem(game, sender, item, true, null);
+            if (description != null) {
+                lines.add(description);
+            }
+        }
+        return lines;
+    }
+
+    private static String describeItem(
+            Game game, Player player, String item, boolean hidePrivateCardText, Player viewer) {
+        StringBuilder trans = new StringBuilder();
+        String thingToTransact = item.split("_")[2];
+        String furtherDetail =
+                item.replace(item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
+        int amountToTransact = 1;
+        boolean isGeneralized = List.of("PNs", "ACs", "SOs", "Hydromorphic").contains(thingToTransact)
+                && furtherDetail.contains("generic");
+        boolean isSupermassiveFragment =
+                "frags".equalsIgnoreCase(thingToTransact) && furtherDetail.startsWith("supermassive");
+        if (("frags".equalsIgnoreCase(thingToTransact) && !isSupermassiveFragment) || isGeneralized) {
+            amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
+            furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
+        }
+        switch (thingToTransact) {
+            case "TGs" -> {
+                amountToTransact = Integer.parseInt(furtherDetail);
+                if (amountToTransact > 4) {
+                    trans.append(amountToTransact).append(MiscEmojis.tg);
+                } else {
+                    trans.append(MiscEmojis.tg(amountToTransact));
+                }
+            }
+            case "Comms" -> {
+                amountToTransact = Integer.parseInt(furtherDetail);
+                if (amountToTransact > 4) {
+                    trans.append(amountToTransact).append(MiscEmojis.comm);
+                } else {
+                    trans.append(MiscEmojis.comm(amountToTransact));
+                }
+            }
+            case "SendDebt" -> {
+                amountToTransact = Integer.parseInt(furtherDetail);
+                trans.append("Send ")
+                        .append(amountToTransact)
+                        .append(" debt token")
+                        .append(amountToTransact == 1 ? "" : "s")
+                        .append(", for their \"Debt Account\" pool");
+            }
+            case "ClearDebt" -> {
+                amountToTransact = Integer.parseInt(furtherDetail);
+                trans.append("Clear ")
+                        .append(amountToTransact)
+                        .append(" debt token")
+                        .append(amountToTransact == 1 ? "" : "s")
+                        .append(", from their \"Debt Account\" pool");
+            }
+            case "shipOrders" ->
+                trans.append(Mapper.getRelic(furtherDetail).getName()).append(FactionEmojis.axis);
+            case "starCharts" ->
+                trans.append(Mapper.getRelic(furtherDetail).getName()).append(SourceEmojis.DiscordantStars);
+            case "ACs" -> {
+                switch (furtherDetail) {
+                    case "generic" ->
+                        trans.append(amountToTransact)
+                                .append(' ')
+                                .append(CardEmojis.getACEmoji(game))
+                                .append(" to be specified by player");
+                    default -> {
+                        int acNum = Integer.parseInt(furtherDetail);
+                        String acID = null;
+                        if (!player.getActionCards().containsValue(acNum)) {
+                            acID = game.getDiscardActionCards().entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(acNum))
+                                    .filter(entry -> game.getDiscardACStatus().get(entry.getKey()) == ACStatus.morphabt)
+                                    .map(Map.Entry::getKey)
+                                    .findFirst()
+                                    .orElse(null);
+                            if (acID == null) {
+                                return null;
+                            }
+                        }
+                        if (acID == null) {
+                            for (Map.Entry<String, Integer> ac :
+                                    player.getActionCards().entrySet()) {
+                                if (ac.getValue().equals(acNum)) {
+                                    acID = ac.getKey();
+                                }
+                            }
+                        }
+                        trans.append(CardEmojis.getACEmoji(game));
+                        if (!hidePrivateCardText) {
+                            trans.append(" _")
+                                    .append(Mapper.getActionCard(acID).getName())
+                                    .append("_");
+                        }
+                    }
+                }
+            }
+            case "Hydromorphic" -> {
+                if ("generic".equals(furtherDetail)) {
+                    trans.append("Hydromorphic card to be specified by player");
+                } else if (!hidePrivateCardText) {
+                    int cardNumber = Integer.parseInt(furtherDetail);
+                    String cardId = player.getHydromorphicCards().entrySet().stream()
+                            .filter(entry -> entry.getValue().equals(cardNumber))
+                            .map(Map.Entry::getKey)
+                            .findFirst()
+                            .orElse(null);
+                    trans.append(
+                            cardId == null
+                                    ? "Hydromorphic card"
+                                    : Mapper.getHydromorphicCard(cardId).getName());
+                } else {
+                    trans.append("Hydromorphic card");
+                }
+            }
+            case "PNs" -> {
+                switch (furtherDetail) {
+                    case "generic" -> {
+                        if (!hidePrivateCardText) {
+                            trans.append(amountToTransact)
+                                    .append(' ')
+                                    .append(CardEmojis.PN)
+                                    .append(" to be specified by player");
+                        } else {
+                            trans.append(CardEmojis.PN);
+                        }
+                    }
+                    default -> {
+                        String id = null;
+                        int pnIndex;
+                        try {
+                            pnIndex = Integer.parseInt(furtherDetail);
+                            for (Map.Entry<String, Integer> pn :
+                                    player.getPromissoryNotes().entrySet()) {
+                                if (pn.getValue().equals(pnIndex)) {
+                                    id = pn.getKey();
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            id = furtherDetail.replace("fin9", "_");
+                        }
+                        trans.append(CardEmojis.PN);
+                        if (!hidePrivateCardText) {
+                            if (Mapper.getPromissoryNote(id) != null) {
+                                trans.append(' ')
+                                        .append(StringUtils.capitalize(Mapper.getPromissoryNote(id)
+                                                .getColor()
+                                                .orElse("")))
+                                        .append(" _")
+                                        .append(Mapper.getPromissoryNote(id).getName())
+                                        .append("_");
+                            } else {
+                                trans.append(' ').append("null pn info for ").append(id);
+                            }
+                        }
+                    }
+                }
+            }
+            case "SOs" -> {
+                switch (furtherDetail) {
+                    case "generic" ->
+                        trans.append(amountToTransact)
+                                .append(' ')
+                                .append(CardEmojis.SecretObjective)
+                                .append(" to be specified by player");
+                    default -> {
+                        String soID = furtherDetail;
+                        if (!player.getSecretsUnscored().containsKey(soID)) return null;
+                        trans.append(CardEmojis.SecretObjective);
+                        if (!hidePrivateCardText)
+                            trans.append(" _")
+                                    .append(Mapper.getSecretObjective(soID).getName())
+                                    .append("_");
+                    }
+                }
+            }
+            case "Frags" -> {
+                if (isSupermassiveFragment) {
+                    var fragment = Mapper.getExplore(furtherDetail);
+                    trans.append(ExploreEmojis.getFragEmoji(fragment.getType()));
+                    if (!hidePrivateCardText) {
+                        trans.append(" _").append(fragment.getName()).append("_");
+                    }
+                } else {
+                    trans.repeat(ExploreEmojis.getFragEmoji(furtherDetail).toString(), amountToTransact);
+                }
+            }
+            case "Technology" -> trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
+            case "EntanglementAgent", "EntanglementCommander" ->
+                trans.append(Mapper.getLeader(furtherDetail).getName());
+            case "EntanglementTechnology" ->
+                trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
+            case "MonumentUnits" -> {
+                String[] unitDetails = furtherDetail.split("\\|", 4);
+                Tile tile = unitDetails.length == 4 ? game.getTileByPosition(unitDetails[0]) : null;
+                UnitKey unitKey = tile == null
+                        ? null
+                        : tile.getSpaceUnitHolder().getUnitKeysForPlayer(player).stream()
+                                .filter(key -> key.asyncID().equals(unitDetails[1]))
+                                .findFirst()
+                                .orElse(null);
+                if (unitKey == null) {
+                    trans.append("Mowshir Freeport unit");
+                } else {
+                    trans.append(unitKey.unitEmoji())
+                            .append(' ')
+                            .append(unitKey.humanReadableName())
+                            .append(" in ")
+                            .append(tile.getRepresentationForButtons(game, player));
+                }
+            }
+            case "Planets", "AlliancePlanets", "dmz" ->
+                trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
+            case "Relics" ->
+                trans.append(Mapper.getRelic(furtherDetail).getName()).append(ExploreEmojis.Relic);
+            case "action" -> trans.append("An in-game ").append(furtherDetail).append(" action");
+            case "details" -> {
+                if (viewer != null || (hidePrivateCardText && game.isLimitedWhispersMode())) {
+                    trans.append("[REDACTED]");
+                } else {
+                    trans.append(MentionGuard.withoutAnyMentions(furtherDetail.replace("fin777", " ")));
+                }
+            }
+            default -> trans.append(" some odd thing: `").append(item).append('`');
+        }
         return trans.toString();
     }
 
@@ -1166,15 +1181,18 @@ public class TransactionHelper {
 
         List<Button> buttons = getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
-        if (game.isHiddenAgendaMode()
-                && game.getPhaseOfGame().toLowerCase().contains("agenda")
-                && game.getStoredValue("executiveOrder").isEmpty()) {
-            message = player.getRepresentation()
-                    + ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
+        if (hiddenAgendaBlocksTransactions(game)) {
+            message = player.getRepresentation() + HIDDEN_AGENDA_REFUSAL;
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+    }
+
+    public static boolean hiddenAgendaBlocksTransactions(Game game) {
+        return game.isHiddenAgendaMode()
+                && game.getPhaseOfGame().toLowerCase().contains("agenda")
+                && game.getStoredValue("executiveOrder").isEmpty();
     }
 
     @ButtonHandler(value = "newTransact_", save = false)
@@ -3179,21 +3197,26 @@ public class TransactionHelper {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 != null) {
-            player.clearTransactionItemsWithPlayer(p2);
-            List<Button> buttons = getStuffToTransButtonsOld(game, player, p2);
-            if (useNewTransactionModel(game)) {
-                buttons = getStuffToTransButtonsNew(game, player, player, p2);
-                if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
-                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2, player);
-                    FileUpload upload = ImageUploads.createFileUpload(image, "transactable_items");
-                    MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
-                }
-            }
-            String message = player.getRepresentation(true, false) + ", please choose what you wish to transact with "
-                    + p2.getRepresentation(false, false) + ".";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-            checkTransactionLegality(game, player, p2);
+            startTransaction(game, player, p2, event.getMessageChannel(), buttonID.startsWith("transactWith_"));
             ButtonHelper.deleteMessage(event);
         }
+    }
+
+    public static void startTransaction(
+            Game game, Player player, Player p2, MessageChannel channel, boolean showTransactables) {
+        player.clearTransactionItemsWithPlayer(p2);
+        List<Button> buttons = getStuffToTransButtonsOld(game, player, p2);
+        if (useNewTransactionModel(game)) {
+            buttons = getStuffToTransButtonsNew(game, player, player, p2);
+            if (player.getUserSettings().isShowTransactables() && showTransactables) {
+                BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2, player);
+                FileUpload upload = ImageUploads.createFileUpload(image, "transactable_items");
+                MessageHelper.sendFileUploadToChannel(channel, upload);
+            }
+        }
+        String message = player.getRepresentation(true, false) + ", please choose what you wish to transact with "
+                + p2.getRepresentation(false, false) + ".";
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+        checkTransactionLegality(game, player, p2);
     }
 }

@@ -21,6 +21,7 @@ import ti4.helpers.Storage;
 import ti4.logging.BotLogger;
 import ti4.message.BacklogTimeouts;
 import ti4.service.fow.LoreService;
+import ti4.service.megagame.MegagameTradablesPanel;
 import ti4.spring.websocket.GameWebStatePipeline;
 
 @UtilityClass
@@ -133,6 +134,7 @@ public class GameManager {
             throw new RuntimeException("Failed to save game " + game.getName() + ".");
         }
         GameWebStatePipeline.queue(game);
+        MegagameTradablesPanel.onSave(game);
         BacklogTimeouts.track(game);
         ManagedGameState managedGameState = ManagedGameState.of(game);
         GameDatabaseSyncPipeline.queueSync(game, managedGameState);

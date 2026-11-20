@@ -88,6 +88,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.genome.ResearchGenome;
 import ti4.service.leader.genome.homebrew.tknova.RecursiveGenome;
 import ti4.service.map.RefractureRulesService;
+import ti4.service.megagame.MegagameTradeInfoService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -183,6 +184,9 @@ public class CardsInfoService {
         }
         Button transaction = Buttons.TRANSACTION;
         buttons.add(transaction);
+        if (MegagameTradeInfoService.isAvailable(game)) {
+            buttons.add(MegagameTradeInfoService.openButton());
+        }
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         buttons.add(modify);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
