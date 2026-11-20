@@ -68,7 +68,7 @@
         "category": "edict",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Either place 1 infantry on each planet you control or place 1 fighter in each system that contains your ships.",
+        "text1": "Either place 1 infantry on each planet you control or place 1 fighter from your reinforcements in each system that contains your ships.",
         "source": "twilights_fall"
     },
     {

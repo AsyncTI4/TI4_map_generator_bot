@@ -47,6 +47,14 @@ Bot data: `src/main/resources/data/action_cards/action_cards.json`.
 | --- | --- | --- | --- | --- |
 | Blitz | `blitz` | text | Each of your non-fighter ships in the active system that **do** not have BOMBARDMENT **gain** BOMBARDMENT 6 | does … gains ("each" is singular) |
 
+## Corrected in the bot
+
+These are missing from the print. Unlike the misprints above, the bot carries the corrected text.
+
+| Card | Bot alias | File | Field | Printed text | Bot text |
+| --- | --- | --- | --- | --- | --- |
+| Arise (Twilight's Fall edict) | `tf-arise` | agendas/twilights_fall.json | text1 | … or place 1 fighter in each system that contains your ships. | … or place 1 fighter **from your reinforcements** in each system that contains your ships. |
+
 ## Not yet checked against images
 
 - Each faction's first, attributed quote, for example "… —Dirzuga Rophal". These quotes aren't printed on the faction sheet backs.
