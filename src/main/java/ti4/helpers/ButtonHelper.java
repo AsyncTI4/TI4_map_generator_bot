@@ -4519,13 +4519,19 @@ public class ButtonHelper {
         buttons.add(Buttons.blue(
                 "getDamageButtons_" + tile.getPosition() + "_remove",
                 "Remove Units in " + tile.getRepresentationForButtons(game, player)));
+        buttons.add(Buttons.gray("viewViolatingSystem_" + tile.getPosition(), "View System"));
         buttons.add(Buttons.red("deleteButtons", "Dismiss These Buttons"));
 
-        FileUpload systemWithContext = SystemContextImage.upload(game, null, 0, tile.getPosition(), player);
-        MessageHelper.sendFileToChannelWithButtonsAfter(
-                player.getCorrectChannel(), systemWithContext, assessment.message(), buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assessment.message(), buttons);
         game.setStoredValue("violatedSystems", game.getStoredValue("violatedSystems") + tile.getPosition() + "_");
         GMService.logPlayerActivity(game, player, assessment.message());
+    }
+
+    @ButtonHandler(value = "viewViolatingSystem_", save = false)
+    public static void viewViolatingSystem(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        String position = buttonID.replace("viewViolatingSystem_", "");
+        MessageHelper.sendEphemeralFileInResponseToButtonPress(
+                SystemContextImage.upload(game, event, 0, position, player), event);
     }
 
     private record FleetAssessment(
