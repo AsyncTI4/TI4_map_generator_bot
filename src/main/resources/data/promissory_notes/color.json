@@ -22,7 +22,7 @@
         "playArea": true,
         "playImmediately": true,
         "source": "base",
-        "text": "When you receive this card, if you are not the <color> player, you must place it faceup in your play area and gain 1 victory point. If you activate a system that contains 1 or more of the <color> player's units, or if the <color> player is eliminated, lose 1 victory point and return this card to the <color> player.",
+        "text": "When you receive this card, if you are not the <color> player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the <color> player's units, or if the <color> player is eliminated, lose 1 victory point and return this card to the <color> player.",
         "shrinkName": true
     },
     {
@@ -40,6 +40,6 @@
         "playArea": true,
         "playImmediately": true,
         "source": "pok",
-        "text": "When you receive this card, if you are not the <color> player, you must place it faceup in your play area. While this card is in your play area, you can use the <color> player's commander ability, if it is unlocked. If you activate a system that contains 1 or more of the <color> player's units, return this card to the <color> player."
+        "text": "When you receive this card, if you are not the <color> player, you must place it faceup in your play area. While this card is in your play area, you can use the <color> player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the <color> player's units, return this card to the <color> player."
     }
 ]

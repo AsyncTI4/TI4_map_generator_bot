@@ -20,7 +20,7 @@
         "initiative": 2,
         "name": "Diplomacy",
         "primaryTexts": [
-            "Choose 1 system other than the Mecatol Rex system that contains a planet you control; each other player places a command token from his reinforcements in the chosen system. Then, ready up to 2 exhausted planets you control."
+            "Choose 1 system other than the Mecatol Rex system that contains a planet you control; each other player places a command token from their reinforcements in the chosen system. Then, ready up to 2 exhausted planets you control."
         ],
         "secondaryTexts": [
             "Spend 1 token from your strategy pool to ready up to 2 exhausted planets you control."
@@ -73,7 +73,7 @@
             "Choose any number of other players. Those players use the secondary ability of this strategy card without spending a command token."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool to replenish commodities."
+            "Spend 1 token from your strategy pool to replenish your commodities."
         ],
         "imageFileName": "base_game_5",
         "colourHexCode": "#00a99d",

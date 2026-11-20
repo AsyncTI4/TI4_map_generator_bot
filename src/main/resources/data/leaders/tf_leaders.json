@@ -180,7 +180,7 @@
         "name": "Event Horizon",
         "title": "Vuil'raith Paradigm",
         "abilityWindow": "ACTION:",
-        "abilityText": "Each other player rolls a die for each of their non-fighter ships that are in or adjacent to a system that contains a gravity rift; on a 1-5, return that unit to their reinforcements.",
+        "abilityText": "Each other player rolls a die for each of their non-fighter ships that are in or adjacent to a system that contains a gravity rift; on a 1-5, return that unit to their reinforcements. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/vuilraith_paradigm.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/vuilraith_paradigm.png?raw=true",

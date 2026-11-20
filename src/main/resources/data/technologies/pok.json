@@ -244,7 +244,7 @@
         ],
         "requirements": "RRR",
         "source": "base",
-        "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of his non-fighter ships.",
+        "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of their non-fighter ships.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/assault_cannon.png?raw=true",
         "initials": "AC"
     },
@@ -534,7 +534,7 @@
         "requirements": "BB",
         "faction": "empyrean",
         "source": "pok",
-        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to move value of all of that player's ships during this tactical action.",
+        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action.",
         "shortName": "Aether-\nstream",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/aetherstream.jpg?raw=true"
     },
@@ -624,7 +624,7 @@
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you gain another player's technology using 1 of your faction abilities, you may place the \"X\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
+        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"X\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/valefar_assimilator_x.jpg?raw=true"
     },
     {
@@ -932,7 +932,7 @@
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you gain another player's technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
+        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/valefar_assimilator_y.jpg?raw=true"
     },
     {
