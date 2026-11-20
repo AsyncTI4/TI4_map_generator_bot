@@ -7,6 +7,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
 import ti4.discord.JdaService;
+import ti4.discord.interactions.ActiveInteraction;
 import ti4.discord.interactions.listeners.context.ModalContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.HandlerRegistry;
@@ -65,7 +66,7 @@ public final class ModalListener extends ListenerAdapter {
                 "ModalListener task for  `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> handleModal(event, route),
+                () -> ActiveInteraction.runWith(event, () -> handleModal(event, route)),
                 lockType);
     }
 

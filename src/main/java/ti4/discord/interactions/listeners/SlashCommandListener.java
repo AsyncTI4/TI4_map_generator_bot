@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
+import ti4.discord.interactions.ActiveInteraction;
 import ti4.discord.interactions.commands.Command;
 import ti4.discord.interactions.commands.GameStateContainer;
 import ti4.discord.interactions.commands.ParentCommand;
@@ -57,12 +58,16 @@ class SlashCommandListener extends ListenerAdapter implements CommandListener {
         ExecutionLockType lockType = getLockType(command);
         String eventString = eventToString(event);
         if (lockType == null) {
-            ExecutorServiceManager.runAsync(eventString, () -> process(event));
+            ExecutorServiceManager.runAsync(eventString, () -> ActiveInteraction.runWith(event, () -> process(event)));
             return;
         }
         String gameName = GameNameService.getGameName(event);
         ExecutorServiceManager.runAsyncWithLock(
-                eventString, gameName, event.getMessageChannel(), () -> process(event), lockType);
+                eventString,
+                gameName,
+                event.getMessageChannel(),
+                () -> ActiveInteraction.runWith(event, () -> process(event)),
+                lockType);
     }
 
     public String eventToString(GenericCommandInteractionEvent event) {

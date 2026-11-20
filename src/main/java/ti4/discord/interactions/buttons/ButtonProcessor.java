@@ -7,6 +7,7 @@ import ti4.contest.replay.buttons.CombatDoubleOrBustButtonIds;
 import ti4.contest.replay.buttons.CombatSideBetButtonIds;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
+import ti4.discord.interactions.ActiveInteraction;
 import ti4.discord.interactions.listeners.context.ButtonContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
@@ -49,7 +50,7 @@ public class ButtonProcessor {
                 eventToString(event, gameName),
                 gameName,
                 event.getMessageChannel(),
-                () -> process(event, route, timeline),
+                () -> ActiveInteraction.runWith(event, () -> process(event, route, timeline)),
                 lockType);
     }
 
