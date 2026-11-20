@@ -39,9 +39,17 @@ These look wrong but match the print and are fine:
 - **Obsidian:** the sheet back is printed in an alien glyph script, so there is no English lore to copy.
 - **Other wording:** "phosphorous chemistry" (Nekro), "near 700 years" (Nekro), "Mecatol, which would become the Rex" (Winnu), "Maaluk" (Arborec and Naalu), "the various Creuss vessels" (Deepwrought) and "the Keleres’s founding" (Keleres).
 
+## Action cards
+
+Bot data: `src/main/resources/data/action_cards/action_cards.json`.
+
+| Card | Bot alias | Field | Printed text | Intended |
+| --- | --- | --- | --- | --- |
+| Blitz | `blitz` | text | Each of your non-fighter ships in the active system that **do** not have BOMBARDMENT **gain** BOMBARDMENT 6 | does … gains ("each" is singular) |
+
 ## Not yet checked against images
 
 - Each faction's first, attributed quote, for example "… —Dirzuga Rophal". These quotes aren't printed on the faction sheet backs.
 - The Letnev quote signed "Baron Unlenn".
 - Leader flavour quotes, which aren't on the leader card images.
-- Action cards, agendas, relics, explores, technologies and other cards. This file lists only misprints found during the faction lore check.
+- Agendas, relics, explores, technologies and other cards, and the action cards that haven't been compared with an image yet. So far only Blitz, Fighter Conscription and Rally have been checked.
