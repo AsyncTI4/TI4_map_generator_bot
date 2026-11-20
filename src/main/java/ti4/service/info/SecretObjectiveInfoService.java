@@ -76,7 +76,7 @@ public class SecretObjectiveInfoService {
             buttons.addAll(SecretObjectiveHelper.getUnscoredSecretObjectiveButtons(player));
         } else {
             Button scoreB = Buttons.red("get_so_score_buttons", "Score A Secret Objective");
-            if (game.getRevealedPublicObjectives().size() > 1) {
+            if (game.isSecretObjectiveScoringOpen()) {
                 buttons.add(scoreB);
                 secretMsg += "score or ";
             }
