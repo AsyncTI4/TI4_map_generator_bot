@@ -74,6 +74,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -173,6 +174,9 @@ public final class AgendaHelper {
                     + " to " + p2.getRepresentation(false, false) + ".\n" + msg;
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(player, game);
+        }
+        if ("tg".equalsIgnoreCase(tgOrDebt) || "comm".equalsIgnoreCase(tgOrDebt)) {
+            LieInWaitService.check(player, p2, game);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (p2.getDebtTokenCount(player.getColor()) < 1) {
@@ -314,6 +318,11 @@ public final class AgendaHelper {
 
     @ButtonHandler("resolveAgendaVote_")
     private static void resolvingAnAgendaVote(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        resolvingAnAgendaVote(buttonID, event, game, player, AgendaEvents.VOTE);
+    }
+
+    private static void resolvingAnAgendaVote(
+            String buttonID, ButtonInteractionEvent event, Game game, Player player, String voteSource) {
         boolean resolveTime = false;
         String winner = "";
         String votes = buttonID.substring(buttonID.lastIndexOf('_') + 1);
@@ -448,6 +457,7 @@ public final class AgendaHelper {
                             player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
                 }
             }
+            AgendaEvents.voteCast(game, player, winner, votes, voteSource);
             AtokeraAgent.clearVotes(player, game);
 
             if (!game.isFowMode()) {
@@ -469,8 +479,14 @@ public final class AgendaHelper {
                     || willPrevote) {
                 String skippedMessage =
                         nextInLine.getRepresentation(true, false) + ", you are being skipped because you cannot vote.";
-                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
-                        && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                String skipSource = skippedVoterSource(game, nextInLine);
+                boolean presetAbstention =
+                        game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction());
+                boolean abstentionHeld =
+                        presetAbstention && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (abstentionHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (presetAbstention && !abstentionHeld) {
+                    skipSource = AgendaEvents.PRESET_ABSTENTION;
                     CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     skippedMessage = realIdentity2
                             + ", you are being skipped because you told the bot you wanted to preset an abstention.";
@@ -479,7 +495,10 @@ public final class AgendaHelper {
                             game.getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (willPrevote && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                boolean prevoteHeld =
+                        willPrevote && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (prevoteHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (willPrevote && !prevoteHeld) {
                     skippedMessage = realIdentity2 + " had logged a pre-vote.";
                     votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
                     game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
@@ -501,6 +520,7 @@ public final class AgendaHelper {
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
                     return;
                 }
+                AgendaEvents.voteCast(game, nextInLine, null, "0", skipSource);
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(
                             nextInLine.getPrivateChannel(), AgendaSummaryHelper.getSummaryOfVotes(game, true) + "\n ");
@@ -819,8 +839,14 @@ public final class AgendaHelper {
                     && counter < game.getRealPlayers().size()) {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
                         + ", you are being skipped because the bot thinks you can't vote.";
-                if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
-                        && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                String skipSource = skippedVoterSource(game, nextInLine);
+                boolean presetAbstention =
+                        game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction());
+                boolean abstentionHeld =
+                        presetAbstention && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (abstentionHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (presetAbstention && !abstentionHeld) {
+                    skipSource = AgendaEvents.PRESET_ABSTENTION;
                     skippedMessage = realIdentity
                             + ", you are being skipped because you told the bot you wanted to preset an abstention.";
                     game.setStoredValue(
@@ -828,7 +854,10 @@ public final class AgendaHelper {
                             game.getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (willPrevote && !ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game)) {
+                boolean prevoteHeld =
+                        willPrevote && ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                if (prevoteHeld) skipSource = AgendaEvents.GENETIC_RECOMBINATION;
+                if (willPrevote && !prevoteHeld) {
                     skippedMessage = realIdentity + " had logged a pre-vote.";
                     String votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
                     game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
@@ -842,6 +871,7 @@ public final class AgendaHelper {
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, null, game, nextInLine);
                     return;
                 }
+                AgendaEvents.voteCast(game, nextInLine, null, "0", skipSource);
                 if (game.isFowMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, game, skippedMessage);
                 } else {
@@ -1524,46 +1554,40 @@ public final class AgendaHelper {
     public static int[] getVoteTotal(Player player, Game game) {
         int hasXxchaAlliance = game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") ? 1 : 0;
         int hasXxchaHero = player.hasLeaderUnlocked("xxchahero") ? 1 : 0;
-        int voteCount = getTotalVoteCount(game, player);
-
-        // Check if Player only has additional votes but not any "normal" votes, if so,
-        // they can't vote
-        if (getVoteCountFromPlanets(game, player) == 0) {
+        int voteCount = isRepresentativeGovernmentInEffect(game) ? 1 : getTotalVoteCount(game, player);
+        if (cannotVoteReason(game, player) != null) {
             voteCount = 0;
         }
-
-        if (game.getLaws() != null
-                && (game.getLaws().containsKey("rep_govt"))
-                && game.getStoredValue("executiveOrder").isEmpty()) {
-            voteCount = 1;
-        }
-
-        if ("nekro".equals(player.getFaction()) && hasXxchaAlliance == 0) {
-            voteCount = 0;
-        }
-        List<Player> riders = getRiders(game);
-        if (riders.contains(player)) {
-            if (hasXxchaAlliance == 0) {
-                voteCount = 0;
-            }
-        }
-
-        if (hasXxchaAlliance == 0
-                && (game.getStoredValue("AssassinatedReps").contains(player.getFaction())
-                        || (game.getStoredValue("PublicExecution").contains(player.getFaction())
-                                && game.getStoredValue("executiveOrder").isEmpty()))) {
-            voteCount = 0;
-        }
-
-        if (game.isStellarAtomicsMode()
-                && hasXxchaAlliance == 0
-                && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
-            if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
-                voteCount = 0;
-            }
-        }
-
         return new int[] {voteCount, hasXxchaHero, hasXxchaAlliance};
+    }
+
+    static String cannotVoteReason(Game game, Player player) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            if ("nekro".equals(player.getFaction())) return "galactic threat";
+            if (getRiders(game).contains(player)) return "rider";
+            if (game.getStoredValue("AssassinatedReps").contains(player.getFaction())) {
+                return "assassinate representative";
+            }
+            if (game.getStoredValue("PublicExecution").contains(player.getFaction())
+                    && game.getStoredValue("executiveOrder").isEmpty()) {
+                return "public execution";
+            }
+            if (missedStellarAtomics(game, player)) return "stellar atomics";
+        }
+        if (!isRepresentativeGovernmentInEffect(game) && getVoteCountFromPlanets(game, player) == 0) {
+            return "no planet votes";
+        }
+        return null;
+    }
+
+    private static boolean missedStellarAtomics(Game game, Player player) {
+        return game.isStellarAtomicsMode()
+                && game.getRevealedPublicObjectives().get("Stellar Atomics") != null
+                && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID());
+    }
+
+    private static String skippedVoterSource(Game game, Player player) {
+        return StringUtils.defaultIfEmpty(cannotVoteReason(game, player), AgendaEvents.NO_VOTES);
     }
 
     public static List<Player> getVotingOrder(Game game) {
@@ -2860,6 +2884,8 @@ public final class AgendaHelper {
                     channel,
                     game.getPing()
                             + " _Emergency Session_ revealed. This Agenda Phase will have an additional agenda compared to normal. Flipping next agenda.");
+            AgendaEvents.discardedOnReveal(
+                    game, agendaID, aCount, revealFromBottom, action, AgendaEvents.EMERGENCY_SESSION);
             aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
@@ -2872,6 +2898,7 @@ public final class AgendaHelper {
                     game.getPing() + "An \"elect law\" agenda (" + agendaName
                             + ") was revealed with no laws in play."
                             + " As such, the agenda has been discarded, and the next agenda is being flipped.");
+            AgendaEvents.discardedOnReveal(game, agendaID, aCount, revealFromBottom, action, AgendaEvents.NO_LAWS);
             aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
@@ -2883,6 +2910,8 @@ public final class AgendaHelper {
                     game.getPing() + ", an \"elect scored secret objective\" agenda (" + agendaName
                             + ") was revealed when no secret objectives have been scored."
                             + " As such, the agenda has been discarded, and the next agenda is being flipped.");
+            AgendaEvents.discardedOnReveal(
+                    game, agendaID, aCount, revealFromBottom, action, AgendaEvents.NO_SCORED_SECRETS);
             aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
@@ -2895,7 +2924,9 @@ public final class AgendaHelper {
             String agendaName2 = agendaName;
             while (!notEmergency) {
                 if ("Emergency Session".equalsIgnoreCase(agendaName2)) {
-                    game.revealAgenda(revealFromBottom);
+                    String emergencySession = game.revealAgenda(revealFromBottom);
+                    AgendaEvents.discardedOnReveal(
+                            game, emergencySession, aCount, revealFromBottom, action, AgendaEvents.EMERGENCY_SESSION);
                     MessageHelper.sendMessageToChannel(
                             channel,
                             game.getPing()
@@ -2916,6 +2947,8 @@ public final class AgendaHelper {
                             game.getPing() + ", an \"elect law\" agenda (" + agendaName2
                                     + ") was hidden under _Covert Legislation_ with no laws in play."
                                     + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
+                    AgendaEvents.discardedOnReveal(
+                            game, agendaID, aCount, revealFromBottom, action, AgendaEvents.HIDDEN_NO_LAWS);
                     aCount -= 1;
                     game.setStoredValue("agendaCount", aCount + "");
                     revealAgenda(event, revealFromBottom, game, channel);
@@ -2929,6 +2962,8 @@ public final class AgendaHelper {
                                     + " As such, both that agenda and _Covert Legislation_ have been discarded, and the next agenda is being flipped.");
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
+                    AgendaEvents.discardedOnReveal(
+                            game, agendaID, aCount, revealFromBottom, action, AgendaEvents.HIDDEN_NO_SCORED_SECRETS);
                     aCount -= 1;
                     game.setStoredValue("agendaCount", aCount + "");
                     revealAgenda(event, revealFromBottom, game, channel);
@@ -2980,6 +3015,7 @@ public final class AgendaHelper {
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + ", an agenda has been revealed.";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
+        AgendaEvents.revealed(game, agendaID, aCount, revealFromBottom, action);
         if (TheodisiAgendaResolver.onAgendaRevealed(game, event, agendaID)) {
             revealAgenda(event, revealFromBottom, game, channel);
             return;
@@ -3525,7 +3561,12 @@ public final class AgendaHelper {
     }
 
     @ButtonHandler("resolveVeto")
-    public static void resolveVeto(ButtonInteractionEvent event, Game game) {
+    public static void resolveVeto(ButtonInteractionEvent event, Game game, Player player) {
+        discardRevealedAgenda(event, game, player, AgendaEvents.VETO);
+    }
+
+    public static void discardRevealedAgenda(ButtonInteractionEvent event, Game game, Player player, String reason) {
+        AgendaEvents.discarded(game, player, getCurrentAgendaId(game), reason);
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {
@@ -3608,7 +3649,7 @@ public final class AgendaHelper {
                 game.getMainGameChannel(),
                 (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained by "
                         + player.getRepresentationNoPing() + ".");
-        resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
+        resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2, AgendaEvents.FORCED_ABSTENTION);
     }
 
     @ButtonHandler("eraseMyVote")

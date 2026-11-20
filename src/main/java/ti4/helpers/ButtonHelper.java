@@ -60,7 +60,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.Ch
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.choir.ChoirLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.deep.DeepBreakthroughHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.natau.NatauLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
@@ -190,7 +189,6 @@ import ti4.service.leader.agent.modules.homebrew.KhraskAgent;
 import ti4.service.leader.agent.modules.homebrew.LanefirAgent;
 import ti4.service.leader.agent.modules.homebrew.LiZhoAgent;
 import ti4.service.leader.agent.modules.homebrew.OlradinAgent;
-import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.RevenantStratumAgent;
 import ti4.service.leader.genome.ExperimentalGenome;
 import ti4.service.leader.genome.homebrew.tknova.SwarmGenome;
@@ -1550,7 +1548,7 @@ public class ButtonHelper {
 
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
-        if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+        if (hasDrawnStatusACs(game, player)) {
             if (event != null) {
                 ReactionService.addReaction(
                         event,
@@ -1562,6 +1560,30 @@ public class ButtonHelper {
             }
             return;
         }
+        announceAndDrawStatusACs(
+                game, player, msg -> ReactionService.addReaction(event, game, player, true, false, msg));
+    }
+
+    @Nullable
+    public static String drawStatusACsForSummary(Game game, Player player) {
+        if (hasDrawnStatusACs(game, player)) {
+            return null;
+        }
+        StringBuilder line = new StringBuilder();
+        announceAndDrawStatusACs(
+                game,
+                player,
+                msg -> line.append(player.getRepresentation(false, false))
+                        .append(' ')
+                        .append(msg));
+        return line.toString();
+    }
+
+    private static boolean hasDrawnStatusACs(Game game, Player player) {
+        return game.getCurrentACDrawStatusInfo().contains(player.getFaction());
+    }
+
+    private static void announceAndDrawStatusACs(Game game, Player player, Consumer<String> announce) {
         List<String> modifiers = new ArrayList<>();
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
@@ -1600,7 +1622,7 @@ public class ButtonHelper {
             msg += " The following modifiers have been accounted for:\n> ";
             msg += String.join("\n> ", modifiers);
         }
-        ReactionService.addReaction(event, game, player, true, false, msg);
+        announce.accept(msg);
         ActionCardHelper.drawActionCardsSilent(player, amount);
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
@@ -2674,8 +2696,7 @@ public class ButtonHelper {
                 || player.hasAbility("desperados_br")
                 || player.hasTech("tf-fraactalspikedrives")
                 || !game.getStoredValue("phantomEnergy").isEmpty()
-                || player.hasTech("fsd")
-                || IronSalvageRelicHandler.carrierCanTransportOutOfLockedSystem(game, player)) {
+                || player.hasTech("fsd")) {
             return true;
         }
         return player.getLeader("nomadhero").map(Leader::isActive).orElse(false);
@@ -5377,9 +5398,6 @@ public class ButtonHelper {
         }
         if (player.hasUnexhaustedLeader("freesystemsagent")) {
             FreeSystemsAgent.button(game, player).ifPresent(endButtons::add);
-        }
-        if (player.hasUnexhaustedLeader("crystellumagent")) {
-            CrystellumAgent.addEndTurnButton(endButtons, game, player);
         }
         SwarmGenome.endOfTurnOffer(player).ifPresent(endButtons::add);
 

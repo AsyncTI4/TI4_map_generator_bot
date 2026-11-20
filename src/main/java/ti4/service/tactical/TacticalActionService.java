@@ -12,7 +12,6 @@ import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.bluereverie.PirateHordeBrActionCardHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.CombatInitiativeLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.crystellum.CrystellumTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaHeroHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -50,7 +49,7 @@ import ti4.service.fow.LoreService;
 import ti4.service.game.MonumentsService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.agent.modules.MercerAgent;
-import ti4.service.map.RefractureRulesService;
+import ti4.service.leader.agent.modules.homebrew.beans.CrystellumAgent;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.BelkoseaAgentService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -210,7 +209,6 @@ public class TacticalActionService {
         }
 
         TkHelperStarflare.onTacticalMove(game, tile);
-        RefractureRulesService.recordCharonShipMovement(game, game.getActivePlayer(), tile);
         BeansMonumentHandler.moveEtherAnchorWithTheDeep(event, game, game.getActivePlayer(), tile);
 
         return TacticalActionDisplacementService.applyDisplacementToActiveSystem(game, tile);
@@ -237,6 +235,9 @@ public class TacticalActionService {
         String message = buildFinishMovementMessage(game, player, ctx);
         List<Button> systemButtons = buildFinishMovementButtons(event, game, player, ctx);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        if (ctx.unitsWereMoved) {
+            CrystellumAgent.offerAfterMovement(game, player);
+        }
 
         // Post-core triggers
         CommanderUnlockCheckService.checkPlayer(player, "naaz", "empyrean", "ghost", "dream");
@@ -398,10 +399,6 @@ public class TacticalActionService {
         for (MoveAbilityButton ability : MoveAbilityButtons.ABILITIES) {
             if (ability.enabled(pubCtx)) buttons.addAll(ability.build(pubCtx));
         }
-        if (player.hasTechReady("becrystrd")) {
-            CrystellumTechHandler.addResonanceDriveButton(buttons, player);
-        }
-
         // Finish movement controls
         buttons.add(
                 Buttons.red(player.factionButtonChecker() + "concludeMove_" + game.getActiveSystem(), "Done moving"));

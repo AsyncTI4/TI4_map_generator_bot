@@ -39,8 +39,8 @@
     "type": "agent",
     "name": "Shardwright Veyla",
     "title": "Fleet Control",
-    "abilityWindow": "At the end of a player's tactical action",
-    "abilityText": "You may exhaust this card to allow that player to place a number of fighters from their reinforcements in the active system up to the number of non-fighter ships in that system. If that player was another player, capture that many fighters from the supply.",
+    "abilityWindow": "After a player moves ships into the active system",
+    "abilityText": "You may exhaust this card to allow that player to place a number of fighters from their reinforcements in that system up to the number of non-fighter ships in that system. If that player was another player, capture that many fighters from the supply.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -63,7 +63,7 @@
     "title": "Hive Mind Nexus",
     "abilityName": "Mirror - Infinite Reflections",
     "abilityWindow": "ACTION:",
-    "abilityText": "You may return any number of captured fighters from your faction sheet to place any number of units in any systems that contain at least 1 of your ships with a total cost of up to twice the amount of fighters returned. Then, purge this card.",
+    "abilityText": "Return any number of captured fighters from your faction sheet to place any number of units in any systems that contain at least 1 of your ships with a total cost of up to the amount of fighters returned. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -85,8 +85,8 @@
     "name": "Karos",
     "title": "Ember-Guide",
     "abilityWindow": "When you roll for a units' BOMBARDMENT ability",
-    "abilityText": "For each hit produced, before applying modifiers, either gain 1 commodity or convert 1 commodity to a trade good.",
-    "unlockCondition": "Produce at least 1 hit during a BOMBARDMENT roll.",
+    "abilityText": "For each hit produced, before applying modifiers, you may gain 1 commodity or convert 1 commodity to a trade good.",
+    "unlockCondition": "Produce at least 2 hits during a BOMBARDMENT roll.",
     "source": "beans"
   },
   {
@@ -108,7 +108,7 @@
     "name": "Shipwright Kastel",
     "title": "Master of Supply",
     "abilityWindow": "ACTION:",
-    "abilityText": "Choose a player and exhaust this card. You may allow that player to produce 1 unit in a system that contains one of their units with PRODUCTION, reducing the cost of the produced unit by 1.",
+    "abilityText": "Choose a player and exhaust this card. That player may produce 1 unit in a system that contains one of their units with PRODUCTION. If that player was another player, you may produce that unit in a system containing your ships for half its cost, rounded up.",
     "unlockCondition": "Always Unlocked",
     "source": "beans"
   },
@@ -120,7 +120,7 @@
     "title": "Master of Logistics",
     "abilityWindow": "Ongoing",
     "abilityText": "Your mechs do not count against capacity when being transported or when in a space area that contains 1 or more of your ships with capacity. While your mechs are in the space area of a system they have PRODUCTION 1.",
-    "unlockCondition": "Have a salvage card in your play area.",
+    "unlockCondition": "Have 10 PRODUCTION in a single system.",
     "source": "beans"
   },
   {
@@ -199,7 +199,7 @@
     "title": "The Technocrat",
     "abilityName": "Power Surge - Network Overload",
     "abilityWindow": "ACTION:",
-    "abilityText": "For each player that has a token on your faction sheet, you may remove it to either gain 1 of that player’s non-faction technologies, or force that player to return 1 technology of your choice to their technology deck.",
+    "abilityText": "Remove up to 3 players' control tokens from your faction sheet to either gain 1 of that player's non-faction technologies, or force that player to return 1 technology of your choice to their technology deck.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans"
   },
@@ -306,7 +306,7 @@
     "title": "The Ascendant Mind",
     "abilityName": "Xenobiological Feedback - Perfect Loop",
     "abilityWindow": "ACTION:",
-    "abilityText": "Ready up to 4 technologies or planets that have a technology specialty, then purge this card.",
+    "abilityText": "Ready up to 4 technologies or planets that have a technology specialty. Then, purge this card.",
     "unlockCondition": "Have 3 scored objectives.",
     "source": "beans",
     "flavorText": "Y’gol na khal. Y’gol na keth. Y’gol na thuun."

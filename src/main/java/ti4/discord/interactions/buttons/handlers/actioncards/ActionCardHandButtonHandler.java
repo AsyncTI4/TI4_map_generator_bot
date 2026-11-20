@@ -15,6 +15,7 @@ import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardTargets;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
@@ -51,7 +52,7 @@ class ActionCardHandButtonHandler {
             ButtonHelper.deleteMessage(event);
             return;
         }
-        if (lieInWait) game.getGameStats().recordAcTarget("Lie in Wait", player, victim);
+        if (lieInWait) ActionCardTargets.record(game, "Lie in Wait", player, victim);
         List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(player, victim);
         ActionCardHelper.showAll(victim, player, game);
         MessageHelper.sendMessageToChannelWithButtons(

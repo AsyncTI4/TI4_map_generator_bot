@@ -51,6 +51,7 @@ import ti4.model.LeaderModel;
 import ti4.model.Mapper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -687,7 +688,6 @@ public final class ButtonHelperSCs {
                     p2.setTg(p2.getTg() + washedCommsPower);
                     p2.setCommodities(p2.getCommodities() - washedCommsPower);
                     ButtonHelperAbilities.pillageCheck(p2, game);
-                    ButtonHelperActionCards.lieInWaitCheck(player, p2, game);
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", " + washedCommsPower
@@ -697,7 +697,6 @@ public final class ButtonHelperSCs {
                     p2.setTg(p2.getTg() + p2.getCommodities());
                     p2.setCommodities(0);
                     ButtonHelperAbilities.pillageCheck(p2, game);
-                    ButtonHelperActionCards.lieInWaitCheck(player, p2, game);
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged()
@@ -722,6 +721,7 @@ public final class ButtonHelperSCs {
             }
             if (p2.getSCs().contains(tradeInitiative)) {
                 TransactionHelper.checkTransactionLegality(game, player, p2);
+                LieInWaitService.check(player, p2, game);
             }
         }
 

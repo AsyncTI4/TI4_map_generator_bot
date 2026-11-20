@@ -15,8 +15,8 @@
         "LIGHTNING"
     ],
     "legendaryAbilityName": "Jupiter Brain",
-    "legendaryAbilityText": "Gain your breakthrough when you gain this card if you do not already have it. You may exhaust this card at the end of your turn to perform another action.",
-    "legendaryAbilityFlavourText": "Heirarch online. State your request.",
+    "legendaryAbilityText": "Gain your breakthrough when you gain this card if you do not already have it. You may exhaust this card at the end of your turn to perform an action.",
+    "legendaryAbilityFlavourText": "\"Hierarch online. State your request.\"",
     "planetLayout": {
         "unitHolderName": "thundersedge",
         "resourcesLocation": "BottomRight",
@@ -28,5 +28,6 @@
         "planetRadius": 65.0
     },
     "contrastColor": "orange",
+    "flavourText": "*Lightning arcs between the stone spires of the planet. The constant storms give Thunder's Edge its name.*",
     "source": "thunders_edge"
 }

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.discord.interactions.commands.GameStateSubcommand;
 import ti4.draft.BagDraft;
+import ti4.draft.BagDraftEventRecorder;
 import ti4.draft.FrankenDrazDraft;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -37,6 +38,7 @@ class ApplyDraftBags extends GameStateSubcommand {
 
         if (force && draft instanceof FrankenDrazDraft frankenDrazDraft) {
             for (Player player : game.getRealPlayers()) {
+                BagDraftEventRecorder.recordPicks(game, player, player.getDraftQueue().Contents, "FORCE");
                 player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                 player.resetDraftQueue();
                 player.setReadyToPassBag(true);

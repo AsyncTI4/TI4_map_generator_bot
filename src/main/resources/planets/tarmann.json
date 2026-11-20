@@ -124,5 +124,6 @@
         "removeUnitCoordinate": true
     },
     "contrastColor": "orange",
+    "flavourText": "*Small isolated planet with small population and modest resources. Most famous for its delicious avinberries.*",
     "source": "base"
 }

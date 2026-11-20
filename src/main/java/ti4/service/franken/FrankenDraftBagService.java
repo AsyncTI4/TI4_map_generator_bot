@@ -27,6 +27,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.utility.ContainerHelper;
 import ti4.draft.BagDraft;
+import ti4.draft.BagDraftEventRecorder;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
@@ -155,6 +156,7 @@ public class FrankenDraftBagService {
             builder.append(getFrankenPlayerSummaryContainer(player));
             builder.send();
         }
+        BagDraftEventRecorder.recordEnded(game);
 
         if (includeGameSetup) {
             if (!game.isFowMode()) {
@@ -172,7 +174,7 @@ public class FrankenDraftBagService {
     public static Container getFrankenPlayerSummaryContainer(Player player) {
         Container summary = player.getRepresentationContainer();
         List<Button> buttons = new ArrayList<>(List.of(Buttons.FACTION_EMBED));
-        if ("n".equals(player.getStoredValue("frankenBuilt"))) {
+        if (!"y".equals(player.getStoredValue("frankenBuilt"))) {
             buttons.add(Buttons.red("finishedBuilding", "Finished Building Faction"));
         }
         return ContainerHelper.appendComponents(summary, ActionRow.of(buttons));
@@ -517,6 +519,7 @@ public class FrankenDraftBagService {
 
             showPlayerBag(game, player);
         }
+        BagDraftEventRecorder.recordStarted(game);
 
         // Clear the status message so it will be regenerated
         GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT);

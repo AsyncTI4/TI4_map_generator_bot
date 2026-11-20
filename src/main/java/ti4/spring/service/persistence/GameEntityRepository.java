@@ -13,6 +13,9 @@ public interface GameEntityRepository extends JpaRepository<GameEntity, String> 
             + " FROM GameEntity g WHERE g.mappingVersion = :mappingVersion AND g.revisionKey IS NOT NULL")
     List<GameRevisionRow> findRevisionRows(@Param("mappingVersion") int mappingVersion);
 
+    @Query("SELECT g.gameName FROM GameEntity g WHERE g.twilightsFall = true AND g.thundersEdge = true")
+    List<String> findTwilightsFallGameNamesWithThundersEdge();
+
     @Modifying
     @Query("DELETE FROM GameEntity g WHERE g.gameName = :gameName")
     void deleteByGameName(@Param("gameName") String gameName);

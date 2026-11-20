@@ -424,10 +424,6 @@ public class StartCombatService {
         VanguardLeadersHandler.clearCommanderState(game);
         game.setStoredValue("factionsInCombat", player1.getFaction() + "_" + player2.getFaction());
         sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
-        if ("space".equalsIgnoreCase(spaceOrGround)) {
-            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player1, tile);
-            IronSalvageRelicHandler.offerDreadnoughtCombatButton(game, player2, tile);
-        }
         String combatName2 = COMBAT_ROUND_TRACKER + player1.getFaction() + tile.getPosition() + unitHolderName;
         game.setStoredValue(combatName2, "");
         combatName2 = COMBAT_ROUND_TRACKER + player2.getFaction() + tile.getPosition() + unitHolderName;
@@ -1150,9 +1146,6 @@ public class StartCombatService {
             String msg = player.getRepresentation();
             IronPromissoryHandler.sendRetrofittingCombatButton(
                     game, player, otherPlayer, tile, "space".equalsIgnoreCase(type));
-            if (game.isFowMode()) {
-                IronSalvageRelicHandler.offerFlagshipCombatButton(game, player, tile);
-            }
             if (ButtonHelper.doesPlayerHaveFSHere("cymiae_flagship", player, tile)) {
                 buttons.add(Buttons.green("resolveSpyStep1", "Resolve Cymiae Flagship"));
                 buttons.add(Buttons.DELETE_BUTTONS);
@@ -1814,13 +1807,11 @@ public class StartCombatService {
         }
 
         // Arcanum Disintegrate
-        if (p1.hasTech("tharcanumpmr")
-                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p1, "tharcanumpmr")) {
+        if (p1.hasTech("tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p1, p2, tile, tile.getSpaceUnitHolder()));
         }
-        if (p2.hasTech("tharcanumpmr")
-                && ArcanumPrimordialTechHandler.hasFourTechsMatchingPrimordial(p2, "tharcanumpmr")) {
+        if (p2.hasTech("tharcanumpmr")) {
             buttons.addAll(
                     ArcanumPrimordialTechHandler.getDisintegrateCombatButtons(p2, p1, tile, tile.getSpaceUnitHolder()));
         }
@@ -1831,11 +1822,6 @@ public class StartCombatService {
         }
         if (p2.hasAbility("pieces_of_a_whole")) {
             CrystellumAbilityHandler.addPiecesOfAWholeButton(buttons, p2, tile);
-        }
-
-        if (!game.isFowMode()) {
-            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p1, tile);
-            IronSalvageRelicHandler.addDreadnoughtCombatButton(buttons, p2, tile);
         }
 
         return buttons;
@@ -1970,12 +1956,6 @@ public class StartCombatService {
         NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p1);
         if (!game.isFowMode() && p2 != p1) {
             NetrunnersTechHandler.addMimeticOverrideCombatButton(buttons, p2);
-        }
-        if (!game.isFowMode()) {
-            IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p1, tile);
-            if (p2 != p1) {
-                IronSalvageRelicHandler.addFlagshipCombatButton(buttons, game, p2, tile);
-            }
         }
         if ("justPicture".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Buttons.blue(

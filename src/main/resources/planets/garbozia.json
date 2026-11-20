@@ -7,8 +7,8 @@
     "influence": 1,
     "planetTypes": ["HAZARDOUS"],
     "legendaryAbilityName": "Dok 'N Pic's Salvage Yard",
-    "legendaryAbilityText": "You may exhaust this card when you pass to place 1 action card from the discard pile faceup on this card; you can purge cards on this card to play them as if they were in your hand.",
-    "legendaryAbilityFlavourText": "Throw 'er on the 'eap with the rest.",
+    "legendaryAbilityText": "You may exhaust this card when you pass to place 1 action card from the discard pile face up on this card; you can purge cards on this card to play them as if they were in your hand.",
+    "legendaryAbilityFlavourText": "\"Throw 'er on the 'eap with the rest.\"",
     "planetLayout": {
         "unitHolderName": "garbozia",
         "resourcesLocation": "BottomLeft",
@@ -16,5 +16,6 @@
         "extraIcons": 1,
         "planetRadius": 95
     },
+    "flavourText": "*Once an Imperial dumping ground, the mixture of mineral and chemical waste on Garbozia has become a resource - and a hazard - of its own.*",
     "source": "thunders_edge"
 }

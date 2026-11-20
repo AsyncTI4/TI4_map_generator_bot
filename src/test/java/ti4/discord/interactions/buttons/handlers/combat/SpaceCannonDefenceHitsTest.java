@@ -124,7 +124,7 @@ class SpaceCannonDefenceHitsTest extends BaseTi4Test {
     }
 
     // Cancelling the only hit leaves nothing to assign: the assignment message goes away instead of offering an
-    // "Auto-assign Hits" for 0 hits, which did nothing and left an AI seat pressing it forever.
+    // "Auto-assign Hits" for 0 hits, which did nothing and left the message waiting forever.
     @Test
     void cancellingTheLastHitRemovesTheAssignment() {
         ButtonInteractionEvent event = mock(ButtonInteractionEvent.class, RETURNS_DEEP_STUBS);

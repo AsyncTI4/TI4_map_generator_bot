@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
@@ -320,7 +319,8 @@ public class CommanderUnlockCheckService {
                 shouldBeUnlocked = eligibleSystems >= 2;
             }
             case "iron" ->
-                shouldBeUnlocked = player.getRelics().stream().anyMatch(IronSalvageRelicHandler::isSalvageRelic);
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                        .anyMatch(tile -> Helper.getProductionValue(player, game, tile, false) >= 10);
             case "ta" -> {
                 int eligiblePlanets = 0;
                 for (String planetName : player.getPlanets()) {

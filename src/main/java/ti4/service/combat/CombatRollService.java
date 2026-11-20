@@ -42,7 +42,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.As
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ashen.AshenUnitHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.iron.IronSalvageRelicHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.migo.MigoHarvestHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.valhavn.ValhavnUnitHandler;
@@ -860,17 +859,6 @@ public class CombatRollService {
         RiggedExplosivesLLButtonHandler.destroyFailedRiggedExplosives(event, game, player, tile, rollType, payload);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, player, game, message);
         int h = rollResult.totalHits();
-        if (rollType == CombatRollType.AFB) {
-            List<Integer> destroyerMissThresholds = payload.unitRolls().stream()
-                    .filter(unitRoll -> "dd".equalsIgnoreCase(unitRoll.baseType())
-                            || "destroyer".equalsIgnoreCase(unitRoll.baseType()))
-                    .flatMap(unitRoll -> unitRoll.dice().stream())
-                    .filter(die -> !die.success())
-                    .map(CombatRollPayload.DieRoll::threshold)
-                    .toList();
-            IronSalvageRelicHandler.offerDestroyerAfbReroll(
-                    event, game, player, opponent, tile, destroyerMissThresholds);
-        }
         if (rollType == CombatRollType.combatround) {
             TheodisiLegendaryButtonHandler.offerPelorHit(
                     game, player, opponent, tile, combatOnHolder, rollType, h, event);
@@ -1359,7 +1347,7 @@ public class CombatRollService {
 
         if (rollType == CombatRollType.bombardment) {
             AshenLeadersHandler.offerCommanderBombardmentButtons(event, game, player, h);
-            if (h >= 1) {
+            if (h >= 2) {
                 CommanderUnlockCheckService.checkPlayer(player, "ashen");
             }
             if (AshenBreakthroughHandler.offerHitReplacement(event, game, player, tile, bombardPlanet, h)) {
@@ -1371,7 +1359,7 @@ public class CombatRollService {
                                 || "warsun".equalsIgnoreCase(unitRoll.baseType()))
                         .mapToInt(CombatRollPayload.UnitRoll::hits)
                         .sum();
-                if (player.hasTech("x89c4")) {
+                if (player.hasTech("x89c4") && !AshenLeadersHandler.isHeroBombardmentResolving(game, player)) {
                     warSunHits *= 2;
                 }
                 if (game.isConventionsOfWarAbandonedMode()) {
@@ -1379,10 +1367,6 @@ public class CombatRollService {
                 }
                 if (player.hasStoredValue("RazeFaction")) {
                     warSunHits *= 2;
-                }
-                if (warSunHits > 0) {
-                    IronSalvageRelicHandler.offerWarSunBombardment(
-                            event, game, player, tile, bombardPlanet, warSunHits);
                 }
                 if (!game.isFowMode()) {
                     List<Button> buttons = new ArrayList<>();
@@ -1475,7 +1459,7 @@ public class CombatRollService {
                     KaloraBreakthroughHandler.offerCommitInfantryButton(event, game, player, tile, bombardPlanet);
                 }
             }
-            if (player.hasTech("x89c4")) {
+            if (player.hasTech("x89c4") && !AshenLeadersHandler.isHeroBombardmentResolving(game, player)) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2.hasPlanetReady(bombardPlanet)) {
                         Planet planet = game.getPlanetsInfo().get(bombardPlanet);
@@ -1692,6 +1676,7 @@ public class CombatRollService {
         UnitHolder space = activeSystem.getUnitHolders().get("space");
         StringBuilder extra = new StringBuilder();
         boolean usesX89c4 = player.hasTech("x89c4")
+                && !AshenLeadersHandler.isHeroBombardmentResolving(game, player)
                 && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment)
                 && (!"space".equalsIgnoreCase(unitHolder.getName()) || rollType == CombatRollType.bombardment);
         if (rollType == CombatRollType.combatround

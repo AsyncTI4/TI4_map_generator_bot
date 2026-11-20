@@ -669,9 +669,24 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         activeDraft = draft;
     }
 
+    @Override
+    public void setThundersEdge(boolean thundersEdge) {
+        super.setThundersEdge(thundersEdge);
+        if (thundersEdge) {
+            super.setTwilightsFallMode(false);
+        }
+    }
+
+    @Override
+    public void setTwilightsFallMode(boolean twilightsFallMode) {
+        super.setTwilightsFallMode(twilightsFallMode);
+        if (twilightsFallMode) {
+            super.setThundersEdge(false);
+        }
+    }
+
     public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
         setTwilightsFallMode(true);
-        setThundersEdge(false);
 
         String agendaDeck = "agendas_twilights_fall";
         String relicDeck = "relics_pok_te";
@@ -5391,7 +5406,7 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
     }
 
     private boolean isProphecyOfKingsGameWithStyx() {
-        return isProphecyOfKings() && !isThundersEdge() && includesStyx();
+        return isProphecyOfKings() && !isThundersEdge() && !isTwilightsFallMode() && includesStyx();
     }
 
     private boolean includesStyx() {

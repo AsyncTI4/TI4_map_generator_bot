@@ -66,6 +66,7 @@ import ti4.model.UnitModel;
 import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.VeiledHeartService;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.actioncard.LieInWaitService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -1330,7 +1331,7 @@ public final class ButtonHelperFactionSpecific {
     }
 
     // TODO: getPlaceUnitButtons resets produced units, so pressing this mid-build drops the unfinished main build's
-    // tally: those units stay on the board unpaid (an AI seat then re-placed them in a loop). Keep or restore the
+    // tally: those units stay on the board unpaid, and finishing the build places them again. Keep or restore the
     // tally.
     @ButtonHandler("solBtBuild_")
     public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
@@ -3632,6 +3633,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            LieInWaitService.check(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(
@@ -3708,6 +3710,7 @@ public final class ButtonHelperFactionSpecific {
             ButtonHelper.deleteMessage(event);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            LieInWaitService.check(player, p2, game);
             return;
         }
         MessageHelper.sendMessageToChannel(
@@ -5414,6 +5417,7 @@ public final class ButtonHelperFactionSpecific {
                         + ").");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
         AgendaHistory.recordQuashed(game, defaultString(AgendaHelper.getCurrentAgendaId(game)));
+        AgendaEvents.discarded(game, player, AgendaHelper.getCurrentAgendaId(game), AgendaEvents.QUASH);
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {

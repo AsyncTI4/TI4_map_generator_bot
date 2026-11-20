@@ -57,6 +57,7 @@ import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
+import ti4.message.BacklogTimeouts;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.MapPositionMapper;
 import ti4.model.Mapper;
@@ -143,10 +144,12 @@ class GameLoadService {
 
     @Nullable
     static Game load(String gameName) {
-        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+        Game game = GameFileLockManager.wrapWithReadLock(gameName, () -> {
             File gameFile = Storage.getGameFile(gameName + GAME_FILE_EXTENSION);
             return readGame(gameFile);
         });
+        BacklogTimeouts.track(game);
+        return game;
     }
 
     static boolean isKnownUnreadable(String gameName) {

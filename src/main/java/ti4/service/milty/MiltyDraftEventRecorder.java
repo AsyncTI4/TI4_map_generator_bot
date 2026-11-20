@@ -13,7 +13,10 @@ import ti4.spring.service.gameevent.GameEventType;
 @UtilityClass
 class MiltyDraftEventRecorder {
 
+    static final String ENDED_KEY = "gameEventMiltyDraftEnded";
+
     static void recordStarted(Game game, MiltyDraftManager manager) {
+        game.removeStoredValue(ENDED_KEY);
         Map<String, Object> payload = new HashMap<>();
         payload.put("orchestrator", "Milty");
         payload.put("mapTemplate", manager.getMapTemplate());
@@ -34,6 +37,36 @@ class MiltyDraftEventRecorder {
         payload.put("choice", item);
         payload.put("source", source);
         GameEventService.commit(game, GameEventType.DRAFT_PICK, player, payload);
+    }
+
+    static void recordEnded(Game game, MiltyDraftManager manager) {
+        if (!game.getStoredValue(ENDED_KEY).isEmpty()) {
+            return;
+        }
+        game.setStoredValue(ENDED_KEY, "yes");
+
+        Map<String, Map<String, List<String>>> picksByPlayer = new LinkedHashMap<>();
+        for (String userId : manager.getPlayers()) {
+            MiltyDraftManager.PlayerDraft draft = manager.getPlayerDraft(userId);
+            Map<String, List<String>> picks = new LinkedHashMap<>();
+            picks.put(
+                    "slice",
+                    draft == null || draft.getSlice() == null
+                            ? List.of()
+                            : List.of(draft.getSlice().getName()));
+            picks.put("faction", draft == null || draft.getFaction() == null ? List.of() : List.of(draft.getFaction()));
+            picks.put(
+                    "order",
+                    draft == null || draft.getPosition() == null
+                            ? List.of()
+                            : List.of(String.valueOf(draft.getPosition())));
+            picksByPlayer.put(userNameOf(game, userId), picks);
+        }
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("orchestrator", "Milty");
+        payload.put("picks", picksByPlayer);
+        GameEventService.commit(game, GameEventType.DRAFT_ENDED, null, payload);
     }
 
     private static Map<String, List<String>> slicesByName(MiltyDraftManager manager) {

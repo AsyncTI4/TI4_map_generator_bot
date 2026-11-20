@@ -9,7 +9,7 @@
     },
     "id": "bakal",
     "tileId": "71",
-    "name": "Bakal",
+    "name": "Ba'kal",
     "aliases": [
         "bakal",
         "bkl",
@@ -121,5 +121,6 @@
         },
         "removeUnitCoordinate": true
     },
+    "flavourText": "*Dry, rocky deserts stretch from pole to pole. Shield cities protect against sandstorms while supplying nomadic harvester crawlers that mine the barrens for salt compounds.*",
     "source": "pok"
 }

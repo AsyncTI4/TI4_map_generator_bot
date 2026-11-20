@@ -39,7 +39,7 @@
         "id": "bastion_spacedock",
         "baseType": "spacedock",
         "asyncId": "sd",
-        "name": "4x41C \"Helios\" V1",
+        "name": "4X41C \"Helios\" V1",
         "upgradesToUnitId": "bastion_spacedock2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/te/faction/bastion_spacedock.jpg?raw=true",
         "source": "thunders_edge",
@@ -48,13 +48,13 @@
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "ability": "The resource value of this planet is increased by 1. This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity"
+        "ability": "This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.\nThe resource value of this planet is increased by 1.\nUp to 3 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "bastion_spacedock2",
         "baseType": "spacedock",
         "asyncId": "sd",
-        "name": "4x41C \"Helios\" V2",
+        "name": "4X41C \"Helios\" V2",
         "upgradesFromUnitId": "bastion_spacedock",
         "requiredTechId": "helios2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/helios2.jpg?raw=true",
@@ -64,7 +64,7 @@
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "ability": "The resource value of this planet is increased by 2. This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity"
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nThe resource value of this planet is increased by 2.\nUp to 3 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "deepwrought_flagship",
@@ -120,7 +120,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "While this unit is in a system that contains an active breach, other players' units in systems with active breaches lose all of their unit abilities"
+        "ability": "While this unit is in a system that contains an active breach, other players' units in systems with active breaches lose all of their unit abilities."
     },
     {
         "id": "crimson_mech",
@@ -175,7 +175,7 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "At the end of any players' combat in this unit's system or up to 2 systems away, you may place 1 active or inactive breach in that system."
+        "ability": "At the end of any player's combat in this unit's system or up to 2 systems away, you may place 1 active or inactive breach in that system."
     },
     {
         "id": "ralnel_flagship",
@@ -210,7 +210,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "At the end of a round of combat on this planet, you may move up to 2 of your ground forces to this planet from planets in adjacent systems.",
+        "ability": "At the end of a round of ground combat on this planet, you may move up to 2 of your ground forces to this planet from planets in adjacent systems.",
         "notes": "Async is ruling that \"adjacent systems\" includes the system containing this planet."
     },
     {
@@ -269,7 +269,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "If the active system contains units that belong to a player who has a control marker on 1 of your plots, apply +1 to this ship's move value and repair it at the end of every combat round."
+        "ability": "If the active system contains units that belong to a player who has a control token on 1 of your plots, apply +1 to this ship's move value and repair it at the end of every combat round."
     },
     {
         "id": "obsidian_flagship",

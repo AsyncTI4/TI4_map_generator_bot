@@ -4,8 +4,8 @@
         "name": "Freelancers",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
-        "flavorText": "*The Vexis Howelers were well-equipped with transports, powered armor, and even logistical support—everything a fledgling outpost needed to survive.*",
+        "text": "You may produce 1 unit in this system; you may spend influence as if it were resources to produce this unit.",
+        "flavorText": "*The Vexis Howlers were well-equipped with transports, powered armor, and even logistical support—everything a fledgling outpost needed to survive.*",
         "source": "pok"
     },
     {
@@ -13,7 +13,7 @@
         "name": "Freelancers",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
+        "text": "You may produce 1 unit in this system; you may spend influence as if it were resources to produce this unit.",
         "flavorText": "*As part of the annexation agreement, local artisans would be well paid to lay the groundwork for military installations in the newly acquired territories.*",
         "source": "pok"
     },
@@ -22,8 +22,8 @@
         "name": "Freelancers",
         "type": "Cultural",
         "resolution": "Instant",
-        "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
-        "flavorText": "*Overseer Flix was known for hiring hundreds of freelancers and then \"forgetting\" to pay them once the bulk of the work was complete.*",
+        "text": "You may produce 1 unit in this system; you may spend influence as if it were resources to produce this unit.",
+        "flavorText": "*Overseer Klix was known for hiring hundreds of freelancers and then \"forgetting\" to pay them once the bulk of the work was complete.*",
         "source": "pok"
     },
     {
@@ -249,7 +249,7 @@
         "type": "Hazardous",
         "resolution": "Instant",
         "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 trade good.",
-        "flavorText": "*The borehole was over a kilometer across. It seemed to stretch down forever, but Ilan could see a faint orange glow in its depths.*",
+        "flavorText": "*Without the proper machinery, a core mine can be a more hostile environment than a star's corona.*",
         "source": "pok"
     },
     {
@@ -284,7 +284,7 @@
         "name": "Warfare Research Facility",
         "type": "Hazardous",
         "resolution": "Attach",
-        "text": "This planet has a red technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "text": "This planet has a red technology specialty; if this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
         "attachmentId": "warfare",
         "source": "pok"
     },
@@ -457,7 +457,7 @@
         "name": "Biotic Research Facility",
         "type": "Industrial",
         "resolution": "Attach",
-        "text": "This planet has a green technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "text": "This planet has a green technology specialty; if this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
         "attachmentId": "biotic",
         "source": "pok"
     },
@@ -466,7 +466,7 @@
         "name": "Cybernetic Research Facility",
         "type": "Industrial",
         "resolution": "Attach",
-        "text": "This planet has a yellow technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "text": "This planet has a yellow technology specialty; if this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
         "attachmentId": "cybernetic",
         "source": "pok"
     },
@@ -475,7 +475,7 @@
         "name": "Propulsion Research Facility",
         "type": "Industrial",
         "resolution": "Attach",
-        "text": "This planet has a blue technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "text": "This planet has a blue technology specialty; if this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
         "attachmentId": "propulsion",
         "source": "pok"
     },
@@ -525,7 +525,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Draw 1 secret objective.",
-        "flavorText": "The flickering ion storm illuminated the hulk, its hull rent and torn apart by some monstrous force.",
+        "flavorText": "The flickering ion storm illuminated the hulk, its hull rent and torn by some monstrous force.",
         "source": "pok"
     },
     {

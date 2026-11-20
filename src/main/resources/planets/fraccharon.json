@@ -6,8 +6,8 @@
         "charontoken"
     ],
     "positionInTile": null,
-    "resources": 1,
-    "influence": 2,
+    "resources": 2,
+    "influence": 1,
     "factionHomeworld": null,
     "planetType": "LIGHTNING",
     "cardImagePath": null,

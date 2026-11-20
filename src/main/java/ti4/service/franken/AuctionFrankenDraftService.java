@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.draft.AuctionFrankenDrazDraft;
+import ti4.draft.BagDraftEventRecorder;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
@@ -77,6 +79,14 @@ public class AuctionFrankenDraftService {
                     playerKey("mulligans", player),
                     String.valueOf(getSetting(game, "mulligans", STARTING_MULLIGANS)));
         }
+        BagDraftEventRecorder.recordAuctionStarted(
+                game,
+                players,
+                Map.of(
+                        "votes", getSetting(game, "votes", STARTING_VOTES),
+                        "bans", getSetting(game, "bans", STARTING_BANS),
+                        "mulligans", getSetting(game, "mulligans", STARTING_MULLIGANS),
+                        "extra", getSetting(game, "extra", EXTRA_COMPONENTS)));
         createDraftedComponentsThread(game);
         MessageHelper.sendMessageToChannel(auctionChannel(game), "# " + game.getPing() + " Auction Draft has started.");
         MessageHelper.sendMessageToChannel(
@@ -270,22 +280,38 @@ public class AuctionFrankenDraftService {
             return;
         }
         set(game, "picker", player.getFaction());
-        completePick(game, player, alias);
+        completePick(game, player, alias, "BUTTON");
         ButtonHelper.deleteMessage(event);
         advancePick(game, event);
     }
 
-    private void completePick(Game game, Player player, String alias) {
+    private void completePick(Game game, Player player, String alias, String source) {
         DraftItem item = DraftItem.generateFromAlias(alias);
         player.getDraftHand().Contents.add(item);
         List<String> pool = pool(game);
+        List<String> offered = List.copyOf(pool);
         pool.remove(alias);
         setList(game, "pool", pool);
         addToList(game, "removed", alias);
         addToList(game, playerKey("drafted", player), alias);
         addToList(game, "picked", player.getFaction());
         int price = number(game, "price." + player.getFaction());
-        set(game, playerKey("votes", player), String.valueOf(number(game, playerKey("votes", player)) - price));
+        int votesRemaining = number(game, playerKey("votes", player)) - price;
+        set(game, playerKey("votes", player), String.valueOf(votesRemaining));
+        BagDraftEventRecorder.recordPick(
+                game,
+                player,
+                item,
+                source,
+                Map.of(
+                        "price",
+                        price,
+                        "votesRemaining",
+                        votesRemaining,
+                        "nomination",
+                        currentNomination(game),
+                        "offered",
+                        offered));
         GameManager.save(game, "Auction draft pick");
         String draftedMessage = player.getRepresentationNoPing() + " drafted " + item.getTitle(game) + ".";
         MessageHelper.sendMessageToChannel(auctionChannel(game), draftedMessage);
@@ -479,12 +505,15 @@ public class AuctionFrankenDraftService {
         String rankedPick =
                 rankings.stream().filter(pool(game)::contains).findFirst().orElse(null);
         if (rankedPick != null) {
-            completeAutomaticPickAndAdvance(game, picker, rankedPick);
+            completeAutomaticPickAndAdvance(game, picker, rankedPick, "RANKED");
             return;
         }
         if ("true".equals(value(game, playerKey("auto", picker))) && !pool(game).isEmpty()) {
-            completeAutomaticPickAndAdvance(game, picker, pool(game).get((int)
-                    (Math.random() * pool(game).size())));
+            completeAutomaticPickAndAdvance(
+                    game,
+                    picker,
+                    pool(game).get((int) (Math.random() * pool(game).size())),
+                    "RANDOM");
             return;
         }
         sendComponentDisplays(picker.getCardsInfoThread(), game, picker, pool(game));
@@ -506,8 +535,8 @@ public class AuctionFrankenDraftService {
         sendDraftedComponentsButton(picker);
     }
 
-    private void completeAutomaticPickAndAdvance(Game game, Player picker, String alias) {
-        completePick(game, picker, alias);
+    private void completeAutomaticPickAndAdvance(Game game, Player picker, String alias, String source) {
+        completePick(game, picker, alias, source);
         replaceAuctionCardsInfo(picker, () -> advancePick(game, null));
     }
 
@@ -525,6 +554,7 @@ public class AuctionFrankenDraftService {
         if (allNominationsComplete(game)) {
             set(game, "phase", "complete");
             MessageHelper.sendMessageToChannel(auctionChannel(game), "Auction Draft is complete.");
+            sendFinalDraftedComponentsSummary(game);
             MessageHelper.sendMessageToChannel(
                     auctionLogChannel(game),
                     game.getPing()
@@ -790,6 +820,29 @@ public class AuctionFrankenDraftService {
             message.append(summary);
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message.toString());
+    }
+
+    private void sendFinalDraftedComponentsSummary(Game game) {
+        for (Player player : players(game)) {
+            if (player.getDraftHand() == null || player.getDraftHand().Contents.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(), "__Final Drafted Components__\nYou did not draft any components.");
+                continue;
+            }
+            List<DraftItem> drafted = player.getDraftHand().Contents;
+            MessageChannel channel = player.getCardsInfoThread();
+            String prefix = "__Final Drafted Components__\n";
+            StringBuilder message = new StringBuilder(prefix);
+            for (DraftItem item : drafted) {
+                String summary = draftedComponentSummary(game, item) + "\n";
+                if (message.length() + summary.length() > 1900 && message.length() > prefix.length()) {
+                    MessageHelper.sendMessageToChannel(channel, message.toString());
+                    message = new StringBuilder("__Final Drafted Components (continued)__\n");
+                }
+                message.append(summary);
+            }
+            MessageHelper.sendMessageToChannel(channel, message.toString());
+        }
     }
 
     private void sendPoolToActionsChannel(Game game) {

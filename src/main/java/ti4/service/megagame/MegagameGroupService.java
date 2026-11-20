@@ -47,6 +47,10 @@ public class MegagameGroupService {
         return game.getTags().stream().anyMatch(SC_GROUPS_TAG::equalsIgnoreCase);
     }
 
+    public static boolean hasTagOutsideFog(Game game) {
+        return hasTag(game) && !game.isFowMode();
+    }
+
     public static boolean isConfigured(Game game) {
         return !groups(game).isEmpty();
     }
