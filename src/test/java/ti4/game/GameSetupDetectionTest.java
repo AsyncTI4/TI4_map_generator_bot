@@ -16,7 +16,7 @@ class GameSetupDetectionTest extends BaseTi4Test {
 
     @Test
     void aFreshGameIsStillInSetup() {
-        assertThat(freshGame().isStillInSetup()).isTrue();
+        assertThat(freshGame().hasSetupEnded()).isFalse();
     }
 
     @Test
@@ -24,7 +24,7 @@ class GameSetupDetectionTest extends BaseTi4Test {
         Game game = freshGame();
         game.setPhaseOfGame("playerSetup");
 
-        assertThat(game.isStillInSetup()).isTrue();
+        assertThat(game.hasSetupEnded()).isFalse();
     }
 
     @Test
@@ -34,7 +34,7 @@ class GameSetupDetectionTest extends BaseTi4Test {
         game.addCustomPO("Marker A", 0);
         game.addCustomPO("Marker B", 0);
 
-        assertThat(game.isStillInSetup()).isFalse();
+        assertThat(game.hasSetupEnded()).isTrue();
     }
 
     @Test
@@ -43,7 +43,7 @@ class GameSetupDetectionTest extends BaseTi4Test {
         Game game = freshGame();
         game.setPhaseOfGame("strategy");
 
-        assertThat(game.isStillInSetup()).isFalse();
+        assertThat(game.hasSetupEnded()).isTrue();
     }
 
     @Test
@@ -51,7 +51,7 @@ class GameSetupDetectionTest extends BaseTi4Test {
         Game game = freshGame();
         for (String phase : new String[] {"action", "statusScoring", "statusHomework", "agendaVoting"}) {
             game.setPhaseOfGame(phase);
-            assertThat(game.isStillInSetup()).as(phase).isFalse();
+            assertThat(game.hasSetupEnded()).as(phase).isTrue();
         }
     }
 
@@ -84,6 +84,6 @@ class GameSetupDetectionTest extends BaseTi4Test {
         game.setPhaseOfGame("");
         game.setRound(2);
 
-        assertThat(game.isStillInSetup()).isFalse();
+        assertThat(game.hasSetupEnded()).isTrue();
     }
 }

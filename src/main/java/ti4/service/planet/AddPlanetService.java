@@ -122,7 +122,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.isStillInSetup() || (unitHolder != null && unitHolder.isSpaceStation(game))) {
+        if (!game.hasSetupEnded() || (unitHolder != null && unitHolder.isSpaceStation(game))) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {

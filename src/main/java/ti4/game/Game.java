@@ -986,8 +986,8 @@ public class Game extends GameProperties implements StoredValueHelper, TwilightF
         return Stream.of("strategy", "action", "status", "agenda").anyMatch(phase::startsWith);
     }
 
-    public boolean isStillInSetup() {
-        return getRevealedPublicObjectives().size() < 3 && !hasStrategyPhaseStarted();
+    public boolean hasSetupEnded() {
+        return getRevealedPublicObjectives().size() >= 3 || hasStrategyPhaseStarted();
     }
 
     public boolean isSecretObjectiveScoringOpen() {

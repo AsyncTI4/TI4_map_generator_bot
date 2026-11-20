@@ -112,7 +112,7 @@ public class MorphaAbilityHandler {
     }
 
     private static boolean isSetup(Game game) {
-        return game.isStillInSetup()
+        return !game.hasSetupEnded()
                 || "setup".equalsIgnoreCase(game.getPhaseOfGame())
                 || "playerSetup".equalsIgnoreCase(game.getPhaseOfGame());
     }
