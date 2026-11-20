@@ -23,6 +23,7 @@ import ti4.ai.naalu.MindsieveFollow;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
+import ti4.ai.scoring.ExpectedReadying;
 import ti4.ai.scoring.ObjectivePolicy;
 import ti4.ai.scoring.PaymentRules;
 import ti4.ai.scoring.ScoringReserve;
@@ -1275,10 +1276,19 @@ public class StrategyCardRules {
     }
 
     public static boolean worthPayingForResearch(Game game, Player seat, int cost, double worth, Wallet wallet) {
-        if (ScoringReserve.planAfterReserve(wallet, ScoringReserve.of(game, seat), SpendCost.resources(cost))
-                .isEmpty()) return false;
+        Optional<Wallet.Payment> payment =
+                ScoringReserve.planAfterReserve(game, seat, wallet, SpendCost.resources(cost));
+        if (payment.isEmpty()) return false;
         boolean idleCoversIt = IdleTradeGoods.surplus(game, seat) * Wallet.tradeGoodValue(seat) >= cost;
-        return worthResearching(game, seat, idleCoversIt ? worth * ResearchPolicy.IDLE_WORTH_SHARE : worth);
+        boolean cheap = idleCoversIt || readiedAgainCovers(game, seat, wallet, payment.get(), cost);
+        return worthResearching(game, seat, cheap ? worth * ResearchPolicy.IDLE_WORTH_SHARE : worth);
+    }
+
+    static boolean readiedAgainCovers(Game game, Player seat, Wallet wallet, Wallet.Payment payment, int cost) {
+        int readied = ExpectedReadying.readiedAgain(game, seat, wallet, payment).stream()
+                .mapToInt(Wallet.PlanetValue::resources)
+                .sum();
+        return readied >= cost;
     }
 
     static boolean worthResearching(Game game, Player seat, double worth) {

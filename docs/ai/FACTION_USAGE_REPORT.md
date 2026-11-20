@@ -156,3 +156,43 @@ offered the hero in only half its games. Sardakk plays it late (rounds 5 to 7). 
   a spend objective; mid-round when they unlock one, or when spending is still ahead and they are worth 4 TG or more.
 * **Peace Accords** buttons showed the emoji of the Xxcha planet they started from; they now show the target planet's
   owner (neutral when unowned).
+
+## Batch 3 (2026-11-20, AI PR head ef0b816624, 4 games)
+
+Same six factions. All ended on victory points, no stalls. Leader 10.0 VP, table total 44.8, final round 5.5. Wins:
+Naalu, Sol, Xxcha and Yin 1 each.
+
+Xxekir Grom with the Diplomacy-style timing: played in 1 of 4 games (round 5, mid-round, "ready planets worth 4 for
+its next actions"), down from 7/8. It was never played before passing, so no game had 4 exhausted planets that
+unlocked a spend objective. Other heroes: Naalu 4/4, Yin 3/4, Letnev 3/4, Sol 2/4, Sardakk 1/4.
+
+### Review notes on batch 3 (developer, 2026-11-20) and changes
+
+Xxcha should plan around its spending: Archon's Gift spends the higher of a planet's resources or influence, and the
+agent and hero ready planets. Spend everything on Leadership (keeping what a Technology follow needs), then ready the
+planets to build; spend on the Technology primary so there is time to ready for a later build or objective; follow
+Construction for docks (two at home, forward docks) so there are bigger builds and more spends to ready.
+
+Changed:
+* `ExpectedReadying` counts Ggrocuto Rinn (1 planet) and Xxekir Grom (4) next to Diplomacy (2) while the seat has not
+  passed. Reserves for spend objectives, custodians and builds are kept only from what will be ready again, so the
+  Leadership purchase and every reserved payment spend planets the seat will ready (Technology follow kept unspent).
+* A second Technology research paid with planets that come back counts as cheap, like idle trade goods.
+* Space docks: dock sites, the second home dock and "rich" planets use the pooled value (Archon's Gift counts
+  influence), and the round's spending counts the readied planets again, so Xxcha wants a second home dock sooner.
+
+Not changed: forward docks still go one per system planet; whether Xxcha follows Construction more is not yet
+measured (the self-play log has no per-seat dock count).
+
+## Batch 4 (2026-11-20, ef0b816624 + uncommitted spending changes, 4 games)
+
+Same six factions as batch 3 (Sardakk, Xxcha, Yin, Sol, Letnev, Naalu), after the Xxcha spending changes.
+
+* Leader 10.0 VP, table total 44.8, average final round 6.0 (batch 3: 10.0 / 44.8 / 5.5). All 4 games ended on points.
+* Wins: Yin 2, Xxcha 1, Naalu 1 (batch 3: Naalu, Sol, Xxcha, Yin 1 each).
+* Xxekir Grom: played in 2 of 4 (batch 3: 1), both in round 5 "to ready the planets it spends on a public objective";
+  it was offered in 3 games.
+* Ggrocuto Rinn: 22 uses over 4 games, every round 1 to 4 in all games (batch 3: 19 uses).
+* Other heroes: Letnev 4/4, Naalu 4/4, Yin 3/4, Sol 2/4 (offered in 2), Sardakk 1/4 (round 6).
+* Not measured: Leadership tokens bought and Construction follows per seat; the log has no per-seat count for either.
+  Four games is too few to tell a win-rate change from noise.

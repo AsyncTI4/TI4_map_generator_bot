@@ -300,8 +300,9 @@ taken out of the wallet first; the reserve becomes 6 influence + 8 resources onl
   `TradeUses`.
 - `ExpectedTradeGoods.netOf` uses spare expected trade goods (beyond the cost's own trade goods part) to replace
   resources/influence, trying 0..spare goods and every split, returning the first net cost the planets can pay.
-- `ExpectedReadying.beforeStatus`: if an unplayed Diplomacy card exists and either the seat holds it or has a strategy token
-  to follow, the seat's 2 exhausted planets with the highest resources + influence (name order on ties). `netOf` subtracts
+- `ExpectedReadying.beforeStatus`: the seat readies 2 planets if an unplayed Diplomacy card exists and either the seat
+  holds it or has a strategy token to follow, plus 1 for an unexhausted Ggrocuto Rinn (`xxchaagent`) and 4 for an
+  unlocked Xxekir Grom (`xxchahero-te`) while it has not passed; that many of its exhausted planets with the highest resources + influence (name order on ties). `netOf` subtracts
   them from a cost, largest first (by the larger of the two values), each paying resources when resources are still
   needed and either no influence is needed or it is at least as rich in resources, otherwise influence (both kinds with
   `COMBINED`).
@@ -1415,3 +1416,10 @@ from explicit guards, hard-coded sets and missing handlers in the code.
   `ActionCardValue.worstDiscard`, `StrategyCard.of`.
 - Infrastructure: `Prompts`, `AiDecision`, `AiTurnContext.memory`, `AiExperiments`, `AiSettings`, `DecisionMemo`,
   `SearchMemo`, `Thinking`.
+
+- **Spending planets that come back** (`ExpectedReadying.ownReadies / spareReadies / afterPaying`): readies the seat makes
+  itself (its own unplayed Diplomacy, Ggrocuto Rinn, Xxekir Grom) beyond its already exhausted planets. A payment's
+  largest planets count as readied again, so `ScoringReserve.planAfterReserve(game, seat, ...)` and the Leadership
+  purchase keep the reserve only from what will be ready later. Leadership still keeps what a Technology follow needs
+  unspent (that follow comes before any readying). A second Technology research paid with planets that come back
+  needs the idle-goods worth share (`StrategyCardRules.readiedAgainCovers`).

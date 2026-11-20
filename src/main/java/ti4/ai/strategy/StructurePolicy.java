@@ -18,7 +18,9 @@ import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.explore.ExploreSite;
+import ti4.ai.scoring.ExpectedReadying;
 import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.Pooling;
 import ti4.ai.tactical.SeatStrike;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -201,7 +203,7 @@ public class StructurePolicy {
                 isDockSite(game, seat, planet),
                 spread && freshOutsideHome(game, seat, planet),
                 dockPreference(game, seat, planet),
-                planet.getResources(),
+                spendableResources(seat, planet),
                 isHome(game, seat, planet) ? 0 : 1,
                 systemResources(game, seat, planet),
                 planet.getInfluence());
@@ -222,7 +224,7 @@ public class StructurePolicy {
     }
 
     private static boolean isForwardDockSite(Game game, Player seat, Planet planet) {
-        return planet.getResources() >= MIN_FORWARD_DOCK_RESOURCES
+        return spendableResources(seat, planet) >= MIN_FORWARD_DOCK_RESOURCES
                 || onOwnIngress(game, seat, planet)
                 || SeatStrike.wantsDockOn(game, seat, planet);
     }
@@ -238,13 +240,25 @@ public class StructurePolicy {
     }
 
     private static boolean homeProductionLimited(Game game, Player seat, Tile home, Planet planet) {
-        int spendable = seat.getPlanets().stream()
-                .map(name -> game.getPlanetsInfo().get(name))
-                .filter(Objects::nonNull)
-                .mapToInt(Planet::getResources)
+        if (spendableThisRound(game, seat) <= Helper.getProductionValue(seat, game, home, false)) return false;
+        return spendableResources(seat, planet) >= bestForwardDockResources(game, seat);
+    }
+
+    static int spendableThisRound(Game game, Player seat) {
+        List<Integer> values = ownedPlanets(game, seat).stream()
+                .map(planet -> spendableResources(seat, planet))
+                .sorted(Comparator.reverseOrder())
+                .toList();
+        int once = values.stream().mapToInt(Integer::intValue).sum();
+        int again = values.stream()
+                .limit(ExpectedReadying.ownReadies(game, seat))
+                .mapToInt(Integer::intValue)
                 .sum();
-        if (spendable <= Helper.getProductionValue(seat, game, home, false)) return false;
-        return planet.getResources() >= bestForwardDockResources(game, seat);
+        return once + again;
+    }
+
+    private static int spendableResources(Player seat, Planet planet) {
+        return Pooling.of(seat).resourcesOf(planet);
     }
 
     private static int bestForwardDockResources(Game game, Player seat) {
@@ -253,14 +267,14 @@ public class StructurePolicy {
                 .filter(Objects::nonNull)
                 .filter(planet -> !isHome(game, seat, planet) && dockLegal(game, seat, planet))
                 .filter(planet -> isForwardDockSite(game, seat, planet))
-                .mapToInt(Planet::getResources)
+                .mapToInt(planet -> spendableResources(seat, planet))
                 .max()
                 .orElse(0);
     }
 
     private static int dockPreference(Game game, Player seat, Planet planet) {
         if (isHome(game, seat, planet)) return 1;
-        int rich = planet.getResources() >= RICH_DOCK_RESOURCES ? 1 : 0;
+        int rich = spendableResources(seat, planet) >= RICH_DOCK_RESOURCES ? 1 : 0;
         int nearby = STYX.equals(planet.getName()) || inSlice(game, seat, planet) ? 1 : 0;
         int ingress = onOwnIngress(game, seat, planet) ? 2 : 0;
         int seatDock = SeatStrike.wantsDockOn(game, seat, planet) ? SEAT_DOCK_PREFERENCE : 0;

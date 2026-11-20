@@ -64,6 +64,29 @@ class StructurePolicyTest extends BaseTi4Test {
         assertThat(StructurePolicy.next(test.game, test.nekro)).contains(StructurePolicy.PDS);
     }
 
+    // Archon's Gift spends Wellon's 2 influence as resources, so the same planet can now build like a 2-resource one.
+    @Test
+    void archonsGiftMakesAnInfluencePlanetAForwardDockSite() {
+        test.place("19", "101");
+        test.nekro.addPlanet("wellon");
+        test.nekro.addBreakthrough("xxchabt");
+        test.nekro.setBreakthroughUnlocked("xxchabt", true);
+
+        assertThat(StructurePolicy.next(test.game, test.nekro)).contains(StructurePolicy.SPACE_DOCK);
+    }
+
+    // Planets the seat can ready again count twice toward what it can spend in a round: the Xxcha agent and
+    // Xxekir Grom ready its 5 best planets.
+    @Test
+    void readyingLeadersCountTheirPlanetsTwiceTowardTheRoundsSpending() {
+        int once = StructurePolicy.spendableThisRound(test.game, test.nekro);
+        test.nekro.addLeader("xxchaagent");
+        test.nekro.addLeader("xxchahero-te");
+        test.nekro.unsafeGetLeader("xxchahero-te").setLocked(false);
+
+        assertThat(StructurePolicy.spendableThisRound(test.game, test.nekro)).isEqualTo(2 * once);
+    }
+
     // Forward docks belong in the seat's own slice: Lodor next to home beats Atlas across the board, though both
     // are worth 3 resources.
     @Test
