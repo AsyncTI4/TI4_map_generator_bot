@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import org.apache.commons.lang3.function.Consumers;
 import ti4.contest.replay.core.CombatContestSettings;
 import ti4.contest.replay.service.CombatReplayService;
-import ti4.discord.interactions.ActiveInteraction;
 import ti4.discord.interactions.listeners.context.SelectionMenuContext;
 import ti4.discord.interactions.routing.AnnotationHandler;
 import ti4.discord.interactions.routing.HandlerRegistry;
@@ -42,7 +41,7 @@ public final class SelectionMenuProcessor {
                 "SelectionMenuProcessor task for `" + gameName + "`",
                 gameName,
                 event.getMessageChannel(),
-                () -> ActiveInteraction.runWith(event, () -> process(event, route)),
+                () -> process(event, route),
                 lockType);
     }
 

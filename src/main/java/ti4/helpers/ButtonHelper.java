@@ -43,7 +43,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.ComponentInteraction;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -53,7 +52,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
-import ti4.discord.interactions.ActiveInteraction;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.buttons.handlers.actioncards.theodisi.TransitRiderLLButtonHandler;
 import ti4.discord.interactions.buttons.handlers.agenda.resolver.TheodisiAgendaResolver;
@@ -4521,13 +4519,9 @@ public class ButtonHelper {
         buttons.add(Buttons.blue(
                 "getDamageButtons_" + tile.getPosition() + "_remove",
                 "Remove Units in " + tile.getRepresentationForButtons(game, player)));
-        Optional<IReplyCallback> violatorInteraction = ActiveInteraction.pressedBy(player.getUserID());
-        if (violatorInteraction.isEmpty()) {
-            buttons.add(Buttons.gray("viewViolatingSystem_" + tile.getPosition(), "View System"));
-        }
+        buttons.add(Buttons.gray("viewViolatingSystem_" + tile.getPosition(), "View System"));
         buttons.add(Buttons.red("deleteButtons", "Dismiss These Buttons"));
 
-        violatorInteraction.ifPresent(interaction -> sendSystemImageEphemerally(interaction, game, player, tile));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assessment.message(), buttons);
         game.setStoredValue("violatedSystems", game.getStoredValue("violatedSystems") + tile.getPosition() + "_");
         GMService.logPlayerActivity(game, player, assessment.message());
@@ -4535,24 +4529,9 @@ public class ButtonHelper {
 
     @ButtonHandler(value = "viewViolatingSystem_", save = false)
     public static void viewViolatingSystem(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
-        Tile tile = game.getTileByPosition(buttonID.replace("viewViolatingSystem_", ""));
-        if (tile == null) {
-            return;
-        }
-        sendSystemImageEphemerally(event, game, player, tile);
-    }
-
-    private static void sendSystemImageEphemerally(IReplyCallback interaction, Game game, Player player, Tile tile) {
-        FileUpload systemWithContext = SystemContextImage.upload(game, null, 0, tile.getPosition(), player);
-        if (systemWithContext == null) {
-            return;
-        }
-        interaction
-                .getHook()
-                .sendMessage("Here is " + tile.getRepresentationForButtons(game, player) + ".")
-                .addFiles(systemWithContext)
-                .setEphemeral(true)
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+        String position = buttonID.replace("viewViolatingSystem_", "");
+        MessageHelper.sendEphemeralFileInResponseToButtonPress(
+                SystemContextImage.upload(game, event, 0, position, player), event);
     }
 
     private record FleetAssessment(
