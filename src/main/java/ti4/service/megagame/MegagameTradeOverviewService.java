@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -251,13 +252,30 @@ public class MegagameTradeOverviewService {
 
     private static CompletableFuture<ThreadChannel> threadOrNull(TextChannel channel, String threadName) {
         String name = DiscordThreadUtility.fitThreadName(threadName);
-        return findOrCreateThread(channel, name, ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
+        return findOrCreateThread(channel, name, ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                 .orTimeout(THREAD_LOOKUP_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .exceptionally(error -> {
                     BotLogger.error(
                             "Could not find or create trade thread " + name + " in " + channel.getName(), error);
                     return null;
                 });
+    }
+
+    static CompletableFuture<Optional<ThreadChannel>> existingTradeThread(Game game, Player player) {
+        TextChannel channel = channelOrNull(game);
+        if (channel == null) return CompletableFuture.completedFuture(Optional.empty());
+        String name = DiscordThreadUtility.fitThreadName(threadName(player));
+        Optional<ThreadChannel> active = channel.getThreadChannels().stream()
+                .filter(thread -> thread.getName().equals(name))
+                .findFirst();
+        if (active.isPresent()) return CompletableFuture.completedFuture(active);
+        return channel.retrieveArchivedPublicThreadChannels()
+                .submit()
+                .thenApply(archived -> archived.stream()
+                        .filter(thread -> thread.getName().equals(name))
+                        .findFirst())
+                .orTimeout(THREAD_LOOKUP_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .exceptionally(_ -> Optional.empty());
     }
 
     static CompletableFuture<ThreadChannel> panelThread(TextChannel channel) {

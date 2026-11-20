@@ -47,6 +47,26 @@ class MegagameTradablesPanelTest extends BaseTi4Test {
         assertThat(solPanel).doesNotContain("Holds:");
     }
 
+    @Test
+    void notesOutListOnlyPlayAreaNotesWithTheirHolder() {
+        Game game = MegagameGroupServiceTest.gameWithCards();
+        game.setName("tradablesPanelNotesTest");
+        Player sol = MegagameGroupServiceTest.player(game, "sol");
+        Player hacan = MegagameGroupServiceTest.player(game, "hacan");
+        String throne = hacan.getColor() + "_sftt";
+        String tradeAgreement = hacan.getColor() + "_ta";
+        hacan.addOwnedPromissoryNoteByID(throne);
+        hacan.addOwnedPromissoryNoteByID(tradeAgreement);
+        // Support for the Throne sits in sol's play area (public); the Trade Agreement stays hidden in sol's hand
+        sol.addPromissoryNoteToPlayArea(throne);
+        sol.setPromissoryNote(tradeAgreement);
+
+        String hacanPanel = describe(game, hacan);
+        assertThat(hacanPanel).contains("Notes out: Support for the Throne → " + sol.getFactionEmoji());
+        assertThat(hacanPanel).doesNotContain("Trade Agreement");
+        assertThat(describe(game, sol)).doesNotContain("Notes out:");
+    }
+
     private static String describe(Game game, Player player) {
         return MegagameTradablesPanel.pages(game).stream()
                 .flatMap(List::stream)

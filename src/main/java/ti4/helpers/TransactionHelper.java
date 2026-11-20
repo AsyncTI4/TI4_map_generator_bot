@@ -118,6 +118,8 @@ public class TransactionHelper {
     private static final int BLIND_SECRET_BUTTONS = 3;
     private static final String HIDDEN_PARTY = "Someone";
     private static final String BLACK_MARKET_MARKER = "_BMD_";
+    public static final String HIDDEN_AGENDA_REFUSAL =
+            ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
 
     record Shortfall(Player sender, String description) {}
 
@@ -1177,15 +1179,18 @@ public class TransactionHelper {
 
         List<Button> buttons = getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
-        if (game.isHiddenAgendaMode()
-                && game.getPhaseOfGame().toLowerCase().contains("agenda")
-                && game.getStoredValue("executiveOrder").isEmpty()) {
-            message = player.getRepresentation()
-                    + ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
+        if (hiddenAgendaBlocksTransactions(game)) {
+            message = player.getRepresentation() + HIDDEN_AGENDA_REFUSAL;
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+    }
+
+    public static boolean hiddenAgendaBlocksTransactions(Game game) {
+        return game.isHiddenAgendaMode()
+                && game.getPhaseOfGame().toLowerCase().contains("agenda")
+                && game.getStoredValue("executiveOrder").isEmpty();
     }
 
     @ButtonHandler(value = "newTransact_", save = false)
@@ -3189,21 +3194,26 @@ public class TransactionHelper {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 != null) {
-            player.clearTransactionItemsWithPlayer(p2);
-            List<Button> buttons = getStuffToTransButtonsOld(game, player, p2);
-            if (useNewTransactionModel(game)) {
-                buttons = getStuffToTransButtonsNew(game, player, player, p2);
-                if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
-                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2, player);
-                    FileUpload upload = ImageUploads.createFileUpload(image, "transactable_items");
-                    MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
-                }
-            }
-            String message = player.getRepresentation(true, false) + ", please choose what you wish to transact with "
-                    + p2.getRepresentation(false, false) + ".";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-            checkTransactionLegality(game, player, p2);
+            startTransaction(game, player, p2, event.getMessageChannel(), buttonID.startsWith("transactWith_"));
             ButtonHelper.deleteMessage(event);
         }
+    }
+
+    public static void startTransaction(
+            Game game, Player player, Player p2, MessageChannel channel, boolean showTransactables) {
+        player.clearTransactionItemsWithPlayer(p2);
+        List<Button> buttons = getStuffToTransButtonsOld(game, player, p2);
+        if (useNewTransactionModel(game)) {
+            buttons = getStuffToTransButtonsNew(game, player, player, p2);
+            if (player.getUserSettings().isShowTransactables() && showTransactables) {
+                BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2, player);
+                FileUpload upload = ImageUploads.createFileUpload(image, "transactable_items");
+                MessageHelper.sendFileUploadToChannel(channel, upload);
+            }
+        }
+        String message = player.getRepresentation(true, false) + ", please choose what you wish to transact with "
+                + p2.getRepresentation(false, false) + ".";
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+        checkTransactionLegality(game, player, p2);
     }
 }

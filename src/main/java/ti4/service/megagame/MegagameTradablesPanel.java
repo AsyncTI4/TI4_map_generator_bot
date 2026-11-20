@@ -32,6 +32,7 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.model.Mapper;
+import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -97,6 +98,10 @@ public class MegagameTradablesPanel {
         NEIGHBOURS.remove(gameName);
     }
 
+    static MessageEmbed card(Game game, Player player) {
+        return factionEmbed(game, player, neighbours(game));
+    }
+
     static List<List<MessageEmbed>> pages(Game game) {
         NeighbourSnapshot neighbours = neighbours(game);
         List<MessageEmbed> embeds = game.getRealPlayers().stream()
@@ -131,6 +136,7 @@ public class MegagameTradablesPanel {
         lines.add(neighbourLine(neighbours, player));
         debtLine("Holds", heldDebt(game, player)).ifPresent(lines::add);
         debtLine("Owes", owedDebt(game, player)).ifPresent(lines::add);
+        notesOutLine(game, player).ifPresent(lines::add);
         return new EmbedBuilder()
                 .setDescription(String.join("\n", lines))
                 .setColor(colour(player))
@@ -216,6 +222,20 @@ public class MegagameTradablesPanel {
                 + debts.entrySet().stream()
                         .map(debt -> debt.getKey() + "×" + debt.getValue())
                         .collect(Collectors.joining(" ")));
+    }
+
+    private static Optional<String> notesOutLine(Game game, Player owner) {
+        List<String> notes = new ArrayList<>();
+        for (Player holder : game.getRealPlayers()) {
+            if (holder == owner) continue;
+            for (String noteId : holder.getPromissoryNotesInPlayArea()) {
+                PromissoryNoteModel note = Mapper.getPromissoryNote(noteId);
+                if (note != null && owner.ownsPromissoryNote(noteId)) {
+                    notes.add(note.getName() + " → " + holder.getFactionEmoji());
+                }
+            }
+        }
+        return notes.isEmpty() ? Optional.empty() : Optional.of("Notes out: " + String.join(", ", notes));
     }
 
     private static Color colour(Player player) {

@@ -22,7 +22,8 @@ public class MegagameCommand implements ParentCommand {
                     new MegagameGm(),
                     new MegagameCardsInfo(),
                     new MegagameShowGameAs(),
-                    new MegagameTradeOverview())
+                    new MegagameTradeOverview(),
+                    new MegagameTradeInfo())
             .collect(Collectors.toMap(Subcommand::getName, Function.identity(), (a, b) -> a, LinkedHashMap::new));
 
     @Override
