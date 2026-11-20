@@ -298,7 +298,7 @@
         "name": "Rise",
         "phase": "Action",
         "window": "Action",
-        "text": "Either place 1 infantry on each planet you control or place 1 fighter in each system that contains your ships or space docks and no other players' ships.",
+        "text": "Either place 1 infantry on each planet you control or place 1 fighter from your reinforcements in each system that contains your ships or space docks and no other players' ships.",
         "flavorText": "Stone and soil shook and fell as the mountains rose on limbs of living metal. Even when the tremors subsided, the world's inhabitants still trembled, for the Titans had heeded their masters' call.",
         "source": "twilights_fall"
     },

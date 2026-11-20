@@ -54,6 +54,7 @@ These are missing from the print. Unlike the misprints above, the bot carries th
 | Card | Bot alias | File | Field | Printed text | Bot text |
 | --- | --- | --- | --- | --- | --- |
 | Arise (Twilight's Fall edict) | `tf-arise` | agendas/twilights_fall.json | text1 | … or place 1 fighter in each system that contains your ships. | … or place 1 fighter **from your reinforcements** in each system that contains your ships. |
+| Rise (Twilight's Fall action card) | `tf-rise` | action_cards/twilights_fall.json | text | … or place 1 fighter in each system that contains your ships or space docks and no other players' ships. | … or place 1 fighter **from your reinforcements** in each system that contains your ships or space docks and no other players' ships. |
 
 ## Not yet checked against images
 
