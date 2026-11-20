@@ -887,7 +887,7 @@
         "name": "Blitz",
         "phase": "Action",
         "window": "At the start of an invasion",
-        "text": "Each of your non-fighter ships in the active system that does not have BOMBARDMENT gains BOMBARDMENT 6 until the end of the invasion.",
+        "text": "Each of your non-fighter ships in the active system that do not have BOMBARDMENT gain BOMBARDMENT 6 until the end of the invasion.",
         "flavorText": "\"T-these weren't meant to be used like this. T-this is a t-terrible idea.\" Tai mumbled, wringing his hands. \"Well 'course it is,\" Dart grinned, slamming his fist down on the release lock. \"But we've got about sixty kilotons of 'surprise' and nothing to lose!\"",
         "source": "codex1"
     },
@@ -905,7 +905,7 @@
         "name": "Fighter Conscription",
         "phase": "Action",
         "window": "Action",
-        "text": "Place 1 fighter from your reinforcements into each system that contains 1 or more of your space docks or ships that have a capacity value; they cannot be placed in systems that contain other players' ships.",
+        "text": "Place 1 fighter from your reinforcements in each system that contains 1 or more of your space docks or units that have capacity; they cannot be placed in systems that contain other players' ships.",
         "flavorText": "T'esla grinned as her shimmering vessel lifted off the flight deck - at last, that damned Viscount would experience the superiority of Naalu dogfighting. \"Get ready,\" she hissed into the comms.",
         "source": "codex1"
     },
@@ -988,7 +988,7 @@
         "name": "Rally",
         "phase": "Action",
         "window": "After you activate a system that contains another player's ships",
-        "text": "Place 2 command tokens from your reinforcements into your fleet pool.",
+        "text": "Place 2 command tokens from your reinforcements in your fleet pool.",
         "flavorText": "The Federation advance would not be halted - not today. Claire set her broadcast to play on all open channels. She began, her voice fierce and unwavering \"Friends! On this day, our names shall be inscribed in the pages of legend!\"",
         "source": "codex1"
     },
