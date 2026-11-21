@@ -266,4 +266,153 @@ class HostilityTest extends BaseTi4Test {
                         0.5 * ti4.ai.eval.ValueScale.spendable(wellon.getResources(), wellon.getInfluence()),
                         within(CLOSE));
     }
+
+    // A Lucky Shot on a Nekro cruiser in a system where Sol also has ships: the attack ledger already charges Sol for
+    // ships lost in a system it shares, so the card does not count the cruiser a second time.
+    @Test
+    void unitsLostWhereTheCardPlayerHasShipsCountOnce() {
+        assertThat(luckyShot(true)).isZero();
+        assertThat(luckyShot(false)).isPositive();
+    }
+
+    private static double luckyShot(boolean solShipsThere) {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        Tile tile = test.place("19", "311");
+        test.units(tile, "space", test.nekro, UnitType.Cruiser, 1);
+        if (solShipsThere) test.units(tile, "space", test.sol, UnitType.Cruiser, 1);
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget("Lucky Shot", test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        tile.getUnitHolders().get("space").removeAllUnits(test.nekro.getColor());
+        Hostility.record(test.game);
+        test.isActive(test.nekro, "action");
+        Hostility.record(test.game);
+        assertThat(Hostility.pending(test.game)).isEmpty();
+        return Hostility.amount(test.game, test.nekro, test.sol);
+    }
+
+    // The user's values (2026-11-21): cards whose harm is outside a player's assets carry set costs: Public Disgrace
+    // 2 TG, Coup d'Etat and Crisis 1 TG.
+    @Test
+    void cardsThatCostTempoCarrySetCosts() {
+        assertThat(flat("Public Disgrace")).isCloseTo(2.0, within(CLOSE));
+        assertThat(flat("Coup d'Etat")).isCloseTo(1.0, within(CLOSE));
+        assertThat(flat("Crisis")).isCloseTo(1.0, within(CLOSE));
+    }
+
+    // The user's rule (2026-11-21): Signal Jamming costs half of what the units it locks down cost. Sol places a Nekro
+    // token over Nekro's cruiser.
+    @Test
+    void signalJammingCostsHalfTheLockedUnits() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        Tile tile = test.place("19", "311");
+        test.units(tile, "space", test.nekro, UnitType.Cruiser, 1);
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.SIGNAL_JAMMING, test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        ti4.helpers.CommandCounterHelper.addCC(null, test.nekro, tile);
+        Hostility.record(test.game);
+        double cruiser = test.nekro
+                        .getUnitFromUnitKey(ti4.helpers.Units.getUnitKey(UnitType.Cruiser, test.nekro.getColor()))
+                        .getCost()
+                * ti4.ai.eval.ValueScale.RESOURCE;
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isCloseTo(cruiser / 2, within(CLOSE));
+    }
+
+    // A Signal Jamming token on a system without Nekro units locks nothing down.
+    @Test
+    void signalJammingAnEmptySystemCostsNothing() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        Tile tile = test.place("19", "311");
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.SIGNAL_JAMMING, test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        ti4.helpers.CommandCounterHelper.addCC(null, test.nekro, tile);
+        Hostility.record(test.game);
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isZero();
+        assertThat(Hostility.pending(test.game)).isEmpty();
+    }
+
+    // Thunder's Edge Mercenary Contract sends Nekro's planet card back to the deck: it costs the planet as if taken.
+    @Test
+    void mercenaryContractCostsThePlanetLost() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        Tile tile = test.place("19", "311");
+        test.nekro.addPlanet("wellon");
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.MERCENARY_CONTRACT, test.sol, test.nekro);
+        test.nekro.removePlanet("wellon");
+        Hostility.record(test.game);
+
+        ti4.game.Planet wellon = test.game.getPlanetsInfo().get("wellon");
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol))
+                .isCloseTo(
+                        ti4.ai.eval.BoardView.planetValue(wellon) * Hostility.location(test.game, tile, test.nekro),
+                        within(CLOSE));
+    }
+
+    private static double flat(String card) {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.game.getGameStats().recordAcTarget(card, test.sol, test.nekro);
+        Hostility.record(test.game);
+        return Hostility.amount(test.game, test.nekro, test.sol);
+    }
+
+    // Lie in Wait takes a card like Spy does, and costs what was taken.
+    @Test
+    void lieInWaitCostsWhatWasTaken() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        test.nekro.setActionCard("overrule", 1);
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.LIE_IN_WAIT, test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        test.nekro.removeActionCard(1);
+        test.sol.setActionCard("overrule", 2);
+        Hostility.record(test.game);
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isPositive();
+    }
+
+    // Extreme Duress costs the trade goods handed over plus the action cards discarded; if Nekro takes the strategic
+    // action instead it costs 1 TG (the user's value, 2026-11-21).
+    @Test
+    void extremeDuressCostsTheGoodsAndTheDiscardedHand() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.nekro, "action");
+        test.nekro.setTg(3);
+        test.nekro.setActionCard("overrule", 1);
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.EXTREME_DURESS, test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        test.nekro.setTg(0);
+        test.nekro.removeActionCard(1);
+        Hostility.record(test.game);
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol))
+                .isGreaterThan(3 * ti4.ai.eval.ValueScale.TRADE_GOOD);
+    }
+
+    @Test
+    void extremeDuressAnsweredWithAStrategicActionCostsOne() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.nekro, "action");
+        test.nekro.setTg(3);
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.EXTREME_DURESS, test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        test.isActive(test.sol, "action");
+        Hostility.record(test.game);
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol))
+                .isCloseTo(Hostility.STRATEGIC_DURESS_COST, within(CLOSE));
+        assertThat(Hostility.pending(test.game)).isEmpty();
+    }
 }

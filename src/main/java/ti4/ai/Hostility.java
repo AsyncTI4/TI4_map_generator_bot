@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.ai.PlayerAssets.Holdings;
 import ti4.ai.actioncards.ActionCardValue;
 import ti4.ai.agenda.AssassinationCost;
 import ti4.ai.agenda.PromisedVotes;
@@ -25,6 +26,7 @@ import ti4.ai.eval.Territory;
 import ti4.ai.eval.Territory.Zone;
 import ti4.game.Game;
 import ti4.game.GameStats;
+import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
@@ -42,7 +44,17 @@ public class Hostility {
     static final String ASSASSINATE = "Assassinate Representative";
     static final String SPY = "Spy";
     static final double MIN_ASSASSINATION_LOSS = 1.0;
-    static final Map<String, Double> FLAT_IMPACT = Map.of("Ancient Burial Sites", 0.5);
+    static final String LIE_IN_WAIT = "Lie in Wait";
+    static final String EXTREME_DURESS = "Extreme Duress";
+    static final String SIGNAL_JAMMING = "Signal Jamming";
+    static final String MERCENARY_CONTRACT = "Mercenary Contract";
+    static final double STRATEGIC_DURESS_COST = 1.0;
+    static final double JAMMED_SHARE = 0.5;
+    static final Map<String, Double> FLAT_IMPACT = Map.of(
+            "Ancient Burial Sites", 0.5,
+            "Coup d'Etat", 1.0,
+            "Public Disgrace", 2.0,
+            "Crisis", 1.0);
     static final Map<String, Double> IMPACT_SHARE = Map.of("Reparations", 0.5);
     static final double SABOTAGE_COST = 1.0;
     static final double SLICE_PRESENCE_COST = 1.0;
@@ -91,7 +103,10 @@ public class Hostility {
     enum Kind {
         ASSETS,
         SPY,
-        ASSASSINATION
+        ASSASSINATION,
+        DURESS,
+        PLANETS,
+        JAMMING
     }
 
     record Pending(
@@ -145,9 +160,11 @@ public class Hostility {
         }
     }
 
-    private static final Map<String, Map<String, Double>> LAST_ASSETS = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, Holdings>> LAST_ASSETS = new ConcurrentHashMap<>();
     private static final Map<String, Map<String, Set<String>>> LAST_HANDS = new ConcurrentHashMap<>();
     private static final String HAND = "+";
+    private static final String SYSTEMS = "@";
+    private static final String SYSTEM = "|";
 
     public static double amount(Game game, Player victim, Player offender) {
         return totals(game).getOrDefault(pair(offender.getFaction(), victim.getFaction()), 0.0);
@@ -198,8 +215,8 @@ public class Hostility {
     }
 
     static void record(Game game) {
-        Map<String, Double> assets = assetsNow(game);
-        Map<String, Double> before = LAST_ASSETS.getOrDefault(game.getName(), assets);
+        Map<String, Holdings> assets = assetsNow(game);
+        Map<String, Holdings> before = LAST_ASSETS.getOrDefault(game.getName(), assets);
         LAST_ASSETS.put(game.getName(), assets);
         Map<String, Set<String>> hands = handsNow(game);
         Map<String, Set<String>> handsBefore = LAST_HANDS.getOrDefault(game.getName(), hands);
@@ -249,34 +266,81 @@ public class Hostility {
     }
 
     private static Optional<Double> settle(
-            Game game, Pending open, Map<String, Double> assets, Map<String, Set<String>> hands) {
+            Game game, Pending open, Map<String, Holdings> assets, Map<String, Set<String>> hands) {
         return switch (open.kind()) {
             case ASSETS -> {
-                double loss = open.before() - assets.getOrDefault(open.victim(), open.before());
+                double loss = assetLoss(open, assets, systems(open.detail()));
                 if (loss >= MIN_IMPACT) yield Optional.of(loss * share(open.detail()));
                 yield open.windowClosed(game) ? Optional.of(0.0) : Optional.empty();
             }
             case SPY -> {
+                Set<String> lost = lostCards(open, hands);
+                if (!lost.isEmpty()) yield Optional.of(cardsValue(game, open.victim(), lost));
+                yield open.windowClosed(game) ? Optional.of(0.0) : Optional.empty();
+            }
+            case DURESS -> {
+                Set<String> lost = lostCards(open, hands);
+                double loss = Math.max(0, assetLoss(open, assets, List.of()));
+                if (!lost.isEmpty() || loss >= MIN_IMPACT)
+                    yield Optional.of(loss + cardsValue(game, open.victim(), lost));
+                yield open.windowClosed(game) ? Optional.of(STRATEGIC_DURESS_COST) : Optional.empty();
+            }
+            case PLANETS -> {
+                Holdings now = assets.get(open.victim());
                 Set<String> lost = new LinkedHashSet<>(List.of(StringUtils.split(open.detail(), HAND)));
-                lost.removeAll(hands.getOrDefault(open.victim(), Set.of()));
-                if (!lost.isEmpty()) yield Optional.of(stolenValue(game, open.victim(), lost));
+                if (now != null) lost.removeAll(now.planets());
+                if (now != null && !lost.isEmpty()) yield Optional.of(planetsValue(game, open.victim(), lost));
+                yield open.windowClosed(game) ? Optional.of(0.0) : Optional.empty();
+            }
+            case JAMMING -> {
+                Holdings now = assets.get(open.victim());
+                Set<String> jammed = now == null ? new LinkedHashSet<>() : new LinkedHashSet<>(now.tokens());
+                jammed.removeAll(List.of(StringUtils.split(open.detail(), HAND)));
+                if (!jammed.isEmpty()) yield Optional.of(JAMMED_SHARE * (now.total() - now.outside(jammed)));
                 yield open.windowClosed(game) ? Optional.of(0.0) : Optional.empty();
             }
             case ASSASSINATION -> assassination(game, open);
         };
     }
 
-    private static double share(String detail) {
-        return NumberUtils.isCreatable(detail) ? Double.parseDouble(detail) : 1.0;
+    private static double assetLoss(Pending open, Map<String, Holdings> assets, List<String> systems) {
+        Holdings now = assets.get(open.victim());
+        return now == null ? 0 : open.before() - now.outside(systems);
     }
 
-    private static double stolenValue(Game game, String victim, Set<String> lost) {
+    private static Set<String> lostCards(Pending open, Map<String, Set<String>> hands) {
+        Set<String> lost = new LinkedHashSet<>(List.of(StringUtils.split(open.detail(), HAND)));
+        lost.removeAll(hands.getOrDefault(open.victim(), Set.of()));
+        return lost;
+    }
+
+    private static double share(String detail) {
+        String share = StringUtils.substringBefore(detail, SYSTEMS);
+        return NumberUtils.isCreatable(share) ? Double.parseDouble(share) : 1.0;
+    }
+
+    private static List<String> systems(String detail) {
+        return List.of(StringUtils.split(StringUtils.substringAfter(detail, SYSTEMS), SYSTEM));
+    }
+
+    private static double planetsValue(Game game, String victim, Set<String> lost) {
+        Player owner = game.getPlayerFromColorOrFaction(victim);
+        if (owner == null) return 0;
+        double total = 0;
+        for (String name : lost) {
+            Tile tile = game.getTileFromPlanet(name);
+            if (tile != null && tile.getUnitHolders().get(name) instanceof Planet planet)
+                total += BoardView.planetValue(planet) * location(game, tile, owner);
+        }
+        return total;
+    }
+
+    private static double cardsValue(Game game, String victim, Set<String> lost) {
         Player owner = game.getPlayerFromColorOrFaction(victim);
         if (owner == null) return 0;
         return lost.stream()
                 .mapToDouble(alias -> Math.max(0, ActionCardValue.keepValue(game, owner, alias)))
-                .max()
-                .orElse(0);
+                .sum();
     }
 
     private static Optional<Double> assassination(Game game, Pending open) {
@@ -298,9 +362,10 @@ public class Hostility {
         return hands;
     }
 
-    private static Map<String, Double> assetsNow(Game game) {
-        Map<String, Double> assets = new LinkedHashMap<>();
-        for (Player player : game.getRealPlayers()) assets.put(player.getFaction(), PlayerAssets.value(game, player));
+    private static Map<String, Holdings> assetsNow(Game game) {
+        Map<String, Holdings> assets = new LinkedHashMap<>();
+        for (Player player : game.getRealPlayers())
+            assets.put(player.getFaction(), PlayerAssets.holdings(game, player));
         return assets;
     }
 
@@ -368,7 +433,7 @@ public class Hostility {
     }
 
     private static CardScan scanCards(
-            Game game, int processed, int targets, Map<String, Double> before, Map<String, Set<String>> hands) {
+            Game game, int processed, int targets, Map<String, Holdings> before, Map<String, Set<String>> hands) {
         List<Cost> found = new ArrayList<>();
         List<Pending> waiting = new ArrayList<>();
         List<GameStats.ActionCardTarget> aimed = game.getGameStats().getActionCardTargets();
@@ -383,19 +448,25 @@ public class Hostility {
                 found.add(new Cost(player.getFaction(), victim.getFaction(), flat));
                 continue;
             }
-            double was = before.getOrDefault(victim.getFaction(), PlayerAssets.value(game, victim));
             Kind kind = kindOf(target.getActionCard());
+            List<String> shared = kind == Kind.ASSETS ? sharedSystems(game, before, player) : List.of();
+            Holdings victimBefore = before.getOrDefault(victim.getFaction(), PlayerAssets.holdings(game, victim));
+            double was = victimBefore.outside(shared);
             String detail = switch (kind) {
-                case SPY ->
+                case PLANETS -> String.join(HAND, victimBefore.planets());
+                case JAMMING -> String.join(HAND, victimBefore.tokens());
+                case SPY, DURESS ->
                     String.join(
                             HAND,
                             hands.getOrDefault(
                                     victim.getFaction(), victim.getActionCards().keySet()));
                 case ASSASSINATION -> PromisedVotes.agendaKey(game);
                 case ASSETS ->
-                    IMPACT_SHARE.containsKey(target.getActionCard())
-                            ? String.valueOf(IMPACT_SHARE.get(target.getActionCard()))
-                            : "";
+                    (IMPACT_SHARE.containsKey(target.getActionCard())
+                                    ? String.valueOf(IMPACT_SHARE.get(target.getActionCard()))
+                                    : "")
+                            + SYSTEMS
+                            + String.join(SYSTEM, shared);
             };
             waiting.add(new Pending(
                     player.getFaction(),
@@ -411,8 +482,18 @@ public class Hostility {
         return new CardScan(found, waiting, scanned, aimed.size());
     }
 
+    private static List<String> sharedSystems(Game game, Map<String, Holdings> before, Player offender) {
+        Holdings was = before.getOrDefault(offender.getFaction(), PlayerAssets.holdings(game, offender));
+        Set<String> systems = new LinkedHashSet<>(was.units().keySet());
+        systems.addAll(PlayerAssets.holdings(game, offender).units().keySet());
+        return List.copyOf(systems);
+    }
+
     private static Kind kindOf(String card) {
-        if (SPY.equals(card)) return Kind.SPY;
+        if (SPY.equals(card) || LIE_IN_WAIT.equals(card)) return Kind.SPY;
+        if (EXTREME_DURESS.equals(card)) return Kind.DURESS;
+        if (MERCENARY_CONTRACT.equals(card)) return Kind.PLANETS;
+        if (SIGNAL_JAMMING.equals(card)) return Kind.JAMMING;
         if (ASSASSINATE.equals(card)) return Kind.ASSASSINATION;
         return Kind.ASSETS;
     }
