@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import ti4.ai.actioncards.ActionCardValue;
+import ti4.ai.agenda.AssassinationCost;
+import ti4.ai.agenda.PromisedVotes;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
@@ -35,8 +39,11 @@ public class Hostility {
     static final String TARGETS_KEY = "aiHostilityTargets";
     static final String PENDING_KEY = "aiHostilityPending";
     static final double MIN_IMPACT = 0.1;
-    static final Map<String, Double> FLAT_IMPACT =
-            Map.of("Assassinate Representative", 1.0, "Spy", ti4.ai.actioncards.ActionCardPrior.AVERAGE_CARD);
+    static final String ASSASSINATE = "Assassinate Representative";
+    static final String SPY = "Spy";
+    static final double MIN_ASSASSINATION_LOSS = 1.0;
+    static final Map<String, Double> FLAT_IMPACT = Map.of("Ancient Burial Sites", 0.5);
+    static final Map<String, Double> IMPACT_SHARE = Map.of("Reparations", 0.5);
     static final double SABOTAGE_COST = 1.0;
     static final double SLICE_PRESENCE_COST = 1.0;
     static final double HOME_PRESENCE_COST = 3.0;
@@ -81,7 +88,25 @@ public class Hostility {
 
     private record CardScan(List<Cost> costs, List<Pending> pending, int processed, int targets) {}
 
-    record Pending(String offender, String victim, double before, int plays, String active, int round) {
+    enum Kind {
+        ASSETS,
+        SPY,
+        ASSASSINATION
+    }
+
+    record Pending(
+            String offender,
+            String victim,
+            double before,
+            int plays,
+            String active,
+            int round,
+            Kind kind,
+            String detail) {
+
+        Pending(String offender, String victim, double before, int plays, String active, int round) {
+            this(offender, victim, before, plays, active, round, Kind.ASSETS, "");
+        }
 
         String encode() {
             return String.join(
@@ -91,21 +116,26 @@ public class Hostility {
                     String.format(Locale.ROOT, FORMAT, before),
                     String.valueOf(plays),
                     active,
-                    String.valueOf(round));
+                    String.valueOf(round),
+                    kind.name(),
+                    detail);
         }
 
         static Optional<Pending> decode(String encoded) {
             String[] fields = StringUtils.splitPreserveAllTokens(encoded, FIELDS);
-            if (fields == null || fields.length != 6) return Optional.empty();
+            if (fields == null || (fields.length != 6 && fields.length != 8)) return Optional.empty();
             if (!NumberUtils.isCreatable(fields[2]) || !NumberUtils.isCreatable(fields[3])) return Optional.empty();
             if (!NumberUtils.isCreatable(fields[5])) return Optional.empty();
+            Kind kind = fields.length == 8 ? Kind.valueOf(fields[6]) : Kind.ASSETS;
             return Optional.of(new Pending(
                     fields[0],
                     fields[1],
                     Double.parseDouble(fields[2]),
                     Integer.parseInt(fields[3]),
                     fields[4],
-                    Integer.parseInt(fields[5])));
+                    Integer.parseInt(fields[5]),
+                    kind,
+                    fields.length == 8 ? fields[7] : ""));
         }
 
         boolean windowClosed(Game game) {
@@ -116,6 +146,8 @@ public class Hostility {
     }
 
     private static final Map<String, Map<String, Double>> LAST_ASSETS = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, Set<String>>> LAST_HANDS = new ConcurrentHashMap<>();
+    private static final String HAND = "+";
 
     public static double amount(Game game, Player victim, Player offender) {
         return totals(game).getOrDefault(pair(offender.getFaction(), victim.getFaction()), 0.0);
@@ -169,21 +201,27 @@ public class Hostility {
         Map<String, Double> assets = assetsNow(game);
         Map<String, Double> before = LAST_ASSETS.getOrDefault(game.getName(), assets);
         LAST_ASSETS.put(game.getName(), assets);
+        Map<String, Set<String>> hands = handsNow(game);
+        Map<String, Set<String>> handsBefore = LAST_HANDS.getOrDefault(game.getName(), hands);
+        LAST_HANDS.put(game.getName(), hands);
         Set<String> seen = seenPresence(game);
         List<Presence> presence = presence(game).stream()
                 .filter(found -> !seen.contains(found.key()))
                 .toList();
         int processed = processedCards(game);
         int targets = processed(game, TARGETS_KEY);
-        CardScan scan = scanCards(game, processed, targets, before);
+        CardScan scan = scanCards(game, processed, targets, before, handsBefore);
         List<Pending> waiting = new ArrayList<>(pending(game));
         waiting.addAll(scan.pending());
         List<Cost> impacts = new ArrayList<>();
         List<Pending> still = new ArrayList<>();
         for (Pending open : waiting) {
-            double loss = open.before() - assets.getOrDefault(open.victim(), open.before());
-            if (loss >= MIN_IMPACT) impacts.add(new Cost(open.offender(), open.victim(), loss));
-            else if (!open.windowClosed(game)) still.add(open);
+            Optional<Double> settled = settle(game, open, assets, hands);
+            if (settled.isPresent()) {
+                if (settled.get() > 0) impacts.add(new Cost(open.offender(), open.victim(), settled.get()));
+            } else {
+                still.add(open);
+            }
         }
         boolean pendingChanged = !still.equals(pending(game));
         boolean cardsMoved = scan.processed() != processed || scan.targets() != targets;
@@ -207,6 +245,57 @@ public class Hostility {
 
     public static void forget(String gameName) {
         LAST_ASSETS.remove(gameName);
+        LAST_HANDS.remove(gameName);
+    }
+
+    private static Optional<Double> settle(
+            Game game, Pending open, Map<String, Double> assets, Map<String, Set<String>> hands) {
+        return switch (open.kind()) {
+            case ASSETS -> {
+                double loss = open.before() - assets.getOrDefault(open.victim(), open.before());
+                if (loss >= MIN_IMPACT) yield Optional.of(loss * share(open.detail()));
+                yield open.windowClosed(game) ? Optional.of(0.0) : Optional.empty();
+            }
+            case SPY -> {
+                Set<String> lost = new LinkedHashSet<>(List.of(StringUtils.split(open.detail(), HAND)));
+                lost.removeAll(hands.getOrDefault(open.victim(), Set.of()));
+                if (!lost.isEmpty()) yield Optional.of(stolenValue(game, open.victim(), lost));
+                yield open.windowClosed(game) ? Optional.of(0.0) : Optional.empty();
+            }
+            case ASSASSINATION -> assassination(game, open);
+        };
+    }
+
+    private static double share(String detail) {
+        return NumberUtils.isCreatable(detail) ? Double.parseDouble(detail) : 1.0;
+    }
+
+    private static double stolenValue(Game game, String victim, Set<String> lost) {
+        Player owner = game.getPlayerFromColorOrFaction(victim);
+        if (owner == null) return 0;
+        return lost.stream()
+                .mapToDouble(alias -> Math.max(0, ActionCardValue.keepValue(game, owner, alias)))
+                .max()
+                .orElse(0);
+    }
+
+    private static Optional<Double> assassination(Game game, Pending open) {
+        if (!open.detail().equals(PromisedVotes.agendaKey(game))) return Optional.of(0.0);
+        Player victim = game.getPlayerFromColorOrFaction(open.victim());
+        if (victim == null) return Optional.of(0.0);
+        OptionalDouble loss = AssassinationCost.whenVotesAreIn(game, victim);
+        if (loss.isEmpty()) return Optional.empty();
+        return Optional.of(loss.getAsDouble() >= MIN_ASSASSINATION_LOSS ? loss.getAsDouble() : 0.0);
+    }
+
+    private static Map<String, Set<String>> handsNow(Game game) {
+        Map<String, Set<String>> hands = new LinkedHashMap<>();
+        for (Player player : game.getRealPlayers()) {
+            hands.put(
+                    player.getFaction(),
+                    new LinkedHashSet<>(player.getActionCards().keySet()));
+        }
+        return hands;
     }
 
     private static Map<String, Double> assetsNow(Game game) {
@@ -278,7 +367,8 @@ public class Hostility {
                 .anyMatch(planet -> BoardView.count(planet, player, UnitType.Spacedock) > 0);
     }
 
-    private static CardScan scanCards(Game game, int processed, int targets, Map<String, Double> before) {
+    private static CardScan scanCards(
+            Game game, int processed, int targets, Map<String, Double> before, Map<String, Set<String>> hands) {
         List<Cost> found = new ArrayList<>();
         List<Pending> waiting = new ArrayList<>();
         List<GameStats.ActionCardTarget> aimed = game.getGameStats().getActionCardTargets();
@@ -294,16 +384,37 @@ public class Hostility {
                 continue;
             }
             double was = before.getOrDefault(victim.getFaction(), PlayerAssets.value(game, victim));
+            Kind kind = kindOf(target.getActionCard());
+            String detail = switch (kind) {
+                case SPY ->
+                    String.join(
+                            HAND,
+                            hands.getOrDefault(
+                                    victim.getFaction(), victim.getActionCards().keySet()));
+                case ASSASSINATION -> PromisedVotes.agendaKey(game);
+                case ASSETS ->
+                    IMPACT_SHARE.containsKey(target.getActionCard())
+                            ? String.valueOf(IMPACT_SHARE.get(target.getActionCard()))
+                            : "";
+            };
             waiting.add(new Pending(
                     player.getFaction(),
                     victim.getFaction(),
                     was,
                     game.getGameStats().getActionCardPlays().size(),
                     StringUtils.defaultString(game.getActivePlayerID()),
-                    game.getRound()));
+                    game.getRound(),
+                    kind,
+                    detail));
         }
         int scanned = scanSabotage(game, processed, found);
         return new CardScan(found, waiting, scanned, aimed.size());
+    }
+
+    private static Kind kindOf(String card) {
+        if (SPY.equals(card)) return Kind.SPY;
+        if (ASSASSINATE.equals(card)) return Kind.ASSASSINATION;
+        return Kind.ASSETS;
     }
 
     private static int scanSabotage(Game game, int processed, List<Cost> found) {

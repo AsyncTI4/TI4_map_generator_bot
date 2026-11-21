@@ -125,17 +125,58 @@ class HostilityTest extends BaseTi4Test {
         assertThat(Hostility.pending(test.game)).isEmpty();
     }
 
-    // Assassinate Representative takes votes and Spy takes a card, neither of which shows in the target's assets, so
-    // they cost a set amount: 1 TG for the votes (the user's Public Execution value) and an average card.
+    // The user's rule (2026-11-21): Spy costs what was stolen. Stealing Overrule from Nekro costs Sol more than
+    // stealing Diplomatic Pressure would.
     @Test
-    void votesAndCardsCostASetAmount() {
+    void spyCostsWhatWasStolen() {
+        double overrule = stolen("overrule");
+        double pressure = stolen("dp1");
+
+        assertThat(overrule).isPositive();
+        assertThat(overrule).isGreaterThan(pressure);
+    }
+
+    private static double stolen(String alias) {
         AiTestGame test = AiTestGame.withSolAi();
-        test.game.getGameStats().recordAcTarget("Assassinate Representative", test.sol, test.nekro);
-        test.game.getGameStats().recordAcTarget("Spy", test.sol, test.nekro);
+        test.isActive(test.sol, "action");
+        test.nekro.setActionCard(alias, 1);
+        test.nekro.setActionCard("sabo1", 2);
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.SPY, test.sol, test.nekro);
+        Hostility.record(test.game);
+        assertThat(Hostility.pending(test.game)).hasSize(1);
+
+        test.nekro.removeActionCard(1);
+        test.sol.setActionCard(alias, 3);
+        Hostility.record(test.game);
+        assertThat(Hostility.pending(test.game)).isEmpty();
+        return Hostility.amount(test.game, test.nekro, test.sol);
+    }
+
+    // Assassinate Representative waits for the votes; if the agenda moves on before they are in, it cost nothing.
+    @Test
+    void anAssassinationIsJudgedOnItsAgenda() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo("Directive_Elect Player_7_execution");
+        test.game.getGameStats().recordAcTarget(Hostility.ASSASSINATE, test.sol, test.nekro);
+        Hostility.record(test.game);
+        assertThat(Hostility.pending(test.game)).hasSize(1);
+
+        test.game.setCurrentAgendaInfo("Law_Elect Player_8_minister_war");
+        Hostility.record(test.game);
+        assertThat(Hostility.pending(test.game)).isEmpty();
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isZero();
+    }
+
+    // Ancient Burial Sites costs a set 0.5 TG.
+    @Test
+    void ancientBurialSitesCostsHalfATradeGood() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.game.getGameStats().recordAcTarget("Ancient Burial Sites", test.sol, test.nekro);
 
         Hostility.record(test.game);
-        assertThat(Hostility.amount(test.game, test.nekro, test.sol))
-                .isCloseTo(1 + ti4.ai.actioncards.ActionCardPrior.AVERAGE_CARD, within(CLOSE));
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isCloseTo(0.5, within(CLOSE));
     }
 
     // Combat cards are part of the fight, not hostility of their own.
@@ -203,5 +244,26 @@ class HostilityTest extends BaseTi4Test {
         assertThat(Hostility.amount(test.game, test.nekro, test.sol))
                 .isCloseTo(
                         ti4.ai.eval.ValueScale.spendable(wellon.getResources(), wellon.getInfluence()), within(CLOSE));
+    }
+
+    // The user's value (2026-11-21): Reparations costs half of what the planet it exhausts was worth to spend.
+    @Test
+    void reparationsCostsHalfTheExhaustedPlanet() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        test.place("19", "311");
+        test.nekro.addPlanet("wellon");
+        test.nekro.refreshPlanet("wellon");
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget("Reparations", test.sol, test.nekro);
+        Hostility.record(test.game);
+        test.nekro.exhaustPlanet("wellon");
+
+        Hostility.record(test.game);
+        ti4.game.Planet wellon = test.game.getPlanetsInfo().get("wellon");
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol))
+                .isCloseTo(
+                        0.5 * ti4.ai.eval.ValueScale.spendable(wellon.getResources(), wellon.getInfluence()),
+                        within(CLOSE));
     }
 }
