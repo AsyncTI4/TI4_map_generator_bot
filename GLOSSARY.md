@@ -506,21 +506,6 @@ _Avoid_: AFB
 **Sustain damage**:
 A unit ability to absorb one hit and flip to a damaged state instead of being destroyed.
 
-**Hit source**:
-What produced the hits a Player is assigning: space combat, ground combat, Anti-fighter barrage, Space cannon, Bombardment, or another ability. It decides which units can be hit, and so which can use Sustain damage (LRR 87.4a).
-_Avoid_: Assign type (the bot's internal button string)
-
-**Sustain suppressor**:
-An effect that stops a unit from using Sustain damage where it applies, such as the Mentak flagship, the Quietus or Publicize Weapon Schematics. A suppressor beats a Granted sustain.
-_Avoid_: Sustain blocker
-
-**Granted sustain**:
-Sustain damage a unit may use here although its printed card does not give it, or would not let it be hit here, such as Metali Void Shielding or a Quantum Manipulator covering ships. Persistent grants from technologies count as printed.
-_Avoid_: Temporary sustain, bonus sustain
-
-**Sustain immunity**:
-An effect that keeps a unit's Sustain damage against suppressors that take unit abilities away, such as Veiled Networking (Star). It does not help against effects that only say a unit "cannot use" Sustain damage.
-
 **Capture**:
 Taking an opposing unit out of play to the capturing Player's faction sheet instead of destroying it, so its owner cannot use it until it is returned.
 
