@@ -26,6 +26,7 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
@@ -235,6 +236,12 @@ public class AddPlanetService {
                     if (player_.isRealPlayer()) {
                         alreadyOwned = true;
                         previousOwner = player_;
+                    }
+                    if ("garbozia".equalsIgnoreCase(planet)
+                            && !ActionCardHelper.getGarboziaActionCards(game).isEmpty()) {
+                        ActionCardHelper.clearActionCardPresets(
+                                game,
+                                ActionCardHelper.getGarboziaActionCards(game).keySet());
                     }
                     if (player_.hasAbility("planetary_reconfiguration")) {
                         TaAbilityHandler.returnPlanetaryReconfigurationDesigns(player_, game, unitHolder);

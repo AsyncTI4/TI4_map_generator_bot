@@ -49,6 +49,7 @@ import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
@@ -491,7 +492,10 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_ghotiagent", "Use Ghoti Agent", FactionEmojis.ghoti));
         }
         if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
-            FactionEmojis f = FactionEmojis.Cabal;
+            TI4Emoji f = null;
+            if ("cabal".equalsIgnoreCase(player.getFaction())) {
+                f = FactionEmojis.Cabal;
+            }
             if (player.hasAbility("mark_of_pharadn")) {
                 f = FactionEmojis.pharadn;
             }
@@ -501,7 +505,11 @@ public class CardsInfoService {
             if (player.hasAbility("shroud_of_lith")) {
                 f = FactionEmojis.kollecc;
             }
-            buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", f));
+            if (f == null) {
+                buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units"));
+            } else {
+                buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", f));
+            }
         }
         if (player.hasRelicReady("e6-g0_network")) {
             buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw Action Card"));

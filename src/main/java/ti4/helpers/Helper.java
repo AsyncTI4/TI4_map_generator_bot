@@ -3162,7 +3162,8 @@ public final class Helper {
                                         tile.getUnitHolders().get("space"))
                                 == 0
                         && !hasRallyingCryProduction
-                        && !canProduceParturitionStructure) {
+                        && !canProduceParturitionStructure
+                        && !TheodisiLegendaryButtonHandler.hasRemoteFactoryProduction(game, player, tile)) {
                     continue;
                 }
 
