@@ -19,6 +19,9 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.testUtils.BaseTi4Test;
 
 class ButtonHelperModifyUnitsTest extends BaseTi4Test {
@@ -562,7 +565,8 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
     void testUnitCanSustainDamage_WarSun_WithoutSchematics() {
         Player player = createPlayerWithDuraniumArmor(game, "red");
 
-        assertTrue(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("warsun")));
+        assertTrue(SustainEligibility.canSustain(
+                SustainContext.of(game, player, tile, null, HitSource.ABILITY), Mapper.getUnit("warsun")));
     }
 
     @Test
@@ -570,9 +574,11 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         Player player = createPlayerWithDuraniumArmor(game, "red");
         game.addLaw("schematics", null);
 
-        assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("warsun")));
+        assertFalse(SustainEligibility.canSustain(
+                SustainContext.of(game, player, tile, null, HitSource.ABILITY), Mapper.getUnit("warsun")));
         // Schematics only affects war suns
-        assertTrue(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("dreadnought")));
+        assertTrue(SustainEligibility.canSustain(
+                SustainContext.of(game, player, tile, null, HitSource.ABILITY), Mapper.getUnit("dreadnought")));
     }
 
     @Test
@@ -580,7 +586,8 @@ class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         Player player = createPlayerWithDuraniumArmor(game, "red");
 
         // Homebrew war suns like Sentinel I have no SUSTAIN DAMAGE; the war sun base type alone must not grant it
-        assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("archon_warsun")));
+        assertFalse(SustainEligibility.canSustain(
+                SustainContext.of(game, player, tile, null, HitSource.ABILITY), Mapper.getUnit("archon_warsun")));
     }
 
     @Test

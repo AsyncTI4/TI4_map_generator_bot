@@ -30,6 +30,9 @@ import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.fog.FogSecretHooks;
@@ -250,8 +253,11 @@ class AssignHitsButtonHandlers {
                                     ? " on " + holder.getRepresentation(game)
                                     : " in tile " + tile.getRepresentationForButtons(game, player))
                             + ".";
-                    boolean cancelsTwoHits = ButtonHelper.doesSustainCancelTwoHits(player, sustainedUnit);
-                    if ("spacecombat".equals(getAssignHitsType(game, player))) {
+                    String assignHitsType = getAssignHitsType(game, player);
+                    SustainContext sustainContext =
+                            SustainContext.of(game, player, tile, holder, HitSource.fromAssignHitsType(assignHitsType));
+                    boolean cancelsTwoHits = SustainEligibility.hitsCancelled(sustainContext, sustainedUnit) == 2;
+                    if ("spacecombat".equals(assignHitsType)) {
                         VanguardUnitHandler.recordSpaceCombatHitAssignment(
                                 game, player, tile, cancelsTwoHits ? amt * 2 : amt);
                     }
@@ -261,7 +267,6 @@ class AssignHitsButtonHandlers {
                                 : "the Ultimate Evolution III (the Kryxos flagship)";
                         msg += "\n> These SUSTAIN DAMAGE uses cancel 2 hits due to " + sustainSource + ".";
                     }
-                    String assignHitsType = getAssignHitsType(game, player);
                     if ("spacecombat".equals(assignHitsType) || "groundcombat".equals(assignHitsType)) {
                         MirrorShieldingLLButtonHandler.recordCancelledHits(
                                 game, player, tile, cancelsTwoHits ? amt * 2 : amt);

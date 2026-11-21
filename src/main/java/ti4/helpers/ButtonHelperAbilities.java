@@ -1376,14 +1376,6 @@ public final class ButtonHelperAbilities {
                                 && FoWHelper.playerHasShipsInSystem(other, activeSystem));
     }
 
-    public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
-        if (player.hasTech("dsxinystar")) return false;
-        return game.getRealPlayersNNeutral().stream()
-                .anyMatch(other -> other != player
-                        && other.hasRelic("superweaponglatison")
-                        && tile == getLocationOfSuperweapon(game, "glatison"));
-    }
-
     @ButtonHandler("exhaustSuperweapon_")
     public static void exhaustSuperweapon(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String name = buttonID.split("_")[1];

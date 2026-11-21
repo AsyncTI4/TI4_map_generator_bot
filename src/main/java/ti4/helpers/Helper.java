@@ -93,7 +93,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
-import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -2557,7 +2556,7 @@ public final class Helper {
                 && !ignoreScar) {
             return 0;
         }
-        if (TeHelperUnits.affectedByQuietus(game, player, tile)) {
+        if (XinTechHandler.isAffectedByQuietus(game, player, tile)) {
             return 0;
         }
         if (game.isTwilightsFallMode() && !XinTechHandler.hasVeiledNetworkingStar(player)) {

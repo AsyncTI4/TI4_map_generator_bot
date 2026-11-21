@@ -543,9 +543,8 @@ public class MonumentsBRButtonHandler {
                                 && tile == MonumentsService.getMonumentTile(game, player, "belkosea_monument"));
     }
 
-    public static boolean removesSustainDamage(Game game, Player player, Tile tile) {
-        return !player.hasTech("dsxinystar")
-                && game != null
+    public static boolean armageddonProjectGlatisonCovers(Game game, Player player, Tile tile) {
+        return game != null
                 && game.getRealPlayersNNeutral().stream()
                         .anyMatch(other -> other != player
                                 && hasArmageddonProjectSuperweapon(game, other, "superweaponglatison")

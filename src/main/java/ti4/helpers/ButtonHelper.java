@@ -80,7 +80,6 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.scrap
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.stoneborn.StonebornUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
-import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisAbilityHandler;
@@ -96,7 +95,6 @@ import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonH
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
-import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
 import ti4.discord.interactions.buttons.ids.AgentButtonIds;
@@ -159,6 +157,9 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.combat.CombatStatsService;
 import ti4.service.combat.CombatUnitSelectionHelper;
 import ti4.service.combat.SpaceCannonOffenceWindow;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.service.decks.ShowActionCardsService;
 import ti4.service.draft.PlayerSetupService;
 import ti4.service.draft.PlayerSetupState;
@@ -1846,7 +1847,7 @@ public class ButtonHelper {
                     "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) do not work in an entropic scar.");
         }
 
-        if (!game.isFowMode() && TeHelperUnits.affectedByQuietus(game, player, activeSystem)) {
+        if (!game.isFowMode() && XinTechHandler.isAffectedByQuietus(game, player, activeSystem)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the Quietus (the Rebellion flagship) is in an active Breach.");
@@ -3099,13 +3100,12 @@ public class ButtonHelper {
                             || ("space".equalsIgnoreCase(type) && removedUnit.getIsGroundForce())) {
                         continue;
                     }
-                    int sustain = 0;
-                    if (removedUnit.getSustainDamage()) {
-                        sustain = 1;
-                        if (doesSustainCancelTwoHits(player, removedUnit)) {
-                            sustain = 2;
-                        }
-                    }
+                    SustainContext sustainContext =
+                            SustainContext.of(player.getGame(), player, tile, uh, HitSource.ABILITY);
+                    int sustain =
+                            removedUnit.getSustainDamage() && SustainEligibility.canSustain(sustainContext, removedUnit)
+                                    ? SustainEligibility.hitsCancelled(sustainContext, removedUnit)
+                                    : 0;
 
                     int totalUnits = uh.getUnitCount(unit);
                     int undamagedUnits = totalUnits - uh.getDamagedUnitCount(unit);
@@ -3115,14 +3115,6 @@ public class ButtonHelper {
             }
         }
         return count;
-    }
-
-    public static boolean doesSustainCancelTwoHits(Player player, UnitModel unitModel) {
-        return player != null
-                && (player.hasTech("nes")
-                        || (player.ownsUnit("kryxos_flagship3")
-                                && unitModel != null
-                                && unitModel.getUnitType() == UnitType.Flagship));
     }
 
     public static int howManyDifferentDebtPlayerHas(Player player) {
@@ -7546,21 +7538,21 @@ public class ButtonHelper {
                 || player.hasUnit("naaz_voltron")
                 || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                 || doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile);
+        HitSource hitSource = HitSource.fromAssignHitsType(type);
+        boolean sustainAllowed =
+                !"courageouscombat".equalsIgnoreCase(type) && !"assaultcannoncombat".equalsIgnoreCase(type);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet && (spaceCombatish || afb) && !groundForcesFightInSpace) {
                 continue;
             } else if (unitHolder instanceof Space && "groundcombat".equalsIgnoreCase(type)) {
                 continue;
             }
+            SustainContext sustainContext = SustainContext.of(game, player, tile, unitHolder, hitSource);
 
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) continue;
-                if (combat) {
-                    unitModel = PonthousUnitHandler.injectTemporaryFighterSustain(game, player, tile, unitModel);
-                    unitModel = VanguardUnitHandler.injectBulwarkSustain(game, player, tile, unitKey, unitModel);
-                }
                 if (unitModel.getUnitType() == UnitType.Infantry
                         && spaceCombatish
                         && (player.hasUnit("purpletf_mech") || player.hasUnit("naaz_voltron"))) {
@@ -7578,16 +7570,12 @@ public class ButtonHelper {
                 }
                 boolean canBeHit =
                         !afb || unitModel.getIsShip() || (groundForcesFightInSpace && unitModel.getIsGroundForce());
-                if (!canBeHit && !canCancelAntiFighterBarrageHitOnShips(game, player, unitHolder, unitKey)) {
+                boolean canDamage = sustainAllowed && SustainEligibility.canSustain(sustainContext, unitModel);
+                if (!canBeHit && !canDamage) {
                     continue;
                 }
 
                 // All sustain damage buttons for all states
-                boolean canDamage = !"courageouscombat".equalsIgnoreCase(type)
-                        && !"assaultcannoncombat".equalsIgnoreCase(type)
-                        && !ThurvialiUnitHandler.isStructureUnitAbilitySuppressed(player, unitHolder, unitModel)
-                        && (unitCanSustainDamage(game, player, tile, unitModel)
-                                || VanguardUnitHandler.hasBulwarkSustain(game, player, tile, unitKey));
                 for (UnitState state : UnitState.values()) {
                     if (state.isDamaged() || !canDamage) continue;
                     int max = Math.min(oneButtonPerUnit ? 1 : 2, unitHolder.getUnitCountForState(unitKey, state));
@@ -7630,37 +7618,6 @@ public class ButtonHelper {
         buttons.add(Buttons.blue("deleteButtons", "Done Removing/Sustaining Units"));
         if (buttons.size() >= 24 && !limitOne) return null;
         return buttons;
-    }
-
-    private static boolean canCancelAntiFighterBarrageHitOnShips(
-            Game game, Player player, UnitHolder unitHolder, UnitKey unitKey) {
-        return unitHolder instanceof Space
-                && unitKey.unitType() == UnitType.Mech
-                && player.hasUnit("nomad_mech")
-                && !isLawInPlay(game, "articles_war");
-    }
-
-    public static boolean unitCanSustainDamage(Game game, Player player, Tile tile, UnitModel unitModel) {
-        String unitBaseType = unitModel.getBaseType();
-        return !ButtonHelperAbilities.removesSustainDamage(game, player, tile)
-                && !MonumentsBRButtonHandler.removesSustainDamage(game, player, tile)
-                && !("warsun".equalsIgnoreCase(unitBaseType) && isLawInPlay(game, "schematics"))
-                && (unitModel.getSustainDamage()
-                        || ("mech".equalsIgnoreCase(unitBaseType)
-                                && !isLawInPlay(game, "articles_war")
-                                && player.hasUnit("nomad_mech"))
-                        || ("mech".equalsIgnoreCase(unitBaseType)
-                                && (player.ownsUnit("purpletf_mech")
-                                        || player.hasUnit("naaz_voltron")
-                                        || doesPlayerHaveFSHere("nekro_flagship", player, tile)
-                                        || doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile)))
-                        || (!player.isActivePlayer()
-                                && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
-                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
-                        || (doesPlayerHaveFSHere("khrask_flagship", player, tile)
-                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
-                        || (player.hasRelic("metalivoidshielding")
-                                && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase())));
     }
 
     @ButtonHandler("startThalnos_")

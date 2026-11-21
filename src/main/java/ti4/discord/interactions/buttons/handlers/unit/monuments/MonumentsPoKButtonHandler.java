@@ -29,6 +29,9 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.UnitModel;
 import ti4.service.abilities.MahactTokenService;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.game.MonumentsService;
 import ti4.service.unit.AddUnitService;
@@ -77,7 +80,8 @@ public class MonumentsPoKButtonHandler {
                         UnitModel unit = targetPlayer.getUnitFromUnitKey(unitKey);
                         return unit != null
                                 && unit.getIsShip()
-                                && ButtonHelper.unitCanSustainDamage(game, targetPlayer, tile, unit);
+                                && SustainEligibility.canSustain(
+                                        SustainContext.of(game, targetPlayer, tile, null, HitSource.ABILITY), unit);
                     });
             if (!hasSustainDamageShip) {
                 continue;
@@ -123,7 +127,8 @@ public class MonumentsPoKButtonHandler {
             UnitModel unit = targetPlayer.getUnitFromUnitKey(unitKey);
             if (unit == null
                     || !unit.getIsShip()
-                    || !ButtonHelper.unitCanSustainDamage(game, targetPlayer, tile, unit)) {
+                    || !SustainEligibility.canSustain(
+                            SustainContext.of(game, targetPlayer, tile, null, HitSource.ABILITY), unit)) {
                 continue;
             }
 

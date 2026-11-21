@@ -30,6 +30,9 @@ import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatStatsService;
 import ti4.service.combat.CombatUnitSelectionHelper;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -132,11 +135,10 @@ public class LazaxCombatSupport {
             CombatStatsService.CombatRoundProfile combatProfile =
                     CombatStatsService.getCombatRoundProfile(true, unitModel, player, tile, opponent);
             expectedHits += computeExpectedHits(totalUnits * combatProfile.diceCount(), combatProfile.hitsOn());
-            if (unitModel.getSustainDamage(player, space)) {
-                hp += undamagedUnits;
-                if (player.hasTech("nes")) {
-                    hp += undamagedUnits;
-                }
+            SustainContext sustainContext =
+                    SustainContext.of(player.getGame(), player, tile, space, HitSource.SPACE_COMBAT);
+            if (unitModel.getSustainDamage() && SustainEligibility.canSustain(sustainContext, unitModel)) {
+                hp += undamagedUnits * SustainEligibility.hitsCancelled(sustainContext, unitModel);
             }
         }
         return new FleetStrength(total, hp, expectedHits);

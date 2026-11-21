@@ -22,6 +22,9 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -293,7 +296,10 @@ public class AeternaTechHandler {
                     + "_"
                     + combatRound;
 
-            if (!state.isDamaged() && ButtonHelper.unitCanSustainDamage(game, targetPlayer, tile, targetUnitModel)) {
+            if (!state.isDamaged()
+                    && SustainEligibility.canSustain(
+                            SustainContext.of(game, targetPlayer, tile, combatHolder, HitSource.ABILITY),
+                            targetUnitModel)) {
                 buttons.add(Buttons.gray(idBase + "_sustain", "Sustain " + unitType.humanReadableName()));
             }
 
@@ -379,7 +385,10 @@ public class AeternaTechHandler {
         }
 
         if (sustain) {
-            if (state.isDamaged() || !ButtonHelper.unitCanSustainDamage(game, targetPlayer, tile, targetUnitModel)) {
+            if (state.isDamaged()
+                    || !SustainEligibility.canSustain(
+                            SustainContext.of(game, targetPlayer, tile, combatHolder, HitSource.ABILITY),
+                            targetUnitModel)) {
                 ButtonHelper.deleteMessage(event);
                 return;
             }
