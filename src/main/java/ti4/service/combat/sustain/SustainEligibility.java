@@ -21,10 +21,10 @@ public class SustainEligibility {
         boolean granted = false;
         for (SustainRule rule : SustainCatalogs.rules()) {
             switch (rule.evaluate(context, unit)) {
-                case IMMUNE -> immunities.add(rule);
-                case SUPPRESS -> suppressors.add(rule);
-                case GRANT -> granted = true;
-                case ABSTAIN -> {}
+                case CANCEL -> immunities.add(rule);
+                case LOSE -> suppressors.add(rule);
+                case GAIN -> granted = true;
+                case INELIGIBLE -> {}
             }
         }
         boolean suppressed = suppressors.stream()

@@ -14,7 +14,7 @@ record ConditionalSustainRule(
 
     @Override
     public SustainVerdict evaluate(SustainContext context, UnitModel unit) {
-        return when.test(context, unit) ? verdict : SustainVerdict.ABSTAIN;
+        return when.test(context, unit) ? verdict : SustainVerdict.INELIGIBLE;
     }
 
     @Override

@@ -19,19 +19,19 @@ public interface SustainRule {
     }
 
     static SustainRule suppressor(String id, BiPredicate<SustainContext, UnitModel> when) {
-        return new ConditionalSustainRule(id, SustainVerdict.SUPPRESS, when, false, suppressor -> false);
+        return new ConditionalSustainRule(id, SustainVerdict.LOSE, when, false, suppressor -> false);
     }
 
     static SustainRule abilityLoss(String id, BiPredicate<SustainContext, UnitModel> when) {
-        return new ConditionalSustainRule(id, SustainVerdict.SUPPRESS, when, true, suppressor -> false);
+        return new ConditionalSustainRule(id, SustainVerdict.LOSE, when, true, suppressor -> false);
     }
 
     static SustainRule grant(String id, BiPredicate<SustainContext, UnitModel> when) {
-        return new ConditionalSustainRule(id, SustainVerdict.GRANT, when, false, suppressor -> false);
+        return new ConditionalSustainRule(id, SustainVerdict.GAIN, when, false, suppressor -> false);
     }
 
     static SustainRule immunity(
             String id, BiPredicate<SustainContext, UnitModel> when, Predicate<SustainRule> shieldsFrom) {
-        return new ConditionalSustainRule(id, SustainVerdict.IMMUNE, when, false, shieldsFrom);
+        return new ConditionalSustainRule(id, SustainVerdict.CANCEL, when, false, shieldsFrom);
     }
 }
