@@ -1918,17 +1918,35 @@ public class CombatRollService {
                 }
             }
             int ogNumOfUnit = numOfUnit;
+            int classifiedWeaponsRolls = CombatModHelper.getCombinedModifierForUnit(
+                    unitModel,
+                    ogNumOfUnit,
+                    availableExtraRolls.stream()
+                            .filter(m ->
+                                    "classifiedWeapons".equals(m.getModifier().getScope()))
+                            .toList(),
+                    player,
+                    opponent,
+                    game,
+                    playerUnitsList,
+                    rollType,
+                    activeSystem,
+                    perUnitHolder);
+            int selectedUnitExtraRolls = selectedUnitExtraRolls(ogNumOfUnit, extraRollsForUnit, classifiedWeaponsRolls);
             for (String singleUnit : singleUnitUse) {
                 int numRolls = (ogNumOfUnit * numRollsPerUnit) + extraRollsForUnit;
+                int segmentExtraRolls = extraRollsForUnit;
                 if ("singleUnit".equals(singleUnit)) {
-                    numRolls = numRollsPerUnit + Math.min(1, extraRollsForUnit);
+                    numRolls = numRollsPerUnit + selectedUnitExtraRolls;
+                    segmentExtraRolls = selectedUnitExtraRolls;
                     modifierToHit += letnevBTBoost;
                     numOfUnit = 1;
                 }
                 if ("RestOfUnits".equals(singleUnit)) {
                     modifierToHit -= letnevBTBoost;
                     numOfUnit = ogNumOfUnit - 1;
-                    numRolls -= numRollsPerUnit + Math.min(1, extraRollsForUnit);
+                    numRolls -= numRollsPerUnit + selectedUnitExtraRolls;
+                    segmentExtraRolls = extraRollsForUnit - selectedUnitExtraRolls;
                 }
                 if (numRolls < 1) {
                     continue;
@@ -2273,7 +2291,7 @@ public class CombatRollService {
                         modifierToHit,
                         numOfUnit,
                         numRollsPerUnit,
-                        extraRollsForUnit,
+                        segmentExtraRolls,
                         resultRolls,
                         hitRolls,
                         holderLabel,
@@ -2285,7 +2303,7 @@ public class CombatRollService {
                         modifierToHit,
                         numOfUnit,
                         numRollsPerUnit,
-                        extraRollsForUnit,
+                        segmentExtraRolls,
                         segmentType,
                         resultRolls,
                         hitRolls,
@@ -3599,6 +3617,14 @@ public class CombatRollService {
             splitUnits.merge(new ImmutablePair<>(damagedUnit, holder), damagedCount, Integer::sum);
         }
         return splitUnits;
+    }
+
+    static int selectedUnitExtraRolls(int unitCount, int extraRolls, int classifiedWeaponsRolls) {
+        if (unitCount <= 1) {
+            return extraRolls;
+        }
+        int otherExtraRolls = extraRolls - classifiedWeaponsRolls;
+        return classifiedWeaponsRolls + Math.min(1, Math.max(0, otherExtraRolls));
     }
 
     record MergeResult(Map<Pair<UnitModel, UnitHolder>, Integer> units, Set<String> divergingModels) {}
