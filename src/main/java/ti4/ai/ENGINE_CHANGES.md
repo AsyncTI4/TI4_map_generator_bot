@@ -106,15 +106,15 @@ identifiers (`nextInt(1000)` / `nextInt(100)` in `Game` and `Player`) and draft/
 `RandomHelper.current()`.
 **Effect on human games:** none in distribution: on a production thread nothing is seeded, so `current()` is
 `ThreadLocalRandom.current()` exactly as before.
-**Limitations:** not every game-relevant draw goes through it. Still unseeded in `HEAD`: `AgendaWhensAftersHelper`
-`offerEveryonePrepassOnShenanigans` (`ThreadLocalRandom.current().nextInt(0, 6)`, decides whether a player without
-shenanigans is pre-passed), `AuctionFrankenDraftService` (`Math.random()` and one one-argument `Collections.shuffle`,
-Franken only), one-argument `Collections.shuffle` calls in `SecretObjectiveDeckService.shuffleIntoDeck` and
-`SecretsOnlyService` (secrets-only mode), `TheodisiAgendaResolver` and `IxthLegendaryButtonHandler` (homebrew) and
-`TileEmojis` (cosmetic), the joke texts in `TransactionHelper` (a `static final` list built at class load),
-`PlanetEmojis`/`TI4Emoji` (emoji), `RenderRandom` (map rendering), `TournamentGrouper` (its own seeded `Random`) and
-`TournamentPanelGroups` (`SecureRandom` seeds). Apart from `TransactionHelper` (changed only for
-`acceptTransactionOffer`), none of these files is in the diff; the draws are the same on `origin/master`.
+Since 2026-11-20 the shenanigans pre-pass draw in `AgendaWhensAftersHelper.offerEveryonePrepassOnShenanigans` and the
+secret-deck shuffles in `SecretObjectiveDeckService.shuffleIntoDeck` and `SecretsOnlyService` (secrets-only mode) go
+through it too; the pre-pass draw had made every seeded game diverge at its first agenda (`DeterminismSelfPlayTest`).
+**Limitations:** still unseeded in `HEAD`: `AuctionFrankenDraftService` (`Math.random()` and one one-argument
+`Collections.shuffle`, Franken only), one-argument `Collections.shuffle` calls in `TheodisiAgendaResolver` and
+`IxthLegendaryButtonHandler` (homebrew) and `TileEmojis` (cosmetic), the joke texts in `TransactionHelper` (a
+`static final` list built at class load), `PlanetEmojis`/`TI4Emoji` (emoji), `RenderRandom` (map rendering),
+`TournamentGrouper` (its own seeded `Random`) and `TournamentPanelGroups` (`SecureRandom` seeds). The draws are the
+same on `origin/master`.
 
 ### Deterministic iteration order (combat roll, `Tile`)
 
@@ -538,10 +538,10 @@ rollout experiment that the seeding enables (`RolloutExperimentTest`, `Determini
   the one-argument `Collections.shuffle`, numeric ids for cards (`nextInt(1000)`, `nextInt(100)` with a retry loop
   on collision in `Game` and `Player`), draft, slice and map generation, random speaker/seat orders, and flavour texts
   chosen at use time.
-- Not routed: `AgendaWhensAftersHelper.offerEveryonePrepassOnShenanigans` (`ThreadLocalRandom.nextInt(0, 6)`, a player
-  without shenanigans is pre-passed unless the draw is 5), `AuctionFrankenDraftService` (`Math.random`, one
-  one-argument shuffle), one-argument `Collections.shuffle` in `SecretObjectiveDeckService.shuffleIntoDeck` and
-  `SecretsOnlyService` (secrets-only mode), `TheodisiAgendaResolver`, `IxthLegendaryButtonHandler` and `TileEmojis`,
+- Routed since 2026-11-20: the shenanigans pre-pass draw (a player without shenanigans is pre-passed unless the draw
+  is 5) and the secret-deck shuffles in `SecretObjectiveDeckService.shuffleIntoDeck` and `SecretsOnlyService`.
+- Not routed: `AuctionFrankenDraftService` (`Math.random`, one one-argument shuffle), one-argument
+  `Collections.shuffle` in `TheodisiAgendaResolver`, `IxthLegendaryButtonHandler` and `TileEmojis`,
   flavour texts built at class load in `TransactionHelper`, emoji pickers, `RenderRandom`, tournament grouping.
 - No softmax or temperature exists in this scope.
 
@@ -745,11 +745,11 @@ The self-play harness's own algorithms (determinizer, seeding, virtual clock, re
 
 ### Determinism is partial
 
-- Game-relevant randomness that bypasses `RandomHelper`: `AgendaWhensAftersHelper.offerEveryonePrepassOnShenanigans`
-  (`ThreadLocalRandom.current().nextInt(0, 6)`), `AuctionFrankenDraftService` (`Math.random()`), and one-argument
-  `Collections.shuffle` calls in `SecretObjectiveDeckService.shuffleIntoDeck`/`SecretsOnlyService` (secrets-only
-  mode), `TheodisiAgendaResolver` and `IxthLegendaryButtonHandler`. All exist on `origin/master` too. The first is called by `AgendaHelper.revealAgenda` for every agenda revealed outside an action (`!action`), once per
-  real player, so a seeded self-play game can still diverge there.
+- Game-relevant randomness that bypasses `RandomHelper`: `AuctionFrankenDraftService` (`Math.random()`) and
+  one-argument `Collections.shuffle` calls in `TheodisiAgendaResolver` and `IxthLegendaryButtonHandler` (Franken and
+  homebrew, which self-play does not reach). All exist on `origin/master` too. Until 2026-11-20 the shenanigans
+  pre-pass draw, called once per real player for every agenda revealed outside an action, was unseeded as well, so
+  every seeded self-play game diverged at its first agenda.
   `AI_PLAYER.md` ("every random draw the game makes goes through `RandomHelper.current()`") and commit `03b3a1812e`
   ("Every ThreadLocalRandom ... goes through it") are no longer exact.
 - Across JVMs, enum-keyed hash orders still differ (stated in `AI_PLAYER.md` and the commit message; a seed reproduced

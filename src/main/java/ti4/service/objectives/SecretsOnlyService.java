@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.discord.interactions.buttons.Buttons;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.SecretObjectiveModel;
@@ -196,7 +197,7 @@ public class SecretsOnlyService {
         }
         player.removeStoredValue(picksKey(tag));
         offered.forEach(game::addSOToGame);
-        Collections.shuffle(game.getSecretObjectives());
+        Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
         return true;
     }
 

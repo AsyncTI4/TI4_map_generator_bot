@@ -521,9 +521,9 @@ Ascendant, Xxekir Grom (4 planets, 4 TG).
    `CombatCardRules`; the SPACE CANNON DEFENSE cancel this branch adds is owned. The old PR description's "Still to do:
    _Shields Holding_, _Maneuvering Jets_" is likewise outdated.
 4. **"Every random draw the game makes goes through `RandomHelper.current()`"** (`AI_PLAYER.md`, Testing). The
-   shenanigans pre-pass draw in `AgendaWhensAftersHelper`, `Math.random` in `AuctionFrankenDraftService`, and the
-   one-argument `Collections.shuffle` calls left in `SecretObjectiveDeckService`, `SecretsOnlyService`,
-   `TheodisiAgendaResolver`, `IxthLegendaryButtonHandler`, `AuctionFrankenDraftService` and `TileEmojis` do not.
+   `Math.random` in `AuctionFrankenDraftService` and the one-argument `Collections.shuffle` calls left in
+   `TheodisiAgendaResolver`, `IxthLegendaryButtonHandler`, `AuctionFrankenDraftService` and `TileEmojis` do not (the
+   shenanigans pre-pass draw and the secret-deck shuffles were routed on 2026-11-20).
 5. **Relic fragment value "2 trade goods, 3 when it is the third of a kind, so a set of three is worth 7"**
    (`AI_PLAYER.md`, and `docs/ai/RELIC_REPORT.md` "2 per fragment, plus 1 for every relic it could purge"). Code
    (`FragmentValue.worth`): `RelicValue.BASE` (3.5) × (complete sets + 0.45 × pairs + 0.2 × singles), plus 2.0 for each of
