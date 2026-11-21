@@ -1,0 +1,418 @@
+package ti4.ai.trade;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static ti4.ai.AiTestGame.NOW;
+
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
+import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.AiSettings;
+import ti4.ai.AiTestGame;
+import ti4.ai.actioncards.AgendaCardRules;
+import ti4.ai.agenda.AgendaPolicy;
+import ti4.ai.agenda.DiscardBounties;
+import ti4.ai.agenda.DiscardBounties.Bounty;
+import ti4.ai.agenda.PromisedVotes;
+import ti4.ai.brain.AiDecision;
+import ti4.ai.brain.AiTurnContext;
+import ti4.ai.perception.AiPrompt;
+import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.promise.Promise;
+import ti4.ai.promise.PromiseBook;
+import ti4.game.Player;
+import ti4.helpers.AgendaHistory;
+import ti4.testUtils.BaseTi4Test;
+
+// Politics notes after the traced self-play (2026-11-12), "pay to kill a doomed loss": a seat that loses trade goods to
+// an agenda whatever it votes offers up to that much for a Veto (any holder) or a Quash (Xxcha), within the user's
+// bounty caps (Veto 1-3 TG, Quash 3-5 TG, pooled across payers). The holder counts the bounty when it decides to play,
+// and the payer pays once the card was played.
+//
+// The table: Economic Equality ("For": everyone returns their trade goods and gains 5). Sol (an AI) holds 12 trade
+// goods
+// and 2 votes; Xxcha (an AI) holds 6 votes and none of its own trade goods, so it carries For and Sol loses 7.
+class DiscardBountiesTest extends BaseTi4Test {
+
+    private static final String ECONOMIC_EQUALITY = "Directive_For/Against_7_economic_equality";
+    private static final String NEXT_AGENDA = "Law_Elect Player_8_minister_war";
+
+    private AiTestGame test;
+    private Player nekro;
+    private Player sol;
+    private Player xxcha;
+
+    @BeforeEach
+    void setUp() {
+        test = AiTestGame.withSolAi();
+        nekro = test.nekro;
+        sol = test.sol;
+        xxcha = test.addSeat("7100000555555555", "xxcha", "red");
+        test.game.setVp(10);
+        test.place("01", "304");
+        sol.addPlanet("jord");
+        test.place("14", "310");
+        test.place("19", "311");
+        xxcha.addPlanet("archonren");
+        xxcha.addPlanet("archontau");
+        xxcha.addPlanet("wellon");
+        test.game.setStoredValue("agendaCount", "1");
+        test.game.setCurrentAgendaInfo(ECONOMIC_EQUALITY);
+        test.game.setSpeakerUserID(xxcha.getUserID());
+        test.game.setStoredValue("agendaStartVoteCounts", "{\"blue\":2,\"red\":6,\"black\":0}");
+        test.isActive(xxcha, "agendawaiting");
+        sol.setTg(12);
+        xxcha.setTg(0);
+        nekro.setTg(0);
+    }
+
+    private AiTurnContext context(Player seat, AiPrompt... prompts) {
+        return test.contextFor(seat, Set.of(), NOW, prompts);
+    }
+
+    private static AiPrompt table() {
+        return AiTestGame.prompt("turn", PromptSource.PUBLIC, NOW - 500, "FFCC_nekro_done");
+    }
+
+    private Bounty bounty(Player payer, int veto, int quash) {
+        return new Bounty(
+                test.game.getRound(),
+                PromisedVotes.agendaKey(test.game),
+                payer.getFaction(),
+                veto,
+                quash,
+                test.game.getGameStats().getActionCardPlays().size(),
+                xxcha.getFaction(),
+                xxcha.getStrategicCC(),
+                DiscardBounties.Status.OPEN);
+    }
+
+    // Sol (14 trade goods) loses 9 whatever it votes, so it offers the most each card's cap allows: 3 for a Veto and 5
+    // to Xxcha for a Quash, paid only once the card is played. Xxcha (10 trade goods) loses a little to For itself, so
+    // 5
+    // is enough to buy its Quash. It offers once per agenda.
+    @Test
+    void aSeatThatLosesWhateverItVotesOffersABounty() {
+        nekro.setTg(5);
+        sol.setTg(14);
+        xxcha.setTg(10);
+        assertThat(AgendaPolicy.expectedLoss(test.game, sol).orElseThrow()).isGreaterThan(DiscardBounties.MIN_LOSS);
+
+        AiDecision.Post post = (AiDecision.Post)
+                DiscardBountyDeals.offer(context(sol, table())).orElseThrow();
+
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.veto()).isEqualTo(DiscardBounties.VETO_CAP);
+        assertThat(posted.quash()).isEqualTo(DiscardBounties.QUASH_CAP);
+        assertThat(post.text()).contains("_Veto_").contains("**Quash**").contains("Nothing is paid unless");
+        assertThat(DiscardBountyDeals.offer(context(sol, table()))).isEmpty();
+    }
+
+    // Trace aiselfplay509377 r3 #5 (Ixthian Artifact): Hacan, facing about 8.7 TG of loss, queued its own Veto (which
+    // Xxcha sabotaged) and passed on "when"s without ever posting a bounty: the brain passed on the window before the
+    // trade rules that post bounties ran. The seat in pain now posts its bounty first, a Quash bounty even while it
+    // holds Veto itself, and only then queues its card or passes.
+    @Test
+    void aSeatInPainPostsItsBountyBeforePassingOnWhens() {
+        nekro.setTg(5);
+        sol.setTg(14);
+        xxcha.setTg(10);
+        sol.setActionCard("veto", 9);
+        AiPrompt whens = AiTestGame.prompt(
+                "whens", PromptSource.AI_THREAD, NOW, "queueAWhen", "declineToQueueAWhen", "explainQueue");
+
+        AiDecision decision = new ti4.ai.brain.StandardBrain().decide(context(sol, whens, table()));
+
+        assertThat(decision).isInstanceOf(AiDecision.Post.class);
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.veto()).isZero();
+        assertThat(posted.quash()).isEqualTo(DiscardBounties.QUASH_CAP);
+    }
+
+    // Several losers pool their offers, but each card's pooled bounty stays within its cap: a second payer offers only
+    // what the cap leaves, and the holder counts the pool up to the cap and never its own offer.
+    @Test
+    void bountiesPoolUpToEachCardsCap() {
+        xxcha.setTg(10);
+        DiscardBounties.save(test.game, bounty(xxcha, 2, 4));
+        DiscardBounties.save(test.game, bounty(nekro, 2, 0));
+
+        assertThat(DiscardBounties.vetoBounty(test.game, sol)).isEqualTo(DiscardBounties.VETO_CAP);
+        assertThat(DiscardBounties.vetoBounty(test.game, nekro)).isEqualTo(2);
+        assertThat(DiscardBounties.quashBounty(test.game, sol)).isEqualTo(4);
+
+        nekro.setTg(5);
+        DiscardBountyDeals.offer(context(sol, table()));
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.veto()).isZero();
+        assertThat(posted.quash()).isEqualTo(1);
+    }
+
+    // Trace aiselfplay763641 r2 #3 (Ixthian Artifact): Hacan offered Xxcha 1 TG for a Quash although Xxcha liked For.
+    // Xxcha spends a strategy token on a Quash and plays it only when its own loss plus the bounty beats that, so a
+    // bounty that cannot buy the Quash is not posted. Here Xxcha (5 trade goods) gains from For, since Sol loses 7:
+    // even the 5 trade good cap is too little, and Sol posts only its Veto bounty.
+    @Test
+    void noQuashBountyTooSmallToBuyTheQuash() {
+        nekro.setTg(5);
+        xxcha.setTg(5);
+
+        DiscardBountyDeals.offer(context(sol, table()));
+
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.veto()).isEqualTo(DiscardBounties.VETO_CAP);
+        assertThat(posted.quash()).isZero();
+    }
+
+    // With 7 trade goods of its own, Nekro loses only 0.5 on Economic Equality, too little to spend its Veto; a 3 trade
+    // good bounty from Sol makes it worth playing. Without the experiment the bounty is ignored.
+    @Test
+    void aBountyTipsTheHolderIntoPlayingVeto() {
+        nekro.setTg(7);
+        nekro.setActionCard("veto", 9);
+        assertThat(AgendaCardRules.worthVetoing(test.game, nekro)).isFalse();
+
+        DiscardBounties.save(test.game, bounty(sol, 2, 0));
+        assertThat(AgendaCardRules.worthVetoing(test.game, nekro)).isFalse();
+
+        DiscardBounties.save(test.game, bounty(sol, 3, 0));
+        assertThat(AgendaCardRules.worthVetoing(test.game, nekro)).isTrue();
+
+        AiExperiments.disable(nekro, Set.of(Experiment.DISCARD_BOUNTIES));
+        assertThat(AgendaCardRules.worthVetoing(test.game, nekro)).isFalse();
+    }
+
+    // Xxcha (7 trade goods) is near indifferent, so a Quash is not worth its strategy token alone; 3 trade goods from
+    // Sol make it worth it.
+    @Test
+    void aBountyTipsXxchaIntoQuashing() {
+        xxcha.setTg(7);
+        assertThat(ti4.ai.xxcha.QuashRules.worthQuashing(test.game, xxcha)).isFalse();
+
+        DiscardBounties.save(test.game, bounty(sol, 0, 3));
+
+        assertThat(ti4.ai.xxcha.QuashRules.worthQuashing(test.game, xxcha)).isTrue();
+    }
+
+    // Nekro played Veto after Sol posted its bounty, and the agenda was replaced. Sol now owes Nekro the 3 trade goods
+    // it offered, settled through the usual bill and pay button.
+    @Test
+    void aPlayedVetoIsPaid() {
+        DiscardBounties.save(test.game, bounty(sol, 3, 5));
+        test.game.getGameStats().recordAcPlay(DiscardBounties.VETO, nekro);
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+
+        DiscardBountyDeals.observe(context(sol));
+
+        Promise owed = PromiseBook.all(test.game).getFirst();
+        assertThat(owed.term()).isEqualTo(Promise.Term.DISCARD_AGENDA);
+        assertThat(owed.status()).isEqualTo(Promise.Status.OWED);
+        assertThat(owed.isPromiser(nekro)).isTrue();
+        assertThat(owed.isPromisee(sol)).isTrue();
+        assertThat(owed.price()).isEqualTo(3);
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.CLAIMED);
+
+        AiDecision.Post bill =
+                (AiDecision.Post) PromiseDeals.answer(context(sol, table())).orElseThrow();
+        assertThat(bill.text()).contains("Veto");
+    }
+
+    // Xxcha spent a strategy token to Quash the agenda: it collects the Quash bounty.
+    @Test
+    void aQuashIsPaidToXxcha() {
+        DiscardBounties.save(test.game, bounty(sol, 3, 5));
+        xxcha.setStrategicCC(xxcha.getStrategicCC() - 1);
+        AgendaHistory.recordQuashed(test.game, "economic_equality");
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+
+        DiscardBountyDeals.observe(context(sol));
+
+        Promise owed = PromiseBook.all(test.game).getFirst();
+        assertThat(owed.isPromiser(xxcha)).isTrue();
+        assertThat(owed.price()).isEqualTo(5);
+    }
+
+    // Once voting starts on the same agenda nobody discarded it, so the bounty lapses and nothing is owed.
+    @Test
+    void anUnclaimedBountyLapsesWhenVotingStarts() {
+        DiscardBounties.save(test.game, bounty(sol, 3, 5));
+        test.game.setPhaseOfGame("agendaVoting");
+
+        DiscardBountyDeals.observe(context(sol));
+
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.LAPSED);
+        assertThat(PromiseBook.all(test.game)).isEmpty();
+    }
+
+    // A Veto holder waits a little before passing on its "when" while an AI seat in pain may still post a bounty, and
+    // stops waiting once it has, or once the wait runs out.
+    @Test
+    void aHolderWaitsForAPayerInPain() {
+        nekro.setTg(7);
+        AiTurnContext holder = context(nekro);
+        assertThat(DiscardBounties.awaitOffers(holder)).containsInstanceOf(AiDecision.Wait.class);
+
+        DiscardBounties.save(test.game, bounty(sol, 3, 0));
+        assertThat(DiscardBounties.awaitOffers(holder)).isEmpty();
+
+        assertThat(DiscardBounties.awaitOffers(test.contextFor(nekro, Set.of(), NOW + 120_000L)))
+                .isEmpty();
+    }
+
+    // Political Favor also takes a token from Xxcha's strategy pool and discards the agenda, but it is not a Quash:
+    // only the engine's record of a Quash on this very agenda pays the Quash bounty.
+    @Test
+    void aPoliticalFavorDiscardDoesNotPayXxcha() {
+        DiscardBounties.save(test.game, bounty(sol, 0, 5));
+        xxcha.setStrategicCC(xxcha.getStrategicCC() - 1);
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+
+        DiscardBountyDeals.observe(context(sol));
+
+        assertThat(PromiseBook.all(test.game)).isEmpty();
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.LAPSED);
+    }
+
+    // Sol's observe lagged: Economic Equality resolved, the next agenda came up and Nekro vetoed that one. The old
+    // bounty was never earned, because its agenda resolved.
+    @Test
+    void aVetoOnTheNextAgendaDoesNotPayTheOldBounty() {
+        DiscardBounties.save(test.game, bounty(sol, 3, 0));
+        AgendaHistory.recordResolved(test.game, "economic_equality", "for");
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+        test.game.getGameStats().recordAcPlay(DiscardBounties.VETO, nekro);
+
+        DiscardBountyDeals.observe(context(sol));
+
+        assertThat(PromiseBook.all(test.game)).isEmpty();
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.LAPSED);
+    }
+
+    // Bounties are paid through promise deals, so without that experiment a seat posts none.
+    @Test
+    void noBountyIsPostedWithoutPromiseDeals() {
+        nekro.setTg(5);
+        xxcha.setTg(5);
+        AiExperiments.disable(sol, Set.of(Experiment.PROMISE_DEALS));
+
+        assertThat(DiscardBountyDeals.offer(context(sol, table()))).isEmpty();
+        assertThat(DiscardBounties.postedOnThisAgenda(test.game, sol)).isEmpty();
+    }
+
+    // With trading off no payer can post, so a holder does not wait for one.
+    @Test
+    void aHolderDoesNotWaitWhenTradingIsOff() {
+        nekro.setTg(7);
+        System.setProperty(AiSettings.TRADING_PROPERTY, "false");
+        try {
+            assertThat(DiscardBounties.awaitOffers(context(nekro))).isEmpty();
+        } finally {
+            System.clearProperty(AiSettings.TRADING_PROPERTY);
+        }
+    }
+
+    @Test
+    void aBountyRecordSurvivesASaveRoundTrip() {
+        Bounty bounty = bounty(sol, 2, 4);
+        DiscardBounties.save(test.game, bounty);
+
+        assertThat(DiscardBounties.all(test.game)).containsExactly(bounty);
+        assertThat(List.of(DiscardBounties.Status.values())).contains(bounty.status());
+    }
+
+    // ---- Deadly Plot bounties (the user's agenda-politics list, 2026-11-16)
+    // ------------------------------------------
+
+    // Xxcha's 6 votes carried For, so Sol loses about 7 TG once it resolves. In the window after voting, where
+    // Deadly Plot is played, Sol offers up to the 3 TG cap to whoever plays it; once per agenda.
+    @Test
+    void aLoserOffersADeadlyPlotBountyAfterVoting() {
+        sol.setTg(14);
+        test.game.setCurrentAgendaVote("for", "red_6");
+        test.game.setPhaseOfGame("agendaEnd");
+        assertThat(DiscardBounties.lossFromWinner(test.game, sol)).isGreaterThan(DiscardBounties.MIN_LOSS);
+
+        AiDecision.Post post = (AiDecision.Post)
+                DiscardBountyDeals.offerDeadlyPlot(context(sol, table())).orElseThrow();
+
+        Bounty posted = DiscardBounties.postedOnThisAgenda(test.game, sol).orElseThrow();
+        assertThat(posted.deadlyPlot()).isEqualTo(DiscardBounties.DEADLY_PLOT_CAP);
+        assertThat(post.text()).contains("_Deadly Plot_");
+        assertThat(DiscardBountyDeals.offerDeadlyPlot(context(sol, table()))).isEmpty();
+        assertThat(DiscardBounties.deadlyPlotBounty(test.game, nekro)).isEqualTo(DiscardBounties.DEADLY_PLOT_CAP);
+    }
+
+    // Before voting ends it is not Deadly Plot's window, so no such bounty is posted.
+    @Test
+    void noDeadlyPlotBountyBeforeTheVotesAreIn() {
+        sol.setTg(14);
+        test.game.setPhaseOfGame("agendaVoting");
+        assertThat(DiscardBountyDeals.offerDeadlyPlot(context(sol, table()))).isEmpty();
+    }
+
+    // Nekro played Deadly Plot and the agenda was discarded: Sol owes Nekro the bounty.
+    @Test
+    void aPlayedDeadlyPlotIsPaid() {
+        Bounty offered = new Bounty(
+                test.game.getRound(),
+                PromisedVotes.agendaKey(test.game),
+                sol.getFaction(),
+                0,
+                0,
+                test.game.getGameStats().getActionCardPlays().size(),
+                "",
+                -1,
+                DiscardBounties.Status.OPEN,
+                3);
+        DiscardBounties.save(test.game, offered);
+        test.game.setPhaseOfGame("agendaVoting");
+        DiscardBountyDeals.observe(context(sol));
+        assertThat(DiscardBounties.all(test.game).getFirst().status()).isEqualTo(DiscardBounties.Status.OPEN);
+
+        test.game.getGameStats().recordAcPlay(DiscardBounties.DEADLY_PLOT, nekro);
+        test.game.setCurrentAgendaInfo(NEXT_AGENDA);
+        DiscardBountyDeals.observe(context(sol));
+
+        Promise owed = PromiseBook.all(test.game).getFirst();
+        assertThat(owed.term()).isEqualTo(Promise.Term.DISCARD_AGENDA);
+        assertThat(owed.isPromiser(nekro)).isTrue();
+        assertThat(owed.target()).isEqualTo(DiscardBounties.DEADLY_PLOT);
+        assertThat(owed.price()).isEqualTo(3);
+    }
+
+    // Old saves wrote 9 fields; they still read, with no Deadly Plot bounty.
+    @Test
+    void oldBountyRecordsStillRead() {
+        test.game.setStoredValue("aiDiscardBounties", "2|economic_equality|sol|3|5|0|xxcha|2|OPEN");
+        Bounty old = DiscardBounties.all(test.game).getFirst();
+        assertThat(old.veto()).isEqualTo(3);
+        assertThat(old.deadlyPlot()).isZero();
+    }
+
+    // A Deadly Plot holder, in the window after voting, waits a little before declining while an AI seat that loses
+    // to the winning outcome may still post a bounty, and stops waiting once it has.
+    @Test
+    void aDeadlyPlotHolderWaitsForAPayerInPain() {
+        sol.setTg(14);
+        test.game.setCurrentAgendaVote("for", "red_6");
+        test.game.setPhaseOfGame("agendaEnd");
+        nekro.setActionCard("deadly_plot", 30);
+        AiTurnContext holder = context(nekro);
+        assertThat(DiscardBounties.awaitDeadlyPlotOffers(holder)).containsInstanceOf(AiDecision.Wait.class);
+
+        DiscardBountyDeals.offerDeadlyPlot(context(sol, table())).orElseThrow();
+        assertThat(DiscardBounties.awaitDeadlyPlotOffers(holder)).isEmpty();
+        assertThat(DiscardBounties.deadlyPlotBounty(test.game, nekro)).isEqualTo(DiscardBounties.DEADLY_PLOT_CAP);
+    }
+
+    // Outside the Deadly Plot window there is nothing to wait for.
+    @Test
+    void noDeadlyPlotWaitBeforeTheVotesAreIn() {
+        sol.setTg(14);
+        nekro.setActionCard("deadly_plot", 30);
+        test.game.setPhaseOfGame("agendaVoting");
+        assertThat(DiscardBounties.awaitDeadlyPlotOffers(context(nekro))).isEmpty();
+    }
+}

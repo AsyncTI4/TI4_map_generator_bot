@@ -1,0 +1,213 @@
+package ti4.ai.tactical;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import ti4.ai.AiExperiments;
+import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.BoardView;
+import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.scoring.ObjectivePolicy;
+import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.Wallet;
+import ti4.ai.scoring.WinOdds;
+import ti4.ai.scoring.WinRace;
+import ti4.ai.secrets.SecretOdds;
+import ti4.ai.tactical.IncomingForces.Horizon;
+import ti4.ai.tactical.IncomingForces.IncomingForce;
+import ti4.ai.trace.Thinking;
+import ti4.game.Game;
+import ti4.game.Player;
+import ti4.game.Tile;
+
+final class Standings {
+
+    static final double SECRET_CHANCE = 0.35;
+    private static final double WIN_WINDOW = 1.5;
+    private static final double HURT_PER_LEAD_POINT = 0.25;
+    private static final double SOLE_LEADER_HURT = 0.25;
+    private static final double MIN_HURT = 0.5;
+    private static final double MAX_HURT = 1.5;
+    private static final double CALM_DENIAL = 0.4;
+    private static final double WINNING_DENIAL = 2.0;
+    private static final double CUSTODIANS_CHANCE = 0.5;
+
+    private final Game game;
+    private final Player seat;
+    private final IncomingForces incoming;
+    private final Map<String, List<String>> ready = new HashMap<>();
+    private final Map<String, Double> projections = new HashMap<>();
+    private List<Player> winnersBefore;
+
+    Standings(Game game, Player seat, IncomingForces incoming) {
+        this.game = game;
+        this.seat = seat;
+        this.incoming = incoming;
+    }
+
+    int goal() {
+        return game.getVp();
+    }
+
+    int vp(Player player) {
+        return player.getTotalVictoryPoints();
+    }
+
+    // TODO: ready (engine progress) and ObjectiveValue.brokenReady (footprint model) can disagree; two spend objectives
+    // under Imperial may not both be affordable
+    List<String> ready(Player player) {
+        if (player.isNeutral()) return List.of();
+        return ready.computeIfAbsent(player.getFaction(), faction -> ObjectivePolicy.scorablePublics(game, player));
+    }
+
+    boolean holdsImperial(Player player) {
+        return holdsUnplayed(player, StrategyCard.IMPERIAL);
+    }
+
+    boolean holdsUnplayedDiplomacy(Player player) {
+        return holdsUnplayed(player, StrategyCard.DIPLOMACY);
+    }
+
+    private boolean holdsUnplayed(Player player, StrategyCard card) {
+        return player.getSCs().stream()
+                .anyMatch(initiative -> StrategyCard.of(game, initiative) == card
+                        && !game.getPlayedSCs().contains(initiative));
+    }
+
+    Optional<Player> imperialHolder() {
+        return game.getRealPlayers().stream().filter(this::holdsImperial).findFirst();
+    }
+
+    int publicScores(Player player) {
+        return 1 + (holdsImperial(player) ? 1 : 0);
+    }
+
+    double publicPoints(Player player) {
+        return publicPoints(player, ready(player));
+    }
+
+    double publicPoints(Player player, Collection<String> readyIds) {
+        return readyIds.stream()
+                .map(ObjectivePolicy::victoryPoints)
+                .sorted(Comparator.reverseOrder())
+                .limit(publicScores(player))
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
+    double imperialPoint(Player player) {
+        return holdsImperial(player) && player.controlsMecatol(false) ? 1 : 0;
+    }
+
+    double custodiansPoint(Player player) {
+        Tile mecatol = game.getMecatolTile();
+        if (mecatol == null || mecatol.getPlanetUnitHolders().stream().noneMatch(BoardView::hasCustodians)) return 0;
+        IncomingForce force = incoming.of(player, mecatol, Horizon.IMMEDIATE);
+        boolean landsGroundForces = !force.isEmpty() && force.carriesGround();
+        boolean canPay = Wallet.of(game, player).influence() >= CustodiansRace.cost(player);
+        return landsGroundForces && canPay ? CUSTODIANS_CHANCE : 0;
+    }
+
+    double secretPoint(Player player) {
+        if (weighsFeasibility()) return SecretOdds.chanceReady(game, seat, player);
+        return player.getSo() > 0 ? SECRET_CHANCE : 0;
+    }
+
+    private boolean weighsFeasibility() {
+        return seat != null && AiExperiments.enabled(seat, AiExperiments.Experiment.WIN_THREAT_FEASIBLE);
+    }
+
+    double projected(Player player) {
+        if (player.isNeutral()) return 0;
+        Double known = projections.get(player.getFaction());
+        if (known != null) return known;
+        double projected = vp(player)
+                + publicPoints(player)
+                + imperialPoint(player)
+                + custodiansPoint(player)
+                + secretPoint(player);
+        projections.put(player.getFaction(), projected);
+        return projected;
+    }
+
+    double winThreat(Player player) {
+        try (Thinking.Span timing = Thinking.measure("standings.winThreat")) {
+            if (winsBeforeTheSeat(player)) return 1;
+            if (weighsFeasibility()) return WinOdds.reachesGoal(game, seat, player);
+            return clamp((projected(player) - (goal() - WIN_WINDOW)) / WIN_WINDOW, 0, 1);
+        }
+    }
+
+    boolean winsBeforeTheSeat(Player player) {
+        if (winnersBefore == null) winnersBefore = WinRace.winnersBefore(game, seat);
+        return winnersBefore.contains(player);
+    }
+
+    double hurtWeight(Player target) {
+        if (target.isNeutral()) return 0;
+        return hurtWeight(game, target, ownGrudge(target));
+    }
+
+    private double ownGrudge(Player target) {
+        if (seat == null || ImaginedTurn.underway() || !AttackLedger.remembers(game, seat)) return 0;
+        return AttackLedger.grudge(game, seat, target);
+    }
+
+    static double hurtWeight(Game game, Player target, double grudge) {
+        if (target.isNeutral()) return 0;
+        List<Player> others = game.getRealPlayers().stream()
+                .filter(player -> player != target)
+                .toList();
+        int points = target.getTotalVictoryPoints();
+        double mean = others.stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .average()
+                .orElse(points);
+        boolean soleLeader = points >= 1 && others.stream().allMatch(player -> player.getTotalVictoryPoints() < points);
+        double weight =
+                1 + HURT_PER_LEAD_POINT * (points - mean) + (soleLeader ? SOLE_LEADER_HURT : 0) + grudgeHurt(grudge);
+        return clamp(weight, MIN_HURT, MAX_HURT);
+    }
+
+    static double grudgeHurt(double grudge) {
+        return HURT_PER_LEAD_POINT * grudge / ObjectiveValue.VICTORY_POINT_VALUE;
+    }
+
+    static double angerRatio(Game game, Player target, double grudge) {
+        double calm = hurtWeight(game, target, 0);
+        return calm <= 0 ? 1 : hurtWeight(game, target, grudge) / calm;
+    }
+
+    double leadOverField(Player target) {
+        if (target.isNeutral()) return 0;
+        int best = game.getRealPlayers().stream()
+                .filter(player -> player != target)
+                .mapToInt(this::vp)
+                .max()
+                .orElse(vp(target));
+        return vp(target) - best;
+    }
+
+    double denialWeight(Player target) {
+        double threat = winThreat(target);
+        return calmDenialWeight(target, threat) + WINNING_DENIAL * threat;
+    }
+
+    double denialWeightBeyondThisRound(Player target) {
+        double threat = winThreat(target);
+        double thisRound = winsBeforeTheSeat(target) ? 1 : WinOdds.reachesGoal(game, seat, target);
+        return calmDenialWeight(target, threat) + WINNING_DENIAL * Math.max(0, threat - thisRound);
+    }
+
+    private double calmDenialWeight(Player target, double threat) {
+        return CALM_DENIAL * hurtWeight(target) * (1 - threat);
+    }
+
+    private static double clamp(double value, double low, double high) {
+        return Math.max(low, Math.min(high, value));
+    }
+}

@@ -554,6 +554,22 @@ A Player's removal from the Game when they control no Planets, have no ground fo
 
 ### Table slang
 
+**Slay**:
+To attack a Player who will otherwise win before you get to score, typically by taking a planet in their home System so they cannot score public objectives. AI seats announce it as "We must slay X, Y, Z." and other AI seats read the declared targets.
+_Avoid_: Kingmaking, gank
+
+**Promise deal**:
+Trade goods paid now for a promise the engine cannot enforce: "my votes go to outcome X on this agenda", "I won't attack you this round" (no combat or invasion against your units or planets, no activation of a system holding them) or "I won't move ships into system S this round". Breaking one costs the breaker trust. AI seats always keep theirs.
+_Avoid_: Pact, treaty
+
+**Win threat**:
+How close a Player is to winning as an AI seat reads it from public information: the chance the points the Player can still score this round (objectives it can complete, Imperial, taking Mecatol Rex from its holder) reach the goal. Denying points to a Player matters more as their win threat rises.
+_Avoid_: Kingmaker risk
+
+**Desperation**:
+Taking a long shot at a point a Player cannot afford to miss: a public objective in the coming status phase when none is ready, a status-phase secret objective from round 3, and every action-phase secret objective once the game is late or a rival can win this round. A desperate AI seat counts such a point at one and a half times its usual value, so a quarter chance at it can be worth a command token.
+_Avoid_: Hail Mary
+
 **Pop**:
 To use a Strategy card: take the strategic action that resolves its primary ability, as in "popping Trade" or "Diplomacy was popped". Other Players then decide whether to follow it.
 _Avoid_: Cast, fire
@@ -596,6 +612,10 @@ _Avoid_: Cancel card
 **Boat float**:
 Players cooperating on a vote or deal so that all of them come out ahead ("a rising tide floats all boats"). The classic case is Articles of War: every Player but one puts 1 vote on For, the last Player votes Against with enough votes to tie, the Speaker breaks the tie for Against, and each Player who voted For receives 3 Trade goods and gives the Against Player 1 of them.
 _Avoid_: Collusion, kingmaking
+
+**Relations**:
+How friendly an AI seat is toward another Player, at most max (2) and with no floor (forever war). Good relations (1 or more) unlock friendly trade: free commodity flips and X-1 on Trade. The AI's personality (STOOGE, FLOATER, NEUTRAL, WARRIOR, WARLORD) sets the starting level; floating the seat raises it, while charging a seat that floats you, and every TG of value a Player has cost the seat (attacks, planets taken, ships parked in its slice or over its docks, mean action cards, fees above boat-float terms), lowers it.
+_Avoid_: Friendship, diplomacy score
 
 **Gum**:
 To park a fighter or other small ship in a System to block opponents from moving through it.

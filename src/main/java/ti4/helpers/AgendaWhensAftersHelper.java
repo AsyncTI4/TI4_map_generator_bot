@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -44,7 +43,7 @@ public final class AgendaWhensAftersHelper {
     static void offerEveryonePrepassOnShenanigans(Game game) {
         if (game.islandMode()) return;
         for (Player player : game.getRealPlayers()) {
-            int result = ThreadLocalRandom.current().nextInt(0, 6);
+            int result = RandomHelper.current().nextInt(0, 6);
             if (playerDoesNotHaveShenanigans(player) && result != 5) {
                 String part2 = player.getFaction();
                 if (!game.getStoredValue("Pass On Shenanigans").isEmpty()) {

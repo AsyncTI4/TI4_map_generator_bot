@@ -5,6 +5,7 @@ import java.util.Collections;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.helpers.RandomHelper;
 
 @UtilityClass
 public class SecretObjectiveDeckService {
@@ -15,7 +16,7 @@ public class SecretObjectiveDeckService {
                 game.addSOToGame(soID);
             }
         }
-        Collections.shuffle(game.getSecretObjectives());
+        Collections.shuffle(game.getSecretObjectives(), RandomHelper.current());
     }
 
     public static void removeFromDeck(Game game, Collection<String> soIDs) {
