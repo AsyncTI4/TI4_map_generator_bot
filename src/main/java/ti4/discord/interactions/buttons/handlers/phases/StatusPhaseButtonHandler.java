@@ -264,7 +264,7 @@ class StatusPhaseButtonHandler {
         }
         String winner = game.isFowMode() ? "someone" : queuedWinner.get().getRepresentationNoPing();
         List<Button> buttons =
-                List.of(Buttons.red("turnOffForcedScoringConfirmed", "Turn Off and Score the Queue"), Buttons.CANCEL);
+                List.of(Buttons.red("confirmTurnOffForcedScoring", "Turn Off and Score the Queue"), Buttons.CANCEL);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 "Are you sure? It looks like " + winner
@@ -272,7 +272,7 @@ class StatusPhaseButtonHandler {
                 buttons);
     }
 
-    @ButtonHandler("turnOffForcedScoringConfirmed")
+    @ButtonHandler("confirmTurnOffForcedScoring")
     public static void turnOffForcedScoringConfirmed(ButtonInteractionEvent event, Game game) {
         turnOffForcedScoringAndResolveQueue(event, game);
     }
