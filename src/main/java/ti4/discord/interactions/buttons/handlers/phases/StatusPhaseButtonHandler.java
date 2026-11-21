@@ -258,8 +258,12 @@ class StatusPhaseButtonHandler {
     public static void turnOffForcedScoring(ButtonInteractionEvent event, Game game) {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                game.getPing() + ", forced scoring order has been turned off. Any queues will not be resolved.");
+                game.getPing()
+                        + ", forced scoring order has been turned off. Any queued objectives will now be scored.");
         game.setStoredValue("forcedScoringOrder", "");
+        game.setStoredValue("potentialScorePOBlockers", "");
+        game.setStoredValue("potentialScoreSOBlockers", "");
+        Helper.resolvePOScoringQueue(game, event);
         ButtonHelper.deleteMessage(event);
     }
 
