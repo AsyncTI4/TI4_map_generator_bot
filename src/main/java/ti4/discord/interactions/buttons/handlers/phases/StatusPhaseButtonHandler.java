@@ -2,6 +2,7 @@ package ti4.discord.interactions.buttons.handlers.phases;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -256,6 +257,27 @@ class StatusPhaseButtonHandler {
 
     @ButtonHandler("turnOffForcedScoring")
     public static void turnOffForcedScoring(ButtonInteractionEvent event, Game game) {
+        Optional<Player> queuedWinner = Helper.firstQueuedPlayerWhoWouldWin(game);
+        if (queuedWinner.isEmpty()) {
+            turnOffForcedScoringAndResolveQueue(event, game);
+            return;
+        }
+        String winner = game.isFowMode() ? "someone" : queuedWinner.get().getRepresentationNoPing();
+        List<Button> buttons =
+                List.of(Buttons.red("turnOffForcedScoringConfirmed", "Turn Off and Score the Queue"), Buttons.CANCEL);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                "Are you sure? It looks like " + winner
+                        + " in the scoring queue will win the game when the queue is scored, without other players getting a chance to score.",
+                buttons);
+    }
+
+    @ButtonHandler("turnOffForcedScoringConfirmed")
+    public static void turnOffForcedScoringConfirmed(ButtonInteractionEvent event, Game game) {
+        turnOffForcedScoringAndResolveQueue(event, game);
+    }
+
+    private static void turnOffForcedScoringAndResolveQueue(ButtonInteractionEvent event, Game game) {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 game.getPing()

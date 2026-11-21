@@ -409,6 +409,49 @@ public final class Helper {
         return "> " + poMessage + '\n' + "> " + soMessage + '\n';
     }
 
+    public static Optional<Player> firstQueuedPlayerWhoWouldWin(Game game) {
+        for (Player player : StatusHelper.getPlayersInScoringOrder(game)) {
+            int queuedPoints = queuedPublicObjectivePoints(game, player) + queuedSecretObjectivePoints(game, player);
+            if (queuedPoints > 0 && player.getTotalVictoryPoints() + queuedPoints >= game.getVp()) {
+                return Optional.of(player);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static int queuedPublicObjectivePoints(Game game, Player player) {
+        if (!game.getStoredValue("queueToScorePOs").contains(player.getFaction() + "*")) {
+            return 0;
+        }
+        String queuedIndex = game.getStoredValue(player.getFaction() + "queuedPOScore");
+        return game.getRevealedPublicObjectives().entrySet().stream()
+                .filter(po -> String.valueOf(po.getValue()).equals(queuedIndex))
+                .findFirst()
+                .map(po -> publicObjectivePoints(game, po.getKey()))
+                .orElse(1);
+    }
+
+    private static int publicObjectivePoints(Game game, String objectiveKey) {
+        PublicObjectiveModel objective = Mapper.getPublicObjective(objectiveKey);
+        if (objective != null && objective.getPoints() != null) {
+            return objective.getPoints();
+        }
+        return game.getCustomPublicVP().getOrDefault(objectiveKey, 1);
+    }
+
+    private static int queuedSecretObjectivePoints(Game game, Player player) {
+        if (!game.getStoredValue("queueToScoreSOs").contains(player.getFaction() + "*")) {
+            return 0;
+        }
+        try {
+            SecretObjectiveModel secret =
+                    player.getSecret(Integer.parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore")));
+            return secret == null ? 1 : secret.getPoints();
+        } catch (NumberFormatException e) {
+            return 1;
+        }
+    }
+
     public static void resolvePOScoringQueue(Game game, GenericInteractionCreateEvent event) {
         String key2 = "queueToScorePOs";
         String key3 = "potentialScorePOBlockers";
