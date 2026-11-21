@@ -74,12 +74,28 @@ class TacticalStrengthTest extends BaseTi4Test {
     // A strong rival: Nekro avoids angering it. A weak one: Nekro cares less.
     @Test
     void aStrongRivalWeighsMore() {
-        Tile tile = test.place("19", "311");
-        test.units(tile, "space", sol, UnitType.Dreadnought, 2);
+        Tile home = test.nekroHome();
+        Tile beside = test.place("19", AiTestGame.neighbourOf(home.getPosition()));
+        sol.setTacticalCC(3);
+        nekro.setTacticalCC(3);
+        sol.addPlanet("wellon");
+        test.units(beside, "space", sol, UnitType.Dreadnought, 2);
         assertThat(TacticalStrength.angerWeight(test.game, nekro, sol)).isGreaterThan(1);
 
-        test.units(tile, "space", nekro, UnitType.Dreadnought, 4);
+        test.units(home, "space", nekro, UnitType.Dreadnought, 4);
         assertThat(TacticalStrength.angerWeight(test.game, nekro, sol)).isLessThan(1);
+    }
+
+    // The user's note (2026-11-17): what counts is what can actually reach the other player, per the defense planner.
+    // Sol's dreadnoughts far from Nekro add to Sol's board strength but not to how much angering Sol weighs.
+    @Test
+    void unitsThatCannotReachDoNotWeigh() {
+        test.nekroHome();
+        Tile far = test.place("19", "311");
+        test.units(far, "space", sol, UnitType.Dreadnought, 2);
+
+        assertThat(TacticalStrength.seenBy(test.game, sol)).isGreaterThan(8 - CLOSE);
+        assertThat(TacticalStrength.angerWeight(test.game, nekro, sol)).isEqualTo(1);
     }
 
     @Test

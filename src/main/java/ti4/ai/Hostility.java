@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +33,10 @@ public class Hostility {
     static final String CARDS_KEY = "aiHostilityCards";
     static final String PRESENCE_KEY = "aiHostilityPresence";
     static final String TARGETS_KEY = "aiHostilityTargets";
-    static final double MEAN_CARD_COST = 2.0;
+    static final String PENDING_KEY = "aiHostilityPending";
+    static final double MIN_IMPACT = 0.1;
+    static final Map<String, Double> FLAT_IMPACT =
+            Map.of("Assassinate Representative", 1.0, "Spy", ti4.ai.actioncards.ActionCardPrior.AVERAGE_CARD);
     static final double SABOTAGE_COST = 1.0;
     static final double SLICE_PRESENCE_COST = 1.0;
     static final double HOME_PRESENCE_COST = 3.0;
@@ -47,6 +51,12 @@ public class Hostility {
     private static final String FIELDS = "/";
     private static final String FORMAT = "%.2f";
     private static final String SABOTAGE = "Sabotage";
+    // Mean cards cost what they actually took from the target, not a flat price: a Tactical Bombardment played as a
+    // blank stall, on a system where the target has nothing readied, costs nothing.
+    static final String TACTICAL_BOMBARDMENT = "Tactical Bombardment";
+    static final String ROUND_KEY = "aiHostilityRound";
+    static final double ANGERED = 1.0;
+    static final double SPREAD_STEP = 0.25;
     private static final Set<String> NOT_MEAN_TARGETS = Set.of(
             SABOTAGE,
             "Forward Supply Base",
@@ -69,7 +79,43 @@ public class Hostility {
 
     private record Presence(String key, Cost cost) {}
 
-    private record CardScan(List<Cost> costs, int processed, int targets) {}
+    private record CardScan(List<Cost> costs, List<Pending> pending, int processed, int targets) {}
+
+    record Pending(String offender, String victim, double before, int plays, String active, int round) {
+
+        String encode() {
+            return String.join(
+                    FIELDS,
+                    offender,
+                    victim,
+                    String.format(Locale.ROOT, FORMAT, before),
+                    String.valueOf(plays),
+                    active,
+                    String.valueOf(round));
+        }
+
+        static Optional<Pending> decode(String encoded) {
+            String[] fields = StringUtils.splitPreserveAllTokens(encoded, FIELDS);
+            if (fields == null || fields.length != 6) return Optional.empty();
+            if (!NumberUtils.isCreatable(fields[2]) || !NumberUtils.isCreatable(fields[3])) return Optional.empty();
+            if (!NumberUtils.isCreatable(fields[5])) return Optional.empty();
+            return Optional.of(new Pending(
+                    fields[0],
+                    fields[1],
+                    Double.parseDouble(fields[2]),
+                    Integer.parseInt(fields[3]),
+                    fields[4],
+                    Integer.parseInt(fields[5])));
+        }
+
+        boolean windowClosed(Game game) {
+            return game.getRound() != round
+                    || game.getGameStats().getActionCardPlays().size() > plays
+                    || !active.equals(StringUtils.defaultString(game.getActivePlayerID()));
+        }
+    }
+
+    private static final Map<String, Map<String, Double>> LAST_ASSETS = new ConcurrentHashMap<>();
 
     public static double amount(Game game, Player victim, Player offender) {
         return totals(game).getOrDefault(pair(offender.getFaction(), victim.getFaction()), 0.0);
@@ -80,6 +126,31 @@ public class Hostility {
         Map<String, Double> totals = totals(game);
         totals.merge(pair(offender, victim), tradeGoods, Double::sum);
         game.setStoredValue(KEY, encode(totals));
+        Map<String, Double> round = thisRound(game);
+        round.merge(pair(offender, victim), tradeGoods, Double::sum);
+        game.setStoredValue(ROUND_KEY, game.getRound() + FIELDS + encode(round));
+    }
+
+    public static long angeredThisRound(Game game, Player offender, Player besides) {
+        String from = offender.getFaction() + PAIR;
+        String except = pair(offender.getFaction(), besides.getFaction());
+        return thisRound(game).entrySet().stream()
+                .filter(entry ->
+                        entry.getKey().startsWith(from) && !entry.getKey().equals(except))
+                .filter(entry -> entry.getValue() >= ANGERED)
+                .count();
+    }
+
+    public static double spreadFactor(Game game, Player seat, Player target) {
+        if (!AiExperiments.enabled(seat, AiExperiments.Experiment.ANGER_SPREAD)) return 1;
+        return 1 + SPREAD_STEP * angeredThisRound(game, seat, target);
+    }
+
+    private static Map<String, Double> thisRound(Game game) {
+        String stored = game.getStoredValue(ROUND_KEY);
+        String round = game.getRound() + FIELDS;
+        if (!stored.startsWith(round)) return new LinkedHashMap<>();
+        return parse(stored.substring(round.length()));
     }
 
     public static void charge(Game game, Player offender, Player victim, double tradeGoods) {
@@ -95,14 +166,28 @@ public class Hostility {
     }
 
     static void record(Game game) {
+        Map<String, Double> assets = assetsNow(game);
+        Map<String, Double> before = LAST_ASSETS.getOrDefault(game.getName(), assets);
+        LAST_ASSETS.put(game.getName(), assets);
         Set<String> seen = seenPresence(game);
         List<Presence> presence = presence(game).stream()
                 .filter(found -> !seen.contains(found.key()))
                 .toList();
         int processed = processedCards(game);
         int targets = processed(game, TARGETS_KEY);
-        CardScan scan = scanCards(game, processed, targets);
-        if (presence.isEmpty() && scan.processed() == processed && scan.targets() == targets) return;
+        CardScan scan = scanCards(game, processed, targets, before);
+        List<Pending> waiting = new ArrayList<>(pending(game));
+        waiting.addAll(scan.pending());
+        List<Cost> impacts = new ArrayList<>();
+        List<Pending> still = new ArrayList<>();
+        for (Pending open : waiting) {
+            double loss = open.before() - assets.getOrDefault(open.victim(), open.before());
+            if (loss >= MIN_IMPACT) impacts.add(new Cost(open.offender(), open.victim(), loss));
+            else if (!open.windowClosed(game)) still.add(open);
+        }
+        boolean pendingChanged = !still.equals(pending(game));
+        boolean cardsMoved = scan.processed() != processed || scan.targets() != targets;
+        if (presence.isEmpty() && !cardsMoved && impacts.isEmpty() && !pendingChanged) return;
         AiGameWrites.persist(game, SAVE_REASON, latest -> {
             Set<String> marked = seenPresence(latest);
             for (Presence found : presence) {
@@ -114,7 +199,28 @@ public class Hostility {
                 latest.setStoredValue(CARDS_KEY, String.valueOf(scan.processed()));
                 latest.setStoredValue(TARGETS_KEY, String.valueOf(scan.targets()));
             }
+            impacts.forEach(cost -> apply(latest, cost));
+            latest.setStoredValue(
+                    PENDING_KEY, still.stream().map(Pending::encode).collect(Collectors.joining(ENTRIES)));
         });
+    }
+
+    public static void forget(String gameName) {
+        LAST_ASSETS.remove(gameName);
+    }
+
+    private static Map<String, Double> assetsNow(Game game) {
+        Map<String, Double> assets = new LinkedHashMap<>();
+        for (Player player : game.getRealPlayers()) assets.put(player.getFaction(), PlayerAssets.value(game, player));
+        return assets;
+    }
+
+    static List<Pending> pending(Game game) {
+        List<Pending> found = new ArrayList<>();
+        for (String entry : StringUtils.split(game.getStoredValue(PENDING_KEY), ENTRIES)) {
+            Pending.decode(entry).ifPresent(found::add);
+        }
+        return found;
     }
 
     private static void apply(Game game, Cost cost) {
@@ -172,25 +278,32 @@ public class Hostility {
                 .anyMatch(planet -> BoardView.count(planet, player, UnitType.Spacedock) > 0);
     }
 
-    private static CardScan scanCards(Game game, int processed, int targets) {
-        List<Cost> found = new ArrayList<>(meanCards(game, targets));
-        List<GameStats.ActionCardTarget> aimed = game.getGameStats().getActionCardTargets();
-        int scanned = scanSabotage(game, processed, found);
-        return new CardScan(found, scanned, aimed.size());
-    }
-
-    private static List<Cost> meanCards(Game game, int targets) {
-        List<GameStats.ActionCardTarget> aimed = game.getGameStats().getActionCardTargets();
+    private static CardScan scanCards(Game game, int processed, int targets, Map<String, Double> before) {
         List<Cost> found = new ArrayList<>();
+        List<Pending> waiting = new ArrayList<>();
+        List<GameStats.ActionCardTarget> aimed = game.getGameStats().getActionCardTargets();
         for (int index = Math.min(targets, aimed.size()); index < aimed.size(); index++) {
-            if (NOT_MEAN_TARGETS.contains(aimed.get(index).getActionCard())) continue;
-            Player player = byTrackedId(game, aimed.get(index).getPlayerId());
-            Player target = byTrackedId(game, aimed.get(index).getTargetId());
-            if (player != null && target != null && player != target) {
-                found.add(new Cost(player.getFaction(), target.getFaction(), MEAN_CARD_COST));
+            GameStats.ActionCardTarget target = aimed.get(index);
+            if (NOT_MEAN_TARGETS.contains(target.getActionCard())) continue;
+            Player player = byTrackedId(game, target.getPlayerId());
+            Player victim = byTrackedId(game, target.getTargetId());
+            if (player == null || victim == null || player == victim) continue;
+            Double flat = FLAT_IMPACT.get(target.getActionCard());
+            if (flat != null) {
+                found.add(new Cost(player.getFaction(), victim.getFaction(), flat));
+                continue;
             }
+            double was = before.getOrDefault(victim.getFaction(), PlayerAssets.value(game, victim));
+            waiting.add(new Pending(
+                    player.getFaction(),
+                    victim.getFaction(),
+                    was,
+                    game.getGameStats().getActionCardPlays().size(),
+                    StringUtils.defaultString(game.getActivePlayerID()),
+                    game.getRound()));
         }
-        return found;
+        int scanned = scanSabotage(game, processed, found);
+        return new CardScan(found, waiting, scanned, aimed.size());
     }
 
     private static int scanSabotage(Game game, int processed, List<Cost> found) {
@@ -248,8 +361,12 @@ public class Hostility {
     }
 
     private static Map<String, Double> totals(Game game) {
+        return parse(game.getStoredValue(KEY));
+    }
+
+    private static Map<String, Double> parse(String stored) {
         Map<String, Double> totals = new LinkedHashMap<>();
-        for (String entry : StringUtils.split(game.getStoredValue(KEY), TOTALS)) {
+        for (String entry : StringUtils.split(stored, TOTALS)) {
             String value = StringUtils.substringAfter(entry, AMOUNT);
             if (NumberUtils.isCreatable(value)) {
                 totals.put(StringUtils.substringBefore(entry, AMOUNT), Double.parseDouble(value));

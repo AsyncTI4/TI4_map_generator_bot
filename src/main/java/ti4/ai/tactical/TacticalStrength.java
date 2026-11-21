@@ -1,5 +1,6 @@
 package ti4.ai.tactical;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class TacticalStrength {
     static final double MIN_ANGER_WEIGHT = 0.25;
     static final double MAX_ANGER_WEIGHT = 2;
     private static final double SMOOTHING = 1;
+    private static final double TWO_MOVE_WEIGHT = 0.5;
     private static final String ASSAULT_CANNON_TECH = "asc";
     private static final Set<String> X89_TECHS = Set.of("x89", "x89c4");
     private static final String PDS_TWO_TECH = "pds2";
@@ -59,8 +61,45 @@ public class TacticalStrength {
 
     public static double angerWeight(Game game, Player seat, Player other) {
         if (seat == other || !AiExperiments.enabled(seat, Experiment.STRENGTH_WEIGHTED_ANGER)) return 1;
-        double ratio = (seenBy(game, other) + SMOOTHING) / (own(game, seat) + SMOOTHING);
-        return Math.clamp(ratio, MIN_ANGER_WEIGHT, MAX_ANGER_WEIGHT);
+        double rival = against(game, other, seat, false);
+        double self = against(game, seat, other, DecidingSeat.knowsHandOf(seat));
+        return Math.clamp((rival + SMOOTHING) / (self + SMOOTHING), MIN_ANGER_WEIGHT, MAX_ANGER_WEIGHT);
+    }
+
+    static double against(Game game, Player attacker, Player target, boolean seesHand) {
+        Map<String, Double> memo = TickMemo.mapFor(game, MEMO);
+        String key = attacker.getFaction() + ">" + target.getFaction() + "|" + seesHand;
+        return memo.computeIfAbsent(
+                key, ignored -> reachingCost(game, attacker, target) + nonUnits(attacker, seesHand));
+    }
+
+    private static double reachingCost(Game game, Player attacker, Player target) {
+        IncomingForces forces = new IncomingForces(game);
+        double most = 0;
+        for (Tile tile : systemsOf(game, target)) {
+            IncomingForces.IncomingForce near = forces.of(attacker, tile, IncomingForces.Horizon.IMMEDIATE);
+            IncomingForces.IncomingForce later = forces.approaching(attacker, tile);
+            double now = near.fleetCost() + near.groundCost();
+            double next = later.fleetCost() + later.groundCost();
+            most = Math.max(most, now + TWO_MOVE_WEIGHT * Math.max(0, next - now));
+        }
+        return most;
+    }
+
+    private static Set<Tile> systemsOf(Game game, Player player) {
+        Set<Tile> systems = new LinkedHashSet<>();
+        Tile home = player.getHomeSystemTile();
+        if (home != null) systems.add(home);
+        for (String planet : player.getPlanets()) {
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile != null) systems.add(tile);
+        }
+        return systems;
+    }
+
+    private static double nonUnits(Player player, boolean seesHand) {
+        double cards = seesHand ? HARSH_CARD * harshCards(player) : UNSEEN_CARD * player.getAcCount();
+        return cards + technology(player) + FactionStrength.bonus(player);
     }
 
     private static double remembered(Game game, Player player, boolean seesHand) {
@@ -69,8 +108,7 @@ public class TacticalStrength {
     }
 
     static double rate(Game game, Player player, boolean seesHand) {
-        double cards = seesHand ? HARSH_CARD * harshCards(player) : UNSEEN_CARD * player.getAcCount();
-        return plasticCost(game, player) + cards + technology(player) + FactionStrength.bonus(player);
+        return plasticCost(game, player) + nonUnits(player, seesHand);
     }
 
     private static long harshCards(Player player) {

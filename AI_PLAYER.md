@@ -1152,10 +1152,7 @@ to build one by hand:
     only boat floated; every 2 TG lowers relations by 1, for the rest of the game. It counts every attack and planet taken, undefended ones included: ship cost lost (in TG)
     and planet value, x3 in the victim's home system and x1.5 in its slice. Each round, ships parked in the victim's
     slice cost 1 TG, over its home 3 TG, and over its undefended space dock 2 TG; a system costs the largest that
-    applies, not the sum. Each mean "choose a player" card resolved on the victim costs 2 TG (Spy, Seize Artifact,
-    Uprising, Signal Jamming, Reactor Meltdown, Plague, Cripple Defenses, Unstable Planet, Insubordination,
-    Assassinate Representative), read from `GameStats.actionCardTargets`, which those cards'
-    resolve steps fill. Sabotage of the victim's card costs 1 TG; combat cards don't count. Trade counts what was charged above boat-float terms: Trade terms above X-1 (or an
+    applies, not the sum. Each mean "choose a player" card resolved on the victim (read from `GameStats.actionCardTargets`) counts by impact: a mean card costs what it actually took from its target, not a flat price: when an entry appears the AI notes the target's assets (trade goods, commodities, promissory notes, command tokens at 2.4 TG, relic fragments, the spendable value of its readied planets and the cost of its units on the board, from the previous observation), and charges the first drop of 0.1 TG or more before the window closes (the next action card play, a turn change or a new round). Assassinate Representative (1 TG, the votes) and Spy (an average card) cost a set amount, since neither shows in those assets. A Tactical Bombardment played as a blank stall costs nothing (`Hostility.Pending`, stored value `aiHostilityPending`). Sabotage of the victim's card costs 1 TG; combat cards and cards that help their target don't count. Trade counts what was charged above boat-float terms: Trade terms above X-1 (or an
     exclusion other than a win) and a fee for flipping this seat's commodities. A fresh betrayal (broken promise or speaker sale) and trust under 0.8
     (a human with unpaid bills or broken promises) lower the level by 1 each. Shifts are stored on the seat
     (`aiRelations`), at most one up and one down per partner per round, never lifting the level above 2:
@@ -1179,13 +1176,15 @@ to build one by hand:
     0.2 per card in a rival's (unseen), and 0.2 per card in its own hand too when it is not the seat deciding (a simulated rival plan never reads the hidden hand). The anger cost of attacking a rival or voting against it is multiplied by
     (rival strength + 1) / (own strength + 1), kept within 0.25 to 2: a strong rival or a weak seat avoids anger, a
     weak rival or a strong seat cares less.
-    - **Open:** modify the ratings by what can actually reach the other player, according to the defensive planner
-      (`IncomingForces`): units that cannot reach the rival (or the seat) should count less toward the strength
-      that weighs anger between them.
+    - **Done (2026-11-21): reach.** In the anger weight, each side's units count only as far as they can reach the
+      other player's systems (home and planets), per the defense planner (`IncomingForces`: fleet and ground cost
+      arriving next move, plus half of what arrives the move after); cards, technology and the faction bonus count in
+      full. `TacticalStrength.seenBy` / `own` still give the whole-board rating.
     - **Open:** widen what defines tactical strength (for example flagships and war suns by ability, mechs, leaders,
       faction technologies, promissory notes held, how close the player is to winning, and known cards).
-    - **Open:** a tendency not to anger too many players at once: today each angered player is priced alone, so the
-      AI can anger several rivals in one round without any extra cost.
+    - **Done (2026-11-21): not angering too many players at once** (experiment `ANGER_SPREAD`). Hostility also keeps
+      this round's totals (`aiHostilityRound`). Angering a player costs 25% more for each other player the seat has
+      already cost 1 TG or more of value this round (`Hostility.spreadFactor`), in attacks and agenda votes.
   - **Friendly trade** (`FriendlyTrade`), with a player in good relations. It flips that player's commodities for free
     when only one side has commodities: it accepts their commodities for at most as many of its trade goods, and on
     its own turn, holding no commodities, offers that flip once a round. As Trade holder it charges such a follower X-1

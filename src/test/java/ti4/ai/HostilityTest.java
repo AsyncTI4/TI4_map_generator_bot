@@ -90,17 +90,52 @@ class HostilityTest extends BaseTi4Test {
         assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isZero();
     }
 
-    // Sol resolves Plague and Uprising on Nekro: each mean card costs 2 TG, once.
+    // The user's rule (2026-11-21): a mean card costs what it actually took from its target. Sol aims a card at Nekro
+    // and Nekro then loses 2 trade goods' worth before the window closes, so Sol is charged 2, once.
     @Test
-    void meanCardsCostTheirTarget() {
+    void meanCardsCostWhatTheyTook() {
         AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        test.nekro.setTg(5);
+        Hostility.record(test.game);
         test.game.getGameStats().recordAcTarget("Plague", test.sol, test.nekro);
-        test.game.getGameStats().recordAcTarget("Uprising", test.sol, test.nekro);
+        Hostility.record(test.game);
+        assertThat(Hostility.pending(test.game)).hasSize(1);
+
+        test.nekro.setTg(3);
+        Hostility.record(test.game);
+        Hostility.record(test.game);
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isCloseTo(2, within(CLOSE));
+        assertThat(Hostility.pending(test.game)).isEmpty();
+    }
+
+    // A Tactical Bombardment used as a blank stall, on a system where Nekro has nothing readied, costs nothing: once
+    // the turn passes the window closes with no loss.
+    @Test
+    void aBlankTacticalBombardmentCostsNothing() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.TACTICAL_BOMBARDMENT, test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        test.isActive(test.nekro, "action");
+        Hostility.record(test.game);
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isZero();
+        assertThat(Hostility.pending(test.game)).isEmpty();
+    }
+
+    // Assassinate Representative takes votes and Spy takes a card, neither of which shows in the target's assets, so
+    // they cost a set amount: 1 TG for the votes (the user's Public Execution value) and an average card.
+    @Test
+    void votesAndCardsCostASetAmount() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.game.getGameStats().recordAcTarget("Assassinate Representative", test.sol, test.nekro);
+        test.game.getGameStats().recordAcTarget("Spy", test.sol, test.nekro);
 
         Hostility.record(test.game);
-        Hostility.record(test.game);
         assertThat(Hostility.amount(test.game, test.nekro, test.sol))
-                .isCloseTo(2 * Hostility.MEAN_CARD_COST, within(CLOSE));
+                .isCloseTo(1 + ti4.ai.actioncards.ActionCardPrior.AVERAGE_CARD, within(CLOSE));
     }
 
     // Combat cards are part of the fight, not hostility of their own.
@@ -125,7 +160,48 @@ class HostilityTest extends BaseTi4Test {
         test.game.getGameStats().recordAcTarget("Plague", test.sol, test.nekro);
 
         Hostility.record(test.game);
+        assertThat(Hostility.pending(test.game)).hasSize(1);
+        assertThat(Hostility.pending(test.game).getFirst().offender()).isEqualTo("sol");
+    }
+
+    // The user's note (2026-11-17): a tendency not to anger too many players at once. Nekro has already cost Sol and
+    // Xxcha a trade good or more this round, so angering a third player weighs 50% more; next round it starts over.
+    @Test
+    void angeringMorePlayersInARoundCostsMore() {
+        AiTestGame test = AiTestGame.withSolAi();
+        ti4.game.Player xxcha = test.addSeat("7100000555555555", "xxcha", "red");
+        ti4.game.Player hacan = test.addSeat("7100000666666666", "hacan", "yellow");
+        assertThat(Hostility.spreadFactor(test.game, test.nekro, hacan)).isEqualTo(1);
+
+        Hostility.add(test.game, "nekro", "sol", 2.0);
+        Hostility.add(test.game, "nekro", "xxcha", 1.0);
+        Hostility.add(test.game, "nekro", "hacan", 0.5);
+        assertThat(Hostility.spreadFactor(test.game, test.nekro, hacan))
+                .isCloseTo(1 + 2 * Hostility.SPREAD_STEP, within(CLOSE));
+        assertThat(Hostility.spreadFactor(test.game, test.nekro, xxcha))
+                .isCloseTo(1 + Hostility.SPREAD_STEP, within(CLOSE));
+
+        test.game.setRound(test.game.getRound() + 1);
+        assertThat(Hostility.spreadFactor(test.game, test.nekro, hacan)).isEqualTo(1);
+        assertThat(Hostility.amount(test.game, test.sol, test.nekro)).isCloseTo(2.0, within(CLOSE));
+    }
+
+    // A Tactical Bombardment that exhausts Nekro's readied planets costs what those planets were worth to spend.
+    @Test
+    void aRealTacticalBombardmentCostsTheExhaustedPlanets() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        test.place("19", "311");
+        test.nekro.addPlanet("wellon");
+        test.nekro.refreshPlanet("wellon");
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget(Hostility.TACTICAL_BOMBARDMENT, test.sol, test.nekro);
+        test.nekro.exhaustPlanet("wellon");
+
+        Hostility.record(test.game);
+        ti4.game.Planet wellon = test.game.getPlanetsInfo().get("wellon");
         assertThat(Hostility.amount(test.game, test.nekro, test.sol))
-                .isCloseTo(Hostility.MEAN_CARD_COST, within(CLOSE));
+                .isCloseTo(
+                        ti4.ai.eval.ValueScale.spendable(wellon.getResources(), wellon.getInfluence()), within(CLOSE));
     }
 }

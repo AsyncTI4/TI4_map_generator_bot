@@ -972,8 +972,8 @@ descriptions for the classes outside `StandardBrain` belong to their own package
     Territory.of(game, victim).zone(tile)`: skip unless the victim has a space dock there or the zone is `HOME`, `SLICE`
     or `LANE`. `parked` = 3.0 in `HOME`, 1.0 in `SLICE`/`LANE`, else 0; `blockade` = dock and no victim ships there;
     `cost = max(parked, blockade ? 2.0 : 0)`. Every other real player with ships in that tile is charged `cost`.
-  - Cards: each new `GameStats.ActionCardTarget` (a player aiming an action card at another) costs 2.0
-    (`MEAN_CARD_COST`); each new Sabotage play costs 1.0 against the player of the most recent earlier cancelled play by
+  - Cards: each new `GameStats.ActionCardTarget` (a player aiming an action card at another) costs what it took
+    from the target (a pending check on its assets, `aiHostilityPending`); each new Sabotage play costs 1.0 against the player of the most recent earlier cancelled play by
     someone else (a Sabotage that is the last play with no cancelled play found yet is left for the next scan).
   - Writes only when something new was found, through `AiGameWrites.persist`, re-checking the marks on the latest game.
   - `location(game, tile, victim)`: 3.0 home, 1.5 slice or lane, else 1.0 (multiplier used by `AttackLedger`).

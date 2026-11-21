@@ -54,6 +54,7 @@ public final class AiTestGame {
         AiLogStore.keepInMemory();
         ti4.ai.tactical.SlayIntent.forget(game.getName());
         ti4.ai.tactical.AttackLedger.forget(game.getName());
+        Hostility.forget(game.getName());
         game.setRound(2);
         game.setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
         game.setActiveSystem("");

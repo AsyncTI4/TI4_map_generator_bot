@@ -329,7 +329,7 @@ trackedId(target))`. `ActionCardTarget` is a Jackson bean with `NON_EMPTY` inclu
 **Invoked when:** in [ButtonHelperActionCards](/src/main/java/ti4/helpers/ButtonHelperActionCards.java) step-2
 resolvers: Insubordination, Spy, Seize Artifact, Uprising, Assassinate Representative, Signal Jamming, Reactor
 Meltdown (recorded before its null-target fizzle check), Plague, Cripple Defenses, Unstable Planet.
-**Read by:** `Hostility.scanCards`/`meanCards`, which charges `MEAN_CARD_COST` = 2.0 TG of hostility per new entry
+**Read by:** `Hostility.scanCards`, which opens a pending impact check per new entry (see the hostility notes below; a mean card costs what it took from the target)
 (offender = card player, victim = target), tracking how many entries it has processed in `aiHostilityTargets`.
 `HostilityTest` records Plague and Uprising targets directly.
 **Effect on human games:** the save's `GameStats` JSON grows by one entry per such card; no behaviour change.
@@ -578,8 +578,9 @@ rollout experiment that the seeding enables (`RolloutExperimentTest`, `Determini
 
 - `recordAcTarget(card, player, target)` appends `(card, trackedId(player), trackedId(target))` unless either is null
   or they are the same player.
-- `Hostility.meanCards` charges each entry past the processed count (`aiHostilityTargets`) 2.0 TG of hostility from the
-  card player toward the target (`MEAN_CARD_COST`). `Relations` turns hostility into relation points at 2 TG per point
+- `Hostility.scanCards` opens a pending impact check (`aiHostilityPending`) for each entry past the processed count
+  (`aiHostilityTargets`) and charges the card player the target's measured loss of assets once the card resolves
+  (Assassinate Representative and Spy cost a set 1 TG and an average card). `Relations` turns hostility into relation points at 2 TG per point
   (`TRADE_GOODS_PER_POINT` = 2.0, floor of the quotient).
 
 ### ButtonHelper.fleetCheck values

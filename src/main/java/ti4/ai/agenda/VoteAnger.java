@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
+import ti4.ai.Hostility;
 import ti4.ai.tactical.TacticalStrength;
 import ti4.ai.trade.Relations;
 import ti4.game.Game;
@@ -24,7 +25,11 @@ class VoteAnger {
         if (votes <= 0 || outcome.isEmpty() || !AiExperiments.enabled(voter, Experiment.VOTE_ANGER)) return 0;
         Map<String, Double> weights = new HashMap<>();
         for (Player other : game.getRealPlayers()) {
-            if (other != voter) weights.put(other.getFaction(), TacticalStrength.angerWeight(game, voter, other));
+            if (other != voter) {
+                weights.put(
+                        other.getFaction(),
+                        TacticalStrength.angerWeight(game, voter, other) * Hostility.spreadFactor(game, voter, other));
+            }
         }
         Map<String, Double> angers = new HashMap<>();
         for (String alternative : forecast.outcomes())
