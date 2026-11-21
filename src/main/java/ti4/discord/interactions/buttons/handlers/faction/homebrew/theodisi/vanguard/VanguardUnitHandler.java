@@ -22,7 +22,6 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParseUnitService;
 import ti4.service.unit.ParsedUnit;
-import ti4.service.unit.UnitModelValueInjectionService;
 
 @UtilityClass
 public class VanguardUnitHandler {
@@ -142,17 +141,6 @@ public class VanguardUnitHandler {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " gave " + unit.getUnitEmoji() + " " + unit.getName()
                         + " SUSTAIN DAMAGE until the end of this action.");
-    }
-
-    public static UnitModel injectBulwarkSustain(Game game, Player player, Tile tile, UnitKey unitKey, UnitModel unit) {
-        if (unit == null || !hasBulwarkSustain(game, player, tile, unitKey)) {
-            return unit;
-        }
-        return UnitModelValueInjectionService.injectTemporaryValues(
-                unit,
-                UnitModelValueInjectionService.UnitValueInjection.of(
-                        UnitModelValueInjectionService.BooleanValueInjection.create()
-                                .sustainDamage(true)));
     }
 
     public static int getBulwarkSustainCount(Game game, Player player, Tile tile, UnitKey unitKey) {

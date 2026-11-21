@@ -50,6 +50,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.ToldarTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinCommanderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -110,7 +111,6 @@ import ti4.helpers.adjacency.Adjacency;
 import ti4.helpers.bluereverie.BlueReverieTechHelper;
 import ti4.helpers.thirtyk.ThirtyKActionCardHooks;
 import ti4.helpers.thirtyk.ThirtyKExploreHooks;
-import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
@@ -3392,7 +3392,7 @@ public class CombatRollService {
                 continue;
             }
             Tile adjTile = game.getTileByPosition(adjacentTilePosition);
-            if (TeHelperUnits.affectedByQuietus(game, player, adjTile)
+            if (XinTechHandler.isAffectedByQuietus(game, player, adjTile)
                     || (adjTile.isScar(game) && !player.hasTech("dsxinystar"))
                     || ButtonHelper.isTileSmothered(game, adjTile, player)) {
                 continue;

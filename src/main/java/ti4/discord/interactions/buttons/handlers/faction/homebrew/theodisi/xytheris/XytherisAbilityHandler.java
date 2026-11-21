@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.ids.AutoAssignGroundHitsButtonIds;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
@@ -23,7 +24,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.adjacency.Adjacency;
-import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
@@ -57,7 +57,7 @@ public class XytherisAbilityHandler {
         return systemsUpToTwoAway(game, player, tile.getPosition()).stream()
                 .map(game::getTileByPosition)
                 .filter(remoteTile -> remoteTile != null
-                        && !TeHelperUnits.affectedByQuietus(game, player, remoteTile)
+                        && !XinTechHandler.isAffectedByQuietus(game, player, remoteTile)
                         && !remoteTile.isScar(game))
                 .flatMap(remoteTile -> remoteTile.getUnitHolders().values().stream())
                 .flatMap(remoteHolder -> remoteHolder.getUnitKeys().stream()

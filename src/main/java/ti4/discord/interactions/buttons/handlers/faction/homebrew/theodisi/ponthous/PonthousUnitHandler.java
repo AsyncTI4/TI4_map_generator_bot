@@ -16,12 +16,8 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
-import ti4.model.UnitModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.unit.UnitModelValueInjectionService;
-import ti4.service.unit.UnitModelValueInjectionService.BooleanValueInjection;
-import ti4.service.unit.UnitModelValueInjectionService.UnitValueInjection;
 
 @UtilityClass
 public class PonthousUnitHandler {
@@ -72,14 +68,6 @@ public class PonthousUnitHandler {
                         + " fighter"
                         + (fightersToGrantSustain == 1 ? " gains" : "s gain")
                         + " SUSTAIN DAMAGE until this combat ends.");
-    }
-
-    public static UnitModel injectTemporaryFighterSustain(Game game, Player player, Tile tile, UnitModel unit) {
-        if (unit.getUnitType() != UnitType.Fighter || getRemainingFighterSustains(game, player, tile) < 1) {
-            return unit;
-        }
-        return UnitModelValueInjectionService.injectTemporaryValues(
-                unit, UnitValueInjection.of(BooleanValueInjection.create().sustainDamage(true)));
     }
 
     public static int getTemporaryFighterSustainRemaining(Game game, Player player, Tile tile) {

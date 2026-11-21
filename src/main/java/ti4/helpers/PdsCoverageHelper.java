@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurviali.ThurvialiUnitHandler;
 import ti4.game.Game;
@@ -15,7 +16,6 @@ import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.adjacency.Adjacency;
-import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.model.UnitModel;
 
 public final class PdsCoverageHelper {
@@ -71,7 +71,7 @@ public final class PdsCoverageHelper {
                 if (adjTile.isScar() && !player.hasTech("dsxinystar")) {
                     continue;
                 }
-                if (TeHelperUnits.affectedByQuietus(game, player, adjTile)) {
+                if (XinTechHandler.isAffectedByQuietus(game, player, adjTile)) {
                     continue;
                 }
                 boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);

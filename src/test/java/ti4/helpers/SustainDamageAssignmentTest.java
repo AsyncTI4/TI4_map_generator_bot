@@ -22,6 +22,9 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.MessageHelper;
 import ti4.model.Mapper;
+import ti4.service.combat.sustain.HitSource;
+import ti4.service.combat.sustain.SustainContext;
+import ti4.service.combat.sustain.SustainEligibility;
 import ti4.testUtils.BaseTi4Test;
 
 class SustainDamageAssignmentTest extends BaseTi4Test {
@@ -183,24 +186,30 @@ class SustainDamageAssignmentTest extends BaseTi4Test {
         assertTrue(ids.stream().noneMatch(id -> id.contains("_mf_")), ids.toString());
     }
 
-    // The Alastor II: ground forces participate "as though they were ships". The Alastor I: "as though they were
-    // fighters", which have no SUSTAIN DAMAGE. The manual check used Alastor I while auto-assign used Alastor II.
+    // The Alastor II: ground forces participate "as though they were ships", so a mech with SUSTAIN DAMAGE in the
+    // system can use it during space combat. Participating does not hand out the ability: Z-Grav Eidolon has none.
     @Test
-    void nekroAlastorTwoLetsMechWithoutSustainSustain() {
+    void nekroAlastorTwoLetsParticipatingMechSustainButGrantsNoAbility() {
         Player player = addPlayer("red", "nekro");
         player.addOwnedUnitByID("sigma_nekro_flagship_2");
         tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, "red"), 1);
+        SustainContext spaceCombat = SustainContext.of(game, player, tile, null, HitSource.SPACE_COMBAT);
 
-        assertTrue(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("naaz_mech_space")));
+        assertTrue(SustainEligibility.canSustain(spaceCombat, Mapper.getUnit("mech")));
+        assertFalse(SustainEligibility.canSustain(spaceCombat, Mapper.getUnit("naaz_mech_space")));
     }
 
+    // The Alastor I: ground forces in the space area participate "as though they were fighters". They keep their own
+    // SUSTAIN DAMAGE, but fighters have none to lend, so Z-Grav Eidolon still cannot sustain.
     @Test
-    void nekroAlastorOneDoesNotLetMechWithoutSustainSustain() {
+    void nekroAlastorOneKeepsPrintedSustainButGrantsNoAbility() {
         Player player = addPlayer("red", "nekro");
         player.addOwnedUnitByID("sigma_nekro_flagship_1");
         tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Flagship, "red"), 1);
+        SustainContext spaceCombat = SustainContext.of(game, player, tile, null, HitSource.SPACE_COMBAT);
 
-        assertFalse(ButtonHelper.unitCanSustainDamage(game, player, tile, Mapper.getUnit("naaz_mech_space")));
+        assertTrue(SustainEligibility.canSustain(spaceCombat, Mapper.getUnit("mech")));
+        assertFalse(SustainEligibility.canSustain(spaceCombat, Mapper.getUnit("naaz_mech_space")));
     }
 
     // With laws disabled, Articles of War is not in effect, so the Mentak mech still stops other players' ground
