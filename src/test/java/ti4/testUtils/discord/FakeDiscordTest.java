@@ -44,6 +44,30 @@ class FakeDiscordTest extends BaseTi4Test {
         assertThat(ti4.model.Mapper.getPlanet("mrte").getLegendaryEmbed()).isNotNull();
     }
 
+    // A continuation A/B restores snapshots of different moments in turn. Restoring an earlier one drops a message
+    // posted after it; restoring the later one must bring that message back, findable by id, or its buttons can never
+    // be pressed again (the strategy-phase stall of the first continuation run).
+    @Test
+    void restoringALaterSnapshotBringsBackWhatAnEarlierOneDropped() {
+        FakeDiscord.Snapshot early = discord.snapshot();
+        Message prompt = actions.sendMessage("Pick a strategy card")
+                .setComponents(ActionRow.of(Button.primary("scPick_1", "Leadership")))
+                .complete();
+        ThreadChannel thread = actions.createThreadChannel("later-thread").complete();
+        FakeDiscord.Snapshot late = discord.snapshot();
+
+        discord.restore(early);
+        assertThat(discord.message(prompt.getIdLong())).isNull();
+        assertThat(discord.channel(thread.getIdLong())).isNull();
+
+        discord.restore(late);
+        assertThat(discord.message(prompt.getIdLong())).isNotNull();
+        assertThat(discord.channel(thread.getIdLong())).isNotNull();
+        assertThat(discord.channel(actions.getIdLong()).liveMessages())
+                .extracting(FakeMessage::content)
+                .contains("Pick a strategy card");
+    }
+
     // The bot's own helper splits, sanitises and sends; the fake must receive the result like Discord would.
     @Test
     void receivesButtonsSentThroughMessageHelper() {

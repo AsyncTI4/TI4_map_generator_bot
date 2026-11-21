@@ -95,7 +95,13 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
     stored values, so `decisionOverride` is not needed.
   - With common random numbers an A/A run scores exactly 0, so the check reads the standard error of a real flag's
     run; `crn=false` gives the unpaired noise.
-  - Next: run one flag with a known whole-game result (needs a yes), compare sign and standard error.
+  - First run, 2026-11-21, DESPERATION_ACTION_SECRET (8 games, 96 pairs, 7 h 20 min wall on 8 threads): void.
+    Restoring the round-2 snapshot dropped Discord messages posted after it, and restoring a later snapshot never
+    brought them back, so round-3 arms and most round-4 arms stalled in the strategy phase with no pick prompt
+    (92% of pairs untouched, -0.007 +/- 0.012 VP from games that barely moved). `FakeDiscord` snapshots now keep the
+    channel and message objects; a one-game repro then finished all 4 arms at their stop round. Each arm that misses
+    its stop round now prints the stall report, and the summary counts arm endings.
+  - Next: rerun the same flag (needs a yes), compare sign and standard error with the whole-game -0.5 VP.
 - [ ] **5. One-round own-seat lookahead, logging only.** Imagine each top plan on a board copy and rank again. Needs
   fresh memo scopes: `DecisionMemo` keys carry no game and `Player.equals` compares only the user id.
   - Check: under 5% of activations change, or flipped decisions don't gain in step 4's test, means stop and skip 8-9.

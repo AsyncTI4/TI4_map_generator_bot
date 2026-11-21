@@ -59,6 +59,8 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
     private static final boolean COMMON_RANDOM_NUMBERS =
             Boolean.parseBoolean(System.getProperty("ai.selfplay.continuation.crn", "true"));
 
+    private static final Map<SelfPlayGame.Ending, Integer> ARM_ENDINGS = new java.util.concurrent.ConcurrentHashMap<>();
+
     record Ending(int round, int leader, int total) {}
 
     record GameResult(List<ContinuationAb.Pair> pairs, List<Ending> endings, long wallSeconds) {}
@@ -138,7 +140,13 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
         Map<String, Integer> before = points(game);
         GameManager.save(game, "AI continuation A/B arm");
         selfPlay.forgetObservedGame();
-        selfPlay.run(next -> next.getRound() >= round + HORIZON, 14 * VIRTUAL_DAY, MAX_TICKS);
+        SelfPlayGame.Outcome outcome =
+                selfPlay.run(next -> next.getRound() >= round + HORIZON, 14 * VIRTUAL_DAY, MAX_TICKS);
+        ARM_ENDINGS.merge(outcome.ending(), 1, Integer::sum);
+        if (outcome.ending() != SelfPlayGame.Ending.STOP_CONDITION) {
+            System.out.println("CONTARM " + selfPlay.name + " round " + round + " seed " + continuationSeed + " ended "
+                    + outcome.ending() + "\n" + selfPlay.report(outcome.ending(), game(selfPlay), outcome.ticks()));
+        }
         return new ContinuationAb.Arm(treated, ContinuationAb.gains(before, points(game(selfPlay))));
     }
 
@@ -184,6 +192,7 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
                     pair.untouched() ? " untouched" : "");
         }
         ContinuationAb.summary(pairs).forEach(System.out::println);
+        System.out.println("Arm endings: " + new java.util.TreeMap<>(ARM_ENDINGS));
         System.out.printf(
                 "Continuation ends: average round %.2f, leader %.2f VP, table %.2f VP over %d arms; wall %d s per game%n",
                 endings.stream().mapToInt(Ending::round).average().orElse(0),
