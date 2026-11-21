@@ -80,7 +80,7 @@
     },
     {
         "id": "sorrow",
-        "name": "Sea of Tears",
+        "name": "The Sorrow",
         "faction": "crimson",
         "permanentEffect": "When you create the game board, place The Sorrow (tile 94) where your home system would be placed, and place an inactive breach in it. The Sorrow is not a home system. Then, place your home system (tile 118) in your play area.",
         "source": "thunders_edge"

@@ -757,7 +757,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "When 1 or more of your units uses ANTI-FIGHTER BARRAGE: For each hit produced in excess of your opponent's fighters, choose 1 of your opponent's ships that has SUSTAIN DAMAGE to become damaged.",
+        "text": "When 1 or more of your units use ANTI-FIGHTER BARRAGE: For each hit produced in excess of your opponent's fighters, choose 1 of your opponent's ships that has SUSTAIN DAMAGE to become damaged.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-raidformation.png?raw=true",
         "source": "twilights_fall",
         "faction": "argent"

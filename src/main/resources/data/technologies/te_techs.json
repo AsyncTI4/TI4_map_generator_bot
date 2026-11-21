@@ -135,7 +135,6 @@
         "types": [
             "CYBERNETIC"
         ],
-        "requirements": "null",
         "faction": "obsidian",
         "text": "At the start of your strategic actions, you may move an ingress token into a system that contains or is adjacent to your units.\nThis technology cannot be researched.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/planesplitter-obs.jpg?raw=true",
@@ -148,7 +147,6 @@
         "types": [
             "BIOTIC"
         ],
-        "requirements": "null",
         "faction": "obsidian",
         "text": "At the start of your turn, destroy 1 of another player's infantry in or adjacent to a system that contains your infantry.\nThis technology cannot be researched.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/parasite-obs.jpg?raw=true",
