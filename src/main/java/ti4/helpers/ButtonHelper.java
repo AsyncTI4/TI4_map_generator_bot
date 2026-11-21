@@ -7537,17 +7537,17 @@ public class ButtonHelper {
                 || "spacecombat".equalsIgnoreCase(type)
                 || "assaultcannoncombat".equalsIgnoreCase(type);
         boolean combat = type.contains("combat");
+        boolean afb = "afb".equalsIgnoreCase(type);
         boolean oneButtonPerUnit = limitOne
                 || spaceCombatish
                 || "combat".equalsIgnoreCase(type); // space combat or generic unspecified combat
+        boolean groundForcesFightInSpace = doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                || player.hasUnit("purpletf_mech")
+                || player.hasUnit("naaz_voltron")
+                || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
+                || doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if (unitHolder instanceof Planet
-                    && (spaceCombatish
-                            && !(doesPlayerHaveFSHere("nekro_flagship", player, tile)
-                                    || player.hasUnit("purpletf_mech")
-                                    || player.hasUnit("naaz_voltron")
-                                    || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
-                                    || doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile)))) {
+            if (unitHolder instanceof Planet && (spaceCombatish || afb) && !groundForcesFightInSpace) {
                 continue;
             } else if (unitHolder instanceof Space && "groundcombat".equalsIgnoreCase(type)) {
                 continue;
@@ -7576,6 +7576,11 @@ public class ButtonHelper {
                                 .contains(unitKey.unitType())) {
                     continue;
                 }
+                boolean canBeHit =
+                        !afb || unitModel.getIsShip() || (groundForcesFightInSpace && unitModel.getIsGroundForce());
+                if (!canBeHit && !canCancelAntiFighterBarrageHitOnShips(game, player, unitHolder, unitKey)) {
+                    continue;
+                }
 
                 // All sustain damage buttons for all states
                 boolean canDamage = !"courageouscombat".equalsIgnoreCase(type)
@@ -7600,6 +7605,7 @@ public class ButtonHelper {
                 }
                 // Then, all assign hits buttons for all states
                 for (UnitState state : UnitState.values()) {
+                    if (!canBeHit) continue;
                     int max = Math.min(oneButtonPerUnit ? 1 : 2, unitHolder.getUnitCountForState(unitKey, state));
                     for (int x = 1; x <= max; x++) {
                         if (combat) {
@@ -7626,6 +7632,14 @@ public class ButtonHelper {
         return buttons;
     }
 
+    private static boolean canCancelAntiFighterBarrageHitOnShips(
+            Game game, Player player, UnitHolder unitHolder, UnitKey unitKey) {
+        return unitHolder instanceof Space
+                && unitKey.unitType() == UnitType.Mech
+                && player.hasUnit("nomad_mech")
+                && !isLawInPlay(game, "articles_war");
+    }
+
     public static boolean unitCanSustainDamage(Game game, Player player, Tile tile, UnitModel unitModel) {
         String unitBaseType = unitModel.getBaseType();
         return !ButtonHelperAbilities.removesSustainDamage(game, player, tile)
@@ -7633,13 +7647,13 @@ public class ButtonHelper {
                 && !("warsun".equalsIgnoreCase(unitBaseType) && isLawInPlay(game, "schematics"))
                 && (unitModel.getSustainDamage()
                         || ("mech".equalsIgnoreCase(unitBaseType)
-                                && !game.getLaws().containsKey("articles_war")
+                                && !isLawInPlay(game, "articles_war")
                                 && player.hasUnit("nomad_mech"))
                         || ("mech".equalsIgnoreCase(unitBaseType)
                                 && (player.ownsUnit("purpletf_mech")
                                         || player.hasUnit("naaz_voltron")
                                         || doesPlayerHaveFSHere("nekro_flagship", player, tile)
-                                        || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
+                                        || doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile)))
                         || (!player.isActivePlayer()
                                 && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")
                                 && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()))
