@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -60,6 +61,7 @@ public class PuppetSoftHeBladeService {
         // Announce Plots
         String factionName = player.getRepresentationNoPing();
         StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
+        Map<Player, List<GenericCardModel>> puppetedPlots = new HashMap<>();
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
             plotInfo.append('\n').append(plot.getRepresentation());
@@ -69,7 +71,12 @@ public class PuppetSoftHeBladeService {
                 StringBuilder factions = new StringBuilder();
                 for (String faction : puppetedFactions) {
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null) factions.append(p2.fogSafeEmoji()).append(' ');
+                    if (p2 != null) {
+                        factions.append(p2.fogSafeEmoji()).append(' ');
+                        puppetedPlots
+                                .computeIfAbsent(p2, k -> new ArrayList<>())
+                                .add(plot);
+                    }
                 }
                 plotInfo.append("\n> - Puppeted Factions for ")
                         .append(plot.getName())
@@ -79,6 +86,16 @@ public class PuppetSoftHeBladeService {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), plotInfo.toString());
+
+        for (Entry<Player, List<GenericCardModel>> entry : puppetedPlots.entrySet()) {
+            Player puppet = entry.getKey();
+            String plotNames =
+                    entry.getValue().stream().map(GenericCardModel::getName).collect(Collectors.joining(", "));
+            MessageHelper.sendMessageToChannel(
+                    puppet.getCorrectChannel(),
+                    puppet.getRepresentation() + ", " + factionName
+                            + " has flipped, revealing that you are puppeted by: " + plotNames + ".");
+        }
 
         // Serve relevant plot automation on reveal
         for (String plotID : player.getPlotCards().keySet()) {

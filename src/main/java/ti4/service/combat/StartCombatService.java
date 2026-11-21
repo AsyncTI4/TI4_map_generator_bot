@@ -1620,7 +1620,7 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
                             player.getRepresentationUnfogged()
-                                    + " Reminder that you have the Metal Void Armaments relic to use AFB 3x6.");
+                                    + " Reminder that you have the Metali Void Armaments relic to use AFB 6x3.");
                 }
                 if (player.hasTech("tf-projectionofpow")) {
                     MessageHelper.sendMessageToChannel(
