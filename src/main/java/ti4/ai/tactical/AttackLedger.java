@@ -17,11 +17,11 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import ti4.ai.AiGameWrites;
 import ti4.ai.Hostility;
+import ti4.ai.PlayerAssets;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.DecidingSeat;
-import ti4.ai.eval.ValueScale;
 import ti4.ai.promise.Promise;
 import ti4.ai.promise.PromiseBook;
 import ti4.ai.strategy.SpeakerSale;
@@ -226,7 +226,7 @@ public class AttackLedger {
             Tile tile = game.getTileByPosition(position);
             Player attacker = attackerAt(game, position, victim, active, before, after);
             if (tile == null || attacker == null) return;
-            double lost = drop * share * ValueScale.RESOURCE;
+            double lost = drop * share;
             double damage = lost * Grievance.location(game, tile, victim);
             found.add(new Loss(
                     new Attack(game.getRound(), attacker.getFaction(), faction, damage),
@@ -283,7 +283,7 @@ public class AttackLedger {
         for (UnitHolder holder : tile.getUnitHolders().values()) {
             for (UnitKey key : holder.getUnitKeysForPlayer(player)) {
                 UnitModel model = player.getUnitFromUnitKey(key);
-                if (model != null) cost += model.getCost() * holder.getUnitCount(key);
+                if (model != null) cost += PlayerAssets.worth(model) * holder.getUnitCount(key);
             }
         }
         return cost;

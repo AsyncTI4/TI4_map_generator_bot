@@ -415,4 +415,21 @@ class HostilityTest extends BaseTi4Test {
                 .isCloseTo(Hostility.STRATEGIC_DURESS_COST, within(CLOSE));
         assertThat(Hostility.pending(test.game)).isEmpty();
     }
+
+    // The user's value (2026-11-21): a space dock or PDS is worth 1 TG + 3 influence, though its unit card has no cost.
+    @Test
+    void aDestroyedStructureCostsATradeGoodAndThreeInfluence() {
+        AiTestGame test = AiTestGame.withSolAi();
+        test.isActive(test.sol, "action");
+        Tile tile = test.place("19", "311");
+        test.units(tile, "wellon", test.nekro, UnitType.Pds, 1);
+        Hostility.record(test.game);
+        test.game.getGameStats().recordAcTarget("Cripple Defenses", test.sol, test.nekro);
+        Hostility.record(test.game);
+
+        tile.getUnitHolders().get("wellon").removeAllUnits(test.nekro.getColor());
+        Hostility.record(test.game);
+        assertThat(PlayerAssets.STRUCTURE).isCloseTo(1 + 3 * 0.8, within(CLOSE));
+        assertThat(Hostility.amount(test.game, test.nekro, test.sol)).isCloseTo(PlayerAssets.STRUCTURE, within(CLOSE));
+    }
 }

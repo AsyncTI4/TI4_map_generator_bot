@@ -22,6 +22,11 @@ public class PlayerAssets {
     static final double COMMAND_TOKEN = 2.4;
     static final double FRAGMENT = 1.0;
     static final double PROMISSORY_NOTE = 1.0;
+    public static final double STRUCTURE = ValueScale.TRADE_GOOD + 3 * ValueScale.INFLUENCE;
+
+    public static double worth(UnitModel model) {
+        return model.getIsStructure() ? STRUCTURE : model.getCost() * ValueScale.RESOURCE;
+    }
 
     public record Holdings(double total, Map<String, Double> units, Set<String> planets, Set<String> tokens) {
 
@@ -80,7 +85,7 @@ public class PlayerAssets {
                 for (Map.Entry<UnitKey, Integer> unit : holder.getUnits().entrySet()) {
                     if (!player.unitBelongsToPlayer(unit.getKey())) continue;
                     UnitModel model = player.getUnitFromUnitKey(unit.getKey());
-                    if (model != null) total += model.getCost() * ValueScale.RESOURCE * unit.getValue();
+                    if (model != null) total += worth(model) * unit.getValue();
                 }
             }
             if (total > 0) byPosition.put(tile.getPosition(), total);
