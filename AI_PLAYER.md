@@ -1868,7 +1868,8 @@ references it:
     seats with those experiments off (control) and half with everything on (treatment). Games run in pairs: both games
     of a pair share a seed and swap the two halves (`seedFor(slot) = seed + slot / 2`). The summary prints the
     treatment-minus-control points and win share over complete pairs, with standard errors. With one experiment
-    named this is a leave-one-out test. A/A noise is about ±0.26 points at 12 pairs. Leave-one-out results from
+    named this is a leave-one-out test. Every A/B run is recorded in the catalog under
+    [docs/ai/experiments](docs/ai/experiments/README.md) (`AbRecord`). A/A noise is about ±0.26 points at 12 pairs. Leave-one-out results from
     2026-11-10, 24 pairs each, seed 7000:
     | Experiment | Points, treatment minus control | Treatment win share |
     | --- | --- | --- |

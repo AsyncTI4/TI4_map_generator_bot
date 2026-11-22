@@ -1,0 +1,27 @@
+{
+  "id": "20261110-win-threat-feasible",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Leave-one-out: does reading rivals' feasible point paths help?",
+  "date": "2026-11-10",
+  "code": {
+    "commit": "before 14bebc007b",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 48,
+    "baseSeed": 7000,
+    "experimentsUnderTest": [
+      "WIN_THREAT_FEASIBLE"
+    ]
+  },
+  "estimate": {
+    "completePairs": 24,
+    "pointDifference": "-0.09 ± 0.16",
+    "treatmentWinShare": "0.50 ± 0.07"
+  },
+  "batch": null,
+  "verdict": "Kept on: neutral, and it reads rivals' real paths to points.",
+  "notes": "Same stack-overflow caveat as the other 2026-11-10 leave-one-out runs."
+}

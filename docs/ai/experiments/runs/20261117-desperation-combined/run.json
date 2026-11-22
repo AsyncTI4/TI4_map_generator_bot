@@ -1,0 +1,25 @@
+{
+  "id": "20261117-desperation-combined",
+  "kind": "ab",
+  "reconstructed": true,
+  "question": "Does boosting long-shot point completions help?",
+  "date": "2026-11-17",
+  "code": {
+    "commit": "before c94304b0b5",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": null,
+    "baseSeed": null,
+    "experimentsUnderTest": null
+  },
+  "estimate": {
+    "completePairs": null,
+    "pointDifference": "-0.65 ± 0.23",
+    "treatmentWinShare": null
+  },
+  "batch": null,
+  "verdict": "Split into three experiments and the boost lowered.",
+  "notes": "Game count and seed not noted."
+}

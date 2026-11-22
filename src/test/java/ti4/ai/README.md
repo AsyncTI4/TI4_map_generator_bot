@@ -397,6 +397,7 @@ The "scenarios" in this scope are situations the harness meets while it runs a g
 - **Trigger:** `-Dai.selfplay.ab=EXPERIMENT,...|all|none` (`none` is an A/A run).
 - **Logic:** games run in pairs: slots `2k` and `2k+1` share seed `BASE_SEED + k`, seating rotation (`pairSlot`), seeded objectives (`-Dai.selfplay.objectiveseed` uses `pairSlot`) and clock start (`clockStart + slot / 2`); in the even game seats 0, 2, 4 are control, in the odd game seats 1, 3, 5. Control seats get the experiments disabled and the NEUTRAL personality; treatment seats get `-Dai.selfplay.ab.personality` if set.
 - **Outcome:** `AbSummary.print` (points, win share), `AgendaTracker.reportAb` (agenda metrics).
+- **Record:** `AbRecord` writes each A/B batch (and each `-Dai.selfplay.record=true` benchmark) to a folder under [docs/ai/experiments/runs](/docs/ai/experiments/README.md) with the commit, uncommitted patch, properties, per-seat `games.csv`, estimates and console log, and appends a row to `docs/ai/experiments/INDEX.md`.
 - **Limitation:** both games of a pair share the seed, but once the two halves decide differently the games diverge, so dice and draws are only common up to the first different decision.
 
 ### Rollouts on one decision

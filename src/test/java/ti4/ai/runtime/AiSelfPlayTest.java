@@ -49,6 +49,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         ti4.ai.brain.TickMemo.resetVerification();
         ti4.ai.trace.ShadowCheck.reset();
         FactionComponentTracker.BATCH.clear();
+        java.util.Optional<AbRecord> record = AbRecord.start("AiSelfPlayTest#sixAiSeatsPlayFullGames", games, threads);
         long batchStart = System.nanoTime();
         List<SelfPlayGame.Outcome> played = playAll(games, threads);
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
@@ -91,6 +92,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get());
         AgendaTracker.report(outcomes);
         FactionComponentTracker.printBatch();
+        record.ifPresent(run -> run.finish(outcomes, SelfPlayGame.Ending::finished, batchSeconds));
 
         String reports = String.join(
                 System.lineSeparator() + System.lineSeparator(),

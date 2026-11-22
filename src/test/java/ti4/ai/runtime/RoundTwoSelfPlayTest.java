@@ -112,7 +112,10 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
     void playTwoRounds() throws Exception {
         int games = Integer.getInteger("ai.selfplay.games", 6);
         int threads = Math.clamp(Integer.getInteger("ai.selfplay.threads", 6), 1, games);
+        java.util.Optional<AbRecord> record = AbRecord.start("RoundTwoSelfPlayTest#playTwoRounds", games, threads);
+        long batchStart = System.nanoTime();
         List<GameResult> results = playAll(games, threads);
+        long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
         report(results);
         System.out.printf(
                 "ROUND2 SARDAKK LEADERS commander pulls %d, hero plays %d over %d games%n",
@@ -129,11 +132,10 @@ class RoundTwoSelfPlayTest extends BaseTi4Test {
         List<SelfPlayGame.Outcome> outcomes =
                 results.stream().map(GameResult::outcome).toList();
         if (PLAY_AGENDA) AgendaTracker.report(outcomes);
-        if (SelfPlayGame.AB.isPresent())
-            AbSummary.print(
-                    outcomes,
-                    SelfPlayGame.AB.get(),
-                    ending -> ending == SelfPlayGame.Ending.STOP_CONDITION || ending.finished());
+        java.util.function.Predicate<SelfPlayGame.Ending> complete =
+                ending -> ending == SelfPlayGame.Ending.STOP_CONDITION || ending.finished();
+        if (SelfPlayGame.AB.isPresent()) AbSummary.print(outcomes, SelfPlayGame.AB.get(), complete);
+        record.ifPresent(run -> run.finish(outcomes, complete, batchSeconds));
     }
 
     private static final AtomicInteger COMMANDER_PULLS = new AtomicInteger();

@@ -91,6 +91,10 @@ public class AiExperiments {
         return !seat.getStoredValue(DISABLED_KEY).isEmpty();
     }
 
+    public static Set<Experiment> offByDefault() {
+        return EnumSet.copyOf(OFF_BY_DEFAULT);
+    }
+
     public static Optional<Set<Experiment>> abExperiments() {
         return parse(System.getProperty(AB_PROPERTY));
     }

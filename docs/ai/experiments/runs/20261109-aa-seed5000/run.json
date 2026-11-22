@@ -1,0 +1,27 @@
+{
+  "id": "20261109-aa-seed5000",
+  "kind": "aa",
+  "reconstructed": true,
+  "question": "How noisy is the paired point difference when both halves run the same code?",
+  "date": "2026-11-09",
+  "code": {
+    "commit": "8240743145 (claude/ai-strength-audit base)",
+    "dirty": null
+  },
+  "setup": {
+    "harness": "AiSelfPlayTest#sixAiSeatsPlayFullGames",
+    "games": 24,
+    "baseSeed": 5000,
+    "experimentsUnderTest": []
+  },
+  "estimate": {
+    "completePairs": 12,
+    "pointDifference": "+0.01 ± 0.26",
+    "treatmentWinShare": null
+  },
+  "batch": {
+    "roundLeaderTable": "6.1 / 10.2 / 44.9"
+  },
+  "verdict": "Calibration: noise ±0.26 VP at 12 pairs; same-seed pairs still diverge (pair SD ~0.9 VP), ~35 pairs needed for a 0.3 VP effect.",
+  "notes": "24/24 games ended on points. About 25 CPU-minutes per game; 24 games on 10 threads took 2.4 h."
+}

@@ -39,6 +39,66 @@ final class AbSummary {
         }
     }
 
+    // A mean with its standard error over n values (NaN error below two values).
+    record Stat(double mean, double error, int n) {
+
+        static Stat of(List<Double> values) {
+            int n = values.size();
+            if (n == 0) return new Stat(Double.NaN, Double.NaN, 0);
+            double mean =
+                    values.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+            if (n == 1) return new Stat(mean, Double.NaN, 1);
+            double variance = values.stream()
+                            .mapToDouble(value -> (value - mean) * (value - mean))
+                            .sum()
+                    / (n - 1);
+            return new Stat(mean, Math.sqrt(variance / n), n);
+        }
+    }
+
+    // The paired estimates of one batch: what the run catalog (AbRecord) stores and the console summary prints.
+    record Estimate(
+            List<GameResult> games,
+            int finishedGames,
+            int pairs,
+            long unfinishedGames,
+            Stat pointDifference,
+            Stat winShare,
+            double treatmentPoints,
+            double controlPoints) {}
+
+    static Estimate estimate(List<SelfPlayGame.Outcome> outcomes, Predicate<SelfPlayGame.Ending> complete) {
+        List<GameResult> results =
+                outcomes.stream().map(outcome -> result(outcome, complete)).toList();
+        Map<Long, List<GameResult>> pairs = new TreeMap<>();
+        for (GameResult game : results)
+            pairs.computeIfAbsent(game.seed(), seed -> new ArrayList<>()).add(game);
+        List<Double> pairDifferences = new ArrayList<>();
+        List<Double> pairWinShares = new ArrayList<>();
+        List<GameResult> completedResults = new ArrayList<>();
+        for (List<GameResult> pair : pairs.values()) {
+            if (!completedPair(pair)) continue;
+            completedResults.addAll(pair);
+            pairDifferences.add((pair.get(0).difference() + pair.get(1).difference()) / 2);
+            pairWinShares.add((pair.get(0).treatmentWinShare() + pair.get(1).treatmentWinShare()) / 2);
+        }
+        return new Estimate(
+                results,
+                completedResults.size(),
+                pairDifferences.size(),
+                results.stream().filter(game -> !game.completed()).count(),
+                Stat.of(pairDifferences),
+                Stat.of(pairWinShares),
+                completedResults.stream()
+                        .mapToDouble(GameResult::treatmentPoints)
+                        .average()
+                        .orElse(0),
+                completedResults.stream()
+                        .mapToDouble(GameResult::controlPoints)
+                        .average()
+                        .orElse(0));
+    }
+
     static GameResult result(SelfPlayGame.Outcome outcome, Predicate<SelfPlayGame.Ending> complete) {
         Map<String, Integer> points = outcome.victoryPoints();
         Set<String> control = outcome.controlSeats();
@@ -84,9 +144,8 @@ final class AbSummary {
             List<SelfPlayGame.Outcome> outcomes,
             Set<AiExperiments.Experiment> experiments,
             Predicate<SelfPlayGame.Ending> complete) {
-        List<GameResult> results =
-                outcomes.stream().map(outcome -> result(outcome, complete)).toList();
-        for (GameResult game : results) {
+        Estimate estimate = estimate(outcomes, complete);
+        for (GameResult game : estimate.games()) {
             System.out.printf(
                     "ABGAME slot=%d seed=%d ending=%s round=%d treatment=%.3f control=%.3f diff=%.3f winshare=%.3f%n",
                     game.slot(),
@@ -98,37 +157,19 @@ final class AbSummary {
                     game.difference(),
                     game.treatmentWinShare());
         }
-        Map<Long, List<GameResult>> pairs = new TreeMap<>();
-        for (GameResult game : results)
-            pairs.computeIfAbsent(game.seed(), seed -> new ArrayList<>()).add(game);
-        List<Double> pairDifferences = new ArrayList<>();
-        List<Double> pairWinShares = new ArrayList<>();
-        List<GameResult> completedResults = new ArrayList<>();
-        for (List<GameResult> pair : pairs.values()) {
-            if (!completedPair(pair)) continue;
-            completedResults.addAll(pair);
-            pairDifferences.add((pair.get(0).difference() + pair.get(1).difference()) / 2);
-            pairWinShares.add((pair.get(0).treatmentWinShare() + pair.get(1).treatmentWinShare()) / 2);
-        }
         System.out.printf(
                 "A/B unfinished games: %d; their pairs are excluded from paired estimates%n",
-                results.stream().filter(game -> !game.completed()).count());
+                estimate.unfinishedGames());
         System.out.printf(
                 "A/B %s: %d finished games in %d complete pairs; treatment minus control victory points %s; treatment win share"
                         + " %s (null 0.500); treatment %.2f vs control %.2f average points%n",
                 experiments.isEmpty() ? "none (A/A)" : experiments,
-                completedResults.size(),
-                pairDifferences.size(),
-                meanAndError(pairDifferences),
-                meanAndError(pairWinShares, 0.5),
-                completedResults.stream()
-                        .mapToDouble(GameResult::treatmentPoints)
-                        .average()
-                        .orElse(0),
-                completedResults.stream()
-                        .mapToDouble(GameResult::controlPoints)
-                        .average()
-                        .orElse(0));
+                estimate.finishedGames(),
+                estimate.pairs(),
+                meanAndError(estimate.pointDifference(), 0),
+                meanAndError(estimate.winShare(), 0.5),
+                estimate.treatmentPoints(),
+                estimate.controlPoints());
     }
 
     static String meanAndError(List<Double> values) {
@@ -141,15 +182,14 @@ final class AbSummary {
 
     // t is measured against the null hypothesis: 0 for the point difference, 0.5 for the win share.
     static String meanAndError(List<Double> values, double nullValue) {
-        int n = values.size();
-        if (n == 0) return "n/a";
-        double mean = values.stream().mapToDouble(Double::doubleValue).average().orElse(0);
-        if (n == 1) return String.format("%.3f", mean);
-        double variance = values.stream()
-                        .mapToDouble(value -> (value - mean) * (value - mean))
-                        .sum()
-                / (n - 1);
-        double error = Math.sqrt(variance / n);
-        return String.format("%.3f ± %.3f (t %.2f)", mean, error, error == 0 ? 0 : (mean - nullValue) / error);
+        return meanAndError(Stat.of(values), nullValue);
+    }
+
+    static String meanAndError(Stat stat, double nullValue) {
+        if (stat.n() == 0) return "n/a";
+        if (stat.n() == 1) return String.format("%.3f", stat.mean());
+        double error = stat.error();
+        return String.format(
+                "%.3f ± %.3f (t %.2f)", stat.mean(), error, error == 0 ? 0 : (stat.mean() - nullValue) / error);
     }
 }
