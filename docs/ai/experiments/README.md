@@ -45,12 +45,54 @@ Switches:
 - `-Dai.selfplay.record=false` skips recording.
 - `-Dai.selfplay.record.dir=...` moves the catalog.
 
+## The run queue
+
+Several sessions want A/B runs at once. Run side by side, they slow each other down, so wall times mean nothing and
+games hit their time limits. So every A/B, A/A, snapshot continuation and benchmark goes through one queue for the
+machine, [scripts/ai-ab-queue.mjs](../../../scripts/ai-ab-queue.mjs), and never straight through `mvn`.
+
+```
+node scripts/ai-ab-queue.mjs submit --label win-break --hours 2.5 --by <session> --question "Keep if points >= 0" -- -Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames -Dai.selfplay.full=true -Dai.selfplay.games=24 -Dai.selfplay.threads=10 -Dai.selfplay.seed=9000 -Dai.selfplay.ab=WIN_BREAK_DENIAL
+node scripts/ai-ab-queue.mjs approve <id>
+node scripts/ai-ab-queue.mjs list
+node scripts/ai-ab-queue.mjs wait <id>
+```
+
+- **One queue, one runner.**
+  - The queue lives in the repository's common git folder (`.git/ai-ab-queue`), so every worktree sees the same one.
+  - A single runner plays the jobs one at a time, in the order they were approved.
+- **Frozen code.**
+  - `submit` refuses uncommitted changes under `src` or `pom.xml`.
+  - The runner plays the job's commit from its own detached checkout, `.claude/worktrees/ab-run-<id>`, and removes it
+    afterwards. The submitting session can keep editing and building its worktree while the job waits or runs.
+- **The user's yes stays in the loop.**
+  - A job waits as `awaiting-approval` until `approve`, which starts the runner if none is up.
+  - Use `submit --approved` only when the user has already said yes to that run.
+- **Status.**
+  - `list` shows what runs, what waits, and when each should start and finish.
+  - A job without `--hours` borrows the median time of past runs of the same command.
+  - `wait <id>` blocks until the job ends and prints its record folder. A session runs it in the background to be told
+    when its job is done.
+  - `cancel <id>` drops a waiting job, or stops a running one with its whole process tree.
+- **The record.**
+  - The run is written to the submitting worktree's catalog, labelled with `--label` and `--question` unless the Maven
+    arguments set their own.
+  - The runner adds a `queue` section to its `run.json` and README.md: wait after approval, run time including the
+    build, estimate, exit code and the machine's load.
+  - Load is sampled every 5 minutes: CPU, and the other Maven builds running beside the job. Test suites stay outside
+    the queue, so a run that shared the machine with a suite says so here.
+- **Logs.** Each job's Maven output is in `.git/ai-ab-queue/logs/<id>.log`, and the runner's own log is in
+  `.git/ai-ab-queue/runner.log`.
+
+The script's tests run with `node --test scripts/ai-ab-queue.test.mjs`.
+
 ## Running an A/B so the record means something
 
 1. **Freeze the code.**
-   - Run from a worktree nothing else builds in, and never recompile under a running batch.
-   - Commit first. A `+dirty` commit in the index means the patch is the only way to rebuild that code.
-2. **Ask first.** Get the user's yes for the run, as for every long self-play run.
+   - Commit first, then submit the run to the queue, which plays that commit from a checkout nothing else builds in.
+   - A run outside the queue must use a worktree nothing else builds in, and must never recompile under a running
+     batch. A `+dirty` commit in the index means the patch is the only way to rebuild that code.
+2. **Ask first.** Get the user's yes for the run, as for every long self-play run, then `approve` it.
 3. **Decide the bar in advance.** Write it in the question, e.g. "keep if points ≥ 0 and no harm in win share".
    - A/A noise is about ±0.26 VP at 12 pairs, so 12 pairs only see big effects. About 35 pairs are needed for 0.3 VP.
 4. **Fix the seed.** Pass `-Dai.selfplay.seed`, so a later run can repeat the same games. Confirm a surprising result
@@ -65,7 +107,7 @@ Switches:
 Run it after each milestone, with the same command every time, so the rows line up:
 
 ```
-mvn -o test -Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames -Dai.selfplay.full=true -Dai.selfplay.games=24 -Dai.selfplay.threads=10 -Dai.selfplay.seed=9000 -Dai.selfplay.record=true -Dai.selfplay.record.label=benchmark-full-24
+node scripts/ai-ab-queue.mjs submit --label benchmark-full-24 -- -Dtest=AiSelfPlayTest#sixAiSeatsPlayFullGames -Dai.selfplay.full=true -Dai.selfplay.games=24 -Dai.selfplay.threads=10 -Dai.selfplay.seed=9000 -Dai.selfplay.record=true -Dai.selfplay.record.label=benchmark-full-24
 ```
 
 Watch:
