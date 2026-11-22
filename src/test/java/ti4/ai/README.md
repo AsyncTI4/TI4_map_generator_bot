@@ -217,6 +217,19 @@ sequenceDiagram
 - **Report:** per decision, each option's card value, mean margin ± standard error (sample standard deviation over continuations / √n), points, the AI's own pick and the best option by mean margin; then "AI pick was the best rollout option in X of Y decisions; mean regret" where regret = best mean margin − chosen mean margin.
 - **Limitations:** `aiPick` is overwritten by every continuation's first pick, so it records the AI's choice in the last continuation (the AI's own pick could differ between continuations after determinization). If no enabled button matches the forced initiative, `forced` returns the original press unchanged, the override does not clear itself and stays armed for that seat's next `scPick_` press. This is a measurement harness only: no production decision uses rollouts.
 
+### ContinuationAbExperimentTest and ContinuationAb
+
+- **Role:** evaluates (offline A/B over short continuations); decides nothing in a real game. Step 4 of [AI_LOOKAHEAD_PLAN.md](/AI_LOOKAHEAD_PLAN.md).
+- **Purpose:** a cheaper A/B than whole games. Files: [ContinuationAbExperimentTest](/src/test/java/ti4/ai/runtime/ContinuationAbExperimentTest.java) (gated by `-Dai.selfplay.continuation=true`) and [ContinuationAb](/src/test/java/ti4/ai/runtime/ContinuationAb.java) (the scoring, unit tested in `ContinuationAbTest`).
+- **Algorithm:** for each of `games` (default 8) seeds `seed + slot` (default base 7000), on `threads` (default 8): play with the default brain and snapshot at the start of each round in `rounds` (default 2,3,4). For each snapshot and each of `seeds` (default 4) continuation seeds `seed * 1000 + round * 100 + k`: pick a random half of the seats (`treatedHalf`); arm A restores the snapshot, reseeds the thread, switches `flags` on for that half (`AiExperiments.enable`) and off for the rest (`AiExperiments.disable`), and plays `horizon` rounds (default 1); arm B does the same with the halves swapped. Both arms use the same seed unless `-Dai.selfplay.continuation.crn=false`.
+- **Score:** per arm, treated seats' average VP gain over the continuation minus control seats'; per pair, the mean of the two arms. Continuations of one snapshot are averaged first; the standard error is reported over snapshots and, more conservatively, over games (a game's snapshots averaged). A pair whose arms end with identical gains is reported as untouched: with common random numbers that means the experiments changed no decision.
+- **Report:** a `CONTPAIR` line per pair, the summary, and the continuation ends' average round, leader VP and table total.
+- **Limitations:**
+  - An A/A run (`flags=none`) with common random numbers plays each pair twice identically and scores exactly 0. Run it with `crn=false` to see the noise without pairing; a real flag's run reports its own standard error.
+  - A one-round VP gain is a fraction of a whole-game effect; replay a flag with a known whole-game result to check the short horizon keeps the sign.
+  - Seat memory in the snapshot was built with the default flags, so control seats start each arm with memory from flag-on play.
+  - Not resampled: hidden information stays as dealt in each snapshot (no `Determinizer`), so continuations of one snapshot differ only by dice and later draws.
+
 ### AbSummary
 
 - **Role:** evaluates (statistics for mixed-brain A/B batches).
@@ -352,6 +365,7 @@ The "scenarios" in this scope are situations the harness meets while it runs a g
 | Agenda phases in round-two runs | phase starts with `agenda` and `.playagenda` is off | `RoundTwoSelfPlayTest.skipAgenda` | | delete all live button messages, ready cards, start the strategy phase | agenda never played |
 | A/B control seats | `-Dai.selfplay.ab` | `SelfPlayGame.markControlSeats` | | `(index + slot) % 2 == 0` is control | control seats play with the named experiments off |
 | Rollout branch | `RolloutExperimentTest` | `decisionOverride` | top 3 cards by `StrategyCardRanking.value` | forced in turn | margins per option |
+| Continuation A/B arms | `ContinuationAbExperimentTest` | `AiExperiments.enable` / `disable` on the restored seats | | a random half per continuation seed, swapped in arm B | treated minus control VP gain per pair |
 
 ### Self-play referee
 

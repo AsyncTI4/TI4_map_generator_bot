@@ -15,12 +15,13 @@ import ti4.testUtils.BaseTi4Test;
 // message reactions, AI state, seat runtime state, clock, random source), plays on to the start of round 3, puts the
 // snapshot back and plays the same stretch again. Both stretches must make the same decisions in the same order: that
 // is what lets a rollout harness try other choices from one decision point.
-// mvn -o test -Dtest=EnvironmentSnapshotTest -Dai.selfplay.snapshot=true
+// mvn -o test -Dtest=EnvironmentSnapshotTest -Dai.selfplay.snapshot=true [-Dai.selfplay.snapshot.round=2]
 @EnabledIfSystemProperty(named = "ai.selfplay.snapshot", matches = "true")
 class EnvironmentSnapshotTest extends BaseTi4Test {
 
     private static final List<String> FACTIONS = List.of("nekro", "sardakk", "hacan", "letnev", "sol", "xxcha");
     private static final long VIRTUAL_DAY = 24 * 60 * 60 * 1000L;
+    private static final int ROUND = Integer.getInteger("ai.selfplay.snapshot.round", 2);
 
     @Test
     void restoringASnapshotPlaysTheSameStretchAgain() throws Exception {
@@ -28,7 +29,7 @@ class EnvironmentSnapshotTest extends BaseTi4Test {
             SelfPlayGame selfPlay = new SelfPlayGame(env, "aisnap731", 0, 731L);
             try {
                 selfPlay.setUp(FACTIONS);
-                selfPlay.run(game -> game.getRound() >= 2, 14 * VIRTUAL_DAY, 100_000);
+                selfPlay.run(game -> game.getRound() >= ROUND, 14 * VIRTUAL_DAY, 100_000);
                 SelfPlayGame.Snapshot snapshot = selfPlay.snapshot();
 
                 List<String> first = stretch(env, selfPlay);
@@ -58,7 +59,8 @@ class EnvironmentSnapshotTest extends BaseTi4Test {
         env.decisionListener = (context, decision) -> {
             if (TrajectoryLog.records(decision)) decisions.add(describe(context, decision));
         };
-        selfPlay.run(game -> game.getRound() >= 3, 14 * VIRTUAL_DAY, 100_000);
+        SelfPlayGame.Outcome outcome = selfPlay.run(game -> game.getRound() >= ROUND + 1, 14 * VIRTUAL_DAY, 100_000);
+        System.out.println("SNAPSHOT stretch ended " + outcome.ending() + " in round " + outcome.round());
         env.decisionListener = (context, decision) -> {};
         return decisions;
     }
