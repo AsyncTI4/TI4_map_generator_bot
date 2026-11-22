@@ -2,8 +2,8 @@
     {
         "alias": "amendment",
         "name": "Amendment",
-        "phase": "Action",
-        "window": "After a public objective is revealed",
+        "phase": "Status",
+        "window": "At the end of the status phase",
         "text": "Purge 1 public objective you have scored. Then, draw and reveal 1 card from either public objective deck and place it near the other public objectives.",
         "notes": "Players do not lose points when an objective they have scored is purged.",
         "automationID": "amendment",
@@ -15,7 +15,7 @@
         "name": "Ancient Trade Routes",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. Then, you may perform a transaction with each of those players.",
+        "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. Then, you may resolve a transaction with each of those players.",
         "notes": "This transaction does not require you to be neighbors or count towards your transaction limit.",
         "flavorText": "\"Stationmaster,\" Kier said nervously, \"these routes have been dead for centuries.\" Artuno smirked. \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
         "source": "action_deck_2"
@@ -63,7 +63,7 @@
         "name": "Black Market Intel",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Draw and reveal 2 secret objectives; give 1 of those cards to another player that has less than 3 scored secret objectives, if able.",
+        "text": "Reveal 2 cards from the top of the secret objective deck. Draw those cards and give 1 of them to another player that has less than 3 scored secret objectives, if able.",
         "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, her pale eyes full of accusation. \"Not every secret is lost in death, Brother,\" they said in unison.",
         "notes": "Other players do not get to see which secret objective you gave away. You keep both secrets if no player can receive the other.",
         "source": "action_deck_2"
@@ -208,7 +208,7 @@
         "name": "Defectors",
         "phase": "Action",
         "window": "After another player produces ships",
-        "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any systems that do not contain another player's units.",
+        "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any systems that contain your ships.",
         "automationID": "defectors",
         "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Its human minions had done well.",
         "source": "action_deck_2"
@@ -479,6 +479,15 @@
         "text": "That unit is not destroyed instead.",
         "notes": "Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.",
         "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he'd been standing on a heartbeat earlier erupted in plasma. The laughter died as their savior rose among them.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "misallocated_funding",
+        "name": "Misallocated Funding",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose 1 non-faction, non-unit upgrade technology that another player owns. That player returns that technology to their deck and researches a technology of a different color.",
+        "flavorText": "\"At last, functioning neural links!\" Dart facepalmed Tai in confusion as a multitude of mingling memories flooded his mind. \"Wait... didn't we order gravity drives?\"",
         "source": "action_deck_2"
     },
     {
@@ -906,8 +915,8 @@
         "alias": "strategic_aid",
         "name": "Strategic Aid",
         "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 of your neighbors. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "window": "After you resolve the primary ability of a strategy card",
+        "text": "Choose 1 of your neighbors. You and that player each gain 1 command token.",
         "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
         "source": "action_deck_2"
     },
@@ -930,16 +939,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "unexpected_strategy",
-        "name": "Unexpected Strategy",
-        "phase": "Any",
-        "window": "When you would spend a command token from your strategy pool",
-        "text": "Remove 1 of your command tokens from the game board instead.",
-        "automationID": "unexpected_strategy",
-        "flavorText": "Gambit? The magi laughed. Hardly.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "unstable_gate",
         "name": "Unstable Gate",
         "phase": "Action",
@@ -948,10 +947,6 @@
         "flavorText": "The conduit overloaded with a keening wail, slowly tearing itself apart as the space within melted away to reveal the beacon.",
         "source": "action_deck_2"
     },
-
-
-
-
     {
         "alias": "abduction",
         "name": "Abduction",
@@ -1046,12 +1041,13 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "mysterious_brokers",
-        "name": "Mysterious Brokers",
-        "phase": "Action",
-        "window": "After you pass",
-        "text": "You may purge 1 of your relics to gain 1 relic. If you do not, gain trade goods equal to the number of neighbors you have that have not passed.",
-        "flavorText": "As the Druaa grabbed the ink-black shard, his stoic face broke into an unnatural, wicked grin.",
+        "alias": "plunder",
+        "name": "Plunder",
+        "phase": "Any",
+        "window": "After you gain control of a planet",
+        "text": "Roll a number of dice equal to that planet's resource or influence value; if that planet has no trait, combine those values instead. On 1 or more results of 10, gain 1 relic.",
+        "automationID": "plunder",
+        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
     {
@@ -1141,16 +1137,12 @@
     {
         "alias": "tomb_raiders",
         "name": "Tomb Raiders",
-        "phase": "Any",
-        "window": "After you gain control of a planet",
-        "text": "Roll a number of dice equal to that planet's resource or influence value; if that planet has no trait, combine those values instead. On 1 or more results of 10, gain 1 relic.",
-        "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Reveal the top card of each exploration deck; gain any relic fragments that you reveal and discard the rest. Then, gain a number of commodities equal to the number of cards you discarded.",
+        "flavorText": "As her hostages hurled insults, S'ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
         "source": "action_deck_2"
     },
-
-
-
-
     {
         "alias": "alliance_rider",
         "name": "Alliance Rider",
@@ -1174,16 +1166,26 @@
         "alias": "brokered_alliance",
         "name": "Brokered Alliance",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Spend 3 trade goods to reveal the alliance ability of a random, unused faction and choose 1 player; that player gains that ability.",
+        "window": "When another player resolves a strategic action",
+        "text": "Place 1 command token from your reinforcements in your strategy pool. Then, that player gains the alliance ability of a random, unused faction.",
         "flavorText": "\"Once enemies,\" Maeve smiled as Rowl growled at Sh'val's terms, \"now kith!\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "collusion",
+        "name": "Collusion",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Choose 1 other player. That player may allow you to resolve the secondary ability of 1 of their strategy cards without spending a command token.",
+        "automationID": "collusion",
+        "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
     {
         "alias": "flawless_strategy",
         "name": "Flawless Strategy",
         "phase": "Action",
-        "window": "After you exhaust your strategy card",
+        "window": "At the end of your strategic action",
         "text": "Resolve the secondary ability of that strategy card without spending a command token.",
         "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
         "source": "action_deck_2"
@@ -1192,18 +1194,28 @@
         "alias": "fractured_reality",
         "name": "Fractured Reality",
         "phase": "Any",
-        "window": "After 1 of your ships moves using an ingress, egress, or wormhole",
-        "text": "Roll 1 die. Replace that ship with 1 unit from your reinforcements with a cost value equal to or less than the result of that die.",
+        "window": "After 1 of your ships moves between 2 systems that do not share a border",
+        "text": "Roll 1 die. Replace that ship with 1 unit from your reinforcements with a cost equal to or less than the result of that die.",
         "flavorText": "\"As we lack the form of your world, you will lack that of ours,\" Taivra said without tone. \"Let us hope you are better prepared for your first pilgrimage than we were for ours.\"",
         "source": "action_deck_2"
     },
     {
-        "alias": "misallocated_funding",
-        "name": "Misallocated Funding",
+        "alias": "hijack",
+        "name": "Hijack",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-faction, non-unit upgrade technology that another player owns. That player returns that technology to their deck and researches a technology of a different color.",
-        "flavorText": "\"At last, functioning neural links!\" Dart facepalmed Tai in confusion as a multitude of mingling memories flooded his mind. \"Wait... didn't we order gravity drives?\"",
+        "text": "Choose 1 of your non-fighter ships. Replace that ship with 1 carrier and 1 infantry from your reinforcements and place 1 neutral ship of that type in any system that contains no non-neutral units.",
+        "automationID": "hijack",
+        "flavorText": "Ipswitch shoved the bound captain into the bay with the other prisoners. \"Good thing you answered that distress call. Thought I'd die of boredom on this old clunker.\" He tossed the command key over his shoulder, grinning as he swaggered to his new toy.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "mysterious_brokers",
+        "name": "Mysterious Brokers",
+        "phase": "Action",
+        "window": "After you pass",
+        "text": "You may purge 1 of your relics to gain 1 relic. If you do not, gain trade goods equal to the number of neighbors you have that have not passed.",
+        "flavorText": "As the Druaa grabbed the ink-black shard, his stoic face broke into an unnatural, wicked grin.",
         "source": "action_deck_2"
     },
     {
@@ -1221,39 +1233,9 @@
         "name": "Overthrow",
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
-        "automationID": "overthrow",
-        "flavorText": "Vos was out of the office before the Winnaran hit the floor. That would send a message to the loyalists.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "overthrow2",
-        "name": "Overthrow",
-        "phase": "Action",
-        "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "text": "Resolve the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in their home system, resolve the primary ability instead.",
         "automationID": "overthrow",
         "flavorText": "The Hercant merchant's blood-slicked finger slipped from Vos's grip as the scanner chimed.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "overthrow3",
-        "name": "Overthrow",
-        "phase": "Action",
-        "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
-        "automationID": "overthrow",
-        "flavorText": "Vos sighed as he approached Mordai II. Sharsiss had given him tough orders before, but this?",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "overthrow4",
-        "name": "Overthrow",
-        "phase": "Action",
-        "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
-        "automationID": "overthrow",
-        "flavorText": "Vos leapt toward the transport below as Connor fired from the balcony. \"See you, cowboy.\"",
         "source": "action_deck_2"
     },
     {
@@ -1261,7 +1243,7 @@
         "name": "Privateers",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 system that contains your non-fighter ships. Replace each ship in that system with a neutral ship of the same type to gain trade goods equal to the cost of 1 of those non-fighter ships.",
+        "text": "Choose 1 non-home system that contains your non-fighter ships. Replace each ship in that system with a neutral ship of the same type to gain trade goods equal to the cost of 1 of those non-fighter ships.",
         "flavorText": "Their sensors exploded with an array of damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },
@@ -1292,7 +1274,7 @@
         "window": "ACTION",
         "text": "Choose 1 system that contains your units. Destroy each of your units in that system to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that system.",
         "automationID": "sacrifice",
-        "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
+        "flavorText": "\"Shen're Ix Ianovar,\" Ahk-Syl Siven murmured, seeming afraid to invoke the name. \"Al'Raith Ix Ianovar,\" he continued, his voice barely a whisper.",
         "source": "action_deck_2"
     },
     {
@@ -1343,6 +1325,16 @@
         "text": "Place each of your participating units into coexistence; the ground combat ends in a draw.",
         "notes": "This can be played if the player is already coexisting. It cannot be played if the player has no more units on the planet. The attacking player cannot choose to engage any coexisting units in combat after the combat ends in a draw.",
         "flavorText": "When the ink dried, Mot knew he would be remembered as a traitor. However, as irony would have it, he had bought the Nomad precisely what he needed—time.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "unexpected_strategy",
+        "name": "Unexpected Strategy",
+        "phase": "Any",
+        "window": "When you would spend a command token from your strategy pool",
+        "text": "Remove 1 of your command tokens from the game board instead.",
+        "automationID": "unexpected_strategy",
+        "flavorText": "Vos sighed as he approached Mordai II. Sharsiss had given him tough orders before, but this?",
         "source": "action_deck_2"
     }
 ]

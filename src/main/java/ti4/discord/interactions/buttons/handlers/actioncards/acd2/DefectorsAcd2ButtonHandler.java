@@ -490,7 +490,7 @@ class DefectorsAcd2ButtonHandler {
     private static boolean isDefectorsPlacementTileEligible(Player player, Game game, Tile tile) {
         return tile != null
                 && (tile.getTileModel() == null || !tile.getTileModel().isHyperlane())
-                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game);
+                && FoWHelper.playerHasShipsInSystem(player, tile);
     }
 
     private static List<String> getDefectorsPositionsForRing(Game game, Player player, String ringSelector) {

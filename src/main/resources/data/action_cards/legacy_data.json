@@ -1630,15 +1630,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "collusion",
-        "name": "Collusion",
-        "phase": "Action",
-        "window": "After you resolve the primary ability of your strategy card",
-        "text": "Remove 1 of another player's command tokens from the game board and place it in their strategy pool. Then, gain 1 command token.",
-        "flavorText": "Gambit? The magi laughed. Hardly.",
-        "source": "deprecated"
-    },
-    {
         "alias": "relay_assembly",
         "name": "Relay Assembly",
         "phase": "Action",
@@ -1841,6 +1832,36 @@
         "text": "Draw 2 additional cards. Then, purge all but 1 of those cards.",
         "automationID": "oracle",
         "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "overthrow2",
+        "name": "Overthrow",
+        "phase": "Action",
+        "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
+        "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "automationID": "overthrow",
+        "flavorText": "The Hercant merchant's blood-slicked finger slipped from Vos's grip as the scanner chimed.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "overthrow3",
+        "name": "Overthrow",
+        "phase": "Action",
+        "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
+        "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "automationID": "overthrow",
+        "flavorText": "Vos sighed as he approached Mordai II. Sharsiss had given him tough orders before, but this?",
+        "source": "deprecated"
+    },
+    {
+        "alias": "overthrow4",
+        "name": "Overthrow",
+        "phase": "Action",
+        "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
+        "text": "Resolve the secondary ability of 1 of that player's strategy cards; if that planet is in their home system, resolve the primary ability instead.",
+        "automationID": "overthrow",
+        "flavorText": "Vos leapt toward the transport below as Connor fired from the balcony. \"See you, cowboy.\"",
         "source": "deprecated"
     }
 ]

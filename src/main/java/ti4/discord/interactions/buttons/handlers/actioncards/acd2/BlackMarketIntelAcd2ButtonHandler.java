@@ -27,7 +27,9 @@ class BlackMarketIntelAcd2ButtonHandler {
         String so1 = game.drawSecretObjective(player.getUserID());
         String so2 = game.drawSecretObjective(player.getUserID());
 
-        String publicMsg = player.getRepresentationNoPing() + " drew 2 secret objectives using _Black Market Intel_.";
+        String publicMsg = player.getRepresentationNoPing()
+                + " revealed and drew the top 2 cards of the secret objective deck using _Black Market Intel_: "
+                + secretName(so1) + " and " + secretName(so2) + ".";
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
 
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
@@ -64,6 +66,12 @@ class BlackMarketIntelAcd2ButtonHandler {
                         + ", choose which secret objective to give to another player with fewer than 3 scored secret objectives.",
                 buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static String secretName(String soID) {
+        if (soID == null) return "nothing (the deck is empty)";
+        SecretObjectiveModel soModel = Mapper.getSecretObjective(soID);
+        return "_" + (soModel != null ? soModel.getName() : soID) + "_";
     }
 
     @ButtonHandler("blackMarketIntelGive_")

@@ -985,6 +985,9 @@ public class StartPhaseService {
         VeylorAbilitiesHandler.returnUnassignedTightSchedulingAgendas(game);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusHomework** Phase for Round " + game.getRound() + " started.", true);
+        for (Player player : game.getRealPlayers()) {
+            ActionCardHelper.sendAmendmentReminder(player);
+        }
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {

@@ -1,9 +1,11 @@
 package ti4.discord.interactions.buttons.handlers.actioncards.acd2;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.discord.interactions.buttons.Buttons;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -18,40 +20,27 @@ class BrokeredAllianceAcd2ButtonHandler {
 
     @ButtonHandler("resolveBrokeredAlliance")
     public static void resolveBrokeredAlliance(Player player, Game game, ButtonInteractionEvent event) {
-        String key = pendingAllyKey(player);
-        String commander = game.getStoredValue(key);
-        if (commander.isEmpty()) {
-            if (player.getTg() < 3) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "You need 3 trade goods to resolve _Brokered Alliance_.");
-                return;
-            }
-            commander = UnusedCommanderHelper.getUnusedCommander(game);
-            if (commander.isBlank()) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        "There are no unused alliance abilities available for _Brokered Alliance_.");
-                return;
-            }
-            player.setTg(player.getTg() - 3);
-            game.setStoredValue(key, commander);
+        List<Button> buttons = new ArrayList<>();
+        for (Player target : game.getRealPlayers()) {
+            if (target == player) continue;
+            buttons.add(FoWHelper.fogSafeTargetButton(
+                    player.factionButtonChecker() + "brokeredAllianceTarget_" + target.getColor(),
+                    "green",
+                    target,
+                    player));
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithEmbed(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " spent 3 trade goods and revealed this alliance ability for"
-                        + " _Brokered Alliance_.",
-                Mapper.getLeader(commander).getRepresentationEmbed());
-        List<Button> buttons = game.getRealPlayers().stream()
-                .map(target -> FoWHelper.fogSafeTargetButton(
-                        player.factionButtonChecker() + "brokeredAllianceTarget_" + target.getColor(),
-                        "green",
-                        target,
-                        player))
-                .toList();
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "There is no other player to target with _Brokered Alliance_.");
+            return;
+        }
+        buttons.add(Buttons.DONE_RED_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", choose a player to gain this alliance ability.",
+                player.getRepresentationUnfogged()
+                        + ", choose the player who is resolving the strategic action. They will gain the alliance"
+                        + " ability of a random, unused faction.",
                 buttons);
     }
 
@@ -59,22 +48,32 @@ class BrokeredAllianceAcd2ButtonHandler {
     public static void resolveBrokeredAllianceTarget(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.substring("brokeredAllianceTarget_".length()));
-        String commander = game.getStoredValue(pendingAllyKey(player));
-        if (target == null || !game.getRealPlayers().contains(target) || commander.isEmpty()) {
+        if (target == null || target == player || !game.getRealPlayers().contains(target)) {
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
+
+        int oldStrategicCC = player.getStrategicCC();
+        player.setStrategicCC(oldStrategicCC + 1);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getFactionEmoji() + " placed 1 command token from their reinforcements in their strategy pool ("
+                        + oldStrategicCC + "->" + player.getStrategicCC() + ") using _Brokered Alliance_.");
+
+        String commander = UnusedCommanderHelper.getUnusedCommander(game);
+        if (commander.isBlank()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "There are no unused alliance abilities available for _Brokered Alliance_.");
             return;
         }
         target.addLeader(commander);
         target.getLeader(commander).ifPresent(leader -> leader.setLocked(false));
         game.addFakeCommander(commander);
-        game.removeStoredValue(pendingAllyKey(player));
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(
+        MessageHelper.sendMessageToChannelWithEmbed(
                 target.getCorrectChannel(),
                 target.getRepresentationUnfogged() + " gained the alliance ability of "
-                        + Mapper.getLeader(commander).getName() + " through _Brokered Alliance_.");
-    }
-
-    private static String pendingAllyKey(Player player) {
-        return "brokeredAlliancePending_" + player.getUserID();
+                        + Mapper.getLeader(commander).getName() + " through _Brokered Alliance_.",
+                Mapper.getLeader(commander).getRepresentationEmbed());
     }
 }

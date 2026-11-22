@@ -152,8 +152,8 @@ public class ActionCardHelper {
         amendmentButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", a reminder that this is the window to play _Amendment_."
-                        + " Use the buttons to start the process.",
+                player.getRepresentationUnfogged() + ", a reminder that _Amendment_ is played at the end of the status phase."
+                        + " Once status homework is done, use the buttons to start the process.",
                 amendmentButtons);
     }
 
@@ -1327,6 +1327,28 @@ public class ActionCardHelper {
 
             if ("tomb_raiders".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveTombRaiders", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("plunder".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolvePlunder", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("strategic_aid".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveStrategicAid", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
+            if ("collusion".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveCollusion", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
+            if ("hijack".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHijack", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
