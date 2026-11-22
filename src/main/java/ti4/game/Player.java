@@ -594,6 +594,24 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         addSpentThing("infantry_" + newTgSpent);
     }
 
+    public int getSpentThingCount(String prefix) {
+        for (String thing : getSpentThingsThisWindow()) {
+            if (thing.startsWith(prefix + "_")) {
+                return Integer.parseInt(thing.split("_")[1]);
+            }
+        }
+        return 0;
+    }
+
+    public void increaseSpentThingCount(String prefix, int amount) {
+        int old = getSpentThingCount(prefix);
+        int newCount = old + amount;
+        if (old != 0) {
+            removeSpentThing(prefix + "_" + old);
+        }
+        addSpentThing(prefix + "_" + newCount);
+    }
+
     public void setProducedUnit(String unit, int count) {
         currentProducedUnits.put(unit, count);
     }
