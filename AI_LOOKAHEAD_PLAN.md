@@ -101,7 +101,12 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
     (92% of pairs untouched, -0.007 +/- 0.012 VP from games that barely moved). `FakeDiscord` snapshots now keep the
     channel and message objects; a one-game repro then finished all 4 arms at their stop round. Each arm that misses
     its stop round now prints the stall report, and the summary counts arm endings.
-  - Next: rerun the same flag (needs a yes), compare sign and standard error with the whole-game -0.5 VP.
+  - Rerun (2026-11-21) also void: after 17 h, with about 190 of 192 arms done and no stalled arm, another session
+    rebuilt this worktree's classes and a late arm hit `NoClassDefFoundError`. Pairs printed only at the end, so
+    none survived. The harness now prints each pair as it lands (`CONTPAIR-LIVE`) and keeps the other games when
+    one fails.
+  - Next: rerun the same flag (needs a yes) from its own detached worktree so no other build can touch its classes,
+    then compare sign and standard error with the whole-game -0.5 VP.
 - [ ] **5. One-round own-seat lookahead, logging only.** Imagine each top plan on a board copy and rank again. Needs
   fresh memo scopes: `DecisionMemo` keys carry no game and `Player.equals` compares only the user id.
   - Check: under 5% of activations change, or flipped decisions don't gain in step 4's test, means stop and skip 8-9.

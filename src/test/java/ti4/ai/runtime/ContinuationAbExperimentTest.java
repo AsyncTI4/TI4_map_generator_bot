@@ -1,5 +1,7 @@
 package ti4.ai.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -74,9 +76,33 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
             futures.add(pool.submit(() -> examine(seed)));
         }
         List<GameResult> results = new ArrayList<>();
-        for (Future<GameResult> future : futures) results.add(future.get());
+        int failed = 0;
+        for (Future<GameResult> future : futures) {
+            try {
+                results.add(future.get());
+            } catch (java.util.concurrent.ExecutionException failure) {
+                // One broken game (for example classes rebuilt under a long run) must not discard the others.
+                failed++;
+                failure.getCause().printStackTrace(System.out);
+            }
+        }
         pool.shutdown();
         report(results);
+        System.out.println("Games failed: " + failed + " of " + GAMES);
+        assertThat(results).isNotEmpty();
+    }
+
+    private static void printPair(String tag, ContinuationAb.Pair pair) {
+        System.out.printf(
+                "%s seed=%d round=%d k=%d a=%.3f b=%.3f value=%.3f%s%n",
+                tag,
+                pair.seed(),
+                pair.round(),
+                pair.continuation(),
+                pair.a().difference(),
+                pair.b().difference(),
+                pair.value(),
+                pair.untouched() ? " untouched" : "");
     }
 
     private static GameResult examine(long seed) throws Exception {
@@ -104,7 +130,10 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
                         long secondSeed = COMMON_RANDOM_NUMBERS ? continuationSeed : continuationSeed + 1_000_000_007L;
                         ContinuationAb.Arm b = arm(selfPlay, snapshot.getValue(), round, secondSeed, half, false);
                         endings.add(ending(selfPlay));
-                        pairs.add(new ContinuationAb.Pair(seed, round, k, a, b));
+                        ContinuationAb.Pair pair = new ContinuationAb.Pair(seed, round, k, a, b);
+                        pairs.add(pair);
+                        // Printed as it lands so a crash late in a long run still leaves the finished pairs in the log.
+                        printPair("CONTPAIR-LIVE", pair);
                     }
                 }
                 return new GameResult(pairs, endings, (System.nanoTime() - wallStart) / 1_000_000_000L);
@@ -180,17 +209,7 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
                 SEEDS,
                 HORIZON,
                 COMMON_RANDOM_NUMBERS ? "common random numbers" : "independent seeds per arm");
-        for (ContinuationAb.Pair pair : pairs) {
-            System.out.printf(
-                    "CONTPAIR seed=%d round=%d k=%d a=%.3f b=%.3f value=%.3f%s%n",
-                    pair.seed(),
-                    pair.round(),
-                    pair.continuation(),
-                    pair.a().difference(),
-                    pair.b().difference(),
-                    pair.value(),
-                    pair.untouched() ? " untouched" : "");
-        }
+        for (ContinuationAb.Pair pair : pairs) printPair("CONTPAIR", pair);
         ContinuationAb.summary(pairs).forEach(System.out::println);
         System.out.println("Arm endings: " + new java.util.TreeMap<>(ARM_ENDINGS));
         System.out.printf(
