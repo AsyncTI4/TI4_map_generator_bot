@@ -75,6 +75,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.Ka
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.TwilightsFallMonumentsButtonHandler;
@@ -3539,6 +3540,7 @@ public class CombatRollService {
                 }
             }
         }
+        ZephyrionAbilityHandler.addMercenaryDefenseContractCannons(game, player, tile, unitsOnTile);
 
         Map<Pair<UnitModel, UnitHolder>, Integer> output = new LinkedHashMap<>(unitsOnTile.entrySet().stream()
                 .filter(entry -> entry.getKey().getLeft() != null

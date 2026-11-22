@@ -91,6 +91,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.BlueReverieRelicHandler;
@@ -8689,6 +8690,12 @@ public class ButtonHelper {
         if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)
                 && ArcanumTechHandler.hasSigilOfTransmutation(game, targetPlayer, activeTile)) {
             playersWithPds2.add(targetPlayer);
+        }
+        for (Player mercenary : game.getRealPlayers()) {
+            if (!playersWithPds2.contains(mercenary)
+                    && ZephyrionAbilityHandler.hasMercenaryDefenseContractCoverage(game, mercenary, activeTile)) {
+                playersWithPds2.add(mercenary);
+            }
         }
         for (Player twilightPlayer : game.getRealPlayers()) {
             if (playersWithPds2.contains(twilightPlayer)

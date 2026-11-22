@@ -74,10 +74,13 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vangu
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaUnitHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
@@ -1075,6 +1078,7 @@ public class StartCombatService {
                         .append('\n');
             }
         }
+        ZephyrionAbilityHandler.offerMercenaryShipCount(game, playersWithPds2);
         List<Button> spaceCannonButtons = getSpaceCannonButtons(game, activePlayer, tile, playersWithPds2);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, pdsMessage.toString(), spaceCannonButtons);
         MonumentsDSButtonHandler.sendPerditionArrayReminder(threadChannel, game, tile, activePlayer);
@@ -1300,6 +1304,14 @@ public class StartCombatService {
             if (player.hasLeader("arvaxicommander")
                     || game.playerHasLeaderUnlockedOrAlliance(player, "arvaxicommander")) {
                 ArvaxiLeaderHandler.sendCombatButtons(player, otherPlayer, game, msg);
+            }
+            if (player.hasTech("baarvay")) {
+                ArvaxiTechHandler.offerWartimeInnovation(player, game, msg);
+            }
+            if ("space".equalsIgnoreCase(type)
+                    && player.getPromissoryNotes().containsKey("bapnxan")
+                    && !player.getPromissoryNotesOwned().contains("bapnxan")) {
+                XanAbilityHandler.reminderWarlordsDecree(player, otherPlayer);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();

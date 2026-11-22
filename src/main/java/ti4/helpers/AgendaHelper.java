@@ -1764,7 +1764,10 @@ public final class AgendaHelper {
 
         boolean prevoting =
                 !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
-        if (!thing.contains("hacan") && !thing.contains("kyro") && !thing.contains("allPlanets")) {
+        if (!thing.contains("hacan")
+                && !thing.contains("kyro")
+                && !thing.contains("allPlanets")
+                && !thing.contains("xanTransform")) {
             if (!finalRes) {
                 player.addSpentThing(thing);
                 if (thing.startsWith("planet_")) {
@@ -1820,6 +1823,16 @@ public final class AgendaHelper {
                             player.getRepresentation()
                                     + " please remove 1 infantry to pay for Silas Deriga, the Kyro commander.",
                             ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "infantry"));
+                }
+            }
+            if (thing.contains("xanTransform")) {
+                List<Button> transformButtons = XanAbilityHandler.getTransformationProtocolButtons(player, game);
+                if (!prevoting && !transformButtons.isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " choose a ship to damage for 4 votes via _Transformation Protocol_.",
+                            transformButtons);
                 }
             }
             if (thing.contains("allPlanets")) {
@@ -2042,6 +2055,13 @@ public final class AgendaHelper {
                         "exhaustForVotes_dsghotg_" + fleetCC,
                         "Silly Ghoti Tech Votes (" + fleetCC + ")",
                         FactionEmojis.ghoti));
+            }
+
+            if (player.hasAbility("transformation_protocol")) {
+                Button xanTransformButton = XanAbilityHandler.getTransformationProtocolTriggerButton(player, game);
+                if (xanTransformButton != null) {
+                    planetButtons.add(xanTransformButton);
+                }
             }
         }
         planetButtons.add(Buttons.gray(

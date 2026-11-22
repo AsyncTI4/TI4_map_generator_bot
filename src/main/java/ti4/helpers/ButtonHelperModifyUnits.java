@@ -34,6 +34,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.thurv
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.vanguard.VanguardUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.veylor.VeylorUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.kalora.KaloraLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
 import ti4.discord.interactions.buttons.handlers.relics.theodisi.LostLegaciesRelicHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.BeansMonumentHandler;
@@ -1609,6 +1610,12 @@ public final class ButtonHelperModifyUnits {
         TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
             LoreService.showPlanetLore(player, game, unitHolder.getName(), LoreService.TRIGGER.MOVED);
+            Player planetController = game.getPlayerThatControlsPlanet(unitHolder.getName());
+            if (planetController != null
+                    && planetController != player
+                    && planetController.hasLeaderUnlocked("kalorahero")) {
+                KaloraLeaderHandler.offerFlashpointButton(game, player, planetController, tile, unitHolder.getName());
+            }
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
             Player player2 = player;
             for (Player p2 : players) {
