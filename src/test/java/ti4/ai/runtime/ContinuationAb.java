@@ -86,9 +86,17 @@ final class ContinuationAb {
         return flags;
     }
 
+    record Estimate(
+            int pairs,
+            int snapshots,
+            int games,
+            long untouched,
+            AbSummary.Stat overSnapshots,
+            AbSummary.Stat overGames) {}
+
     // Each snapshot's continuations are averaged first, since they share a position. The snapshots of one game are
     // correlated too, so the error is also given over games (each game's snapshots averaged), which is the safer one.
-    static List<String> summary(List<Pair> pairs) {
+    static Estimate estimate(List<Pair> pairs) {
         Map<String, List<Double>> bySnapshot = new TreeMap<>();
         Map<Long, List<Double>> byGame = new TreeMap<>();
         for (Pair pair : pairs) {
@@ -104,17 +112,28 @@ final class ContinuationAb {
         List<Double> gameMeans =
                 byGame.values().stream().map(ContinuationAb::mean).toList();
         long untouched = pairs.stream().filter(Pair::untouched).count();
-        List<String> lines = new ArrayList<>();
-        lines.add(String.format(
-                "pairs %d, snapshots %d, games %d; untouched pairs %d (%.0f%%)",
+        return new Estimate(
                 pairs.size(),
                 snapshotMeans.size(),
                 gameMeans.size(),
                 untouched,
-                pairs.isEmpty() ? 0 : 100.0 * untouched / pairs.size()));
+                AbSummary.Stat.of(new ArrayList<>(snapshotMeans.values())),
+                AbSummary.Stat.of(gameMeans));
+    }
+
+    static List<String> summary(List<Pair> pairs) {
+        Estimate estimate = estimate(pairs);
+        List<String> lines = new ArrayList<>();
+        lines.add(String.format(
+                "pairs %d, snapshots %d, games %d; untouched pairs %d (%.0f%%)",
+                estimate.pairs(),
+                estimate.snapshots(),
+                estimate.games(),
+                estimate.untouched(),
+                estimate.pairs() == 0 ? 0 : 100.0 * estimate.untouched() / estimate.pairs()));
         lines.add("treatment minus control VP gain, over snapshots: "
-                + AbSummary.meanAndError(new ArrayList<>(snapshotMeans.values())));
-        lines.add("treatment minus control VP gain, over games: " + AbSummary.meanAndError(gameMeans));
+                + AbSummary.meanAndError(estimate.overSnapshots(), 0));
+        lines.add("treatment minus control VP gain, over games: " + AbSummary.meanAndError(estimate.overGames(), 0));
         return lines;
     }
 

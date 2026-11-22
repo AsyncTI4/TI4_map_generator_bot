@@ -29,14 +29,18 @@ import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
 import tools.jackson.databind.ObjectMapper;
 
-// The A/B run catalog. Every mixed-brain A/B batch (-Dai.selfplay.ab=...) and every benchmark batch
-// (-Dai.selfplay.record=true without A/B) writes one folder under docs/ai/experiments/runs/, and a row in
-// docs/ai/experiments/INDEX.md, so the AI's results can be compared across commits. See docs/ai/experiments/README.md.
+// The A/B run catalog. Every mixed-brain A/B batch (-Dai.selfplay.ab=...), every snapshot continuation A/B
+// (ContinuationAbExperimentTest) and every benchmark batch (-Dai.selfplay.record=true without A/B) writes one folder
+// under docs/ai/experiments/runs/, and a row in docs/ai/experiments/INDEX.md, so the AI's results can be compared
+// across commits. See docs/ai/experiments/README.md.
 //
 // A folder holds:
-//   run.json          the code state (commit, branch, uncommitted files), the harness and every ai.* property, the
-//                     experiments under test and those off by default, the machine, the timings and the estimates
-//   games.csv         one row per seat per game: seed, pair, ending, round, faction, control or treatment, points, won
+//   run.json          the kind of run, the code state (commit, branch, uncommitted files), the harness and every ai.*
+//                     property, the experiments under test and those off by default, the machine, the timings and the
+//                     estimates
+//   games.csv         whole-game runs: one row per seat per game (seed, pair, ending, round, faction, role, points,
+// won)
+//   pairs.csv         snapshot continuations: one row per continuation pair (seed, round, continuation, both arms)
 //   uncommitted.patch the diff against the commit when the tree was dirty, so the exact code can be rebuilt
 //   console.log.gz    everything the batch printed (console-full.log.gz, ignored by git, when it is too big to keep)
 //   README.md         question, setup and results; the question and verdict are filled in by hand after the run
@@ -48,51 +52,102 @@ final class AbRecord {
 
     static final String PROPERTY = "ai.selfplay.record";
     static final long KEPT_CONSOLE_BYTES = 2_000_000L;
+    static final String SNAPSHOT_CONTINUATION = "snapshot-continuation";
     private static final String CATALOG = "docs/ai/experiments";
     private static final String PENDING = "pending";
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final DateTimeFormatter ID_TIME =
             DateTimeFormatter.ofPattern("yyyyMMdd-HHmm", Locale.ROOT).withZone(ZoneId.systemDefault());
 
+    // What a harness tells the catalog about its run. kind is "ab", "aa", "benchmark", or SNAPSHOT_CONTINUATION
+    // (with "-aa" when no experiment is under test); details are harness settings worth keeping beyond the ai.*
+    // properties.
+    record Spec(
+            String kind,
+            String harness,
+            Optional<Set<Experiment>> experiments,
+            long baseSeed,
+            boolean seedFixed,
+            int games,
+            int threads,
+            Map<String, Object> details) {}
+
+    // What the finished batch hands back: estimates for run.json, its data file, result lines for the README and the
+    // cells of the INDEX row.
+    private record Results(
+            @Nullable Map<String, Object> estimate,
+            Map<String, Object> batch,
+            String dataFile,
+            String data,
+            List<String> lines,
+            String pairs,
+            String points,
+            String share,
+            String endState) {}
+
     private final Path catalog;
     private final Path folder;
-    private final String id;
-    private final String harness;
+    private final Spec spec;
     private final Instant started;
     private final Map<String, Object> code;
     private final Map<String, Object> setup;
-    private final Optional<Set<Experiment>> experiments;
     private final Path console;
     private final PrintStream originalOut;
     private final OutputStream consoleFile;
 
-    private AbRecord(Path catalog, String harness, int games, int threads) throws IOException {
+    private AbRecord(Path catalog, Spec spec) throws IOException {
         this.catalog = catalog;
-        this.harness = harness;
+        this.spec = spec;
         this.started = Instant.now();
-        this.experiments = SelfPlayGame.AB;
-        this.id = ID_TIME.format(started) + "-" + slug(label());
-        this.folder = uniqueFolder(catalog.resolve("runs"), id);
+        this.folder = uniqueFolder(catalog.resolve("runs"), ID_TIME.format(started) + "-" + slug(label(spec)));
         Files.createDirectories(folder);
         this.code = codeState(folder);
-        this.setup = setup(games, threads);
+        this.setup = setup(spec);
         this.console = folder.resolve("console.log.gz");
         this.originalOut = System.out;
         this.consoleFile = new GZIPOutputStream(Files.newOutputStream(console));
         System.setOut(new PrintStream(new Tee(originalOut, consoleFile), true, StandardCharsets.UTF_8));
-        writeJson("run.json", runJson(null, null, 0));
+        writeJson("run.json", runJson(null));
     }
 
-    // Starts recording when the batch is an A/B batch (unless -Dai.selfplay.record=false) or a benchmark
+    // Whole-game batches: records an A/B batch (unless -Dai.selfplay.record=false) or a benchmark
     // (-Dai.selfplay.record=true). Recording problems never fail the batch.
     static Optional<AbRecord> start(String harness, int games, int threads) {
         String flag = System.getProperty(PROPERTY, "");
         boolean wanted = SelfPlayGame.AB.isPresent() ? !"false".equalsIgnoreCase(flag) : "true".equalsIgnoreCase(flag);
         if (!wanted) return Optional.empty();
+        String kind = SelfPlayGame.AB.map(set -> set.isEmpty() ? "aa" : "ab").orElse("benchmark");
+        return open(new Spec(
+                kind,
+                harness,
+                SelfPlayGame.AB,
+                SelfPlayGame.BASE_SEED,
+                System.getProperty("ai.selfplay.seed") != null,
+                games,
+                threads,
+                Map.of()));
+    }
+
+    // Snapshot continuation A/B runs are always recorded, unless -Dai.selfplay.record=false.
+    static Optional<AbRecord> startContinuation(
+            String harness, Set<Experiment> flags, long baseSeed, int games, int threads, Map<String, Object> details) {
+        if ("false".equalsIgnoreCase(System.getProperty(PROPERTY, ""))) return Optional.empty();
+        return open(new Spec(
+                flags.isEmpty() ? SNAPSHOT_CONTINUATION + "-aa" : SNAPSHOT_CONTINUATION,
+                harness,
+                Optional.of(flags),
+                baseSeed,
+                true,
+                games,
+                threads,
+                details));
+    }
+
+    private static Optional<AbRecord> open(Spec spec) {
         try {
             Path catalog =
                     Path.of(System.getProperty(PROPERTY + ".dir", CATALOG)).toAbsolutePath();
-            return Optional.of(new AbRecord(catalog, harness, games, threads));
+            return Optional.of(new AbRecord(catalog, spec));
         } catch (IOException | RuntimeException e) {
             System.out.println("AB RECORD could not start: " + e);
             return Optional.empty();
@@ -104,15 +159,96 @@ final class AbRecord {
     }
 
     void finish(List<SelfPlayGame.Outcome> outcomes, Predicate<SelfPlayGame.Ending> complete, long batchSeconds) {
-        try {
+        complete(() -> {
             AbSummary.Estimate estimate = AbSummary.estimate(outcomes, complete);
             Map<String, Object> batch = batch(outcomes, batchSeconds);
+            boolean ab = spec.experiments().isPresent();
+            List<String> lines = new ArrayList<>(List.of(
+                    "Endings: " + batch.get("endings"),
+                    "Average final round " + batch.get("averageFinalRound") + ", leader points "
+                            + batch.get("averageLeaderPoints") + ", table points " + batch.get("averageTablePoints"),
+                    "Batch wall time " + batch.get("batchWallSeconds") + " s, " + batch.get("wallMillisPerTick")
+                            + " ms per tick"));
+            if (ab) {
+                lines.add("Treatment minus control points: " + AbSummary.meanAndError(estimate.pointDifference(), 0)
+                        + " over " + estimate.pairs() + " complete pairs");
+                lines.add("Treatment win share: " + AbSummary.meanAndError(estimate.winShare(), 0.5) + " (null 0.500)");
+                lines.add("Unfinished games (their pairs excluded): " + estimate.unfinishedGames());
+            }
+            return new Results(
+                    ab ? estimateJson(estimate) : null,
+                    batch,
+                    "games.csv",
+                    gamesCsv(outcomes, complete),
+                    lines,
+                    ab ? String.valueOf(estimate.pairs()) : String.valueOf(batch.get("games")),
+                    ab ? AbIndex.stat(estimate.pointDifference()) : "",
+                    ab ? AbIndex.share(estimate.winShare()) : "",
+                    batch.get("averageFinalRound") + " / " + batch.get("averageLeaderPoints") + " / "
+                            + batch.get("averageTablePoints"));
+        });
+    }
+
+    // continuationEnds holds the averages over all arms of where the continuations stopped: round, leader and table
+    // points; armEndings counts how each arm ended.
+    void finishContinuation(
+            List<ContinuationAb.Pair> pairs,
+            int failedGames,
+            Map<String, Integer> armEndings,
+            double endRound,
+            double endLeader,
+            double endTable,
+            long averageGameWallSeconds) {
+        complete(() -> {
+            ContinuationAb.Estimate estimate = ContinuationAb.estimate(pairs);
+            Map<String, Object> batch = new LinkedHashMap<>();
+            batch.put("pairs", estimate.pairs());
+            batch.put("snapshots", estimate.snapshots());
+            batch.put("games", estimate.games());
+            batch.put("failedGames", failedGames);
+            batch.put("armEndings", new TreeMap<>(armEndings));
+            batch.put("averageEndRound", round(endRound));
+            batch.put("averageEndLeaderPoints", round(endLeader));
+            batch.put("averageEndTablePoints", round(endTable));
+            batch.put("averageGameWallSeconds", averageGameWallSeconds);
+            Map<String, Object> json = new LinkedHashMap<>();
+            json.put("pairs", estimate.pairs());
+            json.put("untouchedPairs", estimate.untouched());
+            json.put("gainDifferenceOverSnapshots", statJson(estimate.overSnapshots(), 0));
+            json.put("gainDifferenceOverGames", statJson(estimate.overGames(), 0));
+            List<String> lines = List.of(
+                    "Snapshot continuation: " + estimate.pairs() + " pairs from " + estimate.snapshots()
+                            + " snapshots of " + estimate.games() + " games (" + failedGames + " games failed); "
+                            + estimate.untouched() + " pairs untouched",
+                    "Treatment minus control VP gain over games (the safer error): "
+                            + AbSummary.meanAndError(estimate.overGames(), 0),
+                    "Treatment minus control VP gain over snapshots: "
+                            + AbSummary.meanAndError(estimate.overSnapshots(), 0),
+                    "Arm endings: " + new TreeMap<>(armEndings),
+                    "Continuations end on average in round " + round(endRound) + ", leader " + round(endLeader)
+                            + " VP, table " + round(endTable) + " VP; " + averageGameWallSeconds + " s per game");
+            return new Results(
+                    json,
+                    batch,
+                    "pairs.csv",
+                    pairsCsv(pairs),
+                    lines,
+                    estimate.pairs() + " pairs, " + estimate.games() + " games",
+                    AbIndex.stat(estimate.overGames()),
+                    "",
+                    round(endRound) + " / " + round(endLeader) + " / " + round(endTable) + " (at horizon)");
+        });
+    }
+
+    private void complete(java.util.function.Supplier<Results> collect) {
+        try {
+            Results results = collect.get();
             System.out.println("AB RECORD " + folder);
             restoreConsole();
-            writeJson("run.json", runJson(estimate, batch, outcomes.size()));
-            Files.writeString(folder.resolve("games.csv"), gamesCsv(outcomes, complete), StandardCharsets.UTF_8);
-            Files.writeString(folder.resolve("README.md"), readme(estimate, batch), StandardCharsets.UTF_8);
-            appendIndex(estimate, batch);
+            writeJson("run.json", runJson(results));
+            Files.writeString(folder.resolve(results.dataFile()), results.data(), StandardCharsets.UTF_8);
+            Files.writeString(folder.resolve("README.md"), readme(results), StandardCharsets.UTF_8);
+            appendIndex(results);
         } catch (IOException | RuntimeException e) {
             restoreConsole();
             System.out.println("AB RECORD could not finish " + folder + ": " + e);
@@ -131,16 +267,17 @@ final class AbRecord {
         }
     }
 
-    private static String label() {
+    private static String label(Spec spec) {
         String label = System.getProperty(PROPERTY + ".label", "");
         if (!label.isBlank()) return label;
-        return SelfPlayGame.AB
+        String tested = spec.experiments()
                 .map(set -> set.isEmpty()
                         ? "aa"
                         : set.size() == Experiment.values().length
                                 ? "all"
                                 : set.stream().map(Experiment::name).collect(Collectors.joining("+")))
                 .orElse("benchmark");
+        return spec.kind().startsWith(SNAPSHOT_CONTINUATION) ? "continuation-" + tested : tested;
     }
 
     static String slug(String label) {
@@ -193,16 +330,16 @@ final class AbRecord {
         }
     }
 
-    private Map<String, Object> setup(int games, int threads) {
+    private static Map<String, Object> setup(Spec spec) {
         Map<String, Object> setup = new LinkedHashMap<>();
-        setup.put("harness", harness);
-        setup.put("games", games);
-        setup.put("threads", threads);
-        setup.put("baseSeed", SelfPlayGame.BASE_SEED);
-        setup.put("seedFixed", System.getProperty("ai.selfplay.seed") != null);
+        setup.put("harness", spec.harness());
+        setup.put("games", spec.games());
+        setup.put("threads", spec.threads());
+        setup.put("baseSeed", spec.baseSeed());
+        setup.put("seedFixed", spec.seedFixed());
         setup.put(
                 "experimentsUnderTest",
-                experiments
+                spec.experiments()
                         .map(set -> set.stream().map(Experiment::name).toList())
                         .orElse(null));
         setup.put(
@@ -212,6 +349,7 @@ final class AbRecord {
                 "experimentsOffByDefault",
                 AiExperiments.offByDefault().stream().map(Experiment::name).toList());
         setup.put("experimentsOffEverywhere", System.getProperty(AiExperiments.OFF_PROPERTY, ""));
+        if (!spec.details().isEmpty()) setup.put("details", spec.details());
         Map<String, String> properties = new TreeMap<>();
         System.getProperties().forEach((key, value) -> {
             if (key.toString().startsWith("ai.")) properties.put(key.toString(), value.toString());
@@ -260,20 +398,21 @@ final class AbRecord {
         return batch;
     }
 
-    private Map<String, Object> runJson(
-            @Nullable AbSummary.Estimate estimate, @Nullable Map<String, Object> batch, int games) {
+    private Map<String, Object> runJson(@Nullable Results results) {
         Map<String, Object> run = new LinkedHashMap<>();
         run.put("id", folder.getFileName().toString());
-        run.put("kind", experiments.isPresent() ? (experiments.get().isEmpty() ? "aa" : "ab") : "benchmark");
+        run.put("kind", spec.kind());
         run.put("question", System.getProperty(PROPERTY + ".question", PENDING));
         run.put("started", started.toString());
-        run.put("finished", estimate == null ? null : Instant.now().toString());
-        run.put("status", estimate == null ? "running" : "finished");
+        run.put("finished", results == null ? null : Instant.now().toString());
+        run.put("status", results == null ? "running" : "finished");
         run.put("code", code);
         run.put("setup", setup);
-        if (batch != null) run.put("batch", batch);
-        if (estimate != null && experiments.isPresent()) run.put("estimate", estimateJson(estimate));
-        run.put("gamesRecorded", games);
+        if (results != null) {
+            run.put("batch", results.batch());
+            if (results.estimate() != null) run.put("estimate", results.estimate());
+            run.put("data", results.dataFile());
+        }
         run.put("verdict", PENDING);
         return run;
     }
@@ -332,9 +471,45 @@ final class AbRecord {
         return csv.toString();
     }
 
-    private String readme(AbSummary.Estimate estimate, Map<String, Object> batch) {
+    // Arm A treats treated_a; arm B treats the other seats. gains_a and gains_b are faction:VP gain over the horizon.
+    static String pairsCsv(List<ContinuationAb.Pair> pairs) {
+        StringBuilder csv = new StringBuilder(
+                "seed,round,continuation,difference_a,difference_b,value,untouched,treated_a,gains_a,gains_b\n");
+        for (ContinuationAb.Pair pair : pairs) {
+            csv.append(String.join(
+                            ",",
+                            String.valueOf(pair.seed()),
+                            String.valueOf(pair.round()),
+                            String.valueOf(pair.continuation()),
+                            String.format(Locale.ROOT, "%.3f", pair.a().difference()),
+                            String.format(Locale.ROOT, "%.3f", pair.b().difference()),
+                            String.format(Locale.ROOT, "%.3f", pair.value()),
+                            String.valueOf(pair.untouched()),
+                            String.join(" ", pair.a().treated()),
+                            gains(pair.a().gains()),
+                            gains(pair.b().gains())))
+                    .append('\n');
+        }
+        return csv.toString();
+    }
+
+    private static String gains(Map<String, Integer> gains) {
+        return gains.entrySet().stream()
+                .map(seat -> seat.getKey() + ":" + seat.getValue())
+                .collect(Collectors.joining(" "));
+    }
+
+    private String tested() {
+        String flags = spec.experiments()
+                .map(set -> set.isEmpty() ? "A/A" : set.size() == Experiment.values().length ? "all" : set.toString())
+                .orElse("benchmark");
+        return spec.kind().startsWith(SNAPSHOT_CONTINUATION) ? "snapshot continuation: " + flags : flags;
+    }
+
+    private String readme(Results results) {
         StringBuilder md = new StringBuilder();
         md.append("# ").append(folder.getFileName()).append("\n\n");
+        md.append("**Kind:** ").append(spec.kind()).append("\n\n");
         md.append("**Question:** ")
                 .append(System.getProperty(PROPERTY + ".question", "_fill in: what was tested and why_"))
                 .append("\n\n");
@@ -350,52 +525,27 @@ final class AbRecord {
                 .append(Boolean.TRUE.equals(code.get("dirty")) ? "yes, see `uncommitted.patch`" : "none")
                 .append("\n\n");
         md.append("## Setup\n\n");
-        md.append("- Harness: `").append(harness).append("`\n");
+        md.append("- Harness: `").append(spec.harness()).append("`\n");
         md.append("- Games: ")
-                .append(setup.get("games"))
+                .append(spec.games())
                 .append(" on ")
-                .append(setup.get("threads"))
+                .append(spec.threads())
                 .append(" threads, base seed ")
-                .append(setup.get("baseSeed"))
+                .append(spec.baseSeed())
                 .append('\n');
-        md.append("- Experiments under test: ")
-                .append(experiments
-                        .map(set -> set.isEmpty() ? "none (A/A)" : set.toString())
-                        .orElse("none (benchmark)"))
-                .append('\n');
+        md.append("- Tested: ").append(tested()).append('\n');
+        if (!spec.details().isEmpty())
+            md.append("- Details: `").append(spec.details()).append("`\n");
         md.append("- Properties: `").append(setup.get("properties")).append("`\n\n");
         md.append("## Results\n\n");
-        md.append("- Endings: ").append(batch.get("endings")).append('\n');
-        md.append("- Average final round ")
-                .append(batch.get("averageFinalRound"))
-                .append(", leader points ")
-                .append(batch.get("averageLeaderPoints"))
-                .append(", table points ")
-                .append(batch.get("averageTablePoints"))
-                .append('\n');
-        md.append("- Batch wall time ")
-                .append(batch.get("batchWallSeconds"))
-                .append(" s, ")
-                .append(batch.get("wallMillisPerTick"))
-                .append(" ms per tick\n");
-        if (experiments.isPresent()) {
-            md.append("- Treatment minus control points: ")
-                    .append(AbSummary.meanAndError(estimate.pointDifference(), 0))
-                    .append(" over ")
-                    .append(estimate.pairs())
-                    .append(" complete pairs\n");
-            md.append("- Treatment win share: ")
-                    .append(AbSummary.meanAndError(estimate.winShare(), 0.5))
-                    .append(" (null 0.500)\n");
-            md.append("- Unfinished games (their pairs excluded): ")
-                    .append(estimate.unfinishedGames())
-                    .append('\n');
-        }
-        md.append("\nPer-seat rows are in `games.csv`; the console output is in `console.log.gz`.\n");
+        for (String line : results.lines()) md.append("- ").append(line).append('\n');
+        md.append("\nThe rows are in `")
+                .append(results.dataFile())
+                .append("`; the console output is in `console.log.gz`.\n");
         return md.toString();
     }
 
-    private void appendIndex(AbSummary.Estimate estimate, Map<String, Object> batch) throws IOException {
+    private void appendIndex(Results results) throws IOException {
         Path index = catalog.resolve("INDEX.md");
         if (!Files.exists(index)) Files.writeString(index, AbIndex.HEADER, StandardCharsets.UTF_8);
         String commit = String.valueOf(code.get("commit"));
@@ -404,16 +554,11 @@ final class AbRecord {
                 started.toString().substring(0, 10),
                 (commit.length() > 10 ? commit.substring(0, 10) : commit)
                         + (Boolean.TRUE.equals(code.get("dirty")) ? "+dirty" : ""),
-                experiments
-                        .map(set -> set.isEmpty()
-                                ? "A/A"
-                                : set.size() == Experiment.values().length ? "all" : set.toString())
-                        .orElse("benchmark"),
-                experiments.isPresent() ? String.valueOf(estimate.pairs()) : String.valueOf(batch.get("games")),
-                experiments.isPresent() ? AbIndex.stat(estimate.pointDifference()) : "",
-                experiments.isPresent() ? AbIndex.share(estimate.winShare()) : "",
-                batch.get("averageFinalRound") + " / " + batch.get("averageLeaderPoints") + " / "
-                        + batch.get("averageTablePoints"),
+                tested(),
+                results.pairs(),
+                results.points(),
+                results.share(),
+                results.endState(),
                 PENDING);
         Files.writeString(index, row, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
     }

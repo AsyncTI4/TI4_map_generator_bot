@@ -69,6 +69,19 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
 
     @Test
     void compareArmsFromSnapshots() throws Exception {
+        Map<String, Object> details = new LinkedHashMap<>();
+        details.put("rounds", ROUNDS);
+        details.put("continuationsPerSnapshot", SEEDS);
+        details.put("horizonRounds", HORIZON);
+        details.put("commonRandomNumbers", COMMON_RANDOM_NUMBERS);
+        details.put("factions", FACTIONS);
+        java.util.Optional<AbRecord> record = AbRecord.startContinuation(
+                "ContinuationAbExperimentTest#compareArmsFromSnapshots",
+                FLAGS,
+                BASE_SEED,
+                GAMES,
+                Math.clamp(THREADS, 1, GAMES),
+                details);
         ExecutorService pool = Executors.newFixedThreadPool(Math.clamp(THREADS, 1, GAMES));
         List<Future<GameResult>> futures = new ArrayList<>();
         for (int slot = 0; slot < GAMES; slot++) {
@@ -89,7 +102,29 @@ class ContinuationAbExperimentTest extends BaseTi4Test {
         pool.shutdown();
         report(results);
         System.out.println("Games failed: " + failed + " of " + GAMES);
+        int failedGames = failed;
+        record.ifPresent(run -> finishRecord(run, results, failedGames));
         assertThat(results).isNotEmpty();
+    }
+
+    private static void finishRecord(AbRecord run, List<GameResult> results, int failed) {
+        List<ContinuationAb.Pair> pairs =
+                results.stream().flatMap(result -> result.pairs().stream()).toList();
+        List<Ending> endings =
+                results.stream().flatMap(result -> result.endings().stream()).toList();
+        Map<String, Integer> armEndings = new java.util.TreeMap<>();
+        ARM_ENDINGS.forEach((ending, count) -> armEndings.put(ending.name(), count));
+        run.finishContinuation(
+                pairs,
+                failed,
+                armEndings,
+                endings.stream().mapToInt(Ending::round).average().orElse(0),
+                endings.stream().mapToInt(Ending::leader).average().orElse(0),
+                endings.stream().mapToInt(Ending::total).average().orElse(0),
+                (long) results.stream()
+                        .mapToLong(GameResult::wallSeconds)
+                        .average()
+                        .orElse(0));
     }
 
     private static void printPair(String tag, ContinuationAb.Pair pair) {

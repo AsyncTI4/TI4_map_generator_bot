@@ -8,6 +8,7 @@ to see, over months, whether the AI is getting stronger or weaker, and which cha
 | Kind | How it runs | What it measures | What it cannot measure |
 | --- | --- | --- | --- |
 | **A/B** (`-Dai.selfplay.ab=X,...`) | Half the seats play with experiment X off, half with everything on. The paired game swaps the halves on the same seed. | The marginal value of X, at that commit, against the rest of the AI at that commit. | Growth over time: the control seats are "today's AI minus X", not an older AI. |
+| **Snapshot continuation** (`ContinuationAbExperimentTest`, kind `snapshot-continuation`) | Games are snapshotted at chosen rounds. From each snapshot, two arms play a short horizon on the same seed, each treating a different half of the seats. | The same marginal value of X as an A/B, but on VP gained over the horizon. It is cheaper, and pairs the experiments never touched score exactly 0. | Whole-game effects past the horizon. Its rows are not comparable with whole-game A/B rows. |
 | **A/A** (`-Dai.selfplay.ab=none`) | Same pairing, no difference between the halves. | The noise of the paired estimate: how big an effect has to be before an A/B can see it. | Anything about strength. |
 | **Benchmark** (`-Dai.selfplay.record=true`, no A/B) | All seats run the same code on a fixed protocol. | Health over time: games that finish, stalls, final round, table points, speed. | Strength. When every seat plays the same AI, a better AI does not score more; it only changes the tempo of the table. |
 | **Ladder** (not built yet) | Some seats run the current build, some a frozen older build. | Real growth or decline: the current AI head to head against an anchor. | — |
@@ -24,13 +25,16 @@ So:
 ## What a run folder holds
 
 `AbRecord` (`src/test/java/ti4/ai/runtime/AbRecord.java`) writes it at the end of every A/B batch of
-`AiSelfPlayTest#sixAiSeatsPlayFullGames` or `RoundTwoSelfPlayTest#playTwoRounds`, and of every batch run with
-`-Dai.selfplay.record=true`:
+`AiSelfPlayTest#sixAiSeatsPlayFullGames` or `RoundTwoSelfPlayTest#playTwoRounds`, of every snapshot continuation
+run of `ContinuationAbExperimentTest`, and of every batch run with `-Dai.selfplay.record=true`. In INDEX.md a snapshot
+continuation shows as "snapshot continuation: …". Its points column is the VP gain difference with the error over
+games, and its last column is where the continuations stopped.
 
 | File | Contents |
 | --- | --- |
 | `run.json` | Code state: commit, branch, worktree, uncommitted files. Setup: harness, games, threads, base seed, experiments under test, experiments known and off by default, every `ai.*` property, machine and JVM. Batch: endings, average final round, leader and table points, wall time and ms per tick. A/B estimate: point difference and win share with standard error, t and n, plus unfinished games. Also the question and verdict. |
-| `games.csv` | One row per seat per game: slot, seed, pair, ending, whether it counts, round, ticks, wall seconds, faction, role (control, treatment or none), points and won. |
+| `pairs.csv` | Snapshot continuations only, one row per pair: seed, snapshot round, continuation, each arm's difference, the pair value, whether the pair was untouched, the seats arm A treated, and each arm's VP gains. |
+| `games.csv` | Whole-game runs only, one row per seat per game: slot, seed, pair, ending, whether it counts, round, ticks, wall seconds, faction, role (control, treatment or none), points and won. |
 | `uncommitted.patch` | Only when the tree was dirty: the diff against the commit, so the exact code can be rebuilt. The catalog itself is left out. |
 | `console.log.gz` | Everything the batch printed, including the agenda A/B lines and every tracker summary. Above 2 MB it is saved as `console-full.log.gz`, which git ignores, so it stays only on the machine that ran it. |
 | `README.md` | Question, code, setup and results. The question and verdict are filled in by hand. |

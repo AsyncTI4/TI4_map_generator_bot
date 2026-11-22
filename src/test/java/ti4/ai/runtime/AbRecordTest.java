@@ -83,6 +83,35 @@ class AbRecordTest {
         }
     }
 
+    // A snapshot continuation run is recorded too, marked as such, with one row per continuation pair.
+    @Test
+    void aSnapshotContinuationIsRecordedAsOne() throws IOException {
+        System.setProperty(AbRecord.PROPERTY + ".dir", catalog.toString());
+        try {
+            AbRecord run = AbRecord.startContinuation(
+                            "AbRecordTest",
+                            java.util.EnumSet.of(ti4.ai.AiExperiments.Experiment.VOTE_ANGER),
+                            7000,
+                            1,
+                            1,
+                            Map.of("horizonRounds", 1))
+                    .orElseThrow();
+            ContinuationAb.Arm a = new ContinuationAb.Arm(Set.of("sol"), Map.of("sol", 2, "hacan", 1));
+            ContinuationAb.Arm b = new ContinuationAb.Arm(Set.of("hacan"), Map.of("sol", 1, "hacan", 1));
+            run.finishContinuation(
+                    List.of(new ContinuationAb.Pair(7000, 2, 0, a, b)), 0, Map.of("STOP_CONDITION", 2), 3, 4, 9, 60);
+
+            Path folder = run.folder();
+            assertThat(folder.getFileName().toString()).endsWith("-continuation-vote-anger");
+            assertThat(Files.readString(folder.resolve("run.json")))
+                    .contains("\"kind\" : \"snapshot-continuation\"", "\"gainDifferenceOverGames\"");
+            assertThat(Files.readAllLines(folder.resolve("pairs.csv"))).hasSize(2);
+            assertThat(Files.readString(catalog.resolve("INDEX.md"))).contains("snapshot continuation: [VOTE_ANGER]");
+        } finally {
+            System.clearProperty(AbRecord.PROPERTY + ".dir");
+        }
+    }
+
     @Test
     void labelsBecomeFolderSafeSlugs() {
         assertThat(AbRecord.slug("RELATIONS_ANGER+VOTE_ANGER")).isEqualTo("relations-anger+vote-anger");
