@@ -82,8 +82,7 @@ class PlunderAcd2ButtonHandlerTest {
 
     @Test
     void offersOnlyActiveSystemPlanetsAndAnOtherButtonWhenThereIsAnActiveSystem() {
-        List<String> ids =
-                offeredButtonIds("resolvePlunder", "101", List.of("inactive", "active"), List.of("active"));
+        List<String> ids = offeredButtonIds("resolvePlunder", "101", List.of("inactive", "active"), List.of("active"));
 
         assertEquals(List.of("fcplunderPlanet_active", "fcplunderOther"), ids);
     }
@@ -111,8 +110,7 @@ class PlunderAcd2ButtonHandlerTest {
 
     @Test
     void otherButtonOffersThePlanetsOutsideTheActiveSystem() {
-        List<String> ids =
-                offeredButtonIds("plunderOther", "101", List.of("inactive", "active"), List.of("active"));
+        List<String> ids = offeredButtonIds("plunderOther", "101", List.of("inactive", "active"), List.of("active"));
 
         assertEquals(List.of("fcplunderPlanet_inactive"), ids);
     }

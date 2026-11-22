@@ -86,8 +86,8 @@ class HijackAcd2ButtonHandler {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "There is no system without non-neutral units to place the neutral "
-                            + type.humanReadableName() + " for _Hijack_.");
+                    "There is no system without non-neutral units to place the neutral " + type.humanReadableName()
+                            + " for _Hijack_.");
             return;
         }
         MessageHelper.sendMessageToChannelWithButtons(

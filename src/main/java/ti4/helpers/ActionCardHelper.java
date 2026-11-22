@@ -152,7 +152,8 @@ public class ActionCardHelper {
         amendmentButtons.add(Buttons.DECLINE_DELETE_BUTTONS);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + ", a reminder that _Amendment_ is played at the end of the status phase."
+                player.getRepresentationUnfogged()
+                        + ", a reminder that _Amendment_ is played at the end of the status phase."
                         + " Once status homework is done, use the buttons to start the process.",
                 amendmentButtons);
     }
