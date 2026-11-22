@@ -25,7 +25,7 @@ class HijackAcd2ButtonHandler {
         UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun
     };
 
-    @ButtonHandler("resolveHijack")
+    @ButtonHandler("hijackResolve")
     public static void resolveHijack(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesWithShipsInTheSystem(player, game)) {

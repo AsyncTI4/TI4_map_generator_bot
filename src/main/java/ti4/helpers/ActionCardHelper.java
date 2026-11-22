@@ -1349,7 +1349,7 @@ public class ActionCardHelper {
             }
 
             if ("hijack".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveHijack", buttonLabel));
+                codedButtons.add(Buttons.green(player.factionButtonChecker() + "hijackResolve", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
