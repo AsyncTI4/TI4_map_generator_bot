@@ -107,6 +107,8 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
     one fails.
   - Next: rerun the same flag (needs a yes) from its own detached worktree so no other build can touch its classes,
     then compare sign and standard error with the whole-game -0.5 VP.
+  - Follow-up required: the harness is pushed unproven. Test it as above, then decide whether to keep it or throw
+    it away (delete `ContinuationAb*` and its README section) if it cannot match whole-game A/B at lower cost.
 - [ ] **5. One-round own-seat lookahead, logging only.** Imagine each top plan on a board copy and rank again. Needs
   fresh memo scopes: `DecisionMemo` keys carry no game and `Player.equals` compares only the user id.
   - Check: under 5% of activations change, or flipped decisions don't gain in step 4's test, means stop and skip 8-9.
