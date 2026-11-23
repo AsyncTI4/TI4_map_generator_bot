@@ -40,6 +40,7 @@ import ti4.service.leader.agent.modules.homebrew.theodisi.ThronesAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.VerydithAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.XytherisAgent;
 import ti4.service.leader.agent.modules.homebrew.wftv.ArvaxiAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.VyserixAgent;
 
 public final class HomebrewAgents implements AgentCatalog {
 
@@ -98,6 +99,7 @@ public final class HomebrewAgents implements AgentCatalog {
                             new NatauAgent(),
                             new DreamAgent(),
                             new ArvaxiAgent(),
+                            new VyserixAgent(),
                             new ToldarAgent(),
                             new QhetAgent(),
                             new BelkoseaAgent(),

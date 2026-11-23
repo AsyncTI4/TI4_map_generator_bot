@@ -76,7 +76,9 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xythe
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.xytheris.XytherisUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiLeaderHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiUnitHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.lunarium.LunariumAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.zephyrion.ZephyrionAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.planet.TheodisiLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.relics.bluereverie.BlueReverieArtifactRelicHandler;
@@ -653,6 +655,7 @@ public final class ButtonHelperTacticalAction {
     public static void tacticalActionSpaceCannonOffenceStep(
             Game game, Player player, List<Player> playersWithPds2, Tile tile) {
         if (game.isFowMode()) {
+            ZephyrionAbilityHandler.offerMercenaryShipCount(game, playersWithPds2);
             String title = "### Space Cannon Offence " + UnitEmojis.pds + "\n";
             if (playersWithPds2.size() > 1 || !playersWithPds2.contains(player)) {
                 MessageHelper.sendMessageToChannel(
@@ -749,6 +752,7 @@ public final class ButtonHelperTacticalAction {
     public static void resetStoredValuesForTacticalAction(Game game) {
         ValhavnAbilityHandler.clearBloodlustActionUse(game);
         MigoTechHandler.clearLaghMetalAttractorsMovementBonus(game);
+        ZephyrionAbilityHandler.clearMercenaryDefenseContract(game);
         VanguardUnitHandler.clearBulwarkSustain(game);
         VanguardBreakthroughHandler.clearTrainingDummiesState(game);
         game.setNaaluAgent(false);
@@ -994,6 +998,7 @@ public final class ButtonHelperTacticalAction {
         BlueReverieArtifactRelicHandler.offerUnknownArtifact(game, player);
         TheodisiLegendaryButtonHandler.offerActivationAbility(game, player);
         IxthLegendaryButtonHandler.onSystemActivated(game, player);
+        ArvaxiUnitHandler.offerWrathOfTheCovenantDiscard(game, player, tile);
         BlueReverieHelper.offerShameixBanePrompts(game, player, tile);
         BlueReverieRelicHandler.offerAendsTorch(game, player, tile);
         SarcosaCommanderHandler.offerAdjacencySelection(game, player);

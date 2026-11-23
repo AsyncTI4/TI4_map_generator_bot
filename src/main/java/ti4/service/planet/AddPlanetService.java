@@ -19,6 +19,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbi
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.verydith.VerydithLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.onyxxa.OnyxxaLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.xan.XanLeaderHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsBRButtonHandler;
 import ti4.game.Game;
@@ -683,6 +684,10 @@ public class AddPlanetService {
                             + Helper.getPlanetRepresentation(planet, game)
                             + ". Do not do this prior to exploring. It is an \"after\", while exploring is a \"when\".",
                     saarButton);
+        }
+
+        if (game.getActivePlayer() == player && game.playerHasLeaderUnlockedOrAlliance(player, "xancommander")) {
+            XanLeaderHandler.offerStructureMoveButton(game, player, planet);
         }
 
         if (game.getActivePlayerID() != null

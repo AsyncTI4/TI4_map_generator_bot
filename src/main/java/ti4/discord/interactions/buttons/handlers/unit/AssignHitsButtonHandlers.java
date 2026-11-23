@@ -227,8 +227,12 @@ class AssignHitsButtonHandlers {
                     String planetName = matcher.group("planet");
                     UnitHolder holder =
                             planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
-                    if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
-                    UnitModel sustainedUnit = player.getUnitFromUnitKey(Units.getUnitKey(type, player.getColorID()));
+                    UnitKey sustainedKey = Units.getUnitKey(type, player.getColorID());
+                    if (holder != null) {
+                        holder.addDamagedUnit(sustainedKey, amt);
+                        StonebornUnitHandler.syncMobileMountainDamage(game, player, sustainedKey);
+                    }
+                    UnitModel sustainedUnit = player.getUnitFromUnitKey(sustainedKey);
                     boolean flagbearerSustained = holder == tile.getSpaceUnitHolder()
                             && sustainedUnit != null
                             && "vanguard_flagship".equals(sustainedUnit.getId());
@@ -246,8 +250,7 @@ class AssignHitsButtonHandlers {
                                     ? " on " + holder.getRepresentation(game)
                                     : " in tile " + tile.getRepresentationForButtons(game, player))
                             + ".";
-                    boolean cancelsTwoHits =
-                            player.hasTech("nes") || (player.ownsUnit("kryxos_flagship3") && type == UnitType.Flagship);
+                    boolean cancelsTwoHits = ButtonHelper.doesSustainCancelTwoHits(player, sustainedUnit);
                     if ("spacecombat".equals(getAssignHitsType(game, player))) {
                         VanguardUnitHandler.recordSpaceCombatHitAssignment(
                                 game, player, tile, cancelsTwoHits ? amt * 2 : amt);

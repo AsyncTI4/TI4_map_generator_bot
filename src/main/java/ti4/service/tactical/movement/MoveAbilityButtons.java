@@ -30,6 +30,7 @@ public final class MoveAbilityButtons {
             new UydaiHeroButton(),
             new GhostMechButton(),
             new NivynMechButton(),
+            new CycloneMechButton(),
             new WraithEngineButton(),
             new HoracePlanetAbilityButton(),
             new GyraxisButton());

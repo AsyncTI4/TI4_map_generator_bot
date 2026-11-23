@@ -126,6 +126,7 @@ import ti4.service.game.SetOrderService;
 import ti4.service.leader.agent.modules.ArgentAgent;
 import ti4.service.leader.agent.modules.homebrew.bluereverie.AtokeraAgent;
 import ti4.service.leader.agent.modules.homebrew.theodisi.MyrrAgent;
+import ti4.service.leader.agent.modules.homebrew.wftv.VyserixAgent;
 import ti4.service.leader.genome.homebrew.tknova.BrutalGenome;
 import ti4.service.leader.genome.homebrew.tknova.RavenousGenome;
 import ti4.service.leader.genome.homebrew.tknova.ScornfulGenome;
@@ -1247,6 +1248,14 @@ public final class Helper {
                             .append(" vote")
                             .append(player.getSpentInfantryThisWindow() == 1 ? "" : "s")
                             .append(".\n");
+                case "xanships" ->
+                    msg.append("Damaged ")
+                            .append(count / 4)
+                            .append(" ship")
+                            .append(count / 4 == 1 ? "" : "s")
+                            .append(" for ")
+                            .append(count)
+                            .append(" votes via _Transformation Protocol_.\n");
                 case "planet" ->
                     msg.append(getPlanetRepresentation(secondHalf, game))
                             .append(" for ")
@@ -1996,7 +2005,8 @@ public final class Helper {
                         && !player.hasUnit("arborec_infantry")
                         && !player.hasUnit("tf-lataniwarrior")
                         && !player.hasUnit("deepwrought_mech")
-                        && !player.hasUnit("arborec_infantry2")) {
+                        && !player.hasUnit("arborec_infantry2")
+                        && !player.hasUnit("arvaxi_mech")) {
 
                     int productionLimit;
                     productionLimit = Math.max(
@@ -3115,6 +3125,9 @@ public final class Helper {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
                 unitButtons.add(ArgentAgent.button(player, tile));
+            }
+            if (player.hasUnexhaustedLeader("vyserixagent") && VyserixAgent.hasTargets(game, player, tile)) {
+                unitButtons.add(VyserixAgent.button(player, tile));
             }
             if (player.hasUnexhaustedLeader("tknovascornfulagent")) {
                 unitButtons.add(ScornfulGenome.button(player, tile));

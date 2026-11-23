@@ -26,6 +26,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeter
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.revenant.RevenantLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.tyris.TyrisAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.vyserix.VyserixAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.planet.IxthLegendaryButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsButtonHandler;
 import ti4.discord.interactions.buttons.handlers.unit.monuments.MonumentsDSButtonHandler;
@@ -206,6 +207,10 @@ public class EndTurnService {
             game.shuffleExplores();
             MessageHelper.sendMessageToChannel(
                     mainPlayer.getCorrectChannel(), "Shuffled the explore decks due to the treasure hunter ability");
+        }
+
+        if (mainPlayer.hasAbility("scattered_legions")) {
+            VyserixAbilityHandler.checkScatteredLegions(game, mainPlayer);
         }
 
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
