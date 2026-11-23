@@ -1,9 +1,12 @@
 package ti4.image.tile;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import ti4.game.Tile;
-import ti4.model.ShipPositionModel.ShipPosition;
+import ti4.image.io.ImageHelper;
+import ti4.image.io.ImageResources;
 import ti4.model.TileModel;
+import ti4.service.map.CustomHyperlaneService;
 
 public final class TileGeometry {
 
@@ -15,12 +18,16 @@ public final class TileGeometry {
     private TileGeometry() {}
 
     public static Point hexOffsetInArtwork(Tile tile) {
-        TileModel model = tile.getTileModel();
-        ShipPosition positions = model == null ? null : model.getShipPositionsType();
-        if (positions != null && positions.isSpiral()) {
-            return new Point(TileLayer.SPIRAL_OFFSET_X, TileLayer.SPIRAL_OFFSET_Y);
+        if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
+            return new Point();
         }
-        return new Point(0, 0);
+        TileModel model = tile.getTileModel();
+        String path = model == null ? null : ImageResources.tilePath(model);
+        BufferedImage artwork = path == null ? null : ImageHelper.read(path);
+        if (artwork == null) {
+            return new Point();
+        }
+        return new Point((artwork.getWidth() - TILE_WIDTH) / 2, (artwork.getHeight() - TILE_HEIGHT) / 2);
     }
 
     public static boolean followsArtworkOffset(TileStep step) {
