@@ -1,0 +1,93 @@
+{
+    "planetLayout": {
+        "unitHolderName": "hoddmimis",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 225,
+            "y": 175
+        }
+    },
+    "id": "hoddmimis",
+    "tileId": "ao12",
+    "name": "Hoddmímis",
+    "aliases": [
+        "hoddmimis"
+    ],
+    "positionInTile": {
+        "x": 225.0,
+        "y": 175.0
+    },
+    "resources": 1,
+    "influence": 1,
+    "factionHomeworld": "vaettir",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "hoddmimis",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 187.0,
+                    "y": 165.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 247.0,
+                    "y": 200.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 192.0,
+                    "y": 192.0
+                },
+                {
+                    "x": 209.0,
+                    "y": 192.0
+                },
+                {
+                    "x": 226.0,
+                    "y": 192.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 194.0,
+                    "y": 121.0
+                },
+                {
+                    "x": 212.0,
+                    "y": 121.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 206.0,
+                    "y": 162.0
+                },
+                {
+                    "x": 173.0,
+                    "y": 162.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 257.0,
+                    "y": 154.0
+                },
+                {
+                    "x": 249.0,
+                    "y": 123.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "contrastColor": "orange",
+    "flavourText": "*Small is the seed, long is the patience that feeds it.*",
+    "source": "goose"
+}

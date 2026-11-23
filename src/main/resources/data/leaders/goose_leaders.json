@@ -1,0 +1,138 @@
+[
+    {
+        "id": "jotunnagent",
+        "faction": "jotunn",
+        "type": "agent",
+        "name": "Örnsteinn",
+        "title": "The Master Mason",
+        "abilityWindow": "When a player would resolve an exploration card",
+        "abilityText": "You may exhaust this card. If you do, that player may discard that card and place 1 structure on a planet they control in the active system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "goose"
+    },
+    {
+        "id": "jotunncommander",
+        "faction": "jotunn",
+        "type": "commander",
+        "name": "Aðalsteinn",
+        "title": "The Unbroken",
+        "abilityWindow": "When 1 or more of your PDS units use their SPACE CANNON ability",
+        "abilityText": "For each hit produced in excess of that player's units in that system, gain 1 commodity.",
+        "unlockCondition": "Have 3 or more structures in any 1 system.",
+        "source": "goose"
+    },
+    {
+        "id": "jotunnhero",
+        "faction": "jotunn",
+        "type": "hero",
+        "name": "Þorsteinn",
+        "title": "Of the Deep Frost",
+        "abilityName": "Deep Frost",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Place this card next to the game board. Until the end of this game round, when a player's ships move into the active system, you may use the SPACE CANNON ability of each of your units on the game board against those ships. At the end of this game round, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "goose"
+    },
+    {
+        "id": "brynfolkagent",
+        "faction": "brynfolk",
+        "type": "agent",
+        "name": "Olistef Olafsson",
+        "title": "Guide Raven",
+        "abilityWindow": "At the end of a player's tactical action",
+        "abilityText": "You may exhaust this card. If you do, that player may remove 1 of their ships in the active system and place it in an adjacent system that does not contain another player's ships.",
+        "unlockCondition": "Always Unlocked",
+        "source": "goose"
+    },
+    {
+        "id": "brynfolkcommander",
+        "faction": "brynfolk",
+        "type": "commander",
+        "name": "Adalgust Fjarsynni",
+        "title": "The Wayfinder",
+        "abilityWindow": "When you retreat",
+        "abilityText": "You may move your retreating ships up to 2 systems away.",
+        "unlockCondition": "Have a combined resource and influence value on Blot of at least 3.",
+        "source": "goose"
+    },
+    {
+        "id": "brynfolkhero",
+        "faction": "brynfolk",
+        "type": "hero",
+        "name": "Aleksander Ravnsbarn",
+        "title": "Dark Void Seer",
+        "abilityName": "Gald Offering - The Great Ragnarök",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Return all control tokens on Blot to their owners' reinforcements. For each of another player's control tokens returned this way, choose 1 of that player's units that is not a flagship or war sun and destroy it. For each of your control tokens returned this way, gain either 1 command token or 2 trade goods. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "goose"
+    },
+    {
+        "id": "vaettiragent",
+        "faction": "vaettir",
+        "type": "agent",
+        "name": "The Vigorous Sapling",
+        "title": "The Vigorous Sapling",
+        "abilityWindow": "At the end of a player's tactical action",
+        "abilityText": "You may exhaust this card. If you do, that player places 1 Root token on a planet in the active system and may produce up to a number of units in that system equal to the number of traits that planet has.",
+        "unlockCondition": "Always Unlocked",
+        "source": "goose"
+    },
+    {
+        "id": "vaettircommander",
+        "faction": "vaettir",
+        "type": "commander",
+        "name": "The Hidden Branches",
+        "title": "The Hidden Branches",
+        "abilityWindow": "At the start of the status phase",
+        "abilityText": "Choose 1 planet trait. Gain 1 commodity for every 2 planets with that trait that you control.",
+        "unlockCondition": "Control at least 1 Cultural, 1 Industrial, and 1 Hazardous planet.",
+        "source": "goose"
+    },
+    {
+        "id": "vaettirhero",
+        "faction": "vaettir",
+        "type": "hero",
+        "name": "The Roused Grove",
+        "title": "The Roused Grove",
+        "abilityName": "The Roused Grove",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Return any number of your command tokens from systems that contain 1 or more of your Root tokens to your reinforcements. Then, ready any number of planets that contain Root tokens and place 1 infantry from your reinforcements on planets you control that contain a Root token. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "goose"
+    },
+    {
+        "id": "valdyrjuragent",
+        "faction": "valdyrjur",
+        "type": "agent",
+        "name": "Sigrun",
+        "title": "The Weaver",
+        "abilityWindow": "When a player's unit is destroyed",
+        "abilityText": "You may exhaust this card to HALLOW another of that player's units in the destroyed unit's system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "goose"
+    },
+    {
+        "id": "valdyrjurcommander",
+        "faction": "valdyrjur",
+        "type": "commander",
+        "name": "Brunhilde",
+        "title": "The Valiant Shield",
+        "abilityWindow": "Ongoing",
+        "abilityText": "Each of your damaged units roll an additional die during combat.",
+        "unlockCondition": "Have 4 HALLOWED units on the game board.",
+        "source": "goose"
+    },
+    {
+        "id": "valdyrjurhero",
+        "faction": "valdyrjur",
+        "type": "hero",
+        "name": "Skuld",
+        "title": "The Allmother's Herald",
+        "abilityName": "Velkomin Heim",
+        "abilityWindow": "ACTION:",
+        "abilityText": "You may produce up to 3 ships and 4 ground forces total in systems containing your units with production and you may HALLOW up to 3 of your units on the game board. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "goose"
+    }
+]

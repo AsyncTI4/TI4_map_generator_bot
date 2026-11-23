@@ -1,0 +1,19 @@
+{
+    "tileBack": "green",
+    "id": "ao13",
+    "name": "Valhalla - Valdyrjur",
+    "aliases": [
+        "ao13",
+        "valhalla",
+        "valdyrjur",
+        "valdyrjurhs",
+        "valdyrjur_hs"
+    ],
+    "imagePath": "ao13_valdyrjurhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "valhalla"
+    ],
+    "source": "goose"
+}
