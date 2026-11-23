@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -28,20 +29,30 @@ public class MegagameShowAsService {
     public static final int DEFAULT_DISTANCE = 1;
     public static final int MAX_DISTANCE = 10;
     private static final String MY_AREA_BUTTON_ID = "megagameMyArea";
+    private static final String FOG_REFUSAL =
+            "`show_as` is not available in Fog of War games, because it would show what that faction can see.";
 
     public static boolean isAvailable(Game game) {
+        return game != null && !game.isFowMode();
+    }
+
+    private static boolean isMegagame(Game game) {
         return MegagameTradeOverviewService.isActive(game) || MegagameGmPanelService.isAvailable(game);
     }
 
     public static Optional<Button> myAreaButton(Game game) {
-        if (game == null || !isAvailable(game)) {
+        if (game == null || !isMegagame(game)) {
             return Optional.empty();
         }
         return Optional.of(Buttons.blue(MY_AREA_BUTTON_ID, "My Area"));
     }
 
     @ButtonHandler(value = MY_AREA_BUTTON_ID, save = false)
-    public static void showMyArea(ButtonInteractionEvent event, Game game) {
+    public static void showMyArea(ButtonInteractionEvent event, @Nullable Game game) {
+        if (game == null) {
+            reply(event, "Could not find a game for this channel.");
+            return;
+        }
         Player viewer = game.getPlayer(MapSegmentService.viewerId(game, event));
         if (viewer == null || !viewer.isRealPlayer()) {
             reply(event, "Only players have an area. Use `/show_game show_as` to view a faction.");
@@ -58,7 +69,7 @@ public class MegagameShowAsService {
             boolean wholeMap,
             DisplayType displayType) {
         if (!isAvailable(game)) {
-            reply(event, "`show_as` only works in megagames outside Fog of War.");
+            reply(event, FOG_REFUSAL);
             return;
         }
         Player target = game.getPlayerFromColorOrFaction(AliasHandler.resolveColor(factionOrColor.toLowerCase()));
@@ -77,7 +88,7 @@ public class MegagameShowAsService {
             boolean wholeMap,
             DisplayType displayType) {
         if (!isAvailable(game)) {
-            reply(event, "`show_as` only works in megagames outside Fog of War.");
+            reply(event, FOG_REFUSAL);
             return;
         }
         Set<String> presence = MegagamePlayerReach.presence(game, target);

@@ -184,6 +184,9 @@ public final class Constants {
     public static final String NOTEPAD = "notepad";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String MAP_SEGMENT = "map_segment";
+    public static final String SHOW_AS = "show_as";
+    public static final String SHOW_AS_DISTANCE = "show_as_distance";
+    public static final String SHOW_AS_WHOLE_MAP = "show_as_whole_map";
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";

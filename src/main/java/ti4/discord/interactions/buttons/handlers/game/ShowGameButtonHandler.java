@@ -21,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.fow.MapOverviewService;
 import ti4.service.fow.MapSegmentService;
+import ti4.service.megagame.MegagameShowAsService;
 import ti4.settings.users.RefreshMapStyle;
 import ti4.settings.users.UserSettingsManager;
 
@@ -94,6 +95,7 @@ class ShowGameButtonHandler {
                         MapSegmentService.switchButtons(game, MapSegmentService.viewerId(game, event), foggedView));
                 MapOverviewService.overviewButton(game, viewEvent).ifPresent(mapButtons::add);
                 MapOverviewService.gmOverviewButton(game, event, channel).ifPresent(mapButtons::add);
+                MegagameShowAsService.myAreaButton(game).ifPresent(mapButtons::add);
             }
             if (mapButtons.isEmpty()) {
                 MessageHelper.sendFileUploadToChannel(channel, fileUpload);

@@ -71,7 +71,7 @@ class FocusIslandsTest extends BaseTi4Test {
 
     @Test
     void theHomeIslandIsFoundWithoutAStoredHomePosition() {
-        game.setTile(new Tile("1", "102"));
+        game.setTile(new Tile("01", "102"));
 
         List<FocusIslands.Island> islands = FocusIslands.of(game, viewer, Set.of("102", "401"));
 

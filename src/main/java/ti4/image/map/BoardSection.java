@@ -22,7 +22,7 @@ import ti4.service.map.FractureService;
 
 final class BoardSection {
 
-    private static final Color OUT_OF_FOCUS_SHADE = new Color(0, 0, 0, 165);
+    static final Color OUT_OF_FOCUS_SHADE = new Color(0, 0, 0, 165);
 
     private final RenderContext ctx;
     private final Graphics2D g2;

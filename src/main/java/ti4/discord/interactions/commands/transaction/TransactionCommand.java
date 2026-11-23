@@ -9,7 +9,8 @@ import ti4.helpers.Constants;
 
 public class TransactionCommand implements ParentCommand {
 
-    private final Map<String, Subcommand> subcommands = Stream.of(new TransactionStart(), new ChangeDebtIcon())
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new TransactionStart(), new ChangeDebtIcon(), new TransactionTradables())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

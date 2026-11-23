@@ -123,14 +123,14 @@ public final class FocusIslandsImage {
 
     private static List<Rectangle> labelChoices(String title, Map<String, Point> centres) {
         int width = LABEL_METRICS.stringWidth(title) + 2 * LABEL_PADDING;
-        Point top = extreme(centres, Comparator.comparingInt((Point centre) -> centre.y)
-                .thenComparingInt(centre -> centre.x));
-        Point bottom = extreme(centres, Comparator.comparingInt((Point centre) -> -centre.y)
-                .thenComparingInt(centre -> centre.x));
-        Point left = extreme(centres, Comparator.comparingInt((Point centre) -> centre.x)
-                .thenComparingInt(centre -> centre.y));
-        Point right = extreme(centres, Comparator.comparingInt((Point centre) -> -centre.x)
-                .thenComparingInt(centre -> centre.y));
+        Point top = extreme(
+                centres, Comparator.comparingInt((Point centre) -> centre.y).thenComparingInt(centre -> centre.x));
+        Point bottom = extreme(
+                centres, Comparator.comparingInt((Point centre) -> -centre.y).thenComparingInt(centre -> centre.x));
+        Point left = extreme(
+                centres, Comparator.comparingInt((Point centre) -> centre.x).thenComparingInt(centre -> centre.y));
+        Point right = extreme(
+                centres, Comparator.comparingInt((Point centre) -> -centre.x).thenComparingInt(centre -> centre.y));
         int besideY = LABEL_HEIGHT / 2;
         return List.of(
                 new Rectangle(
@@ -141,12 +141,8 @@ public final class FocusIslandsImage {
                 new Rectangle(
                         bottom.x - width / 2, bottom.y + HexPacker.HEX_HALF_HEIGHT + LABEL_LIFT, width, LABEL_HEIGHT),
                 new Rectangle(
-                        left.x - HexPacker.HEX_HALF_WIDTH - LABEL_LIFT - width,
-                        left.y - besideY,
-                        width,
-                        LABEL_HEIGHT),
-                new Rectangle(
-                        right.x + HexPacker.HEX_HALF_WIDTH + LABEL_LIFT, right.y - besideY, width, LABEL_HEIGHT));
+                        left.x - HexPacker.HEX_HALF_WIDTH - LABEL_LIFT - width, left.y - besideY, width, LABEL_HEIGHT),
+                new Rectangle(right.x + HexPacker.HEX_HALF_WIDTH + LABEL_LIFT, right.y - besideY, width, LABEL_HEIGHT));
     }
 
     private static Point extreme(Map<String, Point> centres, Comparator<Point> order) {

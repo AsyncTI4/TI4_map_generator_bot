@@ -30,6 +30,7 @@ import ti4.service.fow.FogViewer;
 import ti4.service.fow.MapOverviewService;
 import ti4.service.fow.MapSegmentService;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
+import ti4.service.megagame.MegagameShowAsService;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 
@@ -181,6 +182,7 @@ public class ShowGameService {
                         MapSegmentService.switchButtons(game, MapSegmentService.viewerId(game, event), foggedView));
                 MapOverviewService.overviewButton(game, Objects.requireNonNullElse(renderEvent, event))
                         .ifPresent(buttons::add);
+                MegagameShowAsService.myAreaButton(game).ifPresent(buttons::add);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
