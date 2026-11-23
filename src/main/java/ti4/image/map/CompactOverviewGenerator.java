@@ -1,20 +1,23 @@
 package ti4.image.map;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +26,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
-import ti4.image.draw.HorizontalAlign;
-import ti4.image.draw.OutlinedText;
-import ti4.image.draw.VerticalAlign;
-import ti4.image.io.Fonts;
 import ti4.image.io.ImageUploads;
-import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.image.tile.UnexploredBridges;
@@ -39,58 +37,34 @@ import ti4.service.fow.FogViewer;
 public final class CompactOverviewGenerator {
 
     static final int MAX_SIZE = 4000;
-    static final int GAP = 120;
-    static final int TITLE_BAND = 90;
-    static final int HEADER = 70;
-    private static final int CORNER_SPACING = 20;
-    private static final int TITLE_MARGIN = 60;
-    private static final FontMetrics TITLE_METRICS = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
-            .createGraphics()
-            .getFontMetrics(Fonts.ti(32).deriveFont(TITLE_BAND * 0.6f));
     private static final String CORNERS_TITLE = "corners";
-    private static final List<TileStep> GM_STEPS =
+    private static final String PART_SEPARATOR = " - ";
+    private static final List<String> CORNERS = List.of("tl", "tr", "bl", "br");
+    private static final List<TileStep> STEPS =
             List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
-    private static final List<TileStep> PLAYER_STEPS =
-            List.of(TileStep.Tile, TileStep.Extras, TileStep.Units, TileStep.TileNumber);
 
-    record Panel(String title, Map<String, Rectangle> hexes, int margin) {
+    record Panel(String title, Map<String, Point> centres, int colorIndex) {
 
-        Panel(String title, Map<String, Rectangle> hexes) {
-            this(title, hexes, 0);
-        }
-
-        Rectangle content() {
-            Rectangle content = null;
-            for (Rectangle hex : hexes.values()) {
-                content = content == null ? new Rectangle(hex) : content.union(hex);
-            }
-            if (content == null) {
-                return new Rectangle();
-            }
-            content.grow(margin, margin);
-            return content;
+        Panel {
+            centres = Collections.unmodifiableMap(new LinkedHashMap<>(centres));
         }
     }
 
-    record Placed(Panel panel, Rectangle content, int x, int y, int width) {
+    record Placed(Panel panel, Map<String, Point> centres, Rectangle label) {
 
-        int contentLeft() {
-            return x + (width - content.width) / 2;
-        }
-
-        int height() {
-            return content.height + TITLE_BAND;
+        Color color() {
+            return OverviewStyle.color(panel.colorIndex());
         }
     }
 
-    record Layout(List<Placed> placed, int width, int height, double scale) {
+    record Layout(List<Placed> placed, HexIslandStyle.Canvas canvas) {
 
         int canvasWidth() {
-            return Math.max(1, (int) (width * scale));
+            return canvas.width();
         }
 
         int canvasHeight() {
-            return Math.max(1, (int) (height * scale));
+            return canvas.height();
         }
     }
 
@@ -127,8 +101,7 @@ public final class CompactOverviewGenerator {
                 gmPanels(game),
                 new HashMap<>(game.getTileMap()),
                 TileLayers.of(game, null, displayTypeFor(overlay)),
-                withOverlay(withDistances(game, GM_STEPS), overlay),
-                MAX_SIZE,
+                withOverlay(withDistances(game, STEPS), overlay),
                 header(game, "GM overview", overlay));
     }
 
@@ -146,8 +119,7 @@ public final class CompactOverviewGenerator {
                 playerPanels(game, player, tiles.keySet()),
                 tiles,
                 layers,
-                withOverlay(withDistances(game, PLAYER_STEPS), overlay),
-                MAX_SIZE,
+                withOverlay(withDistances(game, STEPS), overlay),
                 header(game, player.getFaction() + " overview", overlay));
     }
 
@@ -183,11 +155,27 @@ public final class CompactOverviewGenerator {
     }
 
     static List<Panel> gmPanels(Game game) {
-        return panels(game, MapSegment.all(game), true, game.getTileMap().keySet());
+        return splitIntoTouchingParts(
+                panels(game, MapSegment.all(game), true, game.getTileMap().keySet()), UnaryOperator.identity());
     }
 
     static List<Panel> playerPanels(Game game, Player player, Set<String> known) {
-        return panels(game, MapSegment.visibleTo(game, player), MapSegment.mainMapVisibleTo(game, player), known);
+        return splitIntoTouchingParts(
+                panels(game, MapSegment.visibleTo(game, player), MapSegment.mainMapVisibleTo(game, player), known),
+                CompactOverviewGenerator::centredOnItself);
+    }
+
+    private static List<Panel> splitIntoTouchingParts(
+            List<Panel> panels, UnaryOperator<Map<String, Point>> partPlacement) {
+        List<Panel> islands = new ArrayList<>();
+        for (Panel panel : panels) {
+            List<Map<String, Point>> parts = touchingParts(panel.centres());
+            for (int index = 0; index < parts.size(); index++) {
+                String title = parts.size() == 1 ? panel.title() : panel.title() + PART_SEPARATOR + (index + 1);
+                islands.add(new Panel(title, partPlacement.apply(parts.get(index)), panel.colorIndex()));
+            }
+        }
+        return islands;
     }
 
     static Map<String, Tile> knownTiles(Game game, Player player, TileLayers layers) {
@@ -227,15 +215,16 @@ public final class CompactOverviewGenerator {
         for (MapSegment segment : segments) {
             addPanel(panels, game, segment.displayName(game), segment.positions(), allowed, fractureYbump);
         }
-        Map<String, Rectangle> corners = new LinkedHashMap<>();
-        for (String corner : List.of("tl", "tr", "bl", "br")) {
+        Map<String, Point> corners = new LinkedHashMap<>();
+        for (String corner : CORNERS) {
             if (allowed.contains(corner) && game.getTileByPosition(corner) != null) {
-                int x = corners.size() * (TileGeometry.TILE_WIDTH + CORNER_SPACING);
-                corners.put(corner, new Rectangle(x, 0, TileGeometry.TILE_WIDTH, TileGeometry.TILE_HEIGHT));
+                int index = corners.size();
+                corners.put(
+                        corner, new Point(index * FocusIslands.COLUMN_STEP, (index % 2) * FocusIslands.HALF_ROW_STEP));
             }
         }
         if (!corners.isEmpty()) {
-            panels.add(new Panel(CORNERS_TITLE, corners, OverviewStyle.TILE_PADDING));
+            panels.add(new Panel(CORNERS_TITLE, corners, panels.size()));
         }
         return panels;
     }
@@ -247,62 +236,106 @@ public final class CompactOverviewGenerator {
             Set<String> positions,
             Set<String> allowed,
             int fractureYbump) {
-        Map<String, Rectangle> hexes = new LinkedHashMap<>();
+        Map<String, Point> centres = new LinkedHashMap<>();
+        Point origin = null;
         for (String position : new TreeSet<>(positions)) {
             if (!allowed.contains(position) || BoardLayout.CORNER_POSITIONS.contains(position.toLowerCase())) {
                 continue;
             }
             Rectangle hex = MapFrame.hexBounds(game, position, fractureYbump, 0, 0);
-            if (hex != null) {
-                hexes.put(position, hex);
+            if (hex == null) {
+                continue;
             }
+            Point centre = new Point((int) hex.getCenterX(), (int) hex.getCenterY());
+            if (origin == null) {
+                origin = centre;
+            }
+            centres.put(position, onLattice(centre, origin));
         }
-        if (!hexes.isEmpty()) {
-            panels.add(new Panel(title, hexes));
+        if (!centres.isEmpty()) {
+            panels.add(new Panel(title, centres, panels.size()));
         }
     }
 
-    static Layout layout(List<Panel> panels, int maxSize) {
+    static Point onLattice(Point centre, Point origin) {
+        int column = Math.round((centre.x - origin.x) / (float) FocusIslands.COLUMN_STEP);
+        int row = Math.round((centre.y - origin.y) / (float) FocusIslands.HALF_ROW_STEP);
+        if ((column + row) % 2 != 0) {
+            row++;
+        }
+        return new Point(origin.x + column * FocusIslands.COLUMN_STEP, origin.y + row * FocusIslands.HALF_ROW_STEP);
+    }
+
+    static List<Map<String, Point>> touchingParts(Map<String, Point> centres) {
+        Map<Point, String> positionAt = new HashMap<>();
+        centres.forEach((position, centre) -> positionAt.put(centre, position));
+        Set<String> seen = new HashSet<>();
+        List<Map<String, Point>> parts = new ArrayList<>();
+        for (String start : centres.keySet()) {
+            if (!seen.add(start)) {
+                continue;
+            }
+            Map<String, Point> part = new TreeMap<>(MapFrame.POSITION_ORDER);
+            ArrayDeque<String> queue = new ArrayDeque<>(List.of(start));
+            while (!queue.isEmpty()) {
+                String position = queue.poll();
+                Point centre = centres.get(position);
+                part.put(position, centre);
+                for (Point step : HexPacker.NEIGHBOUR_OFFSETS) {
+                    String next = positionAt.get(new Point(centre.x + step.x, centre.y + step.y));
+                    if (next != null && seen.add(next)) {
+                        queue.add(next);
+                    }
+                }
+            }
+            parts.add(part);
+        }
+        parts.sort(Comparator.comparingInt((Map<String, Point> part) -> -part.size())
+                .thenComparing(part -> part.keySet().iterator().next(), MapFrame.POSITION_ORDER));
+        return parts;
+    }
+
+    private static Map<String, Point> centredOnItself(Map<String, Point> centres) {
+        long sumX = 0;
+        long sumY = 0;
+        for (Point centre : centres.values()) {
+            sumX += centre.x;
+            sumY += centre.y;
+        }
+        int count = Math.max(1, centres.size());
+        int shiftX = (int) (sumX / count);
+        int shiftY = (int) (sumY / count);
+        Map<String, Point> centred = new LinkedHashMap<>();
+        centres.forEach((position, centre) -> centred.put(position, new Point(centre.x - shiftX, centre.y - shiftY)));
+        return centred;
+    }
+
+    static Layout layout(List<Panel> panels, String header) {
         List<Panel> bySize = new ArrayList<>(panels);
-        bySize.sort(Comparator.comparingInt((Panel panel) -> panel.content().height)
-                .reversed()
+        bySize.sort(Comparator.comparingInt((Panel panel) -> -panel.centres().size())
                 .thenComparing(Panel::title));
-        long area = 0;
-        int widest = 0;
-        for (Panel panel : bySize) {
-            Rectangle content = panel.content();
-            int panelWidth = panelWidth(panel, content);
-            area += (long) (panelWidth + GAP) * (content.height + TITLE_BAND + GAP);
-            widest = Math.max(widest, panelWidth);
-        }
-        int rowWidth = Math.max(widest, (int) (1.4 * Math.sqrt(area)));
+        List<HexPacker.Shape> shapes = bySize.stream()
+                .map(panel -> new HexPacker.Shape(
+                        List.copyOf(panel.centres().values()),
+                        HexIslandStyle.labelChoices(
+                                panel.title(), panel.centres().values())))
+                .toList();
+        List<HexPacker.Placement> placements = HexPacker.pack(shapes);
         List<Placed> placed = new ArrayList<>();
-        int x = GAP;
-        int y = HEADER;
-        int rowHeight = 0;
-        int width = 0;
-        for (Panel panel : bySize) {
-            Rectangle content = panel.content();
-            int panelWidth = panelWidth(panel, content);
-            if (x > GAP && x + panelWidth > rowWidth + GAP) {
-                x = GAP;
-                y += rowHeight + GAP;
-                rowHeight = 0;
-            }
-            Placed box = new Placed(panel, content, x, y, panelWidth);
-            placed.add(box);
-            x += box.width() + GAP;
-            rowHeight = Math.max(rowHeight, box.height());
-            width = Math.max(width, x);
+        for (int index = 0; index < bySize.size(); index++) {
+            Point offset = placements.get(index).offset();
+            Map<String, Point> centres = new LinkedHashMap<>();
+            bySize.get(index)
+                    .centres()
+                    .forEach((position, local) ->
+                            centres.put(position, new Point(local.x + offset.x, local.y + offset.y)));
+            placed.add(
+                    new Placed(bySize.get(index), centres, placements.get(index).label()));
         }
-        int height = y + rowHeight + GAP;
-        width = Math.max(width, GAP * 2);
-        double scale = Math.min(1.0, Math.min((double) maxSize / width, (double) maxSize / height));
-        return new Layout(placed, width, height, scale);
-    }
-
-    private static int panelWidth(Panel panel, Rectangle content) {
-        return Math.max(content.width, TITLE_METRICS.stringWidth(panel.title()) + TITLE_MARGIN);
+        Rectangle content = HexIslandStyle.contentBounds(
+                placed.stream().flatMap(box -> box.centres().values().stream()).toList(),
+                placed.stream().map(Placed::label).toList());
+        return new Layout(placed, HexIslandStyle.Canvas.of(content, MAX_SIZE, header));
     }
 
     private static BufferedImage render(
@@ -311,47 +344,24 @@ public final class CompactOverviewGenerator {
             Map<String, Tile> tiles,
             TileLayers tileLayers,
             List<TileStep> steps,
-            int maxSize,
             String header) {
-        Layout layout = layout(panels, maxSize);
-        BufferedImage image =
-                new BufferedImage(layout.canvasWidth(), layout.canvasHeight(), BufferedImage.TYPE_INT_RGB);
+        Layout layout = layout(panels, header);
+        BufferedImage image = layout.canvas().newImage();
         Graphics2D graphics = OverviewStyle.smoothGraphics(image);
         try {
-            drawPanelFrames(graphics, layout);
-            drawTiles(game, graphics, layout, tiles, tileLayers, steps);
             OverviewStyle.drawHeader(graphics, header);
+            layout.canvas().enter(graphics);
+            drawTiles(game, graphics, layout, tiles, tileLayers, steps);
+            layout.placed()
+                    .forEach(box ->
+                            HexIslandStyle.drawOutline(graphics, box.centres().values(), box.color()));
+            layout.placed()
+                    .forEach(box -> HexIslandStyle.drawLabel(
+                            graphics, box.label(), box.panel().title(), box.color()));
         } finally {
             graphics.dispose();
         }
         return image;
-    }
-
-    private static void drawPanelFrames(Graphics2D graphics, Layout layout) {
-        double scale = layout.scale();
-        Font titleFont = Fonts.ti(32).deriveFont((float) Math.max(16, TITLE_BAND * 0.6 * scale));
-        for (int index = 0; index < layout.placed().size(); index++) {
-            Placed box = layout.placed().get(index);
-            Color color = OverviewStyle.color(index);
-            int left = (int) Math.round(box.x() * scale);
-            int top = (int) Math.round(box.y() * scale);
-            int width = (int) Math.round(box.width() * scale);
-            int height = (int) Math.round(box.height() * scale);
-            graphics.setColor(OverviewStyle.translucent(color, 160));
-            graphics.setStroke(new BasicStroke((float) Math.max(2, 6 * scale)));
-            graphics.drawRoundRect(left, top, width, height, 16, 16);
-            graphics.setFont(titleFont);
-            OutlinedText.draw(
-                    graphics,
-                    box.panel().title(),
-                    left + width / 2,
-                    top + (int) Math.round(TITLE_BAND * scale / 2),
-                    color,
-                    HorizontalAlign.Center,
-                    VerticalAlign.Center,
-                    new BasicStroke(4),
-                    Color.BLACK);
-        }
     }
 
     private static void drawTiles(
@@ -361,26 +371,15 @@ public final class CompactOverviewGenerator {
             Map<String, Tile> tiles,
             TileLayers tileLayers,
             List<TileStep> steps) {
-        double scale = layout.scale();
-        int drawnSize = (int) Math.ceil(OverviewStyle.TILE_IMAGE_SIZE * scale);
         for (TileStep step : steps) {
             for (Placed box : layout.placed()) {
-                box.panel().hexes().forEach((position, hex) -> {
+                box.centres().forEach((position, centre) -> {
                     Tile tile = tiles.get(position);
                     if (tile == null) {
                         return;
                     }
-                    int rawX = box.contentLeft() + hex.x - box.content().x - OverviewStyle.TILE_PADDING;
-                    int rawY = box.y() + TITLE_BAND + hex.y - box.content().y - OverviewStyle.TILE_PADDING;
                     try {
-                        BufferedImage tileImage = tileLayers.draw(tile, step);
-                        graphics.drawImage(
-                                tileImage,
-                                (int) Math.round(rawX * scale),
-                                (int) Math.round(rawY * scale),
-                                drawnSize,
-                                drawnSize,
-                                null);
+                        HexIslandStyle.drawLayer(graphics, tileLayers.draw(tile, step), tile, centre, step);
                     } catch (Exception e) {
                         BotLogger.error(
                                 "Compact overview could not draw tile " + tile.getTileID() + " at " + position + " in "

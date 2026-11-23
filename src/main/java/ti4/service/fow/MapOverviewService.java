@@ -19,6 +19,7 @@ import ti4.helpers.FoWHelper;
 import ti4.image.map.CompactOverviewGenerator;
 import ti4.image.map.MapRenderPipeline;
 import ti4.message.MessageHelper;
+import ti4.service.ShowGameService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -72,7 +73,7 @@ public class MapOverviewService {
                 game,
                 "GM map overview",
                 CompactOverviewGenerator::gmOverview,
-                fileUpload -> MessageHelper.sendFileUploadToChannel(channel, fileUpload));
+                fileUpload -> ShowGameService.sendWithMapButtons(game, event, channel, fileUpload));
     }
 
     private static boolean isGameMasterInOwnPrivateChannel(
@@ -116,7 +117,7 @@ public class MapOverviewService {
                     if (replyPrivately) {
                         MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
                     } else {
-                        MessageHelper.sendFileUploadToChannel(channel, fileUpload);
+                        ShowGameService.sendWithMapButtons(game, event, channel, fileUpload);
                     }
                 });
     }

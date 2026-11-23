@@ -1,5 +1,6 @@
 package ti4.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -174,19 +175,13 @@ public class ShowGameService {
                                 msg.getChannel().getIdLong())
                 : null;
 
-        boolean foggedView = renderEvent != null && MapSegmentService.isFoggedView(game, renderEvent);
         MapRenderPipeline.queue(game, renderEvent, displayType, segment, fileUpload -> {
             if (includeButtons(displayType)) {
                 List<Button> buttons = Buttons.mapImageButtons(game, segment);
-                buttons.addAll(
-                        MapSegmentService.switchButtons(game, MapSegmentService.viewerId(game, event), foggedView));
-                MapOverviewService.overviewButton(game, Objects.requireNonNullElse(renderEvent, event))
-                        .ifPresent(buttons::add);
-                MegagameShowAsService.myAreaButton(game).ifPresent(buttons::add);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
-                MapOverviewService.gmOverviewButton(game, event, channel).ifPresent(buttons::add);
+                buttons.addAll(mapViewButtons(game, event, channel));
                 // Use FoW callback when sending to player's private channel, otherwise use full map callback
                 Consumer<Message> callback = (game.isFowMode() && isSendingToPrivateChannel(game, event))
                         ? persistFowMessageId
@@ -205,6 +200,25 @@ public class ShowGameService {
         });
     }
 
+    public static void sendWithMapButtons(
+            Game game, GenericInteractionCreateEvent event, MessageChannel channel, FileUpload fileUpload) {
+        List<Button> buttons = Buttons.mapImageButtons(game);
+        buttons.addAll(mapViewButtons(game, event, channel));
+        ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons, game, null);
+    }
+
+    public static List<Button> mapViewButtons(Game game, GenericInteractionCreateEvent event, MessageChannel postedIn) {
+        GenericInteractionCreateEvent renderEvent = renderEventFor(game, event);
+        boolean foggedView = renderEvent != null && MapSegmentService.isFoggedView(game, renderEvent);
+        List<Button> buttons = new ArrayList<>(
+                MapSegmentService.switchButtons(game, MapSegmentService.viewerId(game, event), foggedView));
+        MapOverviewService.overviewButton(game, Objects.requireNonNullElse(renderEvent, event))
+                .ifPresent(buttons::add);
+        MapOverviewService.gmOverviewButton(game, event, postedIn).ifPresent(buttons::add);
+        MegagameShowAsService.myAreaButton(game).ifPresent(buttons::add);
+        return buttons;
+    }
+
     public static void showFeature(Game game, GenericInteractionCreateEvent event, DisplayType feature) {
         if (!hasGameToShow(game, event) || !mayShowMap(game, event)) {
             return;
@@ -217,7 +231,11 @@ public class ShowGameService {
             Player viewer =
                     foggedView ? FogViewer.resolve(game, renderEvent, null).player() : null;
             if (!foggedView || (viewer != null && viewer.isRealPlayer())) {
-                MapOverviewService.queueOverlayOverview(game, viewer, feature, post);
+                MapOverviewService.queueOverlayOverview(
+                        game,
+                        viewer,
+                        feature,
+                        fileUpload -> sendWithMapButtons(game, event, sendMessage(game, event), fileUpload));
                 return;
             }
         }
