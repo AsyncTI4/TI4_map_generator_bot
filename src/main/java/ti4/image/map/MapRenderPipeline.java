@@ -2,6 +2,7 @@ package ti4.image.map;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -84,6 +85,42 @@ public class MapRenderPipeline {
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
+    public static void queueImages(
+            Game game, String label, Function<Game, List<FileUpload>> images, Consumer<List<FileUpload>> callback) {
+        if (CircuitBreaker.isOpen()) {
+            return;
+        }
+        Game snapshot = snapshotOf(game);
+        var timedRunnable =
+                new TimedRunnable(label + " for " + game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+                    List<FileUpload> fileUploads = List.of();
+                    try {
+                        fileUploads = images.apply(snapshot);
+                        callback.accept(fileUploads);
+                    } catch (Exception e) {
+                        BotLogger.error(new LogOrigin(game), "Failed to render " + label + ".", e);
+                    } finally {
+                        fileUploads.forEach(MapRenderPipeline::closeQuietly);
+                    }
+                });
+        ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
+    }
+
+    public static FileUpload renderOnThisThread(Game snapshot, DisplayType displayType, MapFocus focus) {
+        RenderTimings timings = RenderTimings.disabled();
+        MapRenderResult result =
+                MapRenderer.render(new MapRenderRequest(snapshot, displayType, null, null, focus), timings);
+        return MapUploads.toDiscord(snapshot, result, timings);
+    }
+
+    private static void closeQuietly(FileUpload fileUpload) {
+        try {
+            fileUpload.close();
+        } catch (IOException e) {
+            BotLogger.error("Could not close a rendered image upload.", e);
+        }
+    }
+
     public static void queueDetachedImage(String label, Supplier<FileUpload> image, Consumer<FileUpload> callback) {
         if (CircuitBreaker.isOpen()) {
             return;
@@ -148,11 +185,11 @@ public class MapRenderPipeline {
         queue(game, null, displayType, null, callback, false);
     }
 
-    public static void queueFocused(Game game, MapFocus focus, Consumer<FileUpload> callback) {
+    public static void queueFocused(Game game, DisplayType displayType, MapFocus focus, Consumer<FileUpload> callback) {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
-        render(new RenderEvent(game, null, DisplayType.all, null, callback, false, focus));
+        render(new RenderEvent(game, null, displayType, null, callback, false, focus));
     }
 
     private static void queue(

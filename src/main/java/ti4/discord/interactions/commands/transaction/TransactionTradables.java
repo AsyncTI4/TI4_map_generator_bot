@@ -1,4 +1,4 @@
-package ti4.discord.interactions.commands.megagame;
+package ti4.discord.interactions.commands.transaction;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -14,12 +14,12 @@ import ti4.logging.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.megagame.MegagameTradeInfoService;
 
-class MegagameTradeInfo extends GameStateSubcommand {
+class TransactionTradables extends GameStateSubcommand {
 
     private static final String PUBLIC = "public";
 
-    MegagameTradeInfo() {
-        super("tradeinfo", "Show a faction's public tradables, with a button to start a trade", false, false);
+    TransactionTradables() {
+        super("tradables", "Megagame: a faction's public tradables, with a button to start a trade", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or colour, default you")
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, PUBLIC, "True to show it to everyone in this channel"));
@@ -34,7 +34,7 @@ class MegagameTradeInfo extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         if (!MegagameTradeInfoService.isAvailable(game)) {
-            reply(event, "Trade info is only available in megagames (tag `megagame`) outside Fog of War.");
+            reply(event, "Tradables are only available in megagames (tag `megagame`) outside Fog of War.");
             return;
         }
         Player viewer = CommandHelper.getPlayerFromGame(
