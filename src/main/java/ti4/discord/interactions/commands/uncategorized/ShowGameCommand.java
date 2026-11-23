@@ -112,8 +112,8 @@ public class ShowGameCommand extends GameStateCommand {
         int distance = event.getOption(
                 Constants.SHOW_AS_DISTANCE, MegagameShowAsService.DEFAULT_DISTANCE, OptionMapping::getAsInt);
         boolean wholeMap = event.getOption(Constants.SHOW_AS_WHOLE_MAP, false, OptionMapping::getAsBoolean);
-        String requested = event.getOption(
-                Constants.DISPLAY_TYPE, DisplayType.all.getValue(), OptionMapping::getAsString);
+        String requested =
+                event.getOption(Constants.DISPLAY_TYPE, DisplayType.all.getValue(), OptionMapping::getAsString);
         DisplayType displayType = SHOW_AS_DISPLAY_TYPES.stream()
                 .filter(type -> type.getValue().equals(requested))
                 .findFirst()
