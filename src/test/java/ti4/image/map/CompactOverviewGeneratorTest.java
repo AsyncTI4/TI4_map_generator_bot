@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.awt.Rectangle;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -55,7 +55,9 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
     }
 
     private static Set<String> positions(List<Panel> panels) {
-        return panels.stream().flatMap(panel -> panel.hexes().keySet().stream()).collect(Collectors.toSet());
+        return panels.stream()
+                .flatMap(panel -> panel.centres().keySet().stream())
+                .collect(Collectors.toSet());
     }
 
     @Test
@@ -93,17 +95,77 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
 
     @Test
     void packedPanelsNeverOverlapAndFitTheSizeCap() {
-        Layout layout = CompactOverviewGenerator.layout(
-                CompactOverviewGenerator.gmPanels(game), CompactOverviewGenerator.MAX_SIZE);
+        Layout layout = CompactOverviewGenerator.layout(CompactOverviewGenerator.gmPanels(game), "header");
 
         List<Placed> placed = layout.placed();
         for (int i = 0; i < placed.size(); i++) {
             for (int j = i + 1; j < placed.size(); j++) {
-                assertFalse(box(placed.get(i)).intersects(box(placed.get(j))), "panels overlap");
+                for (Point p : placed.get(i).centres().values()) {
+                    for (Point q : placed.get(j).centres().values()) {
+                        assertTrue(HexPacker.hexesClear(p, q, HexPacker.GUTTER - 1), "panels overlap");
+                    }
+                }
+                assertFalse(placed.get(i).label().intersects(placed.get(j).label()), "labels overlap");
             }
         }
         assertTrue(layout.canvasWidth() <= CompactOverviewGenerator.MAX_SIZE);
         assertTrue(layout.canvasHeight() <= CompactOverviewGenerator.MAX_SIZE);
+    }
+
+    @Test
+    void aPlayerSeesSeparatePiecesOfASectorAsLooseIslandsButTheGmSeesOnePanel() {
+        // Two known hexes of the core that do not touch: 101 and 104 sit on opposite sides of 000.
+        Set<String> known = Set.of("101", "104");
+        game.getTileByPosition("000")
+                .addUnit(
+                        "space",
+                        ti4.helpers.Units.getUnitKey(ti4.helpers.Units.UnitType.Carrier, player.getColorID()),
+                        1);
+        String core = GalaxyNames.name(game, GalaxyNames.MAIN_ID) + " / core";
+
+        List<Panel> panels = CompactOverviewGenerator.playerPanels(game, player, known);
+
+        assertEquals(Set.of(core + " - 1", core + " - 2"), titles(panels));
+        // Each island is centred on itself, so neither keeps where it lies relative to the other.
+        for (Panel panel : panels) {
+            assertEquals(new Point(0, 0), panel.centres().values().iterator().next());
+        }
+        assertTrue(titles(CompactOverviewGenerator.gmPanels(game)).contains(core));
+    }
+
+    @Test
+    void theGmSeesADisconnectedPanelAsPartsThatKeepTheirRealDirection() {
+        // Map A's rest becomes a301 and a310, on opposite sides of the outpost sector.
+        game.setTile(new Tile("24", "a310"));
+        String galaxyA = GalaxyNames.name(game, "a");
+
+        List<Panel> panels = CompactOverviewGenerator.gmPanels(game);
+
+        Point first = onlyCentre(panels, galaxyA + " - 1");
+        Point second = onlyCentre(panels, galaxyA + " - 2");
+        assertFalse(titles(panels).contains(galaxyA));
+        assertTrue(first.distance(second) > 4 * FocusIslands.COLUMN_STEP, "parts keep their real distance");
+    }
+
+    private static Point onlyCentre(List<Panel> panels, String title) {
+        return panels.stream()
+                .filter(panel -> panel.title().equals(title))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no panel " + title + " in " + titles(panels)))
+                .centres()
+                .values()
+                .iterator()
+                .next();
+    }
+
+    @Test
+    void neighbouringHexesLandOnTheHexLattice() {
+        Point origin = new Point(1000, 1000);
+        Point nudged = new Point(1000 + FocusIslands.COLUMN_STEP + 3, 1000 + FocusIslands.HALF_ROW_STEP - 2);
+
+        assertEquals(
+                new Point(1000 + FocusIslands.COLUMN_STEP, 1000 + FocusIslands.HALF_ROW_STEP),
+                CompactOverviewGenerator.onLattice(nudged, origin));
     }
 
     @Test
@@ -144,9 +206,5 @@ class CompactOverviewGeneratorTest extends BaseTi4Test {
 
     private static int[] pixels(BufferedImage image) {
         return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-    }
-
-    private static Rectangle box(Placed placed) {
-        return new Rectangle(placed.x(), placed.y(), placed.width(), placed.height());
     }
 }

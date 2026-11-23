@@ -14,6 +14,7 @@ import ti4.game.Game;
 import ti4.game.Tile;
 import ti4.helpers.DisplayType;
 import ti4.image.tile.ExtrasStepTiles;
+import ti4.image.tile.TileGeometry;
 import ti4.image.tile.TileLayers;
 import ti4.image.tile.TileStep;
 import ti4.logging.BotLogger;
@@ -96,7 +97,10 @@ final class BoardSection {
         g2.setColor(OUT_OF_FOCUS_SHADE);
         for (String position : positions) {
             Rectangle hex = focus.isDimmed(position) ? board.hexBounds(position) : null;
+            Tile tile = game.getTileByPosition(position);
             if (hex != null) {
+                Point artworkHex = tile == null ? new Point() : TileGeometry.hexOffsetInArtwork(tile);
+                hex.translate(artworkHex.x, artworkHex.y);
                 g2.fillPolygon(MapFrame.hexPolygon(hex));
             }
         }
@@ -151,6 +155,25 @@ final class BoardSection {
         };
     }
 
+    private void paintClippedWhenFocused(Tile tile, TileStep step, Point origin) {
+        if (ctx.focus() == null || step != TileStep.Tile) {
+            tileLayers.paint(tile, step, g2, origin.x, origin.y);
+            return;
+        }
+        Point artworkHex = TileGeometry.hexOffsetInArtwork(tile);
+        Shape previousClip = g2.getClip();
+        g2.clip(MapFrame.hexPolygon(new Rectangle(
+                origin.x + TileGeometry.TILE_PADDING + artworkHex.x,
+                origin.y + TileGeometry.TILE_PADDING + artworkHex.y,
+                TileGeometry.TILE_WIDTH,
+                TileGeometry.TILE_HEIGHT)));
+        try {
+            tileLayers.paint(tile, step, g2, origin.x, origin.y);
+        } finally {
+            g2.setClip(previousClip);
+        }
+    }
+
     private void addTile(Tile tile, TileStep step) {
         if (tile == null || tile.getTileID() == null) {
             return;
@@ -170,7 +193,7 @@ final class BoardSection {
                 return;
             }
 
-            tileLayers.paint(tile, step, g2, origin.x, origin.y);
+            paintClippedWhenFocused(tile, step, origin);
         } catch (Exception exception) {
             BotLogger.error(
                     "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(), exception);

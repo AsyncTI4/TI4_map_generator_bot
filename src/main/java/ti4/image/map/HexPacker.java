@@ -2,7 +2,9 @@ package ti4.image.map;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +21,8 @@ final class HexPacker {
     private static final double TARGET_ASPECT = 1 / 1.2;
     private static final double DIRECTION_WEIGHT = 0.15;
     private static final int BUCKET = 400;
+    private static final Comparator<Point> TOP_FIRST =
+            Comparator.comparingInt((Point point) -> point.y).thenComparingInt(point -> point.x);
     private static final List<Double> EDGE_FRACTIONS = List.of(0.0, 0.25, 0.5, 0.75);
     private static final List<Point> CONTACT_POINTS = contactPoints();
     static final List<Point> NEIGHBOUR_OFFSETS = List.of(
@@ -29,11 +33,16 @@ final class HexPacker {
             new Point(-FocusIslands.COLUMN_STEP, FocusIslands.HALF_ROW_STEP),
             new Point(-FocusIslands.COLUMN_STEP, -FocusIslands.HALF_ROW_STEP));
 
-    record Shape(List<Point> centres, List<Rectangle> labels) {
+    record Shape(List<Point> centres, List<Rectangle> labels, List<Point> footprint) {
 
         Shape {
             centres = List.copyOf(centres);
             labels = labels.stream().map(Rectangle::new).toList();
+            footprint = List.copyOf(footprint);
+        }
+
+        Shape(List<Point> centres, List<Rectangle> labels) {
+            this(centres, labels, withEnclosedHoles(centres));
         }
 
         Rectangle hexBounds() {
@@ -51,8 +60,8 @@ final class HexPacker {
         }
 
         List<Point> boundaryCentres() {
-            Set<Point> all = new HashSet<>(centres);
-            return centres.stream()
+            Set<Point> all = new HashSet<>(footprint);
+            return footprint.stream()
                     .filter(centre -> NEIGHBOUR_OFFSETS.stream()
                             .anyMatch(step -> !all.contains(new Point(centre.x + step.x, centre.y + step.y))))
                     .toList();
@@ -225,7 +234,7 @@ final class HexPacker {
     }
 
     private boolean hexesFit(Shape shape, Point offset) {
-        for (Point local : shape.centres()) {
+        for (Point local : shape.footprint()) {
             Point centre = new Point(local.x + offset.x, local.y + offset.y);
             if (!clearOfPlacedHexes(centre) || !clearOfPlacedLabels(hexBox(centre))) {
                 return false;
@@ -272,13 +281,16 @@ final class HexPacker {
 
     private void place(Shape shape, Placement placement) {
         Point offset = placement.offset();
-        for (Point local : shape.centres()) {
+        for (Point local : shape.footprint()) {
             Point centre = new Point(local.x + offset.x, local.y + offset.y);
             placedHexes
                     .computeIfAbsent(
                             key(Math.floorDiv(centre.x, BUCKET), Math.floorDiv(centre.y, BUCKET)),
                             k -> new ArrayList<>())
                     .add(centre);
+        }
+        for (Point local : shape.centres()) {
+            Point centre = new Point(local.x + offset.x, local.y + offset.y);
             centreSumX += centre.x;
             centreSumY += centre.y;
             centreCount++;
@@ -293,6 +305,62 @@ final class HexPacker {
             moved = moved.union(placement.label());
         }
         placedBounds = placedBounds == null ? moved : placedBounds.union(moved);
+    }
+
+    static List<Point> withEnclosedHoles(List<Point> centres) {
+        if (centres.isEmpty()) {
+            return List.of();
+        }
+        Set<Point> occupied = new HashSet<>(centres);
+        Rectangle area = latticeArea(centres);
+        Point top = centres.stream().min(TOP_FIRST).orElseThrow();
+        Set<Point> outside = flood(new Point(top.x, area.y), occupied, area);
+        List<Point> footprint = new ArrayList<>(centres);
+        Set<Point> holes = new HashSet<>();
+        for (Point centre : centres) {
+            for (Point step : NEIGHBOUR_OFFSETS) {
+                Point next = new Point(centre.x + step.x, centre.y + step.y);
+                if (!occupied.contains(next) && !outside.contains(next) && !holes.contains(next)) {
+                    holes.addAll(flood(next, occupied, area));
+                }
+            }
+        }
+        holes.stream().sorted(TOP_FIRST).forEach(footprint::add);
+        return footprint;
+    }
+
+    private static Rectangle latticeArea(List<Point> centres) {
+        int minX = centres.stream().mapToInt(point -> point.x).min().orElse(0);
+        int maxX = centres.stream().mapToInt(point -> point.x).max().orElse(0);
+        int minY = centres.stream().mapToInt(point -> point.y).min().orElse(0);
+        int maxY = centres.stream().mapToInt(point -> point.y).max().orElse(0);
+        int marginX = 2 * FocusIslands.COLUMN_STEP;
+        int marginY = 4 * HEX_HALF_HEIGHT;
+        return new Rectangle(minX - marginX, minY - marginY, maxX - minX + 2 * marginX, maxY - minY + 2 * marginY);
+    }
+
+    private static Set<Point> flood(Point start, Set<Point> occupied, Rectangle area) {
+        Set<Point> reached = new HashSet<>();
+        ArrayDeque<Point> queue = new ArrayDeque<>();
+        reached.add(start);
+        queue.add(start);
+        while (!queue.isEmpty()) {
+            Point point = queue.poll();
+            for (Point step : NEIGHBOUR_OFFSETS) {
+                Point next = new Point(point.x + step.x, point.y + step.y);
+                if (inside(area, next) && !occupied.contains(next) && reached.add(next)) {
+                    queue.add(next);
+                }
+            }
+        }
+        return reached;
+    }
+
+    private static boolean inside(Rectangle area, Point point) {
+        return point.x >= area.x
+                && point.x <= area.x + area.width
+                && point.y >= area.y
+                && point.y <= area.y + area.height;
     }
 
     private static Point centreOf(List<Point> centres) {

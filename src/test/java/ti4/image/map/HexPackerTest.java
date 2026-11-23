@@ -82,6 +82,18 @@ class HexPackerTest {
         assertTrue(west.x < 0, "west island at " + west);
     }
 
+    @Test
+    void nothingIsPackedIntoTheHoleOfARing() {
+        HexPacker.Shape ring = shape(cell(0, -2), cell(1, -1), cell(1, 1), cell(0, 2), cell(-1, 1), cell(-1, -1));
+        assertTrue(ring.footprint().contains(cell(0, 0)), "the hole counts as taken");
+
+        Point placed = placedCentre(ring, cell(0, 0));
+        for (Point hex : ring.footprint()) {
+            assertTrue(
+                    HexPacker.hexesClear(hex, placed, HexPacker.GUTTER - 1), "single landed in the ring at " + placed);
+        }
+    }
+
     private static Point placedCentre(HexPacker.Shape anchor, Point far) {
         Point offset = HexPacker.pack(List.of(anchor, shape(far))).get(1).offset();
         return new Point(far.x + offset.x, far.y + offset.y);
