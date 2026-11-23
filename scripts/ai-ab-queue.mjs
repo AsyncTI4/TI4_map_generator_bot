@@ -33,7 +33,11 @@ const QUEUE_PROPERTY = "ai.selfplay.queue.id";
 const CODE_PATHS = ["src", "pom.xml"];
 
 export function git(cwd, ...args) {
-  return execFileSync("git", ["-C", cwd, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+  try {
+    return execFileSync("git", ["-C", cwd, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
+  } catch (error) {
+    throw new Error(`git ${args.join(" ")} failed in ${cwd}: ${String(error.stderr ?? error.message).trim()}`);
+  }
 }
 
 function commonDir(cwd) {

@@ -168,7 +168,9 @@ public final class ObjectiveValue {
     }
 
     private double desperation(Target target) {
-        if (!seat.equals(decider) || !seat.equals(DecidingSeat.orSelf(game, decider))) return 1.0;
+        if (!seat.equals(decider) || !seat.equals(DecidingSeat.orSelf(game, decider)) || ImaginedTurn.imagines(seat)) {
+            return 1.0;
+        }
         if (!target.secret()) return publicDesperate() ? desperationFactor() : 1.0;
         return switch (SecretPhase.of(target.id())) {
             case STATUS -> statusSecretDesperate() ? desperationFactor() : 1.0;

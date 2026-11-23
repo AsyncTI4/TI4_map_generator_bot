@@ -142,6 +142,17 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   thinking time. The audit found the other heavy board facts (defense, rankings, win odds) read the deciding seat's
   hidden hand or perspective, so they are not shared across seats.
 
+- 2026-11-23: `EnemyIntent` keeps a rival's predicted plans for every seat that asks on the same save, but the
+  imagined turn ran with the asking seat as the decider, so the READY_PUBLIC_POINTS and PROMISE_DEALS flags of
+  whichever seat asked first decided the plan for all of them (in an A/B, control seats reused treated predictions).
+  The imagined turn now decides as the rival itself: the rival's own flags apply and nobody's hand is known
+  (`EnemyIntentTest`). Imagined turns also hide the rival's promissory notes, as they hide its secrets and action
+  cards, so a defender's Ceasefire is no longer read from a hand the asker cannot see. An imagined rival still gets
+  no desperation boost. `TradeValue` imagines a partner the same way without sharing the answer; it was left as is.
+- 2026-11-23: `-Dai.sharecensus=true` (`ShareCensus`) counts the shareable answers that were worked out again, by
+  who asked and when, with keys that hold the asker's hidden hand and flags. It decides what to share next; not run
+  yet.
+
 ## Unknowns
 
 - Production vCPU count, RAM and heap headroom.

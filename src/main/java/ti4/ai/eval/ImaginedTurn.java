@@ -43,4 +43,8 @@ public class ImaginedTurn {
     public static Map<String, Integer> actionCards(Player seat) {
         return imagines(seat) ? Map.of() : seat.getActionCards();
     }
+
+    public static Map<String, Integer> promissoryNotes(Player seat) {
+        return imagines(seat) ? Map.of() : seat.getPromissoryNotes();
+    }
 }

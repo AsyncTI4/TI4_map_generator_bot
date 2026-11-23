@@ -45,6 +45,7 @@ import ti4.ai.selfplay.RefereeRules.RefereePress;
 import ti4.ai.tactical.CombatRules;
 import ti4.ai.trace.AiDebugLog;
 import ti4.ai.trace.ShadowCheck;
+import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
 import ti4.ai.trace.ThinkingAborted;
 import ti4.ai.trace.ThinkingProfile;
@@ -135,6 +136,7 @@ class AiTickRunner {
         Game game = managed.getGame();
         TimingReport.recordOutside(LOAD_SPAN, System.nanoTime() - loadStart);
         try (TickMemo.Open shared = TickMemo.open(game)) {
+            ShareCensus.startTick(game);
             tickGame(lane, game, now);
         }
     }

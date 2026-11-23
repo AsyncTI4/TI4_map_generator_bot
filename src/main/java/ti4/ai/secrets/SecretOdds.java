@@ -10,6 +10,7 @@ import ti4.ai.AiExperiments;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.trace.ShareCensus;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.model.DeckModel;
@@ -67,7 +68,7 @@ public class SecretOdds {
         if (held <= 0 || pool.isEmpty()) return 0;
         ObjectiveValue board = ObjectiveValue.publicOnly(game, player);
         double mean = pool.stream()
-                .mapToDouble(id -> measuredReadiness(game, board, player, id))
+                .mapToDouble(id -> sharedReadiness(game, board, player, id))
                 .average()
                 .orElse(0);
         return 1 - Math.pow(1 - mean, held);
@@ -102,7 +103,9 @@ public class SecretOdds {
         double status = 0;
         double action = 0;
         for (String id : pool) {
-            double readiness = measuredReadiness(game, board, player, id, footprint);
+            double readiness = footprint == board.before()
+                    ? sharedReadiness(game, board, player, id)
+                    : measuredReadiness(game, board, player, id, footprint);
             SecretPhase phase = SecretPhase.of(id);
             if (phase == SecretPhase.ACTION) action += readiness;
             else if (phase != SecretPhase.AGENDA) status += readiness;
@@ -140,6 +143,15 @@ public class SecretOdds {
         int progress = threshold > 0 ? board.progress(id, board.before()) : ObjectiveValue.NOT_MODELLED;
         if (progress == ObjectiveValue.NOT_MODELLED) return BASE_RATE;
         return readinessAt(progress, threshold);
+    }
+
+    private static double sharedReadiness(Game game, ObjectiveValue board, Player player, String id) {
+        if (!ShareCensus.enabled()) return measuredReadiness(game, board, player, id);
+        return ShareCensus.perSave(
+                "secret.readiness",
+                game,
+                player.getFaction() + "|" + id,
+                () -> measuredReadiness(game, board, player, id));
     }
 
     private static double measuredReadiness(Game game, ObjectiveValue board, Player player, String id) {

@@ -16,6 +16,11 @@ public class DecidingSeat {
         return Objects.equals(DECIDING.get(), seat.getUserID()) && !ImaginedTurn.imagines(seat);
     }
 
+    @Nullable
+    public static String currentUserId() {
+        return DECIDING.get();
+    }
+
     public static Player orSelf(Game game, Player seat) {
         @Nullable String deciding = DECIDING.get();
         if (deciding == null) return seat;

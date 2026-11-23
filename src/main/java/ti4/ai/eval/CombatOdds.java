@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
+import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
 import ti4.helpers.Units.UnitType;
 
@@ -124,6 +125,17 @@ public class CombatOdds {
     }
 
     public static Detailed resolveDetailed(
+            Force attacker, Force defender, Force firstAttacker, Force firstDefender, int absorbedA, int absorbedD) {
+        if (!ShareCensus.enabled()) {
+            return computeDetailed(attacker, defender, firstAttacker, firstDefender, absorbedA, absorbedD);
+        }
+        return ShareCensus.pure(
+                "combat.odds",
+                List.of(attacker, defender, firstAttacker, firstDefender, absorbedA, absorbedD),
+                () -> computeDetailed(attacker, defender, firstAttacker, firstDefender, absorbedA, absorbedD));
+    }
+
+    private static Detailed computeDetailed(
             Force attacker, Force defender, Force firstAttacker, Force firstDefender, int absorbedA, int absorbedD) {
         Side a = new Side(attacker);
         Side d = new Side(defender);

@@ -873,6 +873,15 @@ descriptions for the classes outside `StandardBrain` belong to their own package
 - **ShadowCheck** (`-Dai.shadow=true`): `choose(name, current, candidate)` returns the current answer and counts how
   often the candidate answer would differ; with the property off it returns the candidate answer without counting.
   No production code calls `choose`; only the decision start/end hooks run.
+- **ShareCensus** (`-Dai.sharecensus=true`): counts the answers worked out again with the same key, by who asked and
+  when: the same seat in the same tick, the same seat in a later tick, another seat, and (for pure functions) another
+  save. Every call still computes, so the games are unchanged. Keys hold only what the answer depends on, the
+  asker's hidden hand and experiment flags included, so a repeat is an answer a shared cache could safely have
+  reused. Hooked: `combat.odds` (`CombatOdds.resolveDetailed`, pure), `win.odds` (keyed by rival, points, loss,
+  the asker's WIN_THREAT_FEASIBLE and CANNON_COVER_RISK flags, and the secrets its hand rules out), `secret.readiness`
+  (a player's readiness for one secret on the unchanged board), `incoming.force` (beyond the tick's sharing) and
+  `enemy.intent` (beyond `EnemyIntent`'s own per-save cache). `AiTickRunner` starts each tick. Times include nested
+  census calls. Printed by the self-play test report.
 
 ### AiDebugLog and AiLogStore
 
@@ -1571,8 +1580,8 @@ code.
 ### Instrumentation present but unused in production
 
 - `ShadowCheck.choose` has no production caller; only its start/end hooks run.
-- `TimingReport`, `DecisionInputs`, `TickMemo` verification and `ShadowCheck` reports are produced only with
-  `-Dai.timing`, `-Dai.tickmemo.verify`, `-Dai.shadow` and are printed by the self-play test (`AiSelfPlayTest`).
+- `TimingReport`, `DecisionInputs`, `TickMemo` verification, `ShadowCheck` and `ShareCensus` reports are produced only
+  with `-Dai.timing`, `-Dai.tickmemo.verify`, `-Dai.shadow`, `-Dai.sharecensus` and are printed by the self-play test (`AiSelfPlayTest`).
 - `AiExperiments.disable`, `abExperiments`, `AiPersonality.set`, `AiLane.copy` and `AiGameState.snapshot/restore`
   are called only from tests.
 

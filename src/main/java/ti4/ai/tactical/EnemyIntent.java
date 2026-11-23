@@ -8,11 +8,12 @@ import java.util.OptionalDouble;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
-import ti4.ai.AiExperiments;
+import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.tactical.TacticalPlan.Kind;
 import ti4.ai.tactical.TacticalPlanner.Candidate;
 import ti4.ai.tactical.TacticalPlanner.Context;
+import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Player;
@@ -35,10 +36,7 @@ class EnemyIntent {
         try (Thinking.Span timing = Thinking.measure("enemy.ranked")) {
             if (ImaginedTurn.underway()) return Optional.empty();
             return Optional.of(remembered(
-                    game,
-                    enemy,
-                    enemy.getFaction(),
-                    () -> ImaginedTurn.of(enemy, () -> TacticalPlanner.ranked(game, enemy))));
+                    game, enemy.getFaction(), () -> imagined(enemy, () -> TacticalPlanner.ranked(game, enemy))));
         }
     }
 
@@ -46,21 +44,20 @@ class EnemyIntent {
         if (ImaginedTurn.underway()) return OptionalDouble.empty();
         return remembered(
                 game,
-                enemy,
                 enemy.getFaction() + "|" + tile.getPosition() + "|" + defender.getFaction(),
-                () -> ImaginedTurn.of(enemy, () -> bestAttack(game, enemy, tile, defender)));
+                () -> imagined(enemy, () -> bestAttack(game, enemy, tile, defender)));
     }
 
-    private static String memoryMark(Game game, Player enemy) {
-        return AttackLedger.remembers(game, enemy) ? "|" + AiExperiments.Experiment.ATTACK_MEMORY : "";
+    static <T> T imagined(Player enemy, Supplier<T> turn) {
+        return ImaginedTurn.of(enemy, () -> DecidingSeat.of(enemy, turn));
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T remembered(Game game, Player enemy, String key, Supplier<T> compute) {
-        String fullKey = game.getName() + "|" + key + memoryMark(game, enemy);
+    private static <T> T remembered(Game game, String key, Supplier<T> compute) {
+        String fullKey = game.getName() + "|" + key;
         Cached cached = CACHE.get(fullKey);
         if (cached != null && cached.isFor(game)) return (T) cached.value();
-        T value = compute.get();
+        T value = ShareCensus.perSave("enemy.intent", game, fullKey, compute);
         if (CACHE.size() > MAX_CACHED) CACHE.clear();
         CACHE.put(fullKey, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), value));
         return value;

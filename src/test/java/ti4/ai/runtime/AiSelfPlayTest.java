@@ -232,6 +232,10 @@ class AiSelfPlayTest extends BaseTi4Test {
         if (ti4.ai.trace.ShadowCheck.enabled()) {
             ti4.ai.trace.ShadowCheck.lines().forEach(System.out::println);
         }
+        // -Dai.sharecensus=true: how often a shareable answer was worked out again with the same key, and by whom.
+        if (ti4.ai.trace.ShareCensus.enabled()) {
+            ti4.ai.trace.ShareCensus.lines().forEach(System.out::println);
+        }
     }
 
     // Every secret scored over the batch, most scored first, with its share of all scored secrets: the mix to hold

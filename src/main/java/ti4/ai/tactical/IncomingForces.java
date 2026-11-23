@@ -19,6 +19,7 @@ import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.MoveBoost;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.Footprint;
+import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -120,7 +121,11 @@ final class IncomingForces {
     }
 
     private IncomingForce remembered(String key, Function<IncomingForces, IncomingForce> compute) {
-        IncomingForce found = forces.computeIfAbsent(key, ignored -> compute.apply(this));
+        IncomingForce found = forces.computeIfAbsent(
+                key,
+                ignored -> plain
+                        ? ShareCensus.perSave("incoming.force", game, key, () -> compute.apply(this))
+                        : compute.apply(this));
         if (!plain) return found;
         return TickMemo.checked(SHARED_FORCES, key, found, () -> compute.apply(new IncomingForces(game)));
     }

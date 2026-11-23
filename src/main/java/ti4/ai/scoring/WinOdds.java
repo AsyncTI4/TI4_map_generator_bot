@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.DoubleSupplier;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
@@ -19,6 +21,7 @@ import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.PlanetTake;
 import ti4.ai.tactical.StyxTake;
+import ti4.ai.trace.ShareCensus;
 import ti4.ai.trace.Thinking;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -149,6 +152,27 @@ public class WinOdds {
     }
 
     private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
+        if (!ShareCensus.enabled()) return computeOdds(game, viewer, rival, immediatePoints, loss);
+        return ShareCensus.perSave(
+                "win.odds",
+                game,
+                List.of(
+                        rival.getFaction(),
+                        immediatePoints,
+                        loss,
+                        WinRace.weighsFeasibility(viewer),
+                        AiExperiments.enabled(viewer, AiExperiments.Experiment.CANNON_COVER_RISK),
+                        secretView(viewer, rival)),
+                () -> computeOdds(game, viewer, rival, immediatePoints, loss));
+    }
+
+    private static String secretView(Player viewer, Player rival) {
+        if (!DecidingSeat.knowsHandOf(viewer)) return "";
+        if (viewer == rival) return "own " + viewer.getFaction();
+        return new TreeSet<>(viewer.getSecretsUnscored().keySet()).toString();
+    }
+
+    private static Odds computeOdds(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
         try (Thinking.Span timing = Thinking.measure("winOdds.compute")) {
             Odds held = compute(game, viewer, rival, immediatePoints, loss, Optional.empty());
             if (held == Odds.CERTAIN || !WinRace.weighsFeasibility(viewer)) return held;
