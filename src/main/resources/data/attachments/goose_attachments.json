@@ -1,0 +1,30 @@
+[
+    {
+        "id": "saga",
+        "name": "Saga",
+        "imagePath": "attachment_sagatoken.png",
+        "isLegendary": true,
+        "source": "goose"
+    },
+    {
+        "id": "root_cultural",
+        "name": "Cultural Root",
+        "imagePath": "attachment_root_cultural.png",
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "root_industrial",
+        "name": "Industrial Root",
+        "imagePath": "attachment_root_industrial.png",
+        "isFakeAttachment": true,
+        "source": "goose"
+    },
+    {
+        "id": "root_hazardous",
+        "name": "Hazardous Root",
+        "imagePath": "attachment_root_hazardous.png",
+        "isFakeAttachment": true,
+        "source": "goose"
+    }
+]

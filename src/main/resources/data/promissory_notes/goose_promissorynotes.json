@@ -1,0 +1,42 @@
+[
+    {
+        "alias": "aopnjotunn",
+        "name": "Rime Bound",
+        "faction": "jotunn",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "goose",
+        "text": "ACTION: Place this card face up in your play area. While this card is in your play area, the active player cannot apply modifiers to their combat rolls during combat in a system that contains 1 or more of your structures. At the end of the status phase, return this card to the Jötunn player."
+    },
+    {
+        "alias": "aopnbrynfolk",
+        "name": "Althing Barristers",
+        "faction": "brynfolk",
+        "color": "",
+        "playArea": false,
+        "source": "goose",
+        "text": "After you vote on an agenda\n\nCast a number of additional votes equal to the combined influence and resource value of Blot for an outcome of your choice. Then, place 1 of your control tokens on Blot, if able, and return this card to the Brynfolk player."
+    },
+    {
+        "alias": "aopnvaettir",
+        "name": "Ratatoskr's Guidance",
+        "faction": "vaettir",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "goose",
+        "text": "ACTION: Place this card face up in your play area and place 1 Root token on a planet you control. Then, draw 1 card from the exploration deck for each trait that planet has, resolve 1 of those cards, and discard the others. At the start of the status phase, return this card to the Vaettir player."
+    },
+    {
+        "alias": "aopnvaldyrjur",
+        "name": "Valkyrie's Favor",
+        "faction": "valdyrjur",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "attachment": "saga",
+        "source": "goose",
+        "text": "ACTION: Place this card face up in your play area and attach the Saga token to a non-home, non-legendary planet you control. Gain the Valkyrie Longhouse legendary planet ability card. At the end of the status phase, return the Saga token and this card to the Valdyrjur player."
+    }
+]

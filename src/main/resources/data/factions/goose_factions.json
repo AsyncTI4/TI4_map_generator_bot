@@ -1,0 +1,187 @@
+[
+    {
+        "alias": "jotunn",
+        "factionName": "The Jötunn Core",
+        "homeSystem": "ao10",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 3 ff, 3 inf u, 1 pds u, 1 sd u",
+        "commodities": 2,
+        "factionTech": [
+            "aojotunnwl",
+            "aojotunnpd"
+        ],
+        "startingTech": [
+            "ps",
+            "sdn"
+        ],
+        "homePlanets": [
+            "utgardar"
+        ],
+        "abilities": [
+            "rime_shields",
+            "wardstone_doctrine"
+        ],
+        "leaders": [
+            "jotunnagent",
+            "jotunncommander",
+            "jotunnhero"
+        ],
+        "promissoryNotes": [
+            "aopnjotunn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "jotunn_flagship",
+            "infantry",
+            "jotunn_mech",
+            "jotunn_pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["ice", "blu", "gray", "nvy"],
+        "source": "goose"
+    },
+    {
+        "alias": "brynfolk",
+        "factionName": "The Brynfolk Konungsvark",
+        "homeSystem": "ao11",
+        "startingFleet": "2 cv, 1 cr, 3 ff, 4 inf althing, 1 sd althing",
+        "commodities": 3,
+        "factionTech": [
+            "aobrynfolkhb",
+            "aobrynfolkrg"
+        ],
+        "startingTech": [
+            "det",
+            "sar"
+        ],
+        "homePlanets": [
+            "althing",
+            "blot"
+        ],
+        "abilities": [
+            "gald_tithe",
+            "thrall_conscription",
+            "war_spoils"
+        ],
+        "leaders": [
+            "brynfolkagent",
+            "brynfolkcommander",
+            "brynfolkhero"
+        ],
+        "promissoryNotes": [
+            "aopnbrynfolk"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "brynfolk_flagship",
+            "infantry",
+            "brynfolk_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["red", "blk", "copper", "brown"],
+        "source": "goose"
+    },
+    {
+        "alias": "vaettir",
+        "factionName": "The Vaettir",
+        "homeSystem": "ao12",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 3 inf mimirsrot, 1 pds mimirsrot, 1 sd mimirsrot",
+        "commodities": 3,
+        "factionTech": [
+            "aovaettirys",
+            "aovaettiryw"
+        ],
+        "startingTech": [
+            "pa",
+            "sdn"
+        ],
+        "homePlanets": [
+            "mimirsrot",
+            "hoddmimis"
+        ],
+        "abilities": [
+            "take_root",
+            "communion",
+            "old_growth"
+        ],
+        "leaders": [
+            "vaettiragent",
+            "vaettircommander",
+            "vaettirhero"
+        ],
+        "promissoryNotes": [
+            "aopnvaettir"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "vaettir_flagship",
+            "infantry",
+            "vaettir_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "preferredColours": ["grn", "frs", "eme", "brown"],
+        "source": "goose"
+    },
+    {
+        "alias": "valdyrjur",
+        "factionName": "Valdyrjur Vanguard",
+        "homeSystem": "ao13",
+        "startingFleet": "1 cv, 1 dn, 1 dd, 2 ff, 3 inf valhalla, 1 sd valhalla",
+        "commodities": 4,
+        "factionTech": [
+            "aovaldyrjurce",
+            "aovaldyrjurff"
+        ],
+        "startingTech": [
+            "det",
+            "da"
+        ],
+        "homePlanets": [
+            "valhalla"
+        ],
+        "abilities": [
+            "chooser_of_the_slain",
+            "einherjar_descent",
+            "weave_the_saga"
+        ],
+        "leaders": [
+            "valdyrjuragent",
+            "valdyrjurcommander",
+            "valdyrjurhero"
+        ],
+        "promissoryNotes": [
+            "aopnvaldyrjur"
+        ],
+        "units": [
+            "valdyrjur_fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "valdyrjur_flagship",
+            "infantry",
+            "valdyrjur_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "preferredColours": ["gold", "ylw", "red", "blu"],
+        "source": "goose"
+    }
+]

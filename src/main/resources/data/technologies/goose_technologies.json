@@ -1,0 +1,92 @@
+[
+    {
+        "alias": "aojotunnwl",
+        "name": "Wardstone Lattice",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "jotunn",
+        "source": "goose",
+        "text": "When you assign hits to your units during combat in a system that contains 1 or more of your structures, you may exhaust this card to cancel 1 hit for each adjacent system that contains 1 or more of your structures, to a maximum of 3 hits."
+    },
+    {
+        "alias": "aojotunnpd",
+        "name": "Skaði's Bow II",
+        "baseUpgrade": "pds2",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YR",
+        "faction": "jotunn",
+        "source": "goose",
+        "text": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships in systems adjacent to this unit's system.\nCombat 6 (x2), PLANETARY SHIELD, SPACE CANNON 5"
+    },
+    {
+        "alias": "aobrynfolkhb",
+        "name": "Hearthcall Beacon",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "brynfolk",
+        "source": "goose",
+        "text": "After you activate a system that contains 1 or more of your units, apply +1 to the move value of each of your ships during this tactical action."
+    },
+    {
+        "alias": "aobrynfolkrg",
+        "name": "Roar of the Gjallahorn",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RRR",
+        "faction": "brynfolk",
+        "source": "goose",
+        "text": "At the start of combat, you may exhaust this card and choose one ship. That ship gains BOMBARDMENT 7 (x CAPACITY)."
+    },
+    {
+        "alias": "aovaettirys",
+        "name": "Yggdrasil's Sacrifice",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "vaettir",
+        "source": "goose",
+        "text": "ACTION: Remove 1 root token from a planet to ready that planet."
+    },
+    {
+        "alias": "aovaettiryw",
+        "name": "Yggdrasil's Wrath",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "vaettir",
+        "source": "goose",
+        "text": "When another player's unit uses BOMBARDMENT against 1 of your planets that contains a root token, roll 1 die for each hit produced. For each result of 5 or higher, assign that hit to 1 of that player's units in that system instead."
+    },
+    {
+        "alias": "aovaldyrjurce",
+        "name": "Compose An Edda",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "valdyrjur",
+        "source": "goose",
+        "text": "After you win a combat in a system that contains a legendary planet, gain 2 trade goods and 1 command token."
+    },
+    {
+        "alias": "aovaldyrjurff",
+        "name": "Sleipnir's Steeds II",
+        "baseUpgrade": "ff2",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GB",
+        "faction": "valdyrjur",
+        "source": "goose",
+        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. This unit cannot transport other fighters.\nCost 1 (x2), Combat 8, Move 2, Capacity 1"
+    }
+]
