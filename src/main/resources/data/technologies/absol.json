@@ -323,7 +323,7 @@
         ],
         "requirements": "YR",
         "source": "absol",
-        "text": "PLANETARY SHIELD, SPACE CANNON 5\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",
+        "text": "PLANETARY SHIELD, SPACE CANNON 5\nYou may use this unit's SPACE CANNON against ships that are in adjacent systems.",
         "homebrewReplacesID": "pds2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/pds_2.jpg?raw=true"
     },
@@ -395,7 +395,7 @@
         ],
         "requirements": "YRRR",
         "source": "absol",
-        "text": "Cost 10, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD.",
+        "text": "Cost 10, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD.",
         "homebrewReplacesID": "ws",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/WarSun.png?raw=true"
     },
@@ -449,7 +449,7 @@
         "faction": "sol",
         "baseUpgrade": "absol_inf2",
         "source": "absol",
-        "text": "Cost: 1(x2), Combat 6\nAfter this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet that contains 1 of your space docks.",
+        "text": "Cost: 1(x2), Combat 6\nAfter this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
         "homebrewReplacesID": "so2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/SpecOpsII.png?raw=true"
     },
@@ -554,7 +554,7 @@
         "faction": "sardakk",
         "baseUpgrade": "absol_dn2",
         "source": "absol",
-        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 4(x2)\nThis unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.",
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 4(x2)\nThis unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
         "homebrewReplacesID": "exo2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/exotrireme_2.jpg?raw=true"
     },
@@ -608,7 +608,7 @@
         "faction": "naalu",
         "baseUpgrade": "absol_ff2",
         "source": "absol",
-        "text": "Cost: 1(x2), Combat 7, Move 2\nThis unit may move without being transported. Fighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
+        "text": "Cost: 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool.",
         "homebrewReplacesID": "hcf2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/hybrid_crystal_fighter_2.jpg?raw=true"
     },
@@ -712,7 +712,7 @@
         "requirements": "YRRR",
         "faction": "muaat",
         "source": "absol",
-        "text": "Cost 8, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD. This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "text": "Cost 8, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose the PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "pws2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/PrototypeWarSunII.png?raw=true"
     },
@@ -924,7 +924,7 @@
         "faction": "argent",
         "baseUpgrade": "absol_dd2",
         "source": "absol",
-        "text": "Cost 1, Combat 7, Move 2, Capacity 1\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able. When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system.",
+        "text": "Cost 1, Combat 7, Move 2, Capacity 1\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able.\nWhen this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
         "homebrewReplacesID": "swa2",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/StrikeWingAlphaII.png?raw=true"
     },

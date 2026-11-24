@@ -33,7 +33,7 @@
         "faction": "pharadn",
         "baseUpgrade": "inf2",
         "source": "blue_reverie",
-        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. DEPLOY: At the start of your turn, you may place 1 infantry on a planet you control. ",
+        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. Game effects cannot prevent you from using this ability. DEPLOY: At the start of your turn, you may place 1 infantry on a planet you control. ",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/br/ImmortalTwo.webp?raw=true"
     },
     {

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.game.Game;
@@ -19,10 +18,6 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.TI4Emoji;
 
 public class TechDraftItem extends DraftItem {
-
-    private static final Pattern TYPED_COST = Pattern.compile("\\bCost:?\\s*\\d", Pattern.CASE_INSENSITIVE);
-    private static final Pattern TYPED_STAT_LINE = Pattern.compile("(?m)^\\s*(Cost|Combat|Move|Capacity|PRODUCTION"
-            + "|SPACE CANNON|ANTI-FIGHTER BARRAGE|BOMBARDMENT|PLANETARY SHIELD|SUSTAIN DAMAGE)\\b");
 
     public TechDraftItem(String itemId) {
         super(DraftCategory.TECH, itemId);
@@ -61,15 +56,11 @@ public class TechDraftItem extends DraftItem {
 
     private String rulesText() {
         TechnologyModel tech = getTech();
-        String text = tech.getText() == null ? "" : tech.getText();
         UnitModel upgradedUnit = tech.isUnitUpgrade() ? Mapper.getUnitModelByTechUpgrade(tech.getAlias()) : null;
-        if (upgradedUnit == null
-                || TYPED_COST.matcher(text).find()
-                || TYPED_STAT_LINE.matcher(text).find()) {
-            return text;
+        if (upgradedUnit != null) {
+            return upgradedUnit.getRulesText().trim();
         }
-        String stats = upgradedUnit.getStatsText().trim();
-        return text.isBlank() ? stats : stats + "\n" + text;
+        return tech.getText() == null ? "" : tech.getText();
     }
 
     @JsonIgnore

@@ -197,7 +197,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "source": "ignis_aurora",
-        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource or influence value of this planet.\nUp to 6 fighters in this system do not count against your ships' capacity.",
+        "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\nUp to 6 fighters in this system do not count against your ships' capacity.",
         "homebrewReplacesID": "sd2"
     },
     {
@@ -218,7 +218,7 @@
         "faction": "muaat",
         "baseUpgrade": "ws",
         "source": "ignis_aurora",
-        "text": "Cost 10, Combat 3(x3), Move 2, Capacity 8\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "text": "Cost 10, Combat 3(x3), Move 2, Capacity 8\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose the PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "pws2"
     },
     {

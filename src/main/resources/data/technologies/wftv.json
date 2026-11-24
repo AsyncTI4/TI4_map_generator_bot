@@ -55,7 +55,7 @@
         "faction": "kalora",
         "baseUpgrade": "dn2",
         "source": "wftv",
-        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s units, if it produces 1 or more hits, you may gain 1 trade good. SUSTAIN DAMAGE BOMBARDMENT 5 Cost 4 Combat 5 Move 2 Capacity 1"
+        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s ground forces, if it produces 1 or more hits, you may gain 1 trade good. SUSTAIN DAMAGE BOMBARDMENT 5 Cost 4 Combat 5 Move 2 Capacity 1"
     },
     {
         "alias": "bakalor",
@@ -78,7 +78,7 @@
         "faction": "lunarium",
         "baseUpgrade": "cv2",
         "source": "wftv",
-        "text": "At the end of a tactical action in this system, you may place 1 fighter in this system. This unit has capacity equal to the number of your scored secret objectives plus 6. Cost 3 Combat 9 Move 2 Capacity X"
+        "text": "At the end of a tactical action in this system, you may place 1 fighter in this system. Apply +1 to the capacity of this ship for each of your scored secret objectives. Cost 3 Combat 9 Move 2 Capacity 6"
     },
     {
         "alias": "balunag",
