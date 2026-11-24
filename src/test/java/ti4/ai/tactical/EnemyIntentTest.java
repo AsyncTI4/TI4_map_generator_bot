@@ -3,6 +3,8 @@ package ti4.ai.tactical;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ti4.ai.AiExperiments;
 import ti4.ai.AiExperiments.Experiment;
@@ -66,5 +68,30 @@ class EnemyIntentTest extends BaseTi4Test {
 
         assertThat(after).isEqualTo(test.nekro);
         assertThat(ImaginedTurn.promissoryNotes(rival)).isNotEmpty();
+    }
+
+    @AfterEach
+    void forgetCachedTurns() {
+        EnemyIntent.forget();
+    }
+
+    // A full cache used to be emptied outright, so every seat re-imagined every rival on the next ask. Now only
+    // answers for older saves are dropped and the current save's answers stay.
+    @Test
+    void aFullCacheDropsOnlyAnswersForOlderSaves() {
+        EnemyIntent.forget();
+        test.game.setLastModifiedDate(1000);
+        for (int i = 1; i < EnemyIntent.MAX_CACHED; i++) {
+            EnemyIntent.remembered(test.game, "old" + i, () -> 0);
+        }
+        test.game.setLastModifiedDate(2000);
+        AtomicInteger imagined = new AtomicInteger();
+        EnemyIntent.remembered(test.game, "kept", imagined::incrementAndGet);
+        EnemyIntent.remembered(test.game, "new", () -> 0);
+
+        assertThat(EnemyIntent.cachedCount()).isEqualTo(2);
+        assertThat((int) EnemyIntent.remembered(test.game, "kept", imagined::incrementAndGet))
+                .isEqualTo(1);
+        assertThat(imagined).hasValue(1);
     }
 }

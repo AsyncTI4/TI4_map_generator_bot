@@ -1615,7 +1615,7 @@ The core never branches on Fog of War. Fog safety rests on `AiGameSupport` refus
 | 197 other files in `ti4.ai` | `AiTurnContext`; 110 use `Prompts`, 114 call `.memory()` |
 | `TacticalPlanner`, `WinOdds`, `WinRace`, `ScoringReserve`, `DenialMap`, `PlanetTake`, `StyxTake`, `eval.Adjacency`, `CombatModifiers` | `DecisionMemo.remember` |
 | `ImaginedTurn.of`, `FragmentDeals`, `MilitarySupportDeals`, `NoteDeals`, `TechnologyRequest` | `SearchMemo.open`; 9 more classes call `SearchMemo.remember` |
-| `IncomingForces`, `TacticalStrength` | `TickMemo.mapFor`, `TickMemo.checked` |
+| `IncomingForces`, `TacticalStrength`, `WinOdds` | `TickMemo.mapFor`, `TickMemo.checked` |
 | 16 planner/evaluator classes (40 sites) | `Thinking.enter` |
 | 49 files | `AiExperiments.enabled` |
 | `AttackLedger`, `Relations`, `BoatFloat`, `DiscardBounties`, `HumanAiDealStore`, `PromiseBook`, `SpeakerPromise`, `Extortion` | `AiGameWrites.persist` |

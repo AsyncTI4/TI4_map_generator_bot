@@ -17,6 +17,15 @@ public class ImaginedTurn {
         return IMAGINED.get() != null;
     }
 
+    public static String seatFaction() {
+        @Nullable Player seat = IMAGINED.get();
+        return seat == null ? "" : seat.getFaction();
+    }
+
+    public static String cacheMark(Player seat) {
+        return imagines(seat) ? "|imagined" : "";
+    }
+
     public static boolean imagines(Player seat) {
         return IMAGINED.get() == seat;
     }

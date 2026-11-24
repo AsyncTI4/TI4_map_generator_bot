@@ -29,7 +29,11 @@ class AiSelfPlayTest extends BaseTi4Test {
 
     @Test
     void sixAiSeatsPlayTheirFirstRound() throws Exception {
+        ti4.ai.brain.TickMemo.resetVerification();
         SelfPlayGame.Outcome outcome = play(game -> game.getRound() >= 2, VIRTUAL_DAY, 5000);
+        if (ti4.ai.brain.TickMemo.verifying()) {
+            ti4.ai.brain.TickMemo.verificationLines().forEach(System.out::println);
+        }
 
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
     }

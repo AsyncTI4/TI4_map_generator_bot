@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.eval.ValueScale;
 import ti4.ai.expedition.ExpeditionUnlock;
 import ti4.ai.scoring.Pooling;
@@ -78,7 +79,7 @@ class DiplomacyUse {
     }
 
     static boolean readyingWorthFollowing(Game game, Player seat) {
-        String key = game.getName() + "|" + seat.getUserID();
+        String key = game.getName() + "|" + seat.getUserID() + ImaginedTurn.cacheMark(seat);
         Cached cached = CACHE.get(key);
         if (cached != null && cached.isFor(game)) return cached.worth();
         boolean worth = bestToFollow(game, seat)

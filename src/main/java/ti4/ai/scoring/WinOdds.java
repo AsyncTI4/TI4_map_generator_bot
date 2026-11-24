@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -14,9 +15,11 @@ import java.util.function.DoubleSupplier;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
 import ti4.ai.brain.DecisionMemo;
+import ti4.ai.brain.TickMemo;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.eval.FracturePrize;
+import ti4.ai.eval.ImaginedTurn;
 import ti4.ai.secrets.SecretOdds;
 import ti4.ai.secrets.SecretOdds.CardChance;
 import ti4.ai.tactical.PlanetTake;
@@ -42,6 +45,7 @@ public class WinOdds {
     private static final String BOOK_OF_LATVINIA = "bookoflatvinia";
     private static final String CROWN_OF_EMPHIDIA = "emphidia";
     private static final String TOMB_OF_EMPHIDIA = "attachment_tombofemphidia.png";
+    private static final String TICK_MEMO = "win.odds";
     private static final ThreadLocal<Boolean> PRICING_MECATOL_TAKE = ThreadLocal.withInitial(() -> false);
 
     public record Odds(double duringAction, double byStatusScoring, double byStatusEnd) {
@@ -152,6 +156,27 @@ public class WinOdds {
     }
 
     private static Odds compute(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
+        List<Object> key = List.of(
+                viewer.getFaction(),
+                rival.getFaction(),
+                immediatePoints,
+                loss,
+                DecidingSeat.knowsHandOf(viewer),
+                Objects.toString(DecidingSeat.currentUserId(), ""),
+                ImaginedTurn.seatFaction(),
+                PRICING_MECATOL_TAKE.get());
+        Map<List<Object>, Odds> memo = TickMemo.mapFor(game, TICK_MEMO);
+        Odds found = memo.get(key);
+        if (found != null) {
+            return TickMemo.checked(
+                    TICK_MEMO, key, found, () -> computeOdds(game, viewer, rival, immediatePoints, loss));
+        }
+        Odds odds = counted(game, viewer, rival, immediatePoints, loss);
+        memo.put(key, odds);
+        return odds;
+    }
+
+    private static Odds counted(Game game, Player viewer, Player rival, int immediatePoints, Loss loss) {
         if (!ShareCensus.enabled()) return computeOdds(game, viewer, rival, immediatePoints, loss);
         return ShareCensus.perSave(
                 "win.odds",

@@ -22,13 +22,18 @@ import ti4.game.Tile;
 @UtilityClass
 class EnemyIntent {
 
-    private static final int MAX_CACHED = 256;
+    static final int MAX_CACHED = 4096;
     private static final Map<String, Cached> CACHE = new ConcurrentHashMap<>();
 
     private record Cached(WeakReference<Game> game, long modified, Object value) {
 
         boolean isFor(Game current) {
             return game.get() == current && modified == current.getLastModifiedDate();
+        }
+
+        boolean stale() {
+            Game current = game.get();
+            return current == null || !isFor(current);
         }
     }
 
@@ -53,14 +58,27 @@ class EnemyIntent {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T remembered(Game game, String key, Supplier<T> compute) {
+    static <T> T remembered(Game game, String key, Supplier<T> compute) {
         String fullKey = game.getName() + "|" + key;
         Cached cached = CACHE.get(fullKey);
         if (cached != null && cached.isFor(game)) return (T) cached.value();
         T value = ShareCensus.perSave("enemy.intent", game, fullKey, compute);
-        if (CACHE.size() > MAX_CACHED) CACHE.clear();
+        if (CACHE.size() >= MAX_CACHED) evict();
         CACHE.put(fullKey, new Cached(new WeakReference<>(game), game.getLastModifiedDate(), value));
         return value;
+    }
+
+    static void evict() {
+        CACHE.values().removeIf(Cached::stale);
+        if (CACHE.size() >= MAX_CACHED) CACHE.clear();
+    }
+
+    static int cachedCount() {
+        return CACHE.size();
+    }
+
+    static void forget() {
+        CACHE.clear();
     }
 
     private static OptionalDouble bestAttack(Game game, Player enemy, Tile tile, Player defender) {
