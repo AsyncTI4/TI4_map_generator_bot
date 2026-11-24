@@ -29,10 +29,12 @@ import ti4.service.player.PlayerStatsService;
 class ListPlayerInfoButtonHandler {
 
     @ButtonHandler(value = "gameInfoButtons", save = false)
-    public static void offerInfoButtons(ButtonInteractionEvent event) {
+    public static void offerInfoButtons(ButtonInteractionEvent event, Game game) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
-        buttons.add(Buttons.green("offerInfoButtonStep2_components", "Faction Components"));
+        if (canShowFactionComponents(game)) {
+            buttons.add(Buttons.green("offerInfoButtonStep2_components", "Faction Components"));
+        }
         buttons.add(Buttons.green("offerInfoButtonStep2_objective", "Objective Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_abilities", "Ability Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_stats", "Player Stats Info"));
@@ -202,6 +204,10 @@ class ListPlayerInfoButtonHandler {
             }
         }
         return embeds;
+    }
+
+    private static boolean canShowFactionComponents(Game game) {
+        return game == null || (!game.isFrankenGame() && !game.isTwilightsFallMode());
     }
 
     private static void sendFactionComponents(Game game, Player player, String faction) {
