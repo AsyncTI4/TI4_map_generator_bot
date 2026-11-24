@@ -321,12 +321,21 @@ public class TacticalActionOutputService {
                     .append(moveValue)
                     .append(")");
 
+            boolean tempestaAvailable = canApplyTempestaMoveBonus(game, player);
+            if (tempestaAvailable) {
+                maxBonus++;
+            }
             if (player.hasTech("gd")) {
                 maxBonus++;
-                output.append(", may have used _Gravity Drive_)");
+                output.append(
+                        tempestaAvailable
+                                ? ", may have used _Gravity Drive_ or _Tempesta_)"
+                                : ", may have used _Gravity Drive_)");
             } else if (BlueReverieTechHelper.consumeGravityDriveBonus(game, player)) {
                 maxBonus++;
                 output.append(", used _Gravity Drive_)");
+            } else if (tempestaAvailable) {
+                output.append(", may have used _Tempesta_)");
             } else if (!player.hasTech("gd_br") && !game.isTwilightsFallMode()) {
                 output.append(", __does not have _Gravity Drive___)");
             }
@@ -445,6 +454,12 @@ public class TacticalActionOutputService {
             game.setStoredValue("possiblyUsedRift", "");
         }
         return output.toString();
+    }
+
+    private boolean canApplyTempestaMoveBonus(Game game, Player player) {
+        if (!player.hasPlanet("tempesta")) return false;
+        return !player.getExhaustedPlanetsAbilities().contains("tempesta")
+                || player.getFaction().equals(game.getStoredValue("tempestaUsed"));
     }
 
     int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits) {

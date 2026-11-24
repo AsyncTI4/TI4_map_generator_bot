@@ -1527,6 +1527,7 @@ public final class ButtonHelperTacticalAction {
         game.removeStoredValue("crucibleBoost");
         game.removeStoredValue("flankspeedBoost");
         game.removeStoredValue("baldrickGDboost");
+        game.removeStoredValue("tempestaUsed");
         ButtonHelper.deleteMessage(event);
     }
 
