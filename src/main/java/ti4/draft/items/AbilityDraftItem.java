@@ -103,4 +103,10 @@ public class AbilityDraftItem extends DraftItem {
         }
         return allItems;
     }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getAbilityModel().getNotes();
+    }
 }

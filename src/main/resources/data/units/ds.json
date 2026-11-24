@@ -1142,7 +1142,7 @@
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Heavy Bomber I",
-        "upgradesToUnitId": "lizho_fighter",
+        "upgradesToUnitId": "lizho_fighter2",
         "source": "ds",
         "faction": "lizho",
         "capacityUsed": 1,

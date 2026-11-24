@@ -160,7 +160,7 @@ class MiltyDraftButtonHandlers {
                     btId = "keleresbt";
                 }
                 if (Mapper.getBreakthrough(btId) != null) {
-                    teEmbeds.add(Mapper.getBreakthrough(btId).getRepresentationEmbed());
+                    teEmbeds.addAll(Mapper.getBreakthrough(btId).getRepresentationEmbedsWithLinkedUnit(false));
                 }
             }
             if (!teEmbeds.isEmpty()) {

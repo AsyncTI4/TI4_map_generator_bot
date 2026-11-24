@@ -2,8 +2,12 @@ package ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.model.Mapper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.FactionEmojis;
 
 @UtilityClass
 public class ArvaxiBreakthroughHandler {
@@ -26,6 +31,11 @@ public class ArvaxiBreakthroughHandler {
             "The printed values of this unit have been adjusted: Cost +1, Combat +1, Move -1, Capacity -1.";
 
     private static final String STORED_KEY = "arvaxiMobilizationEngine";
+
+    public static TextDisplay mobilizationEngineCard() {
+        return TextDisplay.of(FactionEmojis.arvaxi + " **Mobilization Engine**\n> **Boon:** " + BOON_TEXT
+                + "\n> **Curse:** " + CURSE_TEXT);
+    }
 
     public static boolean hasEngineAttached(Game game) {
         return !game.getStoredValue(STORED_KEY).isEmpty();
@@ -76,23 +86,36 @@ public class ArvaxiBreakthroughHandler {
         buttons.add(Buttons.red(player.factionButtonChecker() + "deleteButtons", "Delete these buttons"));
 
         String msg = player.getRepresentation() + " use " + btRep()
-                + " to choose which player's unit upgrade to attach the Mobilization Engine to.";
-        String existing = game.getStoredValue(STORED_KEY);
-        if (!existing.isEmpty()) {
-            int firstSep = existing.indexOf('_');
-            int lastSep = existing.lastIndexOf('_');
-            if (firstSep >= 0 && firstSep != lastSep) {
-                String faction = existing.substring(0, firstSep);
-                String techID = existing.substring(firstSep + 1, lastSep);
-                String side = existing.substring(lastSep + 1);
-                Player owner = game.getPlayerFromColorOrFaction(faction);
-                TechnologyModel tech = Mapper.getTech(techID);
-                String ownerName = owner != null ? owner.getRepresentationNoPing() : faction;
-                String techName = tech != null ? tech.getName() : techID;
-                msg += "\n-# Currently attached to " + ownerName + " " + techName + " (" + side + ").";
-            }
-        }
+                + " to choose which player's unit upgrade to attach the Mobilization Engine to."
+                + attachedTo(game)
+                        .map(where -> "\n-# Currently attached to " + where + ".")
+                        .orElse("");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    public static MessageEmbed mobilizationEngineEmbed(Game game) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(FactionEmojis.arvaxi + " Mobilization Engine");
+        eb.setDescription("**Boon:** " + BOON_TEXT + "\n**Curse:** " + CURSE_TEXT + "\n\n"
+                + attachedTo(game).map(where -> "Attached to " + where + ".").orElse("Not attached."));
+        return eb.build();
+    }
+
+    private static Optional<String> attachedTo(Game game) {
+        String existing = game.getStoredValue(STORED_KEY);
+        int firstSep = existing.indexOf('_');
+        int lastSep = existing.lastIndexOf('_');
+        if (firstSep < 0 || firstSep == lastSep) {
+            return Optional.empty();
+        }
+        String faction = existing.substring(0, firstSep);
+        String techID = existing.substring(firstSep + 1, lastSep);
+        String side = existing.substring(lastSep + 1);
+        Player owner = game.getPlayerFromColorOrFaction(faction);
+        TechnologyModel tech = Mapper.getTech(techID);
+        String ownerName = owner != null ? owner.getRepresentationNoPing() : faction;
+        String techName = tech != null ? tech.getName() : techID;
+        return Optional.of(ownerName + " " + techName + " (" + StringUtils.capitalize(side) + " side)");
     }
 
     @ButtonHandler("arvaxiEnginePlayer_")

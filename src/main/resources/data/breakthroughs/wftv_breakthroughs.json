@@ -9,6 +9,7 @@
             "WARFARE"
         ],
         "text": "ACTION:  Exhaust this card to attach or remove and attach the Arvaxi Mobilization Engine card to a player's non-fighter ship unit upgrade technology with either side faceup. ",
+        "notes": "The Mobilization Engine can only affect upgraded units. A unit without a capacity value does not gain capacity from it.",
         "source": "wftv"
     },
     {

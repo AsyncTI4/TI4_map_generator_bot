@@ -6,14 +6,17 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.game.Game;
+import ti4.game.Player;
 import ti4.game.persistence.GameManager;
 import ti4.game.persistence.ManagedGame;
 import ti4.logging.BotLogger;
@@ -48,6 +51,17 @@ public class DataMigrationManager {
 
     static {
         migrations = new HashMap<>();
+        migrations.put("applyBreakthroughFlipSides_241126", DataMigrationManager::applyBreakthroughFlipSides_241126);
+    }
+
+    public static Boolean applyBreakthroughFlipSides_241126(Game game) {
+        boolean changed = false;
+        for (Player player : game.getPlayers().values()) {
+            Set<String> unitsBefore = new HashSet<>(player.getUnitsOwned());
+            player.applyBreakthroughUnitUpgrades();
+            changed |= !unitsBefore.equals(player.getUnitsOwned());
+        }
+        return changed;
     }
 
     public static void runMigrations() {

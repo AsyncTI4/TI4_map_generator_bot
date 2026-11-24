@@ -155,7 +155,7 @@
         "types": ["UNITUPGRADE"],
         "requirements": "GYRR",
         "source": "miltymod",
-        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD.",
+        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD.",
         "homebrewReplacesID": "ws"
     },
     {
@@ -238,7 +238,7 @@
         "faction": "sardakk",
         "baseUpgrade": "miltymod_dn2",
         "source": "miltymod",
-        "text": "Cost 4, Combat 4, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 3(x2)\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.",
+        "text": "Cost 4, Combat 4, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 3(x2)\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
         "homebrewReplacesID": "exo2"
     },
     {
@@ -270,7 +270,7 @@
         "faction": "naalu",
         "baseUpgrade": "miltymod_ff2",
         "source": "miltymod",
-        "text": "Cost: 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nFighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
+        "text": "Cost: 1(x2), Combat 7, Move 2\nThis unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool.",
         "homebrewReplacesID": "hcf2"
     },
     {
@@ -310,7 +310,7 @@
         "requirements": "GYRR",
         "faction": "muaat",
         "source": "miltymod",
-        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD.",
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose the PLANETARY SHIELD ability.",
         "homebrewReplacesID": "pws2"
     },
     {

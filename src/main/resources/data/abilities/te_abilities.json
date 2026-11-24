@@ -100,7 +100,7 @@
         "name": "Puppets of the Blade",
         "shortName": "Puppets of\nthe Blade",
         "faction": "firmament",
-        "window": "If you have at least 1 plot card in your play area, gain the following ability:",
+        "window": "If you have at least 1 plot card in your play area, gain the following ability",
         "windowEffect": "ACTION: Purge The Firmament's faction sheet, leaders, planet cards, and promissory note. Then, gain all of the faction components for The Obsidian.",
         "source": "thunders_edge"
     },

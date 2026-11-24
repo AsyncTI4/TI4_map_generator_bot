@@ -355,7 +355,7 @@
     "faction": "ponthous",
     "baseUpgrade": "dd2",
     "source": "theodisi",
-    "text": ""
+    "text": "Cost 1, Combat 8, Move 2, Capacity 1\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 6(x3)"
   },
   {
     "alias": "thvanguardr",

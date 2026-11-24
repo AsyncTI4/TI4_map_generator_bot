@@ -31,9 +31,13 @@ public class HomeSystemDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getTitle(Game game) {
+        TileModel tile = homeTile();
+        return getItemEmoji() + " " + (tile == null ? "Home System" : tile.getNameRepresentation());
+    }
+
+    private TileModel homeTile() {
         FactionModel faction = Mapper.getFaction(getItemId());
-        TileModel tile = TileHelper.getTileById(faction.getHomeSystem());
-        return getItemEmoji() + " " + tile.getNameRepresentation();
+        return faction == null ? null : TileHelper.getTileById(faction.getHomeSystem());
     }
 
     @JsonIgnore
@@ -59,8 +63,10 @@ public class HomeSystemDraftItem extends DraftItem {
         } else if ("crimson".equals(getItemId())) {
             return "Epsilon Wormhole, Ahk Creuxx (4/2)";
         }
-        FactionModel faction = Mapper.getFaction(getItemId());
-        TileModel tile = TileHelper.getTileById(faction.getHomeSystem());
+        TileModel tile = homeTile();
+        if (tile == null) {
+            return errataTextOrNone();
+        }
         StringBuilder sb = new StringBuilder();
         appendSystemTraits(tile, sb);
         List<String> planetIds = tile.getPlanets();

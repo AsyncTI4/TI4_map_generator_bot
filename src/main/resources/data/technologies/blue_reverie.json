@@ -33,7 +33,7 @@
         "faction": "pharadn",
         "baseUpgrade": "inf2",
         "source": "blue_reverie",
-        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. DEPLOY: At the start of your turn, you may place 1 infantry on a planet you control. ",
+        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. Game effects cannot prevent you from using this ability. DEPLOY: At the start of your turn, you may place 1 infantry on a planet you control. ",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/br/ImmortalTwo.webp?raw=true"
     },
     {
@@ -58,7 +58,7 @@
         "faction": "qhet",
         "baseUpgrade": "inf2",
         "source": "blue_reverie",
-        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the start of your turn, place each unit that is on this card on planets that contain your space docks. 1(x2) 7;",
+        "text": "Cost 1(x2), Combat 7\nUnits cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the start of your turn, place each unit that is on this card on planets that contain your space docks.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/br/CommandoTwo.webp?raw=true"
     },
     {
@@ -135,7 +135,7 @@
         "faction": "sarcosa",
         "baseUpgrade": "dd2",
         "source": "blue_reverie",
-        "text": "After you win a space combat in this system, take up to 1 of your opponent's trade goods. 1, 7, 3, 1; ANTI-FIGHTER BARRAGE 5(x3)",
+        "text": "Cost 1, Combat 7, Move 3, Capacity 1\nANTI-FIGHTER BARRAGE 5(x3)\nAfter you win a space combat in this system, take up to 1 of your opponent's trade goods.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/br/RavagerTwo.webp?raw=true"
     },
     {
@@ -242,7 +242,7 @@
         "faction": "belkosea",
         "baseUpgrade": "ff2",
         "source": "blue_reverie",
-        "text": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships' capacity count against your fleet pool. 1(x2), 8, 2; ANTI-FIGHTER BARRAGE 9(x2)",
+        "text": "Cost 1(x2), Combat 8, Move 2\nANTI-FIGHTER BARRAGE 9(x2)\nYou may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships' capacity count against your fleet pool.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/br/WyvernTwo.webp?raw=true"
     },
     {
