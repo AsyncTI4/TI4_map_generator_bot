@@ -185,12 +185,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
         }
         if (getCombatHitsOn() > 0) {
-            sb.append(" Combat: ");
-            sb.append(getCombatHitsOn());
-            if (getCombatDieCount() > 1) {
-                sb.append("x").append(getCombatDieCount());
-            }
-            sb.append(' ');
+            sb.append(" Combat: ")
+                    .append(rollText(getCombatHitsOn(), getCombatDieCount()))
+                    .append(' ');
         }
 
         if (getSustainDamage()) {
@@ -198,23 +195,17 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         }
         if (getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(getAfbHitsOn())
-                    .append("x")
-                    .append(getAfbDieCount())
+                    .append(rollText(getAfbHitsOn(), getAfbDieCount()))
                     .append(' ');
         }
         if (getSpaceCannonDieCount() > 0) {
             sb.append("SPACE CANNON ")
-                    .append(getSpaceCannonHitsOn())
-                    .append("x")
-                    .append(getSpaceCannonDieCount())
+                    .append(rollText(getSpaceCannonHitsOn(), getSpaceCannonDieCount()))
                     .append(' ');
         }
         if (getBombardDieCount() > 0) {
             sb.append("BOMBARDMENT ")
-                    .append(getBombardHitsOn())
-                    .append("x")
-                    .append(getBombardDieCount())
+                    .append(rollText(getBombardHitsOn(), getBombardDieCount()))
                     .append(' ');
         }
         if (getProductionValue() > 0) {
@@ -233,6 +224,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             sb.append(' ');
         }
         return sb.toString();
+    }
+
+    private static String rollText(int hitsOn, int dieCount) {
+        return dieCount > 1 ? hitsOn + "x" + dieCount : String.valueOf(hitsOn);
     }
 
     public MessageEmbed getRepresentationEmbed() {
