@@ -181,7 +181,7 @@
         "id": "hissho_honor",
         "name": "Honor Bound",
         "faction": "hissho",
-        "window": "During Set-up:",
+        "window": "During Set-up",
         "windowEffect": "Add the Keii tokens to the supply. Then, add the three Hissho Observance cards to your hand. You may place one of them face-up in your play area.",
         "source": "endlesst"
     },
@@ -189,7 +189,7 @@
         "id": "behemoth_specialists",
         "name": "Behemoth Specialists",
         "faction": "hissho",
-        "window": "When you gain the War Sun unit upgrade:",
+        "window": "When you gain the War Sun unit upgrade",
         "windowEffect": "Choose one side of the technology to be face-up in your play area for the rest of the game.",
         "source": "endlesst"
     },
@@ -197,7 +197,7 @@
         "id": "hissho_ritualistic",
         "name": "Ritualistic",
         "faction": "hissho",
-        "window": "At the end of the Agenda phase:",
+        "window": "At the end of the Agenda phase",
         "windowEffect": "gather all three Observance cards and place them near the agenda deck. Each player votes on one of the Observance cards as if it were an agenda, with you acting as Speaker for this vote. Place the Observance card with the most votes face-up in your play area.",
         "source": "endlesst"
     },
@@ -219,7 +219,7 @@
         "id": "enigmatic_agenda",
         "name": "Enigmatic Agenda",
         "faction": "uchoir",
-        "window": "Whenever another player discards a secret objective:",
+        "window": "Whenever another player discards a secret objective",
         "windowEffect": "You look at that card before it is shuffled back into the deck. You may choose to keep that secret objective by discarding another unsocred secret objective from your hand.",
         "source": "endlesst"
     },
@@ -234,7 +234,7 @@
         "id": "lost_lore",
         "name": "Lost Lore",
         "faction": "nakalim",
-        "window": "Whenever you score an Objective:",
+        "window": "Whenever you score an Objective",
         "windowEffect": "You may gain any number of technologies, so long as the number of technologies you are gaining and their combined prerequisites are less than or equal to the number of relics you control plus the number of relic fragments you purge when you use this ability.",
         "source": "endlesst"
     }

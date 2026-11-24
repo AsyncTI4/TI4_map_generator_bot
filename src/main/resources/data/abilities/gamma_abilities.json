@@ -80,7 +80,7 @@
         "name": "Hypnotic Fugue",
         "faction": "clade",
         "window": "At the end of your turn",
-        "permanentEffect": "you may remove 1 of your destroyers to place a Hallucination token face-down in that system.",
+        "windowEffect": "You may remove 1 of your destroyers to place a Hallucination token face-down in that system.",
         "source": "gamma"
     },
     {
@@ -95,9 +95,7 @@
         "id": "convocation_accords",
         "name": "Xxcha Accords",
         "faction": "archon",
-        "window": "",
-        "windowEffect": "At the start of the strategy phase, gather your decrees, then place two into your play area. When a decree is violated, you may remove it from play to place one of your command tokens from your reinforcements on the active player's faction sheet.",
-        "permanentEffect": "While 1 of your command tokens is on a player's factions sheet, that player is an outlaw",
+        "permanentEffect": "At the start of the strategy phase, gather your decrees, then place two into your play area. When a decree is violated, you may remove it from play to place one of your command tokens from your reinforcements on the active player's faction sheet.\nWhile 1 of your command tokens is on a player's factions sheet, that player is an outlaw",
         "source": "gamma"
     },
     {
@@ -179,7 +177,7 @@
         "name": "Eternal Vigilance",
         "faction": "convocation",
         "window": "When another player activates a system that contains at least 1 planet and a least 1 of your ships, if you control every planet in that system",
-        "permanentEffect": " you may move 1 of your non-fighter ships from each adjacent system that does not contain 1 of your command tokens into the active system.",
+        "windowEffect": "You may move 1 of your non-fighter ships from each adjacent system that does not contain 1 of your command tokens into the active system.",
         "source": "gamma"
     },
     {
@@ -193,8 +191,7 @@
         "id": "threads_out_of_the_dark",
         "name": "Threads out of the Dark",
         "faction": "weaveway",
-        "window": "",
-        "windowEffect": "During setup, take the additional Weaveway faction promissory notes; you have 3 faction promissory notes.",
+        "permanentEffect": "During setup, take the additional Weaveway faction promissory notes; you have 3 faction promissory notes.",
         "source": "gamma"
     },
     {
@@ -278,22 +275,21 @@
         "id": "titanic",
         "name": "Titanic",
         "faction": "project",
-        "window": "When you create the game board, place the Elysium Space tile where your home system would be placed, and place the Elysium Planet token into that system. The Elysium Space tile is not a home system.",
+        "permanentEffect": "When you create the game board, place the Elysium Space tile where your home system would be placed, and place the Elysium Planet token into that system. The Elysium Space tile is not a home system.",
         "source": "gamma"
     },
     {
         "id": "elysium",
         "name": "Elysium",
         "faction": "project",
-        "window": "During setup, gain and ready the Elysium planet ability card. The system that contains the Elysium Planet token is your home system.",
-        "permanentEffect":"You can score objectives if you control Elysium, even if you do not control all the planets in your home system.",
+        "permanentEffect": "During setup, gain and ready the Elysium planet ability card. The system that contains the Elysium Planet token is your home system.\nYou can score objectives if you control Elysium, even if you do not control all the planets in your home system.",
         "source": "gamma"
     },
     {
         "id": "prudent",
         "name": "Prudent",
         "faction": "project",
-        "window": "During setup, place all of your starting ground forces in the space area of your home system.",
+        "permanentEffect": "During setup, place all of your starting ground forces in the space area of your home system.",
         "source": "gamma"
     }
 ]

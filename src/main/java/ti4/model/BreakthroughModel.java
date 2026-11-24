@@ -2,6 +2,7 @@ package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -19,9 +20,8 @@ import ti4.service.emoji.TechEmojis;
 
 @Data
 public class BreakthroughModel implements ModelInterface, EmbeddableModel {
-    private static final Pattern LINKED_UNIT_UPGRADE_PATTERN = Pattern.compile(
-            "If you have the (?<name>.+?) (?:unit upgrade )?technology, flip this card and place it on top of \\k<name>\\.",
-            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern FLIPS_ON_UPGRADE_TECH_PATTERN = Pattern.compile(
+            "If you have the (?<tech>[^.]+?) (?:unit upgrade )?technology, flip this card", Pattern.CASE_INSENSITIVE);
 
     private String alias;
     private String name;
@@ -44,21 +44,31 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public Optional<UnitModel> getLinkedUnitUpgrade() {
-        if (text == null) return Optional.empty();
-        Matcher matcher = LINKED_UNIT_UPGRADE_PATTERN.matcher(text);
-        if (!matcher.find()) return Optional.empty();
-        String baseType = matcher.group("name").replaceFirst("(?i) II$", "").replaceAll("\\s", "");
-        List<UnitModel> matchingUpgrades = Mapper.getUnits().values().stream()
+    public Optional<UnitModel> getLinkedUnit() {
+        if (text == null || !text.toLowerCase().contains("flip this card")) return Optional.empty();
+        FactionModel factionModel = faction == null ? null : Mapper.getFaction(faction);
+        if (factionModel == null) return Optional.empty();
+        List<UnitModel> flipSides = Mapper.getUnits().values().stream()
                 .filter(unit -> getFaction().equals(unit.getFaction()))
-                .filter(unit -> baseType.equalsIgnoreCase(unit.getBaseType()))
+                .filter(unit -> unit.getSource() == source)
+                .filter(unit -> !factionModel.getUnits().contains(unit.getId()))
+                .filter(unit -> unit.getRequiredTechId().isEmpty())
+                .filter(unit -> unit.getHomebrewReplacesID().isEmpty())
                 .toList();
-        return matchingUpgrades.stream()
-                .filter(unit -> unit.getId().endsWith("3"))
-                .findFirst()
-                .or(() -> matchingUpgrades.stream()
-                        .filter(UnitModel::getIsUpgrade)
-                        .findFirst());
+        return flipSides.size() == 1 ? Optional.of(flipSides.getFirst()) : Optional.empty();
+    }
+
+    @JsonIgnore
+    public Optional<UnitModel> getLinkedUnitUpgrade() {
+        if (getFlipTechName().isEmpty()) return Optional.empty();
+        return getLinkedUnit();
+    }
+
+    @JsonIgnore
+    public Optional<String> getFlipTechName() {
+        if (text == null) return Optional.empty();
+        Matcher matcher = FLIPS_ON_UPGRADE_TECH_PATTERN.matcher(text);
+        return matcher.find() ? Optional.of(matcher.group("tech")) : Optional.empty();
     }
 
     public TI4Emoji getFactionEmoji() {
@@ -93,12 +103,27 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
             if (notes != null) {
                 sb.append("\n> -# [").append(notes).append("]");
             }
+            getLinkedUnit()
+                    .ifPresent(unit -> sb.append("\n> ")
+                            .append(unit.getNameRepresentation())
+                            .append(": ")
+                            .append(unit.getRulesText().trim()));
         }
         return sb.toString();
     }
 
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
+    }
+
+    public List<MessageEmbed> getRepresentationEmbedsWithLinkedUnit(boolean includeID) {
+        return withLinkedUnitEmbed(getRepresentationEmbed(includeID), includeID);
+    }
+
+    public List<MessageEmbed> withLinkedUnitEmbed(MessageEmbed breakthroughEmbed, boolean includeID) {
+        List<MessageEmbed> embeds = new ArrayList<>(List.of(breakthroughEmbed));
+        getLinkedUnit().ifPresent(unit -> embeds.add(unit.getRepresentationEmbed(includeID)));
+        return embeds;
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeID) {

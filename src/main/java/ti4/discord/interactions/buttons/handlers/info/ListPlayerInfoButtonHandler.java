@@ -195,7 +195,8 @@ class ListPlayerInfoButtonHandler {
     private static List<MessageEmbed> breakthroughEmbeds(Game game, Player player) {
         List<MessageEmbed> embeds = new ArrayList<>();
         for (BreakthroughModel bt : player.getBreakthroughModels()) {
-            embeds.add(FrankenAlternateTextService.getBreakthroughEmbed(game, bt, false));
+            embeds.addAll(
+                    bt.withLinkedUnitEmbed(FrankenAlternateTextService.getBreakthroughEmbed(game, bt, false), false));
             if ("arvaxibt".equals(bt.getAlias())) {
                 embeds.add(ArvaxiBreakthroughHandler.mobilizationEngineEmbed(game));
             }

@@ -123,4 +123,10 @@ public class HeroDraftItem extends DraftItem {
         }
         return allItems;
     }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getLeader().getNotes();
+    }
 }

@@ -68,7 +68,7 @@ public class TechDraftItem extends DraftItem {
                 || TYPED_STAT_LINE.matcher(text).find()) {
             return text;
         }
-        String stats = UnitDraftItem.statsText(upgradedUnit).trim();
+        String stats = upgradedUnit.getStatsText().trim();
         return text.isBlank() ? stats : stats + "\n" + text;
     }
 
@@ -129,5 +129,11 @@ public class TechDraftItem extends DraftItem {
             }
         }
         return allItems;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getNotes() {
+        return getTech().getNotes();
     }
 }
