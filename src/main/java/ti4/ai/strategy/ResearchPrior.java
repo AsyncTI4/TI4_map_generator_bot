@@ -84,9 +84,7 @@ class ResearchPrior {
     private static final Map<String, Integer> XXCHA_RESEARCH = Map.ofEntries(
             Map.entry("pds2", 494),
             Map.entry("ps", 436),
-            Map.entry("nf", 424),
             Map.entry("gd", 413),
-            Map.entry("it", 381),
             Map.entry("x89c4", 217),
             Map.entry("cr2", 217),
             Map.entry("aida", 214),

@@ -1285,9 +1285,10 @@ public class StrategyCardRules {
     }
 
     static boolean readiedAgainCovers(Game game, Player seat, Wallet wallet, Wallet.Payment payment, int cost) {
-        int readied = ExpectedReadying.readiedAgain(game, seat, wallet, payment).stream()
-                .mapToInt(Wallet.PlanetValue::resources)
-                .sum();
+        List<Wallet.PlanetValue> readiedAgain = ExpectedReadying.plannedReadiedAgain(game, seat, wallet, payment);
+        if (readiedAgain.isEmpty()) return false;
+        int readied =
+                readiedAgain.stream().mapToInt(Wallet.PlanetValue::resources).sum();
         return readied >= cost;
     }
 

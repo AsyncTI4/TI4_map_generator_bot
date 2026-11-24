@@ -13,6 +13,8 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.scoring.ObjectiveValue;
+import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.tactical.CombatMoment;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -175,5 +177,40 @@ class MunitionsReservesRulesTest extends BaseTi4Test {
 
         assertThat(MunitionsReservesRules.atRoundStart(context(), new CombatMoment(position, "lodor", true, 0)))
                 .isEmpty();
+    }
+
+    private double plainCost() {
+        return LetnevSpaceCombat.MUNITIONS_COST
+                * MunitionsReservesRules.TRADE_GOOD_VALUE
+                * MunitionsReservesRules.MARGIN;
+    }
+
+    // A reserve the seat cannot pay before the spend is not broken by the spend: 10 promised trade goods against 6
+    // held. The rule used to add a victory point's worth to the required gain here and silently declined every even
+    // fight; it now pays as it would without the reserve.
+    @Test
+    void paysWhenTheReserveWasAlreadyOutOfReach() {
+        fleets(UnitType.Dreadnought, 3, UnitType.Dreadnought, 3);
+        letnev.addTransactionItem("sendingletnev_receivingsol_TGs_10");
+
+        assertThat(ScoringReserve.of(test.game, letnev).tradeGoods()).isEqualTo(10);
+        assertThat(MunitionsReservesRules.requiredGain(test.game, letnev)).isEqualTo(plainCost());
+        assertThat(pressed()).isEqualTo("FFCC_letnev_munitionsReserves");
+    }
+
+    // 5 promised trade goods against 6 held: payable now, not after spending 2, so the reserve surcharge applies.
+    @Test
+    void chargesAVictoryPointWhenTheSpendBreaksAPayableReserve() {
+        letnev.addTransactionItem("sendingletnev_receivingsol_TGs_5");
+
+        assertThat(MunitionsReservesRules.requiredGain(test.game, letnev))
+                .isEqualTo(plainCost() + ObjectiveValue.VICTORY_POINT_VALUE);
+    }
+
+    @Test
+    void chargesNothingExtraWhenTheReserveSurvivesTheSpend() {
+        letnev.addTransactionItem("sendingletnev_receivingsol_TGs_4");
+
+        assertThat(MunitionsReservesRules.requiredGain(test.game, letnev)).isEqualTo(plainCost());
     }
 }

@@ -14,13 +14,15 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
+import ti4.ai.scoring.ExpectedReadying;
 import ti4.game.Player;
 import ti4.testUtils.BaseTi4Test;
 
-// Xxekir Grom (Thunder's Edge) places up to 4 PDS or mechs on the seat's planets and readies each one. It had no rule,
-// so the AI never played it. Xxcha holds its home (Archon Ren 2/3, Archon Tau 1/1), Fria (2/0) and Abyz (3/0), with
-// Abyz and Archon Ren exhausted. Like Diplomacy, it is played before passing only when the planets it readies pay for a
-// public objective in the status phase: Amass Wealth (3 influence, 3 resources, 3 trade goods) needs Archon Ren ready.
+// Xxekir Grom (Thunder's Edge) places up to 4 PDS or mechs on the seat's planets and readies each one. Xxcha holds its
+// home (Archon Ren 2/3, Archon Tau 1/1), Fria (2/0) and Abyz (3/0), with Abyz and Archon Ren exhausted. It is worth
+// playing when the planets it readies get spent this round (2 or more is enough), when the units it places help score
+// (Mechanize the Military, structure objectives) or defend, or before passing when it pays for an objective: Amass
+// Wealth (3 influence, 3 resources, 3 trade goods) needs Archon Ren ready. Units count for more in earlier rounds.
 class XxekirGromRulesTest extends BaseTi4Test {
 
     private AiTestGame test;
@@ -45,6 +47,11 @@ class XxekirGromRulesTest extends BaseTi4Test {
         xxcha.setTg(3);
     }
 
+    private void mechanizeTheMilitaryInRoundThree() {
+        test.game.setRound(3);
+        xxcha.setSecret("mtm");
+    }
+
     private AiTurnContext context(long now, AiPrompt... prompts) {
         return test.contextFor(xxcha, Set.of(), now, prompts);
     }
@@ -61,6 +68,25 @@ class XxekirGromRulesTest extends BaseTi4Test {
         Optional<AiDecision> decision = XxekirGromRules.beforePassing(context(NOW, turn), List.of(turn));
 
         assertThat(decision.map(AiTestGame::pressedId)).contains("FFCC_xxcha_componentAction");
+    }
+
+    // Played to pay for Amass Wealth, the hero must land on the exhausted planets the objective needs (Archon Ren),
+    // and the readies it forecasts are only the placements that land on exhausted planets.
+    @Test
+    void placesOnThePlanetsTheSpendObjectiveNeedsAndCountsOnlyThoseReadies() {
+        amassWealthNeedsArchonRen();
+
+        XxekirGromPlan.Outlook outlook = XxekirGromPlan.outlook(test.game, xxcha);
+        long onExhausted = outlook.placements().stream()
+                .filter(placement -> xxcha.getExhaustedPlanets().contains(placement.planet()))
+                .count();
+
+        assertThat(outlook.unlocksSpend()).isTrue();
+        assertThat(outlook.placements())
+                .extracting(XxekirGromPlan.Placement::planet)
+                .contains("archonren");
+        assertThat(outlook.readiesCounted()).isEqualTo((int) onExhausted);
+        assertThat(XxekirGromPlan.readiesThisRound(test.game, xxcha)).isEqualTo((int) onExhausted);
     }
 
     @Test
@@ -124,5 +150,94 @@ class XxekirGromRulesTest extends BaseTi4Test {
 
         assertThat(XxekirGromRules.next(context(NOW + 1000))).containsInstanceOf(AiDecision.Wait.class);
         assertThat(XxekirGromRules.next(context(NOW + 120_000))).isEmpty();
+    }
+
+    // No mech is on the board yet: four mechs, one on each of the seat's four planets, complete Mechanize the Military.
+    @Test
+    void playsTheHeroInRoundThreeWhenFourMechsCompleteAnObjective() {
+        mechanizeTheMilitaryInRoundThree();
+        AiPrompt turn = turnMenu();
+
+        Optional<AiDecision> decision = XxekirGromRules.insteadOfTacticalAction(context(NOW, turn), List.of(turn));
+
+        assertThat(decision.map(AiTestGame::pressedId)).contains("FFCC_xxcha_componentAction");
+        XxekirGromPlan.Outlook outlook = XxekirGromPlan.outlook(test.game, xxcha);
+        assertThat(outlook.completesObjective()).isTrue();
+        assertThat(outlook.placements())
+                .extracting(XxekirGromPlan.Placement::unit)
+                .containsOnly(XxekirGromRules.MECH)
+                .hasSize(XxekirGromPlan.PLACEMENTS);
+    }
+
+    @Test
+    void playsTheHeroBeforePassingWhenItsMechsCompleteAnObjective() {
+        mechanizeTheMilitaryInRoundThree();
+        AiPrompt turn = turnMenu();
+
+        assertThat(XxekirGromRules.beforePassing(context(NOW, turn), List.of(turn))
+                        .map(AiTestGame::pressedId))
+                .contains("FFCC_xxcha_componentAction");
+    }
+
+    @Test
+    void placesAMechForTheObjectiveWhenAskedWhichUnit() {
+        mechanizeTheMilitaryInRoundThree();
+
+        assertThat(XxekirGromRules.unitToPlace(test.game, xxcha)).isEqualTo(XxekirGromRules.MECH);
+    }
+
+    // Nothing to spend, nothing to score and no enemy near: the hero is kept, so its readies are not planned on. With
+    // no
+    // tactic token left the seat makes no tactical action, so the two exhausted planets would not be spent this round.
+    @Test
+    void countsNoHeroReadiesWhenItWouldNotBePlayed() {
+        xxcha.setTacticalCC(0);
+        AiPrompt turn = turnMenu();
+
+        assertThat(XxekirGromRules.insteadOfTacticalAction(context(NOW, turn), List.of(turn)))
+                .isEmpty();
+        assertThat(XxekirGromPlan.readiesThisRound(test.game, xxcha)).isZero();
+        // The seat still holds its agent, which readies one planet on its own.
+        assertThat(ExpectedReadying.readiesBeforeStatus(test.game, xxcha))
+                .isEqualTo(ExpectedReadying.XXCHA_AGENT_READIES);
+    }
+
+    // Played for Amass Wealth, the hero readies the two exhausted planets (Archon Ren and Abyz), not a flat four.
+    @Test
+    void countsOnlyThePlanetsTheHeroReadiesWhenItWouldBePlayed() {
+        amassWealthNeedsArchonRen();
+
+        assertThat(XxekirGromPlan.readiesThisRound(test.game, xxcha)).isEqualTo(2);
+        assertThat(ExpectedReadying.readiesBeforeStatus(test.game, xxcha))
+                .isEqualTo(2 + ExpectedReadying.XXCHA_AGENT_READIES);
+    }
+
+    @Test
+    void twoSpentPlanetsAreEnoughToPlayItWhileSpendingIsAhead() {
+        assertThat(readyingOnly(2).worthAnAction(true)).isTrue();
+        assertThat(readyingOnly(1).worthAnAction(true)).isFalse();
+        assertThat(readyingOnly(2).worthAnAction(false)).isFalse();
+    }
+
+    // The same placements (6 trade goods of defence) clear the bar in round 3, with five rounds still ahead, but not in
+    // round 6, when the units have only two rounds left to matter.
+    @Test
+    void anEarlierRoundIsWorthMoreThanALaterOneForTheSameUnits() {
+        test.game.setRound(3);
+        XxekirGromPlan.Outlook early = unitsOnly(XxekirGromPlan.roundsAhead(test.game));
+        test.game.setRound(6);
+        XxekirGromPlan.Outlook late = unitsOnly(XxekirGromPlan.roundsAhead(test.game));
+
+        assertThat(early.value()).isGreaterThan(late.value());
+        assertThat(early.worthAnAction(false)).isTrue();
+        assertThat(late.worthAnAction(false)).isFalse();
+    }
+
+    private static XxekirGromPlan.Outlook readyingOnly(int spentPlanets) {
+        return new XxekirGromPlan.Outlook(false, false, spentPlanets, 0.5 * spentPlanets, 0, 0, 1, List.of());
+    }
+
+    private static XxekirGromPlan.Outlook unitsOnly(int roundsAhead) {
+        return new XxekirGromPlan.Outlook(false, false, 0, 0, 0, 6.0, roundsAhead, List.of());
     }
 }

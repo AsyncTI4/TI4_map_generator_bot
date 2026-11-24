@@ -128,9 +128,9 @@ public class ScoringReserve {
 
     public static Optional<Wallet.Payment> planAfterReserve(Game game, Player seat, Wallet wallet, SpendCost cost) {
         SpendCost reserve = of(game, seat);
-        if (ExpectedReadying.spareReadies(game, seat) <= 0) return planAfterReserve(wallet, reserve, cost);
+        if (ExpectedReadying.plannedSpareReadies(game, seat) <= 0) return planAfterReserve(wallet, reserve, cost);
         Optional<Wallet.Payment> readiedAfter = wallet.plan(cost)
-                .filter(payment -> ExpectedReadying.afterPaying(game, seat, wallet, payment)
+                .filter(payment -> ExpectedReadying.plannedAfterPaying(game, seat, wallet, payment)
                         .canPay(reserve));
         return readiedAfter.isPresent() ? readiedAfter : planAfterReserve(wallet, reserve, cost);
     }

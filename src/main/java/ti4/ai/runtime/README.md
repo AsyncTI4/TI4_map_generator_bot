@@ -957,7 +957,12 @@ descriptions for the classes outside `StandardBrain` belong to their own package
 ### AiExperiments
 
 - **Role:** informs (feature flags).
-- **Algorithm:** 29 experiments (`READY_PUBLIC_POINTS` … `STRENGTH_WEIGHTED_ANGER`). `enabled(seat, x)` is false when
+- **Algorithm:** 35 experiments (`READY_PUBLIC_POINTS` … `XXCHA_LEADER_READIES`). Three split the spending on planets
+  readied again (4b2988f8f6). `TECH_FOLLOW_KEEP` off: `TokenPurchase.technologyFollowToKeep` keeps nothing.
+  `DIPLOMACY_READIED_PLANNING` off: `ExpectedReadying.plannedReadies` (used by `ScoringReserve.planAfterReserve`'s
+  readied branch, `StrategyCardRules.readiedAgainCovers` and `StructurePolicy.spendableThisRound`) counts no Diplomacy
+  readies; the Leadership purchase still counts its own Diplomacy (`ExpectedReadying.afterPaying`). `XXCHA_LEADER_READIES`
+  off: `ExpectedReadying.leaderReadies` is 0 and `StructurePolicy` uses raw planet resources instead of pooled values. `enabled(seat, x)` is false when
   `-Dai.experiments.off` lists it (or `all`), or when the seat's stored value `aiExperimentsOff` lists it; a value of
   `-` marks a control seat with nothing listed. Everything is on by default. `disable` and `abExperiments`
   (`-Dai.selfplay.ab`) are called only from tests (`SelfPlayGame` and unit tests), for paired A/B self-play;

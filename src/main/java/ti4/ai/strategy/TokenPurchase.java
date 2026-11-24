@@ -1,9 +1,12 @@
 package ti4.ai.strategy;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.CustodiansRace;
@@ -14,6 +17,8 @@ import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
 import ti4.ai.scoring.Wallet;
 import ti4.ai.tactical.ProductionPlanner;
+import ti4.ai.tactical.ProductionPlanner.BuildOrder;
+import ti4.ai.tactical.ProductionPlanner.BuildPlan;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.helpers.ButtonHelper;
@@ -88,7 +93,8 @@ public class TokenPurchase {
         return Optional.empty();
     }
 
-    private static SpendCost technologyFollowToKeep(Game game, Player seat, Wallet wallet) {
+    static SpendCost technologyFollowToKeep(Game game, Player seat, Wallet wallet) {
+        if (!AiExperiments.enabled(seat, AiExperiments.Experiment.TECH_FOLLOW_KEEP)) return SpendCost.NONE;
         if (ESTIMATING_PLANS.get()) return SpendCost.NONE;
         ESTIMATING_PLANS.set(true);
         try {
@@ -111,23 +117,80 @@ public class TokenPurchase {
     }
 
     private static SpendCost withPlans(Game game, Player seat, Wallet wallet, SpendCost scoring) {
-        SpendCost build = SpendCost.resources(homeBuildCost(game, seat));
         SpendCost research =
                 SpendCost.resources(extraResearchCost(game, seat)).plus(TechnologyFollowReserve.of(game, seat));
-        return Stream.of(scoring.plus(build).plus(research), scoring.plus(build), scoring.plus(research))
+        return keep(wallet, scoring, dockPlans(game, seat), research);
+    }
+
+    static SpendCost keep(Wallet wallet, SpendCost scoring, List<BuildPlan> builds, SpendCost research) {
+        List<BuildPlan> worthBuilding =
+                builds.stream().filter(TokenPurchase::worthAnActivation).toList();
+        Stream<SpendCost> fullBuild = worthBuilding.stream()
+                .max(Comparator.comparingDouble(BuildPlan::totalCost))
+                .map(TokenPurchase::resourcesFor)
+                .stream()
+                .flatMap(build -> Stream.of(scoring.plus(build).plus(research), scoring.plus(build)));
+        Stream<SpendCost> partialBuild =
+                largestAffordablePart(wallet, scoring, worthBuilding)
+                        .map(TokenPurchase::resourcesFor)
+                        .map(scoring::plus)
+                        .stream();
+        return Stream.of(fullBuild, partialBuild, Stream.of(scoring.plus(research)))
+                .flatMap(candidates -> candidates)
                 .filter(wallet::canPay)
                 .findFirst()
                 .orElse(scoring);
     }
 
-    private static int homeBuildCost(Game game, Player seat) {
+    static boolean worthAnActivation(BuildPlan plan) {
+        if (plan.isEmpty()) return false;
+        return plan.scoring()
+                || plan.defense()
+                || plan.units() >= ProductionPlanner.MIN_UNITS
+                || plan.totalCost() >= ProductionPlanner.MIN_BUILD_RESOURCES;
+    }
+
+    static BuildPlan affordablePart(BuildPlan plan, int resources) {
+        List<BuildOrder> kept = new ArrayList<>();
+        double spent = 0;
+        for (BuildOrder order : plan.orders()) {
+            if (spent + order.cost() > resources) continue;
+            kept.add(order);
+            spent += order.cost();
+        }
+        return new BuildPlan(kept);
+    }
+
+    private static Optional<BuildPlan> largestAffordablePart(
+            Wallet wallet, SpendCost scoring, List<BuildPlan> worthBuilding) {
+        int mostCost = worthBuilding.stream()
+                .mapToInt(plan -> resourcesFor(plan).resources())
+                .max()
+                .orElse(0);
+        int room = resourcesAfter(wallet, scoring, mostCost);
+        if (room <= 0) return Optional.empty();
+        return worthBuilding.stream()
+                .map(plan -> affordablePart(plan, room))
+                .filter(TokenPurchase::worthAnActivation)
+                .max(Comparator.comparingDouble(BuildPlan::value));
+    }
+
+    private static int resourcesAfter(Wallet wallet, SpendCost scoring, int most) {
+        for (int resources = most; resources > 0; resources--) {
+            if (wallet.canPay(scoring.plus(SpendCost.resources(resources)))) return resources;
+        }
+        return 0;
+    }
+
+    private static SpendCost resourcesFor(BuildPlan plan) {
+        return SpendCost.resources((int) Math.ceil(plan.totalCost()));
+    }
+
+    private static List<BuildPlan> dockPlans(Game game, Player seat) {
         return ButtonHelper.getTilesOfPlayersSpecificUnits(game, seat, UnitType.Spacedock).stream()
                 .filter(dock -> !dock.hasPlayerCC(seat))
                 .map(dock -> ProductionPlanner.plan(game, seat, dock))
-                .filter(plan -> !plan.isEmpty())
-                .mapToInt(plan -> (int) Math.ceil(plan.totalCost()))
-                .max()
-                .orElse(0);
+                .toList();
     }
 
     private static int extraResearchCost(Game game, Player seat) {

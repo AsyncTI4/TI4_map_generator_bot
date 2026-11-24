@@ -9,8 +9,10 @@ import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.brain.StrategyCard;
+import ti4.ai.eval.GameHorizon;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.promissory.NoteGiving;
+import ti4.ai.strategy.CardValueScale;
 import ti4.ai.strategy.StrategyTokenCost;
 import ti4.ai.trade.TradeRules;
 import ti4.game.Game;
@@ -23,8 +25,16 @@ public class MindsieveFollow {
     static final String BUTTON = "mindsieveFollow_";
     private static final String KEY = "mindsieveFollow|";
     private static final String SEPARATOR = "_";
+    static final double FOLLOWS_PER_ROUND = 1.2;
+    static final double NOTE_GIVEN = 1.0;
 
     record Gift(Match match, String note, double cost) {}
+
+    public static double breakthroughValue(Game game, Player seat) {
+        if (!seat.getBreakthroughIDs().contains(BREAKTHROUGH) || seat.isBreakthroughUnlocked(BREAKTHROUGH)) return 0;
+        double savedPerFollow = Math.max(0, CardValueScale.HELD_TOKEN - NOTE_GIVEN);
+        return FOLLOWS_PER_ROUND * savedPerFollow * GameHorizon.roundsLeft(game);
+    }
 
     public static boolean pending(AiTurnContext context, int initiative) {
         return context.memory().has(key(context.game(), initiative));

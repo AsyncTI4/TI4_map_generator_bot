@@ -3,8 +3,10 @@ package ti4.ai.strategy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ti4.ai.AiExperiments;
 import ti4.ai.AiTestGame;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -85,6 +87,44 @@ class StructurePolicyTest extends BaseTi4Test {
         test.nekro.unsafeGetLeader("xxchahero-te").setLocked(false);
 
         assertThat(StructurePolicy.spendableThisRound(test.game, test.nekro)).isEqualTo(2 * once);
+    }
+
+    // With XXCHA_LEADER_READIES off (the other two split flags on) each planet counts once, as before 4b2988f8f6, even
+    // with both readying leaders.
+    @Test
+    void withLeaderReadiesOffReadyingLeadersDoNotRaiseTheRoundsSpending() {
+        int once = StructurePolicy.spendableThisRound(test.game, test.nekro);
+        test.nekro.addLeader("xxchaagent");
+        test.nekro.addLeader("xxchahero-te");
+        test.nekro.unsafeGetLeader("xxchahero-te").setLocked(false);
+        AiExperiments.disable(test.nekro, Set.of(AiExperiments.Experiment.XXCHA_LEADER_READIES));
+
+        assertThat(StructurePolicy.spendableThisRound(test.game, test.nekro)).isEqualTo(once);
+    }
+
+    // With XXCHA_LEADER_READIES off, Archon's Gift no longer counts Wellon's influence: it gets a PDS as before.
+    @Test
+    void withLeaderReadiesOffArchonsGiftDoesNotMakeADockSite() {
+        test.place("19", "101");
+        test.nekro.addPlanet("wellon");
+        test.nekro.addBreakthrough("xxchabt");
+        test.nekro.setBreakthroughUnlocked("xxchabt", true);
+        AiExperiments.disable(test.nekro, Set.of(AiExperiments.Experiment.XXCHA_LEADER_READIES));
+
+        assertThat(StructurePolicy.next(test.game, test.nekro)).contains(StructurePolicy.PDS);
+    }
+
+    // An unplayed Diplomacy of the seat's own counts its 2 best planets twice; with DIPLOMACY_READIED_PLANNING off
+    // (the other two on) each planet counts once, as before 4b2988f8f6.
+    @Test
+    void withDiplomacyPlanningOffItsOwnDiplomacyDoesNotRaiseTheRoundsSpending() {
+        int once = StructurePolicy.spendableThisRound(test.game, test.nekro);
+        test.nekro.addSC(2);
+        assertThat(StructurePolicy.spendableThisRound(test.game, test.nekro)).isGreaterThan(once);
+
+        AiExperiments.disable(test.nekro, Set.of(AiExperiments.Experiment.DIPLOMACY_READIED_PLANNING));
+
+        assertThat(StructurePolicy.spendableThisRound(test.game, test.nekro)).isEqualTo(once);
     }
 
     // Forward docks belong in the seat's own slice: Lodor next to home beats Atlas across the board, though both

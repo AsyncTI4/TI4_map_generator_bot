@@ -5405,17 +5405,37 @@ public final class ButtonHelperFactionSpecific {
         ReactionService.addReaction(event, game, player, message);
     }
 
+    static boolean payForQuash(Player player) {
+        if (player.getStrategicCC() < 1 && player.hasRelicReady("emelpar")) {
+            player.addExhaustedRelic("emelpar");
+            return true;
+        }
+        player.setStrategicCC(player.getStrategicCC() - 1);
+        return false;
+    }
+
     @ButtonHandler("quash")
     public static void quash(ButtonInteractionEvent event, Player player, Game game) {
+        if (AgendaWhensAftersHelper.silencedByPoliticalSecret(player)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", due to a play of your _Political Secret_, you can't use **Quash** this agenda.");
+            return;
+        }
         int stratCC = player.getStrategicCC();
-        player.setStrategicCC(stratCC - 1);
+        boolean usedScepter = payForQuash(player);
+        String payment = usedScepter
+                ? " has exhausted the _" + RelicHelper.sillySpelling()
+                        + "_ to spend a command token from their reinforcements."
+                : " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1) + ").";
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 "The agenda" + (RandomHelper.isOneInX(50) ? ", just like my hopes and dreams," : "")
-                        + " has been **Quash**'d. " + player.getRepresentationUnfogged()
-                        + " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1)
-                        + ").");
-        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
+                        + " has been **Quash**'d. " + player.getRepresentationUnfogged() + payment);
+        if (!usedScepter) {
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
+        }
         AgendaHistory.recordQuashed(game, defaultString(AgendaHelper.getCurrentAgendaId(game)));
         AgendaEvents.discarded(game, player, AgendaHelper.getCurrentAgendaId(game), AgendaEvents.QUASH);
         String agendaCount = game.getStoredValue("agendaCount");

@@ -196,3 +196,82 @@ Same six factions as batch 3 (Sardakk, Xxcha, Yin, Sol, Letnev, Naalu), after th
 * Other heroes: Letnev 4/4, Naalu 4/4, Yin 3/4, Sol 2/4 (offered in 2), Sardakk 1/4 (round 6).
 * Not measured: Leadership tokens bought and Construction follows per seat; the log has no per-seat count for either.
   Four games is too few to tell a win-rate change from noise.
+
+### Batch 4 correction (found 2026-11-20)
+
+Ggrocuto Rinn never readied a planet in batches 1 to 4: the engine posts its planet buttons with Xxcha's owner prefix
+and `XxchaAgentRules` only matched unowned buttons, so each "use" exhausted the agent and readied nothing. The tracker
+counted the exhaust as a use. Peace Accords, Orbital Drop and Mindsieve were in fact used; the tracker missed their
+camelCase button ids. Both are fixed, and the tracker now prints a follow-through count for the agent.
+
+## Batch 5 (2026-11-21, 4b2988f8f6 + agent, tracker, Quash, Munitions Reserves fixes, 4 games)
+
+Same six factions. First batch with the new SPENDING counts (averages per game).
+
+* Leader 10.5 VP, table total 44.8, average final round 6.5. All 4 games ended on points.
+* Wins: Sol 2, Letnev 2. Average VP: Sol 8.75, Letnev 8.5, Naalu 8.25, Yin 7.75, Sardakk 6.75, Xxcha 4.75
+  (Xxcha 6.75 in batches 3 and 4, 7.0 in batch 2). Xxcha finished last or second to last in every game.
+* Ggrocuto Rinn: 24 of 24 uses readied a planet (6 per game); 5 per game of those planets were spent again the same
+  round.
+* Xxcha Leadership: 5 secondaries per game buying 11.5 tokens for 28 influence (35 pooled), against 2.5 to 3.5
+  secondaries and 6.5 to 8 tokens for every other faction.
+* Xxcha Construction: 2.3 follows per game (others 0.5 to 1.5); docks 0.3 home and 1.5 forward per game.
+* Xxekir Grom: never played (unlocked in 3 games, offered in 2).
+* Now visible: Peace Accords 11 presses in 4/4 games, Orbital Drop 4/4, Munitions Reserves 2/4 (0/4 before the fix),
+  Quash 1/4.
+
+## A/B: XXCHA_READYING_SPEND (2026-11-22, 48 games, 24 pairs, base seed 20261121)
+
+Same six factions, paired seating. Both arms have the hero rework (XxekirGromPlan), the partial build reserve, the
+approved strategy values (Instinct Training 2.0, Nullification Field 2.5, Mindsieve priority, Sh'val keep
+max(0, 4 - round)) and the Political Secret / Quash fixes. The flag gates only the readying spend planning
+(leader readies in ExpectedReadying, the readied branch in ScoringReserve, the Technology-follow keep in
+TokenPurchase, readiedAgainCovers, and pooled dock values in StructurePolicy).
+
+* Leader 10.1 VP, table total 45.4, average final round 6.2. All 48 games ended on points.
+* Table: treatment minus control -0.35 +- 0.18 VP (t -1.93); treatment win share 0.46.
+* Xxcha: +0.38 +- 0.52 VP (t 0.72), win share 0.21 as treatment vs 0.29 as control. Not significant.
+* Other factions as treatment: Letnev -0.88 (t -2.18), Sardakk -0.88 (t -1.63), Sol -0.63, Yin -0.42, Naalu +0.29.
+  The parts that reach every faction (Technology-follow keep, Diplomacy readied branch) look harmful.
+* Wins over both arms: Sol 12, Xxcha 12, Yin 7, Letnev 6, Naalu 6, Sardakk 4. Average VP: Letnev 7.90, Xxcha 7.85,
+  Sol 7.77, Yin 7.50, Naalu 7.48, Sardakk 6.94 (Xxcha 4.75 in batch 5, before the hero rework).
+* Xxekir Grom played in 36/48 games (first use round 4.6); Sh'val 23/48 (round 4.7); Mindsieve used in 48/48;
+  Instinct Training researched once, Nullification Field never.
+* The flag was then split into `TECH_FOLLOW_KEEP`, `DIPLOMACY_READIED_PLANNING` and `XXCHA_LEADER_READIES` for one-at-a-time A/B tests.
+
+## A/B: TECH_FOLLOW_KEEP (2026-11-23, 48 games, 24 pairs, base seed 20261121)
+
+Leadership purchases keep the 4-resource Technology follow payable (every faction). Other two split flags on.
+
+* Leader 10.1 VP, table total 45.4, average final round 6.2. All 48 games ended on points.
+* Table: treatment minus control -0.12 +- 0.17 VP (t -0.70); treatment win share 0.44. Neutral.
+* Per faction (treatment minus control): Naalu +0.46, Xxcha +0.25, Letnev +0.21, Sol -0.38, Yin -0.50,
+  Sardakk -0.75 (t -1.96). None clear.
+* Wins over both arms: Letnev 11, Yin 11, Sol 8, Naalu 6, Sardakk 6, Xxcha 5.
+
+## A/B: DIPLOMACY_READIED_PLANNING (2026-11-23, 48 games, 24 pairs, base seed 20261121)
+
+The Diplomacy holder plans spending (scoring reserve, Technology follow, structures) on the planets its own
+Diplomacy will ready. Other two split flags on.
+
+* Leader 10.2 VP, table total 46.2, average final round 6.3. All 48 games ended on points.
+* Table: treatment minus control -0.10 +- 0.17 VP (t -0.57); treatment win share 0.46. Neutral.
+* Per faction (treatment minus control): Sardakk +0.54, Naalu +0.38, Xxcha +0.25, Letnev -0.21, Yin -0.58,
+  Sol -0.96 (t -1.94). None clear.
+* Wins over both arms: Letnev 11, Yin 11, Xxcha 10, Naalu 7, Sol 7, Sardakk 2.
+
+## A/B: XXCHA_LEADER_READIES (2026-11-24, 48 games, 24 pairs, base seed 20261121)
+
+Xxcha plans spending on the planets its agent and Xxekir Grom will ready, and pools resources and influence by
+its unlocks. Only Xxcha seats are affected. Other two split flags on.
+
+* Leader 10.1 VP, table total 45.8, average final round 6.3. All 48 games ended on points.
+* Table: treatment minus control +0.18 +- 0.20 VP (t 0.93); treatment win share 0.52. Neutral.
+* Per faction (treatment minus control): Naalu +0.67, Letnev +0.58, Yin +0.13, Xxcha +0.08, Sardakk 0.00,
+  Sol -0.38. None clear.
+* Wins over both arms: Letnev 14, Naalu 10, Yin 10, Sol 6, Xxcha 5, Sardakk 3.
+
+### Split summary
+
+None of the three flags moves the table on its own (-0.12, -0.10, +0.18; all |t| < 1). The combined run's
+-0.35 (t -1.93) reads as noise at this sample size, or as a small interaction. All three are kept on.

@@ -170,6 +170,94 @@ final class AbSummary {
                 meanAndError(estimate.winShare(), 0.5),
                 estimate.treatmentPoints(),
                 estimate.controlPoints());
+        perFaction(outcomes.stream()
+                        .map(outcome -> new Seating(
+                                SelfPlayGame.seedFor(outcome.slot()),
+                                complete.test(outcome.ending()),
+                                outcome.victoryPoints(),
+                                outcome.controlSeats()))
+                        .toList())
+                .forEach(System.out::println);
+    }
+
+    // One game of a pair as the per-faction comparison needs it: who scored what, and which factions were control.
+    record Seating(long seed, boolean completed, Map<String, Integer> points, Set<String> control) {
+
+        double winShare(String faction) {
+            int best =
+                    points.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+            long winners =
+                    points.values().stream().filter(value -> value == best).count();
+            return points.getOrDefault(faction, -1) == best && winners > 0 ? 1.0 / winners : 0;
+        }
+    }
+
+    // Per faction, over complete pairs where it played treatment in one game and control in the other: its own
+    // victory points as treatment minus as control. A faction effect shows here at full size, while the table line
+    // above dilutes it across every seat. A faction seated on the same side in both games of a pair (a seating that
+    // does not alternate) or in only one of them is counted apart and left out of the estimate.
+    static List<String> perFaction(List<Seating> games) {
+        Map<Long, List<Seating>> pairs = new TreeMap<>();
+        for (Seating game : games)
+            pairs.computeIfAbsent(game.seed(), seed -> new ArrayList<>()).add(game);
+        Map<String, List<Double>> differences = new TreeMap<>();
+        Map<String, List<Double>> treatmentWins = new TreeMap<>();
+        Map<String, List<Double>> controlWins = new TreeMap<>();
+        Map<String, Integer> sameSide = new TreeMap<>();
+        Map<String, Integer> unpaired = new TreeMap<>();
+        for (List<Seating> pair : pairs.values()) {
+            if (pair.size() != 2 || !pair.stream().allMatch(Seating::completed)) continue;
+            Seating first = pair.get(0);
+            Seating second = pair.get(1);
+            Set<String> factions = new java.util.TreeSet<>(first.points().keySet());
+            factions.addAll(second.points().keySet());
+            for (String faction : factions) {
+                if (!first.points().containsKey(faction) || !second.points().containsKey(faction)) {
+                    unpaired.merge(faction, 1, Integer::sum);
+                    continue;
+                }
+                boolean firstTreated = !first.control().contains(faction);
+                boolean secondTreated = !second.control().contains(faction);
+                if (firstTreated == secondTreated) {
+                    sameSide.merge(faction, 1, Integer::sum);
+                    continue;
+                }
+                Seating treatment = firstTreated ? first : second;
+                Seating control = firstTreated ? second : first;
+                differences
+                        .computeIfAbsent(faction, ignored -> new ArrayList<>())
+                        .add((double) (treatment.points().get(faction)
+                                - control.points().get(faction)));
+                treatmentWins
+                        .computeIfAbsent(faction, ignored -> new ArrayList<>())
+                        .add(treatment.winShare(faction));
+                controlWins
+                        .computeIfAbsent(faction, ignored -> new ArrayList<>())
+                        .add(control.winShare(faction));
+            }
+        }
+        Set<String> factions = new java.util.TreeSet<>(differences.keySet());
+        factions.addAll(sameSide.keySet());
+        factions.addAll(unpaired.keySet());
+        List<String> lines = new ArrayList<>();
+        for (String faction : factions) {
+            List<Double> paired = differences.getOrDefault(faction, List.of());
+            lines.add(String.format(
+                    "A/B faction %s: treatment minus control victory points %s over %d pairs; win share as treatment"
+                            + " %.3f vs as control %.3f; same side in both games %d, seated in one game only %d",
+                    faction,
+                    meanAndError(paired),
+                    paired.size(),
+                    average(treatmentWins.getOrDefault(faction, List.of())),
+                    average(controlWins.getOrDefault(faction, List.of())),
+                    sameSide.getOrDefault(faction, 0),
+                    unpaired.getOrDefault(faction, 0)));
+        }
+        return lines;
+    }
+
+    private static double average(List<Double> values) {
+        return values.stream().mapToDouble(Double::doubleValue).average().orElse(0);
     }
 
     static String meanAndError(List<Double> values) {

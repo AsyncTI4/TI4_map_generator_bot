@@ -372,6 +372,13 @@ From commit `6f65eca854` ("Halve AI self-play CPU per decision"); results are un
   target planet (`planet2`) instead of the source planet.
 - `FrankenHomeService.getPlayerHsRingPosition`: returns `null` when no home-system faction is found instead of
   dereferencing it.
+- `ButtonHelperFactionSpecific.payForQuash` / `quash`: Quash with an empty strategy pool and a ready _Scepter of
+  Emelpar_ exhausts the Scepter (it used to drop the pool to -1 and leave the Scepter ready). Test: `QuashPaymentTest`.
+- Xxcha's _Political Secret_ silences Quash for that agenda: `PromissoryNoteHelper` marks the owner through
+  `AgendaWhensAftersHelper.silenceByPoliticalSecret` (cleared when the next agenda is revealed),
+  `AgendaWhensAftersHelper.canQuash` and the "when" options skip Quash, `queueAWhen` no longer undoes the auto-pass for
+  it, and `quash` refuses a stale button. The no-commander message now names the full restriction. Elder Qanoj restores
+  voting only. Test: `PoliticalSecretQuashTest`.
 
 ### TODO comments added to engine code
 
@@ -637,8 +644,9 @@ Records are `[wins, games]` per faction and kind (`techSkip`, `tradeGoods`, `fiv
 - `kindNudge(f, kind)`: 0 if the faction or kind is missing; `mean` = pooled win rate over all six kinds;
   `shrunk = (wins_kind + 100 × mean) / (games_kind + 100)`; nudge `= clamp(0.2 × 100 × (shrunk − mean), −1.0, 1.0)`.
 - `BreakthroughValue.of` uses the lift as `max(floor, max(0.75, 2.0 + 0.5 × lift)) × timing`, with `timing =
-  min(1, roundsLeft / 4)`, floor 8.0 for Hacan and Letnev and 0 otherwise, and the larger of that and
-  `YinAscendant.value`. `ExpeditionOutlook` adds the nudge to a kind's value before subtracting its price.
+  min(1, roundsLeft / 4)`, floor 8.0 for Hacan, Letnev and Naalu and 0 otherwise, and the larger of that,
+  `YinAscendant.value` and `MindsieveFollow.breakthroughValue` (1.2 follows a round × (held token 2.4 − note 1.0) ×
+  rounds left). `ExpeditionOutlook` adds the nudge to a kind's value before subtracting its price.
 
 Example (Sol, from the file: `any` 189/1049, `none` 26/152): `with` = 0.1802, `without` = (26 + 200 × 0.1702)/352 =
 0.1706, lift = 0.96 points, so a locked Sol breakthrough is worth `2.0 + 0.48 = 2.48` TG times timing. Sol's pooled

@@ -34,7 +34,7 @@ public class SardakkHeroRules {
     static final double MIN_STAKE = VP;
     static final double MIN_LANDING_WIN = 0.65;
     static final double MAX_SPACE_WIN = 0.6;
-    static final double HERO_VALUE = 0.5 * VP;
+    static final double KEEP_BEFORE_ROUND = 4;
     static final double ENEMY_HOME_VALUE = VP;
     private static final String HERO = "sardakkhero";
     private static final String HERO_BUTTON = "purgeSardakkHero";
@@ -42,17 +42,17 @@ public class SardakkHeroRules {
     private static final String PLANNED = "sardakkHeroPlan|";
     private static final String NO_TARGET = "none";
 
-    record Case(double spaceWin, double fleetCost, double fightLoss, double landingWin, double stake) {
+    record Case(double spaceWin, double fleetCost, double fightLoss, double landingWin, double stake, double keep) {
 
         boolean worthPlaying() {
             if (stake < MIN_STAKE || landingWin < MIN_LANDING_WIN || spaceWin > MAX_SPACE_WIN) return false;
             double gainedByNotFighting = (1 - spaceWin) * landingWin * stake;
             double extraShipsGivenUp = fleetCost - fightLoss;
-            return gainedByNotFighting > extraShipsGivenUp + HERO_VALUE;
+            return gainedByNotFighting > extraShipsGivenUp + keep;
         }
 
         double net() {
-            return (1 - spaceWin) * landingWin * stake - (fleetCost - fightLoss) - HERO_VALUE;
+            return (1 - spaceWin) * landingWin * stake - (fleetCost - fightLoss) - keep;
         }
     }
 
@@ -72,13 +72,17 @@ public class SardakkHeroRules {
                 .or(() -> TacticalPlanner.best(game, seat))
                 .map(TacticalPlan::score)
                 .orElse(0.0);
-        if (!heroPlanWorthIt(withHero.get().score(), without)) return;
+        if (!heroPlanWorthIt(withHero.get().score(), without, keepValue(game))) return;
         TacticalRules.remember(context, withHero.get());
         context.memory().put(PLANNED + context.turnKey(), withHero.get().target());
     }
 
-    static boolean heroPlanWorthIt(double withHero, double without) {
-        return withHero >= MIN_STAKE && withHero - Math.max(0, without) >= HERO_VALUE;
+    static double keepValue(Game game) {
+        return Math.max(0, KEEP_BEFORE_ROUND - game.getRound());
+    }
+
+    static boolean heroPlanWorthIt(double withHero, double without, double keep) {
+        return withHero >= MIN_STAKE && withHero - Math.max(0, without) >= keep;
     }
 
     private static boolean plannedHere(AiTurnContext context, Tile tile) {
@@ -119,7 +123,8 @@ public class SardakkHeroRules {
             Map<UnitType, Integer> landing = committable(context, tile, planet);
             if (landing.isEmpty()) continue;
             double win = CombatForecast.landingWin(game, seat, tile.getPosition(), planet.getName(), landing);
-            Case outlook = new Case(space.win(), fleetCost, space.ourLoss(), win, stake(game, seat, tile, planet));
+            Case outlook = new Case(
+                    space.win(), fleetCost, space.ourLoss(), win, stake(game, seat, tile, planet), keepValue(game));
             if (best == null || outlook.net() > best.outlook().net()) best = new Target(planet, outlook, landing);
         }
         return Optional.ofNullable(best);

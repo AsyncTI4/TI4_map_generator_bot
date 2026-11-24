@@ -1422,4 +1422,6 @@ from explicit guards, hard-coded sets and missing handlers in the code.
   largest planets count as readied again, so `ScoringReserve.planAfterReserve(game, seat, ...)` and the Leadership
   purchase keep the reserve only from what will be ready later. Leadership still keeps what a Technology follow needs
   unspent (that follow comes before any readying). A second Technology research paid with planets that come back
-  needs the idle-goods worth share (`StrategyCardRules.readiedAgainCovers`).
+  needs the idle-goods worth share (`StrategyCardRules.readiedAgainCovers`). The planning sites use the `planned*`
+  variants, which drop the Diplomacy readies when `DIPLOMACY_READIED_PLANNING` is off; the Leadership purchase uses
+  `afterPaying`, which always counts them. Leader readies need `XXCHA_LEADER_READIES`.
