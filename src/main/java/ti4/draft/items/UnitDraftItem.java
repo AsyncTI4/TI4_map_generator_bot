@@ -43,6 +43,20 @@ public class UnitDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         UnitModel unit = getUnit();
+        StringBuilder sb = new StringBuilder(rulesText(unit));
+        if (unit.getFaction().isPresent()) {
+            sb.append("Faction: ").append(unit.getFaction().get());
+        }
+        return sb + "\n";
+    }
+
+    public static String rulesText(UnitModel unit) {
+        StringBuilder sb = new StringBuilder(statsText(unit));
+        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(' ');
+        return sb.toString();
+    }
+
+    public static String statsText(UnitModel unit) {
         StringBuilder sb = new StringBuilder();
         if (unit.getCost() > 0) {
             sb.append("Cost: ");
@@ -101,11 +115,7 @@ public class UnitDraftItem extends DraftItem {
             sb.append(unit.getMoveValue());
             sb.append(' ');
         }
-        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(' ');
-        if (unit.getFaction().isPresent()) {
-            sb.append("Faction: ").append(unit.getFaction().get());
-        }
-        return sb + "\n";
+        return sb.toString();
     }
 
     @JsonIgnore

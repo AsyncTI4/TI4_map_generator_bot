@@ -361,7 +361,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "This unit counts as 1/2 capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values.After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control, or in the space area of a system that contains 1 or more of your ships."
+        "ability": "This unit counts as 1/2 capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control, or in the space area of a system that contains 1 or more of your ships."
     },
     {
         "id": "tyris_mech",

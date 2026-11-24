@@ -72,6 +72,11 @@ public abstract class DraftItem {
 
     protected abstract String getLongDescriptionImpl();
 
+    protected String errataTextOrNone() {
+        String alternateText = Errata.getAlternateText();
+        return alternateText.isBlank() ? "None." : alternateText;
+    }
+
     protected abstract String getLongDescriptionImpl(Game game);
 
     public abstract TI4Emoji getItemEmoji();

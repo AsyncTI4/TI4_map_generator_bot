@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.discord.interactions.buttons.Buttons;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.wftv.arvaxi.ArvaxiBreakthroughHandler;
 import ti4.discord.interactions.routing.ButtonHandler;
 import ti4.game.Game;
 import ti4.game.Leader;
@@ -19,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.model.Mapper;
 import ti4.service.franken.FrankenAlternateTextService;
+import ti4.service.info.FactionComponentsService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.player.PlayerStatsService;
@@ -30,6 +32,7 @@ class ListPlayerInfoButtonHandler {
     public static void offerInfoButtons(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_components", "Faction Components"));
         buttons.add(Buttons.green("offerInfoButtonStep2_objective", "Objective Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_abilities", "Ability Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_stats", "Player Stats Info"));
@@ -77,6 +80,11 @@ class ListPlayerInfoButtonHandler {
             ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String category = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
+        if ("components".equals(category)) {
+            sendFactionComponents(game, player, faction);
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            return;
+        }
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         for (Player p2 : game.getRealPlayers()) {
@@ -121,9 +129,7 @@ class ListPlayerInfoButtonHandler {
                                     game, Mapper.getPromissoryNote(pn), false, false, false));
                         }
                     }
-                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
-                        messageEmbeds.add(FrankenAlternateTextService.getBreakthroughEmbed(game, bt, false));
-                    }
+                    messageEmbeds.addAll(breakthroughEmbeds(game, p2));
                 }
                 case "abilities" -> {
                     for (String ability : p2.getAbilities()) {
@@ -143,11 +149,7 @@ class ListPlayerInfoButtonHandler {
                                 game, Mapper.getTech(tech), false, false));
                     }
                 }
-                case "breakthrough" -> {
-                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
-                        messageEmbeds.add(FrankenAlternateTextService.getBreakthroughEmbed(game, bt, false));
-                    }
-                }
+                case "breakthrough" -> messageEmbeds.addAll(breakthroughEmbeds(game, p2));
                 case "tech" -> {
                     for (String tech : p2.getTechs()) {
                         messageEmbeds.add(FrankenAlternateTextService.getTechnologyEmbed(
@@ -188,6 +190,25 @@ class ListPlayerInfoButtonHandler {
 
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), sb.toString(), messageEmbeds);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    private static List<MessageEmbed> breakthroughEmbeds(Game game, Player player) {
+        List<MessageEmbed> embeds = new ArrayList<>();
+        for (BreakthroughModel bt : player.getBreakthroughModels()) {
+            embeds.add(FrankenAlternateTextService.getBreakthroughEmbed(game, bt, false));
+            if ("arvaxibt".equals(bt.getAlias())) {
+                embeds.add(ArvaxiBreakthroughHandler.mobilizationEngineEmbed(game));
+            }
+        }
+        return embeds;
+    }
+
+    private static void sendFactionComponents(Game game, Player player, String faction) {
+        for (Player p2 : game.getRealPlayers()) {
+            if ("all".equals(faction) || faction.equalsIgnoreCase(p2.getFaction())) {
+                FactionComponentsService.sendFactionComponents(player.getCardsInfoThread(), p2.getFaction());
+            }
+        }
     }
 
     @ButtonHandler(value = "showObjInfo_", save = false)

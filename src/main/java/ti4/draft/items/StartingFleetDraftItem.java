@@ -47,7 +47,11 @@ public class StartingFleetDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
-        return Helper.getOrderedUnitListEmojis(getFaction().getStartingFleet(), true);
+        String fleet = getFaction().getStartingFleet();
+        if (fleet == null || fleet.isBlank()) {
+            return errataTextOrNone();
+        }
+        return Helper.getOrderedUnitListEmojis(fleet, true);
     }
 
     @JsonIgnore
