@@ -63,14 +63,15 @@ public class FactionComponentsService {
 
     static Set<String> unplacedExtraAnchors(String factionAlias) {
         FactionModel faction = Mapper.getFaction(factionAlias);
-        Set<String> anchors = new HashSet<>(extrasByAnchor(factionAlias).keySet());
+        Map<String, List<ExtraCards>> extrasByAnchor = extrasByAnchor(factionAlias);
+        Set<String> anchors = new HashSet<>(extrasByAnchor.keySet());
         if (faction == null) {
             return anchors;
         }
         for (DraftItem component : factionComponents(faction, new FactionDraftItem(factionAlias), true)) {
             anchors.remove(component.getAlias());
         }
-        extrasByAnchor(factionAlias).values().stream()
+        extrasByAnchor.values().stream()
                 .flatMap(List::stream)
                 .flatMap(extra -> extra.components().stream())
                 .forEach(component -> anchors.remove(component.getAlias()));
@@ -147,7 +148,11 @@ public class FactionComponentsService {
             }
         }
         units.addAll(listedById.values());
-        units.sort(Comparator.comparing((DraftItem unit) -> nextStage(Mapper.getUnit(unit.getItemId())) == null));
+        Set<String> upgradable = new HashSet<>();
+        units.stream()
+                .filter(unit -> nextStage(Mapper.getUnit(unit.getItemId())) != null)
+                .forEach(unit -> upgradable.add(unit.getItemId()));
+        units.sort(Comparator.comparing((DraftItem unit) -> !upgradable.contains(unit.getItemId())));
         return units;
     }
 

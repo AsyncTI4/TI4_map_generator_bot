@@ -7,7 +7,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,6 +40,13 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private ComponentSource source;
 
+    @JsonIgnore
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private transient Optional<UnitModel> linkedUnit;
+
     public boolean isValid() {
         return alias != null && name != null && source != null && text != null;
     }
@@ -45,6 +57,13 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public Optional<UnitModel> getLinkedUnit() {
+        if (linkedUnit == null) {
+            linkedUnit = findLinkedUnit();
+        }
+        return linkedUnit;
+    }
+
+    private Optional<UnitModel> findLinkedUnit() {
         if (text == null || !text.toLowerCase().contains("flip this card")) return Optional.empty();
         FactionModel factionModel = faction == null ? null : Mapper.getFaction(faction);
         if (factionModel == null) return Optional.empty();

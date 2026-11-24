@@ -212,7 +212,6 @@ public final class BreakthroughCommandHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(), "Added the Grove \"planet\" card to your play area.");
             }
-            player.applyBreakthroughUnitUpgrades();
             if ("celdauribt".equalsIgnoreCase(bt.getID())) {
                 player.addOwnedUnitByID("celdauri_celagrom");
                 String output = player.getRepresentation()

@@ -489,6 +489,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
         getBreakthroughActive().put(btNew, isBreakthroughActive(btOld));
         getBreakthroughTGs().put(btNew, getBreakthroughTGs(btOld));
         removeBreakthrough(btOld);
+        if (isBreakthroughUnlocked(btNew)) {
+            applyBreakthroughUnitUpgrades();
+        }
         return true;
     }
 
@@ -503,6 +506,9 @@ public class Player extends PlayerProperties implements StoredValueHelper {
 
     public void setBreakthroughUnlocked(String bt, boolean unl) {
         getBreakthroughUnlocked().put(bt, unl);
+        if (unl) {
+            applyBreakthroughUnitUpgrades();
+        }
     }
 
     public boolean isBreakthroughExhausted(String bt) {

@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import ti4.game.persistence.migration.DataMigrationManager;
+import ti4.model.BreakthroughModel;
+import ti4.model.Mapper;
 import ti4.service.franken.FrankenUnitService;
 import ti4.testUtils.BaseTi4Test;
 
@@ -36,7 +39,8 @@ class BreakthroughUnitUpgradeTest extends BaseTi4Test {
         assertThat(player.getUnitsOwned()).contains(flipSide).doesNotContain(baseUnit, upgradedUnit);
     }
 
-    // Same table, other order: the upgrade is already researched when the breakthrough unlocks.
+    // Same table, other order: the upgrade is already researched when the breakthrough unlocks. Unlocking goes
+    // through setBreakthroughUnlocked, so every unlock path (command, testbed) flips the card.
     // Kortali never flipped this way before, because the unlock code checked "kortalbt".
     @ParameterizedTest
     @CsvSource({
@@ -53,9 +57,8 @@ class BreakthroughUnitUpgradeTest extends BaseTi4Test {
             String breakthrough, String baseUnit, String tech, String upgradedUnit, String flipSide) {
         Player player = playerOwning(baseUnit);
         player.addTech(tech);
-        unlock(player, breakthrough);
 
-        player.applyBreakthroughUnitUpgrades();
+        unlock(player, breakthrough);
 
         assertThat(player.getUnitsOwned()).contains(flipSide).doesNotContain(baseUnit, upgradedUnit);
     }
@@ -176,6 +179,47 @@ class BreakthroughUnitUpgradeTest extends BaseTi4Test {
         player.addTech("cr2");
 
         assertThat(player.getUnitsOwned()).doesNotContain("celdauri_celagrom", "thrones_aurelion", "naaz_voltron");
+    }
+
+    // Swapping one breakthrough for another (changeBreakthrough) keeps it unlocked, so the new card flips too.
+    @Test
+    void changingToAnUnlockedUpgradeBreakthroughFlipsIt() {
+        Player player = playerOwning("fighter");
+        player.addTech("ff2");
+        unlock(player, "crystellumbt");
+
+        player.changeBreakthrough("crystellumbt", "mirvedabt");
+
+        assertThat(player.getUnitsOwned()).contains("mirveda_fighter3");
+    }
+
+    // Saves from before this rule (or with the unlock written straight into the map) are fixed by a one-time migration.
+    @Test
+    void migrationFlipsExistingSaves() {
+        Game game = new Game();
+        Player player = game.addPlayer("user", "user");
+        player.setUnitsOwned(new LinkedHashSet<>(List.of("dreadnought2")));
+        player.getTechs().add("dn2");
+        player.addBreakthrough("kortalibt");
+        player.getBreakthroughUnlocked().put("kortalibt", true);
+
+        boolean changed = DataMigrationManager.applyBreakthroughFlipSides_241126(game);
+
+        assertThat(changed).isTrue();
+        assertThat(player.getUnitsOwned()).contains("tribune3").doesNotContain("dreadnought2");
+    }
+
+    // A breakthrough that flips on a named upgrade must resolve exactly one back unit. If a pack adds a second
+    // candidate, both the flip and the card display would silently stop working.
+    @Test
+    void everyUpgradeFlipBreakthroughResolvesItsUnit() {
+        List<String> unresolved = Mapper.getBreakthroughs().values().stream()
+                .filter(breakthrough -> breakthrough.getFlipTechName().isPresent())
+                .filter(breakthrough -> breakthrough.getLinkedUnitUpgrade().isEmpty())
+                .map(BreakthroughModel::getAlias)
+                .toList();
+
+        assertThat(unresolved).isEmpty();
     }
 
     private static Player playerOwning(String unit) {

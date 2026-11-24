@@ -65,7 +65,7 @@ public class StartingTechDraftItem extends DraftItem {
         }
 
         List<String> techs = startingTechs();
-        if (techs != null && techs.isEmpty() && getFaction().getStartingTechOptions() == null) {
+        if ((techs == null || techs.isEmpty()) && getFaction().getStartingTechOptions() == null) {
             return errataTextOrNone();
         }
         if (techs != null && !techs.isEmpty()) {
