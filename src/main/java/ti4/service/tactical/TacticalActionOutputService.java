@@ -297,7 +297,7 @@ public class TacticalActionOutputService {
             Set<UnitKey> allMovingUnits,
             int distance,
             int riftDistance) {
-        int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits, false);
+        int moveValue = getUnitMoveValue(game, player, tile, unit, allMovingUnits);
         if (moveValue == 0) return "";
 
         StringBuilder output = new StringBuilder();
@@ -447,8 +447,34 @@ public class TacticalActionOutputService {
         return output.toString();
     }
 
-    private int getUnitMoveValue(
-            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, boolean skipBonus) {
+    int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits) {
+        int ownMoveValue = getUnitMoveValueBeforeGravleash(game, player, tile, unit, allMovingUnits);
+        if (ownMoveValue == 0 || !isRaisedByGravleash(player, unit)) return ownMoveValue;
+        return Math.max(ownMoveValue, gravleashPace(game, player, tile, allMovingUnits));
+    }
+
+    private boolean isRaisedByGravleash(Player player, UnitKey unit) {
+        return player.hasUnlockedBreakthrough("letnevbt")
+                && unit.unitType() != UnitType.Fighter
+                && isOwnShip(player, unit);
+    }
+
+    private int gravleashPace(Game game, Player player, Tile tile, Set<UnitKey> allMovingUnits) {
+        if (allMovingUnits == null) return 0;
+        return allMovingUnits.stream()
+                .filter(key -> isOwnShip(player, key))
+                .mapToInt(key -> getUnitMoveValueBeforeGravleash(game, player, tile, key, allMovingUnits))
+                .max()
+                .orElse(0);
+    }
+
+    private boolean isOwnShip(Player player, UnitKey unit) {
+        UnitModel model = player.getPriorityUnitByAsyncID(unit.asyncID(), null);
+        return model != null && model.getIsShip() && player.unitBelongsToPlayer(unit);
+    }
+
+    private int getUnitMoveValueBeforeGravleash(
+            Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits) {
 
         UnitModel model = player.getPriorityUnitByAsyncID(unit.asyncID(), null);
         // player.getUnitFromUnitKey(unit);
@@ -491,17 +517,8 @@ public class TacticalActionOutputService {
         if (model.getIsShip() && HydromorphicCardHandler.hasRiptideRush(game, player)) {
             baseMoveValue++;
         }
-        if (skipBonus) return baseMoveValue;
-
         // Calculate bonus move value
         int bonusMoveValue = 0;
-        if (player.hasUnlockedBreakthrough("letnevbt") && allMovingUnits != null && !allMovingUnits.isEmpty()) {
-            int maxBase = allMovingUnits.stream()
-                    .map(key -> getUnitMoveValue(game, player, tile, key, null, true))
-                    .max(Integer::compare)
-                    .orElse(baseMoveValue);
-            bonusMoveValue = maxBase - baseMoveValue;
-        }
         if (model.getIsShip() && MigoTechHandler.hasLaghMetalAttractorsMovementBonus(game, player)) {
             bonusMoveValue++;
         }
