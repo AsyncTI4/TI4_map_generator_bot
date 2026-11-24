@@ -157,6 +157,7 @@ public final class Constants {
     public static final String THREAD_NAME = "thread_name";
     public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
     public static final String SHOW_GAME_INFO = "show_game_info";
+    public static final String SHOW_MONUMENT = "show_monument";
     public static final String GAME_NAME = "game_name";
     public static final String SCENARIO = "scenario";
     public static final String CONTROL_GAME_CREATION = "control_game_creation";

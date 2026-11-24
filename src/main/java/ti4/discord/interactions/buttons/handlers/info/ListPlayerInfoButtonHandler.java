@@ -206,7 +206,8 @@ class ListPlayerInfoButtonHandler {
     private static void sendFactionComponents(Game game, Player player, String faction) {
         for (Player p2 : game.getRealPlayers()) {
             if ("all".equals(faction) || faction.equalsIgnoreCase(p2.getFaction())) {
-                FactionComponentsService.sendFactionComponents(player.getCardsInfoThread(), p2.getFaction());
+                FactionComponentsService.sendFactionComponents(
+                        player.getCardsInfoThread(), p2.getFaction(), game.isMonumentsMode());
             }
         }
     }

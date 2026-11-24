@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.components.container.ContainerChildComponent;
@@ -32,184 +32,92 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.franken.FrankenDraftBagService;
+import ti4.service.game.MonumentsService;
 
 @UtilityClass
 public class FactionComponentsService {
 
-    private static final Set<DraftCategory> BEFORE_UNITS = EnumSet.of(DraftCategory.ABILITY, DraftCategory.TECH);
-    private static final Set<String> DRAFTED_UNIT_TYPES = Set.of("mech", "flagship");
     private static final Set<DraftCategory> UNIT_CATEGORIES =
             EnumSet.of(DraftCategory.UNIT, DraftCategory.MECH, DraftCategory.FLAGSHIP);
 
-    public static void sendFactionComponents(MessageChannel channel, String factionAlias) {
+    public static void sendFactionComponents(MessageChannel channel, String factionAlias, boolean showMonument) {
         FactionDraftItem item = new FactionDraftItem(factionAlias);
-        List<DraftItem> components = factionComponents(factionAlias, item);
+        String header = "## " + item.getTitle(null) + " Components";
+        FactionModel faction = Mapper.getFaction(factionAlias);
+        List<DraftItem> components = faction == null ? List.of() : factionComponents(faction, item, showMonument);
         if (components.isEmpty()) {
-            MessageHelper.sendMessageToChannel(channel, "## " + item.getTitle(null) + " Components\nNone.");
+            MessageHelper.sendMessageToChannel(channel, header + "\nNone.");
             return;
         }
 
-        FactionModel faction = Mapper.getFaction(factionAlias);
-        List<TextDisplay> extraCards = extraComponentCards(faction);
         List<Color> accents = FrankenDraftBagService.getAccents();
         MessageV2Builder builder = new MessageV2Builder(channel);
-        builder.append("## " + item.getTitle(null) + " Components");
+        builder.append(header);
         for (DraftItem component : components) {
             appendCard(builder, accents, cardText(component));
             if (isMainBreakthrough(component, faction)) {
-                extraCards.forEach(card -> appendCard(builder, accents, List.of(card)));
-                extraCards = List.of();
+                extraComponentCards(faction).forEach(card -> appendCard(builder, accents, List.of(card)));
             }
         }
-        extraCards.forEach(card -> appendCard(builder, accents, List.of(card)));
         builder.send();
     }
 
-    private static void appendCard(
-            MessageV2Builder builder, List<Color> accents, List<? extends ContainerChildComponent> card) {
-        builder.append(Container.of(card).withAccentColor(accents.getFirst()));
-        Collections.rotate(accents, -1);
-    }
+    private static List<DraftItem> factionComponents(
+            FactionModel faction, FactionDraftItem item, boolean showMonument) {
+        List<DraftItem> drafted = item.getAllComponentsIgnoringErrata();
 
-    private static boolean isMainBreakthrough(DraftItem component, FactionModel faction) {
-        return faction != null
-                && component.getItemCategory() == DraftCategory.BREAKTHROUGH
-                && component.getItemId().equals(faction.getBreakthrough());
-    }
+        List<DraftItem> techs = new ArrayList<>(inCategories(drafted, Set.of(DraftCategory.TECH)));
+        techs.addAll(techsOutsideTechList(faction));
+        Set<String> techAliases = aliases(techs);
 
-    private static List<TextDisplay> extraComponentCards(FactionModel faction) {
-        if (faction != null && "arvaxibt".equals(faction.getBreakthrough())) {
-            return List.of(ArvaxiBreakthroughHandler.mobilizationEngineCard());
+        List<DraftItem> units = new ArrayList<>();
+        for (DraftItem unit : unitsInFactionOrder(faction, inCategories(drafted, UNIT_CATEGORIES))) {
+            units.addAll(upgradeChain(unit, techAliases));
         }
-        return List.of();
-    }
-
-    private static List<ContainerChildComponent> cardText(DraftItem component) {
-        List<ContainerChildComponent> card = new ArrayList<>(cardBody(component));
-        String notes = notesOf(component);
-        if (notes != null && !notes.isBlank()) {
-            card.add(TextDisplay.of("-# [" + notes.trim().replace("\n", "\n-# ") + "]"));
+        UnitModel monument = showMonument ? MonumentsService.getFactionMonument(faction) : null;
+        if (monument != null) {
+            units.add(DraftItem.generate(DraftCategory.MONUMENT, monument.getId()));
         }
-        return card;
-    }
+        Set<String> unitCards = aliases(units);
 
-    private static String notesOf(DraftItem component) {
-        String id = component.getItemId();
-        return switch (component.getItemCategory()) {
-            case ABILITY ->
-                Optional.ofNullable(Mapper.getAbility(id))
-                        .map(AbilityModel::getNotes)
-                        .orElse(null);
-            case TECH ->
-                Optional.ofNullable(Mapper.getTech(id))
-                        .map(TechnologyModel::getNotes)
-                        .orElse(null);
-            case AGENT, COMMANDER, HERO ->
-                Optional.ofNullable(Mapper.getLeader(id))
-                        .map(LeaderModel::getNotes)
-                        .orElse(null);
-            case MECH, FLAGSHIP, UNIT ->
-                Optional.ofNullable(Mapper.getUnit(id)).map(UnitModel::getNotes).orElse(null);
-            case PN ->
-                Optional.ofNullable(Mapper.getPromissoryNote(id))
-                        .map(PromissoryNoteModel::getNotes)
-                        .orElse(null);
-            case BREAKTHROUGH ->
-                Optional.ofNullable(Mapper.getBreakthrough(id))
-                        .map(BreakthroughModel::getNotes)
-                        .orElse(null);
-            default -> null;
-        };
-    }
-
-    private static List<? extends ContainerChildComponent> cardBody(DraftItem component) {
-        UnitModel unit =
-                component.getItemCategory() == DraftCategory.UNIT ? Mapper.getUnit(component.getItemId()) : null;
-        if (unit == null) {
-            return new ArrayList<>(component.getPlainTextDisplays(null));
-        }
-        String body = UnitDraftItem.rulesText(unit).trim().replace("\n", "\n> ");
-        return List.of(TextDisplay.of(component.getTitle(null) + System.lineSeparator() + "> " + body));
-    }
-
-    private static List<DraftItem> factionComponents(String factionAlias, FactionDraftItem item) {
-        List<DraftItem> components = new ArrayList<>(item.getAllComponentsIgnoringErrata());
-        FactionModel faction = Mapper.getFaction(factionAlias);
-        if (faction == null) {
-            return components;
-        }
-        components.addAll(
-                leadingCount(components, Set.of(DraftCategory.ABILITY)), abilityCardsOutsideAbilityList(faction));
-        components.addAll(
-                leadingCount(components, Set.of(DraftCategory.ABILITY, DraftCategory.TECH)),
-                techsOutsideTechList(faction));
-        List<DraftItem> units = new ArrayList<>(baseSpecificUnits(faction));
-        components.stream()
-                .filter(component -> UNIT_CATEGORIES.contains(component.getItemCategory()))
-                .forEach(units::add);
-        components.removeIf(component -> UNIT_CATEGORIES.contains(component.getItemCategory()));
-        components.addAll(leadingCount(components, BEFORE_UNITS), units);
+        List<DraftItem> components = new ArrayList<>(inCategories(drafted, Set.of(DraftCategory.ABILITY)));
+        components.addAll(abilityCardsOutsideAbilityList(faction));
+        techs.stream().filter(tech -> !unitCards.contains(tech.getAlias())).forEach(components::add);
+        components.addAll(units);
+        Set<DraftCategory> placed = EnumSet.of(DraftCategory.ABILITY, DraftCategory.TECH);
+        placed.addAll(UNIT_CATEGORIES);
+        drafted.stream()
+                .filter(component -> !placed.contains(component.getItemCategory()))
+                .forEach(components::add);
         components.addAll(breakthroughsOutsideMain(faction));
-        return groupUpgradeChains(components);
+        return components;
     }
 
-    private static List<DraftItem> techsOutsideTechList(FactionModel faction) {
-        return Mapper.getTechs().values().stream()
-                .filter(tech ->
-                        tech.getFaction().filter(faction.getAlias()::equals).isPresent())
-                .filter(tech -> tech.getSource() == faction.getSource())
-                .filter(tech -> !faction.getFactionTech().contains(tech.getAlias()))
-                .sorted(Comparator.comparing(TechnologyModel::getName))
-                .map(tech -> DraftItem.generate(DraftCategory.TECH, tech.getAlias()))
-                .toList();
-    }
-
-    private static List<DraftItem> breakthroughsOutsideMain(FactionModel faction) {
-        return Mapper.getBreakthroughs().values().stream()
-                .filter(bt -> bt.getFaction().filter(faction.getAlias()::equals).isPresent())
-                .filter(bt -> bt.getSource() == faction.getSource())
-                .filter(bt -> !bt.getAlias().equals(faction.getBreakthrough()))
-                .sorted(Comparator.comparing(BreakthroughModel::getName))
-                .map(bt -> DraftItem.generate(DraftCategory.BREAKTHROUGH, bt.getAlias()))
-                .toList();
-    }
-
-    private static List<DraftItem> groupUpgradeChains(List<DraftItem> components) {
-        Set<String> ownCards = new HashSet<>();
-        components.forEach(component -> ownCards.add(component.getAlias()));
-        Map<String, List<DraftItem>> chainByBase = new HashMap<>();
-        Set<String> chainedCards = new HashSet<>();
-        for (DraftItem component : components) {
-            if (!UNIT_CATEGORIES.contains(component.getItemCategory())) {
-                continue;
-            }
-            List<DraftItem> chain = upgradeChain(component, ownCards);
-            chainByBase.put(component.getAlias(), chain);
-            chain.forEach(member -> chainedCards.add(member.getAlias()));
-        }
-        List<DraftItem> ordered = new ArrayList<>();
-        Set<String> placed = new HashSet<>();
-        for (DraftItem component : components) {
-            List<DraftItem> chain = chainByBase.get(component.getAlias());
-            if (chain == null && chainedCards.contains(component.getAlias())) {
-                continue;
-            }
-            for (DraftItem item : chain == null ? List.of(component) : chain) {
-                if (placed.add(item.getAlias())) {
-                    ordered.add(item);
-                }
+    private static List<DraftItem> unitsInFactionOrder(FactionModel faction, List<DraftItem> listedUnits) {
+        Map<String, DraftItem> listedById = new LinkedHashMap<>();
+        listedUnits.forEach(unit -> listedById.put(unit.getItemId(), unit));
+        List<DraftItem> units = new ArrayList<>();
+        for (String unitId : faction.getUnits()) {
+            DraftItem listed = listedById.remove(unitId);
+            UnitModel unit = Mapper.getUnit(unitId);
+            if (listed != null) {
+                units.add(listed);
+            } else if (unit != null && unit.getFaction().isPresent()) {
+                units.add(DraftItem.generate(DraftCategory.UNIT, unitId));
             }
         }
-        return ordered;
+        units.addAll(listedById.values());
+        units.sort(Comparator.comparing((DraftItem unit) -> nextStage(Mapper.getUnit(unit.getItemId())) == null));
+        return units;
     }
 
-    private static List<DraftItem> upgradeChain(DraftItem base, Set<String> ownCards) {
+    private static List<DraftItem> upgradeChain(DraftItem base, Set<String> ownTechs) {
         List<DraftItem> chain = new ArrayList<>(List.of(base));
         Set<String> seen = new HashSet<>();
         UnitModel stage = nextStage(Mapper.getUnit(base.getItemId()));
         while (stage != null && seen.add(stage.getId())) {
             DraftItem card = stageCard(stage);
-            if (card.getItemCategory() == DraftCategory.TECH && !ownCards.contains(card.getAlias())) {
+            if (card.getItemCategory() == DraftCategory.TECH && !ownTechs.contains(card.getAlias())) {
                 break;
             }
             chain.add(card);
@@ -240,12 +148,6 @@ public class FactionComponentsService {
                 .orElseGet(() -> DraftItem.generate(DraftCategory.UNIT, stage.getId()));
     }
 
-    private static int leadingCount(List<DraftItem> components, Set<DraftCategory> categories) {
-        return (int) components.stream()
-                .takeWhile(component -> categories.contains(component.getItemCategory()))
-                .count();
-    }
-
     private static List<DraftItem> abilityCardsOutsideAbilityList(FactionModel faction) {
         return Mapper.getAbilities().values().stream()
                 .filter(ability -> faction.getAlias().equals(ability.getFaction()))
@@ -256,13 +158,90 @@ public class FactionComponentsService {
                 .toList();
     }
 
-    private static List<DraftItem> baseSpecificUnits(FactionModel faction) {
-        return faction.getUnits().stream()
-                .map(Mapper::getUnit)
-                .filter(unit -> unit != null && unit.getFaction().isPresent())
-                .filter(unit -> !DRAFTED_UNIT_TYPES.contains(unit.getBaseType()))
-                .map(UnitModel::getId)
-                .map(unitId -> DraftItem.generate(DraftCategory.UNIT, unitId))
+    private static List<DraftItem> techsOutsideTechList(FactionModel faction) {
+        return Mapper.getTechs().values().stream()
+                .filter(tech ->
+                        tech.getFaction().filter(faction.getAlias()::equals).isPresent())
+                .filter(tech -> tech.getSource() == faction.getSource())
+                .filter(tech -> !faction.getFactionTech().contains(tech.getAlias()))
+                .sorted(Comparator.comparing(TechnologyModel::getName))
+                .map(tech -> DraftItem.generate(DraftCategory.TECH, tech.getAlias()))
                 .toList();
+    }
+
+    private static List<DraftItem> breakthroughsOutsideMain(FactionModel faction) {
+        return Mapper.getBreakthroughs().values().stream()
+                .filter(bt -> bt.getFaction().filter(faction.getAlias()::equals).isPresent())
+                .filter(bt -> bt.getSource() == faction.getSource())
+                .filter(bt -> !bt.getAlias().equals(faction.getBreakthrough()))
+                .sorted(Comparator.comparing(BreakthroughModel::getName))
+                .map(bt -> DraftItem.generate(DraftCategory.BREAKTHROUGH, bt.getAlias()))
+                .toList();
+    }
+
+    private static List<DraftItem> inCategories(List<DraftItem> items, Set<DraftCategory> categories) {
+        return items.stream()
+                .filter(item -> categories.contains(item.getItemCategory()))
+                .toList();
+    }
+
+    private static Set<String> aliases(List<DraftItem> items) {
+        Set<String> aliases = new HashSet<>();
+        items.forEach(item -> aliases.add(item.getAlias()));
+        return aliases;
+    }
+
+    private static boolean isMainBreakthrough(DraftItem component, FactionModel faction) {
+        return component.getItemCategory() == DraftCategory.BREAKTHROUGH
+                && component.getItemId().equals(faction.getBreakthrough());
+    }
+
+    private static List<TextDisplay> extraComponentCards(FactionModel faction) {
+        if ("arvaxibt".equals(faction.getBreakthrough())) {
+            return List.of(ArvaxiBreakthroughHandler.mobilizationEngineCard());
+        }
+        return List.of();
+    }
+
+    private static void appendCard(
+            MessageV2Builder builder, List<Color> accents, List<? extends ContainerChildComponent> card) {
+        builder.append(Container.of(card).withAccentColor(accents.getFirst()));
+        Collections.rotate(accents, -1);
+    }
+
+    private static List<ContainerChildComponent> cardText(DraftItem component) {
+        List<ContainerChildComponent> card = new ArrayList<>(cardBody(component));
+        String notes = notesOf(component);
+        if (notes != null && !notes.isBlank()) {
+            card.add(TextDisplay.of("-# [" + notes.trim().replace("\n", "\n-# ") + "]"));
+        }
+        return card;
+    }
+
+    private static List<TextDisplay> cardBody(DraftItem component) {
+        UnitModel unit =
+                component.getItemCategory() == DraftCategory.UNIT ? Mapper.getUnit(component.getItemId()) : null;
+        if (unit == null) {
+            return component.getPlainTextDisplays(null);
+        }
+        String body = UnitDraftItem.rulesText(unit).trim().replace("\n", "\n> ");
+        return List.of(TextDisplay.of(component.getTitle(null) + System.lineSeparator() + "> " + body));
+    }
+
+    private static String notesOf(DraftItem component) {
+        String id = component.getItemId();
+        return switch (component.getItemCategory()) {
+            case ABILITY -> notes(Mapper.getAbility(id), AbilityModel::getNotes);
+            case TECH -> notes(Mapper.getTech(id), TechnologyModel::getNotes);
+            case AGENT, COMMANDER, HERO -> notes(Mapper.getLeader(id), LeaderModel::getNotes);
+            case MECH, FLAGSHIP, UNIT, MONUMENT -> notes(Mapper.getUnit(id), UnitModel::getNotes);
+            case PN -> notes(Mapper.getPromissoryNote(id), PromissoryNoteModel::getNotes);
+            case BREAKTHROUGH -> notes(Mapper.getBreakthrough(id), BreakthroughModel::getNotes);
+            default -> null;
+        };
+    }
+
+    private static <T> String notes(T model, Function<T, String> getNotes) {
+        return model == null ? null : getNotes.apply(model);
     }
 }

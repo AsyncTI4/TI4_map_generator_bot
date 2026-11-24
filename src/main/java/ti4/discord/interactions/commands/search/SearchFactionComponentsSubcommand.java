@@ -14,9 +14,11 @@ class SearchFactionComponentsSubcommand extends Subcommand {
 
     SearchFactionComponentsSubcommand() {
         super(Constants.SEARCH_FACTION_COMPONENTS, "Show all of a faction's components");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction")
-                .setRequired(true)
-                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION, "Faction")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.BOOLEAN, Constants.SHOW_MONUMENT, "Include the faction's monument"));
     }
 
     @Override
@@ -26,6 +28,7 @@ class SearchFactionComponentsSubcommand extends Subcommand {
             MessageHelper.sendMessageToEventChannel(event, "That is not a valid faction.");
             return;
         }
-        FactionComponentsService.sendFactionComponents(event.getMessageChannel(), faction);
+        boolean showMonument = event.getOption(Constants.SHOW_MONUMENT, false, OptionMapping::getAsBoolean);
+        FactionComponentsService.sendFactionComponents(event.getMessageChannel(), faction, showMonument);
     }
 }
