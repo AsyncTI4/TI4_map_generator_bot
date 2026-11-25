@@ -45,6 +45,35 @@ class TimingReportTest {
         assertThat(best).isLessThan(keep);
     }
 
+    // Decisions, spans and tick time are also kept per game phase, so the agenda phase can be read apart from the
+    // action phase. Work recorded with no phase entered (harness work between ticks) stays out of every phase.
+    @Test
+    void decisionsSpansAndTicksAreAlsoSplitByGamePhase() {
+        TimingReport.enterPhase("agendavoting");
+        TimingReport.recordDecision(profile(4 * SECOND, span("rule.AgendaRules.vote", 3 * SECOND)), 0, "idle");
+        TimingReport.recordDecision(profile(2 * SECOND, span("rule.AgendaRules.vote", SECOND)), 0, "press");
+        TimingReport.recordOutside("ai.tick", 8 * SECOND);
+        TimingReport.leavePhase();
+        TimingReport.enterPhase("action");
+        TimingReport.recordDecision(profile(SECOND, span("tactical.for.attack", SECOND)), 0, "press");
+        TimingReport.recordOutside("ai.tick", SECOND);
+        TimingReport.leavePhase();
+        TimingReport.recordOutside("harness.observe", 50 * SECOND);
+
+        List<String> lines = TimingReport.lines();
+
+        assertThat(lines)
+                .anyMatch(
+                        line -> line.startsWith("TIMING phase agendavoting ticks 1: 8.0 s, decisions 2: 6.0 s (75.0%"));
+        assertThat(lines).anyMatch(line -> line.contains("2.0 decisions per tick"));
+        assertThat(lines)
+                .anyMatch(line -> line.startsWith("TIMING phase agendavoting span rule.AgendaRules.vote: 2 calls"));
+        assertThat(lines).noneMatch(line -> line.startsWith("TIMING phase agendavoting span tactical.for.attack"));
+        assertThat(lines).noneMatch(line -> line.startsWith("TIMING phase") && line.contains("harness.observe"));
+        assertThat(indexOf(lines, "TIMING phase agendavoting ticks"))
+                .isLessThan(indexOf(lines, "TIMING phase action ticks"));
+    }
+
     // The rule a decision came from is read once: a later decision with no deciding rule is not charged to it.
     @Test
     void aDecidingRuleCountsForOneDecisionOnly() {
