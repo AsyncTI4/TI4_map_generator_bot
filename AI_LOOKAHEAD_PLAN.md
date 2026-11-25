@@ -173,7 +173,12 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
 - 2026-11-25: census after those (2 games, rounds 6 and 8, queue job 20261124-211125): about 505 CPU-s per round
   (539 before, 602 at the first census; two games a side, rough). combat.odds fell from 343 to 6 s, secret.readiness
   from 554 to 140 s. Left: enemy.intent 3,185 s (443 s repeated, mostly later ticks), win.odds 534 s (385 s repeated,
-  221 s same seat, same tick: likely other Game instances of the same save, which `TickMemo` does not share).
+  221 s same seat, same tick: mostly other viewers, whose answers can differ through the Custodians race and
+  Mecatol take, so left alone).
+- 2026-11-25: a JFR profile of a two-round game put 19% of all CPU in `Territory.distancesFrom`, rebuilt for every
+  seat on each `Hostility.observe` (15%), and 8% in `TechnologyFollowReserve.of` from production planning. Hex
+  distances now stay cached per start position for good, and the follow reserve is kept per decision. The
+  `tactical.for.attack` time in the census is mostly this work, reached through enemy.intent.
 
 ## Unknowns
 
