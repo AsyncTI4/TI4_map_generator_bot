@@ -164,6 +164,13 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   inside an imagined turn (hand hidden) was reused when that seat really decided, and the reverse: which one a seat
   got depended on what was computed first. They now add `ImaginedTurn.cacheMark`; on trade seed 2894249192 the
   new caches without it changed the game (failed `TradeFlowSelfPlayTest`), with it they replay the old game.
+- 2026-11-24: census after those caches (2 games, 7 rounds each, queue job 20261124-184311): about 539 CPU-s per
+  round against about 602 before (two games a side, rough). win.odds fell from 1,298 to 635 s (same-tick repeats
+  881 to 167 s), secret.readiness from 851 to 554 s. Left: secret.readiness 498 s repeated (329 s same seat, same
+  tick), combat.odds 340 of 343 s, enemy.intent 528 of 3,170 s (mostly later ticks). Acted on: `SecretOdds` keeps a
+  rival's per-secret readiness in `TickMemo` for every seat (round-one verify: 183,184 shared, 0 differed), and
+  `CombatOdds` keeps answers across saves. Not yet
+  measured on full games.
 
 ## Unknowns
 

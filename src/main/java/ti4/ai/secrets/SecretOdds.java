@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.AiExperiments;
+import ti4.ai.brain.TickMemo;
 import ti4.ai.eval.DecidingSeat;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
@@ -22,6 +24,7 @@ public class SecretOdds {
 
     public static final double BASE_RATE = 0.15;
     static final double ONE_STEP_SHORT = 0.5;
+    static final String TICK_MEMO = "secret.readiness";
 
     public static List<String> unseenPool(Game game, Player viewer) {
         return poolWithout(game, viewer.getSecretsUnscored().keySet());
@@ -146,12 +149,20 @@ public class SecretOdds {
     }
 
     private static double sharedReadiness(Game game, ObjectiveValue board, Player player, String id) {
+        String key = player.getFaction() + "|" + id;
+        Map<String, Double> memo = TickMemo.mapFor(game, TICK_MEMO);
+        Double found = memo.get(key);
+        if (found != null) {
+            return TickMemo.checked(TICK_MEMO, key, found, () -> measuredReadiness(game, board, player, id));
+        }
+        double readiness = countedReadiness(game, board, player, id, key);
+        memo.put(key, readiness);
+        return readiness;
+    }
+
+    private static double countedReadiness(Game game, ObjectiveValue board, Player player, String id, String key) {
         if (!ShareCensus.enabled()) return measuredReadiness(game, board, player, id);
-        return ShareCensus.perSave(
-                "secret.readiness",
-                game,
-                player.getFaction() + "|" + id,
-                () -> measuredReadiness(game, board, player, id));
+        return ShareCensus.perSave("secret.readiness", game, key, () -> measuredReadiness(game, board, player, id));
     }
 
     private static double measuredReadiness(Game game, ObjectiveValue board, Player player, String id) {

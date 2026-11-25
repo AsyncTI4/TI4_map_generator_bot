@@ -785,7 +785,8 @@ descriptions for the classes outside `StandardBrain` belong to their own package
 - **Role:** informs (caches).
 - **TickMemo:** opened by `AiTickRunner.tickOnce` around the whole tick for one `Game` instance (thread-local, nestable).
   `mapFor(game, name)` returns a map shared by every seat's decision in this tick when the scope's game is the same
-  instance, else a fresh map. Used by `IncomingForces` and `TacticalStrength`. With `-Dai.tickmemo.verify=true`,
+  instance, else a fresh map. Used by `IncomingForces`, `TacticalStrength`, `WinOdds` and `SecretOdds` (a rival's
+  readiness per unseen secret, read from the public board only, so every seat shares it). With `-Dai.tickmemo.verify=true`,
   `checked(name, key, shared, fresh)` recomputes outside the cache and counts mismatches (`verificationLines`).
 - **DecisionMemo:** opened by `AiTickRunner.decide` around one seat decision; `remember(supplier, keys…)` caches non-null
   results by `Arrays.asList(keys)`; outside a scope it just computes. Used by 9 evaluator classes (`TacticalPlanner`,
@@ -797,7 +798,10 @@ descriptions for the classes outside `StandardBrain` belong to their own package
   deciding seat's cached values.
 - **Limitations:** keys are caller-chosen; a key that omits an input that changed during the scope returns a stale value.
   Null results are never cached.
-- **Tested:** `TickMemoTest`, `SearchMemoTest`.
+- **CombatOdds cache:** `CombatOdds.resolveDetailed` is pure, so its answers are kept across ticks, seats and saves in a
+  static map keyed by the forces (65,536 entries, emptied when full). `Force` copies its unit list so a caller cannot
+  change a remembered key.
+- **Tested:** `TickMemoTest`, `SearchMemoTest`, `SecretOddsTickMemoTest`, `CombatOddsCacheTest`.
 
 ### AiActuator, AiActor, Proxies and SyncMessage
 
