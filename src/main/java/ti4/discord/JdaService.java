@@ -59,7 +59,6 @@ import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
-import ti4.cron.TournamentWinnerTitleBackfillCron;
 import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
@@ -362,7 +361,6 @@ public class JdaService {
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         BothelperDashboardCron.register();
-        TournamentWinnerTitleBackfillCron.register();
     }
 
     public static void markProcessReady() {
