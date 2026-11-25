@@ -9,7 +9,7 @@
         "requirements": "GG",
         "faction": "firmament",
         "source": "franken",
-        "text": "At the start of the status phase, you may place 4 infantry from your reinforcements on a planet you control in your home system.\nFlip this card if the Obsidian faction is in play.",
+        "text": "This is no longer in use. Use /franken ability_add and /franken ability_remove to add the normal one.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/parasite-firm.jpg?raw=true"
     },
     {
@@ -21,7 +21,7 @@
         ],
         "faction": "obsidian",
         "source": "franken",
-        "text": "At the start of the status phase, destroy 1 of another player's units on a planet they control in or adjacent to a system that contains your infantry.\nThis technology cannot be researched.",
+        "text": "This is no longer in use. Use /franken ability_add and /franken ability_remove to add the normal one.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/parasite-obs.jpg?raw=true"
     }
 ]
