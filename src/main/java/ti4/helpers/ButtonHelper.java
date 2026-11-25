@@ -2714,7 +2714,7 @@ public class ButtonHelper {
                 || player.hasTech("tf-desperados")
                 || player.hasAbility("desperados_br")
                 || player.hasTech("tf-fraactalspikedrives")
-                || !game.getStoredValue("phantomEnergy").isEmpty()
+                || !player.getStoredValue("phantomEnergy").isEmpty()
                 || player.hasTech("fsd")) {
             return true;
         }
