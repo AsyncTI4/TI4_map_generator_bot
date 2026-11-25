@@ -54,6 +54,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         ti4.ai.trace.ShadowCheck.reset();
         FactionComponentTracker.BATCH.clear();
         java.util.Optional<AbRecord> record = AbRecord.start("AiSelfPlayTest#sixAiSeatsPlayFullGames", games, threads);
+        SpendingTracker.BATCH.clear();
+        ProduceTracker.BATCH.clear();
         long batchStart = System.nanoTime();
         List<SelfPlayGame.Outcome> played = playAll(games, threads);
         long batchSeconds = (System.nanoTime() - batchStart) / 1_000_000_000L;
@@ -97,6 +99,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         AgendaTracker.report(outcomes);
         FactionComponentTracker.printBatch();
         record.ifPresent(run -> run.finish(outcomes, SelfPlayGame.Ending::finished, batchSeconds));
+        SpendingTracker.printBatch();
 
         String reports = String.join(
                 System.lineSeparator() + System.lineSeparator(),
@@ -222,6 +225,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                                 .toList(),
                         1));
         printObjectiveRates(summaries);
+        ObjectiveTracker.factionLines(summaries).forEach(System.out::println);
         printSecretMix(summaries);
         ProduceTracker.printBatch();
         // -Dai.timing=true: where the AI spent its time, over every decision of the batch.
@@ -1261,13 +1265,17 @@ class AiSelfPlayTest extends BaseTi4Test {
                     : SelfPlayGame.seededName("aiseed", SelfPlayGame.BASE_SEED + slot);
             SelfPlayGame game = new SelfPlayGame(env, name, slot);
             try {
-                game.setUp(factions(slot));
+                // Both games of an A/B pair seat the same factions in the same seats; only the control half flips.
+                game.setUp(factions(SelfPlayGame.pairSlot(slot)));
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);
                 System.out.println(outcome.report());
                 env.leaders.lines().forEach(line -> System.out.println("LEADERS " + game.name + " " + line));
                 FactionComponentTracker.Summary components = env.factionComponents.summary(game.name);
                 FactionComponentTracker.BATCH.add(components);
                 components.lines().forEach(line -> System.out.println("FACTIONUSE " + game.name + " " + line));
+                SpendingTracker.Summary spend = env.spending.summary(game.name);
+                SpendingTracker.BATCH.add(spend);
+                spend.lines().forEach(line -> System.out.println("SPENDUSE " + game.name + " " + line));
                 // Every channel and thread in this game's fake Discord must be its own; anything else means a call was
                 // routed to the wrong game while several games ran at once.
                 List<String> foreign = env.discord.channels().stream()

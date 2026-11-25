@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.ai.AiExperiments;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
@@ -251,14 +252,16 @@ public class StructurePolicy {
                 .toList();
         int once = values.stream().mapToInt(Integer::intValue).sum();
         int again = values.stream()
-                .limit(ExpectedReadying.ownReadies(game, seat))
+                .limit(ExpectedReadying.plannedReadies(game, seat))
                 .mapToInt(Integer::intValue)
                 .sum();
         return once + again;
     }
 
     private static int spendableResources(Player seat, Planet planet) {
-        return Pooling.of(seat).resourcesOf(planet);
+        return AiExperiments.enabled(seat, AiExperiments.Experiment.XXCHA_LEADER_READIES)
+                ? Pooling.of(seat).resourcesOf(planet)
+                : planet.getResources();
     }
 
     private static int bestForwardDockResources(Game game, Player seat) {

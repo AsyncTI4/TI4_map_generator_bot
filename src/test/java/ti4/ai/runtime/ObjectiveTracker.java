@@ -29,7 +29,16 @@ final class ObjectiveTracker {
 
     // One seat facing one revealed public objective it had not scored, at the start of a status phase: how far short it
     // was (0 means it met it, UNMODELLED that the bot cannot measure the objective) and whether it scored it there.
-    record Chance(String objective, int round, int shortBy, boolean scored) {}
+    // kind is STAGE_ONE or STAGE_TWO for public objectives, SECRET for an unscored secret the seat held.
+    record Chance(String faction, String objective, String kind, int round, int shortBy, boolean scored) {}
+
+    static final String STAGE_ONE = "stage I";
+    static final String STAGE_TWO = "stage II";
+    static final String SECRET = "secret";
+    private static final List<String> KINDS = List.of(STAGE_ONE, STAGE_TWO, SECRET);
+
+    // The command tokens one seat held as a status phase was about to start (every seat had passed).
+    record TokenCount(String faction, int round, int tactic, int fleet, int strategy) {}
 
     // What one seat scored in one round's status phase.
     record StatusScoring(int round, String faction, int publics, int secrets) {}
@@ -49,7 +58,9 @@ final class ObjectiveTracker {
             Map<String, List<Integer>> groundProgress,
             List<MechanizeHolder> mechanize,
             List<String> secretHolders,
-            int seats) {
+            int seats,
+            List<Chance> secretChances,
+            List<TokenCount> tokens) {
 
         static final Summary NOTHING = new Summary(
                 List.of(),
@@ -61,7 +72,9 @@ final class ObjectiveTracker {
                 Map.of(),
                 List.of(),
                 List.of(),
-                0);
+                0,
+                List.of(),
+                List.of());
 
         // For each status phase the game reached, from round 1: the share of seats that scored at least one public
         // objective (or secret) in it.
@@ -89,7 +102,7 @@ final class ObjectiveTracker {
             Map<String, Integer> secretsBefore,
             List<Pending> pending) {}
 
-    private record Pending(String userId, String objective, int shortBy) {}
+    private record Pending(String userId, String faction, String objective, String kind, int shortBy) {}
 
     // A Mechanize the Military holder at the start of one status phase: mechs on the board, planets with a mech, mechs
     // in the home system, own carriers (and those in the home system), mechs built so far and how often a mech first
@@ -133,6 +146,8 @@ final class ObjectiveTracker {
     private int lastOpenedRound;
     private final List<StatusScoring> statusScoring = new ArrayList<>();
     private final List<Chance> chances = new ArrayList<>();
+    private final List<Chance> secretChances = new ArrayList<>();
+    private final List<TokenCount> tokens = new ArrayList<>();
     private final Set<String> held = new java.util.LinkedHashSet<>();
     // Mechanize the Military and Occupy the Fringe: the most progress each holder had at any status phase.
     private static final List<String> GROUND_SECRETS = List.of("mtm", "otf");
@@ -171,6 +186,7 @@ final class ObjectiveTracker {
         NexusWatch.print(game);
         produce.finish(game);
         fringe.gameEnd(game, secretHolders);
+        seatLines(game.getName(), merged(chances, secretChances), tokens).forEach(System.out::println);
         return new Summary(
                 reveals(game),
                 List.copyOf(statusScoring),
@@ -185,7 +201,111 @@ final class ObjectiveTracker {
                 groundProgressByHolder(),
                 List.copyOf(mechanize),
                 List.copyOf(secretHolders),
-                game.getRealPlayers().size());
+                game.getRealPlayers().size(),
+                List.copyOf(secretChances),
+                List.copyOf(tokens));
+    }
+
+    private static List<Chance> merged(List<Chance> publics, List<Chance> secrets) {
+        List<Chance> all = new ArrayList<>(publics);
+        all.addAll(secrets);
+        return all;
+    }
+
+    // One SEATOBJ line per seat with, for every status phase, the objectives it had not scored before it and did not
+    // score in it (with how far short it was: "met" means it qualified, "?" that the bot cannot measure it), and one
+    // SEATTOKENS line per seat with its tactic/fleet/strategy tokens as each status phase began.
+    static List<String> seatLines(String game, List<Chance> chances, List<TokenCount> tokens) {
+        Set<String> factions = new java.util.TreeSet<>();
+        chances.forEach(chance -> factions.add(chance.faction()));
+        tokens.forEach(count -> factions.add(count.faction()));
+        List<String> lines = new ArrayList<>();
+        for (String faction : factions) {
+            Map<Integer, List<Chance>> byRound = new java.util.TreeMap<>();
+            chances.stream()
+                    .filter(chance -> chance.faction().equals(faction))
+                    .forEach(chance -> byRound.computeIfAbsent(chance.round(), r -> new ArrayList<>())
+                            .add(chance));
+            List<String> rounds = new ArrayList<>();
+            byRound.forEach((round, inRound) -> rounds.add(
+                    "r" + round + " publics " + missedIn(inRound, false) + " secrets " + missedIn(inRound, true)));
+            if (!rounds.isEmpty()) lines.add("SEATOBJ " + game + " " + faction + ": " + String.join("; ", rounds));
+            List<String> counts = tokens.stream()
+                    .filter(count -> count.faction().equals(faction))
+                    .sorted(Comparator.comparingInt(TokenCount::round))
+                    .map(count ->
+                            "r" + count.round() + " " + count.tactic() + "/" + count.fleet() + "/" + count.strategy())
+                    .toList();
+            if (!counts.isEmpty())
+                lines.add("SEATTOKENS " + game + " " + faction + " (tactic/fleet/strategy): "
+                        + String.join(", ", counts));
+        }
+        return lines;
+    }
+
+    private static String missedIn(List<Chance> inRound, boolean secrets) {
+        List<String> missed = inRound.stream()
+                .filter(chance -> SECRET.equals(chance.kind()) == secrets && !chance.scored())
+                .map(chance -> chance.objective() + " " + shortText(chance.shortBy()))
+                .toList();
+        long scored = inRound.stream()
+                .filter(chance -> SECRET.equals(chance.kind()) == secrets && chance.scored())
+                .count();
+        return "missed " + missed + (scored > 0 ? " scored " + scored : "");
+    }
+
+    private static String shortText(int shortBy) {
+        if (shortBy == UNMODELLED) return "?";
+        return shortBy == 0 ? "met" : String.valueOf(shortBy);
+    }
+
+    // Over the batch, per faction and objective kind: chances scored at a status phase, missed, missed although the
+    // seat qualified (a seat scores at most one public and one secret per status phase), and missed by exactly one;
+    // then the average tokens each faction held as a status phase began.
+    static List<String> factionLines(List<Summary> summaries) {
+        Map<String, Map<String, int[]>> tallies = new java.util.TreeMap<>();
+        Map<String, int[]> tokenTotals = new java.util.TreeMap<>();
+        for (Summary summary : summaries) {
+            for (Chance chance : merged(summary.chances(), summary.secretChances())) {
+                int[] tally = tallies.computeIfAbsent(chance.faction(), f -> new HashMap<>())
+                        .computeIfAbsent(chance.kind(), k -> new int[4]);
+                if (chance.scored()) {
+                    tally[0]++;
+                    continue;
+                }
+                tally[1]++;
+                if (chance.shortBy() == 0) tally[2]++;
+                if (chance.shortBy() == 1) tally[3]++;
+            }
+            for (TokenCount count : summary.tokens()) {
+                int[] total = tokenTotals.computeIfAbsent(count.faction(), f -> new int[4]);
+                total[0] += count.tactic();
+                total[1] += count.fleet();
+                total[2] += count.strategy();
+                total[3]++;
+            }
+        }
+        List<String> lines = new ArrayList<>();
+        lines.add(
+                "Objective chances per faction at status phases (scored / missed / missed though met / missed by 1):");
+        tallies.forEach((faction, byKind) -> {
+            List<String> parts = new ArrayList<>();
+            for (String kind : KINDS) {
+                int[] tally = byKind.getOrDefault(kind, new int[4]);
+                parts.add(kind + " " + tally[0] + "/" + tally[1] + "/" + tally[2] + "/" + tally[3]);
+            }
+            lines.add("  " + faction + ": " + String.join(", ", parts));
+        });
+        lines.add("Average tokens per faction as a status phase began (tactic/fleet/strategy):");
+        tokenTotals.forEach((faction, total) -> lines.add(String.format(
+                java.util.Locale.ROOT,
+                "  %s: %.1f/%.1f/%.1f over %d seat status phases",
+                faction,
+                (double) total[0] / total[3],
+                (double) total[1] / total[3],
+                (double) total[2] / total[3],
+                total[3])));
+        return lines;
     }
 
     // Seats are dealt two secrets and discard one before round 1; the one discarded there was never really held.
@@ -383,9 +503,24 @@ final class ObjectiveTracker {
             secrets.put(seat.getUserID(), seat.getSecretsScored().size());
             for (String objective : revealedPublics(game)) {
                 if (!scored.contains(objective)) {
-                    pending.add(new Pending(seat.getUserID(), objective, shortBy(game, seat, objective)));
+                    pending.add(new Pending(
+                            seat.getUserID(),
+                            seat.getFaction(),
+                            objective,
+                            stageOf(objective),
+                            shortBy(game, seat, objective)));
                 }
             }
+            for (String secret : seat.getSecretsUnscored().keySet()) {
+                pending.add(
+                        new Pending(seat.getUserID(), seat.getFaction(), secret, SECRET, shortBy(game, seat, secret)));
+            }
+            tokens.add(new TokenCount(
+                    seat.getFaction(),
+                    game.getRound(),
+                    seat.getTacticalCC(),
+                    seat.getFleetCC(),
+                    seat.getStrategicCC()));
         }
         open = new Snapshot(game.getRound(), publics, secrets, pending);
         lastOpenedRound = game.getRound();
@@ -402,10 +537,20 @@ final class ObjectiveTracker {
             int secrets = seat.getSecretsScored().size() - open.secretsBefore().getOrDefault(seat.getUserID(), 0);
             statusScoring.add(new StatusScoring(open.round(), seat.getFaction(), scoredNow.size(), secrets));
         }
+        Map<String, Player> seats = new HashMap<>();
+        for (Player seat : game.getRealPlayers()) seats.put(seat.getUserID(), seat);
         for (Pending pending : open.pending()) {
+            if (SECRET.equals(pending.kind())) {
+                Player seat = seats.get(pending.userId());
+                boolean scored = seat != null && seat.getSecretsScored().containsKey(pending.objective());
+                secretChances.add(new Chance(
+                        pending.faction(), pending.objective(), SECRET, open.round(), pending.shortBy(), scored));
+                continue;
+            }
             boolean scored =
                     newlyScored.getOrDefault(pending.userId(), Set.of()).contains(pending.objective());
-            chances.add(new Chance(pending.objective(), open.round(), pending.shortBy(), scored));
+            chances.add(new Chance(
+                    pending.faction(), pending.objective(), pending.kind(), open.round(), pending.shortBy(), scored));
         }
         open = null;
     }
@@ -415,6 +560,11 @@ final class ObjectiveTracker {
         if (threshold <= 0) return UNMODELLED;
         int progress = ListPlayerInfoService.getPlayerProgressOnObjective(objective, game, seat);
         return Math.max(0, threshold - progress);
+    }
+
+    private static String stageOf(String objective) {
+        PublicObjectiveModel model = Mapper.getPublicObjective(objective);
+        return model != null && model.getPoints() >= 2 ? STAGE_TWO : STAGE_ONE;
     }
 
     private static List<String> revealedPublics(Game game) {

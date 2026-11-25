@@ -14,9 +14,7 @@ import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
-import ti4.ai.scoring.SpendUnlock;
 import ti4.ai.strategy.ReadyingValue;
-import ti4.ai.strategy.SpendOutlook;
 import ti4.ai.strategy.StructurePolicy;
 import ti4.ai.tactical.GroundDrops;
 import ti4.ai.tactical.GroundDrops.Drop;
@@ -30,10 +28,8 @@ public class XxekirGromRules {
     public static final String HERO = "xxchahero-te";
     public static final String UNIT_PREFIX = "xxchaHeroTEStep2_";
     static final String PLACE_PREFIX = "placeOneNDone_skipbuildxxcha_";
-    static final String MECH = "mech";
-    static final String PDS = "pds";
-    static final int PLACEMENTS = 4;
-    static final double MIN_READYING_FOR_EARLY_PLAY = 4.0;
+    static final String MECH = XxekirGromPlan.MECH;
+    static final String PDS = XxekirGromPlan.PDS;
     private static final String HERO_BUTTON = "componentActionRes_leader_" + HERO;
     private static final String COMPONENT_ACTION = "componentAction";
     private static final String KEY = "xxekirGrom|";
@@ -46,33 +42,16 @@ public class XxekirGromRules {
 
     public static Optional<AiDecision> insteadOfTacticalAction(AiTurnContext context, List<AiPrompt> thisTurn) {
         if (!canStart(context)) return Optional.empty();
-        Game game = context.game();
-        Player seat = context.seat();
-        if (unlocksSpendObjective(game, seat)) {
-            return open(context, thisTurn, "to ready the planets it spends on a public objective");
-        }
-        if (!SpendOutlook.spendingAhead(game, seat)) return Optional.empty();
-        double readying = readyingValue(game, seat);
-        if (readying < MIN_READYING_FOR_EARLY_PLAY) return Optional.empty();
-        return open(context, thisTurn, "to ready planets worth " + Math.round(readying) + " for its next actions");
+        Optional<String> why = XxekirGromPlan.actionReason(context.game(), context.seat());
+        if (why.isEmpty()) return Optional.empty();
+        return open(context, thisTurn, why.get());
     }
 
     public static Optional<AiDecision> beforePassing(AiTurnContext context, List<AiPrompt> thisTurn) {
-        if (!canStart(context) || !unlocksSpendObjective(context.game(), context.seat())) return Optional.empty();
-        return open(context, thisTurn, "before passing, to ready the planets it spends on a public objective");
-    }
-
-    static boolean unlocksSpendObjective(Game game, Player seat) {
-        List<String> readied = seat.getExhaustedPlanets().stream()
-                .sorted(Comparator.comparingInt((String planet) -> -higherValue(game, planet))
-                        .thenComparing(Comparator.naturalOrder()))
-                .limit(PLACEMENTS)
-                .toList();
-        return !readied.isEmpty() && SpendUnlock.unlocks(game, seat, readied, 0);
-    }
-
-    private static int higherValue(Game game, String planet) {
-        return Math.max(BoardView.planetResources(game, planet), BoardView.planetInfluence(game, planet));
+        if (!canStart(context)) return Optional.empty();
+        Optional<String> why = XxekirGromPlan.passingReason(context.game(), context.seat());
+        if (why.isEmpty()) return Optional.empty();
+        return open(context, thisTurn, why.get());
     }
 
     public static Optional<AiDecision> next(AiTurnContext context) {
@@ -149,6 +128,10 @@ public class XxekirGromRules {
     }
 
     static String unitToPlace(Game game, Player seat) {
+        return XxekirGromPlan.nextUnit(game, seat).orElseGet(() -> fallbackUnit(game, seat));
+    }
+
+    private static String fallbackUnit(Game game, Player seat) {
         boolean pdsRoom = StructurePolicy.pds(game, seat).isPresent();
         if (pdsRoom && StructurePolicy.nearsStructureObjective(game, seat)) return PDS;
         if (GroundDrops.mechAvailable(game, seat)) return MECH;
@@ -156,6 +139,12 @@ public class XxekirGromRules {
     }
 
     static String bestPlanet(Game game, Player seat, String unit, List<String> candidates) {
+        return XxekirGromPlan.nextPlanet(game, seat, unit, candidates)
+                .filter(candidates::contains)
+                .orElseGet(() -> fallbackPlanet(game, seat, unit, candidates));
+    }
+
+    private static String fallbackPlanet(Game game, Player seat, String unit, List<String> candidates) {
         Map<String, Double> readying = ReadyingValue.eachAlone(game, seat, exhausted(seat, candidates)).stream()
                 .collect(Collectors.toMap(ReadyingValue.Pick::planet, ReadyingValue.Pick::value, Math::max));
         if (PDS.equals(unit)) {
@@ -169,7 +158,7 @@ public class XxekirGromRules {
         return candidates.stream()
                 .max(Comparator.comparingDouble(
                                 (String planet) -> drops.getOrDefault(planet, 0.0) + readying.getOrDefault(planet, 0.0))
-                        .thenComparingInt(planet -> BoardView.planetResources(game, planet))
+                        .thenComparingInt(planet -> higherValue(game, planet))
                         .thenComparing(Comparator.reverseOrder()))
                 .orElseThrow();
     }
@@ -177,18 +166,13 @@ public class XxekirGromRules {
     private static String bestByReadying(Game game, Map<String, Double> readying, List<String> candidates) {
         return candidates.stream()
                 .max(Comparator.comparingDouble((String planet) -> readying.getOrDefault(planet, 0.0))
-                        .thenComparingInt(planet -> BoardView.planetResources(game, planet))
+                        .thenComparingInt(planet -> higherValue(game, planet))
                         .thenComparing(Comparator.reverseOrder()))
                 .orElseThrow();
     }
 
-    static double readyingValue(Game game, Player seat) {
-        return ReadyingValue.eachAlone(game, seat, seat.getExhaustedPlanets()).stream()
-                .map(ReadyingValue.Pick::value)
-                .sorted(Comparator.reverseOrder())
-                .limit(PLACEMENTS)
-                .mapToDouble(Double::doubleValue)
-                .sum();
+    private static int higherValue(Game game, String planet) {
+        return Math.max(BoardView.planetResources(game, planet), BoardView.planetInfluence(game, planet));
     }
 
     private static List<String> exhausted(Player seat, List<String> candidates) {

@@ -12,6 +12,7 @@ import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.scoring.SpendCost;
+import ti4.ai.scoring.Wallet;
 import ti4.ai.strategy.CardValueScale;
 import ti4.ai.tactical.CombatForecast;
 import ti4.ai.tactical.CombatForecast.FirstRoundGain;
@@ -55,10 +56,13 @@ public class MunitionsReservesRules {
 
     static double requiredGain(Game game, Player seat) {
         double cost = LetnevSpaceCombat.MUNITIONS_COST * TRADE_GOOD_VALUE * MARGIN;
-        boolean breaksAScoringReserve = ScoringReserve.planAfterReserve(
-                        game, seat, SpendCost.tradeGoods(LetnevSpaceCombat.MUNITIONS_COST))
+        return breaksAScoringReserve(game, seat) ? cost + ObjectiveValue.VICTORY_POINT_VALUE : cost;
+    }
+
+    private static boolean breaksAScoringReserve(Game game, Player seat) {
+        if (!Wallet.of(game, seat).canPay(ScoringReserve.of(game, seat))) return false;
+        return ScoringReserve.planAfterReserve(game, seat, SpendCost.tradeGoods(LetnevSpaceCombat.MUNITIONS_COST))
                 .isEmpty();
-        return breaksAScoringReserve ? cost + ObjectiveValue.VICTORY_POINT_VALUE : cost;
     }
 
     static boolean armed(Game game, Player seat) {

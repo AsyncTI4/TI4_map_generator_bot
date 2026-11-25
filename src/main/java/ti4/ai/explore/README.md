@@ -582,7 +582,7 @@ flowchart TD
   `ExpeditionStats.kindNudge`; urgency = `RaceUrgency.of` only when breakthrough + thundersEdge + nudge - cost > 0.
   net = breakthrough + thundersEdge + nudge + urgency - cost. Sorted by net descending.
 - `best` = the first option with net > 0.
-- `claimNow`: when `BreakthroughValue.isPriority` (Hacan or Letnev with a locked breakthrough) or one slice remains,
+- `claimNow`: when `BreakthroughValue.isPriority` (Hacan, Letnev or Naalu with a locked breakthrough) or one slice remains,
   `best`; otherwise `best` filtered by net - urgency >= waiting value, where waiting value = max over
   `options(holdings.atPassing())` of (net - urgency) x `RaceUrgency.stillOpen`, positive only, 0 if the holdings are
   already passing.

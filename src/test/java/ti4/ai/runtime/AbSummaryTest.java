@@ -3,6 +3,8 @@ package ti4.ai.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class AbSummaryTest {
@@ -48,5 +50,49 @@ class AbSummaryTest {
                     .as("A game the harness had to cut short is not a result: %s", ending)
                     .isFalse();
         }
+    }
+
+    private static AbSummary.Seating seating(long seed, Map<String, Integer> points, Set<String> control) {
+        return new AbSummary.Seating(seed, true, points, control);
+    }
+
+    // With fixed seating Xxcha is treatment in one game of the pair and control in the other, so its own paired
+    // difference is its points as treatment minus its points as control: (9 - 6) and (8 - 7) here.
+    @Test
+    void reportsEachFactionsOwnTreatmentMinusControlPoints() {
+        var lines = AbSummary.perFaction(List.of(
+                seating(1, Map.of("xxcha", 9, "sol", 7), Set.of("sol")),
+                seating(1, Map.of("xxcha", 6, "sol", 10), Set.of("xxcha")),
+                seating(2, Map.of("xxcha", 8, "sol", 5), Set.of("sol")),
+                seating(2, Map.of("xxcha", 7, "sol", 6), Set.of("xxcha"))));
+
+        assertThat(lines)
+                .anySatisfy(line -> assertThat(line)
+                        .startsWith("A/B faction xxcha: treatment minus control victory points 2.000 ± 1.000")
+                        .contains("over 2 pairs", "same side in both games 0"));
+        assertThat(lines).anySatisfy(line -> assertThat(line).startsWith("A/B faction sol:"));
+    }
+
+    // A faction pool that rotated the seating between the two games of a pair kept every faction on one side; such
+    // pairs say nothing about the faction and are counted apart.
+    @Test
+    void leavesOutAFactionThatPlayedTheSameSideInBothGames() {
+        var lines = AbSummary.perFaction(List.of(
+                seating(1, Map.of("xxcha", 9, "sol", 7), Set.of("sol")),
+                seating(1, Map.of("xxcha", 6, "sol", 10), Set.of("sol"))));
+
+        assertThat(lines)
+                .anySatisfy(line -> assertThat(line)
+                        .startsWith("A/B faction xxcha: treatment minus control victory points n/a over 0 pairs")
+                        .contains("same side in both games 1"));
+    }
+
+    @Test
+    void skipsPairsWithAnUnfinishedGame() {
+        var lines = AbSummary.perFaction(List.of(
+                seating(1, Map.of("xxcha", 9), Set.of()),
+                new AbSummary.Seating(1, false, Map.of("xxcha", 6), Set.of("xxcha"))));
+
+        assertThat(lines).isEmpty();
     }
 }

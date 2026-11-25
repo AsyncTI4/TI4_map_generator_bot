@@ -151,18 +151,21 @@ class SardakkHeroRulesTest extends BaseTi4Test {
                 .orElseThrow();
     }
 
+    // These cases price keeping the hero at 4 trade goods (4 - round with round 0), so only the fight decides.
+    private static final double KEEP = 4;
+
     @Test
     void weighsTheSpaceFightTheLandingAndWhatIsAtStake() {
         double vp = SardakkHeroRules.VP;
 
-        assertThat(new Case(0.05, 3, 3, 0.9, 2 * vp).worthPlaying()).isTrue();
-        assertThat(new Case(0.05, 3, 3, 0.9, 0.5 * vp).worthPlaying())
+        assertThat(new Case(0.05, 3, 3, 0.9, 2 * vp, KEEP).worthPlaying()).isTrue();
+        assertThat(new Case(0.05, 3, 3, 0.9, 0.5 * vp, KEEP).worthPlaying())
                 .as("a stake under a point")
                 .isFalse();
-        assertThat(new Case(0.05, 3, 3, 0.5, 2 * vp).worthPlaying())
+        assertThat(new Case(0.05, 3, 3, 0.5, 2 * vp, KEEP).worthPlaying())
                 .as("a coin-flip landing")
                 .isFalse();
-        assertThat(new Case(0.7, 3, 1, 0.9, 2 * vp).worthPlaying())
+        assertThat(new Case(0.7, 3, 1, 0.9, 2 * vp, KEEP).worthPlaying())
                 .as("ships likely win")
                 .isFalse();
     }
@@ -173,8 +176,8 @@ class SardakkHeroRulesTest extends BaseTi4Test {
     void countsWhatTheFleetWouldCostBeyondTheFight() {
         double vp = SardakkHeroRules.VP;
 
-        assertThat(new Case(0.3, 40, 5, 0.9, 1.2 * vp).worthPlaying()).isFalse();
-        assertThat(new Case(0.3, 40, 40, 0.9, 1.2 * vp).worthPlaying()).isTrue();
+        assertThat(new Case(0.3, 40, 5, 0.9, 1.2 * vp, KEEP).worthPlaying()).isFalse();
+        assertThat(new Case(0.3, 40, 40, 0.9, 1.2 * vp, KEEP).worthPlaying()).isTrue();
     }
 
     @Test
@@ -199,10 +202,49 @@ class SardakkHeroRulesTest extends BaseTi4Test {
     void takesTheHeroPlanOnlyWhenItIsWorthAPointAndBeatsThePlanWithoutIt() {
         double point = SardakkHeroRules.VP;
 
-        assertThat(SardakkHeroRules.heroPlanWorthIt(point, 0)).isTrue();
-        assertThat(SardakkHeroRules.heroPlanWorthIt(point - 1, 0)).isFalse();
-        assertThat(SardakkHeroRules.heroPlanWorthIt(point, point)).isFalse();
-        assertThat(SardakkHeroRules.heroPlanWorthIt(point + SardakkHeroRules.HERO_VALUE, point))
+        double keep = SardakkHeroRules.keepValue(test.game);
+
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point, 0, keep)).isTrue();
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point - 1, 0, keep)).isFalse();
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point, point, keep)).isFalse();
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point + keep, point, keep)).isTrue();
+    }
+
+    // Keeping Sh'val is worth 4 - round trade goods, never below 0: 3 in round 1, nothing from round 4 on.
+    @Test
+    void theKeepValueFallsByOneEachRoundToZero() {
+        test.game.setRound(1);
+        assertThat(SardakkHeroRules.keepValue(test.game)).isEqualTo(3.0);
+        test.game.setRound(4);
+        assertThat(SardakkHeroRules.keepValue(test.game)).isZero();
+        test.game.setRound(5);
+        assertThat(SardakkHeroRules.keepValue(test.game)).isZero();
+    }
+
+    // From round 4 the hero costs nothing to play, so a hero plan that only matches the plan without it still wins;
+    // in round 1 it must beat that plan by the 3 trade goods the hero is still worth keeping.
+    @Test
+    void lateInTheGameAHeroPlanNeedOnlyMatchThePlanWithoutIt() {
+        double point = SardakkHeroRules.VP;
+        test.game.setRound(1);
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point + 2, point, SardakkHeroRules.keepValue(test.game)))
+                .isFalse();
+        test.game.setRound(5);
+        assertThat(SardakkHeroRules.heroPlanWorthIt(point, point, SardakkHeroRules.keepValue(test.game)))
                 .isTrue();
+    }
+
+    // A 1.2-point planet: not fighting gains 0.7 * 0.9 * 9.6 = 6.05 against 5 in extra ships given up. In round 1 the
+    // 3 trade goods the hero is still worth tip it against playing; in round 5 keeping it is worth nothing.
+    @Test
+    void aMarginalCaseIsWorthTheHeroOnceKeepingItIsFree() {
+        double vp = SardakkHeroRules.VP;
+        test.game.setRound(1);
+        Case early = new Case(0.3, 9, 4, 0.9, 1.2 * vp, SardakkHeroRules.keepValue(test.game));
+        test.game.setRound(5);
+        Case late = new Case(0.3, 9, 4, 0.9, 1.2 * vp, SardakkHeroRules.keepValue(test.game));
+
+        assertThat(early.worthPlaying()).isFalse();
+        assertThat(late.worthPlaying()).isTrue();
     }
 }
