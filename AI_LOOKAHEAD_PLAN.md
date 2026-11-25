@@ -169,8 +169,11 @@ Two studies on 2026-11-10 and 2026-11-11 (code reading, logs and local game data
   881 to 167 s), secret.readiness from 851 to 554 s. Left: secret.readiness 498 s repeated (329 s same seat, same
   tick), combat.odds 340 of 343 s, enemy.intent 528 of 3,170 s (mostly later ticks). Acted on: `SecretOdds` keeps a
   rival's per-secret readiness in `TickMemo` for every seat (round-one verify: 183,184 shared, 0 differed), and
-  `CombatOdds` keeps answers across saves. Not yet
-  measured on full games.
+  `CombatOdds` keeps answers across saves.
+- 2026-11-25: census after those (2 games, rounds 6 and 8, queue job 20261124-211125): about 505 CPU-s per round
+  (539 before, 602 at the first census; two games a side, rough). combat.odds fell from 343 to 6 s, secret.readiness
+  from 554 to 140 s. Left: enemy.intent 3,185 s (443 s repeated, mostly later ticks), win.odds 534 s (385 s repeated,
+  221 s same seat, same tick: likely other Game instances of the same save, which `TickMemo` does not share).
 
 ## Unknowns
 
