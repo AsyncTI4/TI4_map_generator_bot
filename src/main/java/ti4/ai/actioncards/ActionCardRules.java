@@ -13,7 +13,7 @@ import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
-import ti4.ai.eval.MoveBoost;
+import ti4.ai.eval.MovementCard;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.PromptButton;
@@ -32,7 +32,6 @@ import ti4.service.agenda.IsPlayerElectedService;
 public class ActionCardRules {
 
     private static final String REF_KEY = "acResolveRef|";
-    private static final String FLANK_SPEED_BOOST = "flankspeedBoost";
     private static final String FIELD = "~";
     private static final String COMPONENT_ACTION = "componentAction";
     private static final String SUMMIT_PRESET = "resolvePreassignment_Summit";
@@ -99,26 +98,33 @@ public class ActionCardRules {
         return best.flatMap(card -> startPlay(context, key, card.alias(), PlayMoment.IN_TURN));
     }
 
-    public static Optional<AiDecision> flankSpeed(AiTurnContext context) {
+    public static Optional<AiDecision> movementCard(AiTurnContext context) {
         Game game = context.game();
         Player seat = context.seat();
         if (!context.isActivePlayer() || AiSettings.usesLegacyActionCards(seat)) return Optional.empty();
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())
-                || game.getActiveSystem().isBlank()) {
+                || game.getActiveSystem().isBlank()
+                || !TacticalRules.activatedThisTurn(context)
+                || TacticalRules.movementConcluded(context)
+                || !mayPlay(game, seat)) {
             return Optional.empty();
         }
-        if (!game.getStoredValue(FLANK_SPEED_BOOST).isEmpty() || !TacticalRules.activatedThisTurn(context)) {
-            return Optional.empty();
-        }
-        String key = PlayMemory.turnKey(context);
-        if (context.memory().has(key) || !mayPlay(game, seat)) return Optional.empty();
-        Optional<String> alias = MoveBoost.flankSpeedCard(seat);
-        boolean needed = TacticalRules.rememberedPlan(context)
+        Optional<MovementCard> card = TacticalRules.rememberedPlan(context)
                 .filter(plan -> plan.target().equals(game.getActiveSystem()))
-                .filter(plan -> TacticalPlanner.needsFlankSpeed(game, seat, plan))
-                .isPresent();
-        if (alias.isEmpty() || !needed) return Optional.empty();
+                .flatMap(plan -> TacticalPlanner.nextMovementCard(game, seat, plan));
+        if (card.isEmpty()) return Optional.empty();
+        String key = PlayMemory.movementKey(context, card.get());
+        Optional<String> alias = card.get().held(seat);
+        if (context.memory().has(key) || alias.isEmpty()) return Optional.empty();
         return startPlay(context, key, alias.get(), PlayMoment.IN_TURN);
+    }
+
+    public static boolean movementCardPending(AiTurnContext context) {
+        return PlayMemory.movementKeys(context).stream()
+                .map(key -> context.memory().get(key).flatMap(CardPlay::decode))
+                .flatMap(Optional::stream)
+                .filter(CardPlay::active)
+                .anyMatch(play -> MovementCard.of(play.alias()).isPresent());
     }
 
     public static Optional<AiDecision> masterPlan(AiTurnContext context, boolean secondActionIsWorthIt) {
@@ -143,7 +149,9 @@ public class ActionCardRules {
 
     public static Optional<AiDecision> holdOwnTurn(AiTurnContext context) {
         if (!context.isActivePlayer()) return Optional.empty();
-        Optional<CardPlay> play = Stream.of(PlayMemory.turnKey(context), PlayMemory.masterPlanKey(context))
+        Optional<CardPlay> play = Stream.concat(
+                        Stream.of(PlayMemory.turnKey(context), PlayMemory.masterPlanKey(context)),
+                        PlayMemory.movementKeys(context).stream())
                 .map(key -> context.memory().get(key).flatMap(CardPlay::decode))
                 .flatMap(Optional::stream)
                 .filter(CardPlay::active)

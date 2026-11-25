@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.actioncards.CardPlay.Stage;
 import ti4.ai.brain.AiTurnContext;
+import ti4.ai.eval.MovementCard;
 
 @UtilityClass
 class PlayMemory {
@@ -19,10 +20,19 @@ class PlayMemory {
     static final String PRODUCTION_SCOPE = "build:";
     static final String COMBAT_PREFIX = PLAY_KEY + "combat:";
     private static final String START_SUFFIX = ":start";
+    private static final String MOVEMENT_SEPARATOR = "|";
     private static final String ANNOUNCE_KEY = "acAnnounce|";
 
     static String turnKey(AiTurnContext context) {
         return PLAY_KEY + TURN_SCOPE + context.turnKey();
+    }
+
+    static String movementKey(AiTurnContext context, MovementCard card) {
+        return turnKey(context) + MOVEMENT_SEPARATOR + card.automationId();
+    }
+
+    static List<String> movementKeys(AiTurnContext context) {
+        return List.copyOf(context.memory().keysStartingWith(turnKey(context) + MOVEMENT_SEPARATOR));
     }
 
     static String masterPlanKey(AiTurnContext context) {
@@ -58,6 +68,7 @@ class PlayMemory {
     static List<String> activeKeys(AiTurnContext context) {
         List<String> keys =
                 new ArrayList<>(List.of(turnKey(context), masterPlanKey(context), summitKey(), agendaKey(context)));
+        keys.addAll(movementKeys(context));
         keys.addAll(context.memory().keysStartingWith(PLAY_KEY + MESSAGE_SCOPE));
         keys.addAll(context.memory().keysStartingWith(PLAY_KEY + PRODUCTION_SCOPE));
         keys.addAll(context.memory().keysStartingWith(COMBAT_PREFIX));

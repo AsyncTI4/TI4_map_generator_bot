@@ -12,7 +12,9 @@ import java.util.Set;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.ShipSpeed;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -330,7 +332,7 @@ public final class GroundCampaign {
         if (from == null || to == null) return null;
         return distances
                 .computeIfAbsent(
-                        from.getPosition(), position -> MovementGraph.reach(game, seat, position, MAX_DISTANCE))
+                        from.getPosition(), position -> MovementGraph.distances(game, seat, position, MAX_DISTANCE))
                 .get(to.getPosition());
     }
 
@@ -507,7 +509,7 @@ public final class GroundCampaign {
     }
 
     private int shipMove(UnitType type, boolean carrierTwo) {
-        int move = BoardView.moveValue(seat, type);
+        int move = moveEachRound(ShipSpeed.printed(game, seat, type));
         return carrierTwo && type == UnitType.Carrier ? Math.max(move, carrierMove(true)) : move;
     }
 
@@ -519,8 +521,13 @@ public final class GroundCampaign {
 
     private int carrierMove(boolean carrierTwo) {
         UnitModel upgraded = Mapper.getUnit(CARRIER_II);
-        int own = Math.max(1, BoardView.moveValue(seat, UnitType.Carrier));
-        return carrierTwo && upgraded != null ? Math.max(own, upgraded.getMoveValue()) : own;
+        int own = Math.max(1, ShipSpeed.printed(game, seat, UnitType.Carrier));
+        int printed = carrierTwo && upgraded != null ? Math.max(own, upgraded.getMoveValue()) : own;
+        return moveEachRound(printed);
+    }
+
+    private int moveEachRound(int printed) {
+        return printed <= 0 ? 0 : printed + MoveBudget.oneShipInLaterRound(seat, null);
     }
 
     private static int ceilDiv(int numerator, int denominator) {

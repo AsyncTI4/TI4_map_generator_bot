@@ -5,10 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import ti4.ai.eval.AnomalyRules;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.IconStake;
 import ti4.ai.eval.MecatolStake;
+import ti4.ai.eval.MoveBudget;
+import ti4.ai.eval.MoveEnablers;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.ShipSpeed;
 import ti4.ai.eval.Territory;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -64,20 +68,47 @@ public final class RoundGoals {
         if (move <= 0) return 0;
         return potentials.computeIfAbsent(
                 at.getPosition() + "#" + move + "#" + claimed.getPosition() + "#" + transports,
-                key -> computePotential(at, move, claimed, transports));
+                key -> MoveEnablers.laterActivation(() -> computePotential(at, move, claimed, transports)));
     }
 
     private double computePotential(Tile at, int move, Tile claimed, boolean transports) {
-        Map<String, Integer> reach = MovementGraph.reach(game, seat, at.getPosition(), 2 * move);
+        int departing = departingMove(at, move);
+        List<Goal> open = goals.stream()
+                .filter(goal -> !goal.needsTransport() || transports)
+                .filter(goal -> !goal.position().equals(at.getPosition()))
+                .filter(goal -> !goal.position().equals(claimed.getPosition()))
+                .toList();
+        int search = open.stream()
+                .mapToInt(goal -> secondLegMove(departing, move, goal))
+                .max()
+                .orElse(0);
+        if (search <= 0) return 0;
+        Map<String, Integer> reach = MovementGraph.distances(game, seat, at.getPosition(), search);
         double potential = 0;
-        for (Goal goal : goals) {
-            if (goal.needsTransport() && !transports) continue;
-            if (goal.position().equals(at.getPosition()) || goal.position().equals(claimed.getPosition())) continue;
+        for (Goal goal : open) {
             Integer distance = reach.get(goal.position());
-            if (distance == null) continue;
-            potential += goal.value() * (distance <= move ? 1 : NEXT_ACTIVATION_SHARE);
+            if (distance == null || distance > secondLegMove(departing, move, goal)) continue;
+            potential += goal.value() * (distance <= firstLegMove(departing, goal) ? 1 : NEXT_ACTIVATION_SHARE);
         }
         return potential;
+    }
+
+    private int departingMove(Tile at, int move) {
+        int base = AnomalyRules.startsCapped(game, seat, at) ? Math.min(move, 1) : move;
+        return base + ShipSpeed.originBonus(game, seat, at);
+    }
+
+    private int firstLegMove(int departing, Goal goal) {
+        return departing + arrivalBoosts(goal);
+    }
+
+    private int secondLegMove(int departing, int move, Goal goal) {
+        return departing + MoveBudget.oneShipInLaterRound(seat, null) + move + arrivalBoosts(goal);
+    }
+
+    private int arrivalBoosts(Goal goal) {
+        Tile target = game.getTileByPosition(goal.position());
+        return ShipSpeed.arrivalBonus(game, seat, target) + MoveBudget.oneShipInLaterRound(seat, target);
     }
 
     private static double expansionValue(Game game, Player seat, Territory territory, Tile tile) {

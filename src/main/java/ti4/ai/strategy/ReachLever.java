@@ -28,9 +28,9 @@ class ReachLever {
         if (home == null || seat.hasTech(ANTIMASS_DEFLECTORS) || seat.hasTech(ABSOL_ANTIMASS_DEFLECTORS)) {
             return Optional.empty();
         }
-        Map<String, Integer> without = MovementGraph.reach(game, seat, home.getPosition(), RANGE);
-        Map<String, Integer> with =
-                MovementGraph.withAntimassDeflectors(() -> MovementGraph.reach(game, seat, home.getPosition(), RANGE));
+        Map<String, Integer> without = MovementGraph.distances(game, seat, home.getPosition(), RANGE);
+        Map<String, Integer> with = MovementGraph.withAntimassDeflectors(
+                () -> MovementGraph.distances(game, seat, home.getPosition(), RANGE));
         return targets(game, seat).stream()
                 .filter(target -> shorterWith(with, without, target.tile().getPosition()))
                 .map(Target::label)

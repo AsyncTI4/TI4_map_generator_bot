@@ -386,7 +386,8 @@ class RoundOneSelfPlayTest extends BaseTi4Test {
         String reachable = "";
         if (home != null) {
             for (int move = 1; move <= 2; move++) {
-                java.util.Set<String> inReach = ti4.ai.eval.MovementGraph.reach(game, seat, home.getPosition(), move)
+                java.util.Set<String> inReach = ti4.ai.eval.MovementGraph.distances(
+                                game, seat, home.getPosition(), move)
                         .keySet();
                 long systems = game.getTileMap().values().stream()
                         .filter(tile -> inReach.contains(tile.getPosition()))

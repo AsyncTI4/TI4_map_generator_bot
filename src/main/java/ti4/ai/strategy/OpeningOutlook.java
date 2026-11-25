@@ -12,7 +12,9 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.ShipSpeed;
 import ti4.ai.tactical.ProductionPlanner;
 import ti4.ai.tactical.RoundGoals;
 import ti4.ai.tactical.RoundGoals.Goal;
@@ -59,7 +61,7 @@ class OpeningOutlook {
     private static final int AFTER_ONE_ACTION = 1;
     private static final int FROM_THE_NEXT_ACTION = 0;
 
-    private record Transport(UnitType type, int capacity, int move) {}
+    private record Transport(UnitType type, int capacity) {}
 
     private record Scenario(Boost boost, Order order, boolean overSupply, int actions, int driveFrom) {
 
@@ -86,7 +88,7 @@ class OpeningOutlook {
 
     private record HomeHop(Carrier carrier, String goal, int action, int load) {}
 
-    private record Forward(String position, int move, int cargo) {}
+    private record Forward(String position, UnitType type, int cargo) {}
 
     static double gain(Game game, Player seat, Boost boost) {
         if (game.getRound() > LAST_OPENING_ROUND || boost == Boost.NONE) return 0;
@@ -229,8 +231,30 @@ class OpeningOutlook {
             return new Round(this, scenario).play();
         }
 
-        Map<String, Integer> reach(String position, int move) {
-            return reach.computeIfAbsent(position + "#" + move, key -> MovementGraph.reach(game, seat, position, move));
+        boolean reachesNow(UnitType type, String position, Goal goal, boolean assumeGravityDrive) {
+            Tile from = game.getTileByPosition(position);
+            Tile target = game.getTileByPosition(goal.position());
+            if (from == null || target == null) return false;
+            int speed = ShipSpeed.of(game, seat, type, from, target);
+            if (speed == 0) return false;
+            int move = speed + MoveBudget.oneShip(game, seat, target, assumeGravityDrive);
+            return reach(position, move).containsKey(goal.position());
+        }
+
+        boolean reachesNextRound(UnitType type, String position, Goal goal, boolean assumeGravityDrive) {
+            Tile from = game.getTileByPosition(position);
+            Tile target = game.getTileByPosition(goal.position());
+            if (from == null || target == null) return false;
+            int base = ShipSpeed.base(game, seat, type, from);
+            if (base == 0) return false;
+            int speed = base + ShipSpeed.originBonus(game, seat, from) + ShipSpeed.arrivalBonus(game, seat, target);
+            int move = speed + MoveBudget.oneShipInLaterRound(seat, target, assumeGravityDrive);
+            return reach(position, move).containsKey(goal.position());
+        }
+
+        private Map<String, Integer> reach(String position, int move) {
+            return reach.computeIfAbsent(
+                    position + "#" + move, key -> MovementGraph.distances(game, seat, position, move));
         }
     }
 
@@ -255,7 +279,7 @@ class OpeningOutlook {
         double play() {
             Player seat = opening.seat;
             Tile home = opening.home;
-            for (Transport transport : transportsAt(seat, home)) {
+            for (Transport transport : transportsAt(opening.game, seat, home)) {
                 carriers.add(new Carrier(transport, home.getPosition(), BEFORE_ANY_ACTION));
             }
             infantry = Math.max(0, groundForcesAt(seat, home) - opening.garrison);
@@ -291,16 +315,16 @@ class OpeningOutlook {
         }
 
         private Optional<Hop> bestHop(int action) {
-            int bonusMove = scenario.boost() == Boost.GRAVITY_DRIVE && action >= scenario.driveFrom() ? 1 : 0;
+            boolean driven = scenario.boost() == Boost.GRAVITY_DRIVE && action >= scenario.driveFrom();
             Hop best = null;
             for (Carrier carrier : carriers) {
                 boolean firstHop = !carrier.moved;
                 if (!firstHop && !(secondHop && carrier.cargo > 0)) continue;
                 int carried = firstHop ? Math.min(carrier.transport.capacity(), infantry) : carrier.cargo;
                 if (carried <= 0) continue;
-                Map<String, Integer> distances = opening.reach(carrier.position, carrier.transport.move() + bonusMove);
                 for (Goal goal : opening.goals) {
-                    if (taken.contains(goal.position()) || !distances.containsKey(goal.position())) continue;
+                    if (taken.contains(goal.position())) continue;
+                    if (!opening.reachesNow(carrier.transport.type(), carrier.position, goal, driven)) continue;
                     int load = firstHop && !secondHop ? Math.min(carried, goal.planets()) : carried;
                     double gain = goal.value() * Math.min(load, goal.planets()) / goal.planets();
                     if (best == null || gain > best.gain()) best = new Hop(carrier, goal, load, gain);
@@ -335,7 +359,7 @@ class OpeningOutlook {
                     (int) (FleetLimit.ships(seat) - BoardView.nonFighterShips(BoardView.space(home), seat) + movedOut);
             OptionalDouble scrap = ProductionPlanner.cheapestShipToScrap(seat, home);
             int overSupply = scenario.overSupply() && scrap.isPresent() ? OVER_SUPPLY_CARRIERS : 0;
-            Transport carrier = transport(seat, UnitType.Carrier);
+            Transport carrier = transport(game, seat, UnitType.Carrier);
             int carrierCost = (int) Math.ceil(BoardView.model(seat, UnitType.Carrier)
                     .map(model -> model.getCost())
                     .orElse(Float.MAX_VALUE));
@@ -387,25 +411,21 @@ class OpeningOutlook {
                     available -= fill;
                     pool -= fill;
                     int cargo = (leader ? carrier.cargo : 0) + fill;
-                    forwards.add(new Forward(hop.goal(), nextMove(carrier), cargo));
+                    forwards.add(new Forward(hop.goal(), carrier.transport.type(), cargo));
                     placed.add(carrier);
                 }
             }
             for (Carrier carrier : carriers) {
                 if (placed.contains(carrier)) continue;
                 if (carrier.moved) {
-                    forwards.add(new Forward(carrier.position, nextMove(carrier), carrier.cargo));
+                    forwards.add(new Forward(carrier.position, carrier.transport.type(), carrier.cargo));
                 } else {
                     int cargo = Math.min(carrier.transport.capacity(), pool);
                     pool -= cargo;
-                    forwards.add(new Forward(carrier.position, nextMove(carrier), cargo));
+                    forwards.add(new Forward(carrier.position, carrier.transport.type(), cargo));
                 }
             }
             return NEXT_ROUND_SHARE * claimNextRound(forwards);
-        }
-
-        private int nextMove(Carrier carrier) {
-            return carrier.transport.move() + (scenario.boost() == Boost.GRAVITY_DRIVE ? 1 : 0);
         }
 
         private double claimNextRound(List<Forward> forwards) {
@@ -413,14 +433,15 @@ class OpeningOutlook {
             List<Forward> left = new ArrayList<>(
                     forwards.stream().filter(forward -> forward.cargo() > 0).toList());
             double total = 0;
+            boolean driven = scenario.boost() == Boost.GRAVITY_DRIVE;
             while (!left.isEmpty()) {
                 Forward bestForward = null;
                 Goal bestGoal = null;
                 double bestGain = 0;
                 for (Forward forward : left) {
-                    Map<String, Integer> distances = opening.reach(forward.position(), forward.move());
                     for (Goal goal : opening.goals) {
-                        if (claimed.contains(goal.position()) || !distances.containsKey(goal.position())) continue;
+                        if (claimed.contains(goal.position())) continue;
+                        if (!opening.reachesNextRound(forward.type(), forward.position(), goal, driven)) continue;
                         double gain = goal.value() * Math.min(forward.cargo(), goal.planets()) / goal.planets();
                         if (gain > bestGain) {
                             bestForward = forward;
@@ -445,21 +466,21 @@ class OpeningOutlook {
                 .sum();
     }
 
-    private static List<Transport> transportsAt(Player seat, Tile home) {
+    private static List<Transport> transportsAt(Game game, Player seat, Tile home) {
         UnitHolder space = BoardView.space(home);
         List<Transport> transports = new ArrayList<>();
         for (UnitType type : BoardView.MOVING_SHIPS) {
-            Transport transport = transport(seat, type);
+            Transport transport = transport(game, seat, type);
             if (transport == null) continue;
             for (int i = 0; i < BoardView.count(space, seat, type); i++) transports.add(transport);
         }
         return transports;
     }
 
-    private static Transport transport(Player seat, UnitType type) {
+    private static Transport transport(Game game, Player seat, UnitType type) {
         int capacity = BoardView.capacity(seat, type);
-        int move = BoardView.moveValue(seat, type);
-        return capacity > 0 && move > 0 ? new Transport(type, capacity, move) : null;
+        int move = ShipSpeed.printed(game, seat, type);
+        return capacity > 0 && move > 0 ? new Transport(type, capacity) : null;
     }
 
     private static int groundForcesAt(Player seat, Tile home) {

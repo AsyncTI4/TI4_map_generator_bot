@@ -84,7 +84,7 @@ public final class CustodiansRace {
 
     public static final class Snapshot {
 
-        private record Transport(Tile tile, int baseMove) {}
+        private record Transport(Tile tile, UnitType type) {}
 
         private final Game game;
         private final Player seat;
@@ -126,14 +126,14 @@ public final class CustodiansRace {
 
         public OptionalInt arrivalFrom(Player player, Tile tile) {
             if (mecatol == null || blockedByCover(player)) return OptionalInt.empty();
-            int needed = hopsFrom(player, tile, bestTransportMove(player), Mode.LIKELY);
+            int needed = hopsFrom(player, tile, bestTransportType(player), Mode.LIKELY);
             if (needed == UNREACHABLE) return OptionalInt.empty();
             return OptionalInt.of(adjusted(player, baseRound() + Math.max(1, needed)));
         }
 
         public OptionalInt hopsToMecatol(Player player, Tile from) {
             if (mecatol == null) return OptionalInt.empty();
-            int needed = hopsFrom(player, from, bestTransportMove(player), Mode.LIKELY);
+            int needed = hopsFrom(player, from, bestTransportType(player), Mode.LIKELY);
             return needed == UNREACHABLE ? OptionalInt.empty() : OptionalInt.of(needed);
         }
 
@@ -141,7 +141,7 @@ public final class CustodiansRace {
             if (mecatol == null || blockedByCover(player)) return false;
             return transportsOf(player).stream()
                     .anyMatch(transport -> actsNow(player, transport.tile())
-                            && hopsFrom(player, transport.tile(), transport.baseMove(), Mode.OWNED) <= 1);
+                            && hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1);
         }
 
         public boolean canLandThisRoundWithout(Player player, String stoppedPosition) {
@@ -149,7 +149,7 @@ public final class CustodiansRace {
             return transportsOf(player).stream()
                     .filter(transport -> !transport.tile().getPosition().equals(stoppedPosition))
                     .anyMatch(transport -> actsNow(player, transport.tile())
-                            && hopsFrom(player, transport.tile(), transport.baseMove(), Mode.OWNED) <= 1);
+                            && hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1);
         }
 
         public double winChance(Player seatOfInterest, int arrival, Order order) {
@@ -312,21 +312,21 @@ public final class CustodiansRace {
             if (!actsNow(player, transport.tile())) {
                 return arrivingNextRound(player, transport, base, Mode.LIKELY);
             }
-            if (hopsFrom(player, transport.tile(), transport.baseMove(), Mode.OWNED) <= 1) return base;
-            int needed = hopsFrom(player, transport.tile(), transport.baseMove(), Mode.MIXED);
+            if (hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1) return base;
+            int needed = hopsFrom(player, transport.tile(), transport.type(), Mode.MIXED);
             return needed == UNREACHABLE ? UNREACHABLE : base + needed - 1;
         }
 
         private int pureArrival(Player player, Transport transport, Mode mode) {
             int base = baseRound();
             if (!actsNow(player, transport.tile())) return arrivingNextRound(player, transport, base, mode);
-            int needed = hopsFrom(player, transport.tile(), transport.baseMove(), mode);
+            int needed = hopsFrom(player, transport.tile(), transport.type(), mode);
             if (needed == UNREACHABLE) return UNREACHABLE;
             return needed <= 1 ? base : base + needed - 1;
         }
 
         private int arrivingNextRound(Player player, Transport transport, int base, Mode mode) {
-            int needed = hopsFrom(player, transport.tile(), transport.baseMove(), mode);
+            int needed = hopsFrom(player, transport.tile(), transport.type(), mode);
             return needed == UNREACHABLE ? UNREACHABLE : base + Math.max(1, needed);
         }
 
@@ -334,7 +334,7 @@ public final class CustodiansRace {
             int base = baseRound();
             return earliest(player, transport -> {
                 if (actsNow(player, transport.tile())
-                        && hopsFrom(player, transport.tile(), transport.baseMove(), Mode.OWNED) <= 1) {
+                        && hopsFrom(player, transport.tile(), transport.type(), Mode.OWNED) <= 1) {
                     return base;
                 }
                 return arrivingNextRound(player, transport, base, Mode.LIKELY);
@@ -381,7 +381,7 @@ public final class CustodiansRace {
         private int reachableFreeInfluence(Player player) {
             Set<String> tiles = new HashSet<>();
             for (Transport transport : transportsOf(player)) {
-                int move = moveFor(player, transport.baseMove(), Mode.LIKELY, 1);
+                int move = hopMove(player, transport.type(), transport.tile(), null, Mode.LIKELY, 1);
                 tiles.addAll(reach(player, transport.tile().getPosition(), move).keySet());
             }
             int influence = 0;
@@ -420,21 +420,26 @@ public final class CustodiansRace {
             return transports.computeIfAbsent(player.getFaction(), faction -> {
                 List<Transport> found = new ArrayList<>();
                 for (Tile tile : game.getTileMap().values()) {
-                    int move = transportMove(player, tile);
-                    if (move > 0 && carriesGroundForces(player, tile)) found.add(new Transport(tile, move));
+                    UnitType type = fastestTransport(player, tile);
+                    if (type != null && carriesGroundForces(player, tile)) found.add(new Transport(tile, type));
                 }
                 return found;
             });
         }
 
-        private static int transportMove(Player player, Tile tile) {
+        @Nullable
+        private UnitType fastestTransport(Player player, Tile tile) {
+            UnitType fastest = null;
             int move = 0;
             for (UnitType type : BoardView.ships(BoardView.space(tile), player).keySet()) {
-                if (BoardView.MOVING_SHIPS.contains(type) && BoardView.capacity(player, type) > 0) {
-                    move = Math.max(move, BoardView.moveValue(player, type));
+                if (!BoardView.MOVING_SHIPS.contains(type) || BoardView.capacity(player, type) <= 0) continue;
+                int speed = ShipSpeed.base(game, player, type, tile);
+                if (speed > move) {
+                    fastest = type;
+                    move = speed;
                 }
             }
-            return move;
+            return fastest;
         }
 
         private static boolean carriesGroundForces(Player player, Tile tile) {
@@ -444,42 +449,73 @@ public final class CustodiansRace {
             return false;
         }
 
-        private int bestTransportMove(Player player) {
-            int best = 0;
-            for (Transport transport : transportsOf(player)) best = Math.max(best, transport.baseMove());
-            return best > 0 ? best : BoardView.moveValue(player, UnitType.Carrier);
+        private UnitType bestTransportType(Player player) {
+            UnitType best = UnitType.Carrier;
+            int bestMove = 0;
+            for (Transport transport : transportsOf(player)) {
+                int move = ShipSpeed.printed(game, player, transport.type());
+                if (move > bestMove) {
+                    best = transport.type();
+                    bestMove = move;
+                }
+            }
+            return best;
         }
 
-        private int hopsFrom(Player player, Tile from, int baseMove, Mode mode) {
-            String key = player.getFaction() + "|" + from.getPosition() + "|" + baseMove + "|" + mode;
-            return hops.computeIfAbsent(key, ignored -> countHops(player, from, baseMove, mode));
+        private int hopsFrom(Player player, Tile from, UnitType type, Mode mode) {
+            String key = player.getFaction() + "|" + from.getPosition() + "|" + type + "|" + mode;
+            return hops.computeIfAbsent(key, ignored -> countHops(player, from, type, mode));
         }
 
         // TODO: intermediate layers may pass through systems holding enemy ships, where a real move would stop
-        private int countHops(Player player, Tile from, int baseMove, Mode mode) {
+        private int countHops(Player player, Tile from, UnitType type, Mode mode) {
             String target = mecatol.getPosition();
             if (from.getPosition().equals(target)) return 0;
             Set<String> layer = Set.of(from.getPosition());
             for (int hop = 1; hop <= MAX_HOPS; hop++) {
-                int move = moveFor(player, baseMove, mode, hop);
+                if (landsFromLayer(player, layer, type, mode, hop)) return hop;
                 Set<String> next = new HashSet<>();
-                for (String position : layer)
-                    next.addAll(reach(player, position, move).keySet());
-                if (next.contains(target)) return hop;
+                for (String position : layer) {
+                    Tile tile = game.getTileByPosition(position);
+                    if (tile == null) continue;
+                    int move = hopMove(player, type, tile, null, mode, hop);
+                    next.addAll(reach(player, position, move, hop).keySet());
+                }
                 layer = next;
             }
             return UNREACHABLE;
         }
 
-        private int moveFor(Player player, int baseMove, Mode mode, int hop) {
-            boolean owned = player.hasTech(GRAVITY_DRIVE);
-            boolean likely = owned || ownsPropulsionTech(player);
-            return baseMove
-                    + switch (mode) {
-                        case OWNED -> owned ? 1 : 0;
-                        case LIKELY -> likely ? 1 : 0;
-                        case MIXED -> (hop == 1 ? owned : likely) ? 1 : 0;
-                    };
+        private boolean landsFromLayer(Player player, Set<String> layer, UnitType type, Mode mode, int hop) {
+            for (String position : layer) {
+                Tile tile = game.getTileByPosition(position);
+                if (tile == null) continue;
+                int move = hopMove(player, type, tile, mecatol, mode, hop);
+                if (reach(player, position, move, hop).containsKey(mecatol.getPosition())) return true;
+            }
+            return false;
+        }
+
+        private int hopMove(Player player, UnitType type, Tile from, @Nullable Tile target, Mode mode, int hop) {
+            boolean assumeGravityDrive = assumesGravityDrive(player, mode, hop);
+            if (hop == 1) {
+                int speed = ShipSpeed.of(game, player, type, from, target);
+                return speed == 0 ? 0 : speed + MoveBudget.oneShip(game, player, target, assumeGravityDrive);
+            }
+            int speed = MoveEnablers.laterActivation(() -> MoveBudget.legBudget(game, player, type, from, null, false));
+            if (speed == 0) return 0;
+            return speed
+                    + ShipSpeed.arrivalBonus(game, player, target)
+                    + MoveBudget.oneShipInLaterRound(player, target, assumeGravityDrive);
+        }
+
+        private boolean assumesGravityDrive(Player player, Mode mode, int hop) {
+            boolean likely = player.hasTech(GRAVITY_DRIVE) || ownsPropulsionTech(player);
+            return switch (mode) {
+                case OWNED -> false;
+                case LIKELY -> likely;
+                case MIXED -> hop > 1 && likely;
+            };
         }
 
         private static boolean ownsPropulsionTech(Player player) {
@@ -490,10 +526,20 @@ public final class CustodiansRace {
             return false;
         }
 
+        private Map<String, Integer> reach(Player player, String position, int move, int hop) {
+            if (hop == 1) return reach(player, position, move);
+            return reaches.computeIfAbsent(
+                    player.getFaction() + "|" + position + "|" + move + "|later",
+                    key -> move <= 0
+                            ? Map.of()
+                            : MoveEnablers.laterActivation(
+                                    () -> MovementGraph.distances(game, player, position, move)));
+        }
+
         private Map<String, Integer> reach(Player player, String position, int move) {
             return reaches.computeIfAbsent(
                     player.getFaction() + "|" + position + "|" + move,
-                    key -> MovementGraph.reach(game, player, position, move));
+                    key -> move <= 0 ? Map.of() : MovementGraph.distances(game, player, position, move));
         }
     }
 }

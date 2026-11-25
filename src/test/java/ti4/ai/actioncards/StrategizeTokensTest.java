@@ -25,7 +25,7 @@ class StrategizeTokensTest extends BaseTi4Test {
     void setUp() {
         table = new CardTable();
         table.nekro.setTacticalCC(2);
-        table.nekro.setFleetCC(3);
+        table.nekro.setFleetCC(4);
         table.nekro.setStrategicCC(2);
         for (ti4.game.Player other : table.game.getRealPlayers()) {
             if (other != table.nekro) other.setTacticalCC(0);

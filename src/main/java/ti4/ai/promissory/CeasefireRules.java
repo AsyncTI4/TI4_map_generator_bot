@@ -9,13 +9,12 @@ import ti4.ai.AiSeats;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
-import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Units.UnitType;
 
 @UtilityClass
 public class CeasefireRules {
@@ -135,21 +134,13 @@ public class CeasefireRules {
     private static boolean canMoveInto(Game game, Player mover, Tile target) {
         for (Tile origin : game.getTileMap().values()) {
             if (origin == target || origin.hasPlayerCC(mover)) continue;
-            int move = fastestShip(mover, origin);
-            if (move > 0
-                    && MovementGraph.reach(game, mover, origin.getPosition(), move)
-                            .containsKey(target.getPosition())) {
-                return true;
-            }
+            if (anyShipCanJoin(game, mover, origin, target)) return true;
         }
         return false;
     }
 
-    private static int fastestShip(Player mover, Tile origin) {
+    private static boolean anyShipCanJoin(Game game, Player mover, Tile origin, Tile target) {
         return BoardView.ships(BoardView.space(origin), mover).keySet().stream()
-                .filter(type -> type != UnitType.Fighter)
-                .mapToInt(type -> BoardView.moveValueWithGravityDrive(mover, type))
-                .max()
-                .orElse(0);
+                .anyMatch(type -> MoveBudget.canJoin(game, mover, origin, target, type));
     }
 }

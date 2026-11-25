@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CustodiansRace;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.Journey;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.ScoringReserve;
 import ti4.ai.strategy.CardPlan.Benefit;
@@ -22,9 +23,13 @@ import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.helpers.Units.UnitType;
 
 @UtilityClass
 class WarfareUses {
+
+    private static final Journey ONE_LEG = new Journey(1, false, null);
+    private static final Journey TWO_LEGS = new Journey(2, false, null);
 
     static List<Benefit> benefits(PlanInputs in, int initiative) {
         boolean thundersEdge = CardVariant.of(in.game(), initiative) == CardVariant.THUNDERS_EDGE;
@@ -110,26 +115,36 @@ class WarfareUses {
         Player seat = in.seat();
         Benefit best = new Benefit(CardUse.WARFARE_FAR_REACH, 0);
         for (Tile origin : game.getTileMap().values()) {
-            UnitHolder space = BoardView.space(origin);
-            if (BoardView.nonFighterShips(space, seat) <= 0) continue;
-            int move = BoardView.ships(space, seat).keySet().stream()
-                    .filter(BoardView.MOVING_SHIPS::contains)
-                    .mapToInt(type -> BoardView.moveValueWithGravityDrive(seat, type))
-                    .max()
-                    .orElse(0);
+            if (BoardView.nonFighterShips(BoardView.space(origin), seat) <= 0) continue;
+            int move = MoveBudget.searchBudget(game, seat, origin);
             if (move <= 0 || !carriesGroundForces(seat, origin)) continue;
-            Set<String> near =
-                    MovementGraph.reach(game, seat, origin.getPosition(), move).keySet();
-            Map<String, Integer> far = MovementGraph.reach(game, seat, origin.getPosition(), 2 * move);
+            Map<String, Integer> far = MovementGraph.distances(game, seat, origin.getPosition(), 2 * move);
             for (String position : far.keySet()) {
-                if (near.contains(position)) continue;
                 Tile tile = game.getTileByPosition(position);
-                if (tile == null || BoardView.hasEnemyShips(game, seat, tile)) continue;
+                if (tile == null || tile == origin) continue;
+                if (BoardView.hasEnemyShips(game, seat, tile)) continue;
+                if (transportArrives(game, seat, origin, tile, ONE_LEG)) continue;
+                if (!transportArrives(game, seat, origin, tile, TWO_LEGS)) continue;
                 double value = CardValueScale.FAR_REACH_SHARE * reachValue(in, tile);
                 if (value > best.value()) best = new Benefit(CardUse.WARFARE_FAR_REACH, value, position);
             }
         }
         return best;
+    }
+
+    private static boolean transportArrives(Game game, Player seat, Tile origin, Tile target, Journey journey) {
+        UnitHolder space = BoardView.space(origin);
+        Map<UnitType, Integer> arriving = MoveBudget.shipsWithin(
+                        game,
+                        seat,
+                        target,
+                        journey,
+                        tile -> tile == origin,
+                        type -> BoardView.capacity(seat, type),
+                        BoardView.nonFighterShips(space, seat))
+                .getOrDefault(origin.getPosition(), Map.of());
+        return arriving.keySet().stream()
+                .anyMatch(type -> BoardView.MOVING_SHIPS.contains(type) && BoardView.capacity(seat, type) > 0);
     }
 
     private static boolean carriesGroundForces(Player seat, Tile origin) {

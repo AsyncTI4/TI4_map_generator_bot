@@ -166,7 +166,7 @@ class TraitRaidTest extends BaseTi4Test {
     @Test
     void landsOnARivalPlanetWithAPdsOnlyForTheSecret() {
         ownsIndustrial(3);
-        Tile tile = solHoldsThibah(1);
+        Tile tile = solHoldsThibah(2);
         test.units(tile, THIBAH, test.sol, UnitType.Pds, 1);
         raidingFleet();
 

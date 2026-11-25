@@ -47,7 +47,7 @@ public class BombardmentRules {
         if (dice(seat, ships) == 0) return Optional.empty();
         for (String name : BombardmentService.getBombardablePlanets(seat, game, tile)) {
             if (!(tile.getUnitHolders().get(name) instanceof Planet planet)) continue;
-            Optional<Player> defender = game.getRealPlayers().stream()
+            Optional<Player> defender = game.getRealPlayersNNeutral().stream()
                     .filter(other -> other != seat && BoardView.groundForces(planet, other) > 0)
                     .findFirst();
             if (defender.isEmpty()) continue;
@@ -61,6 +61,10 @@ public class BombardmentRules {
         double expected = 0;
         for (double chance : dieChances(seat, ships)) expected += chance;
         return (int) Math.floor(expected) * hitMultiplier(seat);
+    }
+
+    public static double[] hitDistribution(Player seat, Map<UnitType, Integer> ships) {
+        return DiceOdds.multiplied(DiceOdds.distribution(dieChances(seat, ships)), hitMultiplier(seat));
     }
 
     private static int hitMultiplier(Player seat) {
@@ -178,7 +182,7 @@ public class BombardmentRules {
                 .map(entry -> seat.getUnitByType(entry.getKey()))
                 .anyMatch(model -> model != null && model.getDisablesPlanetaryShield());
         if (shieldsDown) return false;
-        for (Player other : game.getRealPlayers()) {
+        for (Player other : game.getRealPlayersNNeutral()) {
             if (other == seat) continue;
             for (UnitKey key : planet.getUnitKeysForPlayer(other)) {
                 UnitModel model = other.getUnitFromUnitKey(key);

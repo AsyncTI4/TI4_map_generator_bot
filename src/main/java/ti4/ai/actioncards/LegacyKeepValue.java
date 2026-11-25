@@ -21,8 +21,6 @@ class LegacyKeepValue {
             "reflective",
             "bunker",
             "disable",
-            "lost_star",
-            "nav_suite",
             "silence_space",
             "solar_flare",
             "master_plan",

@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.ShipSpeed;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -20,7 +22,7 @@ final class ExpansionOutlook {
 
     private static final int MAX_ACTIVATIONS = 3;
 
-    private record Transport(Tile tile, int move) {}
+    private record Transport(Tile tile, UnitType type) {}
 
     private record Claim(Tile tile, List<Double> planetValues) {
         double value() {
@@ -39,7 +41,7 @@ final class ExpansionOutlook {
         }
     }
 
-    private record Launch(Claim claim, Transport transport) {}
+    private record Launch(Claim claim, Transport transport, int move) {}
 
     private final Game game;
     private final Player seat;
@@ -71,18 +73,28 @@ final class ExpansionOutlook {
         List<Transport> idle = new ArrayList<>(transports());
         List<Launch> launches = new ArrayList<>();
         int activations = Math.min(MAX_ACTIVATIONS, seat.getTacticalCC());
+        boolean tempestaLeft = MoveBudget.tempestaThisAction(game, seat);
         for (Claim claim : claims()) {
             if (launches.size() >= activations) break;
             if (alreadyGarrisoned(claim.tile(), holdingTile)) continue;
-            Optional<Transport> carrier = idle.stream()
-                    .filter(transport -> canReach(transport, claim.tile()))
-                    .findFirst();
-            carrier.ifPresent(transport -> {
-                idle.remove(transport);
-                launches.add(new Launch(claim, transport));
+            Optional<Launch> launch = launchWith(idle, claim, 0);
+            if (launch.isEmpty() && tempestaLeft) {
+                launch = launchWith(idle, claim, 1);
+                tempestaLeft = launch.isEmpty();
+            }
+            launch.ifPresent(found -> {
+                idle.remove(found.transport());
+                launches.add(found);
             });
         }
         return launches;
+    }
+
+    private Optional<Launch> launchWith(List<Transport> idle, Claim claim, int tempesta) {
+        return idle.stream()
+                .map(transport -> new Launch(claim, transport, moveTo(transport, claim.tile(), tempesta)))
+                .filter(launch -> canReach(launch.transport(), claim.tile(), launch.move()))
+                .findFirst();
     }
 
     private boolean alreadyGarrisoned(Tile tile, Tile holdingTile) {
@@ -90,8 +102,13 @@ final class ExpansionOutlook {
         return groundForcesIn(tile) - removed > 0;
     }
 
-    private boolean canReach(Transport transport, Tile target) {
-        return reach(transport.tile(), transport.move()).containsKey(target.getPosition());
+    private boolean canReach(Transport transport, Tile target, int move) {
+        return reach(transport.tile(), move).containsKey(target.getPosition());
+    }
+
+    private int moveTo(Transport transport, Tile target, int tempesta) {
+        int speed = ShipSpeed.of(game, seat, transport.type(), transport.tile(), target);
+        return speed == 0 ? 0 : speed + MoveBudget.everyActionOneShip(seat, target) + tempesta;
     }
 
     private Set<String> pickupPositions(List<Launch> launches) {
@@ -100,10 +117,11 @@ final class ExpansionOutlook {
         if (home != null && !launches.isEmpty()) positions.add(home.getPosition());
         for (Launch launch : launches) {
             Transport transport = launch.transport();
-            Map<String, Integer> out = reach(transport.tile(), transport.move());
-            Map<String, Integer> back = reach(launch.claim().tile(), transport.move());
+            int move = launch.move();
+            Map<String, Integer> out = reach(transport.tile(), move);
+            Map<String, Integer> back = reach(launch.claim().tile(), move);
             out.forEach((position, distance) -> {
-                if (back.containsKey(position) && distance + back.get(position) <= transport.move()) {
+                if (back.containsKey(position) && distance + back.get(position) <= move) {
                     positions.add(position);
                 }
             });
@@ -126,8 +144,10 @@ final class ExpansionOutlook {
     }
 
     private Map<String, Integer> reach(Tile origin, int move) {
+        if (move <= 0) return Map.of();
         return reaches.computeIfAbsent(
-                origin.getPosition() + "/" + move, key -> MovementGraph.reach(game, seat, origin.getPosition(), move));
+                origin.getPosition() + "/" + move,
+                key -> MovementGraph.distances(game, seat, origin.getPosition(), move));
     }
 
     private List<Transport> transports() {
@@ -144,9 +164,9 @@ final class ExpansionOutlook {
         List<Transport> found = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             BoardView.ships(BoardView.space(tile), seat).forEach((type, count) -> {
-                int move = BoardView.moveValueWithGravityDrive(seat, type);
+                int move = ShipSpeed.printed(game, seat, type);
                 if (type == UnitType.Fighter || move <= 0 || BoardView.capacity(seat, type) <= 0) return;
-                for (int ship = 0; ship < count; ship++) found.add(new Transport(tile, move));
+                for (int ship = 0; ship < count; ship++) found.add(new Transport(tile, type));
             });
         }
         return found;

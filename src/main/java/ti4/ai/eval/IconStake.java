@@ -94,8 +94,8 @@ public class IconStake {
         Tile home = seat.getHomeSystemTile();
         Map<String, Integer> free = new HashMap<>();
         if (home == null) return free;
-        for (String position :
-                MovementGraph.reach(game, seat, home.getPosition(), CLAIM_REACH).keySet()) {
+        for (String position : MovementGraph.distances(game, seat, home.getPosition(), CLAIM_REACH)
+                .keySet()) {
             Tile tile = game.getTileByPosition(position);
             if (tile == null) continue;
             for (Planet planet : tile.getPlanetUnitHolders()) {

@@ -208,4 +208,21 @@ class IncomingForcesTest extends BaseTi4Test {
 
         assertThat(force(Horizon.IMMEDIATE).isEmpty()).isFalse();
     }
+
+    // Fighter II moves 2 on its own: three of them two systems out reach home without a carrier, and the swarm counts
+    // toward the incoming fleet's cost. Fighter Is in the same place go nowhere.
+    @Test
+    void anEnemyFighterIISwarmTwoAwayIsIncoming() {
+        Tile far = board.test.place("47", board.beyondStaging());
+        board.test.units(far, "space", board.sardakk, UnitType.Fighter, 3);
+        assertThat(force(Horizon.IMMEDIATE).isEmpty()).isTrue();
+
+        board.sardakk.removeOwnedUnitByID("fighter");
+        board.sardakk.addOwnedUnitByID("fighter2");
+
+        IncomingForce force = force(Horizon.IMMEDIATE);
+        assertThat(force.isEmpty()).isFalse();
+        assertThat(force.ships()).containsEntry(UnitType.Fighter, 3);
+        assertThat(force.fleetCost()).isCloseTo(1.5, org.assertj.core.data.Offset.offset(1e-9));
+    }
 }

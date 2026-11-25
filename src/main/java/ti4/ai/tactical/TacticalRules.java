@@ -1,5 +1,6 @@
 package ti4.ai.tactical;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,8 +8,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import ti4.ai.actioncards.ActionCardRules;
 import ti4.ai.actioncards.ProductionCards;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
@@ -16,7 +19,10 @@ import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CustodiansRace;
+import ti4.ai.eval.Departure;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MoveBudget;
+import ti4.ai.eval.TurnState;
 import ti4.ai.explore.ExplorationRules;
 import ti4.ai.legendary.TempestaRules;
 import ti4.ai.naalu.MatriarchRules;
@@ -59,6 +65,9 @@ public class TacticalRules {
     static final String SECOND_ACTION_KEY = "secondAction|";
     private static final String EXTRA_ACTION_KEY = "extraAction|";
     private static final String ANOTHER_PRESSED_KEY = "anotherActionPressed|";
+    private static final String OUT_OF_RANGE_RESET_KEY = "outOfRangeReset|";
+    private static final String MOVEMENT_CONCLUDED_KEY = "movementConcluded|";
+    private static final long MOVEMENT_CARD_WAIT_MILLIS = 30_000L;
     private static final String SECOND_ACTION_SUFFIX = "#2";
     private static final String FLEET_LOGISTICS = "fl";
     private static final double URGENT_SCORE = 0.75 * ObjectiveValue.VICTORY_POINT_VALUE;
@@ -91,9 +100,8 @@ public class TacticalRules {
             Set.of(UnitState.dmg.name(), UnitState.glv.name(), UnitState.dmg_glv.name());
 
     public static boolean inProgress(Game game, Player seat) {
-        String summary = game.getStoredValue("currentActionSummary" + seat.getFaction());
         return StringUtils.isNotBlank(game.getCurrentActiveSystem())
-                && summary.contains(" Activated ")
+                && TurnState.activatedThisTurn(game, seat)
                 && !"yes".equals(game.getStoredValue("gameEventTacticalLogged"));
     }
 
@@ -187,8 +195,7 @@ public class TacticalRules {
     }
 
     public static boolean pickingSystem(AiTurnContext context) {
-        String summary = context.game().getStoredValue("currentActionSummary" + context.faction());
-        boolean picking = !summary.contains(" Activated ") || pickingSecondSystem(context);
+        boolean picking = !TurnState.activatedThisTurn(context.game(), context.seat()) || pickingSecondSystem(context);
         return picking && !pickers(context, Prompts.thisTurn(context)).isEmpty();
     }
 
@@ -240,9 +247,18 @@ public class TacticalRules {
     }
 
     public static boolean activatedThisTurn(AiTurnContext context) {
-        return context.game()
-                .getStoredValue("currentActionSummary" + context.faction())
-                .contains(" Activated ");
+        return TurnState.activatedThisTurn(context.game(), context.seat());
+    }
+
+    public static Optional<AiDecision> rollForRifts(AiTurnContext context) {
+        Game game = context.game();
+        if (!context.isActivePlayer() || !"action".equalsIgnoreCase(game.getPhaseOfGame()) || !inProgress(context)) {
+            return Optional.empty();
+        }
+        String target = game.getCurrentActiveSystem();
+        Tile tile = StringUtils.isBlank(target) ? null : game.getTileByPosition(target);
+        if (tile == null) return Optional.empty();
+        return RiftRolls.next(context, Prompts.thisTurn(context), tile);
     }
 
     public static Optional<AiDecision> continueAction(AiTurnContext context) {
@@ -375,20 +391,114 @@ public class TacticalRules {
         if (prompt.isEmpty()) return Optional.empty();
         AiPrompt movementPrompt = prompt.get();
         if (CeasefireRules.blocksMovement(context)) return holdPosition(context, turn, movementPrompt, target);
-        Optional<AiDecision> boost = TempestaRules.boost(context, movementPrompt, plan);
+        if (ActionCardRules.movementCardPending(context)) {
+            return Optional.of(new AiDecision.Wait(
+                    context.now() + MOVEMENT_CARD_WAIT_MILLIS, "the movement card play to settle before moving"));
+        }
+        Optional<AiDecision> reset = resetOutOfRangeMoves(context, turn, plan);
+        if (reset.isPresent()) return reset;
+        Optional<TacticalPlan> reachable = plan.map(planned -> withinRange(context, planned));
+        Optional<AiDecision> boost = TempestaRules.boost(context, movementPrompt, reachable);
         if (boost.isPresent()) return boost;
         if (movementPrompt.hasHandlerPrefix("unitTacticalMove_")) {
-            return unitView(context, movementPrompt, plan);
+            return unitView(context, movementPrompt, reachable);
         }
-        if (plan.isPresent()) {
-            for (UnitMove move : plan.get().moves()) {
+        if (reachable.isPresent()) {
+            for (UnitMove move : reachable.get().moves()) {
                 if (remaining(context, move) <= 0 || originExhausted(context, move.origin())) continue;
                 Optional<Match> from = Prompts.owned(turn, faction, ("tacticalMoveFrom_" + move.origin())::equals);
                 if (from.isPresent()) return Optional.of(from.get().press("pick units in " + move.origin()));
             }
         }
-        return Prompts.owned(turn, faction, ("concludeMove_" + target)::equals)
-                .map(match -> match.press("finish moving"));
+        return Prompts.owned(turn, faction, ("concludeMove_" + target)::equals).map(match -> {
+            RiftRolls.record(context, target);
+            return concludeMovement(context, match, "finish moving");
+        });
+    }
+
+    private static AiDecision concludeMovement(AiTurnContext context, Match match, String reason) {
+        context.memory().put(MOVEMENT_CONCLUDED_KEY + actionKey(context), String.valueOf(context.now()));
+        return match.press(reason);
+    }
+
+    public static boolean movementConcluded(AiTurnContext context) {
+        return context.memory().has(MOVEMENT_CONCLUDED_KEY + actionKey(context))
+                || afterMovementPromptIsNewest(context, Prompts.thisTurn(context));
+    }
+
+    private static boolean afterMovementPromptIsNewest(AiTurnContext context, List<AiPrompt> turn) {
+        String faction = context.faction();
+        Optional<Match> after = Prompts.owned(turn, faction, SpaceCannonWait::afterMovement);
+        if (after.isEmpty()) return false;
+        Optional<Match> moving = Prompts.owned(
+                turn,
+                faction,
+                id -> id.startsWith("unitTacticalMove_")
+                        || id.startsWith("tacticalMoveFrom_")
+                        || id.startsWith("concludeMove_"));
+        return moving.isEmpty()
+                || after.get().prompt().createdAtMillis()
+                        > moving.get().prompt().createdAtMillis();
+    }
+
+    public static List<Departure> departures(TacticalPlan plan) {
+        return plan.moves().stream()
+                .map(move -> new Departure(move.origin(), move.type(), move.count()))
+                .toList();
+    }
+
+    static boolean inRange(Game game, Player seat, TacticalPlan plan) {
+        Tile target = game.getTileByPosition(plan.target());
+        return target != null && MoveBudget.feasible(game, seat, target, departures(plan));
+    }
+
+    private static Optional<AiDecision> resetOutOfRangeMoves(
+            AiTurnContext context, List<AiPrompt> turn, Optional<TacticalPlan> plan) {
+        String resetKey = OUT_OF_RANGE_RESET_KEY + actionKey(context);
+        if (plan.isEmpty()
+                || context.game().getTacticalActionDisplacement().isEmpty()
+                || context.memory().has(resetKey)
+                || inRange(context.game(), context.seat(), plan.get())) {
+            return Optional.empty();
+        }
+        return Prompts.owned(turn, context.faction(), "resetTacticalMovement"::equals)
+                .map(match -> {
+                    context.memory().put(resetKey, "yes");
+                    return match.press(
+                            "take back moves that no longer reach " + plan.get().target());
+                });
+    }
+
+    private static TacticalPlan withinRange(AiTurnContext context, TacticalPlan plan) {
+        Game game = context.game();
+        Player seat = context.seat();
+        if (inRange(game, seat, plan)) return plan;
+        TacticalPlan replacement = freshPlan(context, plan)
+                .filter(fresh -> inRange(game, seat, fresh))
+                .orElseGet(() -> trimToRange(game, seat, plan));
+        remember(context, replacement);
+        return replacement;
+    }
+
+    private static Optional<TacticalPlan> freshPlan(AiTurnContext context, TacticalPlan plan) {
+        if (!context.game().getTacticalActionDisplacement().isEmpty()) return Optional.empty();
+        return TacticalPlanner.forTarget(context.game(), context.seat(), plan.target());
+    }
+
+    private static TacticalPlan trimToRange(Game game, Player seat, TacticalPlan plan) {
+        Map<String, List<UnitMove>> byOrigin = plan.moves().stream()
+                .collect(Collectors.groupingBy(UnitMove::origin, LinkedHashMap::new, Collectors.toList()));
+        List<UnitMove> kept = new ArrayList<>();
+        for (List<UnitMove> group : byOrigin.values()) {
+            List<UnitMove> trial = new ArrayList<>(kept);
+            trial.addAll(group);
+            if (inRange(game, seat, withMoves(plan, trial))) kept = trial;
+        }
+        return withMoves(plan, kept);
+    }
+
+    private static TacticalPlan withMoves(TacticalPlan plan, List<UnitMove> moves) {
+        return new TacticalPlan(plan.kind(), plan.target(), List.copyOf(moves), plan.landings(), plan.score());
     }
 
     private static Optional<AiDecision> holdPosition(
@@ -405,7 +515,7 @@ public class TacticalRules {
             if (reset.isPresent()) return Optional.of(reset.get().press("take back its moves under a Ceasefire"));
         }
         return Prompts.owned(turn, faction, ("concludeMove_" + target)::equals)
-                .map(match -> match.press("move nothing into " + target + " under a Ceasefire"));
+                .map(match -> concludeMovement(context, match, "move nothing into " + target + " under a Ceasefire"));
     }
 
     private static Optional<AiDecision> unitView(AiTurnContext context, AiPrompt prompt, Optional<TacticalPlan> plan) {

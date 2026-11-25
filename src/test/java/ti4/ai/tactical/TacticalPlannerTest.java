@@ -302,6 +302,43 @@ class TacticalPlannerTest extends BaseTi4Test {
         assertThat(plan.moves()).noneMatch(move -> move.type() == UnitType.Dreadnought);
     }
 
+    // Gathering keeps contributions most expensive first and skips any that break the fit. It used to drop from the
+    // cheap end only, so one contribution that could not fit at all threw away every other one with it.
+    @Test
+    void gatheringSkipsAContributionThatDoesNotFitAndKeepsTheRest() {
+        List<String> kept =
+                TacticalPlanner.keepEachThatFits(List.of("A", "B", "C"), 3, chosen -> !chosen.contains("A"));
+        assertThat(kept).containsExactly("B", "C");
+
+        List<String> onlyOneMayJoinA = TacticalPlanner.keepEachThatFits(
+                List.of("A", "B", "C"), 3, chosen -> !(chosen.contains("A") && chosen.contains("B")));
+        assertThat(onlyOneMayJoinA).containsExactly("A", "C");
+
+        assertThat(TacticalPlanner.keepEachThatFits(List.of("A", "B", "C"), 2, chosen -> true))
+                .containsExactly("A", "B");
+    }
+
+    // Transport capacity only counts up to the cargo waiting at the origin. With a single infantry at home, both the
+    // carrier and the dreadnought (capacity 1) can carry it, so the one Gravity Drive boost goes to the dreadnought,
+    // the stronger ship; an empty carrier slot used to outweigh it.
+    @Test
+    void gravityDriveBoostsTheDreadnoughtWhenItCarriesAllTheCargo() {
+        String farther = twoSystemsFromHome();
+        test.place("26", neighbour);
+        test.place("27", farther);
+        test.sol.addPlanet("newalbion");
+        test.sol.addPlanet("starpoint");
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 1);
+        test.nekro.addTech("gd");
+
+        TacticalPlan plan = attackOn(farther).orElseThrow();
+
+        assertThat(plan.moves()).noneMatch(move -> move.type() == UnitType.Carrier);
+        assertThat(plan.moves()).anyMatch(move -> move.type() == UnitType.Dreadnought);
+    }
+
     // A mech is the better garrison: when home needs one against a landing party, the mech stays and the last
     // infantry is free to take Lodor.
     @Test
@@ -488,7 +525,7 @@ class TacticalPlannerTest extends BaseTi4Test {
     @Test
     void x89MakesAnInvasionWorthIt() {
         test.units(home, "space", test.nekro, UnitType.Carrier, 1);
-        test.units(home, "space", test.nekro, UnitType.Dreadnought, 1);
+        test.units(home, "space", test.nekro, UnitType.Cruiser, 1);
         test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 4);
         Tile lodor = test.place("26", neighbour);
         test.sol.addPlanet("lodor");

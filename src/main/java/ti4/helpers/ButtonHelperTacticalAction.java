@@ -1465,10 +1465,21 @@ public final class ButtonHelperTacticalAction {
                 }
             }
         }
+        clearActivationBoosts(game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void clearActivationBoosts(Game game) {
         game.removeStoredValue("crucibleBoost");
         game.removeStoredValue("flankspeedBoost");
+        clearMovementEnablers(game);
         game.removeStoredValue("baldrickGDboost");
-        ButtonHelper.deleteMessage(event);
+        game.removeStoredValue("tempestaUsed");
+    }
+
+    public static void clearMovementEnablers(Game game) {
+        game.removeStoredValue("lostStarChart");
+        game.removeStoredValue("navSuite");
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {

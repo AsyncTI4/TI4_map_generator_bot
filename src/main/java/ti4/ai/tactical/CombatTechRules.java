@@ -151,7 +151,7 @@ class CombatTechRules {
                 .mapToDouble(type -> cost(seat, type))
                 .min()
                 .orElse(Double.MAX_VALUE);
-        for (Player other : game.getRealPlayers()) {
+        for (Player other : game.getRealPlayersNNeutral()) {
             if (other == seat) continue;
             Map<UnitType, Integer> ships = BoardView.ships(space, other);
             ships.remove(UnitType.Fighter);
@@ -215,7 +215,7 @@ class CombatTechRules {
 
     private static double bestTwoEnemyShips(Game game, Player seat, Tile tile) {
         UnitHolder space = BoardView.space(tile);
-        return game.getRealPlayers().stream()
+        return game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != seat)
                 .flatMap(other -> BoardView.ships(space, other).entrySet().stream()
                         .flatMap(entry -> Stream.generate(() -> cost(other, entry.getKey()))

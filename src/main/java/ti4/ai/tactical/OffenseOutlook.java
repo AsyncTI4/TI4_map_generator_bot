@@ -159,7 +159,8 @@ final class OffenseOutlook {
                 + imperial
                 + nekroGain
                 + defenseTerm
-                + existing;
+                + existing
+                + terms.laterLanding();
         double losses = estimate.ourExpectedLoss();
         double anger = 0;
         double counter = 0;

@@ -55,11 +55,12 @@ class SpaceCannonWait {
     }
 
     private static boolean movementFinished(AiTurnContext context, List<AiPrompt> turn) {
-        return Prompts.owned(
-                        turn,
-                        context.faction(),
-                        id -> AFTER_MOVEMENT_PREFIXES.stream().anyMatch(id::startsWith))
+        return Prompts.owned(turn, context.faction(), SpaceCannonWait::afterMovement)
                 .isPresent();
+    }
+
+    static boolean afterMovement(String handlerId) {
+        return AFTER_MOVEMENT_PREFIXES.stream().anyMatch(handlerId::startsWith);
     }
 
     private static String names(List<Player> players) {

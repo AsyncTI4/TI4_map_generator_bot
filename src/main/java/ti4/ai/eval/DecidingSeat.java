@@ -23,6 +23,11 @@ public class DecidingSeat {
         return decider == null ? seat : decider;
     }
 
+    public static String id() {
+        @Nullable String deciding = DECIDING.get();
+        return deciding == null ? "" : deciding;
+    }
+
     public static <T> T of(Player seat, Supplier<T> decision) {
         @Nullable String before = DECIDING.get();
         DECIDING.set(seat.getUserID());

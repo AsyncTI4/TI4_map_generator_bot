@@ -50,13 +50,14 @@ class ScarTokenTest extends BaseTi4Test {
         assertThat(ScarToken.kept(test.game, test.sol)).isZero();
     }
 
+    // Eight tokens: the round two status phase keeps three fleet tokens for round three before the third strategy one.
     @Test
     void takesAThirdStrategyTokenWhileTheRouteNeedsResearch() {
         test.game.setPhaseOfGame("status");
         test.nekro.setTacticalCC(0);
-        Map<CommandTokenPolicy.Pool, Integer> held = CommandTokenPolicy.ideal(test.game, test.sol, 7);
+        Map<CommandTokenPolicy.Pool, Integer> held = CommandTokenPolicy.ideal(test.game, test.sol, 8);
         test.sol.removeSecret(test.sol.getSecretsUnscored().get("ans"));
-        Map<CommandTokenPolicy.Pool, Integer> without = CommandTokenPolicy.ideal(test.game, test.sol, 7);
+        Map<CommandTokenPolicy.Pool, Integer> without = CommandTokenPolicy.ideal(test.game, test.sol, 8);
 
         assertThat(held.get(CommandTokenPolicy.Pool.STRATEGY))
                 .isGreaterThan(without.get(CommandTokenPolicy.Pool.STRATEGY));

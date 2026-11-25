@@ -2,12 +2,17 @@ package ti4.ai.tactical;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.FracturePrize;
+import ti4.ai.eval.Journey;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
 import ti4.game.Planet;
 import ti4.game.Player;
@@ -46,6 +51,7 @@ public final class StyxProbe {
         Player holder = BoardView.controller(game, styxPlanet.getName());
         line.append(" holder=").append(holder == null ? "none" : holder.getFaction());
         reachLine(context, game, seat, styx, line);
+        tokenLine(game, seat, line);
         productionLine(game, seat, line);
         Player opponent = TacticalPlanner.singleOpponent(game, seat, styx);
         line.append(" opp=")
@@ -75,6 +81,20 @@ public final class StyxProbe {
                             .append(plan.kind())
                             .append(':')
                             .append(fmt(plan.score())));
+            ranked.stream()
+                    .filter(plan -> TacticalPlanner.isMarchStep(game, seat, plan))
+                    .findFirst()
+                    .ifPresentOrElse(
+                            plan -> line.append(" marchRank=")
+                                    .append(ranked.indexOf(plan))
+                                    .append(':')
+                                    .append(plan.kind())
+                                    .append('@')
+                                    .append(plan.target())
+                                    .append(':')
+                                    .append(fmt(plan.score())),
+                            () -> line.append(" marchRank=none"));
+            line.append(" topMoves=").append(top.moves().size());
         }
         return Optional.of(line.toString());
     }
@@ -93,17 +113,24 @@ public final class StyxProbe {
     private static void reachLine(
             TacticalPlanner.Context context, Game game, Player seat, Tile styx, StringBuilder line) {
         double[] within = new double[5];
-        for (Tile origin : context.origins()) {
-            for (UnitType type : BoardView.MOVING_SHIPS) {
-                int count = BoardView.count(BoardView.space(origin), seat, type);
-                if (count == 0) continue;
-                int move = BoardView.moveValueWithGravityDrive(seat, type);
-                for (int actions = 1; actions <= 4; actions++) {
-                    if (context.reach(origin, actions * move).containsKey(styx.getPosition())) {
-                        within[actions] += count * TacticalPlanner.cost(seat, type);
-                    }
-                }
-            }
+        java.util.Set<String> origins =
+                context.origins().stream().map(Tile::getPosition).collect(java.util.stream.Collectors.toSet());
+        for (int legs = 1; legs <= 4; legs++) {
+            int rounds = legs;
+            // One leg per round: ships that moved sit under the activated system's token until the status phase.
+            MoveBudget.shipsWithin(
+                            game,
+                            seat,
+                            styx,
+                            Journey.rounds(rounds),
+                            tile -> origins.contains(tile.getPosition()),
+                            type -> TacticalPlanner.cost(seat, type),
+                            Integer.MAX_VALUE)
+                    .values()
+                    .forEach(ships -> ships.forEach((type, count) -> {
+                        if (BoardView.MOVING_SHIPS.contains(type))
+                            within[rounds] += count * TacticalPlanner.cost(seat, type);
+                    }));
         }
         line.append(" reach1-4=")
                 .append(fmt(within[1]))
@@ -134,6 +161,21 @@ public final class StyxProbe {
         line.append(" free=").append(fmt(total)).append(" heldBack=").append(fmt(total - grouped));
     }
 
+    private static void tokenLine(Game game, Player seat, StringBuilder line) {
+        int total = seat.getTacticalCC() + seat.getFleetCC() + seat.getStrategicCC();
+        var ideal = ti4.ai.nekro.CommandTokenPolicy.ideal(game, seat, total);
+        line.append(" gatherFleet=")
+                .append(ti4.ai.eval.FractureCampaign.gatheringFleet(game, seat))
+                .append(" cc=")
+                .append(seat.getTacticalCC())
+                .append("/")
+                .append(seat.getFleetCC())
+                .append("/")
+                .append(seat.getStrategicCC())
+                .append(" idealFleet=")
+                .append(ideal.get(ti4.ai.nekro.CommandTokenPolicy.Pool.FLEET));
+    }
+
     private static void productionLine(Game game, Player seat, StringBuilder line) {
         int nearest = Integer.MAX_VALUE;
         for (Tile tile : game.getTileMap().values()) {
@@ -141,7 +183,7 @@ public final class StyxProbe {
                     .anyMatch(planet -> BoardView.count(planet, seat, UnitType.Spacedock) > 0);
             if (!dock) continue;
             for (var entry :
-                    MovementGraph.reach(game, seat, tile.getPosition(), 4).entrySet()) {
+                    MovementGraph.distances(game, seat, tile.getPosition(), 4).entrySet()) {
                 Tile reached = game.getTileByPosition(entry.getKey());
                 if (reached != null && FracturePrize.hasIngress(reached)) nearest = Math.min(nearest, entry.getValue());
             }
@@ -166,9 +208,20 @@ public final class StyxProbe {
                 .mapToDouble(Double::doubleValue)
                 .max()
                 .orElse(0);
+        TacticalPlanner.Candidate strongest = pool.stream()
+                .max(Comparator.comparingDouble(found -> found.estimate().spaceWin()))
+                .orElseThrow();
+        line.append(" poolSize=")
+                .append(pool.size())
+                .append(" bestSWin=")
+                .append(fmt(strongest.estimate().spaceWin()))
+                .append(" bestShips=")
+                .append(strongest.strike().ships())
+                .append(" landMin=")
+                .append(fmt(best.strike().rules().landMinWin()));
         String gate = best.estimate().spaceWin() < best.strike().rules().landMinWin()
                 ? "spaceWin"
-                : value.score() < TacticalPlanner.ATTACK_MIN_SCORE ? "score" : "ok";
+                : value.score() < TacticalPlanner.attackMinScore(opponent) ? "score" : "ok";
         line.append(" strike=")
                 .append(gate)
                 .append(" sWin=")
@@ -198,7 +251,7 @@ public final class StyxProbe {
                 .append(fmt(feasibility))
                 .append(" prize=")
                 .append(fmt(TacticalPlanner.stagePrize(context, styx, opponent)));
-        if (feasibility < 0.5) {
+        if (feasibility <= 0) {
             line.append(" stage=feas");
             return;
         }
@@ -213,7 +266,7 @@ public final class StyxProbe {
                 continue;
             }
             if (BoardView.hasEnemyShips(game, seat, staging)) continue;
-            TacticalPlanner.gather(context, styx, staging, TacticalPlanner.stageLead(opponent))
+            TacticalPlanner.gather(context, styx, staging, TacticalPlanner.stageLead(opponent, styx))
                     .ifPresent(gatherings::add);
         }
         if (gatherings.isEmpty()) {
@@ -242,7 +295,8 @@ public final class StyxProbe {
                 double leaving = gathering.contributions().stream()
                         .mapToDouble(found -> context.defense().leaveCost(found.origin(), found.moves()))
                         .sum();
-                parts = "fut=" + fmt(future) + ",ctr=" + fmt(counter) + ",leave=" + fmt(leaving) + "@"
+                parts = "fut=" + fmt(future) + ",ctr=" + fmt(counter) + ",leave=" + fmt(leaving) + ","
+                        + progressParts(context, styx, gathering) + "@"
                         + gathering.staging().getPosition();
             }
         }
@@ -263,11 +317,28 @@ public final class StyxProbe {
                 .append('@')
                 .append(bestAt)
                 .append(" stage=")
-                .append(bestFuture < TacticalPlanner.ATTACK_MIN_SCORE ? "future" : "ok")
+                .append(bestFuture <= 0 ? "future" : bestScore < TacticalPlanner.MIN_SCORE ? "belowMin" : "ok")
                 .append(" stageSc=")
                 .append(bestScore == Double.NEGATIVE_INFINITY ? "-" : fmt(bestScore))
                 .append(" parts=")
                 .append(parts);
+    }
+
+    private static String progressParts(
+            TacticalPlanner.Context context, Tile styx, TacticalPlanner.Gathering gathering) {
+        Player seat = context.seat;
+        Map<UnitType, Integer> ships = new EnumMap<>(UnitType.class);
+        ships.putAll(BoardView.ships(BoardView.space(gathering.staging()), seat));
+        gathering.ships().forEach(move -> ships.merge(move.type(), move.count(), Integer::sum));
+        TacticalPlanner.Joined joined = TacticalPlanner.styxJoiners(
+                context, styx, gathering.staging(), gathering.ships(), gathering.cargo(), ships);
+        double joinedCost = joined.ships().entrySet().stream()
+                .mapToDouble(entry -> entry.getValue() * TacticalPlanner.cost(seat, entry.getKey()))
+                .sum();
+        double strength = GatherProgress.strengthShare(joinedCost, TacticalPlanner.takingFleetCost(context));
+        int cargo = gathering.cargo().stream().mapToInt(UnitMove::count).sum();
+        return "str=" + fmt(strength) + ",cargo=" + cargo + ",joinGround=" + joined.ground() + ",fetch="
+                + TacticalPlanner.canFetch(context);
     }
 
     private static String fmt(double value) {

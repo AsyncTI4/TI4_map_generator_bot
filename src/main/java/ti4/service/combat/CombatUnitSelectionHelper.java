@@ -1,8 +1,10 @@
 package ti4.service.combat;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
@@ -124,7 +126,7 @@ public class CombatUnitSelectionHelper {
 
     private static Map<UnitModel, Integer> collectEligibleUnitsFromSystem(
             Tile tile, Player player, Predicate<UnitModel> eligibilityCheck) {
-        Map<UnitModel, Integer> mergedUnits = new HashMap<>();
+        Map<UnitModel, Integer> mergedUnits = new LinkedHashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             addEligibleUnitsOnHolder(mergedUnits, unitHolder, player, eligibilityCheck);
         }
@@ -150,14 +152,25 @@ public class CombatUnitSelectionHelper {
         return unitsByAsyncId.entrySet().stream()
                 .map(entry -> new ImmutablePair<>(
                         player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                .collect(inBoardOrder(Pair::getLeft, Pair::getRight));
     }
 
     private static Map<UnitModel, Integer> filterUnits(
             Map<UnitModel, Integer> unitsInCombat, Predicate<UnitModel> eligibilityCheck) {
-        return new HashMap<>(unitsInCombat.entrySet().stream()
+        return unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && eligibilityCheck.test(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                .collect(inBoardOrder(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static <T> Collector<T, ?, Map<UnitModel, Integer>> inBoardOrder(
+            Function<T, UnitModel> unit, Function<T, Integer> count) {
+        return Collectors.toMap(
+                unit,
+                count,
+                (first, second) -> {
+                    throw new IllegalStateException("Duplicate unit model in combat");
+                },
+                LinkedHashMap::new);
     }
 
     /**
@@ -176,7 +189,7 @@ public class CombatUnitSelectionHelper {
             Map<UnitModel, Integer> unitsOnCombatHolder = unitsByAsyncId.entrySet().stream()
                     .map(entry -> new ImmutablePair<>(
                             player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
-                    .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                    .collect(inBoardOrder(Pair::getLeft, Pair::getRight));
             return new CombatSelectionContext(tile, unitHolder, player, unitsByAsyncId, unitsOnCombatHolder);
         }
 

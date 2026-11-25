@@ -13,7 +13,7 @@ import ti4.ai.actioncards.AiCard.KeepFloor;
 import ti4.ai.actioncards.AiCard.Window;
 import ti4.ai.agenda.RiderPayoff;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.eval.MoveBoost;
+import ti4.ai.eval.MovementCard;
 import ti4.ai.nekro.CommandTokenPolicy;
 import ti4.ai.tactical.Stall;
 import ti4.game.Game;
@@ -87,15 +87,9 @@ public class AiActionCards {
                             ExtraActionCard.masterPlan(),
                             ExtraActionCard.counterstroke(),
                             ProductionCards.warMachine(),
-                            new AiCard(
-                                    MoveBoost.FLANK_SPEED,
-                                    MoveBoost::isFlankSpeed,
-                                    Window.AFTER_ACTIVATION,
-                                    NEVER,
-                                    PRIOR,
-                                    null,
-                                    List.of(),
-                                    null),
+                            movementCard(MovementCard.FLANK_SPEED),
+                            movementCard(MovementCard.LOST_STAR_CHART),
+                            movementCard(MovementCard.NAV_SUITE),
                             new AiCard(
                                     SABOTAGE,
                                     ActionCardHelper::isSabotageOrShatter,
@@ -174,6 +168,11 @@ public class AiActionCards {
                 targetPrefixes,
                 target,
                 onResolve);
+    }
+
+    private static AiCard movementCard(MovementCard card) {
+        return new AiCard(
+                card.automationId(), card::isCard, Window.AFTER_ACTIVATION, NEVER, PRIOR, null, List.of(), null);
     }
 
     static AiCard combatRound(String key, String resolveHandler) {

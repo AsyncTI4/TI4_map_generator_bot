@@ -43,7 +43,7 @@ public record CannonDice(int dice, int hitsOn) {
     public static List<Double> againstShipsOf(Game game, Player target, Tile tile) {
         List<Double> chances = new ArrayList<>();
         if (tile.isScar(game)) return chances;
-        for (Player shooter : game.getRealPlayers()) {
+        for (Player shooter : game.getRealPlayersNNeutral()) {
             if (shooter != target) chances.addAll(fromShooter(game, tile, shooter, target));
         }
         return chances;

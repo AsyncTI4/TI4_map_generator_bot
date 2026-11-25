@@ -51,13 +51,16 @@ class EnemyIntent {
                 () -> ImaginedTurn.of(enemy, () -> bestAttack(game, enemy, tile, defender)));
     }
 
-    private static String memoryMark(Game game, Player enemy) {
-        return AttackLedger.remembers(game, enemy) ? "|" + AiExperiments.Experiment.ATTACK_MEMORY : "";
+    private static String experimentMarks(Game game, Player enemy) {
+        String memory = AttackLedger.remembers(game, enemy) ? "|" + AiExperiments.Experiment.ATTACK_MEMORY : "";
+        String pooled =
+                TacticalPlanner.poolsMoveBoosts(game, enemy) ? "|" + AiExperiments.Experiment.POOLED_BOOST_RESPLIT : "";
+        return memory + pooled;
     }
 
     @SuppressWarnings("unchecked")
     private static <T> T remembered(Game game, Player enemy, String key, Supplier<T> compute) {
-        String fullKey = game.getName() + "|" + key + memoryMark(game, enemy);
+        String fullKey = game.getName() + "|" + key + experimentMarks(game, enemy);
         Cached cached = CACHE.get(fullKey);
         if (cached != null && cached.isFor(game)) return (T) cached.value();
         T value = compute.get();

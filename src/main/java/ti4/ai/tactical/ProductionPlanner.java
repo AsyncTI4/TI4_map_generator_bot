@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +25,7 @@ import ti4.ai.eval.FleetLimit;
 import ti4.ai.eval.FractureCampaign;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.Threats;
 import ti4.ai.eval.ValueScale;
@@ -708,11 +710,16 @@ public class ProductionPlanner {
     private static void planFractureFleet(Builder builder) {
         if (!FractureCampaign.isDock(builder.game, builder.seat, builder.tile)) return;
         fractureShipsUpTo(builder, UnitType.Carrier, FractureCampaign.CARRIERS, builder::lockedShip);
-        fractureShipsUpTo(builder, UnitType.Dreadnought, FractureCampaign.DREADNOUGHTS, builder::evictableShip);
+        fractureShipsUpTo(
+                builder,
+                UnitType.Dreadnought,
+                FractureCampaign.dreadnoughts(builder.game, builder.seat),
+                builder::evictableShip);
         int spare = TacticalPlanner.movableGroundForces(builder.game, builder.seat, builder.tile, builder.defense)
                 + builder.planned(UnitType.Infantry);
         builder.infantry(
-                FractureCampaign.INFANTRY - spare, fractureValuePerResource(builder) * builder.cost(UnitType.Infantry));
+                FractureCampaign.infantry(builder.game, builder.seat) - spare,
+                fractureValuePerResource(builder) * builder.cost(UnitType.Infantry));
     }
 
     private static void planFractureFighters(Builder builder) {
@@ -761,7 +768,9 @@ public class ProductionPlanner {
         double interest = FracturePrize.interest(game, builder.seat);
         if (interest == 0) return 0;
         boolean nearAnIngress =
-                MovementGraph.reach(game, builder.seat, builder.tile.getPosition(), FRACTURE_RANGE).keySet().stream()
+                MovementGraph.distances(game, builder.seat, builder.tile.getPosition(), FRACTURE_RANGE)
+                        .keySet()
+                        .stream()
                         .map(game::getTileByPosition)
                         .anyMatch(tile -> tile != null && FracturePrize.hasIngress(tile));
         return nearAnIngress ? interest : 0;
@@ -771,7 +780,7 @@ public class ProductionPlanner {
         Game game = builder.game;
         Standings standings = builder.defense.standings();
         double interest = 0;
-        for (String position : MovementGraph.reach(game, builder.seat, builder.tile.getPosition(), FRONTLINE_RANGE)
+        for (String position : MovementGraph.distances(game, builder.seat, builder.tile.getPosition(), FRONTLINE_RANGE)
                 .keySet()) {
             Tile tile = game.getTileByPosition(position);
             if (tile == null) continue;
@@ -855,9 +864,7 @@ public class ProductionPlanner {
     }
 
     private static boolean reachesSupremacy(Game game, Player seat, Tile dock, UnitType type) {
-        int move = BoardView.moveValueWithGravityDrive(seat, type);
-        for (String position :
-                MovementGraph.reach(game, seat, dock.getPosition(), move).keySet()) {
+        for (String position : builtShipReach(game, seat, type, dock, 1).keySet()) {
             Tile tile = game.getTileByPosition(position);
             if (tile != null
                     && (tile.isMecatol(game) || (tile.isHomeSystem(game) && tile != seat.getHomeSystemTile()))) {
@@ -865,6 +872,19 @@ public class ProductionPlanner {
             }
         }
         return false;
+    }
+
+    static Map<String, Integer> builtShipReach(Game game, Player seat, UnitType type, Tile dock, int rounds) {
+        int ceiling = MoveBudget.laterRoundCeiling(game, seat, type, dock, rounds);
+        if (ceiling == 0) return Map.of();
+        Map<String, Integer> within = new LinkedHashMap<>();
+        MovementGraph.distances(game, seat, dock.getPosition(), ceiling).forEach((position, distance) -> {
+            Tile target = game.getTileByPosition(position);
+            if (distance <= MoveBudget.laterRoundBudget(game, seat, type, dock, target, rounds)) {
+                within.put(position, distance);
+            }
+        });
+        return within;
     }
 
     private record Claim(
@@ -1224,10 +1244,8 @@ public class ProductionPlanner {
         }
 
         private int countClaimableSystemsInReach() {
-            int move = BoardView.moveValue(seat, UnitType.Carrier);
-            if (move <= 0) return 0;
             int claimable = 0;
-            for (String position : MovementGraph.reach(game, seat, tile.getPosition(), EXPANSION_ROUNDS * move)
+            for (String position : builtShipReach(game, seat, UnitType.Carrier, tile, EXPANSION_ROUNDS)
                     .keySet()) {
                 Tile system = game.getTileByPosition(position);
                 if (system != null && hasClaimablePlanet(system)) claimable++;
@@ -1340,11 +1358,9 @@ public class ProductionPlanner {
         }
 
         private int countGroundToPickUp() {
-            int move = BoardView.moveValue(seat, UnitType.Carrier);
-            if (move <= 0) return 0;
             int waiting = 0;
             for (String position :
-                    MovementGraph.reach(game, seat, tile.getPosition(), move).keySet()) {
+                    builtShipReach(game, seat, UnitType.Carrier, tile, 1).keySet()) {
                 Tile system = game.getTileByPosition(position);
                 if (system == null || system == tile || !hasGroundForcesOnPlanets(system)) continue;
                 UnitHolder space = BoardView.space(system);

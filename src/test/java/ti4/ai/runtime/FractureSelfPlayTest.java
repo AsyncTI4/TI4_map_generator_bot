@@ -119,6 +119,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
         private String attacker;
         private int pointsBefore;
         private int relicsBefore;
+        private int secretPointsBefore;
         boolean taken;
         boolean fleetLost;
         private int waitingForRelic;
@@ -162,7 +163,12 @@ class FractureSelfPlayTest extends BaseTi4Test {
             }
             taken = true;
             round = game.getRound();
-            pointsGained = seat.getTotalVictoryPoints() - pointsBefore - relicPoints(seat);
+            // Secrets the seat scores along the way (e.g. for destroying the neutral dreadnoughts) are not the Styx
+            // point.
+            pointsGained = seat.getTotalVictoryPoints()
+                    - pointsBefore
+                    - relicPoints(seat)
+                    - (seat.getSecretVictoryPoints() - secretPointsBefore);
             relicsGained = seat.getRelics().size() - relicsBefore;
             return relicsGained > 0 || ++waitingForRelic > RELIC_PATIENCE_TICKS;
         }
@@ -201,6 +207,7 @@ class FractureSelfPlayTest extends BaseTi4Test {
             beside.addUnit("space", Units.getUnitKey(UnitType.Infantry, seat.getColor()), infantry);
             pointsBefore = seat.getTotalVictoryPoints();
             relicsBefore = seat.getRelics().size();
+            secretPointsBefore = seat.getSecretVictoryPoints();
             arrangedRound = game.getRound();
             if (flankSpeed) seat.setActionCard("fs1", 401);
         }

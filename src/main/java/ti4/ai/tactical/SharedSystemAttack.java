@@ -61,6 +61,8 @@ class SharedSystemAttack {
         TacticalPlan best = null;
         for (Player lead : withShips.isEmpty() ? present : withShips) {
             Optional<TacticalPlan> plan = TacticalPlanner.finalPlan(
+                    context,
+                    tile,
                     TacticalPlanner.candidatePool(context, tile, lead),
                     finalist -> plan(context, tile, present, finalist));
             if (plan.isPresent() && (best == null || plan.get().score() > best.score())) best = plan.get();
@@ -100,6 +102,8 @@ class SharedSystemAttack {
             Context context, Tile tile, List<Player> present, List<Player> order) {
         Player second = order.get(1);
         return TacticalPlanner.finalPlan(
+                context,
+                tile,
                 TacticalPlanner.candidatePool(context, tile, order.getFirst()),
                 finalist -> twoFleetPlan(context, tile, present, second, finalist));
     }

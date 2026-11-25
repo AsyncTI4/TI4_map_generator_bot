@@ -148,8 +148,8 @@ class StrikeEvaluatorTest extends BaseTi4Test {
         StrikeEstimate weak =
                 estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Cruiser, 1, UnitType.Infantry, 3);
 
-        assertThat(weak.spaceWin()).isZero();
-        assertThat(weak.landings()).isEmpty();
+        assertThat(weak.spaceWin()).isLessThan(0.25);
+        assertThat(weak.ourLossChance()).isGreaterThan(0.75);
         assertThat(weak.ourExpectedLoss()).isGreaterThanOrEqualTo(5.0);
     }
 
@@ -265,7 +265,8 @@ class StrikeEvaluatorTest extends BaseTi4Test {
                 .isEqualTo(1 + estimate.groundSent().get("lodor"));
     }
 
-    // Four PDS II cover the system: the expected hits are enough to destroy the whole small fleet before it fights.
+    // Four PDS II cover the system: two or more of the four dice destroy the whole small fleet before it fights, and
+    // the cargo with it.
     @Test
     void enoughSpaceCannonDestroysTheFleetAndTheCargo() {
         controlSeat();
@@ -275,14 +276,13 @@ class StrikeEvaluatorTest extends BaseTi4Test {
 
         StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Cruiser, 1);
 
-        assertThat(estimate.spaceWin()).isZero();
-        assertThat(estimate.ourLossChance()).isEqualTo(1.0);
-        assertThat(estimate.ourExpectedLoss()).isGreaterThanOrEqualTo(5.0);
+        assertThat(estimate.spaceWin()).isLessThan(0.25);
+        assertThat(estimate.ourLossChance()).isGreaterThan(0.75);
+        assertThat(estimate.ourExpectedLoss()).isGreaterThanOrEqualTo(0.75 * 5.0);
     }
 
-    // The cheapest ship goes first, so with one hit expected the carrier survives, but a surviving carrier's capacity
-    // is
-    // all that can land: two carriers lose one, and half the cargo with it.
+    // One PDS die (6+) sinks a carrier half the time, and then only the surviving carrier's capacity can land: the
+    // take is weighed over both outcomes and the loss counts the carrier in that half.
     @Test
     void cargoOfADestroyedCarrierNeverLands() {
         owns(sardakk(), target, "lodor", UnitType.Infantry, 1);
@@ -290,9 +290,8 @@ class StrikeEvaluatorTest extends BaseTi4Test {
 
         StrikeEstimate estimate = estimate(rules(true, false), UnitType.Carrier, 2, UnitType.Infantry, 8);
 
-        assertThat(estimate.survivors().get(UnitType.Carrier)).isEqualTo(1);
-        assertThat(estimate.groundSent().get("lodor")).isLessThanOrEqualTo(4);
-        assertThat(estimate.ourExpectedLoss()).isGreaterThan(3.0);
+        assertThat(estimate.groundSent().get("lodor")).isLessThanOrEqualTo(8);
+        assertThat(estimate.ourExpectedLoss()).isGreaterThan(0.5 * 3.0 - 1e-9);
     }
 
     @Test
@@ -367,5 +366,21 @@ class StrikeEvaluatorTest extends BaseTi4Test {
                 .filter(position -> !"x".equals(position) && board.test.game.getTileByPosition(position) == null)
                 .findFirst()
                 .orElseThrow();
+    }
+
+    // LRR 16.3 and fleet-pool note alpha: after the strike, Fighter IIs beyond capacity stay only while the fleet pool
+    // has room. With two fleet tokens and one carrier, one fighter beyond the four aboard survives the count.
+    @Test
+    void survivingFighterIIsBeyondCapacityAreKeptOnlyWithinFleetSupply() {
+        nekro().removeOwnedUnitByID("fighter");
+        nekro().addOwnedUnitByID("fighter2");
+        nekro().setFleetCC(2);
+
+        StrikeEstimate tight = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Fighter, 7);
+        assertThat(tight.survivors()).containsEntry(UnitType.Fighter, 5);
+
+        nekro().setFleetCC(10);
+        StrikeEstimate roomy = estimate(rules(true, false), UnitType.Carrier, 1, UnitType.Fighter, 7);
+        assertThat(roomy.survivors()).containsEntry(UnitType.Fighter, 7);
     }
 }

@@ -13,11 +13,13 @@ import ti4.helpers.Units.UnitType;
 public class FractureCampaign {
 
     public static final int DOCK_RANGE = 2;
-    public static final int FLEET_SHIPS = 3;
     public static final int DREADNOUGHTS = 3;
     public static final int CARRIERS = 1;
+    public static final int TAKING_SHIPS = DREADNOUGHTS + CARRIERS;
     public static final int INFANTRY = 6;
     public static final double FOREIGN_ROUTE_SHARE = 0.5;
+    public static final int GATHER_ACTIONS = 2;
+    public static final int GATHER_FLEET_MAX = 6;
 
     public static Optional<Tile> dock(Game game, Player seat) {
         if (!styxToTake(game, seat)) return Optional.empty();
@@ -32,6 +34,60 @@ public class FractureCampaign {
             }
         }
         return Optional.ofNullable(best);
+    }
+
+    public static int fleetShips(Game game, Player seat) {
+        return Math.max(TAKING_SHIPS, strongestRivalFleet(game, seat));
+    }
+
+    public static int gatheringFleet(Game game, Player seat) {
+        Optional<Tile> styx = styxTile(game);
+        if (styx.isEmpty() || !styxToTake(game, seat)) return 0;
+        Map<String, Map<UnitType, Integer>> gathered = MoveBudget.shipsWithin(
+                game,
+                seat,
+                styx.get(),
+                Journey.rounds(GATHER_ACTIONS),
+                tile -> true,
+                FractureCampaign::countsTowardFleet,
+                GATHER_FLEET_MAX);
+        int ships = gathered.values().stream()
+                .flatMap(stack -> stack.entrySet().stream())
+                .filter(entry -> entry.getKey() != UnitType.Fighter)
+                .mapToInt(Map.Entry::getValue)
+                .sum();
+        return Math.min(GATHER_FLEET_MAX, ships);
+    }
+
+    private static double countsTowardFleet(UnitType type) {
+        return BoardView.MOVING_SHIPS.contains(type) ? 1 : 0;
+    }
+
+    private static Optional<Tile> styxTile(Game game) {
+        return FracturePrize.tiles(game).stream()
+                .filter(tile -> tile.getPlanetUnitHolders().stream().anyMatch(FracturePrize::isStyx))
+                .findFirst();
+    }
+
+    public static int dreadnoughts(Game game, Player seat) {
+        return fleetShips(game, seat) - CARRIERS;
+    }
+
+    public static int infantry(Game game, Player seat) {
+        int room = dreadnoughts(game, seat) * BoardView.capacity(seat, UnitType.Dreadnought)
+                + CARRIERS * BoardView.capacity(seat, UnitType.Carrier);
+        return Math.max(INFANTRY, room);
+    }
+
+    private static int strongestRivalFleet(Game game, Player seat) {
+        int strongest = 0;
+        for (Player rival : game.getRealPlayers()) {
+            if (rival == seat) continue;
+            for (Tile tile : game.getTileMap().values()) {
+                strongest = Math.max(strongest, BoardView.nonFighterShips(BoardView.space(tile), rival));
+            }
+        }
+        return strongest;
     }
 
     public static double routeShare(Game game, Player seat) {
@@ -60,7 +116,7 @@ public class FractureCampaign {
     }
 
     private static int distanceToIngress(Game game, Player seat, Tile tile) {
-        Map<String, Integer> reach = MovementGraph.reach(game, seat, tile.getPosition(), DOCK_RANGE);
+        Map<String, Integer> reach = MovementGraph.distances(game, seat, tile.getPosition(), DOCK_RANGE);
         return reach.entrySet().stream()
                 .filter(entry -> {
                     Tile reached = game.getTileByPosition(entry.getKey());

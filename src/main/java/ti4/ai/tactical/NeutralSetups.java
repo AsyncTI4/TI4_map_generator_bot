@@ -8,6 +8,8 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.ImaginedTurn;
+import ti4.ai.eval.Journey;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -17,6 +19,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.model.UnitModel;
 
 @UtilityClass
 public class NeutralSetups {
@@ -85,27 +88,38 @@ public class NeutralSetups {
     private static Strike strikeAt(Game game, Player seat, Tile tile, Pirates pirates) {
         List<Tile> origins = new ArrayList<>();
         List<UnitMove> moves = new ArrayList<>();
-        for (Tile origin : game.getTileMap().values()) {
-            if (origin == tile || origin.hasPlayerCC(seat)) continue;
-            List<UnitMove> departing = shipsReaching(game, seat, origin, tile);
-            if (departing.isEmpty()) continue;
-            origins.add(origin);
+        shipsReaching(game, seat, tile).forEach((position, ships) -> {
+            List<UnitMove> departing = movingShips(position, ships);
+            if (departing.isEmpty()) return;
+            origins.add(game.getTileByPosition(position));
             moves.addAll(departing);
-        }
+        });
         Strike strike = Strike.of(seat, tile, game.getNeutral(), origins, moves, RULES);
         return strike.withExtraDefenderShips(new EnumMap<>(pirates.units));
     }
 
-    private static List<UnitMove> shipsReaching(Game game, Player seat, Tile origin, Tile target) {
+    private static Map<String, Map<UnitType, Integer>> shipsReaching(Game game, Player seat, Tile target) {
+        return MoveBudget.shipsWithin(
+                game,
+                seat,
+                target,
+                Journey.thisAction(),
+                origin -> !origin.hasPlayerCC(seat),
+                type -> shipCost(seat, type),
+                Integer.MAX_VALUE);
+    }
+
+    private static double shipCost(Player seat, UnitType type) {
+        return BoardView.model(seat, type).map(UnitModel::getCost).orElse(0f);
+    }
+
+    private static List<UnitMove> movingShips(String origin, Map<UnitType, Integer> ships) {
         List<UnitMove> departing = new ArrayList<>();
-        for (UnitType type : BoardView.MOVING_SHIPS) {
-            int count = BoardView.count(BoardView.space(origin), seat, type);
-            int move = BoardView.moveValue(seat, type);
-            if (count == 0 || move <= 0) continue;
-            if (MovementGraph.reach(game, seat, origin.getPosition(), move).containsKey(target.getPosition())) {
-                departing.add(new UnitMove(origin.getPosition(), BoardView.SPACE, type, count));
+        ships.forEach((type, count) -> {
+            if (count > 0 && BoardView.MOVING_SHIPS.contains(type)) {
+                departing.add(new UnitMove(origin, BoardView.SPACE, type, count));
             }
-        }
+        });
         return departing;
     }
 

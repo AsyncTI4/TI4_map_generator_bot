@@ -39,7 +39,7 @@ public final class OpeningProbe {
 
     public static String goals(Game game, Player seat) {
         if (seat.getHomeSystemTile() == null) return "no home";
-        java.util.Map<String, Integer> reach = ti4.ai.eval.MovementGraph.reach(
+        java.util.Map<String, Integer> reach = ti4.ai.eval.MovementGraph.distances(
                 game, seat, seat.getHomeSystemTile().getPosition(), 3);
         List<String> parts = new ArrayList<>();
         for (ti4.ai.tactical.RoundGoals.Goal goal :

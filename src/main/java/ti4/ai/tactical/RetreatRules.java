@@ -9,8 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.eval.AnomalyRules;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.eval.RiftRisk;
 import ti4.ai.eval.Threats;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
@@ -51,9 +53,26 @@ public class RetreatRules {
     private static final double DESTINATION_PREFERENCE = 0.1;
 
     static Optional<AiDecision> next(AiTurnContext context, List<AiPrompt> prompts) {
-        return chooseDestination(context, prompts)
+        return riftBeforeRetreat(context, prompts)
+                .or(() -> chooseDestination(context, prompts))
                 .or(() -> groundForces(context, prompts))
                 .or(() -> announceOrRetreat(context, prompts));
+    }
+
+    private static Optional<AiDecision> riftBeforeRetreat(AiTurnContext context, List<AiPrompt> prompts) {
+        return prompts.stream()
+                .flatMap(prompt -> prompt.enabledButtons().stream())
+                .filter(button -> button.isOwnedBy(context.faction())
+                        && button.handlerId().startsWith(DESTINATION_PREFIX))
+                .map(RetreatRules::retreatOrigin)
+                .distinct()
+                .map(origin -> RiftRolls.beforeRetreat(context, prompts, origin))
+                .flatMap(Optional::stream)
+                .findFirst();
+    }
+
+    private static String retreatOrigin(PromptButton button) {
+        return StringUtils.removeStart(button.handlerId(), DESTINATION_PREFIX).split("_")[0];
     }
 
     private static Optional<AiDecision> chooseDestination(AiTurnContext context, List<AiPrompt> prompts) {
@@ -176,11 +195,16 @@ public class RetreatRules {
         if (tile == seat.getHomeSystemTile() || BoardView.nonFighterShips(BoardView.space(tile), seat) == 0) {
             return false;
         }
-        Optional<Player> opponent = game.getRealPlayers().stream()
+        Optional<Player> opponent = game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != seat && BoardView.hasOwnShips(other, tile))
                 .findFirst();
         if (opponent.isEmpty() || !hasDestination(game, seat, tile)) return false;
-        return CombatForces.spaceWinChance(game, tile, seat, opponent.get()) < retreatBelow(game, seat, tile);
+        return CombatForces.spaceWinChance(game, tile, seat, opponent.get()) < retreatBar(game, seat, tile);
+    }
+
+    static double retreatBar(Game game, Player seat, Tile tile) {
+        double below = retreatBelow(game, seat, tile);
+        return AnomalyRules.rollsOnRetreat(game, seat, tile) ? below * RiftRisk.SURVIVAL : below;
     }
 
     public static double retreatBelow(Game game, Player seat, Tile tile) {
@@ -208,8 +232,10 @@ public class RetreatRules {
     }
 
     static boolean canRetreatTo(Game game, Player seat, Tile destination, boolean held) {
-        if (destination.isAsteroidField() && !seat.hasTech(ANTIMASS_DEFLECTORS)) return false;
-        if (destination.isSupernova() && !seat.hasTech(MAGMUS_REACTOR)) return false;
+        boolean circlet = AnomalyRules.holdsCirclet(seat);
+        if (destination.isAsteroidField() && !circlet && !seat.hasTech(ANTIMASS_DEFLECTORS)) return false;
+        if (destination.isSupernova() && !circlet && !seat.hasTech(MAGMUS_REACTOR)) return false;
+        if (AnomalyRules.isNebula(game, destination) && !AnomalyRules.retreatsIntoNebulae(seat)) return false;
         if (BoardView.hasEnemyShips(game, seat, destination)) return false;
         if (held) return true;
         return seat.hasTech(DARK_ENERGY_TAP) && !BoardView.hasEnemyUnits(game, seat, destination);

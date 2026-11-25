@@ -30,7 +30,7 @@ class MovementGraphFractureTest extends BaseTi4Test {
     }
 
     private Map<String, Integer> reach(Tile from, int move) {
-        return MovementGraph.reach(test.game, test.nekro, from.getPosition(), move);
+        return MovementGraph.distances(test.game, test.nekro, from.getPosition(), move);
     }
 
     @Test

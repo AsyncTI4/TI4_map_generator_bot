@@ -41,7 +41,7 @@ class LazaxGateFoldingTest extends BaseTi4Test {
                 .containsExactly(WinnuTestBoard.MECATOL_POSITION);
         assertThat(Adjacency.forMovement(board.test.game, board.winnu, LODOR))
                 .contains(WinnuTestBoard.MECATOL_POSITION);
-        assertThat(MovementGraph.reach(board.test.game, board.winnu, LODOR, 1))
+        assertThat(MovementGraph.distances(board.test.game, board.winnu, LODOR, 1))
                 .containsKey(WinnuTestBoard.MECATOL_POSITION);
     }
 

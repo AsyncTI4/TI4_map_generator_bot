@@ -135,15 +135,18 @@ class CannonCoverRiskTest extends BaseTi4Test {
         assertThat(estimate.ourLossChance()).isGreaterThanOrEqualTo(wiped);
     }
 
+    // The strike estimate rolls the space cannon as a distribution for every seat, so a control seat gets the same
+    // survival chance as a risk seat instead of the old rounded wipe-out.
     @Test
-    void aControlSeatStillCallsTheCoveredStrikeHopeless() {
+    void aControlSeatGetsTheSameSurvivalChanceFromTheStrikeEstimate() {
         Strike4 strike = new Strike4();
+        double wiped = DiceOdds.atLeast(
+                CannonDice.againstShipsOf(strike.board.test.game, strike.board.test.nekro, strike.target), 2);
         control(strike.board.test.nekro);
 
         StrikeEstimate estimate = strike.estimate();
 
-        assertThat(estimate.spaceWin()).isZero();
-        assertThat(estimate.ourLossChance()).isEqualTo(1.0);
+        assertThat(estimate.spaceWin()).isCloseTo(1 - wiped, within(EXACT));
     }
 
     // Threat forecast (DefenseOutlook): Nekro's home holds only a PDS (6+, one die) and a lone Sardakk cruiser waits

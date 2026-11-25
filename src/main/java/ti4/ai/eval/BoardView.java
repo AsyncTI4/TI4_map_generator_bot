@@ -38,7 +38,6 @@ public class BoardView {
     public static final int DOCK_FIGHTER_ALLOWANCE = 3;
     public static final double LEGENDARY_VALUE = 2;
     public static final double TECH_SPECIALTY_VALUE = 0.3;
-    private static final String GRAVITY_DRIVE = "gd";
 
     public static int count(@Nullable UnitHolder holder, Player player, UnitType type) {
         return holder == null ? 0 : holder.getUnitCount(type, player.getColor());
@@ -91,24 +90,6 @@ public class BoardView {
 
     public static Optional<UnitModel> model(Player player, UnitType type) {
         return Optional.ofNullable(player.getUnitByType(type));
-    }
-
-    public static int moveValue(Player player, UnitType type) {
-        int move = model(player, type).map(UnitModel::getMoveValue).orElse(0);
-        return move > 0 ? move + MoveBoost.extra(player) : move;
-    }
-
-    public static int moveValueWithGravityDrive(Player player, UnitType type) {
-        return moveValue(player, type) + (player.hasTech(GRAVITY_DRIVE) ? 1 : 0);
-    }
-
-    public static int moveValueWithBoosts(Player player, UnitType type) {
-        return moveValue(player, type) + singleShipBoosts(player);
-    }
-
-    public static int singleShipBoosts(Player player) {
-        boolean tempesta = LegendaryPlanets.abilityReady(player, LegendaryPlanets.TEMPESTA);
-        return (player.hasTech(GRAVITY_DRIVE) ? 1 : 0) + (tempesta ? 1 : 0);
     }
 
     public static int capacity(Player player, UnitType type) {

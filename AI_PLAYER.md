@@ -471,8 +471,13 @@ to build one by hand:
   3. fleet up to what a revealed _Raise a Fleet_ or _Command an Armada_ needs, once a stack can grow into it this
      round;
   4. fleet up to 3;
-  5. fleet up to 4 while a dock is within two moves of an ingress, one ingress is in the seat's own slice, Styx is
-     not the seat's and a stack has at least 2 ships (`FractureCampaign`: three dreadnoughts and a carrier for Styx);
+  5. fleet up to the Styx fleet while a dock is within two moves of an ingress, one ingress is in the seat's own slice
+     and Styx is not the seat's, before the ships are built (`FractureCampaign.fleetShips`: at least the four ships
+     that take Styx from its guard, three dreadnoughts and a carrier, and as many as the strongest rival stack so the
+     fleet can hold Styx, with no fixed upper size; no fleet of three unupgraded ships that carries enough infantry
+     beats the guard, and production is capped by the pool). In the status phase the four ships that take Styx come
+     earlier, right after two tactic tokens and one strategy token and ahead of the other tactic and strategy levels,
+     so seven tokens cover them; only the growth past four waits here;
   6. strategy up to 2;
   7. fleet up to its largest stack plus one (at most 5), only when that stack has at least 3 ships and other ships
      could join it;
@@ -704,7 +709,7 @@ to build one by hand:
     | Overrule | on Imperial, the points its primary scores beyond what the status phase would (one more public objective than the seat has scoring chances for, 2 for a stage II objective, and 1 for Mecatol Rex), valued as points, or 30 when they reach the goal, plus a fresh secret when it holds no Mecatol Rex; on Technology, what the strategy card plan values the primary at; plus a little for how often human players overrule that card (Imperial 0.5, Technology 0.16). It is held for a *points play* (Imperial with at least a point to score) or a use worth the reserve, see below | an unplayed Imperial or Technology, among the uses the reserve lets through; the card stays unplayed for its holder |
     | Strategize (4 copies) | the best secondary it could perform (Imperial: a fresh secret; Diplomacy: its ready; Construction: a structure when it nears a structure objective; Warfare: a build at home; Politics: two cards; Trade: its missing commodities), less the strategy token the bot takes at once, when no better follow needs that token | the card of that secondary among the unchosen ones and its own unplayed cards (a card another player will play this round can simply be followed), never Technology (the bot's button grants the technology without collecting its 4 resources) or Leadership |
     | Unexpected Action | the best a freed system buys (the Warfare "take back a token" test), else a pure stall; the token goes back to reinforcements | the token whose system unlocks the best tactical action |
-    | Flank Speed (4 copies) | played only for a move into the Fracture its plan needs one more move for, worth that plan less 1.5 for the card | none: played right after it activates the system |
+    | Flank Speed (4 copies), Lost Star Chart, Nav Suite | played only when the remembered plan cannot be moved without the card (one more move; alpha and beta wormhole systems adjacent; anomalies ignored: through nebulae and out of them at full move, into and through asteroid fields and supernovas, across rifts with no roll and no +1), worth that plan less 1.5 for the card. The effects cover only this activation's movement: later legs and rounds (`MoveEnablers.laterActivation`) still feel anomalies and keep normal adjacency. Each card has its own play memory, so Flank Speed and the chart can both be played in one action | none: played right after it activates the system, before it moves |
     | Pirate Contract (4 copies) | the rivals' approaches it blocks (half a point of standing per rival nearby, at most 3), else a pure stall | a legal system that is not next to its own planets or units |
     | Pirate Fleet | 2 × a contender's standing for blocking its approach, less the 3 resources, paid honestly | a legal system next to a contender and away from its own ships |
     | Mercenary Contract | the points a contender loses with the planet (and a third of the planet's value) less the 2 trade goods | an empty non-home planet a contender controls, among the first 22 the bot lists |
@@ -1257,8 +1262,9 @@ to build one by hand:
        holding enemy fighters. A few destroyers to move around for presence objectives.
     2. **Core.** Carriers up to two, the infantry the dock is short of a carrier load, and two mechs (four for
        _Mechanize the Military_).
-    3. **Fracture fleet.** At the dock nearest an ingress (within two moves) while Styx is not the seat's, a carrier,
-       three dreadnoughts and six infantry counted in that system, the smallest fleet that beats the guard of Styx,
+    3. **Fracture fleet.** At the dock nearest an ingress (within two moves) while Styx is not the seat's, a carrier
+       and dreadnoughts up to the Styx fleet (three, the smallest fleet that beats the guard of Styx, or more to match
+       the strongest rival stack), with infantry for its whole capacity (at least six), counted in that system,
        at 0.75 a resource. After the surplus ships, that dock also fills the free capacity with fighters at the same
        value.
     4. **Surplus.** Its flagship, a war sun when it has the technology, dreadnoughts up to three, upgraded cruisers
@@ -1403,30 +1409,38 @@ to build one by hand:
     and only while the fleet that would be there can win the fight (the same score of 4 as for any attack). A step is
     worth 0.8 of that strike when one move is left and 0.85 times less per further move (0.68, then 0.58), against 0.35
     for a player's system: the neutral units never move or reinforce, so the strike a step prepares is near certain.
-    A fleet on that route keeps what it has marched: any other plan that moves its ships out of an empty Fracture system
-    without bringing them closer to Styx (an attack on Cocytus or on Mecatol Rex from the egress, a stage toward another
-    planet) is charged the value of the step it stands on, in proportion to the share of the fleet that leaves, while
-    the strike from there still scores 4.
+    Styx itself has no lead limit (`STYX_MARCH_HORIZON`, ten systems): a fleet stages toward it from any distance, as
+    long as the staging system is closer to Styx than where the fleet stands, and its share counts the moves left in
+    fractions of a tactical action (systems to Styx over the slowest ship's move), so every system gained is worth
+    more even when it does not save a whole action. A fleet built at a dock two moves from the ingress, six one-move
+    actions from Styx, starts its march from there.
+    A fleet on that route keeps what it has marched: any other plan that moves its ships out of an empty Fracture
+    system, the remembered march system or the Styx dock without bringing them closer to Styx (an attack on Cocytus or
+    on Mecatol Rex from the egress, a stage toward another planet) is charged the value of the step it stands on, in
+    proportion to the share of the fleet that leaves, while the strike from there still scores 4. A plan of any kind
+    that carries them closer earns the progress instead (the same value times the gain in share, for example an
+    expansion from the dock onto the ingress).
     All of this is worth half as much (`FractureCampaign.routeShare`) for a seat with no ingress in its own home, lane or
     slice: it can only go in through Mecatol Rex or a neighbour's slice, so it values the march, the march it would
     give up and the fleet it builds for Styx at half, and does not take the third fleet ship for it.
     Three things cover two steps of the march in one round. A seat holding _Flank Speed_ also plans its moves into
     the Fracture with one more move for every ship (`MoveBoost`), keeps such a plan only when it needs the extra move,
     at 1.5 less for the card, and plays the card right after activating the system, before it moves
-    (`ActionCardRules.flankSpeed`). Thunder's Edge Warfare (`bestForWarfare`) may take a step of the march, which
+    (`ActionCardRules.movementCard`, which also plays _Lost Star Chart_ and _Nav Suite_ the same way). Thunder's Edge Warfare (`bestForWarfare`) may take a step of the march, which
     places no command token and leaves the fleet free to move again; Prophecy of Kings Warfare and _Unexpected
     Action_ take back the token of a staged fleet when that unlocks the best tactical action. A seat with a dock near
     an ingress and three or more rounds left values carrier II 1.5 more (at its route share), for a faster march.
     The march is remembered across rounds (`FractureMarch`, in memory per game and seat): a step toward Styx records
     where the fleet stands, and while it still has ships there (and stepped within the last two rounds) a plan that
     takes them elsewhere is charged the march, wherever it stands, an ingress on the board included; a plan that moves
-    it away without a step forgets it. A march carries six infantry at most and fills the rest of its capacity with
+    it away without a step forgets it. A march fills its capacity with ground forces and then with
     the fighters at its origin, which count in the strike it prepares (Saar took Styx with nine fighters).
     A dock within two moves of an ingress system, while a Fracture planet is not yet the seat's, values its warships
     the same half as much again, and builds dreadnoughts up to five instead of three. The dock nearest an ingress
-    (`FractureCampaign`, while Styx is not the seat's) also builds the smallest fleet that beats the guard of Styx,
-    three dreadnoughts, a carrier and six infantry counted in that system, at 0.75 a resource, after the core units and
-    before the surplus ships, and the fleet pool grows to 4 for it (three dreadnoughts and a carrier).
+    (`FractureCampaign`, while Styx is not the seat's) also builds the Styx fleet, a carrier and dreadnoughts up to
+    the larger of the fleet that beats the guard (three dreadnoughts and a carrier) and the strongest rival stack, with
+    infantry for its capacity, counted in that system, at 0.75 a resource, after the core units and before the surplus
+    ships, and the fleet pool grows to that size for it.
     Not yet: locking a captured system with the seat's own Diplomacy; parking ships on Mecatol Rex
     without landing; Magen Defense Grid, Mentak Ambush, L4 Disruptors and Titans' planetary PDS in the odds; retreats in
     the kill estimates; building space docks forward; more than three origins; Prophecy of Kings Warfare with Fleet
@@ -1444,7 +1458,12 @@ to build one by hand:
   Plans respect move values (nebulae, rifts, asteroid fields, supernovas, enemy ships), capacity,
   fleet supply and stranded cargo. With Gravity Drive one ship per action may move one system farther: the
   transport of an expansion, the ship of a single-ship move, or one extra ship in an attack (the strongest against
-  enemy ships, otherwise the one with the most capacity) or a group move. Ships leave a guarded system only as far as its
+  enemy ships, otherwise the one with the most capacity) or a group move. That boost is shared by every starting
+  system of the action, so when two systems' own best departures each spent it, the attack merge re-splits once: it
+  allocates the boost and the fleet supply over both systems' departing ships (`MoveBudget.allocate`, valued like a
+  strike), rebuilds each departure from its share (escort fighters and cargo trimmed to the remaining capacity,
+  Gravleash pace setter kept) and drops a system left with nothing (experiment `POOLED_BOOST_RESPLIT`; the deciding
+  seat's setting also governs its forecasts of enemy strikes). Ships leave a guarded system only as far as its
   defense model allows. `TacticalRules` then walks the bot's own buttons step by step,
   in distance or ring mode, looking for the planned system in every part of a system picker that was split over
   several messages; if it still cannot find it, it activates the best system the picker does offer. Once it has
@@ -1819,7 +1838,8 @@ Seven small generic changes don't reference `ti4.ai`:
     (dice, deck shuffles, secret ids, AI seat ids and profile seeds). Each report header prints the game's seed.
     `-Dai.selfplay.seed=N` gives slot `i` seed `N + i` and also fixes the game names and the virtual clock start
     (message ids and names feed the AI), so the same command replays the batch. Cosmetic randomness (emoji, joke
-    texts built when a class loads, map rendering) stays unseeded on purpose.
+    texts built when a class loads, map rendering) stays unseeded on purpose; the joke texts of an empty trade offer
+    are drawn from `RandomHelper` too, since the offer text is stored in the save.
     `DeterminismSelfPlayTest` (`-Dai.selfplay.determinism=true`, `-Dai.selfplay.determinism.rounds=N`, default 2)
     plays one seed twice in one JVM and compares the trajectory logs line by line; a whole game matched (6,227
     lines) on 2026-10-25. Iteration order over objects with identity hashes breaks this, which is why `Tile` hashes
@@ -1831,6 +1851,21 @@ Seven small generic changes don't reference `ti4.ai`:
     and messages, message reactions, `AiGameState`, the seats' runtime state, virtual clock, random source).
     `EnvironmentSnapshotTest` (`-Dai.selfplay.snapshot=true`) plays round 2 twice from one snapshot and requires the
     same decisions. `SelfPlayEnvironment.decisionOverride` replaces one decision, so a run can force another choice.
+  - Recorded games: `-Dai.selfplay.savesdir=DIR` keeps a folder per game, `DIR/GAME` (`GameRecorder`):
+    `manifest.properties` (name, slot, seed, virtual clock start, factions and every game-shaping `ai.*` flag),
+    `replay.cmd` (the Maven command that replays it), `saves/NNNNNN-rR-PHASE.txt.gz` (the save after save N, written
+    when it changed apart from real-clock stamps), `saves/NNNNNN.ai.json` (`AiGameState` outside the save, when it
+    changed), `events.jsonl.gz` (one line per game event with the columns of the game events table and the save it
+    follows) and `finished.properties` (save and event counts). One round is about 6.5 MB. Self-play has no Spring
+    context, so `GameEventService.commit` is caught by the environment and handed to `eventListener`.
+    `-Dai.selfplay.stopround=N` ends each game after round N.
+    `AiSelfPlayTest#replaySavedGame` (`-Dai.selfplay.replaygame=DIR/GAME`, plus the recorded flags: run `replay.cmd`)
+    plays the game again from the manifest and compares every save with the recorded one, leaving out the real-clock
+    values (`creation_date`, `total_turn_time`, epoch milliseconds past the virtual range). It stops at the first
+    save that differs, or after save N with `-Dai.selfplay.replaygame.to=N`; `-Dai.selfplay.replaygame.continue=true`
+    plays on live from there. `SavedGameInspectionTest` (`-Dai.selfplay.inspect=DIR`, a game folder or a recording
+    folder) runs `StyxProbe` at the start of every recorded action-phase turn straight from the saves, without playing
+    anything; attack memory (`AttackLedger`) is not recorded, so use the replay when that matters.
   - `RolloutExperimentTest` (`-Dai.selfplay.rollouts=true`) is branch-and-compare on the first strategy card pick of a
     round: from a snapshot, each of the seat's top options (by its own card values) is forced and played to the start
     of round R + 2 over several continuation seeds (12 by default). Before each continuation `Determinizer` resamples

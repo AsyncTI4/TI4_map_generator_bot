@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
@@ -19,9 +20,12 @@ import ti4.ai.eval.CombatOdds.Combatant;
 import ti4.ai.eval.CombatOdds.Force;
 import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.FactionAggression;
+import ti4.ai.eval.FighterWings;
 import ti4.ai.eval.FracturePrize;
 import ti4.ai.eval.MecatolStake;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.PlanetStake;
+import ti4.ai.eval.ShipSpeed;
 import ti4.ai.letnev.L4Disruptors;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.IncomingForces.Exclusion;
@@ -917,14 +921,26 @@ public final class DefenseOutlook {
                 .toList();
     }
 
-    private static int carrierMove(Player enemy, Tile origin) {
+    private int carrierMove(Player enemy, Tile origin) {
         boolean hasGround = BoardView.countInTile(origin, enemy, UnitType.Infantry)
                         + BoardView.countInTile(origin, enemy, UnitType.Mech)
                 > 0;
         if (!hasGround) return 0;
-        return BoardView.ships(BoardView.space(origin), enemy).keySet().stream()
+        Set<UnitType> present = BoardView.ships(BoardView.space(origin), enemy).keySet();
+        int speed = present.stream()
                 .filter(type -> type != UnitType.Fighter && BoardView.capacity(enemy, type) > 0)
-                .mapToInt(type -> BoardView.moveValue(enemy, type))
+                .mapToInt(type -> transportSpeed(enemy, origin, present, type))
+                .max()
+                .orElse(0);
+        return speed == 0 ? 0 : speed + MoveBudget.oneShip(game, enemy, null);
+    }
+
+    private int transportSpeed(Player enemy, Tile origin, Set<UnitType> present, UnitType transport) {
+        if (!MoveBudget.hasGravleash(enemy)) return ShipSpeed.of(game, enemy, transport, origin, null);
+        Set<UnitType> setters = ShipSpeed.paceSetters(game, enemy);
+        return present.stream()
+                .filter(setters::contains)
+                .mapToInt(type -> ShipSpeed.of(game, enemy, type, origin, null))
                 .max()
                 .orElse(0);
     }
@@ -1199,11 +1215,12 @@ public final class DefenseOutlook {
         Double known = fleetCosts.get(key);
         if (known != null) return known;
         double total = 0;
+        boolean fightersFly = FighterWings.flies(game, player);
         for (Tile tile : game.getTileMap().values()) {
             if (exclusion != null && exclusion.owner() == player && exclusion.tile() == tile) continue;
             for (Map.Entry<UnitType, Integer> ship :
                     BoardView.ships(BoardView.space(tile), player).entrySet()) {
-                if (ship.getKey() != UnitType.Fighter) {
+                if (fightersFly || ship.getKey() != UnitType.Fighter) {
                     total += ship.getValue() * IncomingForces.cost(player, ship.getKey());
                 }
             }

@@ -4,14 +4,13 @@ import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
-import ti4.ai.eval.BoardView;
-import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.TacticalPlan;
-import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
+import ti4.game.Tile;
 
 @UtilityClass
 public class TempestaRules {
@@ -37,11 +36,11 @@ public class TempestaRules {
     }
 
     static boolean needsBoost(Game game, Player seat, TacticalPlan plan) {
-        for (UnitMove move : plan.moves()) {
-            if (move.origin().equals(plan.target())) continue;
-            int unboosted = BoardView.moveValueWithGravityDrive(seat, move.type());
-            if (!MovementGraph.reach(game, seat, move.origin(), unboosted).containsKey(plan.target())) return true;
-        }
-        return false;
+        Tile target = game.getTileByPosition(plan.target());
+        if (target == null) return false;
+        int needed = MoveBudget.boostsNeeded(game, seat, target, TacticalRules.departures(plan));
+        int tempesta = MoveBudget.tempestaThisAction(game, seat) ? 1 : 0;
+        int withoutTempesta = MoveBudget.oneShip(game, seat, target) - tempesta;
+        return needed > withoutTempesta && needed <= withoutTempesta + 1;
     }
 }

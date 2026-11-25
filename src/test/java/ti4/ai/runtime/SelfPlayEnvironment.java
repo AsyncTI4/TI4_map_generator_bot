@@ -130,6 +130,17 @@ final class SelfPlayEnvironment implements AutoCloseable {
     volatile java.util.function.BiFunction<AiTurnContext, AiDecision, AiDecision> decisionOverride;
     // Set by the game when -Dai.selfplay.trajectories names a folder; null otherwise.
     volatile TrajectoryLog trajectory;
+    // Hears every save of the game (GameManager.save, undo and reload all queue a database sync), for the recorder and
+    // the
+    // replay check.
+    volatile java.util.function.Consumer<Game> saveListener = saved -> {};
+
+    interface EventHeard {
+        void heard(Game game, String archetype, Player player, Map<String, Object> payload, String movementState);
+    }
+
+    // Hears every game event the bot commits, with the arguments the game events table is written from.
+    volatile EventHeard eventListener = (event, archetype, player, payload, movementState) -> {};
     // Set once a game seeds this thread's random source; closing the environment hands the thread back unseeded.
     boolean seeded;
 
@@ -194,6 +205,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
                 return !invocation.getMethod().getName().toLowerCase().contains("drain");
             return null;
         })));
+        open(mockStatic(GameEventService.class, quiet(this::gameEventCommit)));
         MockedStatic<SpringContext> spring = open(mockStatic(SpringContext.class, quiet()));
         spring.when(() -> SpringContext.getBean(org.mockito.ArgumentMatchers.any()))
                 .thenAnswer(invocation -> {
@@ -213,7 +225,7 @@ final class SelfPlayEnvironment implements AutoCloseable {
         Storage.init();
 
         open(mockStatic(MapRenderPipeline.class, quiet()));
-        open(mockStatic(GameDatabaseSyncPipeline.class, quiet()));
+        open(mockStatic(GameDatabaseSyncPipeline.class, quiet(this::databaseSync)));
         open(mockStatic(AutoPingMetadataManager.class, quiet()));
         open(mockStatic(TechSummariesMetadataManager.class, quiet()));
         open(mockStatic(UserSettingsManager.class, quiet(this::userSettings)));
@@ -305,14 +317,38 @@ final class SelfPlayEnvironment implements AutoCloseable {
         return invocation.callRealMethod();
     }
 
-    // Promissory note plays reach the event log; every other event is dropped as before.
+    // Every committed event reaches eventListener; promissory note plays also reach the promissory tracker.
     private Object gameEvent(InvocationOnMock invocation) {
-        if (!"commitEvent".equals(invocation.getMethod().getName())) return null;
-        if (!ti4.spring.service.gameevent.GameEventType.CARD_PLAY_PROMISSORY_NOTE.equals(invocation.getArgument(1)))
-            return null;
-        Map<String, Object> payload = invocation.getArgument(3);
+        if ("commitEvent".equals(invocation.getMethod().getName())) committed(invocation);
+        return null;
+    }
+
+    // GameEventService.commit returns early without a Spring context, which self-play does not start (starting it would
+    // also change AgentLifecycle), so the static entry point is caught here and handed on as the bean would be.
+    private Object gameEventCommit(InvocationOnMock invocation) throws Throwable {
+        if (!"commit".equals(invocation.getMethod().getName())) return invocation.callRealMethod();
+        committed(invocation);
+        return null;
+    }
+
+    private void committed(InvocationOnMock invocation) {
+        Object[] arguments = invocation.getArguments();
+        Game committedGame = (Game) arguments[0];
+        String archetype = (String) arguments[1];
+        Player player = (Player) arguments[2];
+        @SuppressWarnings("unchecked")
+        Map<String, Object> payload = (Map<String, Object>) arguments[3];
+        String movementState = arguments.length > 4 ? (String) arguments[4] : null;
+        eventListener.heard(committedGame, archetype, player, payload, movementState);
+        if (!ti4.spring.service.gameevent.GameEventType.CARD_PLAY_PROMISSORY_NOTE.equals(archetype)) return;
         Object note = payload == null ? null : payload.get("cardId");
-        promissory.played(invocation.getArgument(0), invocation.getArgument(2), note == null ? null : note.toString());
+        promissory.played(committedGame, player, note == null ? null : note.toString());
+    }
+
+    private Object databaseSync(InvocationOnMock invocation) {
+        if ("queueSync".equals(invocation.getMethod().getName()) && invocation.getArgument(0) instanceof Game saved) {
+            saveListener.accept(saved);
+        }
         return null;
     }
 

@@ -35,11 +35,6 @@ class BattleMath {
         return CannonExposure.expectedHits(game, seat, tile);
     }
 
-    static int ownCannonHits(Game game, Player seat, Tile tile, Collection<Tile> origins) {
-        List<UnitHolder> leaving = origins.stream().map(BoardView::space).toList();
-        return (int) Math.round(cannonFireLeaving(game, tile, seat, leaving));
-    }
-
     static double cannonFire(Game game, Tile tile, Player shooter, @Nullable UnitHolder leaving) {
         return cannonFireLeaving(game, tile, shooter, leaving == null ? List.of() : List.of(leaving));
     }
@@ -65,6 +60,81 @@ class BattleMath {
             expected += dice * hitChance(model.getSpaceCannonHitsOn(owner));
         }
         return expected;
+    }
+
+    static List<Double> ownCannonDice(Game game, Player seat, Tile tile, Collection<Tile> origins) {
+        List<UnitHolder> leaving = origins.stream().map(BoardView::space).toList();
+        List<Double> chances = new ArrayList<>();
+        for (CannonDice stack : cannonDice(game, tile, seat, leaving)) {
+            for (int die = 0; die < stack.dice(); die++) chances.add(hitChance(stack.hitsOn()));
+        }
+        return chances;
+    }
+
+    static List<Double> spaceCannonDice(Player owner, UnitHolder holder) {
+        List<Double> chances = new ArrayList<>();
+        for (UnitKey key : holder.getUnitKeysForPlayer(owner)) {
+            UnitModel model = owner.getUnitFromUnitKey(key);
+            if (model == null) continue;
+            int dice = model.getSpaceCannonDieCount(owner) * holder.getUnitCount(key);
+            for (int die = 0; die < dice; die++) chances.add(hitChance(model.getSpaceCannonHitsOn(owner)));
+        }
+        return chances;
+    }
+
+    static List<Double> barrageDice(Player shooter, List<Combatant> ships) {
+        List<Double> chances = new ArrayList<>();
+        for (Combatant ship : ships) {
+            UnitModel model = ship.type() == null ? null : shooter.getUnitByType(ship.type());
+            if (model == null) continue;
+            double chance = hitChance(model.getAfbHitsOn(shooter));
+            for (int die = 0; die < model.getAfbDieCount(shooter); die++) chances.add(chance);
+        }
+        return chances;
+    }
+
+    static int fighters(List<Combatant> ships) {
+        return (int)
+                ships.stream().filter(ship -> ship.type() == UnitType.Fighter).count();
+    }
+
+    static List<Combatant> withoutFighters(List<Combatant> ships, int destroyed) {
+        if (destroyed <= 0) return ships;
+        List<Combatant> remaining = new ArrayList<>(ships.size());
+        int left = destroyed;
+        for (Combatant ship : ships) {
+            if (left > 0 && ship.type() == UnitType.Fighter) {
+                left--;
+                continue;
+            }
+            remaining.add(ship);
+        }
+        return remaining;
+    }
+
+    static boolean firesAssaultCannon(Player shooter, List<Combatant> ships) {
+        return shooter.hasTech(ASSAULT_CANNON) && nonFighterShips(ships) >= ASSAULT_CANNON_SHIPS;
+    }
+
+    static List<Combatant> afterAssaultCannon(List<Combatant> target) {
+        Optional<Combatant> cheapest =
+                target.stream().filter(BattleMath::isNonFighterShip).min(Combatant.LOSS_ORDER);
+        if (cheapest.isEmpty()) return target;
+        List<Combatant> remaining = new ArrayList<>(target);
+        remaining.remove(cheapest.get());
+        return remaining;
+    }
+
+    private static int nonFighterShips(List<Combatant> ships) {
+        return (int) ships.stream().filter(BattleMath::isNonFighterShip).count();
+    }
+
+    private static boolean isNonFighterShip(Combatant ship) {
+        return ship.type() != null && ship.type() != UnitType.Fighter;
+    }
+
+    static int hitPoints(List<Combatant> ships) {
+        return ships.size() + (int) ships.stream().filter(Combatant::sustain).count();
     }
 
     static Side afterBarrage(Side target, Side shooter) {
@@ -123,7 +193,7 @@ class BattleMath {
 
     static List<Combatant> afterCannonFire(List<Combatant> ships, int hits) {
         List<Combatant> remaining = new ArrayList<>(ships);
-        remaining.sort(Comparator.comparingDouble(Combatant::cost));
+        remaining.sort(Combatant.LOSS_ORDER);
         for (int hit = 0; hit < hits && !remaining.isEmpty(); hit++) {
             Optional<Combatant> sustaining =
                     remaining.stream().filter(Combatant::sustain).findFirst();

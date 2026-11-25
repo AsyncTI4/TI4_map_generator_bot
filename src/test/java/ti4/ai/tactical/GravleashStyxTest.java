@@ -69,6 +69,10 @@ class GravleashStyxTest extends BaseTi4Test {
     @Test
     void gravityDriveMakesStyxTheFleetsBestTarget() {
         fracture.nekro().addTech("gd");
+        // Two dreadnoughts, the carrier and the destroyer win the space combat at Styx less than half the time, and
+        // the sure attack on Lethe and Phlegethon outranks that coin flip. A third dreadnought makes Styx a sound
+        // strike.
+        fracture.ships(launch, UnitType.Dreadnought, 1);
 
         assertThat(ranked().getFirst().target()).isEqualTo(FractureScenario.STYX);
     }

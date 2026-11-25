@@ -1,6 +1,7 @@
 package ti4.ai.tactical;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
 import static ti4.ai.AiTestGame.NOW;
 import static ti4.ai.AiTestGame.pressedId;
 import static ti4.ai.AiTestGame.prompt;
@@ -130,6 +131,113 @@ class RetreatRulesTest extends BaseTi4Test {
         test.units(battle, "lodor", test.nekro, UnitType.Infantry, 2);
         battle.removeUnit("space", Units.getUnitKey(UnitType.Infantry, "blue"), 3);
         assertThat(pressedId(next(groundChoice(2)).orElseThrow())).isEqualTo("FFCC_nekro_deleteButtons");
+    }
+
+    // Gravity rift note V: retreating ships roll before they leave, so the rolls come before the destination. Each
+    // retreating ship rolls once; the button that rolls every unit (structures too) is never pressed.
+    @Test
+    void rollsBeforeChoosingARetreatOutOfARift() {
+        Tile rift = test.place("41", position);
+        test.units(rift, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(rift, "space", test.nekro, UnitType.Cruiser, 1);
+        test.units(rift, "space", test.sol, UnitType.Dreadnought, 3);
+        AiPrompt destinations = prompt(
+                "destinations",
+                PromptSource.COMBAT_THREAD,
+                NOW + 10,
+                "FFCC_nekro_retreatUnitsFrom_" + position + "_" + AiTestGame.HOME,
+                "FFCC_nekro_getRiftButtons_" + position);
+
+        assertThat(pressedId(nextOf(destinations).orElseThrow())).isEqualTo("FFCC_nekro_getRiftButtons_" + position);
+
+        AiPrompt rolls = prompt(
+                "rolls",
+                PromptSource.PUBLIC,
+                NOW + 20,
+                "FFCC_nekro_riftUnit_" + position + "_1destroyer",
+                "FFCC_nekro_riftUnit_" + position + "_1cruiser",
+                "FFCC_nekro_riftAllUnits_" + position,
+                "getDamageButtons_" + position + "_remove",
+                "doneRifting");
+        List<String> pressed = new ArrayList<>();
+        for (int step = 0; step < 4; step++)
+            pressed.add(pressedId(nextOf(destinations, rolls).orElseThrow()));
+
+        assertThat(pressed.subList(0, 2))
+                .containsExactlyInAnyOrder(
+                        "FFCC_nekro_riftUnit_" + position + "_1destroyer",
+                        "FFCC_nekro_riftUnit_" + position + "_1cruiser");
+        assertThat(pressed.get(2)).isEqualTo("doneRifting");
+        assertThat(pressed.get(3)).isEqualTo("FFCC_nekro_retreatUnitsFrom_" + position + "_" + AiTestGame.HOME);
+    }
+
+    // Space combat note IV: a nebula can never be retreated into.
+    @Test
+    void neverRetreatsIntoANebula() {
+        Tile nebula = test.place("42", otherNeighbour());
+
+        assertThat(RetreatRules.canRetreatTo(test.game, test.nekro, nebula, true))
+                .isFalse();
+    }
+
+    // The Empyrean may retreat into a nebula (space combat note IV α).
+    @Test
+    void theEmpyreanRetreatsIntoANebula() {
+        Tile nebula = test.place("42", otherNeighbour());
+        test.nekro.addAbility("voidborn");
+
+        assertThat(RetreatRules.canRetreatTo(test.game, test.nekro, nebula, true))
+                .isTrue();
+    }
+
+    // The engine posts the rift button after the destination prompt. Until it shows, the seat waits rather than
+    // retreating without the rolls it owes.
+    @Test
+    void waitsForTheRiftButtonBeforeRetreatingOutOfARift() {
+        Tile rift = test.place("41", position);
+        test.units(rift, "space", test.nekro, UnitType.Destroyer, 1);
+        test.units(rift, "space", test.sol, UnitType.Dreadnought, 3);
+        AiPrompt destinations = prompt(
+                "destinations",
+                PromptSource.COMBAT_THREAD,
+                NOW + 10,
+                "FFCC_nekro_retreatUnitsFrom_" + position + "_" + AiTestGame.HOME);
+
+        assertThat(nextOf(destinations).orElseThrow()).isInstanceOf(AiDecision.Wait.class);
+    }
+
+    // The Circlet of the Void ignores supernovas, retreats included (Circlet I).
+    @Test
+    void theCircletRetreatsIntoASupernova() {
+        Tile supernova = test.place("43", otherNeighbour());
+        assertThat(RetreatRules.canRetreatTo(test.game, test.nekro, supernova, true))
+                .isFalse();
+
+        test.nekro.addRelic("circletofthevoid");
+        assertThat(RetreatRules.canRetreatTo(test.game, test.nekro, supernova, true))
+                .isTrue();
+    }
+
+    // Retreating out of a rift costs each ship a roll, so the seat stays in a losing fight a little longer there.
+    @Test
+    void aRiftLowersTheRetreatBar() {
+        assertThat(RetreatRules.retreatBar(test.game, test.nekro, battle))
+                .isEqualTo(RetreatRules.retreatBelow(test.game, test.nekro, battle));
+
+        Tile rift = test.place("41", position);
+        assertThat(RetreatRules.retreatBar(test.game, test.nekro, rift))
+                .isCloseTo(0.7 * RetreatRules.retreatBelow(test.game, test.nekro, rift), offset(1e-9));
+    }
+
+    private String otherNeighbour() {
+        return ti4.model.MapPositionMapper.getAdjacentTilePositions(AiTestGame.HOME).stream()
+                .filter(each -> !"x".equals(each) && !each.equals(position))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private Optional<AiDecision> nextOf(AiPrompt... prompts) {
+        return RetreatRules.next(test.context(prompts), Prompts.newestFirst(List.of(prompts)));
     }
 
     private AiPrompt groundChoice(int most) {

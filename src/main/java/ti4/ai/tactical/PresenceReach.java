@@ -15,8 +15,11 @@ import javax.annotation.Nullable;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.CombatModifiers.Side;
 import ti4.ai.eval.CombatOdds.Force;
+import ti4.ai.eval.FighterWings;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.ShipSpeed;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
@@ -211,16 +214,18 @@ final class PresenceReach {
 
     private List<Mover> movers(DefenseOutlook defense) {
         List<Mover> movers = new ArrayList<>();
+        boolean fightersFly = FighterWings.flies(game, seat);
         for (Tile tile : game.getTileMap().values()) {
             UnitHolder space = BoardView.space(tile);
             int ships = BoardView.nonFighterShips(space, seat);
-            if (ships == 0) continue;
             int fighters = BoardView.count(space, seat, UnitType.Fighter);
+            if (ships == 0 && !(fightersFly && fighters > 0)) continue;
             List<UnitMove> leaving = new ArrayList<>();
             Map<UnitType, Integer> stack = BoardView.ships(space, seat);
             for (UnitType type : cheapestFirst(stack.keySet())) {
-                if (type == UnitType.Fighter || BoardView.moveValue(seat, type) <= 0) continue;
-                int carried = ships == 1 ? Math.min(BoardView.capacity(seat, type), fighters) : 0;
+                if ((type == UnitType.Fighter && !fightersFly) || ShipSpeed.base(game, seat, type, tile) <= 0) continue;
+                int carried =
+                        ships == 1 && type != UnitType.Fighter ? Math.min(BoardView.capacity(seat, type), fighters) : 0;
                 for (int ship = 0; ship < stack.get(type); ship++) {
                     List<UnitMove> released = defense.holdBack(tile, leaving, shipMove(tile, type, carried));
                     if (released.stream().noneMatch(move -> move.type() == type)) break;
@@ -264,16 +269,13 @@ final class PresenceReach {
 
     private Set<String> candidates(List<Mover> movers) {
         Set<String> positions = new LinkedHashSet<>();
-        for (Mover mover : movers) {
-            positions.addAll(reach(mover.origin(), BoardView.moveValueWithBoosts(seat, mover.type()))
-                    .keySet());
+        for (Tile tile : game.getTileMap().values()) {
+            String position = tile.getPosition();
+            if (position.equals(dock.getPosition()) || !openToPresence(position)) continue;
+            if (dockReachesAny(position) || movers.stream().anyMatch(mover -> reaches(mover, position, true))) {
+                positions.add(position);
+            }
         }
-        for (UnitType type : buildableTypes()) {
-            positions.addAll(reach(dock.getPosition(), BoardView.moveValueWithBoosts(seat, type))
-                    .keySet());
-        }
-        positions.remove(dock.getPosition());
-        positions.removeIf(position -> !openToPresence(position));
         return positions;
     }
 
@@ -301,23 +303,34 @@ final class PresenceReach {
 
     private List<UnitType> buildableTypes() {
         return BoardView.MOVING_SHIPS.stream()
-                .filter(type -> seat.getUnitByType(type) != null && BoardView.moveValue(seat, type) > 0)
+                .filter(type -> ShipSpeed.printed(game, seat, type) > 0)
                 .toList();
     }
 
     private boolean reaches(Mover mover, String position, boolean boosted) {
-        int move =
-                boosted ? BoardView.moveValueWithBoosts(seat, mover.type()) : BoardView.moveValue(seat, mover.type());
-        Integer distance = reach(mover.origin(), BoardView.moveValueWithBoosts(seat, mover.type()))
-                .get(position);
-        return distance != null && distance <= move;
+        Tile origin = game.getTileByPosition(mover.origin());
+        Tile target = game.getTileByPosition(position);
+        if (origin == null || target == null) return false;
+        int move = ShipSpeed.of(game, seat, mover.type(), origin, target);
+        if (move <= 0) return false;
+        if (boosted) move += MoveBudget.oneShip(game, seat, target);
+        return reach(mover.origin(), move).containsKey(position);
     }
 
     private boolean dockReaches(String position, UnitType type) {
-        int move = BoardView.moveValueWithBoosts(seat, type);
-        if (seat.getUnitByType(type) == null || BoardView.moveValue(seat, type) <= 0) return false;
-        Integer distance = reach(dock.getPosition(), move).get(position);
-        return distance != null && distance <= move;
+        Tile target = game.getTileByPosition(position);
+        if (target == null) return false;
+        int move = nextRoundMoveFromDock(type, target);
+        return move > 0 && reach(dock.getPosition(), move).containsKey(position);
+    }
+
+    private int nextRoundMoveFromDock(UnitType type, Tile target) {
+        int departure = ShipSpeed.base(game, seat, type, dock);
+        if (departure == 0) return 0;
+        return departure
+                + ShipSpeed.originBonus(game, seat, dock)
+                + ShipSpeed.arrivalBonus(game, seat, target)
+                + MoveBudget.oneShipInLaterRound(seat, target);
     }
 
     private boolean dockReachesAny(String position) {
@@ -325,7 +338,8 @@ final class PresenceReach {
     }
 
     private Map<String, Integer> reach(String origin, int move) {
-        return reaches.computeIfAbsent(origin + "|" + move, ignored -> MovementGraph.reach(game, seat, origin, move));
+        return reaches.computeIfAbsent(
+                origin + "|" + move, ignored -> MovementGraph.distances(game, seat, origin, move));
     }
 
     private double win(String position, Player occupant, Map<UnitType, Integer> units) {

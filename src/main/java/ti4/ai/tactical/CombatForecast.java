@@ -87,7 +87,7 @@ public class CombatForecast {
         Tile tile = game.getTileByPosition(position);
         if (tile == null || !BoardView.hasOwnShips(seat, tile)) return Optional.empty();
         UnitHolder space = BoardView.space(tile);
-        return game.getRealPlayers().stream()
+        return game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != seat && BoardView.hasOwnShips(other, tile))
                 .findFirst()
                 .map(opponent -> {
@@ -116,7 +116,7 @@ public class CombatForecast {
         Tile tile = game.getTileByPosition(position);
         UnitHolder planet = tile == null ? null : tile.getUnitHolders().get(planetName);
         if (planet == null) return 0;
-        Optional<Player> defender = game.getRealPlayers().stream()
+        Optional<Player> defender = game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != seat && BoardView.groundForces(planet, other) > 0)
                 .findFirst();
         if (defender.isEmpty()) return 1;
@@ -149,7 +149,7 @@ public class CombatForecast {
         return planets.stream()
                 .map(tile.getUnitHolders()::get)
                 .filter(Objects::nonNull)
-                .anyMatch(planet -> game.getRealPlayers().stream()
+                .anyMatch(planet -> game.getRealPlayersNNeutral().stream()
                         .anyMatch(other -> other != seat && BattleMath.spaceCannonHits(other, planet) > 0));
     }
 
@@ -214,7 +214,7 @@ public class CombatForecast {
         if (holder == null) return Optional.empty();
         boolean ground = !BoardView.SPACE.equals(holderName);
         if (!present(seat, tile, holder, ground)) return Optional.empty();
-        return game.getRealPlayers().stream()
+        return game.getRealPlayersNNeutral().stream()
                 .filter(other -> other != seat && present(other, tile, holder, ground))
                 .findFirst()
                 .map(opponent -> new Duel(game, seat, opponent, tile, holder, ground));

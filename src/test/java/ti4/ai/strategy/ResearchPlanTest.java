@@ -358,7 +358,8 @@ class ResearchPlanTest extends BaseTi4Test {
                 .orElseThrow();
         test.place("18", beyond);
         Tile field = test.place(asteroids, middle);
-        assertThat(MovementGraph.reach(test.game, test.sol, AiTestGame.HOME, 4)).doesNotContainKey(beyond);
+        assertThat(MovementGraph.distances(test.game, test.sol, AiTestGame.HOME, 4))
+                .doesNotContainKey(beyond);
 
         ResearchPlan blocked = ResearchPlan.of(test.game, test.sol);
 

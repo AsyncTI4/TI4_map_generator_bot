@@ -27,7 +27,16 @@ public class CombatOdds {
             boolean sustain,
             double cost,
             @Nullable UnitType type,
-            boolean retaliates) {
+            boolean retaliates,
+            boolean guarded) {
+
+        public static final Comparator<Combatant> LOSS_ORDER =
+                Comparator.comparing(Combatant::guarded).thenComparingDouble(Combatant::cost);
+
+        public Combatant(
+                int hitsOn, int dice, boolean sustain, double cost, @Nullable UnitType type, boolean retaliates) {
+            this(hitsOn, dice, sustain, cost, type, retaliates, false);
+        }
 
         public Combatant(int hitsOn, int dice, boolean sustain, double cost) {
             this(hitsOn, dice, sustain, cost, null, false);
@@ -38,15 +47,19 @@ public class CombatOdds {
         }
 
         public Combatant retaliatingOnSustain() {
-            return new Combatant(hitsOn, dice, sustain, cost, type, true);
+            return new Combatant(hitsOn, dice, sustain, cost, type, true, guarded);
         }
 
         public Combatant withoutSustain() {
-            return new Combatant(hitsOn, dice, false, cost, type, false);
+            return new Combatant(hitsOn, dice, false, cost, type, false, guarded);
         }
 
         public Combatant rolling(int newHitsOn, int newDice) {
-            return new Combatant(newHitsOn, newDice, sustain, cost, type, retaliates);
+            return new Combatant(newHitsOn, newDice, sustain, cost, type, retaliates, guarded);
+        }
+
+        public Combatant guarding() {
+            return new Combatant(hitsOn, dice, sustain, cost, type, retaliates, true);
         }
     }
 
@@ -108,7 +121,26 @@ public class CombatOdds {
             double defenderCostLost,
             double attackerCostLostIfWin,
             double attackerLosesUnit,
-            double defenderLosesUnit) {}
+            double defenderLosesUnit,
+            double[] attackerWinsAt) {
+
+        public Detailed(
+                Outcome outcome,
+                double attackerCostLost,
+                double defenderCostLost,
+                double attackerCostLostIfWin,
+                double attackerLosesUnit,
+                double defenderLosesUnit) {
+            this(
+                    outcome,
+                    attackerCostLost,
+                    defenderCostLost,
+                    attackerCostLostIfWin,
+                    attackerLosesUnit,
+                    defenderLosesUnit,
+                    new double[] {outcome.attackerWins()});
+        }
+    }
 
     public static Outcome resolve(Force attacker, Force defender) {
         return resolveDetailed(attacker, defender).outcome();
@@ -129,12 +161,13 @@ public class CombatOdds {
         Side d = new Side(defender);
         Side firstA = firstAttacker == attacker ? a : new Side(firstAttacker);
         Side firstD = firstDefender == defender ? d : new Side(firstDefender);
-        if (a.hitPoints() == 0) return new Detailed(new Outcome(0, 1, 0), 0, 0, 0, 0, 0);
-        if (d.hitPoints() == 0) return new Detailed(new Outcome(1, 0, 0), 0, 0, 0, 0, 0);
+        if (a.hitPoints() == 0) return new Detailed(new Outcome(0, 1, 0), 0, 0, 0, 0, 0, new double[1]);
+        if (d.hitPoints() == 0) return new Detailed(new Outcome(1, 0, 0), 0, 0, 0, 0, 0, absorbedAt(absorbedA, 1));
         double attackerWins = 0;
         double defenderWins = 0;
         double bothDestroyed = 0;
         double[] losses = new double[5];
+        double[] winsAt = new double[a.hitPoints() + 1];
         Map<Long, Double> states = new HashMap<>();
         states.put(key(absorbedA, absorbedD), 1.0);
         for (int round = 0; round < MAX_ROUNDS && !states.isEmpty(); round++) {
@@ -170,6 +203,7 @@ public class CombatOdds {
                             addLosses(losses, p, a, newA, d, newD, false);
                         } else if (dDead) {
                             attackerWins += p;
+                            winsAt[newA] += p;
                             addLosses(losses, p, a, newA, d, newD, true);
                         } else if (aDead) {
                             defenderWins += p;
@@ -198,7 +232,22 @@ public class CombatOdds {
                 losses[DEFENDER_COST],
                 costLostIfWin,
                 losses[ATTACKER_UNIT],
-                losses[DEFENDER_UNIT]);
+                losses[DEFENDER_UNIT],
+                winsAt);
+    }
+
+    public static List<Combatant> survivors(List<Combatant> units, int absorbed) {
+        List<Combatant> sorted = new ArrayList<>(units);
+        sorted.sort(Combatant.LOSS_ORDER);
+        int sustains = (int) units.stream().filter(Combatant::sustain).count();
+        int destroyed = Math.min(sorted.size(), Math.max(0, absorbed - sustains));
+        return sorted.subList(destroyed, sorted.size());
+    }
+
+    private static double[] absorbedAt(int absorbed, double chance) {
+        double[] at = new double[absorbed + 1];
+        at[absorbed] = chance;
+        return at;
     }
 
     private static void addLosses(
@@ -238,7 +287,7 @@ public class CombatOdds {
             this.force = force;
             List<Integer> order = new ArrayList<>();
             for (int i = 0; i < force.units().size(); i++) order.add(i);
-            order.sort(Comparator.comparingDouble(i -> force.units().get(i).cost()));
+            order.sort(Comparator.comparing(force.units()::get, Combatant.LOSS_ORDER));
             lossOrder = order.stream().map(force.units()::get).toList();
             Force improved = force.afterOpponentLoss();
             improvedOrder =

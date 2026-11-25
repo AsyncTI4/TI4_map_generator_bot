@@ -250,7 +250,7 @@ final class SelfPlayGame {
         this.name = name;
         this.slot = slot;
         this.seed = seed;
-        this.fracture = new FractureTracker(FRACTURE_SEED * 1009L + slot);
+        this.fracture = new FractureTracker(FRACTURE_SEED * 1009L + seed);
     }
 
     Game setUp(List<String> factions) throws Exception {
@@ -963,9 +963,10 @@ final class SelfPlayGame {
     // settlements it sent as holder; then the latest accepted offers.
     private List<String> fractureLines() {
         FractureTracker.Summary summary = fracture.summary();
-        if (!summary.enabled()) return List.of();
+        if (!summary.entered()) return List.of();
         List<String> lines = new ArrayList<>();
-        lines.add("entered in round " + summary.enteredRound() + ", ingress on " + summary.ingress());
+        String by = summary.spawner().isEmpty() ? "" : " by " + summary.spawner();
+        lines.add("entered in round " + summary.enteredRound() + by + ", ingress on " + summary.ingress());
         summary.changes()
                 .forEach(change -> lines.add("round " + change.round() + ": " + change.planet() + " "
                         + (change.from().isEmpty() ? "unheld" : change.from()) + " -> "

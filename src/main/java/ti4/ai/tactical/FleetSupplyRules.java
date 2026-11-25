@@ -161,7 +161,7 @@ public class FleetSupplyRules {
         return button.handlerId().split("_")[1];
     }
 
-    private static boolean overLimits(Game game, Player seat, String position) {
+    static boolean overLimits(Game game, Player seat, String position) {
         Tile tile = game.getTileByPosition(position);
         if (tile == null) return false;
         FleetCheck check = ButtonHelper.fleetCheck(seat, game, tile);

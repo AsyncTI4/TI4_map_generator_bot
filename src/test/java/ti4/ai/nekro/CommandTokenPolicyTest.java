@@ -220,15 +220,15 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
     }
 
-    // Fleet beyond three only pays off when there are ships to use it: a stack of three with more ships elsewhere
-    // that could join it. Spare tokens then go there before piling up as tactics.
+    // Fleet beyond the round three pull of four only pays off when there are ships to use it: a stack of four with
+    // more ships elsewhere that could join it. Spare tokens then go there before piling up as tactics.
     @Test
     void growsTheFleetForABiggerStackOnlyWhenThereAreShipsToFillIt() {
         test.nekro.setTacticalCC(3);
-        test.nekro.setFleetCC(3);
+        test.nekro.setFleetCC(4);
         test.nekro.setStrategicCC(2);
         Tile home = test.nekroHome();
-        test.units(home, "space", test.nekro, UnitType.Carrier, 3);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 4);
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_tactic_cc");
 
         Tile away = test.place("26", AiTestGame.neighbourOf(AiTestGame.HOME));
@@ -256,7 +256,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     @Test
     void keepsAtMostThreeStrategyTokens() {
         test.nekro.setTacticalCC(5);
-        test.nekro.setFleetCC(3);
+        test.nekro.setFleetCC(4);
         test.nekro.setStrategicCC(2);
         assertThat(CommandTokenPolicy.poolToGrow(test.game, test.nekro)).isEqualTo("increase_strategy_cc");
 
@@ -265,7 +265,8 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     }
 
     // Redistribution moves a token out of whichever pool holds more than the priorities give it, least important pool
-    // first. Here the fifth fleet token is no longer needed once Raise a Fleet is not on the table.
+    // first. Here the fifth fleet token is no longer needed once Raise a Fleet is not on the table; the round three
+    // pull keeps four.
     @Test
     void redistributesSurplusTokensTowardTheIdealPools() {
         test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 3);
@@ -273,14 +274,14 @@ class CommandTokenPolicyTest extends BaseTi4Test {
         test.nekro.setFleetCC(5);
         test.nekro.setStrategicCC(2);
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 8))
-                .containsEntry(CommandTokenPolicy.Pool.TACTIC, 3)
-                .containsEntry(CommandTokenPolicy.Pool.FLEET, 3)
+                .containsEntry(CommandTokenPolicy.Pool.TACTIC, 2)
+                .containsEntry(CommandTokenPolicy.Pool.FLEET, 4)
                 .containsEntry(CommandTokenPolicy.Pool.STRATEGY, 2);
         assertThat(CommandTokenPolicy.poolToRedistributeFrom(test.game, test.nekro))
                 .contains("decrease_fleet_cc");
 
-        test.nekro.setTacticalCC(3);
-        test.nekro.setFleetCC(3);
+        test.nekro.setTacticalCC(2);
+        test.nekro.setFleetCC(4);
         assertThat(CommandTokenPolicy.poolToRedistributeFrom(test.game, test.nekro))
                 .isEmpty();
     }
@@ -378,12 +379,14 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     // aiplay1: Nekro sat on 30 trade goods with one fleet token from round two on, because the fleet pool followed its
     // largest stack (one ship) and a small fleet kept the stacks small. A seat that can pay for ships at a dock grows
     // its fleet toward the ships it can build there, once three tactic tokens and the usual strategy tokens are kept.
+    // Every seat is pulled to four fleet tokens for round three; the rich one goes on to five.
     @Test
     void aRichSeatGrowsItsFleetTowardTheShipsItCanBuild() {
         test.game.setPhaseOfGame("statusHomework");
         test.game.setRound(2);
         test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
-        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).isEqualTo(split(5, 2, 2));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).isEqualTo(split(3, 4, 2));
+        assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 10)).isEqualTo(split(4, 4, 2));
 
         test.nekro.setTg(30);
         assertThat(CommandTokenPolicy.ideal(test.game, test.nekro, 9)).isEqualTo(split(3, 4, 2));
@@ -424,7 +427,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     @Test
     void exhaustedPlanetsCountTowardNextRoundsBuild() {
         test.game.setPhaseOfGame("statusHomework");
-        test.game.setRound(2);
+        test.game.setRound(1);
         test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
         test.nekro.setTg(2);
         test.nekro.exhaustPlanet("mordaiii");
@@ -436,6 +439,7 @@ class CommandTokenPolicyTest extends BaseTi4Test {
     // build into; in aiplay1 the second fleet token went this way in round three.
     @Test
     void spendsTacticTokensBeforeTheFleetItCanBuildInto() {
+        test.game.setRound(1);
         test.units(test.nekroHome(), "space", test.nekro, UnitType.Carrier, 1);
         test.aiIsActive("action");
         tokens(8, 2, 0);

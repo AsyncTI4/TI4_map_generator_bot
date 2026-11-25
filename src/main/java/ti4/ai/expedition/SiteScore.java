@@ -95,14 +95,14 @@ final class SiteScore {
 
     private void spread(String origin) {
         distances.merge(origin, 0, Math::min);
-        MovementGraph.reach(game, seat, origin, REACH)
+        MovementGraph.distances(game, seat, origin, REACH)
                 .forEach((position, distance) -> distances.merge(position, distance, Math::min));
     }
 
     private Map<String, Integer> homeReach(Player rival) {
         Tile home = rival.getHomeSystemTile();
         if (home == null) return Map.of();
-        Map<String, Integer> reach = new HashMap<>(MovementGraph.reach(game, rival, home.getPosition(), REACH));
+        Map<String, Integer> reach = new HashMap<>(MovementGraph.distances(game, rival, home.getPosition(), REACH));
         reach.putIfAbsent(home.getPosition(), 0);
         return reach;
     }

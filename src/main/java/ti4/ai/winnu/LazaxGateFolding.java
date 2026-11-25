@@ -3,11 +3,13 @@ package ti4.ai.winnu;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.brain.Prompts;
 import ti4.ai.brain.Prompts.Match;
+import ti4.ai.eval.Adjacency;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.tactical.Stall;
 import ti4.ai.tactical.TacticalPlan;
@@ -16,6 +18,7 @@ import ti4.ai.tactical.TacticalRules;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 
 @UtilityClass
@@ -23,6 +26,7 @@ public class LazaxGateFolding {
 
     public static final String TECH = "lgf";
     static final String INFANTRY = "gf";
+    private static final String ENFORCED_TRAVEL_BAN = "travel_ban";
     static final double INFANTRY_ON_MECATOL = 1.0;
     private static final String COMPONENT_ACTION = "componentAction";
     private static final String EXHAUST = "exhaustTech_" + TECH;
@@ -31,10 +35,17 @@ public class LazaxGateFolding {
     private static final String DONE = "done";
 
     public static Set<String> movementLinks(Game game, Player player, String position) {
-        if (player == null || !player.hasTech(TECH) || player.controlsMecatol(false)) return Set.of();
+        String mecatol = foldedMecatol(game, player);
+        if (mecatol == null || ButtonHelper.isLawInPlay(game, ENFORCED_TRAVEL_BAN)) return Set.of();
+        if (position.equals(mecatol)) return Adjacency.alphaBetaSystems(game);
+        return hasAlphaOrBeta(game, position) ? Set.of(mecatol) : Set.of();
+    }
+
+    @Nullable
+    public static String foldedMecatol(Game game, Player player) {
+        if (player == null || !player.hasTech(TECH) || player.controlsMecatol(false)) return null;
         Tile mecatol = game.getMecatolTile();
-        if (mecatol == null || position.equals(mecatol.getPosition())) return Set.of();
-        return hasAlphaOrBeta(game, position) ? Set.of(mecatol.getPosition()) : Set.of();
+        return mecatol == null ? null : mecatol.getPosition();
     }
 
     private static boolean hasAlphaOrBeta(Game game, String position) {

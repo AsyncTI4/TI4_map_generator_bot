@@ -15,6 +15,8 @@ import ti4.ai.AiTestGame;
 import ti4.ai.brain.AiDecision;
 import ti4.ai.brain.AiTurnContext;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.MoveBudget;
+import ti4.ai.eval.ShipSpeed;
 import ti4.ai.perception.AiPrompt;
 import ti4.ai.perception.AiPrompt.PromptSource;
 import ti4.ai.tactical.TacticalPlan;
@@ -300,15 +302,16 @@ class LegendaryRulesTest extends BaseTi4Test {
         assertThat(TacticalRules.mayTakeAnotherAction(context)).isTrue();
     }
 
+    // Tempesta is a "+1 to 1 of your ships" boost: it joins the one-ship budget while the card is ready.
     @Test
     void addsTheTempestaMoveToWhatTheFleetCanReach() {
-        int before = BoardView.moveValueWithBoosts(test.nekro, UnitType.Carrier);
+        int before = MoveBudget.oneShip(test.game, test.nekro, null);
         test.nekro.addPlanet("tempesta");
 
-        assertThat(BoardView.moveValueWithBoosts(test.nekro, UnitType.Carrier)).isEqualTo(before + 1);
+        assertThat(MoveBudget.oneShip(test.game, test.nekro, null)).isEqualTo(before + 1);
 
         test.nekro.exhaustPlanetAbility("tempesta");
-        assertThat(BoardView.moveValueWithBoosts(test.nekro, UnitType.Carrier)).isEqualTo(before);
+        assertThat(MoveBudget.oneShip(test.game, test.nekro, null)).isEqualTo(before);
     }
 
     // The planner counts Tempesta's +1 among the moves a ship can make, so a move that needs it also needs the
@@ -322,8 +325,8 @@ class LegendaryRulesTest extends BaseTi4Test {
         test.place("26", middle);
         String far = otherNeighbour(middle);
         test.place("25", far);
-        int reach = BoardView.moveValueWithGravityDrive(test.nekro, UnitType.Carrier);
-        assertThat(reach).isEqualTo(1);
+        assertThat(ShipSpeed.of(test.game, test.nekro, UnitType.Carrier, home, null))
+                .isEqualTo(1);
 
         TacticalPlan plan = new TacticalPlan(
                 Kind.EXPAND, far, List.of(new UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1)), Map.of(), 5);
@@ -342,6 +345,39 @@ class LegendaryRulesTest extends BaseTi4Test {
         } else {
             assertThat(boost).isEmpty();
         }
+    }
+
+    // Only departing ships need range. Infantry aboard (a cargo move from the origin's planet) never asks for
+    // Tempesta, and once Flank Speed was played in this activation its +1 covers the far system instead.
+    @Test
+    void tempestaIsNeededOnlyForAShipShortOfRange() {
+        test.nekro.addPlanet("tempesta");
+        Tile home = test.game.getTileByPosition(AiTestGame.HOME);
+        test.units(home, "space", test.nekro, UnitType.Carrier, 1);
+        test.units(home, "mordaiii", test.nekro, UnitType.Infantry, 2);
+        String middle = AiTestGame.neighbourOf(AiTestGame.HOME);
+        test.place("26", middle);
+        String far = otherNeighbour(middle);
+        test.place("25", far);
+        List<UnitMove> loaded = List.of(
+                new UnitMove(AiTestGame.HOME, "space", UnitType.Carrier, 1),
+                new UnitMove(AiTestGame.HOME, "mordaiii", UnitType.Infantry, 2));
+
+        assertThat(TempestaRules.needsBoost(test.game, test.nekro, expansion(middle, loaded)))
+                .isFalse();
+        assertThat(TempestaRules.needsBoost(test.game, test.nekro, expansion(far, loaded)))
+                .isTrue();
+
+        test.isActive(test.nekro, "action");
+        test.game.setActiveSystem(far);
+        test.game.setStoredValue("currentActionSummary" + test.nekro.getFaction(), " Activated " + far);
+        test.game.setStoredValue(ShipSpeed.FLANK_SPEED_BOOST, "1");
+        assertThat(TempestaRules.needsBoost(test.game, test.nekro, expansion(far, loaded)))
+                .isFalse();
+    }
+
+    private static TacticalPlan expansion(String target, List<UnitMove> moves) {
+        return new TacticalPlan(Kind.EXPAND, target, moves, Map.of(), 5);
     }
 
     // The Nucleus is a component action: open the menu, exhaust the card, name the system with the war sun, then take

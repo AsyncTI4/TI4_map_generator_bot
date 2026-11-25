@@ -1,21 +1,18 @@
 package ti4.ai.runtime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.helpers.Constants;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.map.FractureService;
 
 /**
- * The Fracture in a self-play game (-Dai.selfplay.fracture=true): it enters play at the start of round 2 with an ingress
- * token on one system of each technology specialty and on Mecatol Rex, and from then on every change of hands of its
+ * The Fracture in a self-play game (-Dai.selfplay.fracture=true): it enters play at the start of round 2, brought in by a
+ * seat drawn from the seed, which places the ingress its breakthrough calls for; from then on every change of hands of its
  * four planets is recorded with the round and the seat.
  */
 final class FractureTracker {
@@ -29,11 +26,12 @@ final class FractureTracker {
     record Summary(
             boolean enabled,
             int enteredRound,
+            String spawner,
             List<String> ingress,
             List<Change> changes,
             Map<String, Integer> firstAttackRound) {
 
-        static final Summary OFF = new Summary(false, 0, List.of(), List.of(), Map.of());
+        static final Summary OFF = new Summary(false, 0, "", List.of(), List.of(), Map.of());
 
         boolean attacked(String planet) {
             return firstAttackRound.containsKey(planet);
@@ -41,6 +39,18 @@ final class FractureTracker {
 
         boolean tookEvery(String planet) {
             return changes.stream().anyMatch(change -> change.planet().equals(planet));
+        }
+
+        boolean entered() {
+            return enteredRound > 0;
+        }
+
+        String holderAtEnd(String planet) {
+            String holder = "";
+            for (Change change : changes) {
+                if (change.planet().equals(planet)) holder = change.to();
+            }
+            return holder;
         }
 
         int styxChanges() {
@@ -56,6 +66,7 @@ final class FractureTracker {
 
     private final long seed;
     private int enteredRound;
+    private String spawner = "";
     private final List<String> ingress = new ArrayList<>();
     private final Map<String, String> holders = new LinkedHashMap<>();
     private final List<Change> changes = new ArrayList<>();
@@ -70,35 +81,53 @@ final class FractureTracker {
         return enabled() && enteredRound == 0 && game.getRound() >= ENTERS_IN_ROUND;
     }
 
+    // A seat drawn from the seed brings the Fracture in the way a successful roll does: the engine places the ingress
+    // tokens its breakthrough calls for and asks that seat to choose the rest, so the ingress differs from game to
+    // game.
     void enter(Game game) {
-        FractureService.spawnFracture(null, game);
+        if (!FractureService.spawnFracture(null, game)) return;
         enteredRound = game.getRound();
-        Random random = new Random(seed);
-        List<Tile> chosen = new ArrayList<>();
-        for (TechnologyType type : TechnologyType.mainFour) {
-            List<Tile> candidates = game.getTileMap().values().stream()
-                    .filter(tile -> !chosen.contains(tile))
-                    .filter(tile ->
-                            tile.getPlanetUnitHolders().stream().anyMatch(planet -> planet.hasTechSpecialty(type)))
-                    .sorted(java.util.Comparator.comparing(Tile::getPosition))
-                    .toList();
-            if (!candidates.isEmpty()) chosen.add(candidates.get(random.nextInt(candidates.size())));
-        }
-        Tile mecatol = game.getMecatolTile();
-        if (mecatol != null) chosen.add(mecatol);
-        for (Tile tile : chosen) {
-            tile.addToken(Constants.TOKEN_INGRESS, "space");
-            ingress.add(tile.getPosition());
-        }
-        Collections.sort(ingress);
+        Player seat = spawningSeat(game, seed);
+        spawner = seat.getFaction();
+        FractureService.spawnIngressTokens(null, game, seat, seat.getBreakthroughID());
+        readIngress(game);
         PLANETS.forEach(planet -> neutralUnits.put(planet, neutralUnitsOn(game, planet)));
     }
 
+    // SplittableRandom mixes the seed, so the consecutive seeds of a batch spread over the seats; java.util.Random
+    // gives nearly the same first draw for neighbouring seeds.
+    static Player spawningSeat(Game game, long seed) {
+        List<Player> seats = game.getRealPlayers().stream()
+                .sorted(java.util.Comparator.comparing(Player::getFaction))
+                .toList();
+        return seats.get(new java.util.SplittableRandom(seed).nextInt(seats.size()));
+    }
+
+    private void readIngress(Game game) {
+        ingress.clear();
+        game.getTileMap().values().stream()
+                .filter(tile -> tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS))
+                .map(Tile::getPosition)
+                .sorted()
+                .forEach(ingress::add);
+    }
+
+    private void startFollowing(Game game) {
+        enteredRound = game.getRound();
+        readIngress(game);
+        PLANETS.forEach(planet -> neutralUnits.put(planet, neutralUnitsOn(game, planet)));
+    }
+
+    // Without the flag the Fracture can still enter by itself (an expedition roll, a breakthrough): from then on its
+    // planets are followed the same way. The seat that brought it in places its chosen ingress tokens over the next
+    // ticks, so the ingress is read again for the rest of that round.
     void observe(Game game) {
+        if (enteredRound == 0 && FractureService.isFractureInPlay(game)) startFollowing(game);
         if (enteredRound == 0) return;
+        if (game.getRound() == enteredRound) readIngress(game);
         for (String planet : PLANETS) {
             Player holder = game.getPlayerThatControlsPlanet(planet);
-            String now = holder == null ? "" : holder.getFaction();
+            String now = holder == null || holder.isNeutral() ? "" : holder.getFaction();
             if (neutralUnitsOn(game, planet) < neutralUnits.getOrDefault(planet, 0)) {
                 firstAttackRound.putIfAbsent(planet, game.getRound());
             }
@@ -123,6 +152,11 @@ final class FractureTracker {
 
     Summary summary() {
         return new Summary(
-                enabled(), enteredRound, List.copyOf(ingress), List.copyOf(changes), Map.copyOf(firstAttackRound));
+                enabled(),
+                enteredRound,
+                spawner,
+                List.copyOf(ingress),
+                List.copyOf(changes),
+                Map.copyOf(firstAttackRound));
     }
 }

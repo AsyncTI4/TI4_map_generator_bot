@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.ImaginedTurn;
-import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.MoveBudget;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.Tile;
@@ -52,9 +52,9 @@ public class PrecisionRules {
                 .orElse(0);
     }
 
-    private static int moveOf(Player seat, Map<UnitType, Integer> barrage) {
+    private static int moveOf(Game game, Player seat, Tile from, Map<UnitType, Integer> barrage) {
         return barrage.keySet().stream()
-                .mapToInt(type -> BoardView.moveValue(seat, type))
+                .mapToInt(type -> MoveBudget.legBudget(game, seat, type, from, null, false))
                 .min()
                 .orElse(0);
     }
@@ -68,7 +68,8 @@ public class PrecisionRules {
         Map<UnitType, Integer> barrage = barrageShips(seat, ships);
         if (barrage.isEmpty()) return 0;
         double best = 0;
-        for (String position : reach.apply(from, moveOf(seat, barrage)).keySet()) {
+        for (String position :
+                reach.apply(from, moveOf(game, seat, from, barrage)).keySet()) {
             Tile target = game.getTileByPosition(position);
             if (target == null || target == from) continue;
             best = Math.max(best, chanceToClear(seat, barrage, enemyFighters(game, seat, target)));
@@ -77,8 +78,7 @@ public class PrecisionRules {
     }
 
     static boolean facesFighters(Game game, Player seat, Tile dock) {
-        int move = BoardView.moveValue(seat, UnitType.Destroyer);
-        return MovementGraph.reach(game, seat, dock.getPosition(), move).keySet().stream()
+        return ProductionPlanner.builtShipReach(game, seat, UnitType.Destroyer, dock, 1).keySet().stream()
                 .map(game::getTileByPosition)
                 .anyMatch(tile -> tile != null && tile != dock && enemyFighters(game, seat, tile) > 0);
     }

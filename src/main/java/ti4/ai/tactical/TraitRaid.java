@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
-import ti4.ai.eval.MovementGraph;
 import ti4.ai.eval.TraitNeeds;
 import ti4.ai.eval.TraitNeeds.Need;
 import ti4.ai.scoring.ObjectiveValue;
@@ -165,8 +164,8 @@ public class TraitRaid {
 
     private static boolean raidTargetWithin(
             Game game, Player seat, Tile dock, List<Need> needs, DefenseOutlook defense) {
-        int move = BoardView.moveValueWithBoosts(seat, UnitType.Carrier);
-        Map<String, Integer> reach = MovementGraph.reach(game, seat, dock.getPosition(), RAID_RANGE_MOVES * move);
+        Map<String, Integer> reach =
+                ProductionPlanner.builtShipReach(game, seat, UnitType.Carrier, dock, RAID_RANGE_MOVES);
         for (Tile tile : game.getTileMap().values()) {
             if (!reach.containsKey(tile.getPosition())) continue;
             for (Player owner : game.getRealPlayers()) {

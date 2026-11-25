@@ -64,7 +64,7 @@ public final class FleetLog {
     }
 
     private static String ingressDistance(Game game, Player seat, Tile tile) {
-        return MovementGraph.reach(game, seat, tile.getPosition(), INGRESS_SEARCH).entrySet().stream()
+        return MovementGraph.distances(game, seat, tile.getPosition(), INGRESS_SEARCH).entrySet().stream()
                 .filter(entry -> {
                     Tile reached = game.getTileByPosition(entry.getKey());
                     return reached != null && FracturePrize.hasIngress(reached);

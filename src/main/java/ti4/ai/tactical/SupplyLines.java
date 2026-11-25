@@ -2,12 +2,11 @@ package ti4.ai.tactical;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.DiceOdds;
 import ti4.ai.eval.ImaginedTurn;
-import ti4.ai.eval.MovementGraph;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.scoring.ObjectiveValue;
 import ti4.ai.tactical.TacticalPlan.UnitMove;
 import ti4.game.Game;
@@ -78,24 +77,15 @@ public class SupplyLines {
     }
 
     private static boolean shipsWithin(Game game, Player player, Tile target) {
-        int widest = 0;
-        for (Tile tile : game.getTileMap().values()) widest = Math.max(widest, longestMove(player, tile));
-        if (widest == 0) return false;
-        Map<String, Integer> reach = MovementGraph.reach(game, player, target.getPosition(), widest);
-        for (Tile tile : game.getTileMap().values()) {
-            int move = longestMove(player, tile);
-            Integer distance = reach.get(tile.getPosition());
-            if (move > 0 && distance != null && distance <= move) return true;
+        for (Tile origin : game.getTileMap().values()) {
+            if (canJoinFrom(game, player, origin, target)) return true;
         }
         return false;
     }
 
-    private static int longestMove(Player player, Tile tile) {
-        int longest = 0;
-        for (UnitType type : BoardView.ships(BoardView.space(tile), player).keySet()) {
-            longest = Math.max(longest, BoardView.moveValueWithBoosts(player, type));
-        }
-        return longest;
+    private static boolean canJoinFrom(Game game, Player player, Tile origin, Tile target) {
+        return BoardView.ships(BoardView.space(origin), player).keySet().stream()
+                .anyMatch(type -> MoveBudget.canJoin(game, player, origin, target, type));
     }
 
     private static int hitsToKillAll(Player seat, List<UnitMove> arriving) {

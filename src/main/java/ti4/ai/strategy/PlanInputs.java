@@ -69,9 +69,10 @@ record PlanInputs(
     }
 
     private static String viewerKey(Game game, Player seat) {
-        return ImperialUses.pointsAware(game, seat)
+        String viewer = ImperialUses.pointsAware(game, seat)
                 ? "|" + ImperialUses.viewer(game, seat).getUserID()
                 : "";
+        return viewer + (TacticalPlanner.poolsMoveBoosts(game, seat) ? "|pooledBoosts" : "");
     }
 
     private static PlanInputs compute(Game game, Player seat, PlanMoment moment) {

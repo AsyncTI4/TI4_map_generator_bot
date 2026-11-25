@@ -1,7 +1,6 @@
 package ti4.ai.tactical;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,8 +14,13 @@ import javax.annotation.Nullable;
 import ti4.ai.brain.StrategyCard;
 import ti4.ai.brain.TickMemo;
 import ti4.ai.eval.BoardView;
+import ti4.ai.eval.DecidingSeat;
+import ti4.ai.eval.FighterWings;
 import ti4.ai.eval.FleetLimit;
+import ti4.ai.eval.Journey;
 import ti4.ai.eval.MoveBoost;
+import ti4.ai.eval.MoveBudget;
+import ti4.ai.eval.MoveEnablers;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.scoring.Footprint;
 import ti4.ai.trace.Thinking;
@@ -25,7 +29,6 @@ import ti4.game.Planet;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
@@ -52,8 +55,8 @@ final class IncomingForces {
         }
 
         boolean isEmpty() {
-            return ships.entrySet().stream()
-                    .noneMatch(ship -> ship.getKey() != UnitType.Fighter && ship.getValue() > 0);
+            return ships.entrySet().stream().noneMatch(ship -> ship.getKey() != UnitType.Fighter && ship.getValue() > 0)
+                    && moves.stream().noneMatch(move -> move.type() == UnitType.Fighter && move.count() > 0);
         }
 
         boolean carriesGround() {
@@ -77,18 +80,12 @@ final class IncomingForces {
     record Exclusion(Player owner, Tile tile) {}
 
     private static final String THUNDERS_EDGE_WARFARE = "te6warfare";
-    private static final int ONE_MOVE = 1;
-    private static final int TWO_MOVES = 2;
     private static final String SHARED_FORCES = "incoming.forces";
-    private static final String SHARED_REACHES = "incoming.reaches";
-
-    private record Slot(Tile origin, UnitType type, double cost) {}
 
     private final Game game;
     private final Set<String> screened;
     private final Exclusion exclusion;
     private final IncomingForces base;
-    private final Map<String, Map<String, Integer>> reaches;
     private final Map<String, IncomingForce> forces;
     private final boolean plain;
 
@@ -115,7 +112,6 @@ final class IncomingForces {
         this.base = base;
         this.screened = screened;
         this.plain = exclusion == null && screened.isEmpty();
-        this.reaches = base != null ? base.reaches : plain ? TickMemo.mapFor(game, SHARED_REACHES) : new HashMap<>();
         this.forces = plain ? TickMemo.mapFor(game, SHARED_FORCES) : new HashMap<>();
     }
 
@@ -126,7 +122,8 @@ final class IncomingForces {
     }
 
     private static String assumptions() {
-        return MoveBoost.boostedFaction() + "/" + FleetLimit.unlimitedFaction() + "/" + MovementGraph.assumesAntimass();
+        return MoveBoost.boostedFaction() + "/" + FleetLimit.unlimitedFaction() + "/" + MovementGraph.assumesAntimass()
+                + "/" + MoveEnablers.assumedKey() + "/" + DecidingSeat.id();
     }
 
     private boolean isGone(Player enemy, Tile tile) {
@@ -162,69 +159,69 @@ final class IncomingForces {
         if (base != null && exclusion != null && enemy != exclusion.owner()) return base.of(enemy, target, horizon);
         return remembered(
                 enemy.getFaction() + "#" + target.getPosition() + "#" + horizon + "#" + assumptions(),
-                forcesOf -> forcesOf.scan(enemy, target, horizon, ONE_MOVE));
+                forcesOf -> forcesOf.scan(enemy, target, horizon, journeyFor(horizon)));
     }
 
     IncomingForce approaching(Player enemy, Tile target) {
         if (base != null && exclusion != null && enemy != exclusion.owner()) return base.approaching(enemy, target);
         return remembered(
                 enemy.getFaction() + "#" + target.getPosition() + "#approaching#" + assumptions(),
-                forcesOf -> forcesOf.scan(enemy, target, Horizon.NEXT_ROUND, TWO_MOVES));
+                forcesOf -> forcesOf.scan(enemy, target, Horizon.NEXT_ROUND, Journey.approaching()));
     }
 
     Map<String, Integer> reach(Player enemy, Tile origin, int move) {
-        String key = enemy.getFaction() + "#" + origin.getPosition() + "#" + move + "#" + assumptions();
-        Map<String, Integer> found = reaches.computeIfAbsent(
-                key, ignored -> MovementGraph.reach(game, enemy, origin.getPosition(), move, screened));
-        if (!screened.isEmpty()) return found;
-        return TickMemo.checked(
-                SHARED_REACHES, key, found, () -> MovementGraph.reach(game, enemy, origin.getPosition(), move));
+        return MovementGraph.distances(game, enemy, origin.getPosition(), move, screened);
     }
 
     IncomingForce activating(Player enemy, Tile target) {
         return remembered(
                 enemy.getFaction() + "#" + target.getPosition() + "#activating#" + assumptions(),
-                forcesOf -> forcesOf.gather(enemy, target, Horizon.IMMEDIATE, ONE_MOVE));
+                forcesOf -> forcesOf.gather(enemy, target, Horizon.IMMEDIATE, Journey.thisAction()));
     }
 
-    private IncomingForce scan(Player enemy, Tile target, Horizon horizon, int moves) {
+    private static Journey journeyFor(Horizon horizon) {
+        return horizon == Horizon.IMMEDIATE ? Journey.thisAction() : Journey.nextRound();
+    }
+
+    private IncomingForce scan(Player enemy, Tile target, Horizon horizon, Journey journey) {
         try (Thinking.Span timing = Thinking.measure("incoming.force")) {
             if (blocked(enemy, target, horizon)) return IncomingForce.none(enemy, horizon);
-            return gather(enemy, target, horizon, moves);
+            return gather(enemy, target, horizon, journey);
         }
     }
 
-    private IncomingForce gather(Player enemy, Tile target, Horizon horizon, int moves) {
+    private IncomingForce gather(Player enemy, Tile target, Horizon horizon, Journey journey) {
         if (enemy.isNeutral()) return assemble(enemy, target, horizon, Map.of());
+        int supply = fleetSupply(enemy, target);
         Map<Tile, Map<UnitType, Integer>> reaching = new LinkedHashMap<>();
-        Slot gravityDriveShip = null;
         // TODO: PoK Warfare + Fleet Logistics can unlock one origin; exclusions do not unblock paths
-        for (Tile origin : game.getTileMap().values()) {
-            if (origin == target
-                    || isGone(enemy, origin)
-                    || (horizon == Horizon.IMMEDIATE && origin.hasPlayerCC(enemy))) {
-                continue;
-            }
-            Map<UnitType, Integer> arriving = new EnumMap<>(UnitType.class);
-            for (Map.Entry<UnitType, Integer> ship : nonFighterShips(BoardView.ships(BoardView.space(origin), enemy))
-                    .entrySet()) {
-                int move = BoardView.moveValue(enemy, ship.getKey()) * moves;
-                if (reaches(enemy, origin, target, move)) {
-                    arriving.put(ship.getKey(), ship.getValue());
-                } else if (enemy.hasTech("gd") && reaches(enemy, origin, target, move + moves)) {
-                    Slot candidate = new Slot(origin, ship.getKey(), cost(enemy, ship.getKey()));
-                    if (gravityDriveShip == null || candidate.cost() > gravityDriveShip.cost()) {
-                        gravityDriveShip = candidate;
-                    }
-                }
-            }
-            if (!arriving.isEmpty()) reaching.put(origin, arriving);
-        }
-        if (gravityDriveShip != null) {
-            reaching.computeIfAbsent(gravityDriveShip.origin(), origin -> new EnumMap<>(UnitType.class))
-                    .merge(gravityDriveShip.type(), 1, Integer::sum);
-        }
-        return assemble(enemy, target, horizon, withinFleetSupply(enemy, target, reaching));
+        MoveBudget.shipsWithin(
+                        game,
+                        enemy,
+                        target,
+                        journey,
+                        origin -> canSetOut(enemy, origin, horizon),
+                        type -> cost(enemy, type),
+                        supply,
+                        screened)
+                .forEach((position, ships) ->
+                        addShips(reaching, game.getTileByPosition(position), movingShips(enemy, ships)));
+        return assemble(enemy, target, horizon, reaching);
+    }
+
+    private Map<UnitType, Integer> movingShips(Player enemy, Map<UnitType, Integer> ships) {
+        return FighterWings.flies(game, enemy) ? ships : nonFighterShips(ships);
+    }
+
+    private static void addShips(
+            Map<Tile, Map<UnitType, Integer>> reaching, @Nullable Tile origin, Map<UnitType, Integer> ships) {
+        if (origin == null) return;
+        ships.forEach((type, count) -> reaching.computeIfAbsent(origin, ignored -> new EnumMap<>(UnitType.class))
+                .merge(type, count, Integer::sum));
+    }
+
+    private boolean canSetOut(Player enemy, Tile origin, Horizon horizon) {
+        return !isGone(enemy, origin) && !(horizon == Horizon.IMMEDIATE && origin.hasPlayerCC(enemy));
     }
 
     private boolean blocked(Player enemy, Tile target, Horizon horizon) {
@@ -234,44 +231,21 @@ final class IncomingForces {
         return enemy.getTacticalCC() <= 0 || target.hasPlayerCC(enemy);
     }
 
-    private boolean reaches(Player enemy, Tile origin, Tile target, int move) {
-        if (move <= 0) return false;
-        if (origin.isGravityRift(game, enemy)) return reachesFromRift(enemy, origin, target, move);
-        return reach(enemy, origin, move).containsKey(target.getPosition());
+    private int fleetSupply(Player enemy, Tile target) {
+        if (isGone(enemy, target)) return FleetLimit.ships(enemy);
+        UnitHolder space = BoardView.space(target);
+        int resident = FighterWings.fleetSlots(
+                game,
+                enemy,
+                BoardView.ships(space, enemy),
+                BoardView.groundForces(space, enemy),
+                hasDock(enemy, target));
+        return FleetLimit.ships(enemy) - resident;
     }
 
-    // TODO: rift survival roll not modelled
-    private boolean reachesFromRift(Player enemy, Tile rift, Tile target, int move) {
-        for (String position : FoWHelper.getAdjacentTiles(game, rift.getPosition(), enemy, false)) {
-            Tile neighbour = game.getTileByPosition(position);
-            if (neighbour == null || neighbour == rift || !MovementGraph.canEnter(game, enemy, neighbour)) continue;
-            if (BoardView.hasEnemyShips(game, enemy, neighbour)) {
-                if (neighbour == target) return true;
-            } else if (reach(enemy, neighbour, move).containsKey(target.getPosition())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Map<Tile, Map<UnitType, Integer>> withinFleetSupply(
-            Player enemy, Tile target, Map<Tile, Map<UnitType, Integer>> reaching) {
-        int resident = isGone(enemy, target) ? 0 : BoardView.nonFighterShips(BoardView.space(target), enemy);
-        int supply = FleetLimit.ships(enemy) - resident;
-        List<Slot> slots = new ArrayList<>();
-        reaching.forEach((origin, ships) -> ships.forEach((type, count) -> {
-            for (int i = 0; i < count; i++) slots.add(new Slot(origin, type, cost(enemy, type)));
-        }));
-        slots.sort(Comparator.comparingDouble(Slot::cost)
-                .reversed()
-                .thenComparing(slot -> slot.origin().getPosition())
-                .thenComparing(slot -> slot.type().name()));
-        Map<Tile, Map<UnitType, Integer>> kept = new LinkedHashMap<>();
-        for (Slot slot : slots.subList(0, Math.max(0, Math.min(supply, slots.size())))) {
-            kept.computeIfAbsent(slot.origin(), origin -> new EnumMap<>(UnitType.class))
-                    .merge(slot.type(), 1, Integer::sum);
-        }
-        return kept;
+    private static boolean hasDock(Player enemy, Tile tile) {
+        return tile.getPlanetUnitHolders().stream()
+                .anyMatch(planet -> BoardView.count(planet, enemy, UnitType.Spacedock) > 0);
     }
 
     // TODO: the enemy is assumed to commit everything that reaches; ground forces survive the space combat
@@ -290,9 +264,12 @@ final class IncomingForces {
                 if (waiting > 0) ground.merge(type, waiting, Integer::sum);
             }
         }
+        int[] flown = {0};
         kept.forEach((origin, arriving) -> {
             UnitHolder space = BoardView.space(origin);
             String position = origin.getPosition();
+            int flying = arriving.getOrDefault(UnitType.Fighter, 0);
+            flown[0] += flying;
             int capacity = 0;
             for (Map.Entry<UnitType, Integer> ship : arriving.entrySet()) {
                 ships.merge(ship.getKey(), ship.getValue(), Integer::sum);
@@ -310,7 +287,7 @@ final class IncomingForces {
                 moves.add(new Footprint.Move(position, type, carried));
                 capacity -= carried;
             }
-            int fighters = Math.min(capacity, BoardView.count(space, enemy, UnitType.Fighter));
+            int fighters = Math.min(capacity, BoardView.count(space, enemy, UnitType.Fighter) - flying);
             if (fighters > 0) {
                 ships.merge(UnitType.Fighter, fighters, Integer::sum);
                 moves.add(new Footprint.Move(position, UnitType.Fighter, fighters));
@@ -321,6 +298,7 @@ final class IncomingForces {
         for (Map.Entry<UnitType, Integer> ship : ships.entrySet()) {
             if (ship.getKey() != UnitType.Fighter) fleetCost += ship.getValue() * cost(enemy, ship.getKey());
         }
+        fleetCost += flown[0] * cost(enemy, UnitType.Fighter);
         double groundCost = 0;
         for (Map.Entry<UnitType, Integer> force : ground.entrySet()) {
             groundCost += force.getValue() * cost(enemy, force.getKey());

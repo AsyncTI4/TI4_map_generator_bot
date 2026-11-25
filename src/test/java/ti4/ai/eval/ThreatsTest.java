@@ -39,4 +39,20 @@ class ThreatsTest extends BaseTi4Test {
 
         assertThat(Threats.reachableByEnemies(test.game, test.nekro)).isEmpty();
     }
+
+    // Fighter IIs move themselves (move 2): two next door threaten home and add their cost to what could arrive.
+    @Test
+    void incomingFleetCostCountsFlyingFighters() {
+        Tile lodor = test.place("26", neighbour);
+        test.units(lodor, "space", test.sol, UnitType.Fighter, 2);
+        Tile home = test.game.getTileByPosition(AiTestGame.HOME);
+        assertThat(Threats.incomingFleetCost(test.game, test.sol, home)).isZero();
+
+        test.sol.removeOwnedUnitByID("fighter");
+        test.sol.addOwnedUnitByID("fighter2");
+
+        assertThat(Threats.incomingFleetCost(test.game, test.sol, home))
+                .isCloseTo(1.0, org.assertj.core.data.Offset.offset(1e-9));
+        assertThat(Threats.reachableByEnemies(test.game, test.nekro)).contains(AiTestGame.HOME, neighbour);
+    }
 }

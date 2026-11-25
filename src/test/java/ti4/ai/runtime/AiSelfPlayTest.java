@@ -2,10 +2,12 @@ package ti4.ai.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,74 @@ class AiSelfPlayTest extends BaseTi4Test {
         SelfPlayGame.Outcome outcome = play(game -> game.getRound() >= 2, VIRTUAL_DAY, 5000);
 
         assertThat(outcome.ending()).as(outcome.report()).isEqualTo(SelfPlayGame.Ending.STOP_CONDITION);
+    }
+
+    // -Dai.selfplay.replaygame=DIR/GAME plays a game recorded with -Dai.selfplay.savesdir=DIR again from its manifest
+    // (same
+    // name, slot, seed, virtual clock start and factions) and checks every save against the recorded one. It stops at
+    // the first save that differs, or after save N with -Dai.selfplay.replaygame.to=N;
+    // -Dai.selfplay.replaygame.continue=true
+    // plays on live from there to the end of the game instead (for example with changed AI code). The JVM must have the
+    // recorded game-shaping flags, since several classes read them when they load: DIR/GAME/replay.cmd is the command.
+    @Test
+    @EnabledIfSystemProperty(named = SavedGameReplay.PROPERTY, matches = ".+")
+    void replaySavedGame() throws Exception {
+        Path folder = Path.of(System.getProperty(SavedGameReplay.PROPERTY));
+        Properties manifest = SavedGameReplay.manifest(folder);
+        assertThat(SavedGameReplay.mismatchedFlags(manifest))
+                .as("flags that differ from the recording; replay with the command in "
+                        + folder.resolve(GameRecorder.REPLAY_COMMAND))
+                .isEmpty();
+        String name = manifest.getProperty("name");
+        int slot = Integer.parseInt(manifest.getProperty("slot"));
+        long seed = Long.parseLong(manifest.getProperty("seed"));
+        long clockStart = Long.parseLong(manifest.getProperty("clockStart"));
+        List<String> seats = List.of(manifest.getProperty("factions").split(","));
+        boolean playOn = Boolean.getBoolean(SavedGameReplay.PROPERTY + ".continue");
+        SavedGameReplay replay = new SavedGameReplay(
+                folder,
+                Math.min(
+                        Integer.getInteger(SavedGameReplay.PROPERTY + ".to", Integer.MAX_VALUE),
+                        SavedGameReplay.recordedSaves(folder)));
+        SelfPlayGame.Outcome outcome;
+        try (SelfPlayEnvironment env = new SelfPlayEnvironment(clockStart)) {
+            env.saveListener = replay::saved;
+            SelfPlayGame game = new SelfPlayGame(env, name, slot, seed);
+            try {
+                game.setUp(seats);
+                outcome = game.run(played -> !playOn && replay.done(), 14 * VIRTUAL_DAY, 100_000);
+                System.out.println(outcome.report());
+            } finally {
+                AiRuntime.forget(game.name);
+                GameManager.delete(game.name);
+            }
+        }
+        System.out.printf(
+                "REPLAY %s: %d saves matched the recording (%d recorded save files), stopped in round %d (%s)%n",
+                name, replay.savesChecked(), replay.recordedFiles(), outcome.round(), outcome.ending());
+        replay.divergence()
+                .ifPresent(found -> System.out.printf(
+                        "REPLAY %s first difference at save %d (recorded %s), line %d%n  recorded: %s%n  replayed: %s%n",
+                        name,
+                        found.save(),
+                        found.file(),
+                        found.line(),
+                        shorten(found.expected()),
+                        shorten(found.actual())));
+        if (!playOn)
+            assertThat(replay.divergence())
+                    .as("first save that differs from the recording")
+                    .isEmpty();
+    }
+
+    // -Dai.selfplay.stopround=N ends each game after round N, so those games end at the stop condition on purpose.
+    private static boolean stoppedAtRound(SelfPlayGame.Outcome outcome) {
+        return Integer.getInteger("ai.selfplay.stopround") != null
+                && outcome.ending() == SelfPlayGame.Ending.STOP_CONDITION;
+    }
+
+    private static String shorten(String line) {
+        return line.length() <= 400 ? line : line.substring(0, 400) + "...";
     }
 
     // Whole games take a minute or two each and dice and decks are random, so they only run when asked for:
@@ -67,7 +137,7 @@ class AiSelfPlayTest extends BaseTi4Test {
             totalPoints += outcome.totalVictoryPoints();
             finalRounds += outcome.round();
             outcomes.add(outcome);
-            if (!outcome.ending().finished()) unfinished.add(outcome);
+            if (!outcome.ending().finished() && !stoppedAtRound(outcome)) unfinished.add(outcome);
         }
         // The batch summary is the measure of the AI's strength: the leader's victory points, the table's total and how
         // early the games finish.
@@ -646,11 +716,35 @@ class AiSelfPlayTest extends BaseTi4Test {
         System.out.println("Expedition claims by kind and round: " + byKindAndRound);
     }
 
-    // The Fracture over the batch (-Dai.selfplay.fracture=true): for each planet, in how many games it was taken and
-    // the rounds and seats that took it, and how often Styx changed hands.
-    private static void printFracture(List<SelfPlayGame.Outcome> outcomes) {
-        if (!FractureTracker.enabled()) return;
+    // The Fracture over the games it entered (by itself, or at round 2 with -Dai.selfplay.fracture=true): for each
+    // planet, in how many of them it was taken and the rounds and seats that took it, how often Styx changed hands, and
+    // in how many a seat still held Styx at the end (the human figure to compare with: Styx taken in 87% of the games
+    // with the Fracture).
+    private static void printFracture(List<SelfPlayGame.Outcome> all) {
+        List<SelfPlayGame.Outcome> outcomes =
+                all.stream().filter(outcome -> outcome.fracture().entered()).toList();
+        if (outcomes.isEmpty()) return;
         int games = outcomes.size();
+        long styxHeld = outcomes.stream()
+                .filter(outcome -> !outcome.fracture().holderAtEnd("styx").isEmpty())
+                .count();
+        long styxTaken = outcomes.stream()
+                .filter(outcome -> outcome.fracture().changes().stream()
+                        .anyMatch(change ->
+                                "styx".equals(change.planet()) && !change.to().isEmpty()))
+                .count();
+        System.out.printf(
+                "Styx with the Fracture in play: taken in %d/%d games (%.0f%%), held at the end in %d/%d (%.0f%%),"
+                        + " the Fracture entered in rounds %s%n",
+                styxTaken,
+                games,
+                100.0 * styxTaken / games,
+                styxHeld,
+                games,
+                100.0 * styxHeld / games,
+                outcomes.stream()
+                        .map(outcome -> outcome.fracture().enteredRound())
+                        .toList());
         for (String planet : FractureTracker.PLANETS) {
             List<String> takes = new ArrayList<>();
             for (int index = 0; index < games; index++) {
@@ -1214,7 +1308,9 @@ class AiSelfPlayTest extends BaseTi4Test {
     private static SelfPlayGame.Outcome playFullGame(long clockStart, int slot, int games) throws Exception {
         java.lang.management.ThreadMXBean threads = java.lang.management.ManagementFactory.getThreadMXBean();
         long cpuStart = threads.getCurrentThreadCpuTime();
-        SelfPlayGame.Outcome outcome = play(game -> false, 14 * VIRTUAL_DAY, 100_000, clockStart, slot);
+        int stopRound = Integer.getInteger("ai.selfplay.stopround", Integer.MAX_VALUE);
+        SelfPlayGame.Outcome outcome =
+                play(game -> game.getRound() > stopRound, 14 * VIRTUAL_DAY, 100_000, clockStart, slot);
         long cpuSeconds = (threads.getCurrentThreadCpuTime() - cpuStart) / 1_000_000_000L;
         System.out.println("Game " + (slot + 1) + "/" + games + " finished: " + outcome.ending() + " in round "
                 + outcome.round() + ", victory points " + outcome.victoryPoints() + ", wall time "
@@ -1236,6 +1332,7 @@ class AiSelfPlayTest extends BaseTi4Test {
                             ? "aiseed" + Math.floorMod(SelfPlayGame.BASE_SEED + slot, 1_000_000L)
                             : "aiselfplay" + ThreadLocalRandom.current().nextInt(100_000, 1_000_000);
             SelfPlayGame game = new SelfPlayGame(env, name, slot);
+            GameRecorder recorder = GameRecorder.root().isPresent() ? record(env, name, slot, clockStart) : null;
             try {
                 game.setUp(factions());
                 SelfPlayGame.Outcome outcome = game.run(stopWhen, maxVirtualMillis, maxTicks);
@@ -1252,9 +1349,41 @@ class AiSelfPlayTest extends BaseTi4Test {
                         .isEmpty();
                 return outcome;
             } finally {
+                if (recorder != null) recorder.close();
                 AiRuntime.forget(game.name);
                 GameManager.delete(game.name);
             }
         }
+    }
+
+    private static GameRecorder record(SelfPlayEnvironment env, String name, int slot, long clockStart)
+            throws java.io.IOException {
+        Path folder = GameRecorder.root().orElseThrow().resolve(name);
+        Properties manifest = new Properties();
+        manifest.setProperty("name", name);
+        manifest.setProperty("slot", String.valueOf(slot));
+        manifest.setProperty("seed", String.valueOf(SelfPlayGame.seedFor(slot)));
+        manifest.setProperty("clockStart", String.valueOf(clockStart));
+        manifest.setProperty("factions", String.join(",", factions()));
+        java.util.TreeMap<String, String> flags = new java.util.TreeMap<>();
+        for (String key : System.getProperties().stringPropertyNames()) {
+            if (SavedGameReplay.replayFlag(key)) flags.put(key, System.getProperty(key));
+        }
+        flags.putIfAbsent("ai.selfplay.seed", String.valueOf(SelfPlayGame.BASE_SEED));
+        flags.forEach((key, value) -> manifest.setProperty(SavedGameReplay.FLAG_PREFIX + key, value));
+        StringBuilder command = new StringBuilder("mvn -o test \"-Dtest=AiSelfPlayTest#replaySavedGame\"")
+                .append(" -Dsurefire.failIfNoSpecifiedTests=false -Dspotless.check.skip=true")
+                .append(" \"-D")
+                .append(SavedGameReplay.PROPERTY)
+                .append('=')
+                .append(folder.toAbsolutePath())
+                .append('"');
+        flags.forEach((key, value) ->
+                command.append(" \"-D").append(key).append('=').append(value).append('"'));
+        GameRecorder.writeManifest(folder, manifest, command.toString());
+        GameRecorder recorder = new GameRecorder(folder, env::now);
+        env.saveListener = recorder::saved;
+        env.eventListener = recorder::event;
+        return recorder;
     }
 }

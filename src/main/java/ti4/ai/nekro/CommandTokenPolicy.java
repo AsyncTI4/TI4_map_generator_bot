@@ -49,6 +49,8 @@ public class CommandTokenPolicy {
     private static final String FLEET_REGULATIONS = "regulations";
     private static final int REGULATED_FLEET = 4;
     private static final String ACTION_PHASE = "action";
+    private static final int FIRST_ROUND_PULLED_TO_FLEET = 2;
+    private static final int FULL_FLEET_ROUND = 3;
 
     public enum Pool {
         TACTIC("tactic"),
@@ -206,9 +208,12 @@ public class CommandTokenPolicy {
                     new Level(Pool.FLEET, Math.min(cap, heroFleet) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus),
                     new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
-                    new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
+                    new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat)) - bonus),
+                    new Level(Pool.FLEET, Math.min(cap, FractureCampaign.gatheringFleet(game, seat)) - bonus),
                     new Level(Pool.STRATEGY, plan.strategy()),
                     new Level(Pool.TACTIC, plan.tactic()),
+                    new Level(Pool.FLEET, Math.min(cap, roundFleet(game.getRound()))),
+                    new Level(Pool.FLEET, Math.min(cap, roundFleetStretch(game.getRound()))),
                     new Level(Pool.FLEET, Math.min(growth, stackingFleet(game, seat, largest)) - bonus));
         }
         int growth = Math.min(cap, plannedFleetCap(game.getRound() + 1));
@@ -217,8 +222,11 @@ public class CommandTokenPolicy {
                 new Level(Pool.TACTIC, 1),
                 new Level(Pool.FLEET, Math.min(cap, heroFleet) - bonus),
                 new Level(Pool.FLEET, Math.min(cap, fleetForAnOpenSlot(game, seat, largest, cap)) - bonus)));
+        levels.addAll(styxTakingFleet(game, seat, cap, bonus));
         levels.addAll(fearsAStall(game, seat) ? TWO_TACTICS_PER_STRATEGY : FOLLOWS_FIRST);
+        levels.add(new Level(Pool.FLEET, Math.min(cap, FractureCampaign.gatheringFleet(game, seat)) - bonus));
         levels.add(new Level(Pool.FLEET, Math.min(cap, SPARE_FLEET)));
+        levels.add(new Level(Pool.FLEET, Math.min(cap, fleetEnteringRound(game.getRound() + 1, false))));
         int toBuild = fleetToBuild(game, seat, true);
         if (toBuild > 0) {
             levels.add(new Level(Pool.TACTIC, TACTIC_BEFORE_BUILDING));
@@ -227,11 +235,26 @@ public class CommandTokenPolicy {
         levels.addAll(List.of(
                 new Level(Pool.FLEET, Math.min(cap, objectiveFleet(game, seat, largest, cap)) - bonus),
                 new Level(Pool.STRATEGY, strategyTarget(game, seat)),
-                new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat, largest)) - bonus),
+                new Level(Pool.FLEET, Math.min(cap, fleetEnteringRound(game.getRound() + 1, true))),
+                new Level(Pool.FLEET, Math.min(cap, fractureFleet(game, seat)) - bonus),
                 new Level(Pool.FLEET, Math.min(growth, stackingFleet(game, seat, largest)) - bonus),
                 new Level(Pool.TACTIC, TACTIC_PLENTY),
                 new Level(Pool.STRATEGY, STRATEGY_MAX)));
         return levels;
+    }
+
+    static int roundFleet(int round) {
+        if (round < FIRST_ROUND_PULLED_TO_FLEET) return 0;
+        return round < FULL_FLEET_ROUND ? FIRST_ROUND_PULLED_TO_FLEET : FULL_FLEET_ROUND;
+    }
+
+    static int roundFleetStretch(int round) {
+        return round < FIRST_ROUND_PULLED_TO_FLEET ? 0 : roundFleet(round) + 1;
+    }
+
+    static int fleetEnteringRound(int round, boolean stretch) {
+        if (round <= FIRST_ROUND_PULLED_TO_FLEET) return 0;
+        return stretch ? roundFleetStretch(round) : roundFleet(round);
     }
 
     private static int plannedFleetCap(int round) {
@@ -281,14 +304,18 @@ public class CommandTokenPolicy {
         return Math.min(target, largest + SHIPS_BUILT_PER_ROUND);
     }
 
-    private static int fractureFleet(Game game, Player seat, int largest) {
-        boolean stackNearTheLimit = largest >= BASE_FLEET - 1;
+    private static List<Level> styxTakingFleet(Game game, Player seat, int cap, int bonus) {
+        int taking = Math.min(FractureCampaign.TAKING_SHIPS, fractureFleet(game, seat));
+        if (taking <= 0) return List.of();
+        return List.of(
+                new Level(Pool.STRATEGY, 1),
+                new Level(Pool.TACTIC, TACTIC_FIRST),
+                new Level(Pool.FLEET, Math.min(cap, taking) - bonus));
+    }
+
+    private static int fractureFleet(Game game, Player seat) {
         boolean ownRoute = FractureCampaign.routeShare(game, seat) >= 1;
-        return stackNearTheLimit
-                        && ownRoute
-                        && FractureCampaign.dock(game, seat).isPresent()
-                ? FractureCampaign.FLEET_SHIPS
-                : 0;
+        return ownRoute && FractureCampaign.dock(game, seat).isPresent() ? FractureCampaign.fleetShips(game, seat) : 0;
     }
 
     private static int fleetKeptForBuilding(Game game, Player seat, int cap) {

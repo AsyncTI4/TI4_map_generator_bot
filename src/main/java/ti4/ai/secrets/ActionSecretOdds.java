@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import ti4.ai.eval.BoardView;
 import ti4.ai.eval.GameHorizon;
+import ti4.ai.eval.MoveBudget;
 import ti4.ai.eval.MovementGraph;
 import ti4.ai.tactical.CannonWipeRules;
 import ti4.game.Game;
@@ -140,16 +141,25 @@ public class ActionSecretOdds {
 
     private static double unveilFlagship(Game game, Player seat) {
         List<Tile> flagships = tilesWhere(game, tile -> BoardView.countInTile(tile, seat, UnitType.Flagship) > 0);
-        int move = BoardView.moveValueWithGravityDrive(seat, UnitType.Flagship);
         if (flagships.stream()
-                .anyMatch(ship -> reaches(game, seat, ship, move, tile -> hasEnemyShips(game, seat, tile)))) {
+                .anyMatch(ship -> flagshipReaches(game, seat, ship, tile -> hasEnemyShips(game, seat, tile)))) {
             return ENGINEERABLE;
         }
         return flagships.isEmpty() ? 0.10 : FLAGSHIP_EVIDENCED;
     }
 
+    private static boolean flagshipReaches(Game game, Player seat, Tile origin, Predicate<Tile> target) {
+        int budget = MoveBudget.searchBudget(game, seat, origin);
+        if (budget <= 0) return false;
+        return MovementGraph.distances(game, seat, origin.getPosition(), budget).keySet().stream()
+                .map(game::getTileByPosition)
+                .anyMatch(tile -> tile != null
+                        && target.test(tile)
+                        && MoveBudget.canJoin(game, seat, origin, tile, UnitType.Flagship));
+    }
+
     private static boolean reaches(Game game, Player seat, Tile origin, int move, Predicate<Tile> target) {
-        return MovementGraph.reach(game, seat, origin.getPosition(), move).keySet().stream()
+        return MovementGraph.distances(game, seat, origin.getPosition(), move).keySet().stream()
                 .map(game::getTileByPosition)
                 .anyMatch(tile -> tile != null && target.test(tile));
     }

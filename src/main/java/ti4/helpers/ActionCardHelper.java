@@ -1542,6 +1542,14 @@ public class ActionCardHelper {
                 game.setStoredValue("flankspeedBoost", "1");
             }
 
+            if ("lost_star".equals(automationID)) {
+                game.setStoredValue("lostStarChart", player.getFaction());
+            }
+
+            if ("nav_suite".equals(automationID)) {
+                game.setStoredValue("navSuite", player.getFaction());
+            }
+
             if ("refabrication".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.factionButtonChecker() + "resolveSisterShip", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
