@@ -572,6 +572,7 @@ function runningCard(j) {
 }
 
 const openTables = new Set();
+const tableScroll = new Map();
 
 function gamesTable(j, openByDefault) {
   const rows = j.progress?.rows || [];
@@ -587,18 +588,16 @@ function gamesTable(j, openByDefault) {
     const time = g.wallSeconds == null ? "" : (g.state === "playing" ? "~" : "") + dur(g.wallSeconds * 1000);
     const perRound = g.wallSeconds && g.round ? Math.round(g.wallSeconds / 60 / g.round) + " min" : "";
     const label = g.end && g.end !== "VICTORY_POINTS" ? g.end.replace(/_/g, " ").toLowerCase() : g.state;
-    const winners = g.vp ? Object.keys(g.vp).filter(f => g.vp[f] === top) : [];
     const think = g.thinkPerTurn == null ? "" : g.turns + " / " + g.thinkPerTurn.toFixed(1) + "s";
-    return "<tr" + attrs + "><td>" + g.index + "</td><td>" + (g.seed != null ? esc(g.seed) + (g.side ? " " + esc(g.side) : "") : "") + "</td>" +
+    return "<tr" + attrs + "><td>" + g.index + "</td>" +
       '<td><span class="pill s-' + (g.state === "playing" ? "running" : g.state === "finished" && label === "finished" ? "done" : g.state === "finished" || g.state === "unfinished" ? "failed" : "queued") + '">' + esc(label) + "</span></td>" +
-      "<td><b>" + time + "</b></td><td>" + (g.round ?? "") + "</td><td>" + perRound + "</td><td>" + (g.agendas || "") + "</td>" +
-      '<td class="win">' + esc(winners.join(", ")) + (winners.length ? " " + top : "") + "</td>" +
+      "<td><b>" + time + "</b></td><td>" + (g.round ?? "") + "</td><td>" + perRound + "</td>" +
       factions.map(f => '<td class="' + (g.vp && g.vp[f] === top ? "win" : "") + '">' + (g.vp?.[f] ?? "") + "</td>").join("") +
       "<td>" + (g.cpuSeconds != null ? dur(g.cpuSeconds * 1000) : "") + "</td><td>" + think + "</td></tr>";
   }).join("");
   const summary = ["playing", "finished", "unfinished", "waiting", "not played"].filter(s => counts[s]).map(s => counts[s] + " " + s).join(" · ");
   const open = openTables.has(j.id) || (openByDefault && !openTables.has("closed:" + j.id));
-  return '<details data-table="' + esc(j.id) + '"' + (open ? " open" : "") + '><summary>Games: ' + summary + ' <span class="small">(click a game for its log)</span></summary><div class="tablewrap"><table><tr><th>Game</th><th>Seed</th><th>Status</th><th title="How long the game took, or has been running (~)">Time</th><th>Round</th><th title="Average real time per round">Per round</th><th>Agendas</th><th>Winner</th>' +
+  return '<details data-table="' + esc(j.id) + '"' + (open ? " open" : "") + '><summary>Games: ' + summary + ' <span class="small">(click a game for its log)</span></summary><div class="tablewrap" data-scroll="' + esc(j.id) + '"><table><tr><th>Game</th><th>Status</th><th title="How long the game took, or has been running (~)">Time</th><th>Round</th><th title="Average real time per round">Per round</th>' +
     factions.map(f => '<th title="' + esc(f) + ' victory points">' + esc(f) + "</th>").join("") +
     '<th title="CPU time of the game\'s thread">CPU</th><th title="Faction turns, and average AI thinking per turn">Turns / think</th></tr>' + body + "</table></div></details>";
 }
@@ -655,6 +654,10 @@ function render() {
     selectedByUser = true;
     openLog(el.dataset.gameJob, el.dataset.game);
   }));
+  document.querySelectorAll("[data-scroll]").forEach(el => {
+    el.scrollLeft = tableScroll.get(el.dataset.scroll) || 0;
+    el.addEventListener("scroll", () => tableScroll.set(el.dataset.scroll, el.scrollLeft), { passive: true });
+  });
   document.querySelectorAll("details[data-table]").forEach(el => el.addEventListener("toggle", () => {
     const id = el.dataset.table;
     openTables.delete(el.open ? "closed:" + id : id);
