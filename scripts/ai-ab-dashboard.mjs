@@ -59,6 +59,8 @@ const logPath = id => path.join(QUEUE, "logs", `${path.basename(id)}.log`);
 const argValue = (job, key) => job.args?.find(a => a.startsWith(`-D${key}=`))?.split("=").slice(1).join("=");
 
 const GAME_LINE = /^Game (\d+)\/(\d+) finished: (\S+) in round (\d+), victory points \{([^}]*)\}, wall time (\d+)s(?:, game thread CPU (\d+)s)?/;
+const GAME_ROUND = /(?<![A-Za-z0-9])(aiab\d+[ab]|aiseed\d+)(?:-round-(\d+)| r(\d+)(?![0-9]))/;
+const AGENDA_HEADER = /^AGENDA TRACE (\S+) r(\d+) #(\d+)/;
 
 // Incremental scan per log: only bytes appended since the last look are read.
 const scans = new Map();
@@ -73,7 +75,7 @@ function scanLog(id) {
   }
   let scan = scans.get(id);
   if (!scan || stat.size < scan.offset) {
-    scan = { offset: 0, carry: "", games: [], phase: "starting", playingSince: null, build: null, errors: 0, firstLine: null };
+    scan = { offset: 0, carry: "", games: [], live: new Map(), phase: "starting", playingSince: null, build: null, errors: 0, firstLine: null };
     scans.set(id, scan);
   }
   if (stat.size > scan.offset) {
@@ -95,8 +97,30 @@ function scanLog(id) {
   return scan;
 }
 
+function liveGame(scan, name) {
+  let game = scan.live.get(name);
+  if (!game) scan.live.set(name, (game = { round: null, agendas: 0 }));
+  return game;
+}
+
+function readGameMentions(scan, line) {
+  const agenda = AGENDA_HEADER.exec(line);
+  if (agenda) {
+    const game = liveGame(scan, agenda[1]);
+    game.round = Math.max(game.round ?? 0, Number(agenda[2]));
+    game.agendas = Math.max(game.agendas, Number(agenda[3]));
+    return;
+  }
+  const round = GAME_ROUND.exec(line);
+  if (round) {
+    const game = liveGame(scan, round[1]);
+    game.round = Math.max(game.round ?? 0, Number(round[2] ?? round[3]));
+  }
+}
+
 function readLine(scan, line) {
   if (scan.firstLine == null) scan.firstLine = line;
+  if (line.includes("aiab") || line.includes("aiseed")) readGameMentions(scan, line);
   const game = GAME_LINE.exec(line);
   if (game) {
     const vp = Object.fromEntries(
@@ -143,6 +167,49 @@ function estimateMs(job, jobs) {
   return past.length ? past[Math.floor(past.length / 2)] : null;
 }
 
+function slotGame(job, slot) {
+  const seed = Number(argValue(job, "ai.selfplay.seed"));
+  if (!Number.isFinite(seed)) return { name: null, seed: null, side: null };
+  if (argValue(job, "ai.selfplay.ab")) {
+    const pairSeed = seed + Math.floor(slot / 2);
+    const side = slot % 2 === 0 ? "a" : "b";
+    return { name: `aiab${((pairSeed % 1_000_000) + 1_000_000) % 1_000_000}${side}`, seed: pairSeed, side };
+  }
+  return { name: `aiseed${(((seed + slot) % 1_000_000) + 1_000_000) % 1_000_000}`, seed: seed + slot, side: null };
+}
+
+// Games start in slot order on a fixed pool of threads, so each finish frees a thread for the next slot. Replaying
+// that with the finished games' wall times gives every game's start, measured from when the job started.
+function gameRows(job, scan, total, started, now) {
+  if (!total || !scan) return [];
+  const finished = new Map(scan.games.map(game => [game.index - 1, game]));
+  const threads = Number(argValue(job, "ai.selfplay.threads")) || Math.max(1, scan.live.size - finished.size) || 1;
+  const running = job.status === "running";
+  const startedCount = Math.min(total, finished.size + threads);
+  const free = Array(threads).fill(started ?? now);
+  const rows = [];
+  for (let slot = 0; slot < total; slot++) {
+    const game = slotGame(job, slot);
+    const done = finished.get(slot);
+    const live = game.name ? scan.live.get(game.name) : null;
+    const row = { index: slot + 1, ...game, round: done?.round ?? live?.round ?? null, agendas: live?.agendas ?? 0 };
+    if (slot >= startedCount && !done) {
+      rows.push({ ...row, state: running ? "waiting" : "not played" });
+      continue;
+    }
+    free.sort((a, b) => a - b);
+    const start = free.shift();
+    if (done) {
+      free.push(start + done.wallSeconds * 1000);
+      rows.push({ ...row, state: "finished", vp: done.vp, wallSeconds: done.wallSeconds, end: done.end });
+    } else {
+      free.push(Infinity);
+      rows.push({ ...row, state: running ? "playing" : "unfinished", startedAt: start, wallSeconds: running ? Math.max(0, (now - start) / 1000) : null });
+    }
+  }
+  return rows;
+}
+
 function progress(job, now) {
   const scan = scanLog(job.id);
   const total = Number(argValue(job, "ai.selfplay.games")) || scan?.games[0]?.total || null;
@@ -157,6 +224,7 @@ function progress(job, now) {
     total,
     finished: games.length,
     games,
+    rows: gameRows(job, scan, total, started, now),
     phase: scan ? (job.status === "running" ? scan.phase : scan.build ?? scan.phase) : null,
     errors: scan?.errors ?? 0,
     logBytes: scan?.size ?? 0,
@@ -236,7 +304,27 @@ function cpuPercent() {
 const NEWLINE = 0x0a;
 const MAX_LOG_RESPONSE = 2 * 1024 * 1024;
 
-function logLines(id, after, backlogBytes) {
+// A game's lines are those naming it, its "Game N/M finished" line, and the indented lines that follow a line naming
+// it (the body of its AGENDA TRACE blocks). The block owner is carried between polls by the client.
+function gameLines(job, game, after, block) {
+  const slot = Array.from({ length: Number(argValue(job, "ai.selfplay.games")) || 0 }, (_, s) => s).find(
+    s => slotGame(job, s).name === game,
+  );
+  const finishedPrefix = slot == null ? null : `Game ${slot + 1}/`;
+  const all = logLines(job.id, after < 0 ? 0 : after, 0, Infinity);
+  if (all.missing) return all;
+  const naming = new RegExp(`(?<![A-Za-z0-9])${game}(?![A-Za-z0-9])`);
+  const lines = [];
+  let owner = after < 0 ? null : block || null;
+  for (const line of all.lines) {
+    const mentions = (line.includes(game) && naming.test(line)) || (finishedPrefix && line.startsWith(finishedPrefix) && line.includes(" finished: "));
+    if (!/^\s/.test(line)) owner = mentions ? game : null;
+    if (mentions || owner === game) lines.push(line);
+  }
+  return { offset: all.offset, lines: after < 0 ? lines.slice(-4000) : lines, block: owner ?? "" };
+}
+
+function logLines(id, after, backlogBytes, maxBytes = MAX_LOG_RESPONSE) {
   const file = logPath(id);
   let size;
   try {
@@ -246,7 +334,7 @@ function logLines(id, after, backlogBytes) {
   }
   const fromTail = after < 0 || after > size;
   let start = fromTail ? Math.max(0, size - backlogBytes) : after;
-  const length = Math.min(size - start, MAX_LOG_RESPONSE);
+  const length = Math.min(size - start, maxBytes);
   if (length <= 0) return { offset: start, lines: [] };
   const buffer = Buffer.alloc(length);
   const fd = fs.openSync(file, "r");
@@ -270,13 +358,22 @@ const server = http.createServer((req, res) => {
     } else if (url.pathname === "/api/state") {
       res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-cache" });
       res.end(JSON.stringify(state()));
-    } else if (url.pathname === "/api/log") {
+    } else if (url.pathname === "/api/output") {
       const id = url.searchParams.get("id") ?? "";
-      if (!readJobs().some(job => job.id === id)) {
+      const job = readJobs().find(job => job.id === id);
+      if (!job) {
         res.writeHead(404).end("no such job");
         return;
       }
-      const result = logLines(id, Number(url.searchParams.get("after") ?? -1), Number(url.searchParams.get("backlog") ?? 262_144));
+      const after = Number(url.searchParams.get("after") ?? -1);
+      const game = url.searchParams.get("game");
+      if (game && !/^(aiab\d+[ab]|aiseed\d+)$/.test(game)) {
+        res.writeHead(400).end("bad game name");
+        return;
+      }
+      const result = game
+        ? gameLines(job, game, after, url.searchParams.get("block"))
+        : logLines(id, after, Number(url.searchParams.get("backlog") ?? 262_144));
       res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-cache" });
       res.end(JSON.stringify(result));
     } else {
@@ -351,6 +448,14 @@ th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line
 th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
 td.win { color: var(--ok); font-weight: 700; }
 .tablewrap { overflow-x: auto; }
+tr.game-row { cursor: pointer; }
+tr.game-row:hover td { background: var(--accent-soft); }
+tr.game-row.selected td { background: var(--accent-soft); box-shadow: inset 0 1px 0 var(--accent), inset 0 -1px 0 var(--accent); }
+tr.dim td { color: var(--muted); }
+td .pill { font-size: 10.5px; }
+.chip { display: inline-flex; gap: 6px; align-items: center; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 2px 4px 2px 10px; font-size: 12.5px; font-weight: 600; }
+.chip[hidden] { display: none; }
+.chip button { font: inherit; font-size: 11.5px; border: 0; border-radius: 999px; padding: 2px 8px; background: var(--panel); color: var(--text); cursor: pointer; }
 .queue-item { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; }
 .pos { width: 24px; height: 24px; border-radius: 50%; background: var(--idle-soft); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
 .log-card { position: sticky; top: 12px; padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 24px); min-height: 420px; }
@@ -389,6 +494,7 @@ code { font: 11.5px ui-monospace, Consolas, monospace; word-break: break-all; }
         <input type="text" id="filter" placeholder="Filter lines (regex)">
         <label><input type="checkbox" id="highlights"> Highlights only</label>
         <label><input type="checkbox" id="follow" checked> Follow</label>
+        <span id="gameChip" class="chip" hidden><span id="gameChipName"></span> <button id="gameChipClear" title="Show the whole log">✕ whole log</button></span>
         <span id="logStatus" class="small"></span>
       </div>
       <pre id="log"></pre>
@@ -445,20 +551,34 @@ function runningCard(j) {
     "<div><span>Commit</span><code>" + esc(j.commit) + "</code> " + esc(j.branch) + "</div>" +
     "<div><span>By</span>" + esc(j.by || "-") + "</div>" +
     (p.errors ? '<div><span>[ERROR] lines</span><b style="color:var(--bad)">' + p.errors + "</b></div>" : "") +
-    "</div>" + gamesTable(games) + argsBlock(j) + "</div>";
+    "</div>" + gamesTable(j, true) + argsBlock(j) + "</div>";
 }
 
-function gamesTable(games) {
-  if (!games.length) return "";
-  const factions = [...new Set(games.flatMap(g => Object.keys(g.vp)))];
-  const rows = [...games].sort((a, b) => a.index - b.index).map(g => {
-    const top = Math.max(...Object.values(g.vp));
-    return "<tr><td>" + g.index + "</td><td>" + g.round + "</td>" +
-      factions.map(f => '<td class="' + (g.vp[f] === top ? "win" : "") + '">' + (g.vp[f] ?? "") + "</td>").join("") +
-      "<td>" + dur(g.wallSeconds * 1000) + "</td><td>" + esc(g.end.replace("_", " ").toLowerCase()) + "</td></tr>";
+const openTables = new Set();
+
+function gamesTable(j, openByDefault) {
+  const rows = j.progress?.rows || [];
+  if (!rows.length) return "";
+  const factions = [...new Set(rows.flatMap(g => Object.keys(g.vp || {})))];
+  const counts = {};
+  rows.forEach(r => (counts[r.state] = (counts[r.state] || 0) + 1));
+  const order = { playing: 0, finished: 1, unfinished: 1, waiting: 2, "not played": 2 };
+  const body = [...rows].sort((a, b) => order[a.state] - order[b.state] || a.index - b.index).map(g => {
+    const top = g.vp ? Math.max(...Object.values(g.vp)) : null;
+    const clickable = g.name && g.state !== "waiting" && g.state !== "not played";
+    const attrs = clickable ? ' class="game-row' + (logJob === j.id && logGame === g.name ? " selected" : "") + '" data-game="' + esc(g.name) + '" data-game-job="' + esc(j.id) + '" title="Show only this game\'s log lines"' : ' class="dim"';
+    const wall = g.wallSeconds == null ? "" : (g.state === "playing" ? "~" : "") + dur(g.wallSeconds * 1000);
+    const end = g.end ? g.end.replace("_", " ").toLowerCase() : g.state;
+    return "<tr" + attrs + "><td>" + g.index + "</td><td>" + (g.seed != null ? esc(g.seed) + (g.side ? " " + esc(g.side) : "") : "") + "</td>" +
+      '<td><span class="pill s-' + (g.state === "playing" ? "running" : g.state === "finished" ? "done" : g.state === "unfinished" ? "failed" : "queued") + '">' + esc(g.state) + "</span></td>" +
+      "<td>" + (g.round ?? "") + "</td><td>" + (g.agendas || "") + "</td>" +
+      factions.map(f => '<td class="' + (g.vp && g.vp[f] === top ? "win" : "") + '">' + (g.vp?.[f] ?? "") + "</td>").join("") +
+      "<td>" + wall + "</td><td>" + esc(end) + "</td></tr>";
   }).join("");
-  return '<details' + (games.length <= 30 ? " open" : "") + '><summary>' + games.length + ' finished games</summary><div class="tablewrap"><table><tr><th>Game</th><th>Round</th>' +
-    factions.map(f => "<th>" + esc(f) + "</th>").join("") + "<th>Wall</th><th>End</th></tr>" + rows + "</table></div></details>";
+  const summary = ["playing", "finished", "unfinished", "waiting", "not played"].filter(s => counts[s]).map(s => counts[s] + " " + s).join(" · ");
+  const open = openTables.has(j.id) || (openByDefault && !openTables.has("closed:" + j.id));
+  return '<details data-table="' + esc(j.id) + '"' + (open ? " open" : "") + '><summary>Games: ' + summary + ' <span class="small">(click a game for its log)</span></summary><div class="tablewrap"><table><tr><th>Game</th><th>Seed</th><th>Status</th><th>Round</th><th>Agendas</th>' +
+    factions.map(f => "<th>" + esc(f) + "</th>").join("") + "<th>Wall</th><th>End</th></tr>" + body + "</table></div></details>";
 }
 
 function argsBlock(j) {
@@ -484,7 +604,7 @@ function finishedCard(j) {
     (j.exitCode != null ? " · exit " + j.exitCode : "") + "</span></div>" +
     (j.question ? '<div class="question">' + esc(j.question) + "</div>" : "") +
     (j.records?.length ? '<div class="small">Record: <code>' + j.records.map(esc).join("</code>, <code>") + "</code></div>" : "") +
-    "</div>";
+    gamesTable(j, false) + "</div>";
 }
 
 function render() {
@@ -507,7 +627,16 @@ function render() {
   document.querySelectorAll("[data-job]").forEach(el => el.addEventListener("click", e => {
     if (e.target.closest("details")) return;
     selectedByUser = true;
-    openLog(el.dataset.job);
+    openLog(el.dataset.job, null);
+  }));
+  document.querySelectorAll("[data-game]").forEach(el => el.addEventListener("click", () => {
+    selectedByUser = true;
+    openLog(el.dataset.gameJob, el.dataset.game);
+  }));
+  document.querySelectorAll("details[data-table]").forEach(el => el.addEventListener("toggle", () => {
+    const id = el.dataset.table;
+    openTables.delete(el.open ? "closed:" + id : id);
+    openTables.add(el.open ? id : "closed:" + id);
   }));
   const withLogs = jobs.filter(j => j.hasLog).sort((a, b) => (b.startedAt || "").localeCompare(a.startedAt || ""));
   const select = $("logJob");
@@ -515,7 +644,7 @@ function render() {
   if (select.dataset.options !== options) { select.innerHTML = options; select.dataset.options = options; }
   if (!selectedByUser || !logJob) {
     const pick = running[0]?.id || withLogs[0]?.id;
-    if (pick && pick !== logJob) openLog(pick);
+    if (pick && pick !== logJob) openLog(pick, null);
   }
   if (logJob) select.value = logJob;
 }
@@ -575,42 +704,57 @@ function appendLines(added) {
   if ($("follow").checked) $("log").scrollTop = $("log").scrollHeight;
 }
 
-async function pollLog(id, token) {
-  let offset = -1;
+async function pollLog(id, game, token) {
+  let offset = -1, block = "";
   while (token === logToken) {
     let more = false;
+    let response = null;
     try {
-      const response = await fetch("/api/log?id=" + encodeURIComponent(id) + "&after=" + offset, { cache: "no-store" });
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      const result = await response.json();
-      if (token !== logToken) return;
-      if (result.missing) {
-        setLogStatus("no log file yet", false);
-      } else {
-        more = result.offset > offset && result.lines.length > 2000;
-        offset = result.offset;
-        if (result.lines.length) appendLines(result.lines.map(localStamp));
-        else if (!lines.length) $("log").textContent = "The log is empty so far.";
-        setLogStatus("live · " + clock(Date.now(), true), false);
-      }
+      const url = "/api/output?id=" + encodeURIComponent(id) + "&after=" + offset +
+        (game ? "&game=" + encodeURIComponent(game) + "&block=" + encodeURIComponent(block) : "");
+      response = await fetch(url, { cache: "no-store" });
     } catch (e) {
-      setLogStatus("can't reach the dashboard server, retrying…", true);
+      setLogStatus("can't reach the dashboard server (" + e.message + "), retrying…", true);
+    }
+    if (response) {
+      try {
+        if (!response.ok) throw new Error("server answered " + response.status + " " + (await response.text()).slice(0, 80));
+        const result = await response.json();
+        if (token !== logToken) return;
+        if (result.missing) {
+          setLogStatus("no log file yet", false);
+        } else {
+          more = result.offset > offset && result.lines.length > 2000;
+          offset = result.offset;
+          block = result.block ?? "";
+          if (result.lines.length) appendLines(result.lines.map(localStamp));
+          else if (!lines.length) $("log").textContent = game ? "No lines for this game yet." : "The log is empty so far.";
+          setLogStatus("live · " + clock(Date.now(), true), false);
+        }
+      } catch (e) {
+        setLogStatus("log error: " + e.message, true);
+      }
     }
     await new Promise(r => setTimeout(r, more ? 50 : 1000));
   }
 }
 
-let logToken = 0;
-function openLog(id) {
+let logToken = 0, logGame = null;
+function openLog(id, game) {
   logJob = id;
+  logGame = game || null;
   lines = [];
   $("log").textContent = "Loading log…";
   document.querySelectorAll("[data-job]").forEach(el => el.classList.toggle("selected", el.dataset.job === id));
+  document.querySelectorAll("[data-game]").forEach(el => el.classList.toggle("selected", el.dataset.gameJob === id && el.dataset.game === logGame));
   $("logJob").value = id;
-  pollLog(id, ++logToken);
+  $("gameChip").hidden = !logGame;
+  $("gameChipName").textContent = logGame ? "Game " + logGame : "";
+  pollLog(id, logGame, ++logToken);
 }
 
-$("logJob").addEventListener("change", e => { selectedByUser = true; openLog(e.target.value); });
+$("logJob").addEventListener("change", e => { selectedByUser = true; openLog(e.target.value, null); });
+$("gameChipClear").addEventListener("click", () => openLog(logJob, null));
 $("filter").addEventListener("input", redraw);
 $("highlights").addEventListener("change", redraw);
 $("follow").addEventListener("change", redraw);
