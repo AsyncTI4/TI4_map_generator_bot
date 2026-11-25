@@ -5931,7 +5931,7 @@ public class ButtonHelper {
         String factionChecker = player.factionButtonChecker();
         List<Button> ringButtons = new ArrayList<>();
         Set<String> visibleFOWPositions =
-                FOWPlusService.isActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
+                FOWPlusService.blindActivationActive(game) ? FoWHelper.getTilePositionsToShow(game, player) : null;
         Tile centerTile = game.getTileByPosition("000");
         if (game.getStoredValue("borrowedAuthorityColor").isEmpty()
                 && centerTile != null
@@ -5961,14 +5961,14 @@ public class ButtonHelper {
         if (game.getTileByPosition("frac1") != null) cornerStr += " & Fracture";
         Button corners = Buttons.green(factionChecker + "ring_corners", cornerStr);
         ringButtons.add(corners);
-        if (FOWPlusService.isActive(game)) {
+        if (FOWPlusService.blindActivationActive(game)) {
             FOWPlusService.filterRingButtons(ringButtons, player, game, visibleFOWPositions);
         }
         if (smartPicker) {
             SystemPickerService.dropUnknownSystems(ringButtons, player, game);
             SystemPickerService.addFirstStep(ringButtons, player, game);
         }
-        if (FOWPlusService.isActive(game) || SystemPickerService.isSegmented(game)) {
+        if (FOWPlusService.blindActivationActive(game) || SystemPickerService.isSegmented(game)) {
             ringButtons.add(Buttons.red(factionChecker + "blindTileSelection~MDL", "Blind Tile"));
         }
         return ringButtons;
