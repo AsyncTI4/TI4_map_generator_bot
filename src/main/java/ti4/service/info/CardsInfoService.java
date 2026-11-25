@@ -16,6 +16,7 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Be
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.KaltrimBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.SarcosaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaUnitsHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.kairn.KairnBreakthroughHandler;
@@ -252,6 +253,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("netrunnersagent")) {
             buttons.add(NetrunnersAgent.cardsInfoButton(player));
+        }
+        if (player.hasUnexhaustedLeader("jotunnagent")) {
+            buttons.add(JotunnLeadersHandler.cardsInfoAgentButton(player));
         }
         if (player.hasUnexhaustedLeader("dreamagent")
                 && !DreamAgent.anomalyTiles(game).isEmpty()) {

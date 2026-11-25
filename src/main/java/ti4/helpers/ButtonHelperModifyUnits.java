@@ -615,7 +615,7 @@ public final class ButtonHelperModifyUnits {
             case "infantry" -> hits > 0;
             case "pds" ->
                 hits > 0
-                        && (player.hasUnit("titans_pds") || player.hasUnit("titans_pds2"))
+                        && player.hasAnyUnit("titans_pds", "titans_pds2", "jotunn_pds", "jotunn_pds2")
                         && units.getUnitCount(UnitType.Pds, player.getColor()) > 0;
             default -> false;
         };
@@ -623,7 +623,7 @@ public final class ButtonHelperModifyUnits {
 
     public static boolean doesPlayerHaveGfOnPlanet(UnitHolder unitHolder, Player player) {
         return !((unitHolder.getUnitCount(UnitType.Pds, player.getColor()) < 1
-                        || (!player.hasUnit("titans_pds") && !player.hasUnit("titans_pds2")))
+                        || !player.hasAnyUnit("titans_pds", "titans_pds2", "jotunn_pds", "jotunn_pds2"))
                 && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) < 1
                 && unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1);
     }

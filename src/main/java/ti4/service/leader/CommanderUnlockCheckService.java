@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.beans.ta.TaAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.LostLegaciesCommanderUnlockHandler;
 import ti4.game.Game;
 import ti4.game.Planet;
@@ -432,6 +433,9 @@ public class CommanderUnlockCheckService {
                         LostLegaciesCommanderUnlockHandler.meetsCommanderUnlockCondition(player, game, faction);
 
             case "xyrix" -> shouldBeUnlocked = true;
+            case "jotunn" ->
+                shouldBeUnlocked = game.getTileMap().values().stream()
+                        .anyMatch(tile -> JotunnAbilityHandler.getJotunnStructureCount(player, tile) >= 3);
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(leaderId, game, player);

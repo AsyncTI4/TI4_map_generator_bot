@@ -69,6 +69,8 @@ import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.Sa
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.bluereverie.XinTechHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixPromissoryHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.frmisc.xyrix.XyrixTomeHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnAbilityHandler;
+import ti4.discord.interactions.buttons.handlers.faction.homebrew.goose.jotunn.JotunnLeadersHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaAbilityHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.aeterna.AeternaBreakthroughHandler;
 import ti4.discord.interactions.buttons.handlers.faction.homebrew.theodisi.arcanum.ArcanumBreakthroughHandler;
@@ -7260,7 +7262,7 @@ public class ButtonHelper {
                         }
                     }
                 }
-                if (player.hasUnit("titans_pds") || player.hasTech("ht2")) {
+                if (player.hasAnyUnit("titans_pds", "jotunn_pds") || player.hasTech("ht2")) {
                     if (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                         if (uH instanceof Planet) {
                             buttons.add(Buttons.green(
@@ -8856,6 +8858,34 @@ public class ButtonHelper {
                 }
             } else {
                 playersWithPds2.add(hiveEchoPlayer);
+            }
+        }
+        for (Player jotunnPlayer : game.getRealPlayers()) {
+            if (playersWithPds2.contains(jotunnPlayer)
+                    || !JotunnAbilityHandler.hasWardstoneDoctrineCoverage(game, jotunnPlayer, activeTile)) {
+                continue;
+            }
+            if (jotunnPlayer == targetPlayer
+                    || targetPlayer.getAllianceMembers().contains(jotunnPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)) {
+                    playersWithPds2.add(jotunnPlayer);
+                }
+            } else {
+                playersWithPds2.add(jotunnPlayer);
+            }
+        }
+        for (Player jotunnPlayer : game.getRealPlayers()) {
+            if (playersWithPds2.contains(jotunnPlayer)
+                    || !JotunnLeadersHandler.hasDeepFrostCoverage(game, jotunnPlayer)) {
+                continue;
+            }
+            if (jotunnPlayer == targetPlayer
+                    || targetPlayer.getAllianceMembers().contains(jotunnPlayer.getFaction())) {
+                if (FoWHelper.otherPlayersHaveShipsInSystem(targetPlayer, activeTile, game)) {
+                    playersWithPds2.add(jotunnPlayer);
+                }
+            } else {
+                playersWithPds2.add(jotunnPlayer);
             }
         }
         return playersWithPds2;
