@@ -1209,6 +1209,10 @@ class AiSelfPlayTest extends BaseTi4Test {
                 .toList();
     }
 
+    // -Dai.selfplay.firstslot=N starts the batch at slot N instead of 0, so one game of an earlier batch (slot N, game
+    // N + 1) replays on its own with the same seed, name and clock. Game numbers in the log count from the first slot.
+    private static final int FIRST_SLOT = Integer.getInteger("ai.selfplay.firstslot", 0);
+
     // Every game gets its own thread, environment and fake Discord. Their virtual clocks start a millisecond apart and
     // only ever move in whole steps, so no two games can stamp the same message id. With -Dai.selfplay.seed the clock
     // start and game names are fixed too, since message ids and names feed the AI: the same seed then replays the
@@ -1217,8 +1221,8 @@ class AiSelfPlayTest extends BaseTi4Test {
         long clockStart = SelfPlayGame.CLOCK_START;
         if (threads == 1) {
             List<SelfPlayGame.Outcome> outcomes = new ArrayList<>();
-            for (int i = 0; i < games; i++)
-                outcomes.add(playFullGame(clockStart + (SelfPlayGame.AB.isPresent() ? i / 2 : i), i, games));
+            for (int slot = FIRST_SLOT; slot < FIRST_SLOT + games; slot++)
+                outcomes.add(playFullGame(clockStart + (SelfPlayGame.AB.isPresent() ? slot / 2 : slot), slot, games));
             return outcomes;
         }
         java.util.concurrent.atomic.AtomicInteger names = new java.util.concurrent.atomic.AtomicInteger();
@@ -1227,7 +1231,7 @@ class AiSelfPlayTest extends BaseTi4Test {
         try {
             List<java.util.concurrent.Future<SelfPlayGame.Outcome>> futures = new ArrayList<>();
             for (int i = 0; i < games; i++) {
-                int slot = i;
+                int slot = FIRST_SLOT + i;
                 long clock = clockStart + (SelfPlayGame.AB.isPresent() ? slot / 2 : slot);
                 futures.add(pool.submit(() -> playFullGame(clock, slot, games)));
             }
@@ -1246,9 +1250,10 @@ class AiSelfPlayTest extends BaseTi4Test {
         long cpuStart = threads.getCurrentThreadCpuTime();
         SelfPlayGame.Outcome outcome = play(game -> false, 14 * VIRTUAL_DAY, 100_000, clockStart, slot);
         long cpuSeconds = (threads.getCurrentThreadCpuTime() - cpuStart) / 1_000_000_000L;
-        System.out.println("Game " + (slot + 1) + "/" + games + " finished: " + outcome.ending() + " in round "
-                + outcome.round() + ", victory points " + outcome.victoryPoints() + ", wall time "
-                + outcome.wallSeconds() + "s, game thread CPU " + cpuSeconds + "s");
+        System.out.println(
+                "Game " + (slot - FIRST_SLOT + 1) + "/" + games + " finished: " + outcome.ending() + " in round "
+                        + outcome.round() + ", victory points " + outcome.victoryPoints() + ", wall time "
+                        + outcome.wallSeconds() + "s, game thread CPU " + cpuSeconds + "s");
         return outcome;
     }
 

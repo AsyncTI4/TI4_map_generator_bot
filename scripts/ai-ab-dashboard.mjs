@@ -180,7 +180,8 @@ function estimateMs(job, jobs) {
   return past.length ? past[Math.floor(past.length / 2)] : null;
 }
 
-function slotGame(job, slot) {
+function slotGame(job, index) {
+  const slot = index + (Number(argValue(job, "ai.selfplay.firstslot")) || 0);
   const seed = Number(argValue(job, "ai.selfplay.seed"));
   if (!Number.isFinite(seed)) return { name: null, seed: null, side: null };
   if (argValue(job, "ai.selfplay.ab")) {
