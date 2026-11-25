@@ -24,6 +24,7 @@ public class TestBedPreset {
     private List<String> combat = new ArrayList<>();
     private List<String> revealedObjectives = new ArrayList<>();
     private List<String> laws = new ArrayList<>();
+    private List<String> lore = new ArrayList<>();
     private Map<String, List<String>> tokens = new LinkedHashMap<>();
     private Map<String, List<String>> borderAnomalies = new LinkedHashMap<>();
     private Map<String, List<String>> customAdjacencies = new LinkedHashMap<>();

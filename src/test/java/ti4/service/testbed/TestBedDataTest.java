@@ -271,6 +271,31 @@ class TestBedDataTest extends BaseTi4Test {
         assertEquals(2, scriptErrors.size(), String.join("\n", scriptErrors));
     }
 
+    // Lore entries use the stored format; a typo in a receiver or trigger must fail before a live run.
+    // `none` clears lore, and `gm:activity` is a shared scope with no seat.
+    @Test
+    void loreAndActivityScopeAreValidated() {
+        List<String> presetErrors = TestBedPresetService.validate(TestBedPresetService.parse("""
+                { "you": { "faction": "sol" },
+                  "lore": [
+                    "strategy#1;Ok;!tg +1;ALL;PHASE_START;NO;ALWAYS",
+                    "strategy#2;Bad;!tg +1;EVERYONE;PHASE_START;NO;ALWAYS",
+                    "strategy#3;Short" ] }"""));
+        assertContains(presetErrors, "unknown receiver, trigger, ping or persistance", "needs `target;text;footer;");
+        assertEquals(2, presetErrors.size(), String.join("\n", presetErrors));
+
+        List<String> scriptErrors = TestBedScriptService.validate(TestBedScriptService.parse("""
+                { "preset": "fog-galaxies-2p",
+                  "steps": [
+                    { "do": "setLore", "value": "none" },
+                    { "do": "setLore", "value": "101;Ok;!tg +1;CURRENT;CONTROLLED;NO;ONCE|102;Bad;x;ALL;NEVER;NO;ONCE" },
+                    { "do": "setLore" },
+                    { "expect": { "in": "gm:activity", "contains": "Phase lore fired" } }
+                  ] }"""));
+        assertContains(scriptErrors, "unknown receiver, trigger, ping or persistance", "needs `value`");
+        assertEquals(2, scriptErrors.size(), String.join("\n", scriptErrors));
+    }
+
     // Neutral units need a real tile position.
     @Test
     void neutralUnitsAreValidated() {

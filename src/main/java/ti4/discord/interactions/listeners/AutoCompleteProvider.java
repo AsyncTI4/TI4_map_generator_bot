@@ -30,7 +30,6 @@ import ti4.discord.interactions.commands.CommandHelper;
 import ti4.discord.interactions.commands.search.FindService;
 import ti4.discord.interactions.commands.statistics.GameStatisticsFilterer;
 import ti4.discord.interactions.commands.uncategorized.ServerPromoteCommand;
-import ti4.discord.interactions.commands.user.SetFowFilter;
 import ti4.game.Game;
 import ti4.game.Player;
 import ti4.game.persistence.GameManager;
@@ -79,6 +78,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
+import ti4.service.fow.FogViewService;
 import ti4.service.fow.MapSegmentService;
 import ti4.service.franken.FrankenDraftMode;
 import ti4.service.game.GameNameService;
@@ -398,7 +398,7 @@ class AutoCompleteProvider {
             }
             case Constants.FOG_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = mapTo25ChoicesThatContain(SetFowFilter.filterLabels(), enteredValue);
+                List<Command.Choice> options = mapTo25ChoicesThatContain(FogViewService.filterLabels(), enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.PRIMARY_TILE_DIRECTION -> {

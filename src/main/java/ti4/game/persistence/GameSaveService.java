@@ -849,6 +849,11 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
+            if (player.isFogOverviewBoxes()) {
+                writer.write(Constants.FOG_OVERVIEW_BOXES + " true");
+                writer.write(System.lineSeparator());
+            }
+
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 

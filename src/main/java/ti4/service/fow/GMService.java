@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
@@ -102,6 +103,17 @@ public final class GMService {
         if (guild == null) return null;
         List<TextChannel> channels = guild.getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? null : channels.getFirst();
+    }
+
+    @Nullable
+    public static ThreadChannel activityThreadOrNull(Game game) {
+        TextChannel gmRoom = gmRoomOrNull(game);
+        if (gmRoom == null) return null;
+        String name = game.getName() + ACTIVITY_LOG_THREAD;
+        return gmRoom.getThreadChannels().stream()
+                .filter(thread -> thread.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 
     private static void withActivityThread(Game game, Consumer<ThreadChannel> action) {

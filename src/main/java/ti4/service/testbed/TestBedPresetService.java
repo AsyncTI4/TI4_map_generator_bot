@@ -31,6 +31,7 @@ import ti4.model.TestBedPreset.CardPick;
 import ti4.model.TestBedPreset.Seat;
 import ti4.model.TileHelper;
 import ti4.service.fow.FogPreset;
+import ti4.service.fow.LoreService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.core.JacksonException;
@@ -410,6 +411,10 @@ public class TestBedPresetService {
         preset.getStored().forEach((key, value) -> {
             if (key.isBlank() || value.isBlank()) errors.add("preset: `stored` keys and values may not be blank.");
         });
+        for (String entry : preset.getLore()) {
+            String problem = LoreService.storedEntryProblem(entry);
+            if (problem != null) errors.add("preset: " + problem);
+        }
         if (preset.getStrategyCardSet() != null && !Mapper.isValidStrategyCardSet(preset.getStrategyCardSet())) {
             errors.add("preset: unknown `strategyCardSet` `" + preset.getStrategyCardSet() + "`.");
         }

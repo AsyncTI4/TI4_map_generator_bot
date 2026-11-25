@@ -95,7 +95,8 @@ public class TestBedStateResolver {
             "commodityValue",
             "exhaustedPlanetAbilities",
             "followedAll",
-            "megagameGroup");
+            "megagameGroup",
+            "fogView");
 
     @Nullable
     public static String validatePath(String path) {
@@ -226,6 +227,9 @@ public class TestBedStateResolver {
             case "planets" -> joinSorted(seat.getPlanets());
             case "exhaustedPlanets" -> joinSorted(seat.getExhaustedPlanets());
             case "commodityValue" -> String.valueOf(seat.getCommoditiesTotal());
+            case "fogView" ->
+                "filter=" + seat.getFogFilter() + ",ghostHexes=" + seat.isFogGhostHexes() + ",overview="
+                        + (seat.isFogOverviewBoxes() ? "boxes" : "hexes");
             case "exhaustedPlanetAbilities" -> joinSorted(seat.getExhaustedPlanetsAbilities());
             case "techs" -> joinSorted(seat.getTechs());
             case "passed" -> String.valueOf(seat.isPassed());

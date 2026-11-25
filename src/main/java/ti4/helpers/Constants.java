@@ -560,7 +560,8 @@ public final class Constants {
     public static final String FOW = "fow";
     public static final String FOW_SYSTEMS = "fow_systems";
     public static final String FOG_FILTER = "fog_filter";
-    public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String FOG_VIEW = "fog_view";
+    public static final String FOG_OVERVIEW_BOXES = "fog_overview_boxes";
     public static final String FOG_GHOST_HEXES = "fog_ghost_hexes";
     public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "system";

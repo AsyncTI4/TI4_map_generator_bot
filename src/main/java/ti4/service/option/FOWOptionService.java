@@ -142,7 +142,7 @@ public class FOWOptionService {
         GHOST_HEXES(
                 FOWOptionCategory.MAP,
                 "Ghost hexes",
-                "Faint numbered rings on unexplored hexes next to known space; players can hide them with /user fog_ghost_hexes"),
+                "Faint numbered rings on unexplored hexes next to known space; players can hide them with /user fog_view"),
 
         NEW_TRANSACTIONS(
                 FOWOptionCategory.FLOW,

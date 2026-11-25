@@ -85,7 +85,8 @@ To test a component, get it into play with the preset (or mid-script with `do: h
 | Fog option | game `fowOptions` (fog presets) | `"fowOptions": ["map_connections", "ghost_hexes"]` |
 | Fog preset (reset a reused fog game's options, e.g. FoW+ off) | game `fogPreset`: `standard`, `plus`, `normal` or `beginner`; applied before `fowOptions` | `"fogPreset": "normal"` |
 | Game stored value (map sectors, feature state) | game `stored` | `"stored": { "fowMapSegments": "core=000:3" }` |
-| Game option (`/custom` setting or game mode; currently `wormhole_token_merge`, `one_way_adjacency`, `secrets_only_mode`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
+| Game option (`/custom` setting or game mode; currently `wormhole_token_merge`, `one_way_adjacency`, `secrets_only_mode`, `lore_mode`) | game `gameOptions`; switch mid-script with `do: setGameOption` | `"gameOptions": { "wormhole_token_merge": "2" }`, `{ "do": "setGameOption", "key": "wormhole_token_merge", "value": "0" }` |
+| Lore | game `lore`: entries in the stored lore format `target;text;footer;RECEIVER;TRIGGER;PING;PERSISTANCE[;fromRound;tillRound]`; give several phase entries `#tags` (`strategy#1`); replace them mid-script with `do: setLore` | `"lore": ["strategy#1;Rift;!unit red 1 infantry @706;ALL;PHASE_START;NO;ALWAYS"]` |
 | Card decks (homebrew sets) | game `decks`: slot (`ac`, `so`, `relic`, `explore`, `agenda`) to deck id | `"decks": { "ac": "action_cards_30k", "explore": "explores_30k" }` |
 | Next explore card | script `do: stackExplore` (value: explore id) puts the card on top of its deck | `{ "do": "stackExplore", "value": "tourismbureau30k" }` |
 | Next agendas | script `do: stackAgenda` (value: agenda id) puts the agenda on top of the agenda deck; stack in reverse to set the order | `{ "do": "stackAgenda", "value": "mutiny" }` |
@@ -277,9 +278,10 @@ copy-paste templates.
 | `fogPreset` | Fog preset applied before `fowOptions`, like choosing one in the fog settings: `standard`, `plus`, `normal` (classic fog, FoW+ off) or `beginner`. Use it when a reused fog game must not keep FoW+ or other options. |
 | `fowOptions` | Fog options switched on at apply (names as in the FoW options, e.g. `map_connections`). `fow_plus` turns on full FoW+ mode, including the options it forces. |
 | `stored` | Game stored values set at apply. Unlike script `setStored`, values may contain `:` and `,` (sector definitions do). |
-| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens), `sc_count_for_map` (strategy cards per player, `1`-`9`), `one_way_adjacency` (`true` or `false`) and `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
+| `gameOptions` | Game options set at apply. Supported keys: `wormhole_token_merge` (`0` off, `2`-`9` = merge from that many wormhole tokens), `sc_count_for_map` (strategy cards per player, `1`-`9`), `one_way_adjacency` (`true` or `false`) `secrets_only_mode` (`true` sets up the Secrets Only mode with its victory points, hand limit and cards, as `/game weird_game_setup` does) and `lore_mode` (`true` turns lore on in a normal game; fog games always have it). Add a key in `TestBedComponentService.NUMBER_GAME_OPTIONS` or `SWITCH_GAME_OPTIONS`. |
 | `strategyCardSet` | Strategy card set alias applied before the start phase, e.g. `pbd30k`. Seats then need `sc` from that set when `start` is `action`. |
 | `tags` | Game tags added at apply, e.g. `megagame_sc_groups`. |
+| `lore` | Lore entries in the stored format (see [Set up any component](#set-up-any-component)); replaces the game's lore and clears the lore cache so stale lore from an earlier run cannot fire. |
 | `decks` | Deck ids switched on before seats get cards, so `acs`, `sos` and `relics` can give cards from homebrew decks. Slots: `ac`, `so`, `relic`, `explore`, `agenda`. |
 | `shortcuts` | Test buttons for the **Preset** group. |
 
@@ -309,7 +311,7 @@ and ids fail with every error listed at once; problems that only show while appl
 | `note` | `{ "note": "round 2 starts" }` |
 | `press` | `{ "as": "sol", "press": "strategicAction_3", "in": "main" }` |
 | `pressId` | `{ "as": "nekro", "pressId": "sc_follow_3" }` |
-| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `stackAgenda` (value: agenda id; moves it from the deck or discard to the top of the agenda deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games) |
+| `do` | `startPhase` (value), `setActivePlayer` (as), `setStored` (key, value), `removeStored` (key), `runCron` (value), `hand` (as: seat or `all`; hand: seat fields; when it gives cards the seat's cards info is re-sent so the new hand buttons appear), `actAs` (as or `you`), `sendAnonComms` (as: sender, value: receiver seat; relays a fixed test message through anonymous comms from the sender's inbox), `stackExplore` (value: explore id; moves it from the deck or discard to the top of the explore deck), `stackAgenda` (value: agenda id; moves it from the deck or discard to the top of the agenda deck), `removeToken` (key: tile position or planet, value: token or attachment as in the preset `tokens` field; fails if it is not there), `setGameOption` (key and value as in the preset `gameOptions` field), `placeTile` (key: position, value: tile id; places or replaces the tile, maps A-G only in fog games), `setLore` (value: lore entries joined with `\|`, or `none` to clear; replaces the game's lore like the preset `lore` field) |
 | `wait` | `{ "wait": 5 }` (seconds) |
 | `expect` | one of the checks below |
 
@@ -324,13 +326,13 @@ Every step may also have a `label` for the report.
 
 - **Seats:** a faction or color, `you`, `seat1`, `seat2`, … (virtual seats in preset order), and `all` (only for
   `do: hand`).
-- **Scopes (`in`):** `main`, `actions` (normal games only; fog games have no actions channel), `gm` (fog games
+- **Scopes (`in`):** `main`, `actions` (normal games only; fog games have no actions channel), `gm:activity` (fog games only; the GM activity-log thread, once it exists), `gm` (fog games
   only), `<seat>` (the seat's own channel from `getCorrectChannel()`: its private channel when it has one, in fog
   or not, otherwise the main channel), `<seat>:private`, `<seat>:cards-info`, `<seat>:combat` (its newest combat
   thread), `<seat>:comms-inbox` (its anonymous comms inbox thread, once it exists).
 - **State paths:** `<seat>.` + `tg`, `commodities`, `ccs`, `tacticalCcs`, `fleetCcs`, `strategyCcs`, `vp`,
   `debt`, `scs`, `passed`, `followed` (cards 1-8), `followedAll` (every followed card, e.g. `11,21`),
-  `megagameGroup` (the seat's SC group letter), `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
+  `megagameGroup` (the seat's SC group letter), `fogView` (`filter=default,ghostHexes=true,overview=hexes`), `acs` (count), `acIds`, `sos` (count), `soIds`, `pns`, `pnsInPlay`,
   `sosScored`, `posScored`, `fragments`, `breakthroughs`, `leaders`, `techs`, `exhaustedTechs`, `purgedTechs`,
   `relics`, `exhaustedRelics`, `planets`, `exhaustedPlanets`, `exhaustedPlanetAbilities`, `commodityValue`
   (commodity value, not the commodities held);

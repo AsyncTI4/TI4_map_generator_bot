@@ -44,6 +44,19 @@ class FoWHelperTest extends BaseTi4Test {
         player.setColor("red");
     }
 
+    // ---- isNamedInPing: who a system ping skips (lore batches group lines by this) -------------
+
+    @Test
+    void isNamedInPing_skipsOnlyAPlayerWhoseOwnColorIsNamed() {
+        assertThat(FoWHelper.isNamedInPing(player, "Placed 2 red infantry in 706"))
+                .isTrue();
+        assertThat(FoWHelper.isNamedInPing(player, "Placed 2 blue infantry in 706"))
+                .isFalse();
+        // A split colour is someone else's units, so the red player still gets the ping.
+        assertThat(FoWHelper.isNamedInPing(player, "Placed 2 splitred infantry in 706"))
+                .isFalse();
+    }
+
     // ---- actorOrAnon: hide the actor under fog ---------------------------------------------
 
     @Test

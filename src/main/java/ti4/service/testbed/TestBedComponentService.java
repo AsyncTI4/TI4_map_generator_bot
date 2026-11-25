@@ -25,6 +25,7 @@ import ti4.model.TileHelper;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FogPreset;
 import ti4.service.fow.FogPresetService;
+import ti4.service.fow.LoreService;
 import ti4.service.map.AddTileService;
 import ti4.service.objectives.SecretsOnlyService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -41,7 +42,9 @@ public class TestBedComponentService {
             Constants.ONE_WAY_ADJACENCY,
             Game::setOneWayAdjacency,
             Constants.SECRETS_ONLY_MODE,
-            SecretsOnlyService::apply);
+            SecretsOnlyService::apply,
+            Constants.LORE_MODE,
+            Game::setLoreMode);
 
     static String gameOptionProblem(String key, String value) {
         if (NUMBER_GAME_OPTIONS.containsKey(key)) {
@@ -84,6 +87,11 @@ public class TestBedComponentService {
         }
         preset.getTags().stream().filter(tag -> !game.getTags().contains(tag)).forEach(game::addTag);
         preset.getStored().forEach(game::setStoredValue);
+        if (preset.getLore().isEmpty()) {
+            LoreService.evictGameLore(game.getName());
+        } else {
+            LoreService.replaceLore(game, preset.getLore());
+        }
         preset.getGameOptions().forEach((key, value) -> setGameOption(game, key, value));
         for (String objective : preset.getRevealedObjectives()) {
             if (!game.revealSpecificStage1(objective) && !game.revealSpecificStage2(objective)) {

@@ -37,6 +37,6 @@ public class FogStandardService {
     static String ghostHexNote() {
         return "Faint numbered rings on unexplored hexes next to known space (ghost hexes) are on in this game. "
                 + "Each player can hide them for themselves with `/" + Constants.USER + " "
-                + Constants.FOG_GHOST_HEXES + " show:False`.";
+                + Constants.FOG_VIEW + " ghost_hexes:False`.";
     }
 }

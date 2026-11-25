@@ -69,6 +69,24 @@ class MapSegmentSaveLoadTest extends BaseTi4Test {
         }
     }
 
+    // Same for the overview layout: written only when a player picked boxes.
+    @Test
+    void overviewBoxesFlagIsOnlySavedWhenPicked() throws IOException {
+        try (var harness = TestGameHarness.forDefaultMap()) {
+            Game game = harness.load();
+            GameSaveService.save(game, "test");
+            Path saveFile = Storage.getGamePath(harness.getGameName() + Constants.TXT);
+            assertThat(Files.readString(saveFile)).doesNotContain(Constants.FOG_OVERVIEW_BOXES);
+
+            Player player = game.getRealPlayers().getFirst();
+            player.setFogOverviewBoxes(true);
+            GameSaveService.save(game, "test");
+
+            assertThat(harness.load().getPlayer(player.getUserID()).isFogOverviewBoxes())
+                    .isTrue();
+        }
+    }
+
     // Only new fog games get map connections switched on (at creation). A game saved without the option, like
     // every game from before it existed, must stay off after a reload; a GM switching it on must stick.
     @Test
