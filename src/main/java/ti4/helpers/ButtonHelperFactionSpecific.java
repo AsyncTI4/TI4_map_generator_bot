@@ -2850,13 +2850,40 @@ public final class ButtonHelperFactionSpecific {
             if (!game.getStoredValue("amalgAmount").isEmpty()) {
                 existingDiscount = Double.parseDouble(game.getStoredValue("amalgAmount"));
             }
-            if (cabal.getUnitFromAsyncID(AliasHandler.resolveUnit(unit)) != null) {
-                double cost =
-                        cabal.getUnitFromAsyncID(AliasHandler.resolveUnit(unit)).getCost();
+            UnitModel uM = cabal.getUnitFromAsyncID(AliasHandler.resolveUnit(unit));
+            if (uM != null) {
+                double cost = uM.getCost();
                 boolean regulated = ButtonHelper.isLawInPlay(game, "conscription")
                         || ButtonHelper.isLawInPlay(game, "absol_conscription");
                 if (cost == 0.5 && regulated) {
                     cost = 1;
+                }
+                if (cost == 0.5) {
+                    if (uM.getIsShip()) {
+                        int numff = 0;
+                        if (!game.getStoredValue("amalgFf").isEmpty()) {
+                            numff = Integer.parseInt(game.getStoredValue("amalgFf"));
+                        }
+                        numff++;
+                        if (numff % 2 == 1) {
+                            cost = 1;
+                        } else {
+                            cost = 0;
+                        }
+                        game.setStoredValue("amalgFf", "" + numff);
+                    } else {
+                        int numff = 0;
+                        if (!game.getStoredValue("amalgInf").isEmpty()) {
+                            numff = Integer.parseInt(game.getStoredValue("amalgInf"));
+                        }
+                        numff++;
+                        if (numff % 2 == 1) {
+                            cost = 1;
+                        } else {
+                            cost = 0;
+                        }
+                        game.setStoredValue("amalgInf", "" + numff);
+                    }
                 }
                 existingDiscount += cost;
                 game.setStoredValue("amalgAmount", "" + existingDiscount);
@@ -4890,11 +4917,20 @@ public final class ButtonHelperFactionSpecific {
             msg = pos + " was not suitable for the _Creuss IFF_.";
         } else {
             StringBuilder sb = new StringBuilder(player.getRepresentation());
-            tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-            sb.append(" moved ")
-                    .append(MiscEmojis.getCreussWormhole(tokenName))
-                    .append(" to ")
-                    .append(tile.getRepresentationForButtons(game, player));
+            if (tile.isScar(game)) {
+                sb.append(" attempted to move ")
+                        .append(MiscEmojis.getCreussWormhole(tokenName))
+                        .append(" to ")
+                        .append(tile.getRepresentationForButtons(game, player))
+                        .append(" but it was immediately discarded because the tile is a scar. ");
+            } else {
+                tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
+                sb.append(" moved ")
+                        .append(MiscEmojis.getCreussWormhole(tokenName))
+                        .append(" to ")
+                        .append(tile.getRepresentationForButtons(game, player));
+            }
+
             for (Tile tile_ : game.getTileMap().values()) {
                 if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                     sb.append(" (from ")
@@ -5004,10 +5040,6 @@ public final class ButtonHelperFactionSpecific {
 
     private static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
         if (tile == null || tile.getTileModel() != null && tile.getTileModel().isHyperlane()) {
-            return false;
-        }
-
-        if (tile.isScar(game)) {
             return false;
         }
 

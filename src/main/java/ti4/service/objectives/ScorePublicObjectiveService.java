@@ -362,5 +362,14 @@ public class ScorePublicObjectiveService {
         }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), commandTokenMessage.toString());
+        if ("action".equalsIgnoreCase(game.getPhaseOfGame())) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.REDISTRIBUTE_CCs);
+            buttons.add(Buttons.gray("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "You may have wanted to spend differently than how the CCs were automatically spent. You can use this button to rearrange what you spent.",
+                    buttons);
+        }
     }
 }
