@@ -469,6 +469,7 @@ tr.game-row { cursor: pointer; }
 tr.game-row:hover td { background: var(--accent-soft); }
 tr.game-row.selected td { background: var(--accent-soft); box-shadow: inset 0 1px 0 var(--accent), inset 0 -1px 0 var(--accent); }
 tr.dim td { color: var(--muted); }
+th.split, td.split { border-left: 1px solid var(--line); }
 td .pill { font-size: 10.5px; }
 .chip { display: inline-flex; gap: 6px; align-items: center; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 2px 4px 2px 10px; font-size: 12.5px; font-weight: 600; }
 .chip[hidden] { display: none; }
@@ -591,15 +592,16 @@ function gamesTable(j, openByDefault) {
     const think = g.thinkPerTurn == null ? "" : g.turns + " / " + g.thinkPerTurn.toFixed(1) + "s";
     return "<tr" + attrs + "><td>" + g.index + "</td>" +
       '<td><span class="pill s-' + (g.state === "playing" ? "running" : g.state === "finished" && label === "finished" ? "done" : g.state === "finished" || g.state === "unfinished" ? "failed" : "queued") + '">' + esc(label) + "</span></td>" +
-      "<td><b>" + time + "</b></td><td>" + (g.round ?? "") + "</td><td>" + perRound + "</td>" +
+      "<td>" + (g.round ?? "") + "</td>" +
       factions.map(f => '<td class="' + (g.vp && g.vp[f] === top ? "win" : "") + '">' + (g.vp?.[f] ?? "") + "</td>").join("") +
+      '<td class="split"><b>' + time + "</b></td><td>" + perRound + "</td>" +
       "<td>" + (g.cpuSeconds != null ? dur(g.cpuSeconds * 1000) : "") + "</td><td>" + think + "</td></tr>";
   }).join("");
   const summary = ["playing", "finished", "unfinished", "waiting", "not played"].filter(s => counts[s]).map(s => counts[s] + " " + s).join(" · ");
   const open = openTables.has(j.id) || (openByDefault && !openTables.has("closed:" + j.id));
-  return '<details data-table="' + esc(j.id) + '"' + (open ? " open" : "") + '><summary>Games: ' + summary + ' <span class="small">(click a game for its log)</span></summary><div class="tablewrap" data-scroll="' + esc(j.id) + '"><table><tr><th>Game</th><th>Status</th><th title="How long the game took, or has been running (~)">Time</th><th>Round</th><th title="Average real time per round">Per round</th>' +
+  return '<details data-table="' + esc(j.id) + '"' + (open ? " open" : "") + '><summary>Games: ' + summary + ' <span class="small">(click a game for its log)</span></summary><div class="tablewrap" data-scroll="' + esc(j.id) + '"><table><tr><th>Game</th><th>Status</th><th>Round</th>' +
     factions.map(f => '<th title="' + esc(f) + ' victory points">' + esc(f) + "</th>").join("") +
-    '<th title="CPU time of the game\'s thread">CPU</th><th title="Faction turns, and average AI thinking per turn">Turns / think</th></tr>' + body + "</table></div></details>";
+    '<th class="split" title="How long the game took, or has been running (~)">Time</th><th title="Average real time per round">Per round</th><th title="CPU time of the game\'s thread">CPU</th><th title="Faction turns, and average AI thinking per turn">Turns / think</th></tr>' + body + "</table></div></details>";
 }
 
 function argsBlock(j) {
